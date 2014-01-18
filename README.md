@@ -43,7 +43,9 @@ svn checkout https://github.com/Ezandora/Guide/branches/Release/
 </pre>
 
 Once it's installed, look in the relay browser. In the upper-right, there will be a "-run script-" menu:
+
 ![Instructions](https://raw.github.com/Ezandora/Guide/master/Images/Instructions.png)
+
 Select Guide. There will be a link to open it in a new window - click it.
 Then, leave the guide window open as you adventure. It'll update automatically.
 
