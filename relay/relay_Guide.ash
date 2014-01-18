@@ -1090,6 +1090,10 @@ boolean [item] lookupItems(string names) //CSV input
     return result;
 }
 
+skill lookupSkill(string name)
+{
+    return name.to_skill();
+}
 
 boolean monsterDropsItem(monster m, item it)
 {
@@ -7835,9 +7839,9 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
             else
             {
                 string shrap_suggestion = "Shrap is nice for this.";
-                if (!$skill[shrap].have_skill())
+                if (!lookupSkill("shrap").have_skill())
                 {
-                    if ($item[warbear metalworking primer (used)].available_amount() > 0)
+                    if (lookupItem("warbear metalworking primer (used)").available_amount() > 0)
                     {
                         shrap_suggestion += " (use your used copy of warbear metalworking primer)";
                     }
@@ -15466,7 +15470,7 @@ string [string] generateAPIResponse()
     else if (true)
     {
         int relevant_skill_count = 0;
-        foreach s in $skills[Gothy Handwave,Shrap]
+        foreach s in $skills[Gothy Handwave]
         {
             if (s.have_skill())
                 relevant_skill_count += 1;
