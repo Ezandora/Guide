@@ -1,7 +1,7 @@
 //This script and its support scripts are in the public domain.
 
 //These settings are for development. Don't worry about editing them.
-string __version = "1.0";
+string __version = "1.0.1";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -7716,10 +7716,31 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 }
 //merkinQuestPath
 
+Record StringHandle
+{
+    string s;
+};
+
 void QSeaInit()
 {
 	if (!__misc_state["In aftercore"])
 		return;
+    
+    //Have they adventured anywhere underwater?
+    boolean have_adventured_in_relevant_area = false;
+    foreach l in $locations[the briny deeps, the brinier deepers, the briniest deepests, an octopus's garden,the wreck of the edgar fitzsimmons, the mer-kin outpost, madness reef,the marinara trench, the dive bar,anemone mine, the coral corral, mer-kin elementary school,mer-kin library,mer-kin gymnasium,mer-kin colosseum,the caliginous abyss]
+    {
+        if (l.turnsAttemptedInLocation() > 0)
+        {
+            have_adventured_in_relevant_area = true;
+            break;
+        }
+    }
+    //don't list the quest unless they've started on the path under the sea:
+    if (!have_adventured_in_relevant_area && $items[Mer-kin trailmap,Mer-kin lockkey,Mer-kin stashbox,wriggling flytrap pellet,damp old boot,Grandma's Map,Grandma's Chartreuse Yarn,Grandma's Fuchsia Yarn,Grandma's Note].available_amount() == 0)
+        return;
+        
+    
 	//FIXME support mom
     if (true)
     {
@@ -7751,6 +7772,178 @@ void QSeaInit()
     }
 }
 
+void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name)
+{
+    string path = get_property("merkinQuestPath");
+    
+    boolean can_fight_dad_sea_monkee = $items[Goggles of Loathing,Stick-Knife of Loathing,Scepter of Loathing,Jeans of Loathing,Treads of Loathing,Belt of Loathing,Pocket Square of Loathing].items_missing().count() <= 1;
+    
+    boolean have_one_outfit = false;
+    if (can_fight_dad_sea_monkee)
+        have_one_outfit = true;
+    foreach outfit_name in $strings[Mer-kin Scholar's Vestments,Mer-kin Gladiatorial Gear,Crappy Mer-kin Disguise]
+    {
+        if (have_outfit_components(outfit_name))
+        {
+            have_one_outfit = true;
+            break;
+        }
+    }
+    
+    
+    if (!have_one_outfit)
+    {
+        subentry.entries.listAppend("Acquire crappy mer-kin disguise from grandma sea monkee.");
+        return;
+    }
+    
+    boolean at_boss = false;
+    boolean at_gladiator_boss = false;
+    boolean at_scholar_boss = false;
+    if (path == "gladiator")
+    {
+        image_name.s = "Shub-Jigguwatt";
+        at_gladiator_boss = true;
+    }
+    else if (path == "scholar")
+    {
+        image_name.s = "Yog-Urt";
+        at_scholar_boss = true;
+    }
+    at_boss = at_gladiator_boss || at_scholar_boss;
+    
+    if (!at_boss || at_gladiator_boss)
+    {
+        string [int] description;
+        string [int] modifiers;
+        //gladiator:
+        if (at_gladiator_boss)
+        {
+            description.listAppend("Buff muscle, equip a powerful weapon.");
+            description.listAppend("Delevel him with crayon shavings for a bit, then attack with your weapon.");
+            description.listAppend("Make sure not to have anything along that will attack him. (saucespheres, familiars, hand in glove, etc)");
+            if (my_mp() > 0)
+                description.listAppend("Try to reduce your MP to 0 before fighting him.");
+        }
+        else
+        {
+            if (!have_outfit_components("Mer-kin Gladiatorial Gear"))
+            {
+                description.listAppend("Acquire gladiatorial outfit.|Components can be found by running +combat in the gymnasium.");
+                modifiers.listAppend("+combat");
+            }
+            else
+            {
+                string shrap_suggestion = "Shrap is nice for this.";
+                if (!$skill[shrap].have_skill())
+                {
+                    if ($item[warbear metalworking primer (used)].available_amount() > 0)
+                    {
+                        shrap_suggestion += " (use your used copy of warbear metalworking primer)";
+                    }
+                    else
+                        shrap_suggestion += " (from warbear metalworking primer)";
+                }
+                modifiers.listAppend("spell damage percent");
+                modifiers.listAppend("mysticality");
+                description.listAppend("Fight in the colosseum!");
+                description.listAppend("Easy way is to buff mysticality and spell damage percent, then cast powerful spells.|" + shrap_suggestion);
+                description.listAppend("There's another way, but it's a bit complicated. Check the wiki?");
+            }
+        }
+        string modifier_string = "";
+        if (modifiers.count() > 0)
+            modifier_string = ChecklistGenerateModifierSpan(modifiers);
+        if (description.count() > 0)
+            subentry.entries.listAppend("Gladiator path" +  HTMLGenerateIndentedText(modifier_string + description.listJoinComponents("<hr>")));
+    }
+    if (!at_boss || at_scholar_boss)
+    {
+        string [int] description;
+        string [int] modifiers;
+        //scholar:
+        if (at_scholar_boss)
+        {
+            description.listAppend("Wear several mer-kin prayerbeads and possibly a mer-kin gutgirdle.");
+            description.listAppend("Avoid wearing any +hp gear or buffs. Ideally, you want low HP.");
+            description.listAppend("Each round, use a different healing item, until you lose the Suckrament effect.|After that, your stats are restored. Fully heal, then attack!");
+            string [int] potential_healers = split_string_mutable("mer-kin healscroll (full HP),scented massage oil (full HP),soggy used band-aid (full HP),extra-strength red potion (+200 HP),red pixel potion (+100-120 HP),red potion (+100 HP),filthy poultice (+80-120 HP),gauze garter (+80-120 HP),green pixel potion (+40-60 HP),cartoon heart (40-60 HP),red plastic oyster egg (+35-40 HP)", ","); //thank you, wiki
+            description.listAppend("Potential healing items:|*" + potential_healers.listJoinComponents("|*"));
+        }
+        else
+        {
+            if (!have_outfit_components("Mer-kin Scholar's Vestments"))
+            {
+                description.listAppend("Acquire scholar outfit.|Components can be found by running -combat in the elementary school.");
+                modifiers.listAppend("-combat");
+            }
+            else
+            {
+                if ($item[Mer-kin dreadscroll].available_amount() == 0)
+                {
+                    description.listAppend("Adventure in the library. Find the dreadscroll.");
+                    modifiers.listAppend("-combat");
+                }
+                else
+                {
+                    description.listAppend("Solve the dreadscroll.");
+                    description.listAppend("Clues are from:|*Three non-combats in the library. (vocabulary)|*Use a mer-kin killscroll in combat. (vocabulary)|*Use a mer-kin healscroll in combat. (vocabulary)|*Use a mer-kin knucklebone.|*Cast deep dark visions.|*Eat sushi with mer-kin worktea.");
+                }
+            }
+        }
+        string modifier_string = "";
+        if (modifiers.count() > 0)
+            modifier_string = ChecklistGenerateModifierSpan(modifiers);
+        if (description.count() > 0)
+            subentry.entries.listAppend("Scholar path" +  HTMLGenerateIndentedText(modifier_string + description.listJoinComponents("<hr>")));
+    }
+    if (!at_boss && can_fight_dad_sea_monkee)
+    {
+        string [int] description;
+        
+        description.listAppend("Equip Clothing of Loathing, go to the temple.");
+        description.listAppend("Fling 120MP hobopolis spells at him.");
+        description.listAppend("Use Mafia's \"dad\" GCLI command to see which element to use.");
+        if (my_mp() < 1200)
+            description.listAppend("Will need 1200MP, or less if using shrap/volcanometeor showeruption.");
+        
+        if (description.count() > 0)
+            subentry.entries.listAppend("Dad sea monkee path" + HTMLGenerateIndentedText(description.listJoinComponents("<hr>")));
+    }
+    
+    item [class] class_to_scholar_item;
+    item [class] class_to_gladiator_item;
+    
+    class_to_scholar_item[$class[seal clubber]] = $item[Cold Stone of Hatred];
+    class_to_scholar_item[$class[turtle tamer]] = $item[Girdle of Hatred];
+    class_to_scholar_item[$class[pastamancer]] = $item[Staff of Simmering Hatred];
+    class_to_scholar_item[$class[sauceror]] = $item[Pantaloons of Hatred];
+    class_to_scholar_item[$class[disco bandit]] = $item[Fuzzy Slippers of Hatred];
+    class_to_scholar_item[$class[accordion thief]] = $item[Lens of Hatred];
+    
+    class_to_gladiator_item[$class[seal clubber]] = $item[Ass-Stompers of Violence];
+    class_to_gladiator_item[$class[turtle tamer]] = $item[Brand of Violence];
+    class_to_gladiator_item[$class[pastamancer]] = $item[Novelty Belt Buckle of Violence];
+    class_to_gladiator_item[$class[sauceror]] = $item[Lens of Violence];
+    class_to_gladiator_item[$class[disco bandit]] = $item[Pigsticker of Violence];
+    class_to_gladiator_item[$class[accordion thief]] = $item[Jodhpurs of Violence];
+    
+    item scholar_item = class_to_scholar_item[my_class()];
+    item gladiator_item = class_to_gladiator_item[my_class()];
+    
+    if (!at_boss)
+    {
+        string line = "Can acquire " + scholar_item + " (scholar) or " + gladiator_item + " (gladiator)";
+        if (can_fight_dad_sea_monkee)
+            line += " or " + $item[pocket square of loathing] + " (dad)";
+        subentry.entries.listAppend(line);
+    }
+    else if (at_gladiator_boss)
+        subentry.entries.listAppend("Will acquire " + gladiator_item + ".");
+    else if (at_scholar_boss)
+        subentry.entries.listAppend("Will acquire " + scholar_item + ".");
+}
+
 //Hmm. Possibly show taffy in resources, if they're under the sea?
 
 void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -7772,18 +7965,18 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 	string url = "seafloor.php";
     boolean need_minus_combat_modifier = false;
 	
-	//the entire sea quest is super complicated
-    //FIXME implement the other half of this
+    
+    if ($effect[fishy].have_effect() == 0)
+    {
+        string line = "Acquire fishy.|*Easy way: Semi-rare in the brinier deeps, 50 turns.";
+        if ($item[fishy pipe].available_amount() > 0 && !get_property_boolean("_fishyPipeUsed"))
+            line += "|*Use fishy pipe.";
+        subentry.entries.listAppend(line);
+    }
+        
 	if (!temple_quest_state.finished)
 	{
-        if ($effect[fishy].have_effect() == 0)
-        {
-            string line = "Acquire fishy.|*Easy way: Semi-rare in the brinier deeps, 50 turns.";
-            if ($item[fishy pipe].available_amount() > 0 && !get_property_boolean("_fishyPipeUsed"))
-                line += "|*Use fishy pipe.";
-            subentry.entries.listAppend(line);
-        }
-		if (get_property("seahorseName") == "")
+		if (get_property("seahorseName").length() == 0)
 		{
             boolean professional_roper = false;
             //merkinLockkeyMonster questS01OldGuy questS02Monkees
@@ -7930,11 +8123,11 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
             {
                 //Octopus's garden, obtain wriggling flytrap pellet
                 if ($item[wriggling flytrap pellet].available_amount() == 0)
-                    subentry.entries.listAppend("Adventure in octopus's garden, find a wriggling flytrap pellet.");
+                    subentry.entries.listAppend("Adventure in octopus's garden, find a wriggling flytrap pellet.|Or talk to little brother if you've done that already.");
                 else
                 {
                     url = "inventory.php?which=3";
-                    subentry.entries.listAppend("Open your wriggling flytrap pellet, talk to little brother.");
+                    subentry.entries.listAppend("Open a wriggling flytrap pellet, talk to little brother.");
                 }
             }
             
@@ -7943,78 +8136,11 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 		else
 		{
             url = "seafloor.php?action=currents";
-            string path = get_property("merkinQuestPath");
-            //merkinQuestPath merkinVocabularyMastery
-			int loathing_completion = 0;
-			foreach it in $items[Goggles of Loathing,Stick-Knife of Loathing,Scepter of Loathing,Jeans of Loathing,Treads of Loathing,Belt of Loathing,Pocket Square of Loathing]
-				loathing_completion += MIN(1, it.available_amount());
-			boolean can_fight_dad_sea_monkee = (loathing_completion >= 6);
-			if (can_fight_dad_sea_monkee)
-				image_name = "dad sea monkee";
-            if (path == "gladiator")
-            {
-                subentry.entries.listAppend("Fight Shub-Jigguwatt.");
-                image_name = "Shub-Jigguwatt";
-            }
-            else if (path == "scholar")
-            {
-                subentry.entries.listAppend("Fight Yog-Urt.");
-                image_name = "Yog-Urt";
-            }
-			else
-            {
-                string [int] available_bosses = split_string_mutable("Shub-Jigguwatt,Yog-Urt", ",");
-                if (can_fight_dad_sea_monkee)
-                    available_bosses.listAppend("Dad Sea Monkee");
-                subentry.entries.listAppend("Fight a temple boss.|*Either " + available_bosses.listJoinComponents(", ", "or"));
-            }
-            
-            //Suggest acquiring a disguise if they lack it.
-            //Suggest acquiring an outfit if they have none of the three.
-            //Then details for each side. so complicated
-            
-            item [class] class_to_scholar_item;
-            item [class] class_to_gladiator_item;
-            
-            class_to_scholar_item[$class[seal clubber]] = $item[Cold Stone of Hatred];
-            class_to_scholar_item[$class[turtle tamer]] = $item[Girdle of Hatred];
-            class_to_scholar_item[$class[pastamancer]] = $item[Staff of Simmering Hatred];
-            class_to_scholar_item[$class[sauceror]] = $item[Pantaloons of Hatred];
-            class_to_scholar_item[$class[disco bandit]] = $item[Fuzzy Slippers of Hatred];
-            class_to_scholar_item[$class[accordion thief]] = $item[Lens of Hatred];
-            
-            class_to_gladiator_item[$class[seal clubber]] = $item[Ass-Stompers of Violence];
-            class_to_gladiator_item[$class[turtle tamer]] = $item[Brand of Violence];
-            class_to_gladiator_item[$class[pastamancer]] = $item[Novelty Belt Buckle of Violence];
-            class_to_gladiator_item[$class[sauceror]] = $item[Lens of Violence];
-            class_to_gladiator_item[$class[disco bandit]] = $item[Pigsticker of Violence];
-            class_to_gladiator_item[$class[accordion thief]] = $item[Jodhpurs of Violence];
-            
-            item scholar_item = class_to_scholar_item[my_class()];
-            item gladiator_item = class_to_gladiator_item[my_class()];
-            
-            if (path.length() == 0 || path == "none")
-            {
-                string line = "Can acquire " + scholar_item + " (scholar) or " + gladiator_item + " (gladiator)";
-                if (can_fight_dad_sea_monkee)
-                    line += " or " + $item[pocket square of loathing] + " (dad)";
-                subentry.entries.listAppend(line);
-            }
-            else if (path == "gladiator")
-                subentry.entries.listAppend("Will acquire " + gladiator_item + ".");
-            else if (path == "scholar")
-                subentry.entries.listAppend("Will acquire " + scholar_item + ".");
-            
-            //FIXME suggest per-side suggestions
-            if (true)
-            {
-                //gladiator:
-            }
-            if (true)
-            {
-                //scholar:
-            }
-		}
+            StringHandle image_name_handle;
+            image_name_handle.s = image_name;
+            QSeaGenerateTempleEntry(subentry, image_name_handle);
+            image_name = image_name_handle.s;
+        }
 	}
             
     if ($item[damp old boot].available_amount() > 0)
@@ -15340,7 +15466,7 @@ string [string] generateAPIResponse()
     else if (true)
     {
         int relevant_skill_count = 0;
-        foreach s in $skills[Gothy Handwave]
+        foreach s in $skills[Gothy Handwave,Shrap]
         {
             if (s.have_skill())
                 relevant_skill_count += 1;
