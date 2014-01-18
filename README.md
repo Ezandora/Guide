@@ -13,6 +13,7 @@ Example UI:
 
 
 Many quests are supported:
+
 ![Quest Example 1](https://raw.github.com/Ezandora/Guide/master/Images/Quest%20Example%201.png)
 ![Quest Example 2](https://raw.github.com/Ezandora/Guide/master/Images/Quest%20Example%202.png)
 
@@ -23,9 +24,11 @@ The script will inform you of many resources you have - free runaways, hipster f
 There is preliminary support for the florist friar and what to pull.
 
 It also works in aftercore:
+
 [![Aftercore](https://raw.github.com/Ezandora/Guide/master/Images/Aftercore%20Small.png)](https://raw.github.com/Ezandora/Guide/master/Images/Aftercore.png)
 
 In-run screenshots:
+
 [![No IOTM character](https://raw.github.com/Ezandora/Guide/master/Images/No%20IOTM%20character%20Small.png)](https://raw.github.com/Ezandora/Guide/master/Images/No%20IOTM%20character.png)
 [![BIG Day 2 end](https://raw.github.com/Ezandora/Guide/master/Images/BIG%20Day%202%20End%20Small.png)](https://raw.github.com/Ezandora/Guide/master/Images/BIG%20Day%202%20End.png)
 
