@@ -5196,6 +5196,8 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 }
 void QLevel11Init()
 {
+    if (!__misc_state["In run"])
+        return;
 	//questL11MacGuffin, questL11Manor, questL11Palindome, questL11Pyramid, questL11Worship
 	//hiddenApartmentProgress, hiddenBowlingAlleyProgress, hiddenHospitalProgress, hiddenOfficeProgress, hiddenTavernUnlock
 	//relocatePygmyJanitor, relocatePygmyLawyer
