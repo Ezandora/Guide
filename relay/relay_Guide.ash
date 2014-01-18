@@ -1,7 +1,7 @@
 //This script and its support scripts are in the public domain.
 
 //These settings are for development. Don't worry about editing them.
-string __version = "1.0a1";
+string __version = "1.0a2";
 
 //Debugging:
 boolean __setting_debug_mode = false;
