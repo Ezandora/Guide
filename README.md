@@ -1,6 +1,27 @@
 Guide.ash
 =========
 
+How do I use it?
+----------------
+First, install it by running this command in KoLmafia's graphical CLI:
+
+<pre>
+svn checkout https://github.com/Ezandora/Guide/branches/Release/
+</pre>
+
+Once it's installed, look in the relay browser. In the upper-right, there will be a "-run script-" menu:
+
+![Instructions](https://raw.github.com/Ezandora/Guide/master/Images/Instructions.png)
+
+Select Guide. There will be a link to open it in a new window - click it.
+Then, leave the guide window open as you adventure. It'll update automatically.
+
+To update the script itself, run this command in the graphical CLI:
+
+<pre>
+svn update
+</pre>
+
 What does it do?
 ----------------
 Guide.ash is a relay script which will give advice on playing the web game [Kingdom of Loathing](http://www.kingdomofloathing.com) within [KoLmafia, a third-party tool](http://kolmafia.sourceforge.net).
@@ -28,27 +49,6 @@ Screenshots:
 [![BIG Day 2 end](https://raw.github.com/Ezandora/Guide/master/Images/BIG%20Day%202%20End%20Small.png)](https://raw.github.com/Ezandora/Guide/master/Images/BIG%20Day%202%20End.png)
 
 Quests supported: All council quests, azazel, pretentious artist, untinker, legendary beat, most of the sea, unlocking the manor, the nemesis quest, pirate quest, repairing the shield generator in outer space, white citadel, the old level 9 quest, and the wizard of ego.
-
-How do I use it?
-----------------
-First, install it by running this command in KoLmafia's graphical CLI:
-
-<pre>
-svn checkout https://github.com/Ezandora/Guide/branches/Release/
-</pre>
-
-Once it's installed, look in the relay browser. In the upper-right, there will be a "-run script-" menu:
-
-![Instructions](https://raw.github.com/Ezandora/Guide/master/Images/Instructions.png)
-
-Select Guide. There will be a link to open it in a new window - click it.
-Then, leave the guide window open as you adventure. It'll update automatically.
-
-To update the script itself, run this command in the graphical CLI:
-
-<pre>
-svn update
-</pre>
 
 Development guidelines
 ---------------------
