@@ -7,11 +7,6 @@ Guide.ash is a relay script which will give advice on playing the web game [King
 During an ascension, it will tell you what you need to know to complete your ascension as quickly as possible.
 The script runs side-by-side with KOL. Leave the window open, and it'll update as you go along.
 
-Example UI:
-
-[![Window picture](https://raw.github.com/Ezandora/Guide/master/Images/Window%20picture%20Small.png)](https://raw.github.com/Ezandora/Guide/master/Images/Window%20picture.png)
-
-
 Many quests are supported:
 
 ![Quest Example 1](https://raw.github.com/Ezandora/Guide/master/Images/Quest%20Example%201.png)
@@ -23,8 +18,11 @@ Reminders are given for many complex tasks:
 The script will inform you of many resources you have - free runaways, hipster fights, semi-rares, etc. - and ideas on what to use them on.
 There is preliminary support for the florist friar and what to pull.
 
-It also works in aftercore. Screenshots:
+It also works in aftercore.
 
+Screenshots:
+
+[![Window picture](https://raw.github.com/Ezandora/Guide/master/Images/Window%20picture%20Small.png)](https://raw.github.com/Ezandora/Guide/master/Images/Window%20picture.png)
 [![Aftercore](https://raw.github.com/Ezandora/Guide/master/Images/Aftercore%20Small.png)](https://raw.github.com/Ezandora/Guide/master/Images/Aftercore.png)
 [![No IOTM character](https://raw.github.com/Ezandora/Guide/master/Images/No%20IOTM%20character%20Small.png)](https://raw.github.com/Ezandora/Guide/master/Images/No%20IOTM%20character.png)
 [![BIG Day 2 end](https://raw.github.com/Ezandora/Guide/master/Images/BIG%20Day%202%20End%20Small.png)](https://raw.github.com/Ezandora/Guide/master/Images/BIG%20Day%202%20End.png)
