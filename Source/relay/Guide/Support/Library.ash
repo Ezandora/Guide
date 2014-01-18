@@ -388,6 +388,10 @@ boolean [item] lookupItems(string names) //CSV input
     return result;
 }
 
+skill lookupSkill(string name)
+{
+    return name.to_skill();
+}
 
 boolean monsterDropsItem(monster m, item it)
 {

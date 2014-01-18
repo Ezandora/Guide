@@ -1,5 +1,7 @@
 void QLevel11Init()
 {
+    if (!__misc_state["In run"])
+        return;
 	//questL11MacGuffin, questL11Manor, questL11Palindome, questL11Pyramid, questL11Worship
 	//hiddenApartmentProgress, hiddenBowlingAlleyProgress, hiddenHospitalProgress, hiddenOfficeProgress, hiddenTavernUnlock
 	//relocatePygmyJanitor, relocatePygmyLawyer
@@ -1084,6 +1086,8 @@ void QLevel11HiddenTempleGenerateTasks(ChecklistEntry [int] task_entries, Checkl
 
 void QLevel11GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
+    if (!__misc_state["In run"])
+        return;
     //Such a complicated quest.
     QLevel11BaseGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     QLevel11ManorGenerateTasks(task_entries, optional_task_entries, future_task_entries);

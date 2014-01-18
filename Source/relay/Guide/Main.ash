@@ -718,7 +718,7 @@ string [string] generateAPIResponse()
     else if (true)
     {
         int relevant_skill_count = 0;
-        foreach s in $skills[Gothy Handwave,Shrap]
+        foreach s in $skills[Gothy Handwave]
         {
             if (s.have_skill())
                 relevant_skill_count += 1;
