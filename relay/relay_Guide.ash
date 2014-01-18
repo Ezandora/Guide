@@ -11068,12 +11068,12 @@ void SAftercoreGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         optional_task_entries.listAppend(ChecklistEntryMake("__item pagoda plans", url, ChecklistSubentryMake("Install a pagoda", "", details)));
     }
     
-    
-    if (knoll_available() && !have_mushroom_plot() && get_property("plantingScript") != "")
+    //Disabled - 16.2 errors.
+    /*if (knoll_available() && !have_mushroom_plot() && get_property("plantingScript") != "")
     {
         //They can plant a mushroom plot, and they have a planting script. But they haven't yet, so let's suggest it:
         optional_task_entries.listAppend(ChecklistEntryMake("__item knob mushroom", "knoll_mushrooms.php", ChecklistSubentryMake("Plant a mushroom plot", "", "Degrassi Knoll")));
-    }
+    }*/
 }
 void SLibramGenerateResource(ChecklistEntry [int] available_resources_entries)
 {
