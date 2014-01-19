@@ -36,6 +36,7 @@ Quest advice:
 ![Quest Example 2](https://raw.github.com/Ezandora/Guide/master/Images/Quest%20Example%202.png)
 
 Reminders:
+
 ![Reminders](https://raw.github.com/Ezandora/Guide/master/Images/Reminders.png)
 
 The script will inform you of many resources you have - free runaways, hipster fights, semi-rares, etc. - and ideas on what to use them on.
