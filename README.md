@@ -24,16 +24,16 @@ svn update
 
 What does it do?
 ----------------
-Guide.ash is a relay script which will give advice on playing the web game [Kingdom of Loathing](http://www.kingdomofloathing.com) within [KoLmafia, a third-party tool](http://kolmafia.sourceforge.net).
-During an ascension, it will tell you what you need to know to complete your ascension as quickly as possible.
+Guide.ash is a relay script which will give advice on playing the web game [Kingdom of Loathing](http://www.kingdomofloathing.com) within [KoLmafia, a third-party tool](http://kolmafia.sourceforge.net). It details how to complete quests you're on, and what resources you have available.
+During an ascension, it will tell you what you need to know to complete your ascension as quickly as possible. It will inform you of most tasks needed to reach the king - if you need to visit the daily dungeon, for example, it'll remind you.
 The script runs side-by-side with KOL. Leave the window open, and it'll update as you go along.
 
-Many quests are supported:
+Quest advice:
 
 ![Quest Example 1](https://raw.github.com/Ezandora/Guide/master/Images/Quest%20Example%201.png)
 ![Quest Example 2](https://raw.github.com/Ezandora/Guide/master/Images/Quest%20Example%202.png)
 
-Reminders are given for many complex tasks:
+Reminders:
 ![Reminders](https://raw.github.com/Ezandora/Guide/master/Images/Reminders.png)
 
 The script will inform you of many resources you have - free runaways, hipster fights, semi-rares, etc. - and ideas on what to use them on.
