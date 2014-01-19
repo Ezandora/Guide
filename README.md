@@ -1,4 +1,4 @@
-Guide.ash
+Guide
 =========
 
 How do I use it?
