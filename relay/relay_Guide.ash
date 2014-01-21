@@ -1,7 +1,7 @@
 //This script and its support scripts are in the public domain.
 
 //These settings are for development. Don't worry about editing them.
-string __version = "1.0.4";
+string __version = "1.0.5";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -3250,8 +3250,6 @@ boolean locationQuestPropertyPastInternalStepNumber(string quest_property, int n
 //Do not call - internal implementation detail.
 boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
 {
-    if (loc.turnsAttemptedInLocation() > 0) //FIXME make this finer-grained, this is hacky
-        return true;
 	string zone = loc.zone;
 	
 	if (zone == "KOL High School")
@@ -3334,6 +3332,8 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
 		default:
 			break;
 	}
+    if (loc.turnsAttemptedInLocation() > 0) //FIXME make this finer-grained, this is hacky
+        return true;
 	
 	ErrorSet(able_to_find, "");
 	return false;
@@ -5185,7 +5185,7 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 	else
 	{
         url = "place.php?whichplace=giantcastle";
-		if (locationAvailable($location[The Castle in the Clouds in the Sky (Top floor)]))
+		if ($location[The Castle in the Clouds in the Sky (Top floor)].locationAvailable())
 		{
 			subentry.modifiers.listAppend("-combat");
 			subentry.entries.listAppend("Top floor. Run -combat.");
@@ -5204,7 +5204,7 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             //There might be some internal mechanics to make it faster? Don't know.
 			image_name = "goggles? yes!";
 		}
-		else if (locationAvailable($location[The Castle in the Clouds in the Sky (Ground floor)]))
+		else if ($location[The Castle in the Clouds in the Sky (Ground floor)].locationAvailable())
 		{
 			subentry.entries.listAppend("Ground floor. Spend eleven turns here to unlock top floor.");
 			image_name = "castle stairs up";
@@ -6495,6 +6495,9 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 			details.listAppend(pluralize(turn_range.x, "turn", "turns") + " remaining");
 		else
 			details.listAppend("[" + turn_range.x + " to " + turn_range.y + "] turns remaining");
+            
+        if ($effect[Sinuses For Miles].have_effect() > 0 && get_property_int("lastTempleAdventures") != my_ascensions() && $item[stone wool].available_amount() > 0)
+            details.listAppend("Potentially use stone wool and visit the hidden temple to extend Sinuses for Miles for 3 turns.");
 	
 		optional_task_entries.listAppend(ChecklistEntryMake("Island War Nuns", "bigisland.php?place=nunnery", ChecklistSubentryMake("Island War Nuns Quest", "+meat", details), $locations[the themthar hills]));
 	}
@@ -13724,7 +13727,8 @@ void generatePullList(Checklist [int] checklists)
     if (__misc_state["In run"] && !__quest_state["Level 13"].state_boolean["past gates"] && ($items[large box, blessed large box].available_amount() == 0 && $items[bubbly potion,cloudy potion,dark potion,effervescent potion,fizzy potion,milky potion,murky potion,smoky potion,swirly potion].items_missing().count() > 0))
         pullable_item_list.listAppend(GPItemMake($item[large box], "Combine with clover for blessed large box", 1));
     
-	pullable_item_list.listAppend(GPItemMake($item[slimy alveolus], "40 turns of +50ML (" + floor(40 * 50 * __misc_state_float["ML to mainstat multiplier"]) +" mainstat total, cave bar levelling)|1 spleen", 3));
+    if (my_path() != "Class Act II: A Class For Pigs") //FIXME really think about this suggestion
+        pullable_item_list.listAppend(GPItemMake($item[slimy alveolus], "40 turns of +50ML (" + floor(40 * 50 * __misc_state_float["ML to mainstat multiplier"]) +" mainstat total, cave bar levelling)|1 spleen", 3));
 	
 	
 	pullable_item_list.listAppend(GPItemMake($item[bottle of blank-out], "run away from your problems|expensive"));
@@ -15262,6 +15266,39 @@ void generateTasks(Checklist [int] checklists)
             url = "inventory.php?which=3";
         
         task_entries.listAppend(ChecklistEntryMake("__item flaskfull of hollow", url, ChecklistSubentryMake("Drink " + $item[flaskfull of hollow], "", "Gives +25 smithsness"), -11));
+    }
+    
+    boolean have_spaghetti_breakfast = (($skill[spaghetti breakfast].have_skill() && !get_property_boolean("_spaghettiBreakfast")) || $item[spaghetti breakfast].available_amount() == 0);
+    if (__misc_state["In run"] && __misc_state["can eat just about anything"] && !get_property_boolean("_spaghettiBreakfastEaten") && my_fullness() == 0 && have_spaghetti_breakfast)
+    {
+    
+        string [int] adventure_gain;
+        adventure_gain[1] = "1";
+        adventure_gain[2] = "?1-2?";
+        adventure_gain[3] = "2";
+        adventure_gain[4] = "2-3";
+        adventure_gain[5] = "3";
+        adventure_gain[6] = "3-4";
+        adventure_gain[7] = "4";
+        adventure_gain[8] = "4-5";
+        adventure_gain[9] = "5";
+        adventure_gain[10] = "5-6";
+        adventure_gain[11] = "6";
+        
+        string adventures_gained = adventure_gain[MAX(1, MIN(11, my_level()))];
+        
+        string level_string = "";
+        if (my_level() < 11)
+            level_string = " Gain levels for more.";
+        string url = "inventory.php?which=1";
+        string [int] description;
+        description.listAppend("Inedible if you eat anything else.|" + adventures_gained + " adventures/fullness." + level_string);
+        if ($item[spaghetti breakfast].available_amount() == 0)
+        {
+            description.listAppend("Obtained by casting spaghetti breakfast.");
+            url = "skills.php";
+        }
+        optional_task_entries.listAppend(ChecklistEntryMake("__item spaghetti breakfast", url, ChecklistSubentryMake("Eat " + $item[spaghetti breakfast] + " first", "", description), 8));
     }
     
 	checklists.listAppend(ChecklistMake("Tasks", task_entries));
