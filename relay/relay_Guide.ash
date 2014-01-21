@@ -1,7 +1,7 @@
 //This script and its support scripts are in the public domain.
 
 //These settings are for development. Don't worry about editing them.
-string __version = "1.0.5";
+string __version = "1.0.6";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -1061,6 +1061,7 @@ int delayRemainingInLocation(location place)
     place_delays[$location[the haunted library]] = 5;
     place_delays[$location[the haunted billiards room]] = 5;
     place_delays[$location[the boss bat's lair]] = 4;
+    place_delays[$location[the oasis]] = 5;
     
     
     if (place_delays contains place)
@@ -5700,7 +5701,19 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
                 if ($item[stone rose].available_amount() > 0)
                     subentry.entries.listAppend("Give stone rose to Gnasir.");
                 else
-                    subentry.entries.listAppend("Potentially adventure in Oasis for stone rose.");
+                {
+                    string line = "Potentially adventure in Oasis for stone rose.";
+                    if (delayRemainingInLocation($location[the oasis]) > 0)
+                    {
+                        string hipster_text = "";
+                        if (__misc_state["have hipster"])
+                        {
+                            hipster_text = " (use " + __misc_state_string["hipster name"] + ")";
+                        }
+                        line += "|Delay for " + pluralize(delayRemainingInLocation($location[the oasis]), "turn", "turns") + hipster_text + ".";
+                    }
+                    subentry.entries.listAppend(line);
+                }
             }
             if (!base_quest_state.state_boolean["Manual Pages Given"])
             {
@@ -15268,7 +15281,7 @@ void generateTasks(Checklist [int] checklists)
         task_entries.listAppend(ChecklistEntryMake("__item flaskfull of hollow", url, ChecklistSubentryMake("Drink " + $item[flaskfull of hollow], "", "Gives +25 smithsness"), -11));
     }
     
-    boolean have_spaghetti_breakfast = (($skill[spaghetti breakfast].have_skill() && !get_property_boolean("_spaghettiBreakfast")) || $item[spaghetti breakfast].available_amount() == 0);
+    boolean have_spaghetti_breakfast = (($skill[spaghetti breakfast].have_skill() && !get_property_boolean("_spaghettiBreakfast")) || $item[spaghetti breakfast].available_amount() > 0);
     if (__misc_state["In run"] && __misc_state["can eat just about anything"] && !get_property_boolean("_spaghettiBreakfastEaten") && my_fullness() == 0 && have_spaghetti_breakfast)
     {
     
