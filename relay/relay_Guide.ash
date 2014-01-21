@@ -15298,7 +15298,7 @@ void generateTasks(Checklist [int] checklists)
             description.listAppend("Obtained by casting spaghetti breakfast.");
             url = "skills.php";
         }
-        optional_task_entries.listAppend(ChecklistEntryMake("__item spaghetti breakfast", url, ChecklistSubentryMake("Eat " + $item[spaghetti breakfast] + " first", "", description), -11));
+        optional_task_entries.listAppend(ChecklistEntryMake("__item spaghetti breakfast", url, ChecklistSubentryMake("Eat " + $item[spaghetti breakfast] + " first", "", description), 8));
     }
     
 	checklists.listAppend(ChecklistMake("Tasks", task_entries));
