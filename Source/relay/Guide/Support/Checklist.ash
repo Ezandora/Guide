@@ -63,15 +63,6 @@ ChecklistSubentry ChecklistSubentryMake(string header, string modifiers, string 
 		return ChecklistSubentryMake(header, listMake(modifiers), listMake(e1));
 }
 
-ChecklistSubentry ChecklistSubentryMake(string header, string modifiers, string e1, string e2)
-{
-	if (modifiers == "")
-		return ChecklistSubentryMake(header, listMakeBlankString(), listMake(e1, e2));
-	else
-		return ChecklistSubentryMake(header, listMake(modifiers), listMake(e1, e2));
-}
-
-
 ChecklistSubentry ChecklistSubentryMake(string header)
 {
 	return ChecklistSubentryMake(header, "", "");

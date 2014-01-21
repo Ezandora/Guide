@@ -17,16 +17,16 @@ void generateMissingItems(Checklist [int] checklists)
 		subentries[subentries.count()] = ChecklistSubentryMake("Wand of Nagamar", "", "");
 		
 		if (__misc_state_int["ruby w needed"] > 0)
-			subentries[subentries.count()] = ChecklistSubentryMake("ruby W", "Clover or +234% item", "Clover the castle basement", "W Imp - Dark Neck of the Woods/Pandamonium Slums - 30% drop");
+			subentries[subentries.count()] = ChecklistSubentryMake("ruby W", "Clover or +234% item", listMake("Clover the castle basement", "W Imp - Dark Neck of the Woods/Pandamonium Slums - 30% drop"));
 		if (__misc_state_int["metallic a needed"] > 0)
-			subentries[subentries.count()] = ChecklistSubentryMake("metallic A", "Clover or +234% item", "Clover the castle basement", "MagiMechTech MechaMech - Penultimate Fantasy Airship - 30% drop");
+			subentries[subentries.count()] = ChecklistSubentryMake("metallic A", "Clover or +234% item", listMake("Clover the castle basement", "MagiMechTech MechaMech - Penultimate Fantasy Airship - 30% drop"));
 		if (__misc_state_int["lowercase n needed"] > 0 && __misc_state_int["lowercase n available"] == 0)
 		{
 			string name = "lowercase N";
-			subentries[subentries.count()] = ChecklistSubentryMake(name, "Clover or +234% item", "Clover the castle basement", "XXX pr0n - Valley of Rof L'm Fao - 30% drop");
+			subentries[subentries.count()] = ChecklistSubentryMake(name, "Clover or +234% item", listMake("Clover the castle basement", "XXX pr0n - Valley of Rof L'm Fao - 30% drop"));
 		}
 		if (__misc_state_int["heavy d needed"] > 0)
-			subentries[subentries.count()] = ChecklistSubentryMake("heavy D", "Clover or +150% item", "Clover the castle basement", "Alphabet Giant - Castle Basement - 40% drop");
+			subentries[subentries.count()] = ChecklistSubentryMake("heavy D", "Clover or +150% item", listMake("Clover the castle basement", "Alphabet Giant - Castle Basement - 40% drop"));
 			
 		ChecklistEntry entry = ChecklistEntryMake("__item wand of nagamar", "", subentries);
 		entry.should_indent_after_first_subentry = true;
