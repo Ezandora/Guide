@@ -1,7 +1,7 @@
 //This script and its support scripts are in the public domain.
 
 //These settings are for development. Don't worry about editing them.
-string __version = "1.0.2";
+string __version = "1.0.3";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -2733,15 +2733,6 @@ ChecklistSubentry ChecklistSubentryMake(string header, string modifiers, string 
 	else
 		return ChecklistSubentryMake(header, listMake(modifiers), listMake(e1));
 }
-
-ChecklistSubentry ChecklistSubentryMake(string header, string modifiers, string e1, string e2)
-{
-	if (modifiers == "")
-		return ChecklistSubentryMake(header, listMakeBlankString(), listMake(e1, e2));
-	else
-		return ChecklistSubentryMake(header, listMake(modifiers), listMake(e1, e2));
-}
-
 
 ChecklistSubentry ChecklistSubentryMake(string header)
 {
@@ -14641,16 +14632,16 @@ void generateMissingItems(Checklist [int] checklists)
 		subentries[subentries.count()] = ChecklistSubentryMake("Wand of Nagamar", "", "");
 		
 		if (__misc_state_int["ruby w needed"] > 0)
-			subentries[subentries.count()] = ChecklistSubentryMake("ruby W", "Clover or +234% item", "Clover the castle basement", "W Imp - Dark Neck of the Woods/Pandamonium Slums - 30% drop");
+			subentries[subentries.count()] = ChecklistSubentryMake("ruby W", "Clover or +234% item", listMake("Clover the castle basement", "W Imp - Dark Neck of the Woods/Pandamonium Slums - 30% drop"));
 		if (__misc_state_int["metallic a needed"] > 0)
-			subentries[subentries.count()] = ChecklistSubentryMake("metallic A", "Clover or +234% item", "Clover the castle basement", "MagiMechTech MechaMech - Penultimate Fantasy Airship - 30% drop");
+			subentries[subentries.count()] = ChecklistSubentryMake("metallic A", "Clover or +234% item", listMake("Clover the castle basement", "MagiMechTech MechaMech - Penultimate Fantasy Airship - 30% drop"));
 		if (__misc_state_int["lowercase n needed"] > 0 && __misc_state_int["lowercase n available"] == 0)
 		{
 			string name = "lowercase N";
-			subentries[subentries.count()] = ChecklistSubentryMake(name, "Clover or +234% item", "Clover the castle basement", "XXX pr0n - Valley of Rof L'm Fao - 30% drop");
+			subentries[subentries.count()] = ChecklistSubentryMake(name, "Clover or +234% item", listMake("Clover the castle basement", "XXX pr0n - Valley of Rof L'm Fao - 30% drop"));
 		}
 		if (__misc_state_int["heavy d needed"] > 0)
-			subentries[subentries.count()] = ChecklistSubentryMake("heavy D", "Clover or +150% item", "Clover the castle basement", "Alphabet Giant - Castle Basement - 40% drop");
+			subentries[subentries.count()] = ChecklistSubentryMake("heavy D", "Clover or +150% item", listMake("Clover the castle basement", "Alphabet Giant - Castle Basement - 40% drop"));
 			
 		ChecklistEntry entry = ChecklistEntryMake("__item wand of nagamar", "", subentries);
 		entry.should_indent_after_first_subentry = true;
@@ -15145,7 +15136,7 @@ void generateTasks(Checklist [int] checklists)
 		{
 			description.listAppend("Otherwise, wait for level 9.");
 		}
-		optional_task_entries.listAppend(ChecklistEntryMake("__item filthy knitted dread sack", "island.php", ChecklistSubentryMake("Acquire a filthy hippy disguise", modifiers, description, $locations[hippy camp])));
+		optional_task_entries.listAppend(ChecklistEntryMake("__item filthy knitted dread sack", "island.php", ChecklistSubentryMake("Acquire a filthy hippy disguise", modifiers, description), $locations[hippy camp]));
 	}
 	if (!have_outfit_components("Frat boy ensemble") && __misc_state["mysterious island available"] && __misc_state["In run"] && !__quest_state["Level 12"].finished && !__quest_state["Level 12"].started && $location[frat house].turnsAttemptedInLocation() > 0)
     {
