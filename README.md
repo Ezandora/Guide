@@ -49,7 +49,7 @@ Screenshots:
 [![No IOTM character](https://raw.github.com/Ezandora/Guide/master/Images/No%20IOTM%20character%20Small.png)](https://raw.github.com/Ezandora/Guide/master/Images/No%20IOTM%20character.png)
 [![BIG Day 2 end](https://raw.github.com/Ezandora/Guide/master/Images/BIG%20Day%202%20End%20Small.png)](https://raw.github.com/Ezandora/Guide/master/Images/BIG%20Day%202%20End.png)
 
-Quests supported: All council quests, azazel, pretentious artist, untinker, legendary beat, most of the sea, unlocking the manor, the nemesis quest, pirate quest, repairing the shield generator in outer space, white citadel, the old level 9 quest, and the wizard of ego.
+Quests supported: All council quests, azazel, pretentious artist, untinker, legendary beat, most of the sea, unlocking the manor, the nemesis quest, pirate quest, repairing the shield generator in outer space, white citadel, the old level 9 quest, jung man's psychoses jars, and the wizard of ego.
 
 Development guidelines
 ---------------------
