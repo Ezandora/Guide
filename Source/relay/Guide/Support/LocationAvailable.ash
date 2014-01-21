@@ -18,8 +18,6 @@ boolean locationQuestPropertyPastInternalStepNumber(string quest_property, int n
 //Do not call - internal implementation detail.
 boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
 {
-    if (loc.turnsAttemptedInLocation() > 0) //FIXME make this finer-grained, this is hacky
-        return true;
 	string zone = loc.zone;
 	
 	if (zone == "KOL High School")
@@ -102,6 +100,8 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
 		default:
 			break;
 	}
+    if (loc.turnsAttemptedInLocation() > 0) //FIXME make this finer-grained, this is hacky
+        return true;
 	
 	ErrorSet(able_to_find, "");
 	return false;

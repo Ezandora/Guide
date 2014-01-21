@@ -89,7 +89,7 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 	else
 	{
         url = "place.php?whichplace=giantcastle";
-		if (locationAvailable($location[The Castle in the Clouds in the Sky (Top floor)]))
+		if ($location[The Castle in the Clouds in the Sky (Top floor)].locationAvailable())
 		{
 			subentry.modifiers.listAppend("-combat");
 			subentry.entries.listAppend("Top floor. Run -combat.");
@@ -108,7 +108,7 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             //There might be some internal mechanics to make it faster? Don't know.
 			image_name = "goggles? yes!";
 		}
-		else if (locationAvailable($location[The Castle in the Clouds in the Sky (Ground floor)]))
+		else if ($location[The Castle in the Clouds in the Sky (Ground floor)].locationAvailable())
 		{
 			subentry.entries.listAppend("Ground floor. Spend eleven turns here to unlock top floor.");
 			image_name = "castle stairs up";

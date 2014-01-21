@@ -168,7 +168,8 @@ void generatePullList(Checklist [int] checklists)
     if (__misc_state["In run"] && !__quest_state["Level 13"].state_boolean["past gates"] && ($items[large box, blessed large box].available_amount() == 0 && $items[bubbly potion,cloudy potion,dark potion,effervescent potion,fizzy potion,milky potion,murky potion,smoky potion,swirly potion].items_missing().count() > 0))
         pullable_item_list.listAppend(GPItemMake($item[large box], "Combine with clover for blessed large box", 1));
     
-	pullable_item_list.listAppend(GPItemMake($item[slimy alveolus], "40 turns of +50ML (" + floor(40 * 50 * __misc_state_float["ML to mainstat multiplier"]) +" mainstat total, cave bar levelling)|1 spleen", 3));
+    if (my_path() != "Class Act II: A Class For Pigs") //FIXME really think about this suggestion
+        pullable_item_list.listAppend(GPItemMake($item[slimy alveolus], "40 turns of +50ML (" + floor(40 * 50 * __misc_state_float["ML to mainstat multiplier"]) +" mainstat total, cave bar levelling)|1 spleen", 3));
 	
 	
 	pullable_item_list.listAppend(GPItemMake($item[bottle of blank-out], "run away from your problems|expensive"));

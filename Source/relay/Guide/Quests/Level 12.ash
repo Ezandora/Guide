@@ -136,6 +136,9 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 			details.listAppend(pluralize(turn_range.x, "turn", "turns") + " remaining");
 		else
 			details.listAppend("[" + turn_range.x + " to " + turn_range.y + "] turns remaining");
+            
+        if ($effect[Sinuses For Miles].have_effect() > 0 && get_property_int("lastTempleAdventures") != my_ascensions() && $item[stone wool].available_amount() > 0)
+            details.listAppend("Potentially use stone wool and visit the hidden temple to extend Sinuses for Miles for 3 turns.");
 	
 		optional_task_entries.listAppend(ChecklistEntryMake("Island War Nuns", "bigisland.php?place=nunnery", ChecklistSubentryMake("Island War Nuns Quest", "+meat", details), $locations[the themthar hills]));
 	}

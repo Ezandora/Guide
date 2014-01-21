@@ -367,6 +367,39 @@ void generateTasks(Checklist [int] checklists)
         task_entries.listAppend(ChecklistEntryMake("__item flaskfull of hollow", url, ChecklistSubentryMake("Drink " + $item[flaskfull of hollow], "", "Gives +25 smithsness"), -11));
     }
     
+    boolean have_spaghetti_breakfast = (($skill[spaghetti breakfast].have_skill() && !get_property_boolean("_spaghettiBreakfast")) || $item[spaghetti breakfast].available_amount() == 0);
+    if (__misc_state["In run"] && __misc_state["can eat just about anything"] && !get_property_boolean("_spaghettiBreakfastEaten") && my_fullness() == 0 && have_spaghetti_breakfast)
+    {
+    
+        string [int] adventure_gain;
+        adventure_gain[1] = "1";
+        adventure_gain[2] = "?1-2?";
+        adventure_gain[3] = "2";
+        adventure_gain[4] = "2-3";
+        adventure_gain[5] = "3";
+        adventure_gain[6] = "3-4";
+        adventure_gain[7] = "4";
+        adventure_gain[8] = "4-5";
+        adventure_gain[9] = "5";
+        adventure_gain[10] = "5-6";
+        adventure_gain[11] = "6";
+        
+        string adventures_gained = adventure_gain[MAX(1, MIN(11, my_level()))];
+        
+        string level_string = "";
+        if (my_level() < 11)
+            level_string = " Gain levels for more.";
+        string url = "inventory.php?which=1";
+        string [int] description;
+        description.listAppend("Inedible if you eat anything else.|" + adventures_gained + " adventures/fullness." + level_string);
+        if ($item[spaghetti breakfast].available_amount() == 0)
+        {
+            description.listAppend("Obtained by casting spaghetti breakfast.");
+            url = "skills.php";
+        }
+        optional_task_entries.listAppend(ChecklistEntryMake("__item spaghetti breakfast", url, ChecklistSubentryMake("Eat " + $item[spaghetti breakfast] + " first", "", description), 8));
+    }
+    
 	checklists.listAppend(ChecklistMake("Tasks", task_entries));
 	checklists.listAppend(ChecklistMake("Optional Tasks", optional_task_entries));
 	checklists.listAppend(ChecklistMake("Future Tasks", future_task_entries));
