@@ -295,8 +295,16 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
     {
         //1 -> find palindome
         url = "place.php?whichplace=cove";
-        subentry.entries.listAppend("Find the palindome.");
-        subentry.entries.listAppend("The pirates will know the way.");
+        subentry.entries.listAppend("Find the palindome. The pirates will know the way.");
+        
+        string line = "Run -combat to unlock belowdecks.|Then olfact gaudy pirate belowdecks";
+        if (!__quest_state["Level 13"].state_boolean["have relevant guitar"])
+            line += ", and possibly run +400% item to find a guitar";
+        line += ".";
+        subentry.entries.listAppend(line);
+        if ($item[gaudy key].available_amount() > 0)
+            subentry.entries.listAppend("Use " + $item[gaudy key].pluralize() + ".");
+            
     }
     else if (base_quest_state.mafia_internal_step == 2 || ($item[talisman o' nam].available_amount() > 0 && base_quest_state.mafia_internal_step == 1))
     {

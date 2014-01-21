@@ -118,6 +118,16 @@ int available_amount(item [int] items)
     return count;
 }
 
+int equipped_amount(boolean [item] items)
+{
+    int count = 0;
+    foreach it in items
+    {
+        count += it.equipped_amount();
+    }
+    return count;
+}
+
 int [item] creatable_items(boolean [item] items)
 {
     int [item] creatable_items;
@@ -218,7 +228,6 @@ boolean stringHasPrefix(string s, string prefix)
 		return true;
 	return false;
 }
-
 string capitalizeFirstLetter(string v)
 {
 	buffer buf = v.to_buffer();
@@ -228,24 +237,45 @@ string capitalizeFirstLetter(string v)
 	return buf.to_string();
 }
 
-item [int] missingComponentsToMakeItem(item it)
+
+
+item [int] missingComponentsToMakeItemPrivateImplementation(item it, int it_amounted_needed, int recursion_limit_remaining)
 {
 	item [int] result;
-	if (creatable_amount(it) > 0)
-    return result;
+    if (recursion_limit_remaining <= 0) //possible loop
+        return result;
+	if (it.available_amount() >= it_amounted_needed)
+        return result;
 	int [item] ingredients = get_ingredients(it);
 	if (ingredients.count() == 0)
-    result.listAppend(it);
+    {
+        for i from 1 to (it_amounted_needed - it.available_amount())
+            result.listAppend(it);
+    }
 	foreach ingredient in ingredients
 	{
-		int amounted_needed = ingredients[ingredient];
-		if (creatable_amount(ingredient) + ingredient.available_amount() >= amounted_needed) //have enough
-        continue;
+		int ingredient_amounted_needed = ingredients[ingredient];
+		if (ingredient.available_amount() >= ingredient_amounted_needed) //have enough
+            continue;
 		//split:
-		item [int] r = missingComponentsToMakeItem(ingredient);
-		result.listAppendList(r);
+		item [int] r = missingComponentsToMakeItemPrivateImplementation(ingredient, ingredient_amounted_needed, recursion_limit_remaining - 1);
+        if (r.count() > 0)
+        {
+            result.listAppendList(r);
+        }
 	}
 	return result;
+}
+
+item [int] missingComponentsToMakeItem(item it, int it_amounted_needed)
+{
+    return missingComponentsToMakeItemPrivateImplementation(it, it_amounted_needed, 30);
+}
+
+
+item [int] missingComponentsToMakeItem(item it)
+{
+    return missingComponentsToMakeItem(it, 1);
 }
 
 //For tracking time deltas. Won't accurately compare across day boundaries and isn't monotonic (be wary of negative deltas), but still useful for temporal rate limiting.
@@ -288,17 +318,27 @@ int turnsAttemptedInLocation(boolean [location] places)
     return count;
 }
 
+string [int] locationSeenNoncombats(location place)
+{
+    return place.noncombat_queue.split_string_mutable("; ");
+}
+
+string [int] locationSeenCombats(location place)
+{
+    return place.combat_queue.split_string_mutable("; ");
+}
+
 string lastNoncombatInLocation(location place)
 {
     if (place.noncombat_queue.length() > 0)
-        return place.noncombat_queue.split_string("; ").listLastObject();
+        return place.locationSeenNoncombats().listLastObject();
     return "";
 }
 
 string lastCombatInLocation(location place)
 {
     if (place.noncombat_queue.length() > 0)
-        return place.combat_queue.split_string("; ").listLastObject();
+        return place.locationSeenCombats().listLastObject();
     return "";
 }
 
@@ -391,6 +431,11 @@ boolean [item] lookupItems(string names) //CSV input
 skill lookupSkill(string name)
 {
     return name.to_skill();
+}
+
+familiar lookupFamiliar(string name)
+{
+    return name.to_familiar();
 }
 
 boolean monsterDropsItem(monster m, item it)
@@ -500,3 +545,8 @@ boolean locationHasPlant(location l, string plant_name)
     }
     return false;
 }
+
+Record StringHandle
+{
+    string s;
+};

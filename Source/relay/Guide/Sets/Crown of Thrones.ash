@@ -182,7 +182,13 @@ void SCOTGenerateSuggestions(string [int] description)
         need_all_res = true;
     if (__misc_state["in run"] && need_all_res)
         suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+2 all res", $familiars[Bulky Buddy Box,Exotic Parrot,Holiday Log,Pet Rock,Toothsome Rock])));
+        
+    if (__misc_state["in run"] && availableSpleen() >= 4)
+        suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("Spleen items", lookupFamiliar("Grim Brother"))));
     
+    //slightly powerful:
+    suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("-combat", lookupFamiliar("Grimstone Golem"))));
+    suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+combat", lookupFamiliar("Grim Brother"))));
     
     string [int][int] familiar_options;
     foreach key in suggestion_sets
@@ -198,6 +204,8 @@ void SCOTGenerateSuggestions(string [int] description)
             foreach key3 in suggestion.familiars
             {
                 familiar f = suggestion.familiars[key3];
+                if (f == $familiar[none]) //didn't find it
+                    continue;
                 if (f.have_familiar())
                 {
                     if (enthroned_familiar == f && enthroned_familiar != $familiar[none])

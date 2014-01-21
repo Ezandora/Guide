@@ -92,7 +92,7 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 				if (can_make_skeleton_key)
 					delay_daily_dungeon_reason = "Make a skeleton key first. (you have the ingredients)";
 				else
-					delay_daily_dungeon_reason = "Acquire a skeleton key first. (from defiled nook)";
+					delay_daily_dungeon_reason = "Acquire a skeleton key first. (from defiled nook)|Unless you can't reach that by the end of today.";
 					
 					
 				if (can_make_skeleton_key)

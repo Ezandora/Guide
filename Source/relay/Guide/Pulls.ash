@@ -228,7 +228,7 @@ void generatePullList(Checklist [int] checklists)
 		
 		if (gp_item.alternate_name != "")
 		{
-			pulls_entries.listAppend(ChecklistEntryMake(gp_item.alternate_image_name, "", ChecklistSubentryMake(gp_item.alternate_name, "", reason_list)));
+			pulls_entries.listAppend(ChecklistEntryMake(gp_item.alternate_image_name, "storage.php", ChecklistSubentryMake(gp_item.alternate_name, "", reason_list)));
 			continue;
 		}
 		
@@ -256,9 +256,9 @@ void generatePullList(Checklist [int] checklists)
 			if (actual_amount > 0)
 			{
 				if (max_wanted == 1)
-					pulls_entries.listAppend(ChecklistEntryMake(it, "", ChecklistSubentryMake(it, "", reason_list)));
+					pulls_entries.listAppend(ChecklistEntryMake(it, "storage.php", ChecklistSubentryMake(it, "", reason_list)));
 				else
-					pulls_entries.listAppend(ChecklistEntryMake(it, "", ChecklistSubentryMake(pluralize(actual_amount, it), "", reason_list)));
+					pulls_entries.listAppend(ChecklistEntryMake(it, "storage.php", ChecklistSubentryMake(pluralize(actual_amount, it), "", reason_list)));
 				break;
 			}
 		}

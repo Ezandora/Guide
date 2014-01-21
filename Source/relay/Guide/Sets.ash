@@ -48,6 +48,8 @@ void SetsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 	SOldLevel9GenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SFaxGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SDungeonsOfDoomGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+	SPsychoanalyticGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+	SOlfactionGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	
     
 }

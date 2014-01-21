@@ -3,6 +3,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
 	int importance_level_item = 7;
 	int importance_level_unimportant_item = 8;
     
+    boolean in_run = __misc_state["In run"];
     
 	int navel_percent_chance_of_runaway = 20;
 	if (true)
@@ -54,7 +55,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
             description.listAppend(pluralize(buffs_remaining, "buff", "buffs") + " remaining.");
 		available_resources_entries.listAppend(ChecklistEntryMake("__item greatest american pants", url, ChecklistSubentryMake(name, "", description)));
 	}
-	if ($item[peppermint parasol].available_amount() > 0 && __misc_state["In run"]) //don't think we want to use the parasol in aftercore, it's expensive
+	if ($item[peppermint parasol].available_amount() > 0 && in_run) //don't think we want to use the parasol in aftercore, it's expensive
 	{
 		int parasol_progress = get_property_int("parasolUsed");
 		string name = "";
@@ -117,7 +118,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
     
     
     
-    if (__misc_state["free runs usable"] && __misc_state["In run"] && ($item[glob of blank-out].available_amount() + $item[bottle of blank-out].available_amount()) > 0)
+    if (__misc_state["free runs usable"] && in_run && ($item[glob of blank-out].available_amount() + $item[bottle of blank-out].available_amount()) > 0)
 	{
 		string [int] description;
 		string name;
@@ -142,12 +143,10 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
 		}
 		available_resources_entries.listAppend(ChecklistEntryMake("__item BitterSweetTarts", "inventory.php?which=3", ChecklistSubentryMake(pluralize($item[BitterSweetTarts]), "", description), importance_level_item));
 	}
-	if ($item[polka pop].available_amount() > 0 && __misc_state["In run"])
+	if ($item[polka pop].available_amount() > 0 && in_run)
 	{
 		int modifier = 5 * min(11, my_level());
 		string [int] description;
-		//description.listAppend("+" + modifier + "% item, 10 turns");
-		//description.listAppend("+" + modifier + "% meat, 10 turns");
         description.listAppend("+" + modifier + "% item, " + "+" + modifier + "% meat");
 		if (my_level() < 11)
 		{
@@ -155,7 +154,14 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
 		}
 		available_resources_entries.listAppend(ChecklistEntryMake("__item polka pop", "", ChecklistSubentryMake(pluralize($item[polka pop]), "10 turns", description), importance_level_item));
 	}
-	if (__misc_state["In run"])
+        
+    if (lookupItem("frost flower").available_amount() > 0 && in_run)
+    {
+        string [int] description;
+        description.listAppend("+100% item, +200% meat, +25 ML, +100% init");
+        available_resources_entries.listAppend(ChecklistEntryMake("__item frost flower", "inventory.php?which=3", ChecklistSubentryMake(lookupItem("frost flower").pluralize(), "50 turns", description), importance_level_item));
+    }
+	if (in_run)
 	{
 		string [item] resolution_descriptions;
 		resolution_descriptions[$item[resolution: be happier]] = "+15% item (20 turns)";
@@ -186,7 +192,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
 			available_resources_entries.listAppend(ChecklistEntryMake("__item resolution: be luckier", "", resolution_lines, importance_level_item));
 			
 	}
-	if (__misc_state["In run"])
+	if (in_run)
 	{
         //doesn't show how much, because wahh I don't wanna write taffy code
 		string [item] taffy_descriptions;
@@ -216,7 +222,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
 	
 	
 	
-	if (__misc_state["In run"])
+	if (in_run)
 	{
 		if (7014.to_item().available_amount() > 0)
 			available_resources_entries.listAppend(ChecklistEntryMake("__item " + 7014.to_item().to_string(), "", ChecklistSubentryMake(pluralize(7014.to_item()), "", "Free run, banish for 20 turns"), importance_level_item));
@@ -278,7 +284,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
 		
 		
 	int clovers_available = $items[disassembled clover,ten-leaf clover].available_amount();
-	if (clovers_available > 0 && __misc_state["In run"])
+	if (clovers_available > 0 && in_run)
 	{
 		ChecklistSubentry subentry;
 		subentry.header = pluralize(clovers_available, "clover", "clovers") + " available";
@@ -314,7 +320,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
 		
 		available_resources_entries.listAppend(ChecklistEntryMake("clover", "", subentry, 7));
 	}
-	if (__misc_state["In run"])
+	if (in_run)
 	{
 		if ($item[gameinformpowerdailypro magazine].available_amount() > 0)
 		{
@@ -433,15 +439,15 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
         if (mojo_filters_usable > 0)
             available_resources_entries.listAppend(ChecklistEntryMake("__item mojo filter", "inventory.php?which=3", ChecklistSubentryMake(pluralize($item[mojo filter]), "", line), importance_level_unimportant_item));
     }
-    if ($item[distention pill].available_amount() > 0 && !get_property_boolean("_distentionPillUsed") && __misc_state["In run"])
+    if ($item[distention pill].available_amount() > 0 && !get_property_boolean("_distentionPillUsed") && in_run)
     {
         available_resources_entries.listAppend(ChecklistEntryMake("__item distention pill", "inventory.php?which=3", ChecklistSubentryMake(pluralize($item[distention pill]), "", "Adds one extra fullness.|Once/day."), importance_level_unimportant_item));
     }
-    if ($item[synthetic dog hair pill].available_amount() > 0 && !get_property_boolean("_syntheticDogHairPillUsed") && __misc_state["In run"])
+    if ($item[synthetic dog hair pill].available_amount() > 0 && !get_property_boolean("_syntheticDogHairPillUsed") && in_run)
     {
         available_resources_entries.listAppend(ChecklistEntryMake("__item synthetic dog hair pill", "inventory.php?which=3", ChecklistSubentryMake(pluralize($item[synthetic dog hair pill]), "", "Adds one extra drunkenness.|Once/day."), importance_level_unimportant_item));
     }
-    if ($item[the lost pill bottle].available_amount() > 0 && __misc_state["In run"])
+    if ($item[the lost pill bottle].available_amount() > 0 && in_run)
     {
         string header = pluralize($item[the lost pill bottle]);
         if ($item[the lost pill bottle].available_amount() == 1)
@@ -467,14 +473,14 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
             available_resources_entries.listAppend(ChecklistEntryMake("__item desktop zen garden", "", ChecklistSubentryMake(pluralize($item[desktop zen garden]), "", "+20% to mysticality gains. (10 turns)"), importance_level_unimportant_item));
         }
     }
-    if ($item[munchies pill].available_amount() > 0 && fullness_limit() > 0 && __misc_state["In run"])
+    if ($item[munchies pill].available_amount() > 0 && fullness_limit() > 0 && in_run)
     {
         available_resources_entries.listAppend(ChecklistEntryMake("__item munchies pill", "", ChecklistSubentryMake(pluralize($item[munchies pill]), "", "+3 turns from fortune cookies and other low-fullness foods."), importance_level_unimportant_item));
     }
-    if (lookupItem("snow cleats").available_amount() > 0 && __misc_state["In run"])
+    if (lookupItem("snow cleats").available_amount() > 0 && in_run)
         available_resources_entries.listAppend(ChecklistEntryMake("__item snow cleats", "", ChecklistSubentryMake(pluralize(lookupItem("snow cleats")), "", "-5% combat, 30 turns."), importance_level_item));
         
-    if ($item[vitachoconutriment capsule].available_amount() > 0 && get_property_int("_vitachocCapsulesUsed") <3 && __misc_state["In run"])
+    if ($item[vitachoconutriment capsule].available_amount() > 0 && get_property_int("_vitachocCapsulesUsed") <3 && in_run)
     {
         string [int] adventures_remaining;
         int capsules_remaining = $item[vitachoconutriment capsule].available_amount();
@@ -506,7 +512,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
         available_resources_entries.listAppend(ChecklistEntryMake("__item vitachoconutriment capsule", "inventory.php?which=3", ChecklistSubentryMake(pluralize($item[vitachoconutriment capsule]), "", line), importance_level_unimportant_item));
     }
     
-    if ($item[drum machine].available_amount() > 0 && __misc_state["In run"] && (my_adventures() <= 1 || (availableDrunkenness() < 0 && availableDrunkenness() > -4)) && __quest_state["Level 11 Pyramid"].state_boolean["Desert Explored"])
+    if ($item[drum machine].available_amount() > 0 && in_run && (my_adventures() <= 1 || (availableDrunkenness() < 0 && availableDrunkenness() > -4)) && __quest_state["Level 11 Pyramid"].state_boolean["Desert Explored"])
     {
         //Daycount strategy that never works, suggest:
         string line = (100.0 * ((item_drop_modifier() / 100.0 + 1.0) * (1.0 / 1000.0))).roundForOutput(2) + "% chance of spice melange.";
@@ -517,7 +523,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
     
     
     
-    if (__misc_state["in run"])
+    if (in_run)
     {
 		if ($item[tattered scrap of paper].available_amount() > 0 && __misc_state["free runs usable"])
 		{
@@ -534,8 +540,6 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
 		}
         if ($item[Box of familiar jacks].available_amount() > 0)
             available_resources_entries.listAppend(ChecklistEntryMake("__item box of familiar jacks", "", ChecklistSubentryMake(pluralize($item[Box of familiar jacks]), "", "Gives current familiar equipment."), 8));
-        //crown of thrones:
-        
         if ($item[csa fire-starting kit].available_amount() > 0 && !get_property_boolean("_fireStartingKitUsed"))
         {
             string [int] description;
@@ -567,6 +571,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
         {
             available_resources_entries.listAppend(castle_stat_items);
         }
+        
     }
     
     foreach it in $items[carton of astral energy drinks,astral hot dog dinner,astral six-pack]

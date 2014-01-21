@@ -24,3 +24,5 @@ import "relay/Guide/Sets/Fax.ash";
 import "relay/Guide/Sets/Dungeons of Doom.ash";
 import "relay/Guide/Sets/Jarlsberg.ash";
 import "relay/Guide/Sets/Crown of Thrones.ash";
+import "relay/Guide/Sets/Psychoanalytic.ash";
+import "relay/Guide/Sets/Olfaction.ash";

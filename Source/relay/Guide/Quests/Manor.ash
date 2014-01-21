@@ -71,7 +71,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 		{
 			subentry.modifiers.listAppend("-combat");
 			subentry.modifiers.listAppend("+234% item");
-			subentry.entries.listAppend("Run +234% item and -combat for dirty hobo glove, for hand in glove. (+lots ML accessory)");
+			subentry.entries.listAppend("Run +234% item and -combat for dirty hobo glove, for hand in glove. (+lots ML accessory)|Potentially olfact half-orc hobo as well, to find said glove in the back alley.");
 		}
 			
 		if (subentry.modifiers.count() > 0)

@@ -6,7 +6,7 @@ void SFaxGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
         return;
     if (__misc_state["In aftercore"] && from_task)
         return;
-    string url;
+    string url = "clan_viplounge.php?action=faxmachine";
     string [int] potential_faxes;
     
     boolean can_arrow = false;

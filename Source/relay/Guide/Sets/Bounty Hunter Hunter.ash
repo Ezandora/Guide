@@ -27,7 +27,7 @@ location [int] locationsForMonster(monster m)
     return result;
 }
 
-ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, int amount_needed, monster target_monster, location [int] relevant_locations)
+ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, int amount_needed, monster target_monster, location [int] relevant_locations, StringHandle url)
 {
     ChecklistSubentry subentry;
     
@@ -38,49 +38,63 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
     
     relevant_locations.listAppendList(monster_locations);
     
-    location target_location = $location[none];
-    if (monster_locations.count() > 0)
-        target_location = monster_locations[0];
-    
     
     boolean [location] skippable_ncs_locations = $locations[the stately pleasure dome, the poop deck, the spooky forest,The Haunted Gallery,tower ruins,the castle in the clouds in the sky (top floor), the castle in the clouds in the sky (ground floor), the castle in the clouds in the sky (basement)];
-    boolean noncombats_skippable = (skippable_ncs_locations contains target_location) && target_location != $location[none];
     
     string turns_remaining_string = "";
     
-    if (amount_needed != -1 && target_monster != $monster[none] && target_location != $location[none])
+    boolean need_plus_combat = false;
+    
+    location [int] target_locations;
+    if (amount_needed != -1 && target_monster != $monster[none] && monster_locations.count() > 0)
     {
-        float [monster] appearance_rates = target_location.appearance_rates_adjusted();
-        int number_remaining = amount_needed - amount_found;
-        
-        if (number_remaining == 0)
+        float min_turns_remaining = 100000000.0;
+        foreach key in monster_locations
         {
-            subentry.header = "Return to the bounty hunter hunter";
-            return subentry;
+            location l = monster_locations[key];
+            boolean noncombats_skippable = (skippable_ncs_locations contains l);
+            float [monster] appearance_rates = l.appearance_rates_adjusted();
+            int number_remaining = amount_needed - amount_found;
+            
+            if (number_remaining == 0)
+            {
+                url.s = "place.php?whichplace=forestvillage";
+                subentry.header = "Return to the bounty hunter hunter";
+                return subentry;
+            }
+            
+            float bounty_appearance_rate = appearance_rates[target_monster] / 100.0;
+            if (noncombats_skippable)
+            {
+                //Recorrect for NC:
+                float nc_rate = appearance_rates[$monster[none]] / 100.0;
+                if (nc_rate != 1.0)
+                    bounty_appearance_rate /= (1.0 - nc_rate);
+            }
+            
+            if (bounty_appearance_rate != 0.0)
+            {
+                float turns_remaining = number_remaining.to_float() / bounty_appearance_rate;
+                if (turns_remaining <= min_turns_remaining)
+                {
+                    if (turns_remaining != min_turns_remaining)
+                        target_locations.listClear();
+                    target_locations.listAppend(l);
+                    
+                    min_turns_remaining = turns_remaining;
+                    turns_remaining_string = " ~" + pluralize(round(turns_remaining), "turn remains", "turns remain") + ".";
+                }
+            }
+            if (noncombats_skippable && appearance_rates[$monster[none]] != 0.0)
+                need_plus_combat = true;
         }
-        
-        float bounty_appearance_rate = appearance_rates[target_monster] / 100.0;
-        if (noncombats_skippable)
-        {
-            //Recorrect for NC:
-            float nc_rate = appearance_rates[$monster[none]] / 100.0;
-            if (nc_rate != 1.0)
-                bounty_appearance_rate /= (1.0 - nc_rate);
-        }
-        
-        if (bounty_appearance_rate != 0.0)
-        {
-            float turns_remaining = number_remaining.to_float() / bounty_appearance_rate;
-            turns_remaining_string = " ~" + pluralize(round(turns_remaining), "turn", "turns") + " remain.";
-        }
-        if (noncombats_skippable && appearance_rates[$monster[none]] != 0.0)
-            subentry.modifiers.listAppend("+combat");
     }
     
-    
+    if (need_plus_combat)
+        subentry.modifiers.listAppend("+combat");
     
     if (target_monster != $monster[none])
-        subentry.entries.listAppend("From a " + target_monster + " in " + monster_locations.listJoinComponents(", ", "or") + ".");
+        subentry.entries.listAppend("From a " + target_monster + " in " + target_locations.listJoinComponents(", ", "or") + ".");
     
     
     if (amount_needed == -1)
@@ -117,6 +131,8 @@ void SBountyHunterHunterGenerateTasks(ChecklistEntry [int] task_entries, Checkli
         on_bounty = true;
     }
     
+    StringHandle url_handle;
+    
     
     if (!on_bounty)
         return;
@@ -139,7 +155,7 @@ void SBountyHunterHunterGenerateTasks(ChecklistEntry [int] task_entries, Checkli
         string bounty_item_name = split[0];
         int amount_found = split[1].to_int_silent();
         
-        if (bounty_item_name == "null") //unknown
+        if (bounty_item_name.length() == 0 || bounty_item_name == "null") //unknown
             bounty_item_name = "unknown";
         
         int amount_needed = -1;
@@ -151,13 +167,13 @@ void SBountyHunterHunterGenerateTasks(ChecklistEntry [int] task_entries, Checkli
             amount_needed = file_entry.amount_needed;
             target_monster = file_Entry.bounty_monster;
         }
-        subentries.listAppend(SBHHGenerateHunt(bounty_item_name, amount_found, amount_needed, target_monster, relevant_locations));
+        subentries.listAppend(SBHHGenerateHunt(bounty_item_name, amount_found, amount_needed, target_monster, relevant_locations, url_handle));
         
     }
     
     boolean [location] highlight_locations = listGeneratePresenceMap(relevant_locations);
     if (subentries.count() > 0)
     {
-        optional_task_entries.listAppend(ChecklistEntryMake("__item bounty-hunting helmet", "", subentries, highlight_locations));
+        optional_task_entries.listAppend(ChecklistEntryMake("__item bounty-hunting helmet", url_handle.s, subentries, highlight_locations));
     }
 }

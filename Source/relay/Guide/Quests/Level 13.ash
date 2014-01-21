@@ -132,6 +132,50 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 		subentry.modifiers.listAppend("+familiar weight");
 		subentry.entries.listAppend("Counter familiars. Need 20-pound familiars.");
 		subentry.entries.listAppend("Have mafia do it: Quests" + __html_right_arrow_character + "Tower (complete)");
+        
+        if (!__misc_state["familiars temporarily blocked"])
+        {
+            familiar [int] missing_familiars;
+            foreach f in $familiars[Mosquito,Angry Goat,Barrrnacle,Sabre-Toothed Lime,Levitating Potato]
+            {
+                if (f.have_familiar())
+                    continue;
+                missing_familiars.listAppend(f);
+            }
+            if (missing_familiars.count() > 0)
+            {
+                string [item] where_to_find_hatchlings;
+                where_to_find_hatchlings[$item[mosquito larva]] = "Spooky forest."; //should have it
+                where_to_find_hatchlings[$item[goat]] = "Combine goat cheese (goatlet, dairy goat, 40% drop) with anti-cheese from the atomic testing house in the desert beach.";
+                where_to_find_hatchlings[$item[barrrnacle]] = "Find from a crusty pirate in the f'c'le. (15% drop)";
+                where_to_find_hatchlings[$item[sabre-toothed lime cub]] = "Combine saber teeth (goatlet, sabre-toothed goat, 5% drop, or stone age hippy camp, 20% drop) with a lime. (Menagerie level 1, fruit golem, 15% drop)";
+                where_to_find_hatchlings[$item[potato sprout]] = "Complete the daily dungeon, visit vending machine.";
+                if (in_bad_moon())
+                    where_to_find_hatchlings[$item[potato sprout]] += " Alternatively, adventure in the haunted conservatory.";
+                    
+                string [int] missing_description;
+                foreach key in missing_familiars
+                {
+                    familiar f = missing_familiars[key];
+                    
+                    string line;
+                    if (missing_description.count() > 0)
+                        line += "<hr>";
+                    line += f.hatchling.capitalizeFirstLetter();
+                    if (f.hatchling.available_amount() > 0)
+                    {
+                        line += "|*Use your " + f.hatchling + ".";
+                    }
+                    else
+                    {
+                        line += "|*" + where_to_find_hatchlings[f.hatchling];
+                    }
+                    missing_description.listAppend(line);
+                }
+                subentry.entries.listAppend("Missing familiars: " + HTMLGenerateIndentedText(missing_description));
+            }
+            //FIXME suggest ways to get to twenty pounds.
+        }
 	}
 	else if (base_quest_state.mafia_internal_step == 10)
 	{

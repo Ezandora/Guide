@@ -48,6 +48,7 @@ void generateTasks(Checklist [int] checklists)
 	
 	if (!__misc_state["desert beach available"])
 	{
+        string url;
 		ChecklistSubentry subentry;
 		subentry.header = "Unlock desert beach";
 		if (!knoll_available())
@@ -68,14 +69,16 @@ void generateTasks(Checklist [int] checklists)
 				subentry.entries.listAppend("Or build a pumpkin carriage.");
             if ($items[can of Br&uuml;talbr&auml;u,can of Drooling Monk,can of Impetuous Scofflaw,fancy tin beer can].available_amount() > 0)
 				subentry.entries.listAppend("Or build a tin lizzie.");
+            url = "place.php?whichplace=knoll_hostile";
 		}
 		else
 		{
+            url = "store.php?whichstore=4";
 			int meatcar_price = $item[spring].npc_price() + $item[sprocket].npc_price() + $item[cog].npc_price() + $item[empty meat tank].npc_price() + 100 + $item[tires].npc_price() + $item[sweet rims].npc_price() + $item[spring].npc_price();
 			subentry.entries.listAppend("Build a bitchin' meatcar (" + meatcar_price + " meat)");
 		}
 		
-		task_entries.listAppend(ChecklistEntryMake("__item bitchin' meatcar", "", subentry));
+		task_entries.listAppend(ChecklistEntryMake("__item bitchin' meatcar", url, subentry));
 	}
 	else if (!__misc_state["mysterious island available"])
 	{
@@ -200,13 +203,22 @@ void generateTasks(Checklist [int] checklists)
 	
 	if (__misc_state["need to level"])
 	{
+        string url = "";
 		int mcd_max_limit = 10;
 		boolean have_mcd = false;
 		if (canadia_available() || knoll_available() || gnomads_available() || in_bad_moon())
 			have_mcd = true;
+        if (knoll_available())
+        {
+            if ($item[detuned radio].available_amount() > 0)
+                url = "inventory.php?which=3";
+            else
+                url = "store.php?whichstore=4";
+        }
+        //FIXME URLs for the other ones
 		if (current_mcd() < mcd_max_limit && have_mcd && monster_level_adjustment() < 50)
 		{
-			optional_task_entries.listAppend(ChecklistEntryMake("__item detuned radio", "", ChecklistSubentryMake("Set monster control device to " + mcd_max_limit, "", (mcd_max_limit * __misc_state_float["ML to mainstat multiplier"]) + " mainstats/turn")));
+			optional_task_entries.listAppend(ChecklistEntryMake("__item detuned radio", url, ChecklistSubentryMake("Set monster control device to " + mcd_max_limit, "", (mcd_max_limit * __misc_state_float["ML to mainstat multiplier"]) + " mainstats/turn")));
 		}
 	}
 	
@@ -329,6 +341,31 @@ void generateTasks(Checklist [int] checklists)
         }
 	}
     
+    if (__last_adventure_location == $location[The Red Queen's Garden] && (!in_ronin() || $item[&quot;DRINK ME&quot; potion].available_amount() > 0) && get_property_int("pendingMapReflections") <= 0)
+    {
+        string url = "mall.php";
+        
+        if ($item[&quot;DRINK ME&quot; potion].available_amount() > 0)
+            url = "inventory.php?which=3";
+        
+        task_entries.listAppend(ChecklistEntryMake("__item &quot;DRINK ME&quot; potion", url, ChecklistSubentryMake("Drink " + $item[&quot;DRINK ME&quot; potion], "+madness", "Otherwise, no reflections of a map will drop."), -11));
+    }
+    
+    if ($effect[Merry Smithsness].have_effect() == 0 && (!in_ronin() || $item[flaskfull of hollow].available_amount() > 0) && $items[Meat Tenderizer is Murder,Ouija Board\, Ouija Board,Hand that Rocks the Ladle,Saucepanic,Frankly Mr. Shank,Shakespeare's Sister's Accordion,Sheila Take a Crossbow,A Light that Never Goes Out,Half a Purse,loose purse strings,Hand in Glove].equipped_amount() > 0)
+    {
+        //They (can) have a flaskfull of hollow and have a smithsness item equipped, but no merry smithsness.
+        //So, suggest a high-priority task.
+        //I suppose in theory they could be saving the flaskfull of hollow for later, for +item? In that case, we would be annoying them. They can closet the flask, but that isn't perfect...
+        //Still, I feel as though having this reminder is better than not having it.
+        
+        //Four items are not on the list due to their marginal bonus: Hairpiece On Fire (+maximum MP), Vicar's Tutu (+maximum HP), Staff of the Headmaster's Victuals (+spell damage), Work is a Four Letter Sword (+weapon damage)
+        string url = "mall.php";
+        
+        if ($item[flaskfull of hollow].available_amount() > 0)
+            url = "inventory.php?which=3";
+        
+        task_entries.listAppend(ChecklistEntryMake("__item flaskfull of hollow", url, ChecklistSubentryMake("Drink " + $item[flaskfull of hollow], "", "Gives +25 smithsness"), -11));
+    }
     
 	checklists.listAppend(ChecklistMake("Tasks", task_entries));
 	checklists.listAppend(ChecklistMake("Optional Tasks", optional_task_entries));

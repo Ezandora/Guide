@@ -1,10 +1,5 @@
 //merkinQuestPath
 
-Record StringHandle
-{
-    string s;
-};
-
 void QSeaInit()
 {
 	if (!__misc_state["In aftercore"])

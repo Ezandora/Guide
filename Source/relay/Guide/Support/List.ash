@@ -115,6 +115,13 @@ void listClear(int [int] list)
 		remove list[i];
 	}
 }
+void listClear(location [int] list)
+{
+	foreach i in list
+	{
+		remove list[i];
+	}
+}
 
 string [int] listMakeBlankString()
 {

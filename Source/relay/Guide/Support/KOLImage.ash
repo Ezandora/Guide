@@ -227,6 +227,9 @@ void KOLImagesInit()
 	__kol_images["inexplicable door"] = KOLImageMake("images/otherimages/woods/8bitdoor.gif", Vec2iMake(100,100), RectMake(15, 43, 85, 99));
 	__kol_images["Dungeons of Doom"] = KOLImageMake("images/otherimages/town/ddoom.gif", Vec2iMake(100,100), RectMake(31, 33, 68, 99));
     
+	__kol_images["chinatown"] = KOLImageMake("images/otherimages/jung/jung_chinaback.gif", Vec2iMake(450,500), RectMake(188, 202, 229, 270));
+	__kol_images["chinatown"].erase_zones.listAppend(RectMake(227, 247, 229, 256));
+    
     
 	
 	string class_name = my_class().to_string();
@@ -485,4 +488,9 @@ buffer KOLImageGenerateImageHTML(string lookup_name, boolean should_center, Vec2
 	if (outputting_div)
 		result.append("</div>");
 	return result;
+}
+
+buffer KOLImageGenerateImageHTML(string lookup_name, boolean should_center)
+{
+	return KOLImageGenerateImageHTML(lookup_name, should_center, Vec2iMake(65535, 65535));
 }
