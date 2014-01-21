@@ -352,6 +352,7 @@ int delayRemainingInLocation(location place)
     place_delays[$location[the haunted library]] = 5;
     place_delays[$location[the haunted billiards room]] = 5;
     place_delays[$location[the boss bat's lair]] = 4;
+    place_delays[$location[the oasis]] = 5;
     
     
     if (place_delays contains place)

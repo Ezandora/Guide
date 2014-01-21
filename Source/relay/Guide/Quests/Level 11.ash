@@ -447,7 +447,19 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
                 if ($item[stone rose].available_amount() > 0)
                     subentry.entries.listAppend("Give stone rose to Gnasir.");
                 else
-                    subentry.entries.listAppend("Potentially adventure in Oasis for stone rose.");
+                {
+                    string line = "Potentially adventure in Oasis for stone rose.";
+                    if (delayRemainingInLocation($location[the oasis]) > 0)
+                    {
+                        string hipster_text = "";
+                        if (__misc_state["have hipster"])
+                        {
+                            hipster_text = " (use " + __misc_state_string["hipster name"] + ")";
+                        }
+                        line += "|Delay for " + pluralize(delayRemainingInLocation($location[the oasis]), "turn", "turns") + hipster_text + ".";
+                    }
+                    subentry.entries.listAppend(line);
+                }
             }
             if (!base_quest_state.state_boolean["Manual Pages Given"])
             {

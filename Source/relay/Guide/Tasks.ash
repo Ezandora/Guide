@@ -367,7 +367,7 @@ void generateTasks(Checklist [int] checklists)
         task_entries.listAppend(ChecklistEntryMake("__item flaskfull of hollow", url, ChecklistSubentryMake("Drink " + $item[flaskfull of hollow], "", "Gives +25 smithsness"), -11));
     }
     
-    boolean have_spaghetti_breakfast = (($skill[spaghetti breakfast].have_skill() && !get_property_boolean("_spaghettiBreakfast")) || $item[spaghetti breakfast].available_amount() == 0);
+    boolean have_spaghetti_breakfast = (($skill[spaghetti breakfast].have_skill() && !get_property_boolean("_spaghettiBreakfast")) || $item[spaghetti breakfast].available_amount() > 0);
     if (__misc_state["In run"] && __misc_state["can eat just about anything"] && !get_property_boolean("_spaghettiBreakfastEaten") && my_fullness() == 0 && have_spaghetti_breakfast)
     {
     
