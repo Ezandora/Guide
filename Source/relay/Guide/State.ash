@@ -436,7 +436,7 @@ void setUpState()
 	__misc_state_int["DD Tokens and keys available"] = dd_tokens_and_keys_available;
 	
 	boolean mysterious_island_unlocked = false;
-	if ($item[dingy dinghy].available_amount() > 0 || $item[skeletal skiff].available_amount() > 0)
+	if ($items[dingy dinghy, skeletal skiff, junk junk].available_amount() > 0)
 		mysterious_island_unlocked = true;
 	
 	__misc_state["mysterious island available"] = mysterious_island_unlocked;

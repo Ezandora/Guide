@@ -88,13 +88,20 @@ void generateTasks(Checklist [int] checklists)
 		int scrip_number = $item[Shore Inc. Ship Trip Scrip].available_amount();
 		int trips_needed = MAX(0, 3 - scrip_number);
         
+        string url = "place.php?whichplace=desertbeach";
         
 		if ($item[dinghy plans].available_amount() > 0)
         {
             if ($item[dingy planks].available_amount() > 0)
-                subentry.entries.listAppend("Build dingy dinghy.");
-            else 
+            {
+                url = "inventory.php?which=3";
+                subentry.entries.listAppend("Use dinghy plans.");
+            }
+            else
+            {
+                url = "store.php?whichstore=m";
                 subentry.entries.listAppend("Buy dingy planks, then build dinghy dinghy.");
+            }
                 
         }
 		else if (trips_needed > 0)
@@ -109,9 +116,9 @@ void generateTasks(Checklist [int] checklists)
 		}
 		else
 		{
-			subentry.entries.listAppend("Redeem scrip at shore");
+			subentry.entries.listAppend("Redeem scrip at shore for dinghy plans.");
 		}
-		task_entries.listAppend(ChecklistEntryMake("__item dingy dinghy", "", subentry, $locations[the shore\, inc. travel agency]));
+		task_entries.listAppend(ChecklistEntryMake("__item dingy dinghy", url, subentry, $locations[the shore\, inc. travel agency]));
 	}
 
 

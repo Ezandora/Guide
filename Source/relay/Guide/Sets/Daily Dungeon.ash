@@ -63,7 +63,8 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 	{
 		if (familiar_is_usable($familiar[gelatinous cubeling]))
 		{
-			if ($item[eleven-foot pole].available_amount() == 0 || $item[ring of detect boring doors].available_amount() == 0 || $item[pick-o-matic lockpicks].available_amount() == 0)
+            item [int] missing_items = $items[eleven-foot pole,ring of detect boring doors,pick-o-matic lockpicks].items_missing();
+			if (missing_items.count() > 0)
 			{
 				delay_daily_dungeon = true;
 				delay_daily_dungeon_reason = "Bring along the gelatinous cubeling first";
@@ -74,7 +75,7 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                     url = "familiar.php";
 				subentry.header = "Bring along the gelatinous cubeling";
 			
-				subentry.entries.listAppend("Acquire items to speed up the daily dungeon.");
+				subentry.entries.listAppend("Acquire " + missing_items.listJoinComponents(", ", "and") + " to speed up the daily dungeon.");
 			
 				optional_task_entries.listAppend(ChecklistEntryMake("__familiar gelatinous cubeling", url, subentry));
 			}

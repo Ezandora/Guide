@@ -183,6 +183,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 	{
 		next_zone = $location[The Haunted Ballroom];
 		subentry.header = "Set -combat ballroom song";
+		url = "place.php?whichplace=spookyraven2";
 		image_name = "Haunted Ballroom";
 		subentry.modifiers.listAppend("-combat");
 	}

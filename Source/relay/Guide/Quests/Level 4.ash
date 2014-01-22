@@ -71,7 +71,12 @@ void QLevel4GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         if (!have_stench_resistance)
         {
             string line = "Need " + HTMLGenerateSpanOfClass("stench resistance", "r_element_stench") + " to adventure in Guano Junction.";
-            if ($item[knob goblin harem veil].available_amount() == 0)
+            if ($item[bum cheek].available_amount() > 0)
+            {
+                if ($item[bum cheek].equipped_amount() == 0)
+                    line += "|*Equip your bum cheek.";
+            }
+            else if ($item[knob goblin harem veil].available_amount() == 0)
                 line += "|*Possibly acquire a knob goblin harem veil.";
             else
             {
