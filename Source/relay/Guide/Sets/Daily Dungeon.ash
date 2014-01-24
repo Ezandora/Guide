@@ -140,7 +140,7 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                 l = pluralize(__misc_state_int["fat loot tokens needed"], "token", "tokens") + " needed.";
 			
 			if (daily_dungeon_aftercore_items_wanted.count() > 0)
-                l += "|Misssing " + daily_dungeon_aftercore_items_wanted.listJoinComponents(", ", "and") + ". Possibly buy them in the mall?";
+                l += "|Missing " + daily_dungeon_aftercore_items_wanted.listJoinComponents(", ", "and") + ". Possibly buy them in the mall?";
 				//l += HTMLGenerateIndentedText(daily_dungeon_aftercore_items_wanted);
             if (l.length() > 0)
                 description.listAppend(l);
