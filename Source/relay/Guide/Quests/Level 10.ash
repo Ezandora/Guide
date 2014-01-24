@@ -48,12 +48,13 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 			subentry.modifiers.listAppend("free runs");
 		if (__misc_state["have hipster"])
 			subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
-		subentry.modifiers.listAppend("+item");
 		
 		string [int] things_we_want_item_for;
-		things_we_want_item_for.listAppend("SGEEA");
+        
+        if ($skill[Transcendent Olfaction].have_skill())
+            things_we_want_item_for.listAppend("SGEEA");
 		
-		image_name = "__half penultimate fantasy airship";
+		image_name = "penultimate fantasy airship";
 		
 		//immateria:
 		
@@ -68,7 +69,7 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 		
         //FIXME it would be nice to track this
 		subentry.entries.listAppend("20 total turns of delay.");
-		if (__misc_state["have olfaction equivalent"] && !($effect[on the trail].have_effect() > 0 && get_property("olfactedMonster") == "Quiet Healer"))
+		if ($skill[Transcendent Olfaction].have_skill() && !($effect[on the trail].have_effect() > 0 && get_property("olfactedMonster") == "Quiet Healer"))
 			subentry.entries.listAppend("Potentially olfact quiet healer for SGEEAs");
 		
 		if ($item[model airship].available_amount() == 0)
@@ -84,7 +85,10 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 			subentry.entries.listAppend("Acquire mohawk wig (Burly Sidekick, 10% drop) to speed up top floor.");
 		}
         if (things_we_want_item_for.count() > 0)
+        {
+            subentry.modifiers.listAppend("+item");
             subentry.entries.listAppend("Potentially run +item for " + listJoinComponents(things_we_want_item_for, ", ", "and") + ".");
+        }
 	}
 	else
 	{

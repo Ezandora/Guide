@@ -247,9 +247,9 @@ void ChecklistInit()
 	PageAddCSSClass("div", "r_cl_l_container_highlighted", gradient + "padding-top:5px;padding-bottom:5px;");
     
     
-	PageAddCSSClass("div", "r_cl_l_left", "float:left;width:100px;margin-left:20px;");
-	PageAddCSSClass("div", "r_cl_l_right_container", "width:100%;margin-left:-120px;float:right;text-align:left;vertical-align:top;");
-	PageAddCSSClass("div", "r_cl_l_right_content", "margin-left:120px;display:inline-block;margin-right:20px;");
+	PageAddCSSClass("div", "r_cl_l_left", "float:left;width:" + __setting_image_width + "px;margin-left:20px;");
+	PageAddCSSClass("div", "r_cl_l_right_container", "width:100%;margin-left:" + (-__setting_image_width - 20) + "px;float:right;text-align:left;vertical-align:top;");
+	PageAddCSSClass("div", "r_cl_l_right_content", "margin-left:" + (__setting_image_width + 20) + "px;display:inline-block;margin-right:20px;");
     
     PageAddCSSClass("hr", "r_cl_hr", "padding:0px;margin-top:0px;margin-bottom:0px;width:auto; margin-left:" + __setting_indention_width + ";margin-right:" + __setting_indention_width +";");
     PageAddCSSClass("hr", "r_cl_hr_extended", "padding:0px;margin-top:0px;margin-bottom:0px;width:auto; margin-left:" + __setting_indention_width + ";margin-right:0px;");
@@ -398,7 +398,14 @@ buffer ChecklistGenerate(Checklist cl, boolean output_borders)
 		
 		boolean setting_use_holding_containers_per_subentry = true;
 			
-		Vec2i max_image_dimensions = Vec2iMake(100,75);
+		Vec2i max_image_dimensions = Vec2iMake(__setting_image_width,75);
+        
+        string container_class = "r_cl_l_container";
+        if (entry.should_highlight)
+            container_class = "r_cl_l_container_highlighted";
+        last_was_highlighted = entry.should_highlight;
+        result.append(HTMLGenerateTagPrefix("div", mapMake("class", container_class)));
+        
 		if (__use_table_based_layouts)
 		{
 			//table-based layout:
@@ -406,7 +413,7 @@ buffer ChecklistGenerate(Checklist cl, boolean output_borders)
 			
 			result.append(HTMLGenerateTagWrap("td", "", mapMake("style", "width:" + __setting_indention_width + ";")));
 			result.append("<td>");
-			result.append(HTMLGenerateTagPrefix("td", mapMake("style", "min-width:100px; max-width:100px; width:100px;vertical-align:top; text-align: center;")));
+			result.append(HTMLGenerateTagPrefix("td", mapMake("style", "min-width:" + __setting_image_width + "px; max-width:" + __setting_image_width + "px; width:" + __setting_image_width + "px;vertical-align:top; text-align: center;")));
 			
 			result.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions));
 			
@@ -474,11 +481,6 @@ buffer ChecklistGenerate(Checklist cl, boolean output_borders)
 		else
 		{
 			//div-based layout:
-            string container_class = "r_cl_l_container";
-            if (entry.should_highlight)
-                container_class = "r_cl_l_container_highlighted";
-            last_was_highlighted = entry.should_highlight;
-            result.append(HTMLGenerateTagPrefix("div", mapMake("class", container_class)));
 			result.append(HTMLGenerateDivOfClass(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions), "r_cl_l_left"));
 			result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_cl_l_right_container")));
 			result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_cl_l_right_content")));
@@ -536,8 +538,8 @@ buffer ChecklistGenerate(Checklist cl, boolean output_borders)
 			result.append("</div>");
 			result.append("</div>");
 			result.append(HTMLGenerateDivOfClass("", "r_end_floating_elements")); //stop floating
-            result.append("</div>");
 		}
+        result.append("</div>");
 
 		
 		if (outputting_anchor)

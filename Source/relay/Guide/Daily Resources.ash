@@ -19,18 +19,20 @@ void generateDailyResources(Checklist [int] checklists)
 		string [int] description;
 		string image_name = "basic hot dog";
 		
-		description.listAppend("Optimal Dog - Forces semi-rare next adventure");
-		description.listAppend("Video Game Hot Dog - +25% item drops, +25% meat drops");
-		description.listAppend("Scaredy Dog - -combat");
-		description.listAppend("Junkyard dog - +combat, marginal");
+        string [int][int] options;
+		options.listAppend(listMake("Optimal Dog", "Semi-rare next adventure. 1 full."));
+		options.listAppend(listMake("Ghost Dog", "-combat. 3 full."));
+		options.listAppend(listMake("Video Game Hot Dog", "+25% item, +25% meat. 3 full."));
+		options.listAppend(listMake("Junkyard dog", "+combat. 3 full."));
 		if (my_primestat() == $stat[muscle])
-			description.listAppend("Savage macho dog - +50% muscle, leveling against scaling monsters?");
+			options.listAppend(listMake("Savage macho dog", "+50% muscle. 2 full."));
 		if (my_primestat() == $stat[mysticality])
-			description.listAppend("One with everything - +50% mysticality, leveling against scaling monsters?");
+			options.listAppend(listMake("One with everything", "+50% mysticality. 2 full."));
 		if (my_primestat() == $stat[moxie])
-			description.listAppend("Top Dog - +50% moxie, leveling against scaling monsters?");
+			options.listAppend(listMake("Sly Dog", "+50% moxie. 2 full."));
 			
-		available_resources_entries.listAppend(ChecklistEntryMake(image_name, "", ChecklistSubentryMake(name, "1 fullness", description), 5));
+        description.listAppend(HTMLGenerateSimpleTableLines(options));
+		available_resources_entries.listAppend(ChecklistEntryMake(image_name, "clan_viplounge.php?action=hotdogstand", ChecklistSubentryMake(name, "", description), 5));
 	}
 	
 		
@@ -176,7 +178,7 @@ void generateDailyResources(Checklist [int] checklists)
     }
     
     //Not sure how I feel about this. It's kind of extraneous?
-    //Disabled for now.
+    //Disabled for now, errors in 16.2 release.
     /*if (get_property_int("telescopeUpgrades") > 0 && !get_property_boolean("telescopeLookedHigh") && __misc_state["In run"])
     {
         string [int] description;
@@ -188,9 +190,52 @@ void generateDailyResources(Checklist [int] checklists)
     
     if (__misc_state_int["free rests remaining"] > 0)
     {
-        //FIXME we could show that the MP/HP restore will be?
-        //very difficult, I think?
+        float resting_hp_percent = numeric_modifier("resting hp percent") / 100.0;
+        float resting_mp_percent = numeric_modifier("resting mp percent") / 100.0;
+        
+        //FIXME trace down every rest effect and make this more accurate, instead of an initial guess.
+        
+        //If grimace or ronald is full, they double the gains of everything else.
+        //This is reported as a modifier of +100% - so with pagoda, that's +200% HP
+        //But, it's actually +300%, or 400% total. I could be wrong about this - my knowledge of rest mechanics is limited.
+        //So, we'll explicitly check for grimace or ronald being full, then recalculate. Not great, but should work okay?
+        //This is probably inaccurate in a great number of cases, due to the complication of resting.
+        
+        float overall_multiplier_hp = 1.0;
+        float overall_multiplier_mp = 1.0;
+        float bonus_resting_hp = numeric_modifier("bonus resting hp");
+        float after_bonus_resting_hp = 0.0;
+        int grimace_light = moon_phase() / 2;
+        int ronald_light = moon_phase() % 8;
+        if (grimace_light == 4)
+        {
+            resting_hp_percent -= 1.0;
+            overall_multiplier_hp += 1.0;
+        }
+        if (ronald_light == 4)
+        {
+            resting_mp_percent -= 1.0;
+            overall_multiplier_mp += 1.0;
+        }
+        
+        if ($effect[L'instinct F&eacute;lin].have_effect() > 0) //not currently tracked by mafia. Seems to triple HP/MP gains.
+        {
+            overall_multiplier_hp *= 3.0;
+            overall_multiplier_mp *= 3.0;
+        }
+        
+        if ((get_campground() contains $item[gauze hammock]))
+        {
+            //Gauze hammock appears to be a flat addition applied after everything else, including grimace, pagoda, and l'instinct.
+            //It shows up it bonus resting hp - we'll remove that, and add it back at the end.
+            bonus_resting_hp -= 60.0;
+            after_bonus_resting_hp += 60.0;
+        }
+        
+        float rest_hp_restore = after_bonus_resting_hp + overall_multiplier_hp * (numeric_modifier("base resting hp") * (1.0 + resting_hp_percent) + bonus_resting_hp);
+        float rest_mp_restore = overall_multiplier_mp * (numeric_modifier("base resting mp") * (1.0 + resting_mp_percent) + numeric_modifier("bonus resting mp"));
         string [int] description;
+        description.listAppend(rest_hp_restore.floor() + " HP, " + rest_mp_restore.floor() + " MP");
 		available_resources_entries.listAppend(ChecklistEntryMake("__effect sleepy", "campground.php", ChecklistSubentryMake(pluralizeWordy(__misc_state_int["free rests remaining"], "free rest", "free rests").capitalizeFirstLetter(), "", description), 10));
     }
     
@@ -270,6 +315,7 @@ void generateDailyResources(Checklist [int] checklists)
     
     //Skill books we have used, but don't have the skill for?
     
+    //soul sauce tracking?
 	
 	checklists.listAppend(ChecklistMake("Resources", available_resources_entries));
 }

@@ -209,7 +209,7 @@ void generatePullList(Checklist [int] checklists)
 		scrip_needed += 3;
 		scrip_reasons.listAppend("mysterious island");
 	}
-	if ($item[uv-resistant compass].available_amount() == 0 && __misc_state["can equip just about any weapon"] && !__quest_state["Level 11 Pyramid"].state_boolean["Desert Explored"])
+	if ($item[uv-resistant compass].available_amount() == 0 && lookupItem("ornate dowsing rod").available_amount() == 0 && __misc_state["can equip just about any weapon"] && !__quest_state["Level 11 Pyramid"].state_boolean["Desert Explored"])
 	{
 		scrip_needed += 1;
 		scrip_reasons.listAppend("uv-compass");

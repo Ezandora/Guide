@@ -107,7 +107,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
 		
 		int spooky_damage_taken = 463 * (1.0 - elemental_resistance($element[spooky]) / 100.0);
 		int cold_damage_taken = 463 * (1.0 - elemental_resistance($element[cold]) / 100.0);
-		details.listAppend("Fully effective A-Boo clues damage by " + (spooky_damage_taken + cold_damage_taken) + ". (" + HTMLGenerateSpanOfClass(spooky_damage_taken, "r_element_spooky") + " + " + HTMLGenerateSpanOfClass(cold_damage_taken, "r_element_cold") + ")");
+		details.listAppend("Need " + (spooky_damage_taken + cold_damage_taken) + " HP (" + HTMLGenerateSpanOfClass(spooky_damage_taken + " spooky", "r_element_spooky") + ", " + HTMLGenerateSpanOfClass(cold_damage_taken + " cold", "r_element_cold") + ") to survive 30% effective A-Boo clues.");
 		
 		task_entries.listAppend(ChecklistEntryMake("a-boo peak", "place.php?whichplace=highlands", ChecklistSubentryMake("A-Boo Peak", modifiers, details), $locations[a-boo peak]));
 	}
@@ -142,7 +142,12 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
             details.listAppend(options_left.listJoinComponents(", ", "and").capitalizeFirstLetter() + ".");
             
 			if ($item[rusty hedge trimmers].available_amount() > 0)
-				details.listAppend("Use rusty hedge trimmers.");
+            {
+                if ($item[rusty hedge trimmers].available_amount() > 1)
+                    details.listAppend("Use " + $item[rusty hedge trimmers].pluralize() + ".");
+                else
+                    details.listAppend("Use rusty hedge trimmers.");
+            }
 			if (numeric_modifier("stench resistance") < 4.0 && !stench_completed)
 				details.listAppend("+4 stench resist required.");
 				
@@ -153,7 +158,12 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
             }
 			
 			if ($item[jar of oil].available_amount() == 0 && !jar_completed)
-				details.listAppend("Jar of oil required.");
+            {
+                string line = "Jar of oil required.";
+                if ($item[bubblin' crude].available_amount() >= 12)
+                    line += " Can make by multi-using 12 bubblin' crude.";
+				details.listAppend(line);
+            }
 			if (initiative_modifier() < 40.0 && !init_completed)
             {
                 string line = "+40% init required.";
@@ -168,54 +178,68 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
 		}
 		task_entries.listAppend(ChecklistEntryMake("twin peak", "place.php?whichplace=highlands", ChecklistSubentryMake("Twin Peak", modifiers, details), $locations[twin peak]));
 	}
-	if (base_quest_state.state_float["oil peak pressure"] > 0)
+    boolean need_jar_of_oil = false;
+    if ($item[jar of oil].available_amount() == 0 && $item[bubblin' crude].available_amount() < 12 && !base_quest_state.state_boolean["Peak Jar Completed"] && base_quest_state.state_boolean["can complete twin peaks quest quickly"])
+        need_jar_of_oil = true;
+        
+	if (base_quest_state.state_float["oil peak pressure"] > 0 || need_jar_of_oil)
 	{
 		string [int] details;
 		string [int] modifiers;
-		modifiers.listAppend("+100 ML");
-		
-		string line = "Run +" + HTMLGenerateSpanFont("20/50", "", "0.8em") + "/100 ML (at ";
-		string adjustment = "+" + monster_level_adjustment() + " ML";
-		if (monster_level_adjustment() < 100)
-			adjustment = HTMLGenerateSpanFont(adjustment, "red", "");
-		adjustment += ")";
-		details.listAppend(line + adjustment);
-		
-		if ($item[jar of oil].available_amount() == 0 && $item[bubblin' crude].available_amount() < 12 && !base_quest_state.state_boolean["Peak Jar Completed"] && base_quest_state.state_boolean["can complete twin peaks quest quickly"])
+        if (base_quest_state.state_float["oil peak pressure"] > 0)
+        {
+            modifiers.listAppend("+100 ML");
+            
+            string line = "Run +" + HTMLGenerateSpanFont("20/50", "", "0.8em") + "/100 ML (at ";
+            string adjustment = "+" + monster_level_adjustment() + " ML";
+            if (monster_level_adjustment() < 100)
+                adjustment = HTMLGenerateSpanFont(adjustment, "red", "");
+            adjustment += ")";
+            details.listAppend(line + adjustment);
+            
+            
+            int turns_remaining_at_current_ml = 0;
+            float pressure_reduced_per_turn = 0.0;
+            if ($item[dress pants].available_amount() > 0)
+            {
+                if ($item[dress pants].equipped_amount() > 0)
+                {
+                    pressure_reduced_per_turn += 6.34;
+                }
+                else
+                {
+                    if (monster_level_adjustment() < 100) //only worth it <100 usually
+                        details.listAppend("Wear dress pants.");
+                }
+            }
+            if (monster_level_adjustment() >= 100)
+                pressure_reduced_per_turn += 63.4;
+            else if (monster_level_adjustment() >= 50)
+                pressure_reduced_per_turn += 31.7;
+            else if (monster_level_adjustment() >= 20)
+                pressure_reduced_per_turn += 19.02;
+            else
+                pressure_reduced_per_turn += 6.34;
+                
+            if (pressure_reduced_per_turn != 0.0)
+                turns_remaining_at_current_ml = ceil(base_quest_state.state_float["oil peak pressure"] / pressure_reduced_per_turn);
+            details.listAppend(pluralize(turns_remaining_at_current_ml, "turn", "turns") + " remaining at " + monster_level_adjustment() + " ML.");
+        }
+		if (need_jar_of_oil)
 		{
 			modifiers.listAppend("+item");
-			details.listAppend("Run +item to acquire 12 bubblin' crude (100%/30%/15% drops)");
-		}
-		
-		int turns_remaining_at_current_ml = 0;
-		float pressure_reduced_per_turn = 0.0;
-		if ($item[dress pants].available_amount() > 0)
-		{
-			if ($item[dress pants].equipped_amount() > 0)
-            {
-				pressure_reduced_per_turn += 6.34;
-            }
+            string item_drop_string = "";
+            if (monster_level_adjustment() >= 100)
+                item_drop_string = "100%/30%/15% drops";
+            else if (monster_level_adjustment() >= 50)
+                item_drop_string = "100%/30% drops";
+            else if (monster_level_adjustment() >= 20)
+                item_drop_string = "100%/10% drops";
             else
-			{
-				if (monster_level_adjustment() < 100) //only worth it <100 usually
-					details.listAppend("Wear dress pants.");
-			}
+                item_drop_string = "100% drop";
+			details.listAppend("Run +item to acquire 12 bubblin' crude (" + item_drop_string + ")");
+			details.listAppend("Have " + MIN(12, $item[bubblin' crude].available_amount()) + "/12 bubblin' crude");
 		}
-		if (monster_level_adjustment() >= 100)
-			pressure_reduced_per_turn += 63.4;
-		else if (monster_level_adjustment() >= 50)
-			pressure_reduced_per_turn += 31.7;
-		else if (monster_level_adjustment() >= 20)
-			pressure_reduced_per_turn += 19.02;
-		else
-			pressure_reduced_per_turn += 6.34;
-			
-		if (pressure_reduced_per_turn != 0.0)
-			turns_remaining_at_current_ml = ceil(base_quest_state.state_float["oil peak pressure"] / pressure_reduced_per_turn);
-			
-		if ($item[jar of oil].available_amount() == 0 && $item[bubblin' crude].available_amount() > 0 && !base_quest_state.state_boolean["Peak Jar Completed"])
-			details.listAppend("Have " + MIN(12, $item[bubblin' crude].available_amount()) + "/12 bubblin' crude"); //"
-		details.listAppend(pluralize(turns_remaining_at_current_ml, "turn", "turns") + " remaining at " + monster_level_adjustment() + " ML.");
 		
 		task_entries.listAppend(ChecklistEntryMake("oil peak", "place.php?whichplace=highlands", ChecklistSubentryMake("Oil Peak", modifiers, details), $locations[oil peak]));
 	}
@@ -275,7 +299,7 @@ void QLevel9GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         if ((lookupItem("snow berries").available_amount() > 0 || lookupItem("ice harvest").available_amount() > 0) && lookupItem("snow boards").available_amount() < 4)
 			subentry.entries.listAppend("Possibly make snow boards.");
         if (__misc_state["can use clovers"])
-			subentry.entries.listAppend("Possibly clover for parts.");
+			subentry.entries.listAppend("Possibly clover for 3 lumber and 3 fasteners.");
 
 		
 		string [int] line;

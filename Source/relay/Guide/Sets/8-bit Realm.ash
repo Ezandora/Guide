@@ -49,7 +49,7 @@ void S8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             active_url = "place.php?whichplace=forestvillage";
             description.listAppend("Psychoanalyze the crackpot mystic.");
         }
-        optional_task_entries.listAppend(ChecklistEntryMake("__familiar angry jung man", active_url, ChecklistSubentryMake("Adventure in fear man's level", modifiers, description), $locations[fear man's level]));
+        optional_task_entries.listAppend(ChecklistEntryMake("__item digital key", active_url, ChecklistSubentryMake("Adventure in fear man's level", modifiers, description), $locations[fear man's level]));
         need_route_output = false;
     }
     if (need_route_output)

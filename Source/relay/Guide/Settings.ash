@@ -1,5 +1,5 @@
 //These settings are for development. Don't worry about editing them.
-string __version = "1.0.7";
+string __version = "1.0.8";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -9,6 +9,7 @@ boolean __setting_debug_show_all_internal_states = false; //displays usable imag
 //Display settings:
 boolean __setting_side_negative_space_is_dark = false;
 boolean __setting_fill_vertical = true;
+int __setting_image_width = 100;
 
 boolean __show_importance_bar = true;
 boolean __setting_show_navbar = true;
@@ -22,6 +23,7 @@ string __setting_dark_color = "#C0C0C0";
 string __setting_modifier_color = "#404040";
 string __setting_navbar_background_color = "#FFFFFF";
 string __setting_page_background_color = "#F7F7F7";
+
 
 
 

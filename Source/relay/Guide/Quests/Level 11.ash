@@ -417,9 +417,19 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
         float exploration_per_turn = 1.0;
         if ($item[uv-resistant compass].available_amount() > 0)
             exploration_per_turn = 2.0;
+        if (lookupItem("ornate dowsing rod").available_amount() > 0)
+            exploration_per_turn = 3.0; //FIXME make completely accurate for first turn? not enough information available
         int combats_remaining = exploration_remaining;
         combats_remaining = ceil(to_float(exploration_remaining) / exploration_per_turn);
         subentry.entries.listAppend(exploration_remaining + "% exploration remaining. (" + pluralize(combats_remaining, "combat", "combats") + ")");
+        if (__last_adventure_location == $location[the arid, extra-dry desert] && $effect[ultrahydrated].have_effect() == 0)
+        {
+            string [int] description;
+            description.listAppend("Adventure in the Oasis.");
+            if ($items[ten-leaf clover, disassembled clover].available_amount() > 0)
+                description.listAppend("Potentially clover for 20 turns, versus 5.");
+            task_entries.listAppend(ChecklistEntryMake("__effect ultrahydrated", "", ChecklistSubentryMake("Acquire Ultrahydrated Effect", "", description), -11));
+        }
         if (exploration < 10)
         {
             int turns_until_gnasir_found = ceil(to_float(10 - exploration) / exploration_per_turn) + 1;
@@ -521,12 +531,31 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
         
         if (__misc_state["can equip just about any weapon"])
         {
-            if ($item[uv-resistant compass].available_amount() == 0)
+            if (lookupItem("ornate dowsing rod").available_amount() > 0)
             {
-                subentry.entries.listAppend("Acquire UV-resistant compass, equip for faster desert exploration. (shore vacation)");
+                if (lookupItem("ornate dowsing rod").equipped_amount() == 0)
+                {
+                    subentry.entries.listAppend("Equip the ornate dowsing rod.");
+                }
             }
-            else if ($item[uv-resistant compass].available_amount() > 0 && $item[uv-resistant compass].equipped_amount() == 0)
-                subentry.entries.listAppend("Equip the UV-resistant compass.");
+            else
+            {
+                if ($item[uv-resistant compass].available_amount() == 0)
+                {
+                    string line = "Acquire UV-resistant compass, equip for faster desert exploration. (shore vacation)";
+                  
+                    if (lookupItem("odd silver coin").available_amount() > 0)
+                    {
+                        line += "|Or acquire ornate dowsing rod from Paul's Boutique? (5 odd silver coins)";
+                    }
+                    subentry.entries.listAppend(line);
+                  
+                }
+                else if ($item[uv-resistant compass].available_amount() > 0 && $item[uv-resistant compass].equipped_amount() == 0)
+                {
+                    subentry.entries.listAppend("Equip the UV-resistant compass.");
+                }
+            }
         }
         
     }
@@ -537,6 +566,11 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
         {
             //Staff of ed.
             subentry.entries.listAppend("Find the Staff of Ed.");
+        }
+        else if (base_quest_state.mafia_internal_step == 12)
+        {
+            url = "place.php?whichplace=desertbeach";
+            subentry.entries.listAppend("Visit the pyramid, click on it.");
         }
         else
         {
@@ -613,8 +647,9 @@ void generateHiddenAreaUnlockForShrine(string [int] description, location shrine
             have_machete_equipped = true;
     }
     int liana_remaining = MAX(0, 3 - shrine.combatTurnsAttemptedInLocation());
-    description.listAppend("Unlock by visiting " + shrine + ".");
-    if (liana_remaining > 0)
+    if (shrine != $location[a massive ziggurat])
+        description.listAppend("Unlock by visiting " + shrine + ".");
+    if (liana_remaining > 0 && shrine.noncombatTurnsAttemptedInLocation() == 0)
     {
         string line = liana_remaining.int_to_wordy().capitalizeFirstLetter() + " dense liana remain.";
         
@@ -710,15 +745,19 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 line += " until protector spirit fight.";
                 
                 subentry.entries.listAppend(line);
-        
-                if (hidden_tavern_unlocked)
+                
+                //FIXME pop up a reminder to acquire bowl of scorpions
+                if (__misc_state["free runs usable"])
                 {
-                    if ($item[bowl of scorpions].available_amount() == 0)
-                        subentry.entries.listAppend("Buy a bowl of scorpions from the Hidden Tavern to free run from drunk pygmys.");
-                }
-                else
-                {
-                    subentry.entries.listAppend("Possibly unlock the hidden tavern first, for free runs from drum pygmys.");
+                    if (hidden_tavern_unlocked)
+                    {
+                        if ($item[bowl of scorpions].available_amount() == 0)
+                            subentry.entries.listAppend(HTMLGenerateSpanOfClass("Buy a bowl of scorpions", "r_bold") + " from the Hidden Tavern to free run from drunk pygmys.");
+                    }
+                    else
+                    {
+                        subentry.entries.listAppend("Possibly unlock the hidden tavern first, for free runs from drum pygmys.");
+                    }
                 }
             }
         
@@ -877,7 +916,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
             }
             else
             {
-                if ($location[a massive ziggurat].combatTurnsAttemptedInLocation() <3)
+                if ($location[a massive ziggurat].combatTurnsAttemptedInLocation() <3 && $location[a massive ziggurat].noncombatTurnsAttemptedInLocation() == 0)
                 {
                     generateHiddenAreaUnlockForShrine(subentry.entries,$location[a massive ziggurat]);
                 }
@@ -892,6 +931,13 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         }
         else
         {
+            if ($location[a massive ziggurat].combatTurnsAttemptedInLocation() <3)
+            {
+                ChecklistSubentry subentry;
+                subentry.header = "Massive Ziggurat";
+                generateHiddenAreaUnlockForShrine(subentry.entries,$location[a massive ziggurat]);
+                entry.subentries.listAppend(subentry);
+            }
             if (!hidden_tavern_unlocked)
             {
                 ChecklistSubentry subentry;

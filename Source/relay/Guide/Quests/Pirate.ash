@@ -195,6 +195,8 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 				line += " Use rigging shampoo, mizzenmast mop, and ball polish, then adventure to complete quest.";
 			else
 			{
+                subentry.modifiers.listAppend("+234% item");
+                subentry.modifiers.listAppend("+combat");
 				line += " Run +234% item, +combat, and collect the three washing items.";
 				if (item_drop_modifier() < 234.0)
 					additional_line = "This location can be a nightmare without +234% item.";
@@ -205,8 +207,6 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 				subentry.entries.listAppend(additional_line);
             if (!$monster[clingy pirate].is_banished() && $item[cocktail napkin].available_amount() > 0)
                 subentry.entries.listAppend("Use cocktail napkin on clingy pirate to free run/banish.");
-			subentry.modifiers.listAppend("+234% item");
-			subentry.modifiers.listAppend("+combat");
 		}
 	}
 	boolean should_output_insult_data = false;

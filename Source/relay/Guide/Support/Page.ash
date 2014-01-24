@@ -305,25 +305,43 @@ string HTMLGenerateSimpleTableLines(string [int][int] lines)
 	else
 	{
 		//div-based layout:
+        int column_count = 0;
+        
 		foreach i in lines
 		{
 			int intra_j = 0;
-			foreach j in lines[i]
-			{
-				string entry = lines[i][j];
-				string class_name;
-				if (intra_j == 0)
-					class_name = "r_stl_left";
-				else
-					class_name = "r_stl_right";
-				
-				result.append(HTMLGenerateDivOfClass(entry, class_name));
-				intra_j += 1;
-				
-			}
-			result.append(HTMLGenerateDivOfClass("", "r_end_floating_elements"));
-			
-		}
+			column_count = MAX(column_count, lines[i].count());
+        }
+        
+        
+        for intra_k from 0 to (column_count - 1)
+        {
+            string class_name;
+            if (intra_k == 0)
+                class_name = "r_stl_left";
+            else
+                class_name = "r_stl_right";
+            buffer column_contents;
+            
+            foreach i in lines
+            {
+                int intra_j = 0;
+                foreach j in lines[i]
+                {
+                    string entry = lines[i][j];
+                    if (intra_j != intra_k)
+                    {
+                        intra_j += 1;
+                        continue;
+                    }
+                    
+                    column_contents.append(HTMLGenerateDiv(entry));
+                    intra_j += 1;
+                }
+            }
+            result.append(HTMLGenerateDivOfClass(column_contents, class_name));
+        }
+        result.append(HTMLGenerateDivOfClass("", "r_end_floating_elements"));
 	}
 	return result.to_string();
 }

@@ -163,7 +163,7 @@ void generateMisc(Checklist [int] checklists)
 		ChecklistEntry [int] unimportant_task_entries;
 		string [int] king_messages;
 		king_messages.listAppend("You know, whenever.");
-		king_messages.listAppend("Maybe the naughty sorceress was right.");
+		king_messages.listAppend("Or become the new naughty sorceress?");
 		unimportant_task_entries.listAppend(ChecklistEntryMake("king imprismed", "lair6.php", ChecklistSubentryMake("Free the King", "", king_messages)));
 		
 		checklists.listAppend(ChecklistMake("Unimportant Tasks", unimportant_task_entries));
@@ -418,7 +418,7 @@ string generateRandomMessage()
         
 	if (!__misc_state["skills temporarily missing"])
 	{
-		if (!have_skill($skill[Transcendent Olfaction]))
+		if (!$skill[Transcendent Olfaction].have_skill())
             random_messages.listAppend(HTMLGenerateTagWrap("a", "visit the bounty hunter hunter sometime", mapMake("class", "r_a_undecorated", "href", "bounty.php", "target", "mainpane")));
 	}
     if (__misc_state["in aftercore"])
@@ -466,6 +466,15 @@ string generateRandomMessage()
         
     random_messages.listAppend(HTMLGenerateTagWrap("a", "&#x266b;", mapMake("class", "r_a_undecorated", "href", "http://www.kingdomofloathing.com/radio.php", "target", "_blank")));
         
+    
+    string [class] class_messages;
+    class_messages[$class[disco bandit]] = "making discos of your castles";
+    class_messages[$class[seal clubber]] = "I &#x2663;&#xfe0e; seals";
+    class_messages[$class[turtle tamer]] = "turtles turtles every where";
+    
+    if (class_messages contains my_class())
+        random_messages.listAppend(class_messages[my_class()]);
+    
     
     string [monster] monster_messages;
     foreach m in $monsters[The Temporal Bandit,crazy bastard,Knott Slanding,hockey elemental,Hypnotist of Hey Deze,infinite meat bug,QuickBASIC elemental,The Master Of Thieves,Baiowulf,Count Bakula]
@@ -556,7 +565,6 @@ void outputChecklists(Checklist [int] ordered_output_checklists)
 	foreach i in ordered_output_checklists
 	{
 		Checklist cl = ordered_output_checklists[i];
-		PageWrite(ChecklistGenerate(cl));
         
         if (__show_importance_bar && cl.title == "Tasks")
         {
@@ -564,10 +572,13 @@ void outputChecklists(Checklist [int] ordered_output_checklists)
             {
                 ChecklistEntry entry = cl.entries[key];
                 if (entry.importance_level <= -11)
+                {
                     extra_important_tasks.entries.listAppend(entry);
+                }
                     
             }
         }
+		PageWrite(ChecklistGenerate(cl));
 	}
     
     if (__show_importance_bar && extra_important_tasks.entries.count() > 0)
@@ -656,7 +667,7 @@ string [string] generateAPIResponse()
     else if (true)
     {
         //Checking every item is slow. But certain items won't trigger a reload, but need to. So:
-        boolean [item] relevant_items = $items[photocopied monster,4-d camera,pagoda plans,Elf Farm Raffle ticket,skeleton key,heavy metal thunderrr guitarrr,heavy metal sonata,Hey Deze nuts,rave whistle,damp old boot,map to Professor Jacking's laboratory,world's most unappetizing beverage,squirmy violent party snack,White Citadel Satisfaction Satchel,rusty screwdriver,giant pinky ring,The Lost Pill Bottle,GameInformPowerDailyPro magazine,dungeoneering kit,Knob Goblin encryption key,dinghy plans,Sneaky Pete's key,Jarlsberg's key,Boris's key,fat loot token,bridge,chrome ore,asbestos ore,linoleum ore,csa fire-starting kit,tropical orchid,stick of dynamite,barbed-wire fence,psychoanalytic jar,digital key,Richard's star key,star hat,star crossbow,star staff,star sword,Wand of Nagamar,Azazel's tutu,Azazel's unicorn,Azazel's lollipop,smut orc keepsake box,blessed large box,massive sitar,hammer of smiting,chelonian morningstar,greek pasta of peril,17-alarm saucepan,shagadelic disco banjo,squeezebox of the ages,E.M.U. helmet,E.M.U. harness,E.M.U. joystick,E.M.U. rocket thrusters,E.M.U. unit,wriggling flytrap pellet,Mer-kin trailmap,Mer-kin stashbox,Makeshift yakuza mask,Novelty tattoo sleeves,strange goggles,zaibatsu level 2 card, zaibatsu level 3 card,flickering pixel];
+        boolean [item] relevant_items = $items[photocopied monster,4-d camera,pagoda plans,Elf Farm Raffle ticket,skeleton key,heavy metal thunderrr guitarrr,heavy metal sonata,Hey Deze nuts,rave whistle,damp old boot,map to Professor Jacking's laboratory,world's most unappetizing beverage,squirmy violent party snack,White Citadel Satisfaction Satchel,rusty screwdriver,giant pinky ring,The Lost Pill Bottle,GameInformPowerDailyPro magazine,dungeoneering kit,Knob Goblin encryption key,dinghy plans,Sneaky Pete's key,Jarlsberg's key,Boris's key,fat loot token,bridge,chrome ore,asbestos ore,linoleum ore,csa fire-starting kit,tropical orchid,stick of dynamite,barbed-wire fence,psychoanalytic jar,digital key,Richard's star key,star hat,star crossbow,star staff,star sword,Wand of Nagamar,Azazel's tutu,Azazel's unicorn,Azazel's lollipop,smut orc keepsake box,blessed large box,massive sitar,hammer of smiting,chelonian morningstar,greek pasta of peril,17-alarm saucepan,shagadelic disco banjo,squeezebox of the ages,E.M.U. helmet,E.M.U. harness,E.M.U. joystick,E.M.U. rocket thrusters,E.M.U. unit,wriggling flytrap pellet,Mer-kin trailmap,Mer-kin stashbox,Makeshift yakuza mask,Novelty tattoo sleeves,strange goggles,zaibatsu level 2 card, zaibatsu level 3 card,flickering pixel,jar of oil,bowl of scorpions,molybdenum magnet,steel lasagna,steel margarita,steel-scented air freshener];
         //future: add snow boards
         
         

@@ -61,6 +61,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 		string [int] details;
 		string [int] modifiers;
 	
+        string url = "bigisland.php?place=orchard";
 		modifiers.listAppend("+1000% item");
 		if (__misc_state["yellow ray potentially available"])
 			modifiers.listAppend("potential YR");
@@ -74,21 +75,30 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 		else if ($effect[Filthworm Guard Stench].have_effect() > 0 || $item[Filthworm royal guard scent gland].available_amount() > 0)
 		{
 			if ($effect[Filthworm Guard Stench].have_effect() == 0)
+            {
+                url = "inventory.php?which=3";
 				details.listAppend("Use filthworm royal guard scent gland");
+            }
 			modifiers.listClear();
 			details.listAppend("Defeat the filthworm queen in the queen's chamber.");
 		}
 		else if ($effect[Filthworm Drone Stench].have_effect() > 0 || $item[Filthworm drone scent gland].available_amount() > 0)
 		{
 			if ($effect[Filthworm Drone Stench].have_effect() == 0)
+            {
+                url = "inventory.php?which=3";
 				details.listAppend("Use filthworm drone scent gland");
+            }
 			details.listAppend("Adventure with +item in the guards' chamber.");
             need_gland = true;
 		}
 		else if ($effect[Filthworm Larva Stench].have_effect() > 0 || $item[filthworm hatchling scent gland].available_amount() > 0)
 		{
 			if ($effect[Filthworm Larva Stench].have_effect() == 0)
+            {
+                url = "inventory.php?which=3";
 				details.listAppend("Use filthworm hatchling scent gland");
+            }
 			details.listAppend("Adventure with +item in the feeding chamber.");
             need_gland = true;
 		}
@@ -109,12 +119,25 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
             details.listAppend("~" + roundForOutput(turns_per_gland, 1) + " turns per gland.");
         }
 	
-		optional_task_entries.listAppend(ChecklistEntryMake("Island War Orchard", "bigisland.php?place=orchard", ChecklistSubentryMake("Island War Orchard Quest", modifiers, details), $locations[the hatching chamber, the feeding chamber, the royal guard chamber, the filthworm queen's chamber]));
+		optional_task_entries.listAppend(ChecklistEntryMake("Island War Orchard", url, ChecklistSubentryMake("Island War Orchard Quest", modifiers, details), $locations[the hatching chamber, the feeding chamber, the royal guard chamber, the filthworm queen's chamber]));
 	}
 	if (!base_quest_state.state_boolean["Farm Finished"])
 	{
 		string [int] details;
-		details.listAppend("great flappin' beasts, with webbed feet and bills! dooks!");
+		details.listAppend("Great flappin' beasts, with webbed feet and bills! dooks!");
+        
+        string [int] tasks;
+        int ncs_seen = $location[McMillicancuddy's Barn].noncombatTurnsAttemptedInLocation();
+        
+        if (ncs_seen < 1)
+            tasks.listAppend("make a fence out of the barbed wire");
+        if (ncs_seen < 2)
+            tasks.listAppend("knock over the lantern");
+        if (ncs_seen < 3)
+        {
+            tasks.listAppend("dump out the drum");
+            details.listAppend("Remember to use a chaos butterfly in combat before clearing the barn.|Then " + tasks.listJoinComponents(", ", "and") + ".");
+        }
 		optional_task_entries.listAppend(ChecklistEntryMake("Island War Farm", "bigisland.php?place=farm", ChecklistSubentryMake("Island War Farm Quest", "+meat", details), $locations[mcmillicancuddy's farm,mcmillicancuddy's barn,mcmillicancuddy's pond,mcmillicancuddy's back 40,mcmillicancuddy's other back 40,mcmillicancuddy's granary,mcmillicancuddy's bog,mcmillicancuddy's family plot,mcmillicancuddy's shady thicket]));
 	}
 	if (!base_quest_state.state_boolean["Nuns Finished"])
@@ -237,7 +260,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 			item it = $item[jam band flyers];
 			if ($item[rock band flyers].available_amount() > 0 && $item[jam band flyers].available_amount() == 0)
 				it = $item[rock band flyers];
-			task_entries.listAppend(ChecklistEntryMake(it, "", ChecklistSubentryMake("Flyer with " + it + " every combat", "", details), -11));
+			task_entries.listAppend(ChecklistEntryMake(it, "", ChecklistSubentryMake("Flyer with " + it + " every combat", "+ML", details), -11));
 		}
 	}
 }
@@ -300,7 +323,7 @@ void QLevel12GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 			if (turns_remaining > 0)
 			{
 				line += "|*" + pluralize(turns_remaining, "turn", "turns") + " remaining.";
-				line += "|*" + pluralize(frat_boys_defeated_per_combat, "frat boy", "frat boys") + " defeated per combat.";
+				line += " " + pluralize(frat_boys_defeated_per_combat, "frat boy", "frat boys") + " defeated per combat.";
 			}
 			subentry.entries.listAppend(line);
 		}
@@ -316,7 +339,7 @@ void QLevel12GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 			if (turns_remaining > 0)
 			{
 				line += "|*" + pluralize(turns_remaining, "turn", "turns") + " remaining.";
-				line += "|*" + pluralize(hippies_defeated_per_combat, "hippy", "hippies") + " defeated per combat.";
+				line += " " + pluralize(hippies_defeated_per_combat, "hippy", "hippies") + " defeated per combat.";
 			}
 			subentry.entries.listAppend(line);
 		}

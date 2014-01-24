@@ -1,3 +1,5 @@
+//FIXME this should be customizable. But an interface for that would be tricky...
+
 record PlantSuggestion
 {
 	location loc;

@@ -43,7 +43,7 @@ void QLevel3GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	
 	if (wait_until_level_eleven)
 		subentry.entries.listAppend("May want to wait until level 11 for most +ML from aria");
-	string line = "Run +ML for tangles (" + roundForOutput(rat_king_chance * 100.0, 0) + "% rat king chance, " + (to_float(round(average_tangles_found * 100.0)) / 100.0) + " tangles on average";
+	string line = "Run +ML for tangles (" + roundForOutput(rat_king_chance * 100.0, 0) + "% rat king chance, " + average_tangles_found.roundForOutput(1) + " tangles on average";
 	line += ")";
 	
 	subentry.entries.listAppend(line);

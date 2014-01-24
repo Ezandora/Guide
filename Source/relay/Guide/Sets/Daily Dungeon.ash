@@ -56,6 +56,8 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 			__misc_state_int["fat loot tokens needed"] += tokens_needed - $item[fat loot token].available_amount();
 		}
 	}
+    //When we're down to two potential skeleton keys, mention they shouldn't use them in the door.
+    boolean avoid_using_skeleton_key = ($item[pick-o-matic lockpicks].available_amount() == 0 && ($item[skeleton key].available_amount() + $item[skeleton key].creatable_amount()) <= 2 && !__quest_state["Level 13"].state_boolean["Past keys"] && in_ronin());
 	
 	boolean delay_daily_dungeon = false;
 	string delay_daily_dungeon_reason = "";
@@ -63,7 +65,9 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 	{
 		if (familiar_is_usable($familiar[gelatinous cubeling]))
 		{
-            item [int] missing_items = $items[eleven-foot pole,ring of detect boring doors,pick-o-matic lockpicks].items_missing();
+            item [int] missing_items;
+            
+            missing_items = $items[eleven-foot pole,ring of detect boring doors,pick-o-matic lockpicks].items_missing();
 			if (missing_items.count() > 0)
 			{
 				delay_daily_dungeon = true;
@@ -85,9 +89,9 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 			//No gelatinous cubeling.
 			//But! We can acquire a skeleton key in-run.
 			//So suggest doing that:
-			boolean can_make_skeleton_key = ($item[loose teeth].available_amount() > 0 && $item[skeleton bone].available_amount() > 0);
+			boolean can_make_skeleton_key = ($items[loose teeth,skeleton bone].items_missing().count() == 0);
 			
-			if ($item[pick-o-matic lockpicks].available_amount() == 0 && $item[skeleton key].available_amount() == 0 && (!__quest_state["Level 7"].state_boolean["nook finished"] || can_make_skeleton_key)) //they don't have lockpicks or a key, and they can reasonably acquire a key
+			if (!avoid_using_skeleton_key && ($item[pick-o-matic lockpicks].available_amount() == 0 && $item[skeleton key].available_amount() == 0 && (!__quest_state["Level 7"].state_boolean["nook finished"] || can_make_skeleton_key))) //they don't have lockpicks or a key, and they can reasonably acquire a key
 			{
 				delay_daily_dungeon = true;
 				if (can_make_skeleton_key)
@@ -98,11 +102,10 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 					
 				if (can_make_skeleton_key)
 				{
-					//wonder if I should suggest this if they just can in general?
 					ChecklistEntry cl = ChecklistEntryMake("__item skeleton key", "", ChecklistSubentryMake("Make a skeleton key", "", listMake("You have the ingredients.", "Speeds up the daily dungeon.")));
                     if (__last_adventure_location == $location[The Daily Dungeon])
                     {
-                        cl.importance_level = -1;
+                        cl.importance_level = -11;
                         task_entries.listAppend(cl);
                     }
                     else
@@ -111,6 +114,13 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 			}
 		}
 	}
+    
+    
+    //Pop up a warning:
+    if (__last_adventure_location == $location[the daily dungeon] && avoid_using_skeleton_key)
+    {
+        task_entries.listAppend(ChecklistEntryMake("__item skeleton key", "", ChecklistSubentryMake("Avoid using the skeleton key in the daily dungeon", "", listMake("Running low, will need one for the gates.")), -11));
+    }
     
     if (get_property_int("_lastDailyDungeonRoom") > 0)
         need_to_do_daily_dungeon = true;
@@ -176,9 +186,13 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 				else
 					description.listAppend("Keep the ring of detect boring doors equipped.");
 			}
+            
 			
             if (rooms_left < 15)
                 description.listAppend(pluralizeWordy(rooms_left, "room", "rooms").capitalizeFirstLetter() + " left.");
+            
+            if (avoid_using_skeleton_key)
+                description.listAppend(HTMLGenerateSpanOfClass("Avoid using your skeleton key, you don't have many left.", "r_bold"));
 			
 			optional_task_entries.listAppend(ChecklistEntryMake("daily dungeon", url, ChecklistSubentryMake("Daily Dungeon", "", description), $locations[the daily dungeon]));
 		}

@@ -111,7 +111,7 @@ void generateMissingItems(Checklist [int] checklists)
 			options.listAppend(from_daily_dungeon_string);
 			if (__misc_state_int["pulls available"] > 0)
 				options.listAppend("From key lime pie");
-			items_needed_entries.listAppend(ChecklistEntryMake("__item Sneaky Pete's key", "", ChecklistSubentryMake("Sneaky Pete's key", "", options)));
+			items_needed_entries.listAppend(ChecklistEntryMake("__item Sneaky Pete's key", "da.php", ChecklistSubentryMake("Sneaky Pete's key", "", options)));
 		}
 		if ($item[jarlsberg's key].available_amount() == 0)
 		{
@@ -119,7 +119,7 @@ void generateMissingItems(Checklist [int] checklists)
 			options.listAppend(from_daily_dungeon_string);
 			if (__misc_state_int["pulls available"] > 0)
 				options.listAppend("From key lime pie");
-			items_needed_entries.listAppend(ChecklistEntryMake("__item jarlsberg's key", "", ChecklistSubentryMake("Jarlsberg's key", "", options)));
+			items_needed_entries.listAppend(ChecklistEntryMake("__item jarlsberg's key", "da.php", ChecklistSubentryMake("Jarlsberg's key", "", options)));
 		}
 		if ($item[Boris's key].available_amount() == 0)
 		{
@@ -127,7 +127,7 @@ void generateMissingItems(Checklist [int] checklists)
 			options.listAppend(from_daily_dungeon_string);
 			if (__misc_state_int["pulls available"] > 0)
 				options.listAppend("From key lime pie");
-			items_needed_entries.listAppend(ChecklistEntryMake("__item Boris's key", "", ChecklistSubentryMake("Boris's key", "", options)));
+			items_needed_entries.listAppend(ChecklistEntryMake("__item Boris's key", "da.php", ChecklistSubentryMake("Boris's key", "", options)));
 		}
 	}
 	
@@ -234,6 +234,7 @@ void generateMissingItems(Checklist [int] checklists)
 				if (state_strings[i] == "Gate item")
 					subentry_string = "";
 				//unknown
+                //FIXME mention looking into your telescope on the first entry
 				items_needed_entries.listAppend(ChecklistEntryMake("Unknown", "", ChecklistSubentryMake("Unknown " + to_lower_case(state_strings[i]), "", subentry_string)));
 			}
 			else

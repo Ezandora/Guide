@@ -528,7 +528,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
 		if ($item[tattered scrap of paper].available_amount() > 0 && __misc_state["free runs usable"])
 		{
 			string [int] description;
-			description.listAppend(($item[tattered scrap of paper].available_amount() / 2.0) + " free runs.");
+			description.listAppend(($item[tattered scrap of paper].available_amount() / 2.0).roundForOutput(1) + " free runs.");
 			available_resources_entries.listAppend(ChecklistEntryMake("__item tattered scrap of paper", "", ChecklistSubentryMake(pluralize($item[tattered scrap of paper]), "", description), 8));
 		}
 		if ($item[dungeoneering kit].available_amount() > 0)
@@ -588,6 +588,66 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
             line += "|Will disappear when you ascend.";
         available_resources_entries.listAppend(ChecklistEntryMake("__item " + $item[map to safety shelter grimace prime], "inventory.php?which=3", ChecklistSubentryMake(pluralize($item[map to safety shelter grimace prime]), "", line), importance_level_unimportant_item));
     }
+    if ($item[rusty hedge trimmers].available_amount() > 0 && __quest_state["Level 9"].state_int["twin peak progress"] != 15)
+    {
+        string line = "Use to visit the Twin Peak non-combat.";
+        available_resources_entries.listAppend(ChecklistEntryMake("__item " + $item[rusty hedge trimmers], "inventory.php?which=3", ChecklistSubentryMake(pluralize($item[rusty hedge trimmers]), "", line), importance_level_unimportant_item));
+    }
     
+    if (in_run && my_path() != "Way of the Surprising Fist")
+    {
+        string image_name = "";
+        string [int] autosell_list;
+        foreach it in $items[meat stack, dense meat stack, really dense meat stack, solid gold bowling ball, fancy seashell necklace, commemorative war stein]
+        {
+            if (it.available_amount() == 0)
+                continue;
+            autosell_list.listAppend(it.pluralize());
+            
+            if (image_name.length() == 0)
+                image_name = "__item " + it;
+        }
+        string [int] open_list;
+        foreach it in $items[old coin purse, old leather wallet, black pension check, ancient vinyl coin purse, warm subject gift certificate]
+        {
+            if (it.available_amount() == 0)
+                continue;
+            open_list.listAppend(it.pluralize());
+            
+            if (image_name.length() == 0)
+                image_name = "__item " + it;
+        }
+        
+        string [int] description;
+        if (autosell_list.count() > 0)
+        {
+            description.listAppend("Autosell " + autosell_list.listJoinComponents(", ", "and") + ".");
+        }
+        if (open_list.count() > 0)
+        {
+            description.listAppend("Open " + open_list.listJoinComponents(", ", "and") + ".");
+        }
+        
+        if (description.count() > 0)
+        {
+            available_resources_entries.listAppend(ChecklistEntryMake(image_name, "inventory.php?which=3", ChecklistSubentryMake("Meat", "", description), importance_level_unimportant_item));
+        }
+    }
+    //Penultimate Fantasy chest?
+    
+    item odd_silver_coin = lookupItem("odd silver coin");
+    if (odd_silver_coin.available_amount() > 0)
+    {
+        string [int] description;
+        //FIXME description
+        //maybe after everything is spaded and on the wiki?
+        //cinnamon cannoli - 2 - 1 fullness awesome food. ...?
+        //expensive champagne - 3 - 1-fullness epic food. ...?
+        //polo trophy - 3 - +50ML for 15 turns
+        //fancy oil painting - 4 - bridge building. 10 progress supposedly?
+        //solid gold rosary - 5 - I think this is the cyrpt? need details
+        //ornate dowsing rod - 5 - better desert exploration
+        available_resources_entries.listAppend(ChecklistEntryMake("__item " + odd_silver_coin, "inventory.php?which=3", ChecklistSubentryMake(odd_silver_coin.pluralize(), "", description), importance_level_item));
+    }
     
 }
