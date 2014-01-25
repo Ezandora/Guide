@@ -19,6 +19,19 @@ CSSEntry CSSEntryMake(string tag, string class_name, string definition, int impo
     return entry;
 }
 
+record CSSBlock
+{
+    CSSEntry [int] defined_css_classes;
+    string identifier;
+};
+
+CSSBlock CSSBlockMake(string identifier)
+{
+    CSSBlock result;
+    result.identifier = identifier;
+    return result;
+}
+
 void listAppend(CSSEntry [int] list, CSSEntry entry)
 {
 	int position = list.count();
@@ -34,7 +47,7 @@ record Page
 	buffer body_contents;
 	string [string] body_attributes; //[attribute_name] -> attribute_value
 	
-    CSSEntry [int] defined_css_classes;
+    CSSBlock [string] defined_css_blocks; //There is always an implicit "" block.
 };
 
 
@@ -65,27 +78,49 @@ buffer PageGenerate(Page page_in)
 		result.append("\n");
 	}
 	//Write CSS styles:
-	if (page_in.defined_css_classes.count() > 0)
-	{
-        result.append("\t\t");
-		result.append(HTMLGenerateTagPrefix("style", mapMake("type", "text/css")));
-		result.append("\n");
-        
-        sort page_in.defined_css_classes by value.importance;
-	
-        foreach key in page_in.defined_css_classes
+    boolean wrote_css_container = false;
+    foreach identifier in page_in.defined_css_blocks
+    {
+        CSSBlock block = page_in.defined_css_blocks[identifier];
+        if (block.defined_css_classes.count() > 0)
         {
-            CSSEntry entry = page_in.defined_css_classes[key];
-            result.append("\t\t\t");
+            if (!wrote_css_container)
+            {
+                result.append("\t\t");
+                result.append(HTMLGenerateTagPrefix("style", mapMake("type", "text/css")));
+                result.append("\n");
+                    wrote_css_container = true;
+            }
+            boolean output_identifier = (block.identifier.length() > 0);
+            if (output_identifier)
+            {
+                result.append("\t\t\t");
+                result.append(block.identifier);
+                result.append("\n\t\t\t{\n");
+            }
+            sort block.defined_css_classes by value.importance;
         
-            if (entry.class_name == "")
-                result.append(entry.tag + " { " + entry.definition + " }");
-            else
-                result.append(entry.tag + "." + entry.class_name + " { " + entry.definition + " }");
-            result.append("\n");
+            foreach key in block.defined_css_classes
+            {
+                CSSEntry entry = block.defined_css_classes[key];
+                result.append("\t\t\t");
+                if (output_identifier)
+                    result.append("\t");
+            
+                if (entry.class_name == "")
+                    result.append(entry.tag + " { " + entry.definition + " }");
+                else
+                    result.append(entry.tag + "." + entry.class_name + " { " + entry.definition + " }");
+                result.append("\n");
+            }
+            if (output_identifier)
+                result.append("\n\t\t\t}\n");
         }
-		result.append("\t\t</style>\n");
-	}
+    }
+    if (wrote_css_container)
+    {
+        result.append("\t\t</style>\n");
+    }
 	result.append("\t</head>\n");
 	
 	//Body:
@@ -113,9 +148,16 @@ void PageSetTitle(Page page_in, string title)
 	page_in.title = title;
 }
 
+void PageAddCSSClass(Page page_in, string tag, string class_name, string definition, int importance, string block_identifier)
+{
+    if (!(page_in.defined_css_blocks contains block_identifier))
+        page_in.defined_css_blocks[block_identifier] = CSSBlockMake(block_identifier);
+    page_in.defined_css_blocks[block_identifier].defined_css_classes.listAppend(CSSEntryMake(tag, class_name, definition, importance));
+}
+
 void PageAddCSSClass(Page page_in, string tag, string class_name, string definition, int importance)
 {
-    page_in.defined_css_classes.listAppend(CSSEntryMake(tag, class_name, definition, importance));
+    PageAddCSSClass(page_in, tag, class_name, definition, importance, "");
 }
 
 void PageAddCSSClass(Page page_in, string tag, string class_name, string definition)
@@ -176,6 +218,11 @@ void PageAddCSSClass(string tag, string class_name, string definition)
 void PageAddCSSClass(string tag, string class_name, string definition, int importance)
 {
 	PageAddCSSClass(Page(), tag, class_name, definition, importance);
+}
+
+void PageAddCSSClass(string tag, string class_name, string definition, int importance, string block_identifier)
+{
+	PageAddCSSClass(Page(), tag, class_name, definition, importance, block_identifier);
 }
 
 void PageWriteHead(string contents)

@@ -47,11 +47,28 @@ string shrinkQuestLog(string html)
 }
 
 boolean __loaded_quest_log = false;
-void requestQuestLogLoad()
+void requestQuestLogLoad(string property_name)
 {
     if (__loaded_quest_log)
         return;
+    
+    //Known quests that should track properly:
+    boolean [string] safe_list = $strings[questM02Artist,questM10Azazel,questL10Garbage,questL11MacGuffin,questL11Manor,questL11Palindome,questL11Pyramid,questL11Worship,questL12War,questL13Final,questL02Larva,questL03Rat,questL04Bat,questL05Goblin,questL06Friar,questL07Cyrptic,questL08Trapper,questL09Topping,questM12Pirate,questS02Monkees,questM01Untinker,questM15Lol,questF04Elves];
+    
+    //Quests not on the list:
+    //questF01Primordial questF02Hyboria questF03Future - minor tracking
+    //questG02Whitecastle - tracked, but updates only started, finished, step1, step5?
+    //questG03Ego - tracked, but not updated
+    //questG04Nemesis questG05Dark - minor tracking
+    //questI02Beat - need to know professor jacking being defeated
+    
+    if (safe_list contains property_name)
+        return;
+    
+    
     __loaded_quest_log = true;
+    
+    
     
     boolean safe_to_load_again = safeToLoadQuestLog();
     int current_time = getMillisecondsOfToday();
@@ -69,19 +86,19 @@ void requestQuestLogLoad()
         string quest_log_2 = visit_url("questlog.php?which=2");
         string quest_log_1 = visit_url("questlog.php?which=1");
         if (quest_log_2.contains_text("Your Quest Log"))
-            set_property_if_changed("__relay_guide_last_quest_log_2", shrinkQuestLog(quest_log_2));
+            set_property("__relay_guide_last_quest_log_2", shrinkQuestLog(quest_log_2));
         else
             stale = true;
         if (quest_log_1.contains_text("Your Quest Log"))
-            set_property_if_changed("__relay_guide_last_quest_log_1", shrinkQuestLog(quest_log_1));
+            set_property("__relay_guide_last_quest_log_1", shrinkQuestLog(quest_log_1));
         else
             stale = true;
-        set_property_if_changed("__relay_guide_last_quest_log_reload_time", current_time.to_string());
-        set_property_if_changed("__relay_guide_stale_quest_data", stale.to_string());
+        set_property("__relay_guide_last_quest_log_reload_time", current_time.to_string());
+        set_property("__relay_guide_stale_quest_data", stale.to_string());
     }
     else
     {
-        set_property_if_changed("__relay_guide_stale_quest_data", true.to_string());
+        set_property("__relay_guide_stale_quest_data", true.to_string());
     }
 }
 
@@ -173,7 +190,7 @@ void QuestStateParseMafiaQuestProperty(QuestState state, string property_name, b
     
     if ((should_load_anyways || state.in_progress) && allow_quest_log_load)
     {
-        requestQuestLogLoad();
+        requestQuestLogLoad(property_name);
         state.QuestStateParseMafiaQuestPropertyValue(get_property(property_name));
     }
     if (QuestLogTracksProperty(property_name) && !state.finished)

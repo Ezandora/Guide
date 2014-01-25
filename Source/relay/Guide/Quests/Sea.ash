@@ -146,8 +146,28 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
             description.listAppend("Wear several mer-kin prayerbeads and possibly a mer-kin gutgirdle.");
             description.listAppend("Avoid wearing any +hp gear or buffs. Ideally, you want low HP.");
             description.listAppend("Each round, use a different healing item, until you lose the Suckrament effect.|After that, your stats are restored. Fully heal, then attack!");
-            string [int] potential_healers = split_string_mutable("mer-kin healscroll (full HP),scented massage oil (full HP),soggy used band-aid (full HP),extra-strength red potion (+200 HP),red pixel potion (+100-120 HP),red potion (+100 HP),filthy poultice (+80-120 HP),gauze garter (+80-120 HP),green pixel potion (+40-60 HP),cartoon heart (40-60 HP),red plastic oyster egg (+35-40 HP)", ","); //thank you, wiki
-            description.listAppend("Potential healing items:|*" + potential_healers.listJoinComponents("|*"));
+            string [item] potential_healers;
+            potential_healers[$item[mer-kin healscroll]] = "mer-kin healscroll (full HP)";
+            potential_healers[$item[scented massage oil]] = "scented massage oil (full HP)";
+            potential_healers[$item[soggy used band-aid]] = "soggy used band-aid (full HP)";
+            potential_healers[$item[extra-strength red potion]] = "extra-strength red potion (+200 HP)";
+            potential_healers[$item[red pixel potion]] = "red pixel potion (+100-120 HP)";
+            potential_healers[$item[red potion]] = "red potion (+100 HP)";
+            potential_healers[$item[filthy poultice]] = "filthy poultice (+80-120 HP)";
+            potential_healers[$item[gauze garter]] = "gauze garter (+80-120 HP)";
+            potential_healers[$item[green pixel potion]] = "green pixel potion (+40-60 HP)";
+            potential_healers[$item[cartoon heart]] = "cartoon heart (40-60 HP)";
+            potential_healers[$item[red plastic oyster egg]] = "red plastic oyster egg (+35-40 HP)";
+            string [int] description_healers;
+            
+            foreach it in potential_healers
+            {
+                if (it.available_amount() > 0)
+                    description_healers.listAppend(potential_healers[it]);
+                else
+                    description_healers.listAppend(HTMLGenerateSpanFont(potential_healers[it], "red", ""));
+            }
+            description.listAppend("Potential healing items:|*" + description_healers.listJoinComponents("|*"));
         }
         else
         {
@@ -165,8 +185,17 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
                 }
                 else
                 {
-                    description.listAppend("Solve the dreadscroll.");
+                    if ($effect[deep-tainted mind].have_effect() > 0)
+                        description.listAppend("Solve the dreadscroll.|Wait for Deep-Tainted Mind to wear off.");
+                    else
+                        description.listAppend("Solve the dreadscroll.");
                     description.listAppend("Clues are from:|*Three non-combats in the library. (vocabulary)|*Use a mer-kin killscroll in combat. (vocabulary)|*Use a mer-kin healscroll in combat. (vocabulary)|*Use a mer-kin knucklebone.|*Cast deep dark visions.|*Eat sushi with mer-kin worktea.");
+                    
+                    int vocabulary = get_property_int("merkinVocabularyMastery");
+                    if (vocabulary < 10)
+                        description.listAppend("At " + (vocabulary * 10) + "% Mer-Kin vocabulary. (use mer-kin wordquiz with a mer-kin cheatsheet)");
+                    else
+                        description.listAppend("Mer-Kin vocabulary mastered.");
                 }
             }
         }
@@ -181,8 +210,8 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
         string [int] description;
         
         description.listAppend("Equip Clothing of Loathing, go to the temple.");
-        description.listAppend("Fling 120MP hobopolis spells at him.");
-        description.listAppend("Use Mafia's \"dad\" GCLI command to see which element to use.");
+        description.listAppend("Cast 120MP hobopolis spells at him.");
+        description.listAppend("Use Mafia's \"dad\" GCLI command to see which element to use which round.");
         if (my_mp() < 1200)
             description.listAppend("Will need 1200MP, or less if using shrap/volcanometeor showeruption.");
         
@@ -348,15 +377,15 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
                     monster lockkey_monster = get_property("merkinLockkeyMonster").to_monster();
                     if (lockkey_monster == $monster[mer-kin burglar])
                     {
-                        nc_details = "Stashbox is in the Sneaky Intent.";
+                        nc_details = "Stashbox is in the camouflaged tent.";
                     }
                     else if (lockkey_monster == $monster[mer-kin raider])
                     {
-                        nc_details = "Stashbox is in the Aggressive Intent.";
+                        nc_details = "Stashbox is in the skull-bedecked tent.";
                     }
                     else if (lockkey_monster == $monster[mer-kin healer])
                     {
-                        nc_details = "Stashbox is in the Mysterious Intent.";
+                        nc_details = "Stashbox is in the glyphed tent.";
                     }
                     
                     need_minus_combat_modifier = true;

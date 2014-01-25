@@ -247,14 +247,19 @@ void ChecklistInit()
 	PageAddCSSClass("div", "r_cl_l_container_highlighted", gradient + "padding-top:5px;padding-bottom:5px;");
     
     
-	PageAddCSSClass("div", "r_cl_l_left", "float:left;width:" + __setting_image_width + "px;margin-left:20px;");
-	PageAddCSSClass("div", "r_cl_l_right_container", "width:100%;margin-left:" + (-__setting_image_width - 20) + "px;float:right;text-align:left;vertical-align:top;");
-	PageAddCSSClass("div", "r_cl_l_right_content", "margin-left:" + (__setting_image_width + 20) + "px;display:inline-block;margin-right:20px;");
+	PageAddCSSClass("div", "r_cl_l_left", "float:left;width:" + __setting_image_width_large + "px;margin-left:20px;overflow:hidden;");
+	PageAddCSSClass("div", "r_cl_l_right_container", "width:100%;margin-left:" + (-__setting_image_width_large - 20) + "px;float:right;text-align:left;vertical-align:top;");
+	PageAddCSSClass("div", "r_cl_l_right_content", "margin-left:" + (__setting_image_width_large + 20 + 2) + "px;display:inline-block;margin-right:20px;");
     
     PageAddCSSClass("hr", "r_cl_hr", "padding:0px;margin-top:0px;margin-bottom:0px;width:auto; margin-left:" + __setting_indention_width + ";margin-right:" + __setting_indention_width +";");
     PageAddCSSClass("hr", "r_cl_hr_extended", "padding:0px;margin-top:0px;margin-bottom:0px;width:auto; margin-left:" + __setting_indention_width + ";margin-right:0px;");
 	PageAddCSSClass("div", "r_cl_holding_container", "display:inline-block;");
 	
+    
+    PageAddCSSClass("", "r_cl_image_container_large", "display:block;");
+    PageAddCSSClass("", "r_cl_image_container_medium", "display:none;");
+    PageAddCSSClass("", "r_cl_image_container_small", "display:none;");
+    
 	if (true)
 	{
 		string div_style = "";
@@ -263,6 +268,52 @@ void ChecklistInit()
         div_style += "background-color:#FFFFFF; width:100%; padding-top:5px;";
 		PageAddCSSClass("div", "r_cl_checklist_container", div_style);
 	}
+    
+    //media queries:
+    if (!__use_table_based_layouts)
+    {
+        PageAddCSSClass("div", "r_cl_l_left", "width:" + __setting_image_width_medium + "px;margin-left:10px;", 0, __setting_media_query_medium_size);
+        PageAddCSSClass("div", "r_cl_l_right_container", "margin-left:" + (-__setting_image_width_medium - 10) + "px;", 0, __setting_media_query_medium_size);
+        PageAddCSSClass("div", "r_cl_l_right_content", "margin-left:" + (__setting_image_width_medium + 10 + 2) + "px;margin-right:10px;", 0, __setting_media_query_medium_size);
+        PageAddCSSClass("div", "r_cl_l_container", "padding-top:4px;padding-bottom:4px;", 0, __setting_media_query_medium_size);
+        PageAddCSSClass("hr", "r_cl_hr", "margin-left:" + (__setting_indention_width_in_em / 2.0) + "em;margin-right:" + (__setting_indention_width_in_em / 2.0) +"em;", 0, __setting_media_query_medium_size);
+        PageAddCSSClass("hr", "r_cl_hr_extended", "margin-left:" + (__setting_indention_width_in_em / 2.0) + "em;", 0, __setting_media_query_medium_size);
+        
+        
+        
+        PageAddCSSClass("div", "r_cl_l_left", "width:" + (__setting_image_width_small) + "px;margin-left:10px;", 0, __setting_media_query_small_size);
+        PageAddCSSClass("div", "r_cl_l_right_container", "margin-left:" + (-(__setting_image_width_small) - 10) + "px;", 0, __setting_media_query_small_size);
+        PageAddCSSClass("div", "r_cl_l_right_content", "margin-left:" + ((__setting_image_width_small) + 10 + 10) + "px;margin-right:3px;", 0, __setting_media_query_small_size);
+        PageAddCSSClass("hr", "r_cl_hr", "margin-left:0px;margin-right:0px;", 0, __setting_media_query_small_size);
+        PageAddCSSClass("hr", "r_cl_hr_extended", "margin-left:0px;", 0, __setting_media_query_small_size);
+        PageAddCSSClass("div", "r_cl_l_container", "padding-top:3px;padding-bottom:3px;", 0, __setting_media_query_small_size);
+        
+        
+        
+        
+        
+        PageAddCSSClass("div", "r_cl_l_left", "width:" + (0) + "px;margin-left:3px;", 0, __setting_media_query_tiny_size);
+        PageAddCSSClass("div", "r_cl_l_right_container", "margin-left:" + (-(0) - 3) + "px;", 0, __setting_media_query_tiny_size);
+        PageAddCSSClass("div", "r_cl_l_right_content", "margin-left:" + ((0) + 3 + 2) + "px;margin-right:3px;", 0, __setting_media_query_tiny_size);
+        PageAddCSSClass("hr", "r_cl_hr", "margin-left:0px;margin-right:0px;", 0, __setting_media_query_tiny_size);
+        PageAddCSSClass("hr", "r_cl_hr_extended", "margin-left:0px;", 0, __setting_media_query_tiny_size);
+        PageAddCSSClass("div", "r_cl_l_container", "padding-top:3px;padding-bottom:3px;", 0, __setting_media_query_tiny_size);
+        
+        
+        
+        PageAddCSSClass("", "r_cl_image_container_large", "display:none", 0, __setting_media_query_medium_size);
+        PageAddCSSClass("", "r_cl_image_container_medium", "display:block;", 0, __setting_media_query_medium_size);
+        PageAddCSSClass("", "r_cl_image_container_small", "display:none;", 0, __setting_media_query_medium_size);
+        
+        PageAddCSSClass("", "r_cl_image_container_large", "display:none", 0, __setting_media_query_small_size);
+        PageAddCSSClass("", "r_cl_image_container_medium", "display:none;", 0, __setting_media_query_small_size);
+        PageAddCSSClass("", "r_cl_image_container_small", "display:block;", 0, __setting_media_query_small_size);
+        
+        PageAddCSSClass("", "r_cl_image_container_large", "display:none", 0, __setting_media_query_tiny_size);
+        PageAddCSSClass("", "r_cl_image_container_medium", "display:none;", 0, __setting_media_query_tiny_size);
+        PageAddCSSClass("", "r_cl_image_container_small", "display:none;", 0, __setting_media_query_tiny_size);
+        
+    }
 }
 
 //Creates if not found:
@@ -388,17 +439,25 @@ buffer ChecklistGenerate(Checklist cl, boolean output_borders)
                 class_name = "r_cl_hr_extended";
 			result.append(HTMLGenerateTagPrefix("hr", mapMake("class", class_name)));
 		}
-		
+        if (__use_table_based_layouts)
+            __setting_entire_area_clickable = true;
 		boolean outputting_anchor = false;
+        buffer anchor_prefix_html;
+        buffer anchor_suffix_html;
 		if (entry.target_location != "")
 		{
-			result.append(HTMLGenerateTagPrefix("a", mapMake("target", "mainpane", "href", entry.target_location, "class", "r_a_undecorated")));
+            anchor_prefix_html = HTMLGenerateTagPrefix("a", mapMake("target", "mainpane", "href", entry.target_location, "class", "r_a_undecorated"));
+			anchor_suffix_html.append("</a>");
 			outputting_anchor = true;
 		}
+        if (outputting_anchor && __setting_entire_area_clickable)
+			result.append(anchor_prefix_html);
 		
 		boolean setting_use_holding_containers_per_subentry = true;
 			
-		Vec2i max_image_dimensions = Vec2iMake(__setting_image_width,75);
+		Vec2i max_image_dimensions_large = Vec2iMake(__setting_image_width_large,75);
+		Vec2i max_image_dimensions_medium = Vec2iMake(__setting_image_width_medium,50);
+		Vec2i max_image_dimensions_small = Vec2iMake(__setting_image_width_small,50);
         
         string container_class = "r_cl_l_container";
         if (entry.should_highlight)
@@ -413,9 +472,9 @@ buffer ChecklistGenerate(Checklist cl, boolean output_borders)
 			
 			result.append(HTMLGenerateTagWrap("td", "", mapMake("style", "width:" + __setting_indention_width + ";")));
 			result.append("<td>");
-			result.append(HTMLGenerateTagPrefix("td", mapMake("style", "min-width:" + __setting_image_width + "px; max-width:" + __setting_image_width + "px; width:" + __setting_image_width + "px;vertical-align:top; text-align: center;")));
+			result.append(HTMLGenerateTagPrefix("td", mapMake("style", "min-width:" + __setting_image_width_large + "px; max-width:" + __setting_image_width_large + "px; width:" + __setting_image_width_large + "px;vertical-align:top; text-align: center;")));
 			
-			result.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions));
+			result.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_large));
 			
 			result.append("</td>");
 			result.append(HTMLGenerateTagPrefix("td", mapMake("style", "text-align:left; vertical-align:top")));
@@ -481,8 +540,33 @@ buffer ChecklistGenerate(Checklist cl, boolean output_borders)
 		else
 		{
 			//div-based layout:
-			result.append(HTMLGenerateDivOfClass(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions), "r_cl_l_left"));
+            
+            if (true)
+            {
+                
+                buffer image_container;
+                
+                if (outputting_anchor && !__setting_entire_area_clickable)
+                    image_container.append(anchor_prefix_html);
+                
+                image_container.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_large, "r_cl_image_container_large"));
+                image_container.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_medium, "r_cl_image_container_medium"));
+                image_container.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_small, "r_cl_image_container_small"));
+                
+                if (outputting_anchor && !__setting_entire_area_clickable)
+                    image_container.append(anchor_suffix_html);
+                
+                result.append(HTMLGenerateDivOfClass(image_container, "r_cl_l_left"));
+                
+            }
+            else
+                result.append(HTMLGenerateDivOfClass(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_large), "r_cl_l_left"));
+            
+            
 			result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_cl_l_right_container")));
+            
+            if (outputting_anchor && !__setting_entire_area_clickable)
+                result.append(anchor_prefix_html);
 			result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_cl_l_right_content")));
 			
 			boolean first = true;
@@ -536,14 +620,16 @@ buffer ChecklistGenerate(Checklist cl, boolean output_borders)
 					result.append("</div>");
 			}
 			result.append("</div>");
+                if (outputting_anchor && !__setting_entire_area_clickable)
+                    result.append(anchor_suffix_html);
 			result.append("</div>");
 			result.append(HTMLGenerateDivOfClass("", "r_end_floating_elements")); //stop floating
 		}
         result.append("</div>");
 
 		
-		if (outputting_anchor)
-			result.append("</a>");
+		if (outputting_anchor && __setting_entire_area_clickable)
+            result.append(anchor_suffix_html);
 		
 		intra_i += 1;
 		entries_output += 1;

@@ -13,7 +13,6 @@ void QPirateInit()
 		state.startable = true;
 		if (!state.in_progress && !state.finished)
 		{
-            requestQuestLogLoad();
 			QuestStateParseMafiaQuestPropertyValue(state, "started");
 		}
 	}

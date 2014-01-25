@@ -320,12 +320,12 @@ void QLevel9GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		if (line.count() > 0)
 			subentry.entries.listAppend("Need " + line.listJoinComponents(" ", "and") + ".");
 	}
-	else if (base_quest_state.mafia_internal_step == 2)
+	/*else if (base_quest_state.mafia_internal_step == 2)
 	{
 		//bridge built, talk to angus:
 		subentry.entries.listAppend("Talk to Angus in the Highland Lord's tower.");
-	}
-	else if (base_quest_state.mafia_internal_step == 3)
+	}*/
+	else if (base_quest_state.mafia_internal_step == 2 || base_quest_state.mafia_internal_step == 3)
 	{
 		//do three peaks:
 		subentry.entries.listAppend("Light the fires!");

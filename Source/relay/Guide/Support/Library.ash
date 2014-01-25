@@ -181,15 +181,6 @@ string int_to_wordy(int v) //Not complete, only supports a handful:
     return v.to_string();
 }
 
-//Prevent a write to disk if nothing's changing:
-//(not sure if mafia checks this internally)
-void set_property_if_changed(string property, string value)
-{
-    if (get_property(property) == value)
-        return;
-    set_property(property, value);
-}
-
 //Non-API-related functions:
 boolean playerIsLoggedIn()
 {

@@ -1,5 +1,5 @@
 //These settings are for development. Don't worry about editing them.
-string __version = "1.0.8";
+string __version = "1.0.9";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -7,9 +7,12 @@ boolean __setting_debug_enable_example_mode_in_aftercore = false; //for testing.
 boolean __setting_debug_show_all_internal_states = false; //displays usable images/__misc_state/__misc_state_string/__misc_state_int/__quest_state
 
 //Display settings:
+boolean __setting_entire_area_clickable = false;
 boolean __setting_side_negative_space_is_dark = false;
 boolean __setting_fill_vertical = true;
-int __setting_image_width = 100;
+int __setting_image_width_large = 100;
+int __setting_image_width_medium = 70;
+int __setting_image_width_small = 30;
 
 boolean __show_importance_bar = true;
 boolean __setting_show_navbar = true;
@@ -24,6 +27,10 @@ string __setting_modifier_color = "#404040";
 string __setting_navbar_background_color = "#FFFFFF";
 string __setting_page_background_color = "#F7F7F7";
 
+string __setting_media_query_large_size = "@media (min-width:500px)";
+string __setting_media_query_medium_size = "@media (min-width:320px) and (max-width:500px)";
+string __setting_media_query_small_size = "@media (max-width:320px) and (min-width:225px)";
+string __setting_media_query_tiny_size = "@media (max-width:225px)";
 
 
 

@@ -6,7 +6,6 @@ void QManorInit()
 		QuestStateParseMafiaQuestPropertyValue(state, "finished");
 	else
     {
-        requestQuestLogLoad();
 		QuestStateParseMafiaQuestPropertyValue(state, "started");
     }
 	state.quest_name = "Spookyraven Manor Unlock";

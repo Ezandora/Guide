@@ -193,7 +193,7 @@ void SPMeatGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     }
         
         
-	optional_task_entries.listAppend(ChecklistEntryMake("meat", "", ChecklistSubentryMake("The Meatsmith's Brainspace", modifiers, description),$locations[The Nightmare Meatrealm]));
+	optional_task_entries.listAppend(ChecklistEntryMake("meat", "place.php?whichplace=junggate_6", ChecklistSubentryMake("The Meatsmith's Brainspace", modifiers, description),$locations[The Nightmare Meatrealm]));
 }
 
 void SPGourdGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)

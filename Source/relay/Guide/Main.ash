@@ -23,12 +23,17 @@ void setUpCSSStyles()
         body_style += "background-color:" + __setting_dark_color + ";";
     else
         body_style += "background-color:#FFFFFF;";
-    body_style += "margin:0px;font-size:14px;";
+    body_style += "margin:0px;padding:0px;font-size:14px;";
     
     if (__setting_ios_appearance)
         body_style += "font-family:'Helvetica Neue',Arial, Helvetica, sans-serif;font-weight:lighter;";
     
     PageAddCSSClass("body", "", body_style, -11);
+    
+    PageAddCSSClass("body", "", "font-size:13px;", -11, __setting_media_query_medium_size);
+    PageAddCSSClass("body", "", "font-size:12px;", -11, __setting_media_query_small_size);
+    PageAddCSSClass("body", "", "font-size:12px;", -11, __setting_media_query_tiny_size);
+    
     
 	PageAddCSSClass("", "r_future_option", "color:" + __setting_unavailable_color + ";");
 	
@@ -75,23 +80,28 @@ void generateImageTest(Checklist [int] checklists)
 void generateStateTest(Checklist [int] checklists)
 {
 	ChecklistEntry [int] misc_state_entries;
-	ChecklistEntry [int] misc_state_string_entries;
-	ChecklistEntry [int] misc_state_int_entries;
 	ChecklistEntry [int] quest_state_entries;
+    
 	
+    string [int] state_description;
+    string [int] string_description;
+    string [int] int_description;
 	foreach key in __misc_state
 	{
-		misc_state_entries.listAppend(ChecklistEntryMake("blank", "", ChecklistSubentryMake(key + " = " + __misc_state[key])));
+        state_description.listAppend(key + " = " + __misc_state[key]);
 	}
 	foreach key in __misc_state_string
 	{
-		misc_state_string_entries.listAppend(ChecklistEntryMake("blank", "", ChecklistSubentryMake(key + " = \"" + __misc_state_string[key] + "\"")));
+        string_description.listAppend(key + " = \"" + __misc_state_string[key] + "\"");
 	}
 	foreach key in __misc_state_int
 	{
-		misc_state_int_entries.listAppend(ChecklistEntryMake("blank", "", ChecklistSubentryMake(key + " = " + __misc_state_int[key])));
+        int_description.listAppend(key + " = " + __misc_state_int[key]);
 	}
 	
+    misc_state_entries.listAppend(ChecklistEntryMake("__item milky potion", "", ChecklistSubentryMake("Boolean", "", state_description.listJoinComponents("|"))));
+    misc_state_entries.listAppend(ChecklistEntryMake("__item ghost thread", "", ChecklistSubentryMake("String", "", string_description.listJoinComponents("|"))));
+    misc_state_entries.listAppend(ChecklistEntryMake("__item handful of numbers", "", ChecklistSubentryMake("Int", "", int_description.listJoinComponents("|"))));
 	
 	boolean [string] names_already_seen;
 	
@@ -149,9 +159,7 @@ void generateStateTest(Checklist [int] checklists)
 	}
 	
 	
-	checklists.listAppend(ChecklistMake("Misc. Boolean States", misc_state_entries));
-	checklists.listAppend(ChecklistMake("Misc. String States", misc_state_string_entries));
-	checklists.listAppend(ChecklistMake("Misc. Int States", misc_state_int_entries));
+	checklists.listAppend(ChecklistMake("Misc. States", misc_state_entries));
 	checklists.listAppend(ChecklistMake("Quest States", quest_state_entries));
 }
 
@@ -432,7 +440,7 @@ string generateRandomMessage()
     familiar_messages[$familiar[Frumious Bandersnatch]] = "frabjous";
     familiar_messages[$familiar[Pair of Stomping Boots]] = "running away again?";
     familiar_messages[$familiar[baby sandworm]] = "the waters of life";
-    familiar_messages[$familiar[baby bugged bugbear]] = "expected }, found ; (Main.ash, line 440)";
+    familiar_messages[$familiar[baby bugged bugbear]] = "expected }, found ; (Main.ash, line 443)";
     familiar_messages[$familiar[mechanical songbird]] = "a little glowing friend";
     familiar_messages[$familiar[nanorhino]] = "write every day";
     familiar_messages[$familiar[rogue program]] = "ascends for the users";
@@ -667,7 +675,7 @@ string [string] generateAPIResponse()
     else if (true)
     {
         //Checking every item is slow. But certain items won't trigger a reload, but need to. So:
-        boolean [item] relevant_items = $items[photocopied monster,4-d camera,pagoda plans,Elf Farm Raffle ticket,skeleton key,heavy metal thunderrr guitarrr,heavy metal sonata,Hey Deze nuts,rave whistle,damp old boot,map to Professor Jacking's laboratory,world's most unappetizing beverage,squirmy violent party snack,White Citadel Satisfaction Satchel,rusty screwdriver,giant pinky ring,The Lost Pill Bottle,GameInformPowerDailyPro magazine,dungeoneering kit,Knob Goblin encryption key,dinghy plans,Sneaky Pete's key,Jarlsberg's key,Boris's key,fat loot token,bridge,chrome ore,asbestos ore,linoleum ore,csa fire-starting kit,tropical orchid,stick of dynamite,barbed-wire fence,psychoanalytic jar,digital key,Richard's star key,star hat,star crossbow,star staff,star sword,Wand of Nagamar,Azazel's tutu,Azazel's unicorn,Azazel's lollipop,smut orc keepsake box,blessed large box,massive sitar,hammer of smiting,chelonian morningstar,greek pasta of peril,17-alarm saucepan,shagadelic disco banjo,squeezebox of the ages,E.M.U. helmet,E.M.U. harness,E.M.U. joystick,E.M.U. rocket thrusters,E.M.U. unit,wriggling flytrap pellet,Mer-kin trailmap,Mer-kin stashbox,Makeshift yakuza mask,Novelty tattoo sleeves,strange goggles,zaibatsu level 2 card, zaibatsu level 3 card,flickering pixel,jar of oil,bowl of scorpions,molybdenum magnet,steel lasagna,steel margarita,steel-scented air freshener];
+        boolean [item] relevant_items = $items[photocopied monster,4-d camera,pagoda plans,Elf Farm Raffle ticket,skeleton key,heavy metal thunderrr guitarrr,heavy metal sonata,Hey Deze nuts,rave whistle,damp old boot,map to Professor Jacking's laboratory,world's most unappetizing beverage,squirmy violent party snack,White Citadel Satisfaction Satchel,rusty screwdriver,giant pinky ring,The Lost Pill Bottle,GameInformPowerDailyPro magazine,dungeoneering kit,Knob Goblin encryption key,dinghy plans,Sneaky Pete's key,Jarlsberg's key,Boris's key,fat loot token,bridge,chrome ore,asbestos ore,linoleum ore,csa fire-starting kit,tropical orchid,stick of dynamite,barbed-wire fence,psychoanalytic jar,digital key,Richard's star key,star hat,star crossbow,star staff,star sword,Wand of Nagamar,Azazel's tutu,Azazel's unicorn,Azazel's lollipop,smut orc keepsake box,blessed large box,massive sitar,hammer of smiting,chelonian morningstar,greek pasta of peril,17-alarm saucepan,shagadelic disco banjo,squeezebox of the ages,E.M.U. helmet,E.M.U. harness,E.M.U. joystick,E.M.U. rocket thrusters,E.M.U. unit,wriggling flytrap pellet,Mer-kin trailmap,Mer-kin stashbox,Makeshift yakuza mask,Novelty tattoo sleeves,strange goggles,zaibatsu level 2 card, zaibatsu level 3 card,flickering pixel,jar of oil,bowl of scorpions,molybdenum magnet,steel lasagna,steel margarita,steel-scented air freshener,Grandma's Map,mer-kin healscroll,scented massage oil,soggy used band-aid,extra-strength red potion,red pixel potion,red potion,filthy poultice,gauze garter,green pixel potion,cartoon heart,red plastic oyster egg];
         //future: add snow boards
         
         
@@ -873,7 +881,7 @@ void runMain(string relay_filename)
         return;
 	}
     
-    set_property_if_changed("__relay_guide_stale_quest_data", "false");
+    set_property("__relay_guide_stale_quest_data", "false");
     
 	boolean output_body_tag_only = false;
 	if (form_fields["body tag only"].length() > 0)
@@ -899,6 +907,8 @@ void runMain(string relay_filename)
 	
     if (__setting_use_kol_css)
         PageWriteHead(HTMLGenerateTagPrefix("link", mapMake("rel", "stylesheet", "type", "text/css", "href", "/images/styles.css")));
+        
+    PageWriteHead(HTMLGenerateTagPrefix("meta", mapMake("name", "viewport", "content", "width=device-width")));
 	
 	
     if (__relay_filename == "relay_Guide.ash")

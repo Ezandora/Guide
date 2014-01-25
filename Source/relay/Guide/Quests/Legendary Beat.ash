@@ -9,7 +9,7 @@ void QLegendaryBeatInit()
     
     if (!state.started)
     {
-        requestQuestLogLoad();
+        requestQuestLogLoad("questI02Beat");
         QuestStateParseMafiaQuestPropertyValue(state, "started");
     }
 	
@@ -34,13 +34,13 @@ void QLegendaryBeatGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         
     //FIXME support for fruit machine sidequest?
     
-    //Main quest, in reverse order:
     if (base_quest_state.mafia_internal_step == 1)
     {
         subentry.entries.listAppend("Defeat Professor Jacking.");
     }
     else if (base_quest_state.mafia_internal_step == 2)
     {
+        //Main quest, in reverse order:
         if ($item[can-you-dig-it?].available_amount() > 0 && $effect[stubbly legs].have_effect() > 0)
         {
             subentry.modifiers.listAppend("-combat");

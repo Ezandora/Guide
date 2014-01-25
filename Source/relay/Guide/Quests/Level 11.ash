@@ -113,7 +113,6 @@ void QLevel11Init()
 			QuestStateParseMafiaQuestPropertyValue(state, "finished");
 		else if (__quest_state["Level 2"].startable)
         {
-            requestQuestLogLoad();
 			QuestStateParseMafiaQuestPropertyValue(state, "started");
         }
 		else
@@ -419,17 +418,23 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
             exploration_per_turn = 2.0;
         if (lookupItem("ornate dowsing rod").available_amount() > 0)
             exploration_per_turn = 3.0; //FIXME make completely accurate for first turn? not enough information available
+        //FIXME deal with ultra-hydrated
         int combats_remaining = exploration_remaining;
         combats_remaining = ceil(to_float(exploration_remaining) / exploration_per_turn);
         subentry.entries.listAppend(exploration_remaining + "% exploration remaining. (" + pluralize(combats_remaining, "combat", "combats") + ")");
-        if (__last_adventure_location == $location[the arid, extra-dry desert] && $effect[ultrahydrated].have_effect() == 0)
+        if ($effect[ultrahydrated].have_effect() == 0)
         {
-            string [int] description;
-            description.listAppend("Adventure in the Oasis.");
-            if ($items[ten-leaf clover, disassembled clover].available_amount() > 0)
-                description.listAppend("Potentially clover for 20 turns, versus 5.");
-            task_entries.listAppend(ChecklistEntryMake("__effect ultrahydrated", "", ChecklistSubentryMake("Acquire Ultrahydrated Effect", "", description), -11));
+            if (__last_adventure_location == $location[the arid, extra-dry desert])
+            {
+                string [int] description;
+                description.listAppend("Adventure in the Oasis.");
+                if ($items[ten-leaf clover, disassembled clover].available_amount() > 0)
+                    description.listAppend("Potentially clover for 20 turns, versus 5.");
+                task_entries.listAppend(ChecklistEntryMake("__effect ultrahydrated", "", ChecklistSubentryMake("Acquire Ultrahydrated Effect", "", description), -11));
+            }
+            subentry.entries.listAppend("Need ultra-hydrated from The Oasis. (potential clover for 20 turns)");
         }
+        //FIXME make gnasir detection slightly more robust
         if (exploration < 10)
         {
             int turns_until_gnasir_found = ceil(to_float(10 - exploration) / exploration_per_turn) + 1;
@@ -756,7 +761,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                     }
                     else
                     {
-                        subentry.entries.listAppend("Possibly unlock the hidden tavern first, for free runs from drum pygmys.");
+                        subentry.entries.listAppend("Possibly unlock the hidden tavern first, for free runs from drunk pygmies.");
                     }
                 }
             }

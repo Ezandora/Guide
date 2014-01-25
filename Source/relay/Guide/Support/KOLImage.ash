@@ -1,6 +1,7 @@
 import "relay/Guide/Support/Math.ash"
 import "relay/Guide/Support/HTML.ash"
 import "relay/Guide/Support/Library.ash"
+import "relay/Guide/Support/Page.ash"
 
 boolean __setting_show_alignment_guides = false;
 //Library for displaying KOL images
@@ -52,6 +53,8 @@ void KOLImagesInit()
 {
     if (__kol_images_has_inited)
         return;
+        
+	PageAddCSSClass("div", "r_image_container", "overflow:hidden;position:relative;top:0px;left:0px;");
     __kol_images_has_inited = true;
 	__kol_images["typical tavern"] = KOLImageMake("images/otherimages/woods/tavern0.gif", Vec2iMake(100,100), RectMake(0,39,99,97));
 	__kol_images["boss bat"] = KOLImageMake("images/adventureimages/bossbat.gif", Vec2iMake(100,100), RectMake(0,27,99,74));
@@ -63,16 +66,15 @@ void KOLImagesInit()
 	__kol_images["highland lord"] = KOLImageMake("images/otherimages/orcchasm/highlands_main.gif", Vec2iMake(500, 250), RectMake(375,73,457,144));
 	__kol_images["orc chasm"] = KOLImageMake("images/otherimages/mountains/chasm.gif", Vec2iMake(100, 100), RectMake(0, 41, 99, 95));
 	
-	__kol_images["spooky forest"] = KOLImageMake("images/otherimages/woods/forest.gif", Vec2iMake(100, 100), RectMake(0,39,99,93));
+	__kol_images["spooky forest"] = KOLImageMake("images/otherimages/woods/forest.gif", Vec2iMake(100, 100), RectMake(12,39,91,93));
 	__kol_images["council"] = KOLImageMake("images/otherimages/council.gif", Vec2iMake(100, 100), RectMake(0,26,99,73));
 	
 	
-	__kol_images["daily dungeon"] = KOLImageMake("images/otherimages/town/dd1.gif", Vec2iMake(100,100), RectMake(0,44,99,86));
+	__kol_images["daily dungeon"] = KOLImageMake("images/otherimages/town/dd1.gif", Vec2iMake(100,100), RectMake(28,44,71,86));
 	__kol_images["clover"] = KOLImageMake("images/itemimages/clover.gif", Vec2iMake(30,30));
 	
 	__kol_images["mayfly bait"] = KOLImageMake("images/itemimages/mayflynecklace.gif", Vec2iMake(30,30));
 	__kol_images["spooky putty"] = KOLImageMake("images/itemimages/sputtysheet.gif", Vec2iMake(30,30));
-	__kol_images["folder holder"] = KOLImageMake("images/itemimages/folderholder2.gif", Vec2iMake(30,30));
 	
 	__kol_images["fax machine"] = KOLImageMake("images/otherimages/clanhall/faxmachine.gif", Vec2iMake(100,100), RectMake(34,28,62,54));
 	
@@ -84,9 +86,9 @@ void KOLImagesInit()
 	
 	__kol_images[""] = KOLImageMake("images/itemimages/blank.gif", Vec2iMake(30,30));
 	__kol_images["blank"] = KOLImageMake("images/itemimages/blank.gif", Vec2iMake(30,30));
-	__kol_images["demon summon"] = KOLImageMake("images/otherimages/manor/chamber.gif", Vec2iMake(100,100), RectMake(11, 11, 88, 66));
+	__kol_images["demon summon"] = KOLImageMake("images/otherimages/manor/chamber.gif", Vec2iMake(100,100), RectMake(14, 12, 88, 66));
 	
-	__kol_images["cobb's knob"] = KOLImageMake("images/otherimages/plains/knob2.gif", Vec2iMake(100,100), RectMake(0,43,99,78));
+	__kol_images["cobb's knob"] = KOLImageMake("images/otherimages/plains/knob2.gif", Vec2iMake(100,100), RectMake(12,43,86,78));
 	
 	__kol_images["generic dwelling"] = KOLImageMake("images/otherimages/campground/rest4.gif", Vec2iMake(100,100), RectMake(0,26,95,99));
 	
@@ -98,7 +100,11 @@ void KOLImagesInit()
 	__kol_images["castle"] = KOLImageMake("images/otherimages/stalktop/beanstalk.gif", Vec2iMake(500,400), RectMake(234,158,362,290)); //experimental - half sized castle
 	__kol_images["penultimate fantasy airship"] = KOLImageMake("images/otherimages/stalktop/beanstalk.gif", Vec2iMake(500,400), RectMake(75, 231, 190, 367));
 	__kol_images["lift, bro"] = KOLImageMake("images/adventureimages/fitposter.gif", Vec2iMake(100,100));
-	__kol_images["castle stairs up"] = KOLImageMake("images/adventureimages/giantstairsup.gif", Vec2iMake(100,100), RectMake(0, 8, 99, 85));
+	//__kol_images["castle stairs up"] = KOLImageMake("images/adventureimages/giantstairsup.gif", Vec2iMake(100,100), RectMake(0, 8, 99, 85));
+    __kol_images["castle stairs up"] = KOLImageMake("images/adventureimages/giantstairsup.gif", Vec2iMake(100,100), RectMake(20, 10, 74, 83));
+	__kol_images["castle stairs up"].erase_zones.listAppend(RectMake(70, 78, 76, 84));
+    
+    
 	__kol_images["goggles? yes!"] = KOLImageMake("images/adventureimages/steamposter.gif", Vec2iMake(100,100));
 	//__kol_images["hole in the sky"] = KOLImageMake("images/otherimages/stalktop/beanstalk.gif", Vec2iMake(500,400), RectMake(403, 4, 487, 92));
     __kol_images["hole in the sky"] = KOLImageMake("images/otherimages/stalktop/beanstalk.gif", Vec2iMake(250,200), RectMake(201, 2, 243, 46));
@@ -157,7 +163,7 @@ void KOLImagesInit()
 	__kol_images["haunted library"] = KOLImageMake("images/otherimages/manor/sm7.gif", Vec2iMake(100,100), RectMake(14, 5, 92, 55));
 	
 	__kol_images["haunted bedroom"] = KOLImageMake("images/otherimages/manor/sm2_1b.gif", Vec2iMake(100,100), RectMake(18, 28, 91, 86));
-	__kol_images["Haunted Ballroom"] = KOLImageMake("images/otherimages/manor/sm2_5.gif", Vec2iMake(100,200), RectMake(19, 10, 74, 76));
+    __kol_images["Haunted Ballroom"] = KOLImageMake("images/otherimages/manor/sm2_5.gif", Vec2iMake(100,200), RectMake(19, 11, 74, 76));
 	
 	__kol_images["Palindome"] = KOLImageMake("images/otherimages/plains/the_palindome.gif", Vec2iMake(96,86), RectMake(0, 17, 96, 83));
 	
@@ -167,7 +173,7 @@ void KOLImagesInit()
 	__kol_images["Toot Oriole"] = KOLImageMake("images/otherimages/mountains/noobsingtop.gif", Vec2iMake(200,100), RectMake(52, 18, 131, 49)); //I love this GIF
 
 	__kol_images["bookshelf"] = KOLImageMake("images/otherimages/campground/bookshelf.gif", Vec2iMake(100,100), RectMake(0, 26, 99, 99));
-	__kol_images["pirate quest"] = KOLImageMake("images/otherimages/trophy/party_on_the_big_boat.gif", Vec2iMake(100,100), RectMake(0, 3, 99, 64));
+	__kol_images["pirate quest"] = KOLImageMake("images/otherimages/trophy/party_on_the_big_boat.gif", Vec2iMake(100,100), RectMake(18, 3, 87, 64));
 	__kol_images["meat"] = KOLImageMake("images/itemimages/meat.gif", Vec2iMake(30,30));
 	__kol_images["monk"] = KOLImageMake("images/itemimages/monkhead.gif", Vec2iMake(30,30));
 	
@@ -191,7 +197,7 @@ void KOLImagesInit()
 	__kol_images["Wine Racks"].erase_zones.listAppend(RectMake(17, 49, 18, 53));
 	
 	
-	__kol_images["Dad Sea Monkee"] = KOLImageMake("images/adventureimages/dad_machine.gif", Vec2iMake(400,300), RectMake(150,212,245,262));
+	__kol_images["Dad Sea Monkee"] = KOLImageMake("images/adventureimages/dad_machine.gif", Vec2iMake(400,300), RectMake(150,212,245,260));
 	__kol_images["Shub-Jigguwatt"] = KOLImageMake("images/adventureimages/shub-jigguwatt.gif", Vec2iMake(300,300), RectMake(19, 17, 267, 288));
 	__kol_images["Yog-Urt"] = KOLImageMake("images/adventureimages/yog-urt.gif", Vec2iMake(300,300), RectMake(36, 88, 248, 299));
 	__kol_images["Sea"] = KOLImageMake("images/adventureimages/wizardfish.gif", Vec2iMake(100,100), RectMake(18, 23, 61, 72));
@@ -210,7 +216,7 @@ void KOLImagesInit()
 	__kol_images["Accordion Thief"] = KOLImageMake("images/otherimages/accordionthief_f.gif", Vec2iMake(60,100), RectMake(0,2,59,99));
 	__kol_images["Avatar of Jarlsberg"] = KOLImageMake("images/otherimages/jarlsberg_avatar_f.gif", Vec2iMake(60,100), RectMake(0,6,59,96));
 	__kol_images["Avatar of Boris"] = KOLImageMake("images/otherimages/boris_avatar_f.gif", Vec2iMake(60,100), RectMake(0,4,59,93));
-	__kol_images["Zombie Master"] = KOLImageMake("images/otherimages/zombavatar_f.gif", Vec2iMake(60,100), RectMake(0,3,59,99));
+	__kol_images["Zombie Master"] = KOLImageMake("images/otherimages/zombavatar_f.gif", Vec2iMake(60,100), RectMake(10,3,55,99));
 
 	__kol_images["Nemesis Disco Bandit"] = KOLImageMake("images/adventureimages/newwave.gif", Vec2iMake(100,100));
 	__kol_images["Nemesis Seal Clubber"] = KOLImageMake("images/adventureimages/1_1.gif", Vec2iMake(100,100));
@@ -228,7 +234,7 @@ void KOLImagesInit()
 	__kol_images["Dungeons of Doom"] = KOLImageMake("images/otherimages/town/ddoom.gif", Vec2iMake(100,100), RectMake(31, 33, 68, 99));
     
 	__kol_images["chinatown"] = KOLImageMake("images/otherimages/jung/jung_chinaback.gif", Vec2iMake(450,500), RectMake(188, 202, 229, 270));
-	__kol_images["chinatown"].erase_zones.listAppend(RectMake(227, 247, 229, 256));
+	__kol_images["chinatown"].erase_zones.listAppend(RectMake(227, 247, 231, 256));
     
     
 	
@@ -301,7 +307,7 @@ KOLImage KOLImageLookup(string lookup_name)
 	return __kol_images[lookup_name];
 }
 
-buffer KOLImageGenerateImageHTML(string lookup_name, boolean should_center, Vec2i max_image_dimensions)
+buffer KOLImageGenerateImageHTML(string lookup_name, boolean should_center, Vec2i max_image_dimensions, string container_additional_class)
 {
     KOLImagesInit();
 	lookup_name = to_lower_case(lookup_name);
@@ -337,6 +343,12 @@ buffer KOLImageGenerateImageHTML(string lookup_name, boolean should_center, Vec2
     if (have_size || have_crop)
     {
         Vec2i effective_image_size = image_size;
+            
+        if (half_sized_output)
+        {
+            effective_image_size.x = round(effective_image_size.x.to_float() * 0.5);
+            effective_image_size.y = round(effective_image_size.y.to_float() * 0.5);
+        }
         if (have_crop)
             effective_image_size = Vec2iMake(image_crop.max_coordinate.x - image_crop.min_coordinate.x + 1, image_crop.max_coordinate.y - image_crop.min_coordinate.y + 1);
         
@@ -360,26 +372,24 @@ buffer KOLImageGenerateImageHTML(string lookup_name, boolean should_center, Vec2
                 }
             }
         }
-            
-        if (half_sized_output)
-        {
-            scale_ratio *= 0.5;
-        }
     }
     if (scale_ratio > 1.0) scale_ratio = 1.0;
     if (scale_ratio < 1.0)
     {
         image_size.x = round(image_size.x.to_float() * scale_ratio);
         image_size.y = round(image_size.y.to_float() * scale_ratio);
-        image_crop.min_coordinate.x = round(image_crop.min_coordinate.x.to_float() * scale_ratio);
-        image_crop.min_coordinate.y = round(image_crop.min_coordinate.y.to_float() * scale_ratio);
-        image_crop.max_coordinate.x = round(image_crop.max_coordinate.x.to_float() * scale_ratio);
-        image_crop.max_coordinate.y = round(image_crop.max_coordinate.y.to_float() * scale_ratio);
+        image_crop.min_coordinate.x = ceil(image_crop.min_coordinate.x.to_float() * scale_ratio);
+        image_crop.min_coordinate.y = ceil(image_crop.min_coordinate.y.to_float() * scale_ratio);
+        image_crop.max_coordinate.x = floor(image_crop.max_coordinate.x.to_float() * scale_ratio);
+        image_crop.max_coordinate.y = floor(image_crop.max_coordinate.y.to_float() * scale_ratio);
     }
 		
 	boolean outputting_div = false;
 	boolean outputting_erase_zones = false;
 	Vec2i div_dimensions;
+    
+    if (container_additional_class.length() > 0)
+        outputting_div = true;
 	if (have_size)
 	{
 		div_dimensions = image_size;
@@ -405,15 +415,21 @@ buffer KOLImageGenerateImageHTML(string lookup_name, boolean should_center, Vec2
 	
 	if (outputting_div)
 	{
-		string style = "width:" + div_dimensions.x + "px; height:" + div_dimensions.y + "px;";
-		style += "overflow:hidden;";
+		string style = "";
+        
+        if (have_size)
+            style = "width:" + div_dimensions.x + "px; height:" + div_dimensions.y + "px;";
 		if (__setting_show_alignment_guides)
 			style += "background:purple;";
-		style += "position:relative;top:0px;left:0px;";
+        
+        string [int] classes;
+        classes.listAppend("r_image_container");
+        
         if (should_center)
-            result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_center", "style", style)));
-        else
-            result.append(HTMLGenerateTagPrefix("div", mapMake("style", style)));
+            classes.listAppend("r_center");
+        if (container_additional_class.length() > 0)
+            classes.listAppend(container_additional_class);
+        result.append(HTMLGenerateTagPrefix("div", mapMake("class", classes.listJoinComponents(" "), "style", style)));
 	}
 	
 	string [string] img_tag_attributes;
@@ -488,6 +504,11 @@ buffer KOLImageGenerateImageHTML(string lookup_name, boolean should_center, Vec2
 	if (outputting_div)
 		result.append("</div>");
 	return result;
+}
+
+buffer KOLImageGenerateImageHTML(string lookup_name, boolean should_center, Vec2i max_image_dimensions)
+{
+    return KOLImageGenerateImageHTML(lookup_name, should_center, max_image_dimensions, "");
 }
 
 buffer KOLImageGenerateImageHTML(string lookup_name, boolean should_center)
