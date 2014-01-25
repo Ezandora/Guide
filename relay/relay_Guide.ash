@@ -1,7 +1,7 @@
 //This script and its support scripts are in the public domain.
 
 //These settings are for development. Don't worry about editing them.
-string __version = "1.0.8";
+string __version = "1.0.9";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -9,9 +9,12 @@ boolean __setting_debug_enable_example_mode_in_aftercore = false; //for testing.
 boolean __setting_debug_show_all_internal_states = false; //displays usable images/__misc_state/__misc_state_string/__misc_state_int/__quest_state
 
 //Display settings:
+boolean __setting_entire_area_clickable = false;
 boolean __setting_side_negative_space_is_dark = false;
 boolean __setting_fill_vertical = true;
-int __setting_image_width = 100;
+int __setting_image_width_large = 100;
+int __setting_image_width_medium = 70;
+int __setting_image_width_small = 30;
 
 boolean __show_importance_bar = true;
 boolean __setting_show_navbar = true;
@@ -26,6 +29,10 @@ string __setting_modifier_color = "#404040";
 string __setting_navbar_background_color = "#FFFFFF";
 string __setting_page_background_color = "#F7F7F7";
 
+string __setting_media_query_large_size = "@media (min-width:500px)";
+string __setting_media_query_medium_size = "@media (min-width:320px) and (max-width:500px)";
+string __setting_media_query_small_size = "@media (max-width:320px) and (min-width:225px)";
+string __setting_media_query_tiny_size = "@media (max-width:225px)";
 
 
 
@@ -892,15 +899,6 @@ string int_to_wordy(int v) //Not complete, only supports a handful:
     return v.to_string();
 }
 
-//Prevent a write to disk if nothing's changing:
-//(not sure if mafia checks this internally)
-void set_property_if_changed(string property, string value)
-{
-    if (get_property(property) == value)
-        return;
-    set_property(property, value);
-}
-
 //Non-API-related functions:
 boolean playerIsLoggedIn()
 {
@@ -1551,11 +1549,28 @@ string shrinkQuestLog(string html)
 }
 
 boolean __loaded_quest_log = false;
-void requestQuestLogLoad()
+void requestQuestLogLoad(string property_name)
 {
     if (__loaded_quest_log)
         return;
+    
+    
+    //Known quests that should track properly:
+    boolean [string] safe_list = $strings[questM02Artist,questM10Azazel,questL10Garbage,questL11MacGuffin,questL11Manor,questL11Palindome,questL11Pyramid,questL11Worship,questL12War,questL13Final,questL02Larva,questL03Rat,questL04Bat,questL05Goblin,questL06Friar,questL07Cyrptic,questL08Trapper,questL09Topping,questM12Pirate,questS02Monkees,questM01Untinker,questM15Lol,questF04Elves];
+    //Quests not on the list:
+    //questF01Primordial questF02Hyboria questF03Future - minor tracking
+    //questG02Whitecastle - tracked, but not updated
+    //questG03Ego - tracked, but not updated
+    //questG04Nemesis questG05Dark - minor tracking
+    //questI02Beat - need to know professor jacking being defeated, not sure if mafia does
+    
+    if (safe_list contains property_name)
+        return;
+    
+    
     __loaded_quest_log = true;
+    
+    
     
     boolean safe_to_load_again = safeToLoadQuestLog();
     int current_time = getMillisecondsOfToday();
@@ -1573,19 +1588,19 @@ void requestQuestLogLoad()
         string quest_log_2 = visit_url("questlog.php?which=2");
         string quest_log_1 = visit_url("questlog.php?which=1");
         if (quest_log_2.contains_text("Your Quest Log"))
-            set_property_if_changed("__relay_guide_last_quest_log_2", shrinkQuestLog(quest_log_2));
+            set_property("__relay_guide_last_quest_log_2", shrinkQuestLog(quest_log_2));
         else
             stale = true;
         if (quest_log_1.contains_text("Your Quest Log"))
-            set_property_if_changed("__relay_guide_last_quest_log_1", shrinkQuestLog(quest_log_1));
+            set_property("__relay_guide_last_quest_log_1", shrinkQuestLog(quest_log_1));
         else
             stale = true;
-        set_property_if_changed("__relay_guide_last_quest_log_reload_time", current_time.to_string());
-        set_property_if_changed("__relay_guide_stale_quest_data", stale.to_string());
+        set_property("__relay_guide_last_quest_log_reload_time", current_time.to_string());
+        set_property("__relay_guide_stale_quest_data", stale.to_string());
     }
     else
     {
-        set_property_if_changed("__relay_guide_stale_quest_data", true.to_string());
+        set_property("__relay_guide_stale_quest_data", true.to_string());
     }
 }
 
@@ -1677,7 +1692,7 @@ void QuestStateParseMafiaQuestProperty(QuestState state, string property_name, b
     
     if ((should_load_anyways || state.in_progress) && allow_quest_log_load)
     {
-        requestQuestLogLoad();
+        requestQuestLogLoad(property_name);
         state.QuestStateParseMafiaQuestPropertyValue(get_property(property_name));
     }
     if (QuestLogTracksProperty(property_name) && !state.finished)
@@ -1854,500 +1869,6 @@ string HTMLEscapeString(string line)
 
 
 
-boolean __setting_show_alignment_guides = false;
-//Library for displaying KOL images
-//Each image is referred to by a string via KOLImageLookup, or KOLImageGenerateImageHTML
-//There's a list of pre-set images in KOLImagesInit. Otherwise, it tries to look up the string as an item, then as a familiar, and then as an effect. If any matches are found, that image is output. (uses KoLmafia's internal database)
-//Also "__item item name", "__familiar familiar name", and "__effect effect name" explicitly request those images.
-//"__half lookup name" will reduce the image to half-size.
-//NOTE: To use KOLImageGenerateImageHTML with should_center set to true, the page must have the class "r_center" set as "margin-left:auto; margin-right:auto;text-align:center;"
-
-record KOLImage
-{
-	string url;
-	
-	Vec2i base_image_size;
-	Rect crop;
-	
-	Rect [int] erase_zones; //rectangular zones which are generated as white divs on the output. Erases specific sections of the image. Can be offset by one pixel depending on the browser, sorry.
-};
-
-KOLImage [string] __kol_images;
-
-KOLImage KOLImageMake(string url, Vec2i base_image_size, Rect crop)
-{
-	KOLImage result;
-	result.url = url;
-	result.base_image_size = base_image_size;
-	result.crop = crop;
-	return result;
-}
-
-KOLImage KOLImageMake(string url, Vec2i base_image_size)
-{
-	return KOLImageMake(url, base_image_size, RectZero());
-}
-
-KOLImage KOLImageMake(string url)
-{
-	return KOLImageMake(url, Vec2iZero(), RectZero());
-}
-
-KOLImage KOLImageMake()
-{
-	return KOLImageMake("", Vec2iZero(), RectZero());
-}
-
-//Does not need to be called directly.
-boolean __kol_images_has_inited = false;
-void KOLImagesInit()
-{
-    if (__kol_images_has_inited)
-        return;
-    __kol_images_has_inited = true;
-	__kol_images["typical tavern"] = KOLImageMake("images/otherimages/woods/tavern0.gif", Vec2iMake(100,100), RectMake(0,39,99,97));
-	__kol_images["boss bat"] = KOLImageMake("images/adventureimages/bossbat.gif", Vec2iMake(100,100), RectMake(0,27,99,74));
-	__kol_images["bugbear"] = KOLImageMake("images/adventureimages/fallsfromsky.gif", Vec2iMake(100,150));
-	
-	__kol_images["twin peak"] = KOLImageMake("images/otherimages/orcchasm/highlands_main.gif", Vec2iMake(500, 250), RectMake(153,128,237,214));
-	__kol_images["a-boo peak"] = KOLImageMake("images/otherimages/orcchasm/highlands_main.gif", Vec2iMake(500, 250), RectMake(40,134,127,218));
-	__kol_images["oil peak"] = KOLImageMake("images/otherimages/orcchasm/highlands_main.gif", Vec2iMake(500, 250), RectMake(261,117,345,213));
-	__kol_images["highland lord"] = KOLImageMake("images/otherimages/orcchasm/highlands_main.gif", Vec2iMake(500, 250), RectMake(375,73,457,144));
-	__kol_images["orc chasm"] = KOLImageMake("images/otherimages/mountains/chasm.gif", Vec2iMake(100, 100), RectMake(0, 41, 99, 95));
-	
-	__kol_images["spooky forest"] = KOLImageMake("images/otherimages/woods/forest.gif", Vec2iMake(100, 100), RectMake(0,39,99,93));
-	__kol_images["council"] = KOLImageMake("images/otherimages/council.gif", Vec2iMake(100, 100), RectMake(0,26,99,73));
-	
-	
-	__kol_images["daily dungeon"] = KOLImageMake("images/otherimages/town/dd1.gif", Vec2iMake(100,100), RectMake(0,44,99,86));
-	__kol_images["clover"] = KOLImageMake("images/itemimages/clover.gif", Vec2iMake(30,30));
-	
-	__kol_images["mayfly bait"] = KOLImageMake("images/itemimages/mayflynecklace.gif", Vec2iMake(30,30));
-	__kol_images["spooky putty"] = KOLImageMake("images/itemimages/sputtysheet.gif", Vec2iMake(30,30));
-	__kol_images["folder holder"] = KOLImageMake("images/itemimages/folderholder2.gif", Vec2iMake(30,30));
-	
-	__kol_images["fax machine"] = KOLImageMake("images/otherimages/clanhall/faxmachine.gif", Vec2iMake(100,100), RectMake(34,28,62,54));
-	
-	__kol_images["unknown"] = KOLImageMake("images/itemimages/confused.gif", Vec2iMake(30,30));
-	
-	__kol_images["goth kid"] = KOLImageMake("images/itemimages/crayongoth.gif", Vec2iMake(30,30));
-	__kol_images["hipster"] = KOLImageMake("images/itemimages/minihipster.gif", Vec2iMake(30,30));
-	
-	
-	__kol_images[""] = KOLImageMake("images/itemimages/blank.gif", Vec2iMake(30,30));
-	__kol_images["blank"] = KOLImageMake("images/itemimages/blank.gif", Vec2iMake(30,30));
-	__kol_images["demon summon"] = KOLImageMake("images/otherimages/manor/chamber.gif", Vec2iMake(100,100), RectMake(11, 11, 88, 66));
-	
-	__kol_images["cobb's knob"] = KOLImageMake("images/otherimages/plains/knob2.gif", Vec2iMake(100,100), RectMake(0,43,99,78));
-	
-	__kol_images["generic dwelling"] = KOLImageMake("images/otherimages/campground/rest4.gif", Vec2iMake(100,100), RectMake(0,26,95,99));
-	
-	
-	__kol_images["forest friars"] = KOLImageMake("images/otherimages/woods/stones0.gif", Vec2iMake(100,100), RectMake(0, 24, 99, 99));
-	__kol_images["cyrpt"] = KOLImageMake("images/otherimages/plains/cyrpt.gif", Vec2iMake(100,100), RectMake(0, 33, 99, 99));
-	__kol_images["trapper"] = KOLImageMake("images/otherimages/thetrapper.gif", Vec2iMake(60,100), RectMake(0,11,59,96));
-	
-	__kol_images["castle"] = KOLImageMake("images/otherimages/stalktop/beanstalk.gif", Vec2iMake(500,400), RectMake(234,158,362,290)); //experimental - half sized castle
-	__kol_images["penultimate fantasy airship"] = KOLImageMake("images/otherimages/stalktop/beanstalk.gif", Vec2iMake(500,400), RectMake(75, 231, 190, 367));
-	__kol_images["lift, bro"] = KOLImageMake("images/adventureimages/fitposter.gif", Vec2iMake(100,100));
-	__kol_images["castle stairs up"] = KOLImageMake("images/adventureimages/giantstairsup.gif", Vec2iMake(100,100), RectMake(0, 8, 99, 85));
-	__kol_images["goggles? yes!"] = KOLImageMake("images/adventureimages/steamposter.gif", Vec2iMake(100,100));
-	//__kol_images["hole in the sky"] = KOLImageMake("images/otherimages/stalktop/beanstalk.gif", Vec2iMake(500,400), RectMake(403, 4, 487, 92));
-    __kol_images["hole in the sky"] = KOLImageMake("images/otherimages/stalktop/beanstalk.gif", Vec2iMake(250,200), RectMake(201, 2, 243, 46));
-	
-	__kol_images["macguffin"] = KOLImageMake("images/itemimages/macguffin.gif", Vec2iMake(30,30));
-	__kol_images["island war"] = KOLImageMake("images/otherimages/sigils/warhiptat.gif", Vec2iMake(50,50), RectMake(0,12,49,35));
-	__kol_images["naughty sorceress"] = KOLImageMake("images/adventureimages/sorcform1.gif", Vec2iMake(100,100));
-	__kol_images["naughty sorceress lair"] = KOLImageMake("images/otherimages/main/map6.gif", Vec2iMake(100,100), RectMake(6,0,50,43));
-	
-	__kol_images["king imprismed"] = KOLImageMake("images/otherimages/lair/kingprism1.gif", Vec2iMake(100,100));
-	__kol_images["campsite"] = KOLImageMake("images/otherimages/plains/plains1.gif", Vec2iMake(100,100));
-	__kol_images["trophy"] = KOLImageMake("images/otherimages/trophy/not_wearing_any_pants.gif", Vec2iMake(100,100));
-	__kol_images["hidden temple"] = KOLImageMake("images/otherimages/woods/temple.gif", Vec2iMake(100,100), RectMake(16, 40, 89, 96));
-	__kol_images["florist friar"] = KOLImageMake("images/adventureimages/floristfriar.gif", Vec2iMake(100,100), RectMake(31, 7, 77, 92));
-	
-	
-	__kol_images["plant rutabeggar"] = KOLImageMake("images/otherimages/friarplants/plant2.gif", Vec2iMake(50,100), RectMake(1, 24, 47, 96));
-	
-	__kol_images["plant stealing magnolia"] = KOLImageMake("images/otherimages/friarplants/plant12.gif", Vec2iMake(49,100), RectMake(3, 15, 43, 94));
-	
-	__kol_images["plant shuffle truffle"] = KOLImageMake("images/otherimages/friarplants/plant24.gif", Vec2iMake(66,100), RectMake(4, 35, 63, 88));
-	__kol_images["plant horn of plenty"] = KOLImageMake("images/otherimages/friarplants/plant22.gif", Vec2iMake(62,100), RectMake(4, 14, 58, 86));
-	
-	__kol_images["plant rabid dogwood"] = KOLImageMake("images/otherimages/friarplants/plant1.gif", Vec2iMake(57,100), RectMake(3, 16, 55, 98));
-	__kol_images["plant rad-ish radish"] = KOLImageMake("images/otherimages/friarplants/plant3.gif", Vec2iMake(48,100), RectMake(4, 14, 42, 96));
-	__kol_images["plant war lily"] = KOLImageMake("images/otherimages/friarplants/plant11.gif", Vec2iMake(49,100), RectMake(5, 5, 45, 98));
-	
-	__kol_images["plant canned spinach"] = KOLImageMake("images/otherimages/friarplants/plant13.gif", Vec2iMake(48,100), RectMake(3, 24, 46, 94));	
-	__kol_images["plant blustery puffball"] = KOLImageMake("images/otherimages/friarplants/plant21.gif", Vec2iMake(54,100), RectMake(3, 38, 50, 90));
-	__kol_images["plant wizard's wig"] = KOLImageMake("images/otherimages/friarplants/plant23.gif", Vec2iMake(53,100), RectMake(2, 15, 48, 90));
-	
-	__kol_images["plant up sea daisy"] = KOLImageMake("images/otherimages/friarplants/plant40.gif", Vec2iMake(64,100), RectMake(3, 8, 60, 92));
-	
-	
-	__kol_images["basic hot dog"] = KOLImageMake("images/itemimages/jarl_regdog.gif", Vec2iMake(30,30));
-	__kol_images["Island War Arena"] = KOLImageMake("images/otherimages/bigisland/6.gif", Vec2iMake(100,100), RectMake(17, 28, 89, 76));
-	__kol_images["Island War Lighthouse"] = KOLImageMake("images/otherimages/bigisland/17.gif", Vec2iMake(100,100), RectMake(30, 34, 68, 97));
-	__kol_images["Island War Nuns"] = KOLImageMake("images/otherimages/bigisland/19.gif", Vec2iMake(100,100), RectMake(20, 43, 78, 87));
-	__kol_images["Island War Farm"] = KOLImageMake("images/otherimages/bigisland/15.gif", Vec2iMake(100,100), RectMake(8, 50, 93, 88));
-	__kol_images["Island War Orchard"] = KOLImageMake("images/otherimages/bigisland/3.gif", Vec2iMake(100,100), RectMake(20, 36, 99, 87));
-	
-	__kol_images["Island War Junkyard"] = KOLImageMake("images/otherimages/bigisland/25.gif", Vec2iMake(100,100), RectMake(0, 4, 99, 89));
-	__kol_images["Island War Junkyard"].erase_zones.listAppend(RectMake(0, 2, 20, 6));
-	__kol_images["Island War Junkyard"].erase_zones.listAppend(RectMake(9, 41, 95, 52));
-	
-	
-	__kol_images["spookyraven manor"] = KOLImageMake("images/otherimages/town/manor.gif", Vec2iMake(100,100), RectMake(0, 22, 99, 99));
-	
-	__kol_images["spookyraven manor"].erase_zones.listAppend(RectMake(23, 18, 53, 28));
-	
-	
-	__kol_images["spookyraven manor locked"] = KOLImageMake("images/otherimages/town/pantry.gif", Vec2iMake(80,80), RectMake(0, 26, 79, 79));
-	
-	__kol_images["haunted billiards room"] = KOLImageMake("images/otherimages/manor/sm4.gif", Vec2iMake(100,100), RectMake(12, 10, 93, 63));
-	
-	__kol_images["haunted library"] = KOLImageMake("images/otherimages/manor/sm7.gif", Vec2iMake(100,100), RectMake(14, 5, 92, 55));
-	
-	__kol_images["haunted bedroom"] = KOLImageMake("images/otherimages/manor/sm2_1b.gif", Vec2iMake(100,100), RectMake(18, 28, 91, 86));
-	__kol_images["Haunted Ballroom"] = KOLImageMake("images/otherimages/manor/sm2_5.gif", Vec2iMake(100,200), RectMake(19, 10, 74, 76));
-	
-	__kol_images["Palindome"] = KOLImageMake("images/otherimages/plains/the_palindome.gif", Vec2iMake(96,86), RectMake(0, 17, 96, 83));
-	
-	
-	__kol_images["high school"] = KOLImageMake("images/otherimages/town/kolhs.gif", Vec2iMake(100,100), RectMake(0, 26, 99, 92));
-	//__kol_images["Toot Oriole"] = KOLImageMake("images/otherimages/oriole.gif", Vec2iMake(60,100), RectMake(0, 12, 59, 85));
-	__kol_images["Toot Oriole"] = KOLImageMake("images/otherimages/mountains/noobsingtop.gif", Vec2iMake(200,100), RectMake(52, 18, 131, 49)); //I love this GIF
-
-	__kol_images["bookshelf"] = KOLImageMake("images/otherimages/campground/bookshelf.gif", Vec2iMake(100,100), RectMake(0, 26, 99, 99));
-	__kol_images["pirate quest"] = KOLImageMake("images/otherimages/trophy/party_on_the_big_boat.gif", Vec2iMake(100,100), RectMake(0, 3, 99, 64));
-	__kol_images["meat"] = KOLImageMake("images/itemimages/meat.gif", Vec2iMake(30,30));
-	__kol_images["monk"] = KOLImageMake("images/itemimages/monkhead.gif", Vec2iMake(30,30));
-	
-	
-	__kol_images["Pyramid"] = KOLImageMake("images/otherimages/desertbeach/pyramid.gif", Vec2iMake(60,70), RectMake(12, 11, 47, 38));
-	__kol_images["Pyramid"].erase_zones.listAppend(RectMake(14, 19, 19, 22));
-	__kol_images["Pyramid"].erase_zones.listAppend(RectMake(41, 12, 45, 16));
-	
-	
-	//__kol_images["hidden city"] = KOLImageMake("images/otherimages/hiddencity//hiddencitybg.gif", Vec2iMake(600,400), RectMake(114, 38, 213, 159)); //building, don't like
-	//__kol_images["hidden city"] = KOLImageMake("images/otherimages/hiddencity//hiddencitybg.gif", Vec2iMake(600,400), RectMake(7, 240, 77, 294)); //shrine, too close to hidden temple
-	__kol_images["hidden city"] = KOLImageMake("images/otherimages/hiddencity//hiddencitybg.gif", Vec2iMake(600,400), RectMake(426, 13, 504, 61)); //hidden tavern, small, better
-	__kol_images["Dispensary"] = KOLImageMake("images/adventureimages/knobwindow.gif", Vec2iMake(100,100));
-	
-	
-	__kol_images["Wine Racks"] = KOLImageMake("images/otherimages/manor/cellar4.gif", Vec2iMake(100,100), RectMake(17, 11, 96, 65));
-	__kol_images["Wine Racks"].erase_zones.listAppend(RectMake(17, 11, 33, 12));
-	__kol_images["Wine Racks"].erase_zones.listAppend(RectMake(39, 61, 42, 66));
-	__kol_images["Wine Racks"].erase_zones.listAppend(RectMake(70, 61, 74, 66));
-	__kol_images["Wine Racks"].erase_zones.listAppend(RectMake(94, 45, 97, 54));
-	__kol_images["Wine Racks"].erase_zones.listAppend(RectMake(17, 49, 18, 53));
-	
-	
-	__kol_images["Dad Sea Monkee"] = KOLImageMake("images/adventureimages/dad_machine.gif", Vec2iMake(400,300), RectMake(150,212,245,262));
-	__kol_images["Shub-Jigguwatt"] = KOLImageMake("images/adventureimages/shub-jigguwatt.gif", Vec2iMake(300,300), RectMake(19, 17, 267, 288));
-	__kol_images["Yog-Urt"] = KOLImageMake("images/adventureimages/yog-urt.gif", Vec2iMake(300,300), RectMake(36, 88, 248, 299));
-	__kol_images["Sea"] = KOLImageMake("images/adventureimages/wizardfish.gif", Vec2iMake(100,100), RectMake(18, 23, 61, 72));
-	__kol_images["Sea"].erase_zones.listAppend(RectMake(18, 23, 27, 28));
-	__kol_images["Sea"].erase_zones.listAppend(RectMake(48, 23, 62, 35));
-	__kol_images["Spooky little girl"] = KOLImageMake("images/adventureimages/axelgirl.gif", Vec2iMake(100,100), RectMake(37, 25, 63, 74));
-	
-	//hermit.gif and oldman.gif are almost identical. twins?
-	
-    __kol_images["astral spirit"] = KOLImageMake("images/otherimages/spirit.gif", Vec2iMake(60,100));
-	__kol_images["Disco Bandit"] = KOLImageMake("images/otherimages/discobandit_f.gif", Vec2iMake(60,100), RectMake(0,6,59,87));
-	__kol_images["Seal Clubber"] = KOLImageMake("images/otherimages/sealclubber_f.gif", Vec2iMake(60,100), RectMake(0,9,59,92));
-	__kol_images["Turtle Tamer"] = KOLImageMake("images/otherimages/turtletamer_f.gif", Vec2iMake(60,100), RectMake(0,5,59,93));
-	__kol_images["Pastamancer"] = KOLImageMake("images/otherimages/pastamancer_f.gif", Vec2iMake(60,100), RectMake(0,0,59,91));
-	__kol_images["Sauceror"] = KOLImageMake("images/otherimages/sauceror_f.gif", Vec2iMake(60,100), RectMake(0,5,59,90));
-	__kol_images["Accordion Thief"] = KOLImageMake("images/otherimages/accordionthief_f.gif", Vec2iMake(60,100), RectMake(0,2,59,99));
-	__kol_images["Avatar of Jarlsberg"] = KOLImageMake("images/otherimages/jarlsberg_avatar_f.gif", Vec2iMake(60,100), RectMake(0,6,59,96));
-	__kol_images["Avatar of Boris"] = KOLImageMake("images/otherimages/boris_avatar_f.gif", Vec2iMake(60,100), RectMake(0,4,59,93));
-	__kol_images["Zombie Master"] = KOLImageMake("images/otherimages/zombavatar_f.gif", Vec2iMake(60,100), RectMake(0,3,59,99));
-
-	__kol_images["Nemesis Disco Bandit"] = KOLImageMake("images/adventureimages/newwave.gif", Vec2iMake(100,100));
-	__kol_images["Nemesis Seal Clubber"] = KOLImageMake("images/adventureimages/1_1.gif", Vec2iMake(100,100));
-	__kol_images["Nemesis Turtle Tamer"] = KOLImageMake("images/adventureimages/2_1.gif", Vec2iMake(100,100));
-	__kol_images["Nemesis Pastamancer"] = KOLImageMake("images/adventureimages/3_1.gif", Vec2iMake(100,100));
-	__kol_images["Nemesis Sauceror"] = KOLImageMake("images/adventureimages/4_1.gif", Vec2iMake(100,100));
-	__kol_images["Nemesis Accordion Thief"] = KOLImageMake("images/adventureimages/6_1.gif", Vec2iMake(100,100));
-	
-	__kol_images["sword guy"] = KOLImageMake("images/otherimages/leftswordguy.gif", Vec2iMake(80,100));
-	__kol_images["Jick"] = KOLImageMake("images/otherimages/customavatars/1.gif", Vec2iMake(30,50));
-	__kol_images["Pulverize"] = KOLImageMake("images/itemimages/blackhammer.gif", Vec2iMake(30,30));
-	__kol_images["Superhuman Cocktailcrafting"] = KOLImageMake("images/itemimages/fruitym.gif", Vec2iMake(30,30));
-    
-	__kol_images["inexplicable door"] = KOLImageMake("images/otherimages/woods/8bitdoor.gif", Vec2iMake(100,100), RectMake(15, 43, 85, 99));
-	__kol_images["Dungeons of Doom"] = KOLImageMake("images/otherimages/town/ddoom.gif", Vec2iMake(100,100), RectMake(31, 33, 68, 99));
-    
-	__kol_images["chinatown"] = KOLImageMake("images/otherimages/jung/jung_chinaback.gif", Vec2iMake(450,500), RectMake(188, 202, 229, 270));
-	__kol_images["chinatown"].erase_zones.listAppend(RectMake(227, 247, 229, 256));
-    
-    
-	
-	string class_name = my_class().to_string();
-	string class_nemesis_name = "Nemesis " + class_name;
-	
-	if (__kol_images contains class_name)
-		__kol_images["Player Character"] = __kol_images[class_name];
-	else
-		__kol_images["Player Character"] = __kol_images["Disco Bandit"];
-		
-	if (__kol_images contains class_nemesis_name)
-		__kol_images["Nemesis"] = __kol_images[class_nemesis_name];
-	else
-		__kol_images["Nemesis"] = __kol_images["Jick"];
-}
-
-
-
-KOLImage KOLImageLookup(string lookup_name)
-{
-    KOLImagesInit();
-	if (!(__kol_images contains lookup_name))
-	{
-		//Automatically look up items, familiars, and effects by name:
-		item it = lookup_name.to_item();
-		familiar f = lookup_name.to_familiar();
-		effect e = lookup_name.to_effect();
-        string secondary_lookup_name = lookup_name;
-        if (lookup_name.stringHasPrefix("__item "))
-        {
-            secondary_lookup_name = lookup_name.substring(7);
-            f = $familiar[none];
-            e = $effect[none];
-            it = secondary_lookup_name.to_item();
-        }
-        else if (lookup_name.stringHasPrefix("__familiar "))
-        {
-            secondary_lookup_name = lookup_name.substring(11);
-            it = $item[none];
-            e = $effect[none];
-            f = secondary_lookup_name.to_familiar();
-        }
-        if (lookup_name.stringHasPrefix("__effect "))
-        {
-            secondary_lookup_name = lookup_name.substring(9);
-            f = $familiar[none];
-            it = $item[none];
-            e = secondary_lookup_name.to_effect();
-        }
-        secondary_lookup_name = secondary_lookup_name.to_lower_case();
-		if (it != $item[none] && it.smallimage != "" && it.to_string().to_lower_case() == secondary_lookup_name)
-		{
-			__kol_images[lookup_name] = KOLImageMake("images/itemimages/" + it.smallimage, Vec2iMake(30,30));
-		}
-		else if (f != $familiar[none] && f.image != "" && f.to_string().to_lower_case() == secondary_lookup_name)
-		{
-			__kol_images[lookup_name] = KOLImageMake("images/itemimages/" + f.image, Vec2iMake(30,30));
-		}
-        else if (e != $effect[none] && e.image != "" && e.to_string().to_lower_case() == secondary_lookup_name)
-        {
-            __kol_images[lookup_name] = KOLImageMake(e.image, Vec2iMake(30,30));
-        }
-		else
-		{
-			print("Unknown image \"" + lookup_name + "\"");
-			return KOLImageMake();
-		}
-	}
-	return __kol_images[lookup_name];
-}
-
-buffer KOLImageGenerateImageHTML(string lookup_name, boolean should_center, Vec2i max_image_dimensions)
-{
-    KOLImagesInit();
-	lookup_name = to_lower_case(lookup_name);
-    
-    boolean half_sized_output = false;
-	lookup_name = to_lower_case(lookup_name);
-    if (lookup_name.stringHasPrefix("__half "))
-    {
-        lookup_name = lookup_name.substring(7);
-        half_sized_output = true;
-    }
-    
-    
-	KOLImage kol_image = KOLImageLookup(lookup_name);
-	buffer result;
-	if (kol_image.url == "")
-		return "".to_buffer();
-    
-    Vec2i image_size = Vec2iCopy(kol_image.base_image_size);
-    Rect image_crop = RectCopy(kol_image.crop);
-    
-    
-		
-	boolean have_size = true;
-	boolean have_crop = true;
-	if (image_size.x == 0 || image_size.y == 0)
-		have_size = false;
-	if (image_crop.max_coordinate.x == 0 || image_crop.max_coordinate.y == 0)
-		have_crop = false;
-    
-    
-    float scale_ratio = 1.0;
-    if (have_size || have_crop)
-    {
-        Vec2i effective_image_size = image_size;
-        if (have_crop)
-            effective_image_size = Vec2iMake(image_crop.max_coordinate.x - image_crop.min_coordinate.x + 1, image_crop.max_coordinate.y - image_crop.min_coordinate.y + 1);
-        
-        if (effective_image_size.x > max_image_dimensions.x || effective_image_size.y > max_image_dimensions.y)
-        {
-            //Scale down, to match limitations:
-            float image_ratio = 1.0;
-            if (effective_image_size.x != 0.0 && effective_image_size.y != 0.0)
-            {
-                image_ratio = effective_image_size.y.to_float() / effective_image_size.x.to_float();
-                //Try width-major:
-                Vec2i new_image_size = Vec2iMake(max_image_dimensions.x.to_float(), max_image_dimensions.x.to_float() * image_ratio);
-                if (new_image_size.x > max_image_dimensions.x || new_image_size.y > max_image_dimensions.y) //too big, try vertical-major:
-                {
-                    new_image_size = Vec2iMake(max_image_dimensions.y.to_float() / image_ratio, max_image_dimensions.y);
-                }
-                //Find ratio:
-                if (new_image_size.x != 0.0)
-                {
-                    scale_ratio = new_image_size.x.to_float() / effective_image_size.x.to_float();
-                }
-            }
-        }
-            
-        if (half_sized_output)
-        {
-            scale_ratio *= 0.5;
-        }
-    }
-    if (scale_ratio > 1.0) scale_ratio = 1.0;
-    if (scale_ratio < 1.0)
-    {
-        image_size.x = round(image_size.x.to_float() * scale_ratio);
-        image_size.y = round(image_size.y.to_float() * scale_ratio);
-        image_crop.min_coordinate.x = round(image_crop.min_coordinate.x.to_float() * scale_ratio);
-        image_crop.min_coordinate.y = round(image_crop.min_coordinate.y.to_float() * scale_ratio);
-        image_crop.max_coordinate.x = round(image_crop.max_coordinate.x.to_float() * scale_ratio);
-        image_crop.max_coordinate.y = round(image_crop.max_coordinate.y.to_float() * scale_ratio);
-    }
-		
-	boolean outputting_div = false;
-	boolean outputting_erase_zones = false;
-	Vec2i div_dimensions;
-	if (have_size)
-	{
-		div_dimensions = image_size;
-		if (have_crop)
-		{
-			outputting_div = true;
-			div_dimensions = Vec2iMake(image_crop.max_coordinate.x - image_crop.min_coordinate.x + 1,
-									   image_crop.max_coordinate.y - image_crop.min_coordinate.y + 1);
-		}
-		else if (image_size.x > 100)
-		{
-			//Automatically crop to 100 pixels wide:
-			outputting_div = true;
-			div_dimensions = image_size;
-			div_dimensions.x = min(100, div_dimensions.x);
-		}
-		if (kol_image.erase_zones.count() > 0)
-		{
-			outputting_div = true;
-			outputting_erase_zones = true;
-		}
-	}
-	
-	if (outputting_div)
-	{
-		string style = "width:" + div_dimensions.x + "px; height:" + div_dimensions.y + "px;";
-		style += "overflow:hidden;";
-		if (__setting_show_alignment_guides)
-			style += "background:purple;";
-		style += "position:relative;top:0px;left:0px;";
-        if (should_center)
-            result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_center", "style", style)));
-        else
-            result.append(HTMLGenerateTagPrefix("div", mapMake("style", style)));
-	}
-	
-	string [string] img_tag_attributes;
-	img_tag_attributes["src"] = kol_image.url;
-	if (have_size)
-	{
-		img_tag_attributes["width"] =  image_size.x;
-		img_tag_attributes["height"] =  image_size.y;
-	}
-	img_tag_attributes["alt"] = lookup_name.HTMLEscapeString();
-	
-	if (have_crop && outputting_div)
-	{
-		//cordinates are upper-left
-		//format is clip:rect(top-edge,right-edge,bottom-edge,left-edge);
-		
-		int top_edge = image_crop.min_coordinate.y;
-		int bottom_edge = image_crop.max_coordinate.y;
-		int left_edge = image_crop.min_coordinate.x;
-		int right_edge = image_crop.max_coordinate.x;
-		
-		int margin_top = -(image_crop.min_coordinate.y);
-		int margin_bottom = -(image_size.y - image_crop.max_coordinate.y);
-		int margin_left = -(image_crop.min_coordinate.x);
-		int margin_right = -(image_size.x - image_crop.max_coordinate.x);
-		img_tag_attributes["style"] = "margin: " + margin_top + "px " + margin_right + "px " + margin_bottom + "px " + margin_left + "px;";
-	}
-	
-	if (__setting_show_alignment_guides)
-		img_tag_attributes["style"] += "opacity: 0.5;";
-	
-	result.append(HTMLGenerateTagPrefix("img", img_tag_attributes));
-	
-	if (outputting_erase_zones)
-	{
-		foreach i in kol_image.erase_zones
-		{
-			Rect zone = RectCopy(kol_image.erase_zones[i]);
-			Vec2i dimensions = Vec2iMake(zone.max_coordinate.x - zone.min_coordinate.x + 1, zone.max_coordinate.y - zone.min_coordinate.y + 1);
-            
-            if (scale_ratio < 1.0)
-            {
-                dimensions.x = round(dimensions.x.to_float() * scale_ratio);
-                dimensions.y = round(dimensions.y.to_float() * scale_ratio);
-                zone.min_coordinate.x = round(zone.min_coordinate.x.to_float() * scale_ratio);
-                zone.min_coordinate.y = round(zone.min_coordinate.y.to_float() * scale_ratio);
-                zone.max_coordinate.x = round(zone.max_coordinate.x.to_float() * scale_ratio);
-                zone.max_coordinate.y = round(zone.max_coordinate.y.to_float() * scale_ratio);
-            }
-			
-			int top = 0;
-			int left = 0;
-			
-			top = -image_crop.min_coordinate.y;
-			left = -image_crop.min_coordinate.x;
-			
-			top += zone.min_coordinate.y;
-			left += zone.min_coordinate.x;
-			//Output a white div over this area:
-			string style = "width:" + dimensions.x + "px;height:" + dimensions.y + "px;";
-			if (__setting_show_alignment_guides)
-				style += "background:pink;";
-			else
-				style += "background:#FFFFFF;";
-			
-			style += "z-index:2;position:absolute;top:" + top + "px;left:" + left + "px;";
-			
-			result.append(HTMLGenerateDivOfStyle("", style));
-		}
-	}
-	
-	if (outputting_div)
-		result.append("</div>");
-	return result;
-}
-
-buffer KOLImageGenerateImageHTML(string lookup_name, boolean should_center)
-{
-	return KOLImageGenerateImageHTML(lookup_name, should_center, Vec2iMake(65535, 65535));
-}
-
-
 
 
 record CSSEntry
@@ -2368,6 +1889,19 @@ CSSEntry CSSEntryMake(string tag, string class_name, string definition, int impo
     return entry;
 }
 
+record CSSBlock
+{
+    CSSEntry [int] defined_css_classes;
+    string identifier;
+};
+
+CSSBlock CSSBlockMake(string identifier)
+{
+    CSSBlock result;
+    result.identifier = identifier;
+    return result;
+}
+
 void listAppend(CSSEntry [int] list, CSSEntry entry)
 {
 	int position = list.count();
@@ -2383,7 +1917,7 @@ record Page
 	buffer body_contents;
 	string [string] body_attributes; //[attribute_name] -> attribute_value
 	
-    CSSEntry [int] defined_css_classes;
+    CSSBlock [string] defined_css_blocks; //There is always an implicit "" block.
 };
 
 
@@ -2414,27 +1948,49 @@ buffer PageGenerate(Page page_in)
 		result.append("\n");
 	}
 	//Write CSS styles:
-	if (page_in.defined_css_classes.count() > 0)
-	{
-        result.append("\t\t");
-		result.append(HTMLGenerateTagPrefix("style", mapMake("type", "text/css")));
-		result.append("\n");
-        
-        sort page_in.defined_css_classes by value.importance;
-	
-        foreach key in page_in.defined_css_classes
+    boolean wrote_css_container = false;
+    foreach identifier in page_in.defined_css_blocks
+    {
+        CSSBlock block = page_in.defined_css_blocks[identifier];
+        if (block.defined_css_classes.count() > 0)
         {
-            CSSEntry entry = page_in.defined_css_classes[key];
-            result.append("\t\t\t");
+            if (!wrote_css_container)
+            {
+                result.append("\t\t");
+                result.append(HTMLGenerateTagPrefix("style", mapMake("type", "text/css")));
+                result.append("\n");
+                    wrote_css_container = true;
+            }
+            boolean output_identifier = (block.identifier.length() > 0);
+            if (output_identifier)
+            {
+                result.append("\t\t\t");
+                result.append(block.identifier);
+                result.append("\n\t\t\t{\n");
+            }
+            sort block.defined_css_classes by value.importance;
         
-            if (entry.class_name == "")
-                result.append(entry.tag + " { " + entry.definition + " }");
-            else
-                result.append(entry.tag + "." + entry.class_name + " { " + entry.definition + " }");
-            result.append("\n");
+            foreach key in block.defined_css_classes
+            {
+                CSSEntry entry = block.defined_css_classes[key];
+                result.append("\t\t\t");
+                if (output_identifier)
+                    result.append("\t");
+            
+                if (entry.class_name == "")
+                    result.append(entry.tag + " { " + entry.definition + " }");
+                else
+                    result.append(entry.tag + "." + entry.class_name + " { " + entry.definition + " }");
+                result.append("\n");
+            }
+            if (output_identifier)
+                result.append("\n\t\t\t}\n");
         }
-		result.append("\t\t</style>\n");
-	}
+    }
+    if (wrote_css_container)
+    {
+        result.append("\t\t</style>\n");
+    }
 	result.append("\t</head>\n");
 	
 	//Body:
@@ -2462,9 +2018,16 @@ void PageSetTitle(Page page_in, string title)
 	page_in.title = title;
 }
 
+void PageAddCSSClass(Page page_in, string tag, string class_name, string definition, int importance, string block_identifier)
+{
+    if (!(page_in.defined_css_blocks contains block_identifier))
+        page_in.defined_css_blocks[block_identifier] = CSSBlockMake(block_identifier);
+    page_in.defined_css_blocks[block_identifier].defined_css_classes.listAppend(CSSEntryMake(tag, class_name, definition, importance));
+}
+
 void PageAddCSSClass(Page page_in, string tag, string class_name, string definition, int importance)
 {
-    page_in.defined_css_classes.listAppend(CSSEntryMake(tag, class_name, definition, importance));
+    PageAddCSSClass(page_in, tag, class_name, definition, importance, "");
 }
 
 void PageAddCSSClass(Page page_in, string tag, string class_name, string definition)
@@ -2525,6 +2088,11 @@ void PageAddCSSClass(string tag, string class_name, string definition)
 void PageAddCSSClass(string tag, string class_name, string definition, int importance)
 {
 	PageAddCSSClass(Page(), tag, class_name, definition, importance);
+}
+
+void PageAddCSSClass(string tag, string class_name, string definition, int importance, string block_identifier)
+{
+	PageAddCSSClass(Page(), tag, class_name, definition, importance, block_identifier);
 }
 
 void PageWriteHead(string contents)
@@ -2694,6 +2262,521 @@ string HTMLGenerateSimpleTableLines(string [int][int] lines)
 	}
 	return result.to_string();
 }
+
+boolean __setting_show_alignment_guides = false;
+//Library for displaying KOL images
+//Each image is referred to by a string via KOLImageLookup, or KOLImageGenerateImageHTML
+//There's a list of pre-set images in KOLImagesInit. Otherwise, it tries to look up the string as an item, then as a familiar, and then as an effect. If any matches are found, that image is output. (uses KoLmafia's internal database)
+//Also "__item item name", "__familiar familiar name", and "__effect effect name" explicitly request those images.
+//"__half lookup name" will reduce the image to half-size.
+//NOTE: To use KOLImageGenerateImageHTML with should_center set to true, the page must have the class "r_center" set as "margin-left:auto; margin-right:auto;text-align:center;"
+
+record KOLImage
+{
+	string url;
+	
+	Vec2i base_image_size;
+	Rect crop;
+	
+	Rect [int] erase_zones; //rectangular zones which are generated as white divs on the output. Erases specific sections of the image. Can be offset by one pixel depending on the browser, sorry.
+};
+
+KOLImage [string] __kol_images;
+
+KOLImage KOLImageMake(string url, Vec2i base_image_size, Rect crop)
+{
+	KOLImage result;
+	result.url = url;
+	result.base_image_size = base_image_size;
+	result.crop = crop;
+	return result;
+}
+
+KOLImage KOLImageMake(string url, Vec2i base_image_size)
+{
+	return KOLImageMake(url, base_image_size, RectZero());
+}
+
+KOLImage KOLImageMake(string url)
+{
+	return KOLImageMake(url, Vec2iZero(), RectZero());
+}
+
+KOLImage KOLImageMake()
+{
+	return KOLImageMake("", Vec2iZero(), RectZero());
+}
+
+//Does not need to be called directly.
+boolean __kol_images_has_inited = false;
+void KOLImagesInit()
+{
+    if (__kol_images_has_inited)
+        return;
+        
+	PageAddCSSClass("div", "r_image_container", "overflow:hidden;position:relative;top:0px;left:0px;");
+    __kol_images_has_inited = true;
+	__kol_images["typical tavern"] = KOLImageMake("images/otherimages/woods/tavern0.gif", Vec2iMake(100,100), RectMake(0,39,99,97));
+	__kol_images["boss bat"] = KOLImageMake("images/adventureimages/bossbat.gif", Vec2iMake(100,100), RectMake(0,27,99,74));
+	__kol_images["bugbear"] = KOLImageMake("images/adventureimages/fallsfromsky.gif", Vec2iMake(100,150));
+	
+	__kol_images["twin peak"] = KOLImageMake("images/otherimages/orcchasm/highlands_main.gif", Vec2iMake(500, 250), RectMake(153,128,237,214));
+	__kol_images["a-boo peak"] = KOLImageMake("images/otherimages/orcchasm/highlands_main.gif", Vec2iMake(500, 250), RectMake(40,134,127,218));
+	__kol_images["oil peak"] = KOLImageMake("images/otherimages/orcchasm/highlands_main.gif", Vec2iMake(500, 250), RectMake(261,117,345,213));
+	__kol_images["highland lord"] = KOLImageMake("images/otherimages/orcchasm/highlands_main.gif", Vec2iMake(500, 250), RectMake(375,73,457,144));
+	__kol_images["orc chasm"] = KOLImageMake("images/otherimages/mountains/chasm.gif", Vec2iMake(100, 100), RectMake(0, 41, 99, 95));
+	
+	__kol_images["spooky forest"] = KOLImageMake("images/otherimages/woods/forest.gif", Vec2iMake(100, 100), RectMake(12,39,91,93));
+	__kol_images["council"] = KOLImageMake("images/otherimages/council.gif", Vec2iMake(100, 100), RectMake(0,26,99,73));
+	
+	
+	__kol_images["daily dungeon"] = KOLImageMake("images/otherimages/town/dd1.gif", Vec2iMake(100,100), RectMake(28,44,71,86));
+	__kol_images["clover"] = KOLImageMake("images/itemimages/clover.gif", Vec2iMake(30,30));
+	
+	__kol_images["mayfly bait"] = KOLImageMake("images/itemimages/mayflynecklace.gif", Vec2iMake(30,30));
+	__kol_images["spooky putty"] = KOLImageMake("images/itemimages/sputtysheet.gif", Vec2iMake(30,30));
+	
+	__kol_images["fax machine"] = KOLImageMake("images/otherimages/clanhall/faxmachine.gif", Vec2iMake(100,100), RectMake(34,28,62,54));
+	
+	__kol_images["unknown"] = KOLImageMake("images/itemimages/confused.gif", Vec2iMake(30,30));
+	
+	__kol_images["goth kid"] = KOLImageMake("images/itemimages/crayongoth.gif", Vec2iMake(30,30));
+	__kol_images["hipster"] = KOLImageMake("images/itemimages/minihipster.gif", Vec2iMake(30,30));
+	
+	
+	__kol_images[""] = KOLImageMake("images/itemimages/blank.gif", Vec2iMake(30,30));
+	__kol_images["blank"] = KOLImageMake("images/itemimages/blank.gif", Vec2iMake(30,30));
+	__kol_images["demon summon"] = KOLImageMake("images/otherimages/manor/chamber.gif", Vec2iMake(100,100), RectMake(14, 12, 88, 66));
+	
+	__kol_images["cobb's knob"] = KOLImageMake("images/otherimages/plains/knob2.gif", Vec2iMake(100,100), RectMake(12,43,86,78));
+	
+	__kol_images["generic dwelling"] = KOLImageMake("images/otherimages/campground/rest4.gif", Vec2iMake(100,100), RectMake(0,26,95,99));
+	
+	
+	__kol_images["forest friars"] = KOLImageMake("images/otherimages/woods/stones0.gif", Vec2iMake(100,100), RectMake(0, 24, 99, 99));
+	__kol_images["cyrpt"] = KOLImageMake("images/otherimages/plains/cyrpt.gif", Vec2iMake(100,100), RectMake(0, 33, 99, 99));
+	__kol_images["trapper"] = KOLImageMake("images/otherimages/thetrapper.gif", Vec2iMake(60,100), RectMake(0,11,59,96));
+	
+	__kol_images["castle"] = KOLImageMake("images/otherimages/stalktop/beanstalk.gif", Vec2iMake(500,400), RectMake(234,158,362,290)); //experimental - half sized castle
+	__kol_images["penultimate fantasy airship"] = KOLImageMake("images/otherimages/stalktop/beanstalk.gif", Vec2iMake(500,400), RectMake(75, 231, 190, 367));
+	__kol_images["lift, bro"] = KOLImageMake("images/adventureimages/fitposter.gif", Vec2iMake(100,100));
+	//__kol_images["castle stairs up"] = KOLImageMake("images/adventureimages/giantstairsup.gif", Vec2iMake(100,100), RectMake(0, 8, 99, 85));
+    __kol_images["castle stairs up"] = KOLImageMake("images/adventureimages/giantstairsup.gif", Vec2iMake(100,100), RectMake(20, 10, 74, 83));
+	__kol_images["castle stairs up"].erase_zones.listAppend(RectMake(70, 78, 76, 84));
+    
+    
+	__kol_images["goggles? yes!"] = KOLImageMake("images/adventureimages/steamposter.gif", Vec2iMake(100,100));
+	//__kol_images["hole in the sky"] = KOLImageMake("images/otherimages/stalktop/beanstalk.gif", Vec2iMake(500,400), RectMake(403, 4, 487, 92));
+    __kol_images["hole in the sky"] = KOLImageMake("images/otherimages/stalktop/beanstalk.gif", Vec2iMake(250,200), RectMake(201, 2, 243, 46));
+	
+	__kol_images["macguffin"] = KOLImageMake("images/itemimages/macguffin.gif", Vec2iMake(30,30));
+	__kol_images["island war"] = KOLImageMake("images/otherimages/sigils/warhiptat.gif", Vec2iMake(50,50), RectMake(0,12,49,35));
+	__kol_images["naughty sorceress"] = KOLImageMake("images/adventureimages/sorcform1.gif", Vec2iMake(100,100));
+	__kol_images["naughty sorceress lair"] = KOLImageMake("images/otherimages/main/map6.gif", Vec2iMake(100,100), RectMake(6,0,50,43));
+	
+	__kol_images["king imprismed"] = KOLImageMake("images/otherimages/lair/kingprism1.gif", Vec2iMake(100,100));
+	__kol_images["campsite"] = KOLImageMake("images/otherimages/plains/plains1.gif", Vec2iMake(100,100));
+	__kol_images["trophy"] = KOLImageMake("images/otherimages/trophy/not_wearing_any_pants.gif", Vec2iMake(100,100));
+	__kol_images["hidden temple"] = KOLImageMake("images/otherimages/woods/temple.gif", Vec2iMake(100,100), RectMake(16, 40, 89, 96));
+	__kol_images["florist friar"] = KOLImageMake("images/adventureimages/floristfriar.gif", Vec2iMake(100,100), RectMake(31, 7, 77, 92));
+	
+	
+	__kol_images["plant rutabeggar"] = KOLImageMake("images/otherimages/friarplants/plant2.gif", Vec2iMake(50,100), RectMake(1, 24, 47, 96));
+	
+	__kol_images["plant stealing magnolia"] = KOLImageMake("images/otherimages/friarplants/plant12.gif", Vec2iMake(49,100), RectMake(3, 15, 43, 94));
+	
+	__kol_images["plant shuffle truffle"] = KOLImageMake("images/otherimages/friarplants/plant24.gif", Vec2iMake(66,100), RectMake(4, 35, 63, 88));
+	__kol_images["plant horn of plenty"] = KOLImageMake("images/otherimages/friarplants/plant22.gif", Vec2iMake(62,100), RectMake(4, 14, 58, 86));
+	
+	__kol_images["plant rabid dogwood"] = KOLImageMake("images/otherimages/friarplants/plant1.gif", Vec2iMake(57,100), RectMake(3, 16, 55, 98));
+	__kol_images["plant rad-ish radish"] = KOLImageMake("images/otherimages/friarplants/plant3.gif", Vec2iMake(48,100), RectMake(4, 14, 42, 96));
+	__kol_images["plant war lily"] = KOLImageMake("images/otherimages/friarplants/plant11.gif", Vec2iMake(49,100), RectMake(5, 5, 45, 98));
+	
+	__kol_images["plant canned spinach"] = KOLImageMake("images/otherimages/friarplants/plant13.gif", Vec2iMake(48,100), RectMake(3, 24, 46, 94));	
+	__kol_images["plant blustery puffball"] = KOLImageMake("images/otherimages/friarplants/plant21.gif", Vec2iMake(54,100), RectMake(3, 38, 50, 90));
+	__kol_images["plant wizard's wig"] = KOLImageMake("images/otherimages/friarplants/plant23.gif", Vec2iMake(53,100), RectMake(2, 15, 48, 90));
+	
+	__kol_images["plant up sea daisy"] = KOLImageMake("images/otherimages/friarplants/plant40.gif", Vec2iMake(64,100), RectMake(3, 8, 60, 92));
+	
+	
+	__kol_images["basic hot dog"] = KOLImageMake("images/itemimages/jarl_regdog.gif", Vec2iMake(30,30));
+	__kol_images["Island War Arena"] = KOLImageMake("images/otherimages/bigisland/6.gif", Vec2iMake(100,100), RectMake(17, 28, 89, 76));
+	__kol_images["Island War Lighthouse"] = KOLImageMake("images/otherimages/bigisland/17.gif", Vec2iMake(100,100), RectMake(30, 34, 68, 97));
+	__kol_images["Island War Nuns"] = KOLImageMake("images/otherimages/bigisland/19.gif", Vec2iMake(100,100), RectMake(20, 43, 78, 87));
+	__kol_images["Island War Farm"] = KOLImageMake("images/otherimages/bigisland/15.gif", Vec2iMake(100,100), RectMake(8, 50, 93, 88));
+	__kol_images["Island War Orchard"] = KOLImageMake("images/otherimages/bigisland/3.gif", Vec2iMake(100,100), RectMake(20, 36, 99, 87));
+	
+	__kol_images["Island War Junkyard"] = KOLImageMake("images/otherimages/bigisland/25.gif", Vec2iMake(100,100), RectMake(0, 4, 99, 89));
+	__kol_images["Island War Junkyard"].erase_zones.listAppend(RectMake(0, 2, 20, 6));
+	__kol_images["Island War Junkyard"].erase_zones.listAppend(RectMake(9, 41, 95, 52));
+	
+	
+	__kol_images["spookyraven manor"] = KOLImageMake("images/otherimages/town/manor.gif", Vec2iMake(100,100), RectMake(0, 22, 99, 99));
+	
+	__kol_images["spookyraven manor"].erase_zones.listAppend(RectMake(23, 18, 53, 28));
+	
+	
+	__kol_images["spookyraven manor locked"] = KOLImageMake("images/otherimages/town/pantry.gif", Vec2iMake(80,80), RectMake(0, 26, 79, 79));
+	
+	__kol_images["haunted billiards room"] = KOLImageMake("images/otherimages/manor/sm4.gif", Vec2iMake(100,100), RectMake(12, 10, 93, 63));
+	
+	__kol_images["haunted library"] = KOLImageMake("images/otherimages/manor/sm7.gif", Vec2iMake(100,100), RectMake(14, 5, 92, 55));
+	
+	__kol_images["haunted bedroom"] = KOLImageMake("images/otherimages/manor/sm2_1b.gif", Vec2iMake(100,100), RectMake(18, 28, 91, 86));
+    __kol_images["Haunted Ballroom"] = KOLImageMake("images/otherimages/manor/sm2_5.gif", Vec2iMake(100,200), RectMake(19, 11, 74, 76));
+	
+	__kol_images["Palindome"] = KOLImageMake("images/otherimages/plains/the_palindome.gif", Vec2iMake(96,86), RectMake(0, 17, 96, 83));
+	
+	
+	__kol_images["high school"] = KOLImageMake("images/otherimages/town/kolhs.gif", Vec2iMake(100,100), RectMake(0, 26, 99, 92));
+	//__kol_images["Toot Oriole"] = KOLImageMake("images/otherimages/oriole.gif", Vec2iMake(60,100), RectMake(0, 12, 59, 85));
+	__kol_images["Toot Oriole"] = KOLImageMake("images/otherimages/mountains/noobsingtop.gif", Vec2iMake(200,100), RectMake(52, 18, 131, 49)); //I love this GIF
+
+	__kol_images["bookshelf"] = KOLImageMake("images/otherimages/campground/bookshelf.gif", Vec2iMake(100,100), RectMake(0, 26, 99, 99));
+	__kol_images["pirate quest"] = KOLImageMake("images/otherimages/trophy/party_on_the_big_boat.gif", Vec2iMake(100,100), RectMake(18, 3, 87, 64));
+	__kol_images["meat"] = KOLImageMake("images/itemimages/meat.gif", Vec2iMake(30,30));
+	__kol_images["monk"] = KOLImageMake("images/itemimages/monkhead.gif", Vec2iMake(30,30));
+	
+	
+	__kol_images["Pyramid"] = KOLImageMake("images/otherimages/desertbeach/pyramid.gif", Vec2iMake(60,70), RectMake(12, 11, 47, 38));
+	__kol_images["Pyramid"].erase_zones.listAppend(RectMake(14, 19, 19, 22));
+	__kol_images["Pyramid"].erase_zones.listAppend(RectMake(41, 12, 45, 16));
+	
+	
+	//__kol_images["hidden city"] = KOLImageMake("images/otherimages/hiddencity//hiddencitybg.gif", Vec2iMake(600,400), RectMake(114, 38, 213, 159)); //building, don't like
+	//__kol_images["hidden city"] = KOLImageMake("images/otherimages/hiddencity//hiddencitybg.gif", Vec2iMake(600,400), RectMake(7, 240, 77, 294)); //shrine, too close to hidden temple
+	__kol_images["hidden city"] = KOLImageMake("images/otherimages/hiddencity//hiddencitybg.gif", Vec2iMake(600,400), RectMake(426, 13, 504, 61)); //hidden tavern, small, better
+	__kol_images["Dispensary"] = KOLImageMake("images/adventureimages/knobwindow.gif", Vec2iMake(100,100));
+	
+	
+	__kol_images["Wine Racks"] = KOLImageMake("images/otherimages/manor/cellar4.gif", Vec2iMake(100,100), RectMake(17, 11, 96, 65));
+	__kol_images["Wine Racks"].erase_zones.listAppend(RectMake(17, 11, 33, 12));
+	__kol_images["Wine Racks"].erase_zones.listAppend(RectMake(39, 61, 42, 66));
+	__kol_images["Wine Racks"].erase_zones.listAppend(RectMake(70, 61, 74, 66));
+	__kol_images["Wine Racks"].erase_zones.listAppend(RectMake(94, 45, 97, 54));
+	__kol_images["Wine Racks"].erase_zones.listAppend(RectMake(17, 49, 18, 53));
+	
+	
+	__kol_images["Dad Sea Monkee"] = KOLImageMake("images/adventureimages/dad_machine.gif", Vec2iMake(400,300), RectMake(150,212,245,260));
+	__kol_images["Shub-Jigguwatt"] = KOLImageMake("images/adventureimages/shub-jigguwatt.gif", Vec2iMake(300,300), RectMake(19, 17, 267, 288));
+	__kol_images["Yog-Urt"] = KOLImageMake("images/adventureimages/yog-urt.gif", Vec2iMake(300,300), RectMake(36, 88, 248, 299));
+	__kol_images["Sea"] = KOLImageMake("images/adventureimages/wizardfish.gif", Vec2iMake(100,100), RectMake(18, 23, 61, 72));
+	__kol_images["Sea"].erase_zones.listAppend(RectMake(18, 23, 27, 28));
+	__kol_images["Sea"].erase_zones.listAppend(RectMake(48, 23, 62, 35));
+	__kol_images["Spooky little girl"] = KOLImageMake("images/adventureimages/axelgirl.gif", Vec2iMake(100,100), RectMake(37, 25, 63, 74));
+	
+	//hermit.gif and oldman.gif are almost identical. twins?
+	
+    __kol_images["astral spirit"] = KOLImageMake("images/otherimages/spirit.gif", Vec2iMake(60,100));
+	__kol_images["Disco Bandit"] = KOLImageMake("images/otherimages/discobandit_f.gif", Vec2iMake(60,100), RectMake(0,6,59,87));
+	__kol_images["Seal Clubber"] = KOLImageMake("images/otherimages/sealclubber_f.gif", Vec2iMake(60,100), RectMake(0,9,59,92));
+	__kol_images["Turtle Tamer"] = KOLImageMake("images/otherimages/turtletamer_f.gif", Vec2iMake(60,100), RectMake(0,5,59,93));
+	__kol_images["Pastamancer"] = KOLImageMake("images/otherimages/pastamancer_f.gif", Vec2iMake(60,100), RectMake(0,0,59,91));
+	__kol_images["Sauceror"] = KOLImageMake("images/otherimages/sauceror_f.gif", Vec2iMake(60,100), RectMake(0,5,59,90));
+	__kol_images["Accordion Thief"] = KOLImageMake("images/otherimages/accordionthief_f.gif", Vec2iMake(60,100), RectMake(0,2,59,99));
+	__kol_images["Avatar of Jarlsberg"] = KOLImageMake("images/otherimages/jarlsberg_avatar_f.gif", Vec2iMake(60,100), RectMake(0,6,59,96));
+	__kol_images["Avatar of Boris"] = KOLImageMake("images/otherimages/boris_avatar_f.gif", Vec2iMake(60,100), RectMake(0,4,59,93));
+	__kol_images["Zombie Master"] = KOLImageMake("images/otherimages/zombavatar_f.gif", Vec2iMake(60,100), RectMake(10,3,55,99));
+
+	__kol_images["Nemesis Disco Bandit"] = KOLImageMake("images/adventureimages/newwave.gif", Vec2iMake(100,100));
+	__kol_images["Nemesis Seal Clubber"] = KOLImageMake("images/adventureimages/1_1.gif", Vec2iMake(100,100));
+	__kol_images["Nemesis Turtle Tamer"] = KOLImageMake("images/adventureimages/2_1.gif", Vec2iMake(100,100));
+	__kol_images["Nemesis Pastamancer"] = KOLImageMake("images/adventureimages/3_1.gif", Vec2iMake(100,100));
+	__kol_images["Nemesis Sauceror"] = KOLImageMake("images/adventureimages/4_1.gif", Vec2iMake(100,100));
+	__kol_images["Nemesis Accordion Thief"] = KOLImageMake("images/adventureimages/6_1.gif", Vec2iMake(100,100));
+	
+	__kol_images["sword guy"] = KOLImageMake("images/otherimages/leftswordguy.gif", Vec2iMake(80,100));
+	__kol_images["Jick"] = KOLImageMake("images/otherimages/customavatars/1.gif", Vec2iMake(30,50));
+	__kol_images["Pulverize"] = KOLImageMake("images/itemimages/blackhammer.gif", Vec2iMake(30,30));
+	__kol_images["Superhuman Cocktailcrafting"] = KOLImageMake("images/itemimages/fruitym.gif", Vec2iMake(30,30));
+    
+	__kol_images["inexplicable door"] = KOLImageMake("images/otherimages/woods/8bitdoor.gif", Vec2iMake(100,100), RectMake(15, 43, 85, 99));
+	__kol_images["Dungeons of Doom"] = KOLImageMake("images/otherimages/town/ddoom.gif", Vec2iMake(100,100), RectMake(31, 33, 68, 99));
+    
+	__kol_images["chinatown"] = KOLImageMake("images/otherimages/jung/jung_chinaback.gif", Vec2iMake(450,500), RectMake(188, 202, 229, 270));
+	__kol_images["chinatown"].erase_zones.listAppend(RectMake(227, 247, 231, 256));
+    
+    
+	
+	string class_name = my_class().to_string();
+	string class_nemesis_name = "Nemesis " + class_name;
+	
+	if (__kol_images contains class_name)
+		__kol_images["Player Character"] = __kol_images[class_name];
+	else
+		__kol_images["Player Character"] = __kol_images["Disco Bandit"];
+		
+	if (__kol_images contains class_nemesis_name)
+		__kol_images["Nemesis"] = __kol_images[class_nemesis_name];
+	else
+		__kol_images["Nemesis"] = __kol_images["Jick"];
+}
+
+
+
+KOLImage KOLImageLookup(string lookup_name)
+{
+    KOLImagesInit();
+	if (!(__kol_images contains lookup_name))
+	{
+		//Automatically look up items, familiars, and effects by name:
+		item it = lookup_name.to_item();
+		familiar f = lookup_name.to_familiar();
+		effect e = lookup_name.to_effect();
+        string secondary_lookup_name = lookup_name;
+        if (lookup_name.stringHasPrefix("__item "))
+        {
+            secondary_lookup_name = lookup_name.substring(7);
+            f = $familiar[none];
+            e = $effect[none];
+            it = secondary_lookup_name.to_item();
+        }
+        else if (lookup_name.stringHasPrefix("__familiar "))
+        {
+            secondary_lookup_name = lookup_name.substring(11);
+            it = $item[none];
+            e = $effect[none];
+            f = secondary_lookup_name.to_familiar();
+        }
+        if (lookup_name.stringHasPrefix("__effect "))
+        {
+            secondary_lookup_name = lookup_name.substring(9);
+            f = $familiar[none];
+            it = $item[none];
+            e = secondary_lookup_name.to_effect();
+        }
+        secondary_lookup_name = secondary_lookup_name.to_lower_case();
+		if (it != $item[none] && it.smallimage != "" && it.to_string().to_lower_case() == secondary_lookup_name)
+		{
+			__kol_images[lookup_name] = KOLImageMake("images/itemimages/" + it.smallimage, Vec2iMake(30,30));
+		}
+		else if (f != $familiar[none] && f.image != "" && f.to_string().to_lower_case() == secondary_lookup_name)
+		{
+			__kol_images[lookup_name] = KOLImageMake("images/itemimages/" + f.image, Vec2iMake(30,30));
+		}
+        else if (e != $effect[none] && e.image != "" && e.to_string().to_lower_case() == secondary_lookup_name)
+        {
+            __kol_images[lookup_name] = KOLImageMake(e.image, Vec2iMake(30,30));
+        }
+		else
+		{
+			print("Unknown image \"" + lookup_name + "\"");
+			return KOLImageMake();
+		}
+	}
+	return __kol_images[lookup_name];
+}
+
+buffer KOLImageGenerateImageHTML(string lookup_name, boolean should_center, Vec2i max_image_dimensions, string container_additional_class)
+{
+    KOLImagesInit();
+	lookup_name = to_lower_case(lookup_name);
+    
+    boolean half_sized_output = false;
+	lookup_name = to_lower_case(lookup_name);
+    if (lookup_name.stringHasPrefix("__half "))
+    {
+        lookup_name = lookup_name.substring(7);
+        half_sized_output = true;
+    }
+    
+    
+	KOLImage kol_image = KOLImageLookup(lookup_name);
+	buffer result;
+	if (kol_image.url == "")
+		return "".to_buffer();
+    
+    Vec2i image_size = Vec2iCopy(kol_image.base_image_size);
+    Rect image_crop = RectCopy(kol_image.crop);
+    
+    
+		
+	boolean have_size = true;
+	boolean have_crop = true;
+	if (image_size.x == 0 || image_size.y == 0)
+		have_size = false;
+	if (image_crop.max_coordinate.x == 0 || image_crop.max_coordinate.y == 0)
+		have_crop = false;
+    
+    
+    float scale_ratio = 1.0;
+    if (have_size || have_crop)
+    {
+        Vec2i effective_image_size = image_size;
+            
+        if (half_sized_output)
+        {
+            effective_image_size.x = round(effective_image_size.x.to_float() * 0.5);
+            effective_image_size.y = round(effective_image_size.y.to_float() * 0.5);
+        }
+        if (have_crop)
+            effective_image_size = Vec2iMake(image_crop.max_coordinate.x - image_crop.min_coordinate.x + 1, image_crop.max_coordinate.y - image_crop.min_coordinate.y + 1);
+        
+        if (effective_image_size.x > max_image_dimensions.x || effective_image_size.y > max_image_dimensions.y)
+        {
+            //Scale down, to match limitations:
+            float image_ratio = 1.0;
+            if (effective_image_size.x != 0.0 && effective_image_size.y != 0.0)
+            {
+                image_ratio = effective_image_size.y.to_float() / effective_image_size.x.to_float();
+                //Try width-major:
+                Vec2i new_image_size = Vec2iMake(max_image_dimensions.x.to_float(), max_image_dimensions.x.to_float() * image_ratio);
+                if (new_image_size.x > max_image_dimensions.x || new_image_size.y > max_image_dimensions.y) //too big, try vertical-major:
+                {
+                    new_image_size = Vec2iMake(max_image_dimensions.y.to_float() / image_ratio, max_image_dimensions.y);
+                }
+                //Find ratio:
+                if (new_image_size.x != 0.0)
+                {
+                    scale_ratio = new_image_size.x.to_float() / effective_image_size.x.to_float();
+                }
+            }
+        }
+    }
+    if (scale_ratio > 1.0) scale_ratio = 1.0;
+    if (scale_ratio < 1.0)
+    {
+        image_size.x = round(image_size.x.to_float() * scale_ratio);
+        image_size.y = round(image_size.y.to_float() * scale_ratio);
+        image_crop.min_coordinate.x = ceil(image_crop.min_coordinate.x.to_float() * scale_ratio);
+        image_crop.min_coordinate.y = ceil(image_crop.min_coordinate.y.to_float() * scale_ratio);
+        image_crop.max_coordinate.x = floor(image_crop.max_coordinate.x.to_float() * scale_ratio);
+        image_crop.max_coordinate.y = floor(image_crop.max_coordinate.y.to_float() * scale_ratio);
+    }
+		
+	boolean outputting_div = false;
+	boolean outputting_erase_zones = false;
+	Vec2i div_dimensions;
+    
+    if (container_additional_class.length() > 0)
+        outputting_div = true;
+	if (have_size)
+	{
+		div_dimensions = image_size;
+		if (have_crop)
+		{
+			outputting_div = true;
+			div_dimensions = Vec2iMake(image_crop.max_coordinate.x - image_crop.min_coordinate.x + 1,
+									   image_crop.max_coordinate.y - image_crop.min_coordinate.y + 1);
+		}
+		else if (image_size.x > 100)
+		{
+			//Automatically crop to 100 pixels wide:
+			outputting_div = true;
+			div_dimensions = image_size;
+			div_dimensions.x = min(100, div_dimensions.x);
+		}
+		if (kol_image.erase_zones.count() > 0)
+		{
+			outputting_div = true;
+			outputting_erase_zones = true;
+		}
+	}
+	
+	if (outputting_div)
+	{
+		string style = "";
+        
+        if (have_size)
+            style = "width:" + div_dimensions.x + "px; height:" + div_dimensions.y + "px;";
+		if (__setting_show_alignment_guides)
+			style += "background:purple;";
+        
+        string [int] classes;
+        classes.listAppend("r_image_container");
+        
+        if (should_center)
+            classes.listAppend("r_center");
+        if (container_additional_class.length() > 0)
+            classes.listAppend(container_additional_class);
+        result.append(HTMLGenerateTagPrefix("div", mapMake("class", classes.listJoinComponents(" "), "style", style)));
+	}
+	
+	string [string] img_tag_attributes;
+	img_tag_attributes["src"] = kol_image.url;
+	if (have_size)
+	{
+		img_tag_attributes["width"] =  image_size.x;
+		img_tag_attributes["height"] =  image_size.y;
+	}
+	img_tag_attributes["alt"] = lookup_name.HTMLEscapeString();
+	
+	if (have_crop && outputting_div)
+	{
+		//cordinates are upper-left
+		//format is clip:rect(top-edge,right-edge,bottom-edge,left-edge);
+		
+		int top_edge = image_crop.min_coordinate.y;
+		int bottom_edge = image_crop.max_coordinate.y;
+		int left_edge = image_crop.min_coordinate.x;
+		int right_edge = image_crop.max_coordinate.x;
+		
+		int margin_top = -(image_crop.min_coordinate.y);
+		int margin_bottom = -(image_size.y - image_crop.max_coordinate.y);
+		int margin_left = -(image_crop.min_coordinate.x);
+		int margin_right = -(image_size.x - image_crop.max_coordinate.x);
+		img_tag_attributes["style"] = "margin: " + margin_top + "px " + margin_right + "px " + margin_bottom + "px " + margin_left + "px;";
+	}
+	
+	if (__setting_show_alignment_guides)
+		img_tag_attributes["style"] += "opacity: 0.5;";
+	
+	result.append(HTMLGenerateTagPrefix("img", img_tag_attributes));
+	
+	if (outputting_erase_zones)
+	{
+		foreach i in kol_image.erase_zones
+		{
+			Rect zone = RectCopy(kol_image.erase_zones[i]);
+			Vec2i dimensions = Vec2iMake(zone.max_coordinate.x - zone.min_coordinate.x + 1, zone.max_coordinate.y - zone.min_coordinate.y + 1);
+            
+            if (scale_ratio < 1.0)
+            {
+                dimensions.x = round(dimensions.x.to_float() * scale_ratio);
+                dimensions.y = round(dimensions.y.to_float() * scale_ratio);
+                zone.min_coordinate.x = round(zone.min_coordinate.x.to_float() * scale_ratio);
+                zone.min_coordinate.y = round(zone.min_coordinate.y.to_float() * scale_ratio);
+                zone.max_coordinate.x = round(zone.max_coordinate.x.to_float() * scale_ratio);
+                zone.max_coordinate.y = round(zone.max_coordinate.y.to_float() * scale_ratio);
+            }
+			
+			int top = 0;
+			int left = 0;
+			
+			top = -image_crop.min_coordinate.y;
+			left = -image_crop.min_coordinate.x;
+			
+			top += zone.min_coordinate.y;
+			left += zone.min_coordinate.x;
+			//Output a white div over this area:
+			string style = "width:" + dimensions.x + "px;height:" + dimensions.y + "px;";
+			if (__setting_show_alignment_guides)
+				style += "background:pink;";
+			else
+				style += "background:#FFFFFF;";
+			
+			style += "z-index:2;position:absolute;top:" + top + "px;left:" + left + "px;";
+			
+			result.append(HTMLGenerateDivOfStyle("", style));
+		}
+	}
+	
+	if (outputting_div)
+		result.append("</div>");
+	return result;
+}
+
+buffer KOLImageGenerateImageHTML(string lookup_name, boolean should_center, Vec2i max_image_dimensions)
+{
+    return KOLImageGenerateImageHTML(lookup_name, should_center, max_image_dimensions, "");
+}
+
+buffer KOLImageGenerateImageHTML(string lookup_name, boolean should_center)
+{
+	return KOLImageGenerateImageHTML(lookup_name, should_center, Vec2iMake(65535, 65535));
+}
+
+
 
 
 
@@ -2939,14 +3022,19 @@ void ChecklistInit()
 	PageAddCSSClass("div", "r_cl_l_container_highlighted", gradient + "padding-top:5px;padding-bottom:5px;");
     
     
-	PageAddCSSClass("div", "r_cl_l_left", "float:left;width:" + __setting_image_width + "px;margin-left:20px;");
-	PageAddCSSClass("div", "r_cl_l_right_container", "width:100%;margin-left:" + (-__setting_image_width - 20) + "px;float:right;text-align:left;vertical-align:top;");
-	PageAddCSSClass("div", "r_cl_l_right_content", "margin-left:" + (__setting_image_width + 20) + "px;display:inline-block;margin-right:20px;");
+	PageAddCSSClass("div", "r_cl_l_left", "float:left;width:" + __setting_image_width_large + "px;margin-left:20px;overflow:hidden;");
+	PageAddCSSClass("div", "r_cl_l_right_container", "width:100%;margin-left:" + (-__setting_image_width_large - 20) + "px;float:right;text-align:left;vertical-align:top;");
+	PageAddCSSClass("div", "r_cl_l_right_content", "margin-left:" + (__setting_image_width_large + 20 + 2) + "px;display:inline-block;margin-right:20px;");
     
     PageAddCSSClass("hr", "r_cl_hr", "padding:0px;margin-top:0px;margin-bottom:0px;width:auto; margin-left:" + __setting_indention_width + ";margin-right:" + __setting_indention_width +";");
     PageAddCSSClass("hr", "r_cl_hr_extended", "padding:0px;margin-top:0px;margin-bottom:0px;width:auto; margin-left:" + __setting_indention_width + ";margin-right:0px;");
 	PageAddCSSClass("div", "r_cl_holding_container", "display:inline-block;");
 	
+    
+    PageAddCSSClass("", "r_cl_image_container_large", "display:block;");
+    PageAddCSSClass("", "r_cl_image_container_medium", "display:none;");
+    PageAddCSSClass("", "r_cl_image_container_small", "display:none;");
+    
 	if (true)
 	{
 		string div_style = "";
@@ -2955,6 +3043,52 @@ void ChecklistInit()
         div_style += "background-color:#FFFFFF; width:100%; padding-top:5px;";
 		PageAddCSSClass("div", "r_cl_checklist_container", div_style);
 	}
+    
+    //media queries:
+    if (!__use_table_based_layouts)
+    {
+        PageAddCSSClass("div", "r_cl_l_left", "width:" + __setting_image_width_medium + "px;margin-left:10px;", 0, __setting_media_query_medium_size);
+        PageAddCSSClass("div", "r_cl_l_right_container", "margin-left:" + (-__setting_image_width_medium - 10) + "px;", 0, __setting_media_query_medium_size);
+        PageAddCSSClass("div", "r_cl_l_right_content", "margin-left:" + (__setting_image_width_medium + 10 + 2) + "px;margin-right:10px;", 0, __setting_media_query_medium_size);
+        PageAddCSSClass("div", "r_cl_l_container", "padding-top:4px;padding-bottom:4px;", 0, __setting_media_query_medium_size);
+        PageAddCSSClass("hr", "r_cl_hr", "margin-left:" + (__setting_indention_width_in_em / 2.0) + "em;margin-right:" + (__setting_indention_width_in_em / 2.0) +"em;", 0, __setting_media_query_medium_size);
+        PageAddCSSClass("hr", "r_cl_hr_extended", "margin-left:" + (__setting_indention_width_in_em / 2.0) + "em;", 0, __setting_media_query_medium_size);
+        
+        
+        
+        PageAddCSSClass("div", "r_cl_l_left", "width:" + (__setting_image_width_small) + "px;margin-left:10px;", 0, __setting_media_query_small_size);
+        PageAddCSSClass("div", "r_cl_l_right_container", "margin-left:" + (-(__setting_image_width_small) - 10) + "px;", 0, __setting_media_query_small_size);
+        PageAddCSSClass("div", "r_cl_l_right_content", "margin-left:" + ((__setting_image_width_small) + 10 + 10) + "px;margin-right:3px;", 0, __setting_media_query_small_size);
+        PageAddCSSClass("hr", "r_cl_hr", "margin-left:0px;margin-right:0px;", 0, __setting_media_query_small_size);
+        PageAddCSSClass("hr", "r_cl_hr_extended", "margin-left:0px;", 0, __setting_media_query_small_size);
+        PageAddCSSClass("div", "r_cl_l_container", "padding-top:3px;padding-bottom:3px;", 0, __setting_media_query_small_size);
+        
+        
+        
+        
+        
+        PageAddCSSClass("div", "r_cl_l_left", "width:" + (0) + "px;margin-left:3px;", 0, __setting_media_query_tiny_size);
+        PageAddCSSClass("div", "r_cl_l_right_container", "margin-left:" + (-(0) - 3) + "px;", 0, __setting_media_query_tiny_size);
+        PageAddCSSClass("div", "r_cl_l_right_content", "margin-left:" + ((0) + 3 + 2) + "px;margin-right:3px;", 0, __setting_media_query_tiny_size);
+        PageAddCSSClass("hr", "r_cl_hr", "margin-left:0px;margin-right:0px;", 0, __setting_media_query_tiny_size);
+        PageAddCSSClass("hr", "r_cl_hr_extended", "margin-left:0px;", 0, __setting_media_query_tiny_size);
+        PageAddCSSClass("div", "r_cl_l_container", "padding-top:3px;padding-bottom:3px;", 0, __setting_media_query_tiny_size);
+        
+        
+        
+        PageAddCSSClass("", "r_cl_image_container_large", "display:none", 0, __setting_media_query_medium_size);
+        PageAddCSSClass("", "r_cl_image_container_medium", "display:block;", 0, __setting_media_query_medium_size);
+        PageAddCSSClass("", "r_cl_image_container_small", "display:none;", 0, __setting_media_query_medium_size);
+        
+        PageAddCSSClass("", "r_cl_image_container_large", "display:none", 0, __setting_media_query_small_size);
+        PageAddCSSClass("", "r_cl_image_container_medium", "display:none;", 0, __setting_media_query_small_size);
+        PageAddCSSClass("", "r_cl_image_container_small", "display:block;", 0, __setting_media_query_small_size);
+        
+        PageAddCSSClass("", "r_cl_image_container_large", "display:none", 0, __setting_media_query_tiny_size);
+        PageAddCSSClass("", "r_cl_image_container_medium", "display:none;", 0, __setting_media_query_tiny_size);
+        PageAddCSSClass("", "r_cl_image_container_small", "display:none;", 0, __setting_media_query_tiny_size);
+        
+    }
 }
 
 //Creates if not found:
@@ -3080,17 +3214,25 @@ buffer ChecklistGenerate(Checklist cl, boolean output_borders)
                 class_name = "r_cl_hr_extended";
 			result.append(HTMLGenerateTagPrefix("hr", mapMake("class", class_name)));
 		}
-		
+        if (__use_table_based_layouts)
+            __setting_entire_area_clickable = true;
 		boolean outputting_anchor = false;
+        buffer anchor_prefix_html;
+        buffer anchor_suffix_html;
 		if (entry.target_location != "")
 		{
-			result.append(HTMLGenerateTagPrefix("a", mapMake("target", "mainpane", "href", entry.target_location, "class", "r_a_undecorated")));
+            anchor_prefix_html = HTMLGenerateTagPrefix("a", mapMake("target", "mainpane", "href", entry.target_location, "class", "r_a_undecorated"));
+			anchor_suffix_html.append("</a>");
 			outputting_anchor = true;
 		}
+        if (outputting_anchor && __setting_entire_area_clickable)
+			result.append(anchor_prefix_html);
 		
 		boolean setting_use_holding_containers_per_subentry = true;
 			
-		Vec2i max_image_dimensions = Vec2iMake(__setting_image_width,75);
+		Vec2i max_image_dimensions_large = Vec2iMake(__setting_image_width_large,75);
+		Vec2i max_image_dimensions_medium = Vec2iMake(__setting_image_width_medium,50);
+		Vec2i max_image_dimensions_small = Vec2iMake(__setting_image_width_small,50);
         
         string container_class = "r_cl_l_container";
         if (entry.should_highlight)
@@ -3105,9 +3247,9 @@ buffer ChecklistGenerate(Checklist cl, boolean output_borders)
 			
 			result.append(HTMLGenerateTagWrap("td", "", mapMake("style", "width:" + __setting_indention_width + ";")));
 			result.append("<td>");
-			result.append(HTMLGenerateTagPrefix("td", mapMake("style", "min-width:" + __setting_image_width + "px; max-width:" + __setting_image_width + "px; width:" + __setting_image_width + "px;vertical-align:top; text-align: center;")));
+			result.append(HTMLGenerateTagPrefix("td", mapMake("style", "min-width:" + __setting_image_width_large + "px; max-width:" + __setting_image_width_large + "px; width:" + __setting_image_width_large + "px;vertical-align:top; text-align: center;")));
 			
-			result.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions));
+			result.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_large));
 			
 			result.append("</td>");
 			result.append(HTMLGenerateTagPrefix("td", mapMake("style", "text-align:left; vertical-align:top")));
@@ -3173,8 +3315,33 @@ buffer ChecklistGenerate(Checklist cl, boolean output_borders)
 		else
 		{
 			//div-based layout:
-			result.append(HTMLGenerateDivOfClass(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions), "r_cl_l_left"));
+            
+            if (true)
+            {
+                
+                buffer image_container;
+                
+                if (outputting_anchor && !__setting_entire_area_clickable)
+                    image_container.append(anchor_prefix_html);
+                
+                image_container.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_large, "r_cl_image_container_large"));
+                image_container.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_medium, "r_cl_image_container_medium"));
+                image_container.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_small, "r_cl_image_container_small"));
+                
+                if (outputting_anchor && !__setting_entire_area_clickable)
+                    image_container.append(anchor_suffix_html);
+                
+                result.append(HTMLGenerateDivOfClass(image_container, "r_cl_l_left"));
+                
+            }
+            else
+                result.append(HTMLGenerateDivOfClass(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_large), "r_cl_l_left"));
+            
+            
 			result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_cl_l_right_container")));
+            
+            if (outputting_anchor && !__setting_entire_area_clickable)
+                result.append(anchor_prefix_html);
 			result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_cl_l_right_content")));
 			
 			boolean first = true;
@@ -3228,14 +3395,16 @@ buffer ChecklistGenerate(Checklist cl, boolean output_borders)
 					result.append("</div>");
 			}
 			result.append("</div>");
+                if (outputting_anchor && !__setting_entire_area_clickable)
+                    result.append(anchor_suffix_html);
 			result.append("</div>");
 			result.append(HTMLGenerateDivOfClass("", "r_end_floating_elements")); //stop floating
 		}
         result.append("</div>");
 
 		
-		if (outputting_anchor)
-			result.append("</a>");
+		if (outputting_anchor && __setting_entire_area_clickable)
+            result.append(anchor_suffix_html);
 		
 		intra_i += 1;
 		entries_output += 1;
@@ -3860,7 +4029,6 @@ void QLevel5Init()
 	if (get_property("questL05Goblin") == "unstarted" && $item[knob goblin encryption key].available_amount() == 0)
 	{
 		//start the quest anyways, because they need to acquire the encryption key:
-        requestQuestLogLoad();
 		QuestStateParseMafiaQuestPropertyValue(state, "started");
 	}
 		
@@ -5422,7 +5590,6 @@ void QLevel11Init()
 			QuestStateParseMafiaQuestPropertyValue(state, "finished");
 		else if (__quest_state["Level 2"].startable)
         {
-            requestQuestLogLoad();
 			QuestStateParseMafiaQuestPropertyValue(state, "started");
         }
 		else
@@ -5728,17 +5895,23 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
             exploration_per_turn = 2.0;
         if (lookupItem("ornate dowsing rod").available_amount() > 0)
             exploration_per_turn = 3.0; //FIXME make completely accurate for first turn? not enough information available
+        //FIXME deal with ultra-hydrated
         int combats_remaining = exploration_remaining;
         combats_remaining = ceil(to_float(exploration_remaining) / exploration_per_turn);
         subentry.entries.listAppend(exploration_remaining + "% exploration remaining. (" + pluralize(combats_remaining, "combat", "combats") + ")");
-        if (__last_adventure_location == $location[the arid, extra-dry desert] && $effect[ultrahydrated].have_effect() == 0)
+        if ($effect[ultrahydrated].have_effect() == 0)
         {
-            string [int] description;
-            description.listAppend("Adventure in the Oasis.");
-            if ($items[ten-leaf clover, disassembled clover].available_amount() > 0)
-                description.listAppend("Potentially clover for 20 turns, versus 5.");
-            task_entries.listAppend(ChecklistEntryMake("__effect ultrahydrated", "", ChecklistSubentryMake("Acquire Ultrahydrated Effect", "", description), -11));
+            if (__last_adventure_location == $location[the arid, extra-dry desert])
+            {
+                string [int] description;
+                description.listAppend("Adventure in the Oasis.");
+                if ($items[ten-leaf clover, disassembled clover].available_amount() > 0)
+                    description.listAppend("Potentially clover for 20 turns, versus 5.");
+                task_entries.listAppend(ChecklistEntryMake("__effect ultrahydrated", "", ChecklistSubentryMake("Acquire Ultrahydrated Effect", "", description), -11));
+            }
+            subentry.entries.listAppend("Need ultra-hydrated from The Oasis. (potential clover for 20 turns)");
         }
+        //FIXME make gnasir detection slightly more robust
         if (exploration < 10)
         {
             int turns_until_gnasir_found = ceil(to_float(10 - exploration) / exploration_per_turn) + 1;
@@ -6065,7 +6238,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                     }
                     else
                     {
-                        subentry.entries.listAppend("Possibly unlock the hidden tavern first, for free runs from drum pygmys.");
+                        subentry.entries.listAppend("Possibly unlock the hidden tavern first, for free runs from drunk pygmies.");
                     }
                 }
             }
@@ -7047,7 +7220,6 @@ void QManorInit()
 		QuestStateParseMafiaQuestPropertyValue(state, "finished");
 	else
     {
-        requestQuestLogLoad();
 		QuestStateParseMafiaQuestPropertyValue(state, "started");
     }
 	state.quest_name = "Spookyraven Manor Unlock";
@@ -7247,7 +7419,6 @@ void QPirateInit()
 		state.startable = true;
 		if (!state.in_progress && !state.finished)
 		{
-            requestQuestLogLoad();
 			QuestStateParseMafiaQuestPropertyValue(state, "started");
 		}
 	}
@@ -7908,7 +8079,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     first_boss_name[$class[Disco Bandit]] = "The Spirit of New Wave";
     first_boss_name[$class[Accordion Thief]] = "Somerset Lopez, Dread Mariachi";
     
-    if (base_quest_state.mafia_internal_step == 1)
+    if (base_quest_state.mafia_internal_step <= 1)
     {
         //1	One of your guild leaders has tasked you to recover a mysterious and unnamed artifact stolen by your Nemesis. Your first step is to smith an Epic Weapon
         if (have_epic_weapon)
@@ -8154,8 +8325,28 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
             description.listAppend("Wear several mer-kin prayerbeads and possibly a mer-kin gutgirdle.");
             description.listAppend("Avoid wearing any +hp gear or buffs. Ideally, you want low HP.");
             description.listAppend("Each round, use a different healing item, until you lose the Suckrament effect.|After that, your stats are restored. Fully heal, then attack!");
-            string [int] potential_healers = split_string_mutable("mer-kin healscroll (full HP),scented massage oil (full HP),soggy used band-aid (full HP),extra-strength red potion (+200 HP),red pixel potion (+100-120 HP),red potion (+100 HP),filthy poultice (+80-120 HP),gauze garter (+80-120 HP),green pixel potion (+40-60 HP),cartoon heart (40-60 HP),red plastic oyster egg (+35-40 HP)", ","); //thank you, wiki
-            description.listAppend("Potential healing items:|*" + potential_healers.listJoinComponents("|*"));
+            string [item] potential_healers;
+            potential_healers[$item[mer-kin healscroll]] = "mer-kin healscroll (full HP)";
+            potential_healers[$item[scented massage oil]] = "scented massage oil (full HP)";
+            potential_healers[$item[soggy used band-aid]] = "soggy used band-aid (full HP)";
+            potential_healers[$item[extra-strength red potion]] = "extra-strength red potion (+200 HP)";
+            potential_healers[$item[red pixel potion]] = "red pixel potion (+100-120 HP)";
+            potential_healers[$item[red potion]] = "red potion (+100 HP)";
+            potential_healers[$item[filthy poultice]] = "filthy poultice (+80-120 HP)";
+            potential_healers[$item[gauze garter]] = "gauze garter (+80-120 HP)";
+            potential_healers[$item[green pixel potion]] = "green pixel potion (+40-60 HP)";
+            potential_healers[$item[cartoon heart]] = "cartoon heart (40-60 HP)";
+            potential_healers[$item[red plastic oyster egg]] = "red plastic oyster egg (+35-40 HP)";
+            string [int] description_healers;
+            
+            foreach it in potential_healers
+            {
+                if (it.available_amount() > 0)
+                    description_healers.listAppend(potential_healers[it]);
+                else
+                    description_healers.listAppend(HTMLGenerateSpanFont(potential_healers[it], "red", ""));
+            }
+            description.listAppend("Potential healing items:|*" + description_healers.listJoinComponents("|*"));
         }
         else
         {
@@ -8173,8 +8364,17 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
                 }
                 else
                 {
-                    description.listAppend("Solve the dreadscroll.");
+                    if ($effect[deep-tainted mind].have_effect() > 0)
+                        description.listAppend("Solve the dreadscroll.|Wait for Deep-Tainted Mind to wear off.");
+                    else
+                        description.listAppend("Solve the dreadscroll.");
                     description.listAppend("Clues are from:|*Three non-combats in the library. (vocabulary)|*Use a mer-kin killscroll in combat. (vocabulary)|*Use a mer-kin healscroll in combat. (vocabulary)|*Use a mer-kin knucklebone.|*Cast deep dark visions.|*Eat sushi with mer-kin worktea.");
+                    
+                    int vocabulary = get_property_int("merkinVocabularyMastery");
+                    if (vocabulary < 10)
+                        description.listAppend("At " + (vocabulary * 10) + "% Mer-Kin vocabulary. (use mer-kin wordquiz with a mer-kin cheatsheet)");
+                    else
+                        description.listAppend("Mer-Kin vocabulary mastered.");
                 }
             }
         }
@@ -8189,8 +8389,8 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
         string [int] description;
         
         description.listAppend("Equip Clothing of Loathing, go to the temple.");
-        description.listAppend("Fling 120MP hobopolis spells at him.");
-        description.listAppend("Use Mafia's \"dad\" GCLI command to see which element to use.");
+        description.listAppend("Cast 120MP hobopolis spells at him.");
+        description.listAppend("Use Mafia's \"dad\" GCLI command to see which element to use which round.");
         if (my_mp() < 1200)
             description.listAppend("Will need 1200MP, or less if using shrap/volcanometeor showeruption.");
         
@@ -8356,15 +8556,15 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
                     monster lockkey_monster = get_property("merkinLockkeyMonster").to_monster();
                     if (lockkey_monster == $monster[mer-kin burglar])
                     {
-                        nc_details = "Stashbox is in the Sneaky Intent.";
+                        nc_details = "Stashbox is in the camouflaged tent.";
                     }
                     else if (lockkey_monster == $monster[mer-kin raider])
                     {
-                        nc_details = "Stashbox is in the Aggressive Intent.";
+                        nc_details = "Stashbox is in the skull-bedecked tent.";
                     }
                     else if (lockkey_monster == $monster[mer-kin healer])
                     {
-                        nc_details = "Stashbox is in the Mysterious Intent.";
+                        nc_details = "Stashbox is in the glyphed tent.";
                     }
                     
                     need_minus_combat_modifier = true;
@@ -8964,7 +9164,7 @@ void QLegendaryBeatInit()
     
     if (!state.started)
     {
-        requestQuestLogLoad();
+        requestQuestLogLoad("questI02Beat");
         QuestStateParseMafiaQuestPropertyValue(state, "started");
     }
 	
@@ -8989,13 +9189,13 @@ void QLegendaryBeatGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         
     //FIXME support for fruit machine sidequest?
     
-    //Main quest, in reverse order:
     if (base_quest_state.mafia_internal_step == 1)
     {
         subentry.entries.listAppend("Defeat Professor Jacking.");
     }
     else if (base_quest_state.mafia_internal_step == 2)
     {
+        //Main quest, in reverse order:
         if ($item[can-you-dig-it?].available_amount() > 0 && $effect[stubbly legs].have_effect() > 0)
         {
             subentry.modifiers.listAppend("-combat");
@@ -10295,7 +10495,7 @@ void SDispensaryGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
 		else
 			subentry.entries.listAppend("Acquire KGE outfit");
 	}
-	optional_task_entries.listAppend(ChecklistEntryMake("__half Dispensary", "cobbsknob.php", subentry, 10));
+	optional_task_entries.listAppend(ChecklistEntryMake("Dispensary", "cobbsknob.php", subentry, 10));
 }
 
 void SSkillsGenerateResource(ChecklistEntry [int] available_resources_entries)
@@ -13334,7 +13534,7 @@ void SPMeatGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     }
         
         
-	optional_task_entries.listAppend(ChecklistEntryMake("meat", "", ChecklistSubentryMake("The Meatsmith's Brainspace", modifiers, description),$locations[The Nightmare Meatrealm]));
+	optional_task_entries.listAppend(ChecklistEntryMake("meat", "place.php?whichplace=junggate_6", ChecklistSubentryMake("The Meatsmith's Brainspace", modifiers, description),$locations[The Nightmare Meatrealm]));
 }
 
 void SPGourdGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -15906,12 +16106,17 @@ void setUpCSSStyles()
         body_style += "background-color:" + __setting_dark_color + ";";
     else
         body_style += "background-color:#FFFFFF;";
-    body_style += "margin:0px;font-size:14px;";
+    body_style += "margin:0px;padding:0px;font-size:14px;";
     
     if (__setting_ios_appearance)
         body_style += "font-family:'Helvetica Neue',Arial, Helvetica, sans-serif;font-weight:lighter;";
     
     PageAddCSSClass("body", "", body_style, -11);
+    
+    PageAddCSSClass("body", "", "font-size:13px;", -11, __setting_media_query_medium_size);
+    PageAddCSSClass("body", "", "font-size:12px;", -11, __setting_media_query_small_size);
+    PageAddCSSClass("body", "", "font-size:12px;", -11, __setting_media_query_tiny_size);
+    
     
 	PageAddCSSClass("", "r_future_option", "color:" + __setting_unavailable_color + ";");
 	
@@ -15958,23 +16163,28 @@ void generateImageTest(Checklist [int] checklists)
 void generateStateTest(Checklist [int] checklists)
 {
 	ChecklistEntry [int] misc_state_entries;
-	ChecklistEntry [int] misc_state_string_entries;
-	ChecklistEntry [int] misc_state_int_entries;
 	ChecklistEntry [int] quest_state_entries;
+    
 	
+    string [int] state_description;
+    string [int] string_description;
+    string [int] int_description;
 	foreach key in __misc_state
 	{
-		misc_state_entries.listAppend(ChecklistEntryMake("blank", "", ChecklistSubentryMake(key + " = " + __misc_state[key])));
+        state_description.listAppend(key + " = " + __misc_state[key]);
 	}
 	foreach key in __misc_state_string
 	{
-		misc_state_string_entries.listAppend(ChecklistEntryMake("blank", "", ChecklistSubentryMake(key + " = \"" + __misc_state_string[key] + "\"")));
+        string_description.listAppend(key + " = \"" + __misc_state_string[key] + "\"");
 	}
 	foreach key in __misc_state_int
 	{
-		misc_state_int_entries.listAppend(ChecklistEntryMake("blank", "", ChecklistSubentryMake(key + " = " + __misc_state_int[key])));
+        int_description.listAppend(key + " = " + __misc_state_int[key]);
 	}
 	
+    misc_state_entries.listAppend(ChecklistEntryMake("__item milky potion", "", ChecklistSubentryMake("Boolean", "", state_description.listJoinComponents("|"))));
+    misc_state_entries.listAppend(ChecklistEntryMake("__item ghost thread", "", ChecklistSubentryMake("String", "", string_description.listJoinComponents("|"))));
+    misc_state_entries.listAppend(ChecklistEntryMake("__item handful of numbers", "", ChecklistSubentryMake("Int", "", int_description.listJoinComponents("|"))));
 	
 	boolean [string] names_already_seen;
 	
@@ -16032,9 +16242,7 @@ void generateStateTest(Checklist [int] checklists)
 	}
 	
 	
-	checklists.listAppend(ChecklistMake("Misc. Boolean States", misc_state_entries));
-	checklists.listAppend(ChecklistMake("Misc. String States", misc_state_string_entries));
-	checklists.listAppend(ChecklistMake("Misc. Int States", misc_state_int_entries));
+	checklists.listAppend(ChecklistMake("Misc. States", misc_state_entries));
 	checklists.listAppend(ChecklistMake("Quest States", quest_state_entries));
 }
 
@@ -16315,7 +16523,7 @@ string generateRandomMessage()
     familiar_messages[$familiar[Frumious Bandersnatch]] = "frabjous";
     familiar_messages[$familiar[Pair of Stomping Boots]] = "running away again?";
     familiar_messages[$familiar[baby sandworm]] = "the waters of life";
-    familiar_messages[$familiar[baby bugged bugbear]] = "expected }, found ; (Main.ash, line 440)";
+    familiar_messages[$familiar[baby bugged bugbear]] = "expected }, found ; (Main.ash, line 443)";
     familiar_messages[$familiar[mechanical songbird]] = "a little glowing friend";
     familiar_messages[$familiar[nanorhino]] = "write every day";
     familiar_messages[$familiar[rogue program]] = "ascends for the users";
@@ -16550,7 +16758,7 @@ string [string] generateAPIResponse()
     else if (true)
     {
         //Checking every item is slow. But certain items won't trigger a reload, but need to. So:
-        boolean [item] relevant_items = $items[photocopied monster,4-d camera,pagoda plans,Elf Farm Raffle ticket,skeleton key,heavy metal thunderrr guitarrr,heavy metal sonata,Hey Deze nuts,rave whistle,damp old boot,map to Professor Jacking's laboratory,world's most unappetizing beverage,squirmy violent party snack,White Citadel Satisfaction Satchel,rusty screwdriver,giant pinky ring,The Lost Pill Bottle,GameInformPowerDailyPro magazine,dungeoneering kit,Knob Goblin encryption key,dinghy plans,Sneaky Pete's key,Jarlsberg's key,Boris's key,fat loot token,bridge,chrome ore,asbestos ore,linoleum ore,csa fire-starting kit,tropical orchid,stick of dynamite,barbed-wire fence,psychoanalytic jar,digital key,Richard's star key,star hat,star crossbow,star staff,star sword,Wand of Nagamar,Azazel's tutu,Azazel's unicorn,Azazel's lollipop,smut orc keepsake box,blessed large box,massive sitar,hammer of smiting,chelonian morningstar,greek pasta of peril,17-alarm saucepan,shagadelic disco banjo,squeezebox of the ages,E.M.U. helmet,E.M.U. harness,E.M.U. joystick,E.M.U. rocket thrusters,E.M.U. unit,wriggling flytrap pellet,Mer-kin trailmap,Mer-kin stashbox,Makeshift yakuza mask,Novelty tattoo sleeves,strange goggles,zaibatsu level 2 card, zaibatsu level 3 card,flickering pixel,jar of oil,bowl of scorpions,molybdenum magnet,steel lasagna,steel margarita,steel-scented air freshener];
+        boolean [item] relevant_items = $items[photocopied monster,4-d camera,pagoda plans,Elf Farm Raffle ticket,skeleton key,heavy metal thunderrr guitarrr,heavy metal sonata,Hey Deze nuts,rave whistle,damp old boot,map to Professor Jacking's laboratory,world's most unappetizing beverage,squirmy violent party snack,White Citadel Satisfaction Satchel,rusty screwdriver,giant pinky ring,The Lost Pill Bottle,GameInformPowerDailyPro magazine,dungeoneering kit,Knob Goblin encryption key,dinghy plans,Sneaky Pete's key,Jarlsberg's key,Boris's key,fat loot token,bridge,chrome ore,asbestos ore,linoleum ore,csa fire-starting kit,tropical orchid,stick of dynamite,barbed-wire fence,psychoanalytic jar,digital key,Richard's star key,star hat,star crossbow,star staff,star sword,Wand of Nagamar,Azazel's tutu,Azazel's unicorn,Azazel's lollipop,smut orc keepsake box,blessed large box,massive sitar,hammer of smiting,chelonian morningstar,greek pasta of peril,17-alarm saucepan,shagadelic disco banjo,squeezebox of the ages,E.M.U. helmet,E.M.U. harness,E.M.U. joystick,E.M.U. rocket thrusters,E.M.U. unit,wriggling flytrap pellet,Mer-kin trailmap,Mer-kin stashbox,Makeshift yakuza mask,Novelty tattoo sleeves,strange goggles,zaibatsu level 2 card, zaibatsu level 3 card,flickering pixel,jar of oil,bowl of scorpions,molybdenum magnet,steel lasagna,steel margarita,steel-scented air freshener,Grandma's Map,mer-kin healscroll,scented massage oil,soggy used band-aid,extra-strength red potion,red pixel potion,red potion,filthy poultice,gauze garter,green pixel potion,cartoon heart,red plastic oyster egg];
         //future: add snow boards
         
         
@@ -16756,7 +16964,7 @@ void runMain(string relay_filename)
         return;
 	}
     
-    set_property_if_changed("__relay_guide_stale_quest_data", "false");
+    set_property("__relay_guide_stale_quest_data", "false");
     
 	boolean output_body_tag_only = false;
 	if (form_fields["body tag only"].length() > 0)
@@ -16782,6 +16990,8 @@ void runMain(string relay_filename)
 	
     if (__setting_use_kol_css)
         PageWriteHead(HTMLGenerateTagPrefix("link", mapMake("rel", "stylesheet", "type", "text/css", "href", "/images/styles.css")));
+        
+    PageWriteHead(HTMLGenerateTagPrefix("meta", mapMake("name", "viewport", "content", "width=device-width")));
 	
 	
     if (__relay_filename == "relay_Guide.ash")
