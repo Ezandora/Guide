@@ -1554,15 +1554,15 @@ void requestQuestLogLoad(string property_name)
     if (__loaded_quest_log)
         return;
     
-    
     //Known quests that should track properly:
     boolean [string] safe_list = $strings[questM02Artist,questM10Azazel,questL10Garbage,questL11MacGuffin,questL11Manor,questL11Palindome,questL11Pyramid,questL11Worship,questL12War,questL13Final,questL02Larva,questL03Rat,questL04Bat,questL05Goblin,questL06Friar,questL07Cyrptic,questL08Trapper,questL09Topping,questM12Pirate,questS02Monkees,questM01Untinker,questM15Lol,questF04Elves];
+    
     //Quests not on the list:
     //questF01Primordial questF02Hyboria questF03Future - minor tracking
-    //questG02Whitecastle - tracked, but not updated
+    //questG02Whitecastle - tracked, but updates only started, finished, step1, step5?
     //questG03Ego - tracked, but not updated
     //questG04Nemesis questG05Dark - minor tracking
-    //questI02Beat - need to know professor jacking being defeated, not sure if mafia does
+    //questI02Beat - need to know professor jacking being defeated
     
     if (safe_list contains property_name)
         return;
@@ -5294,12 +5294,12 @@ void QLevel9GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		if (line.count() > 0)
 			subentry.entries.listAppend("Need " + line.listJoinComponents(" ", "and") + ".");
 	}
-	else if (base_quest_state.mafia_internal_step == 2)
+	/*else if (base_quest_state.mafia_internal_step == 2)
 	{
 		//bridge built, talk to angus:
 		subentry.entries.listAppend("Talk to Angus in the Highland Lord's tower.");
-	}
-	else if (base_quest_state.mafia_internal_step == 3)
+	}*/
+	else if (base_quest_state.mafia_internal_step == 2 || base_quest_state.mafia_internal_step == 3)
 	{
 		//do three peaks:
 		subentry.entries.listAppend("Light the fires!");
