@@ -1,7 +1,7 @@
 //This script and its support scripts are in the public domain.
 
 //These settings are for development. Don't worry about editing them.
-string __version = "1.0.10";
+string __version = "1.0.11";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -719,6 +719,7 @@ string listGetRandomObject(string [int] list)
     return list[listKeyForIndex(list, random(list.count()))];
 }
 
+
 //Additions to standard API:
 //Auto-conversion property functions:
 boolean get_property_boolean(string property)
@@ -1165,6 +1166,9 @@ float [monster] appearance_rates_adjusted(location l)
 {
     float [monster] source = l.appearance_rates();
     
+    if (l == $location[the sleazy back alley])
+        source[$monster[none]] = MIN(MAX(0, 20 - combat_rate_modifier()), 100);
+    
     float minimum_monster_appearance = 1000000000.0;
     foreach m in source
     {
@@ -1551,10 +1555,12 @@ string shrinkQuestLog(string html)
 boolean __loaded_quest_log = false;
 void requestQuestLogLoad(string property_name)
 {
+    if (true) //disabled, remove later
+        return;
     if (__loaded_quest_log)
         return;
     
-    boolean [string] whitelist = $strings[questF01Primordial,questF02Hyboria,questF03Future,questG04Nemesis,questG05Dark,questI02Beat];
+    boolean [string] whitelist = $strings[questF01Primordial,questF02Hyboria,questF03Future,questI02Beat];
     //questF01Primordial questF02Hyboria questF03Future - minor tracking
     //questG02Whitecastle - tracked, but updates only started, finished, step1, step5?
     //questG03Ego - tracked, but not updated
@@ -1581,8 +1587,8 @@ void requestQuestLogLoad(string property_name)
     if (safe_to_load_again)
     {
         boolean stale = false;
-        string quest_log_2 = visit_url("questlog.php?which=2");
-        string quest_log_1 = visit_url("questlog.php?which=1");
+        string quest_log_2 = "";//visit_url("questlog.php?which=2");
+        string quest_log_1 = "";//visit_url("questlog.php?which=1");
         if (quest_log_2.contains_text("Your Quest Log"))
             set_property("__relay_guide_last_quest_log_2", shrinkQuestLog(quest_log_2));
         else
@@ -3707,6 +3713,90 @@ string HTMLGenerateFutureTextByLocationAvailability(location place)
 	return HTMLGenerateFutureTextByLocationAvailability(place.to_string(), place);
 }
 
+
+
+string [location] __urls_for_locations;
+boolean __urls_for_locations_initialized = false;
+
+string getClickableURLForLocation(location l)
+{
+    if (!__urls_for_locations_initialized)
+    {
+        foreach l in $locations[The Beanbat Chamber, the bat hole entrance, the batrat and ratbat burrow, guano junction, the boss bat's lair]
+            __urls_for_locations[l] = "place.php?whichplace=bathole";
+        foreach l in $locations[the \"fun\" house, pre-cyrpt cemetary, post-cyrpt cemetary,The Outskirts of Cobb's Knob]
+            __urls_for_locations[l] = "place.php?whichplace=plains";
+        
+        if ($location[cobb's knob barracks].locationAvailable())
+            __urls_for_locations[$location[The Outskirts of Cobb's Knob]] = "cobbsknob.php";
+        
+        foreach l in $locations[cobb's knob barracks, cobb's knob kitchens, cobb's knob harem, cobb's knob treasury]
+            __urls_for_locations[l] = "cobbsknob.php";
+        __urls_for_locations[$location[a barroom brawl]] = "tavern.php";
+        __urls_for_locations[$location[the sleazy back alley]] = "place.php?whichplace=town_wrong";
+        
+        foreach l in $locations[the spooky forest, whitey's grove, the road to white citadel, the black forest, the hidden temple]
+            __urls_for_locations[l] = "place.php?whichplace=woods";
+            
+        if ($location[cobb's knob kitchens].locationAvailable())
+            __urls_for_locations[$location[The Haunted Pantry]] = "place.php?whichplace=spookyraven1";
+        else
+            __urls_for_locations[$location[The Haunted Pantry]] = "place.php?whichplace=town_right";
+            
+            
+        foreach l in $locations[The Oasis, the arid\, extra-dry desert, south of the border, The Shore\, Inc. Travel Agency]
+            __urls_for_locations[l] = "place.php?whichplace=desertbeach";
+        __urls_for_locations[$location[The Smut Orc Logging Camp]] = "place.php?whichplace=orc_chasm";
+        foreach l in $locations[the haunted wine cellar (northwest), the haunted wine cellar (southwest), the haunted wine cellar (northeast), the haunted wine cellar (southeast)]
+            __urls_for_locations[l] = "manor3.php";
+        foreach l in $locations[the castle in the clouds in the sky (basement), the castle in the clouds in the sky (ground floor), the castle in the clouds in the sky (top floor)]
+            __urls_for_locations[l] = "place.php?whichplace=giantcastle";
+            
+        foreach l in $locations[the haunted bedroom, the haunted ballroom, the haunted bathroom]
+            __urls_for_locations[l] = "place.php?whichplace=spookyraven2";
+            
+            
+        foreach l in $locations[the hidden apartment building, the hidden hospital, the hidden office building, the hidden bowling alley, the hidden park]
+            __urls_for_locations[l] = "place.php?whichplace=hiddencity";
+            
+        foreach l in $locations[the extreme slope, the icy peak, lair of the ninja snowmen, the goatlet, itznotyerzitz mine]
+            __urls_for_locations[l] = "place.php?whichplace=mclargehuge";
+            
+            
+        foreach l in $locations[the poop deck, Barrrney's Barrr, the f'c'le, belowdecks]
+            __urls_for_locations[l] = "place.php?whichplace=cove";
+            
+        foreach l in $locations[the haiku dungeon, the limerick dungeon, the dungeons of doom, the enormous greater-than sign, the daily dungeon]
+            __urls_for_locations[l] = "da.php";
+
+        __urls_for_locations[$location[Anger Man's Level]] = "place.php?whichplace=junggate_3";
+        if ($effect[Absinthe-Minded].have_effect() > 0)
+        {
+            foreach l in $locations[The Stately Pleasure Dome, the mouldering mansion, the rogue windmill]
+                __urls_for_locations[l] = "place.php?whichplace=wormwood";
+        }
+        else
+        {
+            foreach l in $locations[The Stately Pleasure Dome, the mouldering mansion, the rogue windmill]
+                __urls_for_locations[l] = "mall.php";
+        }
+        
+        foreach l in $locations[chinatown shops, chinatown tenement, triad factory,1st floor\, shiawase-mitsuhama building,2nd floor\, shiawase-mitsuhama building,3rd floor\, shiawase-mitsuhama building]
+            __urls_for_locations[l] = "place.php?whichplace=junggate_1";
+        
+        if ($effect[down the rabbit hole].have_effect() > 0)
+            __urls_for_locations[$location[The Red Queen's Garden]] = "place.php?whichplace=rabbithole";
+        else
+            __urls_for_locations[$location[The Red Queen's Garden]] = "mall.php";
+        
+        __urls_for_locations_initialized = true;
+    }
+    
+    if (__urls_for_locations contains l)
+        return __urls_for_locations[l];
+    return "";
+}
+
 void QLevel2Init()
 {
 	//questL02Larva
@@ -3745,7 +3835,7 @@ void QLevel2GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		return;
 		
 	ChecklistSubentry subentry;
-    string url = "woods.php";
+    string url = "place.php?whichplace=woods";
 	
 	subentry.header = base_quest_state.quest_name;
 	
@@ -5616,7 +5706,7 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     if (base_quest_state.mafia_internal_step < 2)
     {
         //Unlock black market:
-        url = "woods.php";
+        url = "place.php?whichplace=woods";
         if ($item[black market map].available_amount() > 0)
             subentry.entries.listAppend("Unlock the black market.");
         else
@@ -5828,7 +5918,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
         //4 -> acquire wet stunt nut stew, give to mr. alarm
         if ($item[wet stunt nut stew].available_amount() == 0)
         {
-            url = "woods.php";
+            url = "place.php?whichplace=woods";
             if (($item[bird rib].available_amount() > 0 && $item[lion oil].available_amount() > 0 || $item[wet stew].available_amount() > 0) && $item[stunt nuts].available_amount() > 0)
                 subentry.entries.listAppend("Cook wet stunt nut stew.");
             else
@@ -6175,7 +6265,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         if ($item[stone wool].available_amount() > 0)
             subentry.entries.listAppend(pluralize($item[stone wool]) + " available.");
         entry.subentries.listAppend(subentry);
-        entry.target_location = "woods.php";
+        entry.target_location = "place.php?whichplace=woods";
     }
     else
     {		
@@ -6629,7 +6719,7 @@ void QLevel11HiddenTempleGenerateTasks(ChecklistEntry [int] task_entries, Checkl
     }
     else
     {
-        task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, "woods.php", subentry, , $locations[the spooky forest]));
+        task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, "place.php?whichplace=woods", subentry, , $locations[the spooky forest]));
     }
 }
 
@@ -7664,11 +7754,11 @@ void QNemesisInit()
 	//questG04Nemesis
 	QuestState state;
     
-    boolean should_quest_load = false;
-    if ($items[distilled seal blood,turtle chain,high-octane olive oil,peppercorns of power,vial of mojo,golden reeds,hammer of smiting,chelonian morningstar,greek pasta of peril,17-alarm saucepan,shagadelic disco banjo,squeezebox of the ages,Sledgehammer of the V&aelig;lkyr,Flail of the Seven Aspects,Wrath of the Capsaician Pastalords,Windsor Pan of the Source,Seeger's Unstoppable Banjo,The Trickster's Trikitixa].available_amount() > 0 || $location[the "fun" house].turnsAttemptedInLocation() > 0) //they've done something with regard to the quest, let's quest load
-        should_quest_load = true;
+    //boolean should_quest_load = false;
+    //if ($items[distilled seal blood,turtle chain,high-octane olive oil,peppercorns of power,vial of mojo,golden reeds,hammer of smiting,chelonian morningstar,greek pasta of peril,17-alarm saucepan,shagadelic disco banjo,squeezebox of the ages,Sledgehammer of the V&aelig;lkyr,Flail of the Seven Aspects,Wrath of the Capsaician Pastalords,Windsor Pan of the Source,Seeger's Unstoppable Banjo,The Trickster's Trikitixa].available_amount() > 0 || $location[the "fun" house].turnsAttemptedInLocation() > 0) //they've done something with regard to the quest, let's quest load
+        //should_quest_load = true;
 	
-	QuestStateParseMafiaQuestProperty(state, "questG04Nemesis", should_quest_load);
+	QuestStateParseMafiaQuestProperty(state, "questG04Nemesis");
 	
 	state.quest_name = "Nemesis Quest";
 	state.image_name = "__half Nemesis";
@@ -7676,7 +7766,7 @@ void QNemesisInit()
 	if (my_basestat(my_primestat()) >= 12)
 		state.startable = true;
     
-    if (!state.finished && false)
+    if (!state.finished)
     {
         //FIXME temporary code
         //Internal checking:
@@ -7985,7 +8075,7 @@ void QNemesisGenerateCaveTasks(ChecklistSubentry subentry, item legendary_epic_w
         if (it.available_amount() > 0)
             paper_strips_found += 1;
     }
-    if (false)
+    if (true)
     {
         //FIXME temporary code
         if (state.mafia_internal_step < 4 && paper_strips_found > 0)
@@ -9268,6 +9358,10 @@ void QLegendaryBeatGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 	QuestState base_quest_state = __quest_state["Legendary Beat"];
 	if (!base_quest_state.in_progress)
 		return;
+    
+    //FIXME temporary:
+    if (!($locations[professor jacking's small-o-fier, professor jacking's huge-a-ma-tron] contains __last_adventure_location))
+        return;
 		
 	ChecklistSubentry subentry;
 	
@@ -9275,11 +9369,11 @@ void QLegendaryBeatGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         
     //FIXME support for fruit machine sidequest?
     
-    if (base_quest_state.mafia_internal_step == 1)
+    if (base_quest_state.mafia_internal_step == 1 && false)
     {
         subentry.entries.listAppend("Defeat Professor Jacking.");
     }
-    else if (base_quest_state.mafia_internal_step == 2)
+    else if (base_quest_state.mafia_internal_step == 2 || true)
     {
         //Main quest, in reverse order:
         if ($item[can-you-dig-it?].available_amount() > 0 && $effect[stubbly legs].have_effect() > 0)
@@ -9561,7 +9655,7 @@ void QWhiteCitadelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 	
 	subentry.header = base_quest_state.quest_name;
 	
-	string active_url = "woods.php";
+	string active_url = "place.php?whichplace=woods";
     
     if (true)
     {
@@ -12570,6 +12664,7 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
     
     subentry.header = "Bounty hunt for " + bounty_item_name.HTMLEscapeString();
     
+    
     //Look up monster location:
     location [int] monster_locations = locationsForMonster(target_monster);
     
@@ -12593,12 +12688,15 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
             float [monster] appearance_rates = l.appearance_rates_adjusted();
             int number_remaining = amount_needed - amount_found;
             
-            if (number_remaining == 0)
+            if (number_remaining == 0 && url.s.length() == 0)
             {
                 url.s = "place.php?whichplace=forestvillage";
                 subentry.header = "Return to the bounty hunter hunter";
                 return subentry;
             }
+            string clickable_url = getClickableURLForLocation(l);
+            if (clickable_url.length() > 0 && url.s.length() == 0)
+                url.s = clickable_url;
             
             float bounty_appearance_rate = appearance_rates[target_monster] / 100.0;
             if (noncombats_skippable)
@@ -12622,7 +12720,7 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
                     turns_remaining_string = " ~" + pluralize(round(turns_remaining), "turn remains", "turns remain") + ".";
                 }
             }
-            if (noncombats_skippable && appearance_rates[$monster[none]] != 0.0)
+            if (!noncombats_skippable && appearance_rates[$monster[none]] != 0.0)
                 need_plus_combat = true;
         }
     }
