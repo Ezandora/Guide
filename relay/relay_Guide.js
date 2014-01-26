@@ -35,7 +35,7 @@ function recalculateImportanceBarVisibility(test_position, relevant_container)
     }
 }
 
-function elementGlobalOffsetTop(element)
+function elementGetGlobalOffsetTop(element)
 {
     if (element == undefined)
         return 0.0;
@@ -53,7 +53,7 @@ function elementGlobalOffsetTop(element)
 
 function writePageExtras()
 {
-    if (window.self != window.top)
+    if (window.self != window.top && window.name == "mainpane")
     {
         //in frame
         var editable_area_top = document.getElementById("extra_words_at_top");
@@ -67,7 +67,7 @@ function writePageExtras()
     if (importance_container != undefined)
     {
         __guide_importance_bar_visible = false;
-        var tasks_position = elementGlobalOffsetTop(document.getElementById("Tasks_checklist_container")) + 1;
+        var tasks_position = elementGetGlobalOffsetTop(document.getElementById("Tasks_checklist_container")) + 1;
         
         recalculateImportanceBarVisibility(tasks_position, importance_container)
         
@@ -244,7 +244,7 @@ function navbarClick(event, checklist_div_id)
     //We also have a fallback in case javascript is disabled - plain anchor tags.
     try
     {
-        var container_position = elementGlobalOffsetTop(document.getElementById(checklist_div_id)) + 1;
+        var container_position = elementGetGlobalOffsetTop(document.getElementById(checklist_div_id)) + 1;
         var importance_container = document.getElementById("importance_bar");
         if (importance_container != undefined && checklist_div_id != "Tasks_checklist_container")
         {
