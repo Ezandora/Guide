@@ -37,7 +37,7 @@ void QLevel2GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		return;
 		
 	ChecklistSubentry subentry;
-    string url = "woods.php";
+    string url = "place.php?whichplace=woods";
 	
 	subentry.header = base_quest_state.quest_name;
 	

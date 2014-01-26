@@ -280,3 +280,87 @@ string HTMLGenerateFutureTextByLocationAvailability(location place)
 {
 	return HTMLGenerateFutureTextByLocationAvailability(place.to_string(), place);
 }
+
+
+
+string [location] __urls_for_locations;
+boolean __urls_for_locations_initialized = false;
+
+string getClickableURLForLocation(location l)
+{
+    if (!__urls_for_locations_initialized)
+    {
+        foreach l in $locations[The Beanbat Chamber, the bat hole entrance, the batrat and ratbat burrow, guano junction, the boss bat's lair]
+            __urls_for_locations[l] = "place.php?whichplace=bathole";
+        foreach l in $locations[the \"fun\" house, pre-cyrpt cemetary, post-cyrpt cemetary,The Outskirts of Cobb's Knob]
+            __urls_for_locations[l] = "place.php?whichplace=plains";
+        
+        if ($location[cobb's knob barracks].locationAvailable())
+            __urls_for_locations[$location[The Outskirts of Cobb's Knob]] = "cobbsknob.php";
+        
+        foreach l in $locations[cobb's knob barracks, cobb's knob kitchens, cobb's knob harem, cobb's knob treasury]
+            __urls_for_locations[l] = "cobbsknob.php";
+        __urls_for_locations[$location[a barroom brawl]] = "tavern.php";
+        __urls_for_locations[$location[the sleazy back alley]] = "place.php?whichplace=town_wrong";
+        
+        foreach l in $locations[the spooky forest, whitey's grove, the road to white citadel, the black forest, the hidden temple]
+            __urls_for_locations[l] = "place.php?whichplace=woods";
+            
+        if ($location[cobb's knob kitchens].locationAvailable())
+            __urls_for_locations[$location[The Haunted Pantry]] = "place.php?whichplace=spookyraven1";
+        else
+            __urls_for_locations[$location[The Haunted Pantry]] = "place.php?whichplace=town_right";
+            
+            
+        foreach l in $locations[The Oasis, the arid\, extra-dry desert, south of the border, The Shore\, Inc. Travel Agency]
+            __urls_for_locations[l] = "place.php?whichplace=desertbeach";
+        __urls_for_locations[$location[The Smut Orc Logging Camp]] = "place.php?whichplace=orc_chasm";
+        foreach l in $locations[the haunted wine cellar (northwest), the haunted wine cellar (southwest), the haunted wine cellar (northeast), the haunted wine cellar (southeast)]
+            __urls_for_locations[l] = "manor3.php";
+        foreach l in $locations[the castle in the clouds in the sky (basement), the castle in the clouds in the sky (ground floor), the castle in the clouds in the sky (top floor)]
+            __urls_for_locations[l] = "place.php?whichplace=giantcastle";
+            
+        foreach l in $locations[the haunted bedroom, the haunted ballroom, the haunted bathroom]
+            __urls_for_locations[l] = "place.php?whichplace=spookyraven2";
+            
+            
+        foreach l in $locations[the hidden apartment building, the hidden hospital, the hidden office building, the hidden bowling alley, the hidden park]
+            __urls_for_locations[l] = "place.php?whichplace=hiddencity";
+            
+        foreach l in $locations[the extreme slope, the icy peak, lair of the ninja snowmen, the goatlet, itznotyerzitz mine]
+            __urls_for_locations[l] = "place.php?whichplace=mclargehuge";
+            
+            
+        foreach l in $locations[the poop deck, Barrrney's Barrr, the f'c'le, belowdecks]
+            __urls_for_locations[l] = "place.php?whichplace=cove";
+            
+        foreach l in $locations[the haiku dungeon, the limerick dungeon, the dungeons of doom, the enormous greater-than sign, the daily dungeon]
+            __urls_for_locations[l] = "da.php";
+
+        __urls_for_locations[$location[Anger Man's Level]] = "place.php?whichplace=junggate_3";
+        if ($effect[Absinthe-Minded].have_effect() > 0)
+        {
+            foreach l in $locations[The Stately Pleasure Dome, the mouldering mansion, the rogue windmill]
+                __urls_for_locations[l] = "place.php?whichplace=wormwood";
+        }
+        else
+        {
+            foreach l in $locations[The Stately Pleasure Dome, the mouldering mansion, the rogue windmill]
+                __urls_for_locations[l] = "mall.php";
+        }
+        
+        foreach l in $locations[chinatown shops, chinatown tenement, triad factory,1st floor\, shiawase-mitsuhama building,2nd floor\, shiawase-mitsuhama building,3rd floor\, shiawase-mitsuhama building]
+            __urls_for_locations[l] = "place.php?whichplace=junggate_1";
+        
+        if ($effect[down the rabbit hole].have_effect() > 0)
+            __urls_for_locations[$location[The Red Queen's Garden]] = "place.php?whichplace=rabbithole";
+        else
+            __urls_for_locations[$location[The Red Queen's Garden]] = "mall.php";
+        
+        __urls_for_locations_initialized = true;
+    }
+    
+    if (__urls_for_locations contains l)
+        return __urls_for_locations[l];
+    return "";
+}

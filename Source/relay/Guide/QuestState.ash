@@ -49,10 +49,12 @@ string shrinkQuestLog(string html)
 boolean __loaded_quest_log = false;
 void requestQuestLogLoad(string property_name)
 {
+    if (true) //disabled, remove later
+        return;
     if (__loaded_quest_log)
         return;
     
-    boolean [string] whitelist = $strings[questF01Primordial,questF02Hyboria,questF03Future,questG04Nemesis,questG05Dark,questI02Beat];
+    boolean [string] whitelist = $strings[questF01Primordial,questF02Hyboria,questF03Future,questI02Beat];
     //questF01Primordial questF02Hyboria questF03Future - minor tracking
     //questG02Whitecastle - tracked, but updates only started, finished, step1, step5?
     //questG03Ego - tracked, but not updated
@@ -79,8 +81,8 @@ void requestQuestLogLoad(string property_name)
     if (safe_to_load_again)
     {
         boolean stale = false;
-        string quest_log_2 = visit_url("questlog.php?which=2");
-        string quest_log_1 = visit_url("questlog.php?which=1");
+        string quest_log_2 = "";//visit_url("questlog.php?which=2");
+        string quest_log_1 = "";//visit_url("questlog.php?which=1");
         if (quest_log_2.contains_text("Your Quest Log"))
             set_property("__relay_guide_last_quest_log_2", shrinkQuestLog(quest_log_2));
         else

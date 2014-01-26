@@ -1,6 +1,7 @@
 import "relay/Guide/Support/Math.ash"
 import "relay/Guide/Support/List.ash"
 
+
 //Additions to standard API:
 //Auto-conversion property functions:
 boolean get_property_boolean(string property)
@@ -447,6 +448,9 @@ float [monster] appearance_rates_adjusted(location l)
 {
     float [monster] source = l.appearance_rates();
     
+    if (l == $location[the sleazy back alley])
+        source[$monster[none]] = MIN(MAX(0, 20 - combat_rate_modifier()), 100);
+    
     float minimum_monster_appearance = 1000000000.0;
     foreach m in source
     {
@@ -542,3 +546,4 @@ Record StringHandle
 {
     string s;
 };
+

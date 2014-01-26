@@ -137,7 +137,7 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     if (base_quest_state.mafia_internal_step < 2)
     {
         //Unlock black market:
-        url = "woods.php";
+        url = "place.php?whichplace=woods";
         if ($item[black market map].available_amount() > 0)
             subentry.entries.listAppend("Unlock the black market.");
         else
@@ -349,7 +349,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
         //4 -> acquire wet stunt nut stew, give to mr. alarm
         if ($item[wet stunt nut stew].available_amount() == 0)
         {
-            url = "woods.php";
+            url = "place.php?whichplace=woods";
             if (($item[bird rib].available_amount() > 0 && $item[lion oil].available_amount() > 0 || $item[wet stew].available_amount() > 0) && $item[stunt nuts].available_amount() > 0)
                 subentry.entries.listAppend("Cook wet stunt nut stew.");
             else
@@ -696,7 +696,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         if ($item[stone wool].available_amount() > 0)
             subentry.entries.listAppend(pluralize($item[stone wool]) + " available.");
         entry.subentries.listAppend(subentry);
-        entry.target_location = "woods.php";
+        entry.target_location = "place.php?whichplace=woods";
     }
     else
     {		
@@ -1150,7 +1150,7 @@ void QLevel11HiddenTempleGenerateTasks(ChecklistEntry [int] task_entries, Checkl
     }
     else
     {
-        task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, "woods.php", subentry, , $locations[the spooky forest]));
+        task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, "place.php?whichplace=woods", subentry, , $locations[the spooky forest]));
     }
 }
 

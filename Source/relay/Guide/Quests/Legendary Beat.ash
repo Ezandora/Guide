@@ -35,6 +35,10 @@ void QLegendaryBeatGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 	QuestState base_quest_state = __quest_state["Legendary Beat"];
 	if (!base_quest_state.in_progress)
 		return;
+    
+    //FIXME temporary:
+    if (!($locations[professor jacking's small-o-fier, professor jacking's huge-a-ma-tron] contains __last_adventure_location))
+        return;
 		
 	ChecklistSubentry subentry;
 	
@@ -42,11 +46,11 @@ void QLegendaryBeatGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         
     //FIXME support for fruit machine sidequest?
     
-    if (base_quest_state.mafia_internal_step == 1)
+    if (base_quest_state.mafia_internal_step == 1 && false)
     {
         subentry.entries.listAppend("Defeat Professor Jacking.");
     }
-    else if (base_quest_state.mafia_internal_step == 2)
+    else if (base_quest_state.mafia_internal_step == 2 || true)
     {
         //Main quest, in reverse order:
         if ($item[can-you-dig-it?].available_amount() > 0 && $effect[stubbly legs].have_effect() > 0)

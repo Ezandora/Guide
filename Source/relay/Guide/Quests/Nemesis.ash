@@ -8,11 +8,11 @@ void QNemesisInit()
 	//questG04Nemesis
 	QuestState state;
     
-    boolean should_quest_load = false;
-    if ($items[distilled seal blood,turtle chain,high-octane olive oil,peppercorns of power,vial of mojo,golden reeds,hammer of smiting,chelonian morningstar,greek pasta of peril,17-alarm saucepan,shagadelic disco banjo,squeezebox of the ages,Sledgehammer of the V&aelig;lkyr,Flail of the Seven Aspects,Wrath of the Capsaician Pastalords,Windsor Pan of the Source,Seeger's Unstoppable Banjo,The Trickster's Trikitixa].available_amount() > 0 || $location[the "fun" house].turnsAttemptedInLocation() > 0) //they've done something with regard to the quest, let's quest load
-        should_quest_load = true;
+    //boolean should_quest_load = false;
+    //if ($items[distilled seal blood,turtle chain,high-octane olive oil,peppercorns of power,vial of mojo,golden reeds,hammer of smiting,chelonian morningstar,greek pasta of peril,17-alarm saucepan,shagadelic disco banjo,squeezebox of the ages,Sledgehammer of the V&aelig;lkyr,Flail of the Seven Aspects,Wrath of the Capsaician Pastalords,Windsor Pan of the Source,Seeger's Unstoppable Banjo,The Trickster's Trikitixa].available_amount() > 0 || $location[the "fun" house].turnsAttemptedInLocation() > 0) //they've done something with regard to the quest, let's quest load
+        //should_quest_load = true;
 	
-	QuestStateParseMafiaQuestProperty(state, "questG04Nemesis", should_quest_load);
+	QuestStateParseMafiaQuestProperty(state, "questG04Nemesis");
 	
 	state.quest_name = "Nemesis Quest";
 	state.image_name = "__half Nemesis";
@@ -20,7 +20,7 @@ void QNemesisInit()
 	if (my_basestat(my_primestat()) >= 12)
 		state.startable = true;
     
-    if (!state.finished && false)
+    if (!state.finished)
     {
         //FIXME temporary code
         //Internal checking:
@@ -329,7 +329,7 @@ void QNemesisGenerateCaveTasks(ChecklistSubentry subentry, item legendary_epic_w
         if (it.available_amount() > 0)
             paper_strips_found += 1;
     }
-    if (false)
+    if (true)
     {
         //FIXME temporary code
         if (state.mafia_internal_step < 4 && paper_strips_found > 0)

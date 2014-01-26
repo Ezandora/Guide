@@ -24,7 +24,7 @@ void QWhiteCitadelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 	
 	subentry.header = base_quest_state.quest_name;
 	
-	string active_url = "woods.php";
+	string active_url = "place.php?whichplace=woods";
     
     if (true)
     {

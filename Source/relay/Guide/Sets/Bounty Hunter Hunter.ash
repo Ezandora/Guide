@@ -33,6 +33,7 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
     
     subentry.header = "Bounty hunt for " + bounty_item_name.HTMLEscapeString();
     
+    
     //Look up monster location:
     location [int] monster_locations = locationsForMonster(target_monster);
     
@@ -56,12 +57,15 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
             float [monster] appearance_rates = l.appearance_rates_adjusted();
             int number_remaining = amount_needed - amount_found;
             
-            if (number_remaining == 0)
+            if (number_remaining == 0 && url.s.length() == 0)
             {
                 url.s = "place.php?whichplace=forestvillage";
                 subentry.header = "Return to the bounty hunter hunter";
                 return subentry;
             }
+            string clickable_url = getClickableURLForLocation(l);
+            if (clickable_url.length() > 0 && url.s.length() == 0)
+                url.s = clickable_url;
             
             float bounty_appearance_rate = appearance_rates[target_monster] / 100.0;
             if (noncombats_skippable)
@@ -85,7 +89,7 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
                     turns_remaining_string = " ~" + pluralize(round(turns_remaining), "turn remains", "turns remain") + ".";
                 }
             }
-            if (noncombats_skippable && appearance_rates[$monster[none]] != 0.0)
+            if (!noncombats_skippable && appearance_rates[$monster[none]] != 0.0)
                 need_plus_combat = true;
         }
     }
