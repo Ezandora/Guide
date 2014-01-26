@@ -1,7 +1,7 @@
 //This script and its support scripts are in the public domain.
 
 //These settings are for development. Don't worry about editing them.
-string __version = "1.0.9";
+string __version = "1.0.10";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -29,10 +29,10 @@ string __setting_modifier_color = "#404040";
 string __setting_navbar_background_color = "#FFFFFF";
 string __setting_page_background_color = "#F7F7F7";
 
-string __setting_media_query_large_size = "@media (min-width:500px)";
-string __setting_media_query_medium_size = "@media (min-width:320px) and (max-width:500px)";
-string __setting_media_query_small_size = "@media (max-width:320px) and (min-width:225px)";
-string __setting_media_query_tiny_size = "@media (max-width:225px)";
+string __setting_media_query_large_size = "@media (min-width: 500px)";
+string __setting_media_query_medium_size = "@media (min-width: 320px) and (max-width: 500px)";
+string __setting_media_query_small_size = "@media (max-width: 320px) and (min-width: 225px)";
+string __setting_media_query_tiny_size = "@media (max-width: 225px)";
 
 
 
@@ -1554,19 +1554,15 @@ void requestQuestLogLoad(string property_name)
     if (__loaded_quest_log)
         return;
     
-    //Known quests that should track properly:
-    boolean [string] safe_list = $strings[questM02Artist,questM10Azazel,questL10Garbage,questL11MacGuffin,questL11Manor,questL11Palindome,questL11Pyramid,questL11Worship,questL12War,questL13Final,questL02Larva,questL03Rat,questL04Bat,questL05Goblin,questL06Friar,questL07Cyrptic,questL08Trapper,questL09Topping,questM12Pirate,questS02Monkees,questM01Untinker,questM15Lol,questF04Elves];
-    
-    //Quests not on the list:
+    boolean [string] whitelist = $strings[questF01Primordial,questF02Hyboria,questF03Future,questG04Nemesis,questG05Dark,questI02Beat];
     //questF01Primordial questF02Hyboria questF03Future - minor tracking
     //questG02Whitecastle - tracked, but updates only started, finished, step1, step5?
     //questG03Ego - tracked, but not updated
     //questG04Nemesis questG05Dark - minor tracking
     //questI02Beat - need to know professor jacking being defeated
     
-    if (safe_list contains property_name)
+    if (!(whitelist contains property_name))
         return;
-    
     
     __loaded_quest_log = true;
     
@@ -1902,6 +1898,40 @@ CSSBlock CSSBlockMake(string identifier)
     return result;
 }
 
+buffer CSSBlockGenerate(CSSBlock block)
+{
+    buffer result;
+    
+    if (block.defined_css_classes.count() > 0)
+    {
+        boolean output_identifier = (block.identifier.length() > 0);
+        if (output_identifier)
+        {
+            result.append("\t\t\t");
+            result.append(block.identifier);
+            result.append(" {\n");
+        }
+        sort block.defined_css_classes by value.importance;
+    
+        foreach key in block.defined_css_classes
+        {
+            CSSEntry entry = block.defined_css_classes[key];
+            result.append("\t\t\t");
+            if (output_identifier)
+                result.append("\t");
+        
+            if (entry.class_name == "")
+                result.append(entry.tag + " { " + entry.definition + " }");
+            else
+                result.append(entry.tag + "." + entry.class_name + " { " + entry.definition + " }");
+            result.append("\n");
+        }
+        if (output_identifier)
+            result.append("\n\t\t\t}\n");
+    }
+    return result;
+}
+
 void listAppend(CSSEntry [int] list, CSSEntry entry)
 {
 	int position = list.count();
@@ -1922,6 +1952,7 @@ record Page
 
 
 Page __global_page;
+
 
 
 Page Page()
@@ -1948,46 +1979,21 @@ buffer PageGenerate(Page page_in)
 		result.append("\n");
 	}
 	//Write CSS styles:
-    boolean wrote_css_container = false;
+    if (true)
+    {
+        result.append("\t\t");
+        result.append(HTMLGenerateTagPrefix("style", mapMake("type", "text/css")));
+        result.append("\n");
+    }
+    result.append(page_in.defined_css_blocks[""].CSSBlockGenerate()); //write first
     foreach identifier in page_in.defined_css_blocks
     {
         CSSBlock block = page_in.defined_css_blocks[identifier];
-        if (block.defined_css_classes.count() > 0)
-        {
-            if (!wrote_css_container)
-            {
-                result.append("\t\t");
-                result.append(HTMLGenerateTagPrefix("style", mapMake("type", "text/css")));
-                result.append("\n");
-                    wrote_css_container = true;
-            }
-            boolean output_identifier = (block.identifier.length() > 0);
-            if (output_identifier)
-            {
-                result.append("\t\t\t");
-                result.append(block.identifier);
-                result.append("\n\t\t\t{\n");
-            }
-            sort block.defined_css_classes by value.importance;
-        
-            foreach key in block.defined_css_classes
-            {
-                CSSEntry entry = block.defined_css_classes[key];
-                result.append("\t\t\t");
-                if (output_identifier)
-                    result.append("\t");
-            
-                if (entry.class_name == "")
-                    result.append(entry.tag + " { " + entry.definition + " }");
-                else
-                    result.append(entry.tag + "." + entry.class_name + " { " + entry.definition + " }");
-                result.append("\n");
-            }
-            if (output_identifier)
-                result.append("\n\t\t\t}\n");
-        }
+        if (identifier == "") //skip, already written
+            continue;
+        result.append(block.CSSBlockGenerate());
     }
-    if (wrote_css_container)
+    if (true)
     {
         result.append("\t\t</style>\n");
     }
@@ -3055,16 +3061,12 @@ void ChecklistInit()
         PageAddCSSClass("hr", "r_cl_hr_extended", "margin-left:" + (__setting_indention_width_in_em / 2.0) + "em;", 0, __setting_media_query_medium_size);
         
         
-        
         PageAddCSSClass("div", "r_cl_l_left", "width:" + (__setting_image_width_small) + "px;margin-left:10px;", 0, __setting_media_query_small_size);
         PageAddCSSClass("div", "r_cl_l_right_container", "margin-left:" + (-(__setting_image_width_small) - 10) + "px;", 0, __setting_media_query_small_size);
         PageAddCSSClass("div", "r_cl_l_right_content", "margin-left:" + ((__setting_image_width_small) + 10 + 10) + "px;margin-right:3px;", 0, __setting_media_query_small_size);
         PageAddCSSClass("hr", "r_cl_hr", "margin-left:0px;margin-right:0px;", 0, __setting_media_query_small_size);
         PageAddCSSClass("hr", "r_cl_hr_extended", "margin-left:0px;", 0, __setting_media_query_small_size);
         PageAddCSSClass("div", "r_cl_l_container", "padding-top:3px;padding-bottom:3px;", 0, __setting_media_query_small_size);
-        
-        
-        
         
         
         PageAddCSSClass("div", "r_cl_l_left", "width:" + (0) + "px;margin-left:3px;", 0, __setting_media_query_tiny_size);
@@ -7657,6 +7659,8 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 
 void QNemesisInit()
 {
+    if (!($classes[seal clubber, turtle tamer, pastamancer, sauceror, disco bandit, accordion thief] contains my_class()))
+        return;
 	//questG04Nemesis
 	QuestState state;
     
@@ -7671,6 +7675,70 @@ void QNemesisInit()
 	
 	if (my_basestat(my_primestat()) >= 12)
 		state.startable = true;
+    
+    if (!state.finished && false)
+    {
+        //FIXME temporary code
+        //Internal checking:
+        
+        item [class] class_epic_weapons;
+        class_epic_weapons[$class[seal clubber]] = $item[bjorn's hammer];
+        class_epic_weapons[$class[turtle tamer]] = $item[mace of the tortoise];
+        class_epic_weapons[$class[pastamancer]] = $item[pasta of peril];
+        class_epic_weapons[$class[sauceror]] = $item[5-alarm saucepan];
+        class_epic_weapons[$class[disco bandit]] = $item[disco banjo];
+        class_epic_weapons[$class[accordion thief]] = $item[rock and roll legend];
+        item epic_weapon = class_epic_weapons[my_class()];
+        if (state.mafia_internal_step < 2 && epic_weapon.available_amount() > 0)
+            state.mafia_internal_step = 2;
+        
+        
+        if (state.mafia_internal_step < 4 && $items[distilled seal blood,turtle chain,high-octane olive oil,Peppercorns of Power,vial of mojo,golden reeds].available_amount() > 0)
+            state.mafia_internal_step = 4;
+            
+        if (state.mafia_internal_step < 5 && $items[hammer of smiting,chelonian morningstar,greek pasta of peril,17-alarm saucepan,shagadelic disco banjo,squeezebox of the ages].available_amount() > 0)
+            state.mafia_internal_step = 5;
+            
+        if (state.mafia_internal_step < 6 && get_property("relayCounters").contains_text("Nemesis Assassin"))
+            state.mafia_internal_step = 6;
+        
+        if (state.mafia_internal_step < 6 && get_property("questG05Dark") == "finished")
+            state.mafia_internal_step = 6;
+            
+        
+        if (state.mafia_internal_step < 15 && $item[secret tropical island volcano lair map].available_amount() > 0)
+            state.mafia_internal_step = 15;
+        
+        if (state.mafia_internal_step < 18 && $items[Sledgehammer of the V&aelig;lkyr,Flail of the Seven Aspects,Wrath of the Capsaician Pastalords,Windsor Pan of the Source,Seeger's Unstoppable Banjo,The Trickster's Trikitixa].available_amount() > 0)
+            state.mafia_internal_step = 18;
+        
+        //Location-based:
+        if (state.mafia_internal_step == 15)
+        {
+            location [class] testing_location;
+            testing_location[$class[seal clubber]] = $location[the broodling grounds];
+            testing_location[$class[turtle tamer]] = $location[the outer compound];
+            testing_location[$class[pastamancer]] = $location[the temple portico];
+            testing_location[$class[sauceror]] = $location[convention hall lobby];
+            testing_location[$class[disco bandit]] = $location[outside the club];
+            testing_location[$class[accordion thief]] = $location[the island barracks];
+            
+            if (testing_location[my_class()].turnsAttemptedInLocation() > 0)
+                state.mafia_internal_step = 16;
+            if (state.mafia_internal_step < 16 && $location[The Nemesis' Lair].turnsAttemptedInLocation() > 0)
+                state.mafia_internal_step = 16;
+        }
+        if (state.mafia_internal_step < 16 && $skill[Gothy Handwave].have_skill())
+            state.mafia_internal_step = 16;
+        if (state.mafia_internal_step < 16 && $items[Fouet de tortue-dressage,encoded cult documents,cult memo,spaghetti cult robe,hacienda key,bottle of G&uuml;-Gone].available_amount() > 0)
+            state.mafia_internal_step = 16;
+            
+        if (!state.in_progress && state.mafia_internal_step > 0)
+        {
+            //force start:
+            QuestStateParseMafiaQuestPropertyValue(state, "step" + (state.mafia_internal_step - 1));
+        }
+    }
 	
 	__quest_state["Nemesis"] = state;
 }
@@ -7910,6 +7978,23 @@ void QNemesisGenerateCaveTasks(ChecklistSubentry subentry, item legendary_epic_w
 	QuestStateParseMafiaQuestProperty(state, "questG05Dark", true);
     
     subentry.entries.listAppend("Visit the sinister cave.");
+    int paper_strips_found = 0;
+    
+    foreach it in $items[a torn paper strip,a rumpled paper strip,a creased paper strip,a folded paper strip,a crinkled paper strip,a crumpled paper strip,a ragged paper strip,a ripped paper strip]
+    {
+        if (it.available_amount() > 0)
+            paper_strips_found += 1;
+    }
+    if (false)
+    {
+        //FIXME temporary code
+        if (state.mafia_internal_step < 4 && paper_strips_found > 0)
+            state.mafia_internal_step = 4;
+        if (state.mafia_internal_step < 4 && $location[nemesis cave].turnsAttemptedInLocation() > 0)
+            state.mafia_internal_step = 4;
+    }
+        
+        
     if (state.mafia_internal_step == 1 || state.mafia_internal_step == 2 || state.mafia_internal_step == 3)
     {
         //1	Finally it's time to meet this Nemesis you've been hearing so much about! The guy at your guild has marked your map with the location of a cave in the Big Mountains, where your Nemesis is supposedly hiding.
@@ -7979,17 +8064,10 @@ void QNemesisGenerateCaveTasks(ChecklistSubentry subentry, item legendary_epic_w
     {
         //4	Woo! You're past the doors and it's time to stab some bastards
         //5	The door to your Nemesis' inner sanctum didn't seem to care for the password you tried earlier
-        int paper_strips_found = 0;
-        
-        foreach it in $items[a torn paper strip,a rumpled paper strip,a creased paper strip,a folded paper strip,a crinkled paper strip,a crumpled paper strip,a ragged paper strip,a ripped paper strip]
-        {
-            if (it.available_amount() > 0)
-                paper_strips_found += 1;
-        }
         
         if (paper_strips_found >= 8)
         {
-            subentry.entries.listAppend("Speak the password, then fight your nemesis..");
+            subentry.entries.listAppend("Speak the password, then fight your nemesis.");
             if (legendary_epic_weapon.equipped_amount() == 0)
                 subentry.entries.listAppend("Equip " + legendary_epic_weapon + ".");
         }
@@ -8324,7 +8402,7 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
         {
             description.listAppend("Wear several mer-kin prayerbeads and possibly a mer-kin gutgirdle.");
             description.listAppend("Avoid wearing any +hp gear or buffs. Ideally, you want low HP.");
-            description.listAppend("Each round, use a different healing item, until you lose the Suckrament effect.|After that, your stats are restored. Fully heal, then attack!");
+            description.listAppend("Each round, use a different healing item, until you lose the Suckrament effect.|After that, your stats are restored. Fully heal, then " + HTMLGenerateSpanOfClass("attack with elemental damage", "r_bold") + ".");
             string [item] potential_healers;
             potential_healers[$item[mer-kin healscroll]] = "mer-kin healscroll (full HP)";
             potential_healers[$item[scented massage oil]] = "scented massage oil (full HP)";
@@ -9170,6 +9248,14 @@ void QLegendaryBeatInit()
 	
 	state.quest_name = "Quest for the Legendary Beat";
 	state.image_name = "__item the Legendary Beat";
+    
+    if (state.in_progress)
+    {
+        //FIXME temporary code
+        //no way to detect if the legendary beat was found
+        //if (state.mafia_internal_step < 2 && $location[professor jacking's small-o-fier].turnsAttemptedInLocation() > 0 || $location[professor jacking's huge-a-ma-tron].turnsAttemptedInLocation() > 0)
+            //state.mafia_internal_step = 2;
+    }
 	
 	__quest_state["Legendary Beat"] = state;
 }
@@ -9477,6 +9563,46 @@ void QWhiteCitadelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 	
 	string active_url = "woods.php";
     
+    if (true)
+    {
+        //FIXME temporary code
+        //Somewhat inaccurate:
+        int cheetahs_seen = 0;
+        int holidays_seen = 0;
+        string [int] noncombats_seen = $location[the road to white citadel].locationSeenNoncombats();
+        foreach key in noncombats_seen
+        {
+            string noncombat = noncombats_seen[key];
+            if (noncombat == "Cheetahs Never Lose")
+                cheetahs_seen += 1;
+            if (noncombat == "Summer Holiday")
+                holidays_seen += 1;
+        }
+        
+        if (base_quest_state.mafia_internal_step == 1)
+        {
+            if ($location[whitey's grove].noncombat_queue.contains_text("It's A Sign!"))
+                base_quest_state.mafia_internal_step = 2;
+        }
+        if (base_quest_state.mafia_internal_step > 1)
+        {
+            if (base_quest_state.mafia_internal_step <3 && cheetahs_seen > 0)
+            {
+                base_quest_state.mafia_internal_step = 3;
+            }
+            if (base_quest_state.mafia_internal_step < 4 && cheetahs_seen > 1)
+            {
+                base_quest_state.mafia_internal_step = 4;
+            }
+            if (base_quest_state.mafia_internal_step < 5 && holidays_seen > 0)
+            {
+                base_quest_state.mafia_internal_step = 5;
+            }
+        }
+        //6 is accurate
+    }
+    
+    
     if (base_quest_state.mafia_internal_step == 1)
     {
         //1	You've been charged by your Guild (sort of) with the task of bringing back a delicious meal from the legendary White Citadel. You've been told it's somewhere near Whitey's Grove, in the Distant Woods.
@@ -9560,6 +9686,39 @@ void QWizardOfEgoInit()
 	QuestState state;
 	
 	QuestStateParseMafiaQuestProperty(state, "questG03Ego");
+    
+    if (!state.finished)
+    {
+        //FIXME temporary code
+        //Update internal step locally:
+        //(this is buggy)
+        if (state.mafia_internal_step < 7 && $item[dusty old book].available_amount() > 0)
+        {
+            state.mafia_internal_step = 7;
+        }
+        if (state.mafia_internal_step < 1 && $location[pre-cyrpt cemetary].noncombat_queue.contains_text("A Grave Mistake") || $location[post-cyrpt cemetary].noncombat_queue.contains_text("A Grave Mistake"))
+            state.mafia_internal_step = 1;
+        if (state.mafia_internal_step < 2 && $location[pre-cyrpt cemetary].noncombat_queue.contains_text("A Grave Situation") || $location[post-cyrpt cemetary].noncombat_queue.contains_text("A Grave Situation"))
+            state.mafia_internal_step = 2;
+        
+        if (state.mafia_internal_step < 2 && $item[Fernswarthy's key].available_amount() > 0)
+            state.mafia_internal_step = 2;
+        
+        if (state.mafia_internal_step < 4 && $location[tower ruins].turnsAttemptedInLocation() > 0 && $item[Fernswarthy's key].available_amount() > 0)
+            state.mafia_internal_step = 4;
+        
+        if (state.mafia_internal_step < 5 && $location[tower ruins].noncombat_queue.contains_text("Staring into Nothing"))
+            state.mafia_internal_step = 5;
+        if (state.mafia_internal_step < 6 && $location[tower ruins].noncombat_queue.contains_text("Into the Maw of Deepness"))
+            state.mafia_internal_step = 6;
+        if (state.mafia_internal_step < 7 && $location[tower ruins].noncombat_queue.contains_text("Take a Dusty Look!"))
+            state.mafia_internal_step = 7;
+        
+        if (!state.in_progress && state.mafia_internal_step > 0 && $item[Fernswarthy's key].available_amount() > 0)
+        {
+            QuestStateParseMafiaQuestPropertyValue(state, "step" + (state.mafia_internal_step - 1));
+        }
+    }
 	
 	state.quest_name = "The Wizard of Ego";
 	state.image_name = "__item dilapidated wizard hat";
@@ -12073,8 +12232,7 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                 l = pluralize(__misc_state_int["fat loot tokens needed"], "token", "tokens") + " needed.";
 			
 			if (daily_dungeon_aftercore_items_wanted.count() > 0)
-                l += "|Misssing " + daily_dungeon_aftercore_items_wanted.listJoinComponents(", ", "and") + ". Possibly buy them in the mall?";
-				//l += HTMLGenerateIndentedText(daily_dungeon_aftercore_items_wanted);
+                l += "|Missing " + daily_dungeon_aftercore_items_wanted.listJoinComponents(", ", "and") + ". Possibly buy them in the mall?";
             if (l.length() > 0)
                 description.listAppend(l);
 			if (!__misc_state["In Aftercore"])
@@ -16758,7 +16916,7 @@ string [string] generateAPIResponse()
     else if (true)
     {
         //Checking every item is slow. But certain items won't trigger a reload, but need to. So:
-        boolean [item] relevant_items = $items[photocopied monster,4-d camera,pagoda plans,Elf Farm Raffle ticket,skeleton key,heavy metal thunderrr guitarrr,heavy metal sonata,Hey Deze nuts,rave whistle,damp old boot,map to Professor Jacking's laboratory,world's most unappetizing beverage,squirmy violent party snack,White Citadel Satisfaction Satchel,rusty screwdriver,giant pinky ring,The Lost Pill Bottle,GameInformPowerDailyPro magazine,dungeoneering kit,Knob Goblin encryption key,dinghy plans,Sneaky Pete's key,Jarlsberg's key,Boris's key,fat loot token,bridge,chrome ore,asbestos ore,linoleum ore,csa fire-starting kit,tropical orchid,stick of dynamite,barbed-wire fence,psychoanalytic jar,digital key,Richard's star key,star hat,star crossbow,star staff,star sword,Wand of Nagamar,Azazel's tutu,Azazel's unicorn,Azazel's lollipop,smut orc keepsake box,blessed large box,massive sitar,hammer of smiting,chelonian morningstar,greek pasta of peril,17-alarm saucepan,shagadelic disco banjo,squeezebox of the ages,E.M.U. helmet,E.M.U. harness,E.M.U. joystick,E.M.U. rocket thrusters,E.M.U. unit,wriggling flytrap pellet,Mer-kin trailmap,Mer-kin stashbox,Makeshift yakuza mask,Novelty tattoo sleeves,strange goggles,zaibatsu level 2 card, zaibatsu level 3 card,flickering pixel,jar of oil,bowl of scorpions,molybdenum magnet,steel lasagna,steel margarita,steel-scented air freshener,Grandma's Map,mer-kin healscroll,scented massage oil,soggy used band-aid,extra-strength red potion,red pixel potion,red potion,filthy poultice,gauze garter,green pixel potion,cartoon heart,red plastic oyster egg];
+        boolean [item] relevant_items = $items[photocopied monster,4-d camera,pagoda plans,Elf Farm Raffle ticket,skeleton key,heavy metal thunderrr guitarrr,heavy metal sonata,Hey Deze nuts,rave whistle,damp old boot,map to Professor Jacking's laboratory,world's most unappetizing beverage,squirmy violent party snack,White Citadel Satisfaction Satchel,rusty screwdriver,giant pinky ring,The Lost Pill Bottle,GameInformPowerDailyPro magazine,dungeoneering kit,Knob Goblin encryption key,dinghy plans,Sneaky Pete's key,Jarlsberg's key,Boris's key,fat loot token,bridge,chrome ore,asbestos ore,linoleum ore,csa fire-starting kit,tropical orchid,stick of dynamite,barbed-wire fence,psychoanalytic jar,digital key,Richard's star key,star hat,star crossbow,star staff,star sword,Wand of Nagamar,Azazel's tutu,Azazel's unicorn,Azazel's lollipop,smut orc keepsake box,blessed large box,massive sitar,hammer of smiting,chelonian morningstar,greek pasta of peril,17-alarm saucepan,shagadelic disco banjo,squeezebox of the ages,E.M.U. helmet,E.M.U. harness,E.M.U. joystick,E.M.U. rocket thrusters,E.M.U. unit,wriggling flytrap pellet,Mer-kin trailmap,Mer-kin stashbox,Makeshift yakuza mask,Novelty tattoo sleeves,strange goggles,zaibatsu level 2 card, zaibatsu level 3 card,flickering pixel,jar of oil,bowl of scorpions,molybdenum magnet,steel lasagna,steel margarita,steel-scented air freshener,Grandma's Map,mer-kin healscroll,scented massage oil,soggy used band-aid,extra-strength red potion,red pixel potion,red potion,filthy poultice,gauze garter,green pixel potion,cartoon heart,red plastic oyster egg,Manual of Dexterity,Manual of Labor,Manual of Transmission];
         //future: add snow boards
         
         
