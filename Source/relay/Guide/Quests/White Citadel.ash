@@ -26,6 +26,46 @@ void QWhiteCitadelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 	
 	string active_url = "woods.php";
     
+    if (true)
+    {
+        //FIXME temporary code
+        //Somewhat inaccurate:
+        int cheetahs_seen = 0;
+        int holidays_seen = 0;
+        string [int] noncombats_seen = $location[the road to white citadel].locationSeenNoncombats();
+        foreach key in noncombats_seen
+        {
+            string noncombat = noncombats_seen[key];
+            if (noncombat == "Cheetahs Never Lose")
+                cheetahs_seen += 1;
+            if (noncombat == "Summer Holiday")
+                holidays_seen += 1;
+        }
+        
+        if (base_quest_state.mafia_internal_step == 1)
+        {
+            if ($location[whitey's grove].noncombat_queue.contains_text("It's A Sign!"))
+                base_quest_state.mafia_internal_step = 2;
+        }
+        if (base_quest_state.mafia_internal_step > 1)
+        {
+            if (base_quest_state.mafia_internal_step <3 && cheetahs_seen > 0)
+            {
+                base_quest_state.mafia_internal_step = 3;
+            }
+            if (base_quest_state.mafia_internal_step < 4 && cheetahs_seen > 1)
+            {
+                base_quest_state.mafia_internal_step = 4;
+            }
+            if (base_quest_state.mafia_internal_step < 5 && holidays_seen > 0)
+            {
+                base_quest_state.mafia_internal_step = 5;
+            }
+        }
+        //6 is accurate
+    }
+    
+    
     if (base_quest_state.mafia_internal_step == 1)
     {
         //1	You've been charged by your Guild (sort of) with the task of bringing back a delicious meal from the legendary White Citadel. You've been told it's somewhere near Whitey's Grove, in the Distant Woods.

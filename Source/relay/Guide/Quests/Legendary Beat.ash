@@ -15,6 +15,14 @@ void QLegendaryBeatInit()
 	
 	state.quest_name = "Quest for the Legendary Beat";
 	state.image_name = "__item the Legendary Beat";
+    
+    if (state.in_progress)
+    {
+        //FIXME temporary code
+        //no way to detect if the legendary beat was found
+        //if (state.mafia_internal_step < 2 && $location[professor jacking's small-o-fier].turnsAttemptedInLocation() > 0 || $location[professor jacking's huge-a-ma-tron].turnsAttemptedInLocation() > 0)
+            //state.mafia_internal_step = 2;
+    }
 	
 	__quest_state["Legendary Beat"] = state;
 }

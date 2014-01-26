@@ -10,6 +10,39 @@ void QWizardOfEgoInit()
 	QuestState state;
 	
 	QuestStateParseMafiaQuestProperty(state, "questG03Ego");
+    
+    if (!state.finished)
+    {
+        //FIXME temporary code
+        //Update internal step locally:
+        //(this is buggy)
+        if (state.mafia_internal_step < 7 && $item[dusty old book].available_amount() > 0)
+        {
+            state.mafia_internal_step = 7;
+        }
+        if (state.mafia_internal_step < 1 && $location[pre-cyrpt cemetary].noncombat_queue.contains_text("A Grave Mistake") || $location[post-cyrpt cemetary].noncombat_queue.contains_text("A Grave Mistake"))
+            state.mafia_internal_step = 1;
+        if (state.mafia_internal_step < 2 && $location[pre-cyrpt cemetary].noncombat_queue.contains_text("A Grave Situation") || $location[post-cyrpt cemetary].noncombat_queue.contains_text("A Grave Situation"))
+            state.mafia_internal_step = 2;
+        
+        if (state.mafia_internal_step < 2 && $item[Fernswarthy's key].available_amount() > 0)
+            state.mafia_internal_step = 2;
+        
+        if (state.mafia_internal_step < 4 && $location[tower ruins].turnsAttemptedInLocation() > 0 && $item[Fernswarthy's key].available_amount() > 0)
+            state.mafia_internal_step = 4;
+        
+        if (state.mafia_internal_step < 5 && $location[tower ruins].noncombat_queue.contains_text("Staring into Nothing"))
+            state.mafia_internal_step = 5;
+        if (state.mafia_internal_step < 6 && $location[tower ruins].noncombat_queue.contains_text("Into the Maw of Deepness"))
+            state.mafia_internal_step = 6;
+        if (state.mafia_internal_step < 7 && $location[tower ruins].noncombat_queue.contains_text("Take a Dusty Look!"))
+            state.mafia_internal_step = 7;
+        
+        if (!state.in_progress && state.mafia_internal_step > 0 && $item[Fernswarthy's key].available_amount() > 0)
+        {
+            QuestStateParseMafiaQuestPropertyValue(state, "step" + (state.mafia_internal_step - 1));
+        }
+    }
 	
 	state.quest_name = "The Wizard of Ego";
 	state.image_name = "__item dilapidated wizard hat";

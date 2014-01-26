@@ -145,7 +145,7 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
         {
             description.listAppend("Wear several mer-kin prayerbeads and possibly a mer-kin gutgirdle.");
             description.listAppend("Avoid wearing any +hp gear or buffs. Ideally, you want low HP.");
-            description.listAppend("Each round, use a different healing item, until you lose the Suckrament effect.|After that, your stats are restored. Fully heal, then attack!");
+            description.listAppend("Each round, use a different healing item, until you lose the Suckrament effect.|After that, your stats are restored. Fully heal, then " + HTMLGenerateSpanOfClass("attack with elemental damage", "r_bold") + ".");
             string [item] potential_healers;
             potential_healers[$item[mer-kin healscroll]] = "mer-kin healscroll (full HP)";
             potential_healers[$item[scented massage oil]] = "scented massage oil (full HP)";

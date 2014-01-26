@@ -52,19 +52,15 @@ void requestQuestLogLoad(string property_name)
     if (__loaded_quest_log)
         return;
     
-    //Known quests that should track properly:
-    boolean [string] safe_list = $strings[questM02Artist,questM10Azazel,questL10Garbage,questL11MacGuffin,questL11Manor,questL11Palindome,questL11Pyramid,questL11Worship,questL12War,questL13Final,questL02Larva,questL03Rat,questL04Bat,questL05Goblin,questL06Friar,questL07Cyrptic,questL08Trapper,questL09Topping,questM12Pirate,questS02Monkees,questM01Untinker,questM15Lol,questF04Elves];
-    
-    //Quests not on the list:
+    boolean [string] whitelist = $strings[questF01Primordial,questF02Hyboria,questF03Future,questG04Nemesis,questG05Dark,questI02Beat];
     //questF01Primordial questF02Hyboria questF03Future - minor tracking
     //questG02Whitecastle - tracked, but updates only started, finished, step1, step5?
     //questG03Ego - tracked, but not updated
     //questG04Nemesis questG05Dark - minor tracking
     //questI02Beat - need to know professor jacking being defeated
     
-    if (safe_list contains property_name)
+    if (!(whitelist contains property_name))
         return;
-    
     
     __loaded_quest_log = true;
     

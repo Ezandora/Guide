@@ -141,7 +141,6 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 			
 			if (daily_dungeon_aftercore_items_wanted.count() > 0)
                 l += "|Missing " + daily_dungeon_aftercore_items_wanted.listJoinComponents(", ", "and") + ". Possibly buy them in the mall?";
-				//l += HTMLGenerateIndentedText(daily_dungeon_aftercore_items_wanted);
             if (l.length() > 0)
                 description.listAppend(l);
 			if (!__misc_state["In Aftercore"])

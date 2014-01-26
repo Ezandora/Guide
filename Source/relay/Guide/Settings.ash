@@ -1,5 +1,5 @@
 //These settings are for development. Don't worry about editing them.
-string __version = "1.0.9";
+string __version = "1.0.10";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -27,10 +27,10 @@ string __setting_modifier_color = "#404040";
 string __setting_navbar_background_color = "#FFFFFF";
 string __setting_page_background_color = "#F7F7F7";
 
-string __setting_media_query_large_size = "@media (min-width:500px)";
-string __setting_media_query_medium_size = "@media (min-width:320px) and (max-width:500px)";
-string __setting_media_query_small_size = "@media (max-width:320px) and (min-width:225px)";
-string __setting_media_query_tiny_size = "@media (max-width:225px)";
+string __setting_media_query_large_size = "@media (min-width: 500px)";
+string __setting_media_query_medium_size = "@media (min-width: 320px) and (max-width: 500px)";
+string __setting_media_query_small_size = "@media (max-width: 320px) and (min-width: 225px)";
+string __setting_media_query_tiny_size = "@media (max-width: 225px)";
 
 
 

@@ -3,6 +3,8 @@
 
 void QNemesisInit()
 {
+    if (!($classes[seal clubber, turtle tamer, pastamancer, sauceror, disco bandit, accordion thief] contains my_class()))
+        return;
 	//questG04Nemesis
 	QuestState state;
     
@@ -17,6 +19,70 @@ void QNemesisInit()
 	
 	if (my_basestat(my_primestat()) >= 12)
 		state.startable = true;
+    
+    if (!state.finished && false)
+    {
+        //FIXME temporary code
+        //Internal checking:
+        
+        item [class] class_epic_weapons;
+        class_epic_weapons[$class[seal clubber]] = $item[bjorn's hammer];
+        class_epic_weapons[$class[turtle tamer]] = $item[mace of the tortoise];
+        class_epic_weapons[$class[pastamancer]] = $item[pasta of peril];
+        class_epic_weapons[$class[sauceror]] = $item[5-alarm saucepan];
+        class_epic_weapons[$class[disco bandit]] = $item[disco banjo];
+        class_epic_weapons[$class[accordion thief]] = $item[rock and roll legend];
+        item epic_weapon = class_epic_weapons[my_class()];
+        if (state.mafia_internal_step < 2 && epic_weapon.available_amount() > 0)
+            state.mafia_internal_step = 2;
+        
+        
+        if (state.mafia_internal_step < 4 && $items[distilled seal blood,turtle chain,high-octane olive oil,Peppercorns of Power,vial of mojo,golden reeds].available_amount() > 0)
+            state.mafia_internal_step = 4;
+            
+        if (state.mafia_internal_step < 5 && $items[hammer of smiting,chelonian morningstar,greek pasta of peril,17-alarm saucepan,shagadelic disco banjo,squeezebox of the ages].available_amount() > 0)
+            state.mafia_internal_step = 5;
+            
+        if (state.mafia_internal_step < 6 && get_property("relayCounters").contains_text("Nemesis Assassin"))
+            state.mafia_internal_step = 6;
+        
+        if (state.mafia_internal_step < 6 && get_property("questG05Dark") == "finished")
+            state.mafia_internal_step = 6;
+            
+        
+        if (state.mafia_internal_step < 15 && $item[secret tropical island volcano lair map].available_amount() > 0)
+            state.mafia_internal_step = 15;
+        
+        if (state.mafia_internal_step < 18 && $items[Sledgehammer of the V&aelig;lkyr,Flail of the Seven Aspects,Wrath of the Capsaician Pastalords,Windsor Pan of the Source,Seeger's Unstoppable Banjo,The Trickster's Trikitixa].available_amount() > 0)
+            state.mafia_internal_step = 18;
+        
+        //Location-based:
+        if (state.mafia_internal_step == 15)
+        {
+            location [class] testing_location;
+            testing_location[$class[seal clubber]] = $location[the broodling grounds];
+            testing_location[$class[turtle tamer]] = $location[the outer compound];
+            testing_location[$class[pastamancer]] = $location[the temple portico];
+            testing_location[$class[sauceror]] = $location[convention hall lobby];
+            testing_location[$class[disco bandit]] = $location[outside the club];
+            testing_location[$class[accordion thief]] = $location[the island barracks];
+            
+            if (testing_location[my_class()].turnsAttemptedInLocation() > 0)
+                state.mafia_internal_step = 16;
+            if (state.mafia_internal_step < 16 && $location[The Nemesis' Lair].turnsAttemptedInLocation() > 0)
+                state.mafia_internal_step = 16;
+        }
+        if (state.mafia_internal_step < 16 && $skill[Gothy Handwave].have_skill())
+            state.mafia_internal_step = 16;
+        if (state.mafia_internal_step < 16 && $items[Fouet de tortue-dressage,encoded cult documents,cult memo,spaghetti cult robe,hacienda key,bottle of G&uuml;-Gone].available_amount() > 0)
+            state.mafia_internal_step = 16;
+            
+        if (!state.in_progress && state.mafia_internal_step > 0)
+        {
+            //force start:
+            QuestStateParseMafiaQuestPropertyValue(state, "step" + (state.mafia_internal_step - 1));
+        }
+    }
 	
 	__quest_state["Nemesis"] = state;
 }
@@ -256,6 +322,23 @@ void QNemesisGenerateCaveTasks(ChecklistSubentry subentry, item legendary_epic_w
 	QuestStateParseMafiaQuestProperty(state, "questG05Dark", true);
     
     subentry.entries.listAppend("Visit the sinister cave.");
+    int paper_strips_found = 0;
+    
+    foreach it in $items[a torn paper strip,a rumpled paper strip,a creased paper strip,a folded paper strip,a crinkled paper strip,a crumpled paper strip,a ragged paper strip,a ripped paper strip]
+    {
+        if (it.available_amount() > 0)
+            paper_strips_found += 1;
+    }
+    if (false)
+    {
+        //FIXME temporary code
+        if (state.mafia_internal_step < 4 && paper_strips_found > 0)
+            state.mafia_internal_step = 4;
+        if (state.mafia_internal_step < 4 && $location[nemesis cave].turnsAttemptedInLocation() > 0)
+            state.mafia_internal_step = 4;
+    }
+        
+        
     if (state.mafia_internal_step == 1 || state.mafia_internal_step == 2 || state.mafia_internal_step == 3)
     {
         //1	Finally it's time to meet this Nemesis you've been hearing so much about! The guy at your guild has marked your map with the location of a cave in the Big Mountains, where your Nemesis is supposedly hiding.
@@ -325,17 +408,10 @@ void QNemesisGenerateCaveTasks(ChecklistSubentry subentry, item legendary_epic_w
     {
         //4	Woo! You're past the doors and it's time to stab some bastards
         //5	The door to your Nemesis' inner sanctum didn't seem to care for the password you tried earlier
-        int paper_strips_found = 0;
-        
-        foreach it in $items[a torn paper strip,a rumpled paper strip,a creased paper strip,a folded paper strip,a crinkled paper strip,a crumpled paper strip,a ragged paper strip,a ripped paper strip]
-        {
-            if (it.available_amount() > 0)
-                paper_strips_found += 1;
-        }
         
         if (paper_strips_found >= 8)
         {
-            subentry.entries.listAppend("Speak the password, then fight your nemesis..");
+            subentry.entries.listAppend("Speak the password, then fight your nemesis.");
             if (legendary_epic_weapon.equipped_amount() == 0)
                 subentry.entries.listAppend("Equip " + legendary_epic_weapon + ".");
         }

@@ -32,6 +32,40 @@ CSSBlock CSSBlockMake(string identifier)
     return result;
 }
 
+buffer CSSBlockGenerate(CSSBlock block)
+{
+    buffer result;
+    
+    if (block.defined_css_classes.count() > 0)
+    {
+        boolean output_identifier = (block.identifier.length() > 0);
+        if (output_identifier)
+        {
+            result.append("\t\t\t");
+            result.append(block.identifier);
+            result.append(" {\n");
+        }
+        sort block.defined_css_classes by value.importance;
+    
+        foreach key in block.defined_css_classes
+        {
+            CSSEntry entry = block.defined_css_classes[key];
+            result.append("\t\t\t");
+            if (output_identifier)
+                result.append("\t");
+        
+            if (entry.class_name == "")
+                result.append(entry.tag + " { " + entry.definition + " }");
+            else
+                result.append(entry.tag + "." + entry.class_name + " { " + entry.definition + " }");
+            result.append("\n");
+        }
+        if (output_identifier)
+            result.append("\n\t\t\t}\n");
+    }
+    return result;
+}
+
 void listAppend(CSSEntry [int] list, CSSEntry entry)
 {
 	int position = list.count();
@@ -52,6 +86,7 @@ record Page
 
 
 Page __global_page;
+
 
 
 Page Page()
@@ -78,46 +113,21 @@ buffer PageGenerate(Page page_in)
 		result.append("\n");
 	}
 	//Write CSS styles:
-    boolean wrote_css_container = false;
+    if (true)
+    {
+        result.append("\t\t");
+        result.append(HTMLGenerateTagPrefix("style", mapMake("type", "text/css")));
+        result.append("\n");
+    }
+    result.append(page_in.defined_css_blocks[""].CSSBlockGenerate()); //write first
     foreach identifier in page_in.defined_css_blocks
     {
         CSSBlock block = page_in.defined_css_blocks[identifier];
-        if (block.defined_css_classes.count() > 0)
-        {
-            if (!wrote_css_container)
-            {
-                result.append("\t\t");
-                result.append(HTMLGenerateTagPrefix("style", mapMake("type", "text/css")));
-                result.append("\n");
-                    wrote_css_container = true;
-            }
-            boolean output_identifier = (block.identifier.length() > 0);
-            if (output_identifier)
-            {
-                result.append("\t\t\t");
-                result.append(block.identifier);
-                result.append("\n\t\t\t{\n");
-            }
-            sort block.defined_css_classes by value.importance;
-        
-            foreach key in block.defined_css_classes
-            {
-                CSSEntry entry = block.defined_css_classes[key];
-                result.append("\t\t\t");
-                if (output_identifier)
-                    result.append("\t");
-            
-                if (entry.class_name == "")
-                    result.append(entry.tag + " { " + entry.definition + " }");
-                else
-                    result.append(entry.tag + "." + entry.class_name + " { " + entry.definition + " }");
-                result.append("\n");
-            }
-            if (output_identifier)
-                result.append("\n\t\t\t}\n");
-        }
+        if (identifier == "") //skip, already written
+            continue;
+        result.append(block.CSSBlockGenerate());
     }
-    if (wrote_css_container)
+    if (true)
     {
         result.append("\t\t</style>\n");
     }

@@ -53,7 +53,7 @@ function elementGetGlobalOffsetTop(element)
 
 function writePageExtras()
 {
-    if (window.self != window.top)
+    if (window.self != window.top && window.name == "mainpane")
     {
         //in frame
         var editable_area_top = document.getElementById("extra_words_at_top");
