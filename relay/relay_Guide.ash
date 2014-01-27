@@ -2578,7 +2578,8 @@ KOLImage KOLImageLookup(string lookup_name)
         }
 		else
 		{
-			print("Unknown image \"" + lookup_name + "\"");
+            if (__setting_debug_mode)
+                print("Unknown image \"" + lookup_name + "\"");
 			return KOLImageMake();
 		}
 	}
