@@ -1,7 +1,7 @@
 //This script and its support scripts are in the public domain.
 
 //These settings are for development. Don't worry about editing them.
-string __version = "1.0.11";
+string __version = "1.0.12";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -2152,8 +2152,10 @@ void PageInit()
 	PageAddCSSClass("", "r_indention", "margin-left:" + __setting_indention_width + ";");
 	
 	//Simple table lines:
-	PageAddCSSClass("div", "r_stl_left", "text-align:left;float:left;");
-	PageAddCSSClass("div", "r_stl_right", "margin-left:10px; text-align:right;float:right;");
+	PageAddCSSClass("div", "r_stl_container", "display:table;");
+	PageAddCSSClass("div", "r_stl_container_row", "display:table-row;");
+    PageAddCSSClass("div", "r_stl_entry", "padding:0px;margin:0px;display:table-cell;");
+    PageAddCSSClass("div", "r_stl_spacer", "width:1em;");
 }
 
 
@@ -2201,8 +2203,13 @@ string HTMLGenerateSimpleTableLines(string [int][int] lines)
 		result.append("<table style=\"margin-right: 10px; width:100%;\" cellpadding=0 cellspacing=0>");
 	
 	
+        int intra_i = 0;
 		foreach i in lines
 		{
+            if (intra_i > 0)
+            {
+                result.append("<tr><td colspan=1000><hr></td></tr>");
+            }
 			result.append("<tr>");
 			int intra_j = 0;
 			foreach j in lines[i]
@@ -2226,6 +2233,7 @@ string HTMLGenerateSimpleTableLines(string [int][int] lines)
 				intra_j += 1;
 			}
 			result.append("</tr>");
+            intra_i += 1;
 		}
 	
 	
@@ -2234,43 +2242,41 @@ string HTMLGenerateSimpleTableLines(string [int][int] lines)
 	else
 	{
 		//div-based layout:
-        int column_count = 0;
-        
+        int intra_i = 0;
+        int last_cell_count = 0;
+        result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_stl_container")));
 		foreach i in lines
 		{
-			int intra_j = 0;
-			column_count = MAX(column_count, lines[i].count());
-        }
-        
-        
-        for intra_k from 0 to (column_count - 1)
-        {
-            string class_name;
-            if (intra_k == 0)
-                class_name = "r_stl_left";
-            else
-                class_name = "r_stl_right";
-            buffer column_contents;
-            
-            foreach i in lines
+            if (intra_i > 0)
             {
-                int intra_j = 0;
-                foreach j in lines[i]
+                result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_stl_container_row")));
+                for i from 1 to last_cell_count //no colspan with display:table, generate extra (zero-padding, zero-margin) cells:
                 {
-                    string entry = lines[i][j];
-                    if (intra_j != intra_k)
-                    {
-                        intra_j += 1;
-                        continue;
-                    }
-                    
-                    column_contents.append(HTMLGenerateDiv(entry));
-                    intra_j += 1;
+                    result.append(HTMLGenerateDivOfClass("<hr>", "r_stl_entry"));
                 }
+                result.append("</div>");
+                last_cell_count = 0;
             }
-            result.append(HTMLGenerateDivOfClass(column_contents, class_name));
-        }
-        result.append(HTMLGenerateDivOfClass("", "r_end_floating_elements"));
+            result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_stl_container_row")));
+            int intra_j = 0;
+			foreach j in lines[i]
+			{
+				string entry = lines[i][j];
+                if (intra_j > 0)
+                {
+                    result.append(HTMLGenerateDivOfClass("", "r_stl_entry r_stl_spacer"));
+                    last_cell_count += 1;
+                }
+				result.append(HTMLGenerateDivOfClass(entry, "r_stl_entry"));
+                last_cell_count += 1;
+                
+                intra_j += 1;
+			}
+			
+            result.append("</div>");
+            intra_i += 1;
+		}
+        result.append("</div>");
 	}
 	return result.to_string();
 }
@@ -10802,6 +10808,11 @@ void SSkillsGenerateResource(ChecklistEntry [int] available_resources_entries)
 		property_summon_limits["_demandSandwich"] = 3;
 	}
 	property_summons_to_skills["_requestSandwichSucceeded"] = listMake($skill[Request Sandwich]);
+    
+    property_summons_to_skills["grimoire1Summons"] = listMake($skill[Summon Hilarious Objects]);
+    property_summons_to_skills["grimoire2Summons"] = listMake($skill[Summon Tasteful Items]);
+    property_summons_to_skills["grimoire3Summons"] = listMake($skill[Summon Alice's Army Cards]);
+    property_summons_to_skills["_grimoireGeekySummons"] = listMake($skill[Summon Geeky Gifts]);
 	
 	string [skill] skills_to_details;
 	
@@ -11467,7 +11478,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
                 image_name = "__item " + it;
         }
         string [int] open_list;
-        foreach it in $items[old coin purse, old leather wallet, black pension check, ancient vinyl coin purse, warm subject gift certificate]
+        foreach it in $items[old coin purse, old leather wallet, black pension check, ancient vinyl coin purse, warm subject gift certificate,chest of the Bonerdagon]
         {
             if (it.available_amount() == 0)
                 continue;
@@ -12959,6 +12970,10 @@ void SGardensGenerateResource(ChecklistEntry [int] available_resources_entries)
         
         foreach it in lookupItems("snow cleats,snow crab,snow boards,unfinished ice sculpture,snow mobile,ice bucket,bod-ice,snow belt,ice house,ice nine")
             garden_creatable_items[it] = true;
+        
+        if (!__quest_state["Level 4"].finished)
+            garden_creatable_items[lookupItem("snow shovel")] = true;
+        
         if (__misc_state["can eat just about anything"])
             garden_creatable_items[lookupItem("snow crab")] = true;
         if (__misc_state["can drink just about anything"])
