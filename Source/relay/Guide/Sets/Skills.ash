@@ -50,6 +50,11 @@ void SSkillsGenerateResource(ChecklistEntry [int] available_resources_entries)
 		property_summon_limits["_demandSandwich"] = 3;
 	}
 	property_summons_to_skills["_requestSandwichSucceeded"] = listMake($skill[Request Sandwich]);
+    
+    property_summons_to_skills["grimoire1Summons"] = listMake($skill[Summon Hilarious Objects]);
+    property_summons_to_skills["grimoire2Summons"] = listMake($skill[Summon Tasteful Items]);
+    property_summons_to_skills["grimoire3Summons"] = listMake($skill[Summon Alice's Army Cards]);
+    property_summons_to_skills["_grimoireGeekySummons"] = listMake($skill[Summon Geeky Gifts]);
 	
 	string [skill] skills_to_details;
 	

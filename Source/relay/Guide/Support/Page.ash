@@ -280,8 +280,10 @@ void PageInit()
 	PageAddCSSClass("", "r_indention", "margin-left:" + __setting_indention_width + ";");
 	
 	//Simple table lines:
-	PageAddCSSClass("div", "r_stl_left", "text-align:left;float:left;");
-	PageAddCSSClass("div", "r_stl_right", "margin-left:10px; text-align:right;float:right;");
+	PageAddCSSClass("div", "r_stl_container", "display:table;");
+	PageAddCSSClass("div", "r_stl_container_row", "display:table-row;");
+    PageAddCSSClass("div", "r_stl_entry", "padding:0px;margin:0px;display:table-cell;");
+    PageAddCSSClass("div", "r_stl_spacer", "width:1em;");
 }
 
 
@@ -329,8 +331,13 @@ string HTMLGenerateSimpleTableLines(string [int][int] lines)
 		result.append("<table style=\"margin-right: 10px; width:100%;\" cellpadding=0 cellspacing=0>");
 	
 	
+        int intra_i = 0;
 		foreach i in lines
 		{
+            if (intra_i > 0)
+            {
+                result.append("<tr><td colspan=1000><hr></td></tr>");
+            }
 			result.append("<tr>");
 			int intra_j = 0;
 			foreach j in lines[i]
@@ -354,6 +361,7 @@ string HTMLGenerateSimpleTableLines(string [int][int] lines)
 				intra_j += 1;
 			}
 			result.append("</tr>");
+            intra_i += 1;
 		}
 	
 	
@@ -362,43 +370,41 @@ string HTMLGenerateSimpleTableLines(string [int][int] lines)
 	else
 	{
 		//div-based layout:
-        int column_count = 0;
-        
+        int intra_i = 0;
+        int last_cell_count = 0;
+        result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_stl_container")));
 		foreach i in lines
 		{
-			int intra_j = 0;
-			column_count = MAX(column_count, lines[i].count());
-        }
-        
-        
-        for intra_k from 0 to (column_count - 1)
-        {
-            string class_name;
-            if (intra_k == 0)
-                class_name = "r_stl_left";
-            else
-                class_name = "r_stl_right";
-            buffer column_contents;
-            
-            foreach i in lines
+            if (intra_i > 0)
             {
-                int intra_j = 0;
-                foreach j in lines[i]
+                result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_stl_container_row")));
+                for i from 1 to last_cell_count //no colspan with display:table, generate extra (zero-padding, zero-margin) cells:
                 {
-                    string entry = lines[i][j];
-                    if (intra_j != intra_k)
-                    {
-                        intra_j += 1;
-                        continue;
-                    }
-                    
-                    column_contents.append(HTMLGenerateDiv(entry));
-                    intra_j += 1;
+                    result.append(HTMLGenerateDivOfClass("<hr>", "r_stl_entry"));
                 }
+                result.append("</div>");
+                last_cell_count = 0;
             }
-            result.append(HTMLGenerateDivOfClass(column_contents, class_name));
-        }
-        result.append(HTMLGenerateDivOfClass("", "r_end_floating_elements"));
+            result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_stl_container_row")));
+            int intra_j = 0;
+			foreach j in lines[i]
+			{
+				string entry = lines[i][j];
+                if (intra_j > 0)
+                {
+                    result.append(HTMLGenerateDivOfClass("", "r_stl_entry r_stl_spacer"));
+                    last_cell_count += 1;
+                }
+				result.append(HTMLGenerateDivOfClass(entry, "r_stl_entry"));
+                last_cell_count += 1;
+                
+                intra_j += 1;
+			}
+			
+            result.append("</div>");
+            intra_i += 1;
+		}
+        result.append("</div>");
 	}
 	return result.to_string();
 }

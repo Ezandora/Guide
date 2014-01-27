@@ -88,6 +88,10 @@ void SGardensGenerateResource(ChecklistEntry [int] available_resources_entries)
         
         foreach it in lookupItems("snow cleats,snow crab,snow boards,unfinished ice sculpture,snow mobile,ice bucket,bod-ice,snow belt,ice house,ice nine")
             garden_creatable_items[it] = true;
+        
+        if (!__quest_state["Level 4"].finished)
+            garden_creatable_items[lookupItem("snow shovel")] = true;
+        
         if (__misc_state["can eat just about anything"])
             garden_creatable_items[lookupItem("snow crab")] = true;
         if (__misc_state["can drink just about anything"])

@@ -608,7 +608,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
                 image_name = "__item " + it;
         }
         string [int] open_list;
-        foreach it in $items[old coin purse, old leather wallet, black pension check, ancient vinyl coin purse, warm subject gift certificate]
+        foreach it in $items[old coin purse, old leather wallet, black pension check, ancient vinyl coin purse, warm subject gift certificate,chest of the Bonerdagon]
         {
             if (it.available_amount() == 0)
                 continue;
