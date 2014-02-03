@@ -44,7 +44,7 @@ void QLevel4GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
     }
     else if (locationAvailable($location[the boss bat's lair]))
     {
-        subentry.entries.listAppend("Run +meat in the boss bat's lair, if you feel like it (250 meat drop)");
+        subentry.entries.listAppend("Run +meat in the boss bat's lair, if you feel like it. (250 meat drop)");
         subentry.modifiers.listAppend("+meat");
 		if (delayRemainingInLocation($location[the boss bat's lair]) > 0)
 		{
@@ -95,7 +95,7 @@ void QLevel4GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             subentry.entries.listAppend("Potentially yellow ray for sonar-in-a-biscuit");
         if (sonars_needed > 0)
             subentry.entries.listAppend("Run +item in the beanbat and batrat burrow for biscuits (15% drop)");
-        subentry.entries.listAppend("Run +meat in the boss bat's lair, if you feel like it (250 meat drop)");
+        subentry.entries.listAppend("Run +meat in the boss bat's lair, if you feel like it. (250 meat drop)");
         subentry.modifiers.listAppend("+meat");
 	}
     

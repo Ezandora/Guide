@@ -296,13 +296,25 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
         url = "place.php?whichplace=cove";
         subentry.entries.listAppend("Find the palindome. The pirates will know the way.");
         
-        string line = "Run -combat to unlock belowdecks.|Then olfact gaudy pirate belowdecks";
-        if (!__quest_state["Level 13"].state_boolean["have relevant guitar"])
-            line += ", and possibly run +400% item to find a guitar";
-        line += ".";
-        subentry.entries.listAppend(line);
-        if ($item[gaudy key].available_amount() > 0)
-            subentry.entries.listAppend("Use " + $item[gaudy key].pluralize() + ".");
+        if ($location[the poop deck].noncombat_queue.contains_text("It's Always Swordfish"))
+        {
+            subentry.modifiers.listAppend("olfact gaudy pirate");
+            string line = "Olfact gaudy pirate belowdecks";
+            if (!__quest_state["Level 13"].state_boolean["have relevant guitar"])
+            {
+                line += ", and possibly run +400% item to find a guitar";
+                subentry.modifiers.listAppend("+400% item");
+            }
+            line += ".";
+            subentry.entries.listAppend(line);
+            if ($item[gaudy key].available_amount() > 0)
+                subentry.entries.listAppend("Use " + $item[gaudy key].pluralize() + ".");
+        }
+        else
+        {
+            subentry.modifiers.listAppend("-combat");
+            subentry.entries.listAppend("Run -combat to unlock belowdecks.");
+        }
             
     }
     else if (base_quest_state.mafia_internal_step == 2 || ($item[talisman o' nam].available_amount() > 0 && base_quest_state.mafia_internal_step == 1))
@@ -430,9 +442,10 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
                 description.listAppend("Adventure in the Oasis.");
                 if ($items[ten-leaf clover, disassembled clover].available_amount() > 0)
                     description.listAppend("Potentially clover for 20 turns, versus 5.");
-                task_entries.listAppend(ChecklistEntryMake("__effect ultrahydrated", "", ChecklistSubentryMake("Acquire Ultrahydrated Effect", "", description), -11));
+                task_entries.listAppend(ChecklistEntryMake("__effect ultrahydrated", "", ChecklistSubentryMake("Acquire ultrahydrated effect", "", description), -11));
             }
-            subentry.entries.listAppend("Need ultra-hydrated from The Oasis. (potential clover for 20 turns)");
+            if (exploration > 0)
+                subentry.entries.listAppend("Need ultra-hydrated from The Oasis. (potential clover for 20 turns)");
         }
         //FIXME make gnasir detection slightly more robust
         if (exploration < 10)
@@ -688,15 +701,19 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
     else if (!locationAvailable($location[the hidden park]))
     {
         entry.image_lookup_name = "Hidden Temple";
+        entry.target_location = "place.php?whichplace=woods";
         ChecklistSubentry subentry;
         subentry.header = base_quest_state.quest_name;
         subentry.entries.listAppend("Unlock the hidden city via the hidden temple.");
         if ($item[the Nostril of the Serpent].available_amount() == 0)
             subentry.entries.listAppend("Need nostril of the serpent.");
         if ($item[stone wool].available_amount() > 0)
+        {
+            if ($effect[Stone-Faced].have_effect() == 0)
+                entry.target_location = "inventory.php?which=3";
             subentry.entries.listAppend(pluralize($item[stone wool]) + " available.");
+        }
         entry.subentries.listAppend(subentry);
-        entry.target_location = "place.php?whichplace=woods";
     }
     else
     {		

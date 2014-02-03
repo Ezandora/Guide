@@ -442,7 +442,7 @@ void setUpState()
 	__misc_state["mysterious island available"] = mysterious_island_unlocked;
 	
 	__misc_state["desert beach available"] = false;
-	if ($items[bitchin' meatcar,desert bus pass,pumpkin carriage,tin lizzie].available_amount() > 0)
+	if ($location[south of the border].locationAvailable())
 		__misc_state["desert beach available"] = true;
 	if (turnsAttemptedInLocation($location[The Shore\, Inc. Travel Agency]) > 0 || turnsAttemptedInLocation($location[the arid, extra-dry desert]) > 0 || turnsAttemptedInLocation($location[the oasis]) > 0 || turnsAttemptedInLocation($location[south of the border]) > 0) //weird issues with detecting the beach. check if we've ever adventured there as a back-up
 		__misc_state["desert beach available"] = true;

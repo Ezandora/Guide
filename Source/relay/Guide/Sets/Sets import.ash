@@ -26,3 +26,5 @@ import "relay/Guide/Sets/Jarlsberg.ash";
 import "relay/Guide/Sets/Crown of Thrones.ash";
 import "relay/Guide/Sets/Psychoanalytic.ash";
 import "relay/Guide/Sets/Olfaction.ash";
+import "relay/Guide/Sets/Holiday.ash";
+import "relay/Guide/Sets/Reminders.ash";

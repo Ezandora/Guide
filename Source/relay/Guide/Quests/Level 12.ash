@@ -265,6 +265,77 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 	}
 }
 
+
+void QLevel12GenerateBattlefieldDescription(ChecklistSubentry subentry, string side, int enemies_remaining, int enemies_defeated_per_combat, string enemy_name, string enemy_name_plural, string boss_name, string [int] sidequest_list)
+{
+    if (enemies_defeated_per_combat == 0)
+        return;
+    
+    int enemies_defeated = 1000 - enemies_remaining;
+    string line;
+    if (enemies_remaining > 0)
+    {
+        line = pluralize(enemies_remaining, enemy_name, enemy_name_plural) + " left.";
+    }
+    else
+        line += "Fight " + boss_name + "!";
+    int turns_remaining = ceiling(enemies_remaining.to_float() / enemies_defeated_per_combat.to_float());
+    if (turns_remaining > 0)
+    {
+        line += "|*" + pluralize(turns_remaining, "turn", "turns") + " remaining.";
+        line += " " + pluralize(enemies_defeated_per_combat, enemy_name, enemy_name_plural) + " defeated per combat.";
+    }
+    int enemies_to_defeat_for_unlock = -1;
+    string area_to_unlock = "";
+    
+    int [int] unlock_threshold;
+    unlock_threshold[0] = 64;
+    unlock_threshold[1] = 192;
+    unlock_threshold[2] = 458;
+    
+    for i from 2 to 0 by -1
+    {
+        int threshold = unlock_threshold[i];
+        
+        if (enemies_defeated < threshold)
+        {
+            if (!__quest_state["Level 12"].state_boolean[sidequest_list[i] + " Finished"])
+            {
+                area_to_unlock = sidequest_list[i];
+                enemies_to_defeat_for_unlock = threshold - enemies_defeated;
+            }
+        }
+    }
+    
+    if (enemies_to_defeat_for_unlock != -1)
+    {
+        int turns_to_reach = ceiling(enemies_to_defeat_for_unlock.to_float() / enemies_defeated_per_combat.to_float());
+        line += "|*" + pluralize(turns_to_reach, "turn", "turns") + " (" + pluralize(enemies_to_defeat_for_unlock, enemy_name, enemy_name_plural) + ") to unlock " + area_to_unlock + ".";
+    }
+    
+    subentry.entries.listAppend(line);
+    
+    if (enemies_remaining == 0)
+    {
+        string [int] items_to_turn_in_for;
+        if (!__quest_state["Level 13"].finished)
+        {
+            if (side == "hippy")
+                items_to_turn_in_for.listAppend("filthy poultices for shadow");
+            else
+                items_to_turn_in_for.listAppend("gauze garters for shadow");
+        }
+        if (!__quest_state["Level 13"].state_boolean["have relevant guitar"] && side == "hippy")
+            items_to_turn_in_for.listAppend("massive sitar");
+        
+        string line2 = "Also, turn in gear to your home camp.";
+        if (items_to_turn_in_for.count() > 0)
+            line2 += " Acquire " + items_to_turn_in_for.listJoinComponents(", ", "and") + ", etc.";
+        subentry.entries.listAppend(line2);
+    }
+}
+
+
 void QLevel12GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
 	if (!__quest_state["Level 12"].in_progress)
@@ -273,7 +344,6 @@ void QLevel12GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 	QuestState base_quest_state = __quest_state["Level 12"];
 	ChecklistSubentry subentry;
 	subentry.header = base_quest_state.quest_name;
-	
 	
 	task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, "island.php", subentry, $locations[the battlefield (frat uniform), the battlefield (hippy uniform), wartime frat house, wartime frat house (hippy disguise), wartime hippy camp, wartime hippy camp (frat disguise)]));
 	if (base_quest_state.mafia_internal_step < 2)
@@ -310,40 +380,14 @@ void QLevel12GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 		
 		int frat_boys_defeated_per_combat = powi(2, sides_completed_hippy);
 		int hippies_defeated_per_combat = powi(2, sides_completed_frat);
-		
-		if (frat_boys_left < 1000 || (frat_boys_left == 1000 && hippies_left == 1000))
-		{
-			string line;
-			if (frat_boys_left == 0)
-				line = "No frat boys";
-			else
-				line = pluralize(frat_boys_left, "frat boy", "frat boys");
-			line += " left.";
-			int turns_remaining = ceiling(frat_boys_left.to_float() / frat_boys_defeated_per_combat.to_float());
-			if (turns_remaining > 0)
-			{
-				line += "|*" + pluralize(turns_remaining, "turn", "turns") + " remaining.";
-				line += " " + pluralize(frat_boys_defeated_per_combat, "frat boy", "frat boys") + " defeated per combat.";
-			}
-			subentry.entries.listAppend(line);
-		}
-		if (hippies_left < 1000 || (frat_boys_left == 1000 && hippies_left == 1000))
-		{
-			string line;
-			if (hippies_left == 0)
-				line = "No hippies";
-			else
-				line = pluralize(hippies_left, "hippy", "hippies");
-			line += " left.";
-			int turns_remaining = ceiling(hippies_left.to_float() / hippies_defeated_per_combat.to_float());
-			if (turns_remaining > 0)
-			{
-				line += "|*" + pluralize(turns_remaining, "turn", "turns") + " remaining.";
-				line += " " + pluralize(hippies_defeated_per_combat, "hippy", "hippies") + " defeated per combat.";
-			}
-			subentry.entries.listAppend(line);
-		}
-		if (frat_boys_left == 1 && hippies_left == 1)
+        
+		if (frat_boys_left < 1000 || (frat_boys_left == 1000 && hippies_left == 1000) || sides_completed_hippy > 0)
+            QLevel12GenerateBattlefieldDescription(subentry, "hippy", frat_boys_left, frat_boys_defeated_per_combat, "frat boy", "frat boys", "The Man", listMake("Lighthouse", "Junkyard", "Arena"));
+            
+		if (hippies_left < 1000 || (frat_boys_left == 1000 && hippies_left == 1000) || sides_completed_frat > 0)
+            QLevel12GenerateBattlefieldDescription(subentry, "frat boy", hippies_left, hippies_defeated_per_combat, "hippy", "hippies", "The Big Wisniewski", listMake("Orchard", "Nuns", "Farm"));
+        
+        if (frat_boys_left == 1 && hippies_left == 1)
 		{
 			if ($item[flaregun].available_amount() > 0)
 				subentry.entries.listAppend("Wossname time! Adventure on battlefield, use a flaregun.");

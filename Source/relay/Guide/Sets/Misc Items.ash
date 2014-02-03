@@ -173,7 +173,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
 			resolution_descriptions[$item[resolution: be sexier]] = "+2 moxie stats/combat (20 turns)";
 		}
 		resolution_descriptions[$item[resolution: be kinder]] = "+5 familiar weight (20 turns)";
-		resolution_descriptions[$item[resolution: be luckier]] = "Luck! (20 turns)"; //???
+		resolution_descriptions[$item[resolution: be luckier]] = "+5% item, +5% meat, +10% init, others (20 turns)"; //???
 		resolution_descriptions[$item[resolution: be more adventurous]] = "+2 adventures at rollover";
 		resolution_descriptions[$item[resolution: be wealthier]] = "+30% meat";
         
@@ -189,7 +189,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
 			resolution_lines.listAppend(ChecklistSubentryMake(pluralize(it), "",  description));
 		}
 		if (resolution_lines.count() > 0)
-			available_resources_entries.listAppend(ChecklistEntryMake("__item resolution: be luckier", "", resolution_lines, importance_level_item));
+			available_resources_entries.listAppend(ChecklistEntryMake("__item resolution: be luckier", "inventory.php?which=3", resolution_lines, importance_level_item));
 			
 	}
 	if (in_run)
@@ -529,49 +529,39 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
 		{
 			string [int] description;
 			description.listAppend(($item[tattered scrap of paper].available_amount() / 2.0).roundForOutput(1) + " free runs.");
-			available_resources_entries.listAppend(ChecklistEntryMake("__item tattered scrap of paper", "", ChecklistSubentryMake(pluralize($item[tattered scrap of paper]), "", description), 8));
+			available_resources_entries.listAppend(ChecklistEntryMake("__item tattered scrap of paper", "", ChecklistSubentryMake(pluralize($item[tattered scrap of paper]), "", description), importance_level_unimportant_item));
 		}
 		if ($item[dungeoneering kit].available_amount() > 0)
 		{
 			string line = "Open it.";
 			if ($item[dungeoneering kit].available_amount() > 1)
 				line = "Open them.";
-			available_resources_entries.listAppend(ChecklistEntryMake("__item dungeoneering kit", "inventory.php?which=3", ChecklistSubentryMake(pluralize($item[dungeoneering kit]), "", line), 8));
+			available_resources_entries.listAppend(ChecklistEntryMake("__item dungeoneering kit", "inventory.php?which=3", ChecklistSubentryMake(pluralize($item[dungeoneering kit]), "", line), importance_level_unimportant_item));
 		}
         if ($item[Box of familiar jacks].available_amount() > 0)
-            available_resources_entries.listAppend(ChecklistEntryMake("__item box of familiar jacks", "", ChecklistSubentryMake(pluralize($item[Box of familiar jacks]), "", "Gives current familiar equipment."), 8));
+            available_resources_entries.listAppend(ChecklistEntryMake("__item box of familiar jacks", "", ChecklistSubentryMake(pluralize($item[Box of familiar jacks]), "", "Gives current familiar equipment."), importance_level_unimportant_item));
         if ($item[csa fire-starting kit].available_amount() > 0 && !get_property_boolean("_fireStartingKitUsed"))
         {
             string [int] description;
             description.listAppend("All-day 4 HP/MP regeneration.");
             if (hippy_stone_broken())
                 description.listAppend("3 PVP fights.");
-            available_resources_entries.listAppend(ChecklistEntryMake("__item csa fire-starting kit", "inventory.php?which=3", ChecklistSubentryMake($item[csa fire-starting kit], "", description), 8));
+            available_resources_entries.listAppend(ChecklistEntryMake("__item csa fire-starting kit", "inventory.php?which=3", ChecklistSubentryMake($item[csa fire-starting kit], "", description), importance_level_unimportant_item));
         }
         
-        ChecklistEntry castle_stat_items;
-        castle_stat_items.image_lookup_name = "";
-        castle_stat_items.target_location = "inventory.php?which=3";
-        castle_stat_items.importance_level = importance_level_unimportant_item;
-        
-        
-        string [item] castle_descriptions;
-        castle_descriptions[$item[Ye Olde Bawdy Limerick]] = "+2 moxie stats/fight (20 turns)";
-        castle_descriptions[$item[Squat-Thrust Magazine]] = "+3 muscle stats/fight (20 turns)";
-        castle_descriptions[$item[O'RLY Manual]] = "+4 mysticality stats/fight (20 turns)";
-        foreach it in $items[Ye Olde Bawdy Limerick, O'RLY Manual, Squat-Thrust Magazine]
+        if ($item[transporter transponder].available_amount() > 0)
         {
-            if (it.available_amount() == 0)
-                continue;
-            if (castle_stat_items.image_lookup_name.length() == 0)
-                castle_stat_items.image_lookup_name = "__item " + it;
-            castle_stat_items.subentries.listAppend(ChecklistSubentryMake(pluralize(it), "", castle_descriptions[it]));
+            string [int] options;
+            if (__misc_state["need to level"])
+                options.listAppend("powerleveling");
+            if (fullness_limit() > 0 || inebriety_limit() > 0)
+                options.listAppend("yellow ray in grimace for synthetic dog hair/distention pill");
+            
+            string description = "Spaaaaace access.";
+            if (options.count() > 0)
+                description += "|" + options.listJoinComponents(", ", "and").capitalizeFirstLetter();
+            available_resources_entries.listAppend(ChecklistEntryMake("__item transporter transponder", "", ChecklistSubentryMake(pluralize($item[transporter transponder]), "", description), importance_level_unimportant_item));
         }
-        if (castle_stat_items.subentries.count() > 0)
-        {
-            available_resources_entries.listAppend(castle_stat_items);
-        }
-        
     }
     
     foreach it in $items[carton of astral energy drinks,astral hot dog dinner,astral six-pack]
@@ -636,7 +626,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
     //Penultimate Fantasy chest?
     
     item odd_silver_coin = lookupItem("odd silver coin");
-    if (odd_silver_coin.available_amount() > 0)
+    if (odd_silver_coin.available_amount() > 0 && __misc_state["In run"])
     {
         string [int] description;
         //FIXME description
@@ -648,6 +638,19 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
         //solid gold rosary - 5 - I think this is the cyrpt? need details
         //ornate dowsing rod - 5 - better desert exploration
         available_resources_entries.listAppend(ChecklistEntryMake("__item " + odd_silver_coin, "inventory.php?which=3", ChecklistSubentryMake(odd_silver_coin.pluralize(), "", description), importance_level_item));
+    }
+    item grimstone_mask = lookupItem("grimstone mask");
+    if (grimstone_mask.available_amount() > 0 && __misc_state["In run"])
+    {
+        string [int] description;
+        //FIXME suggestions
+        
+        available_resources_entries.listAppend(ChecklistEntryMake("__item " + grimstone_mask, "inventory.php?which=3", ChecklistSubentryMake(grimstone_mask.pluralize(), "", description), importance_level_item));
+    }
+    
+    if ($item[very overdue library book].available_amount() > 0 && __misc_state["In run"])
+    {
+        available_resources_entries.listAppend(ChecklistEntryMake("__item very overdue library book", "inventory.php?which=3", ChecklistSubentryMake("Very overdue library book", "", "Open for 63 moxie/mysticality/muscle."), importance_level_unimportant_item));
     }
     
 }

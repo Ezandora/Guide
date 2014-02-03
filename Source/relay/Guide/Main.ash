@@ -6,7 +6,7 @@ import "relay/Guide/Support/Library.ash"
 import "relay/Guide/Support/List.ash"
 import "relay/Guide/Tasks.ash"
 import "relay/Guide/Daily Resources.ash"
-
+import "relay/Guide/Strategy.ash"
 
 void setUpCSSStyles()
 {
@@ -282,6 +282,7 @@ void generateChecklists(Checklist [int] ordered_output_checklists)
         
         
         generateMisc(checklists);
+        generateStrategy(checklists);
     }
 	
 	//Remove checklists that have no entries:
@@ -296,7 +297,7 @@ void generateChecklists(Checklist [int] ordered_output_checklists)
 	listClear(keys_to_remove);
 	
 	//Go through desired output order:
-	string [int] setting_desired_output_order = split_string_mutable("Tasks,Optional Tasks,Unimportant Tasks,Future Tasks,Resources,Future Unimportant Tasks,Required Items,Suggested Pulls,Florist Friar", ",");
+	string [int] setting_desired_output_order = split_string_mutable("Tasks,Optional Tasks,Unimportant Tasks,Future Tasks,Resources,Future Unimportant Tasks,Required Items,Suggested Pulls,Florist Friar,Strategy", ",");
 	foreach key in setting_desired_output_order
 	{
 		string title = setting_desired_output_order[key];
@@ -332,12 +333,25 @@ string generateRandomMessage()
         return "the kingdom awaits";
     
 	if (__misc_state["In run"])
-		random_messages.listAppend("you are ascending too slowly, ascend faster!");
-	if (__misc_state["In run"])
     {
+		random_messages.listAppend("you are ascending too slowly, ascend faster!");
         random_messages.listAppend("take those extra adventures you were going to play, and forget to do them");
         random_messages.listAppend("every spreadsheet you make saves a turn");
     }
+    
+    string [string] holiday_messages;
+    holiday_messages["Groundhog Day"] = "it's cold out there every day";
+    holiday_messages["Crimbo"] = "merry crimbo";
+    
+    boolean [string] holidays_today = getHolidaysToday();
+    foreach holiday in holidays_today
+    {
+        if (holiday_messages contains holiday)
+        {
+            random_messages.listAppend(holiday_messages[holiday]);
+        }
+    }
+    
 	if (__misc_state["free runs usable"] && __misc_state["In run"])
 		random_messages.listAppend("if you see an ultra-rare, free run away");
 	if (__misc_state["In run"])
@@ -358,8 +372,6 @@ string generateRandomMessage()
     if (location_messages contains __last_adventure_location)
         random_messages.listAppend(location_messages[__last_adventure_location]);
     
-    if (now_to_string("M").to_int_silent() == 12)
-        random_messages.listAppend("merry crimbo");
 
     random_messages.listAppend(HTMLGenerateTagWrap("a", "if you're feeling stressed, play alice's army", mapMake("class", "r_a_undecorated", "href", "aagame.php", "target", "mainpane")));
 	random_messages.listAppend("consider your mistakes creative spading");
@@ -390,6 +402,8 @@ string generateRandomMessage()
 	if (my_ascensions() == 0)
 		random_messages.listAppend("welcome to the kingdom!");
         
+    if (__misc_state["In run"])
+        random_messages.listAppend("perfect runs are overrated");
     random_messages.listAppend("math is your helpful friend");
     random_messages.listAppend("click click click");
     
@@ -675,7 +689,7 @@ string [string] generateAPIResponse()
     else if (true)
     {
         //Checking every item is slow. But certain items won't trigger a reload, but need to. So:
-        boolean [item] relevant_items = $items[photocopied monster,4-d camera,pagoda plans,Elf Farm Raffle ticket,skeleton key,heavy metal thunderrr guitarrr,heavy metal sonata,Hey Deze nuts,rave whistle,damp old boot,map to Professor Jacking's laboratory,world's most unappetizing beverage,squirmy violent party snack,White Citadel Satisfaction Satchel,rusty screwdriver,giant pinky ring,The Lost Pill Bottle,GameInformPowerDailyPro magazine,dungeoneering kit,Knob Goblin encryption key,dinghy plans,Sneaky Pete's key,Jarlsberg's key,Boris's key,fat loot token,bridge,chrome ore,asbestos ore,linoleum ore,csa fire-starting kit,tropical orchid,stick of dynamite,barbed-wire fence,psychoanalytic jar,digital key,Richard's star key,star hat,star crossbow,star staff,star sword,Wand of Nagamar,Azazel's tutu,Azazel's unicorn,Azazel's lollipop,smut orc keepsake box,blessed large box,massive sitar,hammer of smiting,chelonian morningstar,greek pasta of peril,17-alarm saucepan,shagadelic disco banjo,squeezebox of the ages,E.M.U. helmet,E.M.U. harness,E.M.U. joystick,E.M.U. rocket thrusters,E.M.U. unit,wriggling flytrap pellet,Mer-kin trailmap,Mer-kin stashbox,Makeshift yakuza mask,Novelty tattoo sleeves,strange goggles,zaibatsu level 2 card, zaibatsu level 3 card,flickering pixel,jar of oil,bowl of scorpions,molybdenum magnet,steel lasagna,steel margarita,steel-scented air freshener,Grandma's Map,mer-kin healscroll,scented massage oil,soggy used band-aid,extra-strength red potion,red pixel potion,red potion,filthy poultice,gauze garter,green pixel potion,cartoon heart,red plastic oyster egg,Manual of Dexterity,Manual of Labor,Manual of Transmission];
+        boolean [item] relevant_items = $items[photocopied monster,4-d camera,pagoda plans,Elf Farm Raffle ticket,skeleton key,heavy metal thunderrr guitarrr,heavy metal sonata,Hey Deze nuts,rave whistle,damp old boot,map to Professor Jacking's laboratory,world's most unappetizing beverage,squirmy violent party snack,White Citadel Satisfaction Satchel,rusty screwdriver,giant pinky ring,The Lost Pill Bottle,GameInformPowerDailyPro magazine,dungeoneering kit,Knob Goblin encryption key,dinghy plans,Sneaky Pete's key,Jarlsberg's key,Boris's key,fat loot token,bridge,chrome ore,asbestos ore,linoleum ore,csa fire-starting kit,tropical orchid,stick of dynamite,barbed-wire fence,psychoanalytic jar,digital key,Richard's star key,star hat,star crossbow,star staff,star sword,Wand of Nagamar,Azazel's tutu,Azazel's unicorn,Azazel's lollipop,smut orc keepsake box,blessed large box,massive sitar,hammer of smiting,chelonian morningstar,greek pasta of peril,17-alarm saucepan,shagadelic disco banjo,squeezebox of the ages,E.M.U. helmet,E.M.U. harness,E.M.U. joystick,E.M.U. rocket thrusters,E.M.U. unit,wriggling flytrap pellet,Mer-kin trailmap,Mer-kin stashbox,Makeshift yakuza mask,Novelty tattoo sleeves,strange goggles,zaibatsu level 2 card, zaibatsu level 3 card,flickering pixel,jar of oil,bowl of scorpions,molybdenum magnet,steel lasagna,steel margarita,steel-scented air freshener,Grandma's Map,mer-kin healscroll,scented massage oil,soggy used band-aid,extra-strength red potion,red pixel potion,red potion,filthy poultice,gauze garter,green pixel potion,cartoon heart,red plastic oyster egg,Manual of Dexterity,Manual of Labor,Manual of Transmission,wet stunt nut stew,bjorn's hammer,mace of the tortoise,pasta of peril,5-alarm saucepan,disco banjo,rock and roll legend];
         //future: add snow boards
         
         
@@ -693,7 +707,7 @@ string [string] generateAPIResponse()
     if (true)
     {
         
-        boolean [string] relevant_mafia_properties = $strings[merkinQuestPath,questF01Primordial,questF02Hyboria,questF03Future,questF04Elves,questF05Clancy,questG01Meatcar,questG02Whitecastle,questG03Ego,questG04Nemesis,questG05Dark,questG06Delivery,questI01Scapegoat,questI02Beat,questL02Larva,questL03Rat,questL04Bat,questL05Goblin,questL06Friar,questL07Cyrptic,questL08Trapper,questL09Topping,questL10Garbage,questL11MacGuffin,questL11Manor,questL11Palindome,questL11Pyramid,questL11Worship,questL12War,questL13Final,questM01Untinker,questM02Artist,questM03Bugbear,questM04Galaktic,questM05Toot,questM06Gourd,questM07Hammer,questM08Baker,questM09Rocks,questM10Azazel,questM11Postal,questM12Pirate,questM13Escape,questM14Bounty,questM15Lol,questS01OldGuy,questS02Monkees,sidequestArenaCompleted,sidequestFarmCompleted,sidequestJunkyardCompleted,sidequestLighthouseCompleted,sidequestNunsCompleted,sidequestOrchardCompleted,cyrptAlcoveEvilness,cyrptCrannyEvilness,cyrptNicheEvilness,cyrptNookEvilness,desertExploration,gnasirProgress,relayCounters,timesRested,currentEasyBountyItem,currentHardBountyItem,currentSpecialBountyItem,volcanoMaze1,_lastDailyDungeonRoom,seahorseName,chasmBridgeProgress,_aprilShower,lastAdventure,_floristPlantsUsed,_fireStartingKitUsed,_psychoJarUsed,hiddenHospitalProgress,hiddenBowlingAlleyProgress,hiddenApartmentProgress,hiddenOfficeProgress,pyramidPosition,parasolUsed,_discoKnife,lastPlusSignUnlock,olfactedMonster];
+        boolean [string] relevant_mafia_properties = $strings[merkinQuestPath,questF01Primordial,questF02Hyboria,questF03Future,questF04Elves,questF05Clancy,questG01Meatcar,questG02Whitecastle,questG03Ego,questG04Nemesis,questG05Dark,questG06Delivery,questI01Scapegoat,questI02Beat,questL02Larva,questL03Rat,questL04Bat,questL05Goblin,questL06Friar,questL07Cyrptic,questL08Trapper,questL09Topping,questL10Garbage,questL11MacGuffin,questL11Manor,questL11Palindome,questL11Pyramid,questL11Worship,questL12War,questL13Final,questM01Untinker,questM02Artist,questM03Bugbear,questM04Galaktic,questM05Toot,questM06Gourd,questM07Hammer,questM08Baker,questM09Rocks,questM10Azazel,questM11Postal,questM12Pirate,questM13Escape,questM14Bounty,questM15Lol,questS01OldGuy,questS02Monkees,sidequestArenaCompleted,sidequestFarmCompleted,sidequestJunkyardCompleted,sidequestLighthouseCompleted,sidequestNunsCompleted,sidequestOrchardCompleted,cyrptAlcoveEvilness,cyrptCrannyEvilness,cyrptNicheEvilness,cyrptNookEvilness,desertExploration,gnasirProgress,relayCounters,timesRested,currentEasyBountyItem,currentHardBountyItem,currentSpecialBountyItem,volcanoMaze1,_lastDailyDungeonRoom,seahorseName,chasmBridgeProgress,_aprilShower,lastAdventure,_floristPlantsUsed,_fireStartingKitUsed,_psychoJarUsed,hiddenHospitalProgress,hiddenBowlingAlleyProgress,hiddenApartmentProgress,hiddenOfficeProgress,pyramidPosition,parasolUsed,_discoKnife,lastPlusSignUnlock,olfactedMonster,photocopyMonster,lastTempleUnlock,volcanoMaze1];
         
         if (false)
         {
@@ -770,8 +784,7 @@ buffer generateNavbar(Checklist [int] ordered_output_checklists)
         style += "max-width:" + width + "px;height:" + __setting_navbar_height + ";margin-left:auto; margin-right:auto;font-size:1em;";
         if (!__setting_side_negative_space_is_dark && !__setting_fill_vertical)
             style += "border-left:1px solid;border-right:1px solid;";
-        style += "border-top:1px solid;";
-        style += "border-color:" + __setting_line_color + ";";
+        style += "border-top:1px solid;border-color:" + __setting_line_color + ";";
         navbar.append(HTMLGenerateTagPrefix("div", mapMake("style", style)));
     }
     

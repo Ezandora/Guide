@@ -21,15 +21,15 @@ void generateDailyResources(Checklist [int] checklists)
 		
         string [int][int] options;
 		options.listAppend(listMake("Optimal Dog", "Semi-rare next adventure. 1 full."));
-		options.listAppend(listMake("Ghost Dog", "-combat. 3 full."));
-		options.listAppend(listMake("Video Game Hot Dog", "+25% item, +25% meat. 3 full."));
-		options.listAppend(listMake("Junkyard dog", "+combat. 3 full."));
+		options.listAppend(listMake("Ghost Dog", "-combat, 30 turns. 3 full."));
+		options.listAppend(listMake("Video Game Hot Dog", "+25% item, +25% meat, 50 turns. 3 full."));
+		options.listAppend(listMake("Junkyard dog", "+combat, 30 turns. 3 full."));
 		if (my_primestat() == $stat[muscle])
-			options.listAppend(listMake("Savage macho dog", "+50% muscle. 2 full."));
+			options.listAppend(listMake("Savage macho dog", "+50% muscle, 50 turns. 2 full."));
 		if (my_primestat() == $stat[mysticality])
-			options.listAppend(listMake("One with everything", "+50% mysticality. 2 full."));
+			options.listAppend(listMake("One with everything", "+50% mysticality, 50 turns. 2 full."));
 		if (my_primestat() == $stat[moxie])
-			options.listAppend(listMake("Sly Dog", "+50% moxie. 2 full."));
+			options.listAppend(listMake("Sly Dog", "+50% moxie, 50 turns. 2 full."));
 			
         description.listAppend(HTMLGenerateSimpleTableLines(options));
 		available_resources_entries.listAppend(ChecklistEntryMake(image_name, "clan_viplounge.php?action=hotdogstand", ChecklistSubentryMake(name, "", description), 5));
@@ -309,7 +309,9 @@ void generateDailyResources(Checklist [int] checklists)
         }
         //_deluxeKlawSummons?
         //_crimboTree?
-        
+        int soaks_remaining = MAX(0, 5 - get_property_int("_hotTubSoaks"));
+        if (__misc_state["In run"] && soaks_remaining > 0)
+            available_resources_entries.listAppend(ChecklistEntryMake("__effect blessing of squirtlcthulli", "clan_viplounge.php", ChecklistSubentryMake(pluralize(soaks_remaining, "hot tub soak", "hot tub soaks"), "", "Restore all HP, removes most bad effects."), 8));
     }
     //_klawSummons?
     

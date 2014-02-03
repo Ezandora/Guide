@@ -40,15 +40,21 @@ string generateNinjaSafetyGuide(boolean show_color)
 		result += "Need";
 	result += " +" + ceil(init_needed) + "% init to survive ninja, or ";
 	
-	if (my_hp() >= damage_taken)
+	int min_safe_damage = (ceil(damage_taken) + 2);
+	if (my_hp() >= min_safe_damage)
 	{
 		result += "keep";
 		can_survive = true;
 	}
 	else
 		result += "need";
-	int min_safe_damage = (ceil(damage_taken) + 2);
 	result += " HP above " + min_safe_damage + ".";
+    
+    if (my_path() == "Class Act II: A Class For Pigs" && monster_level_adjustment() > 50)
+    {
+        result += " Reduce ML to +50 to prevent elemental damage.";
+        can_survive = false;
+    }
 	
 	if (!can_survive && show_color)
 		result = HTMLGenerateSpanFont(result, "red", "");
@@ -62,7 +68,12 @@ void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [in
 	{
 		description.listAppend(generateNinjaSafetyGuide(show_details));
         if (from_copy && $familiar[obtuse angel].familiar_is_usable() && $familiar[reanimated reanimator].familiar_is_usable())
-            description.listAppend("Make sure to copy with angel, not the reanimator.");
+        {
+            string line = "Make sure to copy with angel, not the reanimator.";
+            if (my_familiar() == $familiar[reanimated reanimator])
+                line = HTMLGenerateSpanFont(line, "red", "");
+            description.listAppend(line);
+        }
 	}
 	else if (monster_name == "Quantum Mechanic")
 	{
@@ -80,6 +91,19 @@ void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [in
 			line = HTMLGenerateSpanFont(line, "red", "");
 		description.listAppend(line);
 	}
+    else if ($strings[bricko bat,bricko cathedral,bricko elephant,bricko gargantuchicken,bricko octopus,bricko ooze,bricko oyster,bricko python,bricko turtle,bricko vacuum cleaner] contains monster_name)
+    {
+        description.listAppend("Zero adventure cost, use to burn delay.");
+    }
+    else if (monster_name == "Lobsterfrogman" && show_details)
+    {
+        int lfm_attack = 171 + 5 + monster_level_adjustment();
+        string line = lfm_attack + " attack.";
+        
+		if (my_buffedstat($stat[moxie]) < lfm_attack)
+			line = HTMLGenerateSpanFont(line, "red", "");
+        description.listAppend(line);
+    }
 }
 
 void generateCopiedMonstersEntry(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, boolean from_task) //if from_task is false, assumed to be from resources

@@ -22,4 +22,3 @@ import "relay/Guide/Quests/Legendary Beat.ash";
 import "relay/Guide/Quests/Memories.ash";
 import "relay/Guide/Quests/White Citadel.ash";
 import "relay/Guide/Quests/Wizard of Ego.ash";
-

@@ -31,7 +31,8 @@ void SSkillsGenerateResource(ChecklistEntry [int] available_resources_entries)
 	property_summons_to_skills["_coldOne"] = listMake($skill[Grab a Cold One]);
 	property_summons_to_skills["_spaghettiBreakfast"] = listMake($skill[spaghetti breakfast]);
 	property_summons_to_skills["_discoKnife"] = listMake($skill[that's not a knife]);
-	
+	property_summons_to_skills["_lunchBreak"] = listMake($skill[lunch break]);
+    
 	//Jarlsberg:
 	if (my_path() == "Avatar of Jarlsberg")
 	{
@@ -105,7 +106,7 @@ void SSkillsGenerateResource(ChecklistEntry [int] available_resources_entries)
 	if (subentries.count() > 0)
 	{
 		subentries.listPrepend(ChecklistSubentryMake("Skill summons:"));
-		ChecklistEntry entry = ChecklistEntryMake("__item Knob Goblin love potion", "", subentries, importance);
+		ChecklistEntry entry = ChecklistEntryMake("__item Knob Goblin love potion", "skills.php", subentries, importance);
 		entry.should_indent_after_first_subentry = true;
 		available_resources_entries.listAppend(entry);
 	}

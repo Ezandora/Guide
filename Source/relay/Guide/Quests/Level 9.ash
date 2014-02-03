@@ -105,9 +105,47 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
         float clue_drop_rate = item_drop * 0.15;
         details.listAppend(clue_drop_rate.roundForOutput(2) + " clues/adventure at +" + ((item_drop - 1) * 100.0).roundForOutput(1) + "% item.");
 		
-		int spooky_damage_taken = 463 * (1.0 - elemental_resistance($element[spooky]) / 100.0);
-		int cold_damage_taken = 463 * (1.0 - elemental_resistance($element[cold]) / 100.0);
-		details.listAppend("Need " + (spooky_damage_taken + cold_damage_taken) + " HP (" + HTMLGenerateSpanOfClass(spooky_damage_taken + " spooky", "r_element_spooky") + ", " + HTMLGenerateSpanOfClass(cold_damage_taken + " cold", "r_element_cold") + ") to survive 30% effective A-Boo clues.");
+        
+        int spooky_damage_taken = 0;
+        int cold_damage_taken = 0;
+        
+        if (true)
+        {
+            int [int] damage_levels;
+            damage_levels.listAppend(13);
+            damage_levels.listAppend(25);
+            damage_levels.listAppend(50);
+            damage_levels.listAppend(125);
+            damage_levels.listAppend(250);
+            
+            float spooky_resistance_multiplier = (1.0 - elemental_resistance($element[spooky]) / 100.0);
+            float cold_resistance_multiplier = (1.0 - elemental_resistance($element[cold]) / 100.0);
+            foreach key in damage_levels
+            {
+                int damage = damage_levels[key];
+                
+                spooky_damage_taken += ceil(damage.to_float() * spooky_resistance_multiplier);
+                cold_damage_taken += ceil(damage.to_float() * cold_resistance_multiplier);
+            }
+        }
+        else
+        {
+            //old calculation method:
+            spooky_damage_taken = 463 * (1.0 - elemental_resistance($element[spooky]) / 100.0);
+            cold_damage_taken = 463 * (1.0 - elemental_resistance($element[cold]) / 100.0);
+        }
+        
+        int hp_damage_taken = spooky_damage_taken + cold_damage_taken;
+        string hp_string = hp_damage_taken + " HP";
+        if (hp_damage_taken >= my_hp())
+            hp_string = HTMLGenerateSpanFont(hp_string, "red", "");
+        
+		details.listAppend("Need " + hp_string + " (" + HTMLGenerateSpanOfClass(spooky_damage_taken + " spooky", "r_element_spooky") + ", " + HTMLGenerateSpanOfClass(cold_damage_taken + " cold", "r_element_cold") + ") to survive 30% effective A-Boo clues.");
+        
+        if (!black_market_available() && my_path() != "Way of the Surprising Fist")
+        {
+            details.listAppend("Possibly unlock the black market first, for cans of black paint. (+2 " + HTMLGenerateSpanOfClass("spooky", "r_element_spooky") + "/" + HTMLGenerateSpanOfClass("cold", "r_element_cold") + " res buff, 1k meat)");
+        }
 		
 		task_entries.listAppend(ChecklistEntryMake("a-boo peak", "place.php?whichplace=highlands", ChecklistSubentryMake("A-Boo Peak", modifiers, details), $locations[a-boo peak]));
 	}
@@ -182,11 +220,11 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
     if ($item[jar of oil].available_amount() == 0 && $item[bubblin' crude].available_amount() < 12 && !base_quest_state.state_boolean["Peak Jar Completed"] && base_quest_state.state_boolean["can complete twin peaks quest quickly"])
         need_jar_of_oil = true;
         
-	if (base_quest_state.state_float["oil peak pressure"] > 0 || need_jar_of_oil)
+	if (base_quest_state.state_float["oil peak pressure"] > 0.0 || need_jar_of_oil)
 	{
 		string [int] details;
 		string [int] modifiers;
-        if (base_quest_state.state_float["oil peak pressure"] > 0)
+        if (base_quest_state.state_float["oil peak pressure"] > 0.0)
         {
             modifiers.listAppend("+100 ML");
             
@@ -221,7 +259,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
             else
                 pressure_reduced_per_turn += 6.34;
                 
-            if (pressure_reduced_per_turn != 0.0)
+            if (fabs(pressure_reduced_per_turn) > 0.01)
                 turns_remaining_at_current_ml = ceil(base_quest_state.state_float["oil peak pressure"] / pressure_reduced_per_turn);
             details.listAppend(pluralize(turns_remaining_at_current_ml, "turn", "turns") + " remaining at " + monster_level_adjustment() + " ML.");
         }

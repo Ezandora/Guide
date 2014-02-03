@@ -6,22 +6,27 @@ import "relay/Guide/Support/List.ash"
 //Auto-conversion property functions:
 boolean get_property_boolean(string property)
 {
-	return to_boolean(get_property(property));
+	return get_property(property).to_boolean();
 }
 
 int get_property_int(string property)
 {
-	return to_int_silent(get_property(property));
+	return get_property(property).to_int_silent();
 }
 
 location get_property_location(string property)
 {
-	return to_location(get_property(property));
+	return get_property(property).to_location();
 }
 
 float get_property_float(string property)
 {
-	return to_float(get_property(property));
+	return get_property(property).to_float();
+}
+
+monster get_property_monster(string property)
+{
+	return get_property(property).to_monster();
 }
 
 buffer to_buffer(string str)
@@ -153,6 +158,23 @@ item [slot] equipped_items()
         result[s] = it;
     }
     return result;
+}
+
+//Have at least one of these familiars:
+boolean have_familiar(boolean [familiar] familiars)
+{
+    foreach f in familiars
+    {
+        if (f.have_familiar())
+            return true;
+    }
+    return false;
+}
+
+
+string format_today_to_string(string desired_format)
+{
+    return format_date_time("yyyyMMdd", today_to_string(), desired_format);
 }
 
 item [int] missing_outfit_components(string outfit_name)
@@ -486,11 +508,6 @@ float [monster] appearance_rates_adjusted(location l)
         if (lawyers_relocated && (source_altered contains $monster[pygmy witch lawyer]))
             remove source_altered[$monster[pygmy witch lawyer]];
     }
-    if ($locations[Guano Junction,the Batrat and Ratbat Burrow,the Beanbat Chamber] contains l)
-    {
-        //bit hacky:
-        source_altered[$monster[screambat]] = 1.0 / 8.0;
-    }
     
     foreach m in source_altered
     {
@@ -518,6 +535,14 @@ float [monster] appearance_rates_adjusted(location l)
         if (v > 0)
             total += v;
     }
+    if ($locations[Guano Junction,the Batrat and Ratbat Burrow,the Beanbat Chamber] contains l)
+    {
+        //hacky, probably wrong:
+        float v = total / 8.0;
+        source_altered[$monster[screambat]] = v;
+        total += v;
+    }
+    
     if (total > 0.0)
     {
         foreach m in source_altered
@@ -547,3 +572,7 @@ Record StringHandle
     string s;
 };
 
+Record FloatHandle
+{
+    float f;
+};

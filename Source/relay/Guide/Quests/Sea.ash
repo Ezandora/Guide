@@ -401,7 +401,7 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
             {
                 //Find grandpa in one of the three zones.
                 need_minus_combat_modifier = true;
-                subentry.entries.listAppend("Find grandpa sea monkee in " + class_grandpa_location + ".|" + pluralizeWordy(grandpa_ncs_remaining, "non-combat remains", "non-combat remain").capitalizeFirstLetter() + ".");
+                subentry.entries.listAppend("Find grandpa sea monkee in " + class_grandpa_location + ".|" + pluralizeWordy(grandpa_ncs_remaining, "non-combat remains", "non-combats remain").capitalizeFirstLetter() + ".");
             }
             else if (monkees_quest_state.mafia_internal_step == 4)
             {

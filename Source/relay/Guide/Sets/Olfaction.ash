@@ -55,6 +55,10 @@ void SOlfactionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         }
         location_wanted_monster[$location[fear man's level]] = $monster[morbid skull];
         location_wanted_monster[$location[8-bit realm]] = $monster[blooper];
+        
+        
+        if (!__quest_state["Level 11 Pyramid"].finished && olfacted_monster != $monster[tomb servant])
+            location_wanted_monster[$location[the upper chamber]] = $monster[tomb rat];
 
         //FIXME make astronomer suggestions finer-grained
         if (!($monsters[One-Eyed Willie,Burrowing Bishop,Family Jewels,Hooded Warrior,Junk,Pork Sword,Skinflute,Trouser Snake,Twig and Berries,Axe Wound,Beaver,Box,Bush,Camel's Toe,Flange,Honey Pot,Little Man in the Canoe,Muff] contains olfacted_monster))

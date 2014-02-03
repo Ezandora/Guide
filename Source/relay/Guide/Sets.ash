@@ -50,6 +50,8 @@ void SetsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 	SDungeonsOfDoomGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SPsychoanalyticGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SOlfactionGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+	SHolidayGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+	SRemindersGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	
     
 }

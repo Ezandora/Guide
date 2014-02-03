@@ -98,7 +98,7 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 			subentry.modifiers.listAppend("-combat");
 			subentry.entries.listAppend("Top floor. Run -combat.");
             if ($item[mohawk wig].equipped_amount() == 0 && $item[mohawk wig].available_amount() > 0)
-                subentry.entries.listAppend("Wear your mohawk wig.");
+                subentry.entries.listAppend(HTMLGenerateSpanFont("Wear your mohawk wig.", "red", ""));
             if ($item[model airship].available_amount() == 0)
             {
                 if ($item[mohawk wig].available_amount() == 0) //no wig, no airship
@@ -117,6 +117,7 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 			subentry.entries.listAppend("Ground floor. Spend eleven turns here to unlock top floor.");
 			image_name = "castle stairs up";
             
+			subentry.entries.listAppend("Possibly acquire the very overdue library book from a non-combat. (stats)");
             
             if (true)
             {
@@ -135,7 +136,7 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             if ($item[amulet of extreme plot significance].available_amount() > 0)
             {
                 if ($item[amulet of extreme plot significance].equipped_amount() == 0)
-                    subentry.entries.listAppend("Wear the amulet of extreme plot significance.");
+                    subentry.entries.listAppend(HTMLGenerateSpanFont("Wear the amulet of extreme plot significance.", "red", ""));
                     
             }
             else

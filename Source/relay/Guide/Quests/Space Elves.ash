@@ -22,6 +22,8 @@ void QSpaceElvesGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
 	if (base_quest_state.finished)
 		return;
     
+    string url = "place.php?whichplace=spaaace";
+    
     boolean turns_spent_in_locations_already = false;
     if ($locations[Domed City of Ronaldus,Domed City of Grimacia,Hamburglaris Shield Generator].turnsAttemptedInLocation() > 0)
         turns_spent_in_locations_already = true;
@@ -80,6 +82,8 @@ void QSpaceElvesGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
 		}
 		if (ronald_map_entries.count() == 0 && grimace_map_entries.count() == 0)
 			subentry.entries.listAppend("Look for the spooky little girl on Grimace or Ronald.");
+        else if ($items[map to safety shelter ronald prime, map to safety shelter grimace prime].available_amount() > 0)
+            url = "inventory.php?which=3";
 	}
 	else if (base_quest_state.mafia_internal_step == 3)
 	{
@@ -105,8 +109,12 @@ void QSpaceElvesGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
 		subentry.entries.listClear();
         subentry.entries.listAppend("Gives 200 lunar isotopes and Elvish Paradise access.");
 		subentry.entries.listAppend("Use transporter transponder to reach spaaace.");
+        if ($item[transporter transponder].available_amount() > 0)
+            url = "inventory.php?which=3";
+        else
+            url = "mall.php";
 	}
 	
 	
-	optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, "place.php?whichplace=spaaace", subentry, $locations[domed city of ronaldus, domed city of grimacia,hamburglaris shield generator]));
+	optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[domed city of ronaldus, domed city of grimacia,hamburglaris shield generator]));
 }

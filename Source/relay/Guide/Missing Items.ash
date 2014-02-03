@@ -167,7 +167,7 @@ void generateMissingItems(Checklist [int] checklists)
 			telescope_item_suggestions[$item[Angry Farmer candy]] += "|*Cast candyblast";
 		else
 			telescope_item_suggestions[$item[Angry Farmer candy]] += "|*Raver giant, castle top floor, 30% drop"; //FIXME we need sugar rush, not angry farmer candy.
-		telescope_item_suggestions[$item[thin black candle]] = "Goth Giant, Castle Top Floor, 30% drop|NC on top floor";
+		telescope_item_suggestions[$item[thin black candle]] = "Goth Giant, Castle Top Floor, 30% drop|Non-combat on top floor. (slow)";
 		telescope_item_suggestions[$item[super-spiky hair gel]] = "Protagonist, Penultimate Fantasy Airship, 20% drop";
 		telescope_item_suggestions[$item[Black No. 2]] = "Black panther, black forest, 20% drop";
 		telescope_item_suggestions[$item[Sonar-in-a-biscuit]] = "Bats, Batrat and Ratbat Burrow, 15% drop|Clover Guano Junction";
@@ -265,6 +265,28 @@ void generateMissingItems(Checklist [int] checklists)
 			towergate_items_needed_count[it] = towergate_items_needed_count[it] + 1;
 		}
 	}
+    
+    if (true)
+    {
+        FloatHandle missing_weight;
+        string [int] familiar_weight_how;
+        string [int] familiar_weight_immediately_obtainable;
+        string [int] familiar_weight_missing_potentials;
+        boolean have_familiar_weight_for_tower = generateTowerFamiliarWeightMethod(familiar_weight_how, familiar_weight_immediately_obtainable, familiar_weight_missing_potentials,missing_weight);
+        if (!have_familiar_weight_for_tower)
+        {
+            string [int] description;
+            description.listAppend("For the sorceress's tower familiars.");
+            if (familiar_weight_how.count() > 0)
+                description.listAppend("Have " + familiar_weight_how.listJoinComponents(", ", "and") + ".");
+            if (familiar_weight_immediately_obtainable.count() > 0)
+                description.listAppend("Could use " + familiar_weight_immediately_obtainable.listJoinComponents(", ", "and") + ".");
+            if (familiar_weight_missing_potentials.count() > 0)
+                description.listAppend("Could acquire " + familiar_weight_missing_potentials.listJoinComponents(", ", "or") + ".");
+            
+            items_needed_entries.listAppend(ChecklistEntryMake("__familiar Sabre-Toothed Lime", "", ChecklistSubentryMake("+" + missing_weight.f.ceil() + " familiar weight buffs", "", description)));
+        }
+    }
 	
 	if ($item[lord spookyraven's spectacles].available_amount() == 0)
 		items_needed_entries.listAppend(ChecklistEntryMake("__item lord spookyraven's spectacles", "", ChecklistSubentryMake("lord spookyraven's spectacles", "", "Found in Haunted Bedroom")));

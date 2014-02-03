@@ -5,6 +5,9 @@ void QArtistInit()
 	QuestState state;
 	
 	QuestStateParseMafiaQuestProperty(state, "questM02Artist");
+    
+    if (!state.started && $items[pail of pretentious paint, pretentious paintbrush, pretentious palette].available_amount() > 0)
+        QuestStateParseMafiaQuestPropertyValue(state, "started");
 	
 	state.quest_name = "Pretentious Artist's Quest";
 	state.image_name = "__item pretentious palette";

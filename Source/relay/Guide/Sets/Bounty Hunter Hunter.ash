@@ -29,9 +29,12 @@ location [int] locationsForMonster(monster m)
 
 ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, int amount_needed, monster target_monster, location [int] relevant_locations, StringHandle url)
 {
+    //FIXME update to use new bounty API once 16.3 is out for a sufficient time
     ChecklistSubentry subentry;
     
     subentry.header = "Bounty hunt for " + bounty_item_name.HTMLEscapeString();
+    
+    
     
     
     //Look up monster location:
@@ -40,7 +43,7 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
     relevant_locations.listAppendList(monster_locations);
     
     
-    boolean [location] skippable_ncs_locations = $locations[the stately pleasure dome, the poop deck, the spooky forest,The Haunted Gallery,tower ruins,the castle in the clouds in the sky (top floor), the castle in the clouds in the sky (ground floor), the castle in the clouds in the sky (basement)];
+    boolean [location] skippable_ncs_locations = $locations[the stately pleasure dome, the poop deck, the spooky forest,The Haunted Gallery,tower ruins,the castle in the clouds in the sky (top floor), the castle in the clouds in the sky (ground floor), the castle in the clouds in the sky (basement), mt. molehill];
     
     string turns_remaining_string = "";
     
@@ -94,11 +97,16 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
         }
     }
     
+    
     if (need_plus_combat)
         subentry.modifiers.listAppend("+combat");
     
     if (target_monster != $monster[none])
+    {
         subentry.entries.listAppend("From a " + target_monster + " in " + target_locations.listJoinComponents(", ", "or") + ".");
+        subentry.modifiers.listAppend("olfact " + target_monster);
+        subentry.modifiers.listAppend("banish");
+    }
     
     
     if (amount_needed == -1)
@@ -107,9 +115,33 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
     }
     else
     {
-        subentry.entries.listAppend(amount_found + " out of " + amount_needed + " found." + turns_remaining_string);
+        int amount_remaining = amount_needed - amount_found;
+        subentry.entries.listAppend(amount_remaining.int_to_wordy().capitalizeFirstLetter() + " left." + turns_remaining_string);
+        //subentry.entries.listAppend(amount_found + " out of " + amount_needed + " found." + turns_remaining_string);
     }
     
+    item [string] bounty_item_to_unlock;
+    
+    bounty_item_to_unlock["glittery skate key"] = $item[tiny bottle of absinthe];
+    bounty_item_to_unlock["pile of country guano"] = $item[astral mushroom];
+    if (!get_property_boolean("_psychoJarUsed"))
+    {
+        bounty_item_to_unlock["greasy string"] = $item[jar of psychoses (The Meatsmith)];
+        bounty_item_to_unlock["pixellated ashes"] = $item[jar of psychoses (The Crackpot Mystic)];
+        bounty_item_to_unlock["unlucky claw"] = $item[jar of psychoses (The Suspicious-Looking Guy)];
+    }
+    bounty_item_to_unlock["pop art banana peel"] = $item[llama lama gong];
+    bounty_item_to_unlock["wig powder"] = $item[&quot;DRINK ME&quot; potion];
+    
+    if (bounty_item_to_unlock contains bounty_item_name)
+        subentry.entries.listAppend("Accessed with " + bounty_item_to_unlock[bounty_item_name] + ".");
+    
+        
+    if (bounty_item_name == "half-empty bottle of eyedrops" && knoll_available())
+    {
+        url.s = "place.php?whichplace=forestvillage";
+        subentry.entries.listAppend("You probably can't do this bounty as knoll, sorry.");
+    }
     
     return subentry;
 }

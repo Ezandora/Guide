@@ -55,6 +55,9 @@ void QNemesisInit()
         
         if (state.mafia_internal_step < 18 && $items[Sledgehammer of the V&aelig;lkyr,Flail of the Seven Aspects,Wrath of the Capsaician Pastalords,Windsor Pan of the Source,Seeger's Unstoppable Banjo,The Trickster's Trikitixa].available_amount() > 0)
             state.mafia_internal_step = 18;
+            
+        if (state.mafia_internal_step < 17 && get_property("volcanoMaze1").length() > 0)
+            state.mafia_internal_step = 17;
         
         //Location-based:
         if (state.mafia_internal_step == 15)
@@ -324,6 +327,8 @@ void QNemesisGenerateCaveTasks(ChecklistSubentry subentry, item legendary_epic_w
     subentry.entries.listAppend("Visit the sinister cave.");
     int paper_strips_found = 0;
     
+    if (state.mafia_internal_step == 0)
+        state.mafia_internal_step = 1;
     foreach it in $items[a torn paper strip,a rumpled paper strip,a creased paper strip,a folded paper strip,a crinkled paper strip,a crumpled paper strip,a ragged paper strip,a ripped paper strip]
     {
         if (it.available_amount() > 0)
@@ -411,7 +416,7 @@ void QNemesisGenerateCaveTasks(ChecklistSubentry subentry, item legendary_epic_w
         
         if (paper_strips_found >= 8)
         {
-            subentry.entries.listAppend("Speak the password, then fight your nemesis.");
+            subentry.entries.listAppend("Speak the password, then fight your nemesis.|Then wait for assassins.");
             if (legendary_epic_weapon.equipped_amount() == 0)
                 subentry.entries.listAppend("Equip " + legendary_epic_weapon + ".");
         }
@@ -577,7 +582,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         if ($location[The Nemesis' Lair].turnsAttemptedInLocation() > 0)
         {
             if (my_class() == $class[disco bandit])
-                subentry.entries.listAppend("Fight daft punk, then your nemesis face to face.");
+                subentry.entries.listAppend("Fight daft punk, then your nemesis face to face.|Then solve volcano maze.");
             else
                 subentry.entries.listAppend("Fight goons, then your nemesis.");
         }

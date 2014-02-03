@@ -216,7 +216,7 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		
 	if (should_output_insult_data)
 	{
-		string line = "At " + insult_count + " insults. " + roundForOutput(insult_success_likelyhood[insult_count] * 100, 1) + "% chance of beer pong success.";
+		string line = "At " + pluralize(insult_count, "insult", "insults") + ". " + roundForOutput(insult_success_likelyhood[insult_count] * 100, 1) + "% chance of beer pong success.";
 		if (insult_count < 8)
 			line += "|Insult every pirate with the big book of pirate insults.";
 		subentry.entries.listAppend(line);

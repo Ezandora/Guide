@@ -440,7 +440,21 @@ buffer KOLImageGenerateImageHTML(string lookup_name, boolean should_center, Vec2
 		img_tag_attributes["width"] =  image_size.x;
 		img_tag_attributes["height"] =  image_size.y;
 	}
+    
+    //Needs to be optimized to use buffers first.
+    /*string unadorned_name = lookup_name;
+    int breakout = 50;
+    while (unadorned_name.length() > 0 && unadorned_name.stringHasPrefix("__") && breakout > 0)
+    {
+        int space_index = unadorned_name.index_of(" ") + 1;
+        if (space_index < 0 || space_index > unadorned_name.length())
+            space_index = unadorned_name.length();
+        unadorned_name = unadorned_name.substring(space_index);
+        breakout -= 1;
+    }*/
+    
 	img_tag_attributes["alt"] = lookup_name.HTMLEscapeString();
+	//img_tag_attributes["title"] = unadorned_name.HTMLEscapeString();
 	
 	if (have_crop && outputting_div)
 	{

@@ -41,7 +41,7 @@ void generateTasks(Checklist [int] checklists)
 			subentry.entries.listAppend(line);
 		}
 		if (subentry.entries.count() > 0)
-			task_entries.listAppend(ChecklistEntryMake("plant up sea daisy", "place.php?whichplace=forestvillage&amp;action=fv_friar", subentry));
+			task_entries.listAppend(ChecklistEntryMake("plant up sea daisy", "place.php?whichplace=forestvillage&amp;action=fv_friar", subentry, -11));
 	}
 	
 	QuestsGenerateTasks(task_entries, optional_task_entries, future_task_entries);
@@ -150,14 +150,6 @@ void generateTasks(Checklist [int] checklists)
 	
 	
 	
-	if ($effect[QWOPped Up].have_effect() > 0 && __misc_state["VIP available"] && get_property_int("_hotTubSoaks") < 5) //only suggest if they have hot tub access; other route is a SGEEA, too valuable
-    {
-        string [int] description;
-        description.listAppend("Use hot tub.");
-        
-		task_entries.listAppend(ChecklistEntryMake("__effect qwopped up", "clan_viplounge.php", ChecklistSubentryMake("Remove QWOPped up effect", "", description), -11));
-    }
-
 		
 	
 
@@ -248,7 +240,8 @@ void generateTasks(Checklist [int] checklists)
 		}
 		optional_task_entries.listAppend(ChecklistEntryMake("__item filthy knitted dread sack", "island.php", ChecklistSubentryMake("Acquire a filthy hippy disguise", modifiers, description), $locations[hippy camp]));
 	}
-	if (!have_outfit_components("Frat boy ensemble") && __misc_state["mysterious island available"] && __misc_state["In run"] && !__quest_state["Level 12"].finished && !__quest_state["Level 12"].started && $location[frat house].combatTurnsAttemptedInLocation() > 0)
+    //FIXME better detection
+	if (!have_outfit_components("Frat boy ensemble") && __misc_state["mysterious island available"] && __misc_state["In run"] && !__quest_state["Level 12"].finished && !__quest_state["Level 12"].started && ($location[frat house].combatTurnsAttemptedInLocation() > 0 || $location[frat house].noncombat_queue.contains_text("Sing This Explosion to Me") || $location[frat house].noncombat_queue.contains_text("Sing This Explosion to Me") || $location[frat house].noncombat_queue.contains_text("Murder by Death") || $location[frat house].noncombat_queue.contains_text("I Just Wanna Fly") || $location[frat house].noncombat_queue.contains_text("From Stoked to Smoked") || $location[frat house].noncombat_queue.contains_text("Purple Hazers")))
     {
         //they don't have a frat boy ensemble, but they adventured in the pre-war frat house
         //I'm assuming this means they want the outfit, for whatever reason. So, suggest it, until the level 12 starts:
@@ -259,10 +252,10 @@ void generateTasks(Checklist [int] checklists)
         modifiers.listAppend("-combat");
 		description.listAppend("Missing " + missing_pieces.listJoinComponents(", ", "and") + ".");
 			description.listAppend("Run -combat.");
-		optional_task_entries.listAppend(ChecklistEntryMake("__item homoerotic frat-paddle", "island.php", ChecklistSubentryMake("Acquire a frat boy ensemble", modifiers, description, $locations[frat house])));
+		optional_task_entries.listAppend(ChecklistEntryMake("__item homoerotic frat-paddle", "island.php", ChecklistSubentryMake("Acquire a frat boy ensemble", modifiers, description), $locations[frat house]));
     }
 		
-	if (my_level() >= 9 && $item[giant pinky ring].available_amount() == 0) //very hacky way of testing if leaflet quest was done - in theory, they could smash the ring or pull one (or be casual)
+	if ($item[strange leaflet].available_amount() > 0 && $item[giant pinky ring].available_amount() == 0) //very hacky way of testing if leaflet quest was done - in theory, they could smash the ring or pull one (or be casual)
 	{
 		optional_task_entries.listAppend(ChecklistEntryMake("__item strange leaflet", "", ChecklistSubentryMake("Strange leaflet quest", "", "Quests Menu" + __html_right_arrow_character + "Leaflet (With Stats)")));
 	}
@@ -270,115 +263,7 @@ void generateTasks(Checklist [int] checklists)
 
 	SetsGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	
-    
-    if ($effect[beaten up].have_effect() > 0)
-    {
-        string [int] methods;
-        string url;
-        if ($skill[tongue of the walrus].have_skill())
-        {
-            methods.listAppend("Cast Tongue of the Walrus.");
-            url = "skills.php";
-        }
-        else if (__misc_state["VIP available"] && get_property_int("_hotTubSoaks") < 5)
-        {
-            methods.listAppend("Soak in VIP hot tub.");
-            url = "clan_viplounge.php";
-        }
-        else if (__misc_state_int["free rests remaining"] > 0)
-        {
-            methods.listAppend("Free rest at your campsite.");
-            url = "campground.php";
-        }
-        
-        foreach it in $items[tiny house,space tours tripple,personal massager,forest tears,csa all-purpose soap]
-        {
-            if (it.available_amount() > 0 && methods.count() == 0)
-            {
-                url = "inventory.php?which=1"; //may not be correct in all cases
-                methods.listAppend("Use " + it + ".");
-                break;
-            }
-        }
-        
-        if (methods.count() > 0)
-            task_entries.listAppend(ChecklistEntryMake("__effect beaten up", url, ChecklistSubentryMake("Remove beaten up", "", methods), -11));
-    }
-    
-    if (true)
-    {
-        //Don't get poisoned.
-        effect [int] poison_effects;
-        poison_effects.listAppend($effect[Hardly poisoned at all]);
-        poison_effects.listAppend($effect[A Little Bit Poisoned]);
-        poison_effects.listAppend($effect[Somewhat Poisoned]);
-        poison_effects.listAppend($effect[Really Quite Poisoned]);
-        poison_effects.listAppend($effect[Majorly Poisoned]);
-        poison_effects.listAppend($effect[Toad In The Hole]);
-        
-        effect have_poison = $effect[none];
-        foreach key in poison_effects
-        {
-            effect e = poison_effects[key];
-            if (e.have_effect() > 0)
-            {
-                have_poison = e;
-                break;
-            }
-        }
-        if (have_poison != $effect[none])
-        {
-            string url = "";
-            string [int] methods;
-            
-            if ($skill[disco nap].have_skill() && $skill[adventurer of leisure].have_skill())
-            {
-                url = "skills.php";
-                methods.listAppend("Cast Disco Nap.");
-            }
-            else
-            {
-                url = "galaktik.php";
-                methods.listAppend("Use Doc Galaktik's anti-anti-antidote.");
-                if ($item[anti-anti-antidote].available_amount() > 0)
-                    url = "inventory.php?which=1";
-            }
-            
-            task_entries.listAppend(ChecklistEntryMake("__effect " + have_poison, url, ChecklistSubentryMake("Remove " + have_poison, "", methods), -11));
-        }
-	}
-    if ($effect[Cunctatitis].have_effect() > 0 && $skill[disco nap].have_skill() && $skill[adventurer of leisure].have_skill())
-    {
-        string url = "skills.php";
-        string method = "Cast disco power nap";
-        task_entries.listAppend(ChecklistEntryMake("__effect Cunctatitis", url, ChecklistSubentryMake("Remove Cunctatitis", "", method), -11));
-    }
-    
-    if (__last_adventure_location == $location[The Red Queen's Garden] && (!in_ronin() || $item[&quot;DRINK ME&quot; potion].available_amount() > 0) && get_property_int("pendingMapReflections") <= 0)
-    {
-        string url = "mall.php";
-        
-        if ($item[&quot;DRINK ME&quot; potion].available_amount() > 0)
-            url = "inventory.php?which=3";
-        
-        task_entries.listAppend(ChecklistEntryMake("__item &quot;DRINK ME&quot; potion", url, ChecklistSubentryMake("Drink " + $item[&quot;DRINK ME&quot; potion], "+madness", "Otherwise, no reflections of a map will drop."), -11));
-    }
-    
-    if ($effect[Merry Smithsness].have_effect() == 0 && (!in_ronin() || $item[flaskfull of hollow].available_amount() > 0) && $items[Meat Tenderizer is Murder,Ouija Board\, Ouija Board,Hand that Rocks the Ladle,Saucepanic,Frankly Mr. Shank,Shakespeare's Sister's Accordion,Sheila Take a Crossbow,A Light that Never Goes Out,Half a Purse,loose purse strings,Hand in Glove].equipped_amount() > 0)
-    {
-        //They (can) have a flaskfull of hollow and have a smithsness item equipped, but no merry smithsness.
-        //So, suggest a high-priority task.
-        //I suppose in theory they could be saving the flaskfull of hollow for later, for +item? In that case, we would be annoying them. They can closet the flask, but that isn't perfect...
-        //Still, I feel as though having this reminder is better than not having it.
-        
-        //Four items are not on the list due to their marginal bonus: Hairpiece On Fire (+maximum MP), Vicar's Tutu (+maximum HP), Staff of the Headmaster's Victuals (+spell damage), Work is a Four Letter Sword (+weapon damage)
-        string url = "mall.php";
-        
-        if ($item[flaskfull of hollow].available_amount() > 0)
-            url = "inventory.php?which=3";
-        
-        task_entries.listAppend(ChecklistEntryMake("__item flaskfull of hollow", url, ChecklistSubentryMake("Drink " + $item[flaskfull of hollow], "", "Gives +25 smithsness"), -11));
-    }
+
     
     boolean have_spaghetti_breakfast = (($skill[spaghetti breakfast].have_skill() && !get_property_boolean("_spaghettiBreakfast")) || $item[spaghetti breakfast].available_amount() > 0);
     if (__misc_state["In run"] && __misc_state["can eat just about anything"] && !get_property_boolean("_spaghettiBreakfastEaten") && my_fullness() == 0 && have_spaghetti_breakfast)

@@ -63,7 +63,7 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
 			string quest_value = get_property("questL05Goblin");
 			if (quest_value == "finished")
 				return true;
-			else if (quest_value == "started")
+			else if (quest_value == "started") //FIXME locationQuestPropertyPastInternalStepNumber
 			{
 				//Inference - quest is started. If map is missing, area must be unlocked
 				if ($item[cobb's knob map].available_amount() > 0)
@@ -320,6 +320,9 @@ string getClickableURLForLocation(location l)
         foreach l in $locations[the castle in the clouds in the sky (basement), the castle in the clouds in the sky (ground floor), the castle in the clouds in the sky (top floor)]
             __urls_for_locations[l] = "place.php?whichplace=giantcastle";
             
+        foreach l in $locations[the haunted gallery, the haunted billiards room, the haunted library, the haunted conservatory, the haunted kitchen]
+            __urls_for_locations[l] = "place.php?whichplace=spookyraven1";
+            
         foreach l in $locations[the haunted bedroom, the haunted ballroom, the haunted bathroom]
             __urls_for_locations[l] = "place.php?whichplace=spookyraven2";
             
@@ -356,7 +359,22 @@ string getClickableURLForLocation(location l)
             __urls_for_locations[$location[The Red Queen's Garden]] = "place.php?whichplace=rabbithole";
         else
             __urls_for_locations[$location[The Red Queen's Garden]] = "mall.php";
+            
+        if ($effect[Shape of...Mole!].have_effect() > 0)
+            __urls_for_locations[$location[Mt. Molehill]] = "mountains.php";
+        else
+            __urls_for_locations[$location[Mt. Molehill]] = "mall.php";
         
+        foreach l in $locations[the primordial soup, the jungles of ancient loathing, seaside megalopolis]
+            __urls_for_locations[l] = "place.php?whichplace=memories";
+            
+        foreach l in $locations[the degrassi knoll restroom, the degrassi knoll bakery, the degrassi knoll gym, the degrassi knoll garage]
+        {
+            if (knoll_available())
+                __urls_for_locations[l] = "place.php?whichplace=knoll_friendly";
+            else
+                __urls_for_locations[l] = "place.php?whichplace=knoll_hostile";
+        }
         __urls_for_locations_initialized = true;
     }
     

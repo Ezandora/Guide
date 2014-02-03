@@ -33,11 +33,12 @@ void SFaxGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
                 fax += "Makes scarecrow into superfairy";
                 if (my_primestat() == $stat[moxie] && __misc_state["need to level"])
                 {
-                    fax += "|And +3 mainstat/turn hat";
+                    fax += " and +3 mainstat/turn hat";
                 }
             }
             else if (familiar_is_usable($familiar[mad hatrack]))
                 fax += "Makes hatrack into superfairy";
+            fax += ".";
             
             fax = "sleepy mariachi" + HTMLGenerateIndentedText(fax);
             potential_faxes.listAppend(fax);

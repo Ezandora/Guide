@@ -20,11 +20,20 @@ void QLevel7Init()
 	}
     else
     {
-        //mafia won't track these properly until quest is started:
+        //mafia won't track these properly until quest is started, I think?
         state.state_int["alcove evilness"] = 50;
         state.state_int["cranny evilness"] = 50;
         state.state_int["niche evilness"] = 50;
         state.state_int["nook evilness"] = 50;
+    }
+    
+    if (state.finished)
+    {
+        //just in case:
+        state.state_int["alcove evilness"] = 0;
+        state.state_int["cranny evilness"] = 0;
+        state.state_int["niche evilness"] = 0;
+        state.state_int["nook evilness"] = 0;
     }
     
 	if (state.state_int["alcove evilness"] == 0)
@@ -91,6 +100,8 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
                 subentry.entries.listAppend("Run " + $familiar[oily woim] + " for +init.");
 			
 		}
+        else
+            subentry.modifiers.listAppend("+meat");
 		entry.subentries.listAppend(subentry);
 	}
 	if (!base_quest_state.state_boolean["cranny finished"])
@@ -121,6 +132,8 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 			
 			subentry.entries.listAppend("~" + niche_beep_beep_beep.roundForOutput(1) + " beeps per ghuol swarm. ~" + average_turns_remaining.roundForOutput(1) + " turns remain.");
 		}
+        else
+            subentry.modifiers.listAppend("+meat");
 		
 		entry.subentries.listAppend(subentry);
 	}

@@ -58,11 +58,11 @@ void SemirareGenerateDescription(string [int] description)
 			{
 				string [int] reasons;
 				if (!__quest_state["Level 8"].finished)
-				{
 					reasons.listAppend("Cobb's Knob quest");
-				}
-				reasons.listAppend("dispensary access. (+item, +familiar weight, cheapish MP)");
-				semirares.listAppend(SemirareMake($location[cobb's knob barracks], "|*Acquire KGE outfit for " + reasons.listJoinComponents(", ", "and"), 0));
+                if (!dispensary_available())
+                    reasons.listAppend("dispensary access (+item, +familiar weight, cheapish MP)");
+                if (reasons.count() > 0)
+                    semirares.listAppend(SemirareMake($location[cobb's knob barracks], "|*Acquire KGE outfit for " + reasons.listJoinComponents(", ", "and"), 0));
 			}
 			if (!have_outfit_components("Mining Gear") && !__quest_state["Level 8"].state_boolean["Past mine"])
 				semirares.listAppend(SemirareMake($location[Itznotyerzitz Mine], "|*Acquire mining gear for trapper quest.|*Run +234% item to get drop.", 0));
@@ -78,6 +78,10 @@ void SemirareGenerateDescription(string [int] description)
 		if ($item[cyclops eyedrops].available_amount() == 0 && $effect[One Very Clear Eye].have_effect() == 0)
 			semirares.listAppend(SemirareMake($location[the limerick dungeon], "|*+100% items eyedrops (10 turns), for tomb rats and low drops.", 0));
 	
+        if (needMoreFamiliarWeightForTower())
+        {
+			semirares.listAppend(SemirareMake($location[cobb's knob menagerie\, level 2], "|*+10 familiar weight, for tower familiars.", 0));
+        }
 		//three turn generation SRs go here
 		if (true)
 		{

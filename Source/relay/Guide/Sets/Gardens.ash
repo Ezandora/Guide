@@ -86,8 +86,11 @@ void SGardensGenerateResource(ChecklistEntry [int] available_resources_entries)
     {
         boolean [item] garden_creatable_items;
         
-        foreach it in lookupItems("snow cleats,snow crab,snow boards,unfinished ice sculpture,snow mobile,ice bucket,bod-ice,snow belt,ice house,ice nine")
+        foreach it in lookupItems("snow cleats,snow crab,unfinished ice sculpture,snow mobile,ice bucket,bod-ice,snow belt,ice house,ice nine")
             garden_creatable_items[it] = true;
+        
+        if (!__quest_state["Level 9"].state_boolean["bridge complete"])
+            garden_creatable_items[lookupItem("snow boards")] = true;
         
         if (!__quest_state["Level 4"].finished)
             garden_creatable_items[lookupItem("snow shovel")] = true;

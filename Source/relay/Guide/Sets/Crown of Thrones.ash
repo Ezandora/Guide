@@ -76,6 +76,10 @@ void SCOTGenerateSuggestions(string [int] description)
     //Suggest what it offers:
     COTSuggestionSet [int] suggestion_sets;
     
+    boolean have_two_available = false;
+    if ($item[crown of thrones].available_amount() > 0 && lookupItem("Buddy Bjorn").available_amount() > 0)
+        have_two_available = true;
+
     //Relevant:
     //+10ML
     suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+10 ML and +MP regen", $familiar[el vibrato megadrone])));
@@ -187,9 +191,11 @@ void SCOTGenerateSuggestions(string [int] description)
         suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("Spleen items", lookupFamiliar("Grim Brother"))));
     
     //slightly powerful:
-    suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("-combat", lookupFamiliar("Grimstone Golem"))));
     suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+combat", lookupFamiliar("Grim Brother"))));
+    suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("-combat", lookupFamiliar("Grimstone Golem"))));
     
+    if (get_property_int("_grimstoneMaskDropsCrown") == 0)
+        suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("Grimstone mask", lookupFamiliar("Grimstone Golem"))));
     string [int][int] familiar_options;
     foreach key in suggestion_sets
     {
@@ -198,9 +204,9 @@ void SCOTGenerateSuggestions(string [int] description)
         foreach key2 in suggestion_set.suggestions
         {
             //Suggest the familiar with the highest weight, under the assumption they're using it more.
-            boolean currently_enthroned = false;
             COTSuggestion suggestion = suggestion_set.suggestions[key2];
             familiar best_familiar_by_weight = $familiar[none];
+            familiar second_best_familiar_by_weight = $familiar[none];
             foreach key3 in suggestion.familiars
             {
                 familiar f = suggestion.familiars[key3];
@@ -208,23 +214,29 @@ void SCOTGenerateSuggestions(string [int] description)
                     continue;
                 if (f.have_familiar())
                 {
-                    if (enthroned_familiar == f && enthroned_familiar != $familiar[none])
-                        currently_enthroned = true;
-                    if (best_familiar_by_weight == $familiar[none] || f.familiar_weight() > best_familiar_by_weight.familiar_weight())
-                        best_familiar_by_weight = f;
-                    if (enthroned_familiar == f && enthroned_familiar != $familiar[none])
+                    if ((best_familiar_by_weight != enthroned_familiar || enthroned_familiar == $familiar[none]) && (best_familiar_by_weight == $familiar[none] || f.familiar_weight() > best_familiar_by_weight.familiar_weight() || f == enthroned_familiar))
                     {
+                        second_best_familiar_by_weight = best_familiar_by_weight;
                         best_familiar_by_weight = f;
-                        break;
+                    }
+                    else if (second_best_familiar_by_weight == $familiar[none] || f.familiar_weight() > second_best_familiar_by_weight.familiar_weight())
+                    {
+                        if (best_familiar_by_weight != f)
+                            second_best_familiar_by_weight = f;
                     }
                 }
             }
             if (best_familiar_by_weight != $familiar[none])
             {
-                if (currently_enthroned)
-                    familiar_options.listAppend(listMake(HTMLGenerateSpanOfClass(suggestion.reason, "r_bold"), HTMLGenerateSpanOfClass(best_familiar_by_weight, "r_bold")));
-                else
-                    familiar_options.listAppend(listMake(suggestion.reason, best_familiar_by_weight));
+                string familiar_string;
+                
+                familiar_string = best_familiar_by_weight;
+                if (enthroned_familiar == best_familiar_by_weight && enthroned_familiar != $familiar[none])
+                    familiar_string = HTMLGenerateSpanOfClass(best_familiar_by_weight, "r_bold");
+                    
+                if (second_best_familiar_by_weight != $familiar[none] && have_two_available)
+                    familiar_string += "|" + second_best_familiar_by_weight;
+                familiar_options.listAppend(listMake(suggestion.reason, familiar_string));
                 break;
             }
         }
@@ -235,16 +247,20 @@ void SCOTGenerateSuggestions(string [int] description)
 
 void SCOTGenerateResource(ChecklistEntry [int] available_resources_entries)
 {
-	if ($item[crown of thrones].available_amount() == 0)
+	if ($item[crown of thrones].available_amount() == 0 && lookupItem("Buddy Bjorn").available_amount() == 0)
 		return;
     if (__misc_state["familiars temporarily blocked"]) //avatar paths
         return;
 	string [int] description;
     
-    string image_name = "__item crown of thrones";
+    item crown_item = $item[crown of thrones];
+    if (crown_item.equipped_amount() == 0 && lookupItem("Buddy Bjorn").available_amount() > 0)
+        crown_item = lookupItem("Buddy Bjorn");
+    
+    string image_name = "__item " + crown_item;
     familiar enthroned_familiar = my_enthroned_familiar();
     
-    if ($item[crown of thrones].equipped_amount() > 0 || __misc_state["in run"])
+    if (($item[crown of thrones].equipped_amount() > 0 || lookupItem("Buddy Bjorn").equipped_amount() > 0) || __misc_state["in run"])
     {
         SCOTGenerateSuggestions(description);
     }
@@ -256,8 +272,8 @@ void SCOTGenerateResource(ChecklistEntry [int] available_resources_entries)
     }
     
     string url = "familiar.php";
-    if ($item[crown of thrones].equipped_amount() == 0)
+    if ($item[crown of thrones].equipped_amount() == 0 && lookupItem("Buddy Bjorn").equipped_amount() == 0)
         url = "inventory.php?which=2";
     if (description.count() > 0)
-        available_resources_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake($item[crown of thrones], "", description), 8));
+        available_resources_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(crown_item, "", description), 8));
 }
