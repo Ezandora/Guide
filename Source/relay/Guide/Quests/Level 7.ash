@@ -87,7 +87,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		int evilness = base_quest_state.state_int["alcove evilness"];
 		subentry.header = "Defiled Alcove";
 		subentry.entries.listAppend(evilness_text["cyrptAlcoveEvilness"]);
-		if (evilness > 25)
+		if (evilness > 26)
 		{
             subentry.modifiers.listAppend("+init");
             subentry.modifiers.listAppend("-combat");
@@ -100,7 +100,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
                 subentry.entries.listAppend("Run " + $familiar[oily woim] + " for +init.");
 			
 		}
-        else
+        else if (evilness <= 25)
             subentry.modifiers.listAppend("+meat");
 		entry.subentries.listAppend(subentry);
 	}
@@ -119,7 +119,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             if ($location[the defiled cranny].locationHasPlant("Blustery Puffball"))
                 monster_level += 30;
             
-
+            monster_level = MAX(monster_level, 0);
             
 			float niche_beep_beep_beep = MAX(3.0,sqrt(monster_level));
 			int beep_boop_lookup = floor(niche_beep_beep_beep) - 3;
@@ -170,7 +170,10 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             if ($location[the defiled nook].locationHasPlant("Horn of Plenty"))
                 item_drop += .25;
 			float eyes_per_adventure = MIN(1.0, (item_drop) * 0.2);
-			float evilness_per_adventure = MAX(1.0, 1.0 + eyes_per_adventure * 3.0);
+            float eyes_value = 3.0;
+            if (evilness < 29)
+                eyes_value = clampi(evilness - 25 - 1, 0, 3);
+			float evilness_per_adventure = MAX(1.0, 1.0 + eyes_per_adventure * eyes_value);
 			
 			if ($item[evil eye].available_amount() > 0)
             {
@@ -200,6 +203,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	if (base_quest_state.mafia_internal_step == 2)
 	{
 		entry.subentries[0].entries.listAppend("Go talk to the council to finish the quest.");
+        entry.target_location = "town.php";
 	}
 	else if (base_quest_state.state_boolean["alcove finished"] && base_quest_state.state_boolean["cranny finished"] && base_quest_state.state_boolean["niche finished"] && base_quest_state.state_boolean["nook finished"])
 	{

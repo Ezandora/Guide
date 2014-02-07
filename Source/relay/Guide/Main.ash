@@ -177,7 +177,7 @@ void generateMisc(Checklist [int] checklists)
 		checklists.listAppend(ChecklistMake("Unimportant Tasks", unimportant_task_entries));
 	}
 	
-	if (availableDrunkenness() < 0 && my_path() != "Avatar of Sneaky Pete" && $item[drunkula's wineglass].equipped_amount() == 0) //assuming in advance sneaky pete has some sort of drunkenness adventures
+	if (availableDrunkenness() < 0 && my_path_id() != PATH_AVATAR_OF_SNEAKY_PETE && $item[drunkula's wineglass].equipped_amount() == 0) //assuming in advance sneaky pete has some sort of drunkenness adventures
 	{
         //They're drunk, so tasks aren't as relevant. Re-arrange everything:
         string url;
@@ -368,6 +368,8 @@ string generateRandomMessage()
     location_messages[$location[twin peak]] = "fire walk with me";
     location_messages[$location[The Arrrboretum]] = "save the planet";
     location_messages[$location[the red queen's garden]] = "curiouser and curiouser";
+    location_messages[$location[A Massive Ziggurat]] = "1.21 ziggurats";
+    location_messages[$location[McMillicancuddy's Barn]] = "dooks";
     
     if (location_messages contains __last_adventure_location)
         random_messages.listAppend(location_messages[__last_adventure_location]);
@@ -407,24 +409,24 @@ string generateRandomMessage()
     random_messages.listAppend("math is your helpful friend");
     random_messages.listAppend("click click click");
     
-    string [string] paths;
-    paths["Bees Hate You"] = "bzzzzzz";
-    paths["Way of the Surprising Fist"] = "martial arts and crafts";
-    paths["Trendy"] = "played out";
-    paths["Avatar of Boris"] = "testosterone poisoning";
-    paths["Bugbear Invasion"] = "bugbears!";
-    paths["Zombie Slayer"] = "consumerism metaphor";
-    paths["Class Act"] = "try the sequel";
-    paths["Avatar of Jarlsberg"] = "nerd";
-    paths["BIG!"] = "leveling is boring";
-    paths["KOLHS"] = "did you study?";
-    paths["Class Act II: A Class For Pigs"] = "lonely guild trainer";
-    paths["Avatar of Sneaky Pete"] = "sunglasses at night";
+    string [int] paths;
+    paths[PATH_BEES_HATE_YOU] = "bzzzzzz";
+    paths[PATH_WAY_OF_THE_SURPRISING_FIST] = "martial arts and crafts";
+    paths[PATH_TRENDY] = "played out";
+    paths[PATH_AVATAR_OF_BORIS] = "testosterone poisoning";
+    paths[PATH_BUGBEAR_INVASION] = "bugbears!";
+    paths[PATH_ZOMBIE_SLAYER] = "consumerism metaphor";
+    paths[PATH_CLASS_ACT] = "try the sequel";
+    paths[PATH_AVATAR_OF_JARLSBERG] = "nerd";
+    paths[PATH_BIG] = "leveling is boring";
+    paths[PATH_KOLHS] = "did you study?";
+    paths[PATH_CLASS_ACT_2] = "lonely guild trainer";
+    paths[PATH_AVATAR_OF_SNEAKY_PETE] = "sunglasses at night";
     
-    paths["Oxygenarian"] = "the slow path";
+    paths[PATH_OXYGENARIAN] = "the slow path";
     
-    if (paths contains my_path())
-        random_messages.listAppend(paths[my_path()]);
+    if (paths contains my_path_id())
+        random_messages.listAppend(paths[my_path_id()]);
     
     string lowercase_player_name = my_name().to_lower_case().HTMLEscapeString();
         
@@ -446,15 +448,18 @@ string generateRandomMessage()
     if (__misc_state["in aftercore"])
         random_messages.listAppend(HTMLGenerateTagWrap("a", "ascension is waiting for you", mapMake("class", "r_a_undecorated", "href", "lair6.php", "target", "mainpane")));
     
+    if (my_adventures() == 0)
+        random_messages.listAppend("outtatime");
         
     string [familiar] familiar_messages;
     familiar_messages[$familiar[none]] = "even introverts need friends";
     familiar_messages[$familiar[black cat]] = "aww, cute kitty!";
     familiar_messages[$familiar[temporal riftlet]] = "master of time and space";
     familiar_messages[$familiar[Frumious Bandersnatch]] = "frabjous";
-    familiar_messages[$familiar[Pair of Stomping Boots]] = "running away again?";
+    if (__misc_state["free runs usable"])
+        familiar_messages[$familiar[Pair of Stomping Boots]] = "running away again?";
     familiar_messages[$familiar[baby sandworm]] = "the waters of life";
-    familiar_messages[$familiar[baby bugged bugbear]] = "expected }, found ; (Main.ash, line 443)";
+    familiar_messages[$familiar[baby bugged bugbear]] = "expected }, found ; (Main.ash, line 460)";
     familiar_messages[$familiar[mechanical songbird]] = "a little glowing friend";
     familiar_messages[$familiar[nanorhino]] = "write every day";
     familiar_messages[$familiar[rogue program]] = "ascends for the users";
@@ -499,7 +504,7 @@ string generateRandomMessage()
     
     
     string [monster] monster_messages;
-    foreach m in $monsters[The Temporal Bandit,crazy bastard,Knott Slanding,hockey elemental,Hypnotist of Hey Deze,infinite meat bug,QuickBASIC elemental,The Master Of Thieves,Baiowulf,Count Bakula]
+    foreach m in $monsters[The Temporal Bandit,crazy bastard,Knott Slanding,hockey elemental,Hypnotist of Hey Deze,infinite meat bug,QuickBASIC elemental,The Master Of Thieves,Baiowulf,Count Bakula] //Pooltergeist (Ultra-Rare)?
         monster_messages[m] = "an ultra rare! congratulations!";
     monster_messages[$monster[Dad Sea Monkee]] = "is always was always" + HTMLGenerateSpanFont(" is always was always", "#444444", "") + HTMLGenerateSpanFont(" is always was always", "#888888", "") + HTMLGenerateSpanFont(" is always was always", "#BBBBBB", "");
     foreach m in $monsters[Ed the Undying (1),Ed the Undying (2),Ed the Undying (3),Ed the Undying (4),Ed the Undying (5),Ed the Undying (6),Ed the Undying (7)]
@@ -516,6 +521,20 @@ string generateRandomMessage()
     monster_messages[$monster[sea cowboy]] = "pardon me";
     monster_messages[$monster[topiary golem]] = "almost there";
     monster_messages[$monster[the server]] = "console cowboy";
+    monster_messages[$monster[Fickle Finger of F8]] = "f/8 and be there";
+    monster_messages[$monster[malevolent crop circle]] = "I want to believe";
+    monster_messages[$monster[enraged cow]] = "moo";
+    monster_messages[$monster[Claybender Sorcerer Ghost]] = "accio blank-out";
+    monster_messages[$monster[Space Marine]] = "as if it were from an old dream";
+    monster_messages[$monster[Whatsian Commando Ghost]] = "captain jack hotness";
+    monster_messages[$monster[Regret Man]] = "wasted potential";
+    monster_messages[$monster[Principal Mooney]] = "life moves pretty fast";
+    if (my_turncount() < 11)
+        monster_messages[$monster[family of kobolds]] = "ah, the fun of casuals";
+    monster_messages[$monster[Black Crayon Spiraling Shape]] = "be what you're like";
+    monster_messages[$monster[best-selling novelist]] = "fiction to escape reality";
+    monster_messages[$monster[7-Foot Dwarf Replicant]] = "it's too bad she won't live<br>but then again, who does?";
+    
     
     if (monster_messages contains last_monster() && last_monster() != $monster[none])
     {
@@ -523,6 +542,11 @@ string generateRandomMessage()
         random_messages.listAppend(monster_messages[last_monster()]);
     }
     
+    if (__last_adventure_location == $location[Dreadsylvanian Castle] && $location[Dreadsylvanian Castle].lastNoncombatInLocation() == "The Machine")
+    {
+		random_messages.listClear();
+        random_messages.listAppend("skill singularity");
+    }
     if (mmg_my_bets().count() > 0)
     {
 		random_messages.listClear();
@@ -575,7 +599,7 @@ void outputChecklists(Checklist [int] ordered_output_checklists)
 		PageWrite(HTMLGenerateDivOfStyle("Example ascension", "text-align:center; font-weight:bold;"));
 	}
 		
-	if (my_path() == "Trendy") //trendy is unsupported
+	if (my_path_id() == PATH_TRENDY) //trendy is unsupported
     {
         PageWrite("<br>");
 		PageWrite(HTMLGenerateDiv("Trendy warning - advice may be dangerously out of style"));
@@ -689,7 +713,7 @@ string [string] generateAPIResponse()
     else if (true)
     {
         //Checking every item is slow. But certain items won't trigger a reload, but need to. So:
-        boolean [item] relevant_items = $items[photocopied monster,4-d camera,pagoda plans,Elf Farm Raffle ticket,skeleton key,heavy metal thunderrr guitarrr,heavy metal sonata,Hey Deze nuts,rave whistle,damp old boot,map to Professor Jacking's laboratory,world's most unappetizing beverage,squirmy violent party snack,White Citadel Satisfaction Satchel,rusty screwdriver,giant pinky ring,The Lost Pill Bottle,GameInformPowerDailyPro magazine,dungeoneering kit,Knob Goblin encryption key,dinghy plans,Sneaky Pete's key,Jarlsberg's key,Boris's key,fat loot token,bridge,chrome ore,asbestos ore,linoleum ore,csa fire-starting kit,tropical orchid,stick of dynamite,barbed-wire fence,psychoanalytic jar,digital key,Richard's star key,star hat,star crossbow,star staff,star sword,Wand of Nagamar,Azazel's tutu,Azazel's unicorn,Azazel's lollipop,smut orc keepsake box,blessed large box,massive sitar,hammer of smiting,chelonian morningstar,greek pasta of peril,17-alarm saucepan,shagadelic disco banjo,squeezebox of the ages,E.M.U. helmet,E.M.U. harness,E.M.U. joystick,E.M.U. rocket thrusters,E.M.U. unit,wriggling flytrap pellet,Mer-kin trailmap,Mer-kin stashbox,Makeshift yakuza mask,Novelty tattoo sleeves,strange goggles,zaibatsu level 2 card, zaibatsu level 3 card,flickering pixel,jar of oil,bowl of scorpions,molybdenum magnet,steel lasagna,steel margarita,steel-scented air freshener,Grandma's Map,mer-kin healscroll,scented massage oil,soggy used band-aid,extra-strength red potion,red pixel potion,red potion,filthy poultice,gauze garter,green pixel potion,cartoon heart,red plastic oyster egg,Manual of Dexterity,Manual of Labor,Manual of Transmission,wet stunt nut stew,bjorn's hammer,mace of the tortoise,pasta of peril,5-alarm saucepan,disco banjo,rock and roll legend];
+        boolean [item] relevant_items = $items[photocopied monster,4-d camera,pagoda plans,Elf Farm Raffle ticket,skeleton key,heavy metal thunderrr guitarrr,heavy metal sonata,Hey Deze nuts,rave whistle,damp old boot,map to Professor Jacking's laboratory,world's most unappetizing beverage,squirmy violent party snack,White Citadel Satisfaction Satchel,rusty screwdriver,giant pinky ring,The Lost Pill Bottle,GameInformPowerDailyPro magazine,dungeoneering kit,Knob Goblin encryption key,dinghy plans,Sneaky Pete's key,Jarlsberg's key,Boris's key,fat loot token,bridge,chrome ore,asbestos ore,linoleum ore,csa fire-starting kit,tropical orchid,stick of dynamite,barbed-wire fence,psychoanalytic jar,digital key,Richard's star key,star hat,star crossbow,star staff,star sword,Wand of Nagamar,Azazel's tutu,Azazel's unicorn,Azazel's lollipop,smut orc keepsake box,blessed large box,massive sitar,hammer of smiting,chelonian morningstar,greek pasta of peril,17-alarm saucepan,shagadelic disco banjo,squeezebox of the ages,E.M.U. helmet,E.M.U. harness,E.M.U. joystick,E.M.U. rocket thrusters,E.M.U. unit,wriggling flytrap pellet,Mer-kin trailmap,Mer-kin stashbox,Makeshift yakuza mask,Novelty tattoo sleeves,strange goggles,zaibatsu level 2 card,zaibatsu level 3 card,flickering pixel,jar of oil,bowl of scorpions,molybdenum magnet,steel lasagna,steel margarita,steel-scented air freshener,Grandma's Map,mer-kin healscroll,scented massage oil,soggy used band-aid,extra-strength red potion,red pixel potion,red potion,filthy poultice,gauze garter,green pixel potion,cartoon heart,red plastic oyster egg,Manual of Dexterity,Manual of Labor,Manual of Transmission,wet stunt nut stew,bjorn's hammer,mace of the tortoise,pasta of peril,5-alarm saucepan,disco banjo,rock and roll legend,lost key,resolution: be more adventurous,sugar sheet];
         //future: add snow boards
         
         

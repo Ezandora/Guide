@@ -63,12 +63,13 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             string url = "";
             string [int] methods;
             
-            if ($skill[disco nap].have_skill() && $skill[adventurer of leisure].have_skill())
+            /*if ($skill[disco nap].have_skill() && $skill[adventurer of leisure].have_skill())
             {
                 url = "skills.php";
                 methods.listAppend("Cast Disco Nap.");
             }
-            else
+            else*/
+            if (true)
             {
                 url = "galaktik.php";
                 methods.listAppend("Use Doc Galaktik's anti-anti-antidote.");
@@ -136,38 +137,76 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     
     if (__misc_state["need to level"])
     {
-        ChecklistEntry castle_stat_items;
-        castle_stat_items.image_lookup_name = "";
-        castle_stat_items.target_location = "inventory.php?which=3";
-        castle_stat_items.importance_level = -11;
+        ChecklistEntry stat_items;
+        stat_items.image_lookup_name = "";
+        stat_items.target_location = "inventory.php?which=3";
+        stat_items.importance_level = -11;
         
-        effect [item] castle_effects;
-        string [item] castle_descriptions;
+        effect [item] item_effects;
+        string [item] item_descriptions;
         if (my_primestat() == $stat[moxie] || (my_basestat($stat[moxie]) < 70 && !__quest_state["Level 12"].finished))
-            castle_descriptions[$item[Ye Olde Bawdy Limerick]] = "+2 moxie stats/fight (20 turns)";
+        {
+            item_descriptions[$item[Ye Olde Bawdy Limerick]] = "+2 moxie stats/fight (20 turns)";
+            item_effects[$item[Ye Olde Bawdy Limerick]] = $effect[From Nantucket];
+            
+            
+            item_descriptions[$item[resolution: be sexier]] = "+2 moxie stats/fight (20 turns)";
+            item_effects[$item[resolution: be sexier]] = $effect[Irresistible Resolve];
+        }
 
         if (my_primestat() == $stat[muscle])
-            castle_descriptions[$item[Squat-Thrust Magazine]] = "+3 muscle stats/fight (20 turns)";
-        if (my_primestat() == $stat[mysticality] || (my_basestat($stat[mysticality]) < 70 && !__quest_state["Level 12"].finished))
-            castle_descriptions[$item[O'RLY Manual]] = "+4 mysticality stats/fight (20 turns)";
+        {
+            item_descriptions[$item[Squat-Thrust Magazine]] = "+3 muscle stats/fight (20 turns)";
+            item_effects[$item[Squat-Thrust Magazine]] = $effect[Squatting and Thrusting];
             
-        castle_effects[$item[Ye Olde Bawdy Limerick]] = $effect[From Nantucket];
-        castle_effects[$item[Squat-Thrust Magazine]] = $effect[Squatting and Thrusting];
-        castle_effects[$item[O'RLY Manual]] = $effect[You Read The Manual];
+            
+            item_descriptions[$item[resolution: be stronger]] = "+2 muscle stats/fight (20 turns)";
+            item_effects[$item[resolution: be stronger]] = $effect[Strong Resolve];
+        }
+        if (my_primestat() == $stat[mysticality] || (my_basestat($stat[mysticality]) < 70 && !__quest_state["Level 12"].finished))
+        {
+            item_descriptions[$item[O'RLY Manual]] = "+4 mysticality stats/fight (20 turns)";
+            item_effects[$item[O'RLY Manual]] = $effect[You Read The Manual];
+            
+            
+            item_descriptions[$item[resolution: be smarter]] = "+2 mysticality stats/fight (20 turns)";
+            item_effects[$item[resolution: be smarter]] = $effect[Brilliant Resolve];
+        }
         
-        foreach it in castle_descriptions
+        if (my_level() >= 11)
+        {
+            item_descriptions[$item[BitterSweetTarts]] = "+5.5 " + my_primestat().to_lower_case() + " stats/fight (10 turns)";
+            item_effects[$item[BitterSweetTarts]] = $effect[Full of Wist];
+        }
+        
+        item [int] relevant_items;
+        string [int] relevant_descriptions;
+        foreach it in item_descriptions
         {
             if (it.available_amount() == 0)
                 continue;
-            if (castle_effects[it].have_effect() > 0)
+            if (item_effects[it].have_effect() > 0)
                 continue;
-            if (castle_stat_items.image_lookup_name.length() == 0)
-                castle_stat_items.image_lookup_name = "__item " + it;
-            castle_stat_items.subentries.listAppend(ChecklistSubentryMake("Use " + it, "", castle_descriptions[it]));
+            if (stat_items.image_lookup_name.length() == 0)
+                stat_items.image_lookup_name = "__item " + it;
+            //stat_items.subentries.listAppend(ChecklistSubentryMake("Use " + it, "", item_descriptions[it]));
+            relevant_items.listAppend(it);
+            relevant_descriptions.listAppend(item_descriptions[it]);
         }
-        if (castle_stat_items.subentries.count() > 0)
+        
+        ChecklistSubentry subentry;
+        if (relevant_items.count() > 0)
         {
-            task_entries.listAppend(castle_stat_items);
+            subentry.header = "Use " + relevant_items.listJoinComponents(", ", "and");
+            subentry.entries.listAppend(relevant_descriptions.listJoinComponents(", ", "and"));
+        }
+        
+        
+        if (subentry.header.length() > 0)
+            stat_items.subentries.listAppend(subentry);
+        if (stat_items.subentries.count() > 0)
+        {
+            task_entries.listAppend(stat_items);
         }
     }
     
@@ -179,5 +218,19 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     if ($familiars[mini-hipster, artistic goth kid] contains my_familiar() && __misc_state["need to level"] && __misc_state_int["hipster fights available"] > 0 && !__misc_state["single familiar run"])
     {
         task_entries.listAppend(ChecklistEntryMake("__familiar " + my_familiar(), "", ChecklistSubentryMake("Buff " + my_primestat(), "", "Extra stats from " + my_familiar() + " fights."), -11));
+    }
+    
+    if (__last_adventure_location == $location[the arid\, extra-dry desert] && !__quest_state["Level 11 Pyramid"].state_boolean["Desert Explored"] && __misc_state["In run"])
+    {
+        boolean have_uv_compass_equipped = __quest_state["Level 11 Pyramid"].state_boolean["Have UV-Compass eqipped"];
+        
+        if (!have_uv_compass_equipped)
+        {
+            item compass_item = $item[UV-resistant compass];
+            if (lookupItem("ornate dowsing rod").available_amount() > 0)
+                compass_item = lookupItem("ornate dowsing rod");
+            task_entries.listAppend(ChecklistEntryMake("__item " + compass_item, "", ChecklistSubentryMake("Equip " + compass_item, "", "Explore more efficiently."), -11));
+        }
+        
     }
 }

@@ -20,6 +20,14 @@ float clampNormalf(float v)
 	return clampf(v, 0.0, 1.0);
 }
 
+int clampi(int v, int min_value, int max_value)
+{
+	if (v > max_value)
+		return max_value;
+	if (v < min_value)
+		return min_value;
+	return v;
+}
 
 //random() will halt the script if range is <= 1, which can happen when picking a random object out of a variable-sized list.
 int random_safe(int range)
@@ -66,9 +74,19 @@ string roundForOutput(float v, int additional_fractional_digits)
 		return v.to_string();
 }
 
+float sqrt(float v, Error err)
+{
+    if (v < 0.0)
+    {
+        ErrorSet(err, "Cannot take square root of value " + v + " less than 0.0");
+        return -1.0; //mathematically incorrect, but prevents halting. should return NaN
+    }
+	return square_root(v);
+}
+
 float sqrt(float v)
 {
-	return square_root(v);
+    return sqrt(v, ErrorMake());
 }
 
 float fabs(float v)

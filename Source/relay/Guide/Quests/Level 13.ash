@@ -130,7 +130,7 @@ boolean generateTowerFamiliarWeightMethod(string [int] how, string [int] immedia
     if (get_property("sidequestArenaCompleted") == "hippy" && !get_property_boolean("concertVisited") || $effect[Optimist Primal].have_effect() > 0)
     {
         boolean have_effect = $effect[Optimist Primal].have_effect() > 0;
-        weight_modifiers.listAppend(TFWMInternalModifierMake("Optimist Primal (hippy concert)", have_effect, have_effect, true, 5.0));
+        weight_modifiers.listAppend(TFWMInternalModifierMake("Optimist Primal (hippy concert)", have_effect, have_effect || !get_property_boolean("concertVisited"), true, 5.0));
     }
     //irradiated pet snacks
     if ($item[irradiated pet snacks].available_amount() > 0 || $effect[healthy green glow].have_effect() > 0)
@@ -146,7 +146,7 @@ boolean generateTowerFamiliarWeightMethod(string [int] how, string [int] immedia
     if (__misc_state["VIP available"] && get_property_int("_poolGames") <3 || $effect[Billiards Belligerence].have_effect() > 0)
     {
         boolean have_effect = $effect[Billiards Belligerence].have_effect() > 0;
-        weight_modifiers.listAppend(TFWMInternalModifierMake("VIP Pool (play aggressively)", have_effect, have_effect, true, 5.0));
+        weight_modifiers.listAppend(TFWMInternalModifierMake("VIP Pool (play aggressively)", have_effect, have_effect || (get_property_int("_poolGames") <3), true, 5.0));
     }
     //tea party
     if (($item[&quot;DRINK ME&quot; potion].available_amount() > 0 || $effect[Down the Rabbit Hole].have_effect() > 0) && (!get_property_boolean("_madTeaParty") || $effect[You Can Really Taste the Dormouse].have_effect() > 0))
@@ -281,7 +281,7 @@ void QLevel13Init()
     
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL13Final");
-    if (my_path() == "Bugbear Invasion")
+    if (my_path_id() == PATH_BUGBEAR_INVASION)
         QuestStateParseMafiaQuestPropertyValue(state, "finished"); //never will start
 	//QuestStateParseMafiaQuestPropertyValue(state, "step10");
 	state.quest_name = "Naughty Sorceress Quest";

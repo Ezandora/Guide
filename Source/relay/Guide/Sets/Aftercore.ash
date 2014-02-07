@@ -48,6 +48,8 @@ void SAftercoreGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             }
             else
             {
+                if (url.length() == 0)
+                    url = "inventory.php?which=3";
                 if (in_bad_moon()) //Does bad moon aftercore require a clover?
                 {
                     details.listAppend("Use Elf Farm Raffle ticket.");
@@ -59,9 +61,17 @@ void SAftercoreGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             }
         }
         if ($item[ketchup hound].available_amount() == 0)
+        {
+            if (url.length() == 0)
+                url = "mall.php";
             details.listAppend("Buy a ketchup hound from the mall.");
+        }
         if ($item[ketchup hound].available_amount() > 0 && $item[hey deze nuts].available_amount() > 0 && $item[pagoda plans].available_amount() > 0)
+        {
+            if (url.length() == 0)
+                url = "inventory.php?which=3";
             details.listAppend("Use a ketchup hound to install pagoda.");
+        }
         optional_task_entries.listAppend(ChecklistEntryMake("__item pagoda plans", url, ChecklistSubentryMake("Install a pagoda", "", details)));
     }
     

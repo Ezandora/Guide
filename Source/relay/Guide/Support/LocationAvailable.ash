@@ -22,13 +22,13 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
 	
 	if (zone == "KOL High School")
 	{
-		if (my_path() == "KOLHS")
+		if (my_path_id() == PATH_KOLHS)
 			return true;
 		return false;
 	}
 	if (zone == "Mothership")
 	{
-		if (my_path() == "Bugbear Invasion")
+		if (my_path_id() == PATH_BUGBEAR_INVASION)
 			return true;
 		return false;
 	}

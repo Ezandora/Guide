@@ -2,13 +2,13 @@
 
 void SWOTSFGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (my_path() != "Way of the Surprising Fist")
+	if (my_path_id() != PATH_WAY_OF_THE_SURPRISING_FIST)
 		return;
 }
 
 void SWOTSFGenerateResource(ChecklistEntry [int] available_resources_entries)
 {
-	if (my_path() != "Way of the Surprising Fist")
+	if (my_path_id() != PATH_WAY_OF_THE_SURPRISING_FIST)
 		return;
 	//Meat:
 	if (have_outfit_components("Knob Goblin Harem Girl Disguise") && !get_property_boolean("_treasuryHaremMeatCollected") && locationAvailable($location[Cobb's Knob Barracks]))

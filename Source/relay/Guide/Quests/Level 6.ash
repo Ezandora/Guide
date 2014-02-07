@@ -49,9 +49,6 @@ void QLevel6GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	QuestState base_quest_state = __quest_state["Level 6"];
 	ChecklistSubentry subentry;
 	subentry.header = base_quest_state.quest_name;
-	subentry.modifiers.listAppend("-combat");
-	if (want_hell_ramen || need_more_hot_wings)
-		subentry.modifiers.listAppend("+234% item");
 	if (want_hell_ramen && __misc_state["have olfaction equivalent"])
 		subentry.modifiers.listAppend("olfact hellions");
 	
@@ -60,25 +57,38 @@ void QLevel6GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		sources_need_234.listAppend("hell ramen");
 	if (need_more_hot_wings)
 		sources_need_234.listAppend("hot wings");
-	string line = "Run -combat";
 	if (sources_need_234.count() > 0)
-		line += ", +234% item for " + listJoinComponents(sources_need_234, "/") + ".";
-	subentry.entries.listAppend(line);
+		subentry.modifiers.listAppend("+234% item");
+    
+    boolean need_minus_combat = false;
 	if ($item[dodecagram].available_amount() == 0)
     {
 		subentry.entries.listAppend("Adventure in " + HTMLGenerateSpanOfClass("Dark Neck of the Woods", "r_bold") + ", acquire dodecagram.|~" + roundForOutput(QLevel6TurnsToCompleteArea($location[the dark neck of the woods]), 1) + " average turns remain at " + combat_rate_modifier().floor() + "% combat.");
-        
+        need_minus_combat = true;
     }
 	if ($item[box of birthday candles].available_amount() == 0)
     {
 		subentry.entries.listAppend("Adventure in " + HTMLGenerateSpanOfClass("Dark Heart of the Woods", "r_bold") + ", acquire box of birthday candles.|~" + roundForOutput(QLevel6TurnsToCompleteArea($location[the Dark Heart of the Woods]), 1) + " turns remain at " + combat_rate_modifier().floor() + "% combat.");
+        need_minus_combat = true;
     }
 	if ($item[Eldritch butterknife].available_amount() == 0)
     {
 		subentry.entries.listAppend("Adventure in " + HTMLGenerateSpanOfClass("Dark Elbow of the Woods", "r_bold") + ", acquire Eldritch butterknife.|~" + roundForOutput(QLevel6TurnsToCompleteArea($location[the Dark Elbow of the Woods]), 1) + " turns remain at " + combat_rate_modifier().floor() + "% combat.");
+        need_minus_combat = true;
     }
 	
-	if ($item[dodecagram].available_amount() + $item[box of birthday candles].available_amount() + $item[Eldritch butterknife].available_amount() == 3)
+    string [int] needed_modifiers;
+    if (need_minus_combat)
+    {
+        subentry.modifiers.listAppend("-combat");
+        needed_modifiers.listAppend("-combat");
+    }
+	if (sources_need_234.count() > 0)
+        needed_modifiers.listAppend("+234% item for " + listJoinComponents(sources_need_234, "/"));
+    if (needed_modifiers.count() > 0)
+        subentry.entries.listAppend("Run " + needed_modifiers.listJoinComponents(", ", "and") + ".");
+    
+	if ($item[dodecagram].available_amount() + $item[box of birthday candles].available_amount() + $item[Eldritch butterknife].available_amount() == 3 && !(hot_wings_relevant && $item[hot wing].available_amount() <3))
 		subentry.entries.listAppend("Go to the cairn stones!"); //FIXME suggest this only if we've gotten everything else?
 	
 	if (__misc_state_int["ruby w needed"] > 0)

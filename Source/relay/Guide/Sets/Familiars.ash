@@ -144,6 +144,49 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] available_resources_entries
         available_resources_entries.listAppend(ChecklistEntryMake(__misc_state_string["yellow ray image name"], "", ChecklistSubentryMake("Yellow ray available", "", "From " + __misc_state_string["yellow ray source"] + "."), 6));
     }
     
+    if (my_familiar() == $familiar[happy medium] || $familiar[happy medium].charges > 0 && $familiar[happy medium].familiar_is_usable()) //|| stuff
+    {
+        //FIXME request support for tracking medium combats.
+        string title;
+        string [int] description;
+        
+        int charges = $familiar[happy medium].charges;
+        int siphons = get_property_int("_mediumSiphons");
+        
+        int adventures_to_next_at_most = 3 + siphons;
+        
+        if (charges == 3)
+        {
+            title = "Red medium";
+            description.listAppend("4.25 turns/drunkenness.");
+        }
+        else if (charges == 2)
+        {
+            title = "Orange medium";
+            description.listAppend("3.25 turns/drunkenness.");
+            description.listAppend(pluralizeWordy(adventures_to_next_at_most, "turn", "turns").capitalizeFirstLetter() + " (at most) to red.");
+        }
+        else if (charges == 1)
+        {
+            title = "Blue medium";
+            description.listAppend("2.25 turns/drunkenness.");
+            description.listAppend(pluralizeWordy(adventures_to_next_at_most, "turn", "turns").capitalizeFirstLetter() + " (at most) to orange.");
+        }
+        else
+        {
+            title = "Uncharged medium";
+            description.listAppend(pluralizeWordy(adventures_to_next_at_most, "turn", "turns").capitalizeFirstLetter() + " (at most) to blue. ");
+        }
+        string url;
+        if (my_familiar() != $familiar[happy medium])
+            url = "familiar.php";
+        
+        int importance = 6;
+        if (my_familiar() == $familiar[happy medium] || charges > 0)
+            importance = 0;
+        available_resources_entries.listAppend(ChecklistEntryMake("__familiar happy medium", url, ChecklistSubentryMake(title, "", description), importance));
+    }
+    
     //FIXME small medium, organ grinder, charged boots
 	SFamiliarsGenerateEntry(available_resources_entries, available_resources_entries, false);
 }

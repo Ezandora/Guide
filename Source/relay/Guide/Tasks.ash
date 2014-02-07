@@ -126,7 +126,7 @@ void generateTasks(Checklist [int] checklists)
 	
 	
 	
-	if (my_path() == "Bugbear Invasion")
+	if (my_path_id() == PATH_BUGBEAR_INVASION)
 	{
 		
 		task_entries.listAppend(ChecklistEntryMake("bugbear", "", ChecklistSubentryMake("Bugbears!", "", "I have no idea")));

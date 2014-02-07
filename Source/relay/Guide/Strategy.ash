@@ -6,7 +6,7 @@ void generateStrategy(Checklist [int] checklists)
         return;
     
     
-    //What familiar to run.
+    //What familiar to run. spleen items
     //Turn generation.
     //How to handle combat.
     //How to restore HP.

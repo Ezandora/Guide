@@ -47,7 +47,7 @@ void setUpState()
 		__misc_state["fax accessible"] = true;
 	}
 	
-	if (my_path() == "Avatar of Boris" || my_path() == "Trendy")
+	if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_TRENDY)
 	{
 		__misc_state["fax accessible"] = false;
 	}
@@ -57,20 +57,20 @@ void setUpState()
 	
 	
 	__misc_state["can eat just about anything"] = true;
-	if (my_path() == "Avatar of Jarlsberg" || my_path() == "Zombie Slayer" || fullness_limit() == 0)
+	if (my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_ZOMBIE_SLAYER || fullness_limit() == 0)
 	{
 		__misc_state["can eat just about anything"] = false;
 	}
 	
 	__misc_state["can drink just about anything"] = true;
-	if (my_path() == "Avatar of Jarlsberg" || my_path() == "KOLHS" || inebriety_limit() == 0)
+	if (my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_KOLHS || inebriety_limit() == 0)
 	{
 		__misc_state["can eat just about anything"] = false;
 	}
 	
 	
 	__misc_state["can equip just about any weapon"] = true;
-	if (my_path() == "Avatar of Boris" || my_path() == "Way of the Surprising Fist")
+	if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_WAY_OF_THE_SURPRISING_FIST)
 	{
 		__misc_state["can equip just about any weapon"] = false;
 	}
@@ -135,7 +135,7 @@ void setUpState()
 	if (yellow_ray_available)
 		yellow_ray_potentially_available = true;
 	
-	if (my_path() == "KOLHS")
+	if (my_path_id() == PATH_KOLHS)
 		yellow_ray_potentially_available = true;
 		
 	
@@ -149,12 +149,12 @@ void setUpState()
 	__misc_state["yellow ray potentially available"] = yellow_ray_potentially_available;
 	
 	boolean free_runs_usable = true;
-	if (my_path() == "BIG!")
+	if (my_path_id() == PATH_BIG)
 		free_runs_usable = false;
 	__misc_state["free runs usable"] = free_runs_usable;
 	
 	boolean blank_outs_usable = true;
-	if (my_path() == "Avatar of Jarlsberg")
+	if (my_path_id() == PATH_AVATAR_OF_JARLSBERG)
 		blank_outs_usable = false;
 	if (!free_runs_usable)
 		blank_outs_usable = false;
@@ -190,7 +190,7 @@ void setUpState()
         some_olfact_available = true;
     if ($familiar[nosy nose].familiar_is_usable()) //weakened, but still relevantw
         some_olfact_available = true;
-    if (my_path() == "Avatar of Boris" || my_path() == "Avatar of Jarlsberg" || my_path() == "Avatar of Sneaky Pete")
+    if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE)
         some_olfact_available = true;
 		
 	__misc_state["have olfaction equivalent"] = some_olfact_available;
@@ -204,22 +204,22 @@ void setUpState()
 		skills_temporarily_missing = true;
 		familiars_temporarily_missing = true;
 	}
-	if (my_path() == "Avatar of Jarlsberg" || my_path() == "Avatar of Boris")
+	if (my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_BORIS)
 	{
 		skills_temporarily_missing = true;
 		familiars_temporarily_missing = true;
 		familiars_temporarily_blocked = true;
 	}
-	if (my_path() == "Zombie Slayer")
+	if (my_path_id() == PATH_ZOMBIE_SLAYER)
 	{
 		skills_temporarily_missing = true;
 	}
-	if (my_path() == "Class Act" || my_path() == "Class Act II: A Class For Pigs")
+	if (my_path_id() == PATH_CLASS_ACT || my_path_id() == PATH_CLASS_ACT_2)
 	{
 		//not sure how mafia interprets "have_skill" under class act
 		skills_temporarily_missing = true;
 	}
-	if (my_path() == "Trendy")
+	if (my_path_id() == PATH_TRENDY)
 	{
 		//not sure if this is correct
 		//skills_temporarily_missing = true;
@@ -231,13 +231,13 @@ void setUpState()
 	
 	
 	__misc_state["AT skills available"] = true;
-	if (my_path() == "Avatar of Jarlsberg" || my_path() == "Avatar of Boris" || my_path() == "Avatar of Sneaky Pete" || my_path() == "Zombie Slayer" || (my_path() == "Class Act" && my_class() != $class[accordion thief]))
+	if (my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_ZOMBIE_SLAYER || ((my_path_id() == PATH_CLASS_ACT || my_path_id() == PATH_CLASS_ACT_2) && my_class() != $class[accordion thief]))
 		__misc_state["AT skills available"] = false;
 	
 	
     __misc_state_float["Non-combat statgain multiplier"] = 1.0;
 	__misc_state_float["ML to mainstat multiplier"] = 1.0 / (2.0  * 4.0);
-	if (my_path() == "Class Act II: A Class For Pigs")
+	if (my_path_id() == PATH_CLASS_ACT_2)
 	{
 		__misc_state_float["ML to mainstat multiplier"] = 1.0 / (2.0 * 2.0);
         __misc_state_float["Non-combat statgain multiplier"] = 0.5;
@@ -332,7 +332,7 @@ void setUpState()
 	__misc_state_string["Tower monster item 5"] = telescope_to_item_map[get_property("telescope6")];
 	__misc_state_string["Tower monster item 6"] = telescope_to_item_map[get_property("telescope7")];
 	
-	if (my_path() == "Bees Hate You")
+	if (my_path_id() == PATH_BEES_HATE_YOU)
 	{
 		__misc_state_string["Tower monster item 1"] = "tropical orchid";
 		__misc_state_string["Tower monster item 2"] = "tropical orchid";
@@ -361,7 +361,7 @@ void setUpState()
 	//wand
 	
 	boolean wand_of_nagamar_needed = true;
-	if (my_path() == "Avatar of Boris" || my_path() == "Avatar of Jarlsberg" || my_path() == "Bugbear Invasion" || my_path() == "Zombie Slayer" || my_path() == "KOLHS")
+	if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_BUGBEAR_INVASION || my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_KOLHS)
 		wand_of_nagamar_needed = false;
 		
 	int ruby_w_needed = 1;
@@ -501,7 +501,7 @@ void setUpState()
 		
 		
 	__misc_state["bookshelf accessible"] = true;
-	if (my_path() == "Zombie Slayer" || my_path() == "Avatar of Boris")
+	if (my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_AVATAR_OF_BORIS)
 		__misc_state["bookshelf accessible"] = false;
 }
 

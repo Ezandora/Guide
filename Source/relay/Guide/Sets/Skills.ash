@@ -34,7 +34,7 @@ void SSkillsGenerateResource(ChecklistEntry [int] available_resources_entries)
 	property_summons_to_skills["_lunchBreak"] = listMake($skill[lunch break]);
     
 	//Jarlsberg:
-	if (my_path() == "Avatar of Jarlsberg")
+	if (my_path_id() == PATH_AVATAR_OF_JARLSBERG)
 	{
 		property_summons_to_skills["_jarlsCreamSummoned"] = listMake($skill[Conjure Cream]);
 		property_summons_to_skills["_jarlsEggsSummoned"] = listMake($skill[Conjure Eggs]);
@@ -45,7 +45,7 @@ void SSkillsGenerateResource(ChecklistEntry [int] available_resources_entries)
 		property_summons_to_skills["_jarlsMeatSummoned"] = listMake($skill[Conjure Meat Product]);
 		property_summons_to_skills["_jarlsFruitSummoned"] = listMake($skill[Conjure Fruit]);
 	}
-	if (my_path() == "Avatar of Boris")
+	if (my_path_id() == PATH_AVATAR_OF_BORIS)
 	{
 		property_summons_to_skills["_demandSandwich"] = listMake($skill[Demand Sandwich]);
 		property_summon_limits["_demandSandwich"] = 3;

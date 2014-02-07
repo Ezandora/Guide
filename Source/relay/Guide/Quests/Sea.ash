@@ -214,6 +214,16 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
         description.listAppend("Use Mafia's \"dad\" GCLI command to see which element to use which round.");
         if (my_mp() < 1200)
             description.listAppend("Will need 1200MP, or less if using shrap/volcanometeor showeruption.");
+            
+        string [int] modifiers_needed_150;
+        foreach s in $stats[]
+        {
+            if (s.my_basestat() < 150)
+                modifiers_needed_150.listAppend((150 - s.my_basestat()) + " more " + s.to_lower_case());
+        }
+        
+        if (modifiers_needed_150.count() > 0)
+            description.listAppend("Need " + modifiers_needed_150.listJoinComponents(", ", "and") + " to wear Clothing of Loathing.");
         
         if (description.count() > 0)
             subentry.entries.listAppend("Dad sea monkee path" + HTMLGenerateIndentedText(description.listJoinComponents("<hr>")));

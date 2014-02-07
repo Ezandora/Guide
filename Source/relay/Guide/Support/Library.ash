@@ -36,6 +36,67 @@ buffer to_buffer(string str)
 	return result;
 }
 
+
+int PATH_UNKNOWN = -1;
+int PATH_NONE = 0;
+int PATH_TEETOTALER = 1;
+int PATH_BOOZETAFARIAN = 2;
+int PATH_OXYGENARIAN = 3;
+
+int PATH_BEES_HATE_YOU = 9;
+int PATH_WAY_OF_THE_SURPRISING_FIST = 10;
+int PATH_TRENDY = 11;
+int PATH_AVATAR_OF_BORIS = 12;
+int PATH_BUGBEAR_INVASION = 13;
+int PATH_ZOMBIE_SLAYER = 14;
+int PATH_CLASS_ACT = 15;
+int PATH_AVATAR_OF_JARLSBERG = 16;
+int PATH_BIG = 17;
+int PATH_KOLHS = 18;
+int PATH_CLASS_ACT_2 = 19;
+int PATH_AVATAR_OF_SNEAKY_PETE = 20;
+
+int my_path_id()
+{
+    string path_name = my_path();
+    
+    if (path_name == "" || path_name == "None")
+        return PATH_NONE;
+    if (path_name == "Teetotaler")
+        return PATH_TEETOTALER;
+    if (path_name == "Boozetafarian")
+        return PATH_BOOZETAFARIAN;
+    if (path_name == "Oxygenarian")
+        return PATH_OXYGENARIAN;
+    if (path_name == "Bees Hate You")
+        return PATH_BEES_HATE_YOU;
+    if (path_name == "Way of the Surprising Fist")
+        return PATH_WAY_OF_THE_SURPRISING_FIST;
+    if (path_name == "Trendy")
+        return PATH_TRENDY;
+    if (path_name == "Avatar of Boris")
+        return PATH_AVATAR_OF_BORIS;
+    if (path_name == "Bugbear Invasion")
+        return PATH_BUGBEAR_INVASION;
+    if (path_name == "Zombie Slayer")
+        return PATH_ZOMBIE_SLAYER;
+    if (path_name == "Class Act")
+        return PATH_CLASS_ACT;
+    if (path_name == "Avatar of Jarlsberg")
+        return PATH_AVATAR_OF_JARLSBERG;
+    if (path_name == "BIG!")
+        return PATH_BIG;
+    if (path_name == "KOLHS")
+        return PATH_KOLHS;
+    if (path_name == "Class Act II: A Class For Pigs")
+        return PATH_CLASS_ACT_2;
+    if (path_name == "Avatar of Sneaky Pete")
+        return PATH_AVATAR_OF_SNEAKY_PETE;
+    
+    return PATH_UNKNOWN;
+}
+
+
 //Similar to have_familiar, except it also checks trendy (not sure if have_familiar supports trendy) and 100% familiar runs
 boolean familiar_is_usable(familiar f)
 {
@@ -46,12 +107,12 @@ boolean familiar_is_usable(familiar f)
 			return true;
 		return false;
 	}
-	if (my_path() == "Trendy")
+	if (my_path_id() == PATH_TRENDY)
 	{
 		if (!is_trendy(f))
 			return false;
 	}
-	else if (my_path() == "Bees Hate You")
+	else if (my_path_id() == PATH_BEES_HATE_YOU)
 	{
 		if (f.to_string().contains_text("b") || f.to_string().contains_text("B")) //bzzzz!
 			return false; //so not green

@@ -27,7 +27,7 @@ void SJarlsbergGenerateStaff(ChecklistEntry entry, item staff, string property_n
 
 void SJarlsbergGenerateResource(ChecklistEntry [int] available_resources_entries)
 {
-	if (my_path() != "Avatar of Jarlsberg")
+	if (my_path_id() != PATH_AVATAR_OF_JARLSBERG)
 		return;
     
 	ChecklistEntry entry;

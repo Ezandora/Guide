@@ -584,7 +584,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
         available_resources_entries.listAppend(ChecklistEntryMake("__item " + $item[rusty hedge trimmers], "inventory.php?which=3", ChecklistSubentryMake(pluralize($item[rusty hedge trimmers]), "", line), importance_level_unimportant_item));
     }
     
-    if (in_run && my_path() != "Way of the Surprising Fist")
+    if (in_run && my_path_id() != PATH_WAY_OF_THE_SURPRISING_FIST)
     {
         string image_name = "";
         string [int] autosell_list;
@@ -608,19 +608,22 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
                 image_name = "__item " + it;
         }
         
+        string url = "";
         string [int] description;
         if (autosell_list.count() > 0)
         {
+            url = "sellstuff_ugly.php";
             description.listAppend("Autosell " + autosell_list.listJoinComponents(", ", "and") + ".");
         }
         if (open_list.count() > 0)
         {
+            url = "inventory.php?which=3";
             description.listAppend("Open " + open_list.listJoinComponents(", ", "and") + ".");
         }
         
         if (description.count() > 0)
         {
-            available_resources_entries.listAppend(ChecklistEntryMake(image_name, "inventory.php?which=3", ChecklistSubentryMake("Meat", "", description), importance_level_unimportant_item));
+            available_resources_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake("Meat", "", description), importance_level_unimportant_item));
         }
     }
     //Penultimate Fantasy chest?

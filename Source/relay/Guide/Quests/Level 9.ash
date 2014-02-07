@@ -41,7 +41,7 @@ void QLevel9Init()
 	
 	state.state_boolean["can complete twin peaks quest quickly"] = true;
 	
-	if (my_path() == "Bees Hate You")
+	if (my_path_id() == PATH_BEES_HATE_YOU)
 		state.state_boolean["can complete twin peaks quest quickly"] = false;
 	
 	state.state_float["oil peak pressure"] = get_property_float("oilPeakProgress");
@@ -85,11 +85,26 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
 	{
 		string [int] details;
 		string [int] modifiers;
+        int clues_needed = ceil(MIN(base_quest_state.state_int["a-boo peak hauntedness"], 90).to_float() / 30.0);
+        
+        if (true)
+        {
+            int clues_remaining = MAX(0, clues_needed - $item[a-boo clue].available_amount());
+            string [int] tasks;
+            if (base_quest_state.state_int["a-boo peak hauntedness"] > 90)
+                tasks.listAppend("get down to 90% hauntedness");
+            if (clues_remaining > 0)
+                tasks.listAppend("collect " + clues_remaining.int_to_wordy() + " a-boo clues");
+            tasks.listAppend("use/survive each clue to finish quest");
+            details.listAppend(tasks.listJoinComponents(", ", "then").capitalizeFirstLetter() + ".");
+        }
+        
 		modifiers.listAppend("+567% item");
-		details.listAppend(base_quest_state.state_int["a-boo peak hauntedness"] + "% hauntedness");
+		details.listAppend(base_quest_state.state_int["a-boo peak hauntedness"] + "% hauntedness (may be off by 2%, sorry)");
 		details.listAppend(pluralize($item[a-boo clue]));
         
-        int clues_needed = ceil(MIN(base_quest_state.state_int["a-boo peak hauntedness"], 90).to_float() / 30.0);
+        
+        
         
 		if (base_quest_state.state_int["a-boo peak hauntedness"] <= 90 && __misc_state["can use clovers"] && $item[a-boo clue].available_amount() < clues_needed)
         {
@@ -142,7 +157,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
         
 		details.listAppend("Need " + hp_string + " (" + HTMLGenerateSpanOfClass(spooky_damage_taken + " spooky", "r_element_spooky") + ", " + HTMLGenerateSpanOfClass(cold_damage_taken + " cold", "r_element_cold") + ") to survive 30% effective A-Boo clues.");
         
-        if (!black_market_available() && my_path() != "Way of the Surprising Fist")
+        if (!black_market_available() && my_path_id() != PATH_WAY_OF_THE_SURPRISING_FIST)
         {
             details.listAppend("Possibly unlock the black market first, for cans of black paint. (+2 " + HTMLGenerateSpanOfClass("spooky", "r_element_spooky") + "/" + HTMLGenerateSpanOfClass("cold", "r_element_cold") + " res buff, 1k meat)");
         }

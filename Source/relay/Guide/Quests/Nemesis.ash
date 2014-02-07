@@ -572,7 +572,10 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             url = "place.php?whichplace=cove";
             subentry.entries.listAppend("Ask the pirates how to find the island.");
             if ($item[pirate fledges].equipped_amount() == 0 && !is_wearing_outfit("Swashbuckling Getup"))
+            {
+                url = "inventory.php?which=2";
                 subentry.entries.listAppend("Wear pirate fledges.");
+            }
             subentry.modifiers.listAppend("-combat");
         }
     }
@@ -582,9 +585,9 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         if ($location[The Nemesis' Lair].turnsAttemptedInLocation() > 0)
         {
             if (my_class() == $class[disco bandit])
-                subentry.entries.listAppend("Fight daft punk, then your nemesis face to face.|Then solve volcano maze.");
+                subentry.entries.listAppend("Fight daft punk, then your nemesis face to face.|Then solve the volcano maze.");
             else
-                subentry.entries.listAppend("Fight goons, then your nemesis.");
+                subentry.entries.listAppend("Fight goons, then your nemesis.|Then solve the volcano maze.");
         }
         else
             QNemesisGenerateIslandTasks(subentry);

@@ -98,4 +98,5 @@ void SOlfactionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         
         break;
     }
+    
 }

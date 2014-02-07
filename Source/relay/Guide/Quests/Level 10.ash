@@ -41,7 +41,10 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 	if ($item[s.o.c.k.].available_amount() == 0)
 	{
         if (!base_quest_state.state_boolean["Beanstalk grown"])
+        {
             subentry.entries.listAppend("Grow the beanstalk.");
+            url = "place.php?whichplace=plains";
+        }
 		//FIXME check if enchanted bean used
 		subentry.modifiers.listAppend("-combat");
 		if (__misc_state["free runs available"])

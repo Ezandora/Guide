@@ -73,6 +73,18 @@ void QLevel11Init()
             state.state_int["Desert Exploration"] = 100;
             state.state_boolean["Desert Explored"] = true;
         }
+        
+        
+        boolean have_uv_compass_equipped = false;
+        
+        if (!__misc_state["can equip just about any weapon"])
+            have_uv_compass_equipped = true;
+        if ($item[UV-resistant compass].equipped_amount() > 0)
+            have_uv_compass_equipped = true;
+        if (lookupItem("ornate dowsing rod").equipped_amount() > 0)
+            have_uv_compass_equipped = true;
+        
+        state.state_boolean["Have UV-Compass eqipped"] = have_uv_compass_equipped;
 	
 		if (my_level() >= 11)
 			state.startable = true;
@@ -154,7 +166,7 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         
         familiar bird_needed_familiar;
         item bird_needed;
-        if (my_path() == "Bees Hate You")
+        if (my_path_id() == PATH_BEES_HATE_YOU)
         {
             bird_needed_familiar = $familiar[reconstituted crow];
             bird_needed = $item[reconstituted crow];
@@ -547,35 +559,33 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
                 subentry.entries.listAppend("Use your desert sightseeing pamphlets. (+15% exploration)");
         }
         
-        if (__misc_state["can equip just about any weapon"])
+        if (!base_quest_state.state_boolean["Have UV-Compass eqipped"])
         {
+            string line = "";
             if (lookupItem("ornate dowsing rod").available_amount() > 0)
             {
-                if (lookupItem("ornate dowsing rod").equipped_amount() == 0)
-                {
-                    subentry.entries.listAppend("Equip the ornate dowsing rod.");
-                }
+                line = "Equip the ornate dowsing rod.";
             }
             else
             {
                 if ($item[uv-resistant compass].available_amount() == 0)
                 {
-                    string line = "Acquire UV-resistant compass, equip for faster desert exploration. (shore vacation)";
+                    line = "Acquire UV-resistant compass, equip for faster desert exploration. (shore vacation)";
                   
                     if (lookupItem("odd silver coin").available_amount() > 0)
                     {
                         line += "|Or acquire ornate dowsing rod from Paul's Boutique? (5 odd silver coins)";
                     }
-                    subentry.entries.listAppend(line);
                   
                 }
-                else if ($item[uv-resistant compass].available_amount() > 0 && $item[uv-resistant compass].equipped_amount() == 0)
+                else if ($item[uv-resistant compass].available_amount() > 0)
                 {
-                    subentry.entries.listAppend("Equip the UV-resistant compass.");
+                    line = "Equip the UV-resistant compass.";
                 }
             }
+            if (line.length() == 0)
+                subentry.entries.listAppend(HTMLGenerateSpanFont(line, "red", ""));
         }
-        
     }
     else
     {
