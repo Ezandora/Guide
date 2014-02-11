@@ -1,6 +1,8 @@
 float calculateCurrentNinjaAssassinMaxDamage()
 {
-	float assassin_ml = 155.0 + monster_level_adjustment();
+    
+	//float assassin_ml = 155.0 + monster_level_adjustment();
+    float assassin_ml = $monster[ninja snowman assassin].base_attack + 5.0;
 	float damage_absorption = raw_damage_absorption();
 	float damage_reduction = damage_reduction();
 	float moxie = my_buffedstat($stat[moxie]);

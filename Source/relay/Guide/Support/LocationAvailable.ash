@@ -93,7 +93,14 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
 			return (locationQuestPropertyPastInternalStepNumber("questL11MacGuffin", 3) || $item[your father's MacGuffin diary].available_amount() > 0);
         case $location[the oasis]:
 			return (get_property_int("desertExploration") > 0) && (locationQuestPropertyPastInternalStepNumber("questL11MacGuffin", 3) || $item[your father's MacGuffin diary].available_amount() > 0);
-            
+        case $location[the defiled alcove]:
+			return locationQuestPropertyPastInternalStepNumber("questL07Cyrptic", 1) && get_property_int("cyrptAlcoveEvilness") > 0;
+        case $location[the defiled cranny]:
+			return locationQuestPropertyPastInternalStepNumber("questL07Cyrptic", 1) && get_property_int("cyrptCrannyEvilness") > 0;
+        case $location[the defiled niche]:
+			return locationQuestPropertyPastInternalStepNumber("questL07Cyrptic", 1) && get_property_int("cyrptNicheEvilness") > 0;
+        case $location[the defiled nook]:
+			return locationQuestPropertyPastInternalStepNumber("questL07Cyrptic", 1) && get_property_int("cyrptNookEvilness") > 0;
             
 		case $location[south of the border]:
 			return $items[pumpkin carriage,desert bus pass, bitchin' meatcar, tin lizzie].available_amount() > 0;
@@ -336,6 +343,8 @@ string getClickableURLForLocation(location l)
             
         foreach l in $locations[the poop deck, Barrrney's Barrr, the f'c'le, belowdecks]
             __urls_for_locations[l] = "place.php?whichplace=cove";
+        foreach l in $locations[the penultimate fantasy airship,the hole in the sky]
+            __urls_for_locations[l] = "place.php?whichplace=beanstalk";
             
         foreach l in $locations[the haiku dungeon, the limerick dungeon, the dungeons of doom, the enormous greater-than sign, the daily dungeon]
             __urls_for_locations[l] = "da.php";

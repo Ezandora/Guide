@@ -129,13 +129,13 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] available_resources_entries
         if (get_property("_nanorhinoBanishedMonster") != "")
             description_banish.listAppend(get_property("_nanorhinoBanishedMonster").HTMLEscapeString().capitalizeFirstLetter() + " currently banished.");
         else
-            description_banish.listAppend("All day.");
+            description_banish.listAppend("All day. Cast muscle combat skill.");
 		if (__misc_state["have muscle class combat skill"])
 			subentries.listAppend(ChecklistSubentryMake("Nanorhino Banish", "", description_banish));
 		if (__misc_state["need to level"] && __misc_state["have mysticality class combat skill"])
-			subentries.listAppend(ChecklistSubentryMake("Nanorhino Gray Goo", "", "130? mainstat, fire against non-item monster with >90 attack"));
+			subentries.listAppend(ChecklistSubentryMake("Nanorhino Gray Goo", "", "130? mainstat, fire against non-item monster with >90 attack. Cast mysticality combat skill."));
 		if (!$familiar[he-boulder].familiar_is_usable() && __misc_state["have moxie class combat skill"] && __misc_state["In run"])
-			subentries.listAppend(ChecklistSubentryMake("Nanorhino Yellow Ray", "", ""));
+			subentries.listAppend(ChecklistSubentryMake("Nanorhino Yellow Ray", "", "Cast moxie combat skill."));
 		if (subentries.count() > 0)
 			available_resources_entries.listAppend(ChecklistEntryMake("__familiar nanorhino", url, subentries, 5));
 	}

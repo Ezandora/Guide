@@ -45,9 +45,12 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
     
     boolean [location] skippable_ncs_locations = $locations[the stately pleasure dome, the poop deck, the spooky forest,The Haunted Gallery,tower ruins,the castle in the clouds in the sky (top floor), the castle in the clouds in the sky (ground floor), the castle in the clouds in the sky (basement), mt. molehill];
     
+    boolean [location] want_nc_locations = $locations[the penultimate fantasy airship];
+    
     string turns_remaining_string = "";
     
     boolean need_plus_combat = false;
+    boolean need_minus_combat = false;
     
     location [int] target_locations;
     if (amount_needed != -1 && target_monster != $monster[none] && monster_locations.count() > 0)
@@ -57,12 +60,14 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
         {
             location l = monster_locations[key];
             boolean noncombats_skippable = (skippable_ncs_locations contains l);
+            boolean noncombats_wanted = (want_nc_locations contains l);
             float [monster] appearance_rates = l.appearance_rates_adjusted();
             int number_remaining = amount_needed - amount_found;
             
-            if (number_remaining == 0 && url.s.length() == 0)
+            if (number_remaining == 0)
             {
-                url.s = "place.php?whichplace=forestvillage";
+                if (url.s.length() == 0)
+                    url.s = "place.php?whichplace=forestvillage";
                 subentry.header = "Return to the bounty hunter hunter";
                 return subentry;
             }
@@ -78,6 +83,13 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
                 if (nc_rate != 1.0)
                     bounty_appearance_rate /= (1.0 - nc_rate);
             }
+            else if (noncombats_wanted)
+            {
+                //Recorrect for NC:
+                float nc_rate = appearance_rates[$monster[none]] / 100.0;
+                bounty_appearance_rate += nc_rate;
+            }
+            
             
             if (bounty_appearance_rate != 0.0)
             {
@@ -92,7 +104,9 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
                     turns_remaining_string = " ~" + pluralize(round(turns_remaining), "turn remains", "turns remain") + ".";
                 }
             }
-            if (!noncombats_skippable && appearance_rates[$monster[none]] != 0.0)
+            if (noncombats_wanted && appearance_rates[$monster[none]] != 0.0)
+                need_minus_combat = true;
+            else if (!noncombats_skippable && appearance_rates[$monster[none]] != 0.0)
                 need_plus_combat = true;
         }
     }
@@ -100,6 +114,8 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
     
     if (need_plus_combat)
         subentry.modifiers.listAppend("+combat");
+    if (need_minus_combat)
+        subentry.modifiers.listAppend("-combat");
     
     if (target_monster != $monster[none])
     {
@@ -141,6 +157,15 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
     {
         url.s = "place.php?whichplace=forestvillage";
         subentry.entries.listAppend("You probably can't do this bounty as knoll, sorry.");
+    }
+    
+    if (bounty_item_name == "greasy string")
+        subentry.entries.listAppend("Run away from non-salaminders to complete this bounty in a day.");
+    
+    if (bounty_item_name == "burned-out arcanodiode")
+    {
+        if (monster_level_adjustment() < 20)
+            subentry.entries.listAppend(HTMLGenerateSpanFont("Run +20 ML to find more MechaMechs.", "red", ""));
     }
     
     return subentry;

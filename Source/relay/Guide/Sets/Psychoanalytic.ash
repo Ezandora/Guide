@@ -222,7 +222,7 @@ void SPCrackpotGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     string url = "place.php?whichplace=junggate_3";
     string image_name = "__item red pixel";
     
-    boolean need_byte_sword = !($item[byte].available_amount() > 0 || $item[flickering pixel].available_amount() == 8);
+    boolean need_byte_sword = !($item[byte].available_amount() + $item[byte].storage_amount() > 0 || $item[flickering pixel].available_amount() + $item[flickering pixel].storage_amount() >= 8);
     
     if ($item[flickering pixel].available_amount() == 8)
     {

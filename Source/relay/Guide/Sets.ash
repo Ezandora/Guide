@@ -52,7 +52,7 @@ void SetsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 	SOlfactionGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SHolidayGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SRemindersGenerateTasks(task_entries, optional_task_entries, future_task_entries);
-	
+	SGrimstoneGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     
 }
 

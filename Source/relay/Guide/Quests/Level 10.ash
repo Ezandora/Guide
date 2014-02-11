@@ -71,7 +71,7 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 		
 		
         //FIXME it would be nice to track this
-		subentry.entries.listAppend("20 total turns of delay.");
+		subentry.entries.listAppend("25 total turns of delay.");
 		if ($skill[Transcendent Olfaction].have_skill() && !($effect[on the trail].have_effect() > 0 && get_property("olfactedMonster") == "Quiet Healer"))
 			subentry.entries.listAppend("Potentially olfact quiet healer for SGEEAs");
 		
@@ -120,7 +120,8 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 			subentry.entries.listAppend("Ground floor. Spend eleven turns here to unlock top floor.");
 			image_name = "castle stairs up";
             
-			subentry.entries.listAppend("Possibly acquire the very overdue library book from a non-combat. (stats)");
+            if (__misc_state["Need to level"])
+                subentry.entries.listAppend("Possibly acquire the very overdue library book from a non-combat. (stats)");
             
             if (true)
             {

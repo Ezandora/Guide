@@ -143,7 +143,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		ChecklistSubentry subentry;
 		subentry.header = "Defiled Niche";
 		
-		if (evilness > 25)
+		if (evilness > 26)
         {
             subentry.modifiers.listAppend("olfaction");
             subentry.modifiers.listAppend("banish");

@@ -28,3 +28,4 @@ import "relay/Guide/Sets/Psychoanalytic.ash";
 import "relay/Guide/Sets/Olfaction.ash";
 import "relay/Guide/Sets/Holiday.ash";
 import "relay/Guide/Sets/Reminders.ash";
+import "relay/Guide/Sets/Grimstone.ash";

@@ -509,9 +509,24 @@ skill lookupSkill(string name)
     return name.to_skill();
 }
 
+effect lookupEffect(string name)
+{
+    return name.to_effect();
+}
+
 familiar lookupFamiliar(string name)
 {
     return name.to_familiar();
+}
+
+location lookupLocation(string name)
+{
+    return name.to_location();
+}
+
+monster lookupMonster(string name)
+{
+    return name.to_monster();
 }
 
 boolean monsterDropsItem(monster m, item it)

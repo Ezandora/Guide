@@ -583,7 +583,7 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
                     line = "Equip the UV-resistant compass.";
                 }
             }
-            if (line.length() == 0)
+            if (line.length() > 0)
                 subentry.entries.listAppend(HTMLGenerateSpanFont(line, "red", ""));
         }
     }

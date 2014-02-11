@@ -107,10 +107,10 @@ boolean generateTowerFamiliarWeightMethod(string [int] how, string [int] immedia
         return true;
     
     
+    //Not the best of solutions, but...
     
     TFWMInternalModifier [int] weight_modifiers;
     
-    //FIXME implement this
     //amphibian sympathy
     weight_modifiers.listAppend(TFWMInternalModifierMake($skill[amphibian sympathy]));
     //leash of linguini

@@ -129,11 +129,11 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
         string [int] tasks;
         int ncs_seen = $location[McMillicancuddy's Barn].noncombatTurnsAttemptedInLocation();
         
-        if (ncs_seen < 1)
+        if (ncs_seen < 1 || true)
             tasks.listAppend("make a fence out of the barbed wire");
-        if (ncs_seen < 2)
+        if (ncs_seen < 2 || true)
             tasks.listAppend("knock over the lantern");
-        if (ncs_seen < 3)
+        if (ncs_seen < 3 || true)
         {
             tasks.listAppend("dump out the drum");
             details.listAppend("Remember to use a chaos butterfly in combat before clearing the barn.|Then " + tasks.listJoinComponents(", ", "and") + ".");
@@ -398,6 +398,31 @@ void QLevel12GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 			else
 				subentry.entries.listAppend("That almost was a wossname, but you needed more flare.");
 		}
+        
+        item [int] items_to_closet_for_desert_hippy;
+        foreach it in $items[reinforced beaded headband,round purple sunglasses,bullet-proof corduroys,beer helmet,distressed denim pants,bejeweled pledge pin]
+        {
+            if (it.available_amount() == 0)
+                continue;
+            items_to_closet_for_desert_hippy.listAppend(it);
+        }
+        
+        if (!have_outfit_components("War Hippy Fatigues") && !have_outfit_components("Frat Warrior Fatigues"))
+        {
+            string line = "Visit the Arid, Extra-Dry Desert to find a hippy uniform.";
+            if (items_to_closet_for_desert_hippy.count() > 0)
+                line += "|But first closet " + items_to_closet_for_desert_hippy.listJoinComponents(", ", "and");
+            subentry.entries.listAppend(line);
+        }
+        //FIXME Add when spaded:
+        /*else if (!have_outfit_components("War Hippy Fatigues"))
+        {
+            string line = "If you want a hippy uniform without visiting the battlefield, adventure in the Arid, Extra-Dry Desert.";
+            if (items_to_closet_for_desert_hippy.count() > 0)
+                line += "|But first closet " + items_to_closet_for_desert_hippy.listJoinComponents(", ", "and");
+            subentry.entries.listAppend(line);
+        }*/
+        
 		QLevel12GenerateTasksSidequests(task_entries, optional_task_entries, future_task_entries);
 	}
 	
