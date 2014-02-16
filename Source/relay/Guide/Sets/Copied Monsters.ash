@@ -99,7 +99,7 @@ void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [in
     }
     else if (monster_name == "Lobsterfrogman" && show_details)
     {
-        int lfm_attack = 171 + 5 + monster_level_adjustment();
+        int lfm_attack = $monster[lobsterfrogman].base_attack + 5.0;
         string line = lfm_attack + " attack.";
         
 		if (my_buffedstat($stat[moxie]) < lfm_attack)

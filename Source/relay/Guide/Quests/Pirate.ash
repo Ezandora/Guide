@@ -191,7 +191,10 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 			string line = "F'c'le.";
 			string additional_line = "";
 			if ($item[rigging shampoo].available_amount() > 0 && $item[mizzenmast mop].available_amount() > 0 && $item[ball polish].available_amount() > 0)
+            {
+                url = "inventory.php?which=3";
 				line += " Use rigging shampoo, mizzenmast mop, and ball polish, then adventure to complete quest.";
+            }
 			else
 			{
                 subentry.modifiers.listAppend("+234% item");
@@ -222,7 +225,7 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		subentry.entries.listAppend(line);
 	}
 	if ($item[the big book of pirate insults].available_amount() == 0 && base_quest_state.mafia_internal_step < 6 && have_outfit)
-		subentry.entries.listAppend(HTMLGenerateSpanOfClass("Buy the big book of pirate insults.", "r_bold"));
+		subentry.entries.listAppend(HTMLGenerateSpanFont("Buy the big book of pirate insults.", "red", ""));
 	
 	if (!is_wearing_outfit("Swashbuckling Getup") && have_outfit)
     {

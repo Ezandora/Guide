@@ -214,7 +214,7 @@ boolean generateTowerFamiliarWeightMethod(string [int] how, string [int] immedia
     //furry halo
     weight_modifiers.listAppend(TFWMInternalModifierMake($item[furry halo]));
     //CoT, if they have the right familiars
-    if ($familiars[Animated Macaroni Duck, Autonomous Disco Ball, Barrrnacle, Gelatinous Cubeling, Ghost Pickle on a Stick, Misshapen Animal Skeleton, Pair of Ragged Claws, Penguin Goodfella, Spooky Pirate Skeleton].have_familiar())
+    if ($familiars[Animated Macaroni Duck, Autonomous Disco Ball, Barrrnacle, Gelatinous Cubeling, Ghost Pickle on a Stick, Misshapen Animal Skeleton, Pair of Ragged Claws, Penguin Goodfella, Spooky Pirate Skeleton].have_familiar_replacement())
     {
         weight_modifiers.listAppend(TFWMInternalModifierMake($item[crown of thrones]));
     }
@@ -292,6 +292,9 @@ void QLevel13Init()
 	state.state_boolean["past gates"] = (state.mafia_internal_step > 1);
 	state.state_boolean["past keys"] = (state.mafia_internal_step > 3);
 	state.state_boolean["past tower"] = (state.mafia_internal_step > 5);
+	state.state_boolean["shadow will need to be defeated"] = !(state.mafia_internal_step < 9);
+    //FIXME what paths don't fight the shadow?
+    
 	state.state_boolean["king waiting to be freed"] = (state.mafia_internal_step == 11);
     
     
@@ -416,7 +419,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             familiar [int] missing_familiars;
             foreach f in $familiars[Mosquito,Angry Goat,Barrrnacle,Sabre-Toothed Lime,Levitating Potato]
             {
-                if (f.have_familiar())
+                if (f.have_familiar_replacement())
                     continue;
                 missing_familiars.listAppend(f);
             }
@@ -480,10 +483,10 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 		subentry.modifiers.listAppend("+moxie equipment");
 		subentry.modifiers.listAppend("no buffs");
 		subentry.entries.listAppend("She awaits.");
-		if (familiar_is_usable($familiar[fancypants scarecrow]) && $item[spangly mariachi pants].available_amount() > 0)
-			subentry.entries.listAppend("Run spangly mariachi pants on scarecrow. (2x potato)");
-		else if (familiar_is_usable($familiar[fancypants scarecrow]) && $item[swashbuckling pants].available_amount() > 0)
+		if (familiar_is_usable($familiar[fancypants scarecrow]) && $item[swashbuckling pants].available_amount() > 0)
 			subentry.entries.listAppend("Run swashbuckling pants on scarecrow. (2x potato)");
+		else if (familiar_is_usable($familiar[fancypants scarecrow]) && $item[spangly mariachi pants].available_amount() > 0)
+			subentry.entries.listAppend("Run spangly mariachi pants on scarecrow. (2x potato)");
 		else if (familiar_is_usable($familiar[mad hatrack]) && $item[spangly sombrero].available_amount() > 0)
 			subentry.entries.listAppend("Run spangly sombrero on mad hatrack. (2x potato)");
 		else

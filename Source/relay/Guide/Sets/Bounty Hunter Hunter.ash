@@ -43,7 +43,7 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
     relevant_locations.listAppendList(monster_locations);
     
     
-    boolean [location] skippable_ncs_locations = $locations[the stately pleasure dome, the poop deck, the spooky forest,The Haunted Gallery,tower ruins,the castle in the clouds in the sky (top floor), the castle in the clouds in the sky (ground floor), the castle in the clouds in the sky (basement), mt. molehill];
+    boolean [location] skippable_ncs_locations = $locations[the stately pleasure dome, the poop deck, the spooky forest,The Haunted Gallery,tower ruins,the castle in the clouds in the sky (top floor), the castle in the clouds in the sky (ground floor), the castle in the clouds in the sky (basement), mt. molehill, the jungles of ancient loathing];
     
     boolean [location] want_nc_locations = $locations[the penultimate fantasy airship];
     
@@ -148,6 +148,7 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
     }
     bounty_item_to_unlock["pop art banana peel"] = $item[llama lama gong];
     bounty_item_to_unlock["wig powder"] = $item[&quot;DRINK ME&quot; potion];
+    bounty_item_to_unlock["grizzled stubble"] = $item[transporter transponder];
     
     if (bounty_item_to_unlock contains bounty_item_name)
         subentry.entries.listAppend("Accessed with " + bounty_item_to_unlock[bounty_item_name] + ".");

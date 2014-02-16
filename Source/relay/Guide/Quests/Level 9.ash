@@ -344,7 +344,7 @@ void QLevel9GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             {
                 if ($item[loadstone].available_amount() > 0 && $item[loadstone].equipped_amount() == 0)
                     subentry.entries.listAppend("Possibly equip that loadstone.");
-                else if ($item[loadstone].available_amount() == 0)
+                else if ($item[loadstone].available_amount() == 0 && !__quest_state["Level 8"].state_boolean["Past mine"])
                     subentry.entries.listAppend("Possibly find a loadstone in the mine.");
             }
 		}

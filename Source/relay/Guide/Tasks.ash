@@ -118,6 +118,9 @@ void generateTasks(Checklist [int] checklists)
 		{
 			subentry.entries.listAppend("Redeem scrip at shore for dinghy plans.");
 		}
+        
+        if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE)
+            subentry.entries.listAppend("Possibly upgrade your motorcycle's gas tank. (extra-buoyant)");
 		task_entries.listAppend(ChecklistEntryMake("__item dingy dinghy", url, subentry, $locations[the shore\, inc. travel agency]));
 	}
 

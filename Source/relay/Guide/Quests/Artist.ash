@@ -34,18 +34,24 @@ void QArtistGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	if ($item[pretentious palette].available_amount() == 0)
 	{
 		//haunted pantry
+        if (active_url == "")
+            active_url = $location[the haunted pantry].getClickableURLForLocation();
 		subentry.entries.listAppend("Adventure in the haunted pantry for pretentious palette. (25% superlikely)");
 		output_modifiers = true;
 	}
 	if ($item[pretentious paintbrush].available_amount() == 0)
 	{
 		//cobb's knob
+        if (active_url == "")
+            active_url = $location[the outskirts of Cobb's Knob].getClickableURLForLocation();
 		subentry.entries.listAppend("Adventure in the outskirts of Cobb's Knob for pretentious paintbrush. (25% superlikely)");
 		output_modifiers = true;
 	}
 	if ($item[pail of pretentious paint].available_amount() == 0)
 	{
 		//sleazy back alley
+        if (active_url == "")
+            active_url = $location[the sleazy back alley].getClickableURLForLocation();
 		subentry.entries.listAppend("Adventure in the sleazy back alley for pail of pretentious paint. (25% superlikely)");
 		output_modifiers = true;
 	}

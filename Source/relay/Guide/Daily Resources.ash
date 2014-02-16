@@ -45,7 +45,14 @@ void generateDailyResources(Checklist [int] checklists)
 		string [int] description;
 		if (__misc_state["need to level"])
 			description.listAppend("+mainstat gains (50 turns)");
-		description.listAppend("Double-ice (nice hat, scarecrow pants, tower killing)");
+        
+        string [int] reasons;
+        reasons.listAppend("nice hat");
+        if ($familiar[fancypants scarecrow].familiar_is_usable())
+            reasons.listAppend("scarecrow pants");
+        reasons.listAppend("tower killing");
+        
+		description.listAppend("Double-ice (" + reasons.listJoinComponents(", ", "and") + ")");
 		
 		available_resources_entries.listAppend(ChecklistEntryMake("__item shard of double-ice", "", ChecklistSubentryMake("Take a shower", description), 5));
 	}
@@ -53,7 +60,10 @@ void generateDailyResources(Checklist [int] checklists)
     {
         int games_available = 3 - get_property_int("_poolGames");
         string [int] description;
-        description.listAppend("+5 familiar weight, +50% weapon damage.");
+        if (__misc_state["familiars temporarily blocked"])
+            description.listAppend("+50% weapon damage.");
+        else
+            description.listAppend("+5 familiar weight, +50% weapon damage.");
         description.listAppend("Or +10% item, +50% init.");
         description.listAppend("Or +50% spell damage, +10 MP regeneration.");
 		available_resources_entries.listAppend(ChecklistEntryMake("__item pool cue", "clan_viplounge.php?action=pooltable", ChecklistSubentryMake(pluralize(games_available, "pool table game", "pool table games"), "10 turns", description), 5));

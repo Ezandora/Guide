@@ -95,7 +95,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 		
 		subentry.entries.listAppend("Adventure in the Haunted Billiards Room.");
 		if ($item[pool cue].available_amount() == 0)
-			subentry.entries.listAppend("Acquire a pool cue. (NC)");
+			subentry.entries.listAppend("Acquire a pool cue. (superlikely)");
 		if (delayRemainingInLocation($location[the haunted billiards room]) > 0)
 		{
 			string line = "Delay for " + pluralize(delayRemainingInLocation($location[the haunted billiards room]), "turn", "turns") + ".";

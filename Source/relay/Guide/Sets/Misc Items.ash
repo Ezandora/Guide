@@ -118,19 +118,28 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
     
     
     
-    if (__misc_state["free runs usable"] && in_run && ($item[glob of blank-out].available_amount() + $item[bottle of blank-out].available_amount()) > 0)
+    if (__misc_state["free runs usable"] && in_run && $item[bottle of blank-out].available_amount() > 0)
 	{
 		string [int] description;
 		string name;
-		int blankout_count = $item[glob of blank-out].available_amount() + $item[bottle of blank-out].available_amount();
+		int blankout_count = $item[bottle of blank-out].available_amount();
 		name += pluralize(blankout_count, "blank-out", "blank-out");
-		int uses_remaining = 5 - get_property_int("blankOutUsed");
-		if ($item[glob of blank-out].available_amount() > 0)
-        description.listAppend(pluralize(uses_remaining, "use remains", "uses remain") + " on glob");
-		else
-        description.listAppend("Use blank-out for glob");
-		available_resources_entries.listAppend(ChecklistEntryMake("__item Bottle of Blank-Out", "", ChecklistSubentryMake(name, "", description)));
+        
+		if ($item[glob of blank-out].available_amount() == 0)
+            description.listAppend("Use blank-out for glob");
+        
+		available_resources_entries.listAppend(ChecklistEntryMake("__item Bottle of Blank-Out", "inventory.php?which=3", ChecklistSubentryMake(name, "", description)));
 	}
+    if (__misc_state["free runs usable"] && in_run && $item[glob of blank-out].available_amount() > 0)
+    {
+		int uses_remaining = 5 - get_property_int("blankOutUsed");
+		string [int] description;
+		string name;
+        description.listAppend("Use glob of blank-out in combat.");
+        
+        name = pluralize(uses_remaining, "blank-out runaway", "blank-out runaways");
+		available_resources_entries.listAppend(ChecklistEntryMake("__item glob of blank-out", "", ChecklistSubentryMake(name, "", description)));
+    }
 
 	if ($item[BitterSweetTarts].available_amount() > 0 && __misc_state["need to level"])
 	{
@@ -276,7 +285,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
             }
             
             if (subentries.count() > 0)
-                available_resources_entries.listAppend(ChecklistEntryMake(image_name, "", subentries, importance_level_item));
+                available_resources_entries.listAppend(ChecklistEntryMake(image_name, "inventory.php?which=3", subentries, importance_level_item));
         }
 	}
 	if ($item[smut orc keepsake box].available_amount() > 0 && !__quest_state["Level 9"].state_boolean["bridge complete"])

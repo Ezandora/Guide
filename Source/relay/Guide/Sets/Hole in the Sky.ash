@@ -44,7 +44,7 @@ void QHitsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] 
 		lines_needed_base += 3;
 		item_names_needed.listAppend($item[star hat]);
 	}
-	if (!have_familiar($familiar[star starfish]) && !__misc_state["familiars temporarily blocked"])
+	if (!have_familiar_replacement($familiar[star starfish]) && !__misc_state["familiars temporarily blocked"])
 	{
 		star_charts_needed += 1;
 		stars_needed_base += 6;
@@ -141,10 +141,21 @@ void QHitsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] 
 	
 	if ($item[steam-powered model rocketship].available_amount() == 0)
 	{
+        float turn_estimation = -1.0;
+        float non_combat_rate = 1.0 - (0.95 + combat_rate_modifier() / 100.0);
+        if (non_combat_rate < 0.11111111111111) //every nine adventures, minimum
+            non_combat_rate = 0.11111111111111;
+        if (non_combat_rate != 0.0)
+            turn_estimation = 1.0 / non_combat_rate;
+        
 		//find a way to space:
 		subentry.modifiers.listAppend("-combat");
 		subentry.entries.listAppend("Run -combat on the top floor of the castle for the steam-powered model rocketship.|From steampunk non-combat, unlocks Hole in the Sky.");
         active_url = "place.php?whichplace=giantcastle";
+        
+        
+        if (turn_estimation != -1.0)
+            subentry.entries.listAppend("~" + turn_estimation.roundForOutput(1) + " turns left on average.");
 	}
 	else
 	{
@@ -235,7 +246,7 @@ void QHitsGenerateMissingItems(ChecklistEntry [int] items_needed_entries)
 		oh_my_stars_and_gauze_garters.listAppend($item[line].available_amount() + "/[6, 5, or 4] lines");
 		items_needed_entries.listAppend(ChecklistEntryMake("__item star crossbow", "", ChecklistSubentryMake("Star crossbow, staff, or sword", "", oh_my_stars_and_gauze_garters.listJoinComponents(", ", "and"))));
 	}
-	if (!have_familiar($familiar[star starfish]) && !__misc_state["familiars temporarily blocked"])
+	if (!have_familiar_replacement($familiar[star starfish]) && !__misc_state["familiars temporarily blocked"])
 	{
 		if ($item[star starfish].available_amount() > 0)
 		{

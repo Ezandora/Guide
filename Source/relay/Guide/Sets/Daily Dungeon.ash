@@ -26,7 +26,7 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 		int tokens_needed = 0;
 		if (!__misc_state["familiars temporarily missing"])
 		{
-			if (!have_familiar($familiar[gelatinous cubeling]) && $item[dried gelatinous cube].available_amount() == 0)
+			if (!have_familiar_replacement($familiar[gelatinous cubeling]) && $item[dried gelatinous cube].available_amount() == 0)
 			{
 				daily_dungeon_aftercore_items_wanted.listAppend("gelatinous cubeling");
 				tokens_needed += 27;
@@ -57,7 +57,8 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 		}
 	}
     //When we're down to two potential skeleton keys, mention they shouldn't use them in the door.
-    boolean avoid_using_skeleton_key = ($item[pick-o-matic lockpicks].available_amount() == 0 && ($item[skeleton key].available_amount() + $item[skeleton key].creatable_amount()) <= 2 && !__quest_state["Level 13"].state_boolean["Past keys"] && in_ronin());
+    int skeleton_key_amount = $item[skeleton key].available_amount() + $item[skeleton key].creatable_amount();
+    boolean avoid_using_skeleton_key = ($item[pick-o-matic lockpicks].available_amount() == 0 && (skeleton_key_amount) <= 2 && skeleton_key_amount > 0 && !__quest_state["Level 13"].state_boolean["Past keys"] && in_ronin());
 	
 	boolean delay_daily_dungeon = false;
 	string delay_daily_dungeon_reason = "";
@@ -161,7 +162,7 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 					description.listAppend(submessage);
 			}
 			
-			if (!in_ronin() && !have_familiar($familiar[gelatinous cubeling]))
+			if (!in_ronin() && !have_familiar_replacement($familiar[gelatinous cubeling]))
 			{
 				string [int] shopping_list;
 				foreach it in $items[eleven-foot pole,ring of detect boring doors,pick-o-matic lockpicks]

@@ -356,6 +356,9 @@ void SPCrackpotGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         image_name = "__item flickering pixel";
     }
     
+    if (__misc_state["In run"])
+        description.listAppend("(this isn't ascension relevant after you've gotten a digital key)");
+    
         
 	optional_task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake("The Crackpot Mystic's Psychoses", modifiers, description),$locations[anger man's level, fear man's level, doubt man's level, regret man's level]));
 }

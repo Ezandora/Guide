@@ -350,6 +350,13 @@ void QLevel12GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 	{
 		subentry.modifiers.listAppend("-combat");
 		subentry.entries.listAppend("Start the war!");
+        
+        float noncombat_rate = 1.0 - (.85 + combat_rate_modifier() / 100.0);
+        float turns_remaining = -1.0;
+        if (noncombat_rate != 0.0)
+            turns_remaining = 3.0 / noncombat_rate;
+        
+        
 		if (!have_outfit_components("War Hippy Fatigues") && !have_outfit_components("Frat Warrior Fatigues"))
 		{
             //FIXME suggest routes to doing both.
@@ -360,6 +367,7 @@ void QLevel12GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             //FIXME point out they need to level myst or whatever if necessary
 			subentry.entries.listAppend("Wear war outfit, run -combat, adventure in other side's camp.");
         }
+        subentry.entries.listAppend("~" + turns_remaining.roundForOutput(1) + " turns to start war.");
 	}
 	else
 	{

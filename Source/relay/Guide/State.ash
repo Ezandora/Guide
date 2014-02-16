@@ -47,7 +47,7 @@ void setUpState()
 		__misc_state["fax accessible"] = true;
 	}
 	
-	if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_TRENDY)
+	if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_TRENDY)
 	{
 		__misc_state["fax accessible"] = false;
 	}
@@ -204,7 +204,7 @@ void setUpState()
 		skills_temporarily_missing = true;
 		familiars_temporarily_missing = true;
 	}
-	if (my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_BORIS)
+	if (my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE)
 	{
 		skills_temporarily_missing = true;
 		familiars_temporarily_missing = true;
@@ -258,7 +258,7 @@ void setUpState()
     
     int rests_used = get_property_int("timesRested");
     int total_rests_available = 0;
-    if ($familiar[unconscious collective].have_familiar())
+    if ($familiar[unconscious collective].have_familiar_replacement())
         total_rests_available += 3;
     
     foreach s in rests_granted_by_skills
@@ -361,7 +361,7 @@ void setUpState()
 	//wand
 	
 	boolean wand_of_nagamar_needed = true;
-	if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_BUGBEAR_INVASION || my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_KOLHS)
+	if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_BUGBEAR_INVASION || my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_KOLHS)
 		wand_of_nagamar_needed = false;
 		
 	int ruby_w_needed = 1;
@@ -438,13 +438,22 @@ void setUpState()
 	boolean mysterious_island_unlocked = false;
 	if ($items[dingy dinghy, skeletal skiff, junk junk].available_amount() > 0)
 		mysterious_island_unlocked = true;
-	
-	__misc_state["mysterious island available"] = mysterious_island_unlocked;
+        
+    if (!mysterious_island_unlocked)
+    {
+        if ($locations[frat house, hippy camp, the obligatory pirate's cove, frat house in disguise, the frat house (bombed back to the stone age), hippy camp in disguise, barrrney's barrr, the f'c'le, the poop deck, belowdecks, post-war junkyard, mcmillicancuddy's farm].turnsAttemptedInLocation() > 0) //backup
+            mysterious_island_unlocked = true;
+    }
+        
+    __misc_state["mysterious island available"] = mysterious_island_unlocked;
+    
+    
+    
 	
 	__misc_state["desert beach available"] = false;
 	if ($location[south of the border].locationAvailable())
 		__misc_state["desert beach available"] = true;
-	if (turnsAttemptedInLocation($location[The Shore\, Inc. Travel Agency]) > 0 || turnsAttemptedInLocation($location[the arid, extra-dry desert]) > 0 || turnsAttemptedInLocation($location[the oasis]) > 0 || turnsAttemptedInLocation($location[south of the border]) > 0) //weird issues with detecting the beach. check if we've ever adventured there as a back-up
+	if ($locations[The Shore\, Inc. Travel Agency,the arid\, extra-dry desert,the oasis, south of the border].turnsAttemptedInLocation() > 0) //weird issues with detecting the beach. check if we've ever adventured there as a back-up
 		__misc_state["desert beach available"] = true;
 	
 	string ballroom_song = "";
@@ -501,8 +510,9 @@ void setUpState()
 		
 		
 	__misc_state["bookshelf accessible"] = true;
-	if (my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_AVATAR_OF_BORIS)
+	if (my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE)
 		__misc_state["bookshelf accessible"] = false;
+        
 }
 
 

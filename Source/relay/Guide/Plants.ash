@@ -114,9 +114,13 @@ void finalizeSetUpFloristState()
 		else
 			__plants_suggested_locations.listAppend(PlantSuggestionMake(battlefield_zone, "Rabid Dogwood", ""));
 	}
-	if (my_primestat() == $stat[mysticality])
+	if (my_primestat() == $stat[mysticality] && __misc_state["need to level"])
 	{
 		//Wizard's Wig - underground, +5 myst stats/fight:
+        if (!__quest_state["Level 4"].finished)
+            __plants_suggested_locations.listAppend(PlantSuggestionMake($location[The Boss Bat's Lair], "Wizard's Wig", ""));
+        if (!__quest_state["Level 7"].state_boolean["niche finished"])
+            __plants_suggested_locations.listAppend(PlantSuggestionMake($location[The Defiled Niche], "Wizard's Wig", ""));
 	}
 	//Blustery Puffball - underground, +ML:
 	if (!__quest_state["Level 7"].state_boolean["cranny finished"])
@@ -124,10 +128,10 @@ void finalizeSetUpFloristState()
 		__plants_suggested_locations.listAppend(PlantSuggestionMake($location[the defiled cranny], "Blustery Puffball", "More beeps from swarm of ghuol whelps."));
 	}
 	//Canned Spinach - indoor, +5 muscle stats/fight:
-    if (my_primestat() == $stat[muscle] && __misc_state["need to level"] && !__misc_state["Stat gain from NCs reduced"])
+    if (my_primestat() == $stat[muscle] && __misc_state["need to level"])
     {
         //let's see... castle?
-        if ($item[Spookyraven gallery key].available_amount() > 0)
+        if ($item[Spookyraven gallery key].available_amount() > 0 && !__misc_state["Stat gain from NCs reduced"])
         {
             __plants_suggested_locations.listAppend(PlantSuggestionMake($location[the haunted gallery], "Canned Spinach", "While powerlevelling."));
         }
@@ -140,6 +144,7 @@ void finalizeSetUpFloristState()
 	//Rad-ish Radish - outdoor, +5 moxie stats/fight:
     if (my_primestat() == $stat[moxie] && __misc_state["need to level"])
     {
+        __plants_suggested_locations.listAppend(PlantSuggestionMake($location[The Spooky Forest], "Rad-ish Radish", ""));
     }
 	//Rutabeggar - outdoor, +item:
 	if (__quest_state["Level 9"].state_int["a-boo peak hauntedness"] > 0)

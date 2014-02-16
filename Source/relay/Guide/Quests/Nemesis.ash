@@ -296,6 +296,17 @@ void QNemesisGenerateClownTasks(ChecklistSubentry subentry)
             if (clownosity_possible >= clownosity_needed)
                 break;
         }
+        //Remove extraneous pieces:
+        foreach key in suggested_outfit
+        {
+            int clownosity = suggested_outfit[key].numeric_modifier("clownosity").floor();
+            if (clownosity_possible - clownosity >= clownosity_needed)
+            {
+                clownosity_possible -= clownosity;
+                remove suggested_outfit[key];
+            }
+            
+        }
         string line = "Need " + clownosity_needed + " more clownosity.";
         
         if (available_clown_sources.count() > 0)

@@ -182,7 +182,7 @@ void SCOTGenerateSuggestions(string [int] description)
     
     if (__misc_state["in run"] && need_cold_res)
         suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+3 cold res", $familiar[Flaming Face])));
-    if (need_cold_res && !$familiar[flaming face].have_familiar())
+    if (need_cold_res && !$familiar[flaming face].have_familiar_replacement())
         need_all_res = true;
     if (__misc_state["in run"] && need_all_res)
         suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+2 all res", $familiars[Bulky Buddy Box,Exotic Parrot,Holiday Log,Pet Rock,Toothsome Rock])));
@@ -212,7 +212,7 @@ void SCOTGenerateSuggestions(string [int] description)
                 familiar f = suggestion.familiars[key3];
                 if (f == $familiar[none]) //didn't find it
                     continue;
-                if (f.have_familiar())
+                if (f.have_familiar_replacement())
                 {
                     if ((best_familiar_by_weight != enthroned_familiar || enthroned_familiar == $familiar[none]) && (best_familiar_by_weight == $familiar[none] || f.familiar_weight() > best_familiar_by_weight.familiar_weight() || f == enthroned_familiar))
                     {

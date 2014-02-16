@@ -104,9 +104,15 @@ void generatePullList(Checklist [int] checklists)
 		pullable_item_list.listAppend(GPItemMake($item[spooky putty sheet], "5 copies/day", 1));
 	pullable_item_list.listAppend(GPItemMake($item[over-the-shoulder folder holder], "So many things!", 1));
 	pullable_item_list.listAppend(GPItemMake($item[pantsgiving], "5x banish/day|+2 stats/fight|+15% items|2 extra fullness (realistically)", 1));
-	pullable_item_list.listAppend(GPItemMake($item[snow suit], "+20 familiar weight for a while, +4 free runs|+10% item|spleen items", 1));
     if (!__misc_state["familiars temporarily blocked"])
-        pullable_item_list.listAppend(GPItemMake($item[crown of thrones], "+10ML/+lots MP hat|or +item/+init/+meat/etc", 1));
+        pullable_item_list.listAppend(GPItemMake($item[snow suit], "+20 familiar weight for a while, +4 free runs|+10% item|spleen items", 1));
+    if (!__misc_state["familiars temporarily blocked"])
+    {
+        if (lookupItem("Buddy Bjorn").storage_amount() > 0)
+            pullable_item_list.listAppend(GPItemMake(lookupItem("Buddy Bjorn"), "+10ML/+lots MP hat|or +item/+init/+meat/etc", 1));
+        else
+            pullable_item_list.listAppend(GPItemMake($item[crown of thrones], "+10ML/+lots MP hat|or +item/+init/+meat/etc", 1));
+    }
 	pullable_item_list.listAppend(GPItemMake($item[boris's helm], "+15ML/+5 familiar weight/+init/+mp regeneration/+weapon damage", 1));
 	if ($item[empty rain-doh can].available_amount() == 0 && $item[can of rain-doh].available_amount() == 0)
 		pullable_item_list.listAppend(GPItemMake($item[can of rain-doh], "5 copies/day|everything really", 1));
@@ -212,11 +218,11 @@ void generatePullList(Checklist [int] checklists)
 	if ($item[uv-resistant compass].available_amount() == 0 && lookupItem("ornate dowsing rod").available_amount() == 0 && __misc_state["can equip just about any weapon"] && !__quest_state["Level 11 Pyramid"].state_boolean["Desert Explored"])
 	{
 		scrip_needed += 1;
-		scrip_reasons.listAppend("uv-compass");
+		scrip_reasons.listAppend($item[uv-resistant compass].to_string());
 	}
 	if (scrip_needed > 0)
 	{
-		pullable_item_list.listAppend(GPItemMake($item[Shore Inc. Ship Trip Scrip], "Saves three turns each|" + scrip_reasons.listJoinComponents(", ", "and"), scrip_needed));
+		pullable_item_list.listAppend(GPItemMake($item[Shore Inc. Ship Trip Scrip], "Saves three turns each|" + scrip_reasons.listJoinComponents(", ", "and").capitalizeFirstLetter() + ".", scrip_needed));
 	}
 	
 	

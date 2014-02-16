@@ -377,6 +377,14 @@ string getClickableURLForLocation(location l)
         foreach l in $locations[the primordial soup, the jungles of ancient loathing, seaside megalopolis]
             __urls_for_locations[l] = "place.php?whichplace=memories";
             
+        foreach l in $locations[domed city of ronaldus,domed city of grimacia,hamburglaris shield generator]
+        {
+            if ($effect[Transpondent].have_effect() > 0)
+                __urls_for_locations[l] = "place.php?whichplace=spaaace";
+            else
+                __urls_for_locations[l] = "mall.php";
+        }
+            
         foreach l in $locations[the degrassi knoll restroom, the degrassi knoll bakery, the degrassi knoll gym, the degrassi knoll garage]
         {
             if (knoll_available())

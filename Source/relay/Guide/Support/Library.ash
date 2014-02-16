@@ -56,50 +56,63 @@ int PATH_KOLHS = 18;
 int PATH_CLASS_ACT_2 = 19;
 int PATH_AVATAR_OF_SNEAKY_PETE = 20;
 
+int __my_path_id_cached = -11;
 int my_path_id()
 {
+    if (__my_path_id_cached != -11)
+        return __my_path_id_cached;
     string path_name = my_path();
     
     if (path_name == "" || path_name == "None")
-        return PATH_NONE;
-    if (path_name == "Teetotaler")
-        return PATH_TEETOTALER;
-    if (path_name == "Boozetafarian")
-        return PATH_BOOZETAFARIAN;
-    if (path_name == "Oxygenarian")
-        return PATH_OXYGENARIAN;
-    if (path_name == "Bees Hate You")
-        return PATH_BEES_HATE_YOU;
-    if (path_name == "Way of the Surprising Fist")
-        return PATH_WAY_OF_THE_SURPRISING_FIST;
-    if (path_name == "Trendy")
-        return PATH_TRENDY;
-    if (path_name == "Avatar of Boris")
-        return PATH_AVATAR_OF_BORIS;
-    if (path_name == "Bugbear Invasion")
-        return PATH_BUGBEAR_INVASION;
-    if (path_name == "Zombie Slayer")
-        return PATH_ZOMBIE_SLAYER;
-    if (path_name == "Class Act")
-        return PATH_CLASS_ACT;
-    if (path_name == "Avatar of Jarlsberg")
-        return PATH_AVATAR_OF_JARLSBERG;
-    if (path_name == "BIG!")
-        return PATH_BIG;
-    if (path_name == "KOLHS")
-        return PATH_KOLHS;
-    if (path_name == "Class Act II: A Class For Pigs")
-        return PATH_CLASS_ACT_2;
-    if (path_name == "Avatar of Sneaky Pete")
-        return PATH_AVATAR_OF_SNEAKY_PETE;
-    
-    return PATH_UNKNOWN;
+        __my_path_id_cached = PATH_NONE;
+    else if (path_name == "Teetotaler")
+        __my_path_id_cached = PATH_TEETOTALER;
+    else if (path_name == "Boozetafarian")
+        __my_path_id_cached = PATH_BOOZETAFARIAN;
+    else if (path_name == "Oxygenarian")
+        __my_path_id_cached = PATH_OXYGENARIAN;
+    else if (path_name == "Bees Hate You")
+        __my_path_id_cached = PATH_BEES_HATE_YOU;
+    else if (path_name == "Way of the Surprising Fist")
+        __my_path_id_cached = PATH_WAY_OF_THE_SURPRISING_FIST;
+    else if (path_name == "Trendy")
+        __my_path_id_cached = PATH_TRENDY;
+    else if (path_name == "Avatar of Boris")
+        __my_path_id_cached = PATH_AVATAR_OF_BORIS;
+    else if (path_name == "Bugbear Invasion")
+        __my_path_id_cached = PATH_BUGBEAR_INVASION;
+    else if (path_name == "Zombie Slayer")
+        __my_path_id_cached = PATH_ZOMBIE_SLAYER;
+    else if (path_name == "Class Act")
+        __my_path_id_cached = PATH_CLASS_ACT;
+    else if (path_name == "Avatar of Jarlsberg")
+        __my_path_id_cached = PATH_AVATAR_OF_JARLSBERG;
+    else if (path_name == "BIG!")
+        __my_path_id_cached = PATH_BIG;
+    else if (path_name == "KOLHS")
+        __my_path_id_cached = PATH_KOLHS;
+    else if (path_name == "Class Act II: A Class For Pigs")
+        __my_path_id_cached = PATH_CLASS_ACT_2;
+    else if (path_name == "Avatar of Sneaky Pete")
+        __my_path_id_cached = PATH_AVATAR_OF_SNEAKY_PETE;
+    else
+        __my_path_id_cached = PATH_UNKNOWN;
+    return __my_path_id_cached;
 }
 
+boolean have_familiar_replacement(familiar f)
+{
+    //have_familiar bugs in avatar of sneaky pete for now, so:
+    if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE)
+        return false;
+    return f.have_familiar();
+}
 
 //Similar to have_familiar, except it also checks trendy (not sure if have_familiar supports trendy) and 100% familiar runs
 boolean familiar_is_usable(familiar f)
 {
+    if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE)
+        return false;
 	int single_familiar_run = get_property_int("singleFamiliarRun");
 	if (single_familiar_run != -1 && my_turncount() >= 30) //after 30 turns, they're probably sure
 	{
@@ -162,6 +175,23 @@ item [int] items_missing(boolean [item] items)
     return result;
 }
 
+string slot_to_string(slot s)
+{
+    if (s == $slot[acc1] || s == $slot[acc2] || s == $slot[acc3])
+        return "accessory";
+    else if (s == $slot[sticker1] || s == $slot[sticker2] || s == $slot[sticker3])
+        return "sticker";
+    else if (s == $slot[folder1] || s == $slot[folder2] || s == $slot[folder3] || s == $slot[folder4] || s == $slot[folder5])
+        return "folder";
+    else if (s == $slot[fakehand])
+        return "fake hand";
+    else if (s == $slot[crown-of-thrones])
+        return "crown of thrones";
+    //else if (s == $slot[buddy-bjorn])
+        //return "buddy bjorn";
+    return s;
+}
+
 int available_amount(boolean [item] items)
 {
     //Usage:
@@ -222,7 +252,7 @@ item [slot] equipped_items()
 }
 
 //Have at least one of these familiars:
-boolean have_familiar(boolean [familiar] familiars)
+boolean have_familiar_replacement(boolean [familiar] familiars)
 {
     foreach f in familiars
     {
@@ -479,6 +509,16 @@ string pluralizeWordy(int value, string non_plural, string plural)
 		return value.int_to_wordy() + " " + non_plural;
 	else
 		return value.int_to_wordy() + " " + plural;
+}
+
+string pluralizeWordy(int value, item i)
+{
+	return pluralizeWordy(value, i.to_string(), i.plural);
+}
+
+string pluralizeWordy(item i) //whatever we have around
+{
+	return pluralizeWordy(i.available_amount(), i);
 }
 
 //Backwards compatibility:

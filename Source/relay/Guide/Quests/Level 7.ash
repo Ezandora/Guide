@@ -143,12 +143,26 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		ChecklistSubentry subentry;
 		subentry.header = "Defiled Niche";
 		
+        
+        float [monster] appearance_rates = $location[the defiled niche].appearance_rates_adjusted();
+        float evilness_removed_per_adventure = 0.0;
+        evilness_removed_per_adventure += 1.0 * appearance_rates[$monster[slick lihc]] / 100.0;
+        evilness_removed_per_adventure += 1.0 * appearance_rates[$monster[senile lihc]] / 100.0;
+        evilness_removed_per_adventure += 3.0 * appearance_rates[$monster[dirty old lihc]] / 100.0;
+        
+        float turns_remaining = MAX(0, evilness - 25);
+        
+        if (evilness_removed_per_adventure != 0.0)
+            turns_remaining = turns_remaining / evilness_removed_per_adventure;
+        
+        turns_remaining += 1; //last turn
 		if (evilness > 26)
         {
             subentry.modifiers.listAppend("olfaction");
             subentry.modifiers.listAppend("banish");
         }
 		
+        subentry.entries.listAppend("~" + turns_remaining.roundForOutput(1) + " turns remaining.");
 		subentry.entries.listAppend(evilness_text["cyrptNicheEvilness"]);
 		
 		

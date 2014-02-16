@@ -98,6 +98,13 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         url = "place.php?whichplace=giantcastle";
 		if ($location[The Castle in the Clouds in the Sky (Top floor)].locationAvailable())
 		{
+            float turn_estimation = -1.0;
+            float non_combat_rate = 1.0 - (0.95 + combat_rate_modifier() / 100.0);
+            if (non_combat_rate < 0.11111111111111) //every nine adventures, minimum
+                non_combat_rate = 0.11111111111111;
+            
+            //FIXME turn estimation for all routes, not just mohawk wig/model airship
+            
 			subentry.modifiers.listAppend("-combat");
 			subentry.entries.listAppend("Top floor. Run -combat.");
             if ($item[mohawk wig].equipped_amount() == 0 && $item[mohawk wig].available_amount() > 0)
@@ -110,10 +117,19 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                     subentry.entries.listAppend("Potentially backfarm for a model airship in the fantasy airship. (non-combat option, run -combat)"); //always suggest this - backfarming for model airship is faster than spending time in top floor, I think
             }
             
+            if ($item[mohawk wig].available_amount() > 0 && $item[model airship].available_amount() > 0)
+            {
+                if (non_combat_rate != 0.0)
+                    turn_estimation = 1.0 / non_combat_rate;
+            }
+            
             //We don't suggest trying to complete this quest with the record, even if they lack the mohawk wig/model airship - I feel as though that would take quite a number of turns?
             //It's a 95% combat location (max nine/ten turns between non-combats), and the non-combats are split between two different sets.
             //There might be some internal mechanics to make it faster? Don't know.
 			image_name = "goggles? yes!";
+            
+            if (turn_estimation != -1.0)
+                subentry.entries.listAppend("~" + turn_estimation.roundForOutput(1) + " turns left on average.");
 		}
 		else if ($location[The Castle in the Clouds in the Sky (Ground floor)].locationAvailable())
 		{
@@ -137,26 +153,54 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 		{
 			subentry.modifiers.listAppend("-combat");
 			subentry.entries.listAppend("Basement. Run -combat.");
+            
+            float turn_estimation = -1.0;
+            float non_combat_rate = 1.0 - (0.95 + combat_rate_modifier() / 100.0);
+            if (non_combat_rate < 0.11111111111111) //every nine adventures, minimum
+                non_combat_rate = 0.11111111111111;
             if ($item[amulet of extreme plot significance].available_amount() > 0)
             {
                 if ($item[amulet of extreme plot significance].equipped_amount() == 0)
                     subentry.entries.listAppend(HTMLGenerateSpanFont("Wear the amulet of extreme plot significance.", "red", ""));
+                
+                if (non_combat_rate != 0.0)
+                    turn_estimation = 1.0 / non_combat_rate;
+                
                     
             }
             else
             {
-                if (__misc_state["can equip just about any weapon"] && $item[titanium assault umbrella].available_amount() > 0 && $item[titanium assault umbrella].equipped_amount() == 0)
+                boolean have_usable_umbrella = (__misc_state["can equip just about any weapon"] && $item[titanium assault umbrella].available_amount() > 0);
+                
+                if (have_usable_umbrella && $item[titanium assault umbrella].equipped_amount() == 0)
                     subentry.entries.listAppend("Equip your titanium assault umbrella.");
                 if ($item[massive dumbbell].available_amount() == 0)
                 {
-                    if ($item[titanium assault umbrella].available_amount() > 0)
+                    if (have_usable_umbrella)
+                    {
                         subentry.entries.listAppend("Grab the massive dumbbell from gym if you can't reach the ground floor otherwise.");
+                        
+                        if (non_combat_rate != 0.0)
+                            turn_estimation = (2.0 / 3.0) * (2.0 / non_combat_rate) + (1.0 / 3.0) * (1.0 / non_combat_rate); //1/3rd chance of instant completion with umbrella
+                    }
                     else
+                    {
                         subentry.entries.listAppend("Grab the massive dumbbell from gym.");
+                        if (non_combat_rate != 0.0)
+                            turn_estimation = 2.0 / non_combat_rate;
+                    }
+                    
                 }
                 else
+                {
                     subentry.entries.listAppend("Place the massive dumbbell in the Open Source dumbwaiter.");
+                    if (non_combat_rate != 0.0)
+                        turn_estimation = 1.0 / non_combat_rate;
+                }
             }
+            
+            if (turn_estimation != -1.0)
+                subentry.entries.listAppend("~" + turn_estimation.roundForOutput(1) + " turns left on average.");
 			
 			image_name = "lift, bro";
 		}

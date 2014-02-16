@@ -83,7 +83,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         if ($effect[Cunctatitis].have_effect() > 0 && $skill[disco nap].have_skill() && $skill[adventurer of leisure].have_skill())
     {
         string url = "skills.php";
-        string method = "Cast disco power nap";
+        string method = "Cast disco nap.";
         task_entries.listAppend(ChecklistEntryMake("__effect Cunctatitis", url, ChecklistSubentryMake("Remove Cunctatitis", "", method), -11));
     }
     
@@ -232,5 +232,10 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             task_entries.listAppend(ChecklistEntryMake("__item " + compass_item, "", ChecklistSubentryMake("Equip " + compass_item, "", "Explore more efficiently."), -11));
         }
         
+    }
+    if ($item[bottle of blank-out].available_amount() > 0 && $item[glob of blank-out].available_amount() == 0 && __misc_state["In run"] && __misc_state["free runs usable"])
+    {
+        task_entries.listAppend(ChecklistEntryMake("__item " + $item[bottle of blank-out], "inventory.php?which=3", ChecklistSubentryMake("Use " + $item[bottle of blank-out], "", "Acquire glob to run away with."), -11));
+    
     }
 }

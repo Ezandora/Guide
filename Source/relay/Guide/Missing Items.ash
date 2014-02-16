@@ -295,6 +295,17 @@ void generateMissingItems(Checklist [int] checklists)
     {
 		items_needed_entries.listAppend(ChecklistEntryMake("__item enchanted bean", "", ChecklistSubentryMake("enchanted bean", "", "Found in the beanbat chamber.")));
     }
+    
+    if (__quest_state["Level 13"].state_boolean["shadow will need to be defeated"])
+    {
+        //Let's see
+        //5 gauze garters + filthy poultices
+        //Or...
+        //red pixel potion (not worth farming, but if they have it...)
+        //red potion
+        //extra-strength red potion (they might find it)
+        
+    }
                                
     SetsGenerateMissingItems(items_needed_entries);
 	

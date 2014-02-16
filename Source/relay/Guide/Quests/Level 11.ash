@@ -176,7 +176,7 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
             bird_needed_familiar = $familiar[reassembled blackbird];
             bird_needed = $item[reassembled blackbird];
         }
-        if (!have_familiar(bird_needed_familiar) && bird_needed.available_amount() == 0)
+        if (!have_familiar_replacement(bird_needed_familiar) && bird_needed.available_amount() == 0)
         {
             string line = "";
             line = "Acquire " + bird_needed + ".";
@@ -776,6 +776,9 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                     line = "One More Roll";
                 line += " until protector spirit fight.";
                 
+                if ($item[bowling ball].available_amount() > 0)
+                    line += "|Have " + pluralizeWordy($item[bowling ball]) + ".";
+                
                 subentry.entries.listAppend(line);
                 
                 //FIXME pop up a reminder to acquire bowl of scorpions
@@ -817,14 +820,14 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                     subentry.entries.listAppend("Potentially banish pgymy orderlies.");
         
         
-                item [int] items_we_have_unequipped;
+                string [int] items_we_have_unequipped;
                 foreach it in $items[surgical apron,bloodied surgical dungarees,surgical mask,head mirror,half-size scalpel]
                 {
                     boolean can_equip = true;
                     if (it.to_slot() == $slot[shirt] && !have_skill($skill[Torso Awaregness]))
                         can_equip = false;
                     if (it.available_amount() > 0 && equipped_amount(it) == 0 && can_equip)
-                        items_we_have_unequipped.listAppend(it);
+                        items_we_have_unequipped.listAppend(it + " (" + it.to_slot().slot_to_string() + ")");
                 }
                 if (items_we_have_unequipped.count() > 0)
                 {
@@ -1173,7 +1176,7 @@ void QLevel11HiddenTempleGenerateTasks(ChecklistEntry [int] task_entries, Checkl
     if (__misc_state_string["ballroom song"] != "-combat")
     {
         subentry.entries.listAppend(HTMLGenerateSpanOfClass("Wait until -combat ballroom song set.", "r_bold"));
-        future_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, "", subentry, $locations[the spooky forest]));
+        future_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, "place.php?whichplace=woods", subentry, $locations[the spooky forest]));
     }
     else
     {
