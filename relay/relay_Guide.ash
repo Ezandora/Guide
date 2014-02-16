@@ -923,8 +923,8 @@ string slot_to_string(slot s)
         return "fake hand";
     else if (s == $slot[crown-of-thrones])
         return "crown of thrones";
-    else if (s == $slot[buddy-bjorn])
-        return "buddy bjorn";
+    //else if (s == $slot[buddy-bjorn])
+        //return "buddy bjorn";
     return s;
 }
 
