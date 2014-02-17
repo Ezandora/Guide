@@ -39,6 +39,7 @@ Reminders:
 
 ![Reminders](https://raw.github.com/Ezandora/Guide/master/Images/Reminders.png)
 ![Reminders 2](https://raw.github.com/Ezandora/Guide/master/Images/Reminders 2.png)
+![Reminders 3](https://raw.github.com/Ezandora/Guide/master/Images/Reminders 3.png)
 
 The script will inform you of many resources you have - free runaways, hipster fights, semi-rares, etc. - and ideas on what to use them on.
 There is preliminary support for the florist friar and what to pull. It also works in aftercore.
