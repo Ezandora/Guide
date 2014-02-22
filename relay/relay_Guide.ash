@@ -18785,7 +18785,7 @@ string generateRandomMessage()
     
     effect_messages[$effect[consumed by anger]] = "don't ascend angry";
     effect_messages[$effect[consumed by regret]] = "wasted potential";
-    effect_messages[$effect[All Revved Up]] = "vroom";
+    effect_messages[lookupEffect("All Revved Up")] = "vroom";
     if (my_path_id() != PATH_WAY_OF_THE_SURPRISING_FIST)
         effect_messages[$effect[Expert Timing]] = "martial arts and crafts";
     effect_messages[$effect[apathy]] = "";
@@ -18797,7 +18797,7 @@ string generateRandomMessage()
     
     foreach e in effect_messages
     {
-        if (e.have_effect() > 0)
+        if (e.have_effect() > 0 && e != $effect[none])
         {
             random_messages.listAppend(effect_messages[e]);
             break;
