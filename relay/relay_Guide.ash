@@ -1,7 +1,7 @@
 //This script and its support scripts are in the public domain.
 
 //These settings are for development. Don't worry about editing them.
-string __version = "1.0.18";
+string __version = "1.0.19";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -4492,7 +4492,7 @@ void QLevel5GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 			string [int] harem_lines;
 			if (!have_outfit_components("Knob Goblin Harem Girl Disguise"))
 			{
-				harem_lines.listAppend("Need disguise.|*20% drop from harem girls (olfact)|*Or adventure in zone for eleven turns");
+				harem_lines.listAppend("Need disguise.|*20% drop from harem girls (olfact)|*Or adventure in zone for eleven (or more) turns.");
 				harem_modifiers.listAppend("+400% item");
 				harem_modifiers.listAppend("olfact harem girls");
 			}
@@ -4538,11 +4538,11 @@ void QLevel5GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 				//with banishes and slimeling and +item and?
                 //too complicated. Possibly remove?
 				kge_modifiers.listAppend("-combat");
-				string line = "Need knob goblin elite guard uniform.|*Semi-rare in barracks|*Or run -combat in barracks";
+				string line = "Need knob goblin elite guard uniform.|*Semi-rare in barracks.|*Or run -combat in barracks.";
 				if (familiar_is_usable($familiar[slimeling]))
 					line += " with slimeling";
                 
-                line += generateTurnsToSeeNoncombat(85, outfit_pieces_needed, "acquire outfit via only non-combats");
+                line += "|*" + generateTurnsToSeeNoncombat(85, outfit_pieces_needed, "acquire outfit via only non-combats");
 				kge_lines.listAppend(line);
 			}
 			else
@@ -4680,8 +4680,17 @@ void QLevel6GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
     if (needed_modifiers.count() > 0)
         subentry.entries.listAppend("Run " + needed_modifiers.listJoinComponents(", ", "and") + ".");
     
-	if ($item[dodecagram].available_amount() + $item[box of birthday candles].available_amount() + $item[Eldritch butterknife].available_amount() == 3 && !(hot_wings_relevant && $item[hot wing].available_amount() <3))
-		subentry.entries.listAppend("Go to the cairn stones!"); //FIXME suggest this only if we've gotten everything else?
+	if ($item[dodecagram].available_amount() + $item[box of birthday candles].available_amount() + $item[Eldritch butterknife].available_amount() == 3)
+    {
+        if (!(hot_wings_relevant && $item[hot wing].available_amount() <3))
+        {
+            subentry.entries.listAppend("Go to the cairn stones!");
+        }
+        else
+        {
+            subentry.entries.listAppend("Visit the dark heart of the woods for hot wings.");
+        }
+    }
 	
 	if (__misc_state_int["ruby w needed"] > 0)
 		subentry.entries.listAppend("Potentially find ruby W, if not clovering (w imp, dark neck, 30% drop)");
@@ -5044,7 +5053,7 @@ void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [in
 			line = HTMLGenerateSpanFont(line, "red", "");
         description.listAppend(line);
     }
-    else if (monster_name == "Big swarm of ghuol whelps")
+    else if (monster_name == "Big swarm of ghuol whelps" || monster_name == "Swarm of ghuol whelps" || monster_name == "Giant swarm of ghuol whelps")
     {
         float monster_level = monster_level_adjustment();
     
@@ -7522,7 +7531,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
                     details.listAppend("Potentially banish A.M.C. Gremlin.");
             }
 		}
-		optional_task_entries.listAppend(ChecklistEntryMake("Island War Junkyard", "bigisland.php?place=junkyard", ChecklistSubentryMake("Island War Junkyard Quest", listMake("+DR", "+HP"), details), $locations[next to that barrel with something burning in it,near an abandoned refrigerator,over where the old tires are,out by that rusted-out car]));
+		optional_task_entries.listAppend(ChecklistEntryMake("Island War Junkyard", "bigisland.php?place=junkyard", ChecklistSubentryMake("Island War Junkyard Quest", listMake("+DR", "+DA", "+HP"), details), $locations[next to that barrel with something burning in it,near an abandoned refrigerator,over where the old tires are,out by that rusted-out car]));
 	}
 	if (!base_quest_state.state_boolean["Lighthouse Finished"])
 	{
@@ -8477,7 +8486,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 		
 		//combat queue for haunted bedroom doesn't seem to update
         int delay_remaining = 5; //delayRemainingInLocation($location[the haunted bedroom])
-		if (delay_remaining > 0)
+		if (delay_remaining > 0 && !clink_done)
 		{
 			//string line = "Delay for " + pluralize(delay_remaining), "turn", "turns") + ".";
             string line = "Delay for 5 total turns. (can't track this, sorry)";
@@ -13358,6 +13367,7 @@ void S8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     if ($item[psychoanalytic jar].available_amount() > 0 || $item[jar of psychoses (The Crackpot Mystic)].available_amount() > 0 || get_property_boolean("_psychoJarUsed")) //FIXME check which jar used
     {
         string active_url = "";
+        string title = "Adventure in fear man's level";
         //Have a jar, or jar was installed.
         string [int] description;
         string [int] modifiers;
@@ -13373,14 +13383,16 @@ void S8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         else if ($item[jar of psychoses (The Crackpot Mystic)].available_amount() > 0)
         {
             active_url = "inventory.php?which=3";
-            description.listAppend("Open the " + $item[jar of psychoses (The Crackpot Mystic)] + ".");
+            title = "Open the " + $item[jar of psychoses (The Crackpot Mystic)];
+            description.listAppend("Fear Man's level access, for digital key.");
         }
         else if ($item[psychoanalytic jar].available_amount() > 0)
         {
             active_url = "place.php?whichplace=forestvillage";
-            description.listAppend("Psychoanalyze the crackpot mystic.");
+            title = "Psychoanalyze the crackpot mystic";
+            description.listAppend("Fear Man's level access, for digital key.");
         }
-        optional_task_entries.listAppend(ChecklistEntryMake("__item digital key", active_url, ChecklistSubentryMake("Adventure in fear man's level", modifiers, description), $locations[fear man's level]));
+        optional_task_entries.listAppend(ChecklistEntryMake("__item digital key", active_url, ChecklistSubentryMake(title, modifiers, description), $locations[fear man's level]));
         need_route_output = false;
     }
     if (need_route_output)
@@ -13399,9 +13411,9 @@ void S8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             //No other choice. 8-bit realm.
             //Well, I suppose they could fax and arrow a ghost.
             if ($item[continuum transfunctioner].available_amount() > 0)
-                optional_task_entries.listAppend(ChecklistEntryMake("inexplicable door", "", ChecklistSubentryMake("Adventure in the 8-bit realm", "", description), $locations[8-bit realm]));
+                optional_task_entries.listAppend(ChecklistEntryMake("inexplicable door", "", ChecklistSubentryMake("Adventure in the 8-bit realm", "place.php?whichplace=woods", description), $locations[8-bit realm]));
             else if (my_level() >= 2)
-                optional_task_entries.listAppend(ChecklistEntryMake("__item continuum transfunctioner", "", ChecklistSubentryMake("Acquire a continuum transfunctioner", "", "From the crackpot mystic.")));
+                optional_task_entries.listAppend(ChecklistEntryMake("__item continuum transfunctioner", "", ChecklistSubentryMake("Acquire a continuum transfunctioner", "place.php?whichplace=forestvillage", "From the crackpot mystic.")));
         }
         else
         {
@@ -16012,30 +16024,12 @@ void SSneakyPeteGenerateResource(ChecklistEntry [int] available_resources_entrie
 		return;
     //my_audience() whenever 16.3 is out
     
-    //FIXME put these in one entry?
     
-    //Need more combat message spading before these can be enabled:
-    /*
-    if (lookupSkill("Fix Jukebox").have_skill() && get_property_int("_peteJukeboxFixed") < 3)
-    {
-        int uses_remaining = MAX(0, 3 - get_property_int("_peteJukeboxFixed"));
-        
-        string [int] description;
-        description.listAppend("+300% item, one combat.");
-        description.listAppend("+audience love.");
-        
-        available_resources_entries.listAppend(ChecklistEntryMake("__effect jukebox hero", "", ChecklistSubentryMake(pluralize(uses_remaining, "Fix Jukebox", "Fix Jukeboxes"), "", description), 1));
-    }
+	ChecklistEntry entry;
+	entry.target_location = "";
+	entry.image_lookup_name = "";
+    entry.importance_level = 1;
     
-    if (lookupSkill("Jump Shark").have_skill() && get_property_int("_peteJumpedShark") < 3)
-    {
-        int uses_remaining = MAX(0, 3 - get_property_int("_peteJumpedShark"));
-        
-        string [int] description;
-        description.listAppend("-audience love.");
-        
-        available_resources_entries.listAppend(ChecklistEntryMake("__skill jump shark", "", ChecklistSubentryMake(pluralize(uses_remaining, "shark jump", "shark jumps"), "", description), 5));
-    }*/
     
     if (get_revision() >= 13783)
     {
@@ -16054,9 +16048,44 @@ void SSneakyPeteGenerateResource(ChecklistEntry [int] available_resources_entrie
             else
                 description.listAppend("Free runaway in-combat.");
             
-            available_resources_entries.listAppend(ChecklistEntryMake("__skill Easy Riding", "", ChecklistSubentryMake(pluralize(free_peel_outs_available, "peel out", "peel outs"), "10 MP/cast", description), 1));
+            if (entry.image_lookup_name.length() == 0)
+                entry.image_lookup_name = "__skill Easy Riding";
+        
+            entry.subentries.listAppend(ChecklistSubentryMake(pluralize(free_peel_outs_available, "peel out", "peel outs"), "10 MP/cast", description));
         }
     }
+    
+    if (lookupSkill("Fix Jukebox").have_skill() && get_property_int("_peteJukeboxFixed") < 3 && get_revision() >= 13785)
+    {
+        int uses_remaining = MAX(0, 3 - get_property_int("_peteJukeboxFixed"));
+        
+        string [int] description;
+        description.listAppend("+300% item, one combat.");
+        description.listAppend("+10 audience love.");
+        
+        if (entry.image_lookup_name.length() == 0)
+            entry.image_lookup_name = "__effect jukebox hero";
+        
+        entry.subentries.listAppend(ChecklistSubentryMake(pluralize(uses_remaining, "jukebox fix", "jukebox fixes"), "25 MP", description));
+    }
+    
+    //Need more combat messages for this property first:
+    /*if (lookupSkill("Jump Shark").have_skill() && get_property_int("_peteJumpedShark") < 3)
+    {
+        int uses_remaining = MAX(0, 3 - get_property_int("_peteJumpedShark"));
+        
+        string [int] description;
+        description.listAppend("+? stats");
+        description.listAppend("+10 audience hate.");
+        
+        if (entry.image_lookup_name.length() == 0)
+            entry.image_lookup_name = "__skill jump shark";
+        entry.subentries.listAppend(ChecklistSubentryMake(pluralize(uses_remaining, "shark jump", "shark jumps"), "25 MP", description));
+    }*/
+    
+    
+    if (entry.subentries.count() > 0)
+        available_resources_entries.listAppend(entry);
 }
 
 void SSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -16070,7 +16099,7 @@ void SSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         string [int] parts_not_upgraded;
         int motorcycle_upgrades_have = 0;
         
-        foreach s in $strings[peteMotorbikeCowling,peteMotorbikeGasTank,peteMotorbikeHeadlight,peteMotorbikeMuffler,peteMotorbikeSeat,peteMotorbikeTires]
+        foreach s in $strings[peteMotorbikeTires,peteMotorbikeGasTank,peteMotorbikeHeadlight,peteMotorbikeCowling,peteMotorbikeMuffler,peteMotorbikeSeat]
         {
             if (get_property(s).length() > 0)
                 motorcycle_upgrades_have += 1;
@@ -16639,7 +16668,10 @@ void finalizeSetUpFloristState()
 	}
 	if (__quest_state["Level 4"].state_int["areas unlocked"] + $item[sonar-in-a-biscuit].available_amount() < 3)
 	{
-		__plants_suggested_locations.listAppend(PlantSuggestionMake($location[the batrat and ratbat burrow], "horn of plenty", "Sonars-in-a-biscuit, 15% drop."));
+        string description = "Sonars-in-a-biscuit, 15% drop.";
+        if (!__quest_state["Level 7"].state_boolean["nook finished"]) //FIXME test if that plant is planted already
+            description += " Or ignore in favor of the defiled nook?";
+		__plants_suggested_locations.listAppend(PlantSuggestionMake($location[the batrat and ratbat burrow], "horn of plenty", description));
 	}
     //Intentionally ignored: +item plants in the orchard. Normally you'd plant in the upper chamber instead, since both of these quests often happen on the same day? And there's three zones to plant in - way too complicated.
 	if (!__quest_state["Level 12"].finished && __misc_state["need to level"] && __quest_state["Level 12"].state_int["frat boys left on battlefield"] != 0 && __quest_state["Level 12"].state_int["hippies left on battlefield"] != 0)
@@ -18353,6 +18385,22 @@ void generateDailyResources(Checklist [int] checklists)
     //Skill books we have used, but don't have the skill for?
     
     //soul sauce tracking?
+    
+    
+    
+    if (get_property_int("goldenMrAccessories") > 0)
+    {
+        //FIXME inline with hugs
+        int total_casts_available = get_property_int("goldenMrAccessories") * 5;
+        int casts_used = get_property_int("_smilesOfMrA");
+        
+        int casts_remaining = total_casts_available - casts_used;
+        
+        if (casts_remaining > 0)
+        {
+            available_resources_entries.listAppend(ChecklistEntryMake("__item Golden Mr. Accessory", "skills.php", ChecklistSubentryMake(pluralize(casts_remaining, "smile of the Mr. Accessory", "smiles of the Mr. Accessory"), "", "Give away sunshine."), 8));
+        }
+    }
 	
 	checklists.listAppend(ChecklistMake("Resources", available_resources_entries));
 }
@@ -19130,7 +19178,7 @@ string [string] generateAPIResponse()
     if (true)
     {
         
-        boolean [string] relevant_mafia_properties = $strings[merkinQuestPath,questF01Primordial,questF02Hyboria,questF03Future,questF04Elves,questF05Clancy,questG01Meatcar,questG02Whitecastle,questG03Ego,questG04Nemesis,questG05Dark,questG06Delivery,questI01Scapegoat,questI02Beat,questL02Larva,questL03Rat,questL04Bat,questL05Goblin,questL06Friar,questL07Cyrptic,questL08Trapper,questL09Topping,questL10Garbage,questL11MacGuffin,questL11Manor,questL11Palindome,questL11Pyramid,questL11Worship,questL12War,questL13Final,questM01Untinker,questM02Artist,questM03Bugbear,questM04Galaktic,questM05Toot,questM06Gourd,questM07Hammer,questM08Baker,questM09Rocks,questM10Azazel,questM11Postal,questM12Pirate,questM13Escape,questM14Bounty,questM15Lol,questS01OldGuy,questS02Monkees,sidequestArenaCompleted,sidequestFarmCompleted,sidequestJunkyardCompleted,sidequestLighthouseCompleted,sidequestNunsCompleted,sidequestOrchardCompleted,cyrptAlcoveEvilness,cyrptCrannyEvilness,cyrptNicheEvilness,cyrptNookEvilness,desertExploration,gnasirProgress,relayCounters,timesRested,currentEasyBountyItem,currentHardBountyItem,currentSpecialBountyItem,volcanoMaze1,_lastDailyDungeonRoom,seahorseName,chasmBridgeProgress,_aprilShower,lastAdventure,lastEncounter,_floristPlantsUsed,_fireStartingKitUsed,_psychoJarUsed,hiddenHospitalProgress,hiddenBowlingAlleyProgress,hiddenApartmentProgress,hiddenOfficeProgress,pyramidPosition,parasolUsed,_discoKnife,lastPlusSignUnlock,olfactedMonster,photocopyMonster,lastTempleUnlock,volcanoMaze1,blankOutUsed,peteMotorbikeCowling,peteMotorbikeGasTank,peteMotorbikeHeadlight,peteMotorbikeMuffler,peteMotorbikeSeat,peteMotorbikeTires,_petePeeledOut];
+        boolean [string] relevant_mafia_properties = $strings[merkinQuestPath,questF01Primordial,questF02Hyboria,questF03Future,questF04Elves,questF05Clancy,questG01Meatcar,questG02Whitecastle,questG03Ego,questG04Nemesis,questG05Dark,questG06Delivery,questI01Scapegoat,questI02Beat,questL02Larva,questL03Rat,questL04Bat,questL05Goblin,questL06Friar,questL07Cyrptic,questL08Trapper,questL09Topping,questL10Garbage,questL11MacGuffin,questL11Manor,questL11Palindome,questL11Pyramid,questL11Worship,questL12War,questL13Final,questM01Untinker,questM02Artist,questM03Bugbear,questM04Galaktic,questM05Toot,questM06Gourd,questM07Hammer,questM08Baker,questM09Rocks,questM10Azazel,questM11Postal,questM12Pirate,questM13Escape,questM14Bounty,questM15Lol,questS01OldGuy,questS02Monkees,sidequestArenaCompleted,sidequestFarmCompleted,sidequestJunkyardCompleted,sidequestLighthouseCompleted,sidequestNunsCompleted,sidequestOrchardCompleted,cyrptAlcoveEvilness,cyrptCrannyEvilness,cyrptNicheEvilness,cyrptNookEvilness,desertExploration,gnasirProgress,relayCounters,timesRested,currentEasyBountyItem,currentHardBountyItem,currentSpecialBountyItem,volcanoMaze1,_lastDailyDungeonRoom,seahorseName,chasmBridgeProgress,_aprilShower,lastAdventure,lastEncounter,_floristPlantsUsed,_fireStartingKitUsed,_psychoJarUsed,hiddenHospitalProgress,hiddenBowlingAlleyProgress,hiddenApartmentProgress,hiddenOfficeProgress,pyramidPosition,parasolUsed,_discoKnife,lastPlusSignUnlock,olfactedMonster,photocopyMonster,lastTempleUnlock,volcanoMaze1,blankOutUsed,peteMotorbikeCowling,peteMotorbikeGasTank,peteMotorbikeHeadlight,peteMotorbikeMuffler,peteMotorbikeSeat,peteMotorbikeTires,_petePeeledOut,_navelRunaways];
         
         if (false)
         {
