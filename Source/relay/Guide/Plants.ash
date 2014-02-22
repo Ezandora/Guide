@@ -91,11 +91,11 @@ void finalizeSetUpFloristState()
 		__plants_suggested_locations.listAppend(PlantSuggestionMake($location[the defiled alcove], "Shuffle Truffle", "+2.5% modern zmobie"));
 	}
 	//Horn of Plenty - underground, +item:
-	if (!__quest_state["Level 7"].state_boolean["nook finished"])
+	if (!__quest_state["Level 7"].state_boolean["nook finished"] && item_drop_modifier() < 400.0)
 	{
 		__plants_suggested_locations.listAppend(PlantSuggestionMake($location[the defiled nook], "horn of plenty", "Evil eye, 20% drop."));
 	}
-	if (!__quest_state["Level 11"].finished)
+	if (!__quest_state["Level 11"].finished && item_drop_modifier() < 400.0)
 	{
 		__plants_suggested_locations.listAppend(PlantSuggestionMake($location[the upper chamber], "horn of plenty", "Tomb ratchets, 20% drop."));
 	}
@@ -139,12 +139,19 @@ void finalizeSetUpFloristState()
 	
 	//Stealing Magnolia - indoor, +item:
 	//The haunted ballroom, except they may be changing that?
-	
+    if (my_primestat() == $stat[moxie] && __misc_state["need to level"])
+    {
+        //let's see... castle?
+        if (my_path_id() != PATH_CLASS_ACT_2)
+            __plants_suggested_locations.listAppend(PlantSuggestionMake($location[the haunted ballroom], "Stealing Magnolia", "Dance cards from waltzers, for power leveling.")); //FIXME if stat changes in the future, remove this suggestion
+        
+	}
 	//War Lily - indoor, +ML:
 	//Rad-ish Radish - outdoor, +5 moxie stats/fight:
     if (my_primestat() == $stat[moxie] && __misc_state["need to level"])
     {
         __plants_suggested_locations.listAppend(PlantSuggestionMake($location[The Spooky Forest], "Rad-ish Radish", ""));
+        __plants_suggested_locations.listAppend(PlantSuggestionMake($location[The Penultimate Fantasy Airship], "Rad-ish Radish", ""));
     }
 	//Rutabeggar - outdoor, +item:
 	if (__quest_state["Level 9"].state_int["a-boo peak hauntedness"] > 0)
@@ -153,7 +160,7 @@ void finalizeSetUpFloristState()
 	}
 	
 	//Rabid Dogwood - outdoor, +ML:
-	if (__quest_state["Level 9"].state_float["oil peak pressure"] > 0)
+	if (__quest_state["Level 9"].state_float["oil peak pressure"] > 0 && monster_level_adjustment() < 100)
     {
 		__plants_suggested_locations.listAppend(PlantSuggestionMake($location[oil peak], "Rabid Dogwood", ""));
     }

@@ -131,6 +131,12 @@ void setUpState()
 		yellow_ray_source = "He-Boulder";
 		yellow_ray_image_name = "he-boulder";
 	}
+    if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE && lookupSkill("Flash Headlight").have_skill() && get_property("peteMotorbikeHeadlight") == "Ultrabright Yellow Bulb")
+    {
+		yellow_ray_available = true;
+		yellow_ray_source = "Flash Headlight";
+		yellow_ray_image_name = "__skill Easy Riding";
+    }
 	
 	if (yellow_ray_available)
 		yellow_ray_potentially_available = true;
@@ -438,12 +444,16 @@ void setUpState()
 	boolean mysterious_island_unlocked = false;
 	if ($items[dingy dinghy, skeletal skiff, junk junk].available_amount() > 0)
 		mysterious_island_unlocked = true;
-        
+    
+    if (get_property("peteMotorbikeGasTank") == "Extra-Buoyant Tank")
+        mysterious_island_unlocked = true;
+            
     if (!mysterious_island_unlocked)
     {
         if ($locations[frat house, hippy camp, the obligatory pirate's cove, frat house in disguise, the frat house (bombed back to the stone age), hippy camp in disguise, barrrney's barrr, the f'c'le, the poop deck, belowdecks, post-war junkyard, mcmillicancuddy's farm].turnsAttemptedInLocation() > 0) //backup
             mysterious_island_unlocked = true;
     }
+    
         
     __misc_state["mysterious island available"] = mysterious_island_unlocked;
     
@@ -513,6 +523,10 @@ void setUpState()
 	if (my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE)
 		__misc_state["bookshelf accessible"] = false;
         
+    
+	__misc_state["can pickpocket"] = false;
+    if (my_class() == $class[disco bandit] || my_class() == $class[accordion thief] || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || $item[tiny black hole].equipped_amount() > 0 || $effect[Form of...Bird!].have_effect() > 0)
+        __misc_state["can pickpocket"] = true;
 }
 
 

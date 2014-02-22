@@ -1,3 +1,4 @@
+import "relay/Guide/Support/Library.ash";
 import "relay/Guide/Sets/Semi-rare.ash";
 import "relay/Guide/Sets/Smithsness.ash";
 import "relay/Guide/Sets/Hole in the Sky.ash";
@@ -29,3 +30,4 @@ import "relay/Guide/Sets/Olfaction.ash";
 import "relay/Guide/Sets/Holiday.ash";
 import "relay/Guide/Sets/Reminders.ash";
 import "relay/Guide/Sets/Grimstone.ash";
+import "relay/Guide/Sets/Avatar of Sneaky Pete.ash";

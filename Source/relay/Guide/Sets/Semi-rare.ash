@@ -136,7 +136,7 @@ void SemirareGenerateDescription(string [int] description)
 		//string line = first + HTMLGenerateIndentedText(HTMLGenerateDiv(explanation.listJoinComponents(HTMLGenerateDivOfStyle("", "border-top:1px solid;width:30%;"))));
 		if (!locationAvailable(sr.place) && sr.place != $location[none])
 		{
-			line = HTMLGenerateSpanOfClass(line, "r_future_option");
+			line = HTMLGenerateDivOfClass(line, "r_future_option");
 		}
 		description.listAppend(line);
 	}
@@ -170,10 +170,13 @@ void SSemirareGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
 		else
 		{
 			min_turns_until = potential_turns[0].to_int();
-			if (potential_turns[0].to_int() == 0)
+            foreach key in potential_turns
             {
-				very_important = true;
-                potential_turns[0] = "Now"; //don't like editing this, possibly copy list?
+                if (potential_turns[key].to_int() == 0)
+                {
+                    very_important = true;
+                    potential_turns[key] = "Now"; //don't like editing this, possibly copy list?
+                }
             }
 			title = potential_turns.listJoinComponents(", ", "or") + " turns until semi-rare";
 		}

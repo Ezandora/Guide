@@ -115,6 +115,13 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
                 subentry.entries.listAppend("Run chalky hand. (use handful of hand chalk, 100% wraith drop)");
             subentry.modifiers.listAppend("-combat");
             subentry.entries.listAppend("Run -combat.");
+            
+            float nc_rate = 1.0 - (0.75 + combat_rate_modifier() / 100.0);
+            float turns_to_finish = -1.0;
+            if (nc_rate != 0.0)
+                turns_to_finish = 1.0 / nc_rate;
+            if (turns_to_finish != -1.0)
+                subentry.entries.listAppend("~" + turns_to_finish.roundForOutput(1) + " turns to unlock at " + combat_rate_modifier().floor() + "% combat.");
         }
 	}
 	else if (next_zone == $location[the haunted bedroom])
@@ -140,6 +147,13 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 		{
 			subentry.modifiers.listAppend("-combat");
 			subentry.entries.listAppend("Run -combat.");
+            
+            float nc_rate = 1.0 - (0.75 + combat_rate_modifier() / 100.0);
+            float turns_to_finish = -1.0;
+            if (nc_rate != 0.0)
+                turns_to_finish = 1.0 / nc_rate;
+            if (turns_to_finish != -1.0)
+                subentry.entries.listAppend("~" + turns_to_finish.roundForOutput(1) + " turns to unlock at " + combat_rate_modifier().floor() + "% combat.");
 		}
 		
 		if (my_primestat() == $stat[muscle] && !locationAvailable($location[the haunted gallery]) && !__misc_state["Stat gain from NCs reduced"])
@@ -185,6 +199,9 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 		url = "place.php?whichplace=spookyraven2";
 		image_name = "Haunted Ballroom";
 		subentry.modifiers.listAppend("-combat");
+        
+        
+        subentry.entries.listAppend(generateTurnsToSeeNoncombat(80, 2, ""));
 	}
 	
 	if (next_zone != $location[none])

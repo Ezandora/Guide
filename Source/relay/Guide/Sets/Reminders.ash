@@ -17,6 +17,11 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             methods.listAppend("Soak in VIP hot tub.");
             url = "clan_viplounge.php";
         }
+        else if (lookupSkill("Shake it off").have_skill())
+        {
+            methods.listAppend("Cast shake it off.");
+            url = "skills.php";
+        }
         else if (__misc_state_int["free rests remaining"] > 0)
         {
             methods.listAppend("Free rest at your campsite.");
@@ -220,22 +225,33 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         task_entries.listAppend(ChecklistEntryMake("__familiar " + my_familiar(), "", ChecklistSubentryMake("Buff " + my_primestat(), "", "Extra stats from " + my_familiar() + " fights."), -11));
     }
     
-    if (__last_adventure_location == $location[the arid\, extra-dry desert] && !__quest_state["Level 11 Pyramid"].state_boolean["Desert Explored"] && __misc_state["In run"])
+    boolean have_blacklight_bulb = (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE && get_property("peteMotorbikeHeadlight") == "Blacklight Bulb");
+    if (__last_adventure_location == $location[the arid\, extra-dry desert] && !__quest_state["Level 11 Pyramid"].state_boolean["Desert Explored"] && __misc_state["In run"] && !have_blacklight_bulb)
     {
         boolean have_uv_compass_equipped = __quest_state["Level 11 Pyramid"].state_boolean["Have UV-Compass eqipped"];
         
         if (!have_uv_compass_equipped)
         {
+            string title;
             item compass_item = $item[UV-resistant compass];
             if (lookupItem("ornate dowsing rod").available_amount() > 0)
                 compass_item = lookupItem("ornate dowsing rod");
-            task_entries.listAppend(ChecklistEntryMake("__item " + compass_item, "", ChecklistSubentryMake("Equip " + compass_item, "", "Explore more efficiently."), -11));
+            
+            title = "Equip " + compass_item;
+            if (compass_item.available_amount() == 0)
+                title = "Find and equip " + compass_item;
+            task_entries.listAppend(ChecklistEntryMake("__item " + compass_item, "", ChecklistSubentryMake(title, "", "Explore more efficiently."), -11));
         }
         
     }
-    if ($item[bottle of blank-out].available_amount() > 0 && $item[glob of blank-out].available_amount() == 0 && __misc_state["In run"] && __misc_state["free runs usable"])
+    if ($item[bottle of blank-out].available_amount() > 0 && $item[glob of blank-out].available_amount() == 0 && __misc_state["In run"] && __misc_state["free runs usable"] && !get_property_boolean("_blankOutUsed"))
     {
         task_entries.listAppend(ChecklistEntryMake("__item " + $item[bottle of blank-out], "inventory.php?which=3", ChecklistSubentryMake("Use " + $item[bottle of blank-out], "", "Acquire glob to run away with."), -11));
     
+    }
+    if (__last_adventure_location == $location[the haunted ballroom] && $item[dance card].available_amount() > 0 && __misc_state["need to level"] && my_primestat() == $stat[moxie] && __misc_state_int["Turns until dance card"] == -1)
+    {
+        float statgain = MIN(2.25 * my_basestat($stat[moxie]), 300.0) * __misc_state_float["Non-combat statgain multiplier"];
+        task_entries.listAppend(ChecklistEntryMake("__item " + $item[dance card], "inventory.php?which=3", ChecklistSubentryMake("Use " + $item[dance card], "", "Gives " + statgain.round() + " mainstat in four turns."), -11));
     }
 }

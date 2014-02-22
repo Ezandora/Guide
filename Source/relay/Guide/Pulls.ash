@@ -136,7 +136,7 @@ void generatePullList(Checklist [int] checklists)
     }
     pullable_item_list.listAppend(GPItemMake($item[ice sickle], "+15ML 1h weapon|+item/+meat/+init foldables", 1));
 	pullable_item_list.listAppend(GPItemMake($item[camp scout backpack], "+15% items on back", 1));
-	pullable_item_list.listAppend(GPItemMake($item[flaming pink shirt], "+15% items on shirt|Or extra experience on familiar", 1));
+	pullable_item_list.listAppend(GPItemMake($item[flaming pink shirt], "+15% items on shirt" + (__misc_state["familiars temporarily blocked"] ? "" : "|Or extra experience on familiar."), 1));
     
     if (__misc_state["Need to level"] && $skill[Torso Awaregness].have_skill())
         pullable_item_list.listAppend(GPItemMake($item[cane-mail shirt], "+20ML shirt", 1));
@@ -178,7 +178,8 @@ void generatePullList(Checklist [int] checklists)
         pullable_item_list.listAppend(GPItemMake($item[slimy alveolus], "40 turns of +50ML (" + floor(40 * 50 * __misc_state_float["ML to mainstat multiplier"]) +" mainstat total, cave bar levelling)|1 spleen", 3));
 	
 	
-	pullable_item_list.listAppend(GPItemMake($item[bottle of blank-out], "run away from your problems|expensive"));
+    if (!get_property_boolean("_blankOutUsed"))
+        pullable_item_list.listAppend(GPItemMake($item[bottle of blank-out], "run away from your problems|expensive", 1));
 	
 	
 	

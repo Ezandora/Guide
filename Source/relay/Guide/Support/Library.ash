@@ -672,6 +672,24 @@ float [monster] appearance_rates_adjusted(location l)
 }
 
 
+float [monster] appearance_rates_adjusted_cancel_nc(location l)
+{
+    float [monster] base_rates = appearance_rates_adjusted(l);
+    float nc_rate = base_rates[$monster[none]];
+    float nc_inverse_multiplier = 1.0;
+    if (nc_rate != 1.0)
+        nc_inverse_multiplier = 1.0 / (1.0 - nc_rate);
+    foreach m in base_rates
+    {
+        if (m == $monster[none])
+            base_rates[m] = 0.0;
+        else
+            base_rates[m] *= nc_inverse_multiplier;
+    }
+    return base_rates;
+}
+
+
 boolean locationHasPlant(location l, string plant_name)
 {
     string [int] plants_in_place = get_florist_plants()[l];
@@ -692,3 +710,47 @@ Record FloatHandle
 {
     float f;
 };
+
+
+buffer generateTurnsToSeeNoncombat(int combat_rate, int noncombats_in_zone, string task, int max_turns_between_nc)
+{
+    if (noncombats_in_zone < 1)
+        return "".to_buffer();
+    float turn_estimation = -1.0;
+    float noncombat_rate = 1.0 - (combat_rate + combat_rate_modifier()).to_float() / 100.0;
+    
+    float minimum_nc_rate = 0.0;
+    if (max_turns_between_nc != 0)
+        minimum_nc_rate = 1.0 / max_turns_between_nc.to_float();
+    if (noncombat_rate < minimum_nc_rate)
+        noncombat_rate = minimum_nc_rate;
+    
+    if (noncombat_rate > 0.0)
+        turn_estimation = noncombats_in_zone.to_float() / noncombat_rate;
+        
+    if (turn_estimation == -1.0)
+        return "".to_buffer();
+    
+    buffer result;
+    result.append("~");
+    result.append(turn_estimation.roundForOutput(1));
+    result.append(" turns");
+    
+    if (task.length() > 0)
+    {
+        result.append(" to ");
+        result.append(task);
+    }
+    else
+        result.append(" remain");
+    result.append(" at ");
+    result.append(combat_rate_modifier().floor());
+    result.append("% combat rate.");
+    
+    return result;
+}
+
+buffer generateTurnsToSeeNoncombat(int combat_rate, int noncombats_in_zone, string task)
+{
+    return generateTurnsToSeeNoncombat(combat_rate, noncombats_in_zone, task, 0);
+}

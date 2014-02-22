@@ -21,6 +21,7 @@ void SSkillsGenerateResource(ChecklistEntry [int] available_resources_entries)
 	ChecklistSubentry [int] subentries;
 	int importance = 11;
 	
+	string [skill] skills_to_details;
 	
 	skill [string][int] property_summons_to_skills;
 	int [string] property_summon_limits;
@@ -33,6 +34,13 @@ void SSkillsGenerateResource(ChecklistEntry [int] available_resources_entries)
 	property_summons_to_skills["_discoKnife"] = listMake($skill[that's not a knife]);
 	property_summons_to_skills["_lunchBreak"] = listMake($skill[lunch break]);
     
+    if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE)
+    {
+		property_summons_to_skills["_petePartyThrown"] = listMake(lookupSkill("Throw Party"));
+		property_summons_to_skills["_peteRiotIncited"] = listMake(lookupSkill("Incite Riot"));
+        skills_to_details[lookupSkill("Throw Party")] = "Ideally have 30 audience love before casting.";
+        skills_to_details[lookupSkill("Incite Riot")] = "Ideally have 30 audience hate before casting.";
+    }
 	//Jarlsberg:
 	if (my_path_id() == PATH_AVATAR_OF_JARLSBERG)
 	{
@@ -50,6 +58,7 @@ void SSkillsGenerateResource(ChecklistEntry [int] available_resources_entries)
 		property_summons_to_skills["_demandSandwich"] = listMake($skill[Demand Sandwich]);
 		property_summon_limits["_demandSandwich"] = 3;
 	}
+    
 	property_summons_to_skills["_requestSandwichSucceeded"] = listMake($skill[Request Sandwich]);
     
     property_summons_to_skills["grimoire1Summons"] = listMake($skill[Summon Hilarious Objects]);
@@ -57,7 +66,6 @@ void SSkillsGenerateResource(ChecklistEntry [int] available_resources_entries)
     property_summons_to_skills["grimoire3Summons"] = listMake($skill[Summon Alice's Army Cards]);
     property_summons_to_skills["_grimoireGeekySummons"] = listMake($skill[Summon Geeky Gifts]);
 	
-	string [skill] skills_to_details;
 	
 	item summoned_knife = $item[none];
 	if (my_level() < 4)

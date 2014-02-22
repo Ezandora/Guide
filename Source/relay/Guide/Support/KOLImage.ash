@@ -237,6 +237,8 @@ void KOLImagesInit()
 	__kol_images["chinatown"] = KOLImageMake("images/otherimages/jung/jung_chinaback.gif", Vec2iMake(450,500), RectMake(188, 202, 229, 270));
 	__kol_images["chinatown"].erase_zones.listAppend(RectMake(227, 247, 231, 256));
     
+	__kol_images["__skill Easy Riding"] = KOLImageMake("images/itemimages/motorbike.gif", Vec2iMake(30,30));
+	__kol_images["__skill jump shark"] = KOLImageMake("images/itemimages/sharkfin.gif", Vec2iMake(30,30));
     
 	
 	string class_name = my_class().to_string();
@@ -286,6 +288,15 @@ KOLImage KOLImageLookup(string lookup_name)
             it = $item[none];
             e = secondary_lookup_name.to_effect();
         }
+        //Disabled for now - skill images are a new feature.
+        /*if (lookup_name.stringHasPrefix("__skill "))
+        {
+            secondary_lookup_name = lookup_name.substring(8);
+            skill s = secondary_lookup_name.to_skill();
+            
+			__kol_images[lookup_name] = KOLImageMake("images/itemimages/" + s.image, Vec2iMake(30,30));
+            return __kol_images[lookup_name];
+        }*/
         secondary_lookup_name = secondary_lookup_name.to_lower_case();
 		if (it != $item[none] && it.smallimage != "" && it.to_string().to_lower_case() == secondary_lookup_name)
 		{

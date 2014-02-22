@@ -53,7 +53,7 @@ void generateTasks(Checklist [int] checklists)
 		subentry.header = "Unlock desert beach";
 		if (!knoll_available())
 		{
-			string meatcar_line = "Build a bitchin' meatcar";
+			string meatcar_line = "Build a bitchin' meatcar.";
 			if (creatable_amount($item[bitchin' meatcar]) > 0)
 				meatcar_line += "|*You have all the parts, build it!";
 			else
@@ -75,7 +75,7 @@ void generateTasks(Checklist [int] checklists)
 		{
             url = "store.php?whichstore=4";
 			int meatcar_price = $item[spring].npc_price() + $item[sprocket].npc_price() + $item[cog].npc_price() + $item[empty meat tank].npc_price() + 100 + $item[tires].npc_price() + $item[sweet rims].npc_price() + $item[spring].npc_price();
-			subentry.entries.listAppend("Build a bitchin' meatcar (" + meatcar_price + " meat)");
+			subentry.entries.listAppend("Build a bitchin' meatcar. (" + meatcar_price + " meat)");
 		}
 		
 		task_entries.listAppend(ChecklistEntryMake("__item bitchin' meatcar", url, subentry));
@@ -119,7 +119,7 @@ void generateTasks(Checklist [int] checklists)
 			subentry.entries.listAppend("Redeem scrip at shore for dinghy plans.");
 		}
         
-        if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE)
+        if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE && get_property("peteMotorbikeGasTank").length() == 0)
             subentry.entries.listAppend("Possibly upgrade your motorcycle's gas tank. (extra-buoyant)");
 		task_entries.listAppend(ChecklistEntryMake("__item dingy dinghy", url, subentry, $locations[the shore\, inc. travel agency]));
 	}
@@ -202,6 +202,13 @@ void generateTasks(Checklist [int] checklists)
 		
 		optional_task_entries.listAppend(ChecklistEntryMake(__misc_state_string["yellow ray image name"], "", ChecklistSubentryMake("Fire yellow ray", "", potential_targets), 5));
 	}
+    if (__misc_state["In run"] && !have_mushroom_plot() && knoll_available() && __misc_state["can eat just about anything"] && fullness_limit() >= 4 && $item[spooky mushroom].available_amount() == 0)
+    {
+        string [int] description;
+        description.listAppend("For spooky mushrooms, to cook a grue egg omelette. (epic food)|Will " + ((my_meat() < 5000) ? "need" : "cost") + " 5k meat.");
+		optional_task_entries.listAppend(ChecklistEntryMake("__item spooky mushroom", "knoll_mushrooms.php", ChecklistSubentryMake("Possibly plant a mushroom plot", "", description), 5));
+    
+    }
 	
 	if (__misc_state["need to level"])
 	{
@@ -210,6 +217,8 @@ void generateTasks(Checklist [int] checklists)
 		boolean have_mcd = false;
 		if (canadia_available() || knoll_available() || gnomads_available() || in_bad_moon())
 			have_mcd = true;
+        if (canadia_available())
+            mcd_max_limit = 11;
         if (knoll_available())
         {
             if ($item[detuned radio].available_amount() > 0)
@@ -299,6 +308,25 @@ void generateTasks(Checklist [int] checklists)
             url = "skills.php";
         }
         optional_task_entries.listAppend(ChecklistEntryMake("__item spaghetti breakfast", url, ChecklistSubentryMake("Eat " + $item[spaghetti breakfast] + " first", "", description), 8));
+    }
+    
+    if (__misc_state["In run"])
+    {
+        item dwelling = get_dwelling();
+        item upgraded_dwelling = $item[none];
+        if ($item[Frobozz Real-Estate Company Instant House (TM)].available_amount() > 0 && (dwelling == $item[big rock] || dwelling == $item[Newbiesport&trade; tent]))
+        {
+            upgraded_dwelling = $item[Frobozz Real-Estate Company Instant House (TM)];
+        }
+        else if ($item[Newbiesport&trade; tent].available_amount() > 0 && dwelling == $item[big rock])
+        {
+            upgraded_dwelling = $item[Newbiesport&trade; tent];
+        }
+        if (upgraded_dwelling != $item[none])
+        {
+            optional_task_entries.listAppend(ChecklistEntryMake("__item " + upgraded_dwelling, "inventory.php?which=3", ChecklistSubentryMake("Use " + upgraded_dwelling, "", "Better HP/MP restoration via rollover and free rests."), 8));
+            
+        }
     }
     
 	checklists.listAppend(ChecklistMake("Tasks", task_entries));

@@ -106,6 +106,15 @@ void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [in
 			line = HTMLGenerateSpanFont(line, "red", "");
         description.listAppend(line);
     }
+    else if (monster_name == "Big swarm of ghuol whelps")
+    {
+        float monster_level = monster_level_adjustment();
+    
+        monster_level = MAX(monster_level, 0);
+        
+        float cranny_beep_beep_beep = MAX(3.0,sqrt(monster_level));
+        description.listAppend("~" + cranny_beep_beep_beep.roundForOutput(1) + " cranny beeps.");
+    }
 }
 
 void generateCopiedMonstersEntry(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, boolean from_task) //if from_task is false, assumed to be from resources

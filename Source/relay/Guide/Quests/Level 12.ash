@@ -66,6 +66,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 		if (__misc_state["yellow ray potentially available"])
 			modifiers.listAppend("potential YR");
 	
+        monster pickpocket_monster = $monster[none];
         boolean need_gland = false;
 		if ($item[heart of the filthworm queen].available_amount() > 0)
 		{
@@ -91,6 +92,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
             }
 			details.listAppend("Adventure with +item in the guards' chamber.");
             need_gland = true;
+            pickpocket_monster = $monster[filthworm royal guard];
 		}
 		else if ($effect[Filthworm Larva Stench].have_effect() > 0 || $item[filthworm hatchling scent gland].available_amount() > 0)
 		{
@@ -101,12 +103,22 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
             }
 			details.listAppend("Adventure with +item in the feeding chamber.");
             need_gland = true;
+            pickpocket_monster = $monster[filthworm drone];
 		}
 		else
 		{
 			details.listAppend("Adventure with +item in the hatching chamber.");
             need_gland = true;
+            pickpocket_monster = $monster[larval filthworm];
 		}
+        
+        if (__misc_state["can pickpocket"] && pickpocket_monster != $monster[none])
+        {
+            int total_initiative_needed = pickpocket_monster.base_initiative;
+            int initiative_needed = total_initiative_needed - initiative_modifier();
+            if (initiative_needed > 0)
+                details.listAppend("Need " + initiative_needed + "% more initiative to pickpocket every turn.");
+        }
         
         if (need_gland)
         {
@@ -195,8 +207,20 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 				details.listAppend("Talk to Yossarian to complete quest.");
 			else
             {
-                if ($item[seal tooth].available_amount() == 0 && !$skill[suckerpunch].have_skill())
-                    details.listAppend("Acquire a seal tooth to stasis gremlins. (from hermit)");
+                if ($skill[suckerpunch].have_skill())
+                {
+                    details.listAppend("Cast suckerpunch to stasis gremlins.");
+                }
+                else if ($item[dictionary].available_amount() > 0)
+                {
+                    details.listAppend("Read from the dictionary to stasis gremlins.");
+                }
+                else if ($item[seal tooth].available_amount() > 0)
+                {
+                    details.listAppend("Use your seal tooth to stasis gremlins.");
+                }
+                else
+                    details.listAppend(HTMLGenerateSpanFont("Acquire a seal tooth", "red", "") + " to stasis gremlins. (from hermit)");
                 if (!$monster[a.m.c. gremlin].is_banished())
                     details.listAppend("Potentially banish A.M.C. Gremlin.");
             }
@@ -207,13 +231,16 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 	{
 		string [int] details;
 	
-		details.listAppend($item[barrel of gunpowder].available_amount() + "/5 barrels of gunpowder found.");
-        
         int gunpowder_needed = MAX(0, 5 - $item[barrel of gunpowder].available_amount());
         
         
         if (gunpowder_needed > 0)
         {
+            if (gunpowder_needed == 1)
+                details.listAppend("Need " + gunpowder_needed + " more barrel of gunpowder.");
+            else
+                details.listAppend("Need " + gunpowder_needed + " more barrels of gunpowder.");
+                
             float effective_combat_rate = clampNormalf(0.1 + combat_rate_modifier() / 100.0);
             float turns_per_lobster = -1.0;
             if (effective_combat_rate != 0.0)
@@ -227,8 +254,9 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
                 float turns_to_complete = gunpowder_needed.to_float() * turns_per_lobster;
                 details.listAppend("~" + roundForOutput(turns_to_complete, 1) + " turns to complete quest at " + combat_rate_modifier().floor() + "% combat.|~" + roundForOutput(turns_per_lobster, 1) + " turns per lobster.");
             }
-            
         }
+        else
+            details.listAppend("Talk to the lighthouse keeper.");
 	
 		optional_task_entries.listAppend(ChecklistEntryMake("Island War Lighthouse", "bigisland.php?place=lighthouse", ChecklistSubentryMake("Island War Lighthouse Quest", listMake("+combat", "copies"), details), $locations[sonofa beach]));
 	}
@@ -364,10 +392,22 @@ void QLevel12GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 		}
 		else
         {
-            //FIXME point out they need to level myst or whatever if necessary
-			subentry.entries.listAppend("Wear war outfit, run -combat, adventure in other side's camp.");
+            string [int] stats_needed;
+            if (my_basestat($stat[moxie]) < 70)
+                stats_needed.listAppend((70 - my_basestat($stat[moxie])) + " more moxie");
+            if (my_basestat($stat[mysticality]) < 70)
+                stats_needed.listAppend((70 - my_basestat($stat[mysticality])) + " more mysticality");
+            if (stats_needed.count() == 0)
+                subentry.entries.listAppend("Wear war outfit, run -combat, adventure in other side's camp.");
+            else
+                subentry.entries.listAppend("Acquire " + stats_needed.listJoinComponents(", ", "and") + " to wear war outfit.");
+            
+            
+            //need 70 moxie, 70 myst
+            
         }
-        subentry.entries.listAppend("~" + turns_remaining.roundForOutput(1) + " turns to start war.");
+        
+        subentry.entries.listAppend(generateTurnsToSeeNoncombat(85, 3, "start war"));
 	}
 	else
 	{
@@ -388,6 +428,13 @@ void QLevel12GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 		
 		int frat_boys_defeated_per_combat = powi(2, sides_completed_hippy);
 		int hippies_defeated_per_combat = powi(2, sides_completed_frat);
+        
+        if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE && get_property("peteMotorbikeCowling") == "Rocket Launcher")
+        {
+            frat_boys_defeated_per_combat += 3;
+            hippies_defeated_per_combat += 3;
+        }
+        
         
 		if (frat_boys_left < 1000 || (frat_boys_left == 1000 && hippies_left == 1000) || sides_completed_hippy > 0)
             QLevel12GenerateBattlefieldDescription(subentry, "hippy", frat_boys_left, frat_boys_defeated_per_combat, "frat boy", "frat boys", "The Man", listMake("Lighthouse", "Junkyard", "Arena"));

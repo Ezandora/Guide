@@ -192,7 +192,7 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         else
         {
             if ($item[black market map].available_amount() > 0)
-                subentry.entries.listAppend("Use the black market map");
+                subentry.entries.listAppend("Use the black market map.");
             
         }
     }
@@ -201,7 +201,7 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         //Vacation:
         if ($item[forged identification documents].available_amount() == 0)
         {
-            url = "store.php?whichstore=l";
+            url = "shop.php?whichshop=blackmarket";
             subentry.entries.listAppend("Buy forged identification documents from the black market.");
             if ($item[can of black paint].available_amount() == 0)
                 subentry.entries.listAppend("Also buy a can of black paint while you're there, for the desert quest.");
@@ -311,7 +311,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
         if ($location[the poop deck].noncombat_queue.contains_text("It's Always Swordfish"))
         {
             subentry.modifiers.listAppend("olfact gaudy pirate");
-            string line = "Olfact gaudy pirate belowdecks";
+            string line = "Olfact/copy gaudy pirate belowdecks";
             if (!__quest_state["Level 13"].state_boolean["have relevant guitar"])
             {
                 line += ", and possibly run +400% item to find a guitar";
@@ -326,6 +326,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
         {
             subentry.modifiers.listAppend("-combat");
             subentry.entries.listAppend("Run -combat to unlock belowdecks.");
+            subentry.entries.listAppend(generateTurnsToSeeNoncombat(80, 1, "unlock belowdecks"));
         }
             
     }
@@ -439,9 +440,13 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
         int exploration_remaining = 100 - exploration;
         float exploration_per_turn = 1.0;
         if ($item[uv-resistant compass].available_amount() > 0)
-            exploration_per_turn = 2.0;
+            exploration_per_turn += 1.0;
         if (lookupItem("ornate dowsing rod").available_amount() > 0)
-            exploration_per_turn = 3.0; //FIXME make completely accurate for first turn? not enough information available
+            exploration_per_turn += 2.0; //FIXME make completely accurate for first turn? not enough information available
+        
+        boolean have_blacklight_bulb = (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE && get_property("peteMotorbikeHeadlight") == "Blacklight Bulb");
+        if (have_blacklight_bulb)
+            exploration_per_turn += 2.0;
         //FIXME deal with ultra-hydrated
         int combats_remaining = exploration_remaining;
         combats_remaining = ceil(to_float(exploration_remaining) / exploration_per_turn);
@@ -454,7 +459,7 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
                 description.listAppend("Adventure in the Oasis.");
                 if ($items[ten-leaf clover, disassembled clover].available_amount() > 0)
                     description.listAppend("Potentially clover for 20 turns, versus 5.");
-                task_entries.listAppend(ChecklistEntryMake("__effect ultrahydrated", "", ChecklistSubentryMake("Acquire ultrahydrated effect", "", description), -11));
+                task_entries.listAppend(ChecklistEntryMake("__effect ultrahydrated", "place.php?whichplace=desertbeach", ChecklistSubentryMake("Acquire ultrahydrated effect", "", description), -11));
             }
             if (exploration > 0)
                 subentry.entries.listAppend("Need ultra-hydrated from The Oasis. (potential clover for 20 turns)");
@@ -558,9 +563,9 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
             else
                 subentry.entries.listAppend("Use your desert sightseeing pamphlets. (+15% exploration)");
         }
-        
         if (!base_quest_state.state_boolean["Have UV-Compass eqipped"])
         {
+            boolean should_output_compass_in_red = true;
             string line = "";
             if (lookupItem("ornate dowsing rod").available_amount() > 0)
             {
@@ -570,7 +575,14 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
             {
                 if ($item[uv-resistant compass].available_amount() == 0)
                 {
-                    line = "Acquire UV-resistant compass, equip for faster desert exploration. (shore vacation)";
+                    line = "Acquire";
+                    if (have_blacklight_bulb)
+                    {
+                        line = "Possibly acquire";
+                        should_output_compass_in_red = false;
+                    }
+                  
+                    line += " UV-resistant compass, equip for faster desert exploration. (shore vacation)";
                   
                     if (lookupItem("odd silver coin").available_amount() > 0)
                     {
@@ -584,7 +596,11 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
                 }
             }
             if (line.length() > 0)
-                subentry.entries.listAppend(HTMLGenerateSpanFont(line, "red", ""));
+            {
+                if (should_output_compass_in_red)
+                    line = HTMLGenerateSpanFont(line, "red", "");
+                subentry.entries.listAppend(line);
+            }
         }
     }
     else
@@ -612,6 +628,7 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
             int additional_turns_after_that = 0;
             string task;
             boolean ed_waiting = get_property_boolean("pyramidBombUsed");
+            boolean done_with_wheel_turning = false;
             if (2318.to_item().available_amount() > 0 || ed_waiting)
             {
                 //need 1
@@ -622,6 +639,7 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
                 task = "fight Ed in the lower chambers";
                 if (ed_ml > my_buffedstat($stat[moxie]))
                     task += " (" + ed_ml + " attack)";
+                done_with_wheel_turning = true;
             }
             else if ($item[ancient bronze token].available_amount() > 0)
             {
@@ -651,7 +669,7 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
             tasks.listAppend(task);
             subentry.entries.listAppend(tasks.listJoinComponents(", ", "then").capitalizeFirstLetter() + ".");
             
-            if ($item[tomb ratchet].available_amount() > 0)
+            if ($item[tomb ratchet].available_amount() > 0 && !done_with_wheel_turning)
                 subentry.entries.listAppend(pluralize($item[tomb ratchet]) + " available.");
             //FIXME track wheel being placed
             //FIXME tell them which route is better from where they are
@@ -741,8 +759,76 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         boolean have_machete = false;
     
         have_machete = __dense_liana_machete_items.available_amount() > 0;
-    
         int bowling_progress = get_property_int("hiddenBowlingAlleyProgress");
+        int hospital_progress = get_property_int("hiddenHospitalProgress");
+        int apartment_progress = get_property_int("hiddenApartmentProgress");
+        int office_progress = get_property_int("hiddenOfficeProgress");
+        
+        boolean at_last_spirit = false;
+        
+        if (bowling_progress == 8 && hospital_progress == 8 && apartment_progress == 8 && office_progress == 8 || $item[stone triangle].available_amount() == 4)
+        {
+            at_last_spirit = true;
+            ChecklistSubentry subentry;
+            subentry.header = "Massive Ziggurat";
+            //Instead of checking for four stone triangles, we check for the lack of all four stone spheres. That way it should detect properly after you fight the boss (presumably losing stone triangles), and lost?
+        
+            int spheres_available = $item[moss-covered stone sphere].available_amount() + $item[dripping stone sphere].available_amount() + $item[crackling stone sphere].available_amount() + $item[scorched stone sphere].available_amount();
+        
+            if (spheres_available > 0)
+            {
+                subentry.entries.listAppend("Acquire stone triangles");
+            }
+            else
+            {
+                if ($location[a massive ziggurat].combatTurnsAttemptedInLocation() <3 && $location[a massive ziggurat].noncombatTurnsAttemptedInLocation() == 0)
+                {
+                    generateHiddenAreaUnlockForShrine(subentry.entries,$location[a massive ziggurat]);
+                }
+                else
+                {
+                    subentry.modifiers.listAppend("elemental damage");
+                    subentry.entries.listAppend("Fight the protector spirit!");
+                }
+            }
+        
+            entry.subentries.listAppend(subentry);
+        }
+        if (!at_last_spirit)
+        {
+            if (!janitors_relocated_to_park || !have_machete)
+            {
+                ChecklistSubentry subentry;
+                subentry.header = "Hidden Park";
+            
+                subentry.modifiers.listAppend("-combat");
+                if (!have_machete)
+                {
+                    int turns_remaining = MAX(0, 6 - $location[the hidden park].turnsAttemptedInLocation());
+                    string line;
+                    line += "Adventure for " + turns_remaining.int_to_wordy() + " turns here for antique machete to clear dense lianas.";
+                    if (canadia_available())
+                        line += "|Or potentially use muculent machete by acquiring forest tears. (kodama, Outskirts of Camp Logging Camp, 30% drop or clover)";
+                    subentry.entries.listAppend(line);
+                }
+                if (!janitors_relocated_to_park)
+                    subentry.entries.listAppend("Potentially relocate janitors to park via non-combat.");
+                else
+                    subentry.entries.listAppend("Acquire useful items from dumpster with -combat.");
+                if (__misc_state["have hipster"])
+                    subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
+                if (__misc_state["free runs available"])
+                    subentry.modifiers.listAppend("free runs");
+                if (my_basestat($stat[muscle]) < 62)
+                {
+                    string line = "Will need " + (62 - my_basestat($stat[muscle])) + " more muscle to equip machete.";
+                    subentry.entries.listAppend(line);
+                }
+            
+                entry.subentries.listAppend(subentry);
+            }
+        }
+    
         if (bowling_progress < 8)
         {
             ChecklistSubentry subentry;
@@ -787,7 +873,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                     if (hidden_tavern_unlocked)
                     {
                         if ($item[bowl of scorpions].available_amount() == 0)
-                            subentry.entries.listAppend(HTMLGenerateSpanOfClass("Buy a bowl of scorpions", "r_bold") + " from the Hidden Tavern to free run from drunk pygmys.");
+                            subentry.entries.listAppend(HTMLGenerateSpanFont("Buy a bowl of scorpions", "red", "") + " from the Hidden Tavern to free run from drunk pygmys.");
                     }
                     else
                     {
@@ -800,7 +886,6 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         
             entry.subentries.listAppend(subentry);
         }
-        int hospital_progress = get_property_int("hiddenHospitalProgress");
         if (hospital_progress < 8)
         {
             ChecklistSubentry subentry;
@@ -818,27 +903,42 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 subentry.entries.listAppend("Olfact surgeon.");
                 if (!$monster[pygmy orderlies].is_banished())
                     subentry.entries.listAppend("Potentially banish pgymy orderlies.");
-        
+                
         
                 string [int] items_we_have_unequipped;
+                item [int] items_we_have_equipped;
                 foreach it in $items[surgical apron,bloodied surgical dungarees,surgical mask,head mirror,half-size scalpel]
                 {
                     boolean can_equip = true;
                     if (it.to_slot() == $slot[shirt] && !have_skill($skill[Torso Awaregness]))
                         can_equip = false;
-                    if (it.available_amount() > 0 && equipped_amount(it) == 0 && can_equip)
-                        items_we_have_unequipped.listAppend(it + " (" + it.to_slot().slot_to_string() + ")");
+                    if (it.available_amount() > 0 && it.equipped_amount() == 0 && can_equip)
+                    {
+                        buffer line;
+                        line.append(it);
+                        line.append(" (");
+                        line.append(it.to_slot().slot_to_string());
+                        if (!it.can_equip())
+                            line.append(", can't equip yet");
+                        line.append(")");
+                        items_we_have_unequipped.listAppend(line);
+                    }
+                    if (it.equipped_amount() > 0)
+                        items_we_have_equipped.listAppend(it);
                 }
                 if (items_we_have_unequipped.count() > 0)
                 {
                     subentry.entries.listAppend("Equipment unequipped: (+10% chance of protector spirit per piece)|*" + items_we_have_unequipped.listJoinComponents("|*"));
+                }
+                if (items_we_have_equipped.count() > 0)
+                {
+                    subentry.entries.listAppend((items_we_have_equipped.count() * 10) + "% chance of protector spirit encounter.");
                 }
             }
             
             
             entry.subentries.listAppend(subentry);
         }
-        int apartment_progress = get_property_int("hiddenApartmentProgress");
         if (apartment_progress < 8)
         {
             ChecklistSubentry subentry;
@@ -895,7 +995,6 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
             }
             entry.subentries.listAppend(subentry);
         }
-        int office_progress = get_property_int("hiddenOfficeProgress");
         if (office_progress < 8)
         {
             ChecklistSubentry subentry;
@@ -924,7 +1023,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                     int files_not_found = 5 - files_found;
                     if (files_not_found > 0)
                     {
-                        subentry.entries.listAppend("Need " + pluralize(files_not_found, "McClusky file", "McClusky files") + ". Found from pygmy witch accountants.");
+                        subentry.entries.listAppend("Need " + pluralize(files_not_found, "more McClusky file", "more McClusky files") + ". Found from pygmy witch accountants.");
                         subentry.entries.listAppend("Olfact accountant");
                         //if (!$monster[pygmy witch lawyer].is_banished())
                             //subentry.entries.listAppend("Potentially banish lawyers.");
@@ -937,34 +1036,8 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
             }
             entry.subentries.listAppend(subentry);
         }
-        if (bowling_progress == 8 && hospital_progress == 8 && apartment_progress == 8 && office_progress == 8 || $item[stone triangle].available_amount() == 4)
-        {
-            ChecklistSubentry subentry;
-            subentry.header = "Massive Ziggurat";
-            //Instead of checking for four stone triangles, we check for the lack of all four stone spheres. That way it should detect properly after you fight the boss (presumably losing stone triangles), and lost?
         
-            int spheres_available = $item[moss-covered stone sphere].available_amount() + $item[dripping stone sphere].available_amount() + $item[crackling stone sphere].available_amount() + $item[scorched stone sphere].available_amount();
-        
-            if (spheres_available > 0)
-            {
-                subentry.entries.listAppend("Acquire stone triangles");
-            }
-            else
-            {
-                if ($location[a massive ziggurat].combatTurnsAttemptedInLocation() <3 && $location[a massive ziggurat].noncombatTurnsAttemptedInLocation() == 0)
-                {
-                    generateHiddenAreaUnlockForShrine(subentry.entries,$location[a massive ziggurat]);
-                }
-                else
-                {
-                    subentry.modifiers.listAppend("elemental damage");
-                    subentry.entries.listAppend("Fight the protector spirit!");
-                }
-            }
-        
-            entry.subentries.listAppend(subentry);
-        }
-        else
+        if (!at_last_spirit)
         {
             if ($location[a massive ziggurat].combatTurnsAttemptedInLocation() <3)
             {
@@ -980,7 +1053,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 boolean should_output = true;
             
                 if ($item[book of matches].available_amount() > 0)
-                    subentry.entries.listAppend("Use book of matches");
+                    subentry.entries.listAppend("Use book of matches.");
                 else
                 {
                     if (janitors_relocated_to_park)
@@ -1009,32 +1082,6 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 }
                 if (should_output)
                     entry.subentries.listAppend(subentry);
-            }
-            if (!janitors_relocated_to_park || !have_machete)
-            {
-                ChecklistSubentry subentry;
-                subentry.header = "Hidden Park";
-            
-                subentry.modifiers.listAppend("-combat");
-                if (!have_machete)
-                {
-                    int turns_remaining = MAX(0, 6 - $location[the hidden park].turnsAttemptedInLocation());
-                    string line;
-                    line += "Adventure for " + turns_remaining.int_to_wordy() + " turns here for antique machete to clear dense lianas.";
-                    if (canadia_available())
-                        line += "|Or potentially use muculent machete by acquiring forest tears. (kodama, Outskirts of Camp Logging Camp, 30% drop or clover)";
-                    subentry.entries.listAppend(line);
-                }
-                if (!janitors_relocated_to_park)
-                    subentry.entries.listAppend("Potentially relocate janitors to park via non-combat.");
-                else
-                    subentry.entries.listAppend("Acquire useful items from dumpster with -combat.");
-                if (__misc_state["have hipster"])
-                    subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
-                if (__misc_state["free runs available"])
-                    subentry.modifiers.listAppend("free runs");
-            
-                entry.subentries.listAppend(subentry);
             }
         }
     

@@ -126,16 +126,20 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
 		name += pluralize(blankout_count, "blank-out", "blank-out");
         
 		if ($item[glob of blank-out].available_amount() == 0)
-            description.listAppend("Use blank-out for glob");
+            description.listAppend("Use blank-out for glob.");
+        if (get_property_boolean("_blankOutUsed"))
+            description.listAppend("Will have to wait until tomorrow to open.");
         
 		available_resources_entries.listAppend(ChecklistEntryMake("__item Bottle of Blank-Out", "inventory.php?which=3", ChecklistSubentryMake(name, "", description)));
 	}
-    if (__misc_state["free runs usable"] && in_run && $item[glob of blank-out].available_amount() > 0)
+    if (__misc_state["free runs usable"] && $item[glob of blank-out].available_amount() > 0)
     {
 		int uses_remaining = 5 - get_property_int("blankOutUsed");
 		string [int] description;
 		string name;
         description.listAppend("Use glob of blank-out in combat.");
+        if (!in_run)
+            description.listAppend("Will disappear when you ascend.");
         
         name = pluralize(uses_remaining, "blank-out runaway", "blank-out runaways");
 		available_resources_entries.listAppend(ChecklistEntryMake("__item glob of blank-out", "", ChecklistSubentryMake(name, "", description)));
@@ -367,7 +371,12 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
 		if (__misc_state["need to level"])
 			description.listAppend("Cave bar");
 		if (get_property_int("lastTempleAdventures") != my_ascensions())
-			description.listAppend("+3 adventures (once/ascension)");
+        {
+            string line = "+3 adventures, +3 duration to ten effects. (once/ascension)";
+            if (!__quest_state["Level 12"].state_boolean["Nuns Finished"])
+                line += "|Can use to extend effects at nuns.";
+			description.listAppend(line);
+        }
 		if (description.count() > 0)
 			available_resources_entries.listAppend(ChecklistEntryMake("__item stone wool", "inventory.php?which=3", ChecklistSubentryMake(pluralize($item[stone wool]), "", description), importance_level_unimportant_item));
 	}

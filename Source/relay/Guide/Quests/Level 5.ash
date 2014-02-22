@@ -122,8 +122,6 @@ void QLevel5GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 			
 			if (!have_outfit_components("Knob Goblin Elite Guard Uniform"))
 			{
-				float combat_rate = clampNormalf((85.0 + combat_rate_modifier()) / 100.0);
-				float noncombat_rate = 1.0 - combat_rate;
 				int outfit_pieces_needed = 0;
 				if ($item[Knob Goblin elite polearm].available_amount() == 0)
 					outfit_pieces_needed += 1;
@@ -131,9 +129,6 @@ void QLevel5GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 					outfit_pieces_needed += 1;
 				if ($item[Knob Goblin elite helm].available_amount() == 0)
 					outfit_pieces_needed += 1;
-				float turns_left = -1;
-				if (noncombat_rate != 0.0)
-					turns_left = outfit_pieces_needed.to_float() / noncombat_rate;
 				//take into account combats?
 				//with banishes and slimeling and +item and?
                 //too complicated. Possibly remove?
@@ -141,7 +136,8 @@ void QLevel5GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 				string line = "Need knob goblin elite guard uniform.|*Semi-rare in barracks|*Or run -combat in barracks";
 				if (familiar_is_usable($familiar[slimeling]))
 					line += " with slimeling";
-				line += " (" + turns_left.roundForOutput(1) + " turns to acquire outfit via only NCs at " + floor(combat_rate * 100.0) + "% combats)";
+                
+                line += generateTurnsToSeeNoncombat(85, outfit_pieces_needed, "acquire outfit via only non-combats");
 				kge_lines.listAppend(line);
 			}
 			else

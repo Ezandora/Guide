@@ -283,7 +283,6 @@ void QLevel13Init()
 	QuestStateParseMafiaQuestProperty(state, "questL13Final");
     if (my_path_id() == PATH_BUGBEAR_INVASION)
         QuestStateParseMafiaQuestPropertyValue(state, "finished"); //never will start
-	//QuestStateParseMafiaQuestPropertyValue(state, "step10");
 	state.quest_name = "Naughty Sorceress Quest";
 	state.image_name = "naughty sorceress lair";
 	state.council_quest = true;
@@ -318,7 +317,7 @@ void QLevel13Init()
         if (!__quest_state["Level " + i].finished)
             other_quests_completed = false;
     }
-    if (other_quests_completed)
+    if (other_quests_completed && my_level() >= 13)
         state.startable = true;
     
 	
@@ -382,6 +381,16 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 			subentry.entries.listAppend("Find the key.");
         else
 			subentry.entries.listAppend("Find the way out.");
+            
+            
+        monster pickpocket_monster = $monster[Topiary Golem];
+        if (__misc_state["can pickpocket"] && pickpocket_monster != $monster[none])
+        {
+            int total_initiative_needed = pickpocket_monster.base_initiative;
+            int initiative_needed = total_initiative_needed - initiative_modifier();
+            if (initiative_needed > 0)
+                subentry.entries.listAppend("Need " + initiative_needed + "% more initiative to pickpocket every turn.");
+        }
 		
 	}
 	else if (base_quest_state.mafia_internal_step == 5)

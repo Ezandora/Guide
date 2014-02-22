@@ -384,6 +384,11 @@ string getClickableURLForLocation(location l)
             else
                 __urls_for_locations[l] = "mall.php";
         }
+        
+        foreach l in $locations[Cobb's Knob Menagerie\, Level 1,Cobb's Knob Menagerie\, Level 2,Cobb's Knob Menagerie\, Level 3]
+            __urls_for_locations[l] = "cobbsknob.php?action=tomenagerie";
+        foreach l in $locations[cobb's knob laboratory,the knob shaft]
+            __urls_for_locations[l] = "cobbsknob.php?action=tolabs";
             
         foreach l in $locations[the degrassi knoll restroom, the degrassi knoll bakery, the degrassi knoll gym, the degrassi knoll garage]
         {

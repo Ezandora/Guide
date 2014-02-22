@@ -149,6 +149,7 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
     bounty_item_to_unlock["pop art banana peel"] = $item[llama lama gong];
     bounty_item_to_unlock["wig powder"] = $item[&quot;DRINK ME&quot; potion];
     bounty_item_to_unlock["grizzled stubble"] = $item[transporter transponder];
+    bounty_item_to_unlock["hickory daiquiri"] = $item[devilish folio];
     
     if (bounty_item_to_unlock contains bounty_item_name)
         subentry.entries.listAppend("Accessed with " + bounty_item_to_unlock[bounty_item_name] + ".");

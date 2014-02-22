@@ -100,7 +100,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
         }
         
 		modifiers.listAppend("+567% item");
-		details.listAppend(base_quest_state.state_int["a-boo peak hauntedness"] + "% hauntedness (may be off by 2%, sorry)");
+		details.listAppend(base_quest_state.state_int["a-boo peak hauntedness"] + "% hauntedness");
 		details.listAppend(pluralize($item[a-boo clue]));
         
         
@@ -202,7 +202,9 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
                     details.listAppend("Use rusty hedge trimmers.");
             }
 			if (numeric_modifier("stench resistance") < 4.0 && !stench_completed)
-				details.listAppend("+4 stench resist required.");
+            {
+				details.listAppend("+" + (4.0 - numeric_modifier("stench resistance")).floor() + " more " + HTMLGenerateSpanOfClass("stench", "r_element_stench") + " resist required.");
+            }
 				
             if (!item_completed)
             {
@@ -212,14 +214,18 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
 			
 			if ($item[jar of oil].available_amount() == 0 && !jar_completed)
             {
-                string line = "Jar of oil required.";
+                string line = HTMLGenerateSpanFont("Jar of oil required", "red", "") + ".";
                 if ($item[bubblin' crude].available_amount() >= 12)
                     line += " Can make by multi-using 12 bubblin' crude.";
+                else
+                    line += " Visit oil peak for bubblin' crude.";
 				details.listAppend(line);
             }
 			if (initiative_modifier() < 40.0 && !init_completed)
             {
                 string line = "+40% init required.";
+                if (options_left.count() > 1)
+                    line = "+40% init will be required later.";
                 if ($familiar[oily woim].familiar_is_usable() && !($familiars[oily woim,happy medium] contains my_familiar()))
                     line += "|Run " + $familiar[oily woim] + " for +init.";
 				details.listAppend(line);

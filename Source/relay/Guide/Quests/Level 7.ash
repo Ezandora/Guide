@@ -77,7 +77,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		else if (evilness <= 25)
 			text = HTMLGenerateSpanFont("At boss", "red", "");
 		else
-			text = evilness + " evilness remains.";
+			text = (evilness - 25) + " evilness to boss.";
 		evilness_text[property] = text;
 	}
 	
@@ -121,16 +121,16 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             
             monster_level = MAX(monster_level, 0);
             
-			float niche_beep_beep_beep = MAX(3.0,sqrt(monster_level));
-			int beep_boop_lookup = floor(niche_beep_beep_beep) - 3;
+			float cranny_beep_beep_beep = MAX(3.0,sqrt(monster_level));
+			int beep_boop_lookup = floor(cranny_beep_beep_beep) - 3;
             
             float area_combat_rate = clampNormalf(0.85 + combat_rate_modifier() / 100.0);
             float area_nc_rate = 1.0 - area_combat_rate;
             
-            float average_beeps_per_turn = niche_beep_beep_beep * area_nc_rate + 1.0 * area_combat_rate;
+            float average_beeps_per_turn = cranny_beep_beep_beep * area_nc_rate + 1.0 * area_combat_rate;
             float average_turns_remaining = ((base_quest_state.state_int["cranny evilness"] - 25) / average_beeps_per_turn);
 			
-			subentry.entries.listAppend("~" + niche_beep_beep_beep.roundForOutput(1) + " beeps per ghuol swarm. ~" + average_turns_remaining.roundForOutput(1) + " turns remain.");
+			subentry.entries.listAppend("~" + cranny_beep_beep_beep.roundForOutput(1) + " beeps per ghuol swarm. ~" + average_turns_remaining.roundForOutput(1) + " turns remain.");
 		}
         else
             subentry.modifiers.listAppend("+meat");
@@ -143,8 +143,9 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		ChecklistSubentry subentry;
 		subentry.header = "Defiled Niche";
 		
+		subentry.entries.listAppend(evilness_text["cyrptNicheEvilness"]);
         
-        float [monster] appearance_rates = $location[the defiled niche].appearance_rates_adjusted();
+        float [monster] appearance_rates = $location[the defiled niche].appearance_rates_adjusted_cancel_nc();
         float evilness_removed_per_adventure = 0.0;
         evilness_removed_per_adventure += 1.0 * appearance_rates[$monster[slick lihc]] / 100.0;
         evilness_removed_per_adventure += 1.0 * appearance_rates[$monster[senile lihc]] / 100.0;
@@ -153,7 +154,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         float turns_remaining = MAX(0, evilness - 25);
         
         if (evilness_removed_per_adventure != 0.0)
-            turns_remaining = turns_remaining / evilness_removed_per_adventure;
+            turns_remaining = MAX(1, turns_remaining / evilness_removed_per_adventure);
         
         turns_remaining += 1; //last turn
 		if (evilness > 26)
@@ -161,9 +162,8 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             subentry.modifiers.listAppend("olfaction");
             subentry.modifiers.listAppend("banish");
         }
-		
-        subentry.entries.listAppend("~" + turns_remaining.roundForOutput(1) + " turns remaining.");
-		subentry.entries.listAppend(evilness_text["cyrptNicheEvilness"]);
+		if (evilness > 25)
+            subentry.entries.listAppend("~" + turns_remaining.roundForOutput(1) + " turns remaining.");
 		
 		
 		entry.subentries.listAppend(subentry);

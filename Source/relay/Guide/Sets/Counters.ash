@@ -182,7 +182,7 @@ void SCountersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [i
 		string stats = "Gives " + statgain.round() + " mainstats.";
 		if (turns_until_dance_card == 0)
 		{
-			task_entries.listAppend(ChecklistEntryMake("__item dance card", "", ChecklistSubentryMake("Dance card up now.", "", "Adventure in haunted ballroom. " + stats), -11));
+			task_entries.listAppend(ChecklistEntryMake("__item dance card", $location[the haunted ballroom].getClickableURLForLocation(), ChecklistSubentryMake("Dance card up now.", "", "Adventure in haunted ballroom. " + stats), -11));
 		}
 		else
 		{

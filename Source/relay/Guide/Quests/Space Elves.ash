@@ -30,6 +30,8 @@ void QSpaceElvesGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
     
     if (!turns_spent_in_locations_already && $effect[transpondent].have_effect() == 0) //suggest it when they go to spaaace, otherwise, don't bug them?
         return;
+    if (in_ronin() && $effect[transpondent].have_effect() == 0 && $item[transporter transponder].available_amount() == 0)
+        return;
 		
 	ChecklistSubentry subentry;
 	

@@ -186,6 +186,68 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] available_resources_entries
             importance = 0;
         available_resources_entries.listAppend(ChecklistEntryMake("__familiar happy medium", url, ChecklistSubentryMake(title, "", description), importance));
     }
+    if (my_familiar() == $familiar[steam-powered cheerleader] || $familiar[steam-powered cheerleader].familiar_is_usable() && get_property_int("_cheerleaderSteam") < 200)
+    {
+        string title;
+        string [int] description;
+        
+        int steam_remaining = get_property_int("_cheerleaderSteam");
+        float multiplier = 1.0;
+        float next_multiplier_level = 1.0;
+        
+        int next_steam_level = 0;
+        
+        boolean has_socket_set = $familiar[steam-powered cheerleader].familiar_equipped_equipment() == $item[school spirit socket set];
+        
+        if (steam_remaining >= 151)
+        {
+            multiplier = 1.4;
+            next_multiplier_level = 1.3;
+            next_steam_level = 150;
+        }
+        else if (steam_remaining >= 101)
+        {
+            multiplier = 1.3;
+            next_multiplier_level = 1.2;
+            next_steam_level = 100;
+        }
+        else if (steam_remaining >= 51)
+        {
+            multiplier = 1.2;
+            next_multiplier_level = 1.1;
+            next_steam_level = 50;
+        }
+        else if (steam_remaining >= 1)
+        {
+            multiplier = 1.1;
+            next_multiplier_level = 1.0;
+            next_steam_level = 0;
+        }
+        
+        int steam_at_this_level_remaining = steam_remaining - next_steam_level;
+        int turns_remaining_at_this_level = steam_at_this_level_remaining;
+        if (!has_socket_set)
+            turns_remaining_at_this_level = turns_remaining_at_this_level / 2;
+        
+        
+        
+        title = multiplier + "x fairy steam-powered cheerleader";
+        
+        if (turns_remaining_at_this_level > 0)
+            description.listAppend(pluralize(turns_remaining_at_this_level, "turn remains", "turns remain") + " until " + next_multiplier_level + "x.");
+        
+        int importance = 6;
+        if (my_familiar() == $familiar[steam-powered cheerleader])
+            importance = 0;
+        
+    
+        string url;
+        if (my_familiar() != $familiar[steam-powered cheerleader])
+            url = "familiar.php";
+        
+        
+        available_resources_entries.listAppend(ChecklistEntryMake("__familiar steam-powered cheerleader", url, ChecklistSubentryMake(title, "", description), importance));
+    }
     
     //FIXME small medium, organ grinder, charged boots
 	SFamiliarsGenerateEntry(available_resources_entries, available_resources_entries, false);
