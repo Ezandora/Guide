@@ -341,6 +341,22 @@ void generateDailyResources(Checklist [int] checklists)
     //Skill books we have used, but don't have the skill for?
     
     //soul sauce tracking?
+    
+    
+    
+    if (get_property_int("goldenMrAccessories") > 0)
+    {
+        //FIXME inline with hugs
+        int total_casts_available = get_property_int("goldenMrAccessories") * 5;
+        int casts_used = get_property_int("_smilesOfMrA");
+        
+        int casts_remaining = total_casts_available - casts_used;
+        
+        if (casts_remaining > 0)
+        {
+            available_resources_entries.listAppend(ChecklistEntryMake("__item Golden Mr. Accessory", "skills.php", ChecklistSubentryMake(pluralize(casts_remaining, "smile of the Mr. Accessory", "smiles of the Mr. Accessory"), "", "Give away sunshine."), 8));
+        }
+    }
 	
 	checklists.listAppend(ChecklistMake("Resources", available_resources_entries));
 }

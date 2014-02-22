@@ -180,7 +180,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 		
 		//combat queue for haunted bedroom doesn't seem to update
         int delay_remaining = 5; //delayRemainingInLocation($location[the haunted bedroom])
-		if (delay_remaining > 0)
+		if (delay_remaining > 0 && !clink_done)
 		{
 			//string line = "Delay for " + pluralize(delay_remaining), "turn", "turns") + ".";
             string line = "Delay for 5 total turns. (can't track this, sorry)";

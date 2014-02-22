@@ -6,30 +6,12 @@ void SSneakyPeteGenerateResource(ChecklistEntry [int] available_resources_entrie
 		return;
     //my_audience() whenever 16.3 is out
     
-    //FIXME put these in one entry?
     
-    //Need more combat message spading before these can be enabled:
-    /*
-    if (lookupSkill("Fix Jukebox").have_skill() && get_property_int("_peteJukeboxFixed") < 3)
-    {
-        int uses_remaining = MAX(0, 3 - get_property_int("_peteJukeboxFixed"));
-        
-        string [int] description;
-        description.listAppend("+300% item, one combat.");
-        description.listAppend("+audience love.");
-        
-        available_resources_entries.listAppend(ChecklistEntryMake("__effect jukebox hero", "", ChecklistSubentryMake(pluralize(uses_remaining, "Fix Jukebox", "Fix Jukeboxes"), "", description), 1));
-    }
+	ChecklistEntry entry;
+	entry.target_location = "";
+	entry.image_lookup_name = "";
+    entry.importance_level = 1;
     
-    if (lookupSkill("Jump Shark").have_skill() && get_property_int("_peteJumpedShark") < 3)
-    {
-        int uses_remaining = MAX(0, 3 - get_property_int("_peteJumpedShark"));
-        
-        string [int] description;
-        description.listAppend("-audience love.");
-        
-        available_resources_entries.listAppend(ChecklistEntryMake("__skill jump shark", "", ChecklistSubentryMake(pluralize(uses_remaining, "shark jump", "shark jumps"), "", description), 5));
-    }*/
     
     if (get_revision() >= 13783)
     {
@@ -48,9 +30,44 @@ void SSneakyPeteGenerateResource(ChecklistEntry [int] available_resources_entrie
             else
                 description.listAppend("Free runaway in-combat.");
             
-            available_resources_entries.listAppend(ChecklistEntryMake("__skill Easy Riding", "", ChecklistSubentryMake(pluralize(free_peel_outs_available, "peel out", "peel outs"), "10 MP/cast", description), 1));
+            if (entry.image_lookup_name.length() == 0)
+                entry.image_lookup_name = "__skill Easy Riding";
+        
+            entry.subentries.listAppend(ChecklistSubentryMake(pluralize(free_peel_outs_available, "peel out", "peel outs"), "10 MP/cast", description));
         }
     }
+    
+    if (lookupSkill("Fix Jukebox").have_skill() && get_property_int("_peteJukeboxFixed") < 3 && get_revision() >= 13785)
+    {
+        int uses_remaining = MAX(0, 3 - get_property_int("_peteJukeboxFixed"));
+        
+        string [int] description;
+        description.listAppend("+300% item, one combat.");
+        description.listAppend("+10 audience love.");
+        
+        if (entry.image_lookup_name.length() == 0)
+            entry.image_lookup_name = "__effect jukebox hero";
+        
+        entry.subentries.listAppend(ChecklistSubentryMake(pluralize(uses_remaining, "jukebox fix", "jukebox fixes"), "25 MP", description));
+    }
+    
+    //Need more combat messages for this property first:
+    /*if (lookupSkill("Jump Shark").have_skill() && get_property_int("_peteJumpedShark") < 3)
+    {
+        int uses_remaining = MAX(0, 3 - get_property_int("_peteJumpedShark"));
+        
+        string [int] description;
+        description.listAppend("+? stats");
+        description.listAppend("+10 audience hate.");
+        
+        if (entry.image_lookup_name.length() == 0)
+            entry.image_lookup_name = "__skill jump shark";
+        entry.subentries.listAppend(ChecklistSubentryMake(pluralize(uses_remaining, "shark jump", "shark jumps"), "25 MP", description));
+    }*/
+    
+    
+    if (entry.subentries.count() > 0)
+        available_resources_entries.listAppend(entry);
 }
 
 void SSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -64,7 +81,7 @@ void SSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         string [int] parts_not_upgraded;
         int motorcycle_upgrades_have = 0;
         
-        foreach s in $strings[peteMotorbikeCowling,peteMotorbikeGasTank,peteMotorbikeHeadlight,peteMotorbikeMuffler,peteMotorbikeSeat,peteMotorbikeTires]
+        foreach s in $strings[peteMotorbikeTires,peteMotorbikeGasTank,peteMotorbikeHeadlight,peteMotorbikeCowling,peteMotorbikeMuffler,peteMotorbikeSeat]
         {
             if (get_property(s).length() > 0)
                 motorcycle_upgrades_have += 1;

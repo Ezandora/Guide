@@ -87,7 +87,7 @@ void QLevel5GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 			string [int] harem_lines;
 			if (!have_outfit_components("Knob Goblin Harem Girl Disguise"))
 			{
-				harem_lines.listAppend("Need disguise.|*20% drop from harem girls (olfact)|*Or adventure in zone for eleven turns");
+				harem_lines.listAppend("Need disguise.|*20% drop from harem girls (olfact)|*Or adventure in zone for eleven (or more) turns.");
 				harem_modifiers.listAppend("+400% item");
 				harem_modifiers.listAppend("olfact harem girls");
 			}
@@ -133,11 +133,11 @@ void QLevel5GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 				//with banishes and slimeling and +item and?
                 //too complicated. Possibly remove?
 				kge_modifiers.listAppend("-combat");
-				string line = "Need knob goblin elite guard uniform.|*Semi-rare in barracks|*Or run -combat in barracks";
+				string line = "Need knob goblin elite guard uniform.|*Semi-rare in barracks.|*Or run -combat in barracks.";
 				if (familiar_is_usable($familiar[slimeling]))
 					line += " with slimeling";
                 
-                line += generateTurnsToSeeNoncombat(85, outfit_pieces_needed, "acquire outfit via only non-combats");
+                line += "|*" + generateTurnsToSeeNoncombat(85, outfit_pieces_needed, "acquire outfit via only non-combats");
 				kge_lines.listAppend(line);
 			}
 			else

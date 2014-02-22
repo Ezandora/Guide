@@ -88,8 +88,17 @@ void QLevel6GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
     if (needed_modifiers.count() > 0)
         subentry.entries.listAppend("Run " + needed_modifiers.listJoinComponents(", ", "and") + ".");
     
-	if ($item[dodecagram].available_amount() + $item[box of birthday candles].available_amount() + $item[Eldritch butterknife].available_amount() == 3 && !(hot_wings_relevant && $item[hot wing].available_amount() <3))
-		subentry.entries.listAppend("Go to the cairn stones!"); //FIXME suggest this only if we've gotten everything else?
+	if ($item[dodecagram].available_amount() + $item[box of birthday candles].available_amount() + $item[Eldritch butterknife].available_amount() == 3)
+    {
+        if (!(hot_wings_relevant && $item[hot wing].available_amount() <3))
+        {
+            subentry.entries.listAppend("Go to the cairn stones!");
+        }
+        else
+        {
+            subentry.entries.listAppend("Visit the dark heart of the woods for hot wings.");
+        }
+    }
 	
 	if (__misc_state_int["ruby w needed"] > 0)
 		subentry.entries.listAppend("Potentially find ruby W, if not clovering (w imp, dark neck, 30% drop)");

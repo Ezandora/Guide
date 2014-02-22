@@ -101,7 +101,10 @@ void finalizeSetUpFloristState()
 	}
 	if (__quest_state["Level 4"].state_int["areas unlocked"] + $item[sonar-in-a-biscuit].available_amount() < 3)
 	{
-		__plants_suggested_locations.listAppend(PlantSuggestionMake($location[the batrat and ratbat burrow], "horn of plenty", "Sonars-in-a-biscuit, 15% drop."));
+        string description = "Sonars-in-a-biscuit, 15% drop.";
+        if (!__quest_state["Level 7"].state_boolean["nook finished"]) //FIXME test if that plant is planted already
+            description += " Or ignore in favor of the defiled nook?";
+		__plants_suggested_locations.listAppend(PlantSuggestionMake($location[the batrat and ratbat burrow], "horn of plenty", description));
 	}
     //Intentionally ignored: +item plants in the orchard. Normally you'd plant in the upper chamber instead, since both of these quests often happen on the same day? And there's three zones to plant in - way too complicated.
 	if (!__quest_state["Level 12"].finished && __misc_state["need to level"] && __quest_state["Level 12"].state_int["frat boys left on battlefield"] != 0 && __quest_state["Level 12"].state_int["hippies left on battlefield"] != 0)

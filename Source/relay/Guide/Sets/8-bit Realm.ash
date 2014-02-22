@@ -27,6 +27,7 @@ void S8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     if ($item[psychoanalytic jar].available_amount() > 0 || $item[jar of psychoses (The Crackpot Mystic)].available_amount() > 0 || get_property_boolean("_psychoJarUsed")) //FIXME check which jar used
     {
         string active_url = "";
+        string title = "Adventure in fear man's level";
         //Have a jar, or jar was installed.
         string [int] description;
         string [int] modifiers;
@@ -42,14 +43,16 @@ void S8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         else if ($item[jar of psychoses (The Crackpot Mystic)].available_amount() > 0)
         {
             active_url = "inventory.php?which=3";
-            description.listAppend("Open the " + $item[jar of psychoses (The Crackpot Mystic)] + ".");
+            title = "Open the " + $item[jar of psychoses (The Crackpot Mystic)];
+            description.listAppend("Fear Man's level access, for digital key.");
         }
         else if ($item[psychoanalytic jar].available_amount() > 0)
         {
             active_url = "place.php?whichplace=forestvillage";
-            description.listAppend("Psychoanalyze the crackpot mystic.");
+            title = "Psychoanalyze the crackpot mystic";
+            description.listAppend("Fear Man's level access, for digital key.");
         }
-        optional_task_entries.listAppend(ChecklistEntryMake("__item digital key", active_url, ChecklistSubentryMake("Adventure in fear man's level", modifiers, description), $locations[fear man's level]));
+        optional_task_entries.listAppend(ChecklistEntryMake("__item digital key", active_url, ChecklistSubentryMake(title, modifiers, description), $locations[fear man's level]));
         need_route_output = false;
     }
     if (need_route_output)
@@ -68,9 +71,9 @@ void S8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             //No other choice. 8-bit realm.
             //Well, I suppose they could fax and arrow a ghost.
             if ($item[continuum transfunctioner].available_amount() > 0)
-                optional_task_entries.listAppend(ChecklistEntryMake("inexplicable door", "", ChecklistSubentryMake("Adventure in the 8-bit realm", "", description), $locations[8-bit realm]));
+                optional_task_entries.listAppend(ChecklistEntryMake("inexplicable door", "", ChecklistSubentryMake("Adventure in the 8-bit realm", "place.php?whichplace=woods", description), $locations[8-bit realm]));
             else if (my_level() >= 2)
-                optional_task_entries.listAppend(ChecklistEntryMake("__item continuum transfunctioner", "", ChecklistSubentryMake("Acquire a continuum transfunctioner", "", "From the crackpot mystic.")));
+                optional_task_entries.listAppend(ChecklistEntryMake("__item continuum transfunctioner", "", ChecklistSubentryMake("Acquire a continuum transfunctioner", "place.php?whichplace=forestvillage", "From the crackpot mystic.")));
         }
         else
         {

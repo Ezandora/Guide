@@ -106,7 +106,7 @@ void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [in
 			line = HTMLGenerateSpanFont(line, "red", "");
         description.listAppend(line);
     }
-    else if (monster_name == "Big swarm of ghuol whelps")
+    else if (monster_name == "Big swarm of ghuol whelps" || monster_name == "Swarm of ghuol whelps" || monster_name == "Giant swarm of ghuol whelps")
     {
         float monster_level = monster_level_adjustment();
     
