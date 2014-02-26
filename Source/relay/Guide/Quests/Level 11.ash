@@ -279,6 +279,8 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
         url = "manor3.php";
         subentry.modifiers.listAppend("+400% item");
         subentry.entries.listAppend("Collect wine.");
+        if ($items[spooky putty sheet,Rain-Doh black box].available_amount() > 0)
+            subentry.entries.listAppend("Possibly copy the monsters here. The copy will have all six wines.");
         image_name = "Wine racks";
     }
     else
@@ -669,8 +671,18 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
             tasks.listAppend(task);
             subentry.entries.listAppend(tasks.listJoinComponents(", ", "then").capitalizeFirstLetter() + ".");
             
-            if ($item[tomb ratchet].available_amount() > 0 && !done_with_wheel_turning)
-                subentry.entries.listAppend(pluralize($item[tomb ratchet]) + " available.");
+            if (!done_with_wheel_turning)
+            {
+                string [int] relevant_items;
+                if ($item[tomb ratchet].available_amount() > 0)
+                    relevant_items.listAppend(pluralize($item[tomb ratchet]));
+                if ($item[tangle of rat tails].available_amount() > 0)
+                    relevant_items.listAppend(pluralize($item[tangle of rat tails]));
+                
+                  
+                if (relevant_items.count() > 0)
+                    subentry.entries.listAppend(relevant_items.listJoinComponents(", ", "and") + " available.");
+            }
             //FIXME track wheel being placed
             //FIXME tell them which route is better from where they are
         }
@@ -987,6 +999,8 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 {
                     subentry.entries.listAppend("Need three more curses." + curse_details);
                 }
+                if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE && lookupSkill("Shake it off").have_skill())
+                    subentry.entries.listAppend(HTMLGenerateSpanFont("Avoid using Shake It Off to heal", "red", "") + ", it'll remove the curse.");
         
                 if (__misc_state["have hipster"])
                     subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
@@ -1057,9 +1071,9 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 else
                 {
                     if (janitors_relocated_to_park)
-                        subentry.entries.listAppend("Possibly acquire and use book of matches from janitors. (Pygmy janitors, Hidden Park, 10% drop)");
+                        subentry.entries.listAppend("Possibly acquire and use book of matches from janitors. (Pygmy janitors, Hidden Park, 20% drop)");
                     else
-                        subentry.entries.listAppend("Possibly acquire and use book of matches from janitors. (Pygmy janitors, everywhere in the hidden city, 10% drop)");
+                        subentry.entries.listAppend("Possibly acquire and use book of matches from janitors. (Pygmy janitors, everywhere in the hidden city, 20% drop)");
                     
                     string [int] tavern_provides;
                     if (bowling_progress < 8)

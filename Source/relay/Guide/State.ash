@@ -273,6 +273,7 @@ void setUpState()
             total_rests_available += rests_granted_by_skills[s];
     }
     
+    __misc_state_int["total free rests possible"] = total_rests_available;
 	__misc_state_int["free rests remaining"] = MAX(total_rests_available - rests_used, 0);
 	
 	//monster.monster_initiative() is usually what you need, but just in case:
@@ -527,6 +528,11 @@ void setUpState()
 	__misc_state["can pickpocket"] = false;
     if (my_class() == $class[disco bandit] || my_class() == $class[accordion thief] || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || $item[tiny black hole].equipped_amount() > 0 || $effect[Form of...Bird!].have_effect() > 0)
         __misc_state["can pickpocket"] = true;
+        
+        
+        //Moxie Experience Percent
+    float dance_card_average_stat_gain = MIN(2.25 * my_basestat($stat[moxie]), 300.0) * __misc_state_float["Non-combat statgain multiplier"] * (1.0 + numeric_modifier("Moxie Experience Percent") / 100.0);
+    __misc_state_float["dance card average stats"] = dance_card_average_stat_gain;
 }
 
 

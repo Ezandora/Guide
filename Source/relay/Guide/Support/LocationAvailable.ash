@@ -385,6 +385,15 @@ string getClickableURLForLocation(location l)
                 __urls_for_locations[l] = "mall.php";
         }
         
+        
+        foreach l in $locations[The Clumsiness Grove,The Maelstrom of Lovers,The Glacier of Jerks]
+        {
+            if ($effect[Dis Abled].have_effect() > 0)
+                __urls_for_locations[l] = "suburbandis.php";
+            else
+                __urls_for_locations[l] = "mall.php";
+        }
+        
         foreach l in $locations[Cobb's Knob Menagerie\, Level 1,Cobb's Knob Menagerie\, Level 2,Cobb's Knob Menagerie\, Level 3]
             __urls_for_locations[l] = "cobbsknob.php?action=tomenagerie";
         foreach l in $locations[cobb's knob laboratory,the knob shaft]

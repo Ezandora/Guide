@@ -9,6 +9,11 @@ void QLevel8Init()
 	state.image_name = "trapper";
 	state.council_quest = true;
     
+    if (get_property("peteMotorbikeTires") == "Snow Tires" && state.started && !state.finished && state.mafia_internal_step < 4) //sort of hacky - they're not actually there, but...
+    {
+        state.mafia_internal_step = 4;
+    }
+    
 	
 	if (state.mafia_internal_step > 2)
 		state.state_boolean["Past mine"] = true;
@@ -216,6 +221,10 @@ void QLevel8GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	else if (!base_quest_state.state_boolean["Groar defeated"])
 	{
         int turns_remaining = MAX(0, 4 - $location[mist-shrouded peak].turnsAttemptedInLocation());
+        
+        if (get_property("peteMotorbikeTires") == "Snow Tires")
+            turns_remaining = 1;
+        
 		string [int] todo;
 		if (cold_resistance < 5.0)
 			todo.listAppend(need_cold_res_string);

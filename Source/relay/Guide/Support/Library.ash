@@ -712,29 +712,39 @@ Record FloatHandle
 };
 
 
-buffer generateTurnsToSeeNoncombat(int combat_rate, int noncombats_in_zone, string task, int max_turns_between_nc)
+buffer generateTurnsToSeeNoncombat(int combat_rate, int noncombats_in_zone, string task, int max_turns_between_nc, int extra_starting_turns)
 {
-    if (noncombats_in_zone < 1)
-        return "".to_buffer();
     float turn_estimation = -1.0;
     float noncombat_rate = 1.0 - (combat_rate + combat_rate_modifier()).to_float() / 100.0;
     
-    float minimum_nc_rate = 0.0;
-    if (max_turns_between_nc != 0)
-        minimum_nc_rate = 1.0 / max_turns_between_nc.to_float();
-    if (noncombat_rate < minimum_nc_rate)
-        noncombat_rate = minimum_nc_rate;
     
-    if (noncombat_rate > 0.0)
-        turn_estimation = noncombats_in_zone.to_float() / noncombat_rate;
+    if (noncombats_in_zone > 0)
+    {
+        float minimum_nc_rate = 0.0;
+        if (max_turns_between_nc != 0)
+            minimum_nc_rate = 1.0 / max_turns_between_nc.to_float();
+        if (noncombat_rate < minimum_nc_rate)
+            noncombat_rate = minimum_nc_rate;
+        
+        if (noncombat_rate > 0.0)
+            turn_estimation = noncombats_in_zone.to_float() / noncombat_rate;
+    }
+    else
+        turn_estimation = 0.0;
         
     if (turn_estimation == -1.0)
         return "".to_buffer();
     
+    turn_estimation += extra_starting_turns;
+    
+    
     buffer result;
     result.append("~");
     result.append(turn_estimation.roundForOutput(1));
-    result.append(" turns");
+    if (turn_estimation == 1.0)
+        result.append(" turn");
+    else
+        result.append(" turns");
     
     if (task.length() > 0)
     {
@@ -742,15 +752,61 @@ buffer generateTurnsToSeeNoncombat(int combat_rate, int noncombats_in_zone, stri
         result.append(task);
     }
     else
-        result.append(" remain");
-    result.append(" at ");
-    result.append(combat_rate_modifier().floor());
-    result.append("% combat rate.");
+    {
+        if (turn_estimation == 1.0)
+            result.append(" remains");
+        else
+            result.append(" remain");
+    }
+    if (noncombats_in_zone > 0)
+    {
+        result.append(" at ");
+        result.append(combat_rate_modifier().floor());
+        result.append("% combat rate");
+    }
+    result.append(".");
     
     return result;
+}
+
+buffer generateTurnsToSeeNoncombat(int combat_rate, int noncombats_in_zone, string task, int max_turns_between_nc)
+{
+    return generateTurnsToSeeNoncombat(combat_rate, noncombats_in_zone, task, max_turns_between_nc, 0);
 }
 
 buffer generateTurnsToSeeNoncombat(int combat_rate, int noncombats_in_zone, string task)
 {
     return generateTurnsToSeeNoncombat(combat_rate, noncombats_in_zone, task, 0);
+}
+
+
+int damageTakenByElement(int base_damage, float elemental_resistance)
+{
+    if (base_damage < 0)
+        return 1;
+    
+    float effective_base_damage = MAX(30, base_damage).to_float();
+    
+    return MAX(1, ceil(base_damage.to_float() - effective_base_damage * elemental_resistance));
+}
+
+int damageTakenByElement(int base_damage, element e)
+{
+    float elemental_resistance = e.elemental_resistance() / 100.0;
+    
+    //mafia might already do this for us already, but I haven't checked:
+    
+    if (e == $element[cold] && $effect[coldform].have_effect() > 0)
+        elemental_resistance = 1.0;
+    else if (e == $element[hot] && $effect[hotform].have_effect() > 0)
+        elemental_resistance = 1.0;
+    else if (e == $element[sleaze] && $effect[sleazeform].have_effect() > 0)
+        elemental_resistance = 1.0;
+    else if (e == $element[spooky] && $effect[spookyform].have_effect() > 0)
+        elemental_resistance = 1.0;
+    else if (e == $element[stench] && $effect[stenchform].have_effect() > 0)
+        elemental_resistance = 1.0;
+        
+        
+    return damageTakenByElement(base_damage, elemental_resistance);
 }

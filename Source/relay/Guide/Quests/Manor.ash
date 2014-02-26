@@ -191,6 +191,11 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 			}
 			subentry.entries.listAppend(line);
 		}
+        //Once delay is tracked:
+        /*int ncs_needed = 4;
+        if (!clink_done)
+            ncs_needed *= 2;
+        subentry.entries.listAppend(generateTurnsToSeeNoncombat(20, ncs_needed, "", 0, delay_remaining));*/
 	}
 	else if (__misc_state_string["ballroom song"] != "-combat")
 	{

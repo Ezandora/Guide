@@ -172,11 +172,14 @@ void SSemirareGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
 			min_turns_until = potential_turns[0].to_int();
             foreach key in potential_turns
             {
-                if (potential_turns[key].to_int() == 0)
+                int value = potential_turns[key].to_int();
+                if (value == 0)
                 {
                     very_important = true;
                     potential_turns[key] = "Now"; //don't like editing this, possibly copy list?
                 }
+                else if (value < 0)
+                    remove potential_turns[key];
             }
 			title = potential_turns.listJoinComponents(", ", "or") + " turns until semi-rare";
 		}

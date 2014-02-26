@@ -41,7 +41,7 @@ void generateTasks(Checklist [int] checklists)
 			subentry.entries.listAppend(line);
 		}
 		if (subentry.entries.count() > 0)
-			task_entries.listAppend(ChecklistEntryMake("plant up sea daisy", "place.php?whichplace=forestvillage&amp;action=fv_friar", subentry, -11));
+			task_entries.listAppend(ChecklistEntryMake("sunflower face", "place.php?whichplace=forestvillage&amp;action=fv_friar", subentry, -11));
 	}
 	
 	QuestsGenerateTasks(task_entries, optional_task_entries, future_task_entries);
@@ -324,8 +324,30 @@ void generateTasks(Checklist [int] checklists)
         }
         if (upgraded_dwelling != $item[none])
         {
-            optional_task_entries.listAppend(ChecklistEntryMake("__item " + upgraded_dwelling, "inventory.php?which=3", ChecklistSubentryMake("Use " + upgraded_dwelling, "", "Better HP/MP restoration via rollover and free rests."), 8));
+            string [int] reasons;
+            reasons.listAppend("rollover");
             
+            if (__misc_state_int["total free rests possible"] > 0)
+                reasons.listAppend("free rests");
+            
+            string description = "Better HP/MP restoration via " + reasons.listJoinComponents(", ", "and") + ".";
+            optional_task_entries.listAppend(ChecklistEntryMake("__item " + upgraded_dwelling, "inventory.php?which=3", ChecklistSubentryMake("Use " + upgraded_dwelling, "", description), 8));
+            
+        }
+    }
+    
+    if (__misc_state["In run"] && $item[dry cleaning receipt].available_amount() > 0)
+    {
+        item receipt_item = $item[none];
+        if (my_primestat() == $stat[muscle])
+            receipt_item = $item[power sock];
+        else if (my_primestat() == $stat[mysticality])
+            receipt_item = $item[wool sock];
+        else if (my_primestat() == $stat[moxie])
+            receipt_item = $item[moustache sock];
+        if (receipt_item != $item[none] && receipt_item.available_amount() == 0)
+        {
+            optional_task_entries.listAppend(ChecklistEntryMake("__item " + $item[dry cleaning receipt], "inventory.php?which=3", ChecklistSubentryMake("Use " + $item[dry cleaning receipt], "", "For " + receipt_item + " accessory."), 8));
         }
     }
     

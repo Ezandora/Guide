@@ -142,7 +142,9 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 			
 			if (daily_dungeon_aftercore_items_wanted.count() > 0)
             {
-                l += "|Missing " + daily_dungeon_aftercore_items_wanted.listJoinComponents(", ", "and") + ". Possibly buy ";
+                if (l.length() > 0)
+                    l += "|";
+                l += "Missing " + daily_dungeon_aftercore_items_wanted.listJoinComponents(", ", "and") + ". Possibly buy ";
                 if (daily_dungeon_aftercore_items_wanted.count() > 1)
                     l += "them";
                 else

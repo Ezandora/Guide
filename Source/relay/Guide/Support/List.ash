@@ -187,6 +187,51 @@ string [int] listMake(string e1, string e2, string e3, string e4, string e5)
 	return result;
 }
 
+int [int] listMake(int e1)
+{
+	int [int] result;
+	result.listAppend(e1);
+	return result;
+}
+
+int [int] listMake(int e1, int e2)
+{
+	int [int] result;
+	result.listAppend(e1);
+	result.listAppend(e2);
+	return result;
+}
+
+int [int] listMake(int e1, int e2, int e3)
+{
+	int [int] result;
+	result.listAppend(e1);
+	result.listAppend(e2);
+	result.listAppend(e3);
+	return result;
+}
+
+int [int] listMake(int e1, int e2, int e3, int e4)
+{
+	int [int] result;
+	result.listAppend(e1);
+	result.listAppend(e2);
+	result.listAppend(e3);
+	result.listAppend(e4);
+	return result;
+}
+
+int [int] listMake(int e1, int e2, int e3, int e4, int e5)
+{
+	int [int] result;
+	result.listAppend(e1);
+	result.listAppend(e2);
+	result.listAppend(e3);
+	result.listAppend(e4);
+	result.listAppend(e5);
+	return result;
+}
+
 item [int] listMake(item e1)
 {
 	item [int] result;

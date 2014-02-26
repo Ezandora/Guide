@@ -112,11 +112,16 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	else
 	{
         url = "place.php?whichplace=cove";
+        
+        if (!is_wearing_outfit("Swashbuckling Getup") && $item[pirate fledges].equipped_amount() == 0)
+            url = "inventory.php?which=2";
+        
 		if (base_quest_state.mafia_internal_step == 1)
 		{
 			//caronch gave you a map
 			if ($item[Cap'm Caronch's nasty booty].available_amount() == 0 && $item[Cap'm Caronch's Map].available_amount() > 0)
 			{
+                url = "inventory.php?which=3";
 				subentry.entries.listAppend("Use Cap'm Caronch's Map, fight a booty crab.");
 				subentry.entries.listAppend("Possibly run +meat. (300 base drop)");
                 subentry.modifiers.listAppend("+meat");

@@ -95,15 +95,28 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
                 tasks.listAppend("get down to 90% hauntedness");
             if (clues_remaining > 0)
                 tasks.listAppend("collect " + clues_remaining.int_to_wordy() + " a-boo clues");
-            tasks.listAppend("use/survive each clue to finish quest");
+            tasks.listAppend("use/survive each clue to finish quest.|May want to consider delaying until end of the run");
             details.listAppend(tasks.listJoinComponents(", ", "then").capitalizeFirstLetter() + ".");
         }
         
 		modifiers.listAppend("+567% item");
-		details.listAppend(base_quest_state.state_int["a-boo peak hauntedness"] + "% hauntedness");
-		details.listAppend(pluralize($item[a-boo clue]));
+		details.listAppend(base_quest_state.state_int["a-boo peak hauntedness"] + "% hauntedness.");
         
+        float item_drop = (100.0 + item_drop_modifier())/100.0;
+        if ($location[a-boo peak].locationHasPlant("Rutabeggar") && my_location() != $location[a-boo peak])
+        {
+            item_drop += 0.25;
+        }
         
+        if (true)
+        {
+            string line = pluralize($item[a-boo clue]) + ".";
+            
+            float clue_drop_rate = item_drop * 0.15;
+            line += " " + clue_drop_rate.roundForOutput(2) + " clues/adventure at +" + ((item_drop - 1) * 100.0).roundForOutput(1) + "% item.";
+            
+            details.listAppend(line);
+        }
         
         
 		if (base_quest_state.state_int["a-boo peak hauntedness"] <= 90 && __misc_state["can use clovers"] && $item[a-boo clue].available_amount() < clues_needed)
@@ -111,14 +124,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
             details.listAppend("Can clover for two A-Boo clues.");
         }
         
-        float item_drop = (100.0 + item_drop_modifier())/100.0;
-        if ($location[a-boo peak].locationHasPlant("Rutabeggar"))
-        {
-            item_drop += 0.25;
-        }
 		
-        float clue_drop_rate = item_drop * 0.15;
-        details.listAppend(clue_drop_rate.roundForOutput(2) + " clues/adventure at +" + ((item_drop - 1) * 100.0).roundForOutput(1) + "% item.");
 		
         
         int spooky_damage_taken = 0;
@@ -133,14 +139,16 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
             damage_levels.listAppend(125);
             damage_levels.listAppend(250);
             
-            float spooky_resistance_multiplier = (1.0 - elemental_resistance($element[spooky]) / 100.0);
-            float cold_resistance_multiplier = (1.0 - elemental_resistance($element[cold]) / 100.0);
+            //float spooky_resistance_multiplier = (1.0 - elemental_resistance($element[spooky]) / 100.0);
+            //float cold_resistance_multiplier = (1.0 - elemental_resistance($element[cold]) / 100.0);
             foreach key in damage_levels
             {
                 int damage = damage_levels[key];
                 
-                spooky_damage_taken += ceil(damage.to_float() * spooky_resistance_multiplier);
-                cold_damage_taken += ceil(damage.to_float() * cold_resistance_multiplier);
+                spooky_damage_taken += damageTakenByElement(damage, $element[spooky]);
+                cold_damage_taken += damageTakenByElement(damage, $element[cold]);
+                //spooky_damage_taken += ceil(damage.to_float() * spooky_resistance_multiplier);
+                //cold_damage_taken += ceil(damage.to_float() * cold_resistance_multiplier);
             }
         }
         else
@@ -151,7 +159,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
         }
         
         int hp_damage_taken = spooky_damage_taken + cold_damage_taken;
-        string hp_string = hp_damage_taken + " HP";
+        string hp_string = (hp_damage_taken + 2) + " HP";
         if (hp_damage_taken >= my_hp())
             hp_string = HTMLGenerateSpanFont(hp_string, "red", "");
         
@@ -205,6 +213,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
             {
 				details.listAppend("+" + (4.0 - numeric_modifier("stench resistance")).floor() + " more " + HTMLGenerateSpanOfClass("stench", "r_element_stench") + " resist required.");
             }
+            
 				
             if (!item_completed)
             {
@@ -230,6 +239,12 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
                     line += "|Run " + $familiar[oily woim] + " for +init.";
 				details.listAppend(line);
             }
+            
+            int ncs_need_to_visit_by_hand = MAX(0, options_left.count() - $item[rusty hedge trimmers].available_amount());
+            int ncs_need_to_visit_with_hedge = options_left.count() - ncs_need_to_visit_by_hand;
+            details.listAppend(generateTurnsToSeeNoncombat(80, ncs_need_to_visit_by_hand, "", 0, ncs_need_to_visit_with_hedge));
+            
+            
 		}
 		else
 		{
@@ -245,19 +260,25 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
 	{
 		string [int] details;
 		string [int] modifiers;
+        
+        int oil_ml = monster_level_adjustment();
+        if ($location[oil peak].locationHasPlant("Rabid Dogwood") && my_location() != $location[oil peak])
+            oil_ml += 30;
+        
+        int turns_remaining_at_current_ml = 0;
         if (base_quest_state.state_float["oil peak pressure"] > 0.0)
         {
             modifiers.listAppend("+100 ML");
             
+            
             string line = "Run +" + HTMLGenerateSpanFont("20/50", "", "0.8em") + "/100 ML (at ";
-            string adjustment = "+" + monster_level_adjustment() + " ML";
-            if (monster_level_adjustment() < 100)
+            string adjustment = "+" + oil_ml + " ML";
+            if (oil_ml < 100)
                 adjustment = HTMLGenerateSpanFont(adjustment, "red", "");
             adjustment += ")";
             details.listAppend(line + adjustment);
             
             
-            int turns_remaining_at_current_ml = 0;
             float pressure_reduced_per_turn = 0.0;
             if ($item[dress pants].available_amount() > 0)
             {
@@ -267,37 +288,69 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
                 }
                 else
                 {
-                    if (monster_level_adjustment() < 100) //only worth it <100 usually
+                    if (oil_ml < 100) //only worth it <100 usually
                         details.listAppend("Wear dress pants.");
                 }
             }
-            if (monster_level_adjustment() >= 100)
+            if (oil_ml >= 100)
                 pressure_reduced_per_turn += 63.4;
-            else if (monster_level_adjustment() >= 50)
+            else if (oil_ml >= 50)
                 pressure_reduced_per_turn += 31.7;
-            else if (monster_level_adjustment() >= 20)
+            else if (oil_ml >= 20)
                 pressure_reduced_per_turn += 19.02;
             else
                 pressure_reduced_per_turn += 6.34;
                 
             if (fabs(pressure_reduced_per_turn) > 0.01)
                 turns_remaining_at_current_ml = ceil(base_quest_state.state_float["oil peak pressure"] / pressure_reduced_per_turn);
-            details.listAppend(pluralize(turns_remaining_at_current_ml, "turn", "turns") + " remaining at " + monster_level_adjustment() + " ML.");
+            details.listAppend(pluralize(turns_remaining_at_current_ml, "turn", "turns") + " remaining at " + oil_ml + " ML.");
         }
 		if (need_jar_of_oil)
 		{
 			modifiers.listAppend("+item");
             string item_drop_string = "";
-            if (monster_level_adjustment() >= 100)
+            int [int] drop_rates;
+            if (oil_ml >= 100)
+            {
                 item_drop_string = "100%/30%/15% drops";
-            else if (monster_level_adjustment() >= 50)
+                drop_rates = listMake(100, 30, 15);
+            }
+            else if (oil_ml >= 50)
+            {
                 item_drop_string = "100%/30% drops";
-            else if (monster_level_adjustment() >= 20)
+                drop_rates = listMake(100, 30);
+            }
+            else if (oil_ml >= 20)
+            {
                 item_drop_string = "100%/10% drops";
+                drop_rates = listMake(100, 10);
+            }
             else
+            {
                 item_drop_string = "100% drop";
-			details.listAppend("Run +item to acquire 12 bubblin' crude (" + item_drop_string + ")");
-			details.listAppend("Have " + MIN(12, $item[bubblin' crude].available_amount()) + "/12 bubblin' crude");
+                drop_rates = listMake(100);
+            }
+            
+            float crudes_per_adventure = 0.0;
+            float item_drop_rate_multiplier = (100.0 + item_drop_modifier()) / 100.0;
+            foreach key in drop_rates
+            {
+                int rate = drop_rates[key];
+                float effective_rate = MIN(1.0, rate.to_float() / 100.0 * item_drop_rate_multiplier);
+                crudes_per_adventure += effective_rate;
+            }
+            string crude_string = "~" + crudes_per_adventure.roundForOutput(1) + " crude/adventure.";
+            if (turns_remaining_at_current_ml > 0)
+                crude_string += " ~" + (crudes_per_adventure * turns_remaining_at_current_ml.to_float()).roundForOutput(1) + " crudes before fire lit.";
+            
+            
+            if ($item[bubblin' crude].available_amount() < 12)
+            {
+                details.listAppend("Run +item to acquire 12 bubblin' crude. (" + item_drop_string + ")|" + crude_string);
+                details.listAppend("Need " + pluralize(MAX(0, 12 - $item[bubblin' crude].available_amount()), "more bubblin' crude", "more bubblin' crudes") + ".");
+                if ($item[duskwalker syringe].available_amount() > 0)
+                    details.listAppend("Use " + $item[duskwalker syringe].pluralize() + " in-combat for more crude.");
+            }
 		}
 		
 		task_entries.listAppend(ChecklistEntryMake("oil peak", "place.php?whichplace=highlands", ChecklistSubentryMake("Oil Peak", modifiers, details), $locations[oil peak]));

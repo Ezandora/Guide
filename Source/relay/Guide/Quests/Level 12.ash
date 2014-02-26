@@ -192,6 +192,14 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 			items_and_locations[$item[molybdenum pliers]] = $location[Near an Abandoned Refrigerator];
 			items_and_locations[$item[molybdenum crescent wrench]] = $location[Over Where the Old Tires Are];
 			boolean have_all = true;
+            
+            string [location][int] location_monsters;
+            location_monsters[$location[Next to that Barrel with Something Burning in it]] = listMake("tool batwinged", "vegetable");
+            location_monsters[$location[Out By that Rusted-Out Car]] = listMake("tool vegetable", "erudite");
+            location_monsters[$location[Near an Abandoned Refrigerator]] = listMake("tool spider", "batwinged");
+            location_monsters[$location[Over Where the Old Tires Are]] = listMake("tool erudite", "spider");
+            
+            string [int] areas_left_strings;
 			foreach it in items_and_locations
 			{
 				location loc = items_and_locations[it];
@@ -201,8 +209,10 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 				}
 				else
 					have_all = false;
-				details.listAppend("Adventure " + to_lower_case(to_string(loc)) + ".");
+                areas_left_strings.listAppend(loc.to_string().to_lower_case() + " (" + location_monsters[loc].listJoinComponents(", ") + ")");
 			}
+            if (areas_left_strings.count() > 0)
+                details.listAppend("Areas left:|*" + areas_left_strings.listJoinComponents("|*"));
 			if (have_all)
 				details.listAppend("Talk to Yossarian to complete quest.");
 			else
@@ -275,7 +285,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 		else
 		{
 			if ($item[jam band flyers].available_amount() == 0 && $item[rock band flyers].available_amount() == 0)
-				details.listAppend("Acquire fliers");
+				details.listAppend("Acquire fliers.");
 			details.listAppend("Flyer places around the kingdom (" + round(percent_done, 1) + "% ML completed, " + ml_remaining + " ML remains)");
 		}
 	

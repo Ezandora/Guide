@@ -290,7 +290,7 @@ void generateDailyResources(Checklist [int] checklists)
         
         description.listAppend(mixables.listJoinComponents(", ", "or").capitalizeFirstLetter() + ".");
         
-		available_resources_entries.listAppend(ChecklistEntryMake("Superhuman Cocktailcrafting", "guild.php?place=still", ChecklistSubentryMake(pluralize(stills_available(), "still use", "still uses"), "", description), 10));
+		available_resources_entries.listAppend(ChecklistEntryMake("Superhuman Cocktailcrafting", "shop.php?whichshop=still", ChecklistSubentryMake(pluralize(stills_available(), "still use", "still uses"), "", description), 10));
     }
     
     if (my_class() == $class[seal clubber])

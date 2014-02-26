@@ -53,6 +53,7 @@ void QuestsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 	QSeaGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	QSpaceElvesGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	QAzazelGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+    
 	QUntinkerGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	QArtistGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	QLegendaryBeatGenerateTasks(task_entries, optional_task_entries, future_task_entries);

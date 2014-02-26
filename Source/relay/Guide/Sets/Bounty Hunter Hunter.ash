@@ -16,6 +16,8 @@ location [int] locationsForMonster(monster m)
         return result;
     foreach l in $locations[]
     {
+        if (l == $location[the haunted wine cellar (automatic)])
+            continue;
         monster [int] location_monsters = l.get_monsters();
         foreach key in location_monsters
         {

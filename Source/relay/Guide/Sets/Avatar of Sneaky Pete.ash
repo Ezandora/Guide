@@ -51,19 +51,18 @@ void SSneakyPeteGenerateResource(ChecklistEntry [int] available_resources_entrie
         entry.subentries.listAppend(ChecklistSubentryMake(pluralize(uses_remaining, "jukebox fix", "jukebox fixes"), "25 MP", description));
     }
     
-    //Need more combat messages for this property first:
-    /*if (lookupSkill("Jump Shark").have_skill() && get_property_int("_peteJumpedShark") < 3)
+    if (lookupSkill("Jump Shark").have_skill() && get_property_int("_peteJumpedShark") < 3 && get_revision() >= 13730)
     {
         int uses_remaining = MAX(0, 3 - get_property_int("_peteJumpedShark"));
         
         string [int] description;
-        description.listAppend("+? stats");
+        description.listAppend((10 * my_level()) + " muscle/mysticality/moxie. (increases with level)");
         description.listAppend("+10 audience hate.");
         
         if (entry.image_lookup_name.length() == 0)
             entry.image_lookup_name = "__skill jump shark";
         entry.subentries.listAppend(ChecklistSubentryMake(pluralize(uses_remaining, "shark jump", "shark jumps"), "25 MP", description));
-    }*/
+    }
     
     
     if (entry.subentries.count() > 0)

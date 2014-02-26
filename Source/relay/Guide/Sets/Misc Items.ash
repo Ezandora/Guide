@@ -99,10 +99,10 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
             extra_fullness_available = "2x fullness";
 			if (availableFullness() == 0)
 			{
-				subentry.entries.listAppend(extra_fullness_available + " available next adventure");
+				subentry.entries.listAppend(extra_fullness_available + " available next adventure.");
 			}
 			else
-                subentry.entries.listAppend(extra_fullness_available + " available when you're full");
+                subentry.entries.listAppend(extra_fullness_available + " available when you're full.");
 		}
 		
 		if (pantsgiving_potential_crumbs_remaining > 0)
@@ -351,8 +351,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
 		if ($item[dance card].available_amount() > 0 && my_primestat() == $stat[moxie])
         {
 			string [int] description;
-            float dance_card_stat_gain = MIN(2.25 * my_basestat($stat[moxie]), 300.0) * __misc_state_float["Non-combat statgain multiplier"];
-			description.listAppend("Gain " + round(dance_card_stat_gain) + " mainstat from delayed adventure in the haunted ballroom.");
+			description.listAppend("Gain ~" + round(__misc_state_float["dance card average stats"]) + " mainstat from delayed adventure in the haunted ballroom.");
 			available_resources_entries.listAppend(ChecklistEntryMake("__item dance card", "inventory.php?which=3", ChecklistSubentryMake(pluralize($item[dance card]), "", description), importance_level_unimportant_item));
         }
     }
@@ -616,7 +615,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
                 image_name = "__item " + it;
         }
         string [int] open_list;
-        foreach it in $items[old coin purse, old leather wallet, black pension check, ancient vinyl coin purse, warm subject gift certificate,chest of the Bonerdagon,shiny stones]
+        foreach it in $items[old coin purse, old leather wallet, black pension check, ancient vinyl coin purse, warm subject gift certificate,shiny stones]
         {
             if (it.available_amount() == 0)
                 continue;
@@ -647,7 +646,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
     //Penultimate Fantasy chest?
     
     item odd_silver_coin = lookupItem("odd silver coin");
-    if (odd_silver_coin.available_amount() > 0 && __misc_state["In run"])
+    if (odd_silver_coin.available_amount() > 0 && in_run)
     {
         string [int] description;
         //FIXME description
@@ -661,7 +660,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
         available_resources_entries.listAppend(ChecklistEntryMake("__item " + odd_silver_coin, "inventory.php?which=3", ChecklistSubentryMake(odd_silver_coin.pluralize(), "", description), importance_level_item));
     }
     item grimstone_mask = lookupItem("grimstone mask");
-    if (grimstone_mask.available_amount() > 0 && __misc_state["In run"])
+    if (grimstone_mask.available_amount() > 0 && in_run)
     {
         string [int] description;
         //FIXME suggestions
@@ -669,9 +668,16 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
         available_resources_entries.listAppend(ChecklistEntryMake("__item " + grimstone_mask, "inventory.php?which=3", ChecklistSubentryMake(grimstone_mask.pluralize(), "", description), importance_level_item));
     }
     
-    if ($item[very overdue library book].available_amount() > 0 && __misc_state["In run"])
+    if ($item[very overdue library book].available_amount() > 0 && in_run)
     {
         available_resources_entries.listAppend(ChecklistEntryMake("__item very overdue library book", "inventory.php?which=3", ChecklistSubentryMake("Very overdue library book", "", "Open for 63 moxie/mysticality/muscle."), importance_level_unimportant_item));
     }
     
+    if ($item[chest of the Bonerdagon].available_amount() > 0 && in_run)
+    {
+        string description = "Open for 150 muscle/mysticality/moxie and 3k meat.";
+        if (!$familiar[ninja pirate zombie robot].have_familiar())
+            description += "|Unless you want to make an NPZR this ascension.";
+        available_resources_entries.listAppend(ChecklistEntryMake("__item chest of the Bonerdagon", "inventory.php?which=3", ChecklistSubentryMake("chest of the Bonerdagon", "", description), importance_level_unimportant_item));
+    }
 }

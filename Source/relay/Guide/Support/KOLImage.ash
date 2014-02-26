@@ -136,7 +136,8 @@ void KOLImagesInit()
 	__kol_images["plant blustery puffball"] = KOLImageMake("images/otherimages/friarplants/plant21.gif", Vec2iMake(54,100), RectMake(3, 38, 50, 90));
 	__kol_images["plant wizard's wig"] = KOLImageMake("images/otherimages/friarplants/plant23.gif", Vec2iMake(53,100), RectMake(2, 15, 48, 90));
 	
-	__kol_images["plant up sea daisy"] = KOLImageMake("images/otherimages/friarplants/plant40.gif", Vec2iMake(64,100), RectMake(3, 8, 60, 92));
+	__kol_images["plant up sea daisy"] = KOLImageMake("images/otherimages/friarplants/plant40.gif", Vec2iMake(64,100), RectMake(3, 6, 60, 92));
+	__kol_images["sunflower face"] = KOLImageMake("images/otherimages/friarplants/plant40.gif", Vec2iMake(64,100), RectMake(6, 6, 58, 52));
 	
 	
 	__kol_images["basic hot dog"] = KOLImageMake("images/itemimages/jarl_regdog.gif", Vec2iMake(30,30));
@@ -364,6 +365,14 @@ buffer KOLImageGenerateImageHTML(string lookup_name, boolean should_center, Vec2
         }
         if (have_crop)
             effective_image_size = Vec2iMake(image_crop.max_coordinate.x - image_crop.min_coordinate.x + 1, image_crop.max_coordinate.y - image_crop.min_coordinate.y + 1);
+        
+        if (half_sized_output && have_crop)
+        {
+            image_crop.min_coordinate.x = round(image_crop.min_coordinate.x.to_float() * 0.5);
+            image_crop.min_coordinate.y = round(image_crop.min_coordinate.y.to_float() * 0.5);
+            image_crop.max_coordinate.x = round(image_crop.max_coordinate.x.to_float() * 0.5);
+            image_crop.max_coordinate.y = round(image_crop.max_coordinate.y.to_float() * 0.5);
+        }
         
         if (effective_image_size.x > max_image_dimensions.x || effective_image_size.y > max_image_dimensions.y)
         {

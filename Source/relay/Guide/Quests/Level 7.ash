@@ -81,93 +81,6 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		evilness_text[property] = text;
 	}
 	
-	if (!base_quest_state.state_boolean["alcove finished"])
-	{
-		ChecklistSubentry subentry;
-		int evilness = base_quest_state.state_int["alcove evilness"];
-		subentry.header = "Defiled Alcove";
-		subentry.entries.listAppend(evilness_text["cyrptAlcoveEvilness"]);
-		if (evilness > 26)
-		{
-            subentry.modifiers.listAppend("+init");
-            subentry.modifiers.listAppend("-combat");
-			int zmobies_needed = ceil((evilness.to_float() - 25.0) / 5.0);
-			float zmobie_chance = min(100.0, 15.0 + initiative_modifier() / 10.0);
-			
-			subentry.entries.listAppend(pluralize(zmobies_needed, "modern zmobie", "modern zmobies") + " needed (" + roundForOutput(zmobie_chance, 0) + "% chance of appearing)");
-            
-            if ($familiar[oily woim].familiar_is_usable() && !($familiars[oily woim,happy medium] contains my_familiar()))
-                subentry.entries.listAppend("Run " + $familiar[oily woim] + " for +init.");
-			
-		}
-        else if (evilness <= 25)
-            subentry.modifiers.listAppend("+meat");
-		entry.subentries.listAppend(subentry);
-	}
-	if (!base_quest_state.state_boolean["cranny finished"])
-	{
-		ChecklistSubentry subentry;
-		subentry.header = "Defiled Cranny";
-		subentry.entries.listAppend(evilness_text["cyrptCrannyEvilness"]);
-		
-		if (base_quest_state.state_int["cranny evilness"] > 25)
-		{
-            subentry.modifiers.listAppend("-combat");
-            subentry.modifiers.listAppend("+ML");
-            float monster_level = monster_level_adjustment();
-            
-            if ($location[the defiled cranny].locationHasPlant("Blustery Puffball"))
-                monster_level += 30;
-            
-            monster_level = MAX(monster_level, 0);
-            
-			float cranny_beep_beep_beep = MAX(3.0,sqrt(monster_level));
-			int beep_boop_lookup = floor(cranny_beep_beep_beep) - 3;
-            
-            float area_combat_rate = clampNormalf(0.85 + combat_rate_modifier() / 100.0);
-            float area_nc_rate = 1.0 - area_combat_rate;
-            
-            float average_beeps_per_turn = cranny_beep_beep_beep * area_nc_rate + 1.0 * area_combat_rate;
-            float average_turns_remaining = ((base_quest_state.state_int["cranny evilness"] - 25) / average_beeps_per_turn);
-			
-			subentry.entries.listAppend("~" + cranny_beep_beep_beep.roundForOutput(1) + " beeps per ghuol swarm. ~" + average_turns_remaining.roundForOutput(1) + " turns remain.");
-		}
-        else
-            subentry.modifiers.listAppend("+meat");
-		
-		entry.subentries.listAppend(subentry);
-	}
-	if (!base_quest_state.state_boolean["niche finished"])
-	{
-		int evilness = base_quest_state.state_int["niche evilness"];
-		ChecklistSubentry subentry;
-		subentry.header = "Defiled Niche";
-		
-		subentry.entries.listAppend(evilness_text["cyrptNicheEvilness"]);
-        
-        float [monster] appearance_rates = $location[the defiled niche].appearance_rates_adjusted_cancel_nc();
-        float evilness_removed_per_adventure = 0.0;
-        evilness_removed_per_adventure += 1.0 * appearance_rates[$monster[slick lihc]] / 100.0;
-        evilness_removed_per_adventure += 1.0 * appearance_rates[$monster[senile lihc]] / 100.0;
-        evilness_removed_per_adventure += 3.0 * appearance_rates[$monster[dirty old lihc]] / 100.0;
-        
-        float turns_remaining = MAX(0, evilness - 25);
-        
-        if (evilness_removed_per_adventure != 0.0)
-            turns_remaining = MAX(1, turns_remaining / evilness_removed_per_adventure);
-        
-        turns_remaining += 1; //last turn
-		if (evilness > 26)
-        {
-            subentry.modifiers.listAppend("olfaction");
-            subentry.modifiers.listAppend("banish");
-        }
-		if (evilness > 25)
-            subentry.entries.listAppend("~" + turns_remaining.roundForOutput(1) + " turns remaining.");
-		
-		
-		entry.subentries.listAppend(subentry);
-	}
 	if (!base_quest_state.state_boolean["nook finished"])
 	{
 		int evilness = base_quest_state.state_int["nook evilness"];
@@ -181,7 +94,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             subentry.modifiers.listAppend("+400% item");
             float item_drop = (100.0 + item_drop_modifier()) / 100.0;
             
-            if ($location[the defiled nook].locationHasPlant("Horn of Plenty"))
+            if ($location[the defiled nook].locationHasPlant("Horn of Plenty") && my_location() != $location[the defiled nook])
                 item_drop += .25;
 			float eyes_per_adventure = MIN(1.0, (item_drop) * 0.2);
             float eyes_value = 3.0;
@@ -207,11 +120,97 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 					average_turns_remaining = theoretical_best_turns_remaining;
 		
 				subentry.entries.listAppend(roundForOutput(eyes_per_adventure * 100.0, 0) + "% chance of evil eyes");
-				subentry.entries.listAppend("~" + roundForOutput(average_turns_remaining, 1) + " turns remain. (theoretical best: " + theoretical_best_turns_remaining + ")");
+				subentry.entries.listAppend("~" + roundForOutput(average_turns_remaining, 1) + " turns remain to boss. (theoretical best: " + theoretical_best_turns_remaining + ")");
 			}
 		}
 		
 		
+		entry.subentries.listAppend(subentry);
+	}
+	if (!base_quest_state.state_boolean["niche finished"])
+	{
+		int evilness = base_quest_state.state_int["niche evilness"];
+		ChecklistSubentry subentry;
+		subentry.header = "Defiled Niche";
+		
+		subentry.entries.listAppend(evilness_text["cyrptNicheEvilness"]);
+        
+        float [monster] appearance_rates = $location[the defiled niche].appearance_rates_adjusted_cancel_nc();
+        float evilness_removed_per_adventure = 0.0;
+        evilness_removed_per_adventure += 1.0 * appearance_rates[$monster[slick lihc]] / 100.0;
+        evilness_removed_per_adventure += 1.0 * appearance_rates[$monster[senile lihc]] / 100.0;
+        evilness_removed_per_adventure += 3.0 * appearance_rates[$monster[dirty old lihc]] / 100.0;
+        
+        float turns_remaining = MAX(0, evilness - 25);
+        
+        if (evilness_removed_per_adventure != 0.0)
+            turns_remaining = MAX(1, turns_remaining / evilness_removed_per_adventure);
+        
+		if (evilness > 26)
+        {
+            subentry.modifiers.listAppend("olfaction");
+            subentry.modifiers.listAppend("banish");
+        }
+		if (evilness > 25)
+            subentry.entries.listAppend("~" + turns_remaining.roundForOutput(1) + " turns remaining to boss.");
+		
+		
+		entry.subentries.listAppend(subentry);
+	}
+	if (!base_quest_state.state_boolean["cranny finished"])
+	{
+		ChecklistSubentry subentry;
+		subentry.header = "Defiled Cranny";
+		subentry.entries.listAppend(evilness_text["cyrptCrannyEvilness"]);
+		
+		if (base_quest_state.state_int["cranny evilness"] > 25)
+		{
+            subentry.modifiers.listAppend("-combat");
+            subentry.modifiers.listAppend("+ML");
+            float monster_level = monster_level_adjustment();
+            
+            if ($location[the defiled cranny].locationHasPlant("Blustery Puffball") && my_location() != $location[the defiled cranny])
+                monster_level += 30;
+            
+            monster_level = MAX(monster_level, 0);
+            
+			float cranny_beep_beep_beep = MAX(3.0,sqrt(monster_level));
+			int beep_boop_lookup = floor(cranny_beep_beep_beep) - 3;
+            
+            float area_combat_rate = clampNormalf(0.85 + combat_rate_modifier() / 100.0);
+            float area_nc_rate = 1.0 - area_combat_rate;
+            
+            float average_beeps_per_turn = cranny_beep_beep_beep * area_nc_rate + 1.0 * area_combat_rate;
+            float average_turns_remaining = ((base_quest_state.state_int["cranny evilness"] - 25) / average_beeps_per_turn);
+			
+			subentry.entries.listAppend("~" + cranny_beep_beep_beep.roundForOutput(1) + " beeps per ghuol swarm. ~" + average_turns_remaining.roundForOutput(1) + " turns remain to boss.");
+		}
+        else
+            subentry.modifiers.listAppend("+meat");
+		
+		entry.subentries.listAppend(subentry);
+	}
+	if (!base_quest_state.state_boolean["alcove finished"])
+	{
+		ChecklistSubentry subentry;
+		int evilness = base_quest_state.state_int["alcove evilness"];
+		subentry.header = "Defiled Alcove";
+		subentry.entries.listAppend(evilness_text["cyrptAlcoveEvilness"]);
+		if (evilness > 26)
+		{
+            subentry.modifiers.listAppend("+init");
+            subentry.modifiers.listAppend("-combat");
+			int zmobies_needed = ceil((evilness.to_float() - 25.0) / 5.0);
+			float zmobie_chance = min(100.0, 15.0 + initiative_modifier() / 10.0);
+			
+			subentry.entries.listAppend(pluralize(zmobies_needed, "modern zmobie", "modern zmobies") + " needed (" + roundForOutput(zmobie_chance, 0) + "% chance of appearing)");
+            
+            if ($familiar[oily woim].familiar_is_usable() && !($familiars[oily woim,happy medium] contains my_familiar()))
+                subentry.entries.listAppend("Run " + $familiar[oily woim] + " for +init.");
+			
+		}
+        else if (evilness <= 25)
+            subentry.modifiers.listAppend("+meat");
 		entry.subentries.listAppend(subentry);
 	}
 	if (base_quest_state.mafia_internal_step == 2)

@@ -251,7 +251,28 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     }
     if (__last_adventure_location == $location[the haunted ballroom] && $item[dance card].available_amount() > 0 && __misc_state["need to level"] && my_primestat() == $stat[moxie] && __misc_state_int["Turns until dance card"] == -1)
     {
-        float statgain = MIN(2.25 * my_basestat($stat[moxie]), 300.0) * __misc_state_float["Non-combat statgain multiplier"];
-        task_entries.listAppend(ChecklistEntryMake("__item " + $item[dance card], "inventory.php?which=3", ChecklistSubentryMake("Use " + $item[dance card], "", "Gives " + statgain.round() + " mainstat in four turns."), -11));
+        
+        string [int] semirare_turns = __misc_state_string["Turns until semi-rare"].split_string(",");
+        
+        boolean delay_for_semirare = false;
+        foreach key in semirare_turns
+        {
+            if (semirare_turns[key] == 3)
+            {
+                delay_for_semirare = true;
+                break;
+            }
+        }
+        
+        if (delay_for_semirare)
+            task_entries.listAppend(ChecklistEntryMake("__item " + $item[dance card], "", ChecklistSubentryMake(HTMLGenerateSpanFont("Avoid using " + $item[dance card], "red", ""), "", HTMLGenerateSpanFont("You have a semi-rare coming up then, wait a turn first.", "red", "")), -11));
+        else
+        {
+            string [int] description;
+            description.listAppend("Gives ~" + __misc_state_float["dance card average stats"].round() + " mainstat in four turns.");
+            if ($item[dance card].available_amount() > 1)
+                description.listAppend("Have " + $item[dance card].pluralizeWordy() + ".");
+            task_entries.listAppend(ChecklistEntryMake("__item " + $item[dance card], "inventory.php?which=3", ChecklistSubentryMake("Use " + $item[dance card], "", description), -11));
+        }
     }
 }

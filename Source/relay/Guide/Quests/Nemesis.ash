@@ -458,6 +458,8 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 	QuestState base_quest_state = __quest_state["Nemesis"];
 	if (base_quest_state.finished)
 		return;
+    if (!($classes[seal clubber,turtle tamer,pastamancer,sauceror,disco bandit,accordion thief] contains my_class()))
+        return;
     
 	ChecklistSubentry subentry;
 	
