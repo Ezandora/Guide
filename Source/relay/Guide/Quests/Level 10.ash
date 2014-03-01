@@ -40,6 +40,7 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 	
 	if ($item[s.o.c.k.].available_amount() == 0)
 	{
+        //FIXME delay if ballroom song not set
         if (!base_quest_state.state_boolean["Beanstalk grown"])
         {
             subentry.entries.listAppend("Grow the beanstalk.");
@@ -96,7 +97,12 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 	else
 	{
         url = "place.php?whichplace=giantcastle";
-		if ($location[The Castle in the Clouds in the Sky (Top floor)].locationAvailable())
+        if (get_property("lastEncounter") == "Keep On Turnin' the Wheel in the Sky")
+        {
+            url = "town.php";
+            subentry.entries.listAppend("Talk to the council to finish quest.");
+        }
+		else if ($location[The Castle in the Clouds in the Sky (Top floor)].locationAvailable())
 		{
             float turn_estimation = -1.0;
             float non_combat_rate = 1.0 - (0.95 + combat_rate_modifier() / 100.0);
@@ -109,6 +115,8 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 			subentry.entries.listAppend("Top floor. Run -combat.");
             if ($item[mohawk wig].equipped_amount() == 0 && $item[mohawk wig].available_amount() > 0)
                 subentry.entries.listAppend(HTMLGenerateSpanFont("Wear your mohawk wig.", "red", ""));
+            if ($item[mohawk wig].available_amount() == 0 && !in_hardcore())
+                subentry.entries.listAppend("Potentially pull and wear a mohawk wig.");
             if ($item[model airship].available_amount() == 0)
             {
                 if ($item[mohawk wig].available_amount() == 0) //no wig, no airship

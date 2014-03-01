@@ -108,7 +108,7 @@ void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [in
     }
     else if (monster_name == "Big swarm of ghuol whelps" || monster_name == "Swarm of ghuol whelps" || monster_name == "Giant swarm of ghuol whelps")
     {
-        float monster_level = monster_level_adjustment();
+        float monster_level = monster_level_adjustment_ignoring_plants();
     
         monster_level = MAX(monster_level, 0);
         

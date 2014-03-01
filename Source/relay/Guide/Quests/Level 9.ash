@@ -110,7 +110,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
         
         if (true)
         {
-            string line = pluralize($item[a-boo clue]) + ".";
+            string line = "Have " + pluralize($item[a-boo clue]) + ".";
             
             float clue_drop_rate = item_drop * 0.15;
             line += " " + clue_drop_rate.roundForOutput(2) + " clues/adventure at +" + ((item_drop - 1) * 100.0).roundForOutput(1) + "% item.";
@@ -127,43 +127,52 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
 		
 		
         
-        int spooky_damage_taken = 0;
-        int cold_damage_taken = 0;
+        int spooky_damage_taken_cumulative = 0;
+        int cold_damage_taken_cumulative = 0;
+        
+        int [int] spooky_damage_levels;
+        int [int] cold_damage_levels;
+        
+        int [int] damage_levels = listMake(13, 25, 50, 125, 250);
+        
+        foreach key in damage_levels
+        {
+            int damage = damage_levels[key];
+            
+            int spooky_damage_at_level = damageTakenByElement(damage, $element[spooky]);
+            int cold_damage_at_level = damageTakenByElement(damage, $element[cold]);
+            
+            spooky_damage_taken_cumulative += spooky_damage_at_level;
+            cold_damage_taken_cumulative += cold_damage_at_level;
+            
+            spooky_damage_levels.listAppend(spooky_damage_taken_cumulative);
+            cold_damage_levels.listAppend(cold_damage_taken_cumulative);
+        }
         
         if (true)
         {
-            int [int] damage_levels;
-            damage_levels.listAppend(13);
-            damage_levels.listAppend(25);
-            damage_levels.listAppend(50);
-            damage_levels.listAppend(125);
-            damage_levels.listAppend(250);
+            string line;
+        
+            int hp_damage_taken = spooky_damage_levels[4] + cold_damage_levels[4] + 2;
+            string hp_string = hp_damage_taken + " HP";
+            if (hp_damage_taken >= my_hp())
+                hp_string = HTMLGenerateSpanFont(hp_string, "red", "");
             
-            //float spooky_resistance_multiplier = (1.0 - elemental_resistance($element[spooky]) / 100.0);
-            //float cold_resistance_multiplier = (1.0 - elemental_resistance($element[cold]) / 100.0);
-            foreach key in damage_levels
+            line = "Need " + hp_string + " (" + HTMLGenerateSpanOfClass(spooky_damage_levels[4] + " spooky", "r_element_spooky") + ", " + HTMLGenerateSpanOfClass(cold_damage_levels[4] + " cold", "r_element_cold") + ") to survive 30% effective A-Boo clues.";
+            if (hp_damage_taken >= my_hp())
             {
-                int damage = damage_levels[key];
+                hp_damage_taken = spooky_damage_levels[3] + cold_damage_levels[3] + 2;
+                string hp_string = hp_damage_taken + " HP";
+                if (hp_damage_taken >= my_hp())
+                    hp_string = HTMLGenerateSpanFont(hp_string, "red", "");
                 
-                spooky_damage_taken += damageTakenByElement(damage, $element[spooky]);
-                cold_damage_taken += damageTakenByElement(damage, $element[cold]);
-                //spooky_damage_taken += ceil(damage.to_float() * spooky_resistance_multiplier);
-                //cold_damage_taken += ceil(damage.to_float() * cold_resistance_multiplier);
+                line += "|Or ";
+                line += hp_string;
+                line += " to survive 22% effectiveness clues.";
             }
+            
+            details.listAppend(line);
         }
-        else
-        {
-            //old calculation method:
-            spooky_damage_taken = 463 * (1.0 - elemental_resistance($element[spooky]) / 100.0);
-            cold_damage_taken = 463 * (1.0 - elemental_resistance($element[cold]) / 100.0);
-        }
-        
-        int hp_damage_taken = spooky_damage_taken + cold_damage_taken;
-        string hp_string = (hp_damage_taken + 2) + " HP";
-        if (hp_damage_taken >= my_hp())
-            hp_string = HTMLGenerateSpanFont(hp_string, "red", "");
-        
-		details.listAppend("Need " + hp_string + " (" + HTMLGenerateSpanOfClass(spooky_damage_taken + " spooky", "r_element_spooky") + ", " + HTMLGenerateSpanOfClass(cold_damage_taken + " cold", "r_element_cold") + ") to survive 30% effective A-Boo clues.");
         
         if (!black_market_available() && my_path_id() != PATH_WAY_OF_THE_SURPRISING_FIST)
         {
@@ -261,8 +270,8 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
 		string [int] details;
 		string [int] modifiers;
         
-        int oil_ml = monster_level_adjustment();
-        if ($location[oil peak].locationHasPlant("Rabid Dogwood") && my_location() != $location[oil peak])
+        int oil_ml = monster_level_adjustment_ignoring_plants();
+        if ($location[oil peak].locationHasPlant("Rabid Dogwood"))
             oil_ml += 30;
         
         int turns_remaining_at_current_ml = 0;
@@ -312,8 +321,9 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
             int [int] drop_rates;
             if (oil_ml >= 100)
             {
-                item_drop_string = "100%/30%/15% drops";
-                drop_rates = listMake(100, 30, 15);
+                //last is possibly 10%, needs more spading
+                item_drop_string = "100%/30%/10% drops";
+                drop_rates = listMake(100, 30, 10);
             }
             else if (oil_ml >= 50)
             {

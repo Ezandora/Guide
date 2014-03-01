@@ -37,7 +37,7 @@ void QLevel3GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
     boolean can_skip_stench = numeric_modifier("Stench Damage") >= 20.0;
     
     
-	float rat_king_chance = clampNormalf(monster_level_adjustment() / 300.0);
+	float rat_king_chance = clampNormalf(monster_level_adjustment_ignoring_plants() / 300.0);
 	
     float average_tangles_found = (rat_king_chance * 8.5);
 	

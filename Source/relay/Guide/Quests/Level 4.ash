@@ -42,7 +42,7 @@ void QLevel4GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         subentry.entries.listAppend("Quest finished, speak to the council of loathing.");
         url = "town.php";
     }
-    else if (locationAvailable($location[the boss bat's lair]))
+    else if ($location[the boss bat's lair].locationAvailable())
     {
         subentry.entries.listAppend("Run +meat in the boss bat's lair, if you feel like it. (250 meat drop)");
         subentry.modifiers.listAppend("+meat");

@@ -196,9 +196,20 @@ void SSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         }
     }
     
-    if (true)
+    //sneakyPetePoints first
+    /*int skills_available = MIN(15, my_level()) + get_property_int("sneakyPetePoints");
+    
+    int skills_have = 0;
+    foreach s in lookupSkills("Catchphrase,Mixologist,Throw Party,Fix Jukebox,Snap Fingers,Shake It Off,Check Hair,Cocktail Magic,Make Friends,Natural Dancer,Rev Engine,Born Showman,Pop Wheelie,Rowdy Drinker,Peel Out,Easy Riding,Check Mirror,Riding Tall,Biker Swagger,Flash Headlight,Insult,Live Fast,Incite Riot,Jump Shark,Animal Magnetism,Smoke Break,Hard Drinker,Unrepentant Thief,Brood,Walk Away From Explosion")
     {
-        //FIXME buy skills?
-        //need to know how many we have...
+        if (s.have_skill())
+            skills_have += 1;
     }
+    
+    if (skills_available > skills_have)
+    {
+        string [int] description;
+        description.listAppend(pluralizeWordy(skills_available - skills_have, "skill", "skills").capitalizeFirstLetter() + " available.");
+        optional_task_entries.listAppend(ChecklistEntryMake("__skill Natural Dancer", "da.php?place=gate3", ChecklistSubentryMake("Buy Sneaky Pete skills", "", description), 11));
+    }*/
 }

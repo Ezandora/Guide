@@ -47,7 +47,8 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         //Don't get poisoned.
         effect [int] poison_effects;
         poison_effects.listAppend($effect[Hardly poisoned at all]);
-        poison_effects.listAppend($effect[A Little Bit Poisoned]);
+        if (!hippy_stone_broken()) //FIXME remove next PVP season
+            poison_effects.listAppend($effect[A Little Bit Poisoned]);
         poison_effects.listAppend($effect[Somewhat Poisoned]);
         poison_effects.listAppend($effect[Really Quite Poisoned]);
         poison_effects.listAppend($effect[Majorly Poisoned]);
@@ -149,7 +150,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         
         effect [item] item_effects;
         string [item] item_descriptions;
-        if (my_primestat() == $stat[moxie] || (my_basestat($stat[moxie]) < 70 && !__quest_state["Level 12"].finished))
+        if (__misc_state["need to level moxie"])
         {
             item_descriptions[$item[Ye Olde Bawdy Limerick]] = "+2 moxie stats/fight (20 turns)";
             item_effects[$item[Ye Olde Bawdy Limerick]] = $effect[From Nantucket];
@@ -159,7 +160,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             item_effects[$item[resolution: be sexier]] = $effect[Irresistible Resolve];
         }
 
-        if (my_primestat() == $stat[muscle])
+        if (__misc_state["need to level muscle"])
         {
             item_descriptions[$item[Squat-Thrust Magazine]] = "+3 muscle stats/fight (20 turns)";
             item_effects[$item[Squat-Thrust Magazine]] = $effect[Squatting and Thrusting];
@@ -168,7 +169,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             item_descriptions[$item[resolution: be stronger]] = "+2 muscle stats/fight (20 turns)";
             item_effects[$item[resolution: be stronger]] = $effect[Strong Resolve];
         }
-        if (my_primestat() == $stat[mysticality] || (my_basestat($stat[mysticality]) < 70 && !__quest_state["Level 12"].finished))
+        if (__misc_state["need to level mysticality"])
         {
             item_descriptions[$item[O'RLY Manual]] = "+4 mysticality stats/fight (20 turns)";
             item_effects[$item[O'RLY Manual]] = $effect[You Read The Manual];

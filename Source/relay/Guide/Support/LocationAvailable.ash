@@ -101,7 +101,6 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
 			return locationQuestPropertyPastInternalStepNumber("questL07Cyrptic", 1) && get_property_int("cyrptNicheEvilness") > 0;
         case $location[the defiled nook]:
 			return locationQuestPropertyPastInternalStepNumber("questL07Cyrptic", 1) && get_property_int("cyrptNookEvilness") > 0;
-            
 		case $location[south of the border]:
 			return $items[pumpkin carriage,desert bus pass, bitchin' meatcar, tin lizzie].available_amount() > 0;
 		default:
@@ -406,6 +405,11 @@ string getClickableURLForLocation(location l)
             else
                 __urls_for_locations[l] = "place.php?whichplace=knoll_hostile";
         }
+        
+        if (get_property_boolean("_psychoJarUsed"))
+            __urls_for_locations[$location[the nightmare meatrealm]] = "place.php?whichplace=junggate_6";
+        else
+            __urls_for_locations[$location[the nightmare meatrealm]] = "mall.php";
         __urls_for_locations_initialized = true;
     }
     

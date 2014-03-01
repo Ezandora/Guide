@@ -46,7 +46,7 @@ void QLevel12Init()
 		state.state_boolean["Orchard Finished"] = false;
 	}
 	
-	if (my_level() >= 12 && $location[The Palindome].turnsAttemptedInLocation() > 0)
+	if (my_level() >= 12 && ($location[The Palindome].turnsAttemptedInLocation() > 0 || $items[mega gem,&quot;I Love Me\, Vol. I&quot;,Staff of Ed,Staff of Fats,Staff of Ed\, almost].available_amount() > 0))
 		state.startable = true;
     
 	__quest_state["Level 12"] = state;
@@ -141,12 +141,10 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
         string [int] tasks;
         int ncs_seen = $location[McMillicancuddy's Barn].noncombatTurnsAttemptedInLocation();
         
-        if (ncs_seen < 1 || true)
-            tasks.listAppend("make a fence out of the barbed wire");
-        if (ncs_seen < 2 || true)
-            tasks.listAppend("knock over the lantern");
-        if (ncs_seen < 3 || true)
+        if (ncs_seen < 3)
         {
+            tasks.listAppend("make a fence out of the barbed wire");
+            tasks.listAppend("knock over the lantern");
             tasks.listAppend("dump out the drum");
             details.listAppend("Remember to use a chaos butterfly in combat before clearing the barn.|Then " + tasks.listJoinComponents(", ", "and") + ".");
         }
@@ -304,7 +302,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 }
 
 
-void QLevel12GenerateBattlefieldDescription(ChecklistSubentry subentry, string side, int enemies_remaining, int enemies_defeated_per_combat, string enemy_name, string enemy_name_plural, string boss_name, string [int] sidequest_list)
+void QLevel12GenerateBattlefieldDescription(ChecklistSubentry subentry, string side, int enemies_remaining, int enemies_defeated_per_combat, string enemy_name, string enemy_name_plural, string boss_name, string [int] sidequest_list, string [int] base_sidequest_list)
 {
     if (enemies_defeated_per_combat == 0)
         return;
@@ -325,6 +323,15 @@ void QLevel12GenerateBattlefieldDescription(ChecklistSubentry subentry, string s
     }
     int enemies_to_defeat_for_unlock = -1;
     string area_to_unlock = "";
+    string [int] areas_unlocked_but_not_completed;
+    
+    foreach key in base_sidequest_list
+    {
+        if (!__quest_state["Level 12"].state_boolean[base_sidequest_list[key] + " Finished"])
+        {
+            areas_unlocked_but_not_completed.listAppend(base_sidequest_list[key]);
+        }
+    }
     
     int [int] unlock_threshold;
     unlock_threshold[0] = 64;
@@ -334,13 +341,16 @@ void QLevel12GenerateBattlefieldDescription(ChecklistSubentry subentry, string s
     for i from 2 to 0 by -1
     {
         int threshold = unlock_threshold[i];
-        
-        if (enemies_defeated < threshold)
+        if (!__quest_state["Level 12"].state_boolean[sidequest_list[i] + " Finished"])
         {
-            if (!__quest_state["Level 12"].state_boolean[sidequest_list[i] + " Finished"])
+            if (enemies_defeated < threshold)
             {
                 area_to_unlock = sidequest_list[i];
                 enemies_to_defeat_for_unlock = threshold - enemies_defeated;
+            }
+            else
+            {
+                areas_unlocked_but_not_completed.listAppend(sidequest_list[i]);
             }
         }
     }
@@ -350,6 +360,9 @@ void QLevel12GenerateBattlefieldDescription(ChecklistSubentry subentry, string s
         int turns_to_reach = ceiling(enemies_to_defeat_for_unlock.to_float() / enemies_defeated_per_combat.to_float());
         line += "|*" + pluralize(turns_to_reach, "turn", "turns") + " (" + pluralize(enemies_to_defeat_for_unlock, enemy_name, enemy_name_plural) + ") to unlock " + area_to_unlock + ".";
     }
+    
+    if (areas_unlocked_but_not_completed.count() > 0)
+        line += "|*Quests accessible: " + areas_unlocked_but_not_completed.listJoinComponents(", ", "and") + ".";
     
     subentry.entries.listAppend(line);
     
@@ -447,10 +460,10 @@ void QLevel12GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         
         
 		if (frat_boys_left < 1000 || (frat_boys_left == 1000 && hippies_left == 1000) || sides_completed_hippy > 0)
-            QLevel12GenerateBattlefieldDescription(subentry, "hippy", frat_boys_left, frat_boys_defeated_per_combat, "frat boy", "frat boys", "The Man", listMake("Lighthouse", "Junkyard", "Arena"));
+            QLevel12GenerateBattlefieldDescription(subentry, "hippy", frat_boys_left, frat_boys_defeated_per_combat, "frat boy", "frat boys", "The Man", listMake("Lighthouse", "Junkyard", "Arena"), listMake("Orchard", "Nuns", "Farm"));
             
 		if (hippies_left < 1000 || (frat_boys_left == 1000 && hippies_left == 1000) || sides_completed_frat > 0)
-            QLevel12GenerateBattlefieldDescription(subentry, "frat boy", hippies_left, hippies_defeated_per_combat, "hippy", "hippies", "The Big Wisniewski", listMake("Orchard", "Nuns", "Farm"));
+            QLevel12GenerateBattlefieldDescription(subentry, "frat boy", hippies_left, hippies_defeated_per_combat, "hippy", "hippies", "The Big Wisniewski", listMake("Orchard", "Nuns", "Farm"), listMake("Lighthouse", "Junkyard", "Arena"));
         
         if (frat_boys_left == 1 && hippies_left == 1)
 		{

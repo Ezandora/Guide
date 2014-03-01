@@ -184,16 +184,16 @@ void QHitsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] 
 			else
 				subentry.entries.listAppend("Need:|*" + required_components.listJoinComponents("|*", "or"));
 			
-			if (star_charts_remaining > 1 || (star_charts_remaining > 0 && get_property("olfactedMonster") == "Astronomer"))
+			if (star_charts_remaining > 1)
 			{
-				subentry.entries.listAppend("Olfact astronomers");
+				subentry.entries.listAppend("Olfact astronomers.");
 			}
-			else if (star_charts_remaining > 1) //no need for astronomers
+			else if (star_charts_remaining == 0) //no need for astronomers
 			{
 				if (my_ascensions() % 2 == 0)
-					subentry.entries.listAppend("Olfact skinflute");
+					subentry.entries.listAppend("Olfact skinflute.");
 				else
-					subentry.entries.listAppend("Olfact camel's toe");
+					subentry.entries.listAppend("Olfact camel's toe.");
 			}
 			if (!have_met_stars_requirement || !have_met_lines_requirement)
 				subentry.modifiers.listAppend("+234% item");

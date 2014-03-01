@@ -117,11 +117,12 @@ void finalizeSetUpFloristState()
 		else
 			__plants_suggested_locations.listAppend(PlantSuggestionMake(battlefield_zone, "Rabid Dogwood", ""));
 	}
-	if (my_primestat() == $stat[mysticality] && __misc_state["need to level"])
+	if (__misc_state["need to level mysticality"])
 	{
 		//Wizard's Wig - underground, +5 myst stats/fight:
-        if (!__quest_state["Level 4"].finished)
-            __plants_suggested_locations.listAppend(PlantSuggestionMake($location[The Boss Bat's Lair], "Wizard's Wig", ""));
+        //in SC, can reach level 7 first, so ignore this one:
+        //if (!__quest_state["Level 4"].finished)
+            //__plants_suggested_locations.listAppend(PlantSuggestionMake($location[The Boss Bat's Lair], "Wizard's Wig", ""));
         if (!__quest_state["Level 7"].state_boolean["niche finished"])
             __plants_suggested_locations.listAppend(PlantSuggestionMake($location[The Defiled Niche], "Wizard's Wig", ""));
 	}
@@ -151,8 +152,9 @@ void finalizeSetUpFloristState()
 	}
 	//War Lily - indoor, +ML:
 	//Rad-ish Radish - outdoor, +5 moxie stats/fight:
-    if (my_primestat() == $stat[moxie] && __misc_state["need to level"])
+    if (__misc_state["need to level moxie"])
     {
+        //you wouldn't plant +30ML at airship - because oil peak likely needs it today. FIXME suggest if oil peak done/planted? HCO I guess? I dunno
         __plants_suggested_locations.listAppend(PlantSuggestionMake($location[The Spooky Forest], "Rad-ish Radish", ""));
         __plants_suggested_locations.listAppend(PlantSuggestionMake($location[The Penultimate Fantasy Airship], "Rad-ish Radish", ""));
     }

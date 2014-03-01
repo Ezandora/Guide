@@ -293,7 +293,7 @@ void generateMissingItems(Checklist [int] checklists)
     
     if ($item[enchanted bean].available_amount() == 0 && !__quest_state["Level 10"].state_boolean["Beanstalk grown"])
     {
-		items_needed_entries.listAppend(ChecklistEntryMake("__item enchanted bean", "", ChecklistSubentryMake("enchanted bean", "", "Found in the beanbat chamber.")));
+		items_needed_entries.listAppend(ChecklistEntryMake("__item enchanted bean", "", ChecklistSubentryMake("Enchanted bean", "", "Found in the beanbat chamber.")));
     }
     
     if (__quest_state["Level 13"].state_boolean["shadow will need to be defeated"])
@@ -305,6 +305,17 @@ void generateMissingItems(Checklist [int] checklists)
         //red potion
         //extra-strength red potion (they might find it)
         
+    }
+    if (__quest_state["Level 11 Palindome"].state_boolean["Need instant camera"])
+    {
+        item camera = 7266.to_item();
+        if (camera != $item[none])
+        {
+            string url = "";
+            if ($location[the haunted bedroom].locationAvailable())
+                url = "place.php?whichplace=spookyraven2";
+            items_needed_entries.listAppend(ChecklistEntryMake("__item " + camera, "", ChecklistSubentryMake("Disposable instant camera", url, "Found in the Haunted Bedroom.")));
+        }
     }
                                
     SetsGenerateMissingItems(items_needed_entries);

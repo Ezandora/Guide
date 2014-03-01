@@ -195,16 +195,19 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 			//We can tell them which ones they have... but it's still unreliable. I guess a single message if they have all three?
 			string line = "F'c'le.";
 			string additional_line = "";
-			if ($item[rigging shampoo].available_amount() > 0 && $item[mizzenmast mop].available_amount() > 0 && $item[ball polish].available_amount() > 0)
+            
+            item [int] missing_washing_items = $items[rigging shampoo,mizzenmast mop,ball polish].items_missing();
+            
+			if (missing_washing_items.count() == 0)
             {
                 url = "inventory.php?which=3";
-				line += " Use rigging shampoo, mizzenmast mop, and ball polish, then adventure to complete quest.";
+				line += " " + HTMLGenerateSpanFont("Use rigging shampoo, mizzenmast mop, and ball polish", "red", "") + ", then adventure to complete quest.";
             }
 			else
 			{
                 subentry.modifiers.listAppend("+234% item");
                 subentry.modifiers.listAppend("+combat");
-				line += " Run +234% item, +combat, and collect the three washing items.";
+				line += " Run +234% item, +combat, and collect " + missing_washing_items.listJoinComponents(", ", "and") + ".";
 				if (item_drop_modifier() < 234.0)
 					additional_line = "This location can be a nightmare without +234% item.";
 			}

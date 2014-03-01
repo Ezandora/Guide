@@ -549,6 +549,20 @@ skill lookupSkill(string name)
     return name.to_skill();
 }
 
+boolean [skill] lookupSkills(string names) //CSV input
+{
+    boolean [skill] result;
+    string [int] skill_names = split_string(names, ",");
+    foreach key in skill_names
+    {
+        skill s = skill_names[key].to_skill();
+        if (s == $skill[none])
+            continue;
+        result[s] = true;
+    }
+    return result;
+}
+
 effect lookupEffect(string name)
 {
     return name.to_effect();
@@ -809,4 +823,30 @@ int damageTakenByElement(int base_damage, element e)
         
         
     return damageTakenByElement(base_damage, elemental_resistance);
+}
+
+
+int monster_level_adjustment_ignoring_plants()
+{
+    int ml = monster_level_adjustment();
+    
+    
+    
+    location my_location = my_location();
+    
+    if (my_location != $location[none])
+    {
+        string [3] location_plants = get_florist_plants()[my_location];
+        foreach key in location_plants
+        {
+            string plant = location_plants[key];
+            if (plant == "Rabid Dogwood" || plant == "War Lily"  || plant == "Blustery Puffball")
+            {
+                ml -= 30;
+                break;
+            }
+        }
+        
+    }
+    return ml;
 }

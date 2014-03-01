@@ -448,6 +448,8 @@ void setUpState()
     
     if (get_property("peteMotorbikeGasTank") == "Extra-Buoyant Tank")
         mysterious_island_unlocked = true;
+    if (get_property_int("lastIslandUnlock") == my_ascensions() && get_revision() >= 13812)
+        mysterious_island_unlocked = true;
             
     if (!mysterious_island_unlocked)
     {
@@ -462,6 +464,10 @@ void setUpState()
     
 	
 	__misc_state["desert beach available"] = false;
+    if (get_property("peteMotorbikeGasTank") == "Large Capacity Tank")
+        __misc_state["desert beach available"] = true;
+    if (get_property_int("lastDesertUnlock") == my_ascensions() && get_revision() >= 13812)
+        __misc_state["desert beach available"] = true;
 	if ($location[south of the border].locationAvailable())
 		__misc_state["desert beach available"] = true;
 	if ($locations[The Shore\, Inc. Travel Agency,the arid\, extra-dry desert,the oasis, south of the border].turnsAttemptedInLocation() > 0) //weird issues with detecting the beach. check if we've ever adventured there as a back-up
@@ -567,6 +573,28 @@ void finalizeSetUpState()
 	{
 		__misc_state["need to level"] = true;
 	}
+    __misc_state["need to level muscle"] = false;
+    __misc_state["need to level mysticality"] = false;
+    __misc_state["need to level moxie"] = false;
+    
+    if (__misc_state["In run"])
+    {
+        //62 muscle for antique machete/hidden hospital
+        //70 moxie, 70 mysticality for war outfits
+        if (my_primestat() == $stat[muscle] && __misc_state["need to level"])
+            __misc_state["need to level muscle"] = true;
+        if (my_primestat() == $stat[mysticality] && __misc_state["need to level"])
+            __misc_state["need to level mysticality"] = true;
+        if (my_primestat() == $stat[moxie] && __misc_state["need to level"])
+            __misc_state["need to level moxie"] = true;
+        
+        if (my_basestat($stat[muscle]) < 62)
+            __misc_state["need to level muscle"] = true;
+        if (my_basestat($stat[mysticality]) < 70)
+            __misc_state["need to level mysticality"] = true;
+        if (my_basestat($stat[moxie]) < 70)
+            __misc_state["need to level moxie"] = true;
+    }
 	
 	if (__misc_state_int["pulls available"] > 0)
 	{

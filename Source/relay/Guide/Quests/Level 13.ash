@@ -414,6 +414,11 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 		subentry.modifiers.listAppend("+HP");
 		subentry.modifiers.listAppend("+" + $monster[Your Shadow].monster_initiative() + "% init");
 		subentry.entries.listAppend("Fight your shadow.");
+        foreach it in $items[attorney's badge, navel ring of navel gazing]
+        {
+            if (it.available_amount() > 0 && it.equipped_amount() == 0)
+                subentry.entries.listAppend("Possibly equip your " + it + ". (blocks shadow)");
+        }
 	}
 	else if (base_quest_state.mafia_internal_step == 9)
 	{

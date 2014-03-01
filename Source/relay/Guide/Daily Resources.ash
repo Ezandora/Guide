@@ -5,6 +5,17 @@ import "relay/Guide/Sets/Sets import.ash"
 
 
 
+string [int] generateHotDogLine(string hotdog, string description, int fullness)
+{
+    description += " " + fullness + " full.";
+    if (availableFullness() < fullness)
+    {
+        hotdog = HTMLGenerateSpanOfClass(hotdog , "r_future_option");
+        description = HTMLGenerateSpanOfClass(description , "r_future_option");
+    }
+    return listMake(hotdog, description);
+}
+
 
 void generateDailyResources(Checklist [int] checklists)
 {
@@ -12,7 +23,7 @@ void generateDailyResources(Checklist [int] checklists)
 		
 	SetsGenerateResources(available_resources_entries);
 	
-	if (!get_property_boolean("_fancyHotDogEaten") && availableFullness() > 0 && __misc_state["VIP available"] && __misc_state["can eat just about anything"] && __misc_state["In run"]) //too expensive to use outside a run?
+	if (!get_property_boolean("_fancyHotDogEaten") && availableFullness() > 0 && __misc_state["VIP available"] && __misc_state["can eat just about anything"] && __misc_state["In run"]) //too expensive to use outside a run? well, more that it's information overload
 	{
 		
 		string name = "Fancy hot dog edible";
@@ -20,16 +31,20 @@ void generateDailyResources(Checklist [int] checklists)
 		string image_name = "basic hot dog";
 		
         string [int][int] options;
-		options.listAppend(listMake("Optimal Dog", "Semi-rare next adventure. 1 full."));
-		options.listAppend(listMake("Ghost Dog", "-combat, 30 turns. 3 full."));
-		options.listAppend(listMake("Video Game Hot Dog", "+25% item, +25% meat, 50 turns. 3 full."));
-		options.listAppend(listMake("Junkyard dog", "+combat, 30 turns. 3 full."));
+		options.listAppend(generateHotDogLine("Optimal Dog", "Semi-rare next adventure.", 1));
+		options.listAppend(generateHotDogLine("Ghost Dog", "-combat, 30 turns.", 3));
+		options.listAppend(generateHotDogLine("Video Game Hot Dog", "+25% item, +25% meat, pixels, 50 turns.", 3));
+		options.listAppend(generateHotDogLine("Junkyard dog", "+combat, 30 turns.", 3));
+        if (!__quest_state["Level 8"].finished || __quest_state["Level 9"].state_int["a-boo peak hauntedness"] > 0)
+            options.listAppend(generateHotDogLine("Devil dog", "+3 cold/spooky res, 30 turns.", 3));
+        if (!__quest_state["Level 9"].state_boolean["Peak Stench Completed"])
+            options.listAppend(generateHotDogLine("Chilly dog", "+10ML and +3 stench/sleaze res, 30 turns.", 3));
 		if (my_primestat() == $stat[muscle])
-			options.listAppend(listMake("Savage macho dog", "+50% muscle, 50 turns. 2 full."));
+			options.listAppend(generateHotDogLine("Savage macho dog", "+50% muscle, 50 turns.", 2));
 		if (my_primestat() == $stat[mysticality])
-			options.listAppend(listMake("One with everything", "+50% mysticality, 50 turns. 2 full."));
+			options.listAppend(generateHotDogLine("One with everything", "+50% mysticality, 50 turns.", 2));
 		if (my_primestat() == $stat[moxie])
-			options.listAppend(listMake("Sly Dog", "+50% moxie, 50 turns. 2 full."));
+			options.listAppend(generateHotDogLine("Sly Dog", "+50% moxie, 50 turns.", 2));
 			
         description.listAppend(HTMLGenerateSimpleTableLines(options));
 		available_resources_entries.listAppend(ChecklistEntryMake(image_name, "clan_viplounge.php?action=hotdogstand", ChecklistSubentryMake(name, "", description), 5));
@@ -61,11 +76,11 @@ void generateDailyResources(Checklist [int] checklists)
         int games_available = 3 - get_property_int("_poolGames");
         string [int] description;
         if (__misc_state["familiars temporarily blocked"])
-            description.listAppend("+50% weapon damage.");
+            description.listAppend("+50% weapon damage. (aggressively)");
         else
-            description.listAppend("+5 familiar weight, +50% weapon damage.");
-        description.listAppend("Or +10% item, +50% init.");
-        description.listAppend("Or +50% spell damage, +10 MP regeneration.");
+            description.listAppend("+5 familiar weight, +50% weapon damage. (aggressively)");
+        description.listAppend("Or +50% spell damage, +10 MP regeneration. (strategically)");
+        description.listAppend("Or +10% item, +50% init. (stylishly)");
 		available_resources_entries.listAppend(ChecklistEntryMake("__item pool cue", "clan_viplounge.php?action=pooltable", ChecklistSubentryMake(pluralize(games_available, "pool table game", "pool table games"), "10 turns", description), 5));
     }
     if (__quest_state["Level 6"].finished && !get_property_boolean("friarsBlessingReceived"))

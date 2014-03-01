@@ -167,9 +167,9 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		{
             subentry.modifiers.listAppend("-combat");
             subentry.modifiers.listAppend("+ML");
-            float monster_level = monster_level_adjustment();
+            float monster_level = monster_level_adjustment_ignoring_plants();
             
-            if ($location[the defiled cranny].locationHasPlant("Blustery Puffball") && my_location() != $location[the defiled cranny])
+            if ($location[the defiled cranny].locationHasPlant("Blustery Puffball"))
                 monster_level += 30;
             
             monster_level = MAX(monster_level, 0);

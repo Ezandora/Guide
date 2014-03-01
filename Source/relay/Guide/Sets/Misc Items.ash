@@ -446,7 +446,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
     }
     
     
-    if ($item[mojo filter].available_amount() > 0 && get_property_int("currentMojoFilters") <3)
+    if ($item[mojo filter].available_amount() > 0 && get_property_int("currentMojoFilters") <3 && in_run)
     {
         int mojo_filters_usable = MIN(my_spleen_use(), MIN(3 - get_property_int("currentMojoFilters"), $item[mojo filter].available_amount()));
         string line = "Removes one spleen each.";
@@ -473,19 +473,19 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
     }
     if (__misc_state["need to level"])
     {
-        if ($item[Marvin's marvelous pill].available_amount() > 0 && my_primestat() == $stat[moxie])
+        if ($item[Marvin's marvelous pill].available_amount() > 0 && __misc_state["need to level moxie"])
         {
             available_resources_entries.listAppend(ChecklistEntryMake("__item Marvin's marvelous pill", "", ChecklistSubentryMake(pluralize($item[Marvin's marvelous pill]), "", "+20% to moxie gains. (10 turns)"), importance_level_unimportant_item));
         }
-        if ($item[drum of pomade].available_amount() > 0 && my_primestat() == $stat[moxie])
+        if ($item[drum of pomade].available_amount() > 0 && __misc_state["need to level moxie"])
         {
             available_resources_entries.listAppend(ChecklistEntryMake("__item drum of pomade", "", ChecklistSubentryMake(pluralize($item[drum of pomade]), "", "+15% to moxie gains. (10 turns)"), importance_level_unimportant_item));
         }
-        if ($item[baobab sap].available_amount() > 0 && my_primestat() == $stat[muscle])
+        if ($item[baobab sap].available_amount() > 0 && __misc_state["need to level muscle"])
         {
             available_resources_entries.listAppend(ChecklistEntryMake("__item baobab sap", "", ChecklistSubentryMake(pluralize($item[baobab sap]), "", "+20% to muscle gains. (10 turns)"), importance_level_unimportant_item));
         }
-        if ($item[desktop zen garden].available_amount() > 0 && my_primestat() == $stat[mysticality])
+        if ($item[desktop zen garden].available_amount() > 0 && __misc_state["need to level mysticality"])
         {
             available_resources_entries.listAppend(ChecklistEntryMake("__item desktop zen garden", "", ChecklistSubentryMake(pluralize($item[desktop zen garden]), "", "+20% to mysticality gains. (10 turns)"), importance_level_unimportant_item));
         }
@@ -649,21 +649,35 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
     if (odd_silver_coin.available_amount() > 0 && in_run)
     {
         string [int] description;
-        //FIXME description
-        //maybe after everything is spaded and on the wiki?
-        //cinnamon cannoli - 2 - 1 fullness awesome food. ...?
-        //expensive champagne - 3 - 1-fullness epic food. ...?
+        string [int][int] table;
+        //cinnamon cannoli - 2 - 1 fullness awesome food. not worthwhile?
+        //expensive champagne - 3 - 1-drunkness epic drink. not worthwhile?
         //polo trophy - 3 - +50ML for 15 turns
-        //fancy oil painting - 4 - bridge building. 10 progress supposedly?
-        //solid gold rosary - 5 - I think this is the cyrpt? need details
-        //ornate dowsing rod - 5 - better desert exploration
+        //table.listAppend(listMake("polo trophy", "+50ML for 15 turns, marginal?", "3 coins")); //costs three adventures to find. I guess it'd only be relevant for cave bars? even then...
+        //fancy oil painting - 4 - bridge building. 10 progress
+        if (!__quest_state["Level 9"].state_boolean["bridge complete"] && (__quest_state["Level 9"].state_int["bridge fasteners needed"] > 0 || __quest_state["Level 9"].state_int["bridge lumber needed"] > 0))
+            table.listAppend(listMake("fancy oil painting", "10 fasteners, 10 lumber", "4 coins"));
+        //solid gold rosary - 5 - better cyrpt progression. need details (-4.5 evil?)
+        if (!__quest_state["Level 7"].state_boolean["alcove finished"] || !__quest_state["Level 7"].state_boolean["cranny finished"] || !__quest_state["Level 7"].state_boolean["niche finished"] || !__quest_state["Level 7"].state_boolean["nook finished"])
+            table.listAppend(listMake("solid gold rosary", "-4.5? evilness from cyrpt", "5 coins"));
+        //ornate dowsing rod - 5 - better desert exploration (+2%)
+        
+        if (!__quest_state["Level 11 Pyramid"].state_boolean["Desert Explored"] && lookupItem("ornate dowsing rod").available_amount() == 0)
+            table.listAppend(listMake("ornate dowsing rod", "+2% desert exploration", "5 coins"));
+        description.listAppend(HTMLGenerateSimpleTableLines(table));
+        
         available_resources_entries.listAppend(ChecklistEntryMake("__item " + odd_silver_coin, "inventory.php?which=3", ChecklistSubentryMake(odd_silver_coin.pluralize(), "", description), importance_level_item));
     }
     item grimstone_mask = lookupItem("grimstone mask");
     if (grimstone_mask.available_amount() > 0 && in_run)
     {
         string [int] description;
-        //FIXME suggestions
+        
+        description.listAppend("Wear to take you places.");
+        description.listAppend("The prince's ball lets you find odd silver coins.|Up to six, one adventure each.");
+        description.listAppend("Rumpelstiltskin's for towerkilling with small golem.|Small golem is a 5k/round combat item.|Involves the semi-rare in village. Don't know the details, sorry.");
+        if (get_property("grimstoneMaskPath").length() > 0)
+            description.listAppend("Currently on the path of " + get_property("grimstoneMaskPath") + ".");
         
         available_resources_entries.listAppend(ChecklistEntryMake("__item " + grimstone_mask, "inventory.php?which=3", ChecklistSubentryMake(grimstone_mask.pluralize(), "", description), importance_level_item));
     }
