@@ -1,7 +1,7 @@
 //This script and its support scripts are in the public domain.
 
 //These settings are for development. Don't worry about editing them.
-string __version = "1.0.20";
+string __version = "1.0.21";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -1330,6 +1330,20 @@ skill lookupSkill(string name)
     return name.to_skill();
 }
 
+boolean [skill] lookupSkills(string names) //CSV input
+{
+    boolean [skill] result;
+    string [int] skill_names = split_string(names, ",");
+    foreach key in skill_names
+    {
+        skill s = skill_names[key].to_skill();
+        if (s == $skill[none])
+            continue;
+        result[s] = true;
+    }
+    return result;
+}
+
 effect lookupEffect(string name)
 {
     return name.to_effect();
@@ -1590,6 +1604,32 @@ int damageTakenByElement(int base_damage, element e)
         
         
     return damageTakenByElement(base_damage, elemental_resistance);
+}
+
+
+int monster_level_adjustment_ignoring_plants()
+{
+    int ml = monster_level_adjustment();
+    
+    
+    
+    location my_location = my_location();
+    
+    if (my_location != $location[none])
+    {
+        string [3] location_plants = get_florist_plants()[my_location];
+        foreach key in location_plants
+        {
+            string plant = location_plants[key];
+            if (plant == "Rabid Dogwood" || plant == "War Lily"  || plant == "Blustery Puffball")
+            {
+                ml -= 30;
+                break;
+            }
+        }
+        
+    }
+    return ml;
 }
 //Support for manually parsing the quest log:
 
@@ -2845,6 +2885,8 @@ void KOLImagesInit()
     
 	__kol_images["__skill Easy Riding"] = KOLImageMake("images/itemimages/motorbike.gif", Vec2iMake(30,30));
 	__kol_images["__skill jump shark"] = KOLImageMake("images/itemimages/sharkfin.gif", Vec2iMake(30,30));
+	__kol_images["__skill Natural Dancer"] = KOLImageMake("images/itemimages/dance3.gif", Vec2iMake(30,30));
+    
     
 	
 	string class_name = my_class().to_string();
@@ -3902,7 +3944,6 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
 			return locationQuestPropertyPastInternalStepNumber("questL07Cyrptic", 1) && get_property_int("cyrptNicheEvilness") > 0;
         case $location[the defiled nook]:
 			return locationQuestPropertyPastInternalStepNumber("questL07Cyrptic", 1) && get_property_int("cyrptNookEvilness") > 0;
-            
 		case $location[south of the border]:
 			return $items[pumpkin carriage,desert bus pass, bitchin' meatcar, tin lizzie].available_amount() > 0;
 		default:
@@ -4207,6 +4248,11 @@ string getClickableURLForLocation(location l)
             else
                 __urls_for_locations[l] = "place.php?whichplace=knoll_hostile";
         }
+        
+        if (get_property_boolean("_psychoJarUsed"))
+            __urls_for_locations[$location[the nightmare meatrealm]] = "place.php?whichplace=junggate_6";
+        else
+            __urls_for_locations[$location[the nightmare meatrealm]] = "mall.php";
         __urls_for_locations_initialized = true;
     }
     
@@ -4339,7 +4385,7 @@ void QLevel3GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
     boolean can_skip_stench = numeric_modifier("Stench Damage") >= 20.0;
     
     
-	float rat_king_chance = clampNormalf(monster_level_adjustment() / 300.0);
+	float rat_king_chance = clampNormalf(monster_level_adjustment_ignoring_plants() / 300.0);
 	
     float average_tangles_found = (rat_king_chance * 8.5);
 	
@@ -4463,7 +4509,7 @@ void QLevel4GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         subentry.entries.listAppend("Quest finished, speak to the council of loathing.");
         url = "town.php";
     }
-    else if (locationAvailable($location[the boss bat's lair]))
+    else if ($location[the boss bat's lair].locationAvailable())
     {
         subentry.entries.listAppend("Run +meat in the boss bat's lair, if you feel like it. (250 meat drop)");
         subentry.modifiers.listAppend("+meat");
@@ -5001,9 +5047,9 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		{
             subentry.modifiers.listAppend("-combat");
             subentry.modifiers.listAppend("+ML");
-            float monster_level = monster_level_adjustment();
+            float monster_level = monster_level_adjustment_ignoring_plants();
             
-            if ($location[the defiled cranny].locationHasPlant("Blustery Puffball") && my_location() != $location[the defiled cranny])
+            if ($location[the defiled cranny].locationHasPlant("Blustery Puffball"))
                 monster_level += 30;
             
             monster_level = MAX(monster_level, 0);
@@ -5173,7 +5219,7 @@ void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [in
     }
     else if (monster_name == "Big swarm of ghuol whelps" || monster_name == "Swarm of ghuol whelps" || monster_name == "Giant swarm of ghuol whelps")
     {
-        float monster_level = monster_level_adjustment();
+        float monster_level = monster_level_adjustment_ignoring_plants();
     
         monster_level = MAX(monster_level, 0);
         
@@ -5686,7 +5732,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
         
         if (true)
         {
-            string line = pluralize($item[a-boo clue]) + ".";
+            string line = "Have " + pluralize($item[a-boo clue]) + ".";
             
             float clue_drop_rate = item_drop * 0.15;
             line += " " + clue_drop_rate.roundForOutput(2) + " clues/adventure at +" + ((item_drop - 1) * 100.0).roundForOutput(1) + "% item.";
@@ -5703,43 +5749,52 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
 		
 		
         
-        int spooky_damage_taken = 0;
-        int cold_damage_taken = 0;
+        int spooky_damage_taken_cumulative = 0;
+        int cold_damage_taken_cumulative = 0;
+        
+        int [int] spooky_damage_levels;
+        int [int] cold_damage_levels;
+        
+        int [int] damage_levels = listMake(13, 25, 50, 125, 250);
+        
+        foreach key in damage_levels
+        {
+            int damage = damage_levels[key];
+            
+            int spooky_damage_at_level = damageTakenByElement(damage, $element[spooky]);
+            int cold_damage_at_level = damageTakenByElement(damage, $element[cold]);
+            
+            spooky_damage_taken_cumulative += spooky_damage_at_level;
+            cold_damage_taken_cumulative += cold_damage_at_level;
+            
+            spooky_damage_levels.listAppend(spooky_damage_taken_cumulative);
+            cold_damage_levels.listAppend(cold_damage_taken_cumulative);
+        }
         
         if (true)
         {
-            int [int] damage_levels;
-            damage_levels.listAppend(13);
-            damage_levels.listAppend(25);
-            damage_levels.listAppend(50);
-            damage_levels.listAppend(125);
-            damage_levels.listAppend(250);
+            string line;
+        
+            int hp_damage_taken = spooky_damage_levels[4] + cold_damage_levels[4] + 2;
+            string hp_string = hp_damage_taken + " HP";
+            if (hp_damage_taken >= my_hp())
+                hp_string = HTMLGenerateSpanFont(hp_string, "red", "");
             
-            //float spooky_resistance_multiplier = (1.0 - elemental_resistance($element[spooky]) / 100.0);
-            //float cold_resistance_multiplier = (1.0 - elemental_resistance($element[cold]) / 100.0);
-            foreach key in damage_levels
+            line = "Need " + hp_string + " (" + HTMLGenerateSpanOfClass(spooky_damage_levels[4] + " spooky", "r_element_spooky") + ", " + HTMLGenerateSpanOfClass(cold_damage_levels[4] + " cold", "r_element_cold") + ") to survive 30% effective A-Boo clues.";
+            if (hp_damage_taken >= my_hp())
             {
-                int damage = damage_levels[key];
+                hp_damage_taken = spooky_damage_levels[3] + cold_damage_levels[3] + 2;
+                string hp_string = hp_damage_taken + " HP";
+                if (hp_damage_taken >= my_hp())
+                    hp_string = HTMLGenerateSpanFont(hp_string, "red", "");
                 
-                spooky_damage_taken += damageTakenByElement(damage, $element[spooky]);
-                cold_damage_taken += damageTakenByElement(damage, $element[cold]);
-                //spooky_damage_taken += ceil(damage.to_float() * spooky_resistance_multiplier);
-                //cold_damage_taken += ceil(damage.to_float() * cold_resistance_multiplier);
+                line += "|Or ";
+                line += hp_string;
+                line += " to survive 22% effectiveness clues.";
             }
+            
+            details.listAppend(line);
         }
-        else
-        {
-            //old calculation method:
-            spooky_damage_taken = 463 * (1.0 - elemental_resistance($element[spooky]) / 100.0);
-            cold_damage_taken = 463 * (1.0 - elemental_resistance($element[cold]) / 100.0);
-        }
-        
-        int hp_damage_taken = spooky_damage_taken + cold_damage_taken;
-        string hp_string = (hp_damage_taken + 2) + " HP";
-        if (hp_damage_taken >= my_hp())
-            hp_string = HTMLGenerateSpanFont(hp_string, "red", "");
-        
-		details.listAppend("Need " + hp_string + " (" + HTMLGenerateSpanOfClass(spooky_damage_taken + " spooky", "r_element_spooky") + ", " + HTMLGenerateSpanOfClass(cold_damage_taken + " cold", "r_element_cold") + ") to survive 30% effective A-Boo clues.");
         
         if (!black_market_available() && my_path_id() != PATH_WAY_OF_THE_SURPRISING_FIST)
         {
@@ -5837,8 +5892,8 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
 		string [int] details;
 		string [int] modifiers;
         
-        int oil_ml = monster_level_adjustment();
-        if ($location[oil peak].locationHasPlant("Rabid Dogwood") && my_location() != $location[oil peak])
+        int oil_ml = monster_level_adjustment_ignoring_plants();
+        if ($location[oil peak].locationHasPlant("Rabid Dogwood"))
             oil_ml += 30;
         
         int turns_remaining_at_current_ml = 0;
@@ -5888,8 +5943,9 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
             int [int] drop_rates;
             if (oil_ml >= 100)
             {
-                item_drop_string = "100%/30%/15% drops";
-                drop_rates = listMake(100, 30, 15);
+                //last is possibly 10%, needs more spading
+                item_drop_string = "100%/30%/10% drops";
+                drop_rates = listMake(100, 30, 10);
             }
             else if (oil_ml >= 50)
             {
@@ -6070,6 +6126,7 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 	
 	if ($item[s.o.c.k.].available_amount() == 0)
 	{
+        //FIXME delay if ballroom song not set
         if (!base_quest_state.state_boolean["Beanstalk grown"])
         {
             subentry.entries.listAppend("Grow the beanstalk.");
@@ -6126,7 +6183,12 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 	else
 	{
         url = "place.php?whichplace=giantcastle";
-		if ($location[The Castle in the Clouds in the Sky (Top floor)].locationAvailable())
+        if (get_property("lastEncounter") == "Keep On Turnin' the Wheel in the Sky")
+        {
+            url = "town.php";
+            subentry.entries.listAppend("Talk to the council to finish quest.");
+        }
+		else if ($location[The Castle in the Clouds in the Sky (Top floor)].locationAvailable())
 		{
             float turn_estimation = -1.0;
             float non_combat_rate = 1.0 - (0.95 + combat_rate_modifier() / 100.0);
@@ -6139,6 +6201,8 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 			subentry.entries.listAppend("Top floor. Run -combat.");
             if ($item[mohawk wig].equipped_amount() == 0 && $item[mohawk wig].available_amount() > 0)
                 subentry.entries.listAppend(HTMLGenerateSpanFont("Wear your mohawk wig.", "red", ""));
+            if ($item[mohawk wig].available_amount() == 0 && !in_hardcore())
+                subentry.entries.listAppend("Potentially pull and wear a mohawk wig.");
             if ($item[model airship].available_amount() == 0)
             {
                 if ($item[mohawk wig].available_amount() == 0) //no wig, no airship
@@ -6286,7 +6350,8 @@ void QLevel11Init()
 		QuestStateParseMafiaQuestProperty(state, "questL11Palindome");
 		state.quest_name = "Palindome Quest";
 		state.image_name = "Palindome";
-	
+        
+        state.state_boolean["Need instant camera"] = false; //FIXME track this
 		if (my_level() >= 11)
 			state.startable = true;
 		__quest_state["Level 11 Palindome"] = state;
@@ -6432,7 +6497,10 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         else
         {
             if ($item[black market map].available_amount() > 0)
+            {
+                url = "inventory.php?which=3";
                 subentry.entries.listAppend("Use the black market map.");
+            }
             
         }
     }
@@ -6538,7 +6606,12 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
 {
 	if (!__quest_state["Level 11 Palindome"].in_progress)
         return;
-        
+    //Some emergency exits in case the revamp doesn't detect properly: (not sure yet)
+    if (__quest_state["Level 11"].finished) //emergency tracking
+        return;
+    if ($items[staff of fats,Staff of Ed\, almost,Staff of Ed].available_amount() > 0)
+        return;
+    
     QuestState base_quest_state = __quest_state["Level 11 Palindome"];
     ChecklistSubentry subentry;
     subentry.header = base_quest_state.quest_name;
@@ -6572,94 +6645,202 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
         }
             
     }
-    else if (base_quest_state.mafia_internal_step == 2 || ($item[talisman o' nam].available_amount() > 0 && base_quest_state.mafia_internal_step == 1))
+    else
     {
-        subentry.entries.listAppend("Adventure in the palindome.");
-        url = "place.php?whichplace=plains";
-        //2 -> palindome found, collect items, find dr. awkward
-        if ($item[stunt nuts].available_amount() + $item[wet stunt nut stew].available_amount() == 0 || $item[ketchup hound].available_amount() == 0)
-        {
-            subentry.modifiers.listAppend("+234% item");
-            subentry.modifiers.listAppend("+combat");
-        }
+        url = "place.php?whichplace=palindome";
         if ($item[talisman o' nam].equipped_amount() == 0)
-            subentry.entries.listAppend("Equip the Talisman o' Nam.");
-            
-        if ($item[wet stunt nut stew].available_amount() == 0 && $item[stunt nuts].available_amount() == 0)
-            subentry.entries.listAppend("Acquire stunt nuts from Bob Racecar or Racecar Bob. (30% drop)");
-        if ($item[ketchup hound].available_amount() == 0)
-            subentry.entries.listAppend("Acquire ketchup hound from Bob Racecar or Racecar Bob. (35%/??% drop)");
-        if ($item[photograph of god].available_amount() == 0)
-            subentry.entries.listAppend("Acquire the photograph of god. (superlikely)");
-        if ($item[hard rock candy].available_amount() == 0)
-            subentry.entries.listAppend("Acquire hard rock candy. (superlikely)");
-        if ($item[hard-boiled ostrich egg].available_amount() == 0)
-            subentry.entries.listAppend("Acquire a hard-boiled ostrich egg. (superlikely)");
+            url = "inventory.php?which=3";
         
-        if ($item[ketchup hound].available_amount() > 0 && $item[photograph of god].available_amount() > 0 && $item[hard rock candy].available_amount() > 0 && $item[hard-boiled ostrich egg].available_amount() > 0)
-            subentry.entries.listAppend("Wait for Dr. Awkward to show up.");
-    }
-    else if (base_quest_state.mafia_internal_step == 3)
-    {
-        url = "cobbsknob.php?action=tolabs";
-        //3 -> track down mr. alarm
-        if (!in_hardcore() && $item[wet stunt nut stew].available_amount() == 0)
-            subentry.entries.listAppend("If pulling wet stew, make wet stunt nut stew BEFORE finding Mr. Alarm.");
-        subentry.modifiers.listAppend("-combat");
-        subentry.entries.listAppend("Read &quot;I Love Me, Vol. I&quot;.");
-        subentry.entries.listAppend("Track down Mr. Alarm. (-combat, cobb's knob laboratory)");
-        if (__misc_state["free runs available"])
-            subentry.modifiers.listAppend("free runs");
-    }
-    else if (base_quest_state.mafia_internal_step == 4 && $item[mega gem].available_amount() == 0)
-    {
-        //4 -> acquire wet stunt nut stew, give to mr. alarm
-        if ($item[wet stunt nut stew].available_amount() == 0)
+        
+        /*
+        Quest steps:
+        Adventure in palindome, acquire:
+            photograph of a dog (7263) by taking a picture of one of the racecar twins(?) with a disposable instant camera
+            photograph of an ostrich egg (7265)
+            photograph of a red nugget (7264)
+            photograph of god
+            stunt nuts for wet stunt nut stew
+            "I Love Me, Vol. I" (7262) (dropped from monster, possibly drab bard?, possibly after rest are available?)
+         Use I love me, volume 1. This removes it from your inventory, and unlocks the office.
+         Arrange the photographs on the shelf:
+            god, red nugget, dog, ostrich egg
+        This gives 2 Love Me, Vol. 2 (7270)
+        Read it to unlock mr. alarm in left office. It will disappear.
+        He'll tell you to go acquire wet stunt nut stew. Adventure in whitey's grove as per usual.
+        Cook wet stunt nut stew.
+        Go talk to mr. alarm. He'll give a mega gem.
+        Go fight Dr. Awkward with both equipped.
+        
+        */
+        
+        //I think we need mafia tracking before interactive mode can work?
+        if ($item[mega gem].available_amount() > 0)
         {
-            url = "place.php?whichplace=woods";
-            if (($item[bird rib].available_amount() > 0 && $item[lion oil].available_amount() > 0 || $item[wet stew].available_amount() > 0) && $item[stunt nuts].available_amount() > 0)
-                subentry.entries.listAppend("Cook wet stunt nut stew.");
+            //5 -> fight dr. awkward
+            string [int] tasks;
+            if ($item[talisman o' nam].equipped_amount() == 0)
+                tasks.listAppend("equip the Talisman o' Nam");
+            if ($item[mega gem].equipped_amount() == 0)
+                tasks.listAppend("equip the Mega Gem");
+            
+            tasks.listAppend("fight Dr. Awkward");
+            subentry.entries.listAppend(tasks.listJoinComponents(", ", "then").capitalizeFirstLetter() + ".");
+        }
+        else if (false)
+        {
+            //acquire wet stunt nut stew, give to mr. alarm
+            //FIXME handle alternate route
+            
+            //4 -> acquire wet stunt nut stew, give to mr. alarm
+            if ($item[wet stunt nut stew].available_amount() == 0)
+            {
+                url = "place.php?whichplace=woods";
+                if (($item[bird rib].available_amount() > 0 && $item[lion oil].available_amount() > 0 || $item[wet stew].available_amount() > 0) && $item[stunt nuts].available_amount() > 0)
+                    subentry.entries.listAppend("Cook wet stunt nut stew.");
+                else
+                {
+                    subentry.entries.listAppend("Acquire and make wet stunt nut stew.");
+                    if ($item[wet stunt nut stew].available_amount() == 0 && $item[stunt nuts].available_amount() == 0)
+                        subentry.entries.listAppend("Acquire stunt nuts from Bob Racecar or Racecar Bob in Palindome. (30% drop)");
+                    if ($items[wet stew].available_amount() == 0 && ($items[bird rib].available_amount() == 0 || $items[lion oil].available_amount() == 0))
+                    {
+                        string [int] components;
+                        if ($item[bird rib].available_amount() == 0)
+                            components.listAppend($item[bird rib]);
+                        if ($item[lion oil].available_amount() == 0)
+                            components.listAppend($item[lion oil]);
+                        string line = "Adventure in Whitey's Grove to acquire " + components.listJoinComponents("", "and") + ".|Need +186% item and +combat.";
+                        if (familiar_is_usable($familiar[jumpsuited hound dog]))
+                            line += " (hound dog is useful for this)";
+                        subentry.entries.listAppend(line);
+                        subentry.modifiers.listAppend("+combat");
+                        subentry.modifiers.listAppend("+186% item");
+                        if (!in_hardcore())
+                            subentry.entries.listAppend("Or pull wet stew.");
+                    }
+                }
+            }
             else
             {
-                subentry.entries.listAppend("Acquire and make wet stunt nut stew.");
-                if ($item[wet stunt nut stew].available_amount() == 0 && $item[stunt nuts].available_amount() == 0)
-                    subentry.entries.listAppend("Acquire stunt nuts from Bob Racecar or Racecar Bob in Palindome. (30% drop)");
-                if ($items[wet stew].available_amount() == 0 && ($items[bird rib].available_amount() == 0 || $items[lion oil].available_amount() == 0))
+                subentry.entries.listAppend("Talk to Mr. Alarm.");
+                if ($item[talisman o' nam].equipped_amount() == 0)
+                    subentry.entries.listAppend("Equip the Talisman o' Nam.");
+            }
+        }
+        else if (false)
+        {
+            string [int] tasks;
+            //talk to mr. alarm to unlock whitey's grove
+            if (7270.to_item().available_amount() > 0)
+            {
+                url = "inventory.php?which=3";
+                tasks.listAppend("use 2 Love Me, Vol. 2");
+            }
+            if ($item[wet stunt nut stew].available_amount() > 0)
+                tasks.listAppend("talk to Mr. Alarm");
+            else
+                tasks.listAppend("talk to Mr. Alarm to unlock Whitey's Grove");
+                
+            subentry.entries.listAppend(tasks.listJoinComponents(", ", "and").capitalizeFirstLetter() + ".");
+            if ($item[talisman o' nam].equipped_amount() == 0)
+                subentry.entries.listAppend("Equip the Talisman o' Nam.");
+        }
+        else if (false)
+        {
+            string single_entry_mode = "";
+            //Do we have everything yet?
+            if (false)
+            {
+                //Yes - place everything on the shelves
+                if (false)
                 {
-                    string [int] components;
-                    if ($item[bird rib].available_amount() == 0)
-                        components.listAppend($item[bird rib]);
-                    if ($item[lion oil].available_amount() == 0)
-                        components.listAppend($item[lion oil]);
-                    string line = "Adventure in Whitey's Grove to acquire " + components.listJoinComponents("", "and") + ".|Need +186% item and +combat.";
-                    if (familiar_is_usable($familiar[jumpsuited hound dog]))
-                        line += " (hound dog is useful for this)";
-                    subentry.entries.listAppend(line);
-                    subentry.modifiers.listAppend("+combat");
-                    subentry.modifiers.listAppend("+186% item");
-                    if (!in_hardcore())
-                        subentry.entries.listAppend("Or pull wet stew.");
+                    //use book to unlock office
+                    url = "inventory.php?which=3";
+                    subentry.entries.listAppend("Read I Love Me, Vol I.");
                 }
+                else
+                {
+                    subentry.entries.listAppend("Place items on shelves.|Order is god, red nugget, dog, and ostrich egg.");
+                }
+            }
+            else
+            {
+                //No
+                
+                //Need:
+                //√Wet stunt nut stew / stunt nuts
+                //√"I Love Me, Vol. I" (7262)
+                //√instant camera -> 7263 photograph of a dog
+                //√7264 photograph of a red nugget
+                //√7265 photograph of an ostrich egg
+                //√photograph of god
+                subentry.entries.listAppend("Adventure in the palindome.");
+                
+                if ($item[stunt nuts].available_amount() + $item[wet stunt nut stew].available_amount() == 0 )
+                {
+                    subentry.modifiers.listAppend("+234% item");
+                    subentry.entries.listAppend("Acquire stunt nuts from Bob Racecar or Racecar Bob. (30% drop)");
+                }
+                
+                if (7262.to_item().available_amount() == 0) //I love me, Vol. I
+                {
+                    subentry.entries.listAppend("Find I Love Me, Vol. I in-combat. Unknown mechanic.");
+                }
+                
+                string [int] missing_ncs;
+                if (lookupItem("photograph of a red nugget").available_amount() == 0)
+                {
+                    missing_ncs.listAppend("photograph of a red nugget");
+                }
+                if (lookupItem("photograph of an ostrich egg").available_amount() == 0)
+                {
+                    missing_ncs.listAppend("photograph of an ostrich egg");
+                }
+                if ($item[photograph of god].available_amount() == 0)
+                {
+                    missing_ncs.listAppend("photograph of god");
+                }
+                if (missing_ncs.count() > 0)
+                    subentry.entries.listAppend("Find " + missing_ncs.listJoinComponents(", ", "and") + " from non-combats.|(unknown if affected by -combat");
+                
+                
+                
+                if (lookupItem("photograph of a dog").available_amount() == 0)
+                {
+                    if (lookupItem("disposable instant camera").available_amount() == 0)
+                    {
+                        url = "place.php?whichplace=spookyraven2";
+                        single_entry_mode = "Adventure in the haunted ballroom for a disposable instant camera.";
+                    }
+                    else
+                    {
+                        subentry.entries.listAppend("Photograph Bob Racecar or Racecar Bob with disposable instant camera.");
+                    }
+                }
+                
+            }
+            if (single_entry_mode.length() > 0)
+            {
+                subentry.entries.listClear();
+                subentry.entries.listAppend(single_entry_mode);
+            }
+            else
+            {
+                if ($item[talisman o' nam].equipped_amount() == 0)
+                    subentry.entries.listAppend("Equip the Talisman o' Nam.");
             }
         }
         else
         {
-            url = "cobbsknob.php?action=tolabs";
-            subentry.entries.listAppend("Track down Mr. Alarm. (cobb's knob laboratory, first adventure)");
+            subentry.entries.listAppend("Quest was just revamped; here's a simple (and possibly inaccurate) guide:");
+            subentry.entries.listAppend("First you adventure in the Palindome.|Find three photographs via non-combats(?), and take a picture of Bob Racecar/Racecar Bob with a disposable instant camera. (found in NC in haunted bedroom)|Also, find stunt nuts.");
+            subentry.entries.listAppend("&quot;I Love Me, Vol.&quot; I will drop from a monster. Read it to unlock Dr. Awkward's office.");
+            subentry.entries.listAppend("Place all four photographs on the shelves.|Order is god, red nugget, dog, and ostrich egg.");
+            subentry.entries.listAppend("Read 2 Love Me, Vol. 2 to unlock Mr. Alarm's office.");
+            subentry.entries.listAppend("Talk to Mr. Alarm, unlock Whitey's Grove. Run +186% item, +combat to find lion oil and bird rib.|Or, alternatively, adventure in the palindome. I don't know the details, sorry.");
+            subentry.entries.listAppend("Cook wet stunt nut stew, talk to Mr. Alarm. He'll give you the Mega Gem.");
+            subentry.entries.listAppend("Equip that to fight Dr. Awkard in his office.");
         }
-    }
-    else if (base_quest_state.mafia_internal_step == 5 || $item[mega gem].available_amount() > 0)
-    {
-        url = "place.php?whichplace=plains";
-        //5 -> fight dr. awkward
-        string [int] tasks;
-        if ($item[talisman o' nam].equipped_amount() == 0)
-            tasks.listAppend("equip the Talisman o' Nam");
-        if ($item[mega gem].equipped_amount() == 0)
-            tasks.listAppend("equip the Mega Gem");
-        
-        tasks.listAppend("fight Dr. Awkward");
-        subentry.entries.listAppend(tasks.listJoinComponents(", ", "then").capitalizeFirstLetter() + ".");
     }
 
     task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the poop deck, belowdecks,the palindome,cobb's knob laboratory,whitey's grove]));
@@ -6706,17 +6887,15 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
             if (exploration > 0)
                 subentry.entries.listAppend("Need ultra-hydrated from The Oasis. (potential clover for 20 turns)");
         }
-        //FIXME make gnasir detection slightly more robust
-        if (exploration < 10)
+        if (exploration + exploration_per_turn < 10)
         {
             int turns_until_gnasir_found = ceil(to_float(10 - exploration) / exploration_per_turn) + 1;
             
             subentry.entries.listAppend("Find Gnasir in " + pluralize(turns_until_gnasir_found, "turn", "turns") + ".");
         }
-        else if (exploration == 10 && $location[the arid, extra-dry desert].noncombatTurnsAttemptedInLocation() == 0)
+        else if (get_property_int("gnasirProgress") == 0 && exploration <= 14 && $location[the arid, extra-dry desert].noncombatTurnsAttemptedInLocation() == 0)
         {
             subentry.entries.listAppend("Find Gnasir next turn.");
-            
         }
         else
         {
@@ -6756,7 +6935,7 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
                 {
                     int remaining = 15 - $item[worm-riding manual page].available_amount();
                     
-                    subentry.entries.listAppend("Find " + pluralize(remaining, $item[worm-riding manual page]) + ".");
+                    subentry.entries.listAppend("Find " + pluralize(remaining, "more worm-riding manual page", "more worm-riding manual pages") + ".");
                     need_pages = true;
                 }
                 
@@ -6877,7 +7056,7 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
                 next_position_needed = 1;
                 additional_turns_after_that = 0;
                 
-                int ed_ml = 180 + monster_level_adjustment();
+                int ed_ml = 180 + monster_level_adjustment_ignoring_plants();
                 task = "fight Ed in the lower chambers";
                 if (ed_ml > my_buffedstat($stat[moxie]))
                     task += " (" + ed_ml + " attack)";
@@ -7040,7 +7219,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 else
                 {
                     subentry.modifiers.listAppend("elemental damage");
-                    subentry.entries.listAppend("Fight the protector spirit!");
+                    subentry.entries.listAppend("Fight the protector spectre!");
                 }
             }
         
@@ -7080,117 +7259,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 entry.subentries.listAppend(subentry);
             }
         }
-    
-        if (bowling_progress < 8)
-        {
-            ChecklistSubentry subentry;
-            subentry.header = "Hidden Bowling Alley";
         
-            if (bowling_progress == 7 || $item[scorched stone sphere].available_amount() > 0)
-            {
-                subentry.entries.listAppend("Place scorched stone sphere in shrine.");
-            }
-            else if (bowling_progress == 0)
-            {
-                generateHiddenAreaUnlockForShrine(subentry.entries,$location[an overgrown shrine (southeast)]);
-            }
-            else
-            {
-                int rolls_needed = 6 - bowling_progress;
-                
-                if (!(rolls_needed == 1 && $item[bowling ball].available_amount() > 0))
-                {
-                    subentry.modifiers.listAppend("+150% item");
-                    subentry.entries.listAppend("Olfact bowler, run +150% item.");
-                    if (!$monster[pygmy orderlies].is_banished())
-                        subentry.entries.listAppend("Potentially banish pgymy orderlies.");
-                }
-                
-                string line;
-                line = int_to_wordy(rolls_needed).capitalizeFirstLetter();
-                if (rolls_needed > 1)
-                    line += " more rolls";
-                else
-                    line = "One More Roll";
-                line += " until protector spirit fight.";
-                
-                if ($item[bowling ball].available_amount() > 0)
-                    line += "|Have " + pluralizeWordy($item[bowling ball]) + ".";
-                
-                subentry.entries.listAppend(line);
-                
-                //FIXME pop up a reminder to acquire bowl of scorpions
-                if (__misc_state["free runs usable"])
-                {
-                    if (hidden_tavern_unlocked)
-                    {
-                        if ($item[bowl of scorpions].available_amount() == 0)
-                            subentry.entries.listAppend(HTMLGenerateSpanFont("Buy a bowl of scorpions", "red", "") + " from the Hidden Tavern to free run from drunk pygmys.");
-                    }
-                    else
-                    {
-                        subentry.entries.listAppend("Possibly unlock the hidden tavern first, for free runs from drunk pygmies.");
-                    }
-                }
-            }
-        
-        
-        
-            entry.subentries.listAppend(subentry);
-        }
-        if (hospital_progress < 8)
-        {
-            ChecklistSubentry subentry;
-            subentry.header = "Hidden Hospital";
-            if (hospital_progress == 7 || $item[dripping stone sphere].available_amount() > 0)
-            {
-                subentry.entries.listAppend("Place dripping stone sphere in shrine.");
-            }
-            else if (hospital_progress == 0)
-            {
-                generateHiddenAreaUnlockForShrine(subentry.entries,$location[an overgrown shrine (Southwest)]);
-            }
-            else
-            {
-                subentry.entries.listAppend("Olfact surgeon.");
-                if (!$monster[pygmy orderlies].is_banished())
-                    subentry.entries.listAppend("Potentially banish pgymy orderlies.");
-                
-        
-                string [int] items_we_have_unequipped;
-                item [int] items_we_have_equipped;
-                foreach it in $items[surgical apron,bloodied surgical dungarees,surgical mask,head mirror,half-size scalpel]
-                {
-                    boolean can_equip = true;
-                    if (it.to_slot() == $slot[shirt] && !have_skill($skill[Torso Awaregness]))
-                        can_equip = false;
-                    if (it.available_amount() > 0 && it.equipped_amount() == 0 && can_equip)
-                    {
-                        buffer line;
-                        line.append(it);
-                        line.append(" (");
-                        line.append(it.to_slot().slot_to_string());
-                        if (!it.can_equip())
-                            line.append(", can't equip yet");
-                        line.append(")");
-                        items_we_have_unequipped.listAppend(line);
-                    }
-                    if (it.equipped_amount() > 0)
-                        items_we_have_equipped.listAppend(it);
-                }
-                if (items_we_have_unequipped.count() > 0)
-                {
-                    subentry.entries.listAppend("Equipment unequipped: (+10% chance of protector spirit per piece)|*" + items_we_have_unequipped.listJoinComponents("|*"));
-                }
-                if (items_we_have_equipped.count() > 0)
-                {
-                    subentry.entries.listAppend((items_we_have_equipped.count() * 10) + "% chance of protector spirit encounter.");
-                }
-            }
-            
-            
-            entry.subentries.listAppend(subentry);
-        }
         if (apartment_progress < 8)
         {
             ChecklistSubentry subentry;
@@ -7263,31 +7332,142 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
             }
             else
             {
+                if ($item[McClusky file (complete)].available_amount() == 0)
+                {
+                    int files_found = $item[McClusky file (page 1)].available_amount() + $item[McClusky file (page 2)].available_amount() + $item[McClusky file (page 3)].available_amount() + $item[McClusky file (page 4)].available_amount() + $item[McClusky file (page 5)].available_amount();
+                    int files_not_found = 5 - files_found;
+                    if (files_not_found > 0)
+                    {
+                        subentry.entries.listAppend("Olfact accountant.");
+                        subentry.entries.listAppend("Need " + pluralize(files_not_found, "more McClusky file", "more McClusky files") + ". Found from pygmy witch accountants.");
+                        //if (!$monster[pygmy witch lawyer].is_banished())
+                            //subentry.entries.listAppend("Potentially banish lawyers.");
+                    }
+                    if ($item[Boring binder clip].available_amount() == 0)
+                        subentry.entries.listAppend("Need boring binder clip. (raid the supply cabinet, office NC)");
+                }
+                else
+                {
+                    subentry.entries.listAppend("You have the complete McClusky files, fight boss.");
+                }
                 subentry.entries.listAppend("NC appears first on the 6th adventure, then every 5 adventures.");
         
                 if (__misc_state["have hipster"])
                     subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
                 if (__misc_state["free runs available"])
                     subentry.modifiers.listAppend("free runs");
-                if ($item[McClusky file (complete)].available_amount() == 0)
+            }
+            entry.subentries.listAppend(subentry);
+        }
+        if (hospital_progress < 8)
+        {
+            ChecklistSubentry subentry;
+            subentry.header = "Hidden Hospital";
+            if (hospital_progress == 7 || $item[dripping stone sphere].available_amount() > 0)
+            {
+                subentry.entries.listAppend("Place dripping stone sphere in shrine.");
+            }
+            else if (hospital_progress == 0)
+            {
+                generateHiddenAreaUnlockForShrine(subentry.entries,$location[an overgrown shrine (Southwest)]);
+            }
+            else
+            {
+                subentry.entries.listAppend("Olfact surgeon.");
+                if (!$monster[pygmy orderlies].is_banished())
+                    subentry.entries.listAppend("Potentially banish pgymy orderlies.");
+                
+        
+                string [int] items_we_have_unequipped;
+                item [int] items_we_have_equipped;
+                foreach it in $items[surgical apron,bloodied surgical dungarees,surgical mask,head mirror,half-size scalpel]
                 {
-                    if ($item[Boring binder clip].available_amount() == 0)
-                        subentry.entries.listAppend("Need boring binder clip. (raid the supply cabinet, office NC)");
-                    int files_found = $item[McClusky file (page 1)].available_amount() + $item[McClusky file (page 2)].available_amount() + $item[McClusky file (page 3)].available_amount() + $item[McClusky file (page 4)].available_amount() + $item[McClusky file (page 5)].available_amount();
-                    int files_not_found = 5 - files_found;
-                    if (files_not_found > 0)
+                    boolean can_equip = true;
+                    if (it.to_slot() == $slot[shirt] && !have_skill($skill[Torso Awaregness]))
+                        can_equip = false;
+                    if (it.available_amount() > 0 && it.equipped_amount() == 0 && can_equip)
                     {
-                        subentry.entries.listAppend("Need " + pluralize(files_not_found, "more McClusky file", "more McClusky files") + ". Found from pygmy witch accountants.");
-                        subentry.entries.listAppend("Olfact accountant");
-                        //if (!$monster[pygmy witch lawyer].is_banished())
-                            //subentry.entries.listAppend("Potentially banish lawyers.");
+                        buffer line;
+                        line.append(it);
+                        line.append(" (");
+                        line.append(it.to_slot().slot_to_string());
+                        if (!it.can_equip())
+                            line.append(", can't equip yet");
+                        line.append(")");
+                        items_we_have_unequipped.listAppend(line);
                     }
+                    if (it.equipped_amount() > 0)
+                        items_we_have_equipped.listAppend(it);
                 }
-                else
+                if (items_we_have_unequipped.count() > 0)
                 {
-                    subentry.entries.listAppend("You have the complete McClusky files, fight boss.");
+                    subentry.entries.listAppend("Equipment unequipped: (+10% chance of protector spirit per piece)|*" + items_we_have_unequipped.listJoinComponents("|*"));
+                }
+                if (items_we_have_equipped.count() > 0)
+                {
+                    subentry.entries.listAppend((items_we_have_equipped.count() * 10) + "% chance of protector spirit encounter.");
                 }
             }
+            
+            
+            entry.subentries.listAppend(subentry);
+        }
+    
+        if (bowling_progress < 8)
+        {
+            ChecklistSubentry subentry;
+            subentry.header = "Hidden Bowling Alley";
+        
+            if (bowling_progress == 7 || $item[scorched stone sphere].available_amount() > 0)
+            {
+                subentry.entries.listAppend("Place scorched stone sphere in shrine.");
+            }
+            else if (bowling_progress == 0)
+            {
+                generateHiddenAreaUnlockForShrine(subentry.entries,$location[an overgrown shrine (southeast)]);
+            }
+            else
+            {
+                int rolls_needed = 6 - bowling_progress;
+                
+                if (!(rolls_needed == 1 && $item[bowling ball].available_amount() > 0))
+                {
+                    subentry.modifiers.listAppend("+150% item");
+                    subentry.entries.listAppend("Olfact bowler, run +150% item.");
+                    if (!$monster[pygmy orderlies].is_banished())
+                        subentry.entries.listAppend("Potentially banish pgymy orderlies.");
+                }
+                
+                string line;
+                line = int_to_wordy(rolls_needed).capitalizeFirstLetter();
+                if (rolls_needed > 1)
+                    line += " more rolls";
+                else
+                    line = "One More Roll";
+                line += " until protector spirit fight.";
+                
+                if ($item[bowling ball].available_amount() > 0)
+                    line += "|Have " + pluralizeWordy($item[bowling ball]) + ".";
+                
+                subentry.entries.listAppend(line);
+                
+                //FIXME pop up a reminder to acquire bowl of scorpions
+                if (__misc_state["free runs usable"])
+                {
+                    if (hidden_tavern_unlocked)
+                    {
+                        if ($item[bowl of scorpions].available_amount() == 0)
+                            subentry.entries.listAppend(HTMLGenerateSpanFont("Buy a bowl of scorpions", "red", "") + " from the Hidden Tavern to free run from drunk pygmys.");
+                    }
+                    else
+                    {
+                        subentry.entries.listAppend("Possibly unlock the hidden tavern first, for free runs from drunk pygmies.");
+                    }
+                }
+            }
+        
+        
+        
             entry.subentries.listAppend(subentry);
         }
         
@@ -7546,7 +7726,7 @@ void QLevel12Init()
 		state.state_boolean["Orchard Finished"] = false;
 	}
 	
-	if (my_level() >= 12 && $location[The Palindome].turnsAttemptedInLocation() > 0)
+	if (my_level() >= 12 && ($location[The Palindome].turnsAttemptedInLocation() > 0 || $items[mega gem,&quot;I Love Me\, Vol. I&quot;,Staff of Ed,Staff of Fats,Staff of Ed\, almost].available_amount() > 0))
 		state.startable = true;
     
 	__quest_state["Level 12"] = state;
@@ -7641,12 +7821,10 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
         string [int] tasks;
         int ncs_seen = $location[McMillicancuddy's Barn].noncombatTurnsAttemptedInLocation();
         
-        if (ncs_seen < 1 || true)
-            tasks.listAppend("make a fence out of the barbed wire");
-        if (ncs_seen < 2 || true)
-            tasks.listAppend("knock over the lantern");
-        if (ncs_seen < 3 || true)
+        if (ncs_seen < 3)
         {
+            tasks.listAppend("make a fence out of the barbed wire");
+            tasks.listAppend("knock over the lantern");
             tasks.listAppend("dump out the drum");
             details.listAppend("Remember to use a chaos butterfly in combat before clearing the barn.|Then " + tasks.listJoinComponents(", ", "and") + ".");
         }
@@ -7804,7 +7982,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 }
 
 
-void QLevel12GenerateBattlefieldDescription(ChecklistSubentry subentry, string side, int enemies_remaining, int enemies_defeated_per_combat, string enemy_name, string enemy_name_plural, string boss_name, string [int] sidequest_list)
+void QLevel12GenerateBattlefieldDescription(ChecklistSubentry subentry, string side, int enemies_remaining, int enemies_defeated_per_combat, string enemy_name, string enemy_name_plural, string boss_name, string [int] sidequest_list, string [int] base_sidequest_list)
 {
     if (enemies_defeated_per_combat == 0)
         return;
@@ -7825,6 +8003,15 @@ void QLevel12GenerateBattlefieldDescription(ChecklistSubentry subentry, string s
     }
     int enemies_to_defeat_for_unlock = -1;
     string area_to_unlock = "";
+    string [int] areas_unlocked_but_not_completed;
+    
+    foreach key in base_sidequest_list
+    {
+        if (!__quest_state["Level 12"].state_boolean[base_sidequest_list[key] + " Finished"])
+        {
+            areas_unlocked_but_not_completed.listAppend(base_sidequest_list[key]);
+        }
+    }
     
     int [int] unlock_threshold;
     unlock_threshold[0] = 64;
@@ -7834,13 +8021,16 @@ void QLevel12GenerateBattlefieldDescription(ChecklistSubentry subentry, string s
     for i from 2 to 0 by -1
     {
         int threshold = unlock_threshold[i];
-        
-        if (enemies_defeated < threshold)
+        if (!__quest_state["Level 12"].state_boolean[sidequest_list[i] + " Finished"])
         {
-            if (!__quest_state["Level 12"].state_boolean[sidequest_list[i] + " Finished"])
+            if (enemies_defeated < threshold)
             {
                 area_to_unlock = sidequest_list[i];
                 enemies_to_defeat_for_unlock = threshold - enemies_defeated;
+            }
+            else
+            {
+                areas_unlocked_but_not_completed.listAppend(sidequest_list[i]);
             }
         }
     }
@@ -7850,6 +8040,9 @@ void QLevel12GenerateBattlefieldDescription(ChecklistSubentry subentry, string s
         int turns_to_reach = ceiling(enemies_to_defeat_for_unlock.to_float() / enemies_defeated_per_combat.to_float());
         line += "|*" + pluralize(turns_to_reach, "turn", "turns") + " (" + pluralize(enemies_to_defeat_for_unlock, enemy_name, enemy_name_plural) + ") to unlock " + area_to_unlock + ".";
     }
+    
+    if (areas_unlocked_but_not_completed.count() > 0)
+        line += "|*Quests accessible: " + areas_unlocked_but_not_completed.listJoinComponents(", ", "and") + ".";
     
     subentry.entries.listAppend(line);
     
@@ -7947,10 +8140,10 @@ void QLevel12GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         
         
 		if (frat_boys_left < 1000 || (frat_boys_left == 1000 && hippies_left == 1000) || sides_completed_hippy > 0)
-            QLevel12GenerateBattlefieldDescription(subentry, "hippy", frat_boys_left, frat_boys_defeated_per_combat, "frat boy", "frat boys", "The Man", listMake("Lighthouse", "Junkyard", "Arena"));
+            QLevel12GenerateBattlefieldDescription(subentry, "hippy", frat_boys_left, frat_boys_defeated_per_combat, "frat boy", "frat boys", "The Man", listMake("Lighthouse", "Junkyard", "Arena"), listMake("Orchard", "Nuns", "Farm"));
             
 		if (hippies_left < 1000 || (frat_boys_left == 1000 && hippies_left == 1000) || sides_completed_frat > 0)
-            QLevel12GenerateBattlefieldDescription(subentry, "frat boy", hippies_left, hippies_defeated_per_combat, "hippy", "hippies", "The Big Wisniewski", listMake("Orchard", "Nuns", "Farm"));
+            QLevel12GenerateBattlefieldDescription(subentry, "frat boy", hippies_left, hippies_defeated_per_combat, "hippy", "hippies", "The Big Wisniewski", listMake("Orchard", "Nuns", "Farm"), listMake("Lighthouse", "Junkyard", "Arena"));
         
         if (frat_boys_left == 1 && hippies_left == 1)
 		{
@@ -8408,6 +8601,11 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 		subentry.modifiers.listAppend("+HP");
 		subentry.modifiers.listAppend("+" + $monster[Your Shadow].monster_initiative() + "% init");
 		subentry.entries.listAppend("Fight your shadow.");
+        foreach it in $items[attorney's badge, navel ring of navel gazing]
+        {
+            if (it.available_amount() > 0 && it.equipped_amount() == 0)
+                subentry.entries.listAppend("Possibly equip your " + it + ". (blocks shadow)");
+        }
 	}
 	else if (base_quest_state.mafia_internal_step == 9)
 	{
@@ -8677,7 +8875,10 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 		subentry.entries.listAppend("Adventure in the Haunted Bedroom.");
 		
 		if ($item[lord spookyraven's spectacles].available_amount() == 0)
-			subentry.entries.listAppend("Acquire Lord Spookyraven's spectacles.");
+			subentry.entries.listAppend("Acquire Lord Spookyraven's spectacles from ornate drawer NC.");
+        //FIXME uncomment when test available:
+        if (/*__quest_state["Level 11 Palindome"].state_boolean["Need instant camera"] &&*/ 7266.to_item().available_amount() == 0)
+			subentry.entries.listAppend("Possibly acquire disposable instant camera from ornate drawer NC.");
 		subentry.modifiers.listAppend("-combat");
 		subentry.entries.listAppend("Run -combat.");
         
@@ -8919,16 +9120,19 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 			//We can tell them which ones they have... but it's still unreliable. I guess a single message if they have all three?
 			string line = "F'c'le.";
 			string additional_line = "";
-			if ($item[rigging shampoo].available_amount() > 0 && $item[mizzenmast mop].available_amount() > 0 && $item[ball polish].available_amount() > 0)
+            
+            item [int] missing_washing_items = $items[rigging shampoo,mizzenmast mop,ball polish].items_missing();
+            
+			if (missing_washing_items.count() == 0)
             {
                 url = "inventory.php?which=3";
-				line += " Use rigging shampoo, mizzenmast mop, and ball polish, then adventure to complete quest.";
+				line += " " + HTMLGenerateSpanFont("Use rigging shampoo, mizzenmast mop, and ball polish", "red", "") + ", then adventure to complete quest.";
             }
 			else
 			{
                 subentry.modifiers.listAppend("+234% item");
                 subentry.modifiers.listAppend("+combat");
-				line += " Run +234% item, +combat, and collect the three washing items.";
+				line += " Run +234% item, +combat, and collect " + missing_washing_items.listJoinComponents(", ", "and") + ".";
 				if (item_drop_modifier() < 234.0)
 					additional_line = "This location can be a nightmare without +234% item.";
 			}
@@ -10293,13 +10497,13 @@ void QAzazelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		return;
     
     
-    if (have_skill($skill[Stomach of Steel]) || have_skill($skill[Liver of Steel]) || have_skill($skill[Spleen of Steel]))
+    if ($skill[Stomach of Steel].have_skill() || $skill[Liver of Steel].have_skill() || $skill[Spleen of Steel].have_skill())
         return;
     
     
     //We don't suggest or give advice on this quest in-run unless the player spends an adventure in one of the zones.
     //If that happens, they're probably sure they want the consumable items.
-	if (!__misc_state["In aftercore"] && $locations[The Laugh Floor, Infernal Rackets Backstage].turnsAttemptedInLocation() == 0)
+	if (!__misc_state["In aftercore"] && $locations[The Laugh Floor, Infernal Rackets Backstage].turnsAttemptedInLocation() == 0 && $items[Azazel's unicorn,Azazel's lollipop,Azazel's tutu].available_amount() == 0)
 		return;
     
         
@@ -11779,16 +11983,16 @@ void QHitsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] 
 			else
 				subentry.entries.listAppend("Need:|*" + required_components.listJoinComponents("|*", "or"));
 			
-			if (star_charts_remaining > 1 || (star_charts_remaining > 0 && get_property("olfactedMonster") == "Astronomer"))
+			if (star_charts_remaining > 1)
 			{
-				subentry.entries.listAppend("Olfact astronomers");
+				subentry.entries.listAppend("Olfact astronomers.");
 			}
-			else if (star_charts_remaining > 1) //no need for astronomers
+			else if (star_charts_remaining == 0) //no need for astronomers
 			{
 				if (my_ascensions() % 2 == 0)
-					subentry.entries.listAppend("Olfact skinflute");
+					subentry.entries.listAppend("Olfact skinflute.");
 				else
-					subentry.entries.listAppend("Olfact camel's toe");
+					subentry.entries.listAppend("Olfact camel's toe.");
 			}
 			if (!have_met_stars_requirement || !have_met_lines_requirement)
 				subentry.modifiers.listAppend("+234% item");
@@ -12726,7 +12930,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
     }
     
     
-    if ($item[mojo filter].available_amount() > 0 && get_property_int("currentMojoFilters") <3)
+    if ($item[mojo filter].available_amount() > 0 && get_property_int("currentMojoFilters") <3 && in_run)
     {
         int mojo_filters_usable = MIN(my_spleen_use(), MIN(3 - get_property_int("currentMojoFilters"), $item[mojo filter].available_amount()));
         string line = "Removes one spleen each.";
@@ -12753,19 +12957,19 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
     }
     if (__misc_state["need to level"])
     {
-        if ($item[Marvin's marvelous pill].available_amount() > 0 && my_primestat() == $stat[moxie])
+        if ($item[Marvin's marvelous pill].available_amount() > 0 && __misc_state["need to level moxie"])
         {
             available_resources_entries.listAppend(ChecklistEntryMake("__item Marvin's marvelous pill", "", ChecklistSubentryMake(pluralize($item[Marvin's marvelous pill]), "", "+20% to moxie gains. (10 turns)"), importance_level_unimportant_item));
         }
-        if ($item[drum of pomade].available_amount() > 0 && my_primestat() == $stat[moxie])
+        if ($item[drum of pomade].available_amount() > 0 && __misc_state["need to level moxie"])
         {
             available_resources_entries.listAppend(ChecklistEntryMake("__item drum of pomade", "", ChecklistSubentryMake(pluralize($item[drum of pomade]), "", "+15% to moxie gains. (10 turns)"), importance_level_unimportant_item));
         }
-        if ($item[baobab sap].available_amount() > 0 && my_primestat() == $stat[muscle])
+        if ($item[baobab sap].available_amount() > 0 && __misc_state["need to level muscle"])
         {
             available_resources_entries.listAppend(ChecklistEntryMake("__item baobab sap", "", ChecklistSubentryMake(pluralize($item[baobab sap]), "", "+20% to muscle gains. (10 turns)"), importance_level_unimportant_item));
         }
-        if ($item[desktop zen garden].available_amount() > 0 && my_primestat() == $stat[mysticality])
+        if ($item[desktop zen garden].available_amount() > 0 && __misc_state["need to level mysticality"])
         {
             available_resources_entries.listAppend(ChecklistEntryMake("__item desktop zen garden", "", ChecklistSubentryMake(pluralize($item[desktop zen garden]), "", "+20% to mysticality gains. (10 turns)"), importance_level_unimportant_item));
         }
@@ -12929,21 +13133,35 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
     if (odd_silver_coin.available_amount() > 0 && in_run)
     {
         string [int] description;
-        //FIXME description
-        //maybe after everything is spaded and on the wiki?
-        //cinnamon cannoli - 2 - 1 fullness awesome food. ...?
-        //expensive champagne - 3 - 1-fullness epic food. ...?
+        string [int][int] table;
+        //cinnamon cannoli - 2 - 1 fullness awesome food. not worthwhile?
+        //expensive champagne - 3 - 1-drunkness epic drink. not worthwhile?
         //polo trophy - 3 - +50ML for 15 turns
-        //fancy oil painting - 4 - bridge building. 10 progress supposedly?
-        //solid gold rosary - 5 - I think this is the cyrpt? need details
-        //ornate dowsing rod - 5 - better desert exploration
+        //table.listAppend(listMake("polo trophy", "+50ML for 15 turns, marginal?", "3 coins")); //costs three adventures to find. I guess it'd only be relevant for cave bars? even then...
+        //fancy oil painting - 4 - bridge building. 10 progress
+        if (!__quest_state["Level 9"].state_boolean["bridge complete"] && (__quest_state["Level 9"].state_int["bridge fasteners needed"] > 0 || __quest_state["Level 9"].state_int["bridge lumber needed"] > 0))
+            table.listAppend(listMake("fancy oil painting", "10 fasteners, 10 lumber", "4 coins"));
+        //solid gold rosary - 5 - better cyrpt progression. need details (-4.5 evil?)
+        if (!__quest_state["Level 7"].state_boolean["alcove finished"] || !__quest_state["Level 7"].state_boolean["cranny finished"] || !__quest_state["Level 7"].state_boolean["niche finished"] || !__quest_state["Level 7"].state_boolean["nook finished"])
+            table.listAppend(listMake("solid gold rosary", "-4.5? evilness from cyrpt", "5 coins"));
+        //ornate dowsing rod - 5 - better desert exploration (+2%)
+        
+        if (!__quest_state["Level 11 Pyramid"].state_boolean["Desert Explored"] && lookupItem("ornate dowsing rod").available_amount() == 0)
+            table.listAppend(listMake("ornate dowsing rod", "+2% desert exploration", "5 coins"));
+        description.listAppend(HTMLGenerateSimpleTableLines(table));
+        
         available_resources_entries.listAppend(ChecklistEntryMake("__item " + odd_silver_coin, "inventory.php?which=3", ChecklistSubentryMake(odd_silver_coin.pluralize(), "", description), importance_level_item));
     }
     item grimstone_mask = lookupItem("grimstone mask");
     if (grimstone_mask.available_amount() > 0 && in_run)
     {
         string [int] description;
-        //FIXME suggestions
+        
+        description.listAppend("Wear to take you places.");
+        description.listAppend("The prince's ball lets you find odd silver coins.|Up to six, one adventure each.");
+        description.listAppend("Rumpelstiltskin's for towerkilling with small golem.|Small golem is a 5k/round combat item.|Involves the semi-rare in village. Don't know the details, sorry.");
+        if (get_property("grimstoneMaskPath").length() > 0)
+            description.listAppend("Currently on the path of " + get_property("grimstoneMaskPath") + ".");
         
         available_resources_entries.listAppend(ChecklistEntryMake("__item " + grimstone_mask, "inventory.php?which=3", ChecklistSubentryMake(grimstone_mask.pluralize(), "", description), importance_level_item));
     }
@@ -15906,7 +16124,8 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         //Don't get poisoned.
         effect [int] poison_effects;
         poison_effects.listAppend($effect[Hardly poisoned at all]);
-        poison_effects.listAppend($effect[A Little Bit Poisoned]);
+        if (!hippy_stone_broken()) //FIXME remove next PVP season
+            poison_effects.listAppend($effect[A Little Bit Poisoned]);
         poison_effects.listAppend($effect[Somewhat Poisoned]);
         poison_effects.listAppend($effect[Really Quite Poisoned]);
         poison_effects.listAppend($effect[Majorly Poisoned]);
@@ -16008,7 +16227,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         
         effect [item] item_effects;
         string [item] item_descriptions;
-        if (my_primestat() == $stat[moxie] || (my_basestat($stat[moxie]) < 70 && !__quest_state["Level 12"].finished))
+        if (__misc_state["need to level moxie"])
         {
             item_descriptions[$item[Ye Olde Bawdy Limerick]] = "+2 moxie stats/fight (20 turns)";
             item_effects[$item[Ye Olde Bawdy Limerick]] = $effect[From Nantucket];
@@ -16018,7 +16237,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             item_effects[$item[resolution: be sexier]] = $effect[Irresistible Resolve];
         }
 
-        if (my_primestat() == $stat[muscle])
+        if (__misc_state["need to level muscle"])
         {
             item_descriptions[$item[Squat-Thrust Magazine]] = "+3 muscle stats/fight (20 turns)";
             item_effects[$item[Squat-Thrust Magazine]] = $effect[Squatting and Thrusting];
@@ -16027,7 +16246,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             item_descriptions[$item[resolution: be stronger]] = "+2 muscle stats/fight (20 turns)";
             item_effects[$item[resolution: be stronger]] = $effect[Strong Resolve];
         }
-        if (my_primestat() == $stat[mysticality] || (my_basestat($stat[mysticality]) < 70 && !__quest_state["Level 12"].finished))
+        if (__misc_state["need to level mysticality"])
         {
             item_descriptions[$item[O'RLY Manual]] = "+4 mysticality stats/fight (20 turns)";
             item_effects[$item[O'RLY Manual]] = $effect[You Read The Manual];
@@ -16465,11 +16684,22 @@ void SSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         }
     }
     
-    if (true)
+    //sneakyPetePoints first
+    /*int skills_available = MIN(15, my_level()) + get_property_int("sneakyPetePoints");
+    
+    int skills_have = 0;
+    foreach s in lookupSkills("Catchphrase,Mixologist,Throw Party,Fix Jukebox,Snap Fingers,Shake It Off,Check Hair,Cocktail Magic,Make Friends,Natural Dancer,Rev Engine,Born Showman,Pop Wheelie,Rowdy Drinker,Peel Out,Easy Riding,Check Mirror,Riding Tall,Biker Swagger,Flash Headlight,Insult,Live Fast,Incite Riot,Jump Shark,Animal Magnetism,Smoke Break,Hard Drinker,Unrepentant Thief,Brood,Walk Away From Explosion")
     {
-        //FIXME buy skills?
-        //need to know how many we have...
+        if (s.have_skill())
+            skills_have += 1;
     }
+    
+    if (skills_available > skills_have)
+    {
+        string [int] description;
+        description.listAppend(pluralizeWordy(skills_available - skills_have, "skill", "skills").capitalizeFirstLetter() + " available.");
+        optional_task_entries.listAppend(ChecklistEntryMake("__skill Natural Dancer", "da.php?place=gate3", ChecklistSubentryMake("Buy Sneaky Pete skills", "", description), 11));
+    }*/
 }
 
 void SetsInit()
@@ -16934,11 +17164,12 @@ void finalizeSetUpFloristState()
 		else
 			__plants_suggested_locations.listAppend(PlantSuggestionMake(battlefield_zone, "Rabid Dogwood", ""));
 	}
-	if (my_primestat() == $stat[mysticality] && __misc_state["need to level"])
+	if (__misc_state["need to level mysticality"])
 	{
 		//Wizard's Wig - underground, +5 myst stats/fight:
-        if (!__quest_state["Level 4"].finished)
-            __plants_suggested_locations.listAppend(PlantSuggestionMake($location[The Boss Bat's Lair], "Wizard's Wig", ""));
+        //in SC, can reach level 7 first, so ignore this one:
+        //if (!__quest_state["Level 4"].finished)
+            //__plants_suggested_locations.listAppend(PlantSuggestionMake($location[The Boss Bat's Lair], "Wizard's Wig", ""));
         if (!__quest_state["Level 7"].state_boolean["niche finished"])
             __plants_suggested_locations.listAppend(PlantSuggestionMake($location[The Defiled Niche], "Wizard's Wig", ""));
 	}
@@ -16968,8 +17199,9 @@ void finalizeSetUpFloristState()
 	}
 	//War Lily - indoor, +ML:
 	//Rad-ish Radish - outdoor, +5 moxie stats/fight:
-    if (my_primestat() == $stat[moxie] && __misc_state["need to level"])
+    if (__misc_state["need to level moxie"])
     {
+        //you wouldn't plant +30ML at airship - because oil peak likely needs it today. FIXME suggest if oil peak done/planted? HCO I guess? I dunno
         __plants_suggested_locations.listAppend(PlantSuggestionMake($location[The Spooky Forest], "Rad-ish Radish", ""));
         __plants_suggested_locations.listAppend(PlantSuggestionMake($location[The Penultimate Fantasy Airship], "Rad-ish Radish", ""));
     }
@@ -17513,6 +17745,8 @@ void setUpState()
     
     if (get_property("peteMotorbikeGasTank") == "Extra-Buoyant Tank")
         mysterious_island_unlocked = true;
+    if (get_property_int("lastIslandUnlock") == my_ascensions() && get_revision() >= 13812)
+        mysterious_island_unlocked = true;
             
     if (!mysterious_island_unlocked)
     {
@@ -17527,6 +17761,10 @@ void setUpState()
     
 	
 	__misc_state["desert beach available"] = false;
+    if (get_property("peteMotorbikeGasTank") == "Large Capacity Tank")
+        __misc_state["desert beach available"] = true;
+    if (get_property_int("lastDesertUnlock") == my_ascensions() && get_revision() >= 13812)
+        __misc_state["desert beach available"] = true;
 	if ($location[south of the border].locationAvailable())
 		__misc_state["desert beach available"] = true;
 	if ($locations[The Shore\, Inc. Travel Agency,the arid\, extra-dry desert,the oasis, south of the border].turnsAttemptedInLocation() > 0) //weird issues with detecting the beach. check if we've ever adventured there as a back-up
@@ -17632,6 +17870,28 @@ void finalizeSetUpState()
 	{
 		__misc_state["need to level"] = true;
 	}
+    __misc_state["need to level muscle"] = false;
+    __misc_state["need to level mysticality"] = false;
+    __misc_state["need to level moxie"] = false;
+    
+    if (__misc_state["In run"])
+    {
+        //62 muscle for antique machete/hidden hospital
+        //70 moxie, 70 mysticality for war outfits
+        if (my_primestat() == $stat[muscle] && __misc_state["need to level"])
+            __misc_state["need to level muscle"] = true;
+        if (my_primestat() == $stat[mysticality] && __misc_state["need to level"])
+            __misc_state["need to level mysticality"] = true;
+        if (my_primestat() == $stat[moxie] && __misc_state["need to level"])
+            __misc_state["need to level moxie"] = true;
+        
+        if (my_basestat($stat[muscle]) < 62)
+            __misc_state["need to level muscle"] = true;
+        if (my_basestat($stat[mysticality]) < 70)
+            __misc_state["need to level mysticality"] = true;
+        if (my_basestat($stat[moxie]) < 70)
+            __misc_state["need to level moxie"] = true;
+    }
 	
 	if (__misc_state_int["pulls available"] > 0)
 	{
@@ -17942,7 +18202,7 @@ void generateMissingItems(Checklist [int] checklists)
     
     if ($item[enchanted bean].available_amount() == 0 && !__quest_state["Level 10"].state_boolean["Beanstalk grown"])
     {
-		items_needed_entries.listAppend(ChecklistEntryMake("__item enchanted bean", "", ChecklistSubentryMake("enchanted bean", "", "Found in the beanbat chamber.")));
+		items_needed_entries.listAppend(ChecklistEntryMake("__item enchanted bean", "", ChecklistSubentryMake("Enchanted bean", "", "Found in the beanbat chamber.")));
     }
     
     if (__quest_state["Level 13"].state_boolean["shadow will need to be defeated"])
@@ -17954,6 +18214,17 @@ void generateMissingItems(Checklist [int] checklists)
         //red potion
         //extra-strength red potion (they might find it)
         
+    }
+    if (__quest_state["Level 11 Palindome"].state_boolean["Need instant camera"])
+    {
+        item camera = 7266.to_item();
+        if (camera != $item[none])
+        {
+            string url = "";
+            if ($location[the haunted bedroom].locationAvailable())
+                url = "place.php?whichplace=spookyraven2";
+            items_needed_entries.listAppend(ChecklistEntryMake("__item " + camera, "", ChecklistSubentryMake("Disposable instant camera", url, "Found in the Haunted Bedroom.")));
+        }
     }
                                
     SetsGenerateMissingItems(items_needed_entries);
@@ -18327,6 +18598,17 @@ void generateTasks(Checklist [int] checklists)
 
 
 
+string [int] generateHotDogLine(string hotdog, string description, int fullness)
+{
+    description += " " + fullness + " full.";
+    if (availableFullness() < fullness)
+    {
+        hotdog = HTMLGenerateSpanOfClass(hotdog , "r_future_option");
+        description = HTMLGenerateSpanOfClass(description , "r_future_option");
+    }
+    return listMake(hotdog, description);
+}
+
 
 void generateDailyResources(Checklist [int] checklists)
 {
@@ -18334,7 +18616,7 @@ void generateDailyResources(Checklist [int] checklists)
 		
 	SetsGenerateResources(available_resources_entries);
 	
-	if (!get_property_boolean("_fancyHotDogEaten") && availableFullness() > 0 && __misc_state["VIP available"] && __misc_state["can eat just about anything"] && __misc_state["In run"]) //too expensive to use outside a run?
+	if (!get_property_boolean("_fancyHotDogEaten") && availableFullness() > 0 && __misc_state["VIP available"] && __misc_state["can eat just about anything"] && __misc_state["In run"]) //too expensive to use outside a run? well, more that it's information overload
 	{
 		
 		string name = "Fancy hot dog edible";
@@ -18342,16 +18624,20 @@ void generateDailyResources(Checklist [int] checklists)
 		string image_name = "basic hot dog";
 		
         string [int][int] options;
-		options.listAppend(listMake("Optimal Dog", "Semi-rare next adventure. 1 full."));
-		options.listAppend(listMake("Ghost Dog", "-combat, 30 turns. 3 full."));
-		options.listAppend(listMake("Video Game Hot Dog", "+25% item, +25% meat, 50 turns. 3 full."));
-		options.listAppend(listMake("Junkyard dog", "+combat, 30 turns. 3 full."));
+		options.listAppend(generateHotDogLine("Optimal Dog", "Semi-rare next adventure.", 1));
+		options.listAppend(generateHotDogLine("Ghost Dog", "-combat, 30 turns.", 3));
+		options.listAppend(generateHotDogLine("Video Game Hot Dog", "+25% item, +25% meat, pixels, 50 turns.", 3));
+		options.listAppend(generateHotDogLine("Junkyard dog", "+combat, 30 turns.", 3));
+        if (!__quest_state["Level 8"].finished || __quest_state["Level 9"].state_int["a-boo peak hauntedness"] > 0)
+            options.listAppend(generateHotDogLine("Devil dog", "+3 cold/spooky res, 30 turns.", 3));
+        if (!__quest_state["Level 9"].state_boolean["Peak Stench Completed"])
+            options.listAppend(generateHotDogLine("Chilly dog", "+10ML and +3 stench/sleaze res, 30 turns.", 3));
 		if (my_primestat() == $stat[muscle])
-			options.listAppend(listMake("Savage macho dog", "+50% muscle, 50 turns. 2 full."));
+			options.listAppend(generateHotDogLine("Savage macho dog", "+50% muscle, 50 turns.", 2));
 		if (my_primestat() == $stat[mysticality])
-			options.listAppend(listMake("One with everything", "+50% mysticality, 50 turns. 2 full."));
+			options.listAppend(generateHotDogLine("One with everything", "+50% mysticality, 50 turns.", 2));
 		if (my_primestat() == $stat[moxie])
-			options.listAppend(listMake("Sly Dog", "+50% moxie, 50 turns. 2 full."));
+			options.listAppend(generateHotDogLine("Sly Dog", "+50% moxie, 50 turns.", 2));
 			
         description.listAppend(HTMLGenerateSimpleTableLines(options));
 		available_resources_entries.listAppend(ChecklistEntryMake(image_name, "clan_viplounge.php?action=hotdogstand", ChecklistSubentryMake(name, "", description), 5));
@@ -18383,11 +18669,11 @@ void generateDailyResources(Checklist [int] checklists)
         int games_available = 3 - get_property_int("_poolGames");
         string [int] description;
         if (__misc_state["familiars temporarily blocked"])
-            description.listAppend("+50% weapon damage.");
+            description.listAppend("+50% weapon damage. (aggressively)");
         else
-            description.listAppend("+5 familiar weight, +50% weapon damage.");
-        description.listAppend("Or +10% item, +50% init.");
-        description.listAppend("Or +50% spell damage, +10 MP regeneration.");
+            description.listAppend("+5 familiar weight, +50% weapon damage. (aggressively)");
+        description.listAppend("Or +50% spell damage, +10 MP regeneration. (strategically)");
+        description.listAppend("Or +10% item, +50% init. (stylishly)");
 		available_resources_entries.listAppend(ChecklistEntryMake("__item pool cue", "clan_viplounge.php?action=pooltable", ChecklistSubentryMake(pluralize(games_available, "pool table game", "pool table games"), "10 turns", description), 5));
     }
     if (__quest_state["Level 6"].finished && !get_property_boolean("friarsBlessingReceived"))
@@ -19047,8 +19333,6 @@ string generateRandomMessage()
         }
     }
     
-	if (__misc_state["free runs usable"] && __misc_state["In run"])
-		random_messages.listAppend("if you see an ultra-rare, free run away");
 	if (__misc_state["In run"])
     {
         random_messages.listAppend("optimal power, make up!");
@@ -19259,7 +19543,7 @@ string generateRandomMessage()
     monster_messages[$monster[Black Crayon Spiraling Shape]] = "be what you're like";
     monster_messages[$monster[best-selling novelist]] = "fiction to escape reality";
     monster_messages[$monster[7-Foot Dwarf Replicant]] = "it's too bad she won't live<br>but then again, who does?";
-    monster_messages[lookupMonster("The Avatar of Jarlsberg")] = "smoked cheese";
+    monster_messages[lookupMonster("Avatar of Jarlsberg")] = "smoked cheese";
     
     
     if (monster_messages contains last_monster() && last_monster() != $monster[none])
@@ -19439,7 +19723,7 @@ string [string] generateAPIResponse()
     else if (true)
     {
         //Checking every item is slow. But certain items won't trigger a reload, but need to. So:
-        boolean [item] relevant_items = $items[photocopied monster,4-d camera,pagoda plans,Elf Farm Raffle ticket,skeleton key,heavy metal thunderrr guitarrr,heavy metal sonata,Hey Deze nuts,rave whistle,damp old boot,map to Professor Jacking's laboratory,world's most unappetizing beverage,squirmy violent party snack,White Citadel Satisfaction Satchel,rusty screwdriver,giant pinky ring,The Lost Pill Bottle,GameInformPowerDailyPro magazine,dungeoneering kit,Knob Goblin encryption key,dinghy plans,Sneaky Pete's key,Jarlsberg's key,Boris's key,fat loot token,bridge,chrome ore,asbestos ore,linoleum ore,csa fire-starting kit,tropical orchid,stick of dynamite,barbed-wire fence,psychoanalytic jar,digital key,Richard's star key,star hat,star crossbow,star staff,star sword,Wand of Nagamar,Azazel's tutu,Azazel's unicorn,Azazel's lollipop,smut orc keepsake box,blessed large box,massive sitar,hammer of smiting,chelonian morningstar,greek pasta of peril,17-alarm saucepan,shagadelic disco banjo,squeezebox of the ages,E.M.U. helmet,E.M.U. harness,E.M.U. joystick,E.M.U. rocket thrusters,E.M.U. unit,wriggling flytrap pellet,Mer-kin trailmap,Mer-kin stashbox,Makeshift yakuza mask,Novelty tattoo sleeves,strange goggles,zaibatsu level 2 card,zaibatsu level 3 card,flickering pixel,jar of oil,bowl of scorpions,molybdenum magnet,steel lasagna,steel margarita,steel-scented air freshener,Grandma's Map,mer-kin healscroll,scented massage oil,soggy used band-aid,extra-strength red potion,red pixel potion,red potion,filthy poultice,gauze garter,green pixel potion,cartoon heart,red plastic oyster egg,Manual of Dexterity,Manual of Labor,Manual of Transmission,wet stunt nut stew,bjorn's hammer,mace of the tortoise,pasta of peril,5-alarm saucepan,disco banjo,rock and roll legend,lost key,resolution: be more adventurous,sugar sheet,sack lunch,glob of Blank-Out,gaudy key,talisman o' nam,plus sign,Newbiesport&trade; tent,Frobozz Real-Estate Company Instant House (TM),dry cleaning receipt,book of matches,rock band flyers,jam band flyers];
+        boolean [item] relevant_items = $items[photocopied monster,4-d camera,pagoda plans,Elf Farm Raffle ticket,skeleton key,heavy metal thunderrr guitarrr,heavy metal sonata,Hey Deze nuts,rave whistle,damp old boot,map to Professor Jacking's laboratory,world's most unappetizing beverage,squirmy violent party snack,White Citadel Satisfaction Satchel,rusty screwdriver,giant pinky ring,The Lost Pill Bottle,GameInformPowerDailyPro magazine,dungeoneering kit,Knob Goblin encryption key,dinghy plans,Sneaky Pete's key,Jarlsberg's key,Boris's key,fat loot token,bridge,chrome ore,asbestos ore,linoleum ore,csa fire-starting kit,tropical orchid,stick of dynamite,barbed-wire fence,psychoanalytic jar,digital key,Richard's star key,star hat,star crossbow,star staff,star sword,Wand of Nagamar,Azazel's tutu,Azazel's unicorn,Azazel's lollipop,smut orc keepsake box,blessed large box,massive sitar,hammer of smiting,chelonian morningstar,greek pasta of peril,17-alarm saucepan,shagadelic disco banjo,squeezebox of the ages,E.M.U. helmet,E.M.U. harness,E.M.U. joystick,E.M.U. rocket thrusters,E.M.U. unit,wriggling flytrap pellet,Mer-kin trailmap,Mer-kin stashbox,Makeshift yakuza mask,Novelty tattoo sleeves,strange goggles,zaibatsu level 2 card,zaibatsu level 3 card,flickering pixel,jar of oil,bowl of scorpions,molybdenum magnet,steel lasagna,steel margarita,steel-scented air freshener,Grandma's Map,mer-kin healscroll,scented massage oil,soggy used band-aid,extra-strength red potion,red pixel potion,red potion,filthy poultice,gauze garter,green pixel potion,cartoon heart,red plastic oyster egg,Manual of Dexterity,Manual of Labor,Manual of Transmission,wet stunt nut stew,bjorn's hammer,mace of the tortoise,pasta of peril,5-alarm saucepan,disco banjo,rock and roll legend,lost key,resolution: be more adventurous,sugar sheet,sack lunch,glob of Blank-Out,gaudy key,talisman o' nam,plus sign,Newbiesport&trade; tent,Frobozz Real-Estate Company Instant House (TM),dry cleaning receipt,book of matches,rock band flyers,jam band flyers,disassembled clover];
         //future: add snow boards
         
         
@@ -19457,7 +19741,7 @@ string [string] generateAPIResponse()
     if (true)
     {
         
-        boolean [string] relevant_mafia_properties = $strings[merkinQuestPath,questF01Primordial,questF02Hyboria,questF03Future,questF04Elves,questF05Clancy,questG01Meatcar,questG02Whitecastle,questG03Ego,questG04Nemesis,questG05Dark,questG06Delivery,questI01Scapegoat,questI02Beat,questL02Larva,questL03Rat,questL04Bat,questL05Goblin,questL06Friar,questL07Cyrptic,questL08Trapper,questL09Topping,questL10Garbage,questL11MacGuffin,questL11Manor,questL11Palindome,questL11Pyramid,questL11Worship,questL12War,questL13Final,questM01Untinker,questM02Artist,questM03Bugbear,questM04Galaktic,questM05Toot,questM06Gourd,questM07Hammer,questM08Baker,questM09Rocks,questM10Azazel,questM11Postal,questM12Pirate,questM13Escape,questM14Bounty,questM15Lol,questS01OldGuy,questS02Monkees,sidequestArenaCompleted,sidequestFarmCompleted,sidequestJunkyardCompleted,sidequestLighthouseCompleted,sidequestNunsCompleted,sidequestOrchardCompleted,cyrptAlcoveEvilness,cyrptCrannyEvilness,cyrptNicheEvilness,cyrptNookEvilness,desertExploration,gnasirProgress,relayCounters,timesRested,currentEasyBountyItem,currentHardBountyItem,currentSpecialBountyItem,volcanoMaze1,_lastDailyDungeonRoom,seahorseName,chasmBridgeProgress,_aprilShower,lastAdventure,lastEncounter,_floristPlantsUsed,_fireStartingKitUsed,_psychoJarUsed,hiddenHospitalProgress,hiddenBowlingAlleyProgress,hiddenApartmentProgress,hiddenOfficeProgress,pyramidPosition,parasolUsed,_discoKnife,lastPlusSignUnlock,olfactedMonster,photocopyMonster,lastTempleUnlock,volcanoMaze1,blankOutUsed,peteMotorbikeCowling,peteMotorbikeGasTank,peteMotorbikeHeadlight,peteMotorbikeMuffler,peteMotorbikeSeat,peteMotorbikeTires,_petePeeledOut,_navelRunaways];
+        boolean [string] relevant_mafia_properties = $strings[merkinQuestPath,questF01Primordial,questF02Hyboria,questF03Future,questF04Elves,questF05Clancy,questG01Meatcar,questG02Whitecastle,questG03Ego,questG04Nemesis,questG05Dark,questG06Delivery,questI01Scapegoat,questI02Beat,questL02Larva,questL03Rat,questL04Bat,questL05Goblin,questL06Friar,questL07Cyrptic,questL08Trapper,questL09Topping,questL10Garbage,questL11MacGuffin,questL11Manor,questL11Palindome,questL11Pyramid,questL11Worship,questL12War,questL13Final,questM01Untinker,questM02Artist,questM03Bugbear,questM04Galaktic,questM05Toot,questM06Gourd,questM07Hammer,questM08Baker,questM09Rocks,questM10Azazel,questM11Postal,questM12Pirate,questM13Escape,questM14Bounty,questM15Lol,questS01OldGuy,questS02Monkees,sidequestArenaCompleted,sidequestFarmCompleted,sidequestJunkyardCompleted,sidequestLighthouseCompleted,sidequestNunsCompleted,sidequestOrchardCompleted,cyrptAlcoveEvilness,cyrptCrannyEvilness,cyrptNicheEvilness,cyrptNookEvilness,desertExploration,gnasirProgress,relayCounters,timesRested,currentEasyBountyItem,currentHardBountyItem,currentSpecialBountyItem,volcanoMaze1,_lastDailyDungeonRoom,seahorseName,chasmBridgeProgress,_aprilShower,lastAdventure,lastEncounter,_floristPlantsUsed,_fireStartingKitUsed,_psychoJarUsed,hiddenHospitalProgress,hiddenBowlingAlleyProgress,hiddenApartmentProgress,hiddenOfficeProgress,pyramidPosition,parasolUsed,_discoKnife,lastPlusSignUnlock,olfactedMonster,photocopyMonster,lastTempleUnlock,volcanoMaze1,blankOutUsed,peteMotorbikeCowling,peteMotorbikeGasTank,peteMotorbikeHeadlight,peteMotorbikeMuffler,peteMotorbikeSeat,peteMotorbikeTires,_petePeeledOut,_navelRunaways,hiddenTavernUnlock];
         
         if (false)
         {
