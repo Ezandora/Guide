@@ -81,8 +81,8 @@ void smithsnessGenerateSmithereensSuggestions(string [int] smithereen_suggestion
 	{
 		smithereen_suggestions.listAppend("Vulgar Pitcher: 2 drunkenness epic drink|Bigmouth: 2 drunkenness awesome drink, 50 turns of +10 smithsness");
 	}
-	if (!familiar_is_usable($familiar[he-boulder]))
-		smithereen_suggestions.listAppend("Yellow ray");
+	if (!$familiar[he-boulder].familiar_is_usable())
+		smithereen_suggestions.listAppend("Golden Light: Yellow ray");
 	
 }
 

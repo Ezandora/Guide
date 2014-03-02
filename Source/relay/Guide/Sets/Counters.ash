@@ -27,7 +27,7 @@ void SCountersInit()
 	{
 		if (i + 3 > counter_split.count())
 			break;
-		int turn_number = to_int(counter_split[i]);
+		int turn_number = to_int_silent(counter_split[i]);
 		int turns_until_counter = turn_number - my_turncount();
 		string counter_name = counter_split[i + 1];
 		string counter_gif = counter_split[i + 2];

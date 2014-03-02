@@ -215,7 +215,7 @@ void generateTasks(Checklist [int] checklists)
         string url = "";
 		int mcd_max_limit = 10;
 		boolean have_mcd = false;
-		if (canadia_available() || knoll_available() || gnomads_available() || in_bad_moon())
+		if (canadia_available() || knoll_available() || gnomads_available() && __misc_state["desert beach available"] || in_bad_moon())
 			have_mcd = true;
         if (canadia_available())
             mcd_max_limit = 11;

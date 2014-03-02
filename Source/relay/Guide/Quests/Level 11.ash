@@ -530,8 +530,8 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
         {
             subentry.entries.listAppend("Quest was just revamped; here's a simple (and possibly inaccurate) guide:");
             subentry.entries.listAppend("First you adventure in the Palindome.|Find three photographs via non-combats(?), and take a picture of Bob Racecar/Racecar Bob with a disposable instant camera. (found in NC in haunted bedroom)|Also, find stunt nuts.");
-            subentry.entries.listAppend("&quot;I Love Me, Vol.&quot; I will drop from a monster. Read it to unlock Dr. Awkward's office.");
-            subentry.entries.listAppend("Place all four photographs on the shelves.|Order is god, red nugget, dog, and ostrich egg.");
+            subentry.entries.listAppend("&quot;I Love Me, Vol.&quot; I will drop from a palindome monster. Read it to unlock Dr. Awkward's office.");
+            subentry.entries.listAppend("Place all four photographs on the shelves in the office.|Order is god, red nugget, dog, and ostrich egg.");
             subentry.entries.listAppend("Read 2 Love Me, Vol. 2 to unlock Mr. Alarm's office.");
             subentry.entries.listAppend("Talk to Mr. Alarm, unlock Whitey's Grove. Run +186% item, +combat to find lion oil and bird rib.|Or, alternatively, adventure in the palindome. I don't know the details, sorry.");
             subentry.entries.listAppend("Cook wet stunt nut stew, talk to Mr. Alarm. He'll give you the Mega Gem.");
@@ -583,7 +583,7 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
             if (exploration > 0)
                 subentry.entries.listAppend("Need ultra-hydrated from The Oasis. (potential clover for 20 turns)");
         }
-        if (exploration + exploration_per_turn < 10)
+        if (exploration < 10)
         {
             int turns_until_gnasir_found = ceil(to_float(10 - exploration) / exploration_per_turn) + 1;
             
@@ -738,6 +738,10 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
             url = "pyramid.php";
             //Pyramid unlocked:
             int pyramid_position = get_property_int("pyramidPosition");
+            
+            //Uncertain:
+            //if (get_property_int("lastPyramidReset") != my_ascensions())
+                //pyramid_position = 1;
             
             //I think there are... five positions?
             //1=Ed, 2=bad, 3=vending machine, 4=token, 5=bad

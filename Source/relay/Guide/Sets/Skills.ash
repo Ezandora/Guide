@@ -38,8 +38,13 @@ void SSkillsGenerateResource(ChecklistEntry [int] available_resources_entries)
     {
 		property_summons_to_skills["_petePartyThrown"] = listMake(lookupSkill("Throw Party"));
 		property_summons_to_skills["_peteRiotIncited"] = listMake(lookupSkill("Incite Riot"));
-        skills_to_details[lookupSkill("Throw Party")] = "Ideally have 30 audience love before casting.";
-        skills_to_details[lookupSkill("Incite Riot")] = "Ideally have 30 audience hate before casting.";
+        
+        int audience_max = 30;
+        if (lookupItem("Sneaky Pete's leather jacket").equipped_amount() > 0 || lookupItem("Sneaky Pete's leather jacket (collar popped)").equipped_amount() > 0)
+            audience_max = 50;
+        
+        skills_to_details[lookupSkill("Throw Party")] = "Ideally have " + audience_max + " audience love before casting.";
+        skills_to_details[lookupSkill("Incite Riot")] = "Ideally have " + audience_max + " audience hate before casting.";
     }
 	//Jarlsberg:
 	if (my_path_id() == PATH_AVATAR_OF_JARLSBERG)

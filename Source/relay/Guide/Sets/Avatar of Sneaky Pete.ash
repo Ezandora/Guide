@@ -197,7 +197,7 @@ void SSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
     }
     
     //sneakyPetePoints first
-    /*int skills_available = MIN(15, my_level()) + get_property_int("sneakyPetePoints");
+    /*int skills_available = MIN(30, MIN(15, my_level()) + get_property_int("sneakyPetePoints"));
     
     int skills_have = 0;
     foreach s in lookupSkills("Catchphrase,Mixologist,Throw Party,Fix Jukebox,Snap Fingers,Shake It Off,Check Hair,Cocktail Magic,Make Friends,Natural Dancer,Rev Engine,Born Showman,Pop Wheelie,Rowdy Drinker,Peel Out,Easy Riding,Check Mirror,Riding Tall,Biker Swagger,Flash Headlight,Insult,Live Fast,Incite Riot,Jump Shark,Animal Magnetism,Smoke Break,Hard Drinker,Unrepentant Thief,Brood,Walk Away From Explosion")
