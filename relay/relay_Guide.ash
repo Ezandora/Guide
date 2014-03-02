@@ -1,7 +1,7 @@
 //This script and its support scripts are in the public domain.
 
 //These settings are for development. Don't worry about editing them.
-string __version = "1.0.21";
+string __version = "1.0.22";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -6834,8 +6834,8 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
         {
             subentry.entries.listAppend("Quest was just revamped; here's a simple (and possibly inaccurate) guide:");
             subentry.entries.listAppend("First you adventure in the Palindome.|Find three photographs via non-combats(?), and take a picture of Bob Racecar/Racecar Bob with a disposable instant camera. (found in NC in haunted bedroom)|Also, find stunt nuts.");
-            subentry.entries.listAppend("&quot;I Love Me, Vol.&quot; I will drop from a monster. Read it to unlock Dr. Awkward's office.");
-            subentry.entries.listAppend("Place all four photographs on the shelves.|Order is god, red nugget, dog, and ostrich egg.");
+            subentry.entries.listAppend("&quot;I Love Me, Vol.&quot; I will drop from a palindome monster. Read it to unlock Dr. Awkward's office.");
+            subentry.entries.listAppend("Place all four photographs on the shelves in the office.|Order is god, red nugget, dog, and ostrich egg.");
             subentry.entries.listAppend("Read 2 Love Me, Vol. 2 to unlock Mr. Alarm's office.");
             subentry.entries.listAppend("Talk to Mr. Alarm, unlock Whitey's Grove. Run +186% item, +combat to find lion oil and bird rib.|Or, alternatively, adventure in the palindome. I don't know the details, sorry.");
             subentry.entries.listAppend("Cook wet stunt nut stew, talk to Mr. Alarm. He'll give you the Mega Gem.");
@@ -6887,7 +6887,7 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
             if (exploration > 0)
                 subentry.entries.listAppend("Need ultra-hydrated from The Oasis. (potential clover for 20 turns)");
         }
-        if (exploration + exploration_per_turn < 10)
+        if (exploration < 10)
         {
             int turns_until_gnasir_found = ceil(to_float(10 - exploration) / exploration_per_turn) + 1;
             
@@ -7042,6 +7042,10 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
             url = "pyramid.php";
             //Pyramid unlocked:
             int pyramid_position = get_property_int("pyramidPosition");
+            
+            //Uncertain:
+            //if (get_property_int("lastPyramidReset") != my_ascensions())
+                //pyramid_position = 1;
             
             //I think there are... five positions?
             //1=Ed, 2=bad, 3=vending machine, 4=token, 5=bad
@@ -11768,8 +11772,8 @@ void smithsnessGenerateSmithereensSuggestions(string [int] smithereen_suggestion
 	{
 		smithereen_suggestions.listAppend("Vulgar Pitcher: 2 drunkenness epic drink|Bigmouth: 2 drunkenness awesome drink, 50 turns of +10 smithsness");
 	}
-	if (!familiar_is_usable($familiar[he-boulder]))
-		smithereen_suggestions.listAppend("Yellow ray");
+	if (!$familiar[he-boulder].familiar_is_usable())
+		smithereen_suggestions.listAppend("Golden Light: Yellow ray");
 	
 }
 
@@ -12401,8 +12405,13 @@ void SSkillsGenerateResource(ChecklistEntry [int] available_resources_entries)
     {
 		property_summons_to_skills["_petePartyThrown"] = listMake(lookupSkill("Throw Party"));
 		property_summons_to_skills["_peteRiotIncited"] = listMake(lookupSkill("Incite Riot"));
-        skills_to_details[lookupSkill("Throw Party")] = "Ideally have 30 audience love before casting.";
-        skills_to_details[lookupSkill("Incite Riot")] = "Ideally have 30 audience hate before casting.";
+        
+        int audience_max = 30;
+        if (lookupItem("Sneaky Pete's leather jacket").equipped_amount() > 0 || lookupItem("Sneaky Pete's leather jacket (collar popped)").equipped_amount() > 0)
+            audience_max = 50;
+        
+        skills_to_details[lookupSkill("Throw Party")] = "Ideally have " + audience_max + " audience love before casting.";
+        skills_to_details[lookupSkill("Incite Riot")] = "Ideally have " + audience_max + " audience hate before casting.";
     }
 	//Jarlsberg:
 	if (my_path_id() == PATH_AVATAR_OF_JARLSBERG)
@@ -14105,7 +14114,7 @@ void SCountersInit()
 	{
 		if (i + 3 > counter_split.count())
 			break;
-		int turn_number = to_int(counter_split[i]);
+		int turn_number = to_int_silent(counter_split[i]);
 		int turns_until_counter = turn_number - my_turncount();
 		string counter_name = counter_split[i + 1];
 		string counter_gif = counter_split[i + 2];
@@ -16685,7 +16694,7 @@ void SSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
     }
     
     //sneakyPetePoints first
-    /*int skills_available = MIN(15, my_level()) + get_property_int("sneakyPetePoints");
+    /*int skills_available = MIN(30, MIN(15, my_level()) + get_property_int("sneakyPetePoints"));
     
     int skills_have = 0;
     foreach s in lookupSkills("Catchphrase,Mixologist,Throw Party,Fix Jukebox,Snap Fingers,Shake It Off,Check Hair,Cocktail Magic,Make Friends,Natural Dancer,Rev Engine,Born Showman,Pop Wheelie,Rowdy Drinker,Peel Out,Easy Riding,Check Mirror,Riding Tall,Biker Swagger,Flash Headlight,Insult,Live Fast,Incite Riot,Jump Shark,Animal Magnetism,Smoke Break,Hard Drinker,Unrepentant Thief,Brood,Walk Away From Explosion")
@@ -18451,7 +18460,7 @@ void generateTasks(Checklist [int] checklists)
         string url = "";
 		int mcd_max_limit = 10;
 		boolean have_mcd = false;
-		if (canadia_available() || knoll_available() || gnomads_available() || in_bad_moon())
+		if (canadia_available() || knoll_available() || gnomads_available() && __misc_state["desert beach available"] || in_bad_moon())
 			have_mcd = true;
         if (canadia_available())
             mcd_max_limit = 11;
