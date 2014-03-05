@@ -18,7 +18,7 @@ void QLevel6Init()
 float QLevel6TurnsToCompleteArea(location place)
 {
     //FIXME not sure how accurate these calculations are.
-    //First NC will always happen at 5, second at 10, third at 15.
+    //First NC will always happen at 6, second at 11, third at 16.
     int turns_spent_in_zone = turnsAttemptedInLocation(place); //not always accurate
     int ncs_found = noncombatTurnsAttemptedInLocation(place);
     if (ncs_found == 3)
@@ -32,7 +32,7 @@ float QLevel6TurnsToCompleteArea(location place)
     if (noncombat_rate != 0.0)
         turns_remaining = ncs_remaining / noncombat_rate;
     
-    return MIN(turns_remaining, MAX(0, 15.0 - turns_spent_in_zone.to_float()));
+    return MIN(turns_remaining, MAX(0.0, 16.0 - turns_spent_in_zone.to_float()));
 }
 
 

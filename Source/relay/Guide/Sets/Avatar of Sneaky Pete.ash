@@ -209,7 +209,7 @@ void SSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
     if (skills_available > skills_have)
     {
         string [int] description;
-        description.listAppend(pluralizeWordy(skills_available - skills_have, "skill", "skills").capitalizeFirstLetter() + " available.");
+        description.listAppend("At least " + pluralizeWordy(skills_available - skills_have, "skill", "skills") + " available.");
         optional_task_entries.listAppend(ChecklistEntryMake("__skill Natural Dancer", "da.php?place=gate3", ChecklistSubentryMake("Buy Sneaky Pete skills", "", description), 11));
     }*/
 }

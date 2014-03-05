@@ -424,12 +424,12 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 	{
         url = "lair6.php";
 		//counter familiars
-		subentry.modifiers.listAppend("+familiar weight");
-		subentry.entries.listAppend("Counter familiars. Need 20-pound familiars.");
-		subentry.entries.listAppend("Have mafia do it: Quests" + __html_right_arrow_character + "Tower (complete)");
         
         if (!__misc_state["familiars temporarily blocked"])
         {
+            subentry.modifiers.listAppend("+familiar weight");
+            subentry.entries.listAppend("Counter familiars. Need 20-pound familiars.");
+            subentry.entries.listAppend("Have mafia do it: Quests" + __html_right_arrow_character + "Tower (complete)");
             familiar [int] missing_familiars;
             foreach f in $familiars[Mosquito,Angry Goat,Barrrnacle,Sabre-Toothed Lime,Levitating Potato]
             {
@@ -489,6 +489,8 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 subentry.entries.listAppend(description.listJoinComponents("|*"));
             }
         }
+        else
+            subentry.entries.listAppend("Counter familiars.");
 	}
 	else if (base_quest_state.mafia_internal_step == 10)
 	{

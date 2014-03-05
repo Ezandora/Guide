@@ -345,7 +345,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
     {
         url = "place.php?whichplace=palindome";
         if ($item[talisman o' nam].equipped_amount() == 0)
-            url = "inventory.php?which=3";
+            url = "inventory.php?which=2";
         
         
         /*
@@ -585,7 +585,9 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
         }
         if (exploration < 10)
         {
-            int turns_until_gnasir_found = ceil(to_float(10 - exploration) / exploration_per_turn) + 1;
+            int turns_until_gnasir_found = -1;
+            if (exploration_per_turn != 0.0)
+                turns_until_gnasir_found = ceil(to_float(10 - exploration) / exploration_per_turn);
             
             subentry.entries.listAppend("Find Gnasir in " + pluralize(turns_until_gnasir_found, "turn", "turns") + ".");
         }
@@ -737,11 +739,12 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
         {
             url = "pyramid.php";
             //Pyramid unlocked:
+            boolean have_pyramid_position = false;
             int pyramid_position = get_property_int("pyramidPosition");
             
             //Uncertain:
-            //if (get_property_int("lastPyramidReset") != my_ascensions())
-                //pyramid_position = 1;
+            if (get_property_int("lastPyramidReset") == my_ascensions())
+                have_pyramid_position = true;
             
             //I think there are... five positions?
             //1=Ed, 2=bad, 3=vending machine, 4=token, 5=bad
@@ -760,7 +763,8 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
                 task = "fight Ed in the lower chambers";
                 if (ed_ml > my_buffedstat($stat[moxie]))
                     task += " (" + ed_ml + " attack)";
-                done_with_wheel_turning = true;
+                if (ed_waiting)
+                    done_with_wheel_turning = true;
             }
             else if ($item[ancient bronze token].available_amount() > 0)
             {
@@ -788,6 +792,14 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
                     tasks.listAppend("spin the pyramid " + spins_needed.int_to_wordy() + " times");
             }
             tasks.listAppend(task);
+            
+            
+            if (!have_pyramid_position)
+            {
+                tasks.listClear();
+                tasks.listAppend("look at the pyramid");
+            }
+            
             subentry.entries.listAppend(tasks.listJoinComponents(", ", "then").capitalizeFirstLetter() + ".");
             
             if (!done_with_wheel_turning)
@@ -797,7 +809,6 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
                     relevant_items.listAppend(pluralize($item[tomb ratchet]));
                 if ($item[tangle of rat tails].available_amount() > 0)
                     relevant_items.listAppend(pluralize($item[tangle of rat tails]));
-                
                   
                 if (relevant_items.count() > 0)
                     subentry.entries.listAppend(relevant_items.listJoinComponents(", ", "and") + " available.");

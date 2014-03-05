@@ -12,7 +12,7 @@ void QLevel5Init()
 	if (my_level() >= 5)
 		state.startable = true;
 		
-	if (get_property("questL05Goblin") == "unstarted" && $item[knob goblin encryption key].available_amount() == 0 && my_level() < 4)
+	if (get_property("questL05Goblin") == "unstarted" && $item[knob goblin encryption key].available_amount() == 0 && my_level() < 5)
 	{
 		//start the quest anyways, because they need to acquire the encryption key:
 		QuestStateParseMafiaQuestPropertyValue(state, "started");

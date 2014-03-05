@@ -71,9 +71,9 @@ void S8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             //No other choice. 8-bit realm.
             //Well, I suppose they could fax and arrow a ghost.
             if ($item[continuum transfunctioner].available_amount() > 0)
-                optional_task_entries.listAppend(ChecklistEntryMake("inexplicable door", "", ChecklistSubentryMake("Adventure in the 8-bit realm", "place.php?whichplace=woods", description), $locations[8-bit realm]));
+                optional_task_entries.listAppend(ChecklistEntryMake("inexplicable door", "place.php?whichplace=woods", ChecklistSubentryMake("Adventure in the 8-bit realm", modifiers, description), $locations[8-bit realm]));
             else if (my_level() >= 2)
-                optional_task_entries.listAppend(ChecklistEntryMake("__item continuum transfunctioner", "", ChecklistSubentryMake("Acquire a continuum transfunctioner", "place.php?whichplace=forestvillage", "From the crackpot mystic.")));
+                optional_task_entries.listAppend(ChecklistEntryMake("__item continuum transfunctioner", "place.php?whichplace=forestvillage", ChecklistSubentryMake("Acquire a continuum transfunctioner", "", "From the crackpot mystic.")));
         }
         else
         {

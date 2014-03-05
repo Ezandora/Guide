@@ -175,7 +175,7 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
 
 void SCountersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (__misc_state_int["Turns until dance card"] != -1)
+	if (__misc_state_int["Turns until dance card"] >= 0)
 	{
 		int turns_until_dance_card = __misc_state_int["Turns until dance card"];
         
