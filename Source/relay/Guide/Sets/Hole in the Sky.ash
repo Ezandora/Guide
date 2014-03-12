@@ -13,6 +13,10 @@ boolean HITSStillRelevant()
 	return true;
 }
 
+void QHitsInit()
+{
+}
+
 void QHitsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
 	if (!HITSStillRelevant())

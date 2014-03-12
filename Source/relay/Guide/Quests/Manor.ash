@@ -208,7 +208,8 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 		image_name = "Haunted Ballroom";
 		subentry.modifiers.listAppend("-combat");
         
-        
+        if (my_turncount() > 200)
+            subentry.entries.listAppend("Well, unless you won't need -combat.");
         subentry.entries.listAppend(generateTurnsToSeeNoncombat(80, 2, ""));
 	}
 	

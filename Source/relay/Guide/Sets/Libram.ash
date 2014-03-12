@@ -37,7 +37,7 @@ void SLibramGenerateResource(ChecklistEntry [int] available_resources_entries)
 		}
 		
 		
-		if (have_skill($skill[summon brickos]))
+		if ($skill[summon brickos].have_skill())
 		{
 			if (get_property_int("_brickoEyeSummons") <3)
 			{

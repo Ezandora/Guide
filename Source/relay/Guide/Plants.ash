@@ -86,12 +86,12 @@ void finalizeSetUpFloristState()
 			plants_used[internal_plants_used[key]] = true;
 	}
 	//Shuffle Truffle - underground, init:
-	if (!(__quest_state["Level 7"].state_boolean["alcove finished"] || __quest_state["Level 7"].state_int["alcove evilness"] < 27))
-	{
+	if (__quest_state["Level 7"].state_boolean["alcove needs speed tricks"])
+    {
 		__plants_suggested_locations.listAppend(PlantSuggestionMake($location[the defiled alcove], "Shuffle Truffle", "+2.5% modern zmobie"));
 	}
 	//Horn of Plenty - underground, +item:
-	if (!__quest_state["Level 7"].state_boolean["nook finished"] && item_drop_modifier() < 400.0)
+	if (__quest_state["Level 7"].state_boolean["nook needs speed tricks"] && item_drop_modifier() < 400.0)
 	{
 		__plants_suggested_locations.listAppend(PlantSuggestionMake($location[the defiled nook], "horn of plenty", "Evil eye, 20% drop."));
 	}

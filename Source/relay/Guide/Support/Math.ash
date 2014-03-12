@@ -28,6 +28,10 @@ int clampi(int v, int min_value, int max_value)
 		return min_value;
 	return v;
 }
+float clampNormali(int v)
+{
+	return clampi(v, 0, 1);
+}
 
 //random() will halt the script if range is <= 1, which can happen when picking a random object out of a variable-sized list.
 int random_safe(int range)

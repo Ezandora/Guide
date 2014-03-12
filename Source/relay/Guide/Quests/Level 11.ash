@@ -1,7 +1,5 @@
 void QLevel11Init()
 {
-    if (!__misc_state["In run"])
-        return;
 	//questL11MacGuffin, questL11Manor, questL11Palindome, questL11Pyramid, questL11Worship
 	//hiddenApartmentProgress, hiddenBowlingAlleyProgress, hiddenHospitalProgress, hiddenOfficeProgress, hiddenTavernUnlock
 	//relocatePygmyJanitor, relocatePygmyLawyer
@@ -480,7 +478,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                 
                 if (7262.to_item().available_amount() == 0) //I love me, Vol. I
                 {
-                    subentry.entries.listAppend("Find I Love Me, Vol. I in-combat. Unknown mechanic.");
+                    subentry.entries.listAppend("Find I Love Me, Vol. I in-combat. Fifth(?) dude-type monster.");
                 }
                 
                 string [int] missing_ncs;
@@ -529,8 +527,8 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
         else
         {
             subentry.entries.listAppend("Quest was just revamped; here's a simple (and possibly inaccurate) guide:");
-            subentry.entries.listAppend("First you adventure in the Palindome.|Find three photographs via non-combats(?), and take a picture of Bob Racecar/Racecar Bob with a disposable instant camera. (found in NC in haunted bedroom)|Also, find stunt nuts.");
-            subentry.entries.listAppend("&quot;I Love Me, Vol.&quot; I will drop from a palindome monster. Read it to unlock Dr. Awkward's office.");
+            subentry.entries.listAppend("First you adventure in the Palindome.|Find three photographs via non-combats(?), and take a picture of Bob Racecar/Racecar Bob with a disposable instant camera. (found in NC in haunted bedroom)|Olfact bob racecar/racecar bob.|Also, possibly find stunt nuts. (30% drop, +234% item)");
+            subentry.entries.listAppend("&quot;I Love Me, Vol.&quot; I will drop from the fifth dude-type monster. Read it to unlock Dr. Awkward's office.");
             subentry.entries.listAppend("Place all four photographs on the shelves in the office.|Order is god, red nugget, dog, and ostrich egg.");
             subentry.entries.listAppend("Read 2 Love Me, Vol. 2 to unlock Mr. Alarm's office.");
             subentry.entries.listAppend("Talk to Mr. Alarm, unlock Whitey's Grove. Run +186% item, +combat to find lion oil and bird rib.|Or, alternatively, adventure in the palindome. I don't know the details, sorry.");
@@ -589,7 +587,7 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
             if (exploration_per_turn != 0.0)
                 turns_until_gnasir_found = ceil(to_float(10 - exploration) / exploration_per_turn);
             
-            subentry.entries.listAppend("Find Gnasir in " + pluralize(turns_until_gnasir_found, "turn", "turns") + ".");
+            subentry.entries.listAppend("Find Gnasir after " + pluralize(turns_until_gnasir_found, "turn", "turns") + ".");
         }
         else if (get_property_int("gnasirProgress") == 0 && exploration <= 14 && $location[the arid, extra-dry desert].noncombatTurnsAttemptedInLocation() == 0)
         {
@@ -647,8 +645,11 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
                 }
             }
             if (!base_quest_state.state_boolean["Wormridden"] && $item[drum machine].available_amount() == 0)
-            {				
-                subentry.entries.listAppend("Potentially acquire drum machine from blur. (+234% item), use drum machine.");
+            {
+                if (base_quest_state.state_boolean["Manual Pages Given"])
+                    subentry.entries.listAppend("Potentially acquire drum machine from blur. (+234% item), use drum machine.");
+                else
+                    subentry.entries.listAppend("Potentially acquire drum machine from blur. (+234% item), collect/return pages, then use drum machine.");
                 subentry.modifiers.listAppend("+234% item");
             }
             if (!base_quest_state.state_boolean["Killing Jar Given"])
@@ -1094,7 +1095,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 foreach it in $items[surgical apron,bloodied surgical dungarees,surgical mask,head mirror,half-size scalpel]
                 {
                     boolean can_equip = true;
-                    if (it.to_slot() == $slot[shirt] && !have_skill($skill[Torso Awaregness]))
+                    if (it.to_slot() == $slot[shirt] && !__misc_state["Torso aware"])
                         can_equip = false;
                     if (it.available_amount() > 0 && it.equipped_amount() == 0 && can_equip)
                     {
@@ -1347,7 +1348,7 @@ void QLevel11HiddenTempleGenerateTasks(ChecklistEntry [int] task_entries, Checkl
     {
         subentry.modifiers.listClear();
         subentry.entries.listClear();
-        subentry.entries.listAppend("Use the spooky temple map");
+        subentry.entries.listAppend("Use the spooky temple map.");
     }
     
     if (ncs_remaining > 0)
@@ -1364,6 +1365,11 @@ void QLevel11HiddenTempleGenerateTasks(ChecklistEntry [int] task_entries, Checkl
         
         subentry.entries.listAppend("~" + turns_remaining.roundForOutput(1) + " turns remain at " + combat_rate_modifier().floor() + "% combat.");
     }
+    
+    if (my_level() < 6)
+        subentry.entries.listAppend("There's also another unlock quest at level six, but it's slower.");
+    else
+        subentry.entries.listAppend("There's also another unlock quest, but it's slower.");
     
     if (__misc_state_string["ballroom song"] != "-combat")
     {

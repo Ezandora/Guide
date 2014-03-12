@@ -83,7 +83,7 @@ void QSpaceElvesGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
 			subentry.entries.listAppend(header + HTMLGenerateIndentedText(line.listJoinComponents("<hr>")));
 		}
 		if (ronald_map_entries.count() == 0 && grimace_map_entries.count() == 0)
-			subentry.entries.listAppend("Look for the spooky little girl on Grimace or Ronald.");
+			subentry.entries.listAppend("Look for the spooky little girl on Grimacia or Ronaldus.");
         else if ($items[map to safety shelter ronald prime, map to safety shelter grimace prime].available_amount() > 0)
             url = "inventory.php?which=3";
 	}
@@ -95,7 +95,7 @@ void QSpaceElvesGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
 			subentry.entries.listAppend("spooky");
 		else
 		{
-			subentry.entries.listAppend("Adventure in Grimace with spooky little girl.");
+			subentry.entries.listAppend("Adventure in Grimacia with spooky little girl.");
 		}
 			
 	}

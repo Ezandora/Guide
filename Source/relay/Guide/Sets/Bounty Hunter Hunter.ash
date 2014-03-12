@@ -157,10 +157,13 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
         subentry.entries.listAppend("Accessed with " + bounty_item_to_unlock[bounty_item_name] + ".");
     
         
-    if (bounty_item_name == "half-empty bottle of eyedrops" && knoll_available())
+    if ((bounty_item_name == "half-empty bottle of eyedrops" || bounty_item_name == "broken plunger handle") && knoll_available())
     {
         url.s = "place.php?whichplace=forestvillage";
-        subentry.entries.listAppend("You probably can't do this bounty as knoll, sorry.");
+        subentry.entries.listClear();
+        subentry.modifiers.listClear();
+        subentry.entries.listAppend("Unable to complete this bounty under knoll sign.");
+        subentry.header = "Cancel bounty hunt for " + bounty_item_name.HTMLEscapeString();
     }
     
     if (bounty_item_name == "greasy string")

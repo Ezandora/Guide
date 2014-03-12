@@ -5,6 +5,7 @@ import "relay/Guide/Sets/Sets import.ash";
 void SetsInit()
 {
     SCountersInit();
+    QHitsInit();
 }
 
 

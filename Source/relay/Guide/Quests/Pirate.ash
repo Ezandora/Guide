@@ -141,15 +141,15 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 			if (insult_count < 6)
 				line += ", once you have at least six insults"; //in certain situations five might be slightly faster? but that skips a lot of combats, so probably not
 			line += ".";
-			subentry.entries.listAppend(line);
 			
+            string method;
 			if (have_outfit_components("Frat Boy Ensemble") && __misc_state["can equip just about any weapon"])
 			{
 				string [int] todo;
 				if (!is_wearing_outfit("Frat Boy Ensemble"))
 					todo.listAppend("wear frat boy ensemble");
 				todo.listAppend("attempt a frontal assault");
-				subentry.entries.listAppend(todo.listJoinComponents(", ", "then").capitalizeFirstLetter() + ".");
+				method = todo.listJoinComponents(", ", "then").capitalizeFirstLetter() + ".";
 			}
 			else if ($item[mullet wig].available_amount() > 0 && $item[briefcase].available_amount() > 0)
 			{
@@ -157,7 +157,7 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 				if ($item[mullet wig].equipped_amount() == 0)
 					todo.listAppend("wear mullet wig");
 				todo.listAppend("go in through the side door");
-				subentry.entries.listAppend(todo.listJoinComponents(", ", "then").capitalizeFirstLetter() + ".");
+				method = todo.listJoinComponents(", ", "then").capitalizeFirstLetter() + ".";
 			}
 			else if (knoll_available() || $item[frilly skirt].available_amount() > 0)
 			{
@@ -169,13 +169,15 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 				if ($item[frilly skirt].equipped_amount() == 0)
 					todo.listAppend("wear frilly skirt");
 				todo.listAppend("catburgle");
-                string line = todo.listJoinComponents(", ", "then").capitalizeFirstLetter() + ".";
-				subentry.entries.listAppend(line);
+                string line2 = todo.listJoinComponents(", ", "then").capitalizeFirstLetter() + ".";
+				method = line2;
 			}
 			else
 			{
-				subentry.entries.listAppend("no idea");
+				method = "Not sure how to approach this efficiently, sorry.";
 			}
+            line += "|" + method;
+			subentry.entries.listAppend(line);
 		}
 		else if (base_quest_state.mafia_internal_step == 4)
 		{

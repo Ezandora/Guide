@@ -218,6 +218,35 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] available_resources_en
 		//FIXME make this possibly say which one in the case of 6 (does that matter? how does that mechanic work?)
 		name = pluralize(copies_left, copy_sources + " copy", copy_sources + " copies") + " left";
 		string [int] description;
+        
+        //√ghuol whelps, √modern zmobies, √wine racks, √gaudy pirates, √lobsterfrogmen, √ninja assassin
+        if (!__quest_state["Level 12"].state_boolean["Lighthouse Finished"] && $item[barrel of gunpowder].available_amount() < 5)
+            description.listAppend("Lobsterfrogman.");
+        if (__quest_state["Level 7"].state_boolean["cranny needs speed tricks"])
+            description.listAppend("Swarm of ghuol whelps.");
+        if (__quest_state["Level 7"].state_boolean["alcove needs speed tricks"])
+            description.listAppend("Modern zmobies.");
+        if (!__quest_state["Level 8"].state_boolean["Mountain climbed"] && $items[ninja rope,ninja carabiner,ninja crampons].available_amount() == 0 && !have_outfit_components("eXtreme Cold-Weather Gear"))
+            description.listAppend("Ninja assassin.");
+        if (!__quest_state["Level 11"].finished && !__quest_state["Level 11 Palindome"].finished && $item[talisman o' nam].available_amount() == 0 && $items[gaudy key,snakehead charrrm].available_amount() < 2)
+            description.listAppend("Gaudy pirate - copy once for extra key.");
+        //√baa'baa. astronomer? √nuns trick brigand
+        //FIXME astronomer when we can calculate that
+        if (__misc_state["need to level"])
+            description.listAppend("Baa'baa'bu'ran - stone wool for cave bar leveling.");
+        if (!__quest_state["Level 12"].state_boolean["Nuns Finished"])
+            description.listAppend("Brigand - nuns trick.");
+        if (!__quest_state["Level 11"].finished && __quest_state["Level 11 Manor"].mafia_internal_step < 4)
+            description.listAppend("Wine cellar monsters. (copy has all six wines)");
+        //possibly less relevant:
+        //√ghosts/skulls/bloopers...?
+        //seems very marginal
+        //if (!__quest_state["Level 13"].state_boolean["past keys"] && ($item[digital key].available_amount() + creatable_amount($item[digital key])) == 0)
+            //description.listAppend("Ghosts/morbid skulls/bloopers, for digital key. (marginal?)");
+        //bricko bats, if they have bricko...?
+        //if (__misc_state["bookshelf accessible"] && $skill[summon brickos].have_skill())
+            //description.listAppend("Bricko bats...?");
+        
 		available_resources_entries.listAppend(ChecklistEntryMake(copy_source_list[0], "", ChecklistSubentryMake(name, "", description)));
 	}
     

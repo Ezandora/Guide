@@ -151,8 +151,8 @@ void generateMissingItems(Checklist [int] checklists)
 		telescope_item_suggestions[$item[spider web]] = "Spiders, sleazy back alley, 25% drop (2x)";
 		
 		
-		telescope_item_suggestions[$item[black pepper]] = "Black picnic basket, black widow, black forest, 15% drop|Clover black forest for one basket (success not guaranteed)";
-		telescope_item_suggestions[$item[powdered organs]] = "Canopic jar, Tomb servant, Upper/Middle chamber, 30% drop";
+		telescope_item_suggestions[$item[black pepper]] = "Black picnic basket, black widow, black forest, 15% drop.|46%? open success rate.|Possibly clover black forest for one basket.|Possibly zap ancient spice/dehydrated caviar for it.";
+		telescope_item_suggestions[$item[powdered organs]] = "Canopic jar, Tomb servant, Upper/Middle chamber, 30% drop.|~50% open success rate.";
 		
 		telescope_item_suggestions[$item[photoprotoneutron torpedo]] = "MagiMechTech MechaMech, fantasy airship, 30% drop";
 		

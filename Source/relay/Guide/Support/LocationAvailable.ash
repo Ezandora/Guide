@@ -300,6 +300,11 @@ string getClickableURLForLocation(location l)
             __urls_for_locations[l] = "place.php?whichplace=bathole";
         foreach l in $locations[the \"fun\" house, pre-cyrpt cemetary, post-cyrpt cemetary,The Outskirts of Cobb's Knob]
             __urls_for_locations[l] = "place.php?whichplace=plains";
+            
+        if ($item[talisman o' nam].equipped_amount() == 0)
+            __urls_for_locations[$location[The Palindome]] = "inventory.php?which=2";
+        else
+            __urls_for_locations[$location[The Palindome]] = "place.php?whichplace=palindome";
         
         if ($location[cobb's knob barracks].locationAvailable())
             __urls_for_locations[$location[The Outskirts of Cobb's Knob]] = "cobbsknob.php";

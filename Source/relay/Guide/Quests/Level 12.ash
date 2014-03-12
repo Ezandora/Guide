@@ -137,6 +137,8 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 	{
 		string [int] details;
 		details.listAppend("Great flappin' beasts, with webbed feet and bills! dooks!");
+		string [int] modifiers;
+        modifiers.listAppend("+meat");
         
         string [int] tasks;
         int ncs_seen = $location[McMillicancuddy's Barn].noncombatTurnsAttemptedInLocation();
@@ -147,8 +149,12 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
             tasks.listAppend("knock over the lantern");
             tasks.listAppend("dump out the drum");
             details.listAppend("Remember to use a chaos butterfly in combat before clearing the barn.|Then " + tasks.listJoinComponents(", ", "and") + ".");
+            
+            
+            if (__misc_state["free runs available"])
+                modifiers.listAppend("free runs in barn");
         }
-		optional_task_entries.listAppend(ChecklistEntryMake("Island War Farm", "bigisland.php?place=farm", ChecklistSubentryMake("Island War Farm Quest", "+meat", details), $locations[mcmillicancuddy's farm,mcmillicancuddy's barn,mcmillicancuddy's pond,mcmillicancuddy's back 40,mcmillicancuddy's other back 40,mcmillicancuddy's granary,mcmillicancuddy's bog,mcmillicancuddy's family plot,mcmillicancuddy's shady thicket]));
+		optional_task_entries.listAppend(ChecklistEntryMake("Island War Farm", "bigisland.php?place=farm", ChecklistSubentryMake("Island War Farm Quest", modifiers, details), $locations[mcmillicancuddy's farm,mcmillicancuddy's barn,mcmillicancuddy's pond,mcmillicancuddy's back 40,mcmillicancuddy's other back 40,mcmillicancuddy's granary,mcmillicancuddy's bog,mcmillicancuddy's family plot,mcmillicancuddy's shady thicket]));
 	}
 	if (!base_quest_state.state_boolean["Nuns Finished"])
 	{
@@ -172,6 +178,10 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
             
         if ($effect[Sinuses For Miles].have_effect() > 0 && get_property_int("lastTempleAdventures") != my_ascensions() && $item[stone wool].available_amount() > 0)
             details.listAppend("Potentially use stone wool and visit the hidden temple to extend Sinuses for Miles for 3 turns.");
+            
+            
+        if (lookupItem("Sneaky Pete's leather jacket (collar popped)").equipped_amount() > 0)
+            details.listAppend("Might want to unpop the collar. (+20% meat)");
 	
 		optional_task_entries.listAppend(ChecklistEntryMake("Island War Nuns", "bigisland.php?place=nunnery", ChecklistSubentryMake("Island War Nuns Quest", "+meat", details), $locations[the themthar hills]));
 	}
@@ -248,20 +258,32 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
                 details.listAppend("Need " + gunpowder_needed + " more barrel of gunpowder.");
             else
                 details.listAppend("Need " + gunpowder_needed + " more barrels of gunpowder.");
-                
-            float effective_combat_rate = clampNormalf(0.1 + combat_rate_modifier() / 100.0);
+            
+            
+            
+            //this is an approximation:
+            //off by a little over half a turn on average
+            float effective_combat_rate = (11.0 / 12.0) * clampNormalf(0.1 + combat_rate_modifier() / 100.0) + (1.0 / 12.0) * 1.0;
             float turns_per_lobster = -1.0;
             if (effective_combat_rate != 0.0)
                 turns_per_lobster = 1.0 / effective_combat_rate;
-            if (effective_combat_rate <= 0.0)
+                
+            
+            float turns_to_complete = gunpowder_needed.to_float() * turns_per_lobster;
+            
+            //I had the data lying around, so why not?
+            //misses <-10 and >30, but the estimate above will catch that
+            float [int][int] lfm_simulation_data;
+            lfm_simulation_data[5][-10] = 60.00; lfm_simulation_data[5][-5] = 40.02; lfm_simulation_data[5][0] = 29.92; lfm_simulation_data[5][5] = 23.84; lfm_simulation_data[5][10] = 19.76; lfm_simulation_data[5][15] = 16.84; lfm_simulation_data[5][20] = 14.66; lfm_simulation_data[5][25] = 13.00; lfm_simulation_data[4][-10] = 48.00; lfm_simulation_data[4][-5] = 32.27; lfm_simulation_data[4][0] = 24.20; lfm_simulation_data[4][5] = 19.29; lfm_simulation_data[4][10] = 16.00; lfm_simulation_data[4][15] = 13.68; lfm_simulation_data[4][20] = 11.96; lfm_simulation_data[4][25] = 10.63; lfm_simulation_data[3][-10] = 36.00; lfm_simulation_data[3][-5] = 24.53; lfm_simulation_data[3][0] = 18.47; lfm_simulation_data[3][5] = 14.78; lfm_simulation_data[3][10] = 12.34; lfm_simulation_data[3][15] = 10.59; lfm_simulation_data[3][20] = 9.26; lfm_simulation_data[3][25] = 8.20; lfm_simulation_data[2][-10] = 24.00; lfm_simulation_data[2][-5] = 16.79; lfm_simulation_data[2][0] = 12.84; lfm_simulation_data[2][5] = 10.38; lfm_simulation_data[2][10] = 8.68; lfm_simulation_data[2][15] = 7.40; lfm_simulation_data[2][20] = 6.40; lfm_simulation_data[2][25] = 5.60; lfm_simulation_data[1][-10] = 12.00; lfm_simulation_data[1][-5] = 9.19; lfm_simulation_data[1][0] = 7.17; lfm_simulation_data[1][5] = 5.72; lfm_simulation_data[1][10] = 4.66; lfm_simulation_data[1][15] = 3.87; lfm_simulation_data[1][20] = 3.29; lfm_simulation_data[1][25] = 2.84; lfm_simulation_data[5][26] = 12.71; lfm_simulation_data[5][27] = 12.44; lfm_simulation_data[5][28] = 12.18; lfm_simulation_data[5][29] = 11.93; lfm_simulation_data[5][30] = 11.69; lfm_simulation_data[4][26] = 10.40; lfm_simulation_data[4][27] = 10.17; lfm_simulation_data[4][28] = 9.96; lfm_simulation_data[4][29] = 9.75; lfm_simulation_data[4][30] = 9.56; lfm_simulation_data[3][26] = 8.01; lfm_simulation_data[3][27] = 7.83; lfm_simulation_data[3][28] = 7.65; lfm_simulation_data[3][29] = 7.48; lfm_simulation_data[3][30] = 7.32; lfm_simulation_data[2][26] = 5.46; lfm_simulation_data[2][27] = 5.33; lfm_simulation_data[2][28] = 5.20; lfm_simulation_data[2][29] = 5.07; lfm_simulation_data[2][30] = 4.96; lfm_simulation_data[1][26] = 2.76; lfm_simulation_data[1][27] = 2.69; lfm_simulation_data[1][28] = 2.62; lfm_simulation_data[1][29] = 2.56; lfm_simulation_data[1][30] = 2.50;
+            
+            if (lfm_simulation_data[gunpowder_needed] contains combat_rate_modifier().to_int())
             {
-                details.listAppend("Cannot complete at " + combat_rate_modifier().floor() + "% combat.");
+                turns_to_complete = lfm_simulation_data[gunpowder_needed][combat_rate_modifier().to_int()];
+                if (gunpowder_needed != 0.0)
+                    turns_per_lobster = turns_to_complete / gunpowder_needed.to_float();
             }
-            else
-            {
-                float turns_to_complete = gunpowder_needed.to_float() * turns_per_lobster;
-                details.listAppend("~" + roundForOutput(turns_to_complete, 1) + " turns to complete quest at " + combat_rate_modifier().floor() + "% combat.|~" + roundForOutput(turns_per_lobster, 1) + " turns per lobster.");
-            }
+            
+            details.listAppend("~" + roundForOutput(turns_to_complete, 1) + " turns to complete quest at " + combat_rate_modifier().floor() + "% combat.|~" + roundForOutput(turns_per_lobster, 1) + " turns per lobster.");
         }
         else
             details.listAppend("Talk to the lighthouse keeper.");

@@ -270,10 +270,22 @@ void SCOTGenerateResource(ChecklistEntry [int] available_resources_entries)
 		description.listAppend(enthroned_familiar + " enthroned.");
         //image_name = "__familiar " + enthroned_familiar.to_string();
     }
+    //FIXME my_bjorned_familiar() when 16.3
     
     string url = "familiar.php";
     if ($item[crown of thrones].equipped_amount() == 0 && lookupItem("Buddy Bjorn").equipped_amount() == 0)
         url = "inventory.php?which=2";
+        
+    string header = crown_item;
+    item [int] available_sources;
+    
+    if (lookupItem("Buddy Bjorn").available_amount() > 0)
+        available_sources.listAppend(lookupItem("Buddy Bjorn"));
+    if ($item[crown of thrones].available_amount() > 0)
+        available_sources.listAppend($item[crown of thrones]);
+    if (available_sources.count() > 0)
+        header = available_sources.listJoinComponents(", ", "and");
+        
     if (description.count() > 0)
-        available_resources_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(crown_item, "", description), 8));
+        available_resources_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(header, "", description), 8));
 }

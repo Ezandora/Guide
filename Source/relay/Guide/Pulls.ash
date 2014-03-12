@@ -136,10 +136,12 @@ void generatePullList(Checklist [int] checklists)
     }
     pullable_item_list.listAppend(GPItemMake($item[ice sickle], "+15ML 1h weapon|+item/+meat/+init foldables", 1));
 	pullable_item_list.listAppend(GPItemMake($item[camp scout backpack], "+15% items on back", 1));
-	pullable_item_list.listAppend(GPItemMake($item[flaming pink shirt], "+15% items on shirt" + (__misc_state["familiars temporarily blocked"] ? "" : "|Or extra experience on familiar."), 1));
-    
-    if (__misc_state["Need to level"] && $skill[Torso Awaregness].have_skill())
-        pullable_item_list.listAppend(GPItemMake($item[cane-mail shirt], "+20ML shirt", 1));
+    if (__misc_state["Torso aware"])
+    {
+        pullable_item_list.listAppend(GPItemMake($item[flaming pink shirt], "+15% items on shirt. (marginal)" + (__misc_state["familiars temporarily blocked"] ? "" : "|Or extra experience on familiar. (very marginal)"), 1));
+        if (__misc_state["Need to level"] && lookupItem("Sneaky Pete's leather jacket (collar popped)").available_amount() == 0 && lookupItem("Sneaky Pete's leather jacket").available_amount() == 0)
+            pullable_item_list.listAppend(GPItemMake($item[cane-mail shirt], "+20ML shirt", 1));
+    }
     
     
 	

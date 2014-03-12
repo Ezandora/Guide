@@ -38,7 +38,7 @@ boolean safeToLoadQuestLog()
     return true;
 }
 
-string shrinkQuestLog(string html)
+string shrinkKOLPage(string html)
 {
     int body_position = html.index_of("<body>");
     if (body_position != -1)
@@ -84,11 +84,11 @@ void requestQuestLogLoad(string property_name)
         string quest_log_2 = "";//visit_url("questlog.php?which=2");
         string quest_log_1 = "";//visit_url("questlog.php?which=1");
         if (quest_log_2.contains_text("Your Quest Log"))
-            set_property("__relay_guide_last_quest_log_2", shrinkQuestLog(quest_log_2));
+            set_property("__relay_guide_last_quest_log_2", shrinkKOLPage(quest_log_2));
         else
             stale = true;
         if (quest_log_1.contains_text("Your Quest Log"))
-            set_property("__relay_guide_last_quest_log_1", shrinkQuestLog(quest_log_1));
+            set_property("__relay_guide_last_quest_log_1", shrinkKOLPage(quest_log_1));
         else
             stale = true;
         set_property("__relay_guide_last_quest_log_reload_time", current_time.to_string());

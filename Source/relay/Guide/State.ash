@@ -492,7 +492,9 @@ void setUpState()
 	}
 	__misc_state_string["ballroom song"] = ballroom_song;
 	
-	
+	__misc_state["Torso aware"] = false;
+    if ($skill[Torso Awaregness].have_skill() || lookupSkill("Best Dressed").have_skill())
+        __misc_state["Torso aware"] = true;
 	
 	int hipster_fights_used = get_property_int("_hipsterAdv");
 	if (hipster_fights_used < 0) hipster_fights_used = 0;

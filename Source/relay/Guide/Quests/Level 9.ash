@@ -64,6 +64,11 @@ void QLevel9Init()
 		state.state_int["a-boo peak hauntedness"] = 0;
 	}
     
+    if (state.state_float["oil peak pressure"] > 500.0) //not sure what causes this. detecting this situation
+    {
+        state.state_float["oil peak pressure"] = 310.66;
+        state.state_boolean["oil peak pressure bug in effect"] = true;
+    }
     
     
     int twin_progress = state.state_int["twin peak progress"];
@@ -312,7 +317,11 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
                 
             if (fabs(pressure_reduced_per_turn) > 0.01)
                 turns_remaining_at_current_ml = ceil(base_quest_state.state_float["oil peak pressure"] / pressure_reduced_per_turn);
-            details.listAppend(pluralize(turns_remaining_at_current_ml, "turn", "turns") + " remaining at " + oil_ml + " ML.");
+            
+            string line2 = pluralize(turns_remaining_at_current_ml, "turn", "turns") + " remaining at " + oil_ml + " ML.";
+            if (base_quest_state.state_boolean["oil peak pressure bug in effect"])
+                line2 = "At most " + line2 + " (unable to track, sorry)";
+            details.listAppend(line2);
         }
 		if (need_jar_of_oil)
 		{

@@ -49,7 +49,8 @@ void SOldLevel9GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         //suggest faxing?
         if (__misc_state["fax accessible"])
             description.listAppend("Possibly fax the rampaging adding machine (with all scroll components) for one-turn quest.");
-        description.listAppend("Find rampaging adding machine, feed it 338 + 338, 30669 + 33398, 64067 + 668.");
+        description.listAppend("Find rampaging adding machine, feed it 334 + 334, 30669 + 33398, 64067 + 668.");
+        description.listAppend("31337 scroll is 30669 + 668. (334 + 334)");
     }
     ChecklistSubentry [int] subentries;
     subentries.listAppend(ChecklistSubentryMake("A Quest, LOL", "", description));

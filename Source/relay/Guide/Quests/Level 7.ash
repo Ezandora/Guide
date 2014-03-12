@@ -36,6 +36,18 @@ void QLevel7Init()
         state.state_int["nook evilness"] = 0;
     }
     
+    foreach l in $strings[alcove,cranny,niche,nook]
+    {
+        boolean need_speeding_up = false;
+        int evilness = state.state_int[l + " evilness"];
+        if (evilness <= 26)
+            need_speeding_up = false;
+        else
+            need_speeding_up = true;
+        state.state_boolean[l + " needs speed tricks"] = need_speeding_up;
+            
+    }
+    
 	if (state.state_int["alcove evilness"] == 0)
 		state.state_boolean["alcove finished"] = true;
 	if (state.state_int["cranny evilness"] == 0)
@@ -89,7 +101,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		
 		subentry.entries.listAppend(evilness_text["cyrptNookEvilness"]);
 		
-		if (evilness > 25)
+		if (evilness > 26)
 		{
             subentry.modifiers.listAppend("+400% item");
             float item_drop = (100.0 + item_drop_modifier()) / 100.0;

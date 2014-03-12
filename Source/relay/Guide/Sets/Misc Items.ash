@@ -329,6 +329,8 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
                 l = $location[the haunted gallery];
 			subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Powerlevelling (" + l + ")", l));
         }
+        if (!__quest_state["Level 13"].state_boolean["have relevant guitar"] && $item[big rock].available_amount() == 0)
+			subentry.entries.listAppend("Possible guitar, via big rock");
 		//put relevant tower items here
 		
 		available_resources_entries.listAppend(ChecklistEntryMake("clover", "", subentry, 7));
@@ -693,5 +695,22 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
         if (!$familiar[ninja pirate zombie robot].have_familiar())
             description += "|Unless you want to make an NPZR this ascension.";
         available_resources_entries.listAppend(ChecklistEntryMake("__item chest of the Bonerdagon", "inventory.php?which=3", ChecklistSubentryMake("chest of the Bonerdagon", "", description), importance_level_unimportant_item));
+    }
+    
+    if (lookupItem("smoke grenade").available_amount() > 0 && in_run)
+    {
+        string description = "Turn-costing banish. (lasts 20 turns, no stats, no items, no meat)";
+        available_resources_entries.listAppend(ChecklistEntryMake("__item smoke grenade", "", ChecklistSubentryMake(pluralize(lookupItem("Smoke grenade")), "", description), importance_level_unimportant_item));
+    }
+    
+    if (lookupItem("pile of ashes").available_amount() > 0 && in_run)
+    {
+        string description = "-10% combat. (20 turns)";
+        available_resources_entries.listAppend(ChecklistEntryMake("__item pile of ashes", "", ChecklistSubentryMake(pluralize(lookupItem("pile of ashes")), "", description), importance_level_unimportant_item));
+    }
+    if (lookupItem("7259").available_amount() > 0 && in_run)
+    {
+        string description = "Open for elemental damage combat items.";
+        available_resources_entries.listAppend(ChecklistEntryMake("__item " + lookupItem("7259"), "inventory.php?which=3", ChecklistSubentryMake(pluralize(lookupItem("7259")), "", description), importance_level_unimportant_item));
     }
 }
