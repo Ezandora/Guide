@@ -45,7 +45,9 @@ void QLevel11Init()
 		state.quest_name = "Palindome Quest";
 		state.image_name = "Palindome";
         
-        state.state_boolean["Need instant camera"] = false; //FIXME track this
+        state.state_boolean["Need instant camera"] = false;
+        if (lookupItem("photograph of a dog").available_amount() + lookupItem("disposable instant camera").available_amount() == 0 && state.mafia_internal_step < 3 && get_revision() >= 13870)
+            state.state_boolean["Need instant camera"] = true;
 		if (my_level() >= 11)
 			state.startable = true;
 		__quest_state["Level 11 Palindome"] = state;
@@ -300,8 +302,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
 {
 	if (!__quest_state["Level 11 Palindome"].in_progress)
         return;
-    //Some emergency exits in case the revamp doesn't detect properly: (not sure yet)
-    if (__quest_state["Level 11"].finished) //emergency tracking
+    if (__quest_state["Level 11"].finished)
         return;
     if ($items[staff of fats,Staff of Ed\, almost,Staff of Ed].available_amount() > 0)
         return;
@@ -367,8 +368,18 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
         
         */
         
-        //I think we need mafia tracking before interactive mode can work?
-        if ($item[mega gem].available_amount() > 0)
+        if (get_revision() < 13870) //not actually sure when palindome support went in, so just using a recent one
+        {
+            subentry.entries.listAppend("Update mafia to support revamp. Simple guide:");
+            subentry.entries.listAppend("First you adventure in the Palindome.|Find three photographs via non-combats(?), and take a picture of Bob Racecar/Racecar Bob with a disposable instant camera. (found in NC in haunted bedroom)|Olfact bob racecar/racecar bob.|Also, possibly find stunt nuts. (30% drop, +234% item)");
+            subentry.entries.listAppend("&quot;I Love Me, Vol.&quot; I will drop from the fifth dude-type monster. Read it to unlock Dr. Awkward's office.");
+            subentry.entries.listAppend("Place all four photographs on the shelves in the office.|Order is god, red nugget, dog, and ostrich egg.");
+            subentry.entries.listAppend("Read 2 Love Me, Vol. 2 to unlock Mr. Alarm's office.");
+            subentry.entries.listAppend("Talk to Mr. Alarm, unlock Whitey's Grove. Run +186% item, +combat to find lion oil and bird rib.|Or, alternatively, adventure in the palindome. I don't know the details, sorry.");
+            subentry.entries.listAppend("Cook wet stunt nut stew, talk to Mr. Alarm. He'll give you the Mega Gem.");
+            subentry.entries.listAppend("Equip that to fight Dr. Awkard in his office.");
+        }
+        else if ($item[mega gem].available_amount() > 0 || base_quest_state.mafia_internal_step == 5)
         {
             //5 -> fight dr. awkward
             string [int] tasks;
@@ -380,19 +391,24 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
             tasks.listAppend("fight Dr. Awkward");
             subentry.entries.listAppend(tasks.listJoinComponents(", ", "then").capitalizeFirstLetter() + ".");
         }
-        else if (false)
+        else if (base_quest_state.mafia_internal_step == 4 || base_quest_state.mafia_internal_step == 3)
         {
-            //acquire wet stunt nut stew, give to mr. alarm
-            //FIXME handle alternate route
-            
             //4 -> acquire wet stunt nut stew, give to mr. alarm
+            //FIXME handle alternate route
+            //step3 not supported yet, so we have this instead:
+            if (base_quest_state.mafia_internal_step == 3)
+                subentry.entries.listAppend("Use 2 Love Me, Vol. 2, then talk to Mr. Alarm in his office. Then:");
+            
             if ($item[wet stunt nut stew].available_amount() == 0)
             {
-                url = "place.php?whichplace=woods";
                 if (($item[bird rib].available_amount() > 0 && $item[lion oil].available_amount() > 0 || $item[wet stew].available_amount() > 0) && $item[stunt nuts].available_amount() > 0)
+                {
+                    url = "craft.php?mode=cook";
                     subentry.entries.listAppend("Cook wet stunt nut stew.");
+                }
                 else
                 {
+                    url = "place.php?whichplace=woods";
                     subentry.entries.listAppend("Acquire and make wet stunt nut stew.");
                     if ($item[wet stunt nut stew].available_amount() == 0 && $item[stunt nuts].available_amount() == 0)
                         subentry.entries.listAppend("Acquire stunt nuts from Bob Racecar or Racecar Bob in Palindome. (30% drop)");
@@ -412,6 +428,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                         if (!in_hardcore())
                             subentry.entries.listAppend("Or pull wet stew.");
                     }
+                    subentry.entries.listAppend("Or try the alternate route in the Palindome. (don't know how this works)");
                 }
             }
             else
@@ -421,13 +438,13 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                     subentry.entries.listAppend("Equip the Talisman o' Nam.");
             }
         }
-        else if (false)
+        else if (base_quest_state.mafia_internal_step == 3)
         {
             string [int] tasks;
             //talk to mr. alarm to unlock whitey's grove
             if (7270.to_item().available_amount() > 0)
             {
-                url = "inventory.php?which=3";
+                //url = "inventory.php?which=3";
                 tasks.listAppend("use 2 Love Me, Vol. 2");
             }
             if ($item[wet stunt nut stew].available_amount() > 0)
@@ -439,105 +456,118 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
             if ($item[talisman o' nam].equipped_amount() == 0)
                 subentry.entries.listAppend("Equip the Talisman o' Nam.");
         }
-        else if (false)
+        else
         {
+            boolean dr_awkwards_office_unlocked = false; //no way to track this at the moment
             string single_entry_mode = "";
-            //Do we have everything yet?
-            if (false)
+            boolean need_to_adventure_in_palindome = false;
+            boolean need_palindome_location = true;
+            
+            //Need:
+            //√Wet stunt nut stew / stunt nuts
+            //√"I Love Me, Vol. I" (7262)
+            //√instant camera -> 7263 photograph of a dog
+            //√7264 photograph of a red nugget
+            //√7265 photograph of an ostrich egg
+            //√photograph of god
+            subentry.entries.listAppend("Adventure in the palindome.");
+            
+            if (lookupItem("photograph of a dog").available_amount() == 0)
             {
-                //Yes - place everything on the shelves
-                if (false)
+                if (lookupItem("disposable instant camera").available_amount() == 0)
                 {
-                    //use book to unlock office
-                    url = "inventory.php?which=3";
-                    subentry.entries.listAppend("Read I Love Me, Vol I.");
+                    subentry.modifiers.listClear();
+                    subentry.modifiers.listAppend("-combat");
+                    url = "place.php?whichplace=spookyraven2";
+                    single_entry_mode = "Adventure in the haunted ballroom for a disposable instant camera.";
+                    need_palindome_location = false;
                 }
                 else
                 {
-                    subentry.entries.listAppend("Place items on shelves.|Order is god, red nugget, dog, and ostrich egg.");
+                    subentry.entries.listAppend("Photograph Bob Racecar or Racecar Bob with disposable instant camera.");
+                    need_to_adventure_in_palindome = true;
                 }
             }
-            else
+            
+            if ($item[stunt nuts].available_amount() + $item[wet stunt nut stew].available_amount() == 0 )
             {
-                //No
-                
-                //Need:
-                //√Wet stunt nut stew / stunt nuts
-                //√"I Love Me, Vol. I" (7262)
-                //√instant camera -> 7263 photograph of a dog
-                //√7264 photograph of a red nugget
-                //√7265 photograph of an ostrich egg
-                //√photograph of god
-                subentry.entries.listAppend("Adventure in the palindome.");
-                
-                if ($item[stunt nuts].available_amount() + $item[wet stunt nut stew].available_amount() == 0 )
-                {
-                    subentry.modifiers.listAppend("+234% item");
-                    subentry.entries.listAppend("Acquire stunt nuts from Bob Racecar or Racecar Bob. (30% drop)");
-                }
-                
-                if (7262.to_item().available_amount() == 0) //I love me, Vol. I
-                {
-                    subentry.entries.listAppend("Find I Love Me, Vol. I in-combat. Fifth(?) dude-type monster.");
-                }
-                
-                string [int] missing_ncs;
-                if (lookupItem("photograph of a red nugget").available_amount() == 0)
-                {
-                    missing_ncs.listAppend("photograph of a red nugget");
-                }
-                if (lookupItem("photograph of an ostrich egg").available_amount() == 0)
-                {
-                    missing_ncs.listAppend("photograph of an ostrich egg");
-                }
-                if ($item[photograph of god].available_amount() == 0)
-                {
-                    missing_ncs.listAppend("photograph of god");
-                }
-                if (missing_ncs.count() > 0)
-                    subentry.entries.listAppend("Find " + missing_ncs.listJoinComponents(", ", "and") + " from non-combats.|(unknown if affected by -combat");
-                
-                
-                
-                if (lookupItem("photograph of a dog").available_amount() == 0)
-                {
-                    if (lookupItem("disposable instant camera").available_amount() == 0)
-                    {
-                        url = "place.php?whichplace=spookyraven2";
-                        single_entry_mode = "Adventure in the haunted ballroom for a disposable instant camera.";
-                    }
-                    else
-                    {
-                        subentry.entries.listAppend("Photograph Bob Racecar or Racecar Bob with disposable instant camera.");
-                    }
-                }
-                
+                subentry.modifiers.listAppend("+234% item");
+                subentry.entries.listAppend("Possibly acquire stunt nuts from Bob Racecar or Racecar Bob. (30% drop)");
+                need_to_adventure_in_palindome = true;
             }
+            
+            
+            string [int] missing_ncs;
+            if (lookupItem("photograph of a red nugget").available_amount() == 0)
+            {
+                missing_ncs.listAppend("photograph of a red nugget");
+            }
+            if (lookupItem("photograph of an ostrich egg").available_amount() == 0)
+            {
+                missing_ncs.listAppend("photograph of an ostrich egg");
+            }
+            if ($item[photograph of god].available_amount() == 0)
+            {
+                missing_ncs.listAppend("photograph of god");
+            }
+            if (missing_ncs.count() > 0)
+            {
+                subentry.entries.listAppend("Find " + missing_ncs.listJoinComponents(", ", "and") + " from non-combats.|(unknown if affected by -combat)");
+                need_to_adventure_in_palindome = true;
+            }
+            
+            
+            
+            
+            //This must be after all other need_to_adventure_in_palindome checks:
+            if (7262.to_item().available_amount() == 0 && !dr_awkwards_office_unlocked) //I love me, Vol. I
+            {
+                if (__misc_state["have olfaction equivalent"] && __misc_state_string["olfaction equivalent monster"] != "Racecar Bob" && __misc_state_string["olfaction equivalent monster"] != "Bob Racecar" && __misc_state_string["olfaction equivalent monster"] != "Drab Bard")
+                {
+                    subentry.modifiers.listAppend("olfact racecar");
+                    subentry.entries.listAppend("Olfact Bob Racecar or Racecar Bob.");
+                }
+                string line = "Find I Love Me, Vol. I in-combat. Fifth dude-type monster.";
+                if (!need_to_adventure_in_palindome) //counts stunt nuts and photographs
+                    line += "|Well, unless you have already. If so, place the photographs in Dr. Awkward's Office.";
+                else
+                    line += "|Well, unless you have already.";
+                subentry.entries.listAppend(line);
+                need_to_adventure_in_palindome = true;
+            }
+            else if (7262.to_item().available_amount() > 0)
+            {
+                if (!need_to_adventure_in_palindome)
+                    url = "inventory.php?which=3";
+                subentry.entries.listAppend("Use I Love Me, Vol. I. Then place the photographs in Dr. Awkward's Office.");
+            }
+            
+            if (!need_to_adventure_in_palindome)
+            {
+                if (subentry.entries contains 0)
+                    remove subentry.entries[0]; //remove "Adventure in the palindome" by index - this is hacky
+            }
+            
+            if (!need_to_adventure_in_palindome && dr_awkwards_office_unlocked)
+            {
+                subentry.modifiers.listClear();
+                single_entry_mode = "Place items on shelves in Dr. Awkward's office.|Order is god, red nugget, dog, and ostrich egg.";
+            }
+                
             if (single_entry_mode.length() > 0)
             {
                 subentry.entries.listClear();
                 subentry.entries.listAppend(single_entry_mode);
             }
-            else
-            {
-                if ($item[talisman o' nam].equipped_amount() == 0)
-                    subentry.entries.listAppend("Equip the Talisman o' Nam.");
-            }
-        }
-        else
-        {
-            subentry.entries.listAppend("Quest was just revamped; here's a simple (and possibly inaccurate) guide:");
-            subentry.entries.listAppend("First you adventure in the Palindome.|Find three photographs via non-combats(?), and take a picture of Bob Racecar/Racecar Bob with a disposable instant camera. (found in NC in haunted bedroom)|Olfact bob racecar/racecar bob.|Also, possibly find stunt nuts. (30% drop, +234% item)");
-            subentry.entries.listAppend("&quot;I Love Me, Vol.&quot; I will drop from the fifth dude-type monster. Read it to unlock Dr. Awkward's office.");
-            subentry.entries.listAppend("Place all four photographs on the shelves in the office.|Order is god, red nugget, dog, and ostrich egg.");
-            subentry.entries.listAppend("Read 2 Love Me, Vol. 2 to unlock Mr. Alarm's office.");
-            subentry.entries.listAppend("Talk to Mr. Alarm, unlock Whitey's Grove. Run +186% item, +combat to find lion oil and bird rib.|Or, alternatively, adventure in the palindome. I don't know the details, sorry.");
-            subentry.entries.listAppend("Cook wet stunt nut stew, talk to Mr. Alarm. He'll give you the Mega Gem.");
-            subentry.entries.listAppend("Equip that to fight Dr. Awkard in his office.");
+            if (need_palindome_location && $item[talisman o' nam].equipped_amount() == 0)
+                subentry.entries.listAppend("Equip the Talisman o' Nam.");
         }
     }
+    
+    boolean [location] relevant_locations = makeConstantLocationArrayMutable($locations[the poop deck, belowdecks,cobb's knob laboratory,whitey's grove]);
+    relevant_locations[__location_palindome] = true;
 
-    task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the poop deck, belowdecks,the palindome,cobb's knob laboratory,whitey's grove]));
+    task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, relevant_locations));
 }
 
 void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -760,10 +790,30 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
                 next_position_needed = 1;
                 additional_turns_after_that = 0;
                 
-                int ed_ml = 180 + monster_level_adjustment_ignoring_plants();
-                task = "fight Ed in the lower chambers";
-                if (ed_ml > my_buffedstat($stat[moxie]))
-                    task += " (" + ed_ml + " attack)";
+                
+                string [int] semirare_turns = __misc_state_string["Turns until semi-rare"].split_string(",");
+                
+                boolean delay_for_semirare = false;
+                foreach key in semirare_turns
+                {
+                    int turns = semirare_turns[key].to_int();
+                    if (turns <= 6 && turns >= 0)
+                    {
+                        delay_for_semirare = true;
+                        break;
+                    }
+                }
+                if (delay_for_semirare)
+                {
+                    task = HTMLGenerateSpanFont("Avoid fighting Ed the Undying, semi-rare coming up", "red", "");
+                }
+                else
+                {
+                    int ed_ml = 180 + monster_level_adjustment_ignoring_plants();
+                    task = "fight Ed in the lower chambers";
+                    if (ed_ml > my_buffedstat($stat[moxie]))
+                        task += " (" + ed_ml + " attack)";
+                }
                 if (ed_waiting)
                     done_with_wheel_turning = true;
             }
@@ -1116,9 +1166,9 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                     subentry.entries.listAppend("Equipment unequipped: (+10% chance of protector spirit per piece)|*" + items_we_have_unequipped.listJoinComponents("|*"));
                 }
                 if (items_we_have_equipped.count() > 0)
-                {
-                    subentry.entries.listAppend((items_we_have_equipped.count() * 10) + "% chance of protector spirit encounter.");
-                }
+                    subentry.entries.listAppend((items_we_have_equipped.count() * 10) + "+?% chance of protector spirit encounter.");
+                else
+                    subentry.entries.listAppend("?% chance of protector spirit encounter.");
             }
             
             

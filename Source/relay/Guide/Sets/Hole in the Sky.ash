@@ -217,13 +217,16 @@ void QHitsGenerateMissingItems(ChecklistEntry [int] items_needed_entries)
 		return;
 	//is this the best way to convey this information?
 	//maybe all together instead? complicated...
+    string url = $location[the hole in the sky].getClickableURLForLocation();
+    if (!$location[the hole in the sky].locationAvailable())
+        url = $location[The Castle in the Clouds in the Sky (basement)].getClickableURLForLocation();
 	if ($item[richard's star key].available_amount() == 0)
 	{
 		string [int] oh_my_stars_and_gauze_garters;
 		oh_my_stars_and_gauze_garters.listAppend($item[star chart].available_amount() + "/1 star chart");
 		oh_my_stars_and_gauze_garters.listAppend($item[star].available_amount() + "/8 stars");
 		oh_my_stars_and_gauze_garters.listAppend($item[line].available_amount() + "/7 lines");
-		items_needed_entries.listAppend(ChecklistEntryMake("__item richard's star key", "", ChecklistSubentryMake("Richard's star key", "", oh_my_stars_and_gauze_garters.listJoinComponents(", ", "and"))));
+		items_needed_entries.listAppend(ChecklistEntryMake("__item richard's star key", url, ChecklistSubentryMake("Richard's star key", "", oh_my_stars_and_gauze_garters.listJoinComponents(", ", "and"))));
 	}
 	
 	if ($item[star hat].available_amount() == 0)
@@ -232,7 +235,7 @@ void QHitsGenerateMissingItems(ChecklistEntry [int] items_needed_entries)
 		oh_my_stars_and_gauze_garters.listAppend($item[star chart].available_amount() + "/1 star chart");
 		oh_my_stars_and_gauze_garters.listAppend($item[star].available_amount() + "/5 stars");
 		oh_my_stars_and_gauze_garters.listAppend($item[line].available_amount() + "/3 lines");
-		items_needed_entries.listAppend(ChecklistEntryMake("__item star hat", "", ChecklistSubentryMake("Star hat", "", oh_my_stars_and_gauze_garters.listJoinComponents(", ", "and"))));
+		items_needed_entries.listAppend(ChecklistEntryMake("__item star hat", url, ChecklistSubentryMake("Star hat", "", oh_my_stars_and_gauze_garters.listJoinComponents(", ", "and"))));
 	}
 	if ($item[star crossbow].available_amount() + $item[star staff].available_amount() + $item[star sword].available_amount() == 0)
 	{
@@ -240,13 +243,13 @@ void QHitsGenerateMissingItems(ChecklistEntry [int] items_needed_entries)
 		oh_my_stars_and_gauze_garters.listAppend($item[star chart].available_amount() + "/1 star chart");
 		oh_my_stars_and_gauze_garters.listAppend($item[star].available_amount() + "/[5, 6, or 7] stars");
 		oh_my_stars_and_gauze_garters.listAppend($item[line].available_amount() + "/[6, 5, or 4] lines");
-		items_needed_entries.listAppend(ChecklistEntryMake("__item star crossbow", "", ChecklistSubentryMake("Star crossbow, staff, or sword", "", oh_my_stars_and_gauze_garters.listJoinComponents(", ", "and"))));
+		items_needed_entries.listAppend(ChecklistEntryMake("__item star crossbow", url, ChecklistSubentryMake("Star crossbow, staff, or sword", "", oh_my_stars_and_gauze_garters.listJoinComponents(", ", "and"))));
 	}
 	if (!have_familiar_replacement($familiar[star starfish]) && !__misc_state["familiars temporarily blocked"])
 	{
 		if ($item[star starfish].available_amount() > 0)
 		{
-			items_needed_entries.listAppend(ChecklistEntryMake("__item star starfish", "", ChecklistSubentryMake("Star starfish", "", "You have one, use it.")));
+			items_needed_entries.listAppend(ChecklistEntryMake("__item star starfish", url, ChecklistSubentryMake("Star starfish", "", "You have one, use it.")));
 		}
 		else
 		{
@@ -254,7 +257,7 @@ void QHitsGenerateMissingItems(ChecklistEntry [int] items_needed_entries)
 			oh_my_stars_and_gauze_garters.listAppend($item[star chart].available_amount() + "/1 star chart");
 			oh_my_stars_and_gauze_garters.listAppend($item[star].available_amount() + "/6 stars");
 			oh_my_stars_and_gauze_garters.listAppend($item[line].available_amount() + "/4 lines");
-			items_needed_entries.listAppend(ChecklistEntryMake("__item star starfish", "", ChecklistSubentryMake("Star starfish", "", oh_my_stars_and_gauze_garters.listJoinComponents(", ", "and"))));
+			items_needed_entries.listAppend(ChecklistEntryMake("__item star starfish", url, ChecklistSubentryMake("Star starfish", "", oh_my_stars_and_gauze_garters.listJoinComponents(", ", "and"))));
 		}
 	}
 }

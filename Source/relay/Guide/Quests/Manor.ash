@@ -168,9 +168,8 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 		
 		if ($item[lord spookyraven's spectacles].available_amount() == 0)
 			subentry.entries.listAppend("Acquire Lord Spookyraven's spectacles from ornate drawer NC.");
-        //FIXME uncomment when test available:
-        if (/*__quest_state["Level 11 Palindome"].state_boolean["Need instant camera"] &&*/ 7266.to_item().available_amount() == 0)
-			subentry.entries.listAppend("Possibly acquire disposable instant camera from ornate drawer NC.");
+        if (__quest_state["Level 11 Palindome"].state_boolean["Need instant camera"] && 7266.to_item().available_amount() == 0)
+			subentry.entries.listAppend("Acquire disposable instant camera from ornate drawer NC.");
 		subentry.modifiers.listAppend("-combat");
 		subentry.entries.listAppend("Run -combat.");
         

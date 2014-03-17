@@ -9,6 +9,7 @@ void generateMissingItems(Checklist [int] checklists)
 	if (!__misc_state["In run"])
 		return;
 	
+    //thought about using getClickableURLForLocationIfAvailable for these, but our location detection is very poor, and there are corner cases regardless
 	
 	if (__misc_state["wand of nagamar needed"])
 	{
@@ -28,7 +29,7 @@ void generateMissingItems(Checklist [int] checklists)
 		if (__misc_state_int["heavy d needed"] > 0)
 			subentries[subentries.count()] = ChecklistSubentryMake("heavy D", "Clover or +150% item", listMake("Clover the castle basement", "Alphabet Giant - Castle Basement - 40% drop"));
 			
-		ChecklistEntry entry = ChecklistEntryMake("__item wand of nagamar", "", subentries);
+		ChecklistEntry entry = ChecklistEntryMake("__item wand of nagamar", $location[the castle in the clouds in the sky (basement)].getClickableURLForLocation(), subentries);
 		entry.should_indent_after_first_subentry = true;
 		
 		items_needed_entries.listAppend(entry);
@@ -56,7 +57,7 @@ void generateMissingItems(Checklist [int] checklists)
 		
 		if (!__quest_state["Level 13"].state_boolean["have relevant accordion"])
 		{
-			items_needed_entries.listAppend(ChecklistEntryMake("__item stolen accordion", "", ChecklistSubentryMake("Accordion", "", "Toy accordion, 150 meat")));
+			items_needed_entries.listAppend(ChecklistEntryMake("__item stolen accordion", "store.php?whichstore=z", ChecklistSubentryMake("Accordion", "", "Toy accordion, 150 meat")));
 		}
 		
 		if (!__quest_state["Level 13"].state_boolean["have relevant drum"])
@@ -68,7 +69,7 @@ void generateMissingItems(Checklist [int] checklists)
 			suggestions.listAppend("Jungle drum (pygmy assault squad, hidden park, 10% drop)");
 			suggestions.listAppend("Hippy bongo (YR hippy)");
 			suggestions.listAppend("tambourine?");
-			items_needed_entries.listAppend(ChecklistEntryMake("__item hippy bongo", "", ChecklistSubentryMake("Drum", "", suggestions)));
+			items_needed_entries.listAppend(ChecklistEntryMake("__item hippy bongo", $location[the black forest].getClickableURLForLocation(), ChecklistSubentryMake("Drum", "", suggestions)));
 		}
 		
 		if ($item[skeleton key].available_amount() == 0)
@@ -83,7 +84,7 @@ void generateMissingItems(Checklist [int] checklists)
 				line += " (need)";
 			else
 				line += " (have)";
-			items_needed_entries.listAppend(ChecklistEntryMake("__item skeleton key", "", ChecklistSubentryMake("Skeleton key", "", line)));
+			items_needed_entries.listAppend(ChecklistEntryMake("__item skeleton key", $location[the defiled nook].getClickableURLForLocation(), ChecklistSubentryMake("Skeleton key", "", line)));
 		}
 		
 		if ($item[digital key].available_amount() == 0)
@@ -100,6 +101,7 @@ void generateMissingItems(Checklist [int] checklists)
                     options.listAppend("Fax/copy a ghost");
                 options.listAppend("8-bit realm (olfact blooper, slow)");
             }
+            //FIXME URL?
 			items_needed_entries.listAppend(ChecklistEntryMake("__item digital key", "", ChecklistSubentryMake("Digital key", "", options)));
 		}
 		string from_daily_dungeon_string = "From daily dungeon";
@@ -135,6 +137,8 @@ void generateMissingItems(Checklist [int] checklists)
 	if (!__quest_state["Level 13"].state_boolean["past tower"])
 	{
 		string [item] telescope_item_suggestions;
+        
+        string [item] telescope_item_url;
 		
 		//FIXME support __misc_state["can use clovers"] for these
 		telescope_item_suggestions[$item[mick's icyvapohotness rub]] = "Raver giant, top floor of castle, 30% drop";
@@ -161,6 +165,8 @@ void generateMissingItems(Checklist [int] checklists)
 		telescope_item_suggestions[$item[gremlin juice]] = "Any gremlin, Junkyard, 3% drop (yellow ray)";
 		telescope_item_suggestions[$item[Angry Farmer candy]] = "Need sugar rush";
 		
+        if (gnomads_available())
+            telescope_item_suggestions[$item[Angry Farmer candy]] += "|*Marzipan skull, bought from Gno-Mart";
 		if (have_skill($skill[summon crimbo candy]))
 			telescope_item_suggestions[$item[Angry Farmer candy]] += "|*Summon crimbo candy";
 		else if (have_skill($skill[candyblast]))
@@ -188,6 +194,51 @@ void generateMissingItems(Checklist [int] checklists)
 		telescope_item_suggestions[$item[tropical orchid]] = "Tropical island souvenir crate (vacation)";
 		telescope_item_suggestions[$item[stick of dynamite]] = "Dude ranch souvenir crate (vacation)";
 		telescope_item_suggestions[$item[barbed-wire fence]] = "Ski resort souvenir crate (vacation)";
+        
+        
+        telescope_item_url[$item[razor-sharp can lid]] = $location[the haunted pantry].getClickableURLForLocation();
+        telescope_item_url[$item[spider web]] = $location[the sleazy back alley].getClickableURLForLocation();
+        telescope_item_url[$item[frigid ninja stars]] = $location[lair of the ninja snowmen].getClickableURLForLocation();
+        telescope_item_url[$item[hair spray]] = "store.php?whichstore=m";
+        telescope_item_url[$item[baseball]] = $location[guano junction].getClickableURLForLocation();
+        telescope_item_url[$item[sonar-in-a-biscuit]] = $location[the batrat and ratbat burrow].getClickableURLForLocation();
+        telescope_item_url[$item[NG]] = $location[the castle in the clouds in the sky (basement)].getClickableURLForLocation();
+        telescope_item_url[$item[disease]] = $location[cobb's knob harem].getClickableURLForLocation();
+        telescope_item_url[$item[photoprotoneutron torpedo]] = $location[the penultimate fantasy airship].getClickableURLForLocation();
+        telescope_item_url[$item[chaos butterfly]] = $location[the castle in the clouds in the sky (ground floor)].getClickableURLForLocation();
+        telescope_item_url[$item[leftovers of indeterminate origin]] = $location[the haunted kitchen].getClickableURLForLocation();
+        telescope_item_url[$item[powdered organs]] = $location[the upper chamber].getClickableURLForLocation();
+        telescope_item_url[$item[plot hole]] = $location[the castle in the clouds in the sky (ground floor)].getClickableURLForLocation();
+        telescope_item_url[$item[inkwell]] = $location[the haunted library].getClickableURLForLocation();
+        telescope_item_url[$item[Knob Goblin firecracker]] = $location[the outskirts of cobb's knob].getClickableURLForLocation();
+        telescope_item_url[$item[mariachi G-string]] = $location[south of the border].getClickableURLForLocation();
+        telescope_item_url[$item[pygmy blowgun]] = $location[the hidden park].getClickableURLForLocation();
+        telescope_item_url[$item[fancy bath salts]] = $location[the haunted bathroom].getClickableURLForLocation();
+        telescope_item_url[$item[black pepper]] = $location[the black forest].getClickableURLForLocation();
+        telescope_item_url[$item[bronzed locust]] = $location[the arid\, extra-dry desert].getClickableURLForLocation();
+        telescope_item_url[$item[meat vortex]] = $location[The valley of rof l'm fao].getClickableURLForLocation();
+        telescope_item_url[$item[barbed-wire fence]] = $location[The Shore\, Inc. Travel Agency].getClickableURLForLocation();
+        telescope_item_url[$item[stick of dynamite]] = $location[The Shore\, Inc. Travel Agency].getClickableURLForLocation();
+        telescope_item_url[$item[tropical orchid]] = $location[The Shore\, Inc. Travel Agency].getClickableURLForLocation();
+        if (__quest_state["Level 6"].finished)
+            telescope_item_url[$item[wussiness potion]] = $location[pandamonium slums].getClickableURLForLocation();
+        else
+            telescope_item_url[$item[wussiness potion]] = $location[The Dark Neck of the Woods].getClickableURLForLocation();
+        if (__quest_state["Level 12"].finished)
+            telescope_item_url[$item[gremlin juice]] = $location[post-war junkyard].getClickableURLForLocation();
+        else
+            telescope_item_url[$item[gremlin juice]] = $location[next to that barrel with something burning in it].getClickableURLForLocation();
+        if (gnomads_available())
+            telescope_item_url[$item[Angry Farmer candy]] = ""; //need the URL to gno-mart
+        else
+            telescope_item_url[$item[Angry Farmer candy]] = $location[the castle in the clouds in the sky (top floor)].getClickableURLForLocation();
+        telescope_item_url[$item[thin black candle]] = $location[the castle in the clouds in the sky (top floor)].getClickableURLForLocation();
+        telescope_item_url[$item[Mick's IcyVapoHotness Rub]] = $location[the castle in the clouds in the sky (basement)].getClickableURLForLocation();
+        telescope_item_url[$item[pygmy pygment]] = $location[the hidden park].getClickableURLForLocation();
+        telescope_item_url[$item[super-spiky hair gel]] = $location[the penultimate fantasy airship].getClickableURLForLocation();
+        telescope_item_url[$item[adder bladder]] = $location[the black forest].getClickableURLForLocation();
+        telescope_item_url[$item[Black No. 2]] = $location[the black forest].getClickableURLForLocation();
+        
 		
 		if (familiar_is_usable($familiar[gelatinous cubeling]))
 		{
@@ -217,7 +268,7 @@ void generateMissingItems(Checklist [int] checklists)
 		
 		item [item][int] item_equivalents_lookup;
 		item_equivalents_lookup[$item[angry farmer candy]] = listMakeBlankItem();
-        foreach it in $items[that gum you like,Crimbo fudge,Crimbo peppermint bark,Crimbo candied pecan,cold hots candy,Daffy Taffy,Senior Mints,Wint-O-Fresh mint]
+        foreach it in $items[that gum you like,Crimbo fudge,Crimbo peppermint bark,Crimbo candied pecan,cold hots candy,Daffy Taffy,Senior Mints,Wint-O-Fresh mint,stick of &quot;gum&quot;,pack of KWE trading card]
             item_equivalents_lookup[$item[angry farmer candy]].listAppend(it);
 		
 		int [item] towergate_items_needed_count; //bees hate you has duplicates
@@ -258,7 +309,11 @@ void generateMissingItems(Checklist [int] checklists)
 						details.listAppend("Tower item - towerkill?");
 					if (telescope_item_suggestions contains it)
 						details.listAppend(telescope_item_suggestions[it]);
-					items_needed_entries.listAppend(ChecklistEntryMake(it, "", ChecklistSubentryMake(it, "", details)));
+                    string url = "";
+                    if (telescope_item_url contains it)
+                        url = telescope_item_url[it];
+                    
+					items_needed_entries.listAppend(ChecklistEntryMake(it, url, ChecklistSubentryMake(it, "", details)));
 				}
 				
 			}
@@ -289,11 +344,11 @@ void generateMissingItems(Checklist [int] checklists)
     }
 	
 	if ($item[lord spookyraven's spectacles].available_amount() == 0)
-		items_needed_entries.listAppend(ChecklistEntryMake("__item lord spookyraven's spectacles", "", ChecklistSubentryMake("lord spookyraven's spectacles", "", "Found in Haunted Bedroom")));
+		items_needed_entries.listAppend(ChecklistEntryMake("__item lord spookyraven's spectacles", $location[the haunted bedroom].getClickableURLForLocation(), ChecklistSubentryMake("lord spookyraven's spectacles", "", "Found in Haunted Bedroom")));
     
     if ($item[enchanted bean].available_amount() == 0 && !__quest_state["Level 10"].state_boolean["Beanstalk grown"])
     {
-		items_needed_entries.listAppend(ChecklistEntryMake("__item enchanted bean", "", ChecklistSubentryMake("Enchanted bean", "", "Found in the beanbat chamber.")));
+		items_needed_entries.listAppend(ChecklistEntryMake("__item enchanted bean", $location[The Beanbat Chamber].getClickableURLForLocation(), ChecklistSubentryMake("Enchanted bean", "", "Found in the beanbat chamber.")));
     }
     
     if (__quest_state["Level 13"].state_boolean["shadow will need to be defeated"])
@@ -314,7 +369,7 @@ void generateMissingItems(Checklist [int] checklists)
             string url = "";
             if ($location[the haunted bedroom].locationAvailable())
                 url = "place.php?whichplace=spookyraven2";
-            items_needed_entries.listAppend(ChecklistEntryMake("__item " + camera, "", ChecklistSubentryMake("Disposable instant camera", url, "Found in the Haunted Bedroom.")));
+            items_needed_entries.listAppend(ChecklistEntryMake("__item " + camera, $location[the haunted bedroom].getClickableURLForLocation(), ChecklistSubentryMake("Disposable instant camera", url, "Found in the Haunted Bedroom.")));
         }
     }
                                

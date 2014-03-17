@@ -132,7 +132,7 @@ void generateTasks(Checklist [int] checklists)
 	if (my_path_id() == PATH_BUGBEAR_INVASION)
 	{
 		
-		task_entries.listAppend(ChecklistEntryMake("bugbear", "", ChecklistSubentryMake("Bugbears!", "", "I have no idea")));
+		task_entries.listAppend(ChecklistEntryMake("bugbear", "", ChecklistSubentryMake("Bugbears!", "", "I have no idea.")));
 	}
 	
 	
@@ -146,9 +146,38 @@ void generateTasks(Checklist [int] checklists)
 		subentry.header = "Level to " + (my_level() + 1);
 		
 		subentry.entries.listAppend("Gain " + substats_remaining + " substats.");
+        
+        string url = "";
+        
+        if (my_primestat() == $stat[muscle] && $location[the haunted billiards room].locationAvailable())
+            url = $location[the haunted gallery].getClickableURLForLocation();
+        else if (my_primestat() == $stat[mysticality] && $location[the haunted bedroom].locationAvailable())
+            url = $location[the haunted bathroom].getClickableURLForLocation();
+        else if (my_primestat() == $stat[moxie] && $location[the haunted bedroom].locationAvailable())
+            url = $location[the haunted ballroom].getClickableURLForLocation();
+        
+        string image_name = "player character";
+        
+        if (false)
+        {
+            //vertically less imposing:
+            //disabled for now - player avatars look better. well, sneaky pete's avatar looks better...
+            image_name = "mini-adventurer blank female";
+            
+            string [class] class_images;
+            class_images[$class[seal clubber]] = "mini-adventurer seal clubber female";
+            class_images[$class[turtle tamer]] = "mini-adventurer turtle tamer female";
+            class_images[$class[pastamancer]] = "mini-adventurer pastamancer female";
+            class_images[$class[sauceror]] = "mini-adventurer sauceror female";
+            class_images[$class[disco bandit]] = "mini-adventurer disco bandit female";
+            class_images[$class[accordion thief]] = "mini-adventurer accordion thief female";
+            
+            if (class_images contains my_class())
+                image_name = class_images[my_class()];
+        }
 		
 		
-		task_entries.listAppend(ChecklistEntryMake("player character", "", subentry, 11));
+		task_entries.listAppend(ChecklistEntryMake(image_name, url, subentry, 11));
 	}
 	
 	
@@ -205,7 +234,7 @@ void generateTasks(Checklist [int] checklists)
     if (__misc_state["In run"] && !have_mushroom_plot() && knoll_available() && __misc_state["can eat just about anything"] && fullness_limit() >= 4 && $item[spooky mushroom].available_amount() == 0 && my_path_id() != PATH_WAY_OF_THE_SURPRISING_FIST && my_meat() >= 5000)
     {
         string [int] description;
-        description.listAppend("For spooky mushrooms, to cook a grue egg omelette. (epic food)|Will " + ((my_meat() < 5000) ? "need" : "cost") + " 5k meat.");
+        description.listAppend("For spooky mushrooms, to cook a grue egg omelette. (epic food)|Will " + ((my_meat() < 5000) ? "need" : "cost") + " 5k meat. Plant a spooky spore.");
 		optional_task_entries.listAppend(ChecklistEntryMake("__item spooky mushroom", "knoll_mushrooms.php", ChecklistSubentryMake("Possibly plant a mushroom plot", "", description), 5));
     
     }

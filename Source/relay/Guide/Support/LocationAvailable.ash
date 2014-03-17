@@ -5,6 +5,28 @@ import "relay/Guide/Support/Error.ash"
 import "relay/Guide/Support/List.ash"
 import "relay/Guide/Support/Library.ash"
 
+
+//Version compatibility locations:
+location __location_palindome;
+
+boolean __location_compatibility_inited = false;
+//Should probably be called manually, as a backup:
+void locationCompatibilityInit()
+{
+    //Different versions refer to locations by different names.
+    //For instance, pre-13878 versions refer to the palindome as "The Palindome". Versions after that refer it to "Inside the Palindome".
+    //This method provides correct lookups for both versions, without warnings.
+    if (__location_compatibility_inited)
+        return;
+    __location_compatibility_inited = true;
+    
+    __location_palindome = "Inside the Palindome".to_location();
+    if (__location_palindome == $location[none])
+        __location_palindome = "The Palindome".to_location();
+}
+
+locationCompatibilityInit(); //not sure if calling functions like this is intended. may break in the future?
+
 boolean [location] __la_location_is_available;
 
 boolean __la_commons_were_inited = false;
@@ -85,7 +107,10 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
 			return locationQuestPropertyPastInternalStepNumber("questL02Larva", 1);
 		case $location[The Smut Orc Logging Camp]:
 			return locationQuestPropertyPastInternalStepNumber("questL09Topping", 1);
+		case $location[the black forest]:
+			return locationQuestPropertyPastInternalStepNumber("questL11MacGuffin", 1);
 		case $location[guano junction]:
+		case $location[the bat hole entrance]:
 			return locationQuestPropertyPastInternalStepNumber("questL04Bat", 1);
 		case $location[itznotyerzitz mine]:
 			return locationQuestPropertyPastInternalStepNumber("questL08Trapper", 2);
@@ -302,9 +327,9 @@ string getClickableURLForLocation(location l)
             __urls_for_locations[l] = "place.php?whichplace=plains";
             
         if ($item[talisman o' nam].equipped_amount() == 0)
-            __urls_for_locations[$location[The Palindome]] = "inventory.php?which=2";
+            __urls_for_locations[__location_palindome] = "inventory.php?which=2";
         else
-            __urls_for_locations[$location[The Palindome]] = "place.php?whichplace=palindome";
+            __urls_for_locations[__location_palindome] = "place.php?whichplace=palindome";
         
         if ($location[cobb's knob barracks].locationAvailable())
             __urls_for_locations[$location[The Outskirts of Cobb's Knob]] = "cobbsknob.php";
@@ -322,6 +347,8 @@ string getClickableURLForLocation(location l)
         else
             __urls_for_locations[$location[The Haunted Pantry]] = "place.php?whichplace=town_right";
             
+            
+        
             
         foreach l in $locations[The Oasis, the arid\, extra-dry desert, south of the border, The Shore\, Inc. Travel Agency]
             __urls_for_locations[l] = "place.php?whichplace=desertbeach";
@@ -341,9 +368,17 @@ string getClickableURLForLocation(location l)
         foreach l in $locations[the hidden apartment building, the hidden hospital, the hidden office building, the hidden bowling alley, the hidden park]
             __urls_for_locations[l] = "place.php?whichplace=hiddencity";
             
+        foreach l in $locations[The Dark Neck of the Woods,The Dark Heart of the Woods,The Dark Elbow of the Woods]
+            __urls_for_locations[l] = "friars.php";
+        __urls_for_locations[$location[pandamonium slums]] = "pandamonium.php";
+            
         foreach l in $locations[the extreme slope, the icy peak, lair of the ninja snowmen, the goatlet, itznotyerzitz mine]
             __urls_for_locations[l] = "place.php?whichplace=mclargehuge";
             
+        foreach l in $locations[the upper chamber, the middle chamber, the lower chambers]
+            __urls_for_locations[l] = "pyramid.php";
+            
+        __urls_for_locations[$location[The valley of rof l'm fao]] = "place.php?whichplace=mountains";
             
         foreach l in $locations[the poop deck, Barrrney's Barrr, the f'c'le, belowdecks]
             __urls_for_locations[l] = "place.php?whichplace=cove";
@@ -402,7 +437,10 @@ string getClickableURLForLocation(location l)
             __urls_for_locations[l] = "cobbsknob.php?action=tomenagerie";
         foreach l in $locations[cobb's knob laboratory,the knob shaft]
             __urls_for_locations[l] = "cobbsknob.php?action=tolabs";
-            
+        
+        foreach l in $locations[the defiled nook,the defiled niche,the defiled cranny,the defiled alcove]
+            __urls_for_locations[l] = "crypt.php";
+        
         foreach l in $locations[the degrassi knoll restroom, the degrassi knoll bakery, the degrassi knoll gym, the degrassi knoll garage]
         {
             if (knoll_available())
@@ -415,10 +453,28 @@ string getClickableURLForLocation(location l)
             __urls_for_locations[$location[the nightmare meatrealm]] = "place.php?whichplace=junggate_6";
         else
             __urls_for_locations[$location[the nightmare meatrealm]] = "mall.php";
+            
+            
+        foreach l in $locations[next to that barrel with something burning in it,near an abandoned refrigerator,over where the old tires are,out by that rusted-out car]
+            __urls_for_locations[l] = "bigisland.php?place=junkyard";
+        
+        __urls_for_locations[$location[post-war junkyard]] = "postwarisland.php";
         __urls_for_locations_initialized = true;
     }
     
     if (__urls_for_locations contains l)
         return __urls_for_locations[l];
     return "";
+}
+
+string getClickableURLForLocationIfAvailable(location l)
+{
+    Error able_to_find;
+    boolean found = l.locationAvailable(able_to_find);
+    if (able_to_find.was_error) //assume it's available, since we don't know
+        found = true;
+    if (found)
+        return l.getClickableURLForLocation();
+    else
+        return "";
 }

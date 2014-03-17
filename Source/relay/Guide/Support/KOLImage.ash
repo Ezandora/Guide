@@ -242,6 +242,13 @@ void KOLImagesInit()
 	__kol_images["__skill jump shark"] = KOLImageMake("images/itemimages/sharkfin.gif", Vec2iMake(30,30));
 	__kol_images["__skill Natural Dancer"] = KOLImageMake("images/itemimages/dance3.gif", Vec2iMake(30,30));
     
+	__kol_images["mini-adventurer blank female"] = KOLImageMake("images/itemimages/miniadv0f.gif", Vec2iMake(30,30));
+	__kol_images["mini-adventurer seal clubber female"] = KOLImageMake("images/itemimages/miniadv1f.gif", Vec2iMake(30,30));
+	__kol_images["mini-adventurer turtle tamer female"] = KOLImageMake("images/itemimages/miniadv2f.gif", Vec2iMake(30,30));
+	__kol_images["mini-adventurer pastamancer female"] = KOLImageMake("images/itemimages/miniadv3f.gif", Vec2iMake(30,30));
+	__kol_images["mini-adventurer sauceror female"] = KOLImageMake("images/itemimages/miniadv4f.gif", Vec2iMake(30,30));
+	__kol_images["mini-adventurer disco bandit female"] = KOLImageMake("images/itemimages/miniadv5f.gif", Vec2iMake(30,30));
+	__kol_images["mini-adventurer accordion thief female"] = KOLImageMake("images/itemimages/miniadv6f.gif", Vec2iMake(30,30));
     
 	
 	string class_name = my_class().to_string();

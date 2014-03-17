@@ -8,8 +8,10 @@ void SDispensaryGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
 	if (!__misc_state["can equip just about any weapon"]) //need to wear KGE to learn the password
 		return;
 	
-	if (!__quest_state["Level 5"].started || !locationAvailable($location[cobb's knob barracks]))
+	if (!__quest_state["Level 5"].started || !$location[cobb's knob barracks].locationAvailable())
 		return;
+    if (__quest_state["Level 5"].finished && !have_outfit_components("Knob Goblin Elite Guard Uniform")) //level 5 quest completed, but they don't have KGE - I think we'll close the suggestion here, as they probably don't want to go back? maybe? it'll still show up in semi-rare if they care to
+        return;
 	
 	ChecklistSubentry subentry;
 	subentry.header = "Unlock Cobb's Knob Dispensary";

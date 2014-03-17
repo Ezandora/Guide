@@ -188,18 +188,23 @@ void setUpState()
 	__misc_state["free runs available"] = free_runs_available;
 	
 	
-	
+	string olfacted_monster = "";
 	boolean some_olfact_available = false;
 	if (have_skill($skill[Transcendent Olfaction]))
+    {
 		some_olfact_available = true;
+        if ($effect[on the trail].have_effect() > 0)
+            olfacted_monster = get_property("olfactedMonster");
+    }
     if ($item[odor extractor].available_amount() > 0)
         some_olfact_available = true;
-    if ($familiar[nosy nose].familiar_is_usable()) //weakened, but still relevantw
+    if ($familiar[nosy nose].familiar_is_usable()) //weakened, but still relevant
         some_olfact_available = true;
     if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE)
         some_olfact_available = true;
 		
 	__misc_state["have olfaction equivalent"] = some_olfact_available;
+    __misc_state_string["olfaction equivalent monster"] = olfacted_monster;
 	
 	
 	boolean skills_temporarily_missing = false;

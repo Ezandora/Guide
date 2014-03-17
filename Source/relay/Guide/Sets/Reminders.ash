@@ -258,7 +258,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         boolean delay_for_semirare = false;
         foreach key in semirare_turns
         {
-            if (semirare_turns[key] == 3)
+            if (semirare_turns[key].to_int() == 3)
             {
                 delay_for_semirare = true;
                 break;

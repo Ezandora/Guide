@@ -190,6 +190,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
 	{
 		string [int] details;
 		string [int] modifiers;
+        string url = "place.php?whichplace=highlands";
 		
 		if (base_quest_state.state_boolean["can complete twin peaks quest quickly"])
 		{
@@ -223,6 +224,8 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
                 else
                     details.listAppend("Use rusty hedge trimmers.");
             }
+            if ($item[rusty hedge trimmers].available_amount() >= options_left.count()) //purely trimmers, now
+                url = "inventory.php?which=3";
 			if (numeric_modifier("stench resistance") < 4.0 && !stench_completed)
             {
 				details.listAppend("+" + (4.0 - numeric_modifier("stench resistance")).floor() + " more " + HTMLGenerateSpanOfClass("stench", "r_element_stench") + " resist required.");
@@ -264,7 +267,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
 		{
 			details.listAppend("Spend 50 total turns in the twin peak.");
 		}
-		task_entries.listAppend(ChecklistEntryMake("twin peak", "place.php?whichplace=highlands", ChecklistSubentryMake("Twin Peak", modifiers, details), $locations[twin peak]));
+		task_entries.listAppend(ChecklistEntryMake("twin peak", url, ChecklistSubentryMake("Twin Peak", modifiers, details), $locations[twin peak]));
 	}
     boolean need_jar_of_oil = false;
     if ($item[jar of oil].available_amount() == 0 && $item[bubblin' crude].available_amount() < 12 && !base_quest_state.state_boolean["Peak Jar Completed"] && base_quest_state.state_boolean["can complete twin peaks quest quickly"])
@@ -322,6 +325,9 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
             if (base_quest_state.state_boolean["oil peak pressure bug in effect"])
                 line2 = "At most " + line2 + " (unable to track, sorry)";
             details.listAppend(line2);
+            
+            if (oil_ml < 50 && $item[dress pants].available_amount() == 0 && !in_hardcore())
+                details.listAppend("If you can't reach +50 ML or more, possibly consider pulling and wearing dress pants. (lazy pull, doesn't add ML but saves 4 or 24 turns)");
         }
 		if (need_jar_of_oil)
 		{

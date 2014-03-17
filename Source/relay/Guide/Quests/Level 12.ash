@@ -46,7 +46,7 @@ void QLevel12Init()
 		state.state_boolean["Orchard Finished"] = false;
 	}
 	
-	if (my_level() >= 12 && ($location[The Palindome].turnsAttemptedInLocation() > 0 || $items[mega gem,&quot;I Love Me\, Vol. I&quot;,Staff of Ed,Staff of Fats,Staff of Ed\, almost].available_amount() > 0))
+	if (my_level() >= 12 && (__location_palindome.turnsAttemptedInLocation() > 0 || $items[mega gem,&quot;I Love Me\, Vol. I&quot;,Staff of Ed,Staff of Fats,Staff of Ed\, almost].available_amount() > 0))
 		state.startable = true;
     
 	__quest_state["Level 12"] = state;
@@ -180,7 +180,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
             details.listAppend("Potentially use stone wool and visit the hidden temple to extend Sinuses for Miles for 3 turns.");
             
             
-        if (lookupItem("Sneaky Pete's leather jacket (collar popped)").equipped_amount() > 0)
+        if (lookupItem("Sneaky Pete's leather jacket (collar popped)").equipped_amount() > 0 && turn_range.y > 1)
             details.listAppend("Might want to unpop the collar. (+20% meat)");
 	
 		optional_task_entries.listAppend(ChecklistEntryMake("Island War Nuns", "bigisland.php?place=nunnery", ChecklistSubentryMake("Island War Nuns Quest", "+meat", details), $locations[the themthar hills]));

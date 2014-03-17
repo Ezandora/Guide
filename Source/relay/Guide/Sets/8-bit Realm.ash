@@ -48,6 +48,8 @@ void S8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         }
         else if ($item[psychoanalytic jar].available_amount() > 0)
         {
+            if (my_level() < 2) //no woods yet
+                return;
             active_url = "place.php?whichplace=forestvillage";
             title = "Psychoanalyze the crackpot mystic";
             description.listAppend("Fear Man's level access, for digital key.");

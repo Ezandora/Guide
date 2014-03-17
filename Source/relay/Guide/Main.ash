@@ -177,7 +177,7 @@ void generateMisc(Checklist [int] checklists)
 		checklists.listAppend(ChecklistMake("Unimportant Tasks", unimportant_task_entries));
 	}
 	
-	if (availableDrunkenness() < 0 && $item[drunkula's wineglass].equipped_amount() == 0) //assuming in advance sneaky pete has some sort of drunkenness adventures
+	if (availableDrunkenness() < 0 && $item[drunkula's wineglass].equipped_amount() == 0)
 	{
         //They're drunk, so tasks aren't as relevant. Re-arrange everything:
         string url;
@@ -498,7 +498,7 @@ string generateRandomMessage()
     if (__misc_state["free runs usable"])
         familiar_messages[$familiar[Pair of Stomping Boots]] = "running away again?";
     familiar_messages[$familiar[baby sandworm]] = "the waters of life";
-    familiar_messages[$familiar[baby bugged bugbear]] = "expected }, found ; (Main.ash, line 495)";
+    familiar_messages[$familiar[baby bugged bugbear]] = "expected }, found ; (Main.ash, line 501)";
     familiar_messages[$familiar[mechanical songbird]] = "a little glowing friend";
     familiar_messages[$familiar[nanorhino]] = "write every day";
     familiar_messages[$familiar[rogue program]] = "ascends for the users";
@@ -971,6 +971,8 @@ void runMain(string relay_filename)
 		__misc_state["Example mode"] = true;
 	}
 	
+    
+    locationCompatibilityInit();
 	PageInit();
 	ChecklistInit();
 	setUpCSSStyles();

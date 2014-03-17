@@ -140,6 +140,24 @@ boolean in_ronin()
 	return !can_interact();
 }
 
+
+boolean [item] makeConstantItemArrayMutable(boolean [item] array)
+{
+    boolean [item] result;
+    foreach l in array
+        array[l] = array[l];
+    
+    return result;
+}
+boolean [location] makeConstantLocationArrayMutable(boolean [location] locations)
+{
+    boolean [location] result;
+    foreach l in locations
+        result[l] = locations[l];
+    
+    return result;
+}
+
 //split_string returns an immutable array, which will error on certain edits
 //Use this function - it converts to an editable map.
 string [int] split_string_mutable(string source, string delimiter)
@@ -556,6 +574,21 @@ boolean [skill] lookupSkills(string names) //CSV input
     foreach key in skill_names
     {
         skill s = skill_names[key].to_skill();
+        if (s == $skill[none])
+            continue;
+        result[s] = true;
+    }
+    return result;
+}
+
+
+//lookupSkills(string) will be called instead, so explicitly avoid:
+boolean [skill] lookupSkillsInt(boolean [int] skill_ids)
+{
+    boolean [skill] result;
+    foreach skill_id in skill_ids
+    {
+        skill s = skill_id.to_skill();
         if (s == $skill[none])
             continue;
         result[s] = true;

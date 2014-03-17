@@ -197,10 +197,11 @@ void SSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
     }
     
     //sneakyPetePoints first
-    /*int skills_available = MIN(30, MIN(15, my_level()) + get_property_int("sneakyPetePoints"));
+    int skills_available = MIN(30, MIN(15, my_level()) + get_property_int("sneakyPetePoints"));
     
     int skills_have = 0;
-    foreach s in lookupSkills("Catchphrase,Mixologist,Throw Party,Fix Jukebox,Snap Fingers,Shake It Off,Check Hair,Cocktail Magic,Make Friends,Natural Dancer,Rev Engine,Born Showman,Pop Wheelie,Rowdy Drinker,Peel Out,Easy Riding,Check Mirror,Riding Tall,Biker Swagger,Flash Headlight,Insult,Live Fast,Incite Riot,Jump Shark,Animal Magnetism,Smoke Break,Hard Drinker,Unrepentant Thief,Brood,Walk Away From Explosion")
+    //foreach s in lookupSkills("Catchphrase,Mixologist,Throw Party,Fix Jukebox,Snap Fingers,Shake It Off,Check Hair,Cocktail Magic,Make Friends,Natural Dancer,Rev Engine,Born Showman,Pop Wheelie,Rowdy Drinker,Peel Out,Easy Riding,Check Mirror,Riding Tall,Biker Swagger,Flash Headlight,Insult,Live Fast,Incite Riot,Jump Shark,Animal Magnetism,Smoke Break,Hard Drinker,Unrepentant Thief,Brood,Walk Away From Explosion")
+    foreach s in lookupSkillsInt($ints[15027,15019,15012,15028,15001,15007,15017,15008,15016,15004,15020,15025,15031,15021,15024,15023,15009,15002,15010,15015,15013,15011,15018,15014,15006,15026,15005,15003,15032,15030])
     {
         if (s.have_skill())
             skills_have += 1;
@@ -211,5 +212,5 @@ void SSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         string [int] description;
         description.listAppend("At least " + pluralizeWordy(skills_available - skills_have, "skill", "skills") + " available.");
         optional_task_entries.listAppend(ChecklistEntryMake("__skill Natural Dancer", "da.php?place=gate3", ChecklistSubentryMake("Buy Sneaky Pete skills", "", description), 11));
-    }*/
+    }
 }
