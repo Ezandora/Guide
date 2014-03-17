@@ -1,7 +1,7 @@
 //This script and its support scripts are in the public domain.
 
 //These settings are for development. Don't worry about editing them.
-string __version = "1.0.24";
+string __version = "1.0.25";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -925,6 +925,24 @@ boolean in_ronin()
 	return !can_interact();
 }
 
+
+boolean [item] makeConstantItemArrayMutable(boolean [item] array)
+{
+    boolean [item] result;
+    foreach l in array
+        array[l] = array[l];
+    
+    return result;
+}
+boolean [location] makeConstantLocationArrayMutable(boolean [location] locations)
+{
+    boolean [location] result;
+    foreach l in locations
+        result[l] = locations[l];
+    
+    return result;
+}
+
 //split_string returns an immutable array, which will error on certain edits
 //Use this function - it converts to an editable map.
 string [int] split_string_mutable(string source, string delimiter)
@@ -1341,6 +1359,21 @@ boolean [skill] lookupSkills(string names) //CSV input
     foreach key in skill_names
     {
         skill s = skill_names[key].to_skill();
+        if (s == $skill[none])
+            continue;
+        result[s] = true;
+    }
+    return result;
+}
+
+
+//lookupSkills(string) will be called instead, so explicitly avoid:
+boolean [skill] lookupSkillsInt(boolean [int] skill_ids)
+{
+    boolean [skill] result;
+    foreach skill_id in skill_ids
+    {
+        skill s = skill_id.to_skill();
         if (s == $skill[none])
             continue;
         result[s] = true;
@@ -2891,6 +2924,13 @@ void KOLImagesInit()
 	__kol_images["__skill jump shark"] = KOLImageMake("images/itemimages/sharkfin.gif", Vec2iMake(30,30));
 	__kol_images["__skill Natural Dancer"] = KOLImageMake("images/itemimages/dance3.gif", Vec2iMake(30,30));
     
+	__kol_images["mini-adventurer blank female"] = KOLImageMake("images/itemimages/miniadv0f.gif", Vec2iMake(30,30));
+	__kol_images["mini-adventurer seal clubber female"] = KOLImageMake("images/itemimages/miniadv1f.gif", Vec2iMake(30,30));
+	__kol_images["mini-adventurer turtle tamer female"] = KOLImageMake("images/itemimages/miniadv2f.gif", Vec2iMake(30,30));
+	__kol_images["mini-adventurer pastamancer female"] = KOLImageMake("images/itemimages/miniadv3f.gif", Vec2iMake(30,30));
+	__kol_images["mini-adventurer sauceror female"] = KOLImageMake("images/itemimages/miniadv4f.gif", Vec2iMake(30,30));
+	__kol_images["mini-adventurer disco bandit female"] = KOLImageMake("images/itemimages/miniadv5f.gif", Vec2iMake(30,30));
+	__kol_images["mini-adventurer accordion thief female"] = KOLImageMake("images/itemimages/miniadv6f.gif", Vec2iMake(30,30));
     
 	
 	string class_name = my_class().to_string();
@@ -3852,6 +3892,28 @@ buffer ChecklistGenerate(Checklist cl)
 
 
 
+
+//Version compatibility locations:
+location __location_palindome;
+
+boolean __location_compatibility_inited = false;
+//Should probably be called manually, as a backup:
+void locationCompatibilityInit()
+{
+    //Different versions refer to locations by different names.
+    //For instance, pre-13878 versions refer to the palindome as "The Palindome". Versions after that refer it to "Inside the Palindome".
+    //This method provides correct lookups for both versions, without warnings.
+    if (__location_compatibility_inited)
+        return;
+    __location_compatibility_inited = true;
+    
+    __location_palindome = "Inside the Palindome".to_location();
+    if (__location_palindome == $location[none])
+        __location_palindome = "The Palindome".to_location();
+}
+
+locationCompatibilityInit(); //not sure if calling functions like this is intended. may break in the future?
+
 boolean [location] __la_location_is_available;
 
 boolean __la_commons_were_inited = false;
@@ -3932,7 +3994,10 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
 			return locationQuestPropertyPastInternalStepNumber("questL02Larva", 1);
 		case $location[The Smut Orc Logging Camp]:
 			return locationQuestPropertyPastInternalStepNumber("questL09Topping", 1);
+		case $location[the black forest]:
+			return locationQuestPropertyPastInternalStepNumber("questL11MacGuffin", 1);
 		case $location[guano junction]:
+		case $location[the bat hole entrance]:
 			return locationQuestPropertyPastInternalStepNumber("questL04Bat", 1);
 		case $location[itznotyerzitz mine]:
 			return locationQuestPropertyPastInternalStepNumber("questL08Trapper", 2);
@@ -4149,9 +4214,9 @@ string getClickableURLForLocation(location l)
             __urls_for_locations[l] = "place.php?whichplace=plains";
             
         if ($item[talisman o' nam].equipped_amount() == 0)
-            __urls_for_locations[$location[The Palindome]] = "inventory.php?which=2";
+            __urls_for_locations[__location_palindome] = "inventory.php?which=2";
         else
-            __urls_for_locations[$location[The Palindome]] = "place.php?whichplace=palindome";
+            __urls_for_locations[__location_palindome] = "place.php?whichplace=palindome";
         
         if ($location[cobb's knob barracks].locationAvailable())
             __urls_for_locations[$location[The Outskirts of Cobb's Knob]] = "cobbsknob.php";
@@ -4169,6 +4234,8 @@ string getClickableURLForLocation(location l)
         else
             __urls_for_locations[$location[The Haunted Pantry]] = "place.php?whichplace=town_right";
             
+            
+        
             
         foreach l in $locations[The Oasis, the arid\, extra-dry desert, south of the border, The Shore\, Inc. Travel Agency]
             __urls_for_locations[l] = "place.php?whichplace=desertbeach";
@@ -4188,9 +4255,17 @@ string getClickableURLForLocation(location l)
         foreach l in $locations[the hidden apartment building, the hidden hospital, the hidden office building, the hidden bowling alley, the hidden park]
             __urls_for_locations[l] = "place.php?whichplace=hiddencity";
             
+        foreach l in $locations[The Dark Neck of the Woods,The Dark Heart of the Woods,The Dark Elbow of the Woods]
+            __urls_for_locations[l] = "friars.php";
+        __urls_for_locations[$location[pandamonium slums]] = "pandamonium.php";
+            
         foreach l in $locations[the extreme slope, the icy peak, lair of the ninja snowmen, the goatlet, itznotyerzitz mine]
             __urls_for_locations[l] = "place.php?whichplace=mclargehuge";
             
+        foreach l in $locations[the upper chamber, the middle chamber, the lower chambers]
+            __urls_for_locations[l] = "pyramid.php";
+            
+        __urls_for_locations[$location[The valley of rof l'm fao]] = "place.php?whichplace=mountains";
             
         foreach l in $locations[the poop deck, Barrrney's Barrr, the f'c'le, belowdecks]
             __urls_for_locations[l] = "place.php?whichplace=cove";
@@ -4249,7 +4324,10 @@ string getClickableURLForLocation(location l)
             __urls_for_locations[l] = "cobbsknob.php?action=tomenagerie";
         foreach l in $locations[cobb's knob laboratory,the knob shaft]
             __urls_for_locations[l] = "cobbsknob.php?action=tolabs";
-            
+        
+        foreach l in $locations[the defiled nook,the defiled niche,the defiled cranny,the defiled alcove]
+            __urls_for_locations[l] = "crypt.php";
+        
         foreach l in $locations[the degrassi knoll restroom, the degrassi knoll bakery, the degrassi knoll gym, the degrassi knoll garage]
         {
             if (knoll_available())
@@ -4262,12 +4340,30 @@ string getClickableURLForLocation(location l)
             __urls_for_locations[$location[the nightmare meatrealm]] = "place.php?whichplace=junggate_6";
         else
             __urls_for_locations[$location[the nightmare meatrealm]] = "mall.php";
+            
+            
+        foreach l in $locations[next to that barrel with something burning in it,near an abandoned refrigerator,over where the old tires are,out by that rusted-out car]
+            __urls_for_locations[l] = "bigisland.php?place=junkyard";
+        
+        __urls_for_locations[$location[post-war junkyard]] = "postwarisland.php";
         __urls_for_locations_initialized = true;
     }
     
     if (__urls_for_locations contains l)
         return __urls_for_locations[l];
     return "";
+}
+
+string getClickableURLForLocationIfAvailable(location l)
+{
+    Error able_to_find;
+    boolean found = l.locationAvailable(able_to_find);
+    if (able_to_find.was_error) //assume it's available, since we don't know
+        found = true;
+    if (found)
+        return l.getClickableURLForLocation();
+    else
+        return "";
 }
 
 void QLevel2Init()
@@ -5862,6 +5958,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
 	{
 		string [int] details;
 		string [int] modifiers;
+        string url = "place.php?whichplace=highlands";
 		
 		if (base_quest_state.state_boolean["can complete twin peaks quest quickly"])
 		{
@@ -5895,6 +5992,8 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
                 else
                     details.listAppend("Use rusty hedge trimmers.");
             }
+            if ($item[rusty hedge trimmers].available_amount() >= options_left.count()) //purely trimmers, now
+                url = "inventory.php?which=3";
 			if (numeric_modifier("stench resistance") < 4.0 && !stench_completed)
             {
 				details.listAppend("+" + (4.0 - numeric_modifier("stench resistance")).floor() + " more " + HTMLGenerateSpanOfClass("stench", "r_element_stench") + " resist required.");
@@ -5936,7 +6035,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
 		{
 			details.listAppend("Spend 50 total turns in the twin peak.");
 		}
-		task_entries.listAppend(ChecklistEntryMake("twin peak", "place.php?whichplace=highlands", ChecklistSubentryMake("Twin Peak", modifiers, details), $locations[twin peak]));
+		task_entries.listAppend(ChecklistEntryMake("twin peak", url, ChecklistSubentryMake("Twin Peak", modifiers, details), $locations[twin peak]));
 	}
     boolean need_jar_of_oil = false;
     if ($item[jar of oil].available_amount() == 0 && $item[bubblin' crude].available_amount() < 12 && !base_quest_state.state_boolean["Peak Jar Completed"] && base_quest_state.state_boolean["can complete twin peaks quest quickly"])
@@ -5994,6 +6093,9 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
             if (base_quest_state.state_boolean["oil peak pressure bug in effect"])
                 line2 = "At most " + line2 + " (unable to track, sorry)";
             details.listAppend(line2);
+            
+            if (oil_ml < 50 && $item[dress pants].available_amount() == 0 && !in_hardcore())
+                details.listAppend("If you can't reach +50 ML or more, possibly consider pulling and wearing dress pants. (lazy pull, doesn't add ML but saves 4 or 24 turns)");
         }
 		if (need_jar_of_oil)
 		{
@@ -6408,7 +6510,9 @@ void QLevel11Init()
 		state.quest_name = "Palindome Quest";
 		state.image_name = "Palindome";
         
-        state.state_boolean["Need instant camera"] = false; //FIXME track this
+        state.state_boolean["Need instant camera"] = false;
+        if (lookupItem("photograph of a dog").available_amount() + lookupItem("disposable instant camera").available_amount() == 0 && state.mafia_internal_step < 3 && get_revision() >= 13870)
+            state.state_boolean["Need instant camera"] = true;
 		if (my_level() >= 11)
 			state.startable = true;
 		__quest_state["Level 11 Palindome"] = state;
@@ -6663,8 +6767,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
 {
 	if (!__quest_state["Level 11 Palindome"].in_progress)
         return;
-    //Some emergency exits in case the revamp doesn't detect properly: (not sure yet)
-    if (__quest_state["Level 11"].finished) //emergency tracking
+    if (__quest_state["Level 11"].finished)
         return;
     if ($items[staff of fats,Staff of Ed\, almost,Staff of Ed].available_amount() > 0)
         return;
@@ -6730,8 +6833,18 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
         
         */
         
-        //I think we need mafia tracking before interactive mode can work?
-        if ($item[mega gem].available_amount() > 0)
+        if (get_revision() < 13870) //not actually sure when palindome support went in, so just using a recent one
+        {
+            subentry.entries.listAppend("Update mafia to support revamp. Simple guide:");
+            subentry.entries.listAppend("First you adventure in the Palindome.|Find three photographs via non-combats(?), and take a picture of Bob Racecar/Racecar Bob with a disposable instant camera. (found in NC in haunted bedroom)|Olfact bob racecar/racecar bob.|Also, possibly find stunt nuts. (30% drop, +234% item)");
+            subentry.entries.listAppend("&quot;I Love Me, Vol.&quot; I will drop from the fifth dude-type monster. Read it to unlock Dr. Awkward's office.");
+            subentry.entries.listAppend("Place all four photographs on the shelves in the office.|Order is god, red nugget, dog, and ostrich egg.");
+            subentry.entries.listAppend("Read 2 Love Me, Vol. 2 to unlock Mr. Alarm's office.");
+            subentry.entries.listAppend("Talk to Mr. Alarm, unlock Whitey's Grove. Run +186% item, +combat to find lion oil and bird rib.|Or, alternatively, adventure in the palindome. I don't know the details, sorry.");
+            subentry.entries.listAppend("Cook wet stunt nut stew, talk to Mr. Alarm. He'll give you the Mega Gem.");
+            subentry.entries.listAppend("Equip that to fight Dr. Awkard in his office.");
+        }
+        else if ($item[mega gem].available_amount() > 0 || base_quest_state.mafia_internal_step == 5)
         {
             //5 -> fight dr. awkward
             string [int] tasks;
@@ -6743,19 +6856,24 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
             tasks.listAppend("fight Dr. Awkward");
             subentry.entries.listAppend(tasks.listJoinComponents(", ", "then").capitalizeFirstLetter() + ".");
         }
-        else if (false)
+        else if (base_quest_state.mafia_internal_step == 4 || base_quest_state.mafia_internal_step == 3)
         {
-            //acquire wet stunt nut stew, give to mr. alarm
-            //FIXME handle alternate route
-            
             //4 -> acquire wet stunt nut stew, give to mr. alarm
+            //FIXME handle alternate route
+            //step3 not supported yet, so we have this instead:
+            if (base_quest_state.mafia_internal_step == 3)
+                subentry.entries.listAppend("Use 2 Love Me, Vol. 2, then talk to Mr. Alarm in his office. Then:");
+            
             if ($item[wet stunt nut stew].available_amount() == 0)
             {
-                url = "place.php?whichplace=woods";
                 if (($item[bird rib].available_amount() > 0 && $item[lion oil].available_amount() > 0 || $item[wet stew].available_amount() > 0) && $item[stunt nuts].available_amount() > 0)
+                {
+                    url = "craft.php?mode=cook";
                     subentry.entries.listAppend("Cook wet stunt nut stew.");
+                }
                 else
                 {
+                    url = "place.php?whichplace=woods";
                     subentry.entries.listAppend("Acquire and make wet stunt nut stew.");
                     if ($item[wet stunt nut stew].available_amount() == 0 && $item[stunt nuts].available_amount() == 0)
                         subentry.entries.listAppend("Acquire stunt nuts from Bob Racecar or Racecar Bob in Palindome. (30% drop)");
@@ -6775,6 +6893,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                         if (!in_hardcore())
                             subentry.entries.listAppend("Or pull wet stew.");
                     }
+                    subentry.entries.listAppend("Or try the alternate route in the Palindome. (don't know how this works)");
                 }
             }
             else
@@ -6784,13 +6903,13 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                     subentry.entries.listAppend("Equip the Talisman o' Nam.");
             }
         }
-        else if (false)
+        else if (base_quest_state.mafia_internal_step == 3)
         {
             string [int] tasks;
             //talk to mr. alarm to unlock whitey's grove
             if (7270.to_item().available_amount() > 0)
             {
-                url = "inventory.php?which=3";
+                //url = "inventory.php?which=3";
                 tasks.listAppend("use 2 Love Me, Vol. 2");
             }
             if ($item[wet stunt nut stew].available_amount() > 0)
@@ -6802,105 +6921,118 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
             if ($item[talisman o' nam].equipped_amount() == 0)
                 subentry.entries.listAppend("Equip the Talisman o' Nam.");
         }
-        else if (false)
+        else
         {
+            boolean dr_awkwards_office_unlocked = false; //no way to track this at the moment
             string single_entry_mode = "";
-            //Do we have everything yet?
-            if (false)
+            boolean need_to_adventure_in_palindome = false;
+            boolean need_palindome_location = true;
+            
+            //Need:
+            //√Wet stunt nut stew / stunt nuts
+            //√"I Love Me, Vol. I" (7262)
+            //√instant camera -> 7263 photograph of a dog
+            //√7264 photograph of a red nugget
+            //√7265 photograph of an ostrich egg
+            //√photograph of god
+            subentry.entries.listAppend("Adventure in the palindome.");
+            
+            if (lookupItem("photograph of a dog").available_amount() == 0)
             {
-                //Yes - place everything on the shelves
-                if (false)
+                if (lookupItem("disposable instant camera").available_amount() == 0)
                 {
-                    //use book to unlock office
-                    url = "inventory.php?which=3";
-                    subentry.entries.listAppend("Read I Love Me, Vol I.");
+                    subentry.modifiers.listClear();
+                    subentry.modifiers.listAppend("-combat");
+                    url = "place.php?whichplace=spookyraven2";
+                    single_entry_mode = "Adventure in the haunted ballroom for a disposable instant camera.";
+                    need_palindome_location = false;
                 }
                 else
                 {
-                    subentry.entries.listAppend("Place items on shelves.|Order is god, red nugget, dog, and ostrich egg.");
+                    subentry.entries.listAppend("Photograph Bob Racecar or Racecar Bob with disposable instant camera.");
+                    need_to_adventure_in_palindome = true;
                 }
             }
-            else
+            
+            if ($item[stunt nuts].available_amount() + $item[wet stunt nut stew].available_amount() == 0 )
             {
-                //No
-                
-                //Need:
-                //√Wet stunt nut stew / stunt nuts
-                //√"I Love Me, Vol. I" (7262)
-                //√instant camera -> 7263 photograph of a dog
-                //√7264 photograph of a red nugget
-                //√7265 photograph of an ostrich egg
-                //√photograph of god
-                subentry.entries.listAppend("Adventure in the palindome.");
-                
-                if ($item[stunt nuts].available_amount() + $item[wet stunt nut stew].available_amount() == 0 )
-                {
-                    subentry.modifiers.listAppend("+234% item");
-                    subentry.entries.listAppend("Acquire stunt nuts from Bob Racecar or Racecar Bob. (30% drop)");
-                }
-                
-                if (7262.to_item().available_amount() == 0) //I love me, Vol. I
-                {
-                    subentry.entries.listAppend("Find I Love Me, Vol. I in-combat. Fifth(?) dude-type monster.");
-                }
-                
-                string [int] missing_ncs;
-                if (lookupItem("photograph of a red nugget").available_amount() == 0)
-                {
-                    missing_ncs.listAppend("photograph of a red nugget");
-                }
-                if (lookupItem("photograph of an ostrich egg").available_amount() == 0)
-                {
-                    missing_ncs.listAppend("photograph of an ostrich egg");
-                }
-                if ($item[photograph of god].available_amount() == 0)
-                {
-                    missing_ncs.listAppend("photograph of god");
-                }
-                if (missing_ncs.count() > 0)
-                    subentry.entries.listAppend("Find " + missing_ncs.listJoinComponents(", ", "and") + " from non-combats.|(unknown if affected by -combat");
-                
-                
-                
-                if (lookupItem("photograph of a dog").available_amount() == 0)
-                {
-                    if (lookupItem("disposable instant camera").available_amount() == 0)
-                    {
-                        url = "place.php?whichplace=spookyraven2";
-                        single_entry_mode = "Adventure in the haunted ballroom for a disposable instant camera.";
-                    }
-                    else
-                    {
-                        subentry.entries.listAppend("Photograph Bob Racecar or Racecar Bob with disposable instant camera.");
-                    }
-                }
-                
+                subentry.modifiers.listAppend("+234% item");
+                subentry.entries.listAppend("Possibly acquire stunt nuts from Bob Racecar or Racecar Bob. (30% drop)");
+                need_to_adventure_in_palindome = true;
             }
+            
+            
+            string [int] missing_ncs;
+            if (lookupItem("photograph of a red nugget").available_amount() == 0)
+            {
+                missing_ncs.listAppend("photograph of a red nugget");
+            }
+            if (lookupItem("photograph of an ostrich egg").available_amount() == 0)
+            {
+                missing_ncs.listAppend("photograph of an ostrich egg");
+            }
+            if ($item[photograph of god].available_amount() == 0)
+            {
+                missing_ncs.listAppend("photograph of god");
+            }
+            if (missing_ncs.count() > 0)
+            {
+                subentry.entries.listAppend("Find " + missing_ncs.listJoinComponents(", ", "and") + " from non-combats.|(unknown if affected by -combat)");
+                need_to_adventure_in_palindome = true;
+            }
+            
+            
+            
+            
+            //This must be after all other need_to_adventure_in_palindome checks:
+            if (7262.to_item().available_amount() == 0 && !dr_awkwards_office_unlocked) //I love me, Vol. I
+            {
+                if (__misc_state["have olfaction equivalent"] && __misc_state_string["olfaction equivalent monster"] != "Racecar Bob" && __misc_state_string["olfaction equivalent monster"] != "Bob Racecar" && __misc_state_string["olfaction equivalent monster"] != "Drab Bard")
+                {
+                    subentry.modifiers.listAppend("olfact racecar");
+                    subentry.entries.listAppend("Olfact Bob Racecar or Racecar Bob.");
+                }
+                string line = "Find I Love Me, Vol. I in-combat. Fifth dude-type monster.";
+                if (!need_to_adventure_in_palindome) //counts stunt nuts and photographs
+                    line += "|Well, unless you have already. If so, place the photographs in Dr. Awkward's Office.";
+                else
+                    line += "|Well, unless you have already.";
+                subentry.entries.listAppend(line);
+                need_to_adventure_in_palindome = true;
+            }
+            else if (7262.to_item().available_amount() > 0)
+            {
+                if (!need_to_adventure_in_palindome)
+                    url = "inventory.php?which=3";
+                subentry.entries.listAppend("Use I Love Me, Vol. I. Then place the photographs in Dr. Awkward's Office.");
+            }
+            
+            if (!need_to_adventure_in_palindome)
+            {
+                if (subentry.entries contains 0)
+                    remove subentry.entries[0]; //remove "Adventure in the palindome" by index - this is hacky
+            }
+            
+            if (!need_to_adventure_in_palindome && dr_awkwards_office_unlocked)
+            {
+                subentry.modifiers.listClear();
+                single_entry_mode = "Place items on shelves in Dr. Awkward's office.|Order is god, red nugget, dog, and ostrich egg.";
+            }
+                
             if (single_entry_mode.length() > 0)
             {
                 subentry.entries.listClear();
                 subentry.entries.listAppend(single_entry_mode);
             }
-            else
-            {
-                if ($item[talisman o' nam].equipped_amount() == 0)
-                    subentry.entries.listAppend("Equip the Talisman o' Nam.");
-            }
-        }
-        else
-        {
-            subentry.entries.listAppend("Quest was just revamped; here's a simple (and possibly inaccurate) guide:");
-            subentry.entries.listAppend("First you adventure in the Palindome.|Find three photographs via non-combats(?), and take a picture of Bob Racecar/Racecar Bob with a disposable instant camera. (found in NC in haunted bedroom)|Olfact bob racecar/racecar bob.|Also, possibly find stunt nuts. (30% drop, +234% item)");
-            subentry.entries.listAppend("&quot;I Love Me, Vol.&quot; I will drop from the fifth dude-type monster. Read it to unlock Dr. Awkward's office.");
-            subentry.entries.listAppend("Place all four photographs on the shelves in the office.|Order is god, red nugget, dog, and ostrich egg.");
-            subentry.entries.listAppend("Read 2 Love Me, Vol. 2 to unlock Mr. Alarm's office.");
-            subentry.entries.listAppend("Talk to Mr. Alarm, unlock Whitey's Grove. Run +186% item, +combat to find lion oil and bird rib.|Or, alternatively, adventure in the palindome. I don't know the details, sorry.");
-            subentry.entries.listAppend("Cook wet stunt nut stew, talk to Mr. Alarm. He'll give you the Mega Gem.");
-            subentry.entries.listAppend("Equip that to fight Dr. Awkard in his office.");
+            if (need_palindome_location && $item[talisman o' nam].equipped_amount() == 0)
+                subentry.entries.listAppend("Equip the Talisman o' Nam.");
         }
     }
+    
+    boolean [location] relevant_locations = makeConstantLocationArrayMutable($locations[the poop deck, belowdecks,cobb's knob laboratory,whitey's grove]);
+    relevant_locations[__location_palindome] = true;
 
-    task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the poop deck, belowdecks,the palindome,cobb's knob laboratory,whitey's grove]));
+    task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, relevant_locations));
 }
 
 void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -7123,10 +7255,30 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
                 next_position_needed = 1;
                 additional_turns_after_that = 0;
                 
-                int ed_ml = 180 + monster_level_adjustment_ignoring_plants();
-                task = "fight Ed in the lower chambers";
-                if (ed_ml > my_buffedstat($stat[moxie]))
-                    task += " (" + ed_ml + " attack)";
+                
+                string [int] semirare_turns = __misc_state_string["Turns until semi-rare"].split_string(",");
+                
+                boolean delay_for_semirare = false;
+                foreach key in semirare_turns
+                {
+                    int turns = semirare_turns[key].to_int();
+                    if (turns <= 6 && turns >= 0)
+                    {
+                        delay_for_semirare = true;
+                        break;
+                    }
+                }
+                if (delay_for_semirare)
+                {
+                    task = HTMLGenerateSpanFont("Avoid fighting Ed the Undying, semi-rare coming up", "red", "");
+                }
+                else
+                {
+                    int ed_ml = 180 + monster_level_adjustment_ignoring_plants();
+                    task = "fight Ed in the lower chambers";
+                    if (ed_ml > my_buffedstat($stat[moxie]))
+                        task += " (" + ed_ml + " attack)";
+                }
                 if (ed_waiting)
                     done_with_wheel_turning = true;
             }
@@ -7479,9 +7631,9 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                     subentry.entries.listAppend("Equipment unequipped: (+10% chance of protector spirit per piece)|*" + items_we_have_unequipped.listJoinComponents("|*"));
                 }
                 if (items_we_have_equipped.count() > 0)
-                {
-                    subentry.entries.listAppend((items_we_have_equipped.count() * 10) + "% chance of protector spirit encounter.");
-                }
+                    subentry.entries.listAppend((items_we_have_equipped.count() * 10) + "+?% chance of protector spirit encounter.");
+                else
+                    subentry.entries.listAppend("?% chance of protector spirit encounter.");
             }
             
             
@@ -7806,7 +7958,7 @@ void QLevel12Init()
 		state.state_boolean["Orchard Finished"] = false;
 	}
 	
-	if (my_level() >= 12 && ($location[The Palindome].turnsAttemptedInLocation() > 0 || $items[mega gem,&quot;I Love Me\, Vol. I&quot;,Staff of Ed,Staff of Fats,Staff of Ed\, almost].available_amount() > 0))
+	if (my_level() >= 12 && (__location_palindome.turnsAttemptedInLocation() > 0 || $items[mega gem,&quot;I Love Me\, Vol. I&quot;,Staff of Ed,Staff of Fats,Staff of Ed\, almost].available_amount() > 0))
 		state.startable = true;
     
 	__quest_state["Level 12"] = state;
@@ -7940,7 +8092,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
             details.listAppend("Potentially use stone wool and visit the hidden temple to extend Sinuses for Miles for 3 turns.");
             
             
-        if (lookupItem("Sneaky Pete's leather jacket (collar popped)").equipped_amount() > 0)
+        if (lookupItem("Sneaky Pete's leather jacket (collar popped)").equipped_amount() > 0 && turn_range.y > 1)
             details.listAppend("Might want to unpop the collar. (+20% meat)");
 	
 		optional_task_entries.listAppend(ChecklistEntryMake("Island War Nuns", "bigisland.php?place=nunnery", ChecklistSubentryMake("Island War Nuns Quest", "+meat", details), $locations[the themthar hills]));
@@ -8980,9 +9132,8 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 		
 		if ($item[lord spookyraven's spectacles].available_amount() == 0)
 			subentry.entries.listAppend("Acquire Lord Spookyraven's spectacles from ornate drawer NC.");
-        //FIXME uncomment when test available:
-        if (/*__quest_state["Level 11 Palindome"].state_boolean["Need instant camera"] &&*/ 7266.to_item().available_amount() == 0)
-			subentry.entries.listAppend("Possibly acquire disposable instant camera from ornate drawer NC.");
+        if (__quest_state["Level 11 Palindome"].state_boolean["Need instant camera"] && 7266.to_item().available_amount() == 0)
+			subentry.entries.listAppend("Acquire disposable instant camera from ornate drawer NC.");
 		subentry.modifiers.listAppend("-combat");
 		subentry.entries.listAppend("Run -combat.");
         
@@ -12123,13 +12274,16 @@ void QHitsGenerateMissingItems(ChecklistEntry [int] items_needed_entries)
 		return;
 	//is this the best way to convey this information?
 	//maybe all together instead? complicated...
+    string url = $location[the hole in the sky].getClickableURLForLocation();
+    if (!$location[the hole in the sky].locationAvailable())
+        url = $location[The Castle in the Clouds in the Sky (basement)].getClickableURLForLocation();
 	if ($item[richard's star key].available_amount() == 0)
 	{
 		string [int] oh_my_stars_and_gauze_garters;
 		oh_my_stars_and_gauze_garters.listAppend($item[star chart].available_amount() + "/1 star chart");
 		oh_my_stars_and_gauze_garters.listAppend($item[star].available_amount() + "/8 stars");
 		oh_my_stars_and_gauze_garters.listAppend($item[line].available_amount() + "/7 lines");
-		items_needed_entries.listAppend(ChecklistEntryMake("__item richard's star key", "", ChecklistSubentryMake("Richard's star key", "", oh_my_stars_and_gauze_garters.listJoinComponents(", ", "and"))));
+		items_needed_entries.listAppend(ChecklistEntryMake("__item richard's star key", url, ChecklistSubentryMake("Richard's star key", "", oh_my_stars_and_gauze_garters.listJoinComponents(", ", "and"))));
 	}
 	
 	if ($item[star hat].available_amount() == 0)
@@ -12138,7 +12292,7 @@ void QHitsGenerateMissingItems(ChecklistEntry [int] items_needed_entries)
 		oh_my_stars_and_gauze_garters.listAppend($item[star chart].available_amount() + "/1 star chart");
 		oh_my_stars_and_gauze_garters.listAppend($item[star].available_amount() + "/5 stars");
 		oh_my_stars_and_gauze_garters.listAppend($item[line].available_amount() + "/3 lines");
-		items_needed_entries.listAppend(ChecklistEntryMake("__item star hat", "", ChecklistSubentryMake("Star hat", "", oh_my_stars_and_gauze_garters.listJoinComponents(", ", "and"))));
+		items_needed_entries.listAppend(ChecklistEntryMake("__item star hat", url, ChecklistSubentryMake("Star hat", "", oh_my_stars_and_gauze_garters.listJoinComponents(", ", "and"))));
 	}
 	if ($item[star crossbow].available_amount() + $item[star staff].available_amount() + $item[star sword].available_amount() == 0)
 	{
@@ -12146,13 +12300,13 @@ void QHitsGenerateMissingItems(ChecklistEntry [int] items_needed_entries)
 		oh_my_stars_and_gauze_garters.listAppend($item[star chart].available_amount() + "/1 star chart");
 		oh_my_stars_and_gauze_garters.listAppend($item[star].available_amount() + "/[5, 6, or 7] stars");
 		oh_my_stars_and_gauze_garters.listAppend($item[line].available_amount() + "/[6, 5, or 4] lines");
-		items_needed_entries.listAppend(ChecklistEntryMake("__item star crossbow", "", ChecklistSubentryMake("Star crossbow, staff, or sword", "", oh_my_stars_and_gauze_garters.listJoinComponents(", ", "and"))));
+		items_needed_entries.listAppend(ChecklistEntryMake("__item star crossbow", url, ChecklistSubentryMake("Star crossbow, staff, or sword", "", oh_my_stars_and_gauze_garters.listJoinComponents(", ", "and"))));
 	}
 	if (!have_familiar_replacement($familiar[star starfish]) && !__misc_state["familiars temporarily blocked"])
 	{
 		if ($item[star starfish].available_amount() > 0)
 		{
-			items_needed_entries.listAppend(ChecklistEntryMake("__item star starfish", "", ChecklistSubentryMake("Star starfish", "", "You have one, use it.")));
+			items_needed_entries.listAppend(ChecklistEntryMake("__item star starfish", url, ChecklistSubentryMake("Star starfish", "", "You have one, use it.")));
 		}
 		else
 		{
@@ -12160,7 +12314,7 @@ void QHitsGenerateMissingItems(ChecklistEntry [int] items_needed_entries)
 			oh_my_stars_and_gauze_garters.listAppend($item[star chart].available_amount() + "/1 star chart");
 			oh_my_stars_and_gauze_garters.listAppend($item[star].available_amount() + "/6 stars");
 			oh_my_stars_and_gauze_garters.listAppend($item[line].available_amount() + "/4 lines");
-			items_needed_entries.listAppend(ChecklistEntryMake("__item star starfish", "", ChecklistSubentryMake("Star starfish", "", oh_my_stars_and_gauze_garters.listJoinComponents(", ", "and"))));
+			items_needed_entries.listAppend(ChecklistEntryMake("__item star starfish", url, ChecklistSubentryMake("Star starfish", "", oh_my_stars_and_gauze_garters.listJoinComponents(", ", "and"))));
 		}
 	}
 }
@@ -12438,8 +12592,10 @@ void SDispensaryGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
 	if (!__misc_state["can equip just about any weapon"]) //need to wear KGE to learn the password
 		return;
 	
-	if (!__quest_state["Level 5"].started || !locationAvailable($location[cobb's knob barracks]))
+	if (!__quest_state["Level 5"].started || !$location[cobb's knob barracks].locationAvailable())
 		return;
+    if (__quest_state["Level 5"].finished && !have_outfit_components("Knob Goblin Elite Guard Uniform")) //level 5 quest completed, but they don't have KGE - I think we'll close the suggestion here, as they probably don't want to go back? maybe? it'll still show up in semi-rare if they care to
+        return;
 	
 	ChecklistSubentry subentry;
 	subentry.header = "Unlock Cobb's Knob Dispensary";
@@ -13967,6 +14123,8 @@ void S8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         }
         else if ($item[psychoanalytic jar].available_amount() > 0)
         {
+            if (my_level() < 2) //no woods yet
+                return;
             active_url = "place.php?whichplace=forestvillage";
             title = "Psychoanalyze the crackpot mystic";
             description.listAppend("Fear Man's level access, for digital key.");
@@ -16486,7 +16644,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         boolean delay_for_semirare = false;
         foreach key in semirare_turns
         {
-            if (semirare_turns[key] == 3)
+            if (semirare_turns[key].to_int() == 3)
             {
                 delay_for_semirare = true;
                 break;
@@ -16836,10 +16994,11 @@ void SSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
     }
     
     //sneakyPetePoints first
-    /*int skills_available = MIN(30, MIN(15, my_level()) + get_property_int("sneakyPetePoints"));
+    int skills_available = MIN(30, MIN(15, my_level()) + get_property_int("sneakyPetePoints"));
     
     int skills_have = 0;
-    foreach s in lookupSkills("Catchphrase,Mixologist,Throw Party,Fix Jukebox,Snap Fingers,Shake It Off,Check Hair,Cocktail Magic,Make Friends,Natural Dancer,Rev Engine,Born Showman,Pop Wheelie,Rowdy Drinker,Peel Out,Easy Riding,Check Mirror,Riding Tall,Biker Swagger,Flash Headlight,Insult,Live Fast,Incite Riot,Jump Shark,Animal Magnetism,Smoke Break,Hard Drinker,Unrepentant Thief,Brood,Walk Away From Explosion")
+    //foreach s in lookupSkills("Catchphrase,Mixologist,Throw Party,Fix Jukebox,Snap Fingers,Shake It Off,Check Hair,Cocktail Magic,Make Friends,Natural Dancer,Rev Engine,Born Showman,Pop Wheelie,Rowdy Drinker,Peel Out,Easy Riding,Check Mirror,Riding Tall,Biker Swagger,Flash Headlight,Insult,Live Fast,Incite Riot,Jump Shark,Animal Magnetism,Smoke Break,Hard Drinker,Unrepentant Thief,Brood,Walk Away From Explosion")
+    foreach s in lookupSkillsInt($ints[15027,15019,15012,15028,15001,15007,15017,15008,15016,15004,15020,15025,15031,15021,15024,15023,15009,15002,15010,15015,15013,15011,15018,15014,15006,15026,15005,15003,15032,15030])
     {
         if (s.have_skill())
             skills_have += 1;
@@ -16850,7 +17009,7 @@ void SSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         string [int] description;
         description.listAppend("At least " + pluralizeWordy(skills_available - skills_have, "skill", "skills") + " available.");
         optional_task_entries.listAppend(ChecklistEntryMake("__skill Natural Dancer", "da.php?place=gate3", ChecklistSubentryMake("Buy Sneaky Pete skills", "", description), 11));
-    }*/
+    }
 }
 
 void SetsInit()
@@ -17639,18 +17798,23 @@ void setUpState()
 	__misc_state["free runs available"] = free_runs_available;
 	
 	
-	
+	string olfacted_monster = "";
 	boolean some_olfact_available = false;
 	if (have_skill($skill[Transcendent Olfaction]))
+    {
 		some_olfact_available = true;
+        if ($effect[on the trail].have_effect() > 0)
+            olfacted_monster = get_property("olfactedMonster");
+    }
     if ($item[odor extractor].available_amount() > 0)
         some_olfact_available = true;
-    if ($familiar[nosy nose].familiar_is_usable()) //weakened, but still relevantw
+    if ($familiar[nosy nose].familiar_is_usable()) //weakened, but still relevant
         some_olfact_available = true;
     if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE)
         some_olfact_available = true;
 		
 	__misc_state["have olfaction equivalent"] = some_olfact_available;
+    __misc_state_string["olfaction equivalent monster"] = olfacted_monster;
 	
 	
 	boolean skills_temporarily_missing = false;
@@ -18074,6 +18238,7 @@ void generateMissingItems(Checklist [int] checklists)
 	if (!__misc_state["In run"])
 		return;
 	
+    //thought about using getClickableURLForLocationIfAvailable for these, but our location detection is very poor, and there are corner cases regardless
 	
 	if (__misc_state["wand of nagamar needed"])
 	{
@@ -18093,7 +18258,7 @@ void generateMissingItems(Checklist [int] checklists)
 		if (__misc_state_int["heavy d needed"] > 0)
 			subentries[subentries.count()] = ChecklistSubentryMake("heavy D", "Clover or +150% item", listMake("Clover the castle basement", "Alphabet Giant - Castle Basement - 40% drop"));
 			
-		ChecklistEntry entry = ChecklistEntryMake("__item wand of nagamar", "", subentries);
+		ChecklistEntry entry = ChecklistEntryMake("__item wand of nagamar", $location[the castle in the clouds in the sky (basement)].getClickableURLForLocation(), subentries);
 		entry.should_indent_after_first_subentry = true;
 		
 		items_needed_entries.listAppend(entry);
@@ -18121,7 +18286,7 @@ void generateMissingItems(Checklist [int] checklists)
 		
 		if (!__quest_state["Level 13"].state_boolean["have relevant accordion"])
 		{
-			items_needed_entries.listAppend(ChecklistEntryMake("__item stolen accordion", "", ChecklistSubentryMake("Accordion", "", "Toy accordion, 150 meat")));
+			items_needed_entries.listAppend(ChecklistEntryMake("__item stolen accordion", "store.php?whichstore=z", ChecklistSubentryMake("Accordion", "", "Toy accordion, 150 meat")));
 		}
 		
 		if (!__quest_state["Level 13"].state_boolean["have relevant drum"])
@@ -18133,7 +18298,7 @@ void generateMissingItems(Checklist [int] checklists)
 			suggestions.listAppend("Jungle drum (pygmy assault squad, hidden park, 10% drop)");
 			suggestions.listAppend("Hippy bongo (YR hippy)");
 			suggestions.listAppend("tambourine?");
-			items_needed_entries.listAppend(ChecklistEntryMake("__item hippy bongo", "", ChecklistSubentryMake("Drum", "", suggestions)));
+			items_needed_entries.listAppend(ChecklistEntryMake("__item hippy bongo", $location[the black forest].getClickableURLForLocation(), ChecklistSubentryMake("Drum", "", suggestions)));
 		}
 		
 		if ($item[skeleton key].available_amount() == 0)
@@ -18148,7 +18313,7 @@ void generateMissingItems(Checklist [int] checklists)
 				line += " (need)";
 			else
 				line += " (have)";
-			items_needed_entries.listAppend(ChecklistEntryMake("__item skeleton key", "", ChecklistSubentryMake("Skeleton key", "", line)));
+			items_needed_entries.listAppend(ChecklistEntryMake("__item skeleton key", $location[the defiled nook].getClickableURLForLocation(), ChecklistSubentryMake("Skeleton key", "", line)));
 		}
 		
 		if ($item[digital key].available_amount() == 0)
@@ -18165,6 +18330,7 @@ void generateMissingItems(Checklist [int] checklists)
                     options.listAppend("Fax/copy a ghost");
                 options.listAppend("8-bit realm (olfact blooper, slow)");
             }
+            //FIXME URL?
 			items_needed_entries.listAppend(ChecklistEntryMake("__item digital key", "", ChecklistSubentryMake("Digital key", "", options)));
 		}
 		string from_daily_dungeon_string = "From daily dungeon";
@@ -18200,6 +18366,8 @@ void generateMissingItems(Checklist [int] checklists)
 	if (!__quest_state["Level 13"].state_boolean["past tower"])
 	{
 		string [item] telescope_item_suggestions;
+        
+        string [item] telescope_item_url;
 		
 		//FIXME support __misc_state["can use clovers"] for these
 		telescope_item_suggestions[$item[mick's icyvapohotness rub]] = "Raver giant, top floor of castle, 30% drop";
@@ -18226,6 +18394,8 @@ void generateMissingItems(Checklist [int] checklists)
 		telescope_item_suggestions[$item[gremlin juice]] = "Any gremlin, Junkyard, 3% drop (yellow ray)";
 		telescope_item_suggestions[$item[Angry Farmer candy]] = "Need sugar rush";
 		
+        if (gnomads_available())
+            telescope_item_suggestions[$item[Angry Farmer candy]] += "|*Marzipan skull, bought from Gno-Mart";
 		if (have_skill($skill[summon crimbo candy]))
 			telescope_item_suggestions[$item[Angry Farmer candy]] += "|*Summon crimbo candy";
 		else if (have_skill($skill[candyblast]))
@@ -18253,6 +18423,51 @@ void generateMissingItems(Checklist [int] checklists)
 		telescope_item_suggestions[$item[tropical orchid]] = "Tropical island souvenir crate (vacation)";
 		telescope_item_suggestions[$item[stick of dynamite]] = "Dude ranch souvenir crate (vacation)";
 		telescope_item_suggestions[$item[barbed-wire fence]] = "Ski resort souvenir crate (vacation)";
+        
+        
+        telescope_item_url[$item[razor-sharp can lid]] = $location[the haunted pantry].getClickableURLForLocation();
+        telescope_item_url[$item[spider web]] = $location[the sleazy back alley].getClickableURLForLocation();
+        telescope_item_url[$item[frigid ninja stars]] = $location[lair of the ninja snowmen].getClickableURLForLocation();
+        telescope_item_url[$item[hair spray]] = "store.php?whichstore=m";
+        telescope_item_url[$item[baseball]] = $location[guano junction].getClickableURLForLocation();
+        telescope_item_url[$item[sonar-in-a-biscuit]] = $location[the batrat and ratbat burrow].getClickableURLForLocation();
+        telescope_item_url[$item[NG]] = $location[the castle in the clouds in the sky (basement)].getClickableURLForLocation();
+        telescope_item_url[$item[disease]] = $location[cobb's knob harem].getClickableURLForLocation();
+        telescope_item_url[$item[photoprotoneutron torpedo]] = $location[the penultimate fantasy airship].getClickableURLForLocation();
+        telescope_item_url[$item[chaos butterfly]] = $location[the castle in the clouds in the sky (ground floor)].getClickableURLForLocation();
+        telescope_item_url[$item[leftovers of indeterminate origin]] = $location[the haunted kitchen].getClickableURLForLocation();
+        telescope_item_url[$item[powdered organs]] = $location[the upper chamber].getClickableURLForLocation();
+        telescope_item_url[$item[plot hole]] = $location[the castle in the clouds in the sky (ground floor)].getClickableURLForLocation();
+        telescope_item_url[$item[inkwell]] = $location[the haunted library].getClickableURLForLocation();
+        telescope_item_url[$item[Knob Goblin firecracker]] = $location[the outskirts of cobb's knob].getClickableURLForLocation();
+        telescope_item_url[$item[mariachi G-string]] = $location[south of the border].getClickableURLForLocation();
+        telescope_item_url[$item[pygmy blowgun]] = $location[the hidden park].getClickableURLForLocation();
+        telescope_item_url[$item[fancy bath salts]] = $location[the haunted bathroom].getClickableURLForLocation();
+        telescope_item_url[$item[black pepper]] = $location[the black forest].getClickableURLForLocation();
+        telescope_item_url[$item[bronzed locust]] = $location[the arid\, extra-dry desert].getClickableURLForLocation();
+        telescope_item_url[$item[meat vortex]] = $location[The valley of rof l'm fao].getClickableURLForLocation();
+        telescope_item_url[$item[barbed-wire fence]] = $location[The Shore\, Inc. Travel Agency].getClickableURLForLocation();
+        telescope_item_url[$item[stick of dynamite]] = $location[The Shore\, Inc. Travel Agency].getClickableURLForLocation();
+        telescope_item_url[$item[tropical orchid]] = $location[The Shore\, Inc. Travel Agency].getClickableURLForLocation();
+        if (__quest_state["Level 6"].finished)
+            telescope_item_url[$item[wussiness potion]] = $location[pandamonium slums].getClickableURLForLocation();
+        else
+            telescope_item_url[$item[wussiness potion]] = $location[The Dark Neck of the Woods].getClickableURLForLocation();
+        if (__quest_state["Level 12"].finished)
+            telescope_item_url[$item[gremlin juice]] = $location[post-war junkyard].getClickableURLForLocation();
+        else
+            telescope_item_url[$item[gremlin juice]] = $location[next to that barrel with something burning in it].getClickableURLForLocation();
+        if (gnomads_available())
+            telescope_item_url[$item[Angry Farmer candy]] = ""; //need the URL to gno-mart
+        else
+            telescope_item_url[$item[Angry Farmer candy]] = $location[the castle in the clouds in the sky (top floor)].getClickableURLForLocation();
+        telescope_item_url[$item[thin black candle]] = $location[the castle in the clouds in the sky (top floor)].getClickableURLForLocation();
+        telescope_item_url[$item[Mick's IcyVapoHotness Rub]] = $location[the castle in the clouds in the sky (basement)].getClickableURLForLocation();
+        telescope_item_url[$item[pygmy pygment]] = $location[the hidden park].getClickableURLForLocation();
+        telescope_item_url[$item[super-spiky hair gel]] = $location[the penultimate fantasy airship].getClickableURLForLocation();
+        telescope_item_url[$item[adder bladder]] = $location[the black forest].getClickableURLForLocation();
+        telescope_item_url[$item[Black No. 2]] = $location[the black forest].getClickableURLForLocation();
+        
 		
 		if (familiar_is_usable($familiar[gelatinous cubeling]))
 		{
@@ -18282,7 +18497,7 @@ void generateMissingItems(Checklist [int] checklists)
 		
 		item [item][int] item_equivalents_lookup;
 		item_equivalents_lookup[$item[angry farmer candy]] = listMakeBlankItem();
-        foreach it in $items[that gum you like,Crimbo fudge,Crimbo peppermint bark,Crimbo candied pecan,cold hots candy,Daffy Taffy,Senior Mints,Wint-O-Fresh mint]
+        foreach it in $items[that gum you like,Crimbo fudge,Crimbo peppermint bark,Crimbo candied pecan,cold hots candy,Daffy Taffy,Senior Mints,Wint-O-Fresh mint,stick of &quot;gum&quot;,pack of KWE trading card]
             item_equivalents_lookup[$item[angry farmer candy]].listAppend(it);
 		
 		int [item] towergate_items_needed_count; //bees hate you has duplicates
@@ -18323,7 +18538,11 @@ void generateMissingItems(Checklist [int] checklists)
 						details.listAppend("Tower item - towerkill?");
 					if (telescope_item_suggestions contains it)
 						details.listAppend(telescope_item_suggestions[it]);
-					items_needed_entries.listAppend(ChecklistEntryMake(it, "", ChecklistSubentryMake(it, "", details)));
+                    string url = "";
+                    if (telescope_item_url contains it)
+                        url = telescope_item_url[it];
+                    
+					items_needed_entries.listAppend(ChecklistEntryMake(it, url, ChecklistSubentryMake(it, "", details)));
 				}
 				
 			}
@@ -18354,11 +18573,11 @@ void generateMissingItems(Checklist [int] checklists)
     }
 	
 	if ($item[lord spookyraven's spectacles].available_amount() == 0)
-		items_needed_entries.listAppend(ChecklistEntryMake("__item lord spookyraven's spectacles", "", ChecklistSubentryMake("lord spookyraven's spectacles", "", "Found in Haunted Bedroom")));
+		items_needed_entries.listAppend(ChecklistEntryMake("__item lord spookyraven's spectacles", $location[the haunted bedroom].getClickableURLForLocation(), ChecklistSubentryMake("lord spookyraven's spectacles", "", "Found in Haunted Bedroom")));
     
     if ($item[enchanted bean].available_amount() == 0 && !__quest_state["Level 10"].state_boolean["Beanstalk grown"])
     {
-		items_needed_entries.listAppend(ChecklistEntryMake("__item enchanted bean", "", ChecklistSubentryMake("Enchanted bean", "", "Found in the beanbat chamber.")));
+		items_needed_entries.listAppend(ChecklistEntryMake("__item enchanted bean", $location[The Beanbat Chamber].getClickableURLForLocation(), ChecklistSubentryMake("Enchanted bean", "", "Found in the beanbat chamber.")));
     }
     
     if (__quest_state["Level 13"].state_boolean["shadow will need to be defeated"])
@@ -18379,7 +18598,7 @@ void generateMissingItems(Checklist [int] checklists)
             string url = "";
             if ($location[the haunted bedroom].locationAvailable())
                 url = "place.php?whichplace=spookyraven2";
-            items_needed_entries.listAppend(ChecklistEntryMake("__item " + camera, "", ChecklistSubentryMake("Disposable instant camera", url, "Found in the Haunted Bedroom.")));
+            items_needed_entries.listAppend(ChecklistEntryMake("__item " + camera, $location[the haunted bedroom].getClickableURLForLocation(), ChecklistSubentryMake("Disposable instant camera", url, "Found in the Haunted Bedroom.")));
         }
     }
                                
@@ -18524,7 +18743,7 @@ void generateTasks(Checklist [int] checklists)
 	if (my_path_id() == PATH_BUGBEAR_INVASION)
 	{
 		
-		task_entries.listAppend(ChecklistEntryMake("bugbear", "", ChecklistSubentryMake("Bugbears!", "", "I have no idea")));
+		task_entries.listAppend(ChecklistEntryMake("bugbear", "", ChecklistSubentryMake("Bugbears!", "", "I have no idea.")));
 	}
 	
 	
@@ -18538,9 +18757,38 @@ void generateTasks(Checklist [int] checklists)
 		subentry.header = "Level to " + (my_level() + 1);
 		
 		subentry.entries.listAppend("Gain " + substats_remaining + " substats.");
+        
+        string url = "";
+        
+        if (my_primestat() == $stat[muscle] && $location[the haunted billiards room].locationAvailable())
+            url = $location[the haunted gallery].getClickableURLForLocation();
+        else if (my_primestat() == $stat[mysticality] && $location[the haunted bedroom].locationAvailable())
+            url = $location[the haunted bathroom].getClickableURLForLocation();
+        else if (my_primestat() == $stat[moxie] && $location[the haunted bedroom].locationAvailable())
+            url = $location[the haunted ballroom].getClickableURLForLocation();
+        
+        string image_name = "player character";
+        
+        if (false)
+        {
+            //vertically less imposing:
+            //disabled for now - player avatars look better. well, sneaky pete's avatar looks better...
+            image_name = "mini-adventurer blank female";
+            
+            string [class] class_images;
+            class_images[$class[seal clubber]] = "mini-adventurer seal clubber female";
+            class_images[$class[turtle tamer]] = "mini-adventurer turtle tamer female";
+            class_images[$class[pastamancer]] = "mini-adventurer pastamancer female";
+            class_images[$class[sauceror]] = "mini-adventurer sauceror female";
+            class_images[$class[disco bandit]] = "mini-adventurer disco bandit female";
+            class_images[$class[accordion thief]] = "mini-adventurer accordion thief female";
+            
+            if (class_images contains my_class())
+                image_name = class_images[my_class()];
+        }
 		
 		
-		task_entries.listAppend(ChecklistEntryMake("player character", "", subentry, 11));
+		task_entries.listAppend(ChecklistEntryMake(image_name, url, subentry, 11));
 	}
 	
 	
@@ -18597,7 +18845,7 @@ void generateTasks(Checklist [int] checklists)
     if (__misc_state["In run"] && !have_mushroom_plot() && knoll_available() && __misc_state["can eat just about anything"] && fullness_limit() >= 4 && $item[spooky mushroom].available_amount() == 0 && my_path_id() != PATH_WAY_OF_THE_SURPRISING_FIST && my_meat() >= 5000)
     {
         string [int] description;
-        description.listAppend("For spooky mushrooms, to cook a grue egg omelette. (epic food)|Will " + ((my_meat() < 5000) ? "need" : "cost") + " 5k meat.");
+        description.listAppend("For spooky mushrooms, to cook a grue egg omelette. (epic food)|Will " + ((my_meat() < 5000) ? "need" : "cost") + " 5k meat. Plant a spooky spore.");
 		optional_task_entries.listAppend(ChecklistEntryMake("__item spooky mushroom", "knoll_mushrooms.php", ChecklistSubentryMake("Possibly plant a mushroom plot", "", description), 5));
     
     }
@@ -19311,7 +19559,7 @@ void generateMisc(Checklist [int] checklists)
 		checklists.listAppend(ChecklistMake("Unimportant Tasks", unimportant_task_entries));
 	}
 	
-	if (availableDrunkenness() < 0 && $item[drunkula's wineglass].equipped_amount() == 0) //assuming in advance sneaky pete has some sort of drunkenness adventures
+	if (availableDrunkenness() < 0 && $item[drunkula's wineglass].equipped_amount() == 0)
 	{
         //They're drunk, so tasks aren't as relevant. Re-arrange everything:
         string url;
@@ -19632,7 +19880,7 @@ string generateRandomMessage()
     if (__misc_state["free runs usable"])
         familiar_messages[$familiar[Pair of Stomping Boots]] = "running away again?";
     familiar_messages[$familiar[baby sandworm]] = "the waters of life";
-    familiar_messages[$familiar[baby bugged bugbear]] = "expected }, found ; (Main.ash, line 495)";
+    familiar_messages[$familiar[baby bugged bugbear]] = "expected }, found ; (Main.ash, line 501)";
     familiar_messages[$familiar[mechanical songbird]] = "a little glowing friend";
     familiar_messages[$familiar[nanorhino]] = "write every day";
     familiar_messages[$familiar[rogue program]] = "ascends for the users";
@@ -20105,6 +20353,8 @@ void runMain(string relay_filename)
 		__misc_state["Example mode"] = true;
 	}
 	
+    
+    locationCompatibilityInit();
 	PageInit();
 	ChecklistInit();
 	setUpCSSStyles();
