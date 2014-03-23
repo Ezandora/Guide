@@ -1,7 +1,7 @@
 //This script and its support scripts are in the public domain.
 
 //These settings are for development. Don't worry about editing them.
-string __version = "1.0.25";
+string __version = "1.0.26";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -7261,6 +7261,8 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
                 boolean delay_for_semirare = false;
                 foreach key in semirare_turns
                 {
+                	if (semirare_turns[key].length() == 0)
+                		continue;
                     int turns = semirare_turns[key].to_int();
                     if (turns <= 6 && turns >= 0)
                     {
@@ -16644,6 +16646,8 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         boolean delay_for_semirare = false;
         foreach key in semirare_turns
         {
+        	if (semirare_turns[key].length() == 0)
+        		continue;
             if (semirare_turns[key].to_int() == 3)
             {
                 delay_for_semirare = true;
