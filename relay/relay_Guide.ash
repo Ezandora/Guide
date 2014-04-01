@@ -1,7 +1,7 @@
 //This script and its support scripts are in the public domain.
 
 //These settings are for development. Don't worry about editing them.
-string __version = "1.0.26";
+string __version = "1.0.27";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -19448,6 +19448,8 @@ void setUpCSSStyles()
         PageAddCSSClass("div", "r_navbar_button_container", "overflow:hidden;vertical-align:top;display:inline-block;height:" + __setting_navbar_height + ";");
     }
     PageAddCSSClass("img", "", "border:0px;");
+    if (getHolidaysToday()["April Fool's Day"]) //australia support
+        PageAddCSSClass("img", "", "-moz-transform: scaleY(-1);-o-transform: scaleY(-1);-webkit-transform: scaleY(-1);transform: scaleY(-1);filter: FlipV;-ms-filter: \"FlipV\";");
 }
 
 void generateImageTest(Checklist [int] checklists)
