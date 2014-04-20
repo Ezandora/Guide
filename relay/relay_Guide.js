@@ -17,6 +17,184 @@ function timeInMilliseconds()
     return Date.now();
 }
 
+function mainWindow()
+{
+	var overall_window = window;
+    var breakout = 100; //prevent loops, if somehow that happened
+	while (overall_window.parent != undefined && overall_window.parent != overall_window && breakout > 0)
+    {
+		overall_window = overall_window.parent;
+        breakout--;
+    }
+	return overall_window;
+}
+
+function removeInstalledFrame()
+{
+    try
+    {
+        var overall_window = mainWindow();
+        var rootset = overall_window.frames["rootset"];
+        if (rootset == undefined)
+            return;
+        
+        if (overall_window.frames["Guide Frame"] == undefined)
+            return;
+        rootset.removeChild(rootset.children["Guide Frame"]);
+        rootset.cols = "4*,*";
+    }
+    catch (e)
+    {
+    }
+}
+
+
+function getChatIsCurrentlyActive()
+{
+    var rootset = mainWindow().frames["rootset"];
+	if (rootset == undefined)
+		return false;
+    try
+    {
+        //Test the URL of the chatpane:
+        var url = rootset.children["chatpane"].contentDocument.URL;
+        if (url.indexOf("chatlaunch.php") != -1)
+            return false;
+        if (url.indexOf("mchat.php") != -1) //Modern chat
+            return true;
+        if (url.indexOf("chat.html") != -1) //Older Chat
+            return true;
+        if (url.indexOf("chat.php") != -1) //Ancient Chat
+            return true;
+        //Will miss any chat URLs we don't know about.
+    }
+    catch (e)
+    {
+    }
+    return false;
+}
+
+function getCurrentlyInsideMainpane()
+{
+	return (window.self != window.top && window.name == "mainpane");
+}
+
+function verifyKOLPageIsUnaltered()
+{
+    try
+    {
+        if (mainWindow().frames["rootset"].cols != "4*,*")
+            return false;
+        
+        if (document.getElementById("button_close_box") == undefined)
+            return false;
+        
+        return true;
+    }
+    catch (e)
+    {
+    }
+    return false;
+}
+
+function getCurrentInstalledFramePosition()
+{
+    try
+    {
+        //Bit hacky, examine what we've done to cols:
+        var rootset = mainWindow().frames["rootset"];
+        if (rootset.cols == "*,25%,20%")
+            return 2;
+        else if (rootset.cols == "*,30%,0%" || rootset.cols == "*,30%")
+            return 3;
+    }
+	catch (e)
+    {
+    }
+	return -1;
+}
+
+function installFrame(position)
+{
+    try
+    {
+        var overall_window = mainWindow();
+        var rootset = overall_window.frames["rootset"];
+        if (rootset == undefined)
+            return;
+
+        if (position == getCurrentInstalledFramePosition())
+            return;
+        
+        var chat_active = getChatIsCurrentlyActive();
+        
+        if (overall_window.frames["Guide Frame"] != undefined)
+            removeInstalledFrame();
+
+        
+        //Positions:
+        //-1 - Unknown
+        //1 - Left of everything. Disabled for now.
+        //2 - Left of chat pane, chat pane visible
+        //3 - Left of chat pane, chat pane invisible
+        //4 - Right of everything. Disabled for now.
+            
+        var new_frame = overall_window.document.createElement("frame");
+        new_frame.name = "Guide Frame";
+        new_frame.id = "Guide Frame";
+        new_frame.src = __guide_ash_url;
+        if (position == 2)
+        {
+            rootset.insertBefore(new_frame, rootset.children["chatpane"]);
+            rootset.cols = "*,25%,20%";
+        }
+        else if (position == 3)
+        {
+            rootset.insertBefore(new_frame, rootset.children["chatpane"]);
+            if (chat_active)
+                rootset.cols = "*,30%,0%";
+            else
+                rootset.cols = "*,30%";
+        }
+    }
+    catch (e)
+    {
+    }
+}
+
+function buttonCloseClicked(event)
+{
+	removeInstalledFrame();
+}
+
+function buttonNewWindowClicked(event)
+{
+    openInNewWindow(event,false);
+    buttonCloseClicked(event);
+}
+
+function buttonRightLeftClicked(event)
+{
+    if (getCurrentInstalledFramePosition() != 3)
+        return;
+    installFrame(2);
+}
+
+function buttonRightRightClicked(event)
+{
+    if (getCurrentInstalledFramePosition() != 2)
+        return;
+    installFrame(3);
+}
+
+function installFrameDefault(event)
+{
+    if (getChatIsCurrentlyActive())
+        installFrame(2);
+    else
+        installFrame(3);
+}
+
 function recalculateImportanceBarVisibility(test_position, relevant_container)
 {
     var scroll_position = window.pageYOffset || document.body.scrollTop || document.documentElement.scrollTop;
@@ -53,13 +231,61 @@ function elementGetGlobalOffsetTop(element)
 
 function writePageExtras()
 {
-    if (window.self != window.top && window.name == "mainpane")
+	var editable_area_top = document.getElementById("extra_words_at_top");
+	var did_output_install_to_window_link = false;
+    
+    var page_unaltered = verifyKOLPageIsUnaltered();
+    if (true && getCurrentlyInsideMainpane() && page_unaltered)
     {
-        //in frame
-        var editable_area_top = document.getElementById("extra_words_at_top");
-        
-        editable_area_top.innerHTML = "<br><span style=\"font-weight:bold;font-size:1.2em;\"><a href=\"" + __guide_ash_url + "\" onclick=\"openInNewWindow(event);\">Open in a new window</a></span>"; //large, friendly letters
+        //auto install:
+        installFrameDefault();
+        window.location = "main.php"; //visit the map
     }
+    else
+    {
+        if (page_unaltered && getCurrentlyInsideMainpane() && getCurrentInstalledFramePosition() == -1)
+        {
+            editable_area_top.innerHTML += "<br><span style=\"font-weight:bold;font-size:1.2em;\"><a href=\"main.php\" onclick=\"installFrameDefault(event);\">Install into window</a></span>";
+            did_output_install_to_window_link = true;
+        }
+        
+        if (getCurrentlyInsideMainpane())
+        {
+            //just loaded
+            if (did_output_install_to_window_link)
+                editable_area_top.innerHTML += "<br>";
+            editable_area_top.innerHTML += "<br><span style=\"font-weight:bold;font-size:1.2em;\"><a href=\"" + __guide_ash_url + "\" onclick=\"openInNewWindow(event,true);\">Open in a new window</a></span>"; //large, friendly letters
+        }
+    }
+    var frame_id = "";
+    if (window.frameElement != undefined)
+        frame_id = window.frameElement.id;
+    if (frame_id == "Guide Frame")
+	{
+		//in frame
+        try
+        {
+            document.getElementById("button_close_box").style.visibility = "visible";
+            
+            document.getElementById("button_new_window").style.visibility = "visible";
+            
+            document.getElementById("button_refresh").style.visibility = "visible";
+            
+            var current_position = getCurrentInstalledFramePosition();
+            
+            if (current_position == 3)
+            {
+                document.getElementById("button_arrow_right_left").style.visibility = "visible";
+            }
+            if (current_position == 2)
+            {
+                document.getElementById("button_arrow_right_right").style.visibility = "visible";
+            }
+        }
+        catch (e) //buttons may not be there
+        {
+        }
+	}
     var refresh_status = document.getElementById("refresh_status");
     refresh_status.innerHTML = ""; //clear out disabled message
     
@@ -206,7 +432,7 @@ function checkForUpdate()
 	request.send(form_data);
 }
 
-function openInNewWindow(event)
+function openInNewWindow(event, go_back)
 {
     //Kind of hacky.
     if (event.button == 0) //regular click. not middle click or anything else.
@@ -214,16 +440,19 @@ function openInNewWindow(event)
         //Open new window, go to main.php
         //If we did this with target=_blank, we couldn't control how the window looks.
         window.open(__guide_ash_url,'Guide','width=' + __guide_default_window_size + ',height=65536,left=0,resizable,scrollbars,status=no,toolbar=no,fullscreen=no,channelmode=no,location=no');
-        window.location = "main.php"; //visit the map
-        try
+        if (go_back)
         {
-            event.preventDefault(); //href is to ourselves. Cancel that load, let's visit the map instead.
+            window.location = "main.php"; //visit the map
+            try
+            {
+                event.preventDefault(); //href is to ourselves. Cancel that load, let's visit the map instead.
+            }
+            catch (exception)
+            {
+                //unsupported in IE8, just fall through
+            }
+            return false; //backup method to the cancel method above. Not sure if it works.
         }
-        catch (exception)
-        {
-            //unsupported in IE8, just fall through
-        }
-        return false; //backup method to the cancel method above. Not sure if it works.
     }
     return true;
 }
