@@ -81,7 +81,7 @@ void SGrimstoneHareGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         vehicle_descriptions.listAppend(listMake("sketchy van", elemental_descriptions["sleaze"]));
     
     monster last_encounter = get_property_monster("lastEncounter");
-    string [int] vehicles = split_string_mutable("Fire truck,ice cream truck,monster hearse,sewer tanker,sketchy van", ",");
+    string [int] vehicles = split_string_alternate("Fire truck,ice cream truck,monster hearse,sewer tanker,sketchy van", ",");
     
     foreach key in vehicles
     {

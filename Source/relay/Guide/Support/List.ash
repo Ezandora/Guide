@@ -81,6 +81,22 @@ void listAppend(familiar [int] list, familiar entry)
 	list[position] = entry;
 }
 
+void listAppend(monster [int] list, monster entry)
+{
+	int position = list.count();
+	while (list contains position)
+		position += 1;
+	list[position] = entry;
+}
+
+void listAppend(phylum [int] list, phylum entry)
+{
+	int position = list.count();
+	while (list contains position)
+		position += 1;
+	list[position] = entry;
+}
+
 
 
 
@@ -140,6 +156,14 @@ location [int] listMakeBlankLocation()
 	location [int] result;
 	return result;
 }
+
+monster [int] listMakeBlankMonster()
+{
+	monster [int] result;
+	return result;
+}
+
+
 
 
 string [int] listMake(string e1)
@@ -390,6 +414,22 @@ string listJoinComponents(location [int] list, string joining_string)
 }
 
 
+string listJoinComponents(int [int] list, string joining_string, string and_string)
+{
+	//lazy:
+	//convert ints to strings, join that
+	string [int] list_string;
+	foreach key in list
+		list_string.listAppend(list[key].to_string());
+	return listJoinComponents(list_string, joining_string, and_string);
+}
+
+string listJoinComponents(int [int] list, string joining_string)
+{
+	return listJoinComponents(list, joining_string, "");
+}
+
+
 void listRemoveKeys(string [int] list, int [int] keys_to_remove)
 {
 	foreach i in keys_to_remove
@@ -399,6 +439,36 @@ void listRemoveKeys(string [int] list, int [int] keys_to_remove)
 			continue;
 		remove list[key];
 	}
+}
+
+int listSum(int [int] list)
+{
+    int v = 0;
+    foreach key in list
+    {
+        v += list[key];
+    }
+    return v;
+}
+
+//Strict, in this case, means the keys start at 0, and go up by one per entry. This allows easy consistent access
+boolean listKeysMeetStrictRequirements(string [int] list)
+{
+    int expected_value = 0;
+    foreach key in list
+    {
+        if (key != expected_value)
+            return false;
+        expected_value += 1;
+    }
+    return true;
+}
+string [int] listCopyStrictRequirements(string [int] list)
+{
+    string [int] result;
+    foreach key in list
+        result.listAppend(list[key]);
+    return result;
 }
 
 string [string] mapMake()
@@ -440,6 +510,14 @@ string [string] mapMake(string key1, string value1, string key2, string value2, 
 	result[key4] = value4;
 	return result;
 }
+string [string] mapCopy(string [string] map)
+{
+    string [string] result;
+    foreach key in map
+        result[key] = map[key];
+    return map;
+}
+
 boolean [string] listGeneratePresenceMap(string [int] list)
 {
 	boolean [string] result;

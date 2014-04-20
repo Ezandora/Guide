@@ -15,6 +15,26 @@ boolean HITSStillRelevant()
 
 void QHitsInit()
 {
+    //This isn't really a quest...
+	QuestState state;
+    
+    state.quest_name = "Hole in the Sky";
+    state.image_name = "Hole in the Sky";
+    
+    
+    state.state_boolean["Need starfish"] = true;
+	
+    if ($familiar[star starfish].have_familiar_replacement() || __misc_state["familiars temporarily blocked"] || my_path_id() == PATH_ZOMBIE_SLAYER)
+        state.state_boolean["Need starfish"] = false;
+	
+    
+    if (__quest_state["Level 13"].state_boolean["past keys"])
+    {
+        state.state_boolean["Need starfish"] = false;
+    }
+    //FIXME rest
+    
+	__quest_state["Hole in the Sky"] = state;
 }
 
 void QHitsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -48,7 +68,7 @@ void QHitsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] 
 		lines_needed_base += 3;
 		item_names_needed.listAppend($item[star hat]);
 	}
-	if (!$familiar[star starfish].have_familiar_replacement() && !__misc_state["familiars temporarily blocked"])
+	if (__quest_state["Hole in the Sky"].state_boolean["Need starfish"])
 	{
 		star_charts_needed += 1;
 		stars_needed_base += 6;
@@ -245,7 +265,7 @@ void QHitsGenerateMissingItems(ChecklistEntry [int] items_needed_entries)
 		oh_my_stars_and_gauze_garters.listAppend($item[line].available_amount() + "/[6, 5, or 4] lines");
 		items_needed_entries.listAppend(ChecklistEntryMake("__item star crossbow", url, ChecklistSubentryMake("Star crossbow, staff, or sword", "", oh_my_stars_and_gauze_garters.listJoinComponents(", ", "and"))));
 	}
-	if (!have_familiar_replacement($familiar[star starfish]) && !__misc_state["familiars temporarily blocked"])
+	if (__quest_state["Hole in the Sky"].state_boolean["Need starfish"])
 	{
 		if ($item[star starfish].available_amount() > 0)
 		{

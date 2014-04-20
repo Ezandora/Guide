@@ -236,6 +236,7 @@ string ChecklistGenerateModifierSpan(string modifier)
 void ChecklistInit()
 {
 	PageAddCSSClass("a", "r_cl_internal_anchor", "");
+	PageAddCSSClass("", "r_cl_modifier_inline", "font-size:0.80em; color:" + __setting_modifier_color + ";");
 	PageAddCSSClass("", "r_cl_modifier", "font-size:0.80em; color:" + __setting_modifier_color + "; display:block;");
 	
 	PageAddCSSClass("", "r_cl_header", "text-align:center; font-size:1.15em; font-weight:bold;");
@@ -334,6 +335,7 @@ buffer ChecklistGenerate(Checklist cl, boolean output_borders)
 	
 	//Sort by importance:
 	sort entries by value.importance_level;
+    
 	
 	if (true)
 	{
@@ -346,7 +348,7 @@ buffer ChecklistGenerate(Checklist cl, boolean output_borders)
 				ChecklistSubentry subentry = entry.subentries[j];
 				foreach k in subentry.entries
 				{
-					string [int] line_split = split_string_mutable(subentry.entries[k], "\\|");
+					string [int] line_split = split_string_alternate(subentry.entries[k], "\\|");
 					foreach l in line_split
 					{
 						if (stringHasPrefix(line_split[l], "*"))
@@ -359,13 +361,15 @@ buffer ChecklistGenerate(Checklist cl, boolean output_borders)
 					//Recombine:
 					buffer building_line;
 					boolean first = true;
+                    boolean last_was_indention = false;
 					foreach key in line_split
 					{
 						string line = line_split[key];
-						if (!contains_text(line, "class=\"r_indention\"") && !first) //hack way of testing for indention
+						if (!contains_text(line, "class=\"r_indention\"") && !first && !last_was_indention) //hack way of testing for indention
 						{
 							building_line.append("<br>");
 						}
+                        last_was_indention = contains_text(line, "class=\"r_indention\"");
 						building_line.append(line);
 						first = false;
 					}

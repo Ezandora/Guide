@@ -86,7 +86,7 @@ void SPulverizeGenerateResource(ChecklistEntry [int] available_resources_entries
         blacklist_string += ",reinforced beaded headband,bullet-proof corduroys,round purple sunglasses,beer helmet,distressed denim pants,bejeweled pledge pin";
     if (!__quest_state["Level 11 Hidden City"].state_boolean["Hospital finished"])
         blacklist_string += ",head mirror,surgical apron,bloodied surgical dungarees,surgical mask,half-size scalpel";
-    string [int] blacklist_source = split_string_mutable(blacklist_string, ",");
+    string [int] blacklist_source = split_string_alternate(blacklist_string, ",");
     boolean [item] blacklist;
     foreach key in blacklist_source
         blacklist[blacklist_source[key].to_item()] = true;

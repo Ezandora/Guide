@@ -265,6 +265,7 @@ void PageSetBodyAttribute(string attribute, string value)
 
 void PageInit()
 {
+	PageAddCSSClass("a", "r_a_undecorated", "text-decoration:none;color:inherit;");
 	PageAddCSSClass("div", "r_center", "margin-left:auto; margin-right:auto;text-align:center;");
 	PageAddCSSClass("", "r_bold", "font-weight:bold;");
 	PageAddCSSClass("", "r_end_floating_elements", "clear:both;");
@@ -275,8 +276,14 @@ void PageInit()
 	PageAddCSSClass("", "r_element_cold", "color:blue;");
 	PageAddCSSClass("", "r_element_sleaze", "color:purple;");
 	PageAddCSSClass("", "r_element_spooky", "color:gray;");
+    
+    //50% desaturated versions of above:
+	PageAddCSSClass("", "r_element_stench_desaturated", "color:#427F40;");
+	PageAddCSSClass("", "r_element_hot_desaturated", "color:#FF7F81;");
+	PageAddCSSClass("", "r_element_cold_desaturated", "color:#6B64FF;");
+	PageAddCSSClass("", "r_element_sleaze_desaturated", "color:#7F407F;");
+	PageAddCSSClass("", "r_element_spooky_desaturated", "color:gray;");
 	
-	PageAddCSSClass("a", "r_a_undecorated", "text-decoration:none;color:inherit;");
 	PageAddCSSClass("", "r_indention", "margin-left:" + __setting_indention_width + ";");
 	
 	//Simple table lines:

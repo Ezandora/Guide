@@ -95,7 +95,7 @@ void QSpaceElvesGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
 			subentry.entries.listAppend("spooky");
 		else
 		{
-			subentry.entries.listAppend("Adventure in Grimacia with spooky little girl.");
+			subentry.entries.listAppend("Adventure in Grimacia with spooky little girl for eleven turns.");
 		}
 			
 	}

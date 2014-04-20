@@ -27,7 +27,6 @@ void SDungeonsOfDoomGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
         return;
     if (__misc_state["In run"] && turns_attempted == 0) //in run, but they haven't gone there
     {
-        //Let's see.
         //They haven't adventured there yet, so we should only suggest this if it's a good idea.
         if (__misc_state["fax accessible"] && __misc_state["can use clovers"] || !in_hardcore()) //they can fax quantum mechanics and use clovers
             return;

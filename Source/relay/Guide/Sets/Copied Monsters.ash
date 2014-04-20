@@ -124,11 +124,10 @@ void generateCopiedMonstersEntry(ChecklistEntry [int] task_entries, ChecklistEnt
 	int show_up_in_tasks_turn_cutoff = 10;
 	string title = "";
 	int min_turns_until = -1;
-	if (__misc_state_string["Romantic Monster turn range"] != "" || get_property_int("_romanticFightsLeft") > 0)
+    Counter romantic_arrow_counter = CounterLookup("Romantic Monster");
+	if (romantic_arrow_counter.CounterIsRange() || get_property_int("_romanticFightsLeft") > 0)
 	{
-		string [int] turn_range_string = split_string_mutable(__misc_state_string["Romantic Monster turn range"], ",");
-        
-        Vec2i turn_range = Vec2iMake(turn_range_string[0].to_int(), turn_range_string[1].to_int()); //if these are zero, then we're still accurate
+        Vec2i turn_range = romantic_arrow_counter.CounterGetWindowRange();
         
         title = "Arrowed " + __misc_state_string["Romantic Monster Name"].to_lower_case() + " appears ";
         
@@ -137,7 +136,7 @@ void generateCopiedMonstersEntry(ChecklistEntry [int] task_entries, ChecklistEnt
         else if (turn_range.x <= 0)
             title += "between now and " + turn_range.y + " turns.";
         else
-            title += "in [" + turn_range_string.listJoinComponents(" to ") + "] turns.";
+            title += "in [" + turn_range.x + " to " + turn_range.y + "] turns.";
         
         min_turns_until = turn_range.x;
         
@@ -202,16 +201,19 @@ void SCopiedMonstersGenerateResourceForCopyType(ChecklistEntry [int] available_r
 void SCopiedMonstersGenerateResource(ChecklistEntry [int] available_resources_entries)
 {
     //Sources:
+    
+    boolean have_spooky_putty = $items[Spooky Putty ball,Spooky Putty leotard,Spooky Putty mitre,Spooky Putty sheet,Spooky Putty snake,Spooky Putty monster].available_amount() > 0;
+    
 	int copies_used = get_property_int("spookyPuttyCopiesMade") + get_property_int("_raindohCopiesMade");
-	int copies_available = MIN(6,5*MIN($item[spooky putty sheet].available_amount() + $item[Spooky Putty monster].available_amount(), 1) + 5*MIN($item[Rain-Doh black box].available_amount() + $item[rain-doh box full of monster].available_amount(), 1));
+	int copies_available = MIN(6,5*MIN($items[Spooky Putty ball,Spooky Putty leotard,Spooky Putty mitre,Spooky Putty sheet,Spooky Putty snake,Spooky Putty monster].available_amount(), 1) + 5*MIN($item[Rain-Doh black box].available_amount() + $item[rain-doh box full of monster].available_amount(), 1));
     int copies_left = copies_available - copies_used;
 	if (copies_left > 0)
 	{
 		string [int] copy_source_list;
-		if ($item[spooky putty sheet].available_amount() + $item[Spooky Putty monster].available_amount() > 0)
-        copy_source_list.listAppend("spooky putty");
+		if (have_spooky_putty)
+            copy_source_list.listAppend("spooky putty");
 		if ($item[Rain-Doh black box].available_amount() + $item[rain-doh box full of monster].available_amount() > 0)
-        copy_source_list.listAppend("rain-doh black box");
+            copy_source_list.listAppend("rain-doh black box");
         
 		string copy_sources = copy_source_list.listJoinComponents("/");
 		string name = "";

@@ -76,7 +76,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	entry.subentries.listAppend(ChecklistSubentryMake(base_quest_state.quest_name));
     entry.should_highlight = $locations[the defiled nook, the defiled cranny, the defiled alcove, the defiled niche, haert of the cyrpt] contains __last_adventure_location;
 	
-	string [int] evilness_properties = split_string_mutable("cyrptAlcoveEvilness,cyrptCrannyEvilness,cyrptNicheEvilness,cyrptNookEvilness", ",");
+	string [int] evilness_properties = split_string_alternate("cyrptAlcoveEvilness,cyrptCrannyEvilness,cyrptNicheEvilness,cyrptNookEvilness", ",");
 	string [string] evilness_text;
 	
 	foreach key in evilness_properties
@@ -175,7 +175,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		subentry.header = "Defiled Cranny";
 		subentry.entries.listAppend(evilness_text["cyrptCrannyEvilness"]);
 		
-		if (base_quest_state.state_int["cranny evilness"] > 25)
+		if (base_quest_state.state_int["cranny evilness"] > 26)
 		{
             subentry.modifiers.listAppend("-combat");
             subentry.modifiers.listAppend("+ML");
@@ -197,7 +197,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 			
 			subentry.entries.listAppend("~" + cranny_beep_beep_beep.roundForOutput(1) + " beeps per ghuol swarm. ~" + average_turns_remaining.roundForOutput(1) + " turns remain to boss.");
 		}
-        else
+        else if (base_quest_state.state_int["cranny evilness"] <= 25)
             subentry.modifiers.listAppend("+meat");
 		
 		entry.subentries.listAppend(subentry);
@@ -212,7 +212,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		{
             subentry.modifiers.listAppend("+init");
             subentry.modifiers.listAppend("-combat");
-			int zmobies_needed = ceil((evilness.to_float() - 25.0) / 5.0);
+			int zmobies_needed = ceil((evilness.to_float() - 26.0) / 5.0);
 			float zmobie_chance = min(100.0, 15.0 + initiative_modifier() / 10.0);
 			
 			subentry.entries.listAppend(pluralize(zmobies_needed, "modern zmobie", "modern zmobies") + " needed (" + roundForOutput(zmobie_chance, 0) + "% chance of appearing)");

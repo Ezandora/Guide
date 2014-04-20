@@ -32,10 +32,134 @@ boolean [location] __la_location_is_available;
 boolean __la_commons_were_inited = false;
 int __la_turncount_initialized_on = -1;
 
-boolean locationQuestPropertyPastInternalStepNumber(string quest_property, int number)
+
+//Takes into account banishes and olfactions.
+//Probably will be inaccurate in many corner cases, sorry.
+float [monster] appearance_rates_adjusted(location l)
 {
-	return QuestStateConvertQuestPropertyValueToNumber(get_property(quest_property)) >= number;
+    //FIXME domed city of ronald/grimacia doesn't take into account alien appearance rate
+    float [monster] source = l.appearance_rates();
+    
+    if (l == $location[the sleazy back alley])
+        source[$monster[none]] = MIN(MAX(0, 20 - combat_rate_modifier()), 100);
+    
+    float minimum_monster_appearance = 1000000000.0;
+    foreach m in source
+    {
+        if (m == $monster[none])
+            continue;
+        float v = source[m];
+        if (v > 0.0)
+        {
+            if (v < minimum_monster_appearance)
+                minimum_monster_appearance = v;
+        }
+    }
+    
+    float [monster] source_altered;
+    foreach m in source
+    {
+        float v = source[m];
+        if (m == $monster[none])
+            source_altered[m] = v;
+        else
+            source_altered[m] = v / minimum_monster_appearance;
+    }
+    
+    
+    boolean lawyers_relocated = (get_property_int("relocatePygmyLawyer") == my_ascensions());
+    boolean janitors_relocated = (get_property_int("relocatePygmyJanitor") == my_ascensions());
+    if (l == $location[the hidden park])
+    {
+        if (janitors_relocated)
+            source_altered[$monster[pygmy janitor]] += 1.0;
+        if (lawyers_relocated)
+            source_altered[$monster[pygmy witch lawyer]] += 1.0;
+    }
+    if (($locations[The Hidden Apartment Building,The Hidden Bowling Alley,The Hidden Hospital,The Hidden Office Building] contains l))
+    {
+        if (janitors_relocated && (source_altered contains $monster[pygmy janitor]))
+            remove source_altered[$monster[pygmy janitor]];
+        if (lawyers_relocated && (source_altered contains $monster[pygmy witch lawyer]))
+            remove source_altered[$monster[pygmy witch lawyer]];
+    }
+    
+    foreach m in source_altered
+    {
+        if (m.is_banished())
+            source_altered[m] = 0.0;
+    }
+    
+    if ($effect[on the trail].have_effect() > 0)
+    {
+        monster olfacted_monster = get_property("olfactedMonster").to_monster();
+        if (olfacted_monster != $monster[none])
+        {
+            if (source_altered contains olfacted_monster)
+                source_altered[olfacted_monster] += 3.0; //FIXME is this correct?
+        }
+    }
+    
+    
+    //Convert source_altered to source.
+    if (l == __location_palindome)
+    {
+        if (!questPropertyPastInternalStepNumber("questL11Palindome", 3))
+            source_altered[$monster[none]] = 0.0;
+    }
+    
+    float total = 0.0;
+    float nc_rate = clampf(source_altered[$monster[none]], 0.0, 100.0);
+    float combat_rate = clampf(100.0 - nc_rate, 0.0, 100.0);
+    foreach m in source_altered
+    {
+        float v = source_altered[m];
+        if (m == $monster[none])
+            continue;
+        if (v > 0)
+            total += v;
+    }
+    if ($locations[Guano Junction,the Batrat and Ratbat Burrow,the Beanbat Chamber] contains l)
+    {
+        //hacky, probably wrong:
+        float v = total / 8.0;
+        source_altered[$monster[screambat]] = v;
+        total += v;
+    }
+    //oil peak goes here?
+    
+    if (total > 0.0)
+    {
+        foreach m in source_altered
+        {
+            if (m == $monster[none])
+                continue;
+            float v = source_altered[m];
+            source_altered[m] = v / total * combat_rate;
+        }
+    }
+    
+    return source_altered;
 }
+
+
+float [monster] appearance_rates_adjusted_cancel_nc(location l)
+{
+    float [monster] base_rates = appearance_rates_adjusted(l);
+    float nc_rate = base_rates[$monster[none]];
+    float nc_inverse_multiplier = 1.0;
+    if (nc_rate != 1.0)
+        nc_inverse_multiplier = 1.0 / (1.0 - nc_rate);
+    foreach m in base_rates
+    {
+        if (m == $monster[none])
+            base_rates[m] = 0.0;
+        else
+            base_rates[m] *= nc_inverse_multiplier;
+    }
+    return base_rates;
+}
+
 
 //Do not call - internal implementation detail.
 boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
@@ -85,7 +209,7 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
 			string quest_value = get_property("questL05Goblin");
 			if (quest_value == "finished")
 				return true;
-			else if (quest_value == "started") //FIXME locationQuestPropertyPastInternalStepNumber
+			else if (quest_value == "started") //FIXME questPropertyPastInternalStepNumber
 			{
 				//Inference - quest is started. If map is missing, area must be unlocked
 				if ($item[cobb's knob map].available_amount() > 0)
@@ -100,32 +224,32 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
 				return true;
 			return false;
 		case $location[the hidden park]:
-			return locationQuestPropertyPastInternalStepNumber("questL11Worship", 4);
+			return questPropertyPastInternalStepNumber("questL11Worship", 4);
         case $location[the hidden temple]:
             return (get_property_int("lastTempleUnlock") == my_ascensions());
 		case $location[the spooky forest]:
-			return locationQuestPropertyPastInternalStepNumber("questL02Larva", 1);
+			return questPropertyPastInternalStepNumber("questL02Larva", 1);
 		case $location[The Smut Orc Logging Camp]:
-			return locationQuestPropertyPastInternalStepNumber("questL09Topping", 1);
+			return questPropertyPastInternalStepNumber("questL09Topping", 1);
 		case $location[the black forest]:
-			return locationQuestPropertyPastInternalStepNumber("questL11MacGuffin", 1);
+			return questPropertyPastInternalStepNumber("questL11MacGuffin", 1);
 		case $location[guano junction]:
 		case $location[the bat hole entrance]:
-			return locationQuestPropertyPastInternalStepNumber("questL04Bat", 1);
+			return questPropertyPastInternalStepNumber("questL04Bat", 1);
 		case $location[itznotyerzitz mine]:
-			return locationQuestPropertyPastInternalStepNumber("questL08Trapper", 2);
+			return questPropertyPastInternalStepNumber("questL08Trapper", 2);
         case $location[the arid, extra-dry desert]:
-			return (locationQuestPropertyPastInternalStepNumber("questL11MacGuffin", 3) || $item[your father's MacGuffin diary].available_amount() > 0);
+			return (questPropertyPastInternalStepNumber("questL11MacGuffin", 3) || $item[your father's MacGuffin diary].available_amount() > 0);
         case $location[the oasis]:
-			return (get_property_int("desertExploration") > 0) && (locationQuestPropertyPastInternalStepNumber("questL11MacGuffin", 3) || $item[your father's MacGuffin diary].available_amount() > 0);
+			return (get_property_int("desertExploration") > 0) && (questPropertyPastInternalStepNumber("questL11MacGuffin", 3) || $item[your father's MacGuffin diary].available_amount() > 0);
         case $location[the defiled alcove]:
-			return locationQuestPropertyPastInternalStepNumber("questL07Cyrptic", 1) && get_property_int("cyrptAlcoveEvilness") > 0;
+			return questPropertyPastInternalStepNumber("questL07Cyrptic", 1) && get_property_int("cyrptAlcoveEvilness") > 0;
         case $location[the defiled cranny]:
-			return locationQuestPropertyPastInternalStepNumber("questL07Cyrptic", 1) && get_property_int("cyrptCrannyEvilness") > 0;
+			return questPropertyPastInternalStepNumber("questL07Cyrptic", 1) && get_property_int("cyrptCrannyEvilness") > 0;
         case $location[the defiled niche]:
-			return locationQuestPropertyPastInternalStepNumber("questL07Cyrptic", 1) && get_property_int("cyrptNicheEvilness") > 0;
+			return questPropertyPastInternalStepNumber("questL07Cyrptic", 1) && get_property_int("cyrptNicheEvilness") > 0;
         case $location[the defiled nook]:
-			return locationQuestPropertyPastInternalStepNumber("questL07Cyrptic", 1) && get_property_int("cyrptNookEvilness") > 0;
+			return questPropertyPastInternalStepNumber("questL07Cyrptic", 1) && get_property_int("cyrptNookEvilness") > 0;
 		case $location[south of the border]:
 			return $items[pumpkin carriage,desert bus pass, bitchin' meatcar, tin lizzie].available_amount() > 0;
 		default:
@@ -193,7 +317,7 @@ void locationAvailablePrivateInit()
 	zones_unlocked_by_effect["Wormwood"] = $effect[Absinthe-Minded];	
 	zones_unlocked_by_effect["Suburbs"] = $effect[Dis Abled];
 	
-	string [int] zones_never_accessible = split_string_mutable(zones_never_accessible_string, ",");
+	string [int] zones_never_accessible = split_string_alternate(zones_never_accessible_string, ",");
 	
 	boolean [string] zone_accessibility_status = zones_never_accessible.listGeneratePresenceMap();
 	
@@ -314,157 +438,385 @@ string HTMLGenerateFutureTextByLocationAvailability(location place)
 
 
 
-string [location] __urls_for_locations;
-boolean __urls_for_locations_initialized = false;
+
+string getClickableURLForLocation(location l, Error unable_to_find_url)
+{
+    switch (l)
+    {
+        //quite the list:
+        case $location[the beanbat chamber]:
+        case $location[the bat hole entrance]:
+        case $location[the batrat and ratbat burrow]:
+        case $location[guano junction]:
+        case $location[the boss bat's lair]:
+            return "place.php?whichplace=bathole";
+        case $location[the \"fun\" house]:
+        case $location[pre-cyrpt cemetary]:
+        case $location[post-cyrpt cemetary]:
+        case $location[Spectral Pickle Factory]:
+            return "place.php?whichplace=plains";
+        case $location[South of the Border]:
+        case $location[The Oasis]:
+        case $location[The Arid, Extra-Dry Desert]:
+        case $location[The Shore, Inc. Travel Agency]:
+            return "place.php?whichplace=desertbeach";
+        case $location[The Upper Chamber]:
+        case $location[The Middle Chamber]:
+        case $location[The Lower Chambers]:
+            return "pyramid.php";
+        case $location[Goat Party]:
+        case $location[Pirate Party]:
+        case $location[Lemon Party]:
+        case $location[The Roulette Tables]:
+        case $location[The Poker Room]:
+            return "casino.php";
+        case $location[The Haiku Dungeon]:
+        case $location[The Limerick Dungeon]:
+        case $location[The Enormous Greater-Than Sign]:
+        case $location[The Dungeons of Doom]:
+        case $location[The Daily Dungeon]:
+            return "da.php";
+        case $location[Video Game Level 1]:
+        case $location[Video Game Level 2]:
+        case $location[Video Game Level 3]:
+            return "place.php?whichplace=faqdungeon";
+        case $location[A Maze of Sewer Tunnels]:
+            return "clan_hobopolis.php";
+        case $location[The Slime Tube]:
+            return "clan_slimetube.php";
+        case $location[Dreadsylvanian Woods]:
+        case $location[Dreadsylvanian Village]:
+        case $location[Dreadsylvanian Castle]:
+            return "clan_dreadsylvania.php";
+        case $location[The Briny Deeps]:
+        case $location[The Brinier Deepers]:
+        case $location[The Briniest Deepests]:
+            return "place.php?whichplace=thesea";
+        case $location[An Octopus's Garden]:
+        case $location[The Wreck of the Edgar Fitzsimmons]:
+        case $location[Madness Reef]:
+        case $location[The Mer-Kin Outpost]:
+        case $location[The Skate Park]:
+        case $location[The Marinara Trench]:
+        case $location[Anemone Mine]:
+        case $location[Anemone Mine (Mining)]:
+        case $location[The Dive Bar]:
+        case $location[The Coral Corral]:
+        case $location[The Caliginous Abyss]:
+            return "seafloor.php";
+        case $location[Mer-kin Elementary School]:
+        case $location[Mer-kin Library]:
+        case $location[Mer-kin Gymnasium]:
+        case $location[Mer-kin Colosseum]:
+            return "sea_merkin.php?seahorse=1";
+        case $location[The Sleazy Back Alley]:
+        case lookupLocation("The Copperhead Club"):
+            return "place.php?whichplace=town_wrong";
+        case $location[The Haunted Pantry]:
+            if ($location[the haunted billiards room].locationAvailable())
+                return "place.php?whichplace=spookyraven1";
+            else
+                return "place.php?whichplace=town_right";
+        case $location[The Haunted Kitchen]:
+        case $location[The Haunted Conservatory]:
+        case $location[The Haunted Library]:
+        case $location[The Haunted Billiards Room]:
+        case $location[The Haunted Gallery]:
+            return "place.php?whichplace=spookyraven1";
+        case $location[The Haunted Bathroom]:
+        case $location[The Haunted Bedroom]:
+        case $location[The Haunted Ballroom]:
+            return "place.php?whichplace=spookyraven2";
+        case $location[The Haunted Wine Cellar (automatic)]:
+        case $location[The Haunted Wine Cellar (Northwest)]:
+        case $location[The Haunted Wine Cellar (Northeast)]:
+        case $location[The Haunted Wine Cellar (Southwest)]:
+        case $location[The Haunted Wine Cellar (Southeast)]:
+        case $location[Summoning Chamber]:
+            return "manor3.php";
+        case $location[The Hidden Apartment Building]:
+        case $location[The Hidden Hospital]:
+        case $location[The Hidden Office Building]:
+        case $location[The Hidden Bowling Alley]:
+        case $location[The Hidden Park]:
+        case $location[An Overgrown Shrine (Northwest)]:
+        case $location[An Overgrown Shrine (Southwest)]:
+        case $location[An Overgrown Shrine (Northeast)]:
+        case $location[An Overgrown Shrine (Southeast)]:
+        case $location[A Massive Ziggurat]:
+            return "place.php?whichplace=hiddencity";
+        case $location[The Typical Tavern Cellar]:
+            return "cellar.php";
+        case $location[8-Bit Realm]:
+        case $location[The Spooky Forest]:
+        case $location[The Hidden Temple]:
+        case $location[Whitey's Grove]:
+        case $location[The Road to White Citadel]:
+        case $location[The Black Forest]:
+        case $location[The Old Landfill]:
+        case $location[The Arrrboretum]:
+            return "place.php?whichplace=woods";
+        case $location[A Barroom Brawl]:
+            return "tavern.php";
+        case $location[Tower Ruins]:
+            return "fernruin.php";
+        case $location[Anger Man's Level]:
+        case $location[Fear Man's Level]:
+        case $location[Doubt Man's Level]:
+        case $location[Regret Man's Level]:
+            return "place.php?whichplace=junggate_3";
+        case $location[The Defiled Nook]:
+        case $location[The Defiled Cranny]:
+        case $location[The Defiled Alcove]:
+        case $location[The Defiled Niche]:
+        case $location[Haert of the Cyrpt]:
+            return "crypt.php";
+        case $location[A-Boo Peak]:
+        case $location[Twin Peak]:
+        case $location[Oil Peak]:
+            return "place.php?whichplace=highlands";
+        case $location[The Battlefield (Frat Uniform)]:
+        case $location[The Battlefield (Hippy Uniform)]:
+            return "bigisland.php";
+        case lookupLocation("A Mob of Zeppelin Protesters"):
+        case lookupLocation("The Red Zeppelin"):
+            return "place.php?whichplace=zeppelin";
+        case $location[The Dark Neck of the Woods]:
+        case $location[The Dark Heart of the Woods]:
+        case $location[The Dark Elbow of the Woods]:
+        case $location[Friar Ceremony Location]:
+            return "friars.php";
+        case $location[Pandamonium Slums]:
+            return "pandamonium.php";
+        case $location[The Laugh Floor]:
+            return "pandamonium.php?action=beli";
+        case $location[Infernal Rackets Backstage]:
+            return "pandamonium.php?action=infe";
+        case $location[The Noob Cave]:
+        case $location[The Dire Warren]:
+            return "tutorial.php";
+        case $location[Itznotyerzitz Mine (in Disguise)]:
+        case $location[Itznotyerzitz Mine]:
+        case $location[The Goatlet]:
+        case $location[Lair of the Ninja Snowmen]:
+        case $location[The eXtreme Slope]:
+        case $location[Mist-Shrouded Peak]:
+        case $location[The Icy Peak]:
+            return "place.php?whichplace=mclargehuge";
+        case $location[The Smut Orc Logging Camp]:
+            return "place.php?whichplace=orc_chasm";
+        case $location[The Valley of Rof L'm Fao]:
+        case $location[Mt. Molehill]:
+        case lookupLocation("The Thinknerd Warehouse"):
+            return "place.php?whichplace=mountains";
+        case $location[The Nightmare Meatrealm]:
+            return "place.php?whichplace=junggate_6";
+        case $location[A Kitchen Drawer]:
+        case $location[A Grocery Bag]:
+            return "place.php?whichplace=junggate_5";
+        case $location[Chinatown Shops]:
+        case $location[Triad Factory]:
+        case $location[1st Floor\, Shiawase-Mitsuhama Building]:
+        case $location[2nd Floor\, Shiawase-Mitsuhama Building]:
+        case $location[3rd Floor\, Shiawase-Mitsuhama Building]:
+        case $location[Chinatown Tenement]:
+            return "place.php?whichplace=junggate_1";
+        case $location[Sorceress' Hedge Maze]:
+            return "lair3.php";
+        case $location[Cobb's Knob Laboratory]:
+        case $location[The Knob Shaft]:
+        case $location[The Knob Shaft (Mining)]:
+            return "cobbsknob.php?action=tolabs";
+        case $location[Cobb's Knob Menagerie, Level 1]:
+        case $location[Cobb's Knob Menagerie, Level 2]:
+        case $location[Cobb's Knob Menagerie, Level 3]:
+            return "cobbsknob.php?action=tomenagerie";
+        case $location[McMillicancuddy's Barn]:
+        case $location[McMillicancuddy's Pond]:
+        case $location[McMillicancuddy's Back 40]:
+        case $location[McMillicancuddy's Other Back 40]:
+        case $location[McMillicancuddy's Granary]:
+        case $location[McMillicancuddy's Bog]:
+        case $location[McMillicancuddy's Family Plot]:
+        case $location[McMillicancuddy's Shady Thicket]:
+            return "bigisland.php?place=farm";
+        case $location[Frat House]:
+        case $location[Frat House In Disguise]:
+        case $location[The Frat House (Bombed Back to the Stone Age)]:
+        case $location[Hippy Camp]:
+        case $location[Hippy Camp In Disguise]:
+        case $location[The Hippy Camp (Bombed Back to the Stone Age)]:
+        case $location[Wartime Frat House]:
+        case $location[Wartime Frat House (Hippy Disguise)]:
+        case $location[Wartime Hippy Camp]:
+        case $location[Wartime Hippy Camp (Frat Disguise)]:
+        case $location[The Obligatory Pirate's Cove]:
+        case $location[Post-War Junkyard]:
+        case $location[McMillicancuddy's Farm]:
+            return "island.php";
+        case $location[The Broodling Grounds]:
+        case $location[The Outer Compound]:
+        case $location[The Temple Portico]:
+        case $location[Convention Hall Lobby]:
+        case $location[Outside the Club]:
+        case $location[The Island Barracks]:
+        case $location[The Nemesis' Lair]:
+            return "volcanoisland.php";
+        case $location[The Penultimate Fantasy Airship]:
+        case $location[The Hole in the Sky]:
+            return "place.php?whichplace=beanstalk";
+        case $location[The Castle in the Clouds in the Sky (Basement)]:
+        case $location[The Castle in the Clouds in the Sky (Ground Floor)]:
+        case $location[The Castle in the Clouds in the Sky (Top Floor)]:
+            return "place.php?whichplace=giantcastle";
+        case $location[The Outskirts of Cobb's Knob]:
+            if ($location[cobb's knob barracks].locationAvailable())
+                return "cobbsknob.php";
+            else
+                return "place.php?whichplace=plains";
+        case $location[Cobb's Knob Barracks]:
+        case $location[Cobb's Knob Kitchens]:
+        case $location[Cobb's Knob Harem]:
+        case $location[Cobb's Knob Treasury]:
+        case $location[Throne Room]:
+            return "cobbsknob.php";
+        case $location[Next to that Barrel with Something Burning in it]:
+        case $location[Near an Abandoned Refrigerator]:
+        case $location[Over Where the Old Tires Are]:
+        case $location[Out by that Rusted-Out Car]:
+            return "bigisland.php?place=junkyard";
+        case $location[The Clumsiness Grove]:
+        case $location[The Maelstrom of Lovers]:
+        case $location[The Glacier of Jerks]:
+            return "suburbandis.php";
+        case $location[Domed City of Ronaldus]:
+        case $location[Domed City of Grimacia]:
+        case $location[Hamburglaris Shield Generator]:
+            return "place.php?whichplace=spaaace";
+        case $location[Barrrney's Barrr]:
+        case $location[The F'c'le]:
+        case $location[The Poop Deck]:
+        case $location[Belowdecks]:
+            return "place.php?whichplace=cove";
+        case $location[The Stately Pleasure Dome]:
+        case $location[The Mouldering Mansion]:
+        case $location[The Rogue Windmill]:
+            return "place.php?whichplace=wormwood";
+        case $location[The Red Queen's Garden]:
+            return "place.php?whichplace=rabbithole";
+        case $location[The Primordial Soup]:
+        case $location[The Jungles of Ancient Loathing]:
+        case $location[Seaside Megalopolis]:
+            return "place.php?whichplace=memories";
+        case $location[The Degrassi Knoll Restroom]:
+        case $location[The Degrassi Knoll Bakery]:
+        case $location[The Degrassi Knoll Gym]:
+        case $location[The Degrassi Knoll Garage]:
+        case $location[The Bugbear Pen]:
+        case $location[The Spooky Gravy Barrow]:
+        case $location[Post-Quest Bugbear Pens]:
+            if (knoll_available())
+                return "place.php?whichplace=knoll_friendly";
+            else
+                return "place.php?whichplace=knoll_hostile";
+        case __location_palindome:
+            if ($item[talisman o' nam].equipped_amount() > 0)
+                return "place.php?whichplace=palindome";
+            else
+                return "inventory.php?which=2";
+        case lookupLocation("A Deserted Stretch of I-911"):
+            return "place.php?whichplace=ioty2014_hare";
+        case $location[The Hatching Chamber]:
+        case $location[The Feeding Chamber]:
+        case $location[The Royal Guard Chamber]:
+        case $location[The Filthworm Queen's Chamber]:
+            return "bigisland.php?place=orchard";
+        case $location[Sonofa Beach]:
+            return "bigisland.php?place=lighthouse";
+        case $location[The Themthar Hills]:
+            return "bigisland.php?place=nunnery";
+        case $location[Nemesis Cave]:
+            return "cave.php";
+        case $location[The Barrel Full of Barrels]:
+            return "barrel.php";
+        case $location[Fernswarthy's Basement]:
+            return "basement.php";
+            
+        case $location[Pump Up Muscle]:
+            return "place.php?whichplace=knoll_friendly&action=dk_gym";
+            
+        case $location[hobopolis town square]:
+            return "clan_hobopolis.php?place=2";
+        case $location[Burnbarrel Blvd.]:
+            return "clan_hobopolis.php?place=4";
+        case $location[Exposure Esplanade]:
+            return "clan_hobopolis.php?place=5";
+        case $location[The Ancient Hobo Burial Ground]:
+            return "clan_hobopolis.php?place=7";
+        case $location[The Purple Light District]:
+            return "clan_hobopolis.php?place=8";
+        case $location[The Heap]:
+            return "clan_hobopolis.php?place=6";
+        case $location[richard's hobo muscle]:
+        case $location[richard's hobo mysticality]:
+        case $location[richard's hobo moxie]:
+            return "clan_hobopolis.php?place=3";
+            
+        //Lost to time:
+        case $location[Lollipop Forest]:
+        case $location[Fudge Mountain]:
+        case lookupLocation("WarBear Fortress (First Level)"):
+        case lookupLocation("WarBear Fortress (Second Level)"):
+        case lookupLocation("WarBear Fortress (Third Level)"):
+        case $location[Crimbokutown Toy Factory]:
+        case $location[Elf Alley]:
+        case $location[CRIMBCO cubicles]:
+        case $location[CRIMBCO WC]:
+        case $location[Crimbo Town Toy Factory]:
+        case $location[The Don's Crimbo Compound]:
+        case $location[Atomic Crimbo Toy Factory]:
+        case $location[Old Crimbo Town Toy Factory]:
+        case $location[Sinister Dodecahedron]:
+        case $location[Simple Tool-Making Cave]:
+        case $location[Spooky Fright Factory]:
+        case $location[Crimborg Collective Factory]:
+        case $location[Future Market Square]:
+        case $location[Mall of the Future]:
+        case $location[Future Wrong Side of the Tracks]:
+        case $location[Icy Peak of the Past]:case $location[Shivering Timbers]:
+        case $location[A Skeleton Invasion!]:
+        case $location[The Cannon Museum]:
+        case $location[A Swarm of Yeti-Mounted Skeletons]:
+        case $location[The Bonewall]:
+        case $location[A Massive Flying Battleship]:
+        case $location[A Supply Train]:
+        case $location[The Bone Star]:
+        case $location[Grim Grimacite Site]:
+        case $location[A Pile of Old Servers]:
+        case $location[The Haunted Sorority House]:
+        case $location[Fightin' Fire]:
+        case $location[Super-Intense Mega-Grassfire]:
+        case $location[Fierce Flying Flames]:
+        case $location[Lord Flameface's Castle Entryway]:
+        case $location[Lord Flameface's Castle Belfry]:
+        case $location[Lord Flameface's Throne Room]:
+        case $location[A Stinking Abyssal Portal]:
+        case $location[A Scorching Abyssal Portal]:
+        case $location[A Terrifying Abyssal Portal]:
+        case $location[A Freezing Abyssal Portal]:
+        case $location[An Unsettling Abyssal Portal]:
+        case $location[A Yawning Abyssal Portal]:
+        case $location[The Space Odyssey Discotheque]:
+        case $location[The Spirit World]:
+            return "";
+    }
+    ErrorSet(unable_to_find_url);
+    return "";
+}
 
 string getClickableURLForLocation(location l)
 {
-    if (!__urls_for_locations_initialized)
-    {
-        foreach l in $locations[The Beanbat Chamber, the bat hole entrance, the batrat and ratbat burrow, guano junction, the boss bat's lair]
-            __urls_for_locations[l] = "place.php?whichplace=bathole";
-        foreach l in $locations[the \"fun\" house, pre-cyrpt cemetary, post-cyrpt cemetary,The Outskirts of Cobb's Knob]
-            __urls_for_locations[l] = "place.php?whichplace=plains";
-            
-        if ($item[talisman o' nam].equipped_amount() == 0)
-            __urls_for_locations[__location_palindome] = "inventory.php?which=2";
-        else
-            __urls_for_locations[__location_palindome] = "place.php?whichplace=palindome";
-        
-        if ($location[cobb's knob barracks].locationAvailable())
-            __urls_for_locations[$location[The Outskirts of Cobb's Knob]] = "cobbsknob.php";
-        
-        foreach l in $locations[cobb's knob barracks, cobb's knob kitchens, cobb's knob harem, cobb's knob treasury]
-            __urls_for_locations[l] = "cobbsknob.php";
-        __urls_for_locations[$location[a barroom brawl]] = "tavern.php";
-        __urls_for_locations[$location[the sleazy back alley]] = "place.php?whichplace=town_wrong";
-        
-        foreach l in $locations[the spooky forest, whitey's grove, the road to white citadel, the black forest, the hidden temple]
-            __urls_for_locations[l] = "place.php?whichplace=woods";
-            
-        if ($location[cobb's knob kitchens].locationAvailable())
-            __urls_for_locations[$location[The Haunted Pantry]] = "place.php?whichplace=spookyraven1";
-        else
-            __urls_for_locations[$location[The Haunted Pantry]] = "place.php?whichplace=town_right";
-            
-            
-        
-            
-        foreach l in $locations[The Oasis, the arid\, extra-dry desert, south of the border, The Shore\, Inc. Travel Agency]
-            __urls_for_locations[l] = "place.php?whichplace=desertbeach";
-        __urls_for_locations[$location[The Smut Orc Logging Camp]] = "place.php?whichplace=orc_chasm";
-        foreach l in $locations[the haunted wine cellar (northwest), the haunted wine cellar (southwest), the haunted wine cellar (northeast), the haunted wine cellar (southeast)]
-            __urls_for_locations[l] = "manor3.php";
-        foreach l in $locations[the castle in the clouds in the sky (basement), the castle in the clouds in the sky (ground floor), the castle in the clouds in the sky (top floor)]
-            __urls_for_locations[l] = "place.php?whichplace=giantcastle";
-            
-        foreach l in $locations[the haunted gallery, the haunted billiards room, the haunted library, the haunted conservatory, the haunted kitchen]
-            __urls_for_locations[l] = "place.php?whichplace=spookyraven1";
-            
-        foreach l in $locations[the haunted bedroom, the haunted ballroom, the haunted bathroom]
-            __urls_for_locations[l] = "place.php?whichplace=spookyraven2";
-            
-            
-        foreach l in $locations[the hidden apartment building, the hidden hospital, the hidden office building, the hidden bowling alley, the hidden park]
-            __urls_for_locations[l] = "place.php?whichplace=hiddencity";
-            
-        foreach l in $locations[The Dark Neck of the Woods,The Dark Heart of the Woods,The Dark Elbow of the Woods]
-            __urls_for_locations[l] = "friars.php";
-        __urls_for_locations[$location[pandamonium slums]] = "pandamonium.php";
-            
-        foreach l in $locations[the extreme slope, the icy peak, lair of the ninja snowmen, the goatlet, itznotyerzitz mine]
-            __urls_for_locations[l] = "place.php?whichplace=mclargehuge";
-            
-        foreach l in $locations[the upper chamber, the middle chamber, the lower chambers]
-            __urls_for_locations[l] = "pyramid.php";
-            
-        __urls_for_locations[$location[The valley of rof l'm fao]] = "place.php?whichplace=mountains";
-            
-        foreach l in $locations[the poop deck, Barrrney's Barrr, the f'c'le, belowdecks]
-            __urls_for_locations[l] = "place.php?whichplace=cove";
-        foreach l in $locations[the penultimate fantasy airship,the hole in the sky]
-            __urls_for_locations[l] = "place.php?whichplace=beanstalk";
-            
-        foreach l in $locations[the haiku dungeon, the limerick dungeon, the dungeons of doom, the enormous greater-than sign, the daily dungeon]
-            __urls_for_locations[l] = "da.php";
-
-        __urls_for_locations[$location[Anger Man's Level]] = "place.php?whichplace=junggate_3";
-        if ($effect[Absinthe-Minded].have_effect() > 0)
-        {
-            foreach l in $locations[The Stately Pleasure Dome, the mouldering mansion, the rogue windmill]
-                __urls_for_locations[l] = "place.php?whichplace=wormwood";
-        }
-        else
-        {
-            foreach l in $locations[The Stately Pleasure Dome, the mouldering mansion, the rogue windmill]
-                __urls_for_locations[l] = "mall.php";
-        }
-        
-        foreach l in $locations[chinatown shops, chinatown tenement, triad factory,1st floor\, shiawase-mitsuhama building,2nd floor\, shiawase-mitsuhama building,3rd floor\, shiawase-mitsuhama building]
-            __urls_for_locations[l] = "place.php?whichplace=junggate_1";
-        
-        if ($effect[down the rabbit hole].have_effect() > 0)
-            __urls_for_locations[$location[The Red Queen's Garden]] = "place.php?whichplace=rabbithole";
-        else
-            __urls_for_locations[$location[The Red Queen's Garden]] = "mall.php";
-            
-        if ($effect[Shape of...Mole!].have_effect() > 0)
-            __urls_for_locations[$location[Mt. Molehill]] = "mountains.php";
-        else
-            __urls_for_locations[$location[Mt. Molehill]] = "mall.php";
-        
-        foreach l in $locations[the primordial soup, the jungles of ancient loathing, seaside megalopolis]
-            __urls_for_locations[l] = "place.php?whichplace=memories";
-            
-        foreach l in $locations[domed city of ronaldus,domed city of grimacia,hamburglaris shield generator]
-        {
-            if ($effect[Transpondent].have_effect() > 0)
-                __urls_for_locations[l] = "place.php?whichplace=spaaace";
-            else
-                __urls_for_locations[l] = "mall.php";
-        }
-        
-        
-        foreach l in $locations[The Clumsiness Grove,The Maelstrom of Lovers,The Glacier of Jerks]
-        {
-            if ($effect[Dis Abled].have_effect() > 0)
-                __urls_for_locations[l] = "suburbandis.php";
-            else
-                __urls_for_locations[l] = "mall.php";
-        }
-        
-        foreach l in $locations[Cobb's Knob Menagerie\, Level 1,Cobb's Knob Menagerie\, Level 2,Cobb's Knob Menagerie\, Level 3]
-            __urls_for_locations[l] = "cobbsknob.php?action=tomenagerie";
-        foreach l in $locations[cobb's knob laboratory,the knob shaft]
-            __urls_for_locations[l] = "cobbsknob.php?action=tolabs";
-        
-        foreach l in $locations[the defiled nook,the defiled niche,the defiled cranny,the defiled alcove]
-            __urls_for_locations[l] = "crypt.php";
-        
-        foreach l in $locations[the degrassi knoll restroom, the degrassi knoll bakery, the degrassi knoll gym, the degrassi knoll garage]
-        {
-            if (knoll_available())
-                __urls_for_locations[l] = "place.php?whichplace=knoll_friendly";
-            else
-                __urls_for_locations[l] = "place.php?whichplace=knoll_hostile";
-        }
-        
-        if (get_property_boolean("_psychoJarUsed"))
-            __urls_for_locations[$location[the nightmare meatrealm]] = "place.php?whichplace=junggate_6";
-        else
-            __urls_for_locations[$location[the nightmare meatrealm]] = "mall.php";
-            
-            
-        foreach l in $locations[next to that barrel with something burning in it,near an abandoned refrigerator,over where the old tires are,out by that rusted-out car]
-            __urls_for_locations[l] = "bigisland.php?place=junkyard";
-        
-        __urls_for_locations[$location[post-war junkyard]] = "postwarisland.php";
-        __urls_for_locations_initialized = true;
-    }
-    
-    if (__urls_for_locations contains l)
-        return __urls_for_locations[l];
-    return "";
+    return l.getClickableURLForLocation(ErrorMake());
 }
 
 string getClickableURLForLocationIfAvailable(location l)

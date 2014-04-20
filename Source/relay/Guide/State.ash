@@ -106,7 +106,7 @@ void setUpState()
 	string yellow_ray_image_name = "";
 	boolean yellow_ray_potentially_available = false;
     
-    string [int] item_sources = split_string_mutable("4766,5229,6673,7013", ",");
+    string [int] item_sources = split_string_alternate("4766,5229,6673,7013", ",");
     
     foreach key in item_sources
     {
@@ -183,6 +183,16 @@ void setUpState()
 		if ($item[bottle of Blank-Out].available_amount() > 0 || get_property_int("blankOutUsed") > 0)
 			free_runs_available = true;
 	}
+    if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE && mafiaIsPastRevision(13783) && lookupSkill("Peel Out").have_skill())
+    {
+        
+        int total_free_peel_outs_available = 10;
+        if (get_property("peteMotorbikeTires") == "Racing Slicks")
+            total_free_peel_outs_available += 20;
+        int free_peel_outs_available = MAX(0, total_free_peel_outs_available - get_property_int("_petePeeledOut"));
+        if (free_peel_outs_available > 0)
+            free_runs_available = true;
+    }
 	if (!free_runs_usable)
 		free_runs_available = false;
 	__misc_state["free runs available"] = free_runs_available;
@@ -200,7 +210,7 @@ void setUpState()
         some_olfact_available = true;
     if ($familiar[nosy nose].familiar_is_usable()) //weakened, but still relevant
         some_olfact_available = true;
-    if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE)
+    if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_ZOMBIE_SLAYER)
         some_olfact_available = true;
 		
 	__misc_state["have olfaction equivalent"] = some_olfact_available;
@@ -282,18 +292,7 @@ void setUpState()
 	__misc_state_int["free rests remaining"] = MAX(total_rests_available - rests_used, 0);
 	
 	//monster.monster_initiative() is usually what you need, but just in case:
-	if (monster_level_adjustment() < 21)
-		__misc_state_float["init ML penalty"] = 0.0;
-	else if (monster_level_adjustment() < 41)
-		__misc_state_float["init ML penalty"] = 0.0 + 1.0 * (monster_level_adjustment() - 20.0);
-	else if (monster_level_adjustment() < 61)
-		__misc_state_float["init ML penalty"] = 20.0 + 2.0 * (monster_level_adjustment() - 40.0);
-	else if (monster_level_adjustment() < 81)
-		__misc_state_float["init ML penalty"] = 60.0 + 3.0 * (monster_level_adjustment() - 60.0);
-	else if (monster_level_adjustment() < 101)
-		__misc_state_float["init ML penalty"] = 120.0 + 4.0 * (monster_level_adjustment() - 80.0);
-	else
-		__misc_state_float["init ML penalty"] = 200.0 + 5.0 * (monster_level_adjustment() - 100.0);
+    __misc_state_float["init ML penalty"] = monsterExtraInitForML(monster_level_adjustment_ignoring_plants());
 	
 	
 	//tower items:
@@ -369,6 +368,35 @@ void setUpState()
 		ngs_needed += 1;
 	
 	
+    
+    //stats:
+    
+	if (my_level() < 13 && !__misc_state["In aftercore"])
+	{
+		__misc_state["need to level"] = true;
+	}
+    __misc_state["need to level muscle"] = false;
+    __misc_state["need to level mysticality"] = false;
+    __misc_state["need to level moxie"] = false;
+    
+    if (__misc_state["In run"])
+    {
+        //62 muscle for antique machete/hidden hospital
+        //70 moxie, 70 mysticality for war outfits
+        if (my_primestat() == $stat[muscle] && __misc_state["need to level"])
+            __misc_state["need to level muscle"] = true;
+        if (my_primestat() == $stat[mysticality] && __misc_state["need to level"])
+            __misc_state["need to level mysticality"] = true;
+        if (my_primestat() == $stat[moxie] && __misc_state["need to level"])
+            __misc_state["need to level moxie"] = true;
+        
+        if (my_basestat($stat[muscle]) < 62)
+            __misc_state["need to level muscle"] = true;
+        if (my_basestat($stat[mysticality]) < 70)
+            __misc_state["need to level mysticality"] = true;
+        if (my_basestat($stat[moxie]) < 70)
+            __misc_state["need to level moxie"] = true;
+    }
 	
 	//wand
 	
@@ -423,20 +451,27 @@ void setUpState()
 	
 	
 	int dd_tokens_and_keys_available = 0;
-	int tokens_needed = 3;
-	tokens_needed -= $item[fishbowl].available_amount();
-	tokens_needed -= $item[fishtank].available_amount();
-	tokens_needed -= $item[fish hose].available_amount();
-	
-	tokens_needed -= 2 * $item[hosed fishbowl].available_amount();
-	tokens_needed -= 2 * $item[hosed tank].available_amount();
-	
-	tokens_needed -= 3 * $item[makeshift scuba gear].available_amount();
-	
+	int tokens_needed = 0;
+    boolean need_boris_key = true;
+    boolean need_jarlsberg_key = true;
+    boolean need_sneaky_pete_key = true;
+    
+    if ($items[fishbowl,boris's key,makeshift scuba gear,hosed fishbowl].available_amount() > 0)
+        need_boris_key = false;
+    if ($items[fishtank,jarlsberg's key,makeshift scuba gear,hosed tank].available_amount() > 0)
+        need_jarlsberg_key = false;
+    if ($items[fish hose,sneaky pete's key,makeshift scuba gear,hosed fishbowl,hosed tank].available_amount() > 0)
+        need_sneaky_pete_key = false;
+    
+    if (need_boris_key)
+        tokens_needed += 1;
+    if (need_jarlsberg_key)
+        tokens_needed += 1;
+    if (need_sneaky_pete_key)
+        tokens_needed += 1;
+        
 	tokens_needed -= $item[fat loot token].available_amount();
-	tokens_needed -= $item[boris's key].available_amount();
-	tokens_needed -= $item[jarlsberg's key].available_amount();
-	tokens_needed -= $item[sneaky pete's key].available_amount();
+    tokens_needed = MAX(0, tokens_needed);
 	
 	dd_tokens_and_keys_available += $item[fat loot token].available_amount();
 	dd_tokens_and_keys_available += $item[boris's key].available_amount();
@@ -453,7 +488,7 @@ void setUpState()
     
     if (get_property("peteMotorbikeGasTank") == "Extra-Buoyant Tank")
         mysterious_island_unlocked = true;
-    if (get_property_int("lastIslandUnlock") == my_ascensions() && get_revision() >= 13812)
+    if (get_property_int("lastIslandUnlock") == my_ascensions() && mafiaIsPastRevision(13812))
         mysterious_island_unlocked = true;
             
     if (!mysterious_island_unlocked)
@@ -471,7 +506,7 @@ void setUpState()
 	__misc_state["desert beach available"] = false;
     if (get_property("peteMotorbikeGasTank") == "Large Capacity Tank")
         __misc_state["desert beach available"] = true;
-    if (get_property_int("lastDesertUnlock") == my_ascensions() && get_revision() >= 13812)
+    if (get_property_int("lastDesertUnlock") == my_ascensions() && mafiaIsPastRevision(13812))
         __misc_state["desert beach available"] = true;
 	if ($location[south of the border].locationAvailable())
 		__misc_state["desert beach available"] = true;
@@ -541,7 +576,9 @@ void setUpState()
 	__misc_state["can pickpocket"] = false;
     if (my_class() == $class[disco bandit] || my_class() == $class[accordion thief] || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || $item[tiny black hole].equipped_amount() > 0 || $effect[Form of...Bird!].have_effect() > 0)
         __misc_state["can pickpocket"] = true;
-        
+    
+    if (CounterLookup("Romantic Monster").CounterExists() || get_property_int("_romanticFightsLeft") > 0)
+        __misc_state_string["Romantic Monster Name"] = get_property("romanticTarget").HTMLEscapeString();
         
         //Moxie Experience Percent
     float dance_card_average_stat_gain = MIN(2.25 * my_basestat($stat[moxie]), 300.0) * __misc_state_float["Non-combat statgain multiplier"] * (1.0 + numeric_modifier("Moxie Experience Percent") / 100.0);
@@ -576,32 +613,16 @@ void finalizeSetUpState()
 {
 	//done after quest parsing
 	
-	if (__misc_state["Example mode"] || my_level() < 13 && !__misc_state["In aftercore"])
+	if (__misc_state["Example mode"])
 	{
 		__misc_state["need to level"] = true;
+        if (my_primestat() == $stat[muscle])
+            __misc_state["need to level muscle"] = true;
+        if (my_primestat() == $stat[mysticality])
+            __misc_state["need to level mysticality"] = true;
+        if (my_primestat() == $stat[moxie])
+            __misc_state["need to level moxie"] = true;
 	}
-    __misc_state["need to level muscle"] = false;
-    __misc_state["need to level mysticality"] = false;
-    __misc_state["need to level moxie"] = false;
-    
-    if (__misc_state["In run"])
-    {
-        //62 muscle for antique machete/hidden hospital
-        //70 moxie, 70 mysticality for war outfits
-        if (my_primestat() == $stat[muscle] && __misc_state["need to level"])
-            __misc_state["need to level muscle"] = true;
-        if (my_primestat() == $stat[mysticality] && __misc_state["need to level"])
-            __misc_state["need to level mysticality"] = true;
-        if (my_primestat() == $stat[moxie] && __misc_state["need to level"])
-            __misc_state["need to level moxie"] = true;
-        
-        if (my_basestat($stat[muscle]) < 62)
-            __misc_state["need to level muscle"] = true;
-        if (my_basestat($stat[mysticality]) < 70)
-            __misc_state["need to level mysticality"] = true;
-        if (my_basestat($stat[moxie]) < 70)
-            __misc_state["need to level moxie"] = true;
-    }
 	
 	if (__misc_state_int["pulls available"] > 0)
 	{

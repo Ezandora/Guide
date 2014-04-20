@@ -168,7 +168,7 @@ void generatePullList(Checklist [int] checklists)
 	{
 		pullable_item_list.listAppend(GPItemMake("Food", "hell ramen", "key lime pies, moon pies, fudge bunnies, etc."));
 	}
-	if (__misc_state["can drink just about anything"] && availableDrunkenness() >= 0)
+	if (__misc_state["can drink just about anything"] && availableDrunkenness() >= 0 && inebriety_limit() >= 5)
 	{
 		pullable_item_list.listAppend(GPItemMake("Drink", "gibson", "wrecked generators, etc."));
 	}
@@ -234,7 +234,7 @@ void generatePullList(Checklist [int] checklists)
 	{
 		GPItem gp_item = pullable_item_list[key];
 		string reason = gp_item.reason;
-		string [int] reason_list = split_string_mutable(reason, "\\|");
+		string [int] reason_list = split_string_alternate(reason, "\\|");
 		
 		if (gp_item.alternate_name != "")
 		{
@@ -256,6 +256,14 @@ void generatePullList(Checklist [int] checklists)
 		
 		int max_wanted = gp_item.max_wanted;
 		
+        int found_total;
+        foreach key in items
+        {
+			item it = items[key];
+            found_total += it.available_amount();
+        }
+        if (found_total >= max_wanted)
+            continue;
 		
 		foreach key in items
 		{

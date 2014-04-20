@@ -63,7 +63,7 @@ void SLibramGenerateResource(ChecklistEntry [int] available_resources_entries)
 		if (bricko_potential_fights_available > 0)
 		{
 			ChecklistSubentry subentry;
-			subentry.header =  bricko_potential_fights_available + " BRICKO&trade; fights ready";
+			subentry.header = pluralize(bricko_potential_fights_available, "BRICKO&trade; fight", "BRICKO&trade; fights") + " ready";
 			
 			
 			foreach fight in all_possible_bricko_fights

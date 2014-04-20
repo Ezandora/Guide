@@ -33,6 +33,7 @@ void SSkillsGenerateResource(ChecklistEntry [int] available_resources_entries)
 	property_summons_to_skills["_spaghettiBreakfast"] = listMake($skill[spaghetti breakfast]);
 	property_summons_to_skills["_discoKnife"] = listMake($skill[that's not a knife]);
 	property_summons_to_skills["_lunchBreak"] = listMake($skill[lunch break]);
+	property_summons_to_skills["_psychokineticHugUsed"] = listMake(lookupSkill("Psychokinetic Hug"));
     
     if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE)
     {
@@ -40,11 +41,16 @@ void SSkillsGenerateResource(ChecklistEntry [int] available_resources_entries)
 		property_summons_to_skills["_peteRiotIncited"] = listMake(lookupSkill("Incite Riot"));
         
         int audience_max = 30;
+        int hate_useful_max = 25; //ashes and soda max out early; more audience hatred only gives crates and grenades, not of absolute importance
         if (lookupItem("Sneaky Pete's leather jacket").equipped_amount() > 0 || lookupItem("Sneaky Pete's leather jacket (collar popped)").equipped_amount() > 0)
+        {
             audience_max = 50;
+            hate_useful_max = 41;
+        }
+            
         
         skills_to_details[lookupSkill("Throw Party")] = "Ideally have " + audience_max + " audience love before casting.";
-        skills_to_details[lookupSkill("Incite Riot")] = "Ideally have " + audience_max + " audience hate before casting.";
+        skills_to_details[lookupSkill("Incite Riot")] = "Ideally have " + hate_useful_max + " audience hate before casting.";
     }
 	//Jarlsberg:
 	if (my_path_id() == PATH_AVATAR_OF_JARLSBERG)

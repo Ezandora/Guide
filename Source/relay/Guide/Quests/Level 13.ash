@@ -411,14 +411,35 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         url = "lair6.php";
 		//at top of tower (fight shadow??)
 		//8 -> fight shadow
+        int total_initiative_needed = $monster[Your Shadow].monster_initiative();
 		subentry.modifiers.listAppend("+HP");
-		subentry.modifiers.listAppend("+" + $monster[Your Shadow].monster_initiative() + "% init");
+		subentry.modifiers.listAppend("+" + total_initiative_needed + "% init");
 		subentry.entries.listAppend("Fight your shadow.");
         foreach it in $items[attorney's badge, navel ring of navel gazing]
         {
             if (it.available_amount() > 0 && it.equipped_amount() == 0)
                 subentry.entries.listAppend("Possibly equip your " + it + ". (blocks shadow)");
         }
+        
+        string [int] healing_items_available;
+        foreach it in $items[filthy poultice,gauze garter,red pixel potion,Dreadsylvanian seed pod,soggy used band-aid,Mer-kin healscroll,scented massage oil,extra-strength red potion,red potion]
+        {
+            if (it.available_amount() == 0)
+                continue;
+            if (it.available_amount() == 1)
+                healing_items_available.listAppend(it.to_string());
+            else
+                healing_items_available.listAppend(it.pluralize());
+        }
+        if (healing_items_available.count() > 0)
+            subentry.entries.listAppend("Healing items available: " + healing_items_available.listJoinComponents(", ", "and") + ".");
+        else
+            subentry.entries.listAppend("Might want to go find some healing items.");
+            
+            
+        int initiative_needed = total_initiative_needed - initiative_modifier();
+        if (initiative_needed > 0 && !$skill[Ambidextrous Funkslinging].have_skill())
+            subentry.entries.listAppend("Need " + initiative_needed + "% more initiative.");
 	}
 	else if (base_quest_state.mafia_internal_step == 9)
 	{
@@ -499,15 +520,17 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 		subentry.modifiers.listAppend("+moxie equipment");
 		subentry.modifiers.listAppend("no buffs");
 		subentry.entries.listAppend("She awaits.");
-		if (familiar_is_usable($familiar[fancypants scarecrow]) && $item[swashbuckling pants].available_amount() > 0)
-			subentry.entries.listAppend("Run swashbuckling pants on scarecrow. (2x potato)");
-		else if (familiar_is_usable($familiar[fancypants scarecrow]) && $item[spangly mariachi pants].available_amount() > 0)
-			subentry.entries.listAppend("Run spangly mariachi pants on scarecrow. (2x potato)");
-		else if (familiar_is_usable($familiar[mad hatrack]) && $item[spangly sombrero].available_amount() > 0)
-			subentry.entries.listAppend("Run spangly sombrero on mad hatrack. (2x potato)");
-		else
-			subentry.entries.listAppend("Run a potato familiar if you can.");
-			
+        if (!__misc_state["familiars temporarily blocked"])
+        {
+            if (familiar_is_usable($familiar[fancypants scarecrow]) && $item[swashbuckling pants].available_amount() > 0)
+                subentry.entries.listAppend("Run swashbuckling pants on scarecrow. (2x potato)");
+            else if (familiar_is_usable($familiar[fancypants scarecrow]) && $item[spangly mariachi pants].available_amount() > 0)
+                subentry.entries.listAppend("Run spangly mariachi pants on scarecrow. (2x potato)");
+            else if (familiar_is_usable($familiar[mad hatrack]) && $item[spangly sombrero].available_amount() > 0)
+                subentry.entries.listAppend("Run spangly sombrero on mad hatrack. (2x potato)");
+            else
+                subentry.entries.listAppend("Run a potato familiar if you can.");
+        }
 		image_name = "naughty sorceress";
 	}
 	else if (base_quest_state.mafia_internal_step == 11)

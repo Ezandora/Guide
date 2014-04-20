@@ -119,12 +119,22 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         task_entries.listAppend(ChecklistEntryMake("__item flaskfull of hollow", url, ChecklistSubentryMake("Drink " + $item[flaskfull of hollow], "", "Gives +25 smithsness"), -11));
     }
     
-	if ($effect[QWOPped Up].have_effect() > 0 && __misc_state["VIP available"] && get_property_int("_hotTubSoaks") < 5) //only suggest if they have hot tub access; other route is a SGEEA, too valuable
+	if ($effect[QWOPped Up].have_effect() > 0 && ((__misc_state["VIP available"] && get_property_int("_hotTubSoaks") < 5) || lookupSkill("Shake It Off").have_skill())) //only suggest if they have hot tub access; other route is a SGEEA, too valuable
     {
         string [int] description;
-        description.listAppend("Use hot tub.");
+        string url = "";
+        if (lookupSkill("Shake It Off").have_skill())
+        {
+            url = "skills.php";
+            description.listAppend("Shake it off.");
+        }
+        else
+        {
+            url = "clan_viplounge.php";
+            description.listAppend("Use hot tub.");
+        }
         
-		task_entries.listAppend(ChecklistEntryMake("__effect qwopped up", "clan_viplounge.php", ChecklistSubentryMake("Remove QWOPped up effect", "", description), -11));
+		task_entries.listAppend(ChecklistEntryMake("__effect qwopped up", url, ChecklistSubentryMake("Remove QWOPped up effect", "", description), -11));
     }
 
 
@@ -250,20 +260,9 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         task_entries.listAppend(ChecklistEntryMake("__item " + $item[bottle of blank-out], "inventory.php?which=3", ChecklistSubentryMake("Use " + $item[bottle of blank-out], "", "Acquire glob to run away with."), -11));
     
     }
-    if (__last_adventure_location == $location[the haunted ballroom] && $item[dance card].available_amount() > 0 && __misc_state["need to level"] && my_primestat() == $stat[moxie] && __misc_state_int["Turns until dance card"] == -1)
+    if (__last_adventure_location == $location[the haunted ballroom] && $item[dance card].available_amount() > 0 && __misc_state["need to level"] && my_primestat() == $stat[moxie] && CounterLookup("Dance Card").CounterGetNextExactTurn() == -1)
     {
-        
-        string [int] semirare_turns = __misc_state_string["Turns until semi-rare"].split_string(",");
-        
-        boolean delay_for_semirare = false;
-        foreach key in semirare_turns
-        {
-            if (semirare_turns[key].to_int() == 3)
-            {
-                delay_for_semirare = true;
-                break;
-            }
-        }
+        boolean delay_for_semirare = CounterLookup("Semi-rare").CounterWillHitExactlyInTurnRange(3, 3);
         
         if (delay_for_semirare)
             task_entries.listAppend(ChecklistEntryMake("__item " + $item[dance card], "", ChecklistSubentryMake(HTMLGenerateSpanFont("Avoid using " + $item[dance card], "red", ""), "", HTMLGenerateSpanFont("You have a semi-rare coming up then, wait a turn first.", "red", "")), -11));
@@ -276,4 +275,26 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             task_entries.listAppend(ChecklistEntryMake("__item " + $item[dance card], "inventory.php?which=3", ChecklistSubentryMake("Use " + $item[dance card], "", description), -11));
         }
     }
+    if (!__quest_state["Level 11 Hidden City"].finished && __quest_state["Level 11 Hidden City"].state_boolean["Apartment finished"] && $effect[thrice-cursed].have_effect() > 0)
+    {
+        string curse_removal_method;
+        string url;
+        
+        if (__misc_state["VIP available"] && get_property_int("_hotTubSoaks") < 5)
+        {
+            curse_removal_method = "Relax in hot tub.";
+            url = "clan_viplounge.php";
+        }
+        if (lookupSkill("Shake It Off").have_skill())
+        {
+            curse_removal_method = "Cast shake it off.";
+            url = "skills.php";
+        }
+        
+        if (curse_removal_method.length() > 0)
+        {
+            task_entries.listAppend(ChecklistEntryMake("__effect thrice-cursed", url, ChecklistSubentryMake("Remove Thrice-Cursed", "", curse_removal_method), -11));
+        }
+    }
+    
 }

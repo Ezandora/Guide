@@ -81,7 +81,7 @@ void finalizeSetUpFloristState()
 	boolean [string] plants_used;
 	if (true)
 	{
-		string [int] internal_plants_used = split_string(get_property("_floristPlantsUsed"), ",");
+		string [int] internal_plants_used = split_string_alternate(get_property("_floristPlantsUsed"), ",");
 		foreach key in internal_plants_used
 			plants_used[internal_plants_used[key]] = true;
 	}
@@ -134,7 +134,7 @@ void finalizeSetUpFloristState()
 	//Canned Spinach - indoor, +5 muscle stats/fight:
     if (my_primestat() == $stat[muscle] && __misc_state["need to level"])
     {
-        //let's see... castle?
+        //castle?
         if ($item[Spookyraven gallery key].available_amount() > 0 && !__misc_state["Stat gain from NCs reduced"])
         {
             __plants_suggested_locations.listAppend(PlantSuggestionMake($location[the haunted gallery], "Canned Spinach", "While powerlevelling."));
@@ -145,12 +145,15 @@ void finalizeSetUpFloristState()
 	//The haunted ballroom, except they may be changing that?
     if (my_primestat() == $stat[moxie] && __misc_state["need to level"])
     {
-        //let's see... castle?
         if (my_path_id() != PATH_CLASS_ACT_2)
             __plants_suggested_locations.listAppend(PlantSuggestionMake($location[the haunted ballroom], "Stealing Magnolia", "Dance cards from waltzers, for power leveling.")); //FIXME if stat changes in the future, remove this suggestion
         
 	}
 	//War Lily - indoor, +ML:
+    if (__misc_state["need to level"])
+    {
+        __plants_suggested_locations.listAppend(PlantSuggestionMake($location[The castle in the clouds in the sky (ground floor)], "War Lily", ""));
+    }
 	//Rad-ish Radish - outdoor, +5 moxie stats/fight:
     if (__misc_state["need to level moxie"])
     {
@@ -252,4 +255,84 @@ void generateFloristFriar(Checklist [int] checklists)
     }
 	
 	checklists.listAppend(ChecklistMake("Florist Friar", florist_entries));
+}
+
+//Does not return color formatting for elemental damage; will need to add that yourself.
+string getPlantDescription(string plant_name)
+{
+    switch (plant_name)
+    {
+        case "Rabid Dogwood":
+        case "War Lily":
+        case "Blustery Puffball":
+            return "+30 ML";
+        case "Rutabeggar":
+        case "Stealing Magnolia":
+        case "Horn of Plenty":
+            return "+25% item";
+        case "Aloe Guv'nor":
+            return "HP regen";
+        case "Artichoker":
+            return "delevel";
+        case "Canned Spinach":
+            return "5 muscle/fight";
+        case "Crookweed":
+            return "+60% meat";
+        case "Dis Lichen":
+            return "delevel";
+        case "Duckweed":
+            return "hiding";
+        case "Electric Eelgrass":
+            return "block";
+        case "Impatiens":
+            return "+25% init";
+        case "Kelptomaniac":
+            return "+40% item";
+        case "Lettuce Spray":
+            return "HP regen";
+        case "Max Headshroom":
+            return "MP regen";
+        case "Orca Orchid":
+            return "attack";
+        case "Pitcher Plant":
+            return "MP regen";
+        case "Portlybella":
+            return "HP regen";
+        case "Rad-ish Radish":
+            return "5 moxie/fight";
+        case "Red Fern":
+            return "delevel";
+        case "Seltzer Watercress":
+            return "MP regen";
+        case "Shuffle Truffle":
+            return "+25% init";
+        case "Smoke-ra":
+            return "block";
+        case "Snori":
+            return "HP/MP regen";
+        case "Spankton":
+            return "delevel";
+        case "Spider Plant":
+            return "poison";
+        case "Up Sea Daisy":
+            return "30 stats/fight";
+        case "Wizard's Wig":
+            return "5 myst/fight";
+        case "Arctic Moss":
+        case "Sub-Sea Rose":
+        case "Chillterelle":
+            return "cold attack";
+        case "Celery Stalker":
+        case "BamBOO!":
+            return "spooky attack";
+        case "Deadly Cinnamon":
+            return "hot attack";
+        case "Loose Morels":
+            return "sleaze attack";
+        case "Sargassum":
+        case "Skunk Cabbage":
+        case "Foul Toadstool":
+            return "stench attack";
+    }
+    return "";
 }

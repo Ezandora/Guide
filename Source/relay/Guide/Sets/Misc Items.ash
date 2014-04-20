@@ -587,7 +587,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
     {
         if (it.available_amount() == 0)
             continue;
-        available_resources_entries.listAppend(ChecklistEntryMake("__item " + it, "", ChecklistSubentryMake(pluralize(it), "", "Open for astral consumables."), importance_level_unimportant_item));
+        available_resources_entries.listAppend(ChecklistEntryMake("__item " + it, "inventory.php?which=3", ChecklistSubentryMake(pluralize(it), "", "Open for astral consumables."), importance_level_unimportant_item));
     }
     
     if ($item[map to safety shelter grimace prime].available_amount() > 0)
@@ -706,11 +706,23 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
     if (lookupItem("pile of ashes").available_amount() > 0 && in_run)
     {
         string description = "-10% combat. (20 turns)";
-        available_resources_entries.listAppend(ChecklistEntryMake("__item pile of ashes", "", ChecklistSubentryMake(pluralize(lookupItem("pile of ashes")), "", description), importance_level_unimportant_item));
+        available_resources_entries.listAppend(ChecklistEntryMake("__item pile of ashes", "inventory.php?which=3", ChecklistSubentryMake(pluralize(lookupItem("pile of ashes")), "", description), importance_level_unimportant_item));
     }
     if (lookupItem("7259").available_amount() > 0 && in_run)
     {
         string description = "Open for elemental damage combat items.";
         available_resources_entries.listAppend(ChecklistEntryMake("__item " + lookupItem("7259"), "inventory.php?which=3", ChecklistSubentryMake(pluralize(lookupItem("7259")), "", description), importance_level_unimportant_item));
+    }
+    
+    if ($item[gym membership card].available_amount() > 0 && in_run && __misc_state["need to level"])
+    {
+        int importance = importance_level_item;
+        string description = "Gives 30 muscle/mysticality/moxie stats.|Once per day.";
+        if (my_level() < 4)
+        {
+            description += "|Not usable until level 4.";
+            importance = importance_level_unimportant_item;
+        }
+        available_resources_entries.listAppend(ChecklistEntryMake("__item gym membership card", "inventory.php?which=3", ChecklistSubentryMake(pluralize($item[gym membership card]), "", description), importance_level_item));
     }
 }

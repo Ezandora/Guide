@@ -30,7 +30,7 @@ void listAppend(Semirare [int] list, Semirare entry)
 
 void SemirareGenerateDescription(string [int] description)
 {
-	if (__misc_state_string["Turn range until semi-rare"] != "" && __misc_state["can eat just about anything"])
+	if (CounterLookup("Semi-rare").CounterIsRange() && __misc_state["can eat just about anything"])
 	{
 		string line = "Eat a fortune cookie";
 		if (availableFullness() == 0)
@@ -146,17 +146,30 @@ void SemirareGenerateDescription(string [int] description)
 
 void SSemirareGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, boolean from_task) //if from_task is false, assumed to be from resources
 {
+    Counter semirare_counter = CounterLookup("Semi-rare");
+    if (!semirare_counter.CounterExists())
+        return;
+    
 	boolean very_important = false;
 	int show_up_in_tasks_turn_cutoff = 10;
 	string title = "";
 	int min_turns_until = -1;
-	if (__misc_state_string["Turns until semi-rare"] != "")
+    
+    if (semirare_counter.CounterIsRange())
 	{
-		string [int] potential_turns = split_string_mutable(__misc_state_string["Turns until semi-rare"], ",");
-		
-		if (potential_turns.count() == 1)
-		{
-			int turns_until = potential_turns[0].to_int();
+        Vec2i turn_range = semirare_counter.CounterGetWindowRange();
+        title = "[" + turn_range.x + " to " + turn_range.y + "] turns until semi-rare";
+        
+        min_turns_until = turn_range.x;
+        
+        if (turn_range.x <= 0)
+            very_important = true;
+	}
+	else if (semirare_counter.exact_turns.count() > 0)
+	{
+        if (semirare_counter.exact_turns.count() == 1)
+        {
+			int turns_until = semirare_counter.exact_turns[0];
 			if (turns_until == 0)
 			{
 				very_important = true;
@@ -166,41 +179,30 @@ void SSemirareGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
 				title = pluralize(turns_until, "turn", "turns") + " until semi-rare";
 				
 			min_turns_until = turns_until;
-		}
-		else
-		{
-			min_turns_until = potential_turns[0].to_int();
-            foreach key in potential_turns
+        }
+        else
+        {
+			min_turns_until = semirare_counter.exact_turns[0];
+            string [int] turn_list;
+            
+            foreach key in semirare_counter.exact_turns
             {
-                int value = potential_turns[key].to_int();
+                int value = semirare_counter.exact_turns[key];
                 if (value == 0)
                 {
                     very_important = true;
-                    potential_turns[key] = "Now"; //don't like editing this, possibly copy list?
+                    turn_list.listAppend("Now");
                 }
-                else if (value < 0)
-                    remove potential_turns[key];
+                else if (!(value < 0))
+                    turn_list.listAppend(value.to_string());
             }
-			title = potential_turns.listJoinComponents(", ", "or") + " turns until semi-rare";
-		}
+            
+			title = turn_list.listJoinComponents(", ", "or") + " turns until semi-rare";
+        }
 			
 	}
-	else if (__misc_state_string["Turn range until semi-rare"] != "")
-	{
-		string [int] turn_range_string = split_string_mutable(__misc_state_string["Turn range until semi-rare"], ",");
-		if (turn_range_string.count() == 2) //should be
-		{
-			Vec2i turn_range = Vec2iMake(turn_range_string[0].to_int(), turn_range_string[1].to_int());
-			title = "[" + turn_range_string.listJoinComponents(" to ") + "] turns until semi-rare";
-			
-			min_turns_until = turn_range.x;
-			
-			if (turn_range.x <= 0)
-				very_important = true;
-		}
-		else
-			return; //internal bug
-	}
+	else
+        return;
 	
 	if (from_task && min_turns_until > show_up_in_tasks_turn_cutoff)
 		return;

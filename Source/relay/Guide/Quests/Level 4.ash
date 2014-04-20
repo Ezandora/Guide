@@ -13,6 +13,13 @@ void QLevel4Init()
 	if (state.in_progress)
 	{
 		//Zones opened?
+        if ($location[the batrat and ratbat burrow].turnsAttemptedInLocation() > 0)
+            state.state_int["areas unlocked"] = 1;
+        if ($location[the beanbat chamber].turnsAttemptedInLocation() > 0)
+            state.state_int["areas unlocked"] = 2;
+        if ($location[the boss bat's lair].turnsAttemptedInLocation() > 0)
+            state.state_int["areas unlocked"] = 3;
+            
 	}
 	else if (state.finished)
 	{

@@ -50,7 +50,7 @@ void S8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         {
             if (my_level() < 2) //no woods yet
                 return;
-            active_url = "place.php?whichplace=forestvillage";
+            active_url = "place.php?whichplace=forestvillage&action=fv_mystic";
             title = "Psychoanalyze the crackpot mystic";
             description.listAppend("Fear Man's level access, for digital key.");
         }

@@ -54,6 +54,7 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
     boolean need_plus_combat = false;
     boolean need_minus_combat = false;
     
+    
     location [int] target_locations;
     if (amount_needed != -1 && target_monster != $monster[none] && monster_locations.count() > 0)
     {
@@ -66,6 +67,7 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
             float [monster] appearance_rates = l.appearance_rates_adjusted();
             int number_remaining = amount_needed - amount_found;
             
+            
             if (number_remaining == 0)
             {
                 if (url.s.length() == 0)
@@ -74,7 +76,7 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
                 return subentry;
             }
             string clickable_url = getClickableURLForLocation(l);
-            if (clickable_url.length() > 0 && url.s.length() == 0)
+            if (clickable_url.length() > 0 && (url.s.length() == 0 || url.s == "place.php?whichplace=forestvillage")) //if it's that URL, then it's back to the BHH - we'd rather override that with a bounty
                 url.s = clickable_url;
             
             float bounty_appearance_rate = appearance_rates[target_monster] / 100.0;
@@ -185,7 +187,7 @@ void SBountyHunterHunterGenerateTasks(ChecklistEntry [int] task_entries, Checkli
     
     //FIXME add suggesting taking bounties if we can detect if they have a bounty available
     ChecklistSubentry [int] subentries;
-    string [int] bounty_property_names = split_string_mutable("currentEasyBountyItem,currentHardBountyItem,currentSpecialBountyItem", ",");
+    string [int] bounty_property_names = split_string_alternate("currentEasyBountyItem,currentHardBountyItem,currentSpecialBountyItem", ",");
     string [string] bounty_properties;
     boolean on_bounty = false;
     
@@ -217,7 +219,7 @@ void SBountyHunterHunterGenerateTasks(ChecklistEntry [int] task_entries, Checkli
         
         //Parse:
         //Format is bounty_item:number_found
-        string [int] split = split_string_mutable(property_value, ":");
+        string [int] split = split_string_alternate(property_value, ":");
         if (split.count() != 2)
             continue;
         string bounty_item_name = split[0];

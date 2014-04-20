@@ -145,7 +145,7 @@ void generateTasks(Checklist [int] checklists)
 		
 		subentry.header = "Level to " + (my_level() + 1);
 		
-		subentry.entries.listAppend("Gain " + substats_remaining + " substats.");
+		subentry.entries.listAppend("Gain " + pluralize(substats_remaining, "substat", "substats") + ".");
         
         string url = "";
         

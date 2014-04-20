@@ -57,7 +57,14 @@ void generateMissingItems(Checklist [int] checklists)
 		
 		if (!__quest_state["Level 13"].state_boolean["have relevant accordion"])
 		{
-			items_needed_entries.listAppend(ChecklistEntryMake("__item stolen accordion", "store.php?whichstore=z", ChecklistSubentryMake("Accordion", "", "Toy accordion, 150 meat")));
+            string url = "store.php?whichstore=z";
+            string accordion_source = "Toy accordion, 150 meat";
+            if (my_path_id() == PATH_ZOMBIE_SLAYER)
+            {
+                accordion_source = "Stolen accordion, from chewing gum on a string";
+                url = "store.php?whichstore=m";
+            }
+			items_needed_entries.listAppend(ChecklistEntryMake("__item stolen accordion", url, ChecklistSubentryMake("Accordion", "", accordion_source)));
 		}
 		
 		if (!__quest_state["Level 13"].state_boolean["have relevant drum"])
@@ -111,7 +118,7 @@ void generateMissingItems(Checklist [int] checklists)
 		{
 			string [int] options;
 			options.listAppend(from_daily_dungeon_string);
-			if (__misc_state_int["pulls available"] > 0)
+			if (__misc_state_int["pulls available"] > 0 && __misc_state["can eat just about anything"])
 				options.listAppend("From key lime pie");
 			items_needed_entries.listAppend(ChecklistEntryMake("__item Sneaky Pete's key", "da.php", ChecklistSubentryMake("Sneaky Pete's key", "", options)));
 		}
@@ -119,7 +126,7 @@ void generateMissingItems(Checklist [int] checklists)
 		{
 			string [int] options;
 			options.listAppend(from_daily_dungeon_string);
-			if (__misc_state_int["pulls available"] > 0)
+			if (__misc_state_int["pulls available"] > 0 && __misc_state["can eat just about anything"])
 				options.listAppend("From key lime pie");
 			items_needed_entries.listAppend(ChecklistEntryMake("__item jarlsberg's key", "da.php", ChecklistSubentryMake("Jarlsberg's key", "", options)));
 		}
@@ -127,7 +134,7 @@ void generateMissingItems(Checklist [int] checklists)
 		{
 			string [int] options;
 			options.listAppend(from_daily_dungeon_string);
-			if (__misc_state_int["pulls available"] > 0)
+			if (__misc_state_int["pulls available"] > 0 && __misc_state["can eat just about anything"])
 				options.listAppend("From key lime pie");
 			items_needed_entries.listAppend(ChecklistEntryMake("__item Boris's key", "da.php", ChecklistSubentryMake("Boris's key", "", options)));
 		}

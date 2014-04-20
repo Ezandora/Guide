@@ -27,6 +27,14 @@ void QPirateInit()
     state.state_boolean["need more hot wings"] = need_more_hot_wings;
     
     
+	int insult_count = 0;
+	for i from 1 to 8
+	{
+		if (get_property_boolean("lastPirateInsult" + i))
+			insult_count += 1;
+	}
+    state.state_int["insult count"] = insult_count;
+    
 	//Certain characters are in weird states, I think?
     if ($item[pirate fledges].available_amount() > 0 || $item[talisman o' nam].available_amount() > 0)
         QuestStateParseMafiaQuestPropertyValue(state, "finished");
@@ -46,12 +54,8 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	boolean have_outfit = have_outfit_components("Swashbuckling Getup");
 	if ($item[pirate fledges].available_amount() > 0)
 		have_outfit = true;
-	int insult_count = 0;
-	for i from 1 to 8
-	{
-		if (get_property_boolean("lastPirateInsult" + i))
-			insult_count += 1;
-	}
+        
+    int insult_count = base_quest_state.state_int["insult count"];
 	
 	float [int] insult_success_likelyhood;
 	//haven't verified these numbers, need to double-check
@@ -66,6 +70,7 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	insult_success_likelyhood[8] = 1.0;
 	
     boolean delay_for_future = false;
+    boolean can_acquire_cocktail_napkins = false;
 	
 	if (!have_outfit)
 	{
@@ -103,7 +108,7 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             turns_remaining = outfit_pieces_needed.count().to_float() / average_useful_nc_rate;
 		subentry.entries.listAppend("Run -combat in the obligatory pirate's cove." + "|~" + turns_remaining.roundForOutput(1) + " turns remain at " + combat_rate_modifier().floor() + "% combat.");
         
-        if (__misc_state_string["ballroom song"] != "-combat")
+        if (!__quest_state["Manor Unlock"].state_boolean["ballroom song effectively set"])
         {
             subentry.entries.listAppend(HTMLGenerateSpanOfClass("Wait until -combat ballroom song set.", "r_bold"));
             delay_for_future = true;
@@ -115,9 +120,11 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         
         if (!is_wearing_outfit("Swashbuckling Getup") && $item[pirate fledges].equipped_amount() == 0)
             url = "inventory.php?which=2";
+            
         
 		if (base_quest_state.mafia_internal_step == 1)
 		{
+            can_acquire_cocktail_napkins = true;
 			//caronch gave you a map
 			if ($item[Cap'm Caronch's nasty booty].available_amount() == 0 && $item[Cap'm Caronch's Map].available_amount() > 0)
 			{
@@ -131,11 +138,13 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		}
 		else if (base_quest_state.mafia_internal_step == 2)
 		{
+            can_acquire_cocktail_napkins = true;
 			//give booty back to caronch
 			subentry.entries.listAppend("Find Cap'm Caronch in Barrrney's Barrr.");
 		}
 		else if (base_quest_state.mafia_internal_step == 3)
 		{
+            can_acquire_cocktail_napkins = true;
 			//have blueprints, catburgle
 			string line = "Use the Orcish Frat House blueprints";
 			if (insult_count < 6)
@@ -237,6 +246,9 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	if ($item[the big book of pirate insults].available_amount() == 0 && base_quest_state.mafia_internal_step < 6 && have_outfit)
 		subentry.entries.listAppend(HTMLGenerateSpanFont("Buy the big book of pirate insults.", "red", ""));
 	
+    if (can_acquire_cocktail_napkins && $item[cocktail napkin].available_amount() == 0)
+        subentry.entries.listAppend("Try to acquire a cocktail napkin to speed up F'c'le. (10% drop, marginal)");
+    
 	if (!is_wearing_outfit("Swashbuckling Getup") && have_outfit)
     {
         string [int] stats_needed;

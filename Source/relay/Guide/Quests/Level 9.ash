@@ -107,18 +107,18 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
 		modifiers.listAppend("+567% item");
 		details.listAppend(base_quest_state.state_int["a-boo peak hauntedness"] + "% hauntedness.");
         
-        float item_drop = (100.0 + item_drop_modifier())/100.0;
+        float item_drop_multiplier = (100.0 + item_drop_modifier())/100.0;
         if ($location[a-boo peak].locationHasPlant("Rutabeggar") && my_location() != $location[a-boo peak])
         {
-            item_drop += 0.25;
+            item_drop_multiplier += 0.25;
         }
         
         if (true)
         {
             string line = "Have " + pluralize($item[a-boo clue]) + ".";
             
-            float clue_drop_rate = item_drop * 0.15;
-            line += " " + clue_drop_rate.roundForOutput(2) + " clues/adventure at +" + ((item_drop - 1) * 100.0).roundForOutput(1) + "% item.";
+            float clue_drop_rate = item_drop_multiplier * 0.15;
+            line += " " + clue_drop_rate.roundForOutput(2) + " clues/adventure at +" + ((item_drop_multiplier - 1) * 100.0).roundForOutput(1) + "% item.";
             
             details.listAppend(line);
         }
@@ -201,8 +201,6 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
             boolean jar_completed = base_quest_state.state_boolean["Peak Jar Completed"];
             boolean init_completed = base_quest_state.state_boolean["Peak Init Completed"];
             
-			modifiers.listAppend("-combat");
-            modifiers.listAppend("+item");
             
             string [int] options_left;
             
@@ -224,13 +222,21 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
                 else
                     details.listAppend("Use rusty hedge trimmers.");
             }
+            boolean can_complete_using_trimmers = false;
             if ($item[rusty hedge trimmers].available_amount() >= options_left.count()) //purely trimmers, now
+            {
+                can_complete_using_trimmers = true;
                 url = "inventory.php?which=3";
+            }
 			if (numeric_modifier("stench resistance") < 4.0 && !stench_completed)
             {
 				details.listAppend("+" + (4.0 - numeric_modifier("stench resistance")).floor() + " more " + HTMLGenerateSpanOfClass("stench", "r_element_stench") + " resist required.");
             }
-            
+            if (!can_complete_using_trimmers)
+            {
+                modifiers.listAppend("-combat");
+                modifiers.listAppend("+item");
+            }
 				
             if (!item_completed)
             {
@@ -402,7 +408,7 @@ void QLevel9GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             subentry.modifiers.listAppend("olfaction");
 		subentry.entries.listAppend("Build a bridge.");
         
-        if (get_property_int("chasmBridgeProgress") < 12)
+        if (get_property("questM15Lol") != "finished" && ($item[bridge].available_amount() > 0 || $item[dictionary].available_amount() == 0))
         {
             if ($item[bridge].available_amount() > 0)
                 subentry.entries.listAppend("Place the bridge.");

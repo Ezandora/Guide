@@ -162,13 +162,20 @@ boolean [location] makeConstantLocationArrayMutable(boolean [location] locations
 //Use this function - it converts to an editable map.
 string [int] split_string_mutable(string source, string delimiter)
 {
-	string [int] immutable_array = split_string(source, delimiter);
 	string [int] result;
+	string [int] immutable_array = split_string(source, delimiter);
 	foreach key in immutable_array
 		result[key] = immutable_array[key];
 	return result;
 }
 
+//This returns [] for empty strings. This isn't standard for split(), but is more useful for passing around lists. Hacky, I suppose.
+string [int] split_string_alternate(string source, string delimiter)
+{
+    if (source.length() == 0)
+        return listMakeBlankString();
+    return split_string_mutable(source, delimiter);
+}
 
 //Same as my_primestate(), except refers to substat
 stat my_primesubstat()
@@ -314,6 +321,15 @@ string int_to_wordy(int v) //Not complete, only supports a handful:
 }
 
 //Non-API-related functions:
+
+boolean mafiaIsPastRevision(int revision_number)
+{
+    if (get_revision() <= 0) //get_revision reports zero in certain cases; assume they're on a recent version
+        return true;
+    return (get_revision() >= revision_number);
+}
+
+
 boolean playerIsLoggedIn()
 {
     return !(my_hash().length() == 0 || my_id() == 0);
@@ -351,6 +367,18 @@ boolean stringHasPrefix(string s, string prefix)
 		return true;
 	return false;
 }
+boolean stringHasSuffix(string s, string suffix)
+{
+	if (s.length() < suffix.length())
+		return false;
+	else if (s.length() == suffix.length())
+		return (s == suffix);
+	else if (substring(s, s.length() - suffix.length()) == suffix)
+		return true;
+	return false;
+}
+
+
 string capitalizeFirstLetter(string v)
 {
 	buffer buf = v.to_buffer();
@@ -416,7 +444,7 @@ int combatTurnsAttemptedInLocation(location place)
 {
     int count = 0;
     if (place.combat_queue.length() > 0)
-        count += place.combat_queue.split_string("; ").count();
+        count += place.combat_queue.split_string_alternate("; ").count();
     return count;
 }
 
@@ -424,7 +452,7 @@ int noncombatTurnsAttemptedInLocation(location place)
 {
     int count = 0;
     if (place.noncombat_queue.length() > 0)
-        count += place.noncombat_queue.split_string("; ").count();
+        count += place.noncombat_queue.split_string_alternate("; ").count();
     return count;
 }
 
@@ -443,12 +471,12 @@ int turnsAttemptedInLocation(boolean [location] places)
 
 string [int] locationSeenNoncombats(location place)
 {
-    return place.noncombat_queue.split_string_mutable("; ");
+    return place.noncombat_queue.split_string_alternate("; ");
 }
 
 string [int] locationSeenCombats(location place)
 {
-    return place.combat_queue.split_string_mutable("; ");
+    return place.combat_queue.split_string_alternate("; ");
 }
 
 string lastNoncombatInLocation(location place)
@@ -471,11 +499,12 @@ int delayRemainingInLocation(location place)
     int [location] place_delays;
     place_delays[$location[the spooky forest]] = 5;
     place_delays[$location[the haunted ballroom]] = 5;
-    place_delays[$location[the haunted bedroom]] = 5;
+    //place_delays[$location[the haunted bedroom]] = 5; //combats not tracked properly?
     place_delays[$location[the haunted library]] = 5;
     place_delays[$location[the haunted billiards room]] = 5;
     place_delays[$location[the boss bat's lair]] = 4;
     place_delays[$location[the oasis]] = 5;
+    place_delays[$location[the hidden park]] = 5;
     
     
     if (place_delays contains place)
@@ -551,7 +580,7 @@ item lookupItem(string name)
 boolean [item] lookupItems(string names) //CSV input
 {
     boolean [item] result;
-    string [int] item_names = split_string(names, ",");
+    string [int] item_names = split_string_alternate(names, ",");
     foreach key in item_names
     {
         item it = item_names[key].to_item();
@@ -570,7 +599,7 @@ skill lookupSkill(string name)
 boolean [skill] lookupSkills(string names) //CSV input
 {
     boolean [skill] result;
-    string [int] skill_names = split_string(names, ",");
+    string [int] skill_names = split_string_alternate(names, ",");
     foreach key in skill_names
     {
         skill s = skill_names[key].to_skill();
@@ -627,126 +656,6 @@ boolean monsterDropsItem(monster m, item it)
 	return false;
 }
 
-//Takes into account banishes and olfactions.
-//Probably will be inaccurate in many corner cases, sorry.
-float [monster] appearance_rates_adjusted(location l)
-{
-    float [monster] source = l.appearance_rates();
-    
-    if (l == $location[the sleazy back alley])
-        source[$monster[none]] = MIN(MAX(0, 20 - combat_rate_modifier()), 100);
-    
-    float minimum_monster_appearance = 1000000000.0;
-    foreach m in source
-    {
-        float v = source[m];
-        if (v > 0.0)
-        {
-            if (v < minimum_monster_appearance)
-                minimum_monster_appearance = v;
-        }
-    }
-    
-    float [monster] source_altered;
-    foreach m in source
-    {
-        float v = source[m];
-        source_altered[m] = v / minimum_monster_appearance;
-    }
-    
-    
-    boolean lawyers_relocated = (get_property_int("relocatePygmyLawyer") == my_ascensions());
-    boolean janitors_relocated = (get_property_int("relocatePygmyJanitor") == my_ascensions());
-    if (l == $location[the hidden park])
-    {
-        if (janitors_relocated)
-            source_altered[$monster[pygmy janitor]] += 1.0;
-        if (lawyers_relocated)
-            source_altered[$monster[pygmy witch lawyer]] += 1.0;
-    }
-    if (($locations[The Hidden Apartment Building,The Hidden Bowling Alley,The Hidden Hospital,The Hidden Office Building] contains l))
-    {
-        if (janitors_relocated && (source_altered contains $monster[pygmy janitor]))
-            remove source_altered[$monster[pygmy janitor]];
-        if (lawyers_relocated && (source_altered contains $monster[pygmy witch lawyer]))
-            remove source_altered[$monster[pygmy witch lawyer]];
-    }
-    
-    foreach m in source_altered
-    {
-        if (m.is_banished())
-            source_altered[m] = 0.0;
-    }
-    
-    if ($effect[on the trail].have_effect() > 0)
-    {
-        monster olfacted_monster = get_property("olfactedMonster").to_monster();
-        if (olfacted_monster != $monster[none])
-        {
-            if (source_altered contains olfacted_monster)
-                source_altered[olfacted_monster] += 3.0; //FIXME is this correct?
-        }
-    }
-    
-    
-    //Convert source_altered to source.
-    
-    float total = 0.0;
-    foreach m in source_altered
-    {
-        float v = source_altered[m];
-        if (v > 0)
-            total += v;
-    }
-    if ($locations[Guano Junction,the Batrat and Ratbat Burrow,the Beanbat Chamber] contains l)
-    {
-        //hacky, probably wrong:
-        float v = total / 8.0;
-        source_altered[$monster[screambat]] = v;
-        total += v;
-    }
-    
-    if (total > 0.0)
-    {
-        foreach m in source_altered
-        {
-            float v = source_altered[m];
-            source[m] = v / total * 100.0;
-        }
-    }
-    
-    return source;
-}
-
-
-float [monster] appearance_rates_adjusted_cancel_nc(location l)
-{
-    float [monster] base_rates = appearance_rates_adjusted(l);
-    float nc_rate = base_rates[$monster[none]];
-    float nc_inverse_multiplier = 1.0;
-    if (nc_rate != 1.0)
-        nc_inverse_multiplier = 1.0 / (1.0 - nc_rate);
-    foreach m in base_rates
-    {
-        if (m == $monster[none])
-            base_rates[m] = 0.0;
-        else
-            base_rates[m] *= nc_inverse_multiplier;
-    }
-    return base_rates;
-}
-
-
-boolean locationHasPlant(location l, string plant_name)
-{
-    string [int] plants_in_place = get_florist_plants()[l];
-    foreach key in plants_in_place
-    {
-        if (plants_in_place[key] == plant_name)
-            return true;
-    }
-    return false;
-}
 
 Record StringHandle
 {
@@ -858,6 +767,27 @@ int damageTakenByElement(int base_damage, element e)
     return damageTakenByElement(base_damage, elemental_resistance);
 }
 
+boolean locationHasPlant(location l, string plant_name)
+{
+    string [int] plants_in_place = get_florist_plants()[l];
+    foreach key in plants_in_place
+    {
+        if (plants_in_place[key] == plant_name)
+            return true;
+    }
+    return false;
+}
+
+int initiative_modifier_ignoring_plants()
+{
+    int init = initiative_modifier();
+    
+    location my_location = my_location();
+    if (my_location != $location[none] && (my_location.locationHasPlant("Impatiens") || my_location.locationHasPlant("Shuffle Truffle")))
+        init -= 25.0;
+    
+    return init;
+}
 
 int monster_level_adjustment_ignoring_plants()
 {
@@ -882,4 +812,30 @@ int monster_level_adjustment_ignoring_plants()
         
     }
     return ml;
+}
+
+
+int monster_level_adjustment_for_location(location l)
+{
+    int ml = monster_level_adjustment_ignoring_plants();
+    
+    if (l.locationHasPlant("Rabid Dogwood") || l.locationHasPlant("War Lily") || l.locationHasPlant("Blustery Puffball"))
+        ml += 30;
+    return ml;
+}
+
+int monsterExtraInitForML(int ml)
+{
+	if (ml < 21)
+		return 0.0;
+	else if (ml < 41)
+		return 0.0 + 1.0 * (ml - 20.0);
+	else if (ml < 61)
+		return 20.0 + 2.0 * (ml - 40.0);
+	else if (ml < 81)
+		return 60.0 + 3.0 * (ml - 60.0);
+	else if (ml < 101)
+		return 120.0 + 4.0 * (ml - 80.0);
+	else
+		return 200.0 + 5.0 * (ml - 100.0);
 }

@@ -59,15 +59,20 @@ void generateDailyResources(Checklist [int] checklists)
 	{
 		string [int] description;
 		if (__misc_state["need to level"])
-			description.listAppend("+mainstat gains (50 turns)");
+			description.listAppend("+mainstat gains. (50 turns)");
         
         string [int] reasons;
-        reasons.listAppend("nice hat");
-        if ($familiar[fancypants scarecrow].familiar_is_usable())
+        if ($item[double-ice cap].available_amount() == 0)
+            reasons.listAppend("nice hat");
+        if ($familiar[fancypants scarecrow].familiar_is_usable() && $item[double-ice britches].available_amount() == 0)
             reasons.listAppend("scarecrow pants");
-        reasons.listAppend("tower killing");
+        if (!__quest_state["Level 13"].state_boolean["past tower"])
+            reasons.listAppend("situational tower killing");
         
-		description.listAppend("Double-ice (" + reasons.listJoinComponents(", ", "and") + ")");
+        if (reasons.count() > 0)
+            description.listAppend("Double-ice. (" + reasons.listJoinComponents(", ", "and") + ")");
+        else
+            description.listAppend("Double-ice.");
 		
 		available_resources_entries.listAppend(ChecklistEntryMake("__item shard of double-ice", "", ChecklistSubentryMake("Take a shower", description), 5));
 	}
@@ -118,7 +123,7 @@ void generateDailyResources(Checklist [int] checklists)
 	{
         string [int] description;
         string line = "Various effects.";
-        if (__misc_state["In run"])
+        if (__misc_state["In run"] && my_path_id() != PATH_ZOMBIE_SLAYER)
         {
             line = "+20ML";
             if ($item[pail].available_amount() == 0)

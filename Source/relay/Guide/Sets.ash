@@ -6,6 +6,8 @@ void SetsInit()
 {
     SCountersInit();
     QHitsInit();
+    
+    SDNAInit();
 }
 
 
@@ -28,7 +30,7 @@ void SetsGenerateResources(ChecklistEntry [int] available_resources_entries)
     SJarlsbergGenerateResource(available_resources_entries);
     SCOTGenerateResource(available_resources_entries);
     SSneakyPeteGenerateResource(available_resources_entries);
-    
+    SDNAGenerateResource(available_resources_entries);
     
 }
 
@@ -56,6 +58,7 @@ void SetsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 	SRemindersGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SGrimstoneGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SSneakyPeteGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+	SDNAGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     
 }
 

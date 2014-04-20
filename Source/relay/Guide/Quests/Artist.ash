@@ -8,6 +8,9 @@ void QArtistInit()
     
     if (!state.started && $items[pail of pretentious paint, pretentious paintbrush, pretentious palette].available_amount() > 0)
         QuestStateParseMafiaQuestPropertyValue(state, "started");
+    
+    if (my_path_id() == PATH_ZOMBIE_SLAYER) //cannot be done
+        QuestStateParseMafiaQuestPropertyValue(state, "unstarted");
 	
 	state.quest_name = "Pretentious Artist's Quest";
 	state.image_name = "__item pretentious palette";
@@ -36,7 +39,7 @@ void QArtistGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		//haunted pantry
         if (active_url == "")
             active_url = $location[the haunted pantry].getClickableURLForLocation();
-		subentry.entries.listAppend("Adventure in the haunted pantry for pretentious palette. (25% superlikely)");
+		subentry.entries.listAppend("Adventure in the haunted pantry for palette. (25% superlikely)");
 		output_modifiers = true;
 	}
 	if ($item[pretentious paintbrush].available_amount() == 0)
@@ -44,7 +47,7 @@ void QArtistGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		//cobb's knob
         if (active_url == "")
             active_url = $location[the outskirts of Cobb's Knob].getClickableURLForLocation();
-		subentry.entries.listAppend("Adventure in the outskirts of Cobb's Knob for pretentious paintbrush. (25% superlikely)");
+		subentry.entries.listAppend("Adventure in the outskirts of Cobb's Knob for paintbrush. (25% superlikely)");
 		output_modifiers = true;
 	}
 	if ($item[pail of pretentious paint].available_amount() == 0)
@@ -52,7 +55,7 @@ void QArtistGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		//sleazy back alley
         if (active_url == "")
             active_url = $location[the sleazy back alley].getClickableURLForLocation();
-		subentry.entries.listAppend("Adventure in the sleazy back alley for pail of pretentious paint. (25% superlikely)");
+		subentry.entries.listAppend("Adventure in the sleazy back alley for pail of paint. (25% superlikely)");
 		output_modifiers = true;
 	}
 	

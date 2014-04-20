@@ -69,7 +69,7 @@ void QLevel2GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		subentry.entries.listAppend("Explore the stream" + __html_right_arrow_character + "March to the marsh");
 		
 		
-		if (__misc_state_string["ballroom song"] != "-combat")
+		if (!__quest_state["Manor Unlock"].state_boolean["ballroom song effectively set"])
 			subentry.entries.listAppend("Possibly wait until -combat ballroom song set. (marginal)");
 			
 		if (__misc_state["free runs available"])

@@ -57,26 +57,6 @@ int to_int_silent(string value)
 	return to_int_silent(value, ErrorMake());
 }
 
-//Allows for fractional digits, not just whole numbers. Useful for preventing "+233.333333333333333% item"-type output.
-//Outputs 3.0, 3.1, 3.14, etc.
-float round(float v, int additional_fractional_digits)
-{
-	if (additional_fractional_digits < 1)
-		return v.round().to_float();
-	float multiplier = 10.0 * additional_fractional_digits;
-	return to_float(round(v * multiplier)) / multiplier;
-}
-
-//Similar to round() addition above, but also converts whole float numbers into integers for output
-string roundForOutput(float v, int additional_fractional_digits)
-{
-	v = round(v, additional_fractional_digits);
-	int vi = v.to_int();
-	if (vi.to_float() == v)
-		return vi.to_string();
-	else
-		return v.to_string();
-}
 
 float sqrt(float v, Error err)
 {
@@ -154,6 +134,13 @@ Vec2i Vec2iZero()
 	return Vec2iMake(0,0);
 }
 
+boolean Vec2iValueInRange(Vec2i v, int value)
+{
+    if (value >= v.x && value <= v.y)
+        return true;
+    return false;
+}
+
 
 record Rect
 {
@@ -190,4 +177,25 @@ void listAppend(Rect [int] list, Rect entry)
 	while (list contains position)
 		position += 1;
 	list[position] = entry;
+}
+
+//Allows for fractional digits, not just whole numbers. Useful for preventing "+233.333333333333333% item"-type output.
+//Outputs 3.0, 3.1, 3.14, etc.
+float round(float v, int additional_fractional_digits)
+{
+	if (additional_fractional_digits < 1)
+		return v.round().to_float();
+	float multiplier = powf(10.0, additional_fractional_digits);
+	return to_float(round(v * multiplier)) / multiplier;
+}
+
+//Similar to round() addition above, but also converts whole float numbers into integers for output
+string roundForOutput(float v, int additional_fractional_digits)
+{
+	v = round(v, additional_fractional_digits);
+	int vi = v.to_int();
+	if (vi.to_float() == v)
+		return vi.to_string();
+	else
+		return v.to_string();
 }

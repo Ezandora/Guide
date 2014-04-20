@@ -1,5 +1,4 @@
 import "relay/Guide/Support/Library.ash"
-import "relay/Guide/QuestLog.ash"
 
 //Quest status stores all/most of our quest information in an internal format that's easier to understand.
 record QuestState
@@ -30,12 +29,7 @@ float [string] __misc_state_float;
 
 boolean safeToLoadQuestLog()
 {
-    int current_time = getMillisecondsOfToday();
-    int last_reloaded_time = get_property_int("__relay_guide_last_quest_log_reload_time");
-    int minimum_time_between_quest_log_reloads = 10000; //ten seconds, seems reasonable
-    if (abs(current_time - last_reloaded_time) < minimum_time_between_quest_log_reloads)
-        return false;
-    return true;
+    return false;
 }
 
 string shrinkKOLPage(string html)
@@ -49,55 +43,6 @@ string shrinkKOLPage(string html)
 boolean __loaded_quest_log = false;
 void requestQuestLogLoad(string property_name)
 {
-    if (true) //disabled, remove later
-        return;
-    if (__loaded_quest_log)
-        return;
-    
-    boolean [string] whitelist = $strings[questF01Primordial,questF02Hyboria,questF03Future,questI02Beat];
-    //questF01Primordial questF02Hyboria questF03Future - minor tracking
-    //questG02Whitecastle - tracked, but updates only started, finished, step1, step5?
-    //questG03Ego - tracked, but not updated
-    //questG04Nemesis questG05Dark - minor tracking
-    //questI02Beat - need to know professor jacking being defeated
-    
-    if (!(whitelist contains property_name))
-        return;
-    
-    __loaded_quest_log = true;
-    
-    
-    
-    boolean safe_to_load_again = safeToLoadQuestLog();
-    int current_time = getMillisecondsOfToday();
-    
-    //Rate limit:
-    //A load of both quest logs can be around 9 KiB, or less.
-    //That's quite a bit of data. So, we want to prevent requesting this too much.
-    //We rate limit - quest log loads can only happen every ten seconds.
-    //We have a javascript mechanism in place to reload at a later time, if we skip the check. This insures stale data won't be visible beyond the limit interval.
-    
-    
-    if (safe_to_load_again)
-    {
-        boolean stale = false;
-        string quest_log_2 = "";//visit_url("questlog.php?which=2");
-        string quest_log_1 = "";//visit_url("questlog.php?which=1");
-        if (quest_log_2.contains_text("Your Quest Log"))
-            set_property("__relay_guide_last_quest_log_2", shrinkKOLPage(quest_log_2));
-        else
-            stale = true;
-        if (quest_log_1.contains_text("Your Quest Log"))
-            set_property("__relay_guide_last_quest_log_1", shrinkKOLPage(quest_log_1));
-        else
-            stale = true;
-        set_property("__relay_guide_last_quest_log_reload_time", current_time.to_string());
-        set_property("__relay_guide_stale_quest_data", stale.to_string());
-    }
-    else
-    {
-        set_property("__relay_guide_stale_quest_data", true.to_string());
-    }
 }
 
 int QuestStateConvertQuestPropertyValueToNumber(string property_value)
@@ -115,7 +60,6 @@ int QuestStateConvertQuestPropertyValueToNumber(string property_value)
 	}
 	else if (property_value.contains_text("step"))
 	{
-		//let's see...
 		//lazy:
 		string theoretical_int = property_value.replace_string("step", "");
 		int step_value = theoretical_int.to_int_silent();
@@ -132,6 +76,11 @@ int QuestStateConvertQuestPropertyValueToNumber(string property_value)
 	return result;
 }
 
+
+boolean questPropertyPastInternalStepNumber(string quest_property, int number)
+{
+	return QuestStateConvertQuestPropertyValueToNumber(get_property(quest_property)) >= number;
+}
 
 void QuestStateParseMafiaQuestPropertyValue(QuestState state, string property_value)
 {
@@ -178,21 +127,6 @@ boolean QuestStateEquals(QuestState q1, QuestState q2)
 void QuestStateParseMafiaQuestProperty(QuestState state, string property_name, boolean allow_quest_log_load)
 {
 	state.QuestStateParseMafiaQuestPropertyValue(get_property(property_name));
-    
-    boolean should_load_anyways = false;
-    if (!state.finished)
-    {
-        if (QuestLogTracksProperty(property_name))
-            should_load_anyways = true;
-    }
-    
-    if ((should_load_anyways || state.in_progress) && allow_quest_log_load)
-    {
-        requestQuestLogLoad(property_name);
-        state.QuestStateParseMafiaQuestPropertyValue(get_property(property_name));
-    }
-    if (QuestLogTracksProperty(property_name) && !state.finished)
-        state.QuestStateParseMafiaQuestPropertyValue(QuestLogLookupProperty(property_name));
 }
 
 void QuestStateParseMafiaQuestProperty(QuestState state, string property_name)

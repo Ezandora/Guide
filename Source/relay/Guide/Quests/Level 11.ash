@@ -46,8 +46,14 @@ void QLevel11Init()
 		state.image_name = "Palindome";
         
         state.state_boolean["Need instant camera"] = false;
-        if (lookupItem("photograph of a dog").available_amount() + lookupItem("disposable instant camera").available_amount() == 0 && state.mafia_internal_step < 3 && get_revision() >= 13870)
+        if (lookupItem("photograph of a dog").available_amount() + lookupItem("disposable instant camera").available_amount() == 0 && state.mafia_internal_step < 3 && mafiaIsPastRevision(13870))
             state.state_boolean["Need instant camera"] = true;
+        
+        
+        state.state_boolean["dr. awkward's office unlocked"] = false;
+        if (state.mafia_internal_step > 2)
+            state.state_boolean["dr. awkward's office unlocked"] = true;
+        //FIXME tracking this
 		if (my_level() >= 11)
 			state.startable = true;
 		__quest_state["Level 11 Palindome"] = state;
@@ -157,7 +163,7 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         {
             subentry.modifiers.listAppend("-combat");
             subentry.entries.listAppend("Unlock the black market by adventuring in the Black Forest with -combat.");
-            if (__misc_state_string["ballroom song"] != "-combat")
+            if (!__quest_state["Manor Unlock"].state_boolean["ballroom song effectively set"])
             {
                 subentry.entries.listAppend(HTMLGenerateSpanOfClass("Wait until -combat ballroom song set.", "r_bold"));
                 make_entry_future = true;
@@ -212,8 +218,15 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         }
         else
         {
-            url = "place.php?whichplace=desertbeach";
-            subentry.entries.listAppend("Vacation at the shore, read diary.");
+            if (CounterLookup("Semi-rare").CounterWillHitExactlyInTurnRange(0,2))
+            {
+                subentry.entries.listAppend(HTMLGenerateSpanFont("Avoid vacationing; will override semi-rare.", "red", ""));
+            }
+            else
+            {
+                url = "place.php?whichplace=desertbeach";
+                subentry.entries.listAppend("Vacation at the shore, read diary.");
+            }
         }
     }
     else if (base_quest_state.mafia_internal_step < 4)
@@ -292,6 +305,12 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
         url = "manor3.php";
         subentry.modifiers.listAppend("elemental resistance");
         subentry.entries.listAppend("Fight Lord Spookyraven.");
+        
+        if ($effect[Red Door Syndrome].have_effect() == 0 && my_meat() > 1000)
+        {
+            subentry.entries.listAppend("A can of black paint can help with fighting him. Bit pricy. (1k meat)");
+        }
+        
         image_name = "demon summon";
     }
 
@@ -318,7 +337,10 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
         url = "place.php?whichplace=cove";
         subentry.entries.listAppend("Find the palindome. The pirates will know the way.");
         
-        if ($location[the poop deck].noncombat_queue.contains_text("It's Always Swordfish"))
+        if (!is_wearing_outfit("Swashbuckling Getup") && $item[pirate fledges].equipped_amount() == 0)
+            url = "inventory.php?which=2";
+            
+        if ($location[the poop deck].noncombat_queue.contains_text("It's Always Swordfish") || $location[belowdecks].turnsAttemptedInLocation() > 0)
         {
             subentry.modifiers.listAppend("olfact gaudy pirate");
             string line = "Olfact/copy gaudy pirate belowdecks";
@@ -335,7 +357,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
         else
         {
             subentry.modifiers.listAppend("-combat");
-            subentry.entries.listAppend("Run -combat to unlock belowdecks.");
+            subentry.entries.listAppend("Run -combat on the Poop Deck to unlock belowdecks.");
             subentry.entries.listAppend(generateTurnsToSeeNoncombat(80, 1, "unlock belowdecks"));
         }
             
@@ -368,7 +390,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
         
         */
         
-        if (get_revision() < 13870) //not actually sure when palindome support went in, so just using a recent one
+        if (!mafiaIsPastRevision(13870)) //not actually sure when palindome support went in, so just using a recent one
         {
             subentry.entries.listAppend("Update mafia to support revamp. Simple guide:");
             subentry.entries.listAppend("First you adventure in the Palindome.|Find three photographs via non-combats(?), and take a picture of Bob Racecar/Racecar Bob with a disposable instant camera. (found in NC in haunted bedroom)|Olfact bob racecar/racecar bob.|Also, possibly find stunt nuts. (30% drop, +234% item)");
@@ -377,7 +399,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
             subentry.entries.listAppend("Read 2 Love Me, Vol. 2 to unlock Mr. Alarm's office.");
             subentry.entries.listAppend("Talk to Mr. Alarm, unlock Whitey's Grove. Run +186% item, +combat to find lion oil and bird rib.|Or, alternatively, adventure in the palindome. I don't know the details, sorry.");
             subentry.entries.listAppend("Cook wet stunt nut stew, talk to Mr. Alarm. He'll give you the Mega Gem.");
-            subentry.entries.listAppend("Equip that to fight Dr. Awkard in his office.");
+            subentry.entries.listAppend("Equip that to fight Dr. Awkward in his office.");
         }
         else if ($item[mega gem].available_amount() > 0 || base_quest_state.mafia_internal_step == 5)
         {
@@ -388,7 +410,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
             if ($item[mega gem].equipped_amount() == 0)
                 tasks.listAppend("equip the Mega Gem");
             
-            tasks.listAppend("fight Dr. Awkward");
+            tasks.listAppend("fight Dr. Awkward in his office");
             subentry.entries.listAppend(tasks.listJoinComponents(", ", "then").capitalizeFirstLetter() + ".");
         }
         else if (base_quest_state.mafia_internal_step == 4 || base_quest_state.mafia_internal_step == 3)
@@ -458,7 +480,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
         }
         else
         {
-            boolean dr_awkwards_office_unlocked = false; //no way to track this at the moment
+            boolean dr_awkwards_office_unlocked = base_quest_state.state_boolean["dr. awkward's office unlocked"]; //no way to track this at the moment
             string single_entry_mode = "";
             boolean need_to_adventure_in_palindome = false;
             boolean need_palindome_location = true;
@@ -538,8 +560,14 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
             else if (7262.to_item().available_amount() > 0)
             {
                 if (!need_to_adventure_in_palindome)
+                {
                     url = "inventory.php?which=3";
-                subentry.entries.listAppend("Use I Love Me, Vol. I. Then place the photographs in Dr. Awkward's Office.");
+                    subentry.entries.listAppend("Use I Love Me, Vol. I. Then place the photographs in Dr. Awkward's Office.");
+                }
+                else
+                {
+                    subentry.entries.listAppend("Have I Love Me, Vol. I. Collect photographs and such in the Palindome first..");
+                }
             }
             
             if (!need_to_adventure_in_palindome)
@@ -790,22 +818,11 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
                 next_position_needed = 1;
                 additional_turns_after_that = 0;
                 
+                boolean delay_for_semirare = CounterLookup("Semi-rare").CounterWillHitExactlyInTurnRange(0, 6);
                 
-                string [int] semirare_turns = __misc_state_string["Turns until semi-rare"].split_string(",");
-                
-                boolean delay_for_semirare = false;
-                foreach key in semirare_turns
-                {
-                    int turns = semirare_turns[key].to_int();
-                    if (turns <= 6 && turns >= 0)
-                    {
-                        delay_for_semirare = true;
-                        break;
-                    }
-                }
                 if (delay_for_semirare)
                 {
-                    task = HTMLGenerateSpanFont("Avoid fighting Ed the Undying, semi-rare coming up", "red", "");
+                    task = HTMLGenerateSpanFont("Avoid fighting Ed the Undying, semi-rare coming up ", "red", "");
                 }
                 else
                 {
@@ -865,6 +882,7 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
                     subentry.entries.listAppend(relevant_items.listJoinComponents(", ", "and") + " available.");
             }
             //FIXME track wheel being placed
+            //noncombat_queue => Whee! will show if we have found the wheel
             //FIXME tell them which route is better from where they are
         }
     }
@@ -1137,7 +1155,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
             {
                 subentry.entries.listAppend("Olfact surgeon.");
                 if (!$monster[pygmy orderlies].is_banished())
-                    subentry.entries.listAppend("Potentially banish pgymy orderlies.");
+                    subentry.entries.listAppend("Potentially banish pygmy orderlies.");
                 
         
                 string [int] items_we_have_unequipped;
@@ -1286,7 +1304,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         {
             ChecklistSubentry subentry;
             subentry.header = "Debug";
-            string [int] show_properties = split_string_mutable("hiddenApartmentProgress,hiddenBowlingAlleyProgress,hiddenHospitalProgress,hiddenOfficeProgress", ","); //8,8,8,8 when finished
+            string [int] show_properties = split_string_alternate("hiddenApartmentProgress,hiddenBowlingAlleyProgress,hiddenHospitalProgress,hiddenOfficeProgress", ","); //8,8,8,8 when finished
             foreach key in show_properties
                 subentry.entries.listAppend(show_properties[key] + " = " + get_property(show_properties[key]).HTMLEscapeString());
         
@@ -1421,7 +1439,7 @@ void QLevel11HiddenTempleGenerateTasks(ChecklistEntry [int] task_entries, Checkl
     else
         subentry.entries.listAppend("There's also another unlock quest, but it's slower.");
     
-    if (__misc_state_string["ballroom song"] != "-combat")
+    if (!__quest_state["Manor Unlock"].state_boolean["ballroom song effectively set"])
     {
         subentry.entries.listAppend(HTMLGenerateSpanOfClass("Wait until -combat ballroom song set.", "r_bold"));
         future_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, "place.php?whichplace=woods", subentry, $locations[the spooky forest]));

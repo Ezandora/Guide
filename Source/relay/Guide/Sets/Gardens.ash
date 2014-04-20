@@ -24,7 +24,7 @@ void generateGardenEntry(ChecklistEntry [int] available_resources_entries, boole
                 continue;
             output_list.listAppend(pluralize(amount, it));
         }
-        if (creatable_items.count() > 0)
+        if (output_list.count() > 0)
         {
             subentry.entries.listAppend("Can create " + output_list.listJoinComponents(", ", "or") + ".");
         }

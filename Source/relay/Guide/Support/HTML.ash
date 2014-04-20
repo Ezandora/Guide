@@ -145,3 +145,16 @@ string HTMLEscapeString(string line)
 {
     return entity_encode(line);
 }
+
+string HTMLStripTags(string html)
+{
+    matcher pattern = create_matcher("<[^>]*>", html);
+    return pattern.replace_all("");
+}
+
+
+
+string [string] generateMainLinkMap(string url)
+{
+    return mapMake("class", "r_a_undecorated", "href", url, "target", "mainpane");
+}

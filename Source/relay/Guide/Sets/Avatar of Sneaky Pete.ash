@@ -2,7 +2,7 @@
 
 void SSneakyPeteGenerateResource(ChecklistEntry [int] available_resources_entries)
 {
-	if (my_path_id() != PATH_AVATAR_OF_SNEAKY_PETE)
+	if (my_path_id() != PATH_AVATAR_OF_SNEAKY_PETE || !mafiaIsPastRevision(13785))
 		return;
     //my_audience() whenever 16.3 is out
     
@@ -13,7 +13,7 @@ void SSneakyPeteGenerateResource(ChecklistEntry [int] available_resources_entrie
     entry.importance_level = 1;
     
     
-    if (get_revision() >= 13783)
+    if (true)
     {
         int total_free_peel_outs_available = 10;
         if (get_property("peteMotorbikeTires") == "Racing Slicks")
@@ -37,7 +37,7 @@ void SSneakyPeteGenerateResource(ChecklistEntry [int] available_resources_entrie
         }
     }
     
-    if (lookupSkill("Fix Jukebox").have_skill() && get_property_int("_peteJukeboxFixed") < 3 && get_revision() >= 13785)
+    if (lookupSkill("Fix Jukebox").have_skill() && get_property_int("_peteJukeboxFixed") < 3)
     {
         int uses_remaining = MAX(0, 3 - get_property_int("_peteJukeboxFixed"));
         
@@ -48,10 +48,36 @@ void SSneakyPeteGenerateResource(ChecklistEntry [int] available_resources_entrie
         if (entry.image_lookup_name.length() == 0)
             entry.image_lookup_name = "__effect jukebox hero";
         
+        string [int] targets;
+        //√banshee, √a batrat for sonar, √harem girl (contested), √burly sidekick, √quiet healer, √filthworms, √f'c'le without natural dancer, √a-boo clues
+        if (!lookupSkill("Natural Dancer").have_skill() && !__quest_state["Pirate Quest"].finished && $item[talisman o' nam].available_amount() == 0)
+            targets.listAppend("Three times in the F'c'le, if you can't acquire Natural Dancer/+234% items.");
+            
+        if (!__quest_state["Level 11 Pyramid"].state_boolean["Desert Explored"] && !__quest_state["Level 11 Pyramid"].state_boolean["Killing Jar Given"] && $item[killing jar].available_amount() == 0)
+            targets.listAppend("Haunted Library - Banshee - Killing Jar to speed up desert exploration.");
+        if (__quest_state["Level 4"].state_int["areas unlocked"] + $item[sonar-in-a-biscuit].available_amount() < 3)
+            targets.listAppend("Batrat/Ratbat - Sonar-in-a-biscuit.");
+        
+        if (!have_outfit_components("Knob Goblin Elite Guard Uniform") && !have_outfit_components("Knob Goblin Harem Girl Disguise") && !__quest_state["Level 5"].finished)
+            targets.listAppend("Harem Girl - disguise for quest. (20% drop)");
+        
+		if (!__quest_state["Level 10"].finished && $item[mohawk wig].available_amount() == 0 && $item[s.o.c.k.].available_amount() == 0)
+			targets.listAppend("Burly Sidekick (Mohawk wig) - speed up top floor of castle.");
+        if ($item[amulet of extreme plot significance].available_amount() == 0 && !__quest_state["Level 10"].finished && !$location[The Castle in the Clouds in the Sky (Ground floor)].locationAvailable() && $item[s.o.c.k.].available_amount() == 0)
+			targets.listAppend("Quiet Healer (amulet of extreme plot significance) - speed up castle basement.");
+		if (!__quest_state["Level 12"].state_boolean["Orchard Finished"])
+			targets.listAppend("Filthworms.");
+            
+        if (__quest_state["Level 9"].state_int["a-boo peak hauntedness"] > 0 && $item[a-boo clue].available_amount() < 3)
+            targets.listAppend("A-Boo Peak - a-boo clues. (15% drop)");
+        
+        if (targets.count() > 0)
+            description.listAppend("Potential targets:|*" + targets.listJoinComponents("<hr>|*"));
+        
         entry.subentries.listAppend(ChecklistSubentryMake(pluralize(uses_remaining, "jukebox fix", "jukebox fixes"), "25 MP", description));
     }
     
-    if (lookupSkill("Jump Shark").have_skill() && get_property_int("_peteJumpedShark") < 3 && get_revision() >= 13730)
+    if (lookupSkill("Jump Shark").have_skill() && get_property_int("_peteJumpedShark") < 3)
     {
         int uses_remaining = MAX(0, 3 - get_property_int("_peteJumpedShark"));
         
@@ -71,7 +97,7 @@ void SSneakyPeteGenerateResource(ChecklistEntry [int] available_resources_entrie
 
 void SSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (my_path_id() != PATH_AVATAR_OF_SNEAKY_PETE)
+	if (my_path_id() != PATH_AVATAR_OF_SNEAKY_PETE || !mafiaIsPastRevision(13785))
 		return;
     
     
@@ -89,7 +115,7 @@ void SSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         }
         int motorcycle_upgrades_available = MIN(6, my_level() / 2);
         
-        if (motorcycle_upgrades_have < motorcycle_upgrades_available && (get_revision() > 13738 || motorcycle_upgrades_have > 0))
+        if (motorcycle_upgrades_have < motorcycle_upgrades_available)
         {
             string [int] description;
             description.listAppend(pluralize(motorcycle_upgrades_available - motorcycle_upgrades_have, "upgrade", "upgrades") + " available.");
@@ -193,6 +219,30 @@ void SSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
 
             optional_task_entries.listAppend(ChecklistEntryMake("__skill Easy Riding", "main.php?action=motorcycle", ChecklistSubentryMake("Upgrade your bike", "", description), 11));
             
+        }
+    }
+    
+    if (lookupSkill("Check Mirror").have_skill())
+    {
+        boolean have_intrinsic = false;
+        foreach s in $strings[Slicked-Back Do,Pompadour,Cowlick,Fauxhawk]
+        {
+            effect e = s.lookupEffect();
+            if (e == $effect[none])
+            {
+                have_intrinsic = true; //can't track
+                continue;
+            }
+            if (e.have_effect() == 2147483647)
+                have_intrinsic = true;
+        }
+        if (!have_intrinsic)
+        {
+            string [int] description;
+            
+            description.listAppend("One adventure cost for an intrinsic.");
+            description.listAppend("Potential options:|*+3 all resistances|*+3 stats/fight (best)|*+50% meat (requires 20 love)|*+50% init (requires 20 hate)");
+            optional_task_entries.listAppend(ChecklistEntryMake("__skill Check Mirror", "skills.php", ChecklistSubentryMake("Check mirror", "", description), 11));
         }
     }
     

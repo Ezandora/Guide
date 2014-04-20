@@ -138,6 +138,13 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             
             if (turn_estimation != -1.0)
                 subentry.entries.listAppend("~" + turn_estimation.roundForOutput(1) + " turns left on average.");
+            
+            if (CounterLookup("Semi-rare").CounterWillHitExactlyInTurnRange(1,1))
+            {
+                subentry.modifiers.listClear();
+                subentry.entries.listClear();
+                subentry.entries.listAppend(HTMLGenerateSpanFont("Avoid adventuring here; wheel will override semi-rare.", "red", ""));
+            }
 		}
 		else if ($location[The Castle in the Clouds in the Sky (Ground floor)].locationAvailable())
 		{
