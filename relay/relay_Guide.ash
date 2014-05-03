@@ -1,7 +1,7 @@
 //This script and its support scripts are in the public domain.
 
 //These settings are for development. Don't worry about editing them.
-string __version = "1.1";
+string __version = "1.1.1";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -1876,7 +1876,6 @@ string HTMLStripTags(string html)
 }
 
 
-
 string [string] generateMainLinkMap(string url)
 {
     return mapMake("class", "r_a_undecorated", "href", url, "target", "mainpane");
@@ -2145,8 +2144,11 @@ void CountersInit()
             }
             else
             {
-                c.exact_turns.listAppend(turns_until_counter);
-                sort c.exact_turns by value;
+                if (turns_until_counter >= 0)
+                {
+                    c.exact_turns.listAppend(turns_until_counter);
+                    sort c.exact_turns by value;
+                }
             }
             
             __active_counters[final_name] = c;
@@ -4005,7 +4007,12 @@ float [monster] appearance_rates_adjusted(location l)
     {
         float v = source[m];
         if (m == $monster[none])
-            source_altered[m] = v;
+        {
+            if (v < 0.0)
+                source_altered[m] = 0.0;
+            else
+                source_altered[m] = v;
+        }
         else
             source_altered[m] = v / minimum_monster_appearance;
     }
@@ -4385,6 +4392,8 @@ string HTMLGenerateFutureTextByLocationAvailability(location place)
 
 string getClickableURLForLocation(location l, Error unable_to_find_url)
 {
+    if (l == $location[none])
+        return "";
     switch (l)
     {
         //quite the list:
@@ -4657,7 +4666,7 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         case $location[The Degrassi Knoll Gym]:
         case $location[The Degrassi Knoll Garage]:
         case $location[The Bugbear Pen]:
-        case $location[The Spooky Gravy Barrow]:
+        case lookupLocation("The Spooky Gravy Burrow"):
         case $location[Post-Quest Bugbear Pens]:
             if (knoll_available())
                 return "place.php?whichplace=knoll_friendly";
@@ -7904,7 +7913,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         }
         if (!at_last_spirit)
         {
-            if (!janitors_relocated_to_park || !have_machete)
+            if ((!janitors_relocated_to_park && !$monster[pygmy janitor].is_banished()) || !have_machete)
             {
                 ChecklistSubentry subentry;
                 subentry.header = "Hidden Park";
@@ -8582,7 +8591,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
                 areas_left_strings.listAppend(loc.to_string().to_lower_case() + " (" + location_monsters[loc].listJoinComponents(", ") + ")");
 			}
             if (areas_left_strings.count() > 0)
-                details.listAppend("Areas left:|*" + areas_left_strings.listJoinComponents("|*"));
+                details.listAppend("Areas left:|*" + areas_left_strings.listJoinComponents("<hr>|*"));
 			if (have_all)
 				details.listAppend("Talk to Yossarian to complete quest.");
 			else
@@ -9937,6 +9946,10 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             if (!$monster[clingy pirate].is_banished() && $item[cocktail napkin].available_amount() > 0)
                 subentry.entries.listAppend("Use cocktail napkin on clingy pirate to free run/banish.");
 		}
+        
+        
+        if (__misc_state["free runs available"] && !can_acquire_cocktail_napkins)
+            subentry.modifiers.listAppend("free runs");
 	}
 	boolean should_output_insult_data = false;
 	if ($item[the big book of pirate insults].available_amount() > 0 || have_outfit)
@@ -10293,7 +10306,12 @@ void QNemesisGenerateClownTasks(ChecklistSubentry subentry)
         if (available_clown_sources.count() > 0)
         {
             if (clownosity_possible >= clownosity_needed)
-                line += "|Equip " + suggested_outfit.listJoinComponents(", ", "and") + ".";
+            {
+                string line2 = "Equip " + suggested_outfit.listJoinComponents(", ", "and") + ".";
+                if (__last_adventure_location == $location[The "Fun" House])
+                    line2 = HTMLGenerateSpanFont(line2, "red", "");
+                line += "|" + line2;
+            }
             else
                 line += "|Equip " + available_clown_sources.listJoinComponents(", ", "or") + ".";
         }
@@ -10937,10 +10955,30 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
             if (my_primestat() == $stat[moxie])
                 class_grandpa_location = $location[the dive bar];
             
-            int grandpa_ncs_remaining = 3 - class_grandpa_location.noncombatTurnsAttemptedInLocation();
+            int grandpa_ncs_remaining = 3;
+            
+            //Match NC names to prevent other NCs interfering with tracking:
+            int [string] noncombat_names;
+            noncombat_names["Lost and Found and Lost Again"] = 2;
+            noncombat_names["Respect Your Elders"] = 1;
+            noncombat_names["You've Hit Bottom"] = 0;
+            noncombat_names["Kids Today"] = 1;
+            noncombat_names["Not a Micro Fish"] = 0;
+            noncombat_names["No Country Music for Old Men"] = 2;
+            noncombat_names["Salty Old Men"] = 1;
+            noncombat_names["Boxing the Juke"] = 0;
+            noncombat_names["Bar Hunting"] = 2;
+            noncombat_names["The Salt of the Sea"] = 1;
+            noncombat_names["Ode to the Sea"] = 0;
+            foreach nc in noncombat_names
+            {
+                if (class_grandpa_location.noncombat_queue.contains_text(nc))
+                    grandpa_ncs_remaining = MIN(grandpa_ncs_remaining, noncombat_names[nc]);
+            }
+            
             //Detect where we are:
             //This won't work beyond talking to little brother, my apologies
-            if ($location[the Coral corral].turnsAttemptedInLocation() > 0)
+            if ($location[the coral corral].turnsAttemptedInLocation() > 0)
             {
                 //Coral corral. Banish strategy.
                 string sea_horse_details;
@@ -12563,12 +12601,12 @@ void smithsnessGenerateSmithereensSuggestions(string [int] smithereen_suggestion
 	
 	if (__misc_state["can eat just about anything"] && availableFullness() >= 2)
 	{
-		smithereen_suggestions.listAppend("Charming Flan: 2 fullness epic food|Miserable Pie: 2 fullness awesome food, 50 turns of +10 smithsness");
+		smithereen_suggestions.listAppend("Charming Flan: 2 fullness epic food<br>Miserable Pie: 2 fullness awesome food, 50 turns of +10 smithsness");
 	}
 		
 	if (__misc_state["can drink just about anything"] && availableDrunkenness() >= 2)
 	{
-		smithereen_suggestions.listAppend("Vulgar Pitcher: 2 drunkenness epic drink|Bigmouth: 2 drunkenness awesome drink, 50 turns of +10 smithsness");
+		smithereen_suggestions.listAppend("Vulgar Pitcher: 2 drunkenness epic drink<br>Bigmouth: 2 drunkenness awesome drink, 50 turns of +10 smithsness");
 	}
 	if (!$familiar[he-boulder].familiar_is_usable())
 		smithereen_suggestions.listAppend("Golden Light: Yellow ray");
@@ -14051,10 +14089,8 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
         }
         available_resources_entries.listAppend(ChecklistEntryMake("__item gym membership card", "inventory.php?which=3", ChecklistSubentryMake(pluralize($item[gym membership card]), "", description), importance_level_item));
     }
+    
 }
-
-//Commander Shepard, we
-//[disconnect]
 
 void SCouncilGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
@@ -14192,9 +14228,16 @@ void STomesGenerateResource(ChecklistEntry [int] available_resources_entries)
 				
 			}
 			
-			description.listAppend("1 Flaskfull of Hollow" + HTMLGenerateIndentedText(flask_suggestions.listJoinComponents("<hr>")));
-			description.listAppend("1 Lump of Brituminous coal" + HTMLGenerateIndentedText(coal_suggestions.listJoinComponents("<hr>")));
-			description.listAppend("1 Handful of Smithereens" + HTMLGenerateIndentedText(smithereen_suggestions.listJoinComponents("<hr>")));
+            
+            if (__misc_state["In run"])
+            {
+                description.listAppend("1 Flaskfull of Hollow" + HTMLGenerateIndentedText(flask_suggestions.listJoinComponents("<hr>")));
+                description.listAppend("1 Lump of Brituminous coal" + HTMLGenerateIndentedText(coal_suggestions.listJoinComponents("<hr>")));
+                description.listAppend("1 Handful of Smithereens" + HTMLGenerateIndentedText(smithereen_suggestions.listJoinComponents("<hr>")));
+            }
+            else
+                description.listAppend("Flaskfull of Hollow, Lump of Brituminous coal, and Handful of Smithereens");
+
 			
 			string name = "The Smith's Tome";
 			if (!in_ronin())
@@ -18078,6 +18121,147 @@ void SDNAGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
         optional_task_entries.listAppend(ChecklistEntryMake("__effect Human-Human Hybrid", "campground.php?action=workshed", ChecklistSubentryMake("Hybridize yourself", "", description), 5));
     }
 }
+void SPlasticVampireFangsGenerateResource(ChecklistEntry [int] available_resources_entries)
+{
+    if ($items[plastic vampire fangs,Interview With You (a Vampire)].available_amount() == 0)
+        return;
+    item fang_source = $item[plastic vampire fangs];
+    string url = "";
+    string separator = " " + __html_right_arrow_character + " ";
+    if ($item[plastic vampire fangs].available_amount() == 0)
+    {
+        fang_source = $item[Interview With You (a Vampire)];
+            url = "inventory.php?which=3";
+    }
+    else
+    {
+        url = "town.php";
+        if ($item[plastic vampire fangs].equipped_amount() == 0)
+        {
+            url = "inventory.php?which=2";
+        }
+    }
+    
+    if (!get_property_boolean("_interviewIsabella") && __misc_state["In run"] && __misc_state["need to level"])
+    {
+        string [int] description;
+        int stats_gained = MIN(500, 4 * my_basestat(my_primestat())) * (1.0 + numeric_modifier("Moxie Experience Percent") / 100.0);
+        
+        description.listAppend(stats_gained + " " + my_primestat().to_lower_case() + " gained, one adventure cost.");
+        if ($item[plastic vampire fangs].available_amount() == 0)
+        {
+            description.listAppend("Vamp out via Interview With You (a Vampire).");
+        }
+        else
+        {
+            if ($item[plastic vampire fangs].equipped_amount() == 0)
+            {
+                description.listAppend("Equip plastic vampire fangs, then vamp out in Seaside Town.");
+            }
+            else
+                description.listAppend("Vamp out in Seaside Town.");
+        }
+        
+        if (my_primestat() == $stat[muscle])
+            description.listAppend("Visit Isabella's" + separator + "Drain Her.");
+        else if (my_primestat() == $stat[mysticality])
+            description.listAppend("Visit Isabella's" + separator + "Tell Her How You Feel" + separator + "Find Other Prey.");
+        else if (my_primestat() == $stat[moxie])
+            description.listAppend("Visit Isabella's" + separator + "Redirect Your Desire" + separator + "Go to the Bar.");
+        
+        
+        available_resources_entries.listAppend(ChecklistEntryMake("__item " + fang_source, url, ChecklistSubentryMake("Vampire stats", "", description), 5));
+        
+    }
+
+    if (!__misc_state["In run"])
+    {
+        string [int] description;
+        if ($item[plastic vampire fangs].available_amount() == 0)
+        {
+            description.listAppend("Vamp out via Interview With You (a Vampire).");
+        }
+        else
+        {
+            if ($item[plastic vampire fangs].equipped_amount() == 0)
+            {
+                description.listAppend("Equip plastic vampire fangs, then vamp out in Seaside Town.");
+            }
+            else
+                description.listAppend("Vamp out in Seaside Town.");
+        }
+        
+        int vamp_outs_remaining = 0;
+        
+        //Disabled, unless there's something useful about these to be reminded of in aftercore:
+        /*if (!get_property_boolean("_interviewVlad"))
+        {
+            description.listAppend("Vlad's Boutique - DR or spell damage or weapon damage buff.");
+            vamp_outs_remaining += 1;
+        }
+        if (!get_property_boolean("_interviewIsabella"))
+        {
+            description.listAppend("Isabella's - mainstat gain, meat.");
+            vamp_outs_remaining += 1;
+        }*/
+        if (!get_property_boolean("_interviewMasquerade"))
+        {
+            string [int] masquerade_description;
+            if ($item[Sword of the Brouhaha Prince].available_amount() == 0)
+            {
+                string [int] interview_questions = listMake("Warehouse", "Growl", "The Clash", "Motorcycle", "Lager");
+                string [int] nomination = listMake("Malkovich", "Torremolinos", "Brouhaha", "Ventrilo");
+                string item_name = "Sword of the Brouhaha Prince";
+                masquerade_description.listAppend(item_name + "|*Interview: " + interview_questions.listJoinComponents(separator) + "<hr>|*Nomination order: " + nomination.listJoinComponents(separator));
+            }
+            if ($item[Chalice of the Malkovich Prince].available_amount() == 0)
+            {
+                string [int] interview_questions = listMake("Laugh Factory", "Giggle", "Glass breaking", "Wheelbarrow", "Blood");
+                string [int] nomination = listMake("Torremolinos", "Ventrilo", "Brouhaha", "Malkovich");
+                string item_name = "Chalice of the Malkovich Prince";
+                
+                masquerade_description.listAppend(item_name + "|*Interview: " + interview_questions.listJoinComponents(separator) + "<hr>|*Nomination order: " + nomination.listJoinComponents(separator));
+            }
+            if ($item[Sceptre of the Torremolinos Prince].available_amount() == 0)
+            {
+                string [int] interview_questions = listMake("Loft", "Flirty", "Mozart", "Carriage", "Absinthe");
+                string [int] nomination = listMake("Malkovich", "Ventrilo", "Torremolinos", "Brouhaha");
+                string item_name = "Sceptre of the Torremolinos Prince";
+                masquerade_description.listAppend(item_name + "|*Interview: " + interview_questions.listJoinComponents(separator) + "<hr>|*Nomination order: " + nomination.listJoinComponents(separator));
+            }
+            if ($item[Medallion of the Ventrilo Prince].available_amount() == 0)
+            {
+                string [int] interview_questions = listMake("Penthouse", "Terse", "No time", "Limo", "Espresso");
+                string [int] nomination = listMake("Ventrilo", "Malkovich", "Brouhaha", "Torremolinos");
+                string item_name = "Medallion of the Ventrilo Prince";
+                masquerade_description.listAppend(item_name + "|*Interview: " + interview_questions.listJoinComponents(separator) + "<hr>|*Nomination order: " + nomination.listJoinComponents(separator));
+            }
+            if (true)
+            {
+                string [int] interview_questions = listMake("Warehouse", "Growl", "The Clash", "Motorcycle", "Lager");
+                string [int] nomination = listMake("Ventrilo", "Brouhaha", "Torremolinos", "Malkovich");
+                string item_name = "Your own black heart (restores 100% HP/MP)";
+                masquerade_description.listAppend(item_name + "|*Interview: " + interview_questions.listJoinComponents(separator) + "<hr>|*Nomination order: " + nomination.listJoinComponents(separator));
+            }
+            if ($item[plastic vampire fangs].available_amount() > 0)
+            {
+                string [int] interview_questions = listMake("Warehouse", "Growl", "The Clash", "Motorcycle", "Lager");
+                string [int] nomination = listMake("Ventrilo", "Malkovich", "Torremolinos", "Brouhaha");
+                string item_name = "Interview With You (a Vampire)";
+                masquerade_description.listAppend(item_name + "|*Interview: " + interview_questions.listJoinComponents(separator) + "<hr>|*Nomination order: " + nomination.listJoinComponents(separator));
+            }
+            //description.listAppend("The Masquerade." + HTMLGenerateIndentedText(masquerade_description));
+            description.listAppendList(masquerade_description);
+            vamp_outs_remaining += 1;
+        }
+        
+        if (vamp_outs_remaining > 0)
+        {
+            //available_resources_entries.listAppend(ChecklistEntryMake("__item " + fang_source, url, ChecklistSubentryMake(pluralize(vamp_outs_remaining, "vamp out", "vamp outs"), "", description), 8));
+            available_resources_entries.listAppend(ChecklistEntryMake("__item " + fang_source, url, ChecklistSubentryMake("Vampire masquerade", "", description), 8));
+        }
+    }
+}
 
 void SetsInit()
 {
@@ -18108,6 +18292,7 @@ void SetsGenerateResources(ChecklistEntry [int] available_resources_entries)
     SCOTGenerateResource(available_resources_entries);
     SSneakyPeteGenerateResource(available_resources_entries);
     SDNAGenerateResource(available_resources_entries);
+    SPlasticVampireFangsGenerateResource(available_resources_entries);
     
 }
 
@@ -18262,7 +18447,8 @@ void generatePullList(Checklist [int] checklists)
 	pullable_item_list.listAppend(GPItemMake($item[boris's helm], "+15ML/+5 familiar weight/+init/+mp regeneration/+weapon damage", 1));
 	if ($item[empty rain-doh can].available_amount() == 0 && $item[can of rain-doh].available_amount() == 0)
 		pullable_item_list.listAppend(GPItemMake($item[can of rain-doh], "5 copies/day|everything really", 1));
-	pullable_item_list.listAppend(GPItemMake($item[plastic vampire fangs], "?", 1));
+    if (__misc_state["need to level"])
+        pullable_item_list.listAppend(GPItemMake($item[plastic vampire fangs], "Large stat gain, once/day.", 1));
     pullable_item_list.listAppend(GPItemMake($item[operation patriot shield], "?", 1));
     pullable_item_list.listAppend(GPItemMake($item[v for vivala mask], "?", 1));
 	
@@ -20723,6 +20909,8 @@ string generateRandomMessage()
 	random_messages.listAppend("the RNG is only trying to help");
 	if (__misc_state["In run"])
         random_messages.listAppend("speed ascension is all I have left, " + lowercase_player_name);
+    if (item_drop_modifier() <= -100.0)
+        random_messages.listAppend("let go of your material posessions");
 	if ($item[puppet strings].storage_amount() + $item[puppet strings].available_amount() > 0)
 		random_messages.listAppend(lowercase_player_name + " is totally awesome! hooray for " + lowercase_player_name + "!");
 	
@@ -20746,7 +20934,7 @@ string generateRandomMessage()
     if (!CounterLookup("Semi-rare").CounterIsRange() && CounterLookup("Semi-rare").CounterExists() && CounterLookup("Semi-rare").exact_turns.count() > 1)
         random_messages.listAppend("superpositioned semi-rare");
     if (hippy_stone_broken() && pvp_attacks_left() > 0)
-        random_messages.listAppend(HTMLGenerateTagWrap("a", "aggressive friendship", generateMainLinkMap("")));
+        random_messages.listAppend(HTMLGenerateTagWrap("a", "aggressive friendship", generateMainLinkMap("peevpee.php")));
         
     string [familiar] familiar_messages;
     familiar_messages[$familiar[none]] = "even introverts need friends";
@@ -20789,6 +20977,9 @@ string generateRandomMessage()
         random_messages.listAppend(familiar_messages[my_familiar()]);
         
     random_messages.listAppend(HTMLGenerateTagWrap("a", "&#x266b;", mapMake("class", "r_a_undecorated", "href", "http://www.kingdomofloathing.com/radio.php", "target", "_blank")));
+    
+    if (__misc_state_int["free rests remaining"] > 0)
+        random_messages.listAppend(HTMLGenerateTagWrap("a", "dream your life away", generateMainLinkMap("campground.php")));
         
     
     string [class] class_messages;
@@ -21927,7 +22118,7 @@ string [string] generateAPIResponse()
     result["stills available"] = stills_available();
     result["enthroned familiar"] = my_enthroned_familiar();
     result["pulls remaining"] = pulls_remaining();
-    //result["location"] = my_location();
+    result["location"] = my_location();
     
     
     
@@ -22241,6 +22432,7 @@ void setUpCSSStyles()
     PageAddCSSClass("img", "", "border:0px;");
 }
 
+
 void runMain(string relay_filename)
 {
     __relay_filename = relay_filename;
@@ -22425,6 +22617,7 @@ void runMain(string relay_filename)
         PageWrite(HTMLGenerateTagWrap("div", "", mapMake("class", "r_vertical_fill", "style", "z-index:-11;border-left:1px solid;border-right:1px solid;border-color:" + __setting_line_color + ";width:" + (__setting_horizontal_width) + "px;"))); //Vertical border lines, empty background
     }
     PageWriteHead("<script type=\"text/javascript\" src=\"relay_Guide.js\"></script>");
+    
     
     if (output_body_tag_only)
     	write(__global_page.body_contents);
