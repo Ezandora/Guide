@@ -116,7 +116,8 @@ void generatePullList(Checklist [int] checklists)
 	pullable_item_list.listAppend(GPItemMake($item[boris's helm], "+15ML/+5 familiar weight/+init/+mp regeneration/+weapon damage", 1));
 	if ($item[empty rain-doh can].available_amount() == 0 && $item[can of rain-doh].available_amount() == 0)
 		pullable_item_list.listAppend(GPItemMake($item[can of rain-doh], "5 copies/day|everything really", 1));
-	pullable_item_list.listAppend(GPItemMake($item[plastic vampire fangs], "?", 1));
+    if (__misc_state["need to level"])
+        pullable_item_list.listAppend(GPItemMake($item[plastic vampire fangs], "Large stat gain, once/day.", 1));
     pullable_item_list.listAppend(GPItemMake($item[operation patriot shield], "?", 1));
     pullable_item_list.listAppend(GPItemMake($item[v for vivala mask], "?", 1));
 	

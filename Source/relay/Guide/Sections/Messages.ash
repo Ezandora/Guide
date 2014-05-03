@@ -138,6 +138,8 @@ string generateRandomMessage()
 	random_messages.listAppend("the RNG is only trying to help");
 	if (__misc_state["In run"])
         random_messages.listAppend("speed ascension is all I have left, " + lowercase_player_name);
+    if (item_drop_modifier() <= -100.0)
+        random_messages.listAppend("let go of your material posessions");
 	if ($item[puppet strings].storage_amount() + $item[puppet strings].available_amount() > 0)
 		random_messages.listAppend(lowercase_player_name + " is totally awesome! hooray for " + lowercase_player_name + "!");
 	
@@ -161,7 +163,7 @@ string generateRandomMessage()
     if (!CounterLookup("Semi-rare").CounterIsRange() && CounterLookup("Semi-rare").CounterExists() && CounterLookup("Semi-rare").exact_turns.count() > 1)
         random_messages.listAppend("superpositioned semi-rare");
     if (hippy_stone_broken() && pvp_attacks_left() > 0)
-        random_messages.listAppend(HTMLGenerateTagWrap("a", "aggressive friendship", generateMainLinkMap("")));
+        random_messages.listAppend(HTMLGenerateTagWrap("a", "aggressive friendship", generateMainLinkMap("peevpee.php")));
         
     string [familiar] familiar_messages;
     familiar_messages[$familiar[none]] = "even introverts need friends";
@@ -204,6 +206,9 @@ string generateRandomMessage()
         random_messages.listAppend(familiar_messages[my_familiar()]);
         
     random_messages.listAppend(HTMLGenerateTagWrap("a", "&#x266b;", mapMake("class", "r_a_undecorated", "href", "http://www.kingdomofloathing.com/radio.php", "target", "_blank")));
+    
+    if (__misc_state_int["free rests remaining"] > 0)
+        random_messages.listAppend(HTMLGenerateTagWrap("a", "dream your life away", generateMainLinkMap("campground.php")));
         
     
     string [class] class_messages;

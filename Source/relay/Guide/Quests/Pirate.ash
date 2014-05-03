@@ -229,6 +229,10 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             if (!$monster[clingy pirate].is_banished() && $item[cocktail napkin].available_amount() > 0)
                 subentry.entries.listAppend("Use cocktail napkin on clingy pirate to free run/banish.");
 		}
+        
+        
+        if (__misc_state["free runs available"] && !can_acquire_cocktail_napkins)
+            subentry.modifiers.listAppend("free runs");
 	}
 	boolean should_output_insult_data = false;
 	if ($item[the big book of pirate insults].available_amount() > 0 || have_outfit)

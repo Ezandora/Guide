@@ -312,7 +312,12 @@ void QNemesisGenerateClownTasks(ChecklistSubentry subentry)
         if (available_clown_sources.count() > 0)
         {
             if (clownosity_possible >= clownosity_needed)
-                line += "|Equip " + suggested_outfit.listJoinComponents(", ", "and") + ".";
+            {
+                string line2 = "Equip " + suggested_outfit.listJoinComponents(", ", "and") + ".";
+                if (__last_adventure_location == $location[The "Fun" House])
+                    line2 = HTMLGenerateSpanFont(line2, "red", "");
+                line += "|" + line2;
+            }
             else
                 line += "|Equip " + available_clown_sources.listJoinComponents(", ", "or") + ".";
         }

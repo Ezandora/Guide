@@ -725,4 +725,5 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
         }
         available_resources_entries.listAppend(ChecklistEntryMake("__item gym membership card", "inventory.php?which=3", ChecklistSubentryMake(pluralize($item[gym membership card]), "", description), importance_level_item));
     }
+    
 }

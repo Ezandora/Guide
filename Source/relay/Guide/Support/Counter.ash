@@ -266,8 +266,11 @@ void CountersInit()
             }
             else
             {
-                c.exact_turns.listAppend(turns_until_counter);
-                sort c.exact_turns by value;
+                if (turns_until_counter >= 0)
+                {
+                    c.exact_turns.listAppend(turns_until_counter);
+                    sort c.exact_turns by value;
+                }
             }
             
             __active_counters[final_name] = c;

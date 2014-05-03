@@ -64,9 +64,16 @@ void STomesGenerateResource(ChecklistEntry [int] available_resources_entries)
 				
 			}
 			
-			description.listAppend("1 Flaskfull of Hollow" + HTMLGenerateIndentedText(flask_suggestions.listJoinComponents("<hr>")));
-			description.listAppend("1 Lump of Brituminous coal" + HTMLGenerateIndentedText(coal_suggestions.listJoinComponents("<hr>")));
-			description.listAppend("1 Handful of Smithereens" + HTMLGenerateIndentedText(smithereen_suggestions.listJoinComponents("<hr>")));
+            
+            if (__misc_state["In run"])
+            {
+                description.listAppend("1 Flaskfull of Hollow" + HTMLGenerateIndentedText(flask_suggestions.listJoinComponents("<hr>")));
+                description.listAppend("1 Lump of Brituminous coal" + HTMLGenerateIndentedText(coal_suggestions.listJoinComponents("<hr>")));
+                description.listAppend("1 Handful of Smithereens" + HTMLGenerateIndentedText(smithereen_suggestions.listJoinComponents("<hr>")));
+            }
+            else
+                description.listAppend("Flaskfull of Hollow, Lump of Brituminous coal, and Handful of Smithereens");
+
 			
 			string name = "The Smith's Tome";
 			if (!in_ronin())

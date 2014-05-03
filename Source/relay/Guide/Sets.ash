@@ -31,6 +31,7 @@ void SetsGenerateResources(ChecklistEntry [int] available_resources_entries)
     SCOTGenerateResource(available_resources_entries);
     SSneakyPeteGenerateResource(available_resources_entries);
     SDNAGenerateResource(available_resources_entries);
+    SPlasticVampireFangsGenerateResource(available_resources_entries);
     
 }
 

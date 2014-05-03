@@ -31,7 +31,7 @@ string [string] generateAPIResponse()
     result["stills available"] = stills_available();
     result["enthroned familiar"] = my_enthroned_familiar();
     result["pulls remaining"] = pulls_remaining();
-    //result["location"] = my_location();
+    result["location"] = my_location();
     
     
     

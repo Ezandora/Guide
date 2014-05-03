@@ -334,10 +334,30 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
             if (my_primestat() == $stat[moxie])
                 class_grandpa_location = $location[the dive bar];
             
-            int grandpa_ncs_remaining = 3 - class_grandpa_location.noncombatTurnsAttemptedInLocation();
+            int grandpa_ncs_remaining = 3;
+            
+            //Match NC names to prevent other NCs interfering with tracking:
+            int [string] noncombat_names;
+            noncombat_names["Lost and Found and Lost Again"] = 2;
+            noncombat_names["Respect Your Elders"] = 1;
+            noncombat_names["You've Hit Bottom"] = 0;
+            noncombat_names["Kids Today"] = 1;
+            noncombat_names["Not a Micro Fish"] = 0;
+            noncombat_names["No Country Music for Old Men"] = 2;
+            noncombat_names["Salty Old Men"] = 1;
+            noncombat_names["Boxing the Juke"] = 0;
+            noncombat_names["Bar Hunting"] = 2;
+            noncombat_names["The Salt of the Sea"] = 1;
+            noncombat_names["Ode to the Sea"] = 0;
+            foreach nc in noncombat_names
+            {
+                if (class_grandpa_location.noncombat_queue.contains_text(nc))
+                    grandpa_ncs_remaining = MIN(grandpa_ncs_remaining, noncombat_names[nc]);
+            }
+            
             //Detect where we are:
             //This won't work beyond talking to little brother, my apologies
-            if ($location[the Coral corral].turnsAttemptedInLocation() > 0)
+            if ($location[the coral corral].turnsAttemptedInLocation() > 0)
             {
                 //Coral corral. Banish strategy.
                 string sea_horse_details;

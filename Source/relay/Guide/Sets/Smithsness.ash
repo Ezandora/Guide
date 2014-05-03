@@ -74,12 +74,12 @@ void smithsnessGenerateSmithereensSuggestions(string [int] smithereen_suggestion
 	
 	if (__misc_state["can eat just about anything"] && availableFullness() >= 2)
 	{
-		smithereen_suggestions.listAppend("Charming Flan: 2 fullness epic food|Miserable Pie: 2 fullness awesome food, 50 turns of +10 smithsness");
+		smithereen_suggestions.listAppend("Charming Flan: 2 fullness epic food<br>Miserable Pie: 2 fullness awesome food, 50 turns of +10 smithsness");
 	}
 		
 	if (__misc_state["can drink just about anything"] && availableDrunkenness() >= 2)
 	{
-		smithereen_suggestions.listAppend("Vulgar Pitcher: 2 drunkenness epic drink|Bigmouth: 2 drunkenness awesome drink, 50 turns of +10 smithsness");
+		smithereen_suggestions.listAppend("Vulgar Pitcher: 2 drunkenness epic drink<br>Bigmouth: 2 drunkenness awesome drink, 50 turns of +10 smithsness");
 	}
 	if (!$familiar[he-boulder].familiar_is_usable())
 		smithereen_suggestions.listAppend("Golden Light: Yellow ray");

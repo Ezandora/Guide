@@ -153,7 +153,6 @@ string HTMLStripTags(string html)
 }
 
 
-
 string [string] generateMainLinkMap(string url)
 {
     return mapMake("class", "r_a_undecorated", "href", url, "target", "mainpane");

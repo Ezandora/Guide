@@ -16,6 +16,7 @@ import "relay/Guide/Sections/Navigation Bar.ash"
 import "relay/Guide/Sections/Tests.ash"
 import "relay/Guide/Sections/CSS.ash"
 
+
 void runMain(string relay_filename)
 {
     __relay_filename = relay_filename;
@@ -200,6 +201,7 @@ void runMain(string relay_filename)
         PageWrite(HTMLGenerateTagWrap("div", "", mapMake("class", "r_vertical_fill", "style", "z-index:-11;border-left:1px solid;border-right:1px solid;border-color:" + __setting_line_color + ";width:" + (__setting_horizontal_width) + "px;"))); //Vertical border lines, empty background
     }
     PageWriteHead("<script type=\"text/javascript\" src=\"relay_Guide.js\"></script>");
+    
     
     if (output_body_tag_only)
     	write(__global_page.body_contents);

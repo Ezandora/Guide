@@ -32,3 +32,4 @@ import "relay/Guide/Sets/Reminders.ash";
 import "relay/Guide/Sets/Grimstone.ash";
 import "relay/Guide/Sets/Avatar of Sneaky Pete.ash";
 import "relay/Guide/Sets/DNA.ash";
+import "relay/Guide/Sets/Plastic Vampire Fangs.ash";

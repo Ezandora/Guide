@@ -61,7 +61,12 @@ float [monster] appearance_rates_adjusted(location l)
     {
         float v = source[m];
         if (m == $monster[none])
-            source_altered[m] = v;
+        {
+            if (v < 0.0)
+                source_altered[m] = 0.0;
+            else
+                source_altered[m] = v;
+        }
         else
             source_altered[m] = v / minimum_monster_appearance;
     }
@@ -441,6 +446,8 @@ string HTMLGenerateFutureTextByLocationAvailability(location place)
 
 string getClickableURLForLocation(location l, Error unable_to_find_url)
 {
+    if (l == $location[none])
+        return "";
     switch (l)
     {
         //quite the list:
@@ -713,7 +720,7 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         case $location[The Degrassi Knoll Gym]:
         case $location[The Degrassi Knoll Garage]:
         case $location[The Bugbear Pen]:
-        case $location[The Spooky Gravy Barrow]:
+        case lookupLocation("The Spooky Gravy Burrow"):
         case $location[Post-Quest Bugbear Pens]:
             if (knoll_available())
                 return "place.php?whichplace=knoll_friendly";

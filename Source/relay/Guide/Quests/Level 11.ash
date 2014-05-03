@@ -1007,7 +1007,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         }
         if (!at_last_spirit)
         {
-            if (!janitors_relocated_to_park || !have_machete)
+            if ((!janitors_relocated_to_park && !$monster[pygmy janitor].is_banished()) || !have_machete)
             {
                 ChecklistSubentry subentry;
                 subentry.header = "Hidden Park";

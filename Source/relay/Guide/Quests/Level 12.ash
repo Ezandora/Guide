@@ -220,7 +220,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
                 areas_left_strings.listAppend(loc.to_string().to_lower_case() + " (" + location_monsters[loc].listJoinComponents(", ") + ")");
 			}
             if (areas_left_strings.count() > 0)
-                details.listAppend("Areas left:|*" + areas_left_strings.listJoinComponents("|*"));
+                details.listAppend("Areas left:|*" + areas_left_strings.listJoinComponents("<hr>|*"));
 			if (have_all)
 				details.listAppend("Talk to Yossarian to complete quest.");
 			else

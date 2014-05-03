@@ -1,7 +1,4 @@
 
-//Commander Shepard, we
-//[disconnect]
-
 void SCouncilGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
 	//This may be unreliable. Consider disabling.
