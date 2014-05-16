@@ -4504,7 +4504,7 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         case lookupLocation("The Haunted Nursery"):
         case lookupLocation("The Haunted Laboratory"):
             return "place.php?whichplace=manor3";
-        case lookupLocation("The Haunted Wine Cellar"):
+        //case lookupLocation("The Haunted Wine Cellar"): //incompatible with 16.3
         case lookupLocation("The Haunted Boiler Room"):
         case lookupLocation("The Haunted Laundry Room"):
         case $location[Summoning Chamber]:
@@ -7256,7 +7256,7 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
     boolean [location] relevant_locations;
     relevant_locations[$location[the haunted ballroom]] = true;
     relevant_locations[$location[summoning chamber]] = true;
-    relevant_locations[lookupLocation("The Haunted Wine Cellar")] = true;
+    //relevant_locations[lookupLocation("The Haunted Wine Cellar")] = true; //incompatible with 16.3
     relevant_locations[lookupLocation("The Haunted Boiler Room")] = true;
     relevant_locations[lookupLocation("The Haunted Laundry Room")] = true;
     
