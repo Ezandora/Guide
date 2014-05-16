@@ -99,9 +99,11 @@ buffer generateLocationBar(boolean displaying_navbar)
     float max_init = 0.0;
     float sample_count = 0.0;
     
+    boolean [location] locations_where_monsters_always_matter = $locations[the haunted bedroom];
+    
     foreach m in monster_appearance_rates
     {
-        if (monster_appearance_rates[m] <= 0.0)
+        if (monster_appearance_rates[m] <= 0.0 && !(locations_where_monsters_always_matter contains l)) //one-time hack, sure?
             continue;
         if (m == $monster[none])
             continue;
@@ -281,7 +283,7 @@ buffer generateLocationBar(boolean displaying_navbar)
     {
         int pressure_penalty = MAX(0, -numeric_modifier("item drop penalty"));
         if (l == my_location())
-            custom_location_information = pressure_penalty + "% pressure"; //that brings a building down
+            custom_location_information = pressure_penalty + "% pressure";
         else //numeric_modifier is location sensitive
             custom_location_information = "Unknown pressure";
     }
@@ -358,7 +360,7 @@ buffer generateLocationBar(boolean displaying_navbar)
     string [int] location_urls;
     
     //easy list:
-    //ash foreach l in $locations[] if (l.appearance_rates().count() == 1 && l.appearance_rates()[$monster[none]] == 100.0) print(l);
+    //ashq foreach l in $locations[] if (l.appearance_rates().count() == 1 && l.appearance_rates()[$monster[none]] == 100.0) print(l);
     boolean [location] nc_blacklist = $locations[Pump Up Muscle,Pump Up Mysticality,Pump Up Moxie,The Shore\, Inc. Travel Agency,Goat Party,Pirate Party,Lemon Party,The Roulette Tables,The Poker Room,Anemone Mine (Mining),The Knob Shaft (Mining),Friar Ceremony Location,Itznotyerzitz Mine (in Disguise)];
     
     if ((my_buffedstat($stat[moxie]) < average_ml || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE) && sample_count > 0 && __misc_state["In run"])

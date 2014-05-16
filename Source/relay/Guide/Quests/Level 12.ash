@@ -196,9 +196,9 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 		{
 			location [item] items_and_locations;
 			items_and_locations[$item[molybdenum hammer]] = $location[Next to that Barrel with Something Burning in it];
-			items_and_locations[$item[molybdenum screwdriver]] = $location[Out By that Rusted-Out Car];
 			items_and_locations[$item[molybdenum pliers]] = $location[Near an Abandoned Refrigerator];
 			items_and_locations[$item[molybdenum crescent wrench]] = $location[Over Where the Old Tires Are];
+			items_and_locations[$item[molybdenum screwdriver]] = $location[Out By that Rusted-Out Car];
 			boolean have_all = true;
             
             string [location][int] location_monsters;
@@ -207,9 +207,12 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
             location_monsters[$location[Near an Abandoned Refrigerator]] = listMake("tool spider", "batwinged");
             location_monsters[$location[Over Where the Old Tires Are]] = listMake("tool erudite", "spider");
             
+            item [int] item_display_order = listMake($item[molybdenum hammer],$item[molybdenum pliers],$item[molybdenum crescent wrench],$item[molybdenum screwdriver]); //make a path
             string [int] areas_left_strings;
-			foreach it in items_and_locations
+			//foreach it in items_and_locations
+            foreach key in item_display_order
 			{
+                item it = item_display_order[key];
 				location loc = items_and_locations[it];
 				if (it.available_amount() > 0)
 				{

@@ -33,6 +33,9 @@ void QLevel11Init()
 		QuestStateParseMafiaQuestProperty(state, "questL11Manor");
 		state.quest_name = "Lord Spookyraven Quest";
 		state.image_name = "Spookyraven manor";
+        
+        if ($items[Eye of Ed,Headpiece of the Staff of Ed,Staff of Ed].available_amount() > 0)
+            QuestStateParseMafiaQuestPropertyValue(state, "finished");
 	
 		if (my_level() >= 11)
 			state.startable = true;
@@ -260,7 +263,7 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
     string url = "";
     subentry.header = base_quest_state.quest_name;
     string image_name = base_quest_state.image_name;
-    if ($item[lord spookyraven's spectacles].available_amount() == 0)
+    /*if ($item[lord spookyraven's spectacles].available_amount() == 0)
     {
         subentry.entries.listAppend("Find lord spookyraven's spectacles in the haunted bedroom.");
         url = "place.php?whichplace=town_right";
@@ -298,13 +301,15 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
         subentry.entries.listAppend("Collect wine.");
         if ($items[spooky putty sheet,Rain-Doh black box].available_amount() > 0)
             subentry.entries.listAppend("Possibly copy the monsters here. The copy will have all six wines.");
+        if (__quest_state["Level 6"].finished && !get_property_boolean("friarsBlessingReceived") && $effect[Brother Smothers's Blessing].have_effect() == 0)
+            subentry.entries.listAppend("Possibly use the friars booze blessing for +30% item here.");
         image_name = "Wine racks";
-    }
-    else
+    }*/
+    if (true)
     {
         url = "manor3.php";
         subentry.modifiers.listAppend("elemental resistance");
-        subentry.entries.listAppend("Fight Lord Spookyraven.");
+        subentry.entries.listAppend("Find and fight Lord Spookyraven.");
         
         if ($effect[Red Door Syndrome].have_effect() == 0 && my_meat() > 1000)
         {
@@ -313,8 +318,16 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
         
         image_name = "demon summon";
     }
+    
+    boolean [location] relevant_locations;
+    relevant_locations[$location[the haunted ballroom]] = true;
+    relevant_locations[$location[summoning chamber]] = true;
+    //relevant_locations[lookupLocation("The Haunted Wine Cellar")] = true; //incompatible with 16.3
+    relevant_locations[lookupLocation("The Haunted Boiler Room")] = true;
+    relevant_locations[lookupLocation("The Haunted Laundry Room")] = true;
+    
 
-    task_entries.listAppend(ChecklistEntryMake(image_name, url, subentry, $locations[the haunted ballroom, the haunted wine cellar (northwest), the haunted wine cellar (northeast), the haunted wine cellar (southwest), the haunted wine cellar (southeast), summoning chamber]));
+    task_entries.listAppend(ChecklistEntryMake(image_name, url, subentry, $locations[the haunted ballroom, summoning chamber]));
 }
 
 void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -1236,7 +1249,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 {
                     if (hidden_tavern_unlocked)
                     {
-                        if ($item[bowl of scorpions].available_amount() == 0)
+                        if ($item[bowl of scorpions].available_amount() == 0 && !$monster[drunk pygmy].is_banished())
                             subentry.entries.listAppend(HTMLGenerateSpanFont("Buy a bowl of scorpions", "red", "") + " from the Hidden Tavern to free run from drunk pygmys.");
                     }
                     else

@@ -124,7 +124,7 @@ string generateRandomMessage()
     paths[PATH_KOLHS] = "did you study?";
     paths[PATH_CLASS_ACT_2] = "lonely guild trainer";
     paths[PATH_AVATAR_OF_SNEAKY_PETE] = "sunglasses at night";
-    
+    //paths[PATH_SLOW_AND_STEADY] = "";
     paths[PATH_OXYGENARIAN] = "the slow path";
     
     if (paths contains my_path_id())
@@ -134,14 +134,14 @@ string generateRandomMessage()
     
     string lowercase_player_name = my_name().to_lower_case().HTMLEscapeString();
         
-	random_messages.listAppend(HTMLGenerateTagWrap("a", "check the wiki", mapMake("class", "r_a_undecorated", "href", "http://kol.coldfront.net/thekolwiki/index.php/Main_Page", "target", "_blank")));
-	random_messages.listAppend("the RNG is only trying to help");
-	if (__misc_state["In run"])
+    random_messages.listAppend(HTMLGenerateTagWrap("a", "check the wiki", mapMake("class", "r_a_undecorated", "href", "http://kol.coldfront.net/thekolwiki/index.php/Main_Page", "target", "_blank")));
+    random_messages.listAppend("the RNG is only trying to help");
+    if (__misc_state["In run"])
         random_messages.listAppend("speed ascension is all I have left, " + lowercase_player_name);
     if (item_drop_modifier() <= -100.0)
         random_messages.listAppend("let go of your material posessions");
-	if ($item[puppet strings].storage_amount() + $item[puppet strings].available_amount() > 0)
-		random_messages.listAppend(lowercase_player_name + " is totally awesome! hooray for " + lowercase_player_name + "!");
+    if ($item[puppet strings].storage_amount() + $item[puppet strings].available_amount() > 0)
+        random_messages.listAppend(lowercase_player_name + " is totally awesome! hooray for " + lowercase_player_name + "!");
 	
 	if (florist_available())
         random_messages.listAppend(HTMLGenerateTagWrap("a", "the forgotten friar cries himself to sleep", generateMainLinkMap("place.php?whichplace=forestvillage&amp;action=fv_friar")));
@@ -221,9 +221,11 @@ string generateRandomMessage()
     
     
     string [monster] monster_messages;
+    //TODO add a message for the procrastination giant
     foreach m in $monsters[The Temporal Bandit,crazy bastard,Knott Slanding,hockey elemental,Hypnotist of Hey Deze,infinite meat bug,QuickBASIC elemental,The Master Of Thieves,Baiowulf,Count Bakula] //Pooltergeist (Ultra-Rare)?
         monster_messages[m] = "an ultra rare! congratulations!";
     monster_messages[$monster[Dad Sea Monkee]] = "is always was always" + HTMLGenerateSpanFont(" is always was always", "#444444", "") + HTMLGenerateSpanFont(" is always was always", "#888888", "") + HTMLGenerateSpanFont(" is always was always", "#BBBBBB", "");
+    
     foreach m in $monsters[Ed the Undying (1),Ed the Undying (2),Ed the Undying (3),Ed the Undying (4),Ed the Undying (5),Ed the Undying (6),Ed the Undying (7)]
         monster_messages[m] = "UNDYING!";
     foreach m in $monsters[Naughty Sorceress, Naughty Sorceress (2), Naughty Sorceress (3)]
@@ -267,6 +269,24 @@ string generateRandomMessage()
         random_messages.listAppend(monster_messages[last_monster()]);
     }
     
+    string [string] encounter_messages;
+    encounter_messages["It's Always Swordfish"] = "one two three four five";
+    
+    if (encounter_messages contains get_property("lastEncounter"))
+    {
+		random_messages.listClear();
+        random_messages.listAppend(encounter_messages[get_property("lastEncounter")]);
+    }
+    
+    foreach s in $strings[rainDohMonster,spookyPuttyMonster,cameraMonster,photocopyMonster,envyfishMonster,iceSculptureMonster,crudeMonster,crappyCameraMonster,romanticTarget]
+    {
+        if (get_property(s) == "Quiet Healer")
+        {
+            random_messages.listClear();
+            random_messages.listAppend("you can't bring her back");
+            break;
+        }
+    }
     if (mmg_my_bets().count() > 0)
     {
 		random_messages.listClear();

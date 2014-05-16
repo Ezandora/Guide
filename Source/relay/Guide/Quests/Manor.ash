@@ -49,7 +49,7 @@ void QManorInit()
 	state.image_name = "Spookyraven Manor";
     
 	
-	location zone_to_work_on = $location[none];
+	/*location zone_to_work_on = $location[none];
 	if (!locationAvailable($location[the haunted billiards room]))
 	{
 		zone_to_work_on = $location[the haunted billiards room];
@@ -66,7 +66,7 @@ void QManorInit()
 	{
 		zone_to_work_on = $location[the haunted ballroom];
 	}
-	state.state_string["zone to work on"] = zone_to_work_on;
+	state.state_string["zone to work on"] = zone_to_work_on;*/
 	
 	__quest_state["Manor Unlock"] = state;
 }
@@ -83,13 +83,143 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 	QuestState base_quest_state = __quest_state["Manor Unlock"];
 	ChecklistSubentry subentry;
 	//subentry.header = "Unlock Spookyraven Manor";
+    
+    //This is currently very incomplete, sorry.
 	
 	string url = "";
 	
 	string image_name = base_quest_state.image_name;
+    
+    boolean ballroom_probably_open = false;
+    if ($location[the haunted ballroom].turnsAttemptedInLocation() > 0)
+        ballroom_probably_open = true;
+    if (__misc_state_string["ballroom song"].length() > 0) //FALSE if they haven't ascended since the revamp, I guess
+        ballroom_probably_open = true;
+    
+    boolean second_floor_probably_open = false;
+    
+    if (get_property_int("lastSecondFloorUnlock") == my_ascensions())
+        second_floor_probably_open = true;
+    if (lookupItem("Lady Spookyraven's necklace").available_amount() > 0) //mostly
+        second_floor_probably_open = true;
+    if (lookupItem("ghost of a necklace").available_amount() > 0) //not, strictly speaking, true FIXME consider removing if mafia updates lastSecondFloorUnlock
+        second_floor_probably_open = true;
+    
+    if (lookupItem("telegram from Lady Spookyraven").available_amount() > 0)
+        second_floor_probably_open = false;
+    if (lookupItem("7301").available_amount() == 0 || lookupItem("7302").available_amount() == 0)
+        second_floor_probably_open = false;
+    
+    if (second_floor_probably_open)
+    {
+        if (lookupItem("Lady Spookyraven's necklace").available_amount() > 0)
+        {
+            subentry.header = "Speak to Lady Spookyraven";
+            url = $location[the haunted kitchen].getClickableURLForLocation();
+            image_name = "Lady Spookyraven";
+        }
+        else
+        {
+            if (!ballroom_probably_open)
+            {
+                //Haunted gallery, bathroom, bedroom
+                if (lookupItem("Lady Spookyraven's powder puff").available_amount() == 0)
+                {
+                    //NC [?superlikely] in bathroom
+                    //FIXME implement this
+                }
+                if (lookupItem("Lady Spookyraven's finest gown").available_amount() == 0)
+                {
+                    //elegant nightstand in bedroom (banish)
+                    //also acquire disposable instant camera. spectacles...?
+                    //FIXME implement this
+                    
+                }
+                if (lookupItem("Lady Spookyraven's dancing shoes").available_amount() == 0)
+                {
+                    //NC (louvre or leave it) in gallery
+                    //FIXME implement this
+                }
+            }
+        }
+    }
+    else if (lookupItem("telegram from Lady Spookyraven").available_amount() > 0)
+    {
+        //telegram is removed on using it, even on old copies of mafia
+        subentry.header = "Read telegram from Lady Spookyraven";
+        url = "inventory.php?which=3";
+        image_name = "__item telegram from Lady Spookyraven";
+    }
+    else if (lookupItem("7301").available_amount() == 0) //Spookyraven billiards room key
+    {
+        subentry.header = "Adventure in the Haunted Kitchen";
+        url = $location[the haunted kitchen].getClickableURLForLocation();
+        image_name = "__item tiny knife and fork";
+        subentry.entries.listAppend("To unlock the Haunted Billiards Room.");
+        
+        subentry.entries.listAppend("Run " + HTMLGenerateSpanOfClass("hot", "r_element_hot") + " resistance and " + HTMLGenerateSpanOfClass("stench", "r_element_stench") + " resistance to search more drawers per turn.");
+        subentry.entries.listAppend("Should take about ~25 drawers? Unspaded, sorry.");
+        
+        subentry.modifiers.listAppend(HTMLGenerateSpanOfClass("hot res", "r_element_hot_desaturated"));
+        subentry.modifiers.listAppend(HTMLGenerateSpanOfClass("stench res", "r_element_stench_desaturated"));
+    }
+    else if (lookupItem("7302").available_amount() == 0) //Spookyraven library key
+    {
+        //Find key:
+        subentry.header = "Adventure in the Haunted Billiards Room";
+        url = $location[the Haunted Billiards Room].getClickableURLForLocation();
+        image_name = "__item pool cue";
+        subentry.entries.listAppend("To unlock the Haunted Library.");
+        
+        subentry.modifiers.listAppend("-combat");
+        subentry.entries.listAppend("Train pool skill via -combat.");
+        
+        if ($item[pool cue].available_amount() == 0)
+        {
+            subentry.entries.listAppend("Find pool cue. (superlikely?)");
+            
+        }
+        else if ($item[pool cue].equipped_amount() == 0)
+        {
+            subentry.entries.listAppend("Equip pool cue for +pool skill.");
+        }
+        if ($effect[chalky hand].have_effect() == 0& $item[handful of hand chalk].available_amount() > 0)
+            subentry.entries.listAppend(HTMLGenerateSpanOfClass("Use handful of hand chalk", "r_bold") + " for +pool skill and faster pool skill training.");
+        
+        if (inebriety_limit() > 0)
+        {
+            //Drunkenness's effect is currently unknown FIXME
+            //(last checked, it had zero effect on the listed pool skill, but they may have changed that or it's a hidden modifier ooOoOo)
+            int desired_drunkenness = MIN(inebriety_limit(), 10);
+            if (my_inebriety() < desired_drunkenness)
+            {
+                subentry.entries.listAppend("Consider drinking up to " + desired_drunkenness + " drunkenness. (may affect pool skill, unspaded)");
+            }
+            else if (my_inebriety() > desired_drunkenness)
+                subentry.entries.listAppend("Consider waiting for rollover for better pool skill. (you're over " + desired_drunkenness + " drunkenness. This is a guess, needs spading)");
+        }
+    }
+    else
+    {
+        //Library:
+        subentry.header = "Adventure in the Haunted Library";
+        url = $location[the Haunted Billiards Room].getClickableURLForLocation();
+        image_name = "__item very overdue library book";
+        subentry.modifiers.listAppend("olfact writing desk");
+        
+        subentry.entries.listAppend("To unlock the second floor.");
+        subentry.entries.listAppend("Lady Spookyraven's Necklace drops from the fifth writing desk you encounter.");
+        
+        if ($item[killing jar].available_amount() == 0 && !__quest_state["Level 11 Pyramid"].state_boolean["Desert Explored"] && !__quest_state["Level 11 Pyramid"].state_boolean["Killing Jar Given"])
+        {
+            subentry.modifiers.listAppend("+900% item");
+            subentry.entries.listAppend("Try to acquire a killing jar to speed up the desert later.|10% drop from banshee librarian.");
+        }
+        
+    }
+    
 	
-	location next_zone = to_location(base_quest_state.state_string["zone to work on"]);
-	
+	/*location next_zone = to_location(base_quest_state.state_string["zone to work on"]);
 	
 	if (next_zone == $location[the haunted billiards room])
 	{
@@ -240,7 +370,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         if (!clink_done)
             ncs_needed *= 2;
         subentry.entries.listAppend(generateTurnsToSeeNoncombat(20, ncs_needed, "", 0, delay_remaining));*/
-	}
+	/*}
 	else if (base_quest_state.state_boolean["need ballroom song set"])
 	{
 		next_zone = $location[The Haunted Ballroom];
@@ -258,9 +388,9 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
             should_output_optionally = true;
         }
         subentry.entries.listAppend(generateTurnsToSeeNoncombat(80, 2, ""));
-	}
+	}*/
 	
-	if (next_zone != $location[none])
+	if (subentry.header.length() > 0)
     {
         ChecklistEntry entry = ChecklistEntryMake(image_name, url, subentry, $locations[the haunted pantry, the haunted library, the haunted billiards room, the haunted bedroom, the haunted ballroom]);
         if (should_output_optionally)

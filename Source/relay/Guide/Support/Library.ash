@@ -55,6 +55,7 @@ int PATH_BIG = 17;
 int PATH_KOLHS = 18;
 int PATH_CLASS_ACT_2 = 19;
 int PATH_AVATAR_OF_SNEAKY_PETE = 20;
+int PATH_SLOW_AND_STEADY = 21;
 
 int __my_path_id_cached = -11;
 int my_path_id()
@@ -95,6 +96,8 @@ int my_path_id()
         __my_path_id_cached = PATH_CLASS_ACT_2;
     else if (path_name == "Avatar of Sneaky Pete")
         __my_path_id_cached = PATH_AVATAR_OF_SNEAKY_PETE;
+    else if (path_name == "Slow and Steady")
+        __my_path_id_cached = PATH_SLOW_AND_STEADY;
     else
         __my_path_id_cached = PATH_UNKNOWN;
     return __my_path_id_cached;
@@ -498,10 +501,10 @@ int delayRemainingInLocation(location place)
     int delay_for_place = -1;
     int [location] place_delays;
     place_delays[$location[the spooky forest]] = 5;
-    place_delays[$location[the haunted ballroom]] = 5;
+    //place_delays[$location[the haunted ballroom]] = 5;
     //place_delays[$location[the haunted bedroom]] = 5; //combats not tracked properly?
-    place_delays[$location[the haunted library]] = 5;
-    place_delays[$location[the haunted billiards room]] = 5;
+    //place_delays[$location[the haunted library]] = 5;
+    //place_delays[$location[the haunted billiards room]] = 5;
     place_delays[$location[the boss bat's lair]] = 4;
     place_delays[$location[the oasis]] = 5;
     place_delays[$location[the hidden park]] = 5;
@@ -611,7 +614,7 @@ boolean [skill] lookupSkills(string names) //CSV input
 }
 
 
-//lookupSkills(string) will be called instead, so explicitly avoid:
+//lookupSkills(string) will be called instead if we keep the same name, so use a different name:
 boolean [skill] lookupSkillsInt(boolean [int] skill_ids)
 {
     boolean [skill] result;
@@ -780,7 +783,11 @@ boolean locationHasPlant(location l, string plant_name)
 
 int initiative_modifier_ignoring_plants()
 {
+    //FIXME strange bug here, investigate
+    //seen in cyrpt
     int init = initiative_modifier();
+    //if (mafiaIsPastRevision(13946))
+        //return init;
     
     location my_location = my_location();
     if (my_location != $location[none] && (my_location.locationHasPlant("Impatiens") || my_location.locationHasPlant("Shuffle Truffle")))
@@ -791,9 +798,8 @@ int initiative_modifier_ignoring_plants()
 
 int monster_level_adjustment_ignoring_plants()
 {
+    //FIXME strange bug possibly here, investigate
     int ml = monster_level_adjustment();
-    
-    
     
     location my_location = my_location();
     
@@ -820,8 +826,20 @@ int monster_level_adjustment_for_location(location l)
     int ml = monster_level_adjustment_ignoring_plants();
     
     if (l.locationHasPlant("Rabid Dogwood") || l.locationHasPlant("War Lily") || l.locationHasPlant("Blustery Puffball"))
+    {
         ml += 30;
+    }
     return ml;
+}
+
+float initiative_modifier_for_location(location l)
+{
+    int base = initiative_modifier_ignoring_plants();
+    
+    location my_location = my_location();
+    if (l.locationHasPlant("Impatiens") || l.locationHasPlant("Shuffle Truffle"))
+        base += 25.0;
+    return base;
 }
 
 int monsterExtraInitForML(int ml)

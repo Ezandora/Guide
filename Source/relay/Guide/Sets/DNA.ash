@@ -208,11 +208,16 @@ void SDNAInit()
         //FIXME only suggest constellation if they've not finished HITS?
         __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylums[constellation,humanoid], "+meat", "nuns"));
         __phylum_potion_reminder_suggestions.listAppend(DNASuggestionMake($phylum[constellation], "+meat", "nuns"));
+        __phylum_potion_reminder_suggestions.listAppend(DNASuggestionMake($phylum[humanoid], "+meat", "nuns"));
         
     }
     if (!__quest_state["Level 3"].finished)
     {
         __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylums[demon,hobo,plant,undead], "+elemental damage", "tavern NC skipping"));
+    }
+    if (!__quest_state["Level 12"].finished && (!have_outfit_components("War Hippy Fatigues") && !have_outfit_components("Frat Warrior Fatigues")) && !__misc_state["yellow ray potentially available"])
+    {
+        __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[pirate], "+gear drops", "war outfit?"));
     }
     
     if (true)
@@ -244,10 +249,12 @@ void SDNAInit()
     
     if (__current_dna_intrinsic == $effect[none])
     {
-        
         if (!__misc_state["familiars temporarily blocked"])
         {
-            __dna_intrinsic_ideas.listAppend(DNABoldPhylumIfCurrentMonster($phylum[construct]) + " (+5 familiar weight)");
+            if (__misc_state["In run"])
+                __dna_intrinsic_ideas.listAppend(DNABoldPhylumIfCurrentMonster($phylum[construct]) + " (+5 familiar weight)");
+            else
+                __dna_intrinsic_ideas.listAppend(DNABoldPhylumIfCurrentMonster($phylum[fish]) + " (+10 familiar weight)");
         }
         if (__misc_state["need to level"])
         {

@@ -155,7 +155,7 @@ void QAzazelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         band_members.listAppend(AzazelBandMemberMake("Bognort", $item[giant marshmallow], $item[gin-soaked blotter paper]));
         band_members.listAppend(AzazelBandMemberMake("Stinkface", $item[beer-scented teddy bear], $item[gin-soaked blotter paper]));
         band_members.listAppend(AzazelBandMemberMake("Flargwurm", $item[booze-soaked cherry], $item[sponge cake]));
-        band_members.listAppend(AzazelBandMemberMake("Jim", $item[comfy pillow], $item[sponge cake]));
+        band_members.listAppend(AzazelBandMemberMake("Jim", $item[sponge cake], $item[comfy pillow]));
         
         string [int] quest_completion_instructions;
         boolean can_complete_quest = true;

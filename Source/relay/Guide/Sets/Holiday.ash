@@ -26,40 +26,40 @@ boolean [string] getHolidaysForDate(string realworld_date, int game_day)
     
     
     //Festival of Jarlsberg - acquire the party hat? - Jarlsuary 1
-    if (gameday_to_int() == 0)
+    if (game_day == 0)
         holidays["Festival of Jarlsberg"] = true;
     //Valentine's Day! - Frankuary 4
-    else if (gameday_to_int() == 11)
+    else if (game_day == 11)
         holidays["Valentine's Day"] = true;
     //St. Sneaky Pete's Day - Starch 3
-    else if (gameday_to_int() == 18)
+    else if (game_day == 18)
         holidays["St. Sneaky Pete's Day"] = true;
     //Oyster Egg Day - April 2
-    else if (gameday_to_int() == 25)
+    else if (game_day == 25)
         holidays["Oyster Egg Day"] = true;
     //El Dia de Los Muertos Borrachos? just wandering monsters... - Martinus 2
-    else if (gameday_to_int() == 33)
+    else if (game_day == 33)
         holidays["El Dia de Los Muertos Borrachos"] = true;
     //Generic Summer Holiday - Bill 3
-    else if (gameday_to_int() == 42)
+    else if (game_day == 42)
         holidays["Generic Summer Holiday"] = true;
     //Dependence Day - Bor 4
-    else if (gameday_to_int() == 51)
+    else if (game_day == 51)
         holidays["Dependence Day"] = true;
     //Arrrbor Day - Petember 4
-    else if (gameday_to_int() == 59)
+    else if (game_day == 59)
         holidays["Arrrbor Day"] = true;
     //Labór Day - Carlvember 6
-    else if (gameday_to_int() == 69)
+    else if (game_day == 69)
         holidays["Labór Day"] = true;
     //Halloween / halloween tomorrow, save adventures? - Porktober 8
-    else if (gameday_to_int() == 79)
+    else if (game_day == 79)
         holidays["Halloween"] = true;
     //feast of boris...? - Boozember 7
-    else if (gameday_to_int() == 86)
+    else if (game_day == 86)
         holidays["Feast of Boris"] = true;
     //Yuletide? - Dougtember 4
-    else if (gameday_to_int() == 91)
+    else if (game_day == 91)
         holidays["Yuletide"] = true;
         
     
@@ -83,6 +83,13 @@ void SHolidayGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     boolean [string] todays_holidays = getHolidaysToday();
     boolean [string] all_tomorrows_parties = getHolidaysTomorrow();
     
+    if (todays_holidays["Halloween"])
+    {
+        if (__misc_state["In run"])
+            optional_task_entries.listAppend(ChecklistEntryMake("__item plastic pumpkin bucket", "town.php", ChecklistSubentryMake("Trick or treat for one block", "+moxie", "Free stats/items from monsters on the first block."), 8));
+        else
+            optional_task_entries.listAppend(ChecklistEntryMake("__item plastic pumpkin bucket", "town.php", ChecklistSubentryMake("Trick or treat", "", "Wear an outfit, go from house to house."), 8));
+    }
     if (all_tomorrows_parties["Halloween"] && !__misc_state["In run"])
         optional_task_entries.listAppend(ChecklistEntryMake("__item plastic pumpkin bucket", "", ChecklistSubentryMake("Save turns for Halloween tomorrow", "", ""), 8));
 }

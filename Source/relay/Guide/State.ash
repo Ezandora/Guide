@@ -258,12 +258,12 @@ void setUpState()
 	
     __misc_state_float["Non-combat statgain multiplier"] = 1.0;
 	__misc_state_float["ML to mainstat multiplier"] = 1.0 / (2.0  * 4.0);
-	if (my_path_id() == PATH_CLASS_ACT_2)
+	/*if (my_path_id() == PATH_CLASS_ACT_2)
 	{
 		__misc_state_float["ML to mainstat multiplier"] = 1.0 / (2.0 * 2.0);
-        __misc_state_float["Non-combat statgain multiplier"] = 0.5;
-		__misc_state["Stat gain from NCs reduced"] = true;
-	}
+	}*/
+    __misc_state_float["Non-combat statgain multiplier"] = 0.5;
+    __misc_state["Stat gain from NCs reduced"] = true;
 	
 	int pulls_available = 0;
 	pulls_available = pulls_remaining();
@@ -462,6 +462,13 @@ void setUpState()
         need_jarlsberg_key = false;
     if ($items[fish hose,sneaky pete's key,makeshift scuba gear,hosed fishbowl,hosed tank].available_amount() > 0)
         need_sneaky_pete_key = false;
+    
+    if (__quest_state["Level 13"].state_boolean["past keys"])
+    {
+        need_boris_key = false;
+        need_jarlsberg_key = false;
+        need_sneaky_pete_key = false;
+    }
     
     if (need_boris_key)
         tokens_needed += 1;

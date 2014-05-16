@@ -198,14 +198,14 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
 			return get_property_int("lastCastleTopUnlock") == my_ascensions();
 		case $location[The Haunted Kitchen]:
 		case $location[The Haunted Conservatory]:
+            return true; //FIXME exact detection
 		case $location[The Haunted Billiards Room]:
-            if ($item[spookyraven library key].available_amount() > 0 || $item[spookyraven ballroom key].available_amount() > 0)
+            if (lookupItem("7301").available_amount() > 0)
                 return true;
-			return get_property_int("lastManorUnlock") == my_ascensions();
+			//return get_property_int("lastManorUnlock") == my_ascensions();
 		case $location[The Haunted Bedroom]:
 		case $location[The Haunted Bathroom]:
-            if ($item[spookyraven ballroom key].available_amount() > 0)
-                return true;
+            //FIXME detect this
 			return get_property_int("lastSecondFloorUnlock") == my_ascensions();
 		case $location[cobb's knob barracks]:
 		case $location[cobb's knob kitchens]:
@@ -528,19 +528,21 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         case $location[The Haunted Conservatory]:
         case $location[The Haunted Library]:
         case $location[The Haunted Billiards Room]:
-        case $location[The Haunted Gallery]:
-            return "place.php?whichplace=spookyraven1";
+            return "place.php?whichplace=manor1";
         case $location[The Haunted Bathroom]:
         case $location[The Haunted Bedroom]:
         case $location[The Haunted Ballroom]:
-            return "place.php?whichplace=spookyraven2";
-        case $location[The Haunted Wine Cellar (automatic)]:
-        case $location[The Haunted Wine Cellar (Northwest)]:
-        case $location[The Haunted Wine Cellar (Northeast)]:
-        case $location[The Haunted Wine Cellar (Southwest)]:
-        case $location[The Haunted Wine Cellar (Southeast)]:
+        case $location[The Haunted Gallery]:
+            return "place.php?whichplace=manor2";
+        case lookupLocation("The Haunted Storage Room"):
+        case lookupLocation("The Haunted Nursery"):
+        case lookupLocation("The Haunted Laboratory"):
+            return "place.php?whichplace=manor3";
+        //case lookupLocation("The Haunted Wine Cellar"): //incompatible with 16.3
+        case lookupLocation("The Haunted Boiler Room"):
+        case lookupLocation("The Haunted Laundry Room"):
         case $location[Summoning Chamber]:
-            return "manor3.php";
+            return "place.php?whichplace=manor4";
         case $location[The Hidden Apartment Building]:
         case $location[The Hidden Hospital]:
         case $location[The Hidden Office Building]:

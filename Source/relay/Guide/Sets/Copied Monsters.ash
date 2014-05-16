@@ -207,6 +207,38 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] available_resources_en
 	int copies_used = get_property_int("spookyPuttyCopiesMade") + get_property_int("_raindohCopiesMade");
 	int copies_available = MIN(6,5*MIN($items[Spooky Putty ball,Spooky Putty leotard,Spooky Putty mitre,Spooky Putty sheet,Spooky Putty snake,Spooky Putty monster].available_amount(), 1) + 5*MIN($item[Rain-Doh black box].available_amount() + $item[rain-doh box full of monster].available_amount(), 1));
     int copies_left = copies_available - copies_used;
+    
+    string [int] potential_copies;
+    if (true)
+    {
+        //√ghuol whelps, √modern zmobies, √wine racks, √gaudy pirates, √lobsterfrogmen, √ninja assassin
+        if (!__quest_state["Level 12"].state_boolean["Lighthouse Finished"] && $item[barrel of gunpowder].available_amount() < 5)
+            potential_copies.listAppend("Lobsterfrogman.");
+        if (__quest_state["Level 7"].state_boolean["cranny needs speed tricks"])
+            potential_copies.listAppend("Swarm of ghuol whelps.");
+        if (__quest_state["Level 7"].state_boolean["alcove needs speed tricks"])
+            potential_copies.listAppend("Modern zmobies.");
+        if (!__quest_state["Level 8"].state_boolean["Mountain climbed"] && $items[ninja rope,ninja carabiner,ninja crampons].available_amount() == 0 && !have_outfit_components("eXtreme Cold-Weather Gear"))
+            potential_copies.listAppend("Ninja assassin.");
+        if (!__quest_state["Level 11"].finished && !__quest_state["Level 11 Palindome"].finished && $item[talisman o' nam].available_amount() == 0 && $items[gaudy key,snakehead charrrm].available_amount() < 2)
+            potential_copies.listAppend("Gaudy pirate - copy once for extra key.");
+        //√baa'baa. astronomer? √nuns trick brigand
+        //FIXME astronomer when we can calculate that
+        if (__misc_state["need to level"])
+            potential_copies.listAppend("Baa'baa'bu'ran - stone wool for cave bar leveling.");
+        if (!__quest_state["Level 12"].state_boolean["Nuns Finished"])
+            potential_copies.listAppend("Brigand - nuns trick.");
+        if (!__quest_state["Level 11"].finished && __quest_state["Level 11 Manor"].mafia_internal_step < 4)
+            potential_copies.listAppend("Wine cellar monsters. (copy has all six wines)");
+        //possibly less relevant:
+        //√ghosts/skulls/bloopers...?
+        //seems very marginal
+        //if (!__quest_state["Level 13"].state_boolean["past keys"] && ($item[digital key].available_amount() + creatable_amount($item[digital key])) == 0)
+            //potential_copies.listAppend("Ghosts/morbid skulls/bloopers, for digital key. (marginal?)");
+        //bricko bats, if they have bricko...?
+        //if (__misc_state["bookshelf accessible"] && $skill[summon brickos].have_skill())
+            //potential_copies.listAppend("Bricko bats...?");
+    }
 	if (copies_left > 0)
 	{
 		string [int] copy_source_list;
@@ -219,46 +251,18 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] available_resources_en
 		string name = "";
 		//FIXME make this possibly say which one in the case of 6 (does that matter? how does that mechanic work?)
 		name = pluralize(copies_left, copy_sources + " copy", copy_sources + " copies") + " left";
-		string [int] description;
-        
-        //√ghuol whelps, √modern zmobies, √wine racks, √gaudy pirates, √lobsterfrogmen, √ninja assassin
-        if (!__quest_state["Level 12"].state_boolean["Lighthouse Finished"] && $item[barrel of gunpowder].available_amount() < 5)
-            description.listAppend("Lobsterfrogman.");
-        if (__quest_state["Level 7"].state_boolean["cranny needs speed tricks"])
-            description.listAppend("Swarm of ghuol whelps.");
-        if (__quest_state["Level 7"].state_boolean["alcove needs speed tricks"])
-            description.listAppend("Modern zmobies.");
-        if (!__quest_state["Level 8"].state_boolean["Mountain climbed"] && $items[ninja rope,ninja carabiner,ninja crampons].available_amount() == 0 && !have_outfit_components("eXtreme Cold-Weather Gear"))
-            description.listAppend("Ninja assassin.");
-        if (!__quest_state["Level 11"].finished && !__quest_state["Level 11 Palindome"].finished && $item[talisman o' nam].available_amount() == 0 && $items[gaudy key,snakehead charrrm].available_amount() < 2)
-            description.listAppend("Gaudy pirate - copy once for extra key.");
-        //√baa'baa. astronomer? √nuns trick brigand
-        //FIXME astronomer when we can calculate that
-        if (__misc_state["need to level"])
-            description.listAppend("Baa'baa'bu'ran - stone wool for cave bar leveling.");
-        if (!__quest_state["Level 12"].state_boolean["Nuns Finished"])
-            description.listAppend("Brigand - nuns trick.");
-        if (!__quest_state["Level 11"].finished && __quest_state["Level 11 Manor"].mafia_internal_step < 4)
-            description.listAppend("Wine cellar monsters. (copy has all six wines)");
-        //possibly less relevant:
-        //√ghosts/skulls/bloopers...?
-        //seems very marginal
-        //if (!__quest_state["Level 13"].state_boolean["past keys"] && ($item[digital key].available_amount() + creatable_amount($item[digital key])) == 0)
-            //description.listAppend("Ghosts/morbid skulls/bloopers, for digital key. (marginal?)");
-        //bricko bats, if they have bricko...?
-        //if (__misc_state["bookshelf accessible"] && $skill[summon brickos].have_skill())
-            //description.listAppend("Bricko bats...?");
+		string [int] description = potential_copies;
         
 		available_resources_entries.listAppend(ChecklistEntryMake(copy_source_list[0], "", ChecklistSubentryMake(name, "", description)));
 	}
     
     if (!get_property_boolean("_cameraUsed") && $item[4-d camera].available_amount() > 0)
     {
-		available_resources_entries.listAppend(ChecklistEntryMake("__item 4-d camera", "", ChecklistSubentryMake("4-d camera copy available", "", "")));
+		available_resources_entries.listAppend(ChecklistEntryMake("__item 4-d camera", "", ChecklistSubentryMake("4-d camera copy available", "", potential_copies)));
     }
     if (!get_property_boolean("_iceSculptureUsed") && lookupItem("unfinished ice sculpture").available_amount() > 0)
     {
-		available_resources_entries.listAppend(ChecklistEntryMake("__item unfinished ice sculpture", "", ChecklistSubentryMake("Ice sculpture copy available", "", "")));
+		available_resources_entries.listAppend(ChecklistEntryMake("__item unfinished ice sculpture", "", ChecklistSubentryMake("Ice sculpture copy available", "", potential_copies)));
     }
     if (my_path_id() == PATH_BUGBEAR_INVASION && $item[crayon shavings].available_amount() > 0)
     {

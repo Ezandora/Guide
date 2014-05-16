@@ -61,6 +61,7 @@ void S8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     {
         if (in_hardcore())
         {
+            string url = "place.php?whichplace=woods";
             string [int] description;
             string [int] modifiers;
             modifiers.listAppend("olfact bloopers");
@@ -70,12 +71,17 @@ void S8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             description.listAppend(total_white_pixels + "/30 white pixels found.");
             if (__misc_state["VIP available"] && __misc_state["fax accessible"])
                 description.listAppend("Possibly consider faxing/copying a ghost. (+150% item, drops five white pixels)");
+            if ($item[continuum transfunctioner].equipped_amount() == 0)
+            {
+                url = "inventory.php?which=2";
+                description.listAppend("Equip the continuum transfunctioner.");
+            }
             //No other choice. 8-bit realm.
             //Well, I suppose they could fax and arrow a ghost.
             if ($item[continuum transfunctioner].available_amount() > 0)
-                optional_task_entries.listAppend(ChecklistEntryMake("inexplicable door", "place.php?whichplace=woods", ChecklistSubentryMake("Adventure in the 8-bit realm", modifiers, description), $locations[8-bit realm]));
+                optional_task_entries.listAppend(ChecklistEntryMake("inexplicable door", url, ChecklistSubentryMake("Adventure in the 8-bit realm", modifiers, description), $locations[8-bit realm]));
             else if (my_level() >= 2)
-                optional_task_entries.listAppend(ChecklistEntryMake("__item continuum transfunctioner", "place.php?whichplace=forestvillage", ChecklistSubentryMake("Acquire a continuum transfunctioner", "", "From the crackpot mystic.")));
+                optional_task_entries.listAppend(ChecklistEntryMake("__item continuum transfunctioner", "place.php?whichplace=forestvillage&action=fv_mystic", ChecklistSubentryMake("Acquire a continuum transfunctioner", "", "From the crackpot mystic.")));
         }
         else
         {

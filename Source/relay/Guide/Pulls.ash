@@ -167,7 +167,13 @@ void generatePullList(Checklist [int] checklists)
 	
 	if (__misc_state["can eat just about anything"] && availableFullness() > 0)
 	{
-		pullable_item_list.listAppend(GPItemMake("Food", "hell ramen", "key lime pies, moon pies, fudge bunnies, etc."));
+        string [int] food_selections;
+        
+        if (__misc_state_int["fat loot tokens needed"] > 0)
+            food_selections.listAppend("key lime pies");
+        food_selections.listAppend("moon pies");
+        
+		pullable_item_list.listAppend(GPItemMake("Food", "hell ramen", food_selections.listJoinComponents(", ") + ", etc."));
 	}
 	if (__misc_state["can drink just about anything"] && availableDrunkenness() >= 0 && inebriety_limit() >= 5)
 	{

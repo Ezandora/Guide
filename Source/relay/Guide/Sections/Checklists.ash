@@ -53,22 +53,22 @@ void generateMisc(Checklist [int] checklists)
         foreach s in $slots[]
             rollover_adventures_from_equipment += s.equipped_item().numeric_modifier("adventures").to_int();
         
-        if (rollover_adventures_from_equipment == 0.0)
-        {
-            description.listAppend("Possibly wear +adventures gear.");
-        }
         //detect if they're going to lose some turns, be nice:
         int rollover_adventures_gained = numeric_modifier("adventures").to_int() + 40;
         if (get_property_boolean("_borrowedTimeUsed"))
             rollover_adventures_gained -= 20;
         int adventures_lost = (my_adventures() + rollover_adventures_gained) - 200;
+        if (rollover_adventures_from_equipment == 0.0 && adventures_lost == 0)
+        {
+            description.listAppend("Possibly wear +adventures gear.");
+        }
         if (adventures_lost > 0)
         {
             description.listAppend("You'll miss out on " + pluralizeWordy(adventures_lost, "adventure", "adventures") + ". Alas.|Could work out in the gym, craft, or play arcade games.");
         }
         
         //this could be better (i.e. checking against current shirt and looking in inventory, etc.)
-        if (lookupItem("Sneaky Pete's leather jacket (collar popped)").equipped_amount() > 0)
+        if (lookupItem("Sneaky Pete's leather jacket (collar popped)").equipped_amount() > 0 && adventures_lost == 0)
             description.listAppend("Might want to unpop the collar. (+4 adventures)");
         if (in_ronin() && pulls_remaining() > 0)
         {
