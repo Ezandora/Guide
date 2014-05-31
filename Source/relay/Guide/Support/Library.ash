@@ -114,6 +114,7 @@ boolean have_familiar_replacement(familiar f)
 //Similar to have_familiar, except it also checks trendy (not sure if have_familiar supports trendy) and 100% familiar runs
 boolean familiar_is_usable(familiar f)
 {
+    //r13998 has most of these
     if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE)
         return false;
 	int single_familiar_run = get_property_int("singleFamiliarRun");
@@ -461,6 +462,8 @@ int noncombatTurnsAttemptedInLocation(location place)
 
 int turnsAttemptedInLocation(location place)
 {
+    if (place == $location[the haunted bedroom]) //special case - NCs don't count here
+        return place.combatTurnsAttemptedInLocation();
     return place.combatTurnsAttemptedInLocation() + place.noncombatTurnsAttemptedInLocation();
 }
 
@@ -496,22 +499,29 @@ string lastCombatInLocation(location place)
     return "";
 }
 
-int delayRemainingInLocation(location place)
+int totalDelayForLocation(location place)
 {
-    int delay_for_place = -1;
     int [location] place_delays;
     place_delays[$location[the spooky forest]] = 5;
     //place_delays[$location[the haunted ballroom]] = 5;
     //place_delays[$location[the haunted bedroom]] = 5; //combats not tracked properly?
     //place_delays[$location[the haunted library]] = 5;
     //place_delays[$location[the haunted billiards room]] = 5;
+    place_delays[$location[the haunted bedroom]] = 6; //a guess from spading
     place_delays[$location[the boss bat's lair]] = 4;
     place_delays[$location[the oasis]] = 5;
     place_delays[$location[the hidden park]] = 5;
     
-    
     if (place_delays contains place)
-        delay_for_place = place_delays[place];
+        return place_delays[place];
+    return -1;
+}
+
+int delayRemainingInLocation(location place)
+{
+    int delay_for_place = place.totalDelayForLocation();
+    
+    
     if (delay_for_place == -1)
         return -1;
     return MAX(0, delay_for_place - place.turnsAttemptedInLocation());
@@ -587,6 +597,20 @@ boolean [item] lookupItems(string names) //CSV input
     foreach key in item_names
     {
         item it = item_names[key].to_item();
+        if (it == $item[none])
+            continue;
+        result[it] = true;
+    }
+    return result;
+}
+
+boolean [item] lookupItemsArray(boolean [string] names)
+{
+    boolean [item] result;
+    
+    foreach item_name in names
+    {
+        item it = item_name.to_item();
         if (it == $item[none])
             continue;
         result[it] = true;

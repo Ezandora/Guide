@@ -160,7 +160,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         
 		if (evilness > 26)
         {
-            subentry.modifiers.listAppend("olfaction");
+            subentry.modifiers.listAppend("olfact dirty old lihc");
             subentry.modifiers.listAppend("banish");
         }
 		if (evilness > 25)
@@ -217,9 +217,13 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 			
 			subentry.entries.listAppend(pluralize(zmobies_needed, "modern zmobie", "modern zmobies") + " needed (" + roundForOutput(zmobie_chance, 0) + "% chance of appearing)");
             
+            //float combat_rate = clampNormalf(0.85 + combat_rate_modifier() / 100.0);
+            //float nc_rate = 1.0 - combat_rate;
+            
             if ($familiar[oily woim].familiar_is_usable() && !($familiars[oily woim,happy medium] contains my_familiar()))
                 subentry.entries.listAppend("Run " + $familiar[oily woim] + " for +init.");
 			
+            
 		}
         else if (evilness <= 25)
             subentry.modifiers.listAppend("+meat");

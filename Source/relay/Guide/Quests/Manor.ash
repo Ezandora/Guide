@@ -81,6 +81,8 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     
     boolean should_output_optionally = false;
 	QuestState base_quest_state = __quest_state["Manor Unlock"];
+    
+    boolean [location] relevant_locations = $locations[the haunted kitchen, the haunted library, the haunted billiards room, the haunted bedroom, the haunted ballroom];
 	ChecklistSubentry subentry;
 	//subentry.header = "Unlock Spookyraven Manor";
     
@@ -88,7 +90,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 	
 	string url = "";
 	
-	string image_name = base_quest_state.image_name;
+	string image_name;
     
     boolean ballroom_probably_open = false;
     if ($location[the haunted ballroom].turnsAttemptedInLocation() > 0)
@@ -112,34 +114,114 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     
     if (second_floor_probably_open)
     {
-        if (lookupItem("Lady Spookyraven's necklace").available_amount() > 0)
+        if (lookupItem("Lady Spookyraven's necklace").available_amount() > 0 && lookupItem("ghost of a necklace").available_amount() == 0)
         {
             subentry.header = "Speak to Lady Spookyraven";
             url = $location[the haunted kitchen].getClickableURLForLocation();
             image_name = "Lady Spookyraven";
+            subentry.entries.listAppend("Give her her necklace.");
         }
         else
         {
             if (!ballroom_probably_open)
             {
+                ChecklistSubentry [int] subentries;
                 //Haunted gallery, bathroom, bedroom
-                if (lookupItem("Lady Spookyraven's powder puff").available_amount() == 0)
-                {
-                    //NC [?superlikely] in bathroom
-                    //FIXME implement this
-                }
-                if (lookupItem("Lady Spookyraven's finest gown").available_amount() == 0)
-                {
-                    //elegant nightstand in bedroom (banish)
-                    //also acquire disposable instant camera. spectacles...?
-                    //FIXME implement this
-                    
-                }
+                url = $location[the haunted gallery].getClickableURLForLocation();
                 if (lookupItem("Lady Spookyraven's dancing shoes").available_amount() == 0)
                 {
                     //NC (louvre or leave it) in gallery
-                    //FIXME implement this
+                    string [int] modifiers;
+                    string [int] description;
+                    
+                    modifiers.listAppend("-combat");
+                    description.listAppend("Find Lady Spookyraven's dancing shoes in the Louvre non-combat.");
+                    
+                    subentries.listAppend(ChecklistSubentryMake("Search in the Haunted Gallery", modifiers, description));
+                    if (image_name.length() == 0)
+                        image_name = "__item antique painting of a landscape";
                 }
+                if (lookupItem("Lady Spookyraven's powder puff").available_amount() == 0)
+                {
+                    string [int] modifiers;
+                    string [int] description;
+                    modifiers.listAppend("-combat?");
+                    description.listAppend("Find Lady Spookyraven's powder puff. (NC leads to cosmetics wraith)");
+                    //NC [?superlikely] in bathroom
+                    subentries.listAppend(ChecklistSubentryMake("Search in the Haunted Bathroom", modifiers, description));
+                    
+                    if (image_name.length() == 0)
+                        image_name = "__item bottle of Monsieur Bubble";
+                }
+                if (lookupItem("Lady Spookyraven's finest gown").available_amount() == 0)
+                {
+                    //elegant nightstand in bedroom (banish?)
+                    //also acquire disposable instant camera. spectacles...?
+                    //banishing may not help much?
+                    string [int] modifiers;
+                    string [int] description;
+                    
+                    description.listAppend("Find Lady Spookyraven's finest gown in the elegant nightstand.");
+                    //description.listAppend("Banish everything else.");
+                    
+                    string [int] items_needed_from_ornate_drawer;
+                    
+                    if ($item[lord spookyraven's spectacles].available_amount() == 0 && __quest_state["Level 11 Manor"].state_boolean["Can use fast route"])
+                        items_needed_from_ornate_drawer.listAppend("lord spookyraven's spectacles");
+                    
+                    if (__quest_state["Level 11 Palindome"].state_boolean["Need instant camera"] && 7266.to_item().available_amount() == 0)
+                        items_needed_from_ornate_drawer.listAppend("disposable instant camera");
+                    
+                    if (items_needed_from_ornate_drawer.count() > 0)
+                        description.listAppend("Also acquire " + items_needed_from_ornate_drawer.listJoinComponents(", ", "and") + " from the ornate drawer.");
+                    
+                        
+                    if (delayRemainingInLocation($location[the haunted bedroom]) > 1)
+                    {
+                        string line = "Delay(?) for " + pluralize(delayRemainingInLocation($location[the haunted bedroom]), "turn", "turns") + ".";
+                        if (__misc_state["have hipster"])
+                        {
+                            line += " (use " + __misc_state_string["hipster name"] + "? may or may not help?)";
+                            subentry.modifiers.listAppend(__misc_state_string["hipster name"]+"?");
+                        }
+                        description.listAppend(line);
+                    }
+                    
+                    
+                    subentries.listAppend(ChecklistSubentryMake("Search in the Haunted Bedroom", modifiers, description));
+                    if (image_name.length() == 0)
+                        image_name = "Haunted Bedroom";
+                    
+                }
+                if (lookupItem("Lady Spookyraven's dancing shoes").available_amount() > 0 && lookupItem("Lady Spookyraven's powder puff").available_amount() > 0 && lookupItem("Lady Spookyraven's finest gown").available_amount() > 0)
+                {
+                    subentry.header = "Dance with Lady Spookyraven";
+                    subentry.entries.listAppend("Adventure in the Haunted Ballroom.");
+                    subentry.entries.listAppend("Gives stats.");
+                    
+                    image_name = "Lady Spookyraven";
+                }
+                //FIXME suggest acquiring instant camera and spectacles
+                if (subentries.count() > 0)
+                {
+                    task_entries.listAppend(ChecklistEntryMake(image_name, url, subentries, relevant_locations));
+                }
+            }
+            else if (base_quest_state.state_boolean["need ballroom song set"])
+            {
+                subentry.header = "Set -combat ballroom song";
+                url = $location[the haunted ballroom].getClickableURLForLocation();
+                image_name = "__item the Legendary Beat";
+                subentry.modifiers.listAppend("-combat");
+                
+                subentry.entries.listAppend("Adventure in the Haunted Ballroom.");
+                
+                if (my_turncount() > 200 || base_quest_state.state_boolean["ballroom song effectively set"])
+                {
+                    subentry.entries.listAppend("Well, unless you won't need -combat.");
+                    should_output_optionally = true;
+                }
+                subentry.entries.listAppend(generateTurnsToSeeNoncombat(80, 2, ""));
             }
         }
     }
@@ -157,9 +239,23 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         image_name = "__item tiny knife and fork";
         subentry.entries.listAppend("To unlock the Haunted Billiards Room.");
         
-        subentry.entries.listAppend("Run " + HTMLGenerateSpanOfClass("hot", "r_element_hot") + " resistance and " + HTMLGenerateSpanOfClass("stench", "r_element_stench") + " resistance to search more drawers per turn.");
-        subentry.entries.listAppend("Should take about ~25 drawers? Unspaded, sorry.");
+        subentry.entries.listAppend("Run " + HTMLGenerateSpanOfClass("hot", "r_element_hot") + " resistance and " + HTMLGenerateSpanOfClass("stench", "r_element_stench") + " resistance to search faster.");
         
+        float drawers_per_turn = 0.0;
+        float hot_resistance = numeric_modifier("hot resistance");
+        float stench_resistance = numeric_modifier("stench resistance");
+        
+        drawers_per_turn = 0.5 * MIN(4.0, MAX(1.0, 1.0 + hot_resistance / 3.0)) + 0.5 * MIN(4.0, MAX(1.0, 1.0 + stench_resistance / 3.0));
+        drawers_per_turn = MAX(1.0, drawers_per_turn); //zero-divide safety backup
+        
+        float drawers_needed = MAX(0, 21 - get_property_int("manorDrawerCount"));
+        
+        int total_turns = ceil(drawers_needed / drawers_per_turn) + 1;
+        
+        subentry.entries.listAppend(drawers_per_turn.roundForOutput(1) + " drawers searched per turn.|~" + pluralize(total_turns, "turn", "turns") + " remaining.");
+        
+		if (__misc_state["have hipster"])
+			subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
         subentry.modifiers.listAppend(HTMLGenerateSpanOfClass("hot res", "r_element_hot_desaturated"));
         subentry.modifiers.listAppend(HTMLGenerateSpanOfClass("stench res", "r_element_stench_desaturated"));
     }
@@ -172,16 +268,29 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         subentry.entries.listAppend("To unlock the Haunted Library.");
         
         subentry.modifiers.listAppend("-combat");
-        subentry.entries.listAppend("Train pool skill via -combat.");
+        subentry.entries.listAppend("Train pool skill via -combat. Need 15(?) total pool skill.");
         
-        if ($item[pool cue].available_amount() == 0)
+        if ($item[Staff of Ed, almost].available_amount() > 0)
         {
-            subentry.entries.listAppend("Find pool cue. (superlikely?)");
-            
+            subentry.entries.listAppend("Untinker the Staff of Ed, almost.");
         }
-        else if ($item[pool cue].equipped_amount() == 0)
+        else if ($item[staff of fats].available_amount() > 0)
         {
-            subentry.entries.listAppend("Equip pool cue for +pool skill.");
+            if ($item[staff of fats].equipped_amount() == 0)
+            {
+                subentry.entries.listAppend("Equip the Staff of Fats for +pool skill.");
+            }
+        }
+        else
+        {
+            if ($item[pool cue].available_amount() == 0)
+            {
+                subentry.entries.listAppend("Find pool cue. (superlikely?)");
+            }
+            else if ($item[pool cue].equipped_amount() == 0)
+            {
+                subentry.entries.listAppend("Equip pool cue for +pool skill.");
+            }
         }
         if ($effect[chalky hand].have_effect() == 0& $item[handful of hand chalk].available_amount() > 0)
             subentry.entries.listAppend(HTMLGenerateSpanOfClass("Use handful of hand chalk", "r_bold") + " for +pool skill and faster pool skill training.");
@@ -196,7 +305,24 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
                 subentry.entries.listAppend("Consider drinking up to " + desired_drunkenness + " drunkenness. (may affect pool skill, unspaded)");
             }
             else if (my_inebriety() > desired_drunkenness)
-                subentry.entries.listAppend("Consider waiting for rollover for better pool skill. (you're over " + desired_drunkenness + " drunkenness. This is a guess, needs spading)");
+                subentry.entries.listAppend("Consider waiting for rollover for better pool skill. (you're over " + desired_drunkenness + " drunkenness.)");
+        }
+        if (my_inebriety() > 0)
+        {
+            //shortly after rollover during the revamp, drunkenness affected listed pool skill in the quest log
+            //exact values were 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 8, 6, 4, 2, 0, -2, -4, -6, -8
+            //uncertain whether those are still in effect, but invisible
+            int theoretical_hidden_pool_skill = 0;
+            if (my_inebriety() <= 10)
+                theoretical_hidden_pool_skill = my_inebriety();
+            else
+                theoretical_hidden_pool_skill = 10 - (my_inebriety() - 10) * 2;
+            
+            string pool_skill_string;
+            if (theoretical_hidden_pool_skill >= 0)
+                pool_skill_string = "+";
+            pool_skill_string += theoretical_hidden_pool_skill;
+            subentry.entries.listAppend("Drunkenness theoretical effect: " + pool_skill_string + " pool skill.");
         }
     }
     else
@@ -210,10 +336,16 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         subentry.entries.listAppend("To unlock the second floor.");
         subentry.entries.listAppend("Lady Spookyraven's Necklace drops from the fifth writing desk you encounter.");
         
+        boolean need_killing_jar = false;
         if ($item[killing jar].available_amount() == 0 && !__quest_state["Level 11 Pyramid"].state_boolean["Desert Explored"] && !__quest_state["Level 11 Pyramid"].state_boolean["Killing Jar Given"])
         {
+            need_killing_jar = true;
             subentry.modifiers.listAppend("+900% item");
             subentry.entries.listAppend("Try to acquire a killing jar to speed up the desert later.|10% drop from banshee librarian.");
+        }
+        if (!need_killing_jar && (!$monster[banshee librarian].is_banished() || !$monster[bookbat].is_banished()))
+        {
+            subentry.modifiers.listAppend("banish rest");
         }
         
     }
@@ -253,7 +385,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 	else if (next_zone == $location[the haunted library])
 	{
 		subentry.header = "Open the Haunted Library";
-		url = "place.php?whichplace=spookyraven1";
+		url = "place.php?whichplace=manor1";
 		image_name = "haunted billiards room";
 		
 		if (__misc_state["free runs available"])
@@ -294,7 +426,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 	else if (next_zone == $location[the haunted bedroom])
 	{
 		subentry.header = "Open the Haunted Bedroom";
-		url = "place.php?whichplace=spookyraven1";
+		url = "place.php?whichplace=manor1";
 		image_name = "haunted library";
 
         
@@ -392,7 +524,9 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 	
 	if (subentry.header.length() > 0)
     {
-        ChecklistEntry entry = ChecklistEntryMake(image_name, url, subentry, $locations[the haunted pantry, the haunted library, the haunted billiards room, the haunted bedroom, the haunted ballroom]);
+        if (image_name.length() == 0)
+            image_name = base_quest_state.image_name;
+        ChecklistEntry entry = ChecklistEntryMake(image_name, url, subentry, relevant_locations);
         if (should_output_optionally)
             optional_task_entries.listAppend(entry);
         else

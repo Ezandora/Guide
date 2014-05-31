@@ -344,7 +344,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
 			available_resources_entries.listAppend(ChecklistEntryMake("__item gameinformpowerdailypro magazine", "inventory.php?which=3", ChecklistSubentryMake(pluralize($item[gameinformpowerdailypro magazine]), "", description), importance_level_unimportant_item));
 		}
 	}
-    if ($item[divine champagne popper].available_amount() > 0)
+    if ($item[divine champagne popper].available_amount() > 0 && in_run)
     {
         available_resources_entries.listAppend(ChecklistEntryMake("__item divine champagne popper", "", ChecklistSubentryMake(pluralize($item[divine champagne popper]), "", "Free run and five-turn banish."), importance_level_unimportant_item));
     }
@@ -607,7 +607,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
     {
         string image_name = "";
         string [int] autosell_list;
-        foreach it in $items[meat stack, dense meat stack, really dense meat stack, solid gold bowling ball, fancy seashell necklace, commemorative war stein]
+        foreach it in $items[meat stack, dense meat stack, really dense meat stack, solid gold bowling ball, fancy seashell necklace, commemorative war stein,huge gold coin]
         {
             if (it.available_amount() == 0)
                 continue;

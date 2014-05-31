@@ -236,8 +236,10 @@ string ChecklistGenerateModifierSpan(string modifier)
 void ChecklistInit()
 {
 	PageAddCSSClass("a", "r_cl_internal_anchor", "");
-	PageAddCSSClass("", "r_cl_modifier_inline", "font-size:0.80em; color:" + __setting_modifier_color + ";");
-	PageAddCSSClass("", "r_cl_modifier", "font-size:0.80em; color:" + __setting_modifier_color + "; display:block;");
+	//PageAddCSSClass("", "r_cl_modifier_inline", "font-size:0.80em; color:" + __setting_modifier_color + ";");
+	//PageAddCSSClass("", "r_cl_modifier", "font-size:0.80em; color:" + __setting_modifier_color + "; display:block;");
+    PageAddCSSClass("", "r_cl_modifier_inline", "font-size:0.85em; color:" + __setting_modifier_color + ";");
+    PageAddCSSClass("", "r_cl_modifier", "font-size:0.85em; color:" + __setting_modifier_color + "; display:block;");
 	
 	PageAddCSSClass("", "r_cl_header", "text-align:center; font-size:1.15em; font-weight:bold;");
 	PageAddCSSClass("", "r_cl_subheader", "font-size:1.07em; font-weight:bold;");

@@ -396,6 +396,8 @@ function parseAPIResponseAndFireTimer(response_string)
             
             for (var property_name in response)
             {
+                if (!response.hasOwnProperty(property_name))
+                    continue;
                 if (response[property_name] != __guide_last_reload_api_response[property_name])
                     should_update = true;
             }

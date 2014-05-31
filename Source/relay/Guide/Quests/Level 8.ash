@@ -37,6 +37,7 @@ void QLevel8GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	if (!__quest_state["Level 8"].in_progress)
 		return;
 	QuestState base_quest_state = __quest_state["Level 8"];
+    string image_name = base_quest_state.image_name;
 	ChecklistSubentry subentry;
 	subentry.header = base_quest_state.quest_name;
 	string talk_to_trapper_string = "Go talk to the trapper.";
@@ -236,6 +237,8 @@ void QLevel8GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             subentry.modifiers.listAppend("+meat");
             subentry.entries.listAppend("Optionally run +meat for " + pluralizeWordy((turns_remaining - 1), "turn", "turns") + ". (200 base meat drop)");
         }
+        
+        image_name = "Yeti";
 	}
 	else
 	{
@@ -244,5 +247,5 @@ void QLevel8GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	
 	
 	
-	task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, "place.php?whichplace=mclargehuge", subentry, $locations[itznotyerzitz mine,the goatlet, lair of the ninja snowmen, the extreme slope,mist-shrouded peak, itznotyerzitz mine (in disguise)]));
+	task_entries.listAppend(ChecklistEntryMake(image_name, "place.php?whichplace=mclargehuge", subentry, $locations[itznotyerzitz mine,the goatlet, lair of the ninja snowmen, the extreme slope,mist-shrouded peak, itznotyerzitz mine (in disguise)]));
 }

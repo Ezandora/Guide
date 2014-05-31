@@ -35,6 +35,9 @@ void QPirateInit()
 	}
     state.state_int["insult count"] = insult_count;
     
+    if ($item[Orcish Frat House blueprints].available_amount() > 0 && state.mafia_internal_step <3 )
+        QuestStateParseMafiaQuestPropertyValue(state, "step2");
+    
 	//Certain characters are in weird states, I think?
     if ($item[pirate fledges].available_amount() > 0 || $item[talisman o' nam].available_amount() > 0)
         QuestStateParseMafiaQuestPropertyValue(state, "finished");

@@ -76,6 +76,13 @@ void generateMisc(Checklist [int] checklists)
         }
         
 		task_entries.entries.listAppend(ChecklistEntryMake("__item counterclockwise watch", url, ChecklistSubentryMake("Wait for rollover", "", description), -11));
+        if (stills_available() > 0 && __misc_state["In Run"])
+        {
+            string url = "shop.php?whichshop=still";
+            if ($item[soda water].available_amount() == 0)
+                url = "store.php?whichstore=m";
+            task_entries.entries.listAppend(ChecklistEntryMake("__item tonic water", url, ChecklistSubentryMake("Make " + pluralize(stills_available(), $item[tonic water]), "", listMake("Tonic water is a ~40MP restore, improved from soda water.", "Or improve drinks.")), -11));
+        }
 	}
 }
 

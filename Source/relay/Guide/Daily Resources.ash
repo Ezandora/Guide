@@ -119,7 +119,7 @@ void generateDailyResources(Checklist [int] checklists)
 	
 	
 	
-	if (!get_property_boolean("_madTeaParty") && __misc_state["VIP available"])
+	if (!get_property_boolean("_madTeaParty") && __misc_state["VIP available"] && !__misc_state["type 69 restrictions active"])
 	{
         string [int] description;
         string line = "Various effects.";
@@ -346,13 +346,13 @@ void generateDailyResources(Checklist [int] checklists)
     
     if (__misc_state["VIP available"])
     {
-        if (!get_property_boolean("_lookingGlass"))
+        if (!get_property_boolean("_lookingGlass") && !__misc_state["type 69 restrictions active"])
         {
             available_resources_entries.listAppend(ChecklistEntryMake("__item &quot;DRINK ME&quot; potion", "clan_viplounge.php", ChecklistSubentryMake("A gaze into the looking glass", "", "Acquire a " + $item[&quot;DRINK ME&quot; potion] + "."), 10));
         }
         //_deluxeKlawSummons?
         //_crimboTree?
-        int soaks_remaining = MAX(0, 5 - get_property_int("_hotTubSoaks"));
+        int soaks_remaining = __misc_state_int["hot tub soaks remaining"];
         if (__misc_state["In run"] && soaks_remaining > 0)
             available_resources_entries.listAppend(ChecklistEntryMake("__effect blessing of squirtlcthulli", "clan_viplounge.php", ChecklistSubentryMake(pluralize(soaks_remaining, "hot tub soak", "hot tub soaks"), "", "Restore all HP, removes most bad effects."), 8));
     }

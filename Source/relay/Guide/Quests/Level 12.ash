@@ -228,17 +228,17 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 				details.listAppend("Talk to Yossarian to complete quest.");
 			else
             {
-                if ($skill[suckerpunch].have_skill())
-                {
-                    details.listAppend("Cast suckerpunch to stasis gremlins.");
-                }
-                else if ($item[dictionary].available_amount() > 0)
+                if ($item[dictionary].available_amount() > 0)
                 {
                     details.listAppend("Read from the dictionary to stasis gremlins.");
                 }
                 else if ($item[seal tooth].available_amount() > 0)
                 {
                     details.listAppend("Use your seal tooth to stasis gremlins.");
+                }
+                else if ($skill[suckerpunch].have_skill())
+                {
+                    details.listAppend("Cast suckerpunch to stasis gremlins.");
                 }
                 else
                     details.listAppend(HTMLGenerateSpanFont("Acquire a seal tooth", "red", "") + " to stasis gremlins. (from hermit)");

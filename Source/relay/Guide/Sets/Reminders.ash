@@ -12,7 +12,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             methods.listAppend("Cast Tongue of the Walrus.");
             url = "skills.php";
         }
-        else if (__misc_state["VIP available"] && get_property_int("_hotTubSoaks") < 5)
+        else if (__misc_state["VIP available"] && __misc_state_int["hot tub soaks remaining"] > 0)
         {
             methods.listAppend("Soak in VIP hot tub.");
             url = "clan_viplounge.php";
@@ -119,7 +119,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         task_entries.listAppend(ChecklistEntryMake("__item flaskfull of hollow", url, ChecklistSubentryMake("Drink " + $item[flaskfull of hollow], "", "Gives +25 smithsness"), -11));
     }
     
-	if ($effect[QWOPped Up].have_effect() > 0 && ((__misc_state["VIP available"] && get_property_int("_hotTubSoaks") < 5) || lookupSkill("Shake It Off").have_skill())) //only suggest if they have hot tub access; other route is a SGEEA, too valuable
+	if ($effect[QWOPped Up].have_effect() > 0 && ((__misc_state["VIP available"] && __misc_state_int["hot tub soaks remaining"] > 0) || lookupSkill("Shake It Off").have_skill())) //only suggest if they have hot tub access; other route is a SGEEA, too valuable
     {
         string [int] description;
         string url = "";
@@ -168,6 +168,9 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             
             item_descriptions[$item[resolution: be sexier]] = "+2 moxie stats/fight (20 turns)";
             item_effects[$item[resolution: be sexier]] = $effect[Irresistible Resolve];
+            
+            item_descriptions[lookupItem("old bronzer")] = "+2 moxie stats/fight (25 turns)";
+            item_effects[lookupItem("old bronzer")] = lookupEffect("Sepia Tan");
         }
 
         if (__misc_state["need to level muscle"])
@@ -178,6 +181,10 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             
             item_descriptions[$item[resolution: be stronger]] = "+2 muscle stats/fight (20 turns)";
             item_effects[$item[resolution: be stronger]] = $effect[Strong Resolve];
+            
+            
+            item_descriptions[lookupItem("old eyebrow pencil")] = "+2 muscle stats/fight (25 turns)";
+            item_effects[lookupItem("old eyebrow pencil")] = lookupEffect("Browbeaten");
         }
         if (__misc_state["need to level mysticality"])
         {
@@ -187,6 +194,10 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             
             item_descriptions[$item[resolution: be smarter]] = "+2 mysticality stats/fight (20 turns)";
             item_effects[$item[resolution: be smarter]] = $effect[Brilliant Resolve];
+            
+            
+            item_descriptions[lookupItem("old rosewater cream")] = "+2 mysticality stats/fight (25 turns)";
+            item_effects[lookupItem("old rosewater cream")] = lookupEffect("Rosewater Mark");
         }
         
         if (my_level() >= 11)
@@ -280,7 +291,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         string curse_removal_method;
         string url;
         
-        if (__misc_state["VIP available"] && get_property_int("_hotTubSoaks") < 5)
+        if (__misc_state["VIP available"] && __misc_state_int["hot tub soaks remaining"] > 0)
         {
             curse_removal_method = "Relax in hot tub.";
             url = "clan_viplounge.php";

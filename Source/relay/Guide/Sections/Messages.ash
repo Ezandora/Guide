@@ -69,6 +69,7 @@ string generateRandomMessage()
     equipment_messages[$item[mr. accessory]] = "you can equip mr. accessories?";
     equipment_messages[$item[white hat hacker T-shirt]] = "hack the planet";
     equipment_messages[$item[heart necklace]] = "&#x2665;&#xfe0e;"; //♥︎
+    equipment_messages[$item[fleetwood chain]] = "run in the shadows";
     
     foreach it in equipment_messages
     {
@@ -124,7 +125,7 @@ string generateRandomMessage()
     paths[PATH_KOLHS] = "did you study?";
     paths[PATH_CLASS_ACT_2] = "lonely guild trainer";
     paths[PATH_AVATAR_OF_SNEAKY_PETE] = "sunglasses at night";
-    //paths[PATH_SLOW_AND_STEADY] = "";
+    paths[PATH_SLOW_AND_STEADY] = "";
     paths[PATH_OXYGENARIAN] = "the slow path";
     
     if (paths contains my_path_id())

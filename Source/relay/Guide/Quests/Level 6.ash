@@ -62,22 +62,31 @@ void QLevel6GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	if (sources_need_234.count() > 0)
 		subentry.modifiers.listAppend("+234% item");
     
+    boolean hipster_fights_needed = false;
     boolean need_minus_combat = false;
 	if ($item[dodecagram].available_amount() == 0)
     {
+        hipster_fights_needed = true;
 		subentry.entries.listAppend("Adventure in " + HTMLGenerateSpanOfClass("Dark Neck of the Woods", "r_bold") + ", acquire dodecagram.|~" + roundForOutput(QLevel6TurnsToCompleteArea($location[the dark neck of the woods]), 1) + " average turns remain at " + combat_rate_modifier().floor() + "% combat.");
         need_minus_combat = true;
     }
 	if ($item[box of birthday candles].available_amount() == 0)
     {
+        hipster_fights_needed = true;
 		subentry.entries.listAppend("Adventure in " + HTMLGenerateSpanOfClass("Dark Heart of the Woods", "r_bold") + ", acquire box of birthday candles.|~" + roundForOutput(QLevel6TurnsToCompleteArea($location[the Dark Heart of the Woods]), 1) + " turns remain at " + combat_rate_modifier().floor() + "% combat.");
         need_minus_combat = true;
     }
 	if ($item[Eldritch butterknife].available_amount() == 0)
     {
+        hipster_fights_needed = true;
 		subentry.entries.listAppend("Adventure in " + HTMLGenerateSpanOfClass("Dark Elbow of the Woods", "r_bold") + ", acquire Eldritch butterknife.|~" + roundForOutput(QLevel6TurnsToCompleteArea($location[the Dark Elbow of the Woods]), 1) + " turns remain at " + combat_rate_modifier().floor() + "% combat.");
         need_minus_combat = true;
     }
+    
+    //hipster fights advance the superlikelies. in slow paths, is this relevant?
+    //FIXME suggest in HCO/S&S?
+    //if (hipster_fights_needed && __misc_state["have hipster"])
+        //subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
 	
     string [int] needed_modifiers;
     if (need_minus_combat)

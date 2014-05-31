@@ -36,6 +36,13 @@ void QLevel11Init()
         
         if ($items[Eye of Ed,Headpiece of the Staff of Ed,Staff of Ed].available_amount() > 0)
             QuestStateParseMafiaQuestPropertyValue(state, "finished");
+        
+        
+        boolean use_fast_route = true;
+        if (!__misc_state["can equip just about any weapon"])
+            use_fast_route = false;
+        
+        state.state_boolean["Can use fast route"] = use_fast_route;
 	
 		if (my_level() >= 11)
 			state.startable = true;
@@ -160,18 +167,9 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     {
         //Unlock black market:
         url = "place.php?whichplace=woods";
-        if ($item[black market map].available_amount() > 0)
-            subentry.entries.listAppend("Unlock the black market.");
-        else
-        {
-            subentry.modifiers.listAppend("-combat");
-            subentry.entries.listAppend("Unlock the black market by adventuring in the Black Forest with -combat.");
-            if (!__quest_state["Manor Unlock"].state_boolean["ballroom song effectively set"])
-            {
-                subentry.entries.listAppend(HTMLGenerateSpanOfClass("Wait until -combat ballroom song set.", "r_bold"));
-                make_entry_future = true;
-            }
-        }
+        
+        subentry.modifiers.listAppend("+combat");
+        subentry.entries.listAppend("Unlock the black market by adventuring in the Black Forest with +combat.");
         
         
         familiar bird_needed_familiar;
@@ -186,27 +184,42 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
             bird_needed_familiar = $familiar[reassembled blackbird];
             bird_needed = $item[reassembled blackbird];
         }
-        if (!have_familiar_replacement(bird_needed_familiar) && bird_needed.available_amount() == 0)
+        item [int] missing_components = missingComponentsToMakeItem(bird_needed);
+        
+        //FIXME clean this up:
+        //FIXME test if having a reassembled blackbird in your inventory is more than enough in any path?
+        //FIXME handle both reassembled blackbird and reconstituted crow as familiar
+        
+        if (missing_components.available_amount() > 0 && bird_needed.available_amount() == 0)
+        {
+            subentry.modifiers.listAppend("+100% item"); //FIXME what is the drop rate for bees hate you items? we don't know...
+        }
+        
+        if (bird_needed_familiar.familiar_is_usable())
+        {
+            if (bird_needed.available_amount() == 0 && missing_components.count() == 0)
+            {
+                subentry.entries.listAppend("Make a " + bird_needed + ".");
+            }
+            else if (my_familiar() != bird_needed_familiar && bird_needed.available_amount() == 0)
+            {
+                subentry.entries.listAppend("Bring along " + bird_needed_familiar + " to speed up quest.");
+            }
+            else if (my_familiar() == bird_needed_familiar && bird_needed.available_amount() > 0)
+            {
+                subentry.entries.listAppend("Bring along another familiar, you probably(?) don't need to use the bird anymore.");
+            }
+        }
+        else if (bird_needed.available_amount() == 0)
         {
             string line = "";
             line = "Acquire " + bird_needed + ".";
-            item [int] missing_components = missingComponentsToMakeItem(bird_needed);
         
             if (missing_components.count() == 0)
                 line += " You have all the parts, make it.";
             else
                 line += " Parts needed: " + missing_components.listJoinComponents(", ", "and");
             subentry.entries.listAppend(line);
-            subentry.modifiers.listAppend("+100% item"); //FIXME what is the drop rate for bees hate you items? we don't know...
-        }
-        else
-        {
-            if ($item[black market map].available_amount() > 0)
-            {
-                url = "inventory.php?which=3";
-                subentry.entries.listAppend("Use the black market map.");
-            }
-            
         }
     }
     else if (base_quest_state.mafia_internal_step < 3)
@@ -263,57 +276,187 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
     string url = "";
     subentry.header = base_quest_state.quest_name;
     string image_name = base_quest_state.image_name;
-    /*if ($item[lord spookyraven's spectacles].available_amount() == 0)
-    {
-        subentry.entries.listAppend("Find lord spookyraven's spectacles in the haunted bedroom.");
-        url = "place.php?whichplace=town_right";
-        if ($location[the haunted bedroom].locationAvailable())
-            url = "place.php?whichplace=spookyraven2";
-    }
-    else if (!locationAvailable($location[the haunted ballroom]))
-    {
-        subentry.entries.listAppend("Unlock the haunted ballroom.");
-        url = "place.php?whichplace=spookyraven2";
-    }
-    else if (base_quest_state.mafia_internal_step < 2)
-    {
-        url = "place.php?whichplace=spookyraven2";
-        subentry.modifiers.listAppend("-combat");
-        subentry.entries.listAppend("Run -combat in the haunted ballroom.");
-        
-        if (delayRemainingInLocation($location[the haunted ballroom]) > 0)
-        {
-            string line = "Delay for ~" + pluralize(delayRemainingInLocation($location[the haunted ballroom]), "turn", "turns");
-            if (__misc_state["have hipster"])
-            {
-                subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
-                line += ", use " + __misc_state_string["hipster name"];
-            }
-            line += ". (not tracked properly, sorry)";
-            subentry.entries.listAppend(line);
-        }
-        image_name = "Haunted Ballroom";
-    }
-    else if (base_quest_state.mafia_internal_step < 3)
-    {
-        url = "manor3.php";
-        subentry.modifiers.listAppend("+400% item");
-        subentry.entries.listAppend("Collect wine.");
-        if ($items[spooky putty sheet,Rain-Doh black box].available_amount() > 0)
-            subentry.entries.listAppend("Possibly copy the monsters here. The copy will have all six wines.");
-        if (__quest_state["Level 6"].finished && !get_property_boolean("friarsBlessingReceived") && $effect[Brother Smothers's Blessing].have_effect() == 0)
-            subentry.entries.listAppend("Possibly use the friars booze blessing for +30% item here.");
-        image_name = "Wine racks";
-    }*/
     if (true)
     {
-        url = "manor3.php";
-        subentry.modifiers.listAppend("elemental resistance");
-        subentry.entries.listAppend("Find and fight Lord Spookyraven.");
-        
-        if ($effect[Red Door Syndrome].have_effect() == 0 && my_meat() > 1000)
+        //FIXME spectacles first?
+        if (!$location[the haunted ballroom].noncombat_queue.contains_text("We'll All Be Flat"))
         {
-            subentry.entries.listAppend("A can of black paint can help with fighting him. Bit pricy. (1k meat)");
+            //FIXME is there delay here?
+            url = "place.php?whichplace=manor2";
+            subentry.modifiers.listAppend("-combat");
+            subentry.entries.listAppend("Run -combat in the haunted ballroom.");
+            image_name = "Haunted Ballroom";
+        }
+        else
+        {
+            url = "manor3.php";
+            boolean use_fast_route = base_quest_state.state_boolean["Can use fast route"];
+            //FIXME can bees hate you use the fast path?
+        
+            if (use_fast_route && $item[lord spookyraven's spectacles].available_amount() == 0)
+            {
+                url = $location[the haunted bedroom].getClickableURLForLocation();
+                subentry.entries.listAppend("Acquire Lord Spookyraven's spectacles from the haunted bedroom.");
+            }
+            else if (lookupItem("recipe: mortar-dissolving solution").available_amount() == 0 && !__setting_debug_mode)
+            {
+                if (use_fast_route && $item[lord spookyraven's spectacles].equipped_amount() == 0)
+                {
+                    url = "inventory.php?which=2";
+                    subentry.entries.listAppend("Equip Lord Spookyraven's Spectacles, click on the suspicious masonry in the basement, then read the recipe.");
+                }
+                else
+                    subentry.entries.listAppend("Click on the suspicious masonry in the basement, then read the recipe.");
+                
+            }
+            else
+            {
+                //FIXME also make sure that is relevant when in the haunted bedroom/missing items
+                //FIXME detect the chamber being opened
+                boolean output_final_fight_info = false;
+                if (use_fast_route)
+                {
+                    if (lookupItem("wine bomb").available_amount() > 0)
+                    {
+                        output_final_fight_info = true;
+                    }
+                    else if (lookupItem("unstable fulminate").available_amount() > 0)
+                    {
+                        string [int] tasks;
+                        if (lookupItem("unstable fulminate").equipped_amount() == 0)
+                        {
+                            url = "inventory.php?which=2";
+                            tasks.listAppend("equip unstable fulminate");
+                        }
+                        tasks.listAppend("adventure in the haunted boiler room with +100 ML");
+                        subentry.modifiers.listAppend("+100 ML");
+                        
+                        subentry.entries.listAppend(tasks.listJoinComponents(", ", "then").capitalizeFirstLetter() + ".");
+                        
+                        int current_ml = lookupLocation("The Haunted Boiler Room").monster_level_adjustment_for_location();
+                        
+                        if (current_ml < 100)
+                        {
+                            subentry.modifiers.listAppend("olfact boiler");
+                        }
+                        else
+                        {
+                            string [int] banish_targets;
+                            if (!lookupMonster("coaltergeist").is_banished())
+                                banish_targets.listAppend("coaltergeist");
+                            if (!lookupMonster("steam elemental").is_banished())
+                                banish_targets.listAppend("steam elemental");
+                            if (banish_targets.count() > 0)
+                                subentry.modifiers.listAppend("banish " + banish_targets.listJoinComponents(", "));
+                        }
+                        
+                        int degrees_per_fight = 10 + clampi(current_ml, 0, 100) / 2;
+                        
+                        int boilers_needed = 60.0 / degrees_per_fight.to_float();
+                        
+                        
+                        monster boiler_monster = lookupMonster("monstrous boiler");
+                        float [monster] appearance_rates = lookupLocation("The Haunted Boiler Room").appearance_rates_adjusted();
+                        
+                        
+                        float boiler_per_adventure = appearance_rates[boiler_monster] / 100.0;
+                        
+                        if (boiler_per_adventure != 0.0)
+                        {
+                            float turns_needed = boilers_needed.to_float() / boiler_per_adventure;
+                            subentry.entries.listAppend("~" + turns_needed.roundForOutput(1) + " total turns to charge fulminate.");
+                        }
+                        else if ((appearance_rates contains boiler_monster) && boiler_monster != $monster[none])
+                        {
+                            subentry.entries.listAppend("Seemingly unable to find boilers. They miss you. They look up to you.");
+                        }
+                    }
+                    else
+                    {
+                        //FIXME implement this differently
+                        boolean need_item_modifier = false;
+                        if (lookupItem("bottle of Chateau de Vinegar").available_amount() == 0)
+                        {
+                            //+booze?
+                            subentry.entries.listAppend("Find bottle of Chateau de Vinegar from possessed wine rack in the haunted wine cellar.");
+                            need_item_modifier = true;
+                        }
+                        if (lookupItem("blasting soda").available_amount() == 0)
+                        {
+                            subentry.entries.listAppend("Find blasting soda from the cabinet in the haunted laundry room.");
+                            need_item_modifier = true;
+                        }
+                        if (need_item_modifier)
+                            subentry.modifiers.listAppend("+item"); //exact rates need spading
+                            
+                        if (lookupItem("bottle of Chateau de Vinegar").available_amount() > 0 && lookupItem("blasting soda").available_amount() > 0)
+                        {
+                            url = "craft.php?mode=cook";
+                            subentry.entries.listAppend("Cook unstable fulminate.");
+                        }
+                    }
+                }
+                else
+                {
+                    item [location] searchables;
+                    searchables[$location[the haunted kitchen]] = lookupItem("loosening powder");
+                    searchables[$location[the haunted conservatory]] = lookupItem("powdered castoreum");
+                    searchables[$location[the haunted bathroom]] = lookupItem("drain dissolver");
+                    searchables[$location[the haunted gallery]] = lookupItem("triple-distilled turpentine");
+                    searchables[lookupLocation("the haunted laboratory")] = lookupItem("detartrated anhydrous sublicalc");
+                    searchables[lookupLocation("the haunted storage room")] = lookupItem("triatomaceous dust");
+                    
+                    item [location] missing_searchables;
+                    foreach l in searchables
+                    {
+                        item it = searchables[l];
+                        if (it.available_amount() == 0)
+                            missing_searchables[l] = it;
+                    }
+                    
+                    if (missing_searchables.count() > 0)
+                    {
+                        string [int] places;
+                        foreach l in missing_searchables
+                        {
+                            item it = searchables[l];
+                            places.listAppend(it.capitalizeFirstLetter() + " in " + l + ".");
+                        }
+                        subentry.entries.listAppend("Scavenger hunt! Go search for:|*" + places.listJoinComponents("<hr>|*"));
+                        subentry.entries.listAppend("Read the recipe if you haven't.");
+                        
+                        //are these scheduled, or regular NCs?
+                        //assuming scheduled for now
+                        if (__misc_state["free runs available"])
+                        {
+                            subentry.modifiers.listAppend("free runs");
+                        }
+                        if (__misc_state["have hipster"])
+                        {
+                            subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
+                        }
+                    }
+                    else
+                        output_final_fight_info = true;
+                    
+                }
+                if (output_final_fight_info)
+                {
+                    subentry.modifiers.listAppend("elemental resistance");
+                    subentry.entries.listAppend("Fight Lord Spookyraven.");
+                    
+                    if ($effect[Red Door Syndrome].have_effect() == 0 && my_meat() > 1000)
+                    {
+                        subentry.entries.listAppend("A can of black paint can help with fighting him. Bit pricy. (1k meat)");
+                    }
+                    
+                    
+                    if (use_fast_route)
+                        subentry.entries.listAppend("Remember to wear Spookyraven's spectacles/read the recipe if you haven't.");
+                    else
+                        subentry.entries.listAppend("Remember to read the recipe if you haven't.");
+                }
+            }
         }
         
         image_name = "demon summon";
@@ -322,7 +465,7 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
     boolean [location] relevant_locations;
     relevant_locations[$location[the haunted ballroom]] = true;
     relevant_locations[$location[summoning chamber]] = true;
-    //relevant_locations[lookupLocation("The Haunted Wine Cellar")] = true; //incompatible with 16.3
+    relevant_locations[__location_the_haunted_wine_cellar] = true;
     relevant_locations[lookupLocation("The Haunted Boiler Room")] = true;
     relevant_locations[lookupLocation("The Haunted Laundry Room")] = true;
     
@@ -410,7 +553,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
             subentry.entries.listAppend("&quot;I Love Me, Vol.&quot; I will drop from the fifth dude-type monster. Read it to unlock Dr. Awkward's office.");
             subentry.entries.listAppend("Place all four photographs on the shelves in the office.|Order is god, red nugget, dog, and ostrich egg.");
             subentry.entries.listAppend("Read 2 Love Me, Vol. 2 to unlock Mr. Alarm's office.");
-            subentry.entries.listAppend("Talk to Mr. Alarm, unlock Whitey's Grove. Run +186% item, +combat to find lion oil and bird rib.|Or, alternatively, adventure in the palindome. I don't know the details, sorry.");
+            subentry.entries.listAppend("Talk to Mr. Alarm, unlock Whitey's Grove. Run +186% item, +combat to find lion oil and bird rib.|Or, alternatively, adventure in the palindome.");
             subentry.entries.listAppend("Cook wet stunt nut stew, talk to Mr. Alarm. He'll give you the Mega Gem.");
             subentry.entries.listAppend("Equip that to fight Dr. Awkward in his office.");
         }
@@ -463,7 +606,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                         if (!in_hardcore())
                             subentry.entries.listAppend("Or pull wet stew.");
                     }
-                    subentry.entries.listAppend("Or try the alternate route in the Palindome. (don't know how this works)");
+                    subentry.entries.listAppend("Or try the alternate route in the Palindome.");
                 }
             }
             else
@@ -547,7 +690,8 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
             }
             if (missing_ncs.count() > 0)
             {
-                subentry.entries.listAppend("Find " + missing_ncs.listJoinComponents(", ", "and") + " from non-combats.|(unknown if affected by -combat)");
+                subentry.modifiers.listAppend("-combat"); //initial spading suggests at least two of these are affected by -combat, need more data
+                subentry.entries.listAppend("Find " + missing_ncs.listJoinComponents(", ", "and") + " from non-combats, run -combat");
                 need_to_adventure_in_palindome = true;
             }
             
@@ -1196,10 +1340,12 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 {
                     subentry.entries.listAppend("Equipment unequipped: (+10% chance of protector spirit per piece)|*" + items_we_have_unequipped.listJoinComponents("|*"));
                 }
+                //the cap they implemented seems to be, if you spend thirty turns in the hospital, you always get You, M.D., and it'll come back if you skip it
+                //it appeared on turn 31, with zero doctor equipment equipped
                 if (items_we_have_equipped.count() > 0)
-                    subentry.entries.listAppend((items_we_have_equipped.count() * 10) + "+?% chance of protector spirit encounter.");
+                    subentry.entries.listAppend((items_we_have_equipped.count() * 10) + "% chance of protector spirit encounter.");
                 else
-                    subentry.entries.listAppend("?% chance of protector spirit encounter.");
+                    subentry.entries.listAppend("Without doctor equipment equipped, this area takes thirty-one turns.");
             }
             
             

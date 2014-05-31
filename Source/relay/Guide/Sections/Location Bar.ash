@@ -406,7 +406,7 @@ buffer generateLocationBar(boolean displaying_navbar)
     if (__misc_state["In run"])
     {
         int area_delay = l.delayRemainingInLocation();
-        if (area_delay > 0)
+        if (area_delay > 0 && !(l.totalDelayForLocation() > 5 && area_delay == 1)) //can't track delay over five
             location_data.listAppend(pluralize(area_delay, "turn", "turns") + "<br>delay");
     }
     if (mpa != -1.0 && should_output_meat_drop)

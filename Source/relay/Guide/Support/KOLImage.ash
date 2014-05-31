@@ -252,6 +252,7 @@ void KOLImagesInit()
 	__kol_images["mini-adventurer accordion thief female"] = KOLImageMake("images/itemimages/miniadv6f.gif", Vec2iMake(30,30));
     
 	__kol_images["Lady Spookyraven"] = KOLImageMake("images/otherimages/spookyraven/sr_ladys.gif", Vec2iMake(65,65), RectMake(0, 0, 64, 37));
+	__kol_images["Yeti"] = KOLImageMake("images/adventureimages/yeti.gif", Vec2iMake(100,100), RectMake(12, 0, 80, 98));
     
 	
 	string class_name = my_class().to_string();

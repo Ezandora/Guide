@@ -35,6 +35,20 @@ void setUpState()
         __misc_state["In run"] = true;
     __misc_state["In valhalla"] = (my_class().to_string() == "Astral Spirit");
     
+    
+    
+    __misc_state["type 69 restrictions active"] = false;
+    
+    int year = now_to_string("yyyy").to_int();
+    int month = now_to_string("MM").to_int();
+    int day = now_to_string("dd").to_int();
+    
+    //FIXME: use is_unrestricted once 16.4 is out
+    if (my_path_id() == PATH_SLOW_AND_STEADY && (year == 2014 && month <= 8 && !(month == 8 && day >= 15)))
+        __misc_state["type 69 restrictions active"] = true;
+    
+    
+    
 	if (my_turncount() >= 30 && get_property_int("singleFamiliarRun") != -1)
 		__misc_state["single familiar run"] = true;
 	if ($item[Clan VIP Lounge key].available_amount() > 0)
@@ -51,10 +65,20 @@ void setUpState()
 	{
 		__misc_state["fax accessible"] = false;
 	}
+    if (__misc_state["type 69 restrictions active"])
+        __misc_state["fax accessible"] = false;
+    
     if (!__misc_state["fax accessible"])
 		fax_available = false;
 	__misc_state["fax available"] = fax_available;
 	
+    if (__misc_state["VIP available"])
+    {
+        int soaks_remaining = MAX(0, 5 - get_property_int("_hotTubSoaks"));
+        if (__misc_state["type 69 restrictions active"])
+            soaks_remaining = 0;
+        __misc_state_int["hot tub soaks remaining"] = soaks_remaining;
+    }
 	
 	__misc_state["can eat just about anything"] = true;
 	if (my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_ZOMBIE_SLAYER || fullness_limit() == 0)
@@ -500,13 +524,12 @@ void setUpState()
             
     if (!mysterious_island_unlocked)
     {
-        if ($locations[frat house, hippy camp, the obligatory pirate's cove, frat house in disguise, the frat house (bombed back to the stone age), hippy camp in disguise, barrrney's barrr, the f'c'le, the poop deck, belowdecks, post-war junkyard, mcmillicancuddy's farm].turnsAttemptedInLocation() > 0) //backup
+        if ($locations[frat house, hippy camp, the obligatory pirate's cove, frat house in disguise, hippy camp in disguise, barrrney's barrr, the f'c'le, the poop deck, belowdecks, post-war junkyard, mcmillicancuddy's farm].turnsAttemptedInLocation() > 0) //backup
             mysterious_island_unlocked = true;
     }
     
         
     __misc_state["mysterious island available"] = mysterious_island_unlocked;
-    
     
     
 	
@@ -547,15 +570,15 @@ void setUpState()
 	if (hipster_fights_used < 0) hipster_fights_used = 0;
 	if (hipster_fights_used > 7) hipster_fights_used = 7;
 	
-	if (familiar_is_usable($familiar[Mini-Hipster]) && !(familiar_is_usable($familiar[artistic goth kid]) && hippy_stone_broken())) //use goth kid over hipster when PVPing
+	if (familiar_is_usable($familiar[artistic goth kid])) //goth kid is better now with the stat revamps?
 	{
-		__misc_state_string["hipster name"] = "hipster";
+		__misc_state_string["hipster name"] = "goth kid";
 		__misc_state_int["hipster fights available"] = 7 - hipster_fights_used;
 		__misc_state["have hipster"] = true;
 	}
-	else if (familiar_is_usable($familiar[artistic goth kid]))
+	else if (familiar_is_usable($familiar[Mini-Hipster]))
 	{
-		__misc_state_string["hipster name"] = "goth kid";
+		__misc_state_string["hipster name"] = "hipster";
 		__misc_state_int["hipster fights available"] = 7 - hipster_fights_used;
 		__misc_state["have hipster"] = true;
 	}

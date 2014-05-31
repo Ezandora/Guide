@@ -8,6 +8,7 @@ import "relay/Guide/Support/Library.ash"
 
 //Version compatibility locations:
 location __location_palindome;
+location __location_the_haunted_wine_cellar;
 
 boolean __location_compatibility_inited = false;
 //Should probably be called manually, as a backup:
@@ -23,6 +24,8 @@ void locationCompatibilityInit()
     __location_palindome = "Inside the Palindome".to_location();
     if (__location_palindome == $location[none])
         __location_palindome = "The Palindome".to_location();
+    if (mafiaIsPastRevision(13971)) //FIXME look up exact revision
+        __location_the_haunted_wine_cellar = "The Haunted Wine Cellar".to_location();
 }
 
 locationCompatibilityInit(); //not sure if calling functions like this is intended. may break in the future?
@@ -443,382 +446,328 @@ string HTMLGenerateFutureTextByLocationAvailability(location place)
 
 
 
-
+string [location] __clickable_urls_map;
 string getClickableURLForLocation(location l, Error unable_to_find_url)
 {
     if (l == $location[none])
         return "";
-    switch (l)
+        
+    if (__clickable_urls_map.count() == 0)
     {
-        //quite the list:
-        case $location[the beanbat chamber]:
-        case $location[the bat hole entrance]:
-        case $location[the batrat and ratbat burrow]:
-        case $location[guano junction]:
-        case $location[the boss bat's lair]:
-            return "place.php?whichplace=bathole";
-        case $location[the \"fun\" house]:
-        case $location[pre-cyrpt cemetary]:
-        case $location[post-cyrpt cemetary]:
-        case $location[Spectral Pickle Factory]:
-            return "place.php?whichplace=plains";
-        case $location[South of the Border]:
-        case $location[The Oasis]:
-        case $location[The Arid, Extra-Dry Desert]:
-        case $location[The Shore, Inc. Travel Agency]:
-            return "place.php?whichplace=desertbeach";
-        case $location[The Upper Chamber]:
-        case $location[The Middle Chamber]:
-        case $location[The Lower Chambers]:
-            return "pyramid.php";
-        case $location[Goat Party]:
-        case $location[Pirate Party]:
-        case $location[Lemon Party]:
-        case $location[The Roulette Tables]:
-        case $location[The Poker Room]:
-            return "casino.php";
-        case $location[The Haiku Dungeon]:
-        case $location[The Limerick Dungeon]:
-        case $location[The Enormous Greater-Than Sign]:
-        case $location[The Dungeons of Doom]:
-        case $location[The Daily Dungeon]:
-            return "da.php";
-        case $location[Video Game Level 1]:
-        case $location[Video Game Level 2]:
-        case $location[Video Game Level 3]:
-            return "place.php?whichplace=faqdungeon";
-        case $location[A Maze of Sewer Tunnels]:
-            return "clan_hobopolis.php";
-        case $location[The Slime Tube]:
-            return "clan_slimetube.php";
-        case $location[Dreadsylvanian Woods]:
-        case $location[Dreadsylvanian Village]:
-        case $location[Dreadsylvanian Castle]:
-            return "clan_dreadsylvania.php";
-        case $location[The Briny Deeps]:
-        case $location[The Brinier Deepers]:
-        case $location[The Briniest Deepests]:
-            return "place.php?whichplace=thesea";
-        case $location[An Octopus's Garden]:
-        case $location[The Wreck of the Edgar Fitzsimmons]:
-        case $location[Madness Reef]:
-        case $location[The Mer-Kin Outpost]:
-        case $location[The Skate Park]:
-        case $location[The Marinara Trench]:
-        case $location[Anemone Mine]:
-        case $location[Anemone Mine (Mining)]:
-        case $location[The Dive Bar]:
-        case $location[The Coral Corral]:
-        case $location[The Caliginous Abyss]:
-            return "seafloor.php";
-        case $location[Mer-kin Elementary School]:
-        case $location[Mer-kin Library]:
-        case $location[Mer-kin Gymnasium]:
-        case $location[Mer-kin Colosseum]:
-            return "sea_merkin.php?seahorse=1";
-        case $location[The Sleazy Back Alley]:
-        case lookupLocation("The Copperhead Club"):
-            return "place.php?whichplace=town_wrong";
-        case $location[The Haunted Pantry]:
-            if ($location[the haunted billiards room].locationAvailable())
-                return "place.php?whichplace=spookyraven1";
-            else
-                return "place.php?whichplace=town_right";
-        case $location[The Haunted Kitchen]:
-        case $location[The Haunted Conservatory]:
-        case $location[The Haunted Library]:
-        case $location[The Haunted Billiards Room]:
-            return "place.php?whichplace=manor1";
-        case $location[The Haunted Bathroom]:
-        case $location[The Haunted Bedroom]:
-        case $location[The Haunted Ballroom]:
-        case $location[The Haunted Gallery]:
-            return "place.php?whichplace=manor2";
-        case lookupLocation("The Haunted Storage Room"):
-        case lookupLocation("The Haunted Nursery"):
-        case lookupLocation("The Haunted Laboratory"):
-            return "place.php?whichplace=manor3";
-        //case lookupLocation("The Haunted Wine Cellar"): //incompatible with 16.3
-        case lookupLocation("The Haunted Boiler Room"):
-        case lookupLocation("The Haunted Laundry Room"):
-        case $location[Summoning Chamber]:
-            return "place.php?whichplace=manor4";
-        case $location[The Hidden Apartment Building]:
-        case $location[The Hidden Hospital]:
-        case $location[The Hidden Office Building]:
-        case $location[The Hidden Bowling Alley]:
-        case $location[The Hidden Park]:
-        case $location[An Overgrown Shrine (Northwest)]:
-        case $location[An Overgrown Shrine (Southwest)]:
-        case $location[An Overgrown Shrine (Northeast)]:
-        case $location[An Overgrown Shrine (Southeast)]:
-        case $location[A Massive Ziggurat]:
-            return "place.php?whichplace=hiddencity";
-        case $location[The Typical Tavern Cellar]:
-            return "cellar.php";
-        case $location[8-Bit Realm]:
-        case $location[The Spooky Forest]:
-        case $location[The Hidden Temple]:
-        case $location[Whitey's Grove]:
-        case $location[The Road to White Citadel]:
-        case $location[The Black Forest]:
-        case $location[The Old Landfill]:
-        case $location[The Arrrboretum]:
-            return "place.php?whichplace=woods";
-        case $location[A Barroom Brawl]:
-            return "tavern.php";
-        case $location[Tower Ruins]:
-            return "fernruin.php";
-        case $location[Anger Man's Level]:
-        case $location[Fear Man's Level]:
-        case $location[Doubt Man's Level]:
-        case $location[Regret Man's Level]:
-            return "place.php?whichplace=junggate_3";
-        case $location[The Defiled Nook]:
-        case $location[The Defiled Cranny]:
-        case $location[The Defiled Alcove]:
-        case $location[The Defiled Niche]:
-        case $location[Haert of the Cyrpt]:
-            return "crypt.php";
-        case $location[A-Boo Peak]:
-        case $location[Twin Peak]:
-        case $location[Oil Peak]:
-            return "place.php?whichplace=highlands";
-        case $location[The Battlefield (Frat Uniform)]:
-        case $location[The Battlefield (Hippy Uniform)]:
-            return "bigisland.php";
-        case lookupLocation("A Mob of Zeppelin Protesters"):
-        case lookupLocation("The Red Zeppelin"):
-            return "place.php?whichplace=zeppelin";
-        case $location[The Dark Neck of the Woods]:
-        case $location[The Dark Heart of the Woods]:
-        case $location[The Dark Elbow of the Woods]:
-        case $location[Friar Ceremony Location]:
-            return "friars.php";
-        case $location[Pandamonium Slums]:
-            return "pandamonium.php";
-        case $location[The Laugh Floor]:
-            return "pandamonium.php?action=beli";
-        case $location[Infernal Rackets Backstage]:
-            return "pandamonium.php?action=infe";
-        case $location[The Noob Cave]:
-        case $location[The Dire Warren]:
-            return "tutorial.php";
-        case $location[Itznotyerzitz Mine (in Disguise)]:
-        case $location[Itznotyerzitz Mine]:
-        case $location[The Goatlet]:
-        case $location[Lair of the Ninja Snowmen]:
-        case $location[The eXtreme Slope]:
-        case $location[Mist-Shrouded Peak]:
-        case $location[The Icy Peak]:
-            return "place.php?whichplace=mclargehuge";
-        case $location[The Smut Orc Logging Camp]:
-            return "place.php?whichplace=orc_chasm";
-        case $location[The Valley of Rof L'm Fao]:
-        case $location[Mt. Molehill]:
-        case lookupLocation("The Thinknerd Warehouse"):
-            return "place.php?whichplace=mountains";
-        case $location[The Nightmare Meatrealm]:
-            return "place.php?whichplace=junggate_6";
-        case $location[A Kitchen Drawer]:
-        case $location[A Grocery Bag]:
-            return "place.php?whichplace=junggate_5";
-        case $location[Chinatown Shops]:
-        case $location[Triad Factory]:
-        case $location[1st Floor\, Shiawase-Mitsuhama Building]:
-        case $location[2nd Floor\, Shiawase-Mitsuhama Building]:
-        case $location[3rd Floor\, Shiawase-Mitsuhama Building]:
-        case $location[Chinatown Tenement]:
-            return "place.php?whichplace=junggate_1";
-        case $location[Sorceress' Hedge Maze]:
-            return "lair3.php";
-        case $location[Cobb's Knob Laboratory]:
-        case $location[The Knob Shaft]:
-        case $location[The Knob Shaft (Mining)]:
-            return "cobbsknob.php?action=tolabs";
-        case $location[Cobb's Knob Menagerie, Level 1]:
-        case $location[Cobb's Knob Menagerie, Level 2]:
-        case $location[Cobb's Knob Menagerie, Level 3]:
-            return "cobbsknob.php?action=tomenagerie";
-        case $location[McMillicancuddy's Barn]:
-        case $location[McMillicancuddy's Pond]:
-        case $location[McMillicancuddy's Back 40]:
-        case $location[McMillicancuddy's Other Back 40]:
-        case $location[McMillicancuddy's Granary]:
-        case $location[McMillicancuddy's Bog]:
-        case $location[McMillicancuddy's Family Plot]:
-        case $location[McMillicancuddy's Shady Thicket]:
-            return "bigisland.php?place=farm";
-        case $location[Frat House]:
-        case $location[Frat House In Disguise]:
-        case $location[The Frat House (Bombed Back to the Stone Age)]:
-        case $location[Hippy Camp]:
-        case $location[Hippy Camp In Disguise]:
-        case $location[The Hippy Camp (Bombed Back to the Stone Age)]:
-        case $location[Wartime Frat House]:
-        case $location[Wartime Frat House (Hippy Disguise)]:
-        case $location[Wartime Hippy Camp]:
-        case $location[Wartime Hippy Camp (Frat Disguise)]:
-        case $location[The Obligatory Pirate's Cove]:
-        case $location[Post-War Junkyard]:
-        case $location[McMillicancuddy's Farm]:
-            return "island.php";
-        case $location[The Broodling Grounds]:
-        case $location[The Outer Compound]:
-        case $location[The Temple Portico]:
-        case $location[Convention Hall Lobby]:
-        case $location[Outside the Club]:
-        case $location[The Island Barracks]:
-        case $location[The Nemesis' Lair]:
-            return "volcanoisland.php";
-        case $location[The Penultimate Fantasy Airship]:
-        case $location[The Hole in the Sky]:
-            return "place.php?whichplace=beanstalk";
-        case $location[The Castle in the Clouds in the Sky (Basement)]:
-        case $location[The Castle in the Clouds in the Sky (Ground Floor)]:
-        case $location[The Castle in the Clouds in the Sky (Top Floor)]:
-            return "place.php?whichplace=giantcastle";
-        case $location[The Outskirts of Cobb's Knob]:
-            if ($location[cobb's knob barracks].locationAvailable())
-                return "cobbsknob.php";
-            else
-                return "place.php?whichplace=plains";
-        case $location[Cobb's Knob Barracks]:
-        case $location[Cobb's Knob Kitchens]:
-        case $location[Cobb's Knob Harem]:
-        case $location[Cobb's Knob Treasury]:
-        case $location[Throne Room]:
-            return "cobbsknob.php";
-        case $location[Next to that Barrel with Something Burning in it]:
-        case $location[Near an Abandoned Refrigerator]:
-        case $location[Over Where the Old Tires Are]:
-        case $location[Out by that Rusted-Out Car]:
-            return "bigisland.php?place=junkyard";
-        case $location[The Clumsiness Grove]:
-        case $location[The Maelstrom of Lovers]:
-        case $location[The Glacier of Jerks]:
-            return "suburbandis.php";
-        case $location[Domed City of Ronaldus]:
-        case $location[Domed City of Grimacia]:
-        case $location[Hamburglaris Shield Generator]:
-            return "place.php?whichplace=spaaace";
-        case $location[Barrrney's Barrr]:
-        case $location[The F'c'le]:
-        case $location[The Poop Deck]:
-        case $location[Belowdecks]:
-            return "place.php?whichplace=cove";
-        case $location[The Stately Pleasure Dome]:
-        case $location[The Mouldering Mansion]:
-        case $location[The Rogue Windmill]:
-            return "place.php?whichplace=wormwood";
-        case $location[The Red Queen's Garden]:
-            return "place.php?whichplace=rabbithole";
-        case $location[The Primordial Soup]:
-        case $location[The Jungles of Ancient Loathing]:
-        case $location[Seaside Megalopolis]:
-            return "place.php?whichplace=memories";
-        case $location[The Degrassi Knoll Restroom]:
-        case $location[The Degrassi Knoll Bakery]:
-        case $location[The Degrassi Knoll Gym]:
-        case $location[The Degrassi Knoll Garage]:
-        case $location[The Bugbear Pen]:
-        case lookupLocation("The Spooky Gravy Burrow"):
-        case $location[Post-Quest Bugbear Pens]:
-            if (knoll_available())
-                return "place.php?whichplace=knoll_friendly";
-            else
-                return "place.php?whichplace=knoll_hostile";
-        case __location_palindome:
-            if ($item[talisman o' nam].equipped_amount() > 0)
-                return "place.php?whichplace=palindome";
-            else
-                return "inventory.php?which=2";
-        case lookupLocation("A Deserted Stretch of I-911"):
-            return "place.php?whichplace=ioty2014_hare";
-        case $location[The Hatching Chamber]:
-        case $location[The Feeding Chamber]:
-        case $location[The Royal Guard Chamber]:
-        case $location[The Filthworm Queen's Chamber]:
-            return "bigisland.php?place=orchard";
-        case $location[Sonofa Beach]:
-            return "bigisland.php?place=lighthouse";
-        case $location[The Themthar Hills]:
-            return "bigisland.php?place=nunnery";
-        case $location[Nemesis Cave]:
-            return "cave.php";
-        case $location[The Barrel Full of Barrels]:
-            return "barrel.php";
-        case $location[Fernswarthy's Basement]:
-            return "basement.php";
+        //Initialize:
+        //We use to_location() lookups here because $location[] will halt the script if the location name changes.
+        //Probably could coalese these into foreach s in $strings[] loops, or move this to an external data file.
+        string [string] lookup_map;
+        lookup_map["Pump Up Muscle"] = "place.php?whichplace=knoll_friendly&action=dk_gym";
+        lookup_map["Richard's Hobo Mysticality"] = "clan_hobopolis.php?place=3";
+        lookup_map["Richard's Hobo Moxie"] = "clan_hobopolis.php?place=3";
+        lookup_map["Richard's Hobo Muscle"] = "clan_hobopolis.php?place=3";
+        lookup_map["South of the Border"] = "place.php?whichplace=desertbeach";
+        lookup_map["The Oasis"] = "place.php?whichplace=desertbeach";
+        lookup_map["The Arid, Extra-Dry Desert"] = "place.php?whichplace=desertbeach";
+        lookup_map["The Shore, Inc. Travel Agency"] = "place.php?whichplace=desertbeach";
+        lookup_map["The Upper Chamber"] = "pyramid.php";
+        lookup_map["The Middle Chamber"] = "pyramid.php";
+        lookup_map["The Lower Chambers"] = "pyramid.php";
+        lookup_map["Goat Party"] = "casino.php";
+        lookup_map["Pirate Party"] = "casino.php";
+        lookup_map["Lemon Party"] = "casino.php";
+        lookup_map["The Roulette Tables"] = "casino.php";
+        lookup_map["The Poker Room"] = "casino.php";
+        lookup_map["The Haiku Dungeon"] = "da.php";
+        lookup_map["The Limerick Dungeon"] = "da.php";
+        lookup_map["The Enormous Greater-Than Sign"] = "da.php";
+        lookup_map["The Dungeons of Doom"] = "da.php";
+        lookup_map["The Daily Dungeon"] = "da.php";
+        lookup_map["Video Game Level 1"] = "place.php?whichplace=faqdungeon";
+        lookup_map["Video Game Level 2"] = "place.php?whichplace=faqdungeon";
+        lookup_map["Video Game Level 3"] = "place.php?whichplace=faqdungeon";
+        lookup_map["A Maze of Sewer Tunnels"] = "clan_hobopolis.php";
+        lookup_map["Hobopolis Town Square"] = "clan_hobopolis.php?place=2";
+        lookup_map["Burnbarrel Blvd."] = "clan_hobopolis.php?place=4";
+        lookup_map["Exposure Esplanade"] = "clan_hobopolis.php?place=5";
+        lookup_map["The Heap"] = "clan_hobopolis.php?place=6";
+        lookup_map["The Ancient Hobo Burial Ground"] = "clan_hobopolis.php?place=7";
+        lookup_map["The Purple Light District"] = "clan_hobopolis.php?place=8";
+        lookup_map["The Slime Tube"] = "clan_slimetube.php";
+        lookup_map["Dreadsylvanian Woods"] = "clan_dreadsylvania.php";
+        lookup_map["Dreadsylvanian Village"] = "clan_dreadsylvania.php";
+        lookup_map["Dreadsylvanian Castle"] = "clan_dreadsylvania.php";
+        lookup_map["The Briny Deeps"] = "place.php?whichplace=thesea";
+        lookup_map["The Brinier Deepers"] = "place.php?whichplace=thesea";
+        lookup_map["The Briniest Deepests"] = "place.php?whichplace=thesea";
+        lookup_map["An Octopus's Garden"] = "seafloor.php";
+        lookup_map["The Wreck of the Edgar Fitzsimmons"] = "seafloor.php";
+        lookup_map["Madness Reef"] = "seafloor.php";
+        lookup_map["The Mer-Kin Outpost"] = "seafloor.php";
+        lookup_map["The Skate Park"] = "seafloor.php";
+        lookup_map["The Marinara Trench"] = "seafloor.php";
+        lookup_map["Anemone Mine"] = "seafloor.php";
+        lookup_map["The Dive Bar"] = "seafloor.php";
+        lookup_map["The Coral Corral"] = "seafloor.php";
+        lookup_map["Mer-kin Elementary School"] = "sea_merkin.php?seahorse=1";
+        lookup_map["Mer-kin Library"] = "sea_merkin.php?seahorse=1";
+        lookup_map["Mer-kin Gymnasium"] = "sea_merkin.php?seahorse=1";
+        lookup_map["Mer-kin Colosseum"] = "sea_merkin.php?seahorse=1";
+        lookup_map["The Caliginous Abyss"] = "seafloor.php";
+        lookup_map["Anemone Mine (Mining)"] = "seafloor.php";
+        lookup_map["The Sleazy Back Alley"] = "place.php?whichplace=manor1";
+        lookup_map["The Copperhead Club"] = "place.php?whichplace=town_wrong";
+        lookup_map["The Haunted Kitchen"] = "place.php?whichplace=manor1";
+        lookup_map["The Haunted Conservatory"] = "place.php?whichplace=manor1";
+        lookup_map["The Haunted Library"] = "place.php?whichplace=manor1";
+        lookup_map["The Haunted Billiards Room"] = "place.php?whichplace=manor1";
+        lookup_map["The Haunted Pantry"] = "place.php?whichplace=manor1";
+        lookup_map["The Haunted Gallery"] = "place.php?whichplace=manor2";
+        lookup_map["The Haunted Bathroom"] = "place.php?whichplace=manor2";
+        lookup_map["The Haunted Bedroom"] = "place.php?whichplace=manor2";
+        lookup_map["The Haunted Ballroom"] = "place.php?whichplace=manor2";
+        lookup_map["The Haunted Boiler Room"] = "place.php?whichplace=manor4";
+        lookup_map["The Haunted Laundry Room"] = "place.php?whichplace=manor4";
+        lookup_map["The Haunted Wine Cellar"] = "place.php?whichplace=manor4";
+        lookup_map["The Haunted Laboratory"] = "place.php?whichplace=manor3";
+        lookup_map["The Haunted Nursery"] = "place.php?whichplace=manor3";
+        lookup_map["The Haunted Storage Room"] = "place.php?whichplace=manor3";
+        lookup_map["Summoning Chamber"] = "place.php?whichplace=manor4";
+        lookup_map["The Hidden Apartment Building"] = "place.php?whichplace=hiddencity";
+        lookup_map["The Hidden Hospital"] = "place.php?whichplace=hiddencity";
+        lookup_map["The Hidden Office Building"] = "place.php?whichplace=hiddencity";
+        lookup_map["The Hidden Bowling Alley"] = "place.php?whichplace=hiddencity";
+        lookup_map["The Hidden Park"] = "place.php?whichplace=hiddencity";
+        lookup_map["An Overgrown Shrine (Northwest)"] = "place.php?whichplace=hiddencity";
+        lookup_map["An Overgrown Shrine (Southwest)"] = "place.php?whichplace=hiddencity";
+        lookup_map["An Overgrown Shrine (Northeast)"] = "place.php?whichplace=hiddencity";
+        lookup_map["An Overgrown Shrine (Southeast)"] = "place.php?whichplace=hiddencity";
+        lookup_map["A Massive Ziggurat"] = "place.php?whichplace=hiddencity";
+        lookup_map["The Typical Tavern Cellar"] = "cellar.php";
+        lookup_map["The Spooky Forest"] = "place.php?whichplace=woods";
+        lookup_map["The Hidden Temple"] = "place.php?whichplace=woods";
+        lookup_map["A Barroom Brawl"] = "tavern.php";
+        lookup_map["8-Bit Realm"] = "place.php?whichplace=woods";
+        lookup_map["Whitey's Grove"] = "place.php?whichplace=woods";
+        lookup_map["The Road to White Citadel"] = "place.php?whichplace=woods";
+        lookup_map["The Black Forest"] = "place.php?whichplace=woods";
+        lookup_map["The Old Landfill"] = "place.php?whichplace=woods";
+        lookup_map["The Bat Hole Entrance"] = "place.php?whichplace=bathole";
+        lookup_map["Guano Junction"] = "place.php?whichplace=bathole";
+        lookup_map["The Batrat and Ratbat Burrow"] = "place.php?whichplace=bathole";
+        lookup_map["The Beanbat Chamber"] = "place.php?whichplace=bathole";
+        lookup_map["The Boss Bat's Lair"] = "place.php?whichplace=bathole";
+        lookup_map["The Red Queen's Garden"] = "place.php?whichplace=rabbithole";
+        lookup_map["The Clumsiness Grove"] = "suburbandis.php";
+        lookup_map["The Maelstrom of Lovers"] = "suburbandis.php";
+        lookup_map["The Glacier of Jerks"] = "suburbandis.php";
+        lookup_map["The Degrassi Knoll Restroom"] = "bigisland.php?place=orchard";
+        lookup_map["The Degrassi Knoll Bakery"] = "bigisland.php?place=orchard";
+        lookup_map["The Degrassi Knoll Gym"] = "bigisland.php?place=orchard";
+        lookup_map["The Degrassi Knoll Garage"] = "bigisland.php?place=orchard";
+        lookup_map["The \"Fun\" House"] = "place.php?whichplace=plains";
+        lookup_map["Pre-Cyrpt Cemetary"] = "place.php?whichplace=plains";
+        lookup_map["Post-Cyrpt Cemetary"] = "place.php?whichplace=plains";
+        lookup_map["Tower Ruins"] = "fernruin.php";
+        lookup_map["Fernswarthy's Basement"] = "basement.php";
+        lookup_map["Cobb's Knob Barracks"] = "cobbsknob.php";
+        lookup_map["Cobb's Knob Kitchens"] = "cobbsknob.php";
+        lookup_map["Cobb's Knob Harem"] = "cobbsknob.php";
+        lookup_map["Cobb's Knob Treasury"] = "cobbsknob.php";
+        lookup_map["Throne Room"] = "cobbsknob.php";
+        lookup_map["Cobb's Knob Laboratory"] = "cobbsknob.php?action=tolabs";
+        lookup_map["The Knob Shaft"] = "cobbsknob.php?action=tolabs";
+        lookup_map["The Knob Shaft (Mining)"] = "cobbsknob.php?action=tolabs";
+        lookup_map["Cobb's Knob Menagerie, Level 1"] = "cobbsknob.php?action=tomenagerie";
+        lookup_map["Cobb's Knob Menagerie, Level 2"] = "cobbsknob.php?action=tomenagerie";
+        lookup_map["Cobb's Knob Menagerie, Level 3"] = "cobbsknob.php?action=tomenagerie";
+        lookup_map["The Dark Neck of the Woods"] = "friars.php";
+        lookup_map["The Dark Heart of the Woods"] = "friars.php";
+        lookup_map["The Dark Elbow of the Woods"] = "friars.php";
+        lookup_map["Friar Ceremony Location"] = "friars.php";
+        lookup_map["Pandamonium Slums"] = "pandamonium.php";
+        lookup_map["The Laugh Floor"] = "pandamonium.php?action=beli";
+        lookup_map["Infernal Rackets Backstage"] = "pandamonium.php?action=infe";
+        lookup_map["The Defiled Nook"] = "crypt.php";
+        lookup_map["The Defiled Cranny"] = "crypt.php";
+        lookup_map["The Defiled Alcove"] = "crypt.php";
+        lookup_map["The Defiled Niche"] = "crypt.php";
+        lookup_map["Haert of the Cyrpt"] = "crypt.php";
+        lookup_map["Frat House"] = "island.php";
+        lookup_map["Frat House In Disguise"] = "island.php";
+        lookup_map["The Frat House (Bombed Back to the Stone Age)"] = "island.php";
+        lookup_map["Hippy Camp"] = "island.php";
+        lookup_map["Hippy Camp In Disguise"] = "island.php";
+        lookup_map["The Hippy Camp (Bombed Back to the Stone Age)"] = "island.php";
+        lookup_map["The Obligatory Pirate's Cove"] = "island.php";
+        lookup_map["Barrrney's Barrr"] = "place.php?whichplace=cove";
+        lookup_map["The F'c'le"] = "place.php?whichplace=cove";
+        lookup_map["The Poop Deck"] = "place.php?whichplace=cove";
+        lookup_map["Belowdecks"] = "place.php?whichplace=cove";
+        lookup_map["Post-War Junkyard"] = "island.php";
+        lookup_map["McMillicancuddy's Farm"] = "island.php";
+        lookup_map["The Battlefield (Frat Uniform)"] = "bigisland.php";
+        lookup_map["The Battlefield (Hippy Uniform)"] = "bigisland.php";
+        lookup_map["Wartime Frat House"] = "island.php";
+        lookup_map["Wartime Frat House (Hippy Disguise)"] = "island.php";
+        lookup_map["Wartime Hippy Camp"] = "island.php";
+        lookup_map["Wartime Hippy Camp (Frat Disguise)"] = "island.php";
+        lookup_map["Next to that Barrel with Something Burning in it"] = "bigisland.php?place=junkyard";
+        lookup_map["Near an Abandoned Refrigerator"] = "bigisland.php?place=junkyard";
+        lookup_map["Over Where the Old Tires Are"] = "bigisland.php?place=junkyard";
+        lookup_map["Out by that Rusted-Out Car"] = "bigisland.php?place=junkyard";
+        lookup_map["Sonofa Beach"] = "bigisland.php?place=lighthouse";
+        lookup_map["The Themthar Hills"] = "bigisland.php?place=nunnery";
+        lookup_map["McMillicancuddy's Barn"] = "bigisland.php?place=farm";
+        lookup_map["McMillicancuddy's Pond"] = "bigisland.php?place=farm";
+        lookup_map["McMillicancuddy's Back 40"] = "bigisland.php?place=farm";
+        lookup_map["McMillicancuddy's Other Back 40"] = "bigisland.php?place=farm";
+        lookup_map["McMillicancuddy's Granary"] = "bigisland.php?place=farm";
+        lookup_map["McMillicancuddy's Bog"] = "bigisland.php?place=farm";
+        lookup_map["McMillicancuddy's Family Plot"] = "bigisland.php?place=farm";
+        lookup_map["McMillicancuddy's Shady Thicket"] = "bigisland.php?place=farm";
+        lookup_map["The Hatching Chamber"] = "bigisland.php?place=orchard";
+        lookup_map["The Feeding Chamber"] = "bigisland.php?place=orchard";
+        lookup_map["The Royal Guard Chamber"] = "bigisland.php?place=orchard";
+        lookup_map["The Filthworm Queen's Chamber"] = "bigisland.php?place=orchard";
+        lookup_map["Noob Cave"] = "tutorial.php";
+        lookup_map["The Dire Warren"] = "tutorial.php";
+        lookup_map["The Valley of Rof L'm Fao"] = "place.php?whichplace=junggate_6";
+        lookup_map["Mt. Molehill"] = "place.php?whichplace=junggate_6";
+        lookup_map["The Barrel Full of Barrels"] = "barrel.php";
+        lookup_map["Nemesis Cave"] = "cave.php";
+        lookup_map["The Smut Orc Logging Camp"] = "place.php?whichplace=orc_chasm";
+        lookup_map["The Thinknerd Warehouse"] = "place.php?whichplace=mountains";
+        lookup_map["A Mob of Zeppelin Protesters"] = "place.php?whichplace=zeppelin";
+        lookup_map["The Red Zeppelin"] = "place.php?whichplace=zeppelin";
+        lookup_map["A-Boo Peak"] = "place.php?whichplace=highlands";
+        lookup_map["Twin Peak"] = "place.php?whichplace=highlands";
+        lookup_map["Oil Peak"] = "place.php?whichplace=highlands";
+        lookup_map["Itznotyerzitz Mine"] = "place.php?whichplace=mclargehuge";
+        lookup_map["The Goatlet"] = "place.php?whichplace=mclargehuge";
+        lookup_map["Lair of the Ninja Snowmen"] = "place.php?whichplace=mclargehuge";
+        lookup_map["The eXtreme Slope"] = "place.php?whichplace=mclargehuge";
+        lookup_map["Mist-Shrouded Peak"] = "place.php?whichplace=mclargehuge";
+        lookup_map["The Icy Peak"] = "place.php?whichplace=mclargehuge";
+        lookup_map["Itznotyerzitz Mine (in Disguise)"] = "place.php?whichplace=mclargehuge";
+        lookup_map["The Penultimate Fantasy Airship"] = "place.php?whichplace=beanstalk";
+        lookup_map["The Castle in the Clouds in the Sky (Basement)"] = "place.php?whichplace=giantcastle";
+        lookup_map["The Castle in the Clouds in the Sky (Ground Floor)"] = "place.php?whichplace=giantcastle";
+        lookup_map["The Castle in the Clouds in the Sky (Top Floor)"] = "place.php?whichplace=giantcastle";
+        lookup_map["The Hole in the Sky"] = "place.php?whichplace=beanstalk";
+        lookup_map["Sorceress' Hedge Maze"] = "lair3.php";
+        lookup_map["The Broodling Grounds"] = "volcanoisland.php";
+        lookup_map["The Outer Compound"] = "volcanoisland.php";
+        lookup_map["The Temple Portico"] = "volcanoisland.php";
+        lookup_map["Convention Hall Lobby"] = "volcanoisland.php";
+        lookup_map["Outside the Club"] = "volcanoisland.php";
+        lookup_map["The Island Barracks"] = "volcanoisland.php";
+        lookup_map["The Nemesis' Lair"] = "volcanoisland.php";
+        lookup_map["The Bugbear Pen"] = "bigisland.php?place=orchard";
+        lookup_map["The Spooky Gravy Burrow"] = "bigisland.php?place=orchard";
+        lookup_map["The Stately Pleasure Dome"] = "place.php?whichplace=wormwood";
+        lookup_map["The Mouldering Mansion"] = "place.php?whichplace=wormwood";
+        lookup_map["The Rogue Windmill"] = "place.php?whichplace=wormwood";
+        lookup_map["The Primordial Soup"] = "place.php?whichplace=memories";
+        lookup_map["The Jungles of Ancient Loathing"] = "place.php?whichplace=memories";
+        lookup_map["Seaside Megalopolis"] = "place.php?whichplace=memories";
+        lookup_map["Domed City of Ronaldus"] = "place.php?whichplace=spaaace";
+        lookup_map["Domed City of Grimacia"] = "place.php?whichplace=spaaace";
+        lookup_map["Hamburglaris Shield Generator"] = "place.php?whichplace=spaaace";
+        lookup_map["The Arrrboretum"] = "place.php?whichplace=woods";
+        lookup_map["Spectral Pickle Factory"] = "place.php?whichplace=plains";
+        lookup_map["Lollipop Forest"] = "";
+        lookup_map["Fudge Mountain"] = "";
+        lookup_map["WarBear Fortress (First Level)"] = "";
+        lookup_map["WarBear Fortress (Second Level)"] = "";
+        lookup_map["WarBear Fortress (Third Level)"] = "";
+        lookup_map["Crimbokutown Toy Factory"] = "";
+        lookup_map["Elf Alley"] = "";
+        lookup_map["CRIMBCO cubicles"] = "";
+        lookup_map["CRIMBCO WC"] = "";
+        lookup_map["Crimbo Town Toy Factory"] = "";
+        lookup_map["The Don's Crimbo Compound"] = "";
+        lookup_map["Atomic Crimbo Toy Factory"] = "";
+        lookup_map["Old Crimbo Town Toy Factory"] = "";
+        lookup_map["Sinister Dodecahedron"] = "";
+        lookup_map["Crimbo Town Toy Factory"] = "";
+        lookup_map["Simple Tool-Making Cave"] = "";
+        lookup_map["Spooky Fright Factory"] = "";
+        lookup_map["Crimborg Collective Factory"] = "";
+        lookup_map["Crimbo Town Toy Factory"] = "";
+        lookup_map["Future Market Square"] = "";
+        lookup_map["Mall of the Future"] = "";
+        lookup_map["Future Wrong Side of the Tracks"] = "";
+        lookup_map["Icy Peak of the Past"] = "";
+        lookup_map["Shivering Timbers"] = "";
+        lookup_map["A Skeleton Invasion!"] = "";
+        lookup_map["The Cannon Museum"] = "";
+        lookup_map["A Swarm of Yeti-Mounted Skeletons"] = "";
+        lookup_map["The Bonewall"] = "";
+        lookup_map["A Massive Flying Battleship"] = "";
+        lookup_map["A Supply Train"] = "";
+        lookup_map["The Bone Star"] = "";
+        lookup_map["Grim Grimacite Site"] = "";
+        lookup_map["A Pile of Old Servers"] = "";
+        lookup_map["The Haunted Sorority House"] = "";
+        lookup_map["Fightin' Fire"] = "";
+        lookup_map["Super-Intense Mega-Grassfire"] = "";
+        lookup_map["Fierce Flying Flames"] = "";
+        lookup_map["Lord Flameface's Castle Entryway"] = "";
+        lookup_map["Lord Flameface's Castle Belfry"] = "";
+        lookup_map["Lord Flameface's Throne Room"] = "";
+        lookup_map["A Stinking Abyssal Portal"] = "";
+        lookup_map["A Scorching Abyssal Portal"] = "";
+        lookup_map["A Terrifying Abyssal Portal"] = "";
+        lookup_map["A Freezing Abyssal Portal"] = "";
+        lookup_map["An Unsettling Abyssal Portal"] = "";
+        lookup_map["A Yawning Abyssal Portal"] = "";
+        lookup_map["The Space Odyssey Discotheque"] = "";
+        lookup_map["The Spirit World"] = "";
+        lookup_map["Some Scattered Smoking Debris"] = "place.php?whichplace=crashsite";
+        lookup_map["Anger Man's Level"] = "place.php?whichplace=junggate_3";
+        lookup_map["Fear Man's Level"] = "place.php?whichplace=junggate_3";
+        lookup_map["Doubt Man's Level"] = "place.php?whichplace=junggate_3";
+        lookup_map["Regret Man's Level"] = "place.php?whichplace=junggate_3";
+        lookup_map["The Nightmare Meatrealm"] = "place.php?whichplace=junggate_6";
+        lookup_map["A Kitchen Drawer"] = "place.php?whichplace=junggate_5";
+        lookup_map["A Grocery Bag"] = "place.php?whichplace=junggate_5";
+        lookup_map["Chinatown Shops"] = "place.php?whichplace=junggate_1";
+        lookup_map["Triad Factory"] = "place.php?whichplace=junggate_1";
+        lookup_map["1st Floor, Shiawase-Mitsuhama Building"] = "place.php?whichplace=junggate_1";
+        lookup_map["2nd Floor, Shiawase-Mitsuhama Building"] = "place.php?whichplace=junggate_1";
+        lookup_map["3rd Floor, Shiawase-Mitsuhama Building"] = "place.php?whichplace=junggate_1";
+        lookup_map["Chinatown Tenement"] = "place.php?whichplace=junggate_1";
+        lookup_map["A Deserted Stretch of I-911"] = "place.php?whichplace=ioty2014_hare";
+        
+        //Conditionals:
+        if ($location[cobb's knob barracks].locationAvailable())
+            lookup_map["The Outskirts of Cobb's Knob"] = "cobbsknob.php";
+        else
+            lookup_map["The Outskirts of Cobb's Knob"] = "place.php?whichplace=plains";
             
-        case $location[Pump Up Muscle]:
-            return "place.php?whichplace=knoll_friendly&action=dk_gym";
+        if (knoll_available())
+            lookup_map["Post-Quest Bugbear Pens"] = "place.php?whichplace=knoll_friendly";
+        else
+            lookup_map["Post-Quest Bugbear Pens"] =  "place.php?whichplace=knoll_hostile";
             
-        case $location[hobopolis town square]:
-            return "clan_hobopolis.php?place=2";
-        case $location[Burnbarrel Blvd.]:
-            return "clan_hobopolis.php?place=4";
-        case $location[Exposure Esplanade]:
-            return "clan_hobopolis.php?place=5";
-        case $location[The Ancient Hobo Burial Ground]:
-            return "clan_hobopolis.php?place=7";
-        case $location[The Purple Light District]:
-            return "clan_hobopolis.php?place=8";
-        case $location[The Heap]:
-            return "clan_hobopolis.php?place=6";
-        case $location[richard's hobo muscle]:
-        case $location[richard's hobo mysticality]:
-        case $location[richard's hobo moxie]:
-            return "clan_hobopolis.php?place=3";
-            
-        //Lost to time:
-        case $location[Lollipop Forest]:
-        case $location[Fudge Mountain]:
-        case lookupLocation("WarBear Fortress (First Level)"):
-        case lookupLocation("WarBear Fortress (Second Level)"):
-        case lookupLocation("WarBear Fortress (Third Level)"):
-        case $location[Crimbokutown Toy Factory]:
-        case $location[Elf Alley]:
-        case $location[CRIMBCO cubicles]:
-        case $location[CRIMBCO WC]:
-        case $location[Crimbo Town Toy Factory]:
-        case $location[The Don's Crimbo Compound]:
-        case $location[Atomic Crimbo Toy Factory]:
-        case $location[Old Crimbo Town Toy Factory]:
-        case $location[Sinister Dodecahedron]:
-        case $location[Simple Tool-Making Cave]:
-        case $location[Spooky Fright Factory]:
-        case $location[Crimborg Collective Factory]:
-        case $location[Future Market Square]:
-        case $location[Mall of the Future]:
-        case $location[Future Wrong Side of the Tracks]:
-        case $location[Icy Peak of the Past]:case $location[Shivering Timbers]:
-        case $location[A Skeleton Invasion!]:
-        case $location[The Cannon Museum]:
-        case $location[A Swarm of Yeti-Mounted Skeletons]:
-        case $location[The Bonewall]:
-        case $location[A Massive Flying Battleship]:
-        case $location[A Supply Train]:
-        case $location[The Bone Star]:
-        case $location[Grim Grimacite Site]:
-        case $location[A Pile of Old Servers]:
-        case $location[The Haunted Sorority House]:
-        case $location[Fightin' Fire]:
-        case $location[Super-Intense Mega-Grassfire]:
-        case $location[Fierce Flying Flames]:
-        case $location[Lord Flameface's Castle Entryway]:
-        case $location[Lord Flameface's Castle Belfry]:
-        case $location[Lord Flameface's Throne Room]:
-        case $location[A Stinking Abyssal Portal]:
-        case $location[A Scorching Abyssal Portal]:
-        case $location[A Terrifying Abyssal Portal]:
-        case $location[A Freezing Abyssal Portal]:
-        case $location[An Unsettling Abyssal Portal]:
-        case $location[A Yawning Abyssal Portal]:
-        case $location[The Space Odyssey Discotheque]:
-        case $location[The Spirit World]:
-            return "";
+        if ($item[talisman o' nam].equipped_amount() > 0)
+            lookup_map["Palindome"] = "place.php?whichplace=palindome";
+        else
+            lookup_map["Palindome"] = "inventory.php?which=2";
+        
+        //Parse into locations:
+        foreach location_name in lookup_map
+        {
+            location l = location_name.to_location();
+            if (l == $location[none])
+            {
+                if (__setting_debug_mode)
+                    print("Location \"" + location_name + "\" does not appear to exist anymore.");
+                continue;
+            }
+            __clickable_urls_map[l] = lookup_map[location_name];
+        }
     }
+    if (__clickable_urls_map contains l)
+        return __clickable_urls_map[l];
+
     ErrorSet(unable_to_find_url);
     return "";
 }

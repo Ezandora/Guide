@@ -1,7 +1,6 @@
 
 void SCouncilGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	//This may be unreliable. Consider disabling.
 	boolean council_probably_wants_to_speak_to_you = false;
 	string [int] reasons;
     boolean [string] seen_quest_name;
