@@ -20752,7 +20752,7 @@ void generateTasks(Checklist [int] checklists)
 	
 	QuestsGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	
-	if (!__misc_state["desert beach available"])
+	if (!__misc_state["desert beach available"] && __misc_state["In run"])
 	{
         string url;
 		ChecklistSubentry subentry;
@@ -20786,7 +20786,7 @@ void generateTasks(Checklist [int] checklists)
 		
 		task_entries.listAppend(ChecklistEntryMake("__item bitchin' meatcar", url, subentry));
 	}
-	else if (!__misc_state["mysterious island available"])
+	else if (!__misc_state["mysterious island available"] && __misc_state["In run"])
 	{
 		ChecklistSubentry subentry;
 		subentry.header = "Unlock mysterious island";
