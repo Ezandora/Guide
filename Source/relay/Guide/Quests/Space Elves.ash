@@ -84,7 +84,8 @@ void QSpaceElvesGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
 		}
 		if (ronald_map_entries.count() == 0 && grimace_map_entries.count() == 0)
 			subentry.entries.listAppend("Look for the spooky little girl on Grimacia or Ronaldus.");
-        else if ($items[map to safety shelter ronald prime, map to safety shelter grimace prime].available_amount() > 0)
+        //else if ($items[map to safety shelter ronald prime, map to safety shelter grimace prime].available_amount() > 0)
+        else if ((ronald_map_entries.count() > 0 && $item[map to safety shelter ronald prime].available_amount() > 0) || (grimace_map_entries.count() > 0 && $item[map to safety shelter grimace prime].available_amount() > 0))
             url = "inventory.php?which=3";
 	}
 	else if (base_quest_state.mafia_internal_step == 3)

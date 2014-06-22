@@ -511,6 +511,10 @@ int totalDelayForLocation(location place)
     place_delays[$location[the boss bat's lair]] = 4;
     place_delays[$location[the oasis]] = 5;
     place_delays[$location[the hidden park]] = 5;
+    place_delays[$location[the haunted gallery]] = 5; //FIXME this is a guess, spade
+    place_delays[$location[the haunted bathroom]] = 5; //FIXME rumored
+    place_delays[$location[the haunted ballroom]] = 5; //FIXME rumored
+    //place_delays[$location[the haunted everyroominthemanor]] = 5;
     
     if (place_delays contains place)
         return place_delays[place];

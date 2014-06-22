@@ -106,6 +106,8 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         second_floor_probably_open = true;
     if (lookupItem("ghost of a necklace").available_amount() > 0) //not, strictly speaking, true FIXME consider removing if mafia updates lastSecondFloorUnlock
         second_floor_probably_open = true;
+    if (get_property("questM20Necklace") == "finished")
+        second_floor_probably_open = true;
     
     if (lookupItem("telegram from Lady Spookyraven").available_amount() > 0)
         second_floor_probably_open = false;
@@ -114,7 +116,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     
     if (second_floor_probably_open)
     {
-        if (lookupItem("Lady Spookyraven's necklace").available_amount() > 0 && lookupItem("ghost of a necklace").available_amount() == 0)
+        if (lookupItem("Lady Spookyraven's necklace").available_amount() > 0 && lookupItem("ghost of a necklace").available_amount() == 0 && get_property("questM20Necklace") != "finished")
         {
             subentry.header = "Speak to Lady Spookyraven";
             url = $location[the haunted kitchen].getClickableURLForLocation();
@@ -134,24 +136,47 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
                     string [int] modifiers;
                     string [int] description;
                     
-                    modifiers.listAppend("-combat");
                     description.listAppend("Find Lady Spookyraven's dancing shoes in the Louvre non-combat.");
                     
                     subentries.listAppend(ChecklistSubentryMake("Search in the Haunted Gallery", modifiers, description));
                     if (image_name.length() == 0)
                         image_name = "__item antique painting of a landscape";
+                    
+                        
+                    if (delayRemainingInLocation($location[the haunted gallery]) > 0)
+                    {
+                        string line = "Delay(?) for " + pluralize(delayRemainingInLocation($location[the haunted gallery]), "turn", "turns") + ".";
+                        if (__misc_state["have hipster"])
+                        {
+                            subentry.modifiers.listAppend(__misc_state_string["hipster name"]+"?");
+                        }
+                        description.listAppend(line);
+                    }
+                    else
+                        modifiers.listAppend("-combat");
                 }
                 if (lookupItem("Lady Spookyraven's powder puff").available_amount() == 0)
                 {
                     string [int] modifiers;
                     string [int] description;
-                    modifiers.listAppend("-combat?");
                     description.listAppend("Find Lady Spookyraven's powder puff. (NC leads to cosmetics wraith)");
-                    //NC [?superlikely] in bathroom
+                    //combat rate extremely approximate, needs spading
+                    description.listAppend(generateTurnsToSeeNoncombat(85, 1, "find cosmetics wraith", 10 - delayRemainingInLocation($location[the haunted bathroom]), delayRemainingInLocation($location[the haunted bathroom])));
                     subentries.listAppend(ChecklistSubentryMake("Search in the Haunted Bathroom", modifiers, description));
                     
                     if (image_name.length() == 0)
                         image_name = "__item bottle of Monsieur Bubble";
+                    if (delayRemainingInLocation($location[the haunted bathroom]) > 0)
+                    {
+                        string line = "Delay(?) for " + pluralize(delayRemainingInLocation($location[the haunted bathroom]), "turn", "turns") + ".";
+                        if (__misc_state["have hipster"])
+                        {
+                            subentry.modifiers.listAppend(__misc_state_string["hipster name"]+"?");
+                        }
+                        description.listAppend(line);
+                    }
+                    else
+                        modifiers.listAppend("-combat");
                 }
                 if (lookupItem("Lady Spookyraven's finest gown").available_amount() == 0)
                 {
@@ -162,7 +187,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
                     string [int] description;
                     
                     description.listAppend("Find Lady Spookyraven's finest gown in the elegant nightstand.");
-                    //description.listAppend("Banish everything else.");
+                    description.listAppend("Banish non-ornate drawers?");
                     
                     string [int] items_needed_from_ornate_drawer;
                     
@@ -258,6 +283,9 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 			subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
         subentry.modifiers.listAppend(HTMLGenerateSpanOfClass("hot res", "r_element_hot_desaturated"));
         subentry.modifiers.listAppend(HTMLGenerateSpanOfClass("stench res", "r_element_stench_desaturated"));
+        
+        if (inebriety_limit() > 0 && my_inebriety() < 10)
+            subentry.entries.listAppend("Try not to drink past ten, the billiards room is next.");
     }
     else if (lookupItem("7302").available_amount() == 0) //Spookyraven library key
     {
@@ -293,7 +321,10 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
             }
         }
         if ($effect[chalky hand].have_effect() == 0& $item[handful of hand chalk].available_amount() > 0)
-            subentry.entries.listAppend(HTMLGenerateSpanOfClass("Use handful of hand chalk", "r_bold") + " for +pool skill and faster pool skill training.");
+        {
+            subentry.entries.listAppend(HTMLGenerateSpanFont("Use handful of hand chalk", "red", "") + " for +pool skill and faster pool skill training.");
+            url = "inventory.php?which=3";
+        }
         
         if (inebriety_limit() > 0)
         {

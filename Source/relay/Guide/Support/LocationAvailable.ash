@@ -208,8 +208,11 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
 			//return get_property_int("lastManorUnlock") == my_ascensions();
 		case $location[The Haunted Bedroom]:
 		case $location[The Haunted Bathroom]:
+        case $location[the haunted gallery]:
             //FIXME detect this
 			return get_property_int("lastSecondFloorUnlock") == my_ascensions();
+        case $location[the haunted ballroom]:
+            return questPropertyPastInternalStepNumber("questM21Dance", 4);
 		case $location[cobb's knob barracks]:
 		case $location[cobb's knob kitchens]:
 		case $location[cobb's knob harem]:
@@ -217,7 +220,7 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
 			string quest_value = get_property("questL05Goblin");
 			if (quest_value == "finished")
 				return true;
-			else if (quest_value == "started") //FIXME questPropertyPastInternalStepNumber
+			else if (questPropertyPastInternalStepNumber("questL05Goblin", 1))
 			{
 				//Inference - quest is started. If map is missing, area must be unlocked
 				if ($item[cobb's knob map].available_amount() > 0)
@@ -303,9 +306,9 @@ void locationAvailablePrivateInit()
 	locations_unlocked_by_item[$location[Cobb's Knob Menagerie\, Level 2]] = $item[Cobb's Knob Menagerie key];
 	locations_unlocked_by_item[$location[Cobb's Knob Menagerie\, Level 3]] = $item[Cobb's Knob Menagerie key];
 	
-	locations_unlocked_by_item[$location[the haunted ballroom]] = $item[spookyraven ballroom key];
+	//locations_unlocked_by_item[$location[the haunted ballroom]] = $item[spookyraven ballroom key];
 	locations_unlocked_by_item[$location[The Haunted Library]] = $item[spookyraven library key];
-	locations_unlocked_by_item[$location[The Haunted Gallery]] = $item[spookyraven gallery key];
+	//locations_unlocked_by_item[$location[The Haunted Gallery]] = $item[spookyraven gallery key];
 	locations_unlocked_by_item[$location[The Castle in the Clouds in the Sky (Basement)]] = $item[S.O.C.K.];
 	locations_unlocked_by_item[$location[the hole in the sky]] = $item[steam-powered model rocketship];
 	
@@ -511,7 +514,7 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         lookup_map["Mer-kin Colosseum"] = "sea_merkin.php?seahorse=1";
         lookup_map["The Caliginous Abyss"] = "seafloor.php";
         lookup_map["Anemone Mine (Mining)"] = "seafloor.php";
-        lookup_map["The Sleazy Back Alley"] = "place.php?whichplace=manor1";
+        lookup_map["The Sleazy Back Alley"] = "place.php?whichplace=town_wrong";
         lookup_map["The Copperhead Club"] = "place.php?whichplace=town_wrong";
         lookup_map["The Haunted Kitchen"] = "place.php?whichplace=manor1";
         lookup_map["The Haunted Conservatory"] = "place.php?whichplace=manor1";
@@ -524,7 +527,7 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         lookup_map["The Haunted Ballroom"] = "place.php?whichplace=manor2";
         lookup_map["The Haunted Boiler Room"] = "place.php?whichplace=manor4";
         lookup_map["The Haunted Laundry Room"] = "place.php?whichplace=manor4";
-        lookup_map["The Haunted Wine Cellar"] = "place.php?whichplace=manor4";
+        lookup_map[__location_the_haunted_wine_cellar.to_string()] = "place.php?whichplace=manor4";
         lookup_map["The Haunted Laboratory"] = "place.php?whichplace=manor3";
         lookup_map["The Haunted Nursery"] = "place.php?whichplace=manor3";
         lookup_map["The Haunted Storage Room"] = "place.php?whichplace=manor3";

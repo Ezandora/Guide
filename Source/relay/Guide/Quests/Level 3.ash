@@ -83,12 +83,12 @@ void QLevel3GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         
         //drunken rat kings seem to happen after the combat/non-combat check, so recommend +combat if they need tangles:
         
-        string combat_type_to_run = "+combat";
+        string combat_type_to_run = "-combat/maybe +combat";
         if (ncs_skippable > 0 && ($item[tangle of rat tails].available_amount() * 3 + $item[tomb ratchet].available_amount() >= 11 || __quest_state["Level 11"].finished)) //technically should check if we're done with the pyramid moving, not level 11 finished, but that's harder to test
             combat_type_to_run = "-combat";
         string line;
         if (additionals.count() > 0)
-            line += "Run " +combat_type_to_run + " with +20 " + additionals.listJoinComponents("/") + " damage.";
+            line += "Run " + combat_type_to_run + " with +20 " + additionals.listJoinComponents("/") + " damage.";
         else
             line += "Run " + combat_type_to_run + ".";
         if (ncs_skippable < 4)

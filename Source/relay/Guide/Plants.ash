@@ -97,7 +97,7 @@ void finalizeSetUpFloristState()
 	}
 	if (!__quest_state["Level 11"].finished && item_drop_modifier() < 400.0)
 	{
-		__plants_suggested_locations.listAppend(PlantSuggestionMake($location[the upper chamber], "horn of plenty", "Tomb ratchets, 20% drop."));
+		__plants_suggested_locations.listAppend(PlantSuggestionMake($location[the middle chamber], "horn of plenty", "Tomb ratchets, 20% drop."));
 	}
 	if (__quest_state["Level 4"].state_int["areas unlocked"] + $item[sonar-in-a-biscuit].available_amount() < 3)
 	{
@@ -143,7 +143,7 @@ void finalizeSetUpFloristState()
 	
 	//Stealing Magnolia - indoor, +item:
 	//The haunted ballroom, except they may be changing that?
-    if (my_primestat() == $stat[moxie] && __misc_state["need to level"])
+    if (my_primestat() == $stat[moxie] && __misc_state["need to level"] && false) //disabled for now, not sure if it's a good idea or not
     {
         if (my_path_id() != PATH_CLASS_ACT_2)
             __plants_suggested_locations.listAppend(PlantSuggestionMake($location[the haunted ballroom], "Stealing Magnolia", "Dance cards from waltzers, for power leveling.")); //FIXME if stat changes in the future, remove this suggestion

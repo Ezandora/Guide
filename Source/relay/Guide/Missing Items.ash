@@ -79,7 +79,7 @@ void generateMissingItems(Checklist [int] checklists)
 			items_needed_entries.listAppend(ChecklistEntryMake("__item hippy bongo", $location[the black forest].getClickableURLForLocation(), ChecklistSubentryMake("Drum", "", suggestions)));
 		}
 		
-		if ($item[skeleton key].available_amount() == 0)
+		if ($item[skeleton key].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["past keys"])
 		{
 			string line = "loose teeth";
 			if ($item[loose teeth].available_amount() == 0)

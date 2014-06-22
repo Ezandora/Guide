@@ -60,7 +60,12 @@ void SemirareGenerateDescription(string [int] description)
 				if (!__quest_state["Level 8"].finished)
 					reasons.listAppend("Cobb's Knob quest");
                 if (!dispensary_available())
-                    reasons.listAppend("dispensary access (+item, +familiar weight, cheapish MP)");
+                {
+                    if (__misc_state["familiars temporarily blocked"])
+                        reasons.listAppend("dispensary access (+item, cheapish MP)");
+                    else
+                        reasons.listAppend("dispensary access (+item, +familiar weight, cheapish MP)");
+                }
                 if (reasons.count() > 0)
                     semirares.listAppend(SemirareMake($location[cobb's knob barracks], "|*Acquire KGE outfit for " + reasons.listJoinComponents(", ", "and"), 0));
 			}

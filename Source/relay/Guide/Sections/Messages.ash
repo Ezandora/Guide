@@ -10,7 +10,21 @@ string generateRandomMessage()
     
 	if (__misc_state["In run"])
     {
-        random_messages.listAppend("you are ascending too slowly, ascend faster!");
+        if (my_turncount() > 1000)
+            random_messages.listAppend("so many turns");
+        
+        if (false)
+            random_messages.listAppend("you are ascending perfectly, excellent work!");
+        else if (my_daycount() >= 365)
+            random_messages.listAppend("no king, forever");
+        else if (my_daycount() >= 11)
+            random_messages.listAppend("does the king even exist...?");
+        else if (my_turncount() > 500 && my_daycount() == 1)
+            random_messages.listAppend("you are ascending too... wait, what?");
+        else if (gameday_to_int() == 7)
+            random_messages.listAppend("you are ascending at a reasonable pace, could do better");
+        else
+            random_messages.listAppend("you are ascending too slowly, ascend faster!");
         random_messages.listAppend("every spreadsheet you make saves a turn");
     }
     
@@ -44,6 +58,9 @@ string generateRandomMessage()
     location_messages[$location[the red queen's garden]] = "curiouser and curiouser";
     location_messages[$location[A Massive Ziggurat]] = "1.21 ziggurats";
     location_messages[$location[McMillicancuddy's Barn]] = "dooks";
+    location_messages[$location[the battlefield (hippy uniform)]] = "love and war";
+    location_messages[$location[the middle chamber]] = "pyramid laundry machine";
+    location_messages[$location[the arid, extra-dry desert]] = "can't remember your name";
     
     foreach l in $locations[fear man's level,doubt man's level,regret man's level,anger man's level]
         location_messages[l] = "<em>this isn't me</em>";
@@ -94,7 +111,7 @@ string generateRandomMessage()
     effect_messages[lookupEffect("All Revved Up")] = "vroom";
     if (my_path_id() != PATH_WAY_OF_THE_SURPRISING_FIST)
         effect_messages[$effect[Expert Timing]] = "martial arts and crafts";
-    effect_messages[$effect[apathy]] = "";
+    effect_messages[$effect[apathy]] = ""; //TODO fix thi
     effect_messages[$effect[silent running]] = "an awful lot of running";
     effect_messages[$effect[Neuromancy]] = "the silver paths";
     effect_messages[$effect[Teleportitis]] = "everywhere and nowhere";
@@ -125,7 +142,10 @@ string generateRandomMessage()
     paths[PATH_KOLHS] = "did you study?";
     paths[PATH_CLASS_ACT_2] = "lonely guild trainer";
     paths[PATH_AVATAR_OF_SNEAKY_PETE] = "sunglasses at night";
-    paths[PATH_SLOW_AND_STEADY] = "";
+    if (!in_hardcore())
+        paths[PATH_SLOW_AND_STEADY] = "infinite pulls";
+    else
+        paths[PATH_SLOW_AND_STEADY] = "skip a day if you like";
     paths[PATH_OXYGENARIAN] = "the slow path";
     
     if (paths contains my_path_id())
@@ -144,6 +164,9 @@ string generateRandomMessage()
     if ($item[puppet strings].storage_amount() + $item[puppet strings].available_amount() > 0)
         random_messages.listAppend(lowercase_player_name + " is totally awesome! hooray for " + lowercase_player_name + "!");
 	
+    if (__quest_state["Level 12"].in_progress && __quest_state["Level 12"].state_int["hippies left on battlefield"] < 1000 && __quest_state["Level 12"].state_int["frat boys left on battlefield"] < 1000)
+        random_messages.listAppend("playing sides");
+    
 	if (florist_available())
         random_messages.listAppend(HTMLGenerateTagWrap("a", "the forgotten friar cries himself to sleep", generateMainLinkMap("place.php?whichplace=forestvillage&amp;action=fv_friar")));
     
@@ -201,7 +224,10 @@ string generateRandomMessage()
     familiar_messages[$familiar[Gluttonous Green Ghost]] = "I think he can hear you, " + lowercase_player_name;
     familiar_messages[$familiar[hand turkey]] = "a rare bird";
     familiar_messages[$familiar[reanimated reanimator]] = "weird science";
+    familiar_messages[lookupFamiliar("Twitching Space Critter")] = "right right right right down right"; //agh
     
+    if (get_property_boolean("_warbearGyrocopterUsed"))
+        random_messages.listAppend("[gyroseaten] => 109"); //jick best spade
     
     if (familiar_messages contains my_familiar() && !__misc_state["familiars temporarily blocked"])
         random_messages.listAppend(familiar_messages[my_familiar()]);
@@ -278,6 +304,8 @@ string generateRandomMessage()
 		random_messages.listClear();
         random_messages.listAppend(encounter_messages[get_property("lastEncounter")]);
     }
+    if (__quest_state["Level 12"].in_progress && __quest_state["Level 12"].state_int["hippies left on battlefield"] == 1 && __quest_state["Level 12"].state_int["frat boys left on battlefield"] == 1)
+        random_messages.listAppend("wossname is waiting");
     
     foreach s in $strings[rainDohMonster,spookyPuttyMonster,cameraMonster,photocopyMonster,envyfishMonster,iceSculptureMonster,crudeMonster,crappyCameraMonster,romanticTarget]
     {

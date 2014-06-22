@@ -245,6 +245,15 @@ void SSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
             optional_task_entries.listAppend(ChecklistEntryMake("__skill Check Mirror", "skills.php", ChecklistSubentryMake("Check mirror", "", description), 11));
         }
     }
+    int audience_max = 30;
+    if (lookupItem("Sneaky Pete's leather jacket").equipped_amount() > 0 || lookupItem("Sneaky Pete's leather jacket (collar popped)").equipped_amount() > 0)
+    {
+        audience_max = 50;
+    }
+    if ($skill[Throw Party].have_skill() && my_audience() == audience_max && !get_property_boolean("_petePartyThrown"))
+        task_entries.listAppend(ChecklistEntryMake("__item party hat", "skills.php", ChecklistSubentryMake("Throw a party!", "", "Drinks."), -11));
+    if ($skill[Incite Riot].have_skill() && my_audience() == -audience_max && !get_property_boolean("_peteRiotIncited"))
+        task_entries.listAppend(ChecklistEntryMake("__item fire", "skills.php", ChecklistSubentryMake("Incite a riot", "", "Breaking the law, breaking the law."), -11));
     
     //sneakyPetePoints first
     int skills_available = MIN(30, MIN(15, my_level()) + get_property_int("sneakyPetePoints"));

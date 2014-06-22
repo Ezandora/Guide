@@ -165,12 +165,29 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     boolean make_entry_future = false;
     if (base_quest_state.mafia_internal_step < 2)
     {
+        //This needs better spading.
+        //Side info: in the livestream, the flag [blackforestexplore] => 55 was visible, as well as [blackforestprogress] => 5
+        
         //Unlock black market:
         url = "place.php?whichplace=woods";
         
         subentry.modifiers.listAppend("+combat");
         subentry.entries.listAppend("Unlock the black market by adventuring in the Black Forest with +combat.");
         
+        if ($item[blackberry galoshes].available_amount() > 0)
+        {
+            if ($item[blackberry galoshes].equipped_amount() == 0)
+            {
+                subentry.entries.listAppend(HTMLGenerateSpanFont("Equip blackberry galoshes", "red", "") + " to speed up exploration.");
+            }
+        }
+        else
+        {
+            if (!in_hardcore())
+                subentry.entries.listAppend("Possibly pull and wear the blackberry galoshes?");
+            //it seems unlikely finding the galoshes in HC would be worth it? maaaybe in no-familiar paths, but probably not? sneaky pete, perhaps
+            //subentry.entries.listAppend("Possibly make the blackberry galoshes via NC, if you get three blackberries.");
+        }
         
         familiar bird_needed_familiar;
         item bird_needed;
@@ -221,6 +238,9 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
                 line += " Parts needed: " + missing_components.listJoinComponents(", ", "and");
             subentry.entries.listAppend(line);
         }
+        
+        if (!__quest_state["Level 13"].state_boolean["have relevant drum"])
+            subentry.entries.listAppend("Acquire a drum from the non-combat. (Church -> orchestra pit)");
     }
     else if (base_quest_state.mafia_internal_step < 3)
     {
@@ -352,8 +372,7 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                         
                         int degrees_per_fight = 10 + clampi(current_ml, 0, 100) / 2;
                         
-                        int boilers_needed = 60.0 / degrees_per_fight.to_float();
-                        
+                        int boilers_needed = ceil(60.0 / degrees_per_fight.to_float());
                         
                         monster boiler_monster = lookupMonster("monstrous boiler");
                         float [monster] appearance_rates = lookupLocation("The Haunted Boiler Room").appearance_rates_adjusted();
@@ -379,15 +398,17 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                         {
                             //+booze?
                             subentry.entries.listAppend("Find bottle of Chateau de Vinegar from possessed wine rack in the haunted wine cellar.");
+                            subentry.modifiers.listAppend("olfact wine rack");
                             need_item_modifier = true;
                         }
                         if (lookupItem("blasting soda").available_amount() == 0)
                         {
                             subentry.entries.listAppend("Find blasting soda from the cabinet in the haunted laundry room.");
+                            subentry.modifiers.listAppend("olfact cabinet");
                             need_item_modifier = true;
                         }
                         if (need_item_modifier)
-                            subentry.modifiers.listAppend("+item"); //exact rates need spading
+                            subentry.modifiers.listPrepend("+item?"); //???
                             
                         if (lookupItem("bottle of Chateau de Vinegar").available_amount() > 0 && lookupItem("blasting soda").available_amount() > 0)
                         {
@@ -449,13 +470,14 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                     {
                         subentry.entries.listAppend("A can of black paint can help with fighting him. Bit pricy. (1k meat)");
                     }
-                    
-                    
-                    if (use_fast_route)
-                        subentry.entries.listAppend("Remember to wear Spookyraven's spectacles/read the recipe if you haven't.");
-                    else
-                        subentry.entries.listAppend("Remember to read the recipe if you haven't.");
                 }
+                if (use_fast_route)
+                {
+                    if (lookupItem("unstable fulminate").available_amount() == 0 && !output_final_fight_info && lookupItem("bottle of Chateau de Vinegar").available_amount() == 0 && lookupItem("bottle of Chateau de Vinegar").available_amount() == 0)
+                        subentry.entries.listAppend("Remember to wear Spookyraven's spectacles/read the recipe if you haven't.");
+                }
+                else
+                    subentry.entries.listAppend("Remember to read the recipe if you haven't.");
             }
         }
         
@@ -470,7 +492,7 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
     relevant_locations[lookupLocation("The Haunted Laundry Room")] = true;
     
 
-    task_entries.listAppend(ChecklistEntryMake(image_name, url, subentry, $locations[the haunted ballroom, summoning chamber]));
+    task_entries.listAppend(ChecklistEntryMake(image_name, url, subentry, relevant_locations));
 }
 
 void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -597,12 +619,12 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                             components.listAppend($item[bird rib]);
                         if ($item[lion oil].available_amount() == 0)
                             components.listAppend($item[lion oil]);
-                        string line = "Adventure in Whitey's Grove to acquire " + components.listJoinComponents("", "and") + ".|Need +186% item and +combat.";
+                        string line = "Adventure in Whitey's Grove to acquire " + components.listJoinComponents("", "and") + ".|Need +300% item and +combat.";
                         if (familiar_is_usable($familiar[jumpsuited hound dog]))
                             line += " (hound dog is useful for this)";
                         subentry.entries.listAppend(line);
                         subentry.modifiers.listAppend("+combat");
-                        subentry.modifiers.listAppend("+186% item");
+                        subentry.modifiers.listAppend("+300% item");
                         if (!in_hardcore())
                             subentry.entries.listAppend("Or pull wet stew.");
                     }
@@ -655,9 +677,8 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                 if (lookupItem("disposable instant camera").available_amount() == 0)
                 {
                     subentry.modifiers.listClear();
-                    subentry.modifiers.listAppend("-combat");
                     url = "place.php?whichplace=spookyraven2";
-                    single_entry_mode = "Adventure in the haunted ballroom for a disposable instant camera.";
+                    single_entry_mode = "Adventure in the haunted bedroom for a disposable instant camera.";
                     need_palindome_location = false;
                 }
                 else
@@ -919,7 +940,7 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
                   
                     line += " UV-resistant compass, equip for faster desert exploration. (shore vacation)";
                   
-                    if (lookupItem("odd silver coin").available_amount() > 0)
+                    if (lookupItem("odd silver coin").available_amount() > 0 || lookupItem("grimstone mask").available_amount() > 0 || get_property("grimstoneMaskPath").length() > 0) //FIXME check for the correct grimstoneMaskPath
                     {
                         line += "|Or acquire ornate dowsing rod from Paul's Boutique? (5 odd silver coins)";
                     }
@@ -953,9 +974,89 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
         }
         else
         {
+            /*
+            How the new pyramid seemingly works:
+            Adventure six times in the upper chamber with -combat. (delay, free runs relevant) This unlocks the middle chamber with the adventure "Down Dooby-Doo Down Down"
+            Adventure six times in the middle chamber with +400% item and banishes. (delay, free runs relevant). This unlocks the lower chamber.
+            Adventure five times in the middle chamber with +400% item and banishes. (delay, free runs relevant) This unlocks the control chamber.
+            After that, you handle the control chamber and solve the puzzle. One tomb ratchet/crumbling wooden wheel advances the puzzle by one step. So, you can farm tomb ratchets (+item) or wooden wheels (-combat). There's so much delay in the middle chamber though...
+            "Under Control" is the control room unlock.
+            
+            */
+            //location non-combats saved between rollovers/logins, so this is stable
+            
+            //middleChamberUnlock, lowerChamberUnlock, controlRoomUnlock implemented
+            
             url = "pyramid.php";
+            //pyramidPosition/lastPyramidReset/pyramidBombUsed not tracked yet
+            boolean done_with_wheel_turning = false; //FIXME set this
+            if (get_property_boolean("middleChamberUnlock") || $location[the middle chamber].turnsAttemptedInLocation() > 0 || $location[the upper chamber].noncombat_queue.contains_text("Down Dooby-Doo Down Down"))
+            {
+                //middle chamber unlocked:
+                if (get_property_boolean("controlRoomUnlock") || $location[the middle chamber].noncombat_queue.contains_text("Under Control"))
+                {
+                    //control room unlocked:
+                    subentry.entries.listAppend("Spin the control room, search the lower chambers! Then fight Ed.");
+                    //FIXME implement this
+                    //FIXME suggest the better route
+                    subentry.modifiers.listAppend("+400% item OR -combat");
+                    subentry.modifiers.listAppend("olfact tomb rats");
+                    subentry.entries.listAppend("Can find crumbling wooden wheels in the upper chamber (-combat), or tomb ratchets in the middle chamber (+400% item, olfact rats)");
+                }
+                else if (get_property_boolean("lowerChamberUnlock") || $location[the middle chamber].noncombat_queue.contains_text("Further Down Dooby-Doo Down Down"))
+                {
+                    //lower chamber unlocked:
+                    subentry.entries.listAppend("Adventure in the middle chamber for five total turns to unlock the control room.");
+                    subentry.modifiers.listAppend("+400% item");
+                    subentry.modifiers.listAppend("olfact tomb rats");
+                    if (__misc_state["have hipster"])
+                        subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
+                    if (__misc_state["free runs available"])
+                        subentry.modifiers.listAppend("free runs");
+                }
+                else
+                {
+                    //unlock lower chamber:
+                    subentry.entries.listAppend("Adventure in the middle chamber for eleven total turns to unlock the control room.");
+                    subentry.modifiers.listAppend("+400% item");
+                    subentry.modifiers.listAppend("olfact tomb rats");
+                    if (__misc_state["have hipster"])
+                        subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
+                    if (__misc_state["free runs available"])
+                        subentry.modifiers.listAppend("free runs");
+                    
+                }
+                if ($item[tangle of rat tails].available_amount() > 0)
+                    subentry.entries.listAppend("Use tangle of rat tails against tomb rats for more tomb ratchets.");
+            }
+            else
+            {
+                //unlock middle chamber:
+                subentry.entries.listAppend("Adventure in the upper chamber for six total turns to unlock the middle chamber.");
+                subentry.modifiers.listAppend("-combat");
+                if (__misc_state["have hipster"])
+                    subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
+                if (__misc_state["free runs available"])
+                    subentry.modifiers.listAppend("free runs");
+            }
+            
+            if (!done_with_wheel_turning)
+            {
+                string [int] relevant_items;
+                if ($item[tomb ratchet].available_amount() > 0)
+                    relevant_items.listAppend(pluralize($item[tomb ratchet]));
+                if ($item[tangle of rat tails].available_amount() > 0)
+                    relevant_items.listAppend(pluralize($item[tangle of rat tails]));
+                if (lookupItem("crumbling wooden wheel").available_amount() > 0)
+                    relevant_items.listAppend(pluralize(lookupItem("crumbling wooden wheel")));
+                  
+                if (relevant_items.count() > 0)
+                    subentry.entries.listAppend(relevant_items.listJoinComponents(", ", "and") + " available.");
+            }
+            
+            
             //Pyramid unlocked:
-            boolean have_pyramid_position = false;
+            /*boolean have_pyramid_position = false;
             int pyramid_position = get_property_int("pyramidPosition");
             
             //Uncertain:
@@ -1037,10 +1138,7 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
                   
                 if (relevant_items.count() > 0)
                     subentry.entries.listAppend(relevant_items.listJoinComponents(", ", "and") + " available.");
-            }
-            //FIXME track wheel being placed
-            //noncombat_queue => Whee! will show if we have found the wheel
-            //FIXME tell them which route is better from where they are
+            }*/
         }
     }
     

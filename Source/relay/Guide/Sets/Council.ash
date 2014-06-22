@@ -1,6 +1,8 @@
 
 void SCouncilGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
+    if (!__misc_state["In run"])
+        return;
 	boolean council_probably_wants_to_speak_to_you = false;
 	string [int] reasons;
     boolean [string] seen_quest_name;

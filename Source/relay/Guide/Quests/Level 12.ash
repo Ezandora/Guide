@@ -309,7 +309,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 		{
 			if ($item[jam band flyers].available_amount() == 0 && $item[rock band flyers].available_amount() == 0)
 				details.listAppend("Acquire fliers.");
-			details.listAppend("Flyer places around the kingdom (" + round(percent_done, 1) + "% ML completed, " + ml_remaining + " ML remains)");
+            details.listAppend(round(percent_done, 1) + "% ML completed, " + ml_remaining + " ML remains");
 		}
 	
         //Normally, this would be bigisland.php?place=concert

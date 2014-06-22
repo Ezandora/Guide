@@ -209,12 +209,47 @@ void generatePullList(Checklist [int] checklists)
     if (!__quest_state["Level 13"].state_boolean["Past keys"])
     {
         pullable_item_list.listAppend(GPItemMake($item[star hat], "speed up hole in the sky", 1));
-        if ($items[star crossbow, star staff, star sword].available_amount() == 0)
+        if ($items[star crossbow, star staff, star sword].available_amount() == 0 && __misc_state["can equip just about any weapon"])
             pullable_item_list.listAppend(GPItemMake($item[star crossbow], "speed up hole in the sky", 1));
 	}
+    if (__quest_state["Level 11"].mafia_internal_step < 2)
+        pullable_item_list.listAppend(GPItemMake($item[blackberry galoshes], "speed up black forest by 3-4? turns?", 1));
+        
+    //OUTFITS: √Pirate outfit, √War outfit, √Ninja "outfit"
+    if (!__quest_state["Level 12"].finished && (!have_outfit_components("War Hippy Fatigues") && !have_outfit_components("Frat Warrior Fatigues")))
+    {
+        item [int] missing_hippy_components = missing_outfit_components("War Hippy Fatigues");
+        item [int] missing_frat_components = missing_outfit_components("Frat Warrior Fatigues");
+        pullable_item_list.listAppend(GPItemMake("Island War Outfit", "__item round purple sunglasses", "<strong>Hippy</strong>: " + missing_hippy_components.listJoinComponents(", ", "and") + ".|<strong>Frat boy</strong>: " + missing_frat_components.listJoinComponents(", ", "and") + "."));
+    }
+    
+    if (!__quest_state["Level 8"].state_boolean["Mountain climbed"] && !have_outfit_components("eXtreme Cold-Weather Gear"))
+    {
+        item [int] missing_ninja_components = items_missing($items[ninja rope, ninja carabiner, ninja crampons]);
+        if (missing_ninja_components.count() > 0)
+        {
+            string description = missing_ninja_components.listJoinComponents(", ", "and").capitalizeFirstLetter() + ".";
+            
+            if (numeric_modifier("cold resistance") < 5.0)
+                description += "|Will require five " + HTMLGenerateSpanOfClass("cold", "r_element_cold") + " resist to use properly.";
+            pullable_item_list.listAppend(GPItemMake("Ninja peak climbing", "__item " + missing_ninja_components[0], description));
+        }
+    }
+    if ($item[talisman o' nam].available_amount() == 0 && !have_outfit_components("Swashbuckling Getup") && $item[pirate fledges].available_amount() == 0 && !__quest_state["Pirate Quest"].finished)
+    {
+        item [int] missing_outfit_components = missing_outfit_components("Swashbuckling Getup");
+        if (missing_outfit_components.count() > 0)
+            pullable_item_list.listAppend(GPItemMake("Swashbuckling Getup", "__item " + missing_outfit_components[0], missing_outfit_components.listJoinComponents(", ", "and").capitalizeFirstLetter() + "."));
+    }
+    
+    //FIXME suggest machetito?
+    //FIXME suggest super marginal stuff in SCO or S&S
+    //Ideas: Goat cheese, keepsake box, spooky-gro fertilizer, harem outfit, perfume, rusty hedge trimmers, bowling ball, surgeon gear, tomb ratchets or tangles, all the other pies
+    //FIXME suggest ore when we don't have access to free mining
+    
+    
     
 	//FIXME suggest guitar if we're out of clovers, we need one, and we've gone past belowdecks already?
-    //FIXME suggest outfits?
 	
 	pullable_item_list.listAppend(GPItemMake($item[ten-leaf clover], "Turn saving everywhere|Generic pull"));
 	

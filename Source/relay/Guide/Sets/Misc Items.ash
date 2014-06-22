@@ -292,7 +292,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
                 available_resources_entries.listAppend(ChecklistEntryMake(image_name, "inventory.php?which=3", subentries, importance_level_item));
         }
 	}
-	if ($item[smut orc keepsake box].available_amount() > 0 && !__quest_state["Level 9"].state_boolean["bridge complete"])
+	if ($item[smut orc keepsake box].available_amount() > 0 && !__quest_state["Level 9"].state_boolean["bridge complete"] && __misc_state["In run"])
 		available_resources_entries.listAppend(ChecklistEntryMake("__item smut orc keepsake box", "inventory.php?which=3", ChecklistSubentryMake(pluralize($item[smut orc keepsake box]), "", "Open for bridge building."), 0));
 		
 		
@@ -726,4 +726,25 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
         available_resources_entries.listAppend(ChecklistEntryMake("__item gym membership card", "inventory.php?which=3", ChecklistSubentryMake(pluralize($item[gym membership card]), "", description), importance_level_item));
     }
     
+    if (!get_property_boolean("_warbearGyrocopterUsed"))
+    {
+        if ($item[warbear gyrocopter].available_amount() > 0)
+        {
+            string [int] description;
+            description.listAppend("Usable once/day for a gyro. Only breaks a quarter of the time.");
+            if (!in_ronin())
+                description.listAppend("Could always send it to yourself.");
+            available_resources_entries.listAppend(ChecklistEntryMake("__item warbear gyrocopter", "curse.php?whichitem=7038", ChecklistSubentryMake(pluralize($item[warbear gyrocopter]), "", description), importance_level_unimportant_item));
+            
+        }
+        else if ($item[broken warbear gyrocopter].available_amount() > 0)
+        {
+            available_resources_entries.listAppend(ChecklistEntryMake("__item broken warbear gyrocopter", "inventory.php?which=3", ChecklistSubentryMake(pluralize($item[broken warbear gyrocopter]), "", "Gyrocopters dream of the sky. Set one free!"), importance_level_unimportant_item));
+            
+        }
+    }
+    if (lookupItem("burned government manual fragment").available_amount() > 0)
+    {
+        available_resources_entries.listAppend(ChecklistEntryMake("__item burned government manual fragment", "inventory.php?which=3", ChecklistSubentryMake(pluralize(lookupItem("burned government manual fragment")), "", "Foreign language study.|Will disappear on ascension."), importance_level_unimportant_item));
+    }
 }

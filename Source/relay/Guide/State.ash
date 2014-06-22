@@ -89,7 +89,7 @@ void setUpState()
 	__misc_state["can drink just about anything"] = true;
 	if (my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_KOLHS || inebriety_limit() == 0)
 	{
-		__misc_state["can eat just about anything"] = false;
+		__misc_state["can drink just about anything"] = false;
 	}
 	
 	
@@ -286,8 +286,12 @@ void setUpState()
 	{
 		__misc_state_float["ML to mainstat multiplier"] = 1.0 / (2.0 * 2.0);
 	}*/
-    __misc_state_float["Non-combat statgain multiplier"] = 0.5;
-    __misc_state["Stat gain from NCs reduced"] = true;
+    if (false)
+    {
+        //this does not seem to be the case? FIXME spade please
+        __misc_state_float["Non-combat statgain multiplier"] = 0.5;
+        __misc_state["Stat gain from NCs reduced"] = false;
+    }
 	
 	int pulls_available = 0;
 	pulls_available = pulls_remaining();
@@ -522,11 +526,6 @@ void setUpState()
     if (get_property_int("lastIslandUnlock") == my_ascensions() && mafiaIsPastRevision(13812))
         mysterious_island_unlocked = true;
             
-    if (!mysterious_island_unlocked)
-    {
-        if ($locations[frat house, hippy camp, the obligatory pirate's cove, frat house in disguise, hippy camp in disguise, barrrney's barrr, the f'c'le, the poop deck, belowdecks, post-war junkyard, mcmillicancuddy's farm].turnsAttemptedInLocation() > 0) //backup
-            mysterious_island_unlocked = true;
-    }
     
         
     __misc_state["mysterious island available"] = mysterious_island_unlocked;
