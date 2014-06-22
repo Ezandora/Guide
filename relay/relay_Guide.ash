@@ -14246,7 +14246,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
                 available_resources_entries.listAppend(ChecklistEntryMake(image_name, "inventory.php?which=3", subentries, importance_level_item));
         }
 	}
-	if ($item[smut orc keepsake box].available_amount() > 0 && !__quest_state["Level 9"].state_boolean["bridge complete"])
+	if ($item[smut orc keepsake box].available_amount() > 0 && !__quest_state["Level 9"].state_boolean["bridge complete"] && __misc_state["In run"])
 		available_resources_entries.listAppend(ChecklistEntryMake("__item smut orc keepsake box", "inventory.php?which=3", ChecklistSubentryMake(pluralize($item[smut orc keepsake box]), "", "Open for bridge building."), 0));
 		
 		
@@ -14705,6 +14705,8 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
 
 void SCouncilGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
+    if (!__misc_state["In run"])
+        return;
 	boolean council_probably_wants_to_speak_to_you = false;
 	string [int] reasons;
     boolean [string] seen_quest_name;
