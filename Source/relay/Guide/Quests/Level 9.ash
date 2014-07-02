@@ -88,6 +88,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
     
 	if (base_quest_state.state_int["a-boo peak hauntedness"] > 0)
 	{
+        boolean should_delay = false;
 		string [int] details;
 		string [int] modifiers;
         int clues_needed = ceil(MIN(base_quest_state.state_int["a-boo peak hauntedness"], 90).to_float() / 30.0);
@@ -183,8 +184,17 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
         {
             details.listAppend("Possibly unlock the black market first, for cans of black paint. (+2 " + HTMLGenerateSpanOfClass("spooky", "r_element_spooky") + "/" + HTMLGenerateSpanOfClass("cold", "r_element_cold") + " res buff, 1k meat)");
         }
-		
-		task_entries.listAppend(ChecklistEntryMake("a-boo peak", "place.php?whichplace=highlands", ChecklistSubentryMake("A-Boo Peak", modifiers, details), $locations[a-boo peak]));
+        if ($item[a-boo clue].available_amount() * 30 >= base_quest_state.state_int["a-boo peak hauntedness"] && my_level() < 13) //wait for later
+            should_delay = true;
+        
+        ChecklistEntry checklist_entry = ChecklistEntryMake("a-boo peak", "place.php?whichplace=highlands", ChecklistSubentryMake("A-Boo Peak", modifiers, details), $locations[a-boo peak]);
+		if (should_delay)
+        {
+            checklist_entry.importance_level = 11;
+            future_task_entries.listAppend(checklist_entry);
+        }
+        else
+            task_entries.listAppend(checklist_entry);
 	}
 	if (base_quest_state.state_int["twin peak progress"] < 15)
 	{

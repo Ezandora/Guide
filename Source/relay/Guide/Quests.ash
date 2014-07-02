@@ -60,4 +60,5 @@ void QuestsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 	QMemoriesGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	QWhiteCitadelGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	QWizardOfEgoGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+	QSpookyravenLightsOutGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 }

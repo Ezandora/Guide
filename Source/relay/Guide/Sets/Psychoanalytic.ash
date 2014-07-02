@@ -472,7 +472,6 @@ void SPArtistGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 	optional_task_entries.listAppend(ChecklistEntryMake("__effect My Breakfast With Andrea", "place.php?whichplace=junggate_5", ChecklistSubentryMake("The Pretentious Artist's Obsession", modifiers, description),$locations[a kitchen drawer, a grocery bag]));
 }
 
-
 void SPsychoanalyticGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     if (!get_property_boolean("_psychoJarUsed"))

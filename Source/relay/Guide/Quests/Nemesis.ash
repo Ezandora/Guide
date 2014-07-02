@@ -621,6 +621,20 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         url = "volcanoisland.php";
         if (legendary_epic_weapon.equipped_amount() == 0 && ultimate_legendary_epic_weapon.equipped_amount() == 0)
             subentry.entries.listAppend("Equip " + legendary_epic_weapon + ".");
+        if (my_class() == $class[sauceror])
+        {
+            string [int] missing_saucespheres;
+            foreach e in $effects[elemental saucesphere,Jalape&ntilde;o Saucesphere,antibiotic saucesphere,scarysauce]
+            {
+                if (e.have_effect() > 0)
+                    continue;
+                missing_saucespheres.listAppend(e);
+            }
+            if (missing_saucespheres.count() > 0)
+            {
+                subentry.entries.listAppend("Acquire saucespheres: " + missing_saucespheres.listJoinComponents(", ", "and") + ".");
+            }
+        }
     }
 	
 	optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the "fun" house, nemesis cave, the nemesis' lair, the broodling grounds, the outer compound, the temple portico, convention hall lobby, outside the club, the island barracks, the poop deck]));

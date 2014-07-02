@@ -172,7 +172,7 @@ void finalizeSetUpFloristState()
     {
 		__plants_suggested_locations.listAppend(PlantSuggestionMake($location[oil peak], "Rabid Dogwood", ""));
     }
-	if (!__quest_state["Level 11 Pyramid"].state_boolean["Desert Explored"] && __misc_state["need to level"]) //you spend a lot of turns in the desert
+	if (!__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && __misc_state["need to level"]) //you spend a lot of turns in the desert
 		__plants_suggested_locations.listAppend(PlantSuggestionMake($location[the arid, extra-dry desert], "Rabid Dogwood", ""));
 	
 	//Now, go through results, and remove all plants that are already in that location:

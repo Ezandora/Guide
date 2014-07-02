@@ -97,17 +97,17 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         ballroom_probably_open = true;
     if (__misc_state_string["ballroom song"].length() > 0) //FALSE if they haven't ascended since the revamp, I guess
         ballroom_probably_open = true;
+    if (get_property("questM21Dance") == "finished")
+        ballroom_probably_open = true;
     
     boolean second_floor_probably_open = false;
     
-    if (get_property_int("lastSecondFloorUnlock") == my_ascensions())
+    if (get_property_int("lastSecondFloorUnlock") == my_ascensions()) //updates properly now.
         second_floor_probably_open = true;
     if (lookupItem("Lady Spookyraven's necklace").available_amount() > 0) //mostly
         second_floor_probably_open = true;
-    if (lookupItem("ghost of a necklace").available_amount() > 0) //not, strictly speaking, true FIXME consider removing if mafia updates lastSecondFloorUnlock
-        second_floor_probably_open = true;
-    if (get_property("questM20Necklace") == "finished")
-        second_floor_probably_open = true;
+    //if (get_property("questM20Necklace") == "finished") //mafia will erroneously set questM20Necklace to finished in certain (unknown) cases. could be an error in QuestDatabase.java's reset(), but I am uncertain what caused the bug locally (it also set lastSecondFloorUnlock to current, though it is not unlocked)
+        //second_floor_probably_open = true;
     
     if (lookupItem("telegram from Lady Spookyraven").available_amount() > 0)
         second_floor_probably_open = false;
@@ -296,7 +296,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         subentry.entries.listAppend("To unlock the Haunted Library.");
         
         subentry.modifiers.listAppend("-combat");
-        subentry.entries.listAppend("Train pool skill via -combat. Need 15(?) total pool skill.");
+        subentry.entries.listAppend("Train pool skill via -combat. Need somewhere around 15(?) total pool skill");
         
         if ($item[Staff of Ed, almost].available_amount() > 0)
         {
@@ -333,7 +333,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
             int desired_drunkenness = MIN(inebriety_limit(), 10);
             if (my_inebriety() < desired_drunkenness)
             {
-                subentry.entries.listAppend("Consider drinking up to " + desired_drunkenness + " drunkenness. (may affect pool skill, unspaded)");
+                subentry.entries.listAppend("Consider drinking up to " + desired_drunkenness + " drunkenness.");
             }
             else if (my_inebriety() > desired_drunkenness)
                 subentry.entries.listAppend("Consider waiting for rollover for better pool skill. (you're over " + desired_drunkenness + " drunkenness.)");
@@ -353,7 +353,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
             if (theoretical_hidden_pool_skill >= 0)
                 pool_skill_string = "+";
             pool_skill_string += theoretical_hidden_pool_skill;
-            subentry.entries.listAppend("Drunkenness theoretical effect: " + pool_skill_string + " pool skill.");
+            subentry.entries.listAppend("Drunkenness effect: " + pool_skill_string + " pool skill.");
         }
     }
     else
@@ -368,7 +368,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         subentry.entries.listAppend("Lady Spookyraven's Necklace drops from the fifth writing desk you encounter.");
         
         boolean need_killing_jar = false;
-        if ($item[killing jar].available_amount() == 0 && !__quest_state["Level 11 Pyramid"].state_boolean["Desert Explored"] && !__quest_state["Level 11 Pyramid"].state_boolean["Killing Jar Given"])
+        if ($item[killing jar].available_amount() == 0 && !__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && !__quest_state["Level 11 Desert"].state_boolean["Killing Jar Given"])
         {
             need_killing_jar = true;
             subentry.modifiers.listAppend("+900% item");
@@ -380,179 +380,6 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         }
         
     }
-    
-	
-	/*location next_zone = to_location(base_quest_state.state_string["zone to work on"]);
-	
-	if (next_zone == $location[the haunted billiards room])
-	{
-		subentry.header = "Open the Haunted Billiards Room";
-		url = "place.php?whichplace=town_right";
-		image_name = "spookyraven manor locked";
-		
-		subentry.entries.listAppend("Adventure in the Haunted Pantry. (right side of the tracks)");
-		if (__misc_state["free runs available"])
-			subentry.modifiers.listAppend("free runs");
-		if (__misc_state["have hipster"])
-			subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
-			
-		if (have_skill($skill[summon smithsness]) && $item[dirty hobo gloves].available_amount() == 0 && $item[hand in glove].available_amount() == 0 && __misc_state["Need to level"])
-		{
-			subentry.modifiers.listAppend("-combat");
-			subentry.modifiers.listAppend("+234% item");
-			subentry.entries.listAppend("Run +234% item and -combat for dirty hobo glove, for hand in glove. (+lots ML accessory)|Potentially olfact half-orc hobo as well, to find said glove in the back alley.");
-		}
-			
-		if (subentry.modifiers.count() > 0)
-			subentry.entries.listAppend("Ten turn delay. (use " + listJoinComponents(subentry.modifiers, ", ") + ")");
-		else
-			subentry.entries.listAppend("Ten turn delay.");
-        
-        
-        if ($classes[pastamancer, sauceror] contains my_class() && !guild_store_available()) //FIXME tracking guild quest being started
-            subentry.entries.listAppend("Possibly start your guild quest if you haven't.");
-		
-	}
-	else if (next_zone == $location[the haunted library])
-	{
-		subentry.header = "Open the Haunted Library";
-		url = "place.php?whichplace=manor1";
-		image_name = "haunted billiards room";
-		
-		if (__misc_state["free runs available"])
-			subentry.modifiers.listAppend("free runs");
-		
-		
-		subentry.entries.listAppend("Adventure in the Haunted Billiards Room.");
-		if ($item[pool cue].available_amount() == 0)
-			subentry.entries.listAppend("Acquire a pool cue. (superlikely)");
-		if (delayRemainingInLocation($location[the haunted billiards room]) > 0)
-		{
-			string line = "Delay for " + pluralize(delayRemainingInLocation($location[the haunted billiards room]), "turn", "turns") + ".";
-			if (__misc_state["have hipster"])
-			{
-				line += " (use " + __misc_state_string["hipster name"] + ")";
-				subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
-			}
-			subentry.entries.listAppend(line);
-			subentry.entries.listAppend("Then run chalky hands once you have a pool cue. (use handful of hand chalk, 100% wraith drop)");
-		}
-		else if ($item[pool cue].available_amount() == 0)
-			subentry.entries.listAppend("Run chalky hand and -combat once you have a pool cue. (use handful of hand chalk, 100% wraith drop)");
-        else
-        {
-            if ($effect[chalky hand].have_effect() == 0)
-                subentry.entries.listAppend("Run chalky hand. (use handful of hand chalk, 100% wraith drop)");
-            subentry.modifiers.listAppend("-combat");
-            subentry.entries.listAppend("Run -combat.");
-            
-            float nc_rate = 1.0 - (0.75 + combat_rate_modifier() / 100.0);
-            float turns_to_finish = -1.0;
-            if (nc_rate != 0.0)
-                turns_to_finish = 1.0 / nc_rate;
-            if (turns_to_finish != -1.0)
-                subentry.entries.listAppend("~" + turns_to_finish.roundForOutput(1) + " turns to unlock at " + combat_rate_modifier().floor() + "% combat.");
-        }
-	}
-	else if (next_zone == $location[the haunted bedroom])
-	{
-		subentry.header = "Open the Haunted Bedroom";
-		url = "place.php?whichplace=manor1";
-		image_name = "haunted library";
-
-        
-		subentry.entries.listAppend("Adventure in the Haunted Library.");
-		if (delayRemainingInLocation($location[the haunted library]) > 0)
-		{
-			string line = "Delay for " + pluralize(delayRemainingInLocation($location[the haunted library]), "turn", "turns") + ".";
-			if (__misc_state["have hipster"])
-			{
-				line += " (use " + __misc_state_string["hipster name"] + ")";
-				subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
-			}
-			line += "|Then run -combat.";
-			subentry.entries.listAppend(line);
-		}
-		else
-		{
-			subentry.modifiers.listAppend("-combat");
-			subentry.entries.listAppend("Run -combat.");
-            
-            float nc_rate = 1.0 - (0.75 + combat_rate_modifier() / 100.0);
-            float turns_to_finish = -1.0;
-            if (nc_rate != 0.0)
-                turns_to_finish = 1.0 / nc_rate;
-            if (turns_to_finish != -1.0)
-                subentry.entries.listAppend("~" + turns_to_finish.roundForOutput(1) + " turns to unlock at " + combat_rate_modifier().floor() + "% combat.");
-		}
-        if ($item[killing jar].available_amount() == 0 && !__quest_state["Level 11 Pyramid"].state_boolean["Desert Explored"] && !__quest_state["Level 11 Pyramid"].state_boolean["Killing Jar Given"])
-        {
-            subentry.modifiers.listAppend("+900% item");
-            subentry.entries.listAppend("Try to acquire a killing jar to speed up the desert later.|10% drop from banshee librarian.");
-        }
-		
-		if (my_primestat() == $stat[muscle] && !locationAvailable($location[the haunted gallery]) && !__misc_state["Stat gain from NCs reduced"])
-			subentry.entries.listAppend("Optionally, unlock gallery key conservatory adventure:|*Fall of the House of Spookyraven" + __html_right_arrow_character + "Chapter 2: Stephen and Elizabeth.");
-	}
-	else if (next_zone == $location[the haunted ballroom])
-	{
-		subentry.header = "Open the Haunted Ballroom";
-		url = "place.php?whichplace=spookyraven2";
-		image_name = "haunted bedroom";
-		subentry.entries.listAppend("Adventure in the Haunted Bedroom.");
-		
-		if ($item[lord spookyraven's spectacles].available_amount() == 0)
-			subentry.entries.listAppend("Acquire Lord Spookyraven's spectacles from ornate drawer NC.");
-        if (__quest_state["Level 11 Palindome"].state_boolean["Need instant camera"] && 7266.to_item().available_amount() == 0)
-			subentry.entries.listAppend("Acquire disposable instant camera from ornate drawer NC.");
-		subentry.modifiers.listAppend("-combat");
-		subentry.entries.listAppend("Run -combat.");
-        
-        //I think this is what lastBallroomUnlock does? It's when the key has dropped down?
-        boolean clink_done = get_property_int("lastBallroomUnlock") == my_ascensions();
-        if (clink_done)
-            subentry.entries.listAppend("Unlock ballroom key. Wooden nightstand, second choice.");
-        else
-            subentry.entries.listAppend("Unlock ballroom key in two-step process. Wooden nightstand, first choice, then second.");
-		
-		//combat queue for haunted bedroom doesn't seem to update
-        int delay_remaining = 5; //delayRemainingInLocation($location[the haunted bedroom])
-		if (delay_remaining > 0 && !clink_done)
-		{
-			//string line = "Delay for " + pluralize(delay_remaining), "turn", "turns") + ".";
-            string line = "Delay for 5 total turns. (can't track this, sorry)";
-			if (__misc_state["have hipster"])
-			{
-				line += " (use " + __misc_state_string["hipster name"] + ")";
-				subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
-			}
-			subentry.entries.listAppend(line);
-		}
-        //Once delay is tracked:
-        /*int ncs_needed = 4;
-        if (!clink_done)
-            ncs_needed *= 2;
-        subentry.entries.listAppend(generateTurnsToSeeNoncombat(20, ncs_needed, "", 0, delay_remaining));*/
-	/*}
-	else if (base_quest_state.state_boolean["need ballroom song set"])
-	{
-		next_zone = $location[The Haunted Ballroom];
-		subentry.header = "Set -combat ballroom song";
-		url = "place.php?whichplace=spookyraven2";
-		//image_name = "Haunted Ballroom";
-        image_name = "__item the Legendary Beat";
-		subentry.modifiers.listAppend("-combat");
-        
-        subentry.entries.listAppend("Adventure in the Haunted Ballroom.");
-        
-        if (my_turncount() > 200 || base_quest_state.state_boolean["ballroom song effectively set"])
-        {
-            subentry.entries.listAppend("Well, unless you won't need -combat.");
-            should_output_optionally = true;
-        }
-        subentry.entries.listAppend(generateTurnsToSeeNoncombat(80, 2, ""));
-	}*/
-	
 	if (subentry.header.length() > 0)
     {
         if (image_name.length() == 0)

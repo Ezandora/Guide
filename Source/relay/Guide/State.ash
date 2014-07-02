@@ -75,8 +75,6 @@ void setUpState()
     if (__misc_state["VIP available"])
     {
         int soaks_remaining = MAX(0, 5 - get_property_int("_hotTubSoaks"));
-        if (__misc_state["type 69 restrictions active"])
-            soaks_remaining = 0;
         __misc_state_int["hot tub soaks remaining"] = soaks_remaining;
     }
 	

@@ -373,10 +373,7 @@ void generateMissingItems(Checklist [int] checklists)
         item camera = 7266.to_item();
         if (camera != $item[none])
         {
-            string url = "";
-            if ($location[the haunted bedroom].locationAvailable())
-                url = "place.php?whichplace=spookyraven2";
-            items_needed_entries.listAppend(ChecklistEntryMake("__item " + camera, $location[the haunted bedroom].getClickableURLForLocation(), ChecklistSubentryMake("Disposable instant camera", url, "Found in the Haunted Bedroom.")));
+            items_needed_entries.listAppend(ChecklistEntryMake("__item " + camera, $location[the haunted bedroom].getClickableURLForLocation(), ChecklistSubentryMake("Disposable instant camera", "", "Found in the Haunted Bedroom.")));
         }
     }
                                

@@ -196,6 +196,11 @@ void KOLImagesInit()
 	__kol_images["Wine Racks"].erase_zones.listAppend(RectMake(70, 61, 74, 66));
 	__kol_images["Wine Racks"].erase_zones.listAppend(RectMake(94, 45, 97, 54));
 	__kol_images["Wine Racks"].erase_zones.listAppend(RectMake(17, 49, 18, 53));
+    
+	__kol_images["possessed wine rack"] = KOLImageMake("images/adventureimages/winerack.gif", Vec2iMake(100,100), RectMake(0, 0, 99, 99));
+	__kol_images["cabinet of Dr. Limpieza"] = KOLImageMake("images/adventureimages/laundrycabinet.gif", Vec2iMake(100,100), RectMake(0, 0, 99, 99));
+	__kol_images["monstrous boiler"] = KOLImageMake("images/adventureimages/boiler.gif", Vec2iMake(100,100), RectMake(0, 0, 99, 99));
+    
 	
 	
 	__kol_images["Dad Sea Monkee"] = KOLImageMake("images/adventureimages/dad_machine.gif", Vec2iMake(400,300), RectMake(150,212,245,260));
@@ -253,6 +258,7 @@ void KOLImagesInit()
     
 	__kol_images["Lady Spookyraven"] = KOLImageMake("images/otherimages/spookyraven/sr_ladys.gif", Vec2iMake(65,65), RectMake(0, 0, 64, 37));
 	__kol_images["Yeti"] = KOLImageMake("images/adventureimages/yeti.gif", Vec2iMake(100,100), RectMake(12, 0, 80, 98));
+	__kol_images["Lights Out"] = KOLImageMake("images/adventureimages/lightning.gif", Vec2iMake(100,100), RectMake(0, 10, 99, 96));
     
 	
 	string class_name = my_class().to_string();

@@ -183,8 +183,7 @@ void generatePullList(Checklist [int] checklists)
     if (__misc_state["In run"] && !__quest_state["Level 13"].state_boolean["past gates"] && ($items[large box, blessed large box].available_amount() == 0 && $items[bubbly potion,cloudy potion,dark potion,effervescent potion,fizzy potion,milky potion,murky potion,smoky potion,swirly potion].items_missing().count() > 0))
         pullable_item_list.listAppend(GPItemMake($item[large box], "Combine with clover for blessed large box", 1));
     
-    if (my_path_id() != PATH_CLASS_ACT_2) //FIXME really think about this suggestion
-        pullable_item_list.listAppend(GPItemMake($item[slimy alveolus], "40 turns of +50ML (" + floor(40 * 50 * __misc_state_float["ML to mainstat multiplier"]) +" mainstat total, cave bar levelling)|1 spleen", 3));
+    //pullable_item_list.listAppend(GPItemMake($item[slimy alveolus], "40 turns of +50ML (" + floor(40 * 50 * __misc_state_float["ML to mainstat multiplier"]) +" mainstat total, cave bar levelling)|1 spleen", 3)); //marginal now. low-skill oil peak/cyrpt?
 	
 	
     if (!get_property_boolean("_blankOutUsed"))
@@ -239,7 +238,12 @@ void generatePullList(Checklist [int] checklists)
     {
         item [int] missing_outfit_components = missing_outfit_components("Swashbuckling Getup");
         if (missing_outfit_components.count() > 0)
-            pullable_item_list.listAppend(GPItemMake("Swashbuckling Getup", "__item " + missing_outfit_components[0], missing_outfit_components.listJoinComponents(", ", "and").capitalizeFirstLetter() + "."));
+        {
+            string entry = missing_outfit_components.listJoinComponents(", ", "and").capitalizeFirstLetter() + ".";
+            if ($item[eyepatch].available_amount() == 0)
+                entry += "|Or NPZR head/clockwork pirate skull to untinker for eyepatch/clockwork maid.";
+            pullable_item_list.listAppend(GPItemMake("Swashbuckling Getup", "__item " + missing_outfit_components[0], entry));
+        }
     }
     
     //FIXME suggest machetito?
@@ -260,7 +264,7 @@ void generatePullList(Checklist [int] checklists)
 		scrip_needed += 3;
 		scrip_reasons.listAppend("mysterious island");
 	}
-	if ($item[uv-resistant compass].available_amount() == 0 && lookupItem("ornate dowsing rod").available_amount() == 0 && __misc_state["can equip just about any weapon"] && !__quest_state["Level 11 Pyramid"].state_boolean["Desert Explored"])
+	if ($item[uv-resistant compass].available_amount() == 0 && lookupItem("ornate dowsing rod").available_amount() == 0 && __misc_state["can equip just about any weapon"] && !__quest_state["Level 11 Desert"].state_boolean["Desert Explored"])
 	{
 		scrip_needed += 1;
 		scrip_reasons.listAppend($item[uv-resistant compass].to_string());
@@ -312,6 +316,7 @@ void generatePullList(Checklist [int] checklists)
 			item it = items[key];
 			if (currently_trendy && !is_trendy(it))
 				continue;
+            //if (!it.is_unrestricted()) continue; //FIXME uncomment next point release
 			int actual_amount = pullable_amount(it, max_wanted);
 			if (actual_amount > 0)
 			{

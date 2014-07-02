@@ -70,7 +70,16 @@ void SLibramGenerateResource(ChecklistEntry [int] available_resources_entries)
 			{
 				int number_available = fight.available_amount();
 				if (number_available > 0)
-					subentry.entries.listAppend(pluralize(number_available, fight));
+                {
+                    string line = pluralize(number_available, fight);
+                    
+                    if ($items[rock band flyers,jam band flyers].available_amount() > 0 && !__quest_state["Level 12"].state_boolean["Arena Finished"] && __quest_state["Level 12"].in_progress && get_property_int("flyeredML") < 10000)
+                    {
+                        monster m = fight.to_string().to_monster(); //is there a better way to look this up?
+                        line += " (" + m.base_initiative + "% init)";
+                    }
+					subentry.entries.listAppend(line);
+                }
 			}
 			
 			item [int] craftable_fights;

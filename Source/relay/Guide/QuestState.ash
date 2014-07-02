@@ -61,7 +61,7 @@ int QuestStateConvertQuestPropertyValueToNumber(string property_value)
 	else if (property_value.contains_text("step"))
 	{
 		//lazy:
-		string theoretical_int = property_value.replace_string("step", "");
+		string theoretical_int = property_value.replace_string(" ", "").replace_string("step", ""); //one revision had a bug that set questL11Worship to "step 4", so remove spaces
 		int step_value = theoretical_int.to_int_silent();
 		
 		result = step_value + 1;

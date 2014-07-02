@@ -250,9 +250,9 @@ buffer generateLocationBar(boolean displaying_navbar)
     }*/
     else if (l == $location[the arid\, extra-dry desert])
     {
-        if (__quest_state["Level 11 Pyramid"].state_int["Desert Exploration"] < 100)
+        if (__quest_state["Level 11 Desert"].state_int["Desert Exploration"] < 100)
         {
-            custom_location_information = __quest_state["Level 11 Pyramid"].state_int["Desert Exploration"] + "% explored";
+            custom_location_information = __quest_state["Level 11 Desert"].state_int["Desert Exploration"] + "% explored";
         }
     }
     else if (l == $location[barrrney's barrr])

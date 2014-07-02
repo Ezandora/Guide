@@ -738,6 +738,7 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         lookup_map["3rd Floor, Shiawase-Mitsuhama Building"] = "place.php?whichplace=junggate_1";
         lookup_map["Chinatown Tenement"] = "place.php?whichplace=junggate_1";
         lookup_map["A Deserted Stretch of I-911"] = "place.php?whichplace=ioty2014_hare";
+        lookup_map["The Cave Before Time"] = "place.php?whichplace=twitch";
         
         //Conditionals:
         if ($location[cobb's knob barracks].locationAvailable())

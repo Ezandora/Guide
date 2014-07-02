@@ -718,20 +718,25 @@ buffer generateTurnsToSeeNoncombat(int combat_rate, int noncombats_in_zone, stri
     }
     else
         turn_estimation = 0.0;
-        
-    if (turn_estimation == -1.0)
-        return "".to_buffer();
     
     turn_estimation += extra_starting_turns;
     
     
     buffer result;
-    result.append("~");
-    result.append(turn_estimation.roundForOutput(1));
-    if (turn_estimation == 1.0)
-        result.append(" turn");
+    
+    if (turn_estimation == -1.0)
+    {
+        result.append("Impossible");
+    }
     else
-        result.append(" turns");
+    {
+        result.append("~");
+        result.append(turn_estimation.roundForOutput(1));
+        if (turn_estimation == 1.0)
+            result.append(" turn");
+        else
+            result.append(" turns");
+    }
     
     if (task.length() > 0)
     {
@@ -740,7 +745,10 @@ buffer generateTurnsToSeeNoncombat(int combat_rate, int noncombats_in_zone, stri
     }
     else
     {
-        if (turn_estimation == 1.0)
+        if (turn_estimation == -1.0)
+        {
+        }
+        else if (turn_estimation == 1.0)
             result.append(" remains");
         else
             result.append(" remain");

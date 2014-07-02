@@ -143,7 +143,7 @@ boolean generateTowerFamiliarWeightMethod(string [int] how, string [int] immedia
         weight_modifiers.listAppend(TFWMInternalModifierMake("irradiated pet snacks (semi-rare, menagerie level 2)", false, false, true, 10.0));
     }
     //billiards
-    if (__misc_state["VIP available"] && get_property_int("_poolGames") <3 || $effect[Billiards Belligerence].have_effect() > 0)
+    if (__misc_state["VIP available"] && get_property_int("_poolGames") <3 && !__misc_state["type 69 restrictions active"] || $effect[Billiards Belligerence].have_effect() > 0)
     {
         boolean have_effect = $effect[Billiards Belligerence].have_effect() > 0;
         weight_modifiers.listAppend(TFWMInternalModifierMake("VIP Pool (play aggressively)", have_effect, have_effect || (get_property_int("_poolGames") <3), true, 5.0));

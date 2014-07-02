@@ -229,7 +229,15 @@ void QLevel8GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		string [int] todo;
 		if (cold_resistance < 5.0)
 			todo.listAppend(need_cold_res_string);
-		todo.listAppend("fight Groar at the peak");
+            
+            
+        float groar_attack = (120 + monster_level_adjustment());
+        
+        string line = "fight Groar at the peak";
+        if (my_basestat($stat[moxie]) < groar_attack)
+            line += " (attack: " + groar_attack.round() + ")";
+            
+		todo.listAppend(line);
 		subentry.entries.listAppend(todo.listJoinComponents(", ", "then").capitalizeFirstLetter() + ".");
 		
         if (turns_remaining > 1)

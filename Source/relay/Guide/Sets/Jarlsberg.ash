@@ -56,7 +56,7 @@ void SJarlsbergGenerateResource(ChecklistEntry [int] available_resources_entries
     if (true)
     {
         //I must capture the avatar (of jarlsberg) to regain my honor
-        string [int] banished_monsters = split_string_alternate(get_property("_jiggleCheesedMonsters"), "|");
+        string [int] banished_monsters = split_string_alternate(get_property("_jiggleCheesedMonsters"), "\\|");
         boolean always_output = false;
         string cheese_line = "Banish monsters.";
         if (get_property("_jiggleCheesedMonsters").length() > 0)

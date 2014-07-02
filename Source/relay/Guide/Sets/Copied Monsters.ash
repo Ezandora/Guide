@@ -228,8 +228,6 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] available_resources_en
             potential_copies.listAppend("Baa'baa'bu'ran - stone wool for cave bar leveling.");
         if (!__quest_state["Level 12"].state_boolean["Nuns Finished"])
             potential_copies.listAppend("Brigand - nuns trick.");
-        if (!__quest_state["Level 11"].finished && __quest_state["Level 11 Manor"].mafia_internal_step < 4)
-            potential_copies.listAppend("Wine cellar monsters. (copy has all six wines)");
         //possibly less relevant:
         //√ghosts/skulls/bloopers...?
         //seems very marginal

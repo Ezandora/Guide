@@ -87,6 +87,7 @@ string generateRandomMessage()
     equipment_messages[$item[white hat hacker T-shirt]] = "hack the planet";
     equipment_messages[$item[heart necklace]] = "&#x2665;&#xfe0e;"; //♥︎
     equipment_messages[$item[fleetwood chain]] = "run in the shadows";
+    equipment_messages[$item[liar's pants]] = "never tell the same lie twice";
     
     foreach it in equipment_messages
     {
@@ -104,6 +105,11 @@ string generateRandomMessage()
         random_messages.listAppend("perfect runs are overrated");
     random_messages.listAppend("math is your helpful friend");
     
+    if (get_property_int("_pantsgivingCount") >= 5500)
+    {
+        random_messages.listAppend("Could not connect to secondary database server:2003 - Can't connect to MySQL server on '10.0.0.51' (99)");
+    }
+    
     string [effect] effect_messages;
     
     effect_messages[$effect[consumed by anger]] = "don't ascend angry";
@@ -111,7 +117,7 @@ string generateRandomMessage()
     effect_messages[lookupEffect("All Revved Up")] = "vroom";
     if (my_path_id() != PATH_WAY_OF_THE_SURPRISING_FIST)
         effect_messages[$effect[Expert Timing]] = "martial arts and crafts";
-    effect_messages[$effect[apathy]] = ""; //TODO fix thi
+    effect_messages[$effect[apathy]] = "";
     effect_messages[$effect[silent running]] = "an awful lot of running";
     effect_messages[$effect[Neuromancy]] = "the silver paths";
     effect_messages[$effect[Teleportitis]] = "everywhere and nowhere";
@@ -224,13 +230,14 @@ string generateRandomMessage()
     familiar_messages[$familiar[Gluttonous Green Ghost]] = "I think he can hear you, " + lowercase_player_name;
     familiar_messages[$familiar[hand turkey]] = "a rare bird";
     familiar_messages[$familiar[reanimated reanimator]] = "weird science";
-    familiar_messages[lookupFamiliar("Twitching Space Critter")] = "right right right right down right"; //agh
+    familiar_messages[lookupFamiliar("Twitching Space Critter")] = "right right right right down right agh";
     
-    if (get_property_boolean("_warbearGyrocopterUsed"))
-        random_messages.listAppend("[gyroseaten] => 109"); //jick best spade
     
     if (familiar_messages contains my_familiar() && !__misc_state["familiars temporarily blocked"])
         random_messages.listAppend(familiar_messages[my_familiar()]);
+        
+    if (get_property_boolean("_warbearGyrocopterUsed"))
+        random_messages.listAppend("[gyroseaten] => 109");
         
     random_messages.listAppend(HTMLGenerateTagWrap("a", "&#x266b;", mapMake("class", "r_a_undecorated", "href", "http://www.kingdomofloathing.com/radio.php", "target", "_blank")));
     
@@ -304,8 +311,66 @@ string generateRandomMessage()
 		random_messages.listClear();
         random_messages.listAppend(encounter_messages[get_property("lastEncounter")]);
     }
+    
     if (__quest_state["Level 12"].in_progress && __quest_state["Level 12"].state_int["hippies left on battlefield"] == 1 && __quest_state["Level 12"].state_int["frat boys left on battlefield"] == 1)
+    {
+        random_messages.listClear();
         random_messages.listAppend("wossname is waiting");
+    }
+    
+    if (my_familiar() == lookupFamiliar("Helix Fossil"))
+    {
+        buffer generated;
+        
+        
+        string [int] commands;
+        
+        string property_value = get_property("__voices");
+        
+        if (property_value.length() > 1) //remove sentinel
+        {
+            if (property_value.char_at(property_value.length() - 1) == "|")
+                property_value = property_value.substring(0, property_value.length() - 1);
+        }
+        
+        commands = property_value.split_string_alternate(",");
+        
+        for i from 0 to 0
+        {
+            string word;
+            int r = random(100);
+            if (r < 15)
+                word = "&#11014;"; //⬆︎
+            else if (r < 30)
+                word = "&#11015;"; //⬇︎
+            else if (r < 45)
+                word = "&#10145;"; //➡
+            else if (r < 60)
+                word = "&#11013;"; //⬅︎
+            else if (r < 75)
+                word = "A";// &#9398; = Ⓐ
+            else if (r < 95)
+                word = "B"; //&#9399; = Ⓑ
+            else
+                word = "start";
+                
+            
+                
+            commands.listAppend(word);
+        }
+        while (commands.count() > 6)
+            remove commands[commands.listKeyForIndex(0)];
+        set_property("__voices", commands.listJoinComponents(",") + "|"); //we add an ending sentinel because set_property() will remove ";" if it's at the end of the string. set_property() is not guaranteed to keep data integrity
+        
+        random_messages.listClear();
+        
+        string message = commands.listJoinComponents(" ");
+        message = HTMLGenerateTagWrap("span", message, mapMake("onclick", "updatePageAndFireTimer()", "style", "cursor:pointer;cursor:hand;"));
+        
+        random_messages.listAppend(message);
+    }
+        
+    
     
     foreach s in $strings[rainDohMonster,spookyPuttyMonster,cameraMonster,photocopyMonster,envyfishMonster,iceSculptureMonster,crudeMonster,crappyCameraMonster,romanticTarget]
     {

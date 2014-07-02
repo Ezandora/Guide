@@ -46,7 +46,7 @@ void QLevel12Init()
 		state.state_boolean["Orchard Finished"] = false;
 	}
 	
-	if (my_level() >= 12 && (__location_palindome.turnsAttemptedInLocation() > 0 || $items[mega gem,&quot;I Love Me\, Vol. I&quot;,Staff of Ed,Staff of Fats,Staff of Ed\, almost].available_amount() > 0))
+	if (my_level() >= 12)
 		state.startable = true;
     
 	__quest_state["Level 12"] = state;
@@ -207,9 +207,33 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
             location_monsters[$location[Near an Abandoned Refrigerator]] = listMake("tool spider", "batwinged");
             location_monsters[$location[Over Where the Old Tires Are]] = listMake("tool erudite", "spider");
             
+            location [monster] banishment_locations; //it's time we had a talk... about your hair! it's gone too far!
+            banishment_locations[$monster[batwinged gremlin]] = $location[Near an Abandoned Refrigerator];
+            banishment_locations[$monster[erudite gremlin]] = $location[Out By that Rusted-Out Car];
+            banishment_locations[$monster[spider gremlin]] = $location[Over Where the Old Tires Are];
+            banishment_locations[$monster[vegetable gremlin]] = $location[Next to that Barrel with Something Burning in it];
+            
+            foreach m in banishment_locations
+            {
+                if (!m.is_banished())
+                    continue;
+                location l = banishment_locations[m];
+                location_monsters[l][1] = HTMLGenerateSpanFont(location_monsters[l][1], "grey", "");
+            }
+
+
+
+            
             item [int] item_display_order = listMake($item[molybdenum hammer],$item[molybdenum pliers],$item[molybdenum crescent wrench],$item[molybdenum screwdriver]); //make a path
             string [int] areas_left_strings;
 			//foreach it in items_and_locations
+            
+            string [location] location_shorthand_name;
+            location_shorthand_name[$location[Next to that Barrel with Something Burning in it]] = "Barrel";
+            location_shorthand_name[$location[Out By that Rusted-Out Car]] = "Car";
+            location_shorthand_name[$location[Near an Abandoned Refrigerator]] = "Refrigerator";
+            location_shorthand_name[$location[Over Where the Old Tires Are]] = "Tires";
+            
             foreach key in item_display_order
 			{
                 item it = item_display_order[key];
@@ -220,7 +244,14 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 				}
 				else
 					have_all = false;
-                areas_left_strings.listAppend(loc.to_string().to_lower_case() + " (" + location_monsters[loc].listJoinComponents(", ") + ")");
+                
+                string location_display_name;
+                if (location_shorthand_name contains loc)
+                    location_display_name = location_shorthand_name[loc];
+                else
+                    location_display_name = loc.to_string().to_lower_case();
+                    
+                areas_left_strings.listAppend("<strong>" + location_display_name + "</strong> - " + location_monsters[loc].listJoinComponents(", "));
 			}
             if (areas_left_strings.count() > 0)
                 details.listAppend("Areas left:|*" + areas_left_strings.listJoinComponents("<hr>|*"));

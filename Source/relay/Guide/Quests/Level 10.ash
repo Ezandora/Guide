@@ -16,6 +16,8 @@ void QLevel10Init()
         beanstalk_grown = true;
     if ($location[the penultimate fantasy airship].turnsAttemptedInLocation() > 0)
         beanstalk_grown = true;
+    if (state.mafia_internal_step > 1)
+        beanstalk_grown = true;
     
     state.state_boolean["Beanstalk grown"] = beanstalk_grown;
 	
@@ -176,7 +178,7 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             if ($item[amulet of extreme plot significance].available_amount() > 0)
             {
                 if ($item[amulet of extreme plot significance].equipped_amount() == 0)
-                    subentry.entries.listAppend(HTMLGenerateSpanFont("Wear the amulet of extreme plot significance.", "red", ""));
+                    subentry.entries.listAppend("Possibly " + HTMLGenerateSpanFont("wear the amulet of extreme plot significance.", "red", "") + "|Or search for the non-combat, skip it, equip the amulet, and adventure again.");
                 
                 if (non_combat_rate != 0.0)
                     turn_estimation = 1.0 / non_combat_rate;

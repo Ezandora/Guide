@@ -86,6 +86,8 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
 		
 		int adventures_needed_for_fullness_boost = 5 * powi(10, pantsgiving_fullness_used);
 		int adventures_needed_for_fullness_boost_x2 = 5 * powi(10, 1 + pantsgiving_fullness_used);
+		int adventures_needed_for_fullness_boost_x3 = 5 * powi(10, 2 + pantsgiving_fullness_used);
+		int adventures_needed_for_fullness_boost_x4 = 5 * powi(10, 3 + pantsgiving_fullness_used);
 		
 		if (adventures_needed_for_fullness_boost > pantsgiving_adventures_used)
 		{
@@ -96,7 +98,11 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
 		{
 			string extra_fullness_available = "Fullness";
 			if (pantsgiving_adventures_used > adventures_needed_for_fullness_boost_x2)
-            extra_fullness_available = "2x fullness";
+                extra_fullness_available = "2x fullness";
+			if (pantsgiving_adventures_used > adventures_needed_for_fullness_boost_x3)
+                extra_fullness_available = "3x fullness";
+			if (pantsgiving_adventures_used > adventures_needed_for_fullness_boost_x4)
+                extra_fullness_available = "4x fullness (wh.. what?)";
 			if (availableFullness() == 0)
 			{
 				subentry.entries.listAppend(extra_fullness_available + " available next adventure.");
@@ -316,7 +322,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
 			subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Potential gate border gum", $location[south of the border]));
 		if (__quest_state["Level 4"].state_int["areas unlocked"] + $item[sonar-in-a-biscuit].available_amount() < 2)
 			subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("2 sonar-in-a-biscuit (Guano Junction)", $location[guano junction]));
-		if (!__quest_state["Level 11 Pyramid"].state_boolean["Desert Explored"])
+		if (!__quest_state["Level 11 Desert"].state_boolean["Desert Explored"])
 			subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Ultrahydrated (Oasis)", $location[the oasis]));
 		if (__misc_state["need to level"] && !__misc_state["Stat gain from NCs reduced"])
         {
@@ -531,7 +537,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
         available_resources_entries.listAppend(ChecklistEntryMake("__item vitachoconutriment capsule", "inventory.php?which=3", ChecklistSubentryMake(pluralize($item[vitachoconutriment capsule]), "", line), importance_level_unimportant_item));
     }
     
-    if ($item[drum machine].available_amount() > 0 && in_run && (my_adventures() <= 1 || (availableDrunkenness() < 0 && availableDrunkenness() > -4)) && __quest_state["Level 11 Pyramid"].state_boolean["Desert Explored"])
+    if ($item[drum machine].available_amount() > 0 && in_run && (my_adventures() <= 1 || (availableDrunkenness() < 0 && availableDrunkenness() > -4)) && __quest_state["Level 11 Desert"].state_boolean["Desert Explored"])
     {
         //Daycount strategy that never works, suggest:
         string line = (100.0 * ((item_drop_modifier() / 100.0 + 1.0) * (1.0 / 1000.0))).roundForOutput(2) + "% chance of spice melange.";
@@ -664,11 +670,11 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
             table.listAppend(listMake("solid gold rosary", "-4.5? evilness from cyrpt", "5 coins"));
         //ornate dowsing rod - 5 - better desert exploration (+2%)
         
-        if (!__quest_state["Level 11 Pyramid"].state_boolean["Desert Explored"] && lookupItem("ornate dowsing rod").available_amount() == 0)
+        if (!__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && lookupItem("ornate dowsing rod").available_amount() == 0)
             table.listAppend(listMake("ornate dowsing rod", "+2% desert exploration", "5 coins"));
         description.listAppend(HTMLGenerateSimpleTableLines(table));
         
-        available_resources_entries.listAppend(ChecklistEntryMake("__item " + odd_silver_coin, "inventory.php?which=3", ChecklistSubentryMake(odd_silver_coin.pluralize(), "", description), importance_level_item));
+        available_resources_entries.listAppend(ChecklistEntryMake("__item " + odd_silver_coin, "shop.php?whichshop=cindy", ChecklistSubentryMake(odd_silver_coin.pluralize(), "", description), importance_level_item));
     }
     item grimstone_mask = lookupItem("grimstone mask");
     if (grimstone_mask.available_amount() > 0 && in_run)
@@ -676,7 +682,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
         string [int] description;
         
         description.listAppend("Wear to take you places.");
-        description.listAppend("The prince's ball lets you find odd silver coins.|Up to six, one adventure each.");
+        description.listAppend("The prince's ball (stepmother) lets you find odd silver coins.|Up to six, one adventure each.");
         description.listAppend("Rumpelstiltskin's for towerkilling with small golem.|Small golem is a 5k/round combat item.|Involves the semi-rare in village. Don't know the details, sorry.");
         if (get_property("grimstoneMaskPath").length() > 0)
             description.listAppend("Currently on the path of " + get_property("grimstoneMaskPath") + ".");
@@ -684,7 +690,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
         available_resources_entries.listAppend(ChecklistEntryMake("__item " + grimstone_mask, "inventory.php?which=3", ChecklistSubentryMake(grimstone_mask.pluralize(), "", description), importance_level_item));
     }
     
-    if ($item[very overdue library book].available_amount() > 0 && in_run)
+    if ($item[very overdue library book].available_amount() > 0 && in_run && __misc_state["Need to level"])
     {
         available_resources_entries.listAppend(ChecklistEntryMake("__item very overdue library book", "inventory.php?which=3", ChecklistSubentryMake("Very overdue library book", "", "Open for 63 moxie/mysticality/muscle."), importance_level_unimportant_item));
     }

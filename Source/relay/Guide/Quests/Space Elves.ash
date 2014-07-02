@@ -1,6 +1,5 @@
 void QSpaceElvesInit()
 {
-	//questG04Nemesis
 	QuestState state;
 	
 	QuestStateParseMafiaQuestProperty(state, "questF04Elves");

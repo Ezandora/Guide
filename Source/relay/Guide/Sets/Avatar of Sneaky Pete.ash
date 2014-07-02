@@ -53,7 +53,7 @@ void SSneakyPeteGenerateResource(ChecklistEntry [int] available_resources_entrie
         if (!lookupSkill("Natural Dancer").have_skill() && !__quest_state["Pirate Quest"].finished && $item[talisman o' nam].available_amount() == 0)
             targets.listAppend("Three times in the F'c'le, if you can't acquire Natural Dancer/+234% items.");
             
-        if (!__quest_state["Level 11 Pyramid"].state_boolean["Desert Explored"] && !__quest_state["Level 11 Pyramid"].state_boolean["Killing Jar Given"] && $item[killing jar].available_amount() == 0)
+        if (!__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && !__quest_state["Level 11 Desert"].state_boolean["Killing Jar Given"] && $item[killing jar].available_amount() == 0)
             targets.listAppend("Haunted Library - Banshee - Killing Jar to speed up desert exploration.");
         if (__quest_state["Level 4"].state_int["areas unlocked"] + $item[sonar-in-a-biscuit].available_amount() < 3)
             targets.listAppend("Batrat/Ratbat - Sonar-in-a-biscuit.");
@@ -171,7 +171,7 @@ void SSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
                         options.listAppend("yellow ray (need flash headlight)");
                         options.listAppend("prismatic damage (need flash headlight)");
                     }
-                    if (!__quest_state["Level 11 Pyramid"].state_boolean["Desert Explored"])
+                    if (!__quest_state["Level 11 Desert"].state_boolean["Desert Explored"])
                         options.listAppend("+2% desert exporation");
                 }
                 else if (property_name == "peteMotorbikeMuffler")

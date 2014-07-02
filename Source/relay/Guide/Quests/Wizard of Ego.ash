@@ -98,7 +98,6 @@ void QWizardOfEgoGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     {
         //3	Much as you expected, you've been given back the key to Fernswarthy's tower and ordered to investigate.
         url = "fernruin.php";
-        subentry.modifiers.listAppend("-combat?");
         subentry.entries.listAppend("Adventure in the tower ruins.");
     }
     else if (base_quest_state.mafia_internal_step == 4)
@@ -106,21 +105,18 @@ void QWizardOfEgoGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         //4	You've unlocked Fernswarthy's tower. Now you just have to find something to show your guild leaders, to prove you haven't just been slacking off this whole time.
         //Unlocking just means visiting the area.
         url = "fernruin.php";
-        subentry.modifiers.listAppend("-combat?");
         subentry.entries.listAppend("Adventure in the tower ruins. Three more non-combats remain.");
     }
     else if (base_quest_state.mafia_internal_step == 5)
     {
         //5	You've found some stairs in Fernswarthy's tower, but they don't lead to much. Better keep looking.
         url = "fernruin.php";
-        subentry.modifiers.listAppend("-combat?");
         subentry.entries.listAppend("Adventure in the tower ruins. Two more non-combats remain.");
     }
     else if (base_quest_state.mafia_internal_step == 6)
     {
         //6	You've found a trapdoor to Fernswarthy's basement, which is potentially interesting and/or dangerous. It's probably not what your Guild is interested in, though, so you should probably keep looking.
         url = "fernruin.php";
-        subentry.modifiers.listAppend("-combat?");
         subentry.entries.listAppend("Adventure in the tower ruins. One more non-combat remain.");
     }
     

@@ -18,7 +18,7 @@ void SOldLevel9GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     }
     else
     {
-        description.listAppend("Make the 64735 scroll using the rampaging fax machine.");
+        description.listAppend("Make the 64735 scroll using the rampaging adding machine.");
         
         item [int] components_testing;
         if ($item[64067 scroll].available_amount() == 0)
