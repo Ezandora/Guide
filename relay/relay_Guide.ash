@@ -7674,9 +7674,10 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                     url = $location[the haunted bedroom].getClickableURLForLocation();
                     single_entry_mode = "Adventure in the haunted bedroom for a disposable instant camera.";
                     int monsters_in_zone = 0;
-                    foreach m in $monsters[animated mahogany nightstand,animated ornate nightstand,animated rustic nightstand,elegant animated nightstand,Wardr&ouml;b nightstand]
+                    foreach s in $strings[animated mahogany nightstand,animated ornate nightstand,animated rustic nightstand,elegant animated nightstand,Wardr&ouml;b nightstand]
                     {
-                        if (!m.is_banished())
+                        monster m = s.to_monster();
+                        if (!m.is_banished() || m == $monster[none])
                             monsters_in_zone += 1;
                     }
                     if (monsters_in_zone == 0)
