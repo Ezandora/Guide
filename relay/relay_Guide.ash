@@ -9444,7 +9444,7 @@ boolean generateTowerFamiliarWeightMethod(string [int] how, string [int] immedia
         weight_modifiers.listAppend(TFWMInternalModifierMake("irradiated pet snacks (semi-rare, menagerie level 2)", false, false, true, 10.0));
     }
     //billiards
-    if (__misc_state["VIP available"] && get_property_int("_poolGames") <3 || $effect[Billiards Belligerence].have_effect() > 0)
+    if (__misc_state["VIP available"] && get_property_int("_poolGames") <3 && !__misc_state["type 69 restrictions active"] || $effect[Billiards Belligerence].have_effect() > 0)
     {
         boolean have_effect = $effect[Billiards Belligerence].have_effect() > 0;
         weight_modifiers.listAppend(TFWMInternalModifierMake("VIP Pool (play aggressively)", have_effect, have_effect || (get_property_int("_poolGames") <3), true, 5.0));
@@ -19836,8 +19836,6 @@ void setUpState()
     if (__misc_state["VIP available"])
     {
         int soaks_remaining = MAX(0, 5 - get_property_int("_hotTubSoaks"));
-        if (__misc_state["type 69 restrictions active"])
-            soaks_remaining = 0;
         __misc_state_int["hot tub soaks remaining"] = soaks_remaining;
     }
 	
@@ -21257,7 +21255,7 @@ void generateDailyResources(Checklist [int] checklists)
 		available_resources_entries.listAppend(ChecklistEntryMake("__item inflatable duck", "", ChecklistSubentryMake("Dive for swimming pool item", "", "\"swim item\" in GCLI"), 5));
 	if (!get_property_boolean("_olympicSwimmingPool") && __misc_state["VIP available"])
 		available_resources_entries.listAppend(ChecklistEntryMake("__item inflatable duck", "clan_viplounge.php?action=swimmingpool", ChecklistSubentryMake("Swim in VIP pool", "50 turns", listMake("+20 ML, +30% init", "Or -combat")), 5));
-	if (!get_property_boolean("_aprilShower") && __misc_state["VIP available"])
+	if (!get_property_boolean("_aprilShower") && __misc_state["VIP available"] && !__misc_state["type 69 restrictions active"])
 	{
 		string [int] description;
 		if (__misc_state["need to level"])
@@ -21278,7 +21276,7 @@ void generateDailyResources(Checklist [int] checklists)
 		
 		available_resources_entries.listAppend(ChecklistEntryMake("__item shard of double-ice", "", ChecklistSubentryMake("Take a shower", description), 5));
 	}
-    if (__misc_state["VIP available"] && get_property_int("_poolGames") <3 )
+    if (__misc_state["VIP available"] && get_property_int("_poolGames") <3 && !__misc_state["type 69 restrictions active"])
     {
         int games_available = 3 - get_property_int("_poolGames");
         string [int] description;
