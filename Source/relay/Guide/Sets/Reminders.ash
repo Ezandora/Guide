@@ -160,6 +160,13 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         
         effect [item] item_effects;
         string [item] item_descriptions;
+        
+        if ($effect[Purple Tongue].have_effect() == 0 && $effect[Green Tongue].have_effect() == 0 && $effect[Red Tongue].have_effect() == 0 && $effect[Blue Tongue].have_effect() == 0 && $effect[Black Tongue].have_effect() == 0)
+        {
+            item_descriptions[$item[orange snowcone]] = "+1.5 mainstat/fight (20 turns)";
+            item_effects[$item[orange snowcone]] = $effect[Orange Tongue];
+        }
+        
         if (__misc_state["need to level moxie"])
         {
             item_descriptions[$item[Ye Olde Bawdy Limerick]] = "+2 moxie stats/fight (20 turns)";
@@ -248,7 +255,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     }
     
     boolean have_blacklight_bulb = (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE && get_property("peteMotorbikeHeadlight") == "Blacklight Bulb");
-    if (__last_adventure_location == $location[the arid\, extra-dry desert] && !__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && __misc_state["In run"] && !have_blacklight_bulb)
+    if (__last_adventure_location == $location[the arid\, extra-dry desert] && !__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && __misc_state["In run"] && !have_blacklight_bulb && __quest_state["Level 11 Desert"].state_int["Desert Exploration"] < 99)
     {
         boolean have_uv_compass_equipped = __quest_state["Level 11 Desert"].state_boolean["Have UV-Compass eqipped"];
         

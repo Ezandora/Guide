@@ -184,8 +184,8 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         //Unlock black market:
         url = "place.php?whichplace=woods";
         
-        subentry.modifiers.listAppend("+combat");
-        subentry.entries.listAppend("Unlock the black market by adventuring in the Black Forest with +combat.");
+        subentry.modifiers.listAppend("+5% combat");
+        subentry.entries.listAppend("Unlock the black market by adventuring in the Black Forest with +5% combat.");
         
         if ($item[blackberry galoshes].available_amount() > 0)
         {
@@ -220,7 +220,7 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         //FIXME test if having a reassembled blackbird in your inventory is more than enough in any path?
         //FIXME handle both reassembled blackbird and reconstituted crow as familiar
         
-        if (missing_components.available_amount() > 0 && bird_needed.available_amount() == 0)
+        if (missing_components.count() > 0 && bird_needed.available_amount() == 0)
         {
             subentry.modifiers.listAppend("+100% item"); //FIXME what is the drop rate for bees hate you items? we don't know...
         }
@@ -240,7 +240,7 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
                 subentry.entries.listAppend("Bring along another familiar, you don't need to use the bird anymore.");
             }
         }
-        else if (bird_needed.available_amount() == 0)
+        if (bird_needed.available_amount() == 0)
         {
             string line = "";
             line = "Acquire " + bird_needed + ".";
@@ -313,6 +313,8 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
     string image_name = base_quest_state.image_name;
     if (true)
     {
+        boolean use_fast_route = base_quest_state.state_boolean["Can use fast route"];
+        boolean recipe_will_be_autoread = (mafiaIsPastRevision(14187) && ($item[lord spookyraven's spectacles].available_amount() > 0) && use_fast_route);
         //FIXME spectacles first?
         if (!$location[the haunted ballroom].noncombat_queue.contains_text("We'll All Be Flat") && base_quest_state.mafia_internal_step < 2)
         {
@@ -325,7 +327,6 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
         else
         {
             url = "manor3.php";
-            boolean use_fast_route = base_quest_state.state_boolean["Can use fast route"];
             //FIXME can bees hate you use the fast path?
         
             if (use_fast_route && $item[lord spookyraven's spectacles].available_amount() == 0)
@@ -336,7 +337,12 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
             }
             else if (lookupItem("recipe: mortar-dissolving solution").available_amount() == 0 && !__setting_debug_mode)
             {
-                if (use_fast_route && $item[lord spookyraven's spectacles].equipped_amount() == 0)
+                if (recipe_will_be_autoread)
+                {
+                    subentry.entries.listAppend("Click on the suspicious masonry in the basement.");
+                    image_name = "__item recipe: mortar-dissolving solution";
+                }
+                else if (use_fast_route && $item[lord spookyraven's spectacles].equipped_amount() == 0)
                 {
                     url = "inventory.php?which=2";
                     subentry.entries.listAppend("Equip Lord Spookyraven's Spectacles, click on the suspicious masonry in the basement, then read the recipe.");
@@ -367,7 +373,7 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                         if (lookupItem("unstable fulminate").equipped_amount() == 0)
                         {
                             url = "inventory.php?which=2";
-                            tasks.listAppend("equip unstable fulminate");
+                            tasks.listAppend(HTMLGenerateSpanFont("Equip unstable fulminate", "red", ""));
                         }
                         image_name = "monstrous boiler";
                         tasks.listAppend("adventure in the haunted boiler room with +100 ML");
@@ -500,7 +506,7 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                 }
                 if (use_fast_route)
                 {
-                    if (lookupItem("unstable fulminate").available_amount() == 0 && !output_final_fight_info && lookupItem("bottle of Chateau de Vinegar").available_amount() == 0 && lookupItem("bottle of Chateau de Vinegar").available_amount() == 0)
+                    if (lookupItem("unstable fulminate").available_amount() == 0 && !output_final_fight_info && lookupItem("bottle of Chateau de Vinegar").available_amount() == 0 && lookupItem("bottle of Chateau de Vinegar").available_amount() == 0 && !recipe_will_be_autoread)
                         subentry.entries.listAppend("Remember to wear Spookyraven's spectacles/read the recipe if you haven't.");
                 }
                 else
@@ -653,7 +659,15 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                             line += " (hound dog is useful for this)";
                         subentry.entries.listAppend(line);
                         subentry.modifiers.listAppend("+combat");
-                        subentry.modifiers.listAppend("+300% item");
+                        subentry.modifiers.listAppend("+300% item/food drop");
+                        if (__quest_state["Level 6"].finished && !get_property_boolean("friarsBlessingReceived"))
+                        {
+                            subentry.entries.listAppend("Can use friars blessing for +30% food drop.");
+                        }
+                        if ($item[Gene Tonic: Goblin].available_amount() > 0 && $effect[Human-Goblin Hybrid].have_effect() == 0)
+                        {
+                            subentry.entries.listAppend("Use goblin gene tonic for +50% food drop.");
+                        }
                         if (!in_hardcore())
                             subentry.entries.listAppend("Or pull wet stew.");
                     }
@@ -667,7 +681,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                     subentry.entries.listAppend("Equip the Talisman o' Nam.");
             }
         }
-        else if (base_quest_state.mafia_internal_step == 3)
+        else if (base_quest_state.mafia_internal_step == 3 || 7270.to_item().available_amount() > 0)
         {
             string [int] tasks;
             //talk to mr. alarm to unlock whitey's grove
@@ -724,7 +738,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                 }
                 else
                 {
-                    subentry.entries.listAppend("Photograph Bob Racecar or Racecar Bob with disposable instant camera.");
+                    subentry.entries.listAppend(HTMLGenerateSpanFont("Photograph Bob Racecar or Racecar Bob", "red", "") + " with disposable instant camera.");
                     need_to_adventure_in_palindome = true;
                 }
             }
@@ -960,10 +974,11 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         else
             subentry.entries.listAppend("Use your desert sightseeing pamphlets. (+15% exploration)");
     }
-    if (!base_quest_state.state_boolean["Have UV-Compass eqipped"])
+    if (!base_quest_state.state_boolean["Have UV-Compass eqipped"] && __quest_state["Level 11 Desert"].state_int["Desert Exploration"] < 99)
     {
         boolean should_output_compass_in_red = true;
         string line = "";
+        string line_extra = "";
         if (lookupItem("ornate dowsing rod").available_amount() > 0)
         {
             line = "Equip the ornate dowsing rod.";
@@ -983,7 +998,7 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
               
                 if (lookupItem("odd silver coin").available_amount() > 0 || lookupItem("grimstone mask").available_amount() > 0 || get_property("grimstoneMaskPath").length() > 0) //FIXME check for the correct grimstoneMaskPath
                 {
-                    line += "|Or acquire ornate dowsing rod from Paul's Boutique? (5 odd silver coins)";
+                    line_extra += "|Or acquire ornate dowsing rod from Paul's Boutique? (5 odd silver coins)";
                 }
               
             }
@@ -996,6 +1011,7 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         {
             if (should_output_compass_in_red)
                 line = HTMLGenerateSpanFont(line, "red", "");
+            line += line_extra;
             subentry.entries.listAppend(line);
         }
     }
@@ -1006,12 +1022,15 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
 {
 	if (!__quest_state["Level 11"].in_progress)
         return;
+    if (__quest_state["Level 11 Pyramid"].finished)
+        return;
         
     QuestState base_quest_state = __quest_state["Level 11 Pyramid"];
     ChecklistSubentry subentry;
     subentry.header = base_quest_state.quest_name;
     string url = "";
-    
+    if (!__quest_state["Level 11 Desert"].state_boolean["Desert Explored"])
+        return;
     //Desert explored.
     if ($item[staff of ed].available_amount() + $item[staff of ed].creatable_amount() == 0)
     {
@@ -1019,7 +1038,7 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
         //subentry.entries.listAppend("Find the Staff of Ed.");
         return;
     }
-    else if (base_quest_state.mafia_internal_step <= 12 && false) //no longer tracked
+    else if (!base_quest_state.in_progress && $location[the upper chamber].turnsAttemptedInLocation() == 0)
     {
         url = "place.php?whichplace=desertbeach";
         subentry.entries.listAppend("Visit the pyramid, click on it.");
@@ -1040,9 +1059,9 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
         //middleChamberUnlock, lowerChamberUnlock, controlRoomUnlock implemented
         
         
-        url = "place.php?whichplace=desertbeach";
-        if ($location[the upper chamber].turnsAttemptedInLocation() > 0 || $location[the middle chamber].turnsAttemptedInLocation() > 0 || get_property_boolean("middleChamberUnlock"))
-            url = "pyramid.php";
+        //url = "place.php?whichplace=desertbeach";
+        //if ($location[the upper chamber].turnsAttemptedInLocation() > 0 || $location[the middle chamber].turnsAttemptedInLocation() > 0 || get_property_boolean("middleChamberUnlock"))
+        url = "pyramid.php";
         //pyramidPosition/lastPyramidReset/pyramidBombUsed not tracked yet
         boolean done_with_wheel_turning = false; //FIXME set this
         if (get_property_boolean("middleChamberUnlock") || $location[the middle chamber].turnsAttemptedInLocation() > 0 || $location[the upper chamber].noncombat_queue.contains_text("Down Dooby-Doo Down Down"))

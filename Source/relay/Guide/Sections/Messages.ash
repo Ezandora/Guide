@@ -88,6 +88,7 @@ string generateRandomMessage()
     equipment_messages[$item[heart necklace]] = "&#x2665;&#xfe0e;"; //♥︎
     equipment_messages[$item[fleetwood chain]] = "run in the shadows";
     equipment_messages[$item[liar's pants]] = "never tell the same lie twice";
+    equipment_messages[$item[detective skull]] = "too slow ascend faster";
     
     foreach it in equipment_messages
     {
@@ -152,6 +153,7 @@ string generateRandomMessage()
         paths[PATH_SLOW_AND_STEADY] = "infinite pulls";
     else
         paths[PATH_SLOW_AND_STEADY] = "skip a day if you like";
+    
     paths[PATH_OXYGENARIAN] = "the slow path";
     
     if (paths contains my_path_id())

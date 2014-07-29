@@ -127,7 +127,7 @@ void finalizeSetUpFloristState()
             __plants_suggested_locations.listAppend(PlantSuggestionMake($location[The Defiled Niche], "Wizard's Wig", ""));
 	}
 	//Blustery Puffball - underground, +ML:
-	if (!__quest_state["Level 7"].state_boolean["cranny finished"])
+	if (__quest_state["Level 7"].state_int["cranny evilness"] > 25 + 3)
 	{
 		__plants_suggested_locations.listAppend(PlantSuggestionMake($location[the defiled cranny], "Blustery Puffball", "More beeps from swarm of ghuol whelps."));
 	}

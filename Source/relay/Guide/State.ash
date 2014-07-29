@@ -46,12 +46,14 @@ void setUpState()
     //FIXME: use is_unrestricted once 16.4 is out
     if (my_path_id() == PATH_SLOW_AND_STEADY && (year == 2014 && month <= 8 && !(month == 8 && day >= 15)))
         __misc_state["type 69 restrictions active"] = true;
+    //if (my_path_id() == PATH_SPOILER_PATH && (year == 2014 && month <= 11 && !(month == 11 && day >= 15))) //assumption
+        //__misc_state["type 69 restrictions active"] = true;
     
     
     
 	if (my_turncount() >= 30 && get_property_int("singleFamiliarRun") != -1)
 		__misc_state["single familiar run"] = true;
-	if ($item[Clan VIP Lounge key].available_amount() > 0)
+	if ($item[Clan VIP Lounge key].available_amount() > 0 && !in_bad_moon())
 		__misc_state["VIP available"] = true;
 	boolean fax_available = false;
 	if (__misc_state["VIP available"])

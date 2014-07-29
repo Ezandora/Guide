@@ -217,7 +217,14 @@ void SDNAInit()
     }
     if (!__quest_state["Level 12"].finished && (!have_outfit_components("War Hippy Fatigues") && !have_outfit_components("Frat Warrior Fatigues")) && !__misc_state["yellow ray potentially available"])
     {
-        __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[pirate], "+gear drops", "war outfit?"));
+        __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[pirate], "+50% gear drop", "war outfit?"));
+    }
+    if (__quest_state["Level 11 Palindome"].mafia_internal_step < 5 && $item[mega gem].available_amount() == 0 && in_hardcore() && !(lookupSkill("Check Hair").have_skill() && lookupSkill("Natural Dancer").have_skill())) //avatar of sneaky pete usually can cap this easily... usually
+    {
+        if ($item[wet stunt nut stew].available_amount() == 0 && !(($item[bird rib].available_amount() > 0 && $item[lion oil].available_amount() > 0 || $item[wet stew].available_amount() > 0)))
+        {
+            __phylum_potion_reminder_suggestions.listAppend(DNASuggestionMake($phylum[goblin], "+50% food drop", "Wet stunt nut stew components.")); //300% drop, very important
+        }
     }
     
     if (true)
@@ -468,7 +475,7 @@ void SDNAGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
             if (suggestion_reason.length() > 0)
             {
                 string description = suggestion_reason.capitalizeFirstLetter() + ".";
-                task_entries.listAppend(ChecklistEntryMake("__effect Human-Human Hybrid", "campground.php?action=workshed", ChecklistSubentryMake("Make gene tonic for " + monster_phylum().to_string(), "", description), -11));
+                task_entries.listAppend(ChecklistEntryMake("__effect Human-Human Hybrid", "campground.php?action=workshed", ChecklistSubentryMake("Make gene tonic for " + syringe_phylum, "", description), -11));
             }
         }
         

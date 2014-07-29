@@ -138,9 +138,18 @@ boolean generateTowerFamiliarWeightMethod(string [int] how, string [int] immedia
         boolean have_effect = $effect[healthy green glow].have_effect() > 0;
         weight_modifiers.listAppend(TFWMInternalModifierMake("irradiated pet snacks", have_effect, true, true, 10.0));
     }
-    else if (__misc_state["can eat just about anything"])
+    else if (__misc_state["can eat just about anything"] || (__misc_state["can drink just about anything"] && __misc_state["VIP available"]))
     {
         weight_modifiers.listAppend(TFWMInternalModifierMake("irradiated pet snacks (semi-rare, menagerie level 2)", false, false, true, 10.0));
+    }
+    if (__misc_state["VIP available"] && __misc_state["can drink just about anything"])
+    {
+        if (get_property_int("_speakeasyDrinksDrunk") <3 && availableDrunkenness() >= 3)
+        {
+            boolean have_effect = lookupEffect("Hip to the Jive").have_effect() > 0;
+            weight_modifiers.listAppend(TFWMInternalModifierMake("Speakeasy hot socks", have_effect, true, true, 10.0));
+        }
+        
     }
     //billiards
     if (__misc_state["VIP available"] && get_property_int("_poolGames") <3 && !__misc_state["type 69 restrictions active"] || $effect[Billiards Belligerence].have_effect() > 0)
@@ -294,7 +303,7 @@ void QLevel13Init()
 	state.state_boolean["shadow will need to be defeated"] = !(state.mafia_internal_step < 9);
     //FIXME what paths don't fight the shadow?
     
-	state.state_boolean["king waiting to be freed"] = (state.mafia_internal_step == 11);
+	state.state_boolean["king waiting to be freed"] = (state.mafia_internal_step == 17);
     
     
 	state.state_boolean["have relevant guitar"] = $items[acoustic guitarrr,heavy metal thunderrr guitarrr,stone banjo,Disco Banjo,Shagadelic Disco Banjo,Seeger's Unstoppable Banjo,Massive sitar,4-dimensional guitar,plastic guitar,half-sized guitar,out-of-tune biwa,Zim Merman's guitar,dueling banjo].available_amount() > 0;
@@ -393,20 +402,50 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         }
 		
 	}
-	else if (base_quest_state.mafia_internal_step == 5)
+	else if (base_quest_state.mafia_internal_step > 4 && base_quest_state.mafia_internal_step < 11)
 	{
 		//at tower, time to kill monsters!
 		subentry.entries.listAppend("Tower monsters.");
+        
+        //extremely strange bug here - quest tracking is off for tower monsters. need testing
+        
+        
+        /*int level = -1;
+        
+        if (base_quest_state.mafia_internal_step == 8)
+            level = 1;
+        else if (base_quest_state.mafia_internal_step == 9)
+            level = 2;
+        else if (base_quest_state.mafia_internal_step == 10)
+            level = 3;
+        else if (base_quest_state.mafia_internal_step == 11)
+            level = 4;
+        else if (base_quest_state.mafia_internal_step == 12)
+            level = 5;
+        else if (base_quest_state.mafia_internal_step == 13)
+            level = 6;
+        if (level != -1)
+        {
+            string monster_item = __misc_state_string["Tower monster item " + level];
+            if (monster_item.length() > 0)
+                subentry.entries.listAppend("Level " + level + ", use " + monster_item + ".");
+            else
+                subentry.entries.listAppend("Level " + level + ".");
+            if (level <= 3)
+                url = "lair4.php";
+            else
+                url = "lair5.php";
+        }*/
 		//FIXME show levels and... um... all that
 	}
-	else if (base_quest_state.mafia_internal_step == 6)
+	else if (base_quest_state.mafia_internal_step == 11 || base_quest_state.mafia_internal_step == 12)
 	{
         url = "lair6.php";
 		//past tower, at some sort of door code
 		subentry.entries.listAppend("Puzzles.");
 		subentry.entries.listAppend("Have mafia do it: Quests" + __html_right_arrow_character + "Tower (to shadow)");
 	}
-	else if (base_quest_state.mafia_internal_step == 7 || base_quest_state.mafia_internal_step == 8)
+	else if (base_quest_state.mafia_internal_step == 13)
 	{
         url = "lair6.php";
 		//at top of tower (fight shadow??)
@@ -441,7 +480,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         if (initiative_needed > 0 && !$skill[Ambidextrous Funkslinging].have_skill())
             subentry.entries.listAppend("Need " + initiative_needed + "% more initiative.");
 	}
-	else if (base_quest_state.mafia_internal_step == 9)
+	else if (base_quest_state.mafia_internal_step == 14 || base_quest_state.mafia_internal_step == 15)
 	{
         url = "lair6.php";
 		//counter familiars
@@ -513,7 +552,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         else
             subentry.entries.listAppend("Counter familiars.");
 	}
-	else if (base_quest_state.mafia_internal_step == 10)
+	else if (base_quest_state.mafia_internal_step == 16)
 	{
         url = "lair6.php";
 		//At NS. Good luck, we're all counting on you.
@@ -533,11 +572,19 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         }
 		image_name = "naughty sorceress";
 	}
-	else if (base_quest_state.mafia_internal_step == 11)
+	else if (base_quest_state.mafia_internal_step == 17)
 	{
         url = "lair6.php";
 		//King is waiting in his prism.
-		task_entries.listAppend(ChecklistEntryMake("__item puzzling trophy", "trophy.php", ChecklistSubentryMake("Check for trophies", "10k meat, trophy requirements", "Certain trophies are missable after freeing the king")));
+        
+        boolean trophies_are_possible = false;
+        
+        //ehh, disable displaying this, mostly because it's in the way
+        //if (in_hardcore())
+            //trophies_are_possible = true; //Gourdcore, Golden Meat Stack
+        
+        if (trophies_are_possible)
+            task_entries.listAppend(ChecklistEntryMake("__item puzzling trophy", "trophy.php", ChecklistSubentryMake("Check for trophies", "10k meat, trophy requirements", "Certain trophies are missable after freeing the king")));
 		should_output_main_entry = false;
 		
 	}

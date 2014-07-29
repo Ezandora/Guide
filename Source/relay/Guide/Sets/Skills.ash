@@ -1,7 +1,7 @@
 
 void SSkillsGenerateResource(ChecklistEntry [int] available_resources_entries)
 {	
-	if (have_skill($skill[inigo's incantation of inspiration]))
+	if (skill_is_usable($skill[inigo's incantation of inspiration]))
 	{
 		int inigos_casts_remaining = 5 - get_property_int("_inigosCasts");
 		string description = "";

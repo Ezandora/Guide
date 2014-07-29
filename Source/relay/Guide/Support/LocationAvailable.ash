@@ -213,6 +213,12 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
 			return get_property_int("lastSecondFloorUnlock") == my_ascensions();
         case $location[the haunted ballroom]:
             return questPropertyPastInternalStepNumber("questM21Dance", 4);
+        case $location[the batrat and ratbat burrow]:
+            return questPropertyPastInternalStepNumber("questL04Bat", 2);
+        case $location[the beanbat chamber]:
+            return questPropertyPastInternalStepNumber("questL04Bat", 3);
+        case $location[the boss bat's lair]:
+            return questPropertyPastInternalStepNumber("questL04Bat", 4);
 		case $location[cobb's knob barracks]:
 		case $location[cobb's knob kitchens]:
 		case $location[cobb's knob harem]:
@@ -631,8 +637,8 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         lookup_map["The Filthworm Queen's Chamber"] = "bigisland.php?place=orchard";
         lookup_map["Noob Cave"] = "tutorial.php";
         lookup_map["The Dire Warren"] = "tutorial.php";
-        lookup_map["The Valley of Rof L'm Fao"] = "place.php?whichplace=junggate_6";
-        lookup_map["Mt. Molehill"] = "place.php?whichplace=junggate_6";
+        lookup_map["The Valley of Rof L'm Fao"] = "place.php?whichplace=mountains";
+        lookup_map["Mt. Molehill"] = "place.php?whichplace=mountains";
         lookup_map["The Barrel Full of Barrels"] = "barrel.php";
         lookup_map["Nemesis Cave"] = "cave.php";
         lookup_map["The Smut Orc Logging Camp"] = "place.php?whichplace=orc_chasm";
@@ -738,7 +744,15 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         lookup_map["3rd Floor, Shiawase-Mitsuhama Building"] = "place.php?whichplace=junggate_1";
         lookup_map["Chinatown Tenement"] = "place.php?whichplace=junggate_1";
         lookup_map["A Deserted Stretch of I-911"] = "place.php?whichplace=ioty2014_hare";
+        lookup_map["The Prince's Restroom"] = "place.php?whichplace=ioty2014_cindy";
+        lookup_map["The Prince's Dance Floor"] = "place.php?whichplace=ioty2014_cindy";
+        lookup_map["The Prince's Kitchen"] = "place.php?whichplace=ioty2014_cindy";
+        lookup_map["The Prince's Balcony"] = "place.php?whichplace=ioty2014_cindy";
+        lookup_map["The Prince's Lounge"] = "place.php?whichplace=ioty2014_cindy";
+        lookup_map["The Prince's Canapes table"] = "place.php?whichplace=ioty2014_cindy";
         lookup_map["The Cave Before Time"] = "place.php?whichplace=twitch";
+        lookup_map["An Illicit Bohemian Party"] = "place.php?whichplace=twitch";
+        lookup_map["Mooonshriners' Woods"] = "place.php?whichplace=twitch";
         
         //Conditionals:
         if ($location[cobb's knob barracks].locationAvailable())

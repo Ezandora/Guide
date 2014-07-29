@@ -193,7 +193,8 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
 		}
 		resolution_descriptions[$item[resolution: be kinder]] = "+5 familiar weight (20 turns)";
 		resolution_descriptions[$item[resolution: be luckier]] = "+5% item, +5% meat, +10% init, others (20 turns)"; //???
-		resolution_descriptions[$item[resolution: be more adventurous]] = "+2 adventures at rollover";
+        if (my_path_id() != PATH_SLOW_AND_STEADY)
+            resolution_descriptions[$item[resolution: be more adventurous]] = "+2 adventures at rollover";
 		resolution_descriptions[$item[resolution: be wealthier]] = "+30% meat";
         
         
@@ -498,7 +499,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
             available_resources_entries.listAppend(ChecklistEntryMake("__item desktop zen garden", "", ChecklistSubentryMake(pluralize($item[desktop zen garden]), "", "+20% to mysticality gains. (10 turns)"), importance_level_unimportant_item));
         }
     }
-    if ($item[munchies pill].available_amount() > 0 && fullness_limit() > 0 && in_run)
+    if ($item[munchies pill].available_amount() > 0 && fullness_limit() > 0 && in_run && my_path_id() != PATH_SLOW_AND_STEADY)
     {
         available_resources_entries.listAppend(ChecklistEntryMake("__item munchies pill", "", ChecklistSubentryMake(pluralize($item[munchies pill]), "", "+3 turns from fortune cookies and other low-fullness foods."), importance_level_unimportant_item));
     }
@@ -684,6 +685,8 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
         description.listAppend("Wear to take you places.");
         description.listAppend("The prince's ball (stepmother) lets you find odd silver coins.|Up to six, one adventure each.");
         description.listAppend("Rumpelstiltskin's for towerkilling with small golem.|Small golem is a 5k/round combat item.|Involves the semi-rare in village. Don't know the details, sorry.");
+        if (lookupEffect("Human-Fish Hybrid").have_effect() == 0 && get_campground()[lookupItem("Little Geneticist DNA-Splicing Lab")] > 0 && !__misc_state["familiars temporarily blocked"])
+            description.listAppend("Candy witch for human-fish hybrid. (+10 familiar weight)");
         if (get_property("grimstoneMaskPath").length() > 0)
             description.listAppend("Currently on the path of " + get_property("grimstoneMaskPath") + ".");
         

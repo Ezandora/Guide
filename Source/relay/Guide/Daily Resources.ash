@@ -22,6 +22,7 @@ void generateDailyResources(Checklist [int] checklists)
 	ChecklistEntry [int] available_resources_entries;
 		
 	SetsGenerateResources(available_resources_entries);
+    QuestsGenerateResources(available_resources_entries);
 	
 	if (!get_property_boolean("_fancyHotDogEaten") && availableFullness() > 0 && __misc_state["VIP available"] && __misc_state["can eat just about anything"] && __misc_state["In run"]) //too expensive to use outside a run? well, more that it's information overload
 	{
@@ -123,11 +124,9 @@ void generateDailyResources(Checklist [int] checklists)
 	{
         string [int] description;
         string line = "Various effects.";
-        if (__misc_state["In run"] && my_path_id() != PATH_ZOMBIE_SLAYER)
+        if (__misc_state["In run"] && my_path_id() != PATH_ZOMBIE_SLAYER && $item[pail].available_amount() > 0)
         {
             line = "+20ML";
-            if ($item[pail].available_amount() == 0)
-                line += " with pail (you don't have one, talk to artist)";
             line += "|Or various effects.";
         }
         description.listAppend(line);
@@ -266,6 +265,15 @@ void generateDailyResources(Checklist [int] checklists)
         float rest_mp_restore = overall_multiplier_mp * (numeric_modifier("base resting mp") * (1.0 + resting_mp_percent) + numeric_modifier("bonus resting mp"));
         string [int] description;
         description.listAppend(rest_hp_restore.floor() + " HP, " + rest_mp_restore.floor() + " MP");
+        
+        if ($item[pantsgiving].available_amount() > 0)
+        {
+            if ($item[pantsgiving].equipped_amount() == 0)
+                description.listAppend("Wear pantsgiving for extra HP/MP.");
+            if (availableFullness() > 0)
+                description.listAppend("Eat more for +" + (availableFullness() * 5) + " extra HP/MP.");
+        }
+        
 		available_resources_entries.listAppend(ChecklistEntryMake("__effect sleepy", "campground.php", ChecklistSubentryMake(pluralizeWordy(__misc_state_int["free rests remaining"], "free rest", "free rests").capitalizeFirstLetter(), "", description), 10));
     }
     
@@ -355,12 +363,19 @@ void generateDailyResources(Checklist [int] checklists)
         int soaks_remaining = __misc_state_int["hot tub soaks remaining"];
         if (__misc_state["In run"] && soaks_remaining > 0)
             available_resources_entries.listAppend(ChecklistEntryMake("__effect blessing of squirtlcthulli", "clan_viplounge.php", ChecklistSubentryMake(pluralize(soaks_remaining, "hot tub soak", "hot tub soaks"), "", "Restore all HP, removes most bad effects."), 8));
+        
+        
     }
     //_klawSummons?
     
     //Skill books we have used, but don't have the skill for?
     
     //soul sauce tracking?
+    
+    if ($item[can of rain-doh].available_amount() > 0 && $item[empty rain-doh can].available_amount() == 0 && __misc_state["In run"])
+    {
+        available_resources_entries.listAppend(ChecklistEntryMake("__item can of rain-doh", "inventory.php?which=3", ChecklistSubentryMake("Can of Rain-Doh", "", "Open it!"), 0));
+    }
     
     
     

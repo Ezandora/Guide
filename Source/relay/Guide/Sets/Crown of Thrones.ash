@@ -73,6 +73,7 @@ void listAppend(COTSuggestionSet [int] list, COTSuggestionSet entry)
 void SCOTGenerateSuggestions(string [int] description)
 {
     familiar enthroned_familiar = my_enthroned_familiar();
+    familiar bjorned_familiar = my_bjorned_familiar();
     //Suggest what it offers:
     COTSuggestionSet [int] suggestion_sets;
     
@@ -231,7 +232,7 @@ void SCOTGenerateSuggestions(string [int] description)
                 string familiar_string;
                 
                 familiar_string = best_familiar_by_weight;
-                if (enthroned_familiar == best_familiar_by_weight && enthroned_familiar != $familiar[none])
+                if ((enthroned_familiar == best_familiar_by_weight && enthroned_familiar != $familiar[none]) || (bjorned_familiar == best_familiar_by_weight && bjorned_familiar != $familiar[none]))
                     familiar_string = HTMLGenerateSpanOfClass(best_familiar_by_weight, "r_bold");
                     
                 if (second_best_familiar_by_weight != $familiar[none] && have_two_available)
@@ -259,6 +260,7 @@ void SCOTGenerateResource(ChecklistEntry [int] available_resources_entries)
     
     string image_name = "__item " + crown_item;
     familiar enthroned_familiar = my_enthroned_familiar();
+    familiar bjorned_familiar = my_bjorned_familiar();
     
     if (($item[crown of thrones].equipped_amount() > 0 || lookupItem("Buddy Bjorn").equipped_amount() > 0) || __misc_state["in run"])
     {
@@ -270,6 +272,8 @@ void SCOTGenerateResource(ChecklistEntry [int] available_resources_entries)
 		description.listAppend(enthroned_familiar + " enthroned.");
         //image_name = "__familiar " + enthroned_familiar.to_string();
     }
+    if (bjorned_familiar != $familiar[none])
+		description.listAppend(bjorned_familiar + " bjorned.");
     //FIXME my_bjorned_familiar() when 16.3
     
     string url = "familiar.php";

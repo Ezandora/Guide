@@ -1,4 +1,4 @@
-void QSpookyravenLightsOutGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+void QSpookyravenLightsOutGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, boolean from_task) //if from_task is false, assumed to be from resources
 {
     //nextSpookyravenElizabethRoom
     //nextSpookyravenStephenRoom
@@ -15,6 +15,12 @@ void QSpookyravenLightsOutGenerateTasks(ChecklistEntry [int] task_entries, Check
     int turns_until_next_lights_out = -1;
     
     //turns_until_next_lights_out = 37 - total_turns_played() % 37; //FIXME uncomment next point release
+    
+    Counter lights_out_counter = CounterLookup("Spookyraven Lights Out");
+    if (lights_out_counter.CounterExists() && !lights_out_counter.CounterIsRange())
+        turns_until_next_lights_out = lights_out_counter.CounterGetNextExactTurn();
+        
+    
     if (turns_until_next_lights_out == 37)
         turns_until_next_lights_out = 0;
     
@@ -24,7 +30,7 @@ void QSpookyravenLightsOutGenerateTasks(ChecklistEntry [int] task_entries, Check
     string url = "";
     
     ChecklistSubentry [int] important_subentries;
-    if (turns_until_next_lights_out == 0)
+    if (turns_until_next_lights_out == 0 && from_task)
     {
         //now
         if (next_stephen_location != $location[none])
@@ -108,7 +114,7 @@ void QSpookyravenLightsOutGenerateTasks(ChecklistEntry [int] task_entries, Check
             important_subentries.listAppend(ChecklistSubentryMake("Elizabeth Spookyraven Quest", "", description));
         }
     }
-    else if (turns_until_next_lights_out < 6)
+    else if ((turns_until_next_lights_out < 6 && from_task) || (turns_until_next_lights_out >= 6 && !from_task))
     {
         //Soon...
         //FIXME should we show this?
@@ -119,7 +125,7 @@ void QSpookyravenLightsOutGenerateTasks(ChecklistEntry [int] task_entries, Check
             available_questlines.listAppend("Elizabeth");
         if (available_questlines.count() > 0)
         {
-            optional_task_entries.listAppend(ChecklistEntryMake("__half Lights Out", "", ChecklistSubentryMake("Lights Out in " + pluralize(turns_until_next_lights_out, "adventure", "adventures"), "", available_questlines.listJoinComponents(",", "and") + " quest " + (available_questlines.count() > 1 ? "lines" : "line") + " available."), 5));
+            optional_task_entries.listAppend(ChecklistEntryMake("__half Lights Out", "", ChecklistSubentryMake("Lights Out in " + pluralize(turns_until_next_lights_out, "adventure", "adventures"), "", available_questlines.listJoinComponents(",", "and") + " quest " + (available_questlines.count() > 1 ? "lines" : "line") + "."), (from_task ? 5 : 8)));
         }
     }
     
@@ -127,4 +133,14 @@ void QSpookyravenLightsOutGenerateTasks(ChecklistEntry [int] task_entries, Check
     {
         task_entries.listAppend(ChecklistEntryMake("__half Lights Out", url, important_subentries, -11));
     }
+}
+
+void QSpookyravenLightsOutGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+	QSpookyravenLightsOutGenerateEntry(task_entries, optional_task_entries, true);
+}
+
+void QSpookyravenLightsOutGenerateResource(ChecklistEntry [int] available_resources_entries)
+{
+	QSpookyravenLightsOutGenerateEntry(available_resources_entries, available_resources_entries, false);
 }

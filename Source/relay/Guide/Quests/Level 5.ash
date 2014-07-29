@@ -144,7 +144,7 @@ void QLevel5GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 			else
 			{
 				string cook_cake_line  = "cook a knob cake (1 adventure";
-				if (have_skill($skill[inigo's incantation of inspiration]))
+				if (skill_is_usable($skill[inigo's incantation of inspiration]))
 					cook_cake_line += ", can use inigo's";
 				cook_cake_line += ")";
 				string [int] things_to_do_before_fighting_king;

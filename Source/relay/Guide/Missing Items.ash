@@ -70,9 +70,9 @@ void generateMissingItems(Checklist [int] checklists)
 		if (!__quest_state["Level 13"].state_boolean["have relevant drum"])
 		{
 			string [int] suggestions;
-			suggestions.listAppend("Black kettle drum (black forest NC)");
+			suggestions.listAppend("Black kettle drum - run -combat in the black forest, choose Church->Orchestra Pit in the NC.");
 			if ($item[broken skull].available_amount() > 0)
-				suggestions.listAppend("Bone rattle (skeleton bone + broken skull)");
+				suggestions.listAppend(HTMLGenerateSpanOfClass("Bone rattle (paste skeleton bone + broken skull)", "r_bold"));
 			suggestions.listAppend("Jungle drum (pygmy assault squad, hidden park, 10% drop)");
 			suggestions.listAppend("Hippy bongo (YR hippy)");
 			suggestions.listAppend("tambourine?");
@@ -253,7 +253,7 @@ void generateMissingItems(Checklist [int] checklists)
 			{
 				if (it == $item[none])
 					continue;
-				telescope_item_suggestions[it] += "|Or potentially bring along the gelatinous cubeling.";
+				telescope_item_suggestions[it] += "|Or potentially bring along the gelatinous cubeling. (~18 turns)";
 			}
 		}
 		

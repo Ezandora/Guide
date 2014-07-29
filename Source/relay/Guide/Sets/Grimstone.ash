@@ -121,12 +121,54 @@ void SGrimstoneHareGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 	optional_task_entries.listAppend(ChecklistEntryMake("__effect hare-brained", "place.php?whichplace=ioty2014_hare", ChecklistSubentryMake("Hare Race", modifiers, description)));
 }
 
+void SGrimstoneStepmotherGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    int minutes_to_midnight = get_property_int("cinderellaMinutesToMidnight");
+    if (minutes_to_midnight <= 0)
+        return;
+    string [int] description;
+    string [int] modifiers;
+    
+    description.listAppend(pluralize(minutes_to_midnight, "minute", "minutes") + " to midnight");
+    
+    
+    //FIXME add suggestions for a path
+	optional_task_entries.listAppend(ChecklistEntryMake("__item broken clock", "place.php?whichplace=ioty2014_cindy", ChecklistSubentryMake("The Prince's Ball", modifiers, description)));
+}
+
+void SGrimstoneWolfGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    //FIXME I have no idea
+}
+
+void SGrimstoneWitchGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    //FIXME I have no idea
+}
+
+void SGrimstoneGnomeGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    //FIXME I have no idea
+}
 
 void SGrimstoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     //grimstoneMaskPath
     //rumpelstiltskinTurnsUsed gives number of turns used getting materials. rumpelstiltskinKidsRescued gives the number of children rescued. It is likely that there are more messages than are documented on the wiki, so if some are missing and aren't parsed correctly, please put a note in the forum.
     //cinderellaMinutesToMidnight gives number of turns remaining. cinderellaScore gives the current score. Also added grimstoneMaskPath which gives the current grimstone content available, "stepmother", "wolf", "witch", "gnome" or "hare".
+    
+    string mask_path = get_property("grimstoneMaskPath");
+    
     if (lookupEffect("hare-brained").have_effect() > 0)
         SGrimstoneHareGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+    if (mask_path == "stepmother")
+        SGrimstoneStepmotherGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+    if (mask_path == "wolf")
+        SGrimstoneWolfGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+    if (mask_path == "witch")
+        SGrimstoneWitchGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+    if (mask_path == "gnome")
+        SGrimstoneGnomeGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+    if (mask_path == "tuxedo")
+        task_entries.listAppend(ChecklistEntryMake("__item long-stemmed rose", "arcade.php", ChecklistSubentryMake("Believe in yourself", "", ""), -11));
 }

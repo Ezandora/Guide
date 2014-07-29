@@ -30,14 +30,33 @@ void listAppend(Semirare [int] list, Semirare entry)
 
 void SemirareGenerateDescription(string [int] description)
 {
-	if (CounterLookup("Semi-rare").CounterIsRange() && __misc_state["can eat just about anything"])
-	{
-		string line = "Eat a fortune cookie";
-		if (availableFullness() == 0)
-			line += " later.";
-        else
-            line += ".";
-		description.listAppend(line);
+	if (CounterLookup("Semi-rare").CounterIsRange())
+    {
+        boolean fortune_output = false;
+        string line;
+        if (__misc_state["can eat just about anything"])
+        {
+            line = "Eat a fortune cookie";
+            if (availableFullness() <= 0)
+                line += " later.";
+            else
+                line += ".";
+            fortune_output = true;
+        }
+        if (__misc_state["VIP available"] && __misc_state["can drink just about anything"])
+        {
+            if (fortune_output)
+                line += " Or drink a Lucky Lindy";
+            else
+                line += "Drink a Lucky Lindy";
+            if (availableDrunkenness() <= 0 || get_property_int("_speakeasyDrinksDrunk") >= 3)
+                line += " later.";
+            else
+                line += ".";
+            
+        }
+        if (line.length() > 0)
+            description.listAppend(line);
 	}
 	location last_location = $location[none];
 	if (get_property_int("lastSemirareReset") == my_ascensions() && get_property("semirareLocation") != "")

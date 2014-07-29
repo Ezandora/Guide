@@ -62,3 +62,8 @@ void QuestsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 	QWizardOfEgoGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	QSpookyravenLightsOutGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 }
+
+void QuestsGenerateResources(ChecklistEntry [int] available_resources_entries)
+{
+    QSpookyravenLightsOutGenerateResource(available_resources_entries);
+}

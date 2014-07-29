@@ -155,6 +155,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
             cold_damage_levels.listAppend(cold_damage_taken_cumulative);
         }
         
+        boolean can_survive_clues_now = false;
         if (true)
         {
             string line;
@@ -164,6 +165,8 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
             if (hp_damage_taken >= my_hp())
                 hp_string = HTMLGenerateSpanFont(hp_string, "red", "");
             
+            if (hp_damage_taken <= my_maxhp())
+                can_survive_clues_now = true;
             line = "Need " + hp_string + " (" + HTMLGenerateSpanOfClass(spooky_damage_levels[4] + " spooky", "r_element_spooky") + ", " + HTMLGenerateSpanOfClass(cold_damage_levels[4] + " cold", "r_element_cold") + ") to survive 30% effective A-Boo clues.";
             if (hp_damage_taken >= my_hp())
             {
@@ -186,6 +189,8 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
         }
         if ($item[a-boo clue].available_amount() * 30 >= base_quest_state.state_int["a-boo peak hauntedness"] && my_level() < 13) //wait for later
             should_delay = true;
+        if (can_survive_clues_now)
+            should_delay = false;
         
         ChecklistEntry checklist_entry = ChecklistEntryMake("a-boo peak", "place.php?whichplace=highlands", ChecklistSubentryMake("A-Boo Peak", modifiers, details), $locations[a-boo peak]);
 		if (should_delay)
@@ -414,8 +419,8 @@ void QLevel9GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         url = "place.php?whichplace=orc_chasm";
 		//build bridge:
 		subentry.modifiers.listAppend("+item");
-        if (__misc_state["have olfaction equivalent"])
-            subentry.modifiers.listAppend("olfaction");
+        //if (__misc_state["have olfaction equivalent"]) //don't remember what you'd olfact here
+            //subentry.modifiers.listAppend("olfaction");
 		subentry.entries.listAppend("Build a bridge.");
         
         if (get_property("questM15Lol") != "finished" && ($item[bridge].available_amount() > 0 || $item[dictionary].available_amount() == 0))

@@ -43,57 +43,60 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 	if ($item[s.o.c.k.].available_amount() == 0)
 	{
         //FIXME delay if ballroom song not set
+        image_name = "penultimate fantasy airship";
         if (!base_quest_state.state_boolean["Beanstalk grown"])
         {
             subentry.entries.listAppend("Grow the beanstalk.");
             url = "place.php?whichplace=plains";
         }
-		//FIXME check if enchanted bean used
-		subentry.modifiers.listAppend("-combat");
-		if (__misc_state["free runs available"])
-			subentry.modifiers.listAppend("free runs");
-		if (__misc_state["have hipster"])
-			subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
-		
-		string [int] things_we_want_item_for;
-        
-        if ($skill[Transcendent Olfaction].have_skill())
-            things_we_want_item_for.listAppend("SGEEA");
-		
-		image_name = "penultimate fantasy airship";
-		
-		//immateria:
-		
-		item [int] immaterias_missing = $items[Tissue Paper Immateria,Tin Foil Immateria,Gauze Immateria,Plastic Wrap Immateria].items_missing();
-		if (immaterias_missing.count() == 0)
-			subentry.entries.listAppend("Immateria found, find Cid (-combat)");
-		else
-		{
-			subentry.entries.listAppend("Find the immateria (-combat): " + listJoinComponents(immaterias_missing, ", ", "and"));
-		}
-		
-		
-        //FIXME it would be nice to track this
-		subentry.entries.listAppend("25 total turns of delay.");
-		if ($skill[Transcendent Olfaction].have_skill() && !($effect[on the trail].have_effect() > 0 && get_property("olfactedMonster") == "Quiet Healer"))
-			subentry.entries.listAppend("Potentially olfact quiet healer for SGEEAs");
-		
-		if ($item[model airship].available_amount() == 0)
-			subentry.entries.listAppend("Acquire model airship from non-combat. (speeds up quest)");
-		if ($item[amulet of extreme plot significance].available_amount() == 0)
-		{
-			things_we_want_item_for.listAppend("amulet of extreme plot significance");
-			subentry.entries.listAppend("Acquire amulet of extreme plot significance (quiet healer, 10% drop) to speed up opening ground floor.");
-		}
-		if ($item[mohawk wig].available_amount() == 0)
-		{
-			things_we_want_item_for.listAppend("Mohawk wig");
-			subentry.entries.listAppend("Acquire mohawk wig (Burly Sidekick, 10% drop) to speed up top floor.");
-		}
-        if (things_we_want_item_for.count() > 0)
+        else
         {
-            subentry.modifiers.listAppend("+item");
-            subentry.entries.listAppend("Potentially run +item for " + listJoinComponents(things_we_want_item_for, ", ", "and") + ".");
+            //FIXME check if enchanted bean used
+            subentry.modifiers.listAppend("-combat");
+            if (__misc_state["free runs available"])
+                subentry.modifiers.listAppend("free runs");
+            if (__misc_state["have hipster"])
+                subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
+            
+            string [int] things_we_want_item_for;
+            
+            if ($skill[Transcendent Olfaction].have_skill())
+                things_we_want_item_for.listAppend("SGEEA");
+            
+            
+            //immateria:
+            
+            item [int] immaterias_missing = $items[Tissue Paper Immateria,Tin Foil Immateria,Gauze Immateria,Plastic Wrap Immateria].items_missing();
+            if (immaterias_missing.count() == 0)
+                subentry.entries.listAppend("Immateria found, find Cid (-combat)");
+            else
+            {
+                subentry.entries.listAppend("Find the immateria (-combat): " + listJoinComponents(immaterias_missing, ", ", "and"));
+            }
+            
+            
+            //FIXME it would be nice to track this
+            subentry.entries.listAppend("25 total turns of delay.");
+            if ($skill[Transcendent Olfaction].have_skill() && !($effect[on the trail].have_effect() > 0 && get_property("olfactedMonster") == "Quiet Healer"))
+                subentry.entries.listAppend("Potentially olfact quiet healer for SGEEAs");
+            
+            if ($item[model airship].available_amount() == 0)
+                subentry.entries.listAppend("Acquire model airship from non-combat. (speeds up quest)");
+            if ($item[amulet of extreme plot significance].available_amount() == 0)
+            {
+                things_we_want_item_for.listAppend("amulet of extreme plot significance");
+                subentry.entries.listAppend("Acquire amulet of extreme plot significance (quiet healer, 10% drop) to speed up opening ground floor.");
+            }
+            if ($item[mohawk wig].available_amount() == 0)
+            {
+                things_we_want_item_for.listAppend("Mohawk wig");
+                subentry.entries.listAppend("Acquire mohawk wig (Burly Sidekick, 10% drop) to speed up top floor.");
+            }
+            if (things_we_want_item_for.count() > 0)
+            {
+                subentry.modifiers.listAppend("+item");
+                subentry.entries.listAppend("Potentially run +item for " + listJoinComponents(things_we_want_item_for, ", ", "and") + ".");
+            }
         }
 	}
 	else

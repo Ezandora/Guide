@@ -251,7 +251,7 @@ void generatePullList(Checklist [int] checklists)
     //Ideas: Goat cheese, keepsake box, spooky-gro fertilizer, harem outfit, perfume, rusty hedge trimmers, bowling ball, surgeon gear, tomb ratchets or tangles, all the other pies
     //FIXME suggest ore when we don't have access to free mining
     
-    
+    pullable_item_list.listAppend(GPItemMake($item[ring of conflict], "-combat"));
     
 	//FIXME suggest guitar if we're out of clovers, we need one, and we've gone past belowdecks already?
 	
@@ -316,6 +316,8 @@ void generatePullList(Checklist [int] checklists)
 			item it = items[key];
 			if (currently_trendy && !is_trendy(it))
 				continue;
+            if (!is_unrestricted_passthrough(it))
+                continue;
             //if (!it.is_unrestricted()) continue; //FIXME uncomment next point release
 			int actual_amount = pullable_amount(it, max_wanted);
 			if (actual_amount > 0)

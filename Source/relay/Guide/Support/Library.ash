@@ -2,6 +2,34 @@ import "relay/Guide/Support/Math.ash"
 import "relay/Guide/Support/List.ash"
 
 
+
+//temporary placeholder until next point release:
+boolean is_unrestricted_passthrough(item v)
+{
+    //return is_unrestricted(v);
+    return true;
+}
+
+boolean is_unrestricted_passthrough(skill v)
+{
+    //return is_unrestricted(v);
+    return true;
+}
+
+boolean is_unrestricted_passthrough(familiar v)
+{
+    //return is_unrestricted(v);
+    return true;
+}
+
+boolean is_unrestricted_passthrough(string v)
+{
+    //return is_unrestricted(v);
+    return true;
+}
+
+
+
 //Additions to standard API:
 //Auto-conversion property functions:
 boolean get_property_boolean(string property)
@@ -117,6 +145,8 @@ boolean familiar_is_usable(familiar f)
     //r13998 has most of these
     if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE)
         return false;
+    if (!is_unrestricted_passthrough(f))
+        return false;
 	int single_familiar_run = get_property_int("singleFamiliarRun");
 	if (single_familiar_run != -1 && my_turncount() >= 30) //after 30 turns, they're probably sure
 	{
@@ -135,6 +165,16 @@ boolean familiar_is_usable(familiar f)
 			return false; //so not green
 	}
 	return have_familiar(f);
+}
+
+//inigo's shows up as have_skill while under restrictions, possibly others
+boolean skill_is_usable(skill s)
+{
+    if (!s.have_skill())
+        return false;
+    if (!s.is_unrestricted_passthrough())
+        return false;
+    return true;
 }
 
 //Possibly skill_is_usable as well, for trendy and such.
@@ -503,17 +543,16 @@ int totalDelayForLocation(location place)
 {
     int [location] place_delays;
     place_delays[$location[the spooky forest]] = 5;
-    //place_delays[$location[the haunted ballroom]] = 5;
-    //place_delays[$location[the haunted bedroom]] = 5; //combats not tracked properly?
-    //place_delays[$location[the haunted library]] = 5;
-    //place_delays[$location[the haunted billiards room]] = 5;
     place_delays[$location[the haunted bedroom]] = 6; //a guess from spading
     place_delays[$location[the boss bat's lair]] = 4;
     place_delays[$location[the oasis]] = 5;
     place_delays[$location[the hidden park]] = 5;
     place_delays[$location[the haunted gallery]] = 5; //FIXME this is a guess, spade
-    place_delays[$location[the haunted bathroom]] = 5; //FIXME rumored
+    place_delays[$location[the haunted bathroom]] = 5;
     place_delays[$location[the haunted ballroom]] = 5; //FIXME rumored
+    //the haunted billiards room does not contain delay
+    //yojimbos_law saw it on turn two on 2014-7-14, immediately after seeing the pool cue adventure, as have I
+    //also failure at 16 skill
     //place_delays[$location[the haunted everyroominthemanor]] = 5;
     
     if (place_delays contains place)

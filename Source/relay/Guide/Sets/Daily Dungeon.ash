@@ -3,7 +3,7 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 	
 	if (__last_adventure_location == $location[The Daily Dungeon])
 	{
-		if ($item[ring of detect boring doors].equipped_amount() == 0 && $item[ring of detect boring doors].available_amount() > 0 && !get_property_boolean("dailyDungeonDone"))
+		if ($item[ring of detect boring doors].equipped_amount() == 0 && $item[ring of detect boring doors].available_amount() > 0 && !get_property_boolean("dailyDungeonDone") && get_property_int("_lastDailyDungeonRoom") < 13)
 		{
 			task_entries.listAppend(ChecklistEntryMake("__item ring of detect boring doors", "inventory.php?which=2", ChecklistSubentryMake("Wear ring of detect boring doors", "", "Speeds up daily dungeon"), -11));
 		}
@@ -67,6 +67,7 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 		if (familiar_is_usable($familiar[gelatinous cubeling]))
 		{
             item [int] missing_items;
+            int priority = CHECKLIST_DEFAULT_IMPORTANCE;
             
             missing_items = $items[eleven-foot pole,ring of detect boring doors,pick-o-matic lockpicks].items_missing();
 			if (missing_items.count() > 0)
@@ -81,8 +82,14 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 				subentry.header = "Bring along the gelatinous cubeling";
 			
 				subentry.entries.listAppend("Acquire " + missing_items.listJoinComponents(", ", "and") + " to speed up the daily dungeon.");
+                
+                if (missing_items.count() == 1 && missing_items[0] == $item[pick-o-matic lockpicks] && skeleton_key_amount > 1)
+                {
+                    subentry.entries.listAppend("Or ignore this and use the skeleton keys. (slightly risky)");
+                    priority = 8;
+                }
 			
-				optional_task_entries.listAppend(ChecklistEntryMake("__familiar gelatinous cubeling", url, subentry));
+				optional_task_entries.listAppend(ChecklistEntryMake("__familiar gelatinous cubeling", url, subentry, priority));
 			}
 		}
 		else

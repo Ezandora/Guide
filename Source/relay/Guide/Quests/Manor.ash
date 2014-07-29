@@ -102,21 +102,21 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     
     boolean second_floor_probably_open = false;
     
+    //if (lookupItem("7301").available_amount() == 0 || lookupItem("7302").available_amount() == 0) //first floor can be skipped via faxing
+        //second_floor_probably_open = false;
     if (get_property_int("lastSecondFloorUnlock") == my_ascensions()) //updates properly now.
         second_floor_probably_open = true;
+    if (get_property("questM20Necklace") == "finished") //mafia will erroneously set questM20Necklace to finished in certain (unknown) cases. could be an error in QuestDatabase.java's reset(), but I am uncertain what caused the bug locally (it also set lastSecondFloorUnlock to current, though it is not unlocked)
+        second_floor_probably_open = true;
+    
     if (lookupItem("Lady Spookyraven's necklace").available_amount() > 0) //mostly
         second_floor_probably_open = true;
-    //if (get_property("questM20Necklace") == "finished") //mafia will erroneously set questM20Necklace to finished in certain (unknown) cases. could be an error in QuestDatabase.java's reset(), but I am uncertain what caused the bug locally (it also set lastSecondFloorUnlock to current, though it is not unlocked)
-        //second_floor_probably_open = true;
-    
     if (lookupItem("telegram from Lady Spookyraven").available_amount() > 0)
-        second_floor_probably_open = false;
-    if (lookupItem("7301").available_amount() == 0 || lookupItem("7302").available_amount() == 0)
         second_floor_probably_open = false;
     
     if (second_floor_probably_open)
     {
-        if (lookupItem("Lady Spookyraven's necklace").available_amount() > 0 && lookupItem("ghost of a necklace").available_amount() == 0 && get_property("questM20Necklace") != "finished")
+        if (lookupItem("Lady Spookyraven's necklace").available_amount() > 0 && get_property("questM20Necklace") != "finished")
         {
             subentry.header = "Speak to Lady Spookyraven";
             url = $location[the haunted kitchen].getClickableURLForLocation();
@@ -148,7 +148,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
                         string line = "Delay(?) for " + pluralize(delayRemainingInLocation($location[the haunted gallery]), "turn", "turns") + ".";
                         if (__misc_state["have hipster"])
                         {
-                            subentry.modifiers.listAppend(__misc_state_string["hipster name"]+"?");
+                            modifiers.listAppend(__misc_state_string["hipster name"]+"?");
                         }
                         description.listAppend(line);
                     }
@@ -168,10 +168,10 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
                         image_name = "__item bottle of Monsieur Bubble";
                     if (delayRemainingInLocation($location[the haunted bathroom]) > 0)
                     {
-                        string line = "Delay(?) for " + pluralize(delayRemainingInLocation($location[the haunted bathroom]), "turn", "turns") + ".";
+                        string line = "Delay for " + pluralize(delayRemainingInLocation($location[the haunted bathroom]), "turn", "turns") + ".";
                         if (__misc_state["have hipster"])
                         {
-                            subentry.modifiers.listAppend(__misc_state_string["hipster name"]+"?");
+                            modifiers.listAppend(__misc_state_string["hipster name"]+"?");
                         }
                         description.listAppend(line);
                     }
@@ -187,7 +187,8 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
                     string [int] description;
                     
                     description.listAppend("Find Lady Spookyraven's finest gown in the elegant nightstand.");
-                    description.listAppend("Banish non-ornate drawers?");
+                    description.listAppend("Banish non-ornate drawers.");
+                    modifiers.listAppend("banish non-ornate");
                     
                     string [int] items_needed_from_ornate_drawer;
                     
@@ -203,11 +204,11 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
                         
                     if (delayRemainingInLocation($location[the haunted bedroom]) > 1)
                     {
-                        string line = "Delay(?) for " + pluralize(delayRemainingInLocation($location[the haunted bedroom]), "turn", "turns") + ".";
+                        string line = "Delay for " + pluralize(delayRemainingInLocation($location[the haunted bedroom]), "turn", "turns") + ".";
                         if (__misc_state["have hipster"])
                         {
-                            line += " (use " + __misc_state_string["hipster name"] + "? may or may not help?)";
-                            subentry.modifiers.listAppend(__misc_state_string["hipster name"]+"?");
+                            line += " (use " + __misc_state_string["hipster name"] + ")";
+                            modifiers.listAppend(__misc_state_string["hipster name"]);
                         }
                         description.listAppend(line);
                     }
@@ -281,8 +282,16 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         
 		if (__misc_state["have hipster"])
 			subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
-        subentry.modifiers.listAppend(HTMLGenerateSpanOfClass("hot res", "r_element_hot_desaturated"));
-        subentry.modifiers.listAppend(HTMLGenerateSpanOfClass("stench res", "r_element_stench_desaturated"));
+        if (total_turns > 1)
+        {
+            subentry.modifiers.listAppend(HTMLGenerateSpanOfClass("hot res", "r_element_hot_desaturated"));
+            subentry.modifiers.listAppend(HTMLGenerateSpanOfClass("stench res", "r_element_stench_desaturated"));
+        }
+        
+        if (!__misc_state["familiars temporarily blocked"] && $familiar[exotic parrot].familiar_is_usable() && my_familiar() != $familiar[exotic parrot] && (hot_resistance < 9.0 || stench_resistance < 9.0) && total_turns > 1)
+        {
+            subentry.entries.listAppend("Possibly bring along your exotic parrot.");
+        }
         
         if (inebriety_limit() > 0 && my_inebriety() < 10)
             subentry.entries.listAppend("Try not to drink past ten, the billiards room is next.");

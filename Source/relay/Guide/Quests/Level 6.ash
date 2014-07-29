@@ -45,6 +45,8 @@ void QLevel6GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	boolean want_hell_ramen = false;
 	if (have_skill($skill[pastamastery]) && have_skill($skill[Advanced Saucecrafting]))
 		want_hell_ramen = true;
+    if (my_path_id() == PATH_SLOW_AND_STEADY)
+        want_hell_ramen = false;
 	boolean hot_wings_relevant = __quest_state["Pirate Quest"].state_boolean["hot wings relevant"];
 	boolean need_more_hot_wings = __quest_state["Pirate Quest"].state_boolean["need more hot wings"];
 	
