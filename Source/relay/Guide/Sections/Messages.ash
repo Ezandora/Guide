@@ -62,6 +62,9 @@ string generateRandomMessage()
     location_messages[$location[the middle chamber]] = "pyramid laundry machine";
     location_messages[$location[the arid, extra-dry desert]] = "can't remember your name";
     
+    foreach l in $locations[The Prince's Restroom,The Prince's Dance Floor,The Prince's Kitchen,The Prince's Balcony,The Prince's Lounge,The Prince's Canapes table]
+        location_messages[l] = "social sabotage";
+    
     foreach l in $locations[fear man's level,doubt man's level,regret man's level,anger man's level]
         location_messages[l] = "<em>this isn't me</em>";
     
@@ -149,6 +152,7 @@ string generateRandomMessage()
     paths[PATH_KOLHS] = "did you study?";
     paths[PATH_CLASS_ACT_2] = "lonely guild trainer";
     paths[PATH_AVATAR_OF_SNEAKY_PETE] = "sunglasses at night";
+    //paths[PATH_SPOILER_PATH] = "";
     if (!in_hardcore())
         paths[PATH_SLOW_AND_STEADY] = "infinite pulls";
     else
@@ -245,7 +249,9 @@ string generateRandomMessage()
     
     if (__misc_state_int["free rests remaining"] > 0)
         random_messages.listAppend(HTMLGenerateTagWrap("a", "dream your life away", generateMainLinkMap("campground.php")));
-        
+    
+    if (get_property_int("cinderellaScore") >= 32)
+        random_messages.listAppend("mother knows best");
     
     string [class] class_messages;
     class_messages[$class[disco bandit]] = "making discos of your castles";

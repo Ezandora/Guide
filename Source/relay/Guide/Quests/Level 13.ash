@@ -299,6 +299,7 @@ void QLevel13Init()
 	
 	state.state_boolean["past gates"] = (state.mafia_internal_step > 1);
 	state.state_boolean["past keys"] = (state.mafia_internal_step > 3);
+	state.state_boolean["past hedge maze"] = (state.mafia_internal_step > 4);
 	state.state_boolean["past tower"] = (state.mafia_internal_step > 5);
 	state.state_boolean["shadow will need to be defeated"] = !(state.mafia_internal_step < 9);
     //FIXME what paths don't fight the shadow?

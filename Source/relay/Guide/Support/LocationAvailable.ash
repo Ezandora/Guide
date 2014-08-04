@@ -750,10 +750,14 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         lookup_map["The Prince's Balcony"] = "place.php?whichplace=ioty2014_cindy";
         lookup_map["The Prince's Lounge"] = "place.php?whichplace=ioty2014_cindy";
         lookup_map["The Prince's Canapes table"] = "place.php?whichplace=ioty2014_cindy";
+        lookup_map["The Inner Wolf Gym"] = "place.php?whichplace=ioty2014_wolf";
+        lookup_map["Unleash Your Inner Wolf"] = "place.php?whichplace=ioty2014_wolf";
         lookup_map["The Cave Before Time"] = "place.php?whichplace=twitch";
         lookup_map["An Illicit Bohemian Party"] = "place.php?whichplace=twitch";
-        lookup_map["Mooonshriners' Woods"] = "place.php?whichplace=twitch";
-        
+        lookup_map["Moonshiners' Woods"] = "place.php?whichplace=twitch";
+        lookup_map["The Fun-Guy Mansion"] = "place.php?whichplace=airport_sleaze";
+        lookup_map["Sloppy Seconds Diner"] = "place.php?whichplace=airport_sleaze";
+        lookup_map["The Sunken Party Yacht"] = "place.php?whichplace=airport_sleaze";
         //Conditionals:
         if ($location[cobb's knob barracks].locationAvailable())
             lookup_map["The Outskirts of Cobb's Knob"] = "cobbsknob.php";

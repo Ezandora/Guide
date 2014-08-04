@@ -84,6 +84,7 @@ int PATH_KOLHS = 18;
 int PATH_CLASS_ACT_2 = 19;
 int PATH_AVATAR_OF_SNEAKY_PETE = 20;
 int PATH_SLOW_AND_STEADY = 21;
+int PATH_SPOILER_PATH = 22;
 
 int __my_path_id_cached = -11;
 int my_path_id()
@@ -126,6 +127,8 @@ int my_path_id()
         __my_path_id_cached = PATH_AVATAR_OF_SNEAKY_PETE;
     else if (path_name == "Slow and Steady")
         __my_path_id_cached = PATH_SLOW_AND_STEADY;
+    //else if (path_name == "") //this is known but might as well keep it a secret for now
+        //__my_path_id_cached = PATH_SPOILER_PATH;
     else
         __my_path_id_cached = PATH_UNKNOWN;
     return __my_path_id_cached;

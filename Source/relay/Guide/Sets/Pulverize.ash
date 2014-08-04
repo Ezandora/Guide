@@ -161,6 +161,12 @@ void SPulverizeGenerateResource(ChecklistEntry [int] available_resources_entries
     {
         string title;
         title = "Pulverizable equipment";
-        available_resources_entries.listAppend(ChecklistEntryMake("pulverize", "", ChecklistSubentryMake(title, "", details), 10));
+        string url = "craft.php?mode=smith";
+        if ($item[tenderizing hammer].available_amount() == 0)
+        {
+            url = "store.php?whichstore=s";
+            details.listAppend("Acquire a tenderizing hammer.");
+        }
+        available_resources_entries.listAppend(ChecklistEntryMake("pulverize", url, ChecklistSubentryMake(title, "", details), 10));
     }
 }

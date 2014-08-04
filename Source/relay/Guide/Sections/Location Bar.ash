@@ -163,7 +163,10 @@ buffer generateLocationBar(boolean displaying_navbar)
             }
         }
         if (plant_data.count() == 0 && l.environment != "unknown" && l.environment != "none")
-            plant_data.listAppend(l.environment.capitalizeFirstLetter());
+        {
+            if (!($locations[The Prince's Restroom,The Prince's Dance Floor,The Prince's Kitchen,The Prince's Balcony,The Prince's Lounge,The Prince's Canapes table,the shore\, inc. travel agency] contains l))
+                plant_data.listAppend(l.environment.capitalizeFirstLetter());
+        }
     }
     
     
@@ -287,6 +290,12 @@ buffer generateLocationBar(boolean displaying_navbar)
         else //numeric_modifier is location sensitive
             custom_location_information = "Unknown pressure";
     }
+    else if ($locations[The Prince's Restroom,The Prince's Dance Floor,The Prince's Kitchen,The Prince's Balcony,The Prince's Lounge,The Prince's Canapes table] contains l)
+    {
+        int minutes_to_midnight = get_property_int("cinderellaMinutesToMidnight");
+        if (minutes_to_midnight > 0)
+            custom_location_information = pluralize(minutes_to_midnight, "minute", "minutes") + " left";
+    }
         
     //else if (pressure_penalties contains l)
         //custom_location_information = pressure_penalties[l] + "% pressure";
@@ -361,7 +370,7 @@ buffer generateLocationBar(boolean displaying_navbar)
     
     //easy list:
     //ashq foreach l in $locations[] if (l.appearance_rates().count() == 1 && l.appearance_rates()[$monster[none]] == 100.0) print(l);
-    boolean [location] nc_blacklist = $locations[Pump Up Muscle,Pump Up Mysticality,Pump Up Moxie,The Shore\, Inc. Travel Agency,Goat Party,Pirate Party,Lemon Party,The Roulette Tables,The Poker Room,Anemone Mine (Mining),The Knob Shaft (Mining),Friar Ceremony Location,Itznotyerzitz Mine (in Disguise)];
+    boolean [location] nc_blacklist = $locations[Pump Up Muscle,Pump Up Mysticality,Pump Up Moxie,The Shore\, Inc. Travel Agency,Goat Party,Pirate Party,Lemon Party,The Roulette Tables,The Poker Room,Anemone Mine (Mining),The Knob Shaft (Mining),Friar Ceremony Location,Itznotyerzitz Mine (in Disguise),The Prince's Restroom,The Prince's Dance Floor,The Prince's Kitchen,The Prince's Balcony,The Prince's Lounge,The Prince's Canapes table];
     
     if ((my_buffedstat($stat[moxie]) < average_ml || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE) && sample_count > 0 && __misc_state["In run"])
     {

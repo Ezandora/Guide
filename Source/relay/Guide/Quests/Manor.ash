@@ -82,7 +82,8 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     boolean should_output_optionally = false;
 	QuestState base_quest_state = __quest_state["Manor Unlock"];
     
-    boolean [location] relevant_locations = $locations[the haunted kitchen, the haunted library, the haunted billiards room, the haunted bedroom, the haunted ballroom];
+    boolean [location] relevant_locations = $locations[the haunted kitchen, the haunted library, the haunted billiards room, the haunted bedroom, the haunted ballroom, the haunted gallery, the haunted bathroom];
+    //$locations[the haunted kitchen, the haunted library, the haunted billiards room, the haunted bedroom, the haunted ballroom];
 	ChecklistSubentry subentry;
 	//subentry.header = "Unlock Spookyraven Manor";
     
@@ -305,7 +306,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         subentry.entries.listAppend("To unlock the Haunted Library.");
         
         subentry.modifiers.listAppend("-combat");
-        subentry.entries.listAppend("Train pool skill via -combat. Need somewhere around 15(?) total pool skill");
+        subentry.entries.listAppend("Train pool skill via -combat. Need 14 up to 18(?) total pool skill");
         
         if ($item[Staff of Ed, almost].available_amount() > 0)
         {

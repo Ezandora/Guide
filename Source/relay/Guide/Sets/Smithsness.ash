@@ -70,7 +70,7 @@ void smithsnessGenerateCoalSuggestions(string [int] coal_suggestions)
 
 void smithsnessGenerateSmithereensSuggestions(string [int] smithereen_suggestions) //suggestereens
 {
-	smithereen_suggestions.listAppend(7014.to_item().to_string() + ": free run/banish for 20 turns");
+	smithereen_suggestions.listAppend(7014.to_item().to_string() + ": " + (__misc_state["free runs usable"] ? "free run/" : "") + "banish for 20 turns");
 	
 	if (__misc_state["can eat just about anything"] && availableFullness() >= 2)
 	{

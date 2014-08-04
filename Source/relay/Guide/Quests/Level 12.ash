@@ -21,6 +21,7 @@ void QLevel12Init()
 	state.state_boolean["Lighthouse Finished"] = (get_property("sidequestLighthouseCompleted") != "none");
 	state.state_boolean["Nuns Finished"] = (get_property("sidequestNunsCompleted") != "none");
 	state.state_boolean["Orchard Finished"] = (get_property("sidequestOrchardCompleted") != "none");
+    state.state_boolean["War started"] = (state.mafia_internal_step >= 3);
     
     state.state_int["hippies left on battlefield"] = 1000 - get_property_int("hippiesDefeated");
     state.state_int["frat boys left on battlefield"] = 1000 - get_property_int("fratboysDefeated");
@@ -34,6 +35,40 @@ void QLevel12Init()
 		state.state_boolean["Nuns Finished"] = true;
 		state.state_boolean["Orchard Finished"] = true;
 	}
+    int quests_completed_hippy = 0;
+    int quests_completed_frat = 0;
+    
+    foreach s in $strings[sidequestArenaCompleted,sidequestFarmCompleted,sidequestJunkyardCompleted,sidequestLighthouseCompleted,sidequestNunsCompleted,sidequestOrchardCompleted]
+    {
+        string property_value = get_property(s);
+        if (property_value == "hippy")
+            quests_completed_hippy += 1;
+        else if (property_value == "fratboy")
+            quests_completed_frat += 1;
+    }
+    
+    state.state_int["Quests completed for hippies"] = quests_completed_hippy;
+    state.state_int["Quests completed for frat boys"] = quests_completed_frat;
+    
+    if (!state.finished)
+    {
+        //define state.state_string["Side seemingly fighting for"]
+        //"hippy", "frat boys", "both", ""
+        
+        if (state.state_int["Quests completed for hippies"] > 0)
+            state.state_string["Side seemingly fighting for"] = "hippy";
+        if (state.state_int["Quests completed for frat boys"] > 0)
+            state.state_string["Side seemingly fighting for"] = "frat boys";
+        
+        if (state.state_int["hippies left on battlefield"] == 1000 && state.state_int["frat boys left on battlefield"] != 1000)
+            state.state_string["Side seemingly fighting for"] = "hippy";
+        if (state.state_int["hippies left on battlefield"] != 1000 && state.state_int["frat boys left on battlefield"] == 1000)
+            state.state_string["Side seemingly fighting for"] = "frat boys";
+        if (state.state_int["hippies left on battlefield"] != 1000 && state.state_int["frat boys left on battlefield"] != 1000)
+            state.state_string["Side seemingly fighting for"] = "both";
+        if (state.state_int["Quests completed for hippies"] > 0 && state.state_int["Quests completed for frat boys"] > 0)
+            state.state_string["Side seemingly fighting for"] = "both";
+    }
 	
 	if (false)
 	{
@@ -175,10 +210,13 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 			details.listAppend(pluralize(turn_range.x, "turn", "turns") + " remaining");
 		else
 			details.listAppend("[" + turn_range.x + " to " + turn_range.y + "] turns remaining");
-            
+        
+        if ($item[ice nine].available_amount() == 0 && __misc_state["can equip just about any weapon"] && $item[ice harvest].available_amount() >= 9 && $item[ice nine].is_unrestricted_passthrough()) //is this safe? unfinished ice sculpture is really nice, and ice bucket in sneaky pete...
+            details.listAppend("Possibly make and equip an ice nine. (+30% meat 1h weapon)");
+                
         if ($effect[Sinuses For Miles].have_effect() > 0 && get_property_int("lastTempleAdventures") != my_ascensions() && $item[stone wool].available_amount() > 0)
             details.listAppend("Potentially use stone wool and visit the hidden temple to extend Sinuses for Miles for 3 turns.");
-            
+        
             
         if (lookupItem("Sneaky Pete's leather jacket (collar popped)").equipped_amount() > 0 && turn_range.y > 1)
             details.listAppend("Might want to unpop the collar. (+20% meat)");
@@ -490,19 +528,10 @@ void QLevel12GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 	}
 	else
 	{
-		int sides_completed_hippy = 0;
-		int sides_completed_frat = 0;
+		int sides_completed_hippy = base_quest_state.state_int["Quests completed for hippies"];
+		int sides_completed_frat = base_quest_state.state_int["Quests completed for frat boys"];
 		
-		string [int] sidequest_properties = split_string_alternate("sidequestArenaCompleted,sidequestFarmCompleted,sidequestJunkyardCompleted,sidequestLighthouseCompleted,sidequestNunsCompleted,sidequestOrchardCompleted", ",");
-		foreach key in sidequest_properties
-		{
-			string property_value = get_property(sidequest_properties[key]);
-			if (property_value == "hippy")
-				sides_completed_hippy += 1;
-			else if (property_value == "fratboy")
-				sides_completed_frat += 1;
-		}
-		int frat_boys_left = base_quest_state.state_int["frat boys left on battlefield"];
+        int frat_boys_left = base_quest_state.state_int["frat boys left on battlefield"];
 		int hippies_left = base_quest_state.state_int["hippies left on battlefield"];
 		
 		int frat_boys_defeated_per_combat = powi(2, sides_completed_hippy);

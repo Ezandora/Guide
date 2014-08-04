@@ -756,4 +756,113 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
     {
         available_resources_entries.listAppend(ChecklistEntryMake("__item burned government manual fragment", "inventory.php?which=3", ChecklistSubentryMake(pluralize(lookupItem("burned government manual fragment")), "", "Foreign language study.|Will disappear on ascension."), importance_level_unimportant_item));
     }
+    
+    if (in_run && $item[llama lama gong].available_amount() > 0)
+    {
+        //fiddle fiddle fiddle
+        //I'm not sure anyone should actually do this, so fiddly!
+        boolean need_pickpocket = true;
+        if (my_primestat() == $stat[moxie])
+            need_pickpocket = false;
+            
+        string [int] description;
+        string [int] birdform_description;
+        
+        //options:
+        
+        string [int] possible_pickpocket_locations;
+        
+        if (need_pickpocket)
+        {
+            //bird form for pickpocket in crypt, filthworms, golems
+            
+            if (__quest_state["Level 7"].state_boolean["nook needs speed tricks"])
+                possible_pickpocket_locations.listAppend("Cyrpt Nook");
+            if (!__quest_state["Level 12"].state_boolean["Orchard Finished"])
+                possible_pickpocket_locations.listAppend("filthworms");
+            if (!__quest_state["Level 13"].state_boolean["past hedge maze"])
+                possible_pickpocket_locations.listAppend("Hedge Maze");
+                
+            if (possible_pickpocket_locations.count() == 0)
+                birdform_description.listAppend("Gives pickpocketing ability.");
+            else
+                birdform_description.listAppend("Gives pickpocketing ability for stealing from the " + possible_pickpocket_locations.listJoinComponents(", ", "and") + ".");
+        }
+        
+        string [element][int] element_options;
+        
+        foreach e in $elements[]
+            element_options[e] = listMakeBlankString();
+        if (!__quest_state["Level 6"].finished)
+            element_options[$element[hot]].listAppend("friars quest");
+        
+        if (__quest_state["Level 9"].state_float["oil peak pressure"] > 0.0)
+            element_options[$element[sleaze]].listAppend("oil peak");
+            
+        if (!__quest_state["Level 12"].finished && __quest_state["Level 12"].state_string["Side seemingly fighting for"] == "hippy")
+            element_options[$element[sleaze]].listAppend("frat boys");
+            
+        
+        if (!__quest_state["Level 7"].finished)
+            element_options[$element[spooky]].listAppend("cyrpt");
+        
+        
+        if (!__quest_state["Level 12"].state_boolean["War started"])
+            element_options[$element[stench]].listAppend("starting war against hippies");
+        if (!__quest_state["Level 12"].state_boolean["Orchard Finished"])
+            element_options[$element[stench]].listAppend("filthworms");
+        
+        if (__quest_state["Level 11 Manor"].mafia_internal_step < 2)
+            element_options[$element[spooky]].listAppend("spookyraven ballroom");
+        if (get_property("questM20Necklace") != "finished" && lookupItem("Lady Spookyraven's powder puff").available_amount() == 0)
+            element_options[$element[spooky]].listAppend("spookyraven bathroom");
+            
+            
+            
+        string [element] element_to_potion;
+        
+        if (__misc_state["need to level"])
+            element_to_potion[$element[hot]] = "+6 stats/fight";
+        element_to_potion[$element[sleaze]] = "+20 ML";
+        element_to_potion[$element[spooky]] = "+60% item";
+        
+        if (!__quest_state["Level 12"].state_boolean["Nuns Finished"] && $item[glimmering raven feather].available_amount() == 0 && $effect[Melancholy Burden].have_effect() == 0)
+            element_to_potion[$element[stench]] = "+60% meat";
+        
+        
+        //string [int][int] monster_fight_table;
+        //monster_fight_table.listAppend(listMake(HTMLGenerateSpanOfClass("Monster element", "r_bold"), HTMLGenerateSpanOfClass("Areas", "r_bold"), HTMLGenerateSpanOfClass("Gives potion", "r_bold")));
+        foreach e in element_options
+        {
+            if (element_options[e].count() == 0)
+                continue;
+            if (!(element_to_potion contains e))
+                continue;
+                
+            //monster_fight_table.listAppend(listMake(e.to_string(), element_options[e].listJoinComponents("<br>"), element_to_potion[e]));
+            birdform_description.listAppend("Fight " + e + " monsters (" + element_options[e].listJoinComponents(", ", "and") + ") for " + element_to_potion[e] + " spleen potion.");
+        }
+        
+        //if (monster_fight_table.count() > 1)
+            //birdform_description.listAppend(HTMLGenerateSimpleTableLines(monster_fight_table));
+        
+        //√against hot (friars) for +6 stats/fight potion
+        //against sleaze (oil peak) for +ML potion
+        //against spooky (cyrpt, spookyraven ballroom/bathroom) for +60% items from monsters potion
+        //against stench (filthworms, starting war against hippy) for +60% meat potion
+        
+        //cast boner battalion to handle birdform?
+        //can only cast vicious talon slash/All-You-Can-Beat Wing Buffet 14 times, 15 leads to the feather you don't want (property birdformRoc maybe?)
+        
+        //FIXME implement birdform reminders? (like AVOID CASTING X)
+        
+        if (my_maxmp() >= 200 && $skill[Summon &quot;Boner Battalion&quot;].skill_is_usable() && !get_property_boolean("_bonersSummoned"))
+            description.listAppend("Possibly cast the battalion to handle birdform."); //yojimbos_law wants this here, so..
+        
+        if (birdform_description.count() > 0)
+            description.listAppend(HTMLGenerateSpanOfClass("Birdform", "r_bold") + "|*" + birdform_description.listJoinComponents("|*<hr>"));
+        
+        available_resources_entries.listAppend(ChecklistEntryMake("__item llama lama gong", "inventory.php?which=3", ChecklistSubentryMake(pluralize($item[llama lama gong]), "", description), importance_level_item));
+        
+    }
 }

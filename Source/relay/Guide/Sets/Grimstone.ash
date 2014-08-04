@@ -126,14 +126,125 @@ void SGrimstoneStepmotherGenerateTasks(ChecklistEntry [int] task_entries, Checkl
     int minutes_to_midnight = get_property_int("cinderellaMinutesToMidnight");
     if (minutes_to_midnight <= 0)
         return;
+    
+    int score = get_property_int("cinderellaScore");
     string [int] description;
     string [int] modifiers;
     
-    description.listAppend(pluralize(minutes_to_midnight, "minute", "minutes") + " to midnight");
+    
+    if (minutes_to_midnight > 0)
+    {
+        string line;
+        line = pluralize(minutes_to_midnight, "minute", "minutes") + " to midnight.";
+        
+        if (score > 0)
+            line += " " + pluralize(score, "point", "points") + " earned.";
+        
+        description.listAppend(line);
+    }
+    
+    /*
+        The idea behind this solution is you want to put three items into cindy's purse.
+        The first two make her ignore her hankerchief and go to the restroom - where the doctored soap gives her puffy eyes - whereupon she returns and confirms the disease rumor.
+        The third is the mouse, which you confront her about. Then later she'll not have the purse at all and go to the restroom again.
+        
+        There are other solutions, but I don't know them. Find them! It's a fun puzzle.
+    */
+    
+    string [int][int] minute_to_action;
+    minute_to_action[30] = listMake("Lounge", "Take a cigar from the sideboard"); //I say, old chap
+    minute_to_action[29] = listMake("Balcony", "Examine the flowers."); //to give to prince
+    minute_to_action[28] = listMake("Canapés Table", "Give your carnation to the Prince."); //causes sneezing fit at 23, 13, 3
+    minute_to_action[27] = listMake("Canapés Table", "Slip something into Cindy's purse while she's distracted", "The cigar."); //Make her leave when sneezing
+    minute_to_action[26] = listMake("Balcony", "Examine the flowers."); //For doctoring
+    minute_to_action[25] = listMake("Restroom", "Rub the flower on the soap."); //For 23 sneezing.
+    minute_to_action[24] = listMake("Lounge", "Start a rumor about Cinderella", "Cinderella has a terrible disease."); //Points!
+    minute_to_action[23] = listMake("Lounge", "Take the empty cigar box."); //Mouse trap setup. 3 points (from sneezing)
+    minute_to_action[22] = listMake("Kitchen", "Inspect the kitchen pantry."); //Acquire cinnamon, notice mouse hole.
+    minute_to_action[21] = listMake("Canapés Table", "Take a piece of cheese."); //Mouse trap setup.
+    minute_to_action[20] = listMake("Kitchen", "Set a trap for the mouse."); //Set up mouse trap with cigar box and cheese. (if we had room, soap too, but that adds one point and there's no room - used in 31-point solution)
+    minute_to_action[19] = listMake("Canapés Table", "Slip something into Cindy's purse while she's distracted", "The cinnamon."); //For 13 sneezing fit, makes her ignore hankerchief.
+    minute_to_action[18] = listMake("Lounge", "Take the whiskey flask."); //To make cindy drunk. 5 points (prince hears rumor)
+    minute_to_action[17] = listMake("Canapés Table", "Pour some whisky into Cindy's glass."); //Cindy's drunk - used at 16, 6, and extra points from soap.
+    minute_to_action[16] = listMake("Balcony", "Examine the flowers."); //For stealing a hairpin from baronness. 6 points (16 behavior hits, she's drunk)
+    minute_to_action[15] = listMake("Balcony", "Speak with the Baroness."); //First step baronness
+    minute_to_action[14] = listMake("Balcony", "Ask the Baroness what troubles her."); //Makes baronness move to dance floor
+    minute_to_action[13] = listMake("Dance Floor", "Give your carnation to the Baroness and steal one of her hairpins."); //Now we can steal a hairpin. 11 points (sneezing fit with disease rumor)
+    minute_to_action[12] = listMake("Restroom", "Look in the medicine cabinet", "Pick the lock", "Take the bottle of syrup of ipecac."); //Which we use to pick the lock of the medicine cabinet, acquiring ipecac.
+    minute_to_action[11] = listMake("Kitchen", "Dose the tray of cannoli with ipecac."); //Ipecac we use here.
+    minute_to_action[10] = listMake("Restroom", "Take some soap."); //We'll be throwing it later.
+    minute_to_action[9] = listMake("Canapés Table", "Offer Cindy your 'customized' cannoli."); //Makes her throw up in eight turns. (no cinnamon)
+    minute_to_action[8] = listMake("Kitchen", "Take the mouse out of the trap."); //It showed up. Hello mouse.
+    minute_to_action[7] = listMake("Canapés Table", "Slip something into Cindy's purse while she's distracted", "The mouse."); //Third time.
+    minute_to_action[6] = listMake("Canapés Table", "Ask Cindy to loan you her handkerchief."); //Hey, is that a mouse in your purse? 13 points. (one from mouse, one from 6 behavior)
+    minute_to_action[5] = listMake("Dance Floor", "Kick some soap at Cindy."); //She's on the dance floor. Let's make her dance. 15 points. (dance!)
+    minute_to_action[4] = listMake("Restroom", "Take some soap."); //Dancing supplies.
+    minute_to_action[3] = listMake("Dance Floor", "Kick some soap at Cindy."); //Dance. 21 points (sneezing, dance!)
+    minute_to_action[2] = listMake("Restroom", "Take some soap."); //Dancing supplies.
+    minute_to_action[1] = listMake("Dance Floor", "Kick some soap at Cindy."); //She throws up. Dance. 32 points. (she threw up, dance!)
+    
+    if (false)
+    {
+        //output full details for reference:
+        string line;
+        foreach minute in minute_to_action
+        {
+            string description = minute_to_action[minute];
+            line = "|" + pluralize(minute, "minute", "minutes") + ":|*" + minute_to_action[minute].listJoinComponents(" > ") + line;
+        }
+        description.listAppend(line);
+    }
+    //FIXME add the other two trophies?
     
     
-    //FIXME add suggestions for a path
-	optional_task_entries.listAppend(ChecklistEntryMake("__item broken clock", "place.php?whichplace=ioty2014_cindy", ChecklistSubentryMake("The Prince's Ball", modifiers, description)));
+    //int [int] needed_points_at_spot_to_be_following_correct_path; //score isn't tracked properly, and anyways there's split score per turn
+    
+    /*
+√30	take cigar
+√29	flower
+√28	give flower to prince
+√27	give cigar to cindy
+√26	flower
+√25	doctor soap
+√24	spread rumour (disease)
+√23	take empty cigar box
+√22	inspect kitchen
+√21	get cheese
+√20	set trap
+√19	plant cinnamon in cindy's purse
+√18	get whiskey
+√17	pour whiskey
+√16	flower
+√15	ask baronness
+√14	ask baronness x2
+√13	steal from baronness
+√12	steal ipecac
+√11	make cannoli (mouse available)
+√10	get soap
+√9	give cindy cannoli
+√8	get mouse
+√7	plant mouse
+√6	ask for hankerchief
+√5	kick soap
+√4	get soap
+√3	kick soap
+√2	get soap
+√1	kick soap
+    */
+    
+    boolean output_next_step = true;
+    //if (needed_points_at_spot_to_be_following_correct_path contains minutes_to_midnight && score != needed_points_at_spot_to_be_following_correct_path[minutes_to_midnight]) //they're doing a different route
+        //output_next_step = false;
+    
+    if (minute_to_action contains minutes_to_midnight && output_next_step)
+    {
+        description.listAppend("Next step for 32 points:|*" + minute_to_action[minutes_to_midnight].listJoinComponents(__html_right_arrow_character));
+        description.listAppend("Though, this is a fun puzzle to solve on your own.");
+    }
+    
+    
+    //FIXME add suggestions for other two trophies (partners in crime, ending party early)
+	optional_task_entries.listAppend(ChecklistEntryMake("__item long-stemmed rose", "place.php?whichplace=ioty2014_cindy", ChecklistSubentryMake("The Prince's Ball", modifiers, description)));
 }
 
 void SGrimstoneWolfGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)

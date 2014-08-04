@@ -108,17 +108,19 @@ void generatePullList(Checklist [int] checklists)
         pullable_item_list.listAppend(GPItemMake($item[snow suit], "+20 familiar weight for a while, +4 free runs|+10% item|spleen items", 1));
     if (!__misc_state["familiars temporarily blocked"])
     {
-        if (lookupItem("Buddy Bjorn").storage_amount() > 0)
+        if ($item[Buddy Bjorn].storage_amount() > 0)
             pullable_item_list.listAppend(GPItemMake(lookupItem("Buddy Bjorn"), "+10ML/+lots MP hat|or +item/+init/+meat/etc", 1));
-        else
+        else if ($item[buddy bjorn].available_amount() == 0)
             pullable_item_list.listAppend(GPItemMake($item[crown of thrones], "+10ML/+lots MP hat|or +item/+init/+meat/etc", 1));
     }
 	pullable_item_list.listAppend(GPItemMake($item[boris's helm], "+15ML/+5 familiar weight/+init/+mp regeneration/+weapon damage", 1));
 	if ($item[empty rain-doh can].available_amount() == 0 && $item[can of rain-doh].available_amount() == 0)
 		pullable_item_list.listAppend(GPItemMake($item[can of rain-doh], "5 copies/day|everything really", 1));
     if (__misc_state["need to level"])
+    {
         pullable_item_list.listAppend(GPItemMake($item[plastic vampire fangs], "Large stat gain, once/day.", 1));
-    pullable_item_list.listAppend(GPItemMake($item[operation patriot shield], "?", 1));
+        pullable_item_list.listAppend(GPItemMake($item[operation patriot shield], "?", 1));
+    }
     pullable_item_list.listAppend(GPItemMake($item[v for vivala mask], "?", 1));
 	
 	if (my_primestat() == $stat[mysticality]) //should we only suggest this for mysticality classes?
@@ -126,7 +128,8 @@ void generatePullList(Checklist [int] checklists)
 	pullable_item_list.listAppend(GPItemMake($item[loathing legion knife], "?", 1));
 	pullable_item_list.listAppend(GPItemMake($item[greatest american pants], "navel runaways|others", 1));
 	pullable_item_list.listAppend(GPItemMake($item[juju mojo mask], "towerkilling?", 1));
-	pullable_item_list.listAppend(GPItemMake($item[navel ring of navel gazing], "free runaways|easy fights", 1));
+    if (__misc_state["free runs usable"])
+        pullable_item_list.listAppend(GPItemMake($item[navel ring of navel gazing], "free runaways|easy fights", 1));
 	//pullable_item_list.listAppend(GPItemMake($item[haiku katana], "?", 1));
 	pullable_item_list.listAppend(GPItemMake($item[bottle-rocket crossbow], "?", 1));
 	pullable_item_list.listAppend(GPItemMake($item[jekyllin hide belt], "+variable% item", 3));
@@ -143,7 +146,6 @@ void generatePullList(Checklist [int] checklists)
         if (__misc_state["Need to level"] && lookupItem("Sneaky Pete's leather jacket (collar popped)").available_amount() == 0 && lookupItem("Sneaky Pete's leather jacket").available_amount() == 0)
             pullable_item_list.listAppend(GPItemMake($item[cane-mail shirt], "+20ML shirt", 1));
     }
-    
     
 	
 	boolean have_super_fairy = false;
@@ -186,7 +188,7 @@ void generatePullList(Checklist [int] checklists)
     //pullable_item_list.listAppend(GPItemMake($item[slimy alveolus], "40 turns of +50ML (" + floor(40 * 50 * __misc_state_float["ML to mainstat multiplier"]) +" mainstat total, cave bar levelling)|1 spleen", 3)); //marginal now. low-skill oil peak/cyrpt?
 	
 	
-    if (!get_property_boolean("_blankOutUsed"))
+    if (!get_property_boolean("_blankOutUsed") && __misc_state["free runs usable"])
         pullable_item_list.listAppend(GPItemMake($item[bottle of blank-out], "run away from your problems|expensive", 1));
 	
 	
@@ -221,6 +223,9 @@ void generatePullList(Checklist [int] checklists)
         item [int] missing_frat_components = missing_outfit_components("Frat Warrior Fatigues");
         pullable_item_list.listAppend(GPItemMake("Island War Outfit", "__item round purple sunglasses", "<strong>Hippy</strong>: " + missing_hippy_components.listJoinComponents(", ", "and") + ".|<strong>Frat boy</strong>: " + missing_frat_components.listJoinComponents(", ", "and") + "."));
     }
+    
+    if (!__quest_state["Level 13"].state_boolean["past gates"] && !gnomads_available())
+        pullable_item_list.listAppend(GPItemMake("Unknown gate item", "__item pickle-flavored chewing gum", "Skips south of the border."));
     
     if (!__quest_state["Level 8"].state_boolean["Mountain climbed"] && !have_outfit_components("eXtreme Cold-Weather Gear"))
     {

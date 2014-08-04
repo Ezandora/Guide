@@ -46,8 +46,17 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         image_name = "penultimate fantasy airship";
         if (!base_quest_state.state_boolean["Beanstalk grown"])
         {
-            subentry.entries.listAppend("Grow the beanstalk.");
-            url = "place.php?whichplace=plains";
+            if ($item[enchanted bean].available_amount() == 0)
+            {
+                subentry.entries.listAppend("Acquire enchanted bean from a beanbat.");
+                subentry.modifiers.listAppend("+100% item");
+                url = $location[the beanbat chamber].getClickableURLForLocation();
+            }
+            else
+            {
+                subentry.entries.listAppend("Grow the beanstalk.");
+                url = "place.php?whichplace=plains";
+            }
         }
         else
         {

@@ -76,6 +76,9 @@ void SSkillsGenerateResource(ChecklistEntry [int] available_resources_entries)
     property_summons_to_skills["grimoire2Summons"] = listMake($skill[Summon Tasteful Items]);
     property_summons_to_skills["grimoire3Summons"] = listMake($skill[Summon Alice's Army Cards]);
     property_summons_to_skills["_grimoireGeekySummons"] = listMake($skill[Summon Geeky Gifts]);
+    if (mafiaIsPastRevision(14300))
+        property_summons_to_skills["_grimoireConfiscatorSummons"] = listMake(lookupSkill("Summon Confiscated Things"));
+    
 	
 	
 	item summoned_knife = $item[none];

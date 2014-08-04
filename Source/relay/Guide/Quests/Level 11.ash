@@ -1603,7 +1603,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                         subentry.entries.listAppend("Possibly acquire and use book of matches from janitors. (Pygmy janitors, everywhere in the hidden city, 20% drop)");
                     
                     string [int] tavern_provides;
-                    if (bowling_progress < 8)
+                    if (bowling_progress < 8 && __misc_state["free runs usable"])
                         tavern_provides.listAppend("Free runs from drunk pygmys.");
                     if (__misc_state["can drink just about anything"])
                     {
