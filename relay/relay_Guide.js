@@ -10,6 +10,19 @@ var __guide_timer_interval = 2000;
 
 var __guide_importance_bar_visible = false;
 
+var __guide_colset_type = -1; //1 for long, 2 for short
+
+var __guide_colset_long_kol_default = "200,3*,*";
+var __guide_colset_long_2 = "200,3*,25%,20%";
+var __guide_colset_long_3_chatpane_slightly_visible = "200,3*,30%,0%";
+var __guide_colset_long_3_chatpane_invisible = "200,3*,30%";
+
+
+var __guide_colset_short_kol_default = "4*,*";
+var __guide_colset_short_2 = "*,25%,20%";
+var __guide_colset_short_3_chatpane_slightly_visible = "*,30%,0%";
+var __guide_colset_short_3_chatpane_invisible = "*,30%";
+
 function timeInMilliseconds()
 {
     if (Date.now == undefined) //IE8 compatibility
@@ -41,7 +54,10 @@ function removeInstalledFrame()
         if (overall_window.frames["Guide Frame"] == undefined)
             return;
         rootset.removeChild(rootset.children["Guide Frame"]);
-        rootset.cols = "4*,*";
+        if (__guide_colset_type == 2)
+            rootset.cols = __guide_colset_short_kol_default;
+        else
+            rootset.cols = __guide_colset_long_kol_default;
     }
     catch (e)
     {
@@ -83,7 +99,14 @@ function verifyKOLPageIsUnaltered()
 {
     try
     {
-        if (mainWindow().frames["rootset"].cols != "4*,*")
+        //if (mainWindow().frames["rootset"].cols != "4*,*")
+        __guide_colset_type = -1;
+        if (mainWindow().frames["rootset"].cols === __guide_colset_long_kol_default)
+            __guide_colset_type = 1;
+        if (mainWindow().frames["rootset"].cols === __guide_colset_short_kol_default)
+            __guide_colset_type = 2;
+        
+        if (__guide_colset_type === -1)
             return false;
         
         if (document.getElementById("button_close_box") == undefined)
@@ -101,12 +124,37 @@ function getCurrentInstalledFramePosition()
 {
     try
     {
+        if (mainWindow().frames["Guide Frame"] === undefined)
+            return
         //Bit hacky, examine what we've done to cols:
         var rootset = mainWindow().frames["rootset"];
-        if (rootset.cols == "*,25%,20%")
+        if (rootset.cols === __guide_colset_long_2)
+        {
+            __guide_colset_type = 1;
+            return 2;
+        }
+        else if (rootset.cols == __guide_colset_long_3_chatpane_slightly_visible || rootset.cols == __guide_colset_long_3_chatpane_invisible)
+        {
+            __guide_colset_type = 1;
+            return 3;
+        }
+        
+        if (rootset.cols === __guide_colset_short_2)
+        {
+            __guide_colset_type = 2;
+            return 2;
+        }
+        else if (rootset.cols == __guide_colset_short_3_chatpane_slightly_visible || rootset.cols == __guide_colset_short_3_chatpane_invisible)
+        {
+            __guide_colset_type = 2;
+            return 3;
+        }
+        //else if (rootset.cols == "*,30%,0%" || rootset.cols == "*,30%")
+            //return 3;
+        /*if (rootset.cols == "*,25%,20%")
             return 2;
         else if (rootset.cols == "*,30%,0%" || rootset.cols == "*,30%")
-            return 3;
+            return 3;*/
     }
 	catch (e)
     {
@@ -118,6 +166,8 @@ function installFrame(position)
 {
     try
     {
+        if (__guide_colset_type != 1 && __guide_colset_type != 2)
+            return;
         var overall_window = mainWindow();
         var rootset = overall_window.frames["rootset"];
         if (rootset == undefined)
@@ -146,15 +196,33 @@ function installFrame(position)
         if (position == 2)
         {
             rootset.insertBefore(new_frame, rootset.children["chatpane"]);
-            rootset.cols = "*,25%,20%";
+            if (__guide_colset_type === 1)
+                rootset.cols = __guide_colset_long_2;
+            else if (__guide_colset_type === 2)
+                rootset.cols = __guide_colset_short_2;
+            //rootset.cols = "*,25%,20%";
         }
         else if (position == 3)
         {
             rootset.insertBefore(new_frame, rootset.children["chatpane"]);
             if (chat_active)
+            {
+                if (__guide_colset_type === 1)
+                    rootset.cols = __guide_colset_long_3_chatpane_slightly_visible;
+                else if (__guide_colset_type === 2)
+                    rootset.cols = __guide_colset_short_3_chatpane_slightly_visible;
+            }
+            else
+            {
+                if (__guide_colset_type === 1)
+                    rootset.cols = __guide_colset_long_3_chatpane_invisible;
+                else if (__guide_colset_type === 2)
+                    rootset.cols = __guide_colset_short_3_chatpane_invisible;
+            }
+            /*if (chat_active)
                 rootset.cols = "*,30%,0%";
             else
-                rootset.cols = "*,30%";
+                rootset.cols = "*,30%";*/
         }
     }
     catch (e)
