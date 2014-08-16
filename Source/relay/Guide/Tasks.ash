@@ -281,6 +281,19 @@ void generateTasks(Checklist [int] checklists)
 		}
 		optional_task_entries.listAppend(ChecklistEntryMake("__item filthy knitted dread sack", "island.php", ChecklistSubentryMake("Acquire a filthy hippy disguise", modifiers, description), $locations[hippy camp]));
 	}
+    
+    if (__misc_state["In run"] && (inebriety_limit() == 0 || my_path_id() == PATH_SLOW_AND_STEADY))
+    {
+        //may be removed in the future?
+        //FIXME does this burn delay?
+        string [int] modifiers;
+		if (__misc_state["have hipster"] && get_property_int("_hipsterAdv") < 7)
+		{
+			modifiers.listAppend(__misc_state_string["hipster name"]);
+		}
+		optional_task_entries.listAppend(ChecklistEntryMake("__item dead guy's watch", "", ChecklistSubentryMake("Use rollover runaway", modifiers, listMake("At the end of the day, enter a combat, but don't finish it. Rollover will end it for you.", "This gives an extra chance to look for an NC.")), 8));
+    }
+    
     //I'm not sure if you ever need a frat boy ensemble in-run, even if you're doing the hippy side on the war? If you need war hippy fatigues, the faster (?) way is acquire hippy outfit -> frat warrior fatigues -> start the war / use desert adventure for hippy fatigues. But if they're sure...
 	if (!have_outfit_components("Frat boy ensemble") && __misc_state["mysterious island available"] && __misc_state["In run"] && !__quest_state["Level 12"].finished && !__quest_state["Level 12"].started && $location[frat house].turnsAttemptedInLocation() >= 3 && ($location[frat house].combatTurnsAttemptedInLocation() > 0 || $location[frat house].noncombat_queue.contains_text("Sing This Explosion to Me") || $location[frat house].noncombat_queue.contains_text("Sing This Explosion to Me") || $location[frat house].noncombat_queue.contains_text("Murder by Death") || $location[frat house].noncombat_queue.contains_text("I Just Wanna Fly") || $location[frat house].noncombat_queue.contains_text("From Stoked to Smoked") || $location[frat house].noncombat_queue.contains_text("Purple Hazers")))
     {

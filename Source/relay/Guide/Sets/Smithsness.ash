@@ -30,6 +30,9 @@ void smithsnessGenerateCoalSuggestions(string [int] coal_suggestions)
 			coal_item_suggestions[$item[Work is a Four Letter Sword]] = "weapon, +2x smithsness weapon damage";
 		else if (my_primestat() == $stat[moxie])
 			coal_item_suggestions[$item[Sheila Take a Crossbow]] = "weapon, +smithsness initiative";
+            
+        if (__quest_state["Level 7"].state_boolean["alcove needs speed tricks"])
+			coal_item_suggestions[$item[Sheila Take a Crossbow]] = "weapon, +smithsness initiative (useful for modern zmobies)";
 			
 			
 	}
@@ -72,17 +75,25 @@ void smithsnessGenerateSmithereensSuggestions(string [int] smithereen_suggestion
 {
 	smithereen_suggestions.listAppend(7014.to_item().to_string() + ": " + (__misc_state["free runs usable"] ? "free run/" : "") + "banish for 20 turns");
 	
-	if (__misc_state["can eat just about anything"] && availableFullness() >= 2)
+	if (__misc_state["can eat just about anything"] && availableFullness() >= 2 && my_path_id() != PATH_SLOW_AND_STEADY)
 	{
 		smithereen_suggestions.listAppend("Charming Flan: 2 fullness epic food<br>Miserable Pie: 2 fullness awesome food, 50 turns of +10 smithsness");
 	}
 		
-	if (__misc_state["can drink just about anything"] && availableDrunkenness() >= 2)
+	if (__misc_state["can drink just about anything"] && availableDrunkenness() >= 2 && my_path_id() != PATH_SLOW_AND_STEADY)
 	{
 		smithereen_suggestions.listAppend("Vulgar Pitcher: 2 drunkenness epic drink<br>Bigmouth: 2 drunkenness awesome drink, 50 turns of +10 smithsness");
 	}
 	if (!$familiar[he-boulder].familiar_is_usable())
-		smithereen_suggestions.listAppend("Golden Light: Yellow ray");
+    {
+        string line = "Golden Light: Yellow ray";
+        if ($effect[everything looks yellow].have_effect() > 0)
+            line = HTMLGenerateSpanFont(line, "gray", "");
+		smithereen_suggestions.listAppend(line);
+    }
+    
+    if (__misc_state["In run"])
+        smithereen_suggestions.listAppend("Handsome Devil: single-turn +100% item");
 	
 }
 

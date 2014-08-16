@@ -107,7 +107,7 @@ void SemirareGenerateDescription(string [int] description)
 			semirares.listAppend(SemirareMake($location[cobb's knob menagerie\, level 2], "|*+10 familiar weight, for tower familiars.", 0));
         }
 		//three turn generation SRs go here
-		if (true)
+		if (my_path_id() != PATH_SLOW_AND_STEADY)
 		{
 			Semirare food_semirares;
 			food_semirares.importance = 11;

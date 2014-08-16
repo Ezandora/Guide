@@ -22,7 +22,7 @@ void SPlasticVampireFangsGenerateResource(ChecklistEntry [int] available_resourc
     if (!get_property_boolean("_interviewIsabella") && __misc_state["In run"] && __misc_state["need to level"])
     {
         string [int] description;
-        int stats_gained = MIN(500, 4 * my_basestat(my_primestat())) * (1.0 + numeric_modifier("Moxie Experience Percent") / 100.0);
+        int stats_gained = MIN(500, 4 * my_basestat(my_primestat())) * (1.0 + numeric_modifier(my_primestat().to_string() + " Experience Percent") / 100.0);
         
         description.listAppend(stats_gained + " " + my_primestat().to_lower_case() + " gained, one adventure cost.");
         if ($item[plastic vampire fangs].available_amount() == 0)

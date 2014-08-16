@@ -56,7 +56,7 @@ void QLevel4GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
     }
     else if ($location[the boss bat's lair].locationAvailable())
     {
-        subentry.entries.listAppend("Run +meat in the boss bat's lair, if you feel like it. (250 meat drop)");
+        subentry.entries.listAppend("Possibly run +meat in the boss bat's lair. (250 meat drop)");
         subentry.modifiers.listAppend("+meat");
 		if (delayRemainingInLocation($location[the boss bat's lair]) > 0)
 		{

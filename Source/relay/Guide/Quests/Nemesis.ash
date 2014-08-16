@@ -20,7 +20,7 @@ void QNemesisInit()
 	if (my_basestat(my_primestat()) >= 12)
 		state.startable = true;
     
-    if (!state.finished)
+    if (!state.finished && !mafiaIsPastRevision(14330))
     {
         //FIXME temporary code
         //Internal checking:
@@ -432,7 +432,10 @@ void QNemesisGenerateCaveTasks(ChecklistSubentry subentry, item legendary_epic_w
         
         if (paper_strips_found >= 8)
         {
-            subentry.entries.listAppend("Speak the password, then fight your nemesis.|Then wait for assassins.");
+            string line = "Speak the password, then fight your nemesis.";
+            if (!mafiaIsPastRevision(14330))
+                line += "|Then wait for assassins.";
+            subentry.entries.listAppend(line);
             if (legendary_epic_weapon.equipped_amount() == 0)
                 subentry.entries.listAppend("Equip " + legendary_epic_weapon + ".");
         }
@@ -460,6 +463,34 @@ void QNemesisGenerateCaveTasks(ChecklistSubentry subentry, item legendary_epic_w
 
 void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
+
+    
+    /*
+    mafia ordering:
+    1 -> acquire disco banjo
+    2 -> defeat the clown prince
+    3 -> make shagadelic disco banjo, talk to your guild
+    4 -> wait for guild to find out where your nemesis is hiding
+    5 -> time to visit the dark and dank and sinister cave
+    6 -> defeated nemesis in cave, let's go talk to the guild
+    7 -> they aren't impressed, wait for assassins
+    8 -> first assassin appeared
+    9 -> first assassin defeated
+    10 -> second assassin appeared
+    11 -> second assassin defeated
+    12 -> third assassin appeared
+    13 -> third assassin defeated
+    14 -> final assassin appeared
+    15 -> final assassin defeated, go find the lair
+    16 -> we're at the island, do island stuff
+    17 -> "got away. Again."
+    18 -> lava maze solved
+    19 -> final form [cue music]
+
+    (same ordering we use)
+    */
+    
+    
 	QuestState base_quest_state = __quest_state["Nemesis"];
 	if (base_quest_state.finished)
 		return;
@@ -573,9 +604,69 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         //12	have been confirmed: your Nemesis has put the order out for you to be hunted down and killed, and now they're sending their own guys instead of contracting out
         //13	Bam! So much for your Nemesis' assassins! If that's the best they've got, you have nothing at all to worry about
         //14	You had a run-in with some crazy mercenary or assassin or... thing that your Nemesis sent to do you in once and for all. A run-in followed by a run-out, evidently,
-        subentry.entries.listAppend("Wait for assassins.");
+        string assassin_up_next = "";
+        int assassins_left = -1;
+        
+        if (mafiaIsPastRevision(14330))
+        {
+            if (base_quest_state.mafia_internal_step < 9)
+            {
+                assassin_up_next = "menacing thug";
+                assassins_left = 4;
+            }
+            else if (base_quest_state.mafia_internal_step < 11)
+            {
+                assassin_up_next = "Mob Penguin hitman";
+                assassins_left = 3;
+            }
+            else if (base_quest_state.mafia_internal_step < 13)
+            {
+                if (my_class() == $class[seal clubber])
+                    assassin_up_next = "hunting seal";
+                else if (my_class() == $class[turtle tamer])
+                    assassin_up_next = "turtle trapper";
+                else if (my_class() == $class[pastamancer])
+                    assassin_up_next = "evil spaghetti cult assassin";
+                else if (my_class() == $class[sauceror])
+                    assassin_up_next = "béarnaise zombie";
+                else if (my_class() == $class[disco bandit])
+                    assassin_up_next = "flock of seagulls";
+                else if (my_class() == $class[accordion thief])
+                    assassin_up_next = "mariachi bandolero";
+                
+                assassins_left = 2;
+            }
+            else
+            {
+                if (my_class() == $class[seal clubber])
+                    assassin_up_next = "Argarggagarg the Dire Hellseal";
+                else if (my_class() == $class[turtle tamer])
+                    assassin_up_next = "Safari Jack, Small-Game Hunter";
+                else if (my_class() == $class[pastamancer])
+                    assassin_up_next = "Yakisoba the Executioner";
+                else if (my_class() == $class[sauceror])
+                    assassin_up_next = "Heimandatz, Nacho Golem";
+                else if (my_class() == $class[disco bandit])
+                    assassin_up_next = "Jocko Homo";
+                else if (my_class() == $class[accordion thief])
+                    assassin_up_next = "The Mariachi With No Name";
+                assassins_left = 1;
+            }
+        }
+        
+        if (assassins_left != -1)
+            subentry.entries.listAppend("Wait for " + pluralizeWordy(assassins_left, "more assassin", "more assassins") + ".");
+        else
+            subentry.entries.listAppend("Wait for assassins.");
+            
+            
+        if (assassin_up_next.length() > 0)
+            subentry.entries.listAppend(assassin_up_next.capitalizeFirstLetter() + " up next.");
+            
         if (my_basestat(my_primestat()) < 90)
             subentry.entries.listAppend("Level to 90 " + my_primestat().to_lower_case() + ".");
+        
+        
     }
     else if (base_quest_state.mafia_internal_step == 15)
     {

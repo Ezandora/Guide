@@ -135,7 +135,12 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] available_resources_entries
 		if (__misc_state["need to level"] && __misc_state["have mysticality class combat skill"])
 			subentries.listAppend(ChecklistSubentryMake("Nanorhino Gray Goo", "", "130? mainstat, fire against non-item monster with >90 attack. Cast mysticality combat skill."));
 		if (!$familiar[he-boulder].familiar_is_usable() && __misc_state["have moxie class combat skill"] && __misc_state["In run"])
-			subentries.listAppend(ChecklistSubentryMake("Nanorhino Yellow Ray", "", "Cast moxie combat skill."));
+        {
+            if ($effect[everything looks yellow].have_effect() > 0)
+                subentries.listAppend(ChecklistSubentryMake(HTMLGenerateSpanFont("Nanorhino Yellow Ray", "gray", ""), "", HTMLGenerateSpanFont("Cast moxie combat skill once everything looks yellow is gone.", "gray", "")));
+            else
+                subentries.listAppend(ChecklistSubentryMake("Nanorhino Yellow Ray", "", "Cast moxie combat skill."));
+        }
 		if (subentries.count() > 0)
 			available_resources_entries.listAppend(ChecklistEntryMake("__familiar nanorhino", url, subentries, 5));
 	}

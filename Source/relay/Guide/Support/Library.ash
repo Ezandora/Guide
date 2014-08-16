@@ -84,7 +84,7 @@ int PATH_KOLHS = 18;
 int PATH_CLASS_ACT_2 = 19;
 int PATH_AVATAR_OF_SNEAKY_PETE = 20;
 int PATH_SLOW_AND_STEADY = 21;
-int PATH_SPOILER_PATH = 22;
+int PATH_HEAVY_RAINS = 22;
 
 int __my_path_id_cached = -11;
 int my_path_id()
@@ -127,8 +127,8 @@ int my_path_id()
         __my_path_id_cached = PATH_AVATAR_OF_SNEAKY_PETE;
     else if (path_name == "Slow and Steady")
         __my_path_id_cached = PATH_SLOW_AND_STEADY;
-    //else if (path_name == "") //this is known but might as well keep it a secret for now
-        //__my_path_id_cached = PATH_SPOILER_PATH;
+    else if (path_name == "Heavy Rains")
+        __my_path_id_cached = PATH_HEAVY_RAINS;
     else
         __my_path_id_cached = PATH_UNKNOWN;
     return __my_path_id_cached;
@@ -563,14 +563,45 @@ int totalDelayForLocation(location place)
     return -1;
 }
 
+boolean delayForLocationIsCombatOnly(location place)
+{
+    //mafia will sometimes put things in the noncombat_queue that aren't really there
+    //an example is "Pick a Part", but I have seen others
+    //fixing these could be difficult (I don't know), so manually blank them out
+    //using the queue is unreliable but...
+    boolean [location] place_combat_only;
+    
+    place_combat_only[$location[the spooky forest]] = true;
+    place_combat_only[$location[the haunted bedroom]] = true;
+    place_combat_only[$location[the boss bat's lair]] = true;
+    place_combat_only[$location[the oasis]] = true;
+    place_combat_only[$location[the hidden park]] = false;
+    place_combat_only[$location[the haunted gallery]] = true;
+    place_combat_only[$location[the haunted bathroom]] = true; //fairly certain that's true
+    //place_combat_only[$location[the haunted ballroom]] = false; //don't really know
+    
+    if (place_combat_only contains place)
+        return place_combat_only[place];
+    return false;
+}
+
 int delayRemainingInLocation(location place)
 {
     int delay_for_place = place.totalDelayForLocation();
+    boolean delay_is_combat_only = place.delayForLocationIsCombatOnly();
     
     
     if (delay_for_place == -1)
         return -1;
-    return MAX(0, delay_for_place - place.turnsAttemptedInLocation());
+    
+    int turns_attempted = 0;
+    
+    if (delay_is_combat_only)
+        turns_attempted = place.combatTurnsAttemptedInLocation();
+    else
+        turns_attempted = place.turnsAttemptedInLocation();
+        
+    return MAX(0, delay_for_place - turns_attempted);
 }
 
 int turnsCompletedInLocation(location place)

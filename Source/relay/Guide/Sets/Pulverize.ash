@@ -29,6 +29,8 @@ void SPulverizeGenerateResource(ChecklistEntry [int] available_resources_entries
         return;
     if (availableSpleen() == 0) //only want wads for spleen. could disable this for planning? but information overload
         return;
+    if (my_path_id() == PATH_SLOW_AND_STEADY)
+        return;
     
     
     /*

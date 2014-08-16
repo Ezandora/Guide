@@ -51,6 +51,9 @@ void SSpeakeasyGenerateResource(ChecklistEntry [int] available_resources_entries
             options.listAppend(listMake("Sockdollager", "2", "Tavern NC skipping"));
     }
     
+    if (__misc_state["In run"] && my_meat() >= 20000)
+        options.listAppend(listMake("Flivver", "2", "Epic-level drunkenness."));
+    
     if (my_path_id() == PATH_SLOW_AND_STEADY && __misc_state["need to level"])
     {
         string drink_name = "";
@@ -78,7 +81,7 @@ void SSpeakeasyGenerateResource(ChecklistEntry [int] available_resources_entries
     if (options.count() > 1)
         description.listAppend(HTMLGenerateSimpleTableLines(options));
     
-    if (__misc_state["In run"] || drinks_remaining <3)
+    if (__misc_state["In run"] || drinks_remaining > 0)
         available_resources_entries.listAppend(ChecklistEntryMake("__item observational glasses", "clan_viplounge.php?action=speakeasy", ChecklistSubentryMake(pluralize(drinks_remaining, "speakeasy drink", "speakeasy drinks"), "", description), 8)); //the eyes of T.J. Eckleburg
     
 }

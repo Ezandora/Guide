@@ -143,6 +143,9 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
                     if (image_name.length() == 0)
                         image_name = "__item antique painting of a landscape";
                     
+                    boolean garden_banished = CounterLookup("Garden Banished").CounterExists();
+                    
+                    boolean need_minus_combat = false;
                         
                     if (delayRemainingInLocation($location[the haunted gallery]) > 0)
                     {
@@ -151,10 +154,20 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
                         {
                             modifiers.listAppend(__misc_state_string["hipster name"]+"?");
                         }
+                        if (!garden_banished)
+                        {
+                            line += " Try to find the garden NC to banish it.";
+                            need_minus_combat = true;
+                        }
                         description.listAppend(line);
                     }
                     else
+                        need_minus_combat = true;
+                    
+                    if (need_minus_combat)
                         modifiers.listAppend("-combat");
+                    
+                    modifiers.listAppend("+meat");
                 }
                 if (lookupItem("Lady Spookyraven's powder puff").available_amount() == 0)
                 {
@@ -188,8 +201,6 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
                     string [int] description;
                     
                     description.listAppend("Find Lady Spookyraven's finest gown in the elegant nightstand.");
-                    description.listAppend("Banish non-ornate drawers.");
-                    modifiers.listAppend("banish non-ornate");
                     
                     string [int] items_needed_from_ornate_drawer;
                     
@@ -198,6 +209,18 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
                     
                     if (__quest_state["Level 11 Palindome"].state_boolean["Need instant camera"] && 7266.to_item().available_amount() == 0)
                         items_needed_from_ornate_drawer.listAppend("disposable instant camera");
+                        
+                        
+                    if (items_needed_from_ornate_drawer.count() > 0)
+                    {
+                        description.listAppend("Banish non-ornate drawers.");
+                        modifiers.listAppend("banish non-ornate");
+                    }
+                    else
+                    {
+                        description.listAppend("Banish non-elegant drawers.");
+                        modifiers.listAppend("banish non-elegant");
+                    }
                     
                     if (items_needed_from_ornate_drawer.count() > 0)
                         description.listAppend("Also acquire " + items_needed_from_ornate_drawer.listJoinComponents(", ", "and") + " from the ornate drawer.");
@@ -266,11 +289,24 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         image_name = "__item tiny knife and fork";
         subentry.entries.listAppend("To unlock the Haunted Billiards Room.");
         
-        subentry.entries.listAppend("Run " + HTMLGenerateSpanOfClass("hot", "r_element_hot") + " resistance and " + HTMLGenerateSpanOfClass("stench", "r_element_stench") + " resistance to search faster.");
         
         float drawers_per_turn = 0.0;
         float hot_resistance = numeric_modifier("hot resistance");
         float stench_resistance = numeric_modifier("stench resistance");
+        
+        int more_hot_needed = MAX(0, 9 - hot_resistance.to_int());
+        int more_stench_needed = MAX(0, 9 - stench_resistance.to_int());
+        
+        
+        string [int] needed_resists;
+        if (more_hot_needed > 0)
+            needed_resists.listAppend(more_hot_needed + " more " + HTMLGenerateSpanOfClass("hot", "r_element_hot") + " resistance");
+        if (more_stench_needed > 0)
+            needed_resists.listAppend(more_stench_needed + " more " + HTMLGenerateSpanOfClass("stench", "r_element_stench") + " resistance");
+        if (needed_resists.count() > 0)
+            subentry.entries.listAppend("Run " + needed_resists.listJoinComponents(", ", "and") + " to search faster.");
+        
+        //subentry.entries.listAppend("Run 9 " + HTMLGenerateSpanOfClass("hot", "r_element_hot") + " resistance and " + HTMLGenerateSpanOfClass("stench", "r_element_stench") + " resistance to search faster.");
         
         drawers_per_turn = 0.5 * MIN(4.0, MAX(1.0, 1.0 + hot_resistance / 3.0)) + 0.5 * MIN(4.0, MAX(1.0, 1.0 + stench_resistance / 3.0));
         drawers_per_turn = MAX(1.0, drawers_per_turn); //zero-divide safety backup

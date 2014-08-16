@@ -116,6 +116,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 				details.listAppend("Use filthworm royal guard scent gland");
             }
 			modifiers.listClear();
+            modifiers.listAppend("+meat");
 			details.listAppend("Defeat the filthworm queen in the queen's chamber.");
 		}
 		else if ($effect[Filthworm Drone Stench].have_effect() > 0 || $item[Filthworm drone scent gland].available_amount() > 0)
@@ -472,6 +473,25 @@ void QLevel12GenerateBattlefieldDescription(ChecklistSubentry subentry, string s
         }
         if (!__quest_state["Level 13"].state_boolean["have relevant guitar"] && side == "hippy")
             items_to_turn_in_for.listAppend("massive sitar");
+            
+        if (!__quest_state["Level 13"].state_boolean["past tower"]) //bugbears will have this true
+        {
+            int missing_tower_items = 0;
+            for i from 1 to 6
+            {
+                item tower_item = __misc_state_string["Tower monster item " + i].to_item();
+                if (tower_item.available_amount() == 0 || tower_item == $item[none])
+                    missing_tower_items += 1;
+            }
+            
+            if (missing_tower_items > 0)
+            {
+                if (side == "hippy")
+                    items_to_turn_in_for.listAppend("macrame net for tower stunning");
+                else
+                    items_to_turn_in_for.listAppend("boom boxes for tower stunning");
+            }
+        }
         
         string line2 = "Also, turn in gear to your home camp.";
         if (items_to_turn_in_for.count() > 0)
@@ -522,6 +542,10 @@ void QLevel12GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             
             //need 70 moxie, 70 myst
             
+        }
+        if ($item[Talisman o' Nam].available_amount() == 0 && !__quest_state["Level 11 Palindome"].finished)
+        {
+            subentry.entries.listAppend("May want to " + HTMLGenerateSpanFont("acquire the Talisman o' Nam", "red", "") + " first.");
         }
         
         subentry.entries.listAppend(generateTurnsToSeeNoncombat(85, 3, "start war"));

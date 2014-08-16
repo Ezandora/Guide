@@ -123,7 +123,11 @@ void SFaxGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
         
         if (lookupItem("7301").available_amount() == 0 && get_property("questM20Necklace") != "finished" && lookupItem("Lady Spookyraven's necklace").available_amount() == 0)
         {
-            potential_faxes.listAppend("Writing desk - <strong>only if you can copy it four times</strong>. Skips the manor's first floor if you fight five total.");
+            string line = "Writing desk - <strong>only if you can copy it four times</strong>. Skips the manor's first floor if you fight five total.";
+            
+            if (lookupItem("telegram from Lady Spookyraven").available_amount() > 0)
+                line += HTMLGenerateSpanFont("<br>Read the telegram from Lady Spookyraven first.", "red", "");
+            potential_faxes.listAppend(line);
         }
         
     }

@@ -44,9 +44,9 @@ void setUpState()
     int day = now_to_string("dd").to_int();
     
     //FIXME: use is_unrestricted once 16.4 is out
-    if (my_path_id() == PATH_SLOW_AND_STEADY && (year == 2014 && month <= 8 && !(month == 8 && day >= 15)))
-        __misc_state["type 69 restrictions active"] = true;
-    if (my_path_id() == PATH_SPOILER_PATH && (year == 2014 && month <= 11 && !(month == 11 && day >= 15))) //assumption
+    //if (my_path_id() == PATH_SLOW_AND_STEADY && (year == 2014 && month <= 8 && !(month == 8 && day >= 15)))
+        //__misc_state["type 69 restrictions active"] = true;
+    if (my_path_id() == PATH_HEAVY_RAINS && (year == 2014 && month <= 11 && !(month == 11 && day >= 15))) //assumption
         __misc_state["type 69 restrictions active"] = true;
     
     

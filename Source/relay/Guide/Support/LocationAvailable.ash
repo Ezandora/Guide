@@ -218,6 +218,8 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
         case $location[the beanbat chamber]:
             return questPropertyPastInternalStepNumber("questL04Bat", 3);
         case $location[the boss bat's lair]:
+            if ($location[the boss bat's lair].combatTurnsAttemptedInLocation() > 0)
+                return true;
             return questPropertyPastInternalStepNumber("questL04Bat", 4);
 		case $location[cobb's knob barracks]:
 		case $location[cobb's knob kitchens]:
@@ -752,12 +754,15 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         lookup_map["The Prince's Canapes table"] = "place.php?whichplace=ioty2014_cindy";
         lookup_map["The Inner Wolf Gym"] = "place.php?whichplace=ioty2014_wolf";
         lookup_map["Unleash Your Inner Wolf"] = "place.php?whichplace=ioty2014_wolf";
+        foreach s in $strings[Ye Olde Medievale Villagee,Portal to Terrible Parents,Rumpelstiltskin's Workshop]
+            lookup_map[s] = "place.php?whichplace=ioty2014_rumple";
         lookup_map["The Cave Before Time"] = "place.php?whichplace=twitch";
         lookup_map["An Illicit Bohemian Party"] = "place.php?whichplace=twitch";
         lookup_map["Moonshiners' Woods"] = "place.php?whichplace=twitch";
         lookup_map["The Fun-Guy Mansion"] = "place.php?whichplace=airport_sleaze";
         lookup_map["Sloppy Seconds Diner"] = "place.php?whichplace=airport_sleaze";
         lookup_map["The Sunken Party Yacht"] = "place.php?whichplace=airport_sleaze";
+        lookup_map["Trick-or-treating"] = "town.php?action=trickortreat";
         //Conditionals:
         if ($location[cobb's knob barracks].locationAvailable())
             lookup_map["The Outskirts of Cobb's Knob"] = "cobbsknob.php";

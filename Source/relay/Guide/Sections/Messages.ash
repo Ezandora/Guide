@@ -92,6 +92,7 @@ string generateRandomMessage()
     equipment_messages[$item[fleetwood chain]] = "run in the shadows";
     equipment_messages[$item[liar's pants]] = "never tell the same lie twice";
     equipment_messages[$item[detective skull]] = "too slow ascend faster";
+    equipment_messages[$item[gasmask]] = "are you my mummy?";
     
     foreach it in equipment_messages
     {
@@ -125,7 +126,7 @@ string generateRandomMessage()
     effect_messages[$effect[silent running]] = "an awful lot of running";
     effect_messages[$effect[Neuromancy]] = "the silver paths";
     effect_messages[$effect[Teleportitis]] = "everywhere and nowhere";
-    
+    effect_messages[$effect[Form of...Bird!]] = "fiddle fiddle fiddle";
     
     
     foreach e in effect_messages
@@ -136,6 +137,10 @@ string generateRandomMessage()
             break;
         }
     }
+    
+    
+    if (__misc_state["single familiar run"])
+        random_messages.listAppend("together forever");
     
     random_messages.listAppend("click click click");
     
@@ -152,11 +157,11 @@ string generateRandomMessage()
     paths[PATH_KOLHS] = "did you study?";
     paths[PATH_CLASS_ACT_2] = "lonely guild trainer";
     paths[PATH_AVATAR_OF_SNEAKY_PETE] = "sunglasses at night";
-    //paths[PATH_SPOILER_PATH] = "";
     if (!in_hardcore())
         paths[PATH_SLOW_AND_STEADY] = "infinite pulls";
     else
         paths[PATH_SLOW_AND_STEADY] = "skip a day if you like";
+    paths[PATH_HEAVY_RAINS] = "survive";
     
     paths[PATH_OXYGENARIAN] = "the slow path";
     
@@ -237,7 +242,7 @@ string generateRandomMessage()
     familiar_messages[$familiar[hand turkey]] = "a rare bird";
     familiar_messages[$familiar[reanimated reanimator]] = "weird science";
     familiar_messages[lookupFamiliar("Twitching Space Critter")] = "right right right right down right agh";
-    
+    familiar_messages[$familiar[slimeling]] = "lost mother";
     
     if (familiar_messages contains my_familiar() && !__misc_state["familiars temporarily blocked"])
         random_messages.listAppend(familiar_messages[my_familiar()]);
@@ -304,6 +309,7 @@ string generateRandomMessage()
     monster_messages[$monster[bookbat]] = "tattered scrap of dignity";
     if (!$skill[Transcendent Olfaction].have_skill() && __misc_state["In run"])
         monster_messages[$monster[Astronomer]] = "nooo astronomer come back";
+    monster_messages[$monster[urge to stare at your hands]] = ".&#x20dd;.&#x20dd;"; //.⃝.⃝
     
     if (monster_messages contains last_monster() && last_monster() != $monster[none])
     {

@@ -21,8 +21,33 @@ float calculateCurrentNinjaAssassinMaxDamage()
 	else
 		v = ((((MAX((assassin_ml - moxie), 0.0) - damage_reduction) + 120.0) * MAX(0.1, MIN((1.1 - sqrt((damage_absorption/1000.0))), 1.0))) * (0.1 - myst_class_extra_cold_resistance + (0.5 * (powf((5.0/6.0), (cold_resistance - 9.0))))));
 	
+    
+    
 	return v;
 }
+
+float calculateCurrentNinjaAssassinMaxEnvironmentalDamage()
+{
+    float v = 0.0;
+    int ml_level = monster_level_adjustment_ignoring_plants();
+    if (ml_level >= 30 && false) //doesn't work yet
+    {
+        //this is very, very unspaded, and this formula is likely hugely incorrect - it's a huge approximation that deliberately ignores a bunch of variables
+        //FIXME put in real numbers
+        float expected_assassin_damage = 0.0;
+        
+        expected_assassin_damage = 0.0021 * ml_level * ml_level + 0.287 * ml_level - 9.9;
+        
+        //Resists don't work properly. They have an effect, but it's different. I don't know how much exactly, so for now, ignore this:
+        //expected_assassin_damage = damageTakenByElement(expected_assassin_damage, $element[cold]);
+        
+        expected_assassin_damage = ceil(expected_assassin_damage);
+        
+        v += expected_assassin_damage;
+    }
+    return v;
+}
+
 
 string generateNinjaSafetyGuide(boolean show_color)
 {
@@ -31,18 +56,27 @@ string generateNinjaSafetyGuide(boolean show_color)
 	init_needed = monster_initiative($monster[Ninja snowman assassin]);
 	
 	float damage_taken = calculateCurrentNinjaAssassinMaxDamage();
+    float damage_taken_always = calculateCurrentNinjaAssassinMaxEnvironmentalDamage();
 	
 	string result;
 	if (initiative_modifier() >= init_needed)
 	{
-		can_survive = true;
+        if (my_hp() >= ceil(damage_taken_always) + 2)
+            can_survive = true;
 		result += "Keep";
 	}
 	else
 		result += "Need";
-	result += " +" + ceil(init_needed) + "% init to survive ninja, or ";
+	result += " +" + ceil(init_needed) + "% init";
+    
+    if (damage_taken_always > my_hp())
+        result += "/" + ceil(damage_taken_always) + " HP";
+    
+    result += " to survive ninja, or ";
+    
+    //FIXME warn about damage_taken_always WITH INIT
 	
-	int min_safe_damage = (ceil(damage_taken) + 2);
+	int min_safe_damage = (ceil(damage_taken) + 2) + (ceil(damage_taken_always) + 2) ;
 	if (my_hp() >= min_safe_damage)
 	{
 		result += "keep";
@@ -114,6 +148,11 @@ void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [in
         
         float cranny_beep_beep_beep = MAX(3.0,sqrt(monster_level));
         description.listAppend("~" + cranny_beep_beep_beep.roundForOutput(1) + " cranny beeps.");
+    }
+    else if (monster_name == "Writing Desk")
+    {
+        if (lookupItem("telegram from Lady Spookyraven").available_amount() > 0)
+            description.listAppend(HTMLGenerateSpanFont("Read the telegram from Lady Spookyraven first.", "red", ""));
     }
 }
 

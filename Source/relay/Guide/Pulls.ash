@@ -105,7 +105,7 @@ void generatePullList(Checklist [int] checklists)
 	pullable_item_list.listAppend(GPItemMake($item[over-the-shoulder folder holder], "So many things!", 1));
 	pullable_item_list.listAppend(GPItemMake($item[pantsgiving], "5x banish/day|+2 stats/fight|+15% items|2 extra fullness (realistically)", 1));
     if (!__misc_state["familiars temporarily blocked"])
-        pullable_item_list.listAppend(GPItemMake($item[snow suit], "+20 familiar weight for a while, +4 free runs|+10% item|spleen items", 1));
+        pullable_item_list.listAppend(GPItemMake($item[snow suit], "+20 familiar weight for a while" + (__misc_state["free runs usable"] ? ", +4 free runs" : "") + "|+10% item|spleen items", 1));
     if (!__misc_state["familiars temporarily blocked"])
     {
         if ($item[Buddy Bjorn].storage_amount() > 0)

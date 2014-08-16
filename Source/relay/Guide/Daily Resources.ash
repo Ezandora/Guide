@@ -310,7 +310,7 @@ void generateDailyResources(Checklist [int] checklists)
     {
         string [int] description;
         string [int] mixables;
-        if (__misc_state["can drink just about anything"])
+        if (__misc_state["can drink just about anything"] && my_path_id() != PATH_SLOW_AND_STEADY)
         {
             mixables.listAppend("neuromancer-level drinks");
         }

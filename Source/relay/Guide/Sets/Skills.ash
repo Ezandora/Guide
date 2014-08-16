@@ -1,6 +1,7 @@
 
 void SSkillsGenerateResource(ChecklistEntry [int] available_resources_entries)
-{	
+{
+    string url;
 	if (skill_is_usable($skill[inigo's incantation of inspiration]))
 	{
 		int inigos_casts_remaining = 5 - get_property_int("_inigosCasts");
@@ -22,7 +23,7 @@ void SSkillsGenerateResource(ChecklistEntry [int] available_resources_entries)
 	int importance = 11;
 	
 	string [skill] skills_to_details;
-	
+	string [skill] skills_to_urls;
 	skill [string][int] property_summons_to_skills;
 	int [string] property_summon_limits;
 	
@@ -77,7 +78,14 @@ void SSkillsGenerateResource(ChecklistEntry [int] available_resources_entries)
     property_summons_to_skills["grimoire3Summons"] = listMake($skill[Summon Alice's Army Cards]);
     property_summons_to_skills["_grimoireGeekySummons"] = listMake($skill[Summon Geeky Gifts]);
     if (mafiaIsPastRevision(14300))
+    {
         property_summons_to_skills["_grimoireConfiscatorSummons"] = listMake(lookupSkill("Summon Confiscated Things"));
+        skills_to_urls[lookupSkill("Summon Confiscated Things")] = "campground.php?action=bookshelf";
+    }
+    property_summons_to_skills["_candySummons"] = listMake($skill[Summon Crimbo Candy]);
+    
+    foreach s in $skills[Summon Hilarious Objects,Summon Tasteful Items,Summon Alice's Army Cards,Summon Geeky Gifts]
+        skills_to_urls[s] = "campground.php?action=bookshelf";
     
 	
 	
@@ -119,6 +127,15 @@ void SSkillsGenerateResource(ChecklistEntry [int] available_resources_entries)
 			string details = skills_to_details[s];
 			if (details != "")
 				description.listAppend(details);
+                
+                
+            if (url.length() == 0)
+            {
+                if (skills_to_urls contains s)
+                    url = skills_to_urls[s];
+                else
+                    url = "skills.php";
+            }
 			
 			subentries.listAppend(ChecklistSubentryMake(line, "", description));
 			break;
@@ -128,7 +145,7 @@ void SSkillsGenerateResource(ChecklistEntry [int] available_resources_entries)
 	if (subentries.count() > 0)
 	{
 		subentries.listPrepend(ChecklistSubentryMake("Skill summons:"));
-		ChecklistEntry entry = ChecklistEntryMake("__item Knob Goblin love potion", "skills.php", subentries, importance);
+		ChecklistEntry entry = ChecklistEntryMake("__item Knob Goblin love potion", url, subentries, importance);
 		entry.should_indent_after_first_subentry = true;
 		available_resources_entries.listAppend(entry);
 	}

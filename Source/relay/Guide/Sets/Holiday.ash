@@ -86,9 +86,24 @@ void SHolidayGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     if (todays_holidays["Halloween"])
     {
         if (__misc_state["In run"])
-            optional_task_entries.listAppend(ChecklistEntryMake("__item plastic pumpkin bucket", "town.php", ChecklistSubentryMake("Trick or treat for one block", "+moxie", "Free stats/items from monsters on the first block."), 8));
+        {
+            string [int] description;
+            description.listAppend("Free stats/items from monsters on the first block.");
+            if (knoll_available() && !have_outfit_components("Filthy Hippy Disguise"))
+            {
+                item [int] missing_components = missing_outfit_components("Bugbear Costume");
+                if (missing_components.count() > 0)
+                    description.listAppend("If you need an outfit, buy a " + missing_components.listJoinComponents(", ", "and") + " from the knoll.");
+            }
+            optional_task_entries.listAppend(ChecklistEntryMake("__item plastic pumpkin bucket", "town.php?action=trickortreat", ChecklistSubentryMake("Trick or treat for one block", "+" + my_primestat().to_lower_case(), description), $locations[trick-or-treating]));
+        }
         else
-            optional_task_entries.listAppend(ChecklistEntryMake("__item plastic pumpkin bucket", "town.php", ChecklistSubentryMake("Trick or treat", "", "Wear an outfit, go from house to house."), 8));
+        {
+            string [int] description;
+            description.listAppend("Wear an outfit, go from house to house.");
+            description.listAppend("Remember you can trick-or-treat while drunk.");
+            optional_task_entries.listAppend(ChecklistEntryMake("__item plastic pumpkin bucket", "town.php?action=trickortreat", ChecklistSubentryMake("Trick or treat", "", description), $locations[trick-or-treating]));
+        }
     }
     if (all_tomorrows_parties["Halloween"] && !__misc_state["In run"])
         optional_task_entries.listAppend(ChecklistEntryMake("__item plastic pumpkin bucket", "", ChecklistSubentryMake("Save turns for Halloween tomorrow", "", ""), 8));

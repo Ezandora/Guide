@@ -192,10 +192,31 @@ void finalizeSetUpFloristState()
 	foreach key in __plants_suggested_locations
 	{
 		PlantSuggestion suggestion = __plants_suggested_locations[key];
+        
+        boolean should_remove = false;
 		if (current_plants_used[suggestion.loc][suggestion.plant_name] || plants_used[suggestion.plant_name])
 		{
-			keys_removing.listAppend(key);
+			should_remove = true;
 		}
+        else
+        {
+            if (suggestion.plant_name == "Rad-ish Radish" || suggestion.plant_name == "Canned Spinach" || suggestion.plant_name == "Wizard's Wig") //+stat plants
+            {
+                boolean area_has_ml_plant = false;
+                if (current_plants_used[suggestion.loc]["Rabid Dogwood"])
+                    area_has_ml_plant = true;
+                if (current_plants_used[suggestion.loc]["War Lily"])
+                    area_has_ml_plant = true;
+                if (current_plants_used[suggestion.loc]["Blustery Puffball"])
+                    area_has_ml_plant = true;
+                if (area_has_ml_plant)
+                    should_remove = true;
+            }
+            
+        }
+        
+        if (should_remove)
+            keys_removing.listAppend(key);
 	}
 	foreach key in keys_removing
 	{

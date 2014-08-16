@@ -158,6 +158,9 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         if (evilness_removed_per_adventure != 0.0)
             turns_remaining = MAX(1, turns_remaining / evilness_removed_per_adventure);
         
+        if (floor(turns_remaining) * 3 < evilness)
+            turns_remaining = ceiling(turns_remaining);
+        
 		if (evilness > 26)
         {
             subentry.modifiers.listAppend("olfact dirty old lihc");

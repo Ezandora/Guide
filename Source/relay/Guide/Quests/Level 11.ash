@@ -314,7 +314,7 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
     if (true)
     {
         boolean use_fast_route = base_quest_state.state_boolean["Can use fast route"];
-        boolean recipe_will_be_autoread = (mafiaIsPastRevision(14187) && ($item[lord spookyraven's spectacles].available_amount() > 0) && use_fast_route);
+        boolean recipe_will_be_autoread = (mafiaIsPastRevision(14187) && ($item[lord spookyraven's spectacles].available_amount() > 0) && use_fast_route) && get_property_boolean("autoCraft");
         //FIXME spectacles first?
         if (!$location[the haunted ballroom].noncombat_queue.contains_text("We'll All Be Flat") && base_quest_state.mafia_internal_step < 2)
         {
@@ -1064,13 +1064,18 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
         url = "pyramid.php";
         //pyramidPosition/lastPyramidReset/pyramidBombUsed not tracked yet
         boolean done_with_wheel_turning = false; //FIXME set this
+        boolean should_generate_control_room_information = false;
+        boolean ed_chamber_open = get_property_boolean("pyramidBombUsed");
         if (get_property_boolean("middleChamberUnlock") || $location[the middle chamber].turnsAttemptedInLocation() > 0 || $location[the upper chamber].noncombat_queue.contains_text("Down Dooby-Doo Down Down"))
         {
             //middle chamber unlocked:
             if (get_property_boolean("controlRoomUnlock") || $location[the middle chamber].noncombat_queue.contains_text("Under Control"))
             {
                 //control room unlocked:
-                subentry.entries.listAppend("Spin the control room, search the lower chambers! Then fight Ed.");
+                if (mafiaIsPastRevision(14319))
+                    should_generate_control_room_information = true;
+                else
+                    subentry.entries.listAppend("Spin the control room, search the lower chambers! Then fight Ed.");
                 //FIXME implement this
                 //FIXME suggest the better route
                 subentry.modifiers.listAppend("+400% item OR -combat");
@@ -1114,6 +1119,104 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
                 subentry.modifiers.listAppend("free runs");
         }
         
+        //Pyramid unlocked:
+        if (should_generate_control_room_information)
+        {
+            //this is not very good code:
+            boolean have_pyramid_position = false;
+            int pyramid_position = get_property_int("pyramidPosition");
+            
+            //Uncertain:
+            if (get_property_int("lastPyramidReset") == my_ascensions())
+                have_pyramid_position = true;
+            
+            //I think there are... five positions?
+            //1=Ed, 2=bad, 3=vending machine, 4=token, 5=bad
+            int next_position_needed = -1;
+            int additional_turns_after_that = 0;
+            string task;
+            done_with_wheel_turning = false;
+            if (2318.to_item().available_amount() > 0 || ed_chamber_open)
+            {
+                //need 1
+                next_position_needed = 1;
+                additional_turns_after_that = 0;
+                
+                boolean delay_for_semirare = CounterLookup("Semi-rare").CounterWillHitExactlyInTurnRange(0, 6);
+                
+                if (delay_for_semirare)
+                {
+                    task = HTMLGenerateSpanFont("Avoid fighting Ed the Undying, semi-rare coming up ", "red", "");
+                }
+                else
+                {
+                    int ed_ml = 180 + monster_level_adjustment_ignoring_plants();
+                    task = "fight Ed in the lower chambers";
+                    if (ed_ml > my_buffedstat($stat[moxie]))
+                        task += " (" + ed_ml + " attack)";
+                }
+                if (ed_chamber_open)
+                    done_with_wheel_turning = true;
+            }
+            else if ($item[ancient bronze token].available_amount() > 0)
+            {
+                //need 3
+                next_position_needed = 3;
+                additional_turns_after_that = 3;
+                task = "acquire " + 2318.to_item().to_string() + " in lower chamber";
+            }
+            else
+            {
+                //need 4
+                next_position_needed = 4;
+                additional_turns_after_that = 3 + 4;
+                task = "acquire token in lower chamber";
+            }
+            
+            int spins_needed = (next_position_needed - pyramid_position + 10) % 5;
+            
+            string [int] tasks;
+            if (spins_needed > 0)
+            {
+                if (spins_needed == 1)
+                    tasks.listAppend("spin the pyramid One More Time");
+                else
+                    tasks.listAppend("spin the pyramid " + spins_needed.int_to_wordy() + " times");
+                url = "place.php?whichplace=pyramid&action=pyramid_control";
+            }
+            tasks.listAppend(task);
+            
+            
+            if (!have_pyramid_position)
+            {
+                tasks.listClear();
+                //tasks.listAppend("look at the pyramid"); //I dunno
+            }
+            
+            if (ed_chamber_open && done_with_wheel_turning)
+            {
+                subentry.modifiers.listClear();
+                subentry.entries.listClear();
+            }
+            
+            if (tasks.count() > 0)
+                subentry.entries.listPrepend(tasks.listJoinComponents(", ", "then").capitalizeFirstLetter() + ".");
+            else
+                subentry.entries.listAppend("Spin the control room, search the lower chambers! Then fight Ed.");
+            
+            /*if (!done_with_wheel_turning)
+            {
+                string [int] relevant_items;
+                if ($item[tomb ratchet].available_amount() > 0)
+                    relevant_items.listAppend(pluralize($item[tomb ratchet]));
+                if ($item[tangle of rat tails].available_amount() > 0)
+                    relevant_items.listAppend(pluralize($item[tangle of rat tails]));
+                  
+                if (relevant_items.count() > 0)
+                    subentry.entries.listAppend(relevant_items.listJoinComponents(", ", "and") + " available.");
+            }*/
+        }
+        
         if (!done_with_wheel_turning)
         {
             int amount = $item[tomb ratchet].available_amount() + lookupItem("crumbling wooden wheel").available_amount();
@@ -1123,91 +1226,6 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
                 subentry.entries.listAppend(pluralize($item[tangle of rat tails]) + " available.");
         }
         
-        
-        //Pyramid unlocked:
-        /*boolean have_pyramid_position = false;
-        int pyramid_position = get_property_int("pyramidPosition");
-        
-        //Uncertain:
-        if (get_property_int("lastPyramidReset") == my_ascensions())
-            have_pyramid_position = true;
-        
-        //I think there are... five positions?
-        //1=Ed, 2=bad, 3=vending machine, 4=token, 5=bad
-        int next_position_needed = -1;
-        int additional_turns_after_that = 0;
-        string task;
-        boolean ed_waiting = get_property_boolean("pyramidBombUsed");
-        boolean done_with_wheel_turning = false;
-        if (2318.to_item().available_amount() > 0 || ed_waiting)
-        {
-            //need 1
-            next_position_needed = 1;
-            additional_turns_after_that = 0;
-            
-            boolean delay_for_semirare = CounterLookup("Semi-rare").CounterWillHitExactlyInTurnRange(0, 6);
-            
-            if (delay_for_semirare)
-            {
-                task = HTMLGenerateSpanFont("Avoid fighting Ed the Undying, semi-rare coming up ", "red", "");
-            }
-            else
-            {
-                int ed_ml = 180 + monster_level_adjustment_ignoring_plants();
-                task = "fight Ed in the lower chambers";
-                if (ed_ml > my_buffedstat($stat[moxie]))
-                    task += " (" + ed_ml + " attack)";
-            }
-            if (ed_waiting)
-                done_with_wheel_turning = true;
-        }
-        else if ($item[ancient bronze token].available_amount() > 0)
-        {
-            //need 3
-            next_position_needed = 3;
-            additional_turns_after_that = 3;
-            task = "acquire " + 2318.to_item().to_string() + " in lower chamber";
-        }
-        else
-        {
-            //need 4
-            next_position_needed = 4;
-            additional_turns_after_that = 3 + 4;
-            task = "acquire token in lower chamber";
-        }
-        
-        int spins_needed = (next_position_needed - pyramid_position + 10) % 5;
-        
-        string [int] tasks;
-        if (spins_needed > 0)
-        {
-            if (spins_needed == 1)
-                tasks.listAppend("spin the pyramid One More Time");
-            else
-                tasks.listAppend("spin the pyramid " + spins_needed.int_to_wordy() + " times");
-        }
-        tasks.listAppend(task);
-        
-        
-        if (!have_pyramid_position)
-        {
-            tasks.listClear();
-            tasks.listAppend("look at the pyramid");
-        }
-        
-        subentry.entries.listAppend(tasks.listJoinComponents(", ", "then").capitalizeFirstLetter() + ".");
-        
-        if (!done_with_wheel_turning)
-        {
-            string [int] relevant_items;
-            if ($item[tomb ratchet].available_amount() > 0)
-                relevant_items.listAppend(pluralize($item[tomb ratchet]));
-            if ($item[tangle of rat tails].available_amount() > 0)
-                relevant_items.listAppend(pluralize($item[tangle of rat tails]));
-              
-            if (relevant_items.count() > 0)
-                subentry.entries.listAppend(relevant_items.listJoinComponents(", ", "and") + " available.");
-        }*/
     }
     
     task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the upper chamber,the lower chambers, the middle chamber]));
@@ -1613,7 +1631,8 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                         if (have_skill($skill[the ode to booze]))
                             adventures_given += 6;
                         
-                        tavern_provides.listAppend("Nightcap drink. (Fog Murderer for " + adventures_given + " adventures)");
+                        if (my_path_id() != PATH_SLOW_AND_STEADY)
+                            tavern_provides.listAppend("Nightcap drink. (Fog Murderer for " + adventures_given + " adventures)");
                     }
                     if (tavern_provides.count() > 0)
                         subentry.entries.listAppend("Hidden Tavern provides:|*" + tavern_provides.listJoinComponents("|*"));

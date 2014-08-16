@@ -67,7 +67,7 @@ void QLevel8GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 				subentry.modifiers.listAppend("olfact dairy goats");
 			
 				
-			if (have_skill($skill[Advanced Saucecrafting]))
+			if (have_skill($skill[Advanced Saucecrafting]) && fullness_limit() > 0 && __misc_state["can eat just about anything"] && my_path_id() != PATH_SLOW_AND_STEADY)
 				cheese_lines.listAppend("Have " + pluralize($item[glass of goat's milk]) + " for magnesium (20% drop)");
 		}
 		

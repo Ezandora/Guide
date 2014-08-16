@@ -148,7 +148,7 @@ void generateMissingItems(Checklist [int] checklists)
         string [item] telescope_item_url;
 		
 		//FIXME support __misc_state["can use clovers"] for these
-		telescope_item_suggestions[$item[mick's icyvapohotness rub]] = "Raver giant, top floor of castle, 30% drop";
+		telescope_item_suggestions[$item[mick's icyvapohotness rub]] = "Raver giant, top floor of castle, 20%? drop";
 		telescope_item_suggestions[$item[leftovers of indeterminate origin]] = "Demonic icebox, haunted kitchen (5 monster location), 40% drop|Or clover haunted kitchen";
 		telescope_item_suggestions[$item[NG]] = "Clover castle basement";
 		telescope_item_suggestions[$item[adder bladder]] = "Black adder, black forest, 30% drop";
@@ -272,6 +272,9 @@ void generateMissingItems(Checklist [int] checklists)
                 state_ns13_lookup_booleans.listAppend("Past tower monster " + i);
             }
         }
+        
+        //state_string["Tower monster item 1"] through 6
+        //state_boolean["Past tower monster 1"] through 6
 		
 		item [item][int] item_equivalents_lookup;
 		item_equivalents_lookup[$item[angry farmer candy]] = listMakeBlankItem();
