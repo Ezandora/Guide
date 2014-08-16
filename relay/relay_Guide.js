@@ -307,6 +307,7 @@ function writePageExtras()
     {
         //auto install:
         installFrameDefault();
+        //we considered using window.history.back(), but what if it's adventure.php?
         window.location = "main.php"; //visit the map
     }
     else
