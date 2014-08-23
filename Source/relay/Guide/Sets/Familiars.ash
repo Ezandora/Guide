@@ -254,6 +254,19 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] available_resources_entries
         available_resources_entries.listAppend(ChecklistEntryMake("__familiar steam-powered cheerleader", url, ChecklistSubentryMake(title, "", description), importance));
     }
     
+    if ($familiar[grim brother].familiar_is_usable() && !get_property_boolean("_grimBuff") && __misc_state["In run"]) //in aftercore, let the maximizer handle it?
+    {
+        string title;
+        string [int] description;
+        string url = "familiar.php?action=chatgrim&pwd=" + my_hash();
+        
+        title = "Chat with grim brother";
+        
+        description.listAppend("30 turns of +20% init or +HP/MP or +damage.");
+        int importance = 9;
+        available_resources_entries.listAppend(ChecklistEntryMake("__familiar grim brother", url, ChecklistSubentryMake(title, "", description), importance));
+    }
+    
     //FIXME small medium, organ grinder, charged boots
 	SFamiliarsGenerateEntry(available_resources_entries, available_resources_entries, false);
 }

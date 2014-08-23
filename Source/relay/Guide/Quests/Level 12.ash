@@ -218,7 +218,9 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
         if ($effect[Sinuses For Miles].have_effect() > 0 && get_property_int("lastTempleAdventures") != my_ascensions() && $item[stone wool].available_amount() > 0)
             details.listAppend("Potentially use stone wool and visit the hidden temple to extend Sinuses for Miles for 3 turns.");
         
-            
+        
+        if (my_path_id() == PATH_HEAVY_RAINS && lookupSkill("Make it Rain").have_skill() && turn_range.y > 1)
+            details.listAppend("Cast Make it Rain each fight. (+300%? meat)");
         if (lookupItem("Sneaky Pete's leather jacket (collar popped)").equipped_amount() > 0 && turn_range.y > 1)
             details.listAppend("Might want to unpop the collar. (+20% meat)");
 	

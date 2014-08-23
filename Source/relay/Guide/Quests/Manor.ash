@@ -36,6 +36,8 @@ void QManorInit()
     state.state_boolean["ballroom song effectively set"] = !state.state_boolean["need ballroom song set"];
     if (combat_rate_modifier() <= -25.0)
         state.state_boolean["ballroom song effectively set"] = true;
+    if (__quest_state["Level 13"].in_progress || (__quest_state["Level 13"].finished && my_path_id() != PATH_BUGBEAR_INVASION))
+        state.state_boolean["ballroom song effectively set"] = false;
     
     
     
@@ -259,12 +261,12 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
             }
             else if (base_quest_state.state_boolean["need ballroom song set"])
             {
-                subentry.header = "Set -combat ballroom song";
+                subentry.header = "Possibly set -combat ballroom song";
                 url = $location[the haunted ballroom].getClickableURLForLocation();
                 image_name = "__item the Legendary Beat";
                 subentry.modifiers.listAppend("-combat");
                 
-                subentry.entries.listAppend("Adventure in the Haunted Ballroom.");
+                subentry.entries.listAppend("Adventure in the Haunted Ballroom. May not be relevant, depending on your path.");
                 
                 if (my_turncount() > 200 || base_quest_state.state_boolean["ballroom song effectively set"])
                 {
@@ -303,8 +305,6 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
             needed_resists.listAppend(more_hot_needed + " more " + HTMLGenerateSpanOfClass("hot", "r_element_hot") + " resistance");
         if (more_stench_needed > 0)
             needed_resists.listAppend(more_stench_needed + " more " + HTMLGenerateSpanOfClass("stench", "r_element_stench") + " resistance");
-        if (needed_resists.count() > 0)
-            subentry.entries.listAppend("Run " + needed_resists.listJoinComponents(", ", "and") + " to search faster.");
         
         //subentry.entries.listAppend("Run 9 " + HTMLGenerateSpanOfClass("hot", "r_element_hot") + " resistance and " + HTMLGenerateSpanOfClass("stench", "r_element_stench") + " resistance to search faster.");
         
@@ -315,6 +315,8 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         
         int total_turns = ceil(drawers_needed / drawers_per_turn) + 1;
         
+        if (needed_resists.count() > 0 && total_turns > 1)
+            subentry.entries.listAppend("Run " + needed_resists.listJoinComponents(", ", "and") + " to search faster.");
         subentry.entries.listAppend(drawers_per_turn.roundForOutput(1) + " drawers searched per turn.|~" + pluralize(total_turns, "turn", "turns") + " remaining.");
         
 		if (__misc_state["have hipster"])
@@ -341,35 +343,65 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         image_name = "__item pool cue";
         subentry.entries.listAppend("To unlock the Haunted Library.");
         
-        subentry.modifiers.listAppend("-combat");
-        subentry.entries.listAppend("Train pool skill via -combat. Need 14 up to 18(?) total pool skill");
+        int estimated_pool_skill = get_property_int("poolSkill");
         
-        if ($item[Staff of Ed, almost].available_amount() > 0)
-        {
-            subentry.entries.listAppend("Untinker the Staff of Ed, almost.");
-        }
-        else if ($item[staff of fats].available_amount() > 0)
-        {
-            if ($item[staff of fats].equipped_amount() == 0)
-            {
-                subentry.entries.listAppend("Equip the Staff of Fats for +pool skill.");
-            }
-        }
+        if ($effect[chalky hand].have_effect() > 0)
+            estimated_pool_skill += 3;
+            
+        if ($item[staff of fats].equipped_amount() > 0)
+            estimated_pool_skill += 5;
+        if ($item[pool cue].equipped_amount() > 0)
+            estimated_pool_skill += 3;
+        if ($effect[chalked weapon].have_effect() > 0)
+            estimated_pool_skill += 5;
+        if ($effect[video... games?].have_effect() > 0)
+            estimated_pool_skill += 5;
+        if ($effect[swimming with sharks].have_effect() > 0)
+            estimated_pool_skill += 3;
+        
+        int theoretical_hidden_pool_skill = 0;
+        if (my_inebriety() <= 10)
+            theoretical_hidden_pool_skill = my_inebriety();
         else
+            theoretical_hidden_pool_skill = 10 - (my_inebriety() - 10) * 2;
+            
+        estimated_pool_skill += theoretical_hidden_pool_skill;
+        estimated_pool_skill += clampi(floor(2.0 * sqrt(get_property("poolSharkCount").to_float())), 0, 10);
+        
+        subentry.modifiers.listAppend("-combat");
+        subentry.entries.listAppend("Train pool skill via -combat. Need 14 up to 18(?) total pool skill.|Have ~" + estimated_pool_skill + " pool skill.");
+        
+        int missing_pool_skill = MAX(18 - estimated_pool_skill, 0);
+        
+        if (missing_pool_skill > 0)
         {
-            if ($item[pool cue].available_amount() == 0)
+            if ($item[Staff of Ed, almost].available_amount() > 0)
             {
-                subentry.entries.listAppend("Find pool cue. (superlikely?)");
+                subentry.entries.listAppend("Untinker the Staff of Ed, almost.");
             }
-            else if ($item[pool cue].equipped_amount() == 0)
+            else if ($item[staff of fats].available_amount() > 0)
             {
-                subentry.entries.listAppend("Equip pool cue for +pool skill.");
+                if ($item[staff of fats].equipped_amount() == 0)
+                {
+                    subentry.entries.listAppend("Equip the Staff of Fats for +pool skill.");
+                }
             }
-        }
-        if ($effect[chalky hand].have_effect() == 0& $item[handful of hand chalk].available_amount() > 0)
-        {
-            subentry.entries.listAppend(HTMLGenerateSpanFont("Use handful of hand chalk", "red", "") + " for +pool skill and faster pool skill training.");
-            url = "inventory.php?which=3";
+            else
+            {
+                if ($item[pool cue].available_amount() == 0)
+                {
+                    subentry.entries.listAppend("Find pool cue. (superlikely?)");
+                }
+                else if ($item[pool cue].equipped_amount() == 0)
+                {
+                    subentry.entries.listAppend("Equip pool cue for +pool skill.");
+                }
+            }
+            if ($effect[chalky hand].have_effect() == 0& $item[handful of hand chalk].available_amount() > 0)
+            {
+                subentry.entries.listAppend(HTMLGenerateSpanFont("Use handful of hand chalk", "red", "") + " for +pool skill and faster pool skill training.");
+                url = "inventory.php?which=3";
+            }
         }
         
         if (inebriety_limit() > 0)
@@ -377,23 +409,18 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
             //Drunkenness's effect is currently unknown FIXME
             //(last checked, it had zero effect on the listed pool skill, but they may have changed that or it's a hidden modifier ooOoOo)
             int desired_drunkenness = MIN(inebriety_limit(), 10);
-            if (my_inebriety() < desired_drunkenness)
+            if (missing_pool_skill > 0)
             {
-                subentry.entries.listAppend("Consider drinking up to " + desired_drunkenness + " drunkenness.");
+                subentry.entries.listAppend("Consider drinking " + MIN(missing_pool_skill, desired_drunkenness) + " more drunkenness.");
             }
             else if (my_inebriety() > desired_drunkenness)
-                subentry.entries.listAppend("Consider waiting for rollover for better pool skill. (you're over " + desired_drunkenness + " drunkenness.)");
+                subentry.entries.listAppend(HTMLGenerateSpanFont("Consider waiting for rollover for better pool skill.", "red", "") + " (you're over " + desired_drunkenness + " drunkenness.)");
         }
-        if (my_inebriety() > 0)
+        if (my_inebriety() > 0 && false)
         {
             //shortly after rollover during the revamp, drunkenness affected listed pool skill in the quest log
             //exact values were 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 8, 6, 4, 2, 0, -2, -4, -6, -8
             //uncertain whether those are still in effect, but invisible
-            int theoretical_hidden_pool_skill = 0;
-            if (my_inebriety() <= 10)
-                theoretical_hidden_pool_skill = my_inebriety();
-            else
-                theoretical_hidden_pool_skill = 10 - (my_inebriety() - 10) * 2;
             
             string pool_skill_string;
             if (theoretical_hidden_pool_skill >= 0)

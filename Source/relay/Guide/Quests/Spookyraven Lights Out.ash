@@ -131,6 +131,8 @@ void QSpookyravenLightsOutGenerateEntry(ChecklistEntry [int] task_entries, Check
     
     if (important_subentries.count() > 0)
     {
+        if (url == "place.php?whichplace=manor2" && get_property("lastSecondFloorUnlock") != my_ascensions())
+            url = "";
         task_entries.listAppend(ChecklistEntryMake("__half Lights Out", url, important_subentries, -11));
     }
 }

@@ -9,7 +9,7 @@ void QSeaInit()
     boolean have_adventured_in_relevant_area = false;
     foreach l in $locations[the briny deeps, the brinier deepers, the briniest deepests, an octopus's garden,the wreck of the edgar fitzsimmons, the mer-kin outpost, madness reef,the marinara trench, the dive bar,anemone mine, the coral corral, mer-kin elementary school,mer-kin library,mer-kin gymnasium,mer-kin colosseum,the caliginous abyss]
     {
-        if (l.turnsAttemptedInLocation() > 0)
+        if (l.turnsAttemptedInLocation() > 0 || my_location() == l)
         {
             have_adventured_in_relevant_area = true;
             break;
@@ -126,7 +126,7 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
                 modifiers.listAppend("spell damage percent");
                 modifiers.listAppend("mysticality");
                 description.listAppend("Fight in the colosseum!");
-                description.listAppend("Easy way is to buff mysticality and spell damage percent, then cast powerful spells.|" + shrap_suggestion);
+                description.listAppend("Easy way is to buff mysticality and spell damage percent, then cast powerful spells.<br>" + shrap_suggestion);
                 description.listAppend("There's another way, but it's a bit complicated. Check the wiki?");
             }
         }
@@ -186,16 +186,88 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
                 else
                 {
                     if ($effect[deep-tainted mind].have_effect() > 0)
-                        description.listAppend("Solve the dreadscroll.|Wait for Deep-Tainted Mind to wear off.");
+                        description.listAppend("Solve the dreadscroll.<br>Wait for Deep-Tainted Mind to wear off.");
                     else
                         description.listAppend("Solve the dreadscroll.");
-                    description.listAppend("Clues are from:|*Three non-combats in the library. (vocabulary)|*Use a mer-kin killscroll in combat. (vocabulary)|*Use a mer-kin healscroll in combat. (vocabulary)|*Use a mer-kin knucklebone.|*Cast deep dark visions.|*Eat sushi with mer-kin worktea.");
+                        
+                    string [int] unknown_clues;
                     
-                    int vocabulary = get_property_int("merkinVocabularyMastery");
-                    if (vocabulary < 10)
-                        description.listAppend("At " + (vocabulary * 10) + "% Mer-Kin vocabulary. (use mer-kin wordquiz with a mer-kin cheatsheet)");
-                    else
-                        description.listAppend("Mer-Kin vocabulary mastered.");
+                    /*
+                    Mer-kin Library 1 -> dreadScroll1
+                    Mer-kin healscroll -> dreadScroll2
+                    Deep Dark Visions -> dreadScroll3
+                    Mer-kin knucklebone -> dreadScroll4
+                    Mer-kin killscroll -> dreadScroll5
+                    Mer-kin Library 2 -> dreadScroll6
+                    Mer-kin worktea -> dreadScroll7
+                    Mer-kin Library 3 -> dreadScroll8
+                    */
+                    
+                    int library_clues_known = 0;
+                    if (get_property_int("dreadScroll1") > 0)
+                        library_clues_known += 1;
+                    if (get_property_int("dreadScroll6") > 0)
+                        library_clues_known += 1;
+                    if (get_property_int("dreadScroll8") > 0)
+                        library_clues_known += 1;
+                    
+                    boolean need_to_learn_vocabulary = false;
+                    
+                    if (library_clues_known < 3)
+                    {
+                        unknown_clues.listAppend((3 - library_clues_known).int_to_wordy().capitalizeFirstLetter() + " non-combats in the library. (vocabulary)");
+                        need_to_learn_vocabulary = true;
+                    }
+                    if (get_property_int("dreadScroll5") == 0)
+                    {
+                        unknown_clues.listAppend("Use a mer-kin killscroll in combat. (vocabulary)");
+                        need_to_learn_vocabulary = true;
+                    }
+                    if (get_property_int("dreadScroll2") == 0)
+                    {
+                        unknown_clues.listAppend("Use a mer-kin healscroll in combat. (vocabulary)");
+                        need_to_learn_vocabulary = true;
+                    }
+                    if (get_property_int("dreadScroll4") == 0)
+                        unknown_clues.listAppend("Use a mer-kin knucklebone.");
+                    if (get_property_int("dreadScroll3") == 0)
+                        unknown_clues.listAppend("Cast deep dark visions.");
+                    if (get_property_int("dreadScroll7") == 0)
+                        unknown_clues.listAppend("Eat sushi with mer-kin worktea.");
+                    
+                    if (unknown_clues.count() > 0)
+                        description.listAppend("Clues are from:|*-" + unknown_clues.listJoinComponents("|*-"));
+                    
+                    int known_clue_count = 0;
+                    for i from 1 to 8
+                    {
+                        string property_name = "dreadScroll" + i;
+                        int property_value = get_property_int(property_name);
+                        
+                        if (property_value >= 1 && property_value <= 4)
+                        {
+                            known_clue_count += 1;
+                        }
+                    }
+                    
+                    if (need_to_learn_vocabulary)
+                    {
+                        int vocabulary = get_property_int("merkinVocabularyMastery");
+                        if (vocabulary < 100)
+                        {
+                            int word_quizzes_needed = clampi(10 - vocabulary / 10, 1, 10);
+                            description.listAppend("At " + (vocabulary) + "% Mer-Kin vocabulary. (use " + pluralize(word_quizzes_needed, $item[mer-kin wordquiz]) + " with a mer-kin cheatsheet)");
+                        }
+                        else
+                            description.listAppend("Mer-Kin vocabulary mastered.");
+                    }
+                    if (known_clue_count > 0)
+                    {
+                        if (known_clue_count == 8)
+                            description.listAppend("Have all clues.");
+                        else
+                            description.listAppend("Have " + known_clue_count + " out of 8 clues.");
+                    }
                 }
             }
         }
@@ -303,7 +375,7 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 			{
 				string line = "";
 				if ($item[sea lasso].available_amount() == 0)
-					line += "Buy and use a sea lasso in each combat.";
+					line += HTMLGenerateSpanFont("Buy and use a sea lasso in each combat.", "red", "");
 				else
 					line += "Use a sea lasso in each combat.";
 				if ($item[sea cowboy hat].equipped_amount() == 0)
@@ -461,7 +533,7 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
             {
                 //Octopus's garden, obtain wriggling flytrap pellet
                 if ($item[wriggling flytrap pellet].available_amount() == 0)
-                    subentry.entries.listAppend("Adventure in octopus's garden, find a wriggling flytrap pellet.|Or talk to little brother if you've done that already.");
+                    subentry.entries.listAppend("Adventure in octopus's garden, find a wriggling flytrap pellet.");
                 else
                 {
                     url = "inventory.php?which=3";

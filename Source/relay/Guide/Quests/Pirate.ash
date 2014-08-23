@@ -235,6 +235,11 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             }
 		}
         
+        if (base_quest_state.mafia_internal_step <= 3 && my_inebriety() > 0)
+        {
+            subentry.entries.listAppend("Could wait until rollover; one of the non-combats can become a combat at zero drunkenness.");
+        }
+        
         
         if (__misc_state["free runs available"] && !can_acquire_cocktail_napkins)
             subentry.modifiers.listAppend("free runs");

@@ -149,6 +149,12 @@ void setUpState()
 		yellow_ray_image_name = "nanorhino";
 		
 	}
+    if (lookupSkill("Ball Lightning").have_skill() && my_path_id() == PATH_HEAVY_RAINS)
+    {
+        yellow_ray_available = true;
+        yellow_ray_source = "Ball Lightning";
+        yellow_ray_image_name = "__skill Ball Lightning";
+    }
 	if (familiar_is_usable($familiar[he-boulder]))
 	{
 		yellow_ray_available = true;
@@ -217,6 +223,8 @@ void setUpState()
         if (free_peel_outs_available > 0)
             free_runs_available = true;
     }
+    if (my_path_id() == PATH_HEAVY_RAINS && lookupSkill("Lightning Strike").have_skill())
+        free_runs_available = true;
 	if (!free_runs_usable)
 		free_runs_available = false;
 	__misc_state["free runs available"] = free_runs_available;
@@ -429,7 +437,7 @@ void setUpState()
 	//wand
 	
 	boolean wand_of_nagamar_needed = true;
-	if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_BUGBEAR_INVASION || my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_KOLHS)
+	if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_BUGBEAR_INVASION || my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_KOLHS || my_path_id() == PATH_HEAVY_RAINS)
 		wand_of_nagamar_needed = false;
 		
 	int ruby_w_needed = 1;

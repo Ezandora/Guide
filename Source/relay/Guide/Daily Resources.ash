@@ -24,7 +24,7 @@ void generateDailyResources(Checklist [int] checklists)
 	SetsGenerateResources(available_resources_entries);
     QuestsGenerateResources(available_resources_entries);
 	
-	if (!get_property_boolean("_fancyHotDogEaten") && availableFullness() > 0 && __misc_state["VIP available"] && __misc_state["can eat just about anything"] && __misc_state["In run"]) //too expensive to use outside a run? well, more that it's information overload
+	if (!get_property_boolean("_fancyHotDogEaten") && availableFullness() > 0 && __misc_state["VIP available"] && __misc_state["can eat just about anything"]) //too expensive to use outside a run? well, more that it's information overload
 	{
 		
 		string name = "Fancy hot dog edible";
@@ -33,19 +33,23 @@ void generateDailyResources(Checklist [int] checklists)
 		
         string [int][int] options;
 		options.listAppend(generateHotDogLine("Optimal Dog", "Semi-rare next adventure.", 1));
-		options.listAppend(generateHotDogLine("Ghost Dog", "-combat, 30 turns.", 3));
-		options.listAppend(generateHotDogLine("Video Game Hot Dog", "+25% item, +25% meat, pixels, 50 turns.", 3));
-		options.listAppend(generateHotDogLine("Junkyard dog", "+combat, 30 turns.", 3));
-        if (!__quest_state["Level 8"].finished || __quest_state["Level 9"].state_int["a-boo peak hauntedness"] > 0)
-            options.listAppend(generateHotDogLine("Devil dog", "+3 cold/spooky res, 30 turns.", 3));
-        if (!__quest_state["Level 9"].state_boolean["Peak Stench Completed"])
-            options.listAppend(generateHotDogLine("Chilly dog", "+10ML and +3 stench/sleaze res, 30 turns.", 3));
-		if (my_primestat() == $stat[muscle])
-			options.listAppend(generateHotDogLine("Savage macho dog", "+50% muscle, 50 turns.", 2));
-		if (my_primestat() == $stat[mysticality])
-			options.listAppend(generateHotDogLine("One with everything", "+50% mysticality, 50 turns.", 2));
-		if (my_primestat() == $stat[moxie])
-			options.listAppend(generateHotDogLine("Sly Dog", "+50% moxie, 50 turns.", 2));
+        
+        if (__misc_state["In run"])
+        {
+            options.listAppend(generateHotDogLine("Ghost Dog", "-combat, 30 turns.", 3));
+            options.listAppend(generateHotDogLine("Video Game Hot Dog", "+25% item, +25% meat, pixels, 50 turns.", 3));
+            options.listAppend(generateHotDogLine("Junkyard dog", "+combat, 30 turns.", 3));
+            if (!__quest_state["Level 8"].finished || __quest_state["Level 9"].state_int["a-boo peak hauntedness"] > 0)
+                options.listAppend(generateHotDogLine("Devil dog", "+3 cold/spooky res, 30 turns.", 3));
+            if (!__quest_state["Level 9"].state_boolean["Peak Stench Completed"])
+                options.listAppend(generateHotDogLine("Chilly dog", "+10ML and +3 stench/sleaze res, 30 turns.", 3));
+            if (my_primestat() == $stat[muscle])
+                options.listAppend(generateHotDogLine("Savage macho dog", "+50% muscle, 50 turns.", 2));
+            if (my_primestat() == $stat[mysticality])
+                options.listAppend(generateHotDogLine("One with everything", "+50% mysticality, 50 turns.", 2));
+            if (my_primestat() == $stat[moxie])
+                options.listAppend(generateHotDogLine("Sly Dog", "+50% moxie, 50 turns.", 2));
+        }
 			
         description.listAppend(HTMLGenerateSimpleTableLines(options));
 		available_resources_entries.listAppend(ChecklistEntryMake(image_name, "clan_viplounge.php?action=hotdogstand", ChecklistSubentryMake(name, "", description), 5));

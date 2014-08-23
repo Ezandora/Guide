@@ -310,12 +310,15 @@ string generateRandomMessage()
     if (!$skill[Transcendent Olfaction].have_skill() && __misc_state["In run"])
         monster_messages[$monster[Astronomer]] = "nooo astronomer come back";
     monster_messages[$monster[urge to stare at your hands]] = ".&#x20dd;.&#x20dd;"; //.⃝.⃝
+    if (my_path_id() == PATH_HEAVY_RAINS)
+        monster_messages[$monster[pygmy bowler]] = "right into the gutter"; //come back!
     
     if (monster_messages contains last_monster() && last_monster() != $monster[none])
     {
 		random_messages.listClear();
         random_messages.listAppend(monster_messages[last_monster()]);
     }
+    
     
     string [string] encounter_messages;
     encounter_messages["It's Always Swordfish"] = "one two three four five";

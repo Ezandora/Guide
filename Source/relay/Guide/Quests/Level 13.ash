@@ -557,8 +557,11 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 	{
         url = "lair6.php";
 		//At NS. Good luck, we're all counting on you.
-		subentry.modifiers.listAppend("+moxie equipment");
-		subentry.modifiers.listAppend("no buffs");
+        if (my_path_id() != PATH_HEAVY_RAINS)
+        {
+            subentry.modifiers.listAppend("+moxie equipment");
+            subentry.modifiers.listAppend("no buffs");
+        }
 		subentry.entries.listAppend("She awaits.");
         if (!__misc_state["familiars temporarily blocked"])
         {
@@ -571,6 +574,17 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             else
                 subentry.entries.listAppend("Run a potato familiar if you can.");
         }
+        
+        if (my_path_id() == PATH_HEAVY_RAINS)
+        {
+            subentry.modifiers.listAppend("many buffs");
+            subentry.entries.listAppend("Try to run as many buffs as you can. (one removed per round, have " + my_effects().count() + ")");
+            subentry.entries.listAppend("Try to have as many damage sources as possible. (40? damage cap per source)");
+            subentry.entries.listAppend("Only your weapon, offhand, and familiar equipment(?) are relevant this fight.");
+            if ($item[crayon shavings].available_amount() > 0)
+                subentry.entries.listAppend("Try repeatedly using crayon shavings?");
+        }
+        
 		image_name = "naughty sorceress";
 	}
 	else if (base_quest_state.mafia_internal_step == 17)

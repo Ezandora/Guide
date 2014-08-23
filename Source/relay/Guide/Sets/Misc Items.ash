@@ -253,7 +253,13 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
 			available_resources_entries.listAppend(ChecklistEntryMake("__item harold's bell", "", ChecklistSubentryMake(pluralize($item[harold's bell]), "", "Turn-costing banishing"), importance_level_item));
         
 		if ($item[lost key].available_amount() > 0)
-			available_resources_entries.listAppend(ChecklistEntryMake("__item lost key", "inventory.php?which=3", ChecklistSubentryMake(pluralize($item[lost key]), "", "Lost pill bottle is mini-fridge, take a nap, open the pill bottle"), importance_level_item));
+        {
+            string [int] details;
+            details.listAppend("Lost pill bottle is mini-fridge, take a nap, open the pill bottle.");
+            if (!__quest_state["Level 13"].state_boolean["past tower"] && (__misc_state["type 69 restrictions active"] || !__misc_state["can eat just about anything"]))
+                details.listAppend("The lost comb is turn on the TV, take a nap, pick up the comb. (towerkilling)");
+			available_resources_entries.listAppend(ChecklistEntryMake("__item lost key", "inventory.php?which=3", ChecklistSubentryMake(pluralize($item[lost key]), "", details), importance_level_item));
+        }
 			
 		if ($item[soft green echo eyedrop antidote].available_amount() > 0 && have_skill($skill[Transcendent Olfaction]))
 			available_resources_entries.listAppend(ChecklistEntryMake("__item soft green echo eyedrop antidote", "", ChecklistSubentryMake(pluralize($item[soft green echo eyedrop antidote]), "", "Removes on the trail, teleportitis"), importance_level_unimportant_item));

@@ -29,6 +29,7 @@ void QuestsInit()
 	QMemoriesInit();
 	QWhiteCitadelInit();
 	QWizardOfEgoInit();
+    QFeloniaInit();
 }
 
 
@@ -61,6 +62,7 @@ void QuestsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 	QWhiteCitadelGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	QWizardOfEgoGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	QSpookyravenLightsOutGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+	QFeloniaGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 }
 
 void QuestsGenerateResources(ChecklistEntry [int] available_resources_entries)

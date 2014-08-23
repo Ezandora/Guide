@@ -134,9 +134,11 @@ void QLevel5GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 				//with banishes and slimeling and +item and?
                 //too complicated. Possibly remove?
 				kge_modifiers.listAppend("-combat");
-				string line = "Need knob goblin elite guard uniform.|*Semi-rare in barracks.|*Or run -combat in barracks.";
+				string line = "Need knob goblin elite guard uniform.|*Semi-rare in barracks.|*Or run -combat in barracks";
 				if (familiar_is_usable($familiar[slimeling]))
 					line += " with slimeling";
+                    
+                line += ".";
                 
                 line += "|*" + generateTurnsToSeeNoncombat(85, outfit_pieces_needed, "acquire outfit via only non-combats");
 				kge_lines.listAppend(line);
@@ -150,20 +152,23 @@ void QLevel5GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 				string [int] things_to_do_before_fighting_king;
 				if (!is_wearing_outfit("Knob Goblin Elite Guard Uniform"))
 					things_to_do_before_fighting_king.listAppend("wear knob goblin elite guard uniform");
+                    
+                    
+                boolean have_first_step = ($item[knob cake pan].available_amount() > 0 || $item[unfrosted Knob cake].available_amount() > 0);
+                boolean have_second_step = ($item[knob batter].available_amount() > 0 || $item[unfrosted Knob cake].available_amount() > 0);
+                boolean have_third_step = ($item[knob frosting].available_amount() > 0);
+                have_third_step = have_third_step && have_second_step && have_first_step;
+                have_second_step = have_second_step && have_first_step;
+                    
 				if ($item[knob cake].available_amount() > 0)
 				{
 				}
-				else if (creatable_amount($item[knob cake]) > 0)
+				else if (have_first_step && have_second_step && have_third_step)
 				{
 					things_to_do_before_fighting_king.listAppend(cook_cake_line);
 				}
 				else
 				{
-					boolean have_first_step = ($item[knob cake pan].available_amount() > 0 || $item[unfrosted Knob cake].available_amount() > 0);
-					boolean have_second_step = ($item[knob batter].available_amount() > 0 || $item[unfrosted Knob cake].available_amount() > 0);
-					boolean have_third_step = ($item[knob frosting].available_amount() > 0); //should be impossible
-					have_third_step = have_third_step && have_second_step && have_first_step;
-					have_second_step = have_second_step && have_first_step;
 					
 					string times_remaining = "three times";
 					if (have_first_step)

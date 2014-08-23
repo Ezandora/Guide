@@ -151,6 +151,12 @@ item [int] listMakeBlankItem()
 	return result;
 }
 
+skill [int] listMakeBlankSkill()
+{
+	skill [int] result;
+	return result;
+}
+
 location [int] listMakeBlankLocation()
 {
 	location [int] result;

@@ -196,7 +196,7 @@ void generateTasks(Checklist [int] checklists)
 		if (!have_outfit_components("War Hippy Fatigues") && !have_outfit_components("Frat Warrior Fatigues"))
 			potential_targets.listAppend("Hippy/frat war outfit?");
 		//fax targets?
-		if (__misc_state["fax available"])
+		if (__misc_state["fax available"] || lookupSkill("Rain Man").have_skill())
 		{
 			potential_targets.listAppend("Anything on the fax list.");
 		}
@@ -291,7 +291,7 @@ void generateTasks(Checklist [int] checklists)
 		{
 			modifiers.listAppend(__misc_state_string["hipster name"]);
 		}
-		optional_task_entries.listAppend(ChecklistEntryMake("__item dead guy's watch", "", ChecklistSubentryMake("Use rollover runaway", modifiers, listMake("At the end of the day, enter a combat, but don't finish it. Rollover will end it for you.", "This gives an extra chance to look for an NC.")), 8));
+		optional_task_entries.listAppend(ChecklistEntryMake("__item dead guy's watch", "", ChecklistSubentryMake("Use rollover runaway", modifiers, listMake("At the end of the day, enter a combat, but don't finish it. Rollover will end it for you.", "This gives an extra chance to look for a non-comba t.")), 8));
     }
     
     //I'm not sure if you ever need a frat boy ensemble in-run, even if you're doing the hippy side on the war? If you need war hippy fatigues, the faster (?) way is acquire hippy outfit -> frat warrior fatigues -> start the war / use desert adventure for hippy fatigues. But if they're sure...
@@ -325,7 +325,7 @@ void generateTasks(Checklist [int] checklists)
     
         string [int] adventure_gain;
         adventure_gain[1] = "1";
-        adventure_gain[2] = "?1-2?";
+        adventure_gain[2] = "1-2";
         adventure_gain[3] = "2";
         adventure_gain[4] = "2-3";
         adventure_gain[5] = "3";

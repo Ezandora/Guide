@@ -1,14 +1,7 @@
-void SFaxGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, boolean from_task)
+
+string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
 {
-	if (!(__misc_state["fax available"] && $item[photocopied monster].available_amount() == 0))
-        return;
-    if (!__misc_state["In aftercore"] && !from_task)
-        return;
-    if (__misc_state["In aftercore"] && from_task)
-        return;
-    string url = "clan_viplounge.php?action=faxmachine";
     string [int] potential_faxes;
-    
     boolean can_arrow = false;
     if (get_property_int("_badlyRomanticArrows") == 0 && (familiar_is_usable($familiar[obtuse angel]) || familiar_is_usable($familiar[reanimated reanimator])))
         can_arrow = true;
@@ -16,7 +9,6 @@ void SFaxGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
     
     if (get_auto_attack() != 0)
     {
-        url = "account.php?tab=combat";
         potential_faxes.listAppend("Auto attack is on, disable it?");
     }
     
@@ -77,6 +69,24 @@ void SFaxGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
             potential_faxes.listAppend(fax);
         }
         
+        int missing_ore = MAX(0, 3 - __quest_state["Level 8"].state_string["ore needed"].to_item().available_amount());
+        if (!__quest_state["Level 8"].state_boolean["Past mine"] && missing_ore > 0 && !$skill[unaccompanied miner].have_skill())
+        {
+            string fax = "";			
+            fax += ChecklistGenerateModifierSpan("+150% item or more");
+            fax += "Mining ores. Try to copy a few times.";
+            if (__misc_state_string["obtuse angel name"].length() > 0)
+            {
+                string arrow_text = " (arrow?)";
+                if (get_property_int("_badlyRomanticArrows") > 0)
+                    arrow_text = HTMLGenerateSpanFont(arrow_text, "gray", "");
+                fax += arrow_text;
+            }
+        
+            fax = "mountain man" + HTMLGenerateIndentedText(fax);
+            potential_faxes.listAppend(fax);
+        }
+        
         
         if (!(__quest_state["Level 12"].finished || __quest_state["Level 12"].state_boolean["Lighthouse Finished"] || $item[barrel of gunpowder].available_amount() == 5))
         {
@@ -130,6 +140,127 @@ void SFaxGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
             potential_faxes.listAppend(line);
         }
         
+        if ($item[Bram's choker].available_amount() == 0 && combat_rate_modifier() > -25.0 && !(__quest_state["Level 13"].in_progress || (__quest_state["Level 13"].finished && my_path_id() != PATH_BUGBEAR_INVASION)))
+        {
+            string line = "Bram the Stoker - drops a -5% combat accessory.";
+            if (my_basestat($stat[mysticality]) < 50)
+                line += " (requires 50 myst)";
+            potential_faxes.listAppend(line);
+        }
+        
+        if (!in_hardcore() && $item[richard's star key].available_amount() + $item[richard's star key].creatable_amount() == 0 && !__quest_state["Level 13"].state_boolean["past gates"])
+            potential_faxes.listAppend("Skinflute - +234% item, fight 4 times (arrow) to skip HITS with pulls.");
+        
+        if (suggest_less_powerful_faxes)
+        {
+            //FIXME add low-relevancy faxes for rain man:
+            //giant swarm of ghuol whelps
+            if (__quest_state["Level 7"].state_boolean["cranny needs speed tricks"])
+                potential_faxes.listAppend("Giant swarm of ghuol whelps - with a copy possibly");
+            //modern zmobie
+            if (__quest_state["Level 7"].state_boolean["alcove needs speed tricks"])
+            {
+                string line = "Modern zmobie - with copies/arrows";
+                if (!__quest_state["Level 7"].in_progress)
+                {
+                    line = HTMLGenerateSpanFont(line + " (wait until quest started)", "gray", "");
+                }
+                
+                potential_faxes.listAppend(line);
+            }
+            //gaudy pirate (use for insults!)
+            if (!__quest_state["Level 11 Palindome"].finished && $item[talisman o' nam].available_amount() == 0 && $items[snakehead charrrm,gaudy key].available_amount() < 2 && $items[Copperhead Charm,Copperhead Charm (rampant)].available_amount() < 2)
+            {
+                string description = "Gaudy pirate - two fights for talisman o' nam. (copy once)";
+                if ($items[snakehead charrrm,gaudy key].available_amount() == 1)
+                    description = "Gaudy pirate - one fight for talisman o' nam.";
+                if (__quest_state["Pirate Quest"].mafia_internal_step < 6 && __quest_state["Pirate Quest"].state_int["insult count"] < 8)
+                {
+                    string l = "Pirate insult them!";
+                    if ($item[the big book of pirate insults].available_amount() == 0)
+                        l += " (get the big book of pirate insults first)";
+                    
+                    description += HTMLGenerateIndentedText(l);
+                }
+                potential_faxes.listAppend(description);
+            }
+            
+            //screambat for sonar replacement
+            if ((3 - __quest_state["Level 4"].state_int["areas unlocked"]) > $item[sonar-in-a-biscuit].available_amount())
+                potential_faxes.listAppend("Screambat - unlocks a single bat lair area");
+            //drunken half-orc hobo (smiths)
+            if (in_hardcore() && $skill[summon smithsness].skill_is_usable() && $items[dirty hobo gloves,hand in glove].available_amount() == 0)
+            {
+                potential_faxes.listAppend("Drunken half-orc hobo - run +234% item to make +ML smithness accessory.");
+            }
+            //nuns bandit for trickery
+            if (!__quest_state["Level 12"].state_boolean["Nuns Finished"])
+            {
+                string description = "Dirty thieving brigand - nuns trick.";
+                if (!__quest_state["Level 12"].state_boolean["War started"])
+                    description = HTMLGenerateSpanFont(description, "gray", "");
+                potential_faxes.listAppend(description);
+            }
+            //monstrous boiler
+            if (__quest_state["Level 11 Manor"].mafia_internal_step < 4 && lookupItem("wine bomb").available_amount() == 0)
+            {
+                string description = "Monstrous boiler - charge up unstable fulminate.";
+                if (lookupItem("unstable fulminate").available_amount() == 0)
+                    description = HTMLGenerateSpanFont(description, "gray", "");
+                potential_faxes.listAppend(description);
+            }
+            if (true) //not sure about this
+            {
+                //marginal stuff:
+                //whitesnake, white lion
+                if (in_hardcore() && $items[wet stunt nut stew,mega gem].available_amount() == 0 && !__quest_state["Level 11 Palindome"].finished)
+                {
+                    string [int] stew_source_monsters;
+                    if ($item[bird rib].available_amount() == 0)
+                    {
+                        stew_source_monsters.listAppend("whitesnake");
+                    }
+                    if ($item[lion oil].available_amount() == 0)
+                    {
+                        stew_source_monsters.listAppend("white lion");
+                    }
+                    if (stew_source_monsters.count() > 0)
+                    {
+                        string description = stew_source_monsters.listJoinComponents("/").capitalizeFirstLetter() + " - run +300% item/food drops for wet stunt nut stew components. (marginal?)";
+                        
+                        potential_faxes.listAppend(description);
+                    }
+                }
+            }
+            //blur
+            if (!__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && $item[drum machine].available_amount() == 0 && !__quest_state["Level 11 Desert"].state_boolean["Wormridden"] && in_hardcore())
+            {
+                potential_faxes.listAppend("Blur - +234% item for drum machine for possible desert exploration route.");
+            }
+            
+            if (in_hardcore() && knoll_available() && __quest_state["Level 11 Hidden City"].state_boolean["need machete for liana"])
+            {
+                potential_faxes.listAppend("forest spirit - +234% item - forest tears can meatsmith into a muculent machete for dense liana");
+            }
+            //FIXME rest
+            //f'c'le - cleanly pirate/curmudgeonly pirate/that other pirate (and insults)
+            //baa'baa'bu'ran
+            //KGE
+            
+            //grungy pirate - for guitar (need 400% item/YR)
+            //dairy goat? mostly for milk of magnesium
+            //harem girl
+            //possessed wine rack / cabinet
+            //pygmy shaman / accountant - if you absolutely have to
+            //barret / aerith for equipment
+            //racecar bob to olfact
+            
+            //brainsweeper for chef-in-the-box / bartender-in-the-box?
+            
+            
+            //FIXME gate items?
+            //FIXME handsome mariachi/etc?
+        }
     }
     else
     {
@@ -138,7 +269,29 @@ void SFaxGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
         potential_faxes.listAppend("Clod Hopper (YR/+item) - floaty sand");
         potential_faxes.listAppend("Swarm of fudgewasps - fudge");
     }
-    optional_task_entries.listAppend(ChecklistEntryMake("fax machine", url, ChecklistSubentryMake("Fax", "", listJoinComponents(potential_faxes, "<hr>"))));
+    
+    return potential_faxes;
+}
+
+void SFaxGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, boolean from_task)
+{
+    if (!__misc_state["In aftercore"] && !from_task)
+        return;
+    if (__misc_state["In aftercore"] && from_task)
+        return;
+    string url = "clan_viplounge.php?action=faxmachine";
+    
+    if (get_auto_attack() != 0)
+    {
+        url = "account.php?tab=combat";
+    }
+    
+	if (__misc_state["fax available"] && $item[photocopied monster].available_amount() == 0)
+        optional_task_entries.listAppend(ChecklistEntryMake("fax machine", url, ChecklistSubentryMake("Fax", "", listJoinComponents(SFaxGeneratePotentialFaxes(false), "<hr>"))));
+    if (lookupSkill("Rain Man").have_skill())
+    {
+        optional_task_entries.listAppend(ChecklistEntryMake("__skill rain man", "skills.php", ChecklistSubentryMake("Rain man copy", "50 rain drops", listJoinComponents(SFaxGeneratePotentialFaxes(true), "<hr>"))));
+    }
 }
 
 void SFaxGenerateResource(ChecklistEntry [int] available_resources_entries)

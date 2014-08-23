@@ -188,15 +188,17 @@ void SCOTGenerateSuggestions(string [int] description)
     if (__misc_state["in run"] && need_all_res)
         suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+2 all res", $familiars[Bulky Buddy Box,Exotic Parrot,Holiday Log,Pet Rock,Toothsome Rock])));
         
-    if (__misc_state["in run"] && availableSpleen() >= 4)
-        suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("Spleen items", lookupFamiliar("Grim Brother"))));
+    //if (__misc_state["in run"] && availableSpleen() >= 4)
+        //suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("Spleen items", lookupFamiliar("Grim Brother"))));
     
     //slightly powerful:
-    suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+combat", lookupFamiliar("Grim Brother"))));
-    suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("-combat", lookupFamiliar("Grimstone Golem"))));
+    suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+combat", $familiar[Grim Brother])));
+    suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("-combat", $familiar[Grimstone Golem])));
     
     if (get_property_int("_grimstoneMaskDropsCrown") == 0)
-        suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("Grimstone mask", lookupFamiliar("Grimstone Golem"))));
+        suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("Grimstone mask", $familiar[Grimstone Golem])));
+    if (get_property_int("_grimFairyTaleDropsCrown") < 2 && !(__misc_state["in run"] && spleen_limit() == 0))
+        suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake(pluralizeWordy(clampi(2 - get_property_int("_grimFairyTaleDropsCrown"), 0, 2), "spleen item", "spleen items").capitalizeFirstLetter(), $familiar[grim Brother])));
     string [int][int] familiar_options;
     foreach key in suggestion_sets
     {

@@ -1,3 +1,7 @@
+
+boolean [item] __dense_liana_machete_items = $items[antique machete,Machetito,Muculent machete,Papier-m&acirc;ch&eacute;te];
+
+
 void QLevel11Init()
 {
 	//questL11MacGuffin, questL11Manor, questL11Palindome, questL11Pyramid, questL11Worship
@@ -132,12 +136,26 @@ void QLevel11Init()
         state.state_boolean["Apartment finished"] = (get_property_int("hiddenApartmentProgress") >= 8);
         state.state_boolean["Office finished"] = (get_property_int("hiddenOfficeProgress") >= 8);
         
+        state.state_boolean["need machete for liana"] = true;
+        foreach it in __dense_liana_machete_items
+        {
+            if (it.available_amount() > 0)
+            {
+                state.state_boolean["need machete for liana"] = false;
+                break;
+            }
+        }
+        if (!__misc_state["can equip just about any weapon"])
+            state.state_boolean["need machete for liana"] = false;
+        
+        
         if (state.finished) //backup
         {
             state.state_boolean["Hospital finished"] = true;
             state.state_boolean["Bowling alley finished"] = true;
             state.state_boolean["Apartment finished"] = true;
             state.state_boolean["Office finished"] = true;
+            state.state_boolean["need machete for liana"] = false;
         }
         
 		//if (my_level() >= 11)
@@ -318,11 +336,19 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
         //FIXME spectacles first?
         if (!$location[the haunted ballroom].noncombat_queue.contains_text("We'll All Be Flat") && base_quest_state.mafia_internal_step < 2)
         {
-            //FIXME is there delay here?
             url = "place.php?whichplace=manor2";
             subentry.modifiers.listAppend("-combat");
             subentry.entries.listAppend("Run -combat in the haunted ballroom.");
             image_name = "Haunted Ballroom";
+            if (delayRemainingInLocation($location[the haunted ballroom]) > 0)
+            {
+                string line = "Delay for " + pluralize(delayRemainingInLocation($location[the haunted ballroom]), "turn", "turns") + ".";
+                if (__misc_state["have hipster"])
+                {
+                    subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
+                }
+                subentry.entries.listAppend(line);
+            }
         }
         else
         {
@@ -376,14 +402,20 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                             tasks.listAppend(HTMLGenerateSpanFont("Equip unstable fulminate", "red", ""));
                         }
                         image_name = "monstrous boiler";
-                        tasks.listAppend("adventure in the haunted boiler room with +100 ML");
-                        subentry.modifiers.listAppend("+100 ML");
+                        
+                        int ml_needed = 82;
+                        int inherent_ml_modifier = 0;
+                        //if (my_path_id() == PATH_HEAVY_RAINS) //need to test this
+                            //inherent_ml_modifier = 82 - 40; //maybe?
+                        ml_needed -= inherent_ml_modifier;
+                        tasks.listAppend("adventure in the haunted boiler room with +" + ml_needed + " ML");
+                        subentry.modifiers.listAppend("+" + ml_needed + " ML");
                         
                         subentry.entries.listAppend(tasks.listJoinComponents(", ", "then").capitalizeFirstLetter() + ".");
                         
                         int current_ml = lookupLocation("The Haunted Boiler Room").monster_level_adjustment_for_location();
                         
-                        if (current_ml < 100)
+                        if (current_ml < ml_needed)
                         {
                             subentry.modifiers.listAppend("olfact boiler");
                         }
@@ -398,9 +430,9 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                                 subentry.modifiers.listAppend("banish " + banish_targets.listJoinComponents(", "));
                         }
                         
-                        int degrees_per_fight = 10 + clampi(current_ml, 0, 100) / 2;
+                        float degrees_per_fight = 10 + floor(MAX((current_ml + inherent_ml_modifier).to_float(), 0.0) / 2.0);
                         
-                        int boilers_needed = ceil(60.0 / degrees_per_fight.to_float());
+                        int boilers_needed = clampi(ceil(50.1 / degrees_per_fight.to_float()), 1, 6);
                         
                         monster boiler_monster = lookupMonster("monstrous boiler");
                         float [monster] appearance_rates = lookupLocation("The Haunted Boiler Room").appearance_rates_adjusted();
@@ -555,15 +587,20 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
             
         if ($location[the poop deck].noncombat_queue.contains_text("It's Always Swordfish") || $location[belowdecks].turnsAttemptedInLocation() > 0)
         {
-            subentry.modifiers.listAppend("olfact gaudy pirate");
-            string line = "Olfact/copy gaudy pirate belowdecks";
-            if (!__quest_state["Level 13"].state_boolean["have relevant guitar"])
+            if ($items[gaudy key,snakehead charrrm].available_amount() < 2)
             {
-                line += ", and possibly run +400% item to find a guitar";
-                subentry.modifiers.listAppend("+400% item");
+                subentry.modifiers.listAppend("olfact gaudy pirate");
+                string line = "Olfact/copy gaudy pirate belowdecks";
+                if (!__quest_state["Level 13"].state_boolean["have relevant guitar"])
+                {
+                    line += ", and possibly run +400% item to find a guitar";
+                    subentry.modifiers.listAppend("+400% item");
+                }
+                line += ".";
+                subentry.entries.listAppend(line);
             }
-            line += ".";
-            subentry.entries.listAppend(line);
+            else
+                url = "inventory.php?which=3";
             if ($item[gaudy key].available_amount() > 0)
                 subentry.entries.listAppend("Use " + $item[gaudy key].pluralize() + ".");
         }
@@ -647,7 +684,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                     subentry.entries.listAppend("Acquire and make wet stunt nut stew.");
                     if ($item[wet stunt nut stew].available_amount() == 0 && $item[stunt nuts].available_amount() == 0)
                         subentry.entries.listAppend("Acquire stunt nuts from Bob Racecar or Racecar Bob in Palindome. (30% drop)");
-                    if ($items[wet stew].available_amount() == 0 && ($items[bird rib].available_amount() == 0 || $items[lion oil].available_amount() == 0))
+                    if ($item[wet stew].available_amount() == 0 && ($item[bird rib].available_amount() == 0 || $item[lion oil].available_amount() == 0))
                     {
                         string [int] components;
                         if ($item[bird rib].available_amount() == 0)
@@ -658,6 +695,10 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                         if (familiar_is_usable($familiar[jumpsuited hound dog]))
                             line += " (hound dog is useful for this)";
                         subentry.entries.listAppend(line);
+                      
+                        if ($item[white page].available_amount() > 0)
+                            subentry.entries.listAppend("Can use your white pages to dial them up.");
+                      
                         subentry.modifiers.listAppend("+combat");
                         subentry.modifiers.listAppend("+300% item/food drop");
                         if (__quest_state["Level 6"].finished && !get_property_boolean("friarsBlessingReceived"))
@@ -1107,6 +1148,8 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
             }
             if ($item[tangle of rat tails].available_amount() > 0)
                 subentry.entries.listAppend("Use tangle of rat tails against tomb rats for more tomb ratchets.");
+            if (my_path_id() == PATH_HEAVY_RAINS && lookupItem("catfish whiskers").available_amount() > 0 && lookupEffect("Fishy Whiskers").have_effect() == 0)
+                subentry.entries.listAppend("Possibly use catfish whiskers to find more tomb ratchets.");
         }
         else
         {
@@ -1127,7 +1170,8 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
             int pyramid_position = get_property_int("pyramidPosition");
             
             //Uncertain:
-            if (get_property_int("lastPyramidReset") == my_ascensions())
+            //if (get_property_int("lastPyramidReset") == my_ascensions())
+            if (pyramid_position > 0 && mafiaIsPastRevision(14319)) //does this work?
                 have_pyramid_position = true;
             
             //I think there are... five positions?
@@ -1231,7 +1275,6 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
     task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the upper chamber,the lower chambers, the middle chamber]));
 }
 
-boolean [item] __dense_liana_machete_items = $items[antique machete,Machetito,Muculent machete,Papier-m&acirc;ch&eacute;te];
 
 void generateHiddenAreaUnlockForShrine(string [int] description, location shrine)
 {

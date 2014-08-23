@@ -104,7 +104,7 @@ void generatePullList(Checklist [int] checklists)
 		pullable_item_list.listAppend(GPItemMake($item[spooky putty sheet], "5 copies/day", 1));
 	pullable_item_list.listAppend(GPItemMake($item[over-the-shoulder folder holder], "So many things!", 1));
 	pullable_item_list.listAppend(GPItemMake($item[pantsgiving], "5x banish/day|+2 stats/fight|+15% items|2 extra fullness (realistically)", 1));
-    if (!__misc_state["familiars temporarily blocked"])
+    if (!__misc_state["familiars temporarily blocked"]) //relevant in heavy rains, on the +item/+meat underwater familiars
         pullable_item_list.listAppend(GPItemMake($item[snow suit], "+20 familiar weight for a while" + (__misc_state["free runs usable"] ? ", +4 free runs" : "") + "|+10% item|spleen items", 1));
     if (!__misc_state["familiars temporarily blocked"])
     {
@@ -143,8 +143,14 @@ void generatePullList(Checklist [int] checklists)
     if (__misc_state["Torso aware"])
     {
         pullable_item_list.listAppend(GPItemMake($item[flaming pink shirt], "+15% items on shirt. (marginal)" + (__misc_state["familiars temporarily blocked"] ? "" : "|Or extra experience on familiar. (very marginal)"), 1));
-        if (__misc_state["Need to level"] && lookupItem("Sneaky Pete's leather jacket (collar popped)").available_amount() == 0 && lookupItem("Sneaky Pete's leather jacket").available_amount() == 0)
-            pullable_item_list.listAppend(GPItemMake($item[cane-mail shirt], "+20ML shirt", 1));
+        if (__misc_state["Need to level"] && lookupItem("Sneaky Pete's leather jacket (collar popped)").available_amount() == 0 && lookupItem("Sneaky Pete's leather jacket").available_amount() == 0 && my_path_id() != PATH_AVATAR_OF_SNEAKY_PETE)
+        {
+            
+            if (lookupItem("Sneaky Pete's leather jacket (collar popped)").storage_amount() + lookupItem("Sneaky Pete's leather jacket").storage_amount() > 0)
+                pullable_item_list.listAppend(GPItemMake(lookupItem("Sneaky Pete's leather jacket"), "+30ML/+meat/+adv/+init/+moxie shirt", 1));
+            else
+                pullable_item_list.listAppend(GPItemMake($item[cane-mail shirt], "+20ML shirt", 1));
+        }
     }
     
 	
@@ -173,13 +179,30 @@ void generatePullList(Checklist [int] checklists)
         
         if (__misc_state_int["fat loot tokens needed"] > 0)
             food_selections.listAppend("key lime pies");
-        food_selections.listAppend("moon pies");
+        if (availableFullness() >= 5)
+        {
+            if ($item[moon pie].is_unrestricted_passthrough() && !($skill[saucemaven].have_skill() && my_primestat() == $stat[mysticality]))
+                food_selections.listAppend("moon pies");
+            else if ($skill[saucemaven].have_skill())
+                food_selections.listAppend("hi meins");
+        }
         
-		pullable_item_list.listAppend(GPItemMake("Food", "hell ramen", food_selections.listJoinComponents(", ") + ", etc."));
+        string description;
+        if (food_selections.count() > 0)
+            description = food_selections.listJoinComponents(", ") + ", etc.";
+		pullable_item_list.listAppend(GPItemMake("Food", "hell ramen", description));
 	}
 	if (__misc_state["can drink just about anything"] && availableDrunkenness() >= 0 && inebriety_limit() >= 5)
 	{
-		pullable_item_list.listAppend(GPItemMake("Drink", "gibson", "wrecked generators, etc."));
+        string [int] drink_selections;
+        if ($item[wrecked generator].is_unrestricted_passthrough())
+            drink_selections.listAppend("wrecked generators");
+        
+        string description;
+        if (drink_selections.count() > 0)
+            description = drink_selections.listJoinComponents(", ") + ", etc.";
+        
+		pullable_item_list.listAppend(GPItemMake("Drink", "gibson", description));
 	}
     
     if (__misc_state["In run"] && !__quest_state["Level 13"].state_boolean["past gates"] && ($items[large box, blessed large box].available_amount() == 0 && $items[bubbly potion,cloudy potion,dark potion,effervescent potion,fizzy potion,milky potion,murky potion,smoky potion,swirly potion].items_missing().count() > 0))
@@ -214,7 +237,11 @@ void generatePullList(Checklist [int] checklists)
             pullable_item_list.listAppend(GPItemMake($item[star crossbow], "speed up hole in the sky", 1));
 	}
     if (__quest_state["Level 11"].mafia_internal_step < 2)
-        pullable_item_list.listAppend(GPItemMake($item[blackberry galoshes], "speed up black forest by 3-4? turns?", 1));
+        pullable_item_list.listAppend(GPItemMake($item[blackberry galoshes], "speed up black forest by 2-3? turns", 1));
+        
+    if (my_path_id() == PATH_HEAVY_RAINS)
+        pullable_item_list.listAppend(GPItemMake(lookupItem("fishbone catcher's mitt"), "offhand, less items washing away", 1));
+    
         
     //OUTFITS: √Pirate outfit, √War outfit, √Ninja "outfit"
     if (!__quest_state["Level 12"].finished && (!have_outfit_components("War Hippy Fatigues") && !have_outfit_components("Frat Warrior Fatigues")))

@@ -41,6 +41,8 @@ void SSpeakeasyGenerateResource(ChecklistEntry [int] available_resources_entries
     if (!__misc_state["In run"] && !lookupSkill("Hollow Leg").have_skill())
         options.listAppend(listMake("Sloppy Jalopy", "5", "+1 liver capacity skill|Very expensive"));
     
+    
+    string [int] reasons_to_sockdollager;
     if (!__quest_state["Level 3"].finished)
     {
         boolean can_skip_cold = numeric_modifier("Cold Damage") >= 20.0;
@@ -48,13 +50,19 @@ void SSpeakeasyGenerateResource(ChecklistEntry [int] available_resources_entries
         boolean can_skip_spooky = numeric_modifier("Spooky Damage") >= 20.0;
         boolean can_skip_stench = numeric_modifier("Stench Damage") >= 20.0;
         if (!can_skip_cold || !can_skip_hot || !can_skip_spooky || !can_skip_stench)
-            options.listAppend(listMake("Sockdollager", "2", "Tavern NC skipping"));
+            reasons_to_sockdollager.listAppend("tavern NC skipping");
     }
+    
+    if (my_path_id() == PATH_HEAVY_RAINS && !__quest_state["Level 13"].finished)
+        reasons_to_sockdollager.listAppend("fighting rain king");
+    
+    if (reasons_to_sockdollager.count() > 0)
+        options.listAppend(listMake("Sockdollager", "2", reasons_to_sockdollager.listJoinComponents(", ", "and").capitalizeFirstLetter()));
     
     if (__misc_state["In run"] && my_meat() >= 20000)
         options.listAppend(listMake("Flivver", "2", "Epic-level drunkenness."));
     
-    if (my_path_id() == PATH_SLOW_AND_STEADY && __misc_state["need to level"])
+    if (__misc_state["need to level"])
     {
         string drink_name = "";
         
@@ -70,9 +78,14 @@ void SSpeakeasyGenerateResource(ChecklistEntry [int] available_resources_entries
         {
             drink_name = "Thermos of \"whiskey\"";
         }
-        //FIXME correct statgain
         if (drink_name.length() > 0)
-            options.listAppend(listMake(drink_name, "1", "87.5 mainstat"));
+        {
+            float mainstat_gain = 87.5 * (1.0 + numeric_modifier(my_primestat().to_string() + " Experience Percent") / 100.0);
+            string description = mainstat_gain.roundForOutput(0) + " mainstat";
+            //if (my_path_id() != PATH_SLOW_AND_STEADY)
+                //description += "";
+            options.listAppend(listMake(drink_name, "1", description));
+        }
         
     }
     //FIXME prismatic feather peacock drink!

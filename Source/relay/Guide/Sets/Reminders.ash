@@ -315,4 +315,19 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         }
     }
     
+    if (my_path_id() == PATH_HEAVY_RAINS && my_familiar() != $familiar[none] && $slot[familiar].equipped_item() == $item[none])
+    {
+        //mafia has code to do this, but it doesn't always work - had it not equip on the blackbird once
+        //plus they have to buy one anyways
+        string url = "familiar.php";
+        string [int] description;
+        description.listAppend("Otherwise it'll (probably) be blocked.");
+        if (lookupItem("miniature life preserver").available_amount() == 0)
+        {
+            description.listAppend("Buy from the general store.");
+            url = "store.php?whichstore=m";
+        }
+        
+        task_entries.listAppend(ChecklistEntryMake("__item miniature life preserver", url, ChecklistSubentryMake("Equip miniature life preserver", "", description), -11));
+    }
 }
