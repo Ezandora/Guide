@@ -51,6 +51,36 @@ int CounterGetNextExactTurn(Counter c)
     
 }
 
+boolean CounterMayHitNextTurn(Counter c)
+{
+    if (!c.initialized)
+        return false;
+    if (c.exact_turns.count() > 0)
+    {
+        foreach key, turn in c.exact_turns
+        {
+            if (turn == 0)
+                return true;
+        }
+        return false;
+    }
+    else if (!c.found_start_turn_range && !c.found_end_turn_range)
+    {
+        return false;
+    }
+    //turn range:
+    else if (c.found_start_turn_range)
+    {
+        if (c.range_start_turn <= 0)
+            return true;
+        else
+            return false;
+    }
+    else if (c.found_end_turn_range)
+        return true; //maaaybe?
+    return false;
+}
+
 Vec2i CounterGetWindowRange(Counter c) //x is min, y is max
 {
     if (!c.CounterIsRange())
@@ -286,6 +316,16 @@ void CountersReparse()
         remove __active_counters[key];
     }
     CountersInit();
+}
+
+boolean CounterWanderingMonsterMayHitNextTurn()
+{
+    foreach s in $strings[Romantic Monster,Rain Monster,Holiday Monster,Nemesis Assassin,Bee]
+    {
+        if (CounterLookup(s).CounterExists() && CounterLookup(s).CounterMayHitNextTurn())
+            return true;
+    }
+    return false;
 }
 
 CountersInit();

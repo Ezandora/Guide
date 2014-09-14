@@ -61,6 +61,7 @@ string generateRandomMessage()
     location_messages[$location[the battlefield (hippy uniform)]] = "love and war";
     location_messages[$location[the middle chamber]] = "pyramid laundry machine";
     location_messages[$location[the arid, extra-dry desert]] = "can't remember your name";
+    location_messages[$location[outside the club]] = "around the world around the world around the world around the world";
     
     foreach l in $locations[The Prince's Restroom,The Prince's Dance Floor,The Prince's Kitchen,The Prince's Balcony,The Prince's Lounge,The Prince's Canapes table]
         location_messages[l] = "social sabotage";
@@ -91,7 +92,7 @@ string generateRandomMessage()
     equipment_messages[$item[heart necklace]] = "&#x2665;&#xfe0e;"; //♥︎
     equipment_messages[$item[fleetwood chain]] = "run in the shadows";
     equipment_messages[$item[liar's pants]] = "never tell the same lie twice";
-    equipment_messages[$item[detective skull]] = "too slow ascend faster";
+    equipment_messages[$item[detective skull]] = HTMLGenerateSpanFont("too slow ascend faster", "#ACA200", ""); //speakeasy password
     equipment_messages[$item[gasmask]] = "are you my mummy?";
     
     foreach it in equipment_messages
@@ -162,6 +163,8 @@ string generateRandomMessage()
     else
         paths[PATH_SLOW_AND_STEADY] = "skip a day if you like";
     paths[PATH_HEAVY_RAINS] = "survive";
+    //paths[PATH_CLASS_ACT_3] = "buttons for the people";
+    //paths[PATH_AVATAR_OF_THE_NAUGHTY_SORCERESS] = "go forth to your lair! have some tea";
     
     paths[PATH_OXYGENARIAN] = "the slow path";
     
@@ -406,7 +409,11 @@ string generateRandomMessage()
 	if ($effect[beaten up].have_effect() > 0)
 	{
 		random_messages.listClear();
-		random_messages.listAppend("ow");
+        monster last_monster = get_property_monster("lastEncounter");
+        if (last_monster == lookupMonster("storm cow") && last_monster != $monster[none])
+            random_messages.listAppend("<pre>^__^            <br>(oo)\\_______    <br>(__)\\       )\\/\\<br>    ||----w |   <br>    ||     ||   </pre>");
+        else
+            random_messages.listAppend("ow");
 	}
 	if (my_turncount() <= 0)
 	{

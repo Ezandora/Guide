@@ -30,6 +30,8 @@ void QLevel3GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	ChecklistSubentry subentry;
 	subentry.header = base_quest_state.quest_name;
 	
+    if (base_quest_state.mafia_internal_step == 1)
+        subentry.entries.listAppend("Speak to the bartender.");
     
     boolean can_skip_cold = numeric_modifier("Cold Damage") >= 20.0;
     boolean can_skip_hot = numeric_modifier("Hot Damage") >= 20.0;
@@ -37,7 +39,7 @@ void QLevel3GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
     boolean can_skip_stench = numeric_modifier("Stench Damage") >= 20.0;
     
     
-	float rat_king_chance = clampNormalf(monster_level_adjustment_ignoring_plants() / 300.0);
+	float rat_king_chance = clampNormalf(monster_level_adjustment_for_location($location[the typical tavern cellar]) / 300.0);
 	
     float combat_rate = clampNormalf((0.85 + combat_rate_modifier() / 100.0)); //15%? I can't remember...
     
@@ -105,12 +107,17 @@ void QLevel3GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         }
         subentry.modifiers.listAppend(combat_type_to_run);
         subentry.entries.listAppend(line);
+        
+        if ($item[tangle of rat tails].available_amount() > 0 && !__quest_state["Level 11"].finished)
+        {
+            subentry.entries.listAppend(pluralize($item[tangle of rat tails]) + " found.");
+        }
     }
     subentry.modifiers.listAppend("+300 ML");
     
     string url = "tavern.php";
     
-    if (get_property_int("lastCellarReset") == my_ascensions())
+    if (get_property_int("lastCellarReset") == my_ascensions() && base_quest_state.mafia_internal_step > 1)
         url = "cellar.php";
 	
 	if (wait_until_level_eleven)

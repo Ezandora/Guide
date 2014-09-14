@@ -28,6 +28,7 @@ int clampi(int v, int min_value, int max_value)
 		return min_value;
 	return v;
 }
+
 float clampNormali(int v)
 {
 	return clampi(v, 0, 1);
@@ -155,6 +156,7 @@ Rect RectMake(Vec2i min_coordinate, Vec2i max_coordinate)
 	result.max_coordinate = Vec2iCopy(max_coordinate);
 	return result;
 }
+
 Rect RectCopy(Rect r)
 {
     return RectMake(r.min_coordinate, r.max_coordinate);

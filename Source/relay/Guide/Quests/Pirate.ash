@@ -137,7 +137,10 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
                 subentry.modifiers.listAppend("+meat");
 			}
 			else if (have_outfit)
+            {
+                subentry.modifiers.listAppend("-combat");
 				subentry.entries.listAppend("Find Cap'm Caronch in Barrrney's Barrr.");
+            }
 		}
 		else if (base_quest_state.mafia_internal_step == 2)
 		{
@@ -151,7 +154,10 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 			//have blueprints, catburgle
 			string line = "Use the Orcish Frat House blueprints";
 			if (insult_count < 6)
+            {
+                subentry.modifiers.listAppend("+20% combat");
 				line += ", once you have at least six insults"; //in certain situations five might be slightly faster? but that skips a lot of combats, so probably not
+            }
 			line += ".";
 			
             string method;
@@ -220,7 +226,7 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 			else
 			{
                 subentry.modifiers.listAppend("+234% item");
-                subentry.modifiers.listAppend("+combat");
+                subentry.modifiers.listAppend("+20% combat");
 				line += " Run +234% item, +combat, and collect " + missing_washing_items.listJoinComponents(", ", "and") + ".";
 				if (item_drop_modifier() < 234.0)
 					additional_line = "This location can be a nightmare without +234% item.";
@@ -261,7 +267,10 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		subentry.entries.listAppend(HTMLGenerateSpanFont("Buy the big book of pirate insults.", "red", ""));
 	
     if (can_acquire_cocktail_napkins && $item[cocktail napkin].available_amount() == 0)
+    {
+        subentry.modifiers.listAppend("+item");
         subentry.entries.listAppend("Try to acquire a cocktail napkin to speed up F'c'le. (10% drop, marginal)");
+    }
     
 	if (!is_wearing_outfit("Swashbuckling Getup") && have_outfit)
     {

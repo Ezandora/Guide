@@ -36,21 +36,6 @@ void setUpState()
     __misc_state["In valhalla"] = (my_class().to_string() == "Astral Spirit");
     
     
-    
-    __misc_state["type 69 restrictions active"] = false;
-    
-    int year = now_to_string("yyyy").to_int();
-    int month = now_to_string("MM").to_int();
-    int day = now_to_string("dd").to_int();
-    
-    //FIXME: use is_unrestricted once 16.4 is out
-    //if (my_path_id() == PATH_SLOW_AND_STEADY && (year == 2014 && month <= 8 && !(month == 8 && day >= 15)))
-        //__misc_state["type 69 restrictions active"] = true;
-    if (my_path_id() == PATH_HEAVY_RAINS && (year == 2014 && month <= 11 && !(month == 11 && day >= 15))) //assumption
-        __misc_state["type 69 restrictions active"] = true;
-    
-    
-    
 	if (my_turncount() >= 30 && get_property_int("singleFamiliarRun") != -1)
 		__misc_state["single familiar run"] = true;
 	if ($item[Clan VIP Lounge key].available_amount() > 0 && !in_bad_moon())
@@ -67,12 +52,16 @@ void setUpState()
 	{
 		__misc_state["fax accessible"] = false;
 	}
-    if (__misc_state["type 69 restrictions active"])
+    if (!$item[deluxe fax machine].is_unrestricted())
         __misc_state["fax accessible"] = false;
     
     if (!__misc_state["fax accessible"])
 		fax_available = false;
 	__misc_state["fax available"] = fax_available;
+    
+    __misc_state["fax equivalent accessible"] = __misc_state["fax available"];
+    if (my_path_id() == PATH_HEAVY_RAINS && $skill[rain man].have_skill())
+        __misc_state["fax equivalent accessible"] = true;
 	
     if (__misc_state["VIP available"])
     {
@@ -149,7 +138,7 @@ void setUpState()
 		yellow_ray_image_name = "nanorhino";
 		
 	}
-    if (lookupSkill("Ball Lightning").have_skill() && my_path_id() == PATH_HEAVY_RAINS)
+    if (lookupSkill("Ball Lightning").have_skill() && my_path_id() == PATH_HEAVY_RAINS && my_lightning() >= 5)
     {
         yellow_ray_available = true;
         yellow_ray_source = "Ball Lightning";
@@ -161,7 +150,7 @@ void setUpState()
 		yellow_ray_source = "He-Boulder";
 		yellow_ray_image_name = "he-boulder";
 	}
-    if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE && lookupSkill("Flash Headlight").have_skill() && get_property("peteMotorbikeHeadlight") == "Ultrabright Yellow Bulb")
+    if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE && $skill[Flash Headlight].have_skill() && get_property("peteMotorbikeHeadlight") == "Ultrabright Yellow Bulb")
     {
 		yellow_ray_available = true;
 		yellow_ray_source = "Flash Headlight";
@@ -213,7 +202,7 @@ void setUpState()
 		if ($item[bottle of Blank-Out].available_amount() > 0 || get_property_int("blankOutUsed") > 0)
 			free_runs_available = true;
 	}
-    if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE && mafiaIsPastRevision(13783) && lookupSkill("Peel Out").have_skill())
+    if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE && mafiaIsPastRevision(13783) && $skill[Peel Out].have_skill())
     {
         
         int total_free_peel_outs_available = 10;
@@ -570,7 +559,7 @@ void setUpState()
 	__misc_state_string["ballroom song"] = ballroom_song;
 	
 	__misc_state["Torso aware"] = false;
-    if ($skill[Torso Awaregness].have_skill() || lookupSkill("Best Dressed").have_skill())
+    if ($skill[Torso Awaregness].have_skill() || $skill[Best Dressed].have_skill())
         __misc_state["Torso aware"] = true;
 	
 	int hipster_fights_used = get_property_int("_hipsterAdv");

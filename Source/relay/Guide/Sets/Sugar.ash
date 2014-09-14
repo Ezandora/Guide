@@ -11,6 +11,8 @@ void SugarGenerateSuggestions(string [int] suggestions)
 
 void SSugarGenerateResource(ChecklistEntry [int] available_resources_entries)
 {
+    if (!$item[sugar sheet].is_unrestricted())
+        return;
     item [int] sugar_crafted_items;
     for i from 4178 to 4183
     {

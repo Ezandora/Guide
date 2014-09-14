@@ -21,7 +21,7 @@ void QLevel12Init()
 	state.state_boolean["Lighthouse Finished"] = (get_property("sidequestLighthouseCompleted") != "none");
 	state.state_boolean["Nuns Finished"] = (get_property("sidequestNunsCompleted") != "none");
 	state.state_boolean["Orchard Finished"] = (get_property("sidequestOrchardCompleted") != "none");
-    state.state_boolean["War started"] = (state.mafia_internal_step >= 3);
+    state.state_boolean["War started"] = (state.mafia_internal_step >= 2);
     
     state.state_int["hippies left on battlefield"] = 1000 - get_property_int("hippiesDefeated");
     state.state_int["frat boys left on battlefield"] = 1000 - get_property_int("fratboysDefeated");
@@ -212,7 +212,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 		else
 			details.listAppend("[" + turn_range.x + " to " + turn_range.y + "] turns remaining");
         
-        if ($item[ice nine].available_amount() == 0 && __misc_state["can equip just about any weapon"] && $item[ice harvest].available_amount() >= 9 && $item[ice nine].is_unrestricted_passthrough()) //is this safe? unfinished ice sculpture is really nice, and ice bucket in sneaky pete...
+        if ($item[ice nine].available_amount() == 0 && __misc_state["can equip just about any weapon"] && $item[ice harvest].available_amount() >= 9 && $item[ice nine].is_unrestricted()) //is this safe? unfinished ice sculpture is really nice, and ice bucket in sneaky pete...
             details.listAppend("Possibly make and equip an ice nine. (+30% meat 1h weapon)");
                 
         if ($effect[Sinuses For Miles].have_effect() > 0 && get_property_int("lastTempleAdventures") != my_ascensions() && $item[stone wool].available_amount() > 0)
@@ -222,7 +222,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
         if (my_path_id() == PATH_HEAVY_RAINS && lookupSkill("Make it Rain").have_skill() && turn_range.y > 1)
             details.listAppend("Cast Make it Rain each fight. (+300%? meat)");
         if (lookupItem("Sneaky Pete's leather jacket (collar popped)").equipped_amount() > 0 && turn_range.y > 1)
-            details.listAppend("Might want to unpop the collar. (+20% meat)");
+            details.listAppend("Could unpop your collar. (+20% meat)");
 	
 		optional_task_entries.listAppend(ChecklistEntryMake("Island War Nuns", "bigisland.php?place=nunnery", ChecklistSubentryMake("Island War Nuns Quest", "+meat", details), $locations[the themthar hills]));
 	}
@@ -327,8 +327,10 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
         int gunpowder_needed = MAX(0, 5 - $item[barrel of gunpowder].available_amount());
         
         
+        string [int] modifiers;
         if (gunpowder_needed > 0)
         {
+            modifiers = listMake("+combat", "copies");
             if (gunpowder_needed == 1)
                 details.listAppend("Need " + gunpowder_needed + " more barrel of gunpowder.");
             else
@@ -363,7 +365,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
         else
             details.listAppend("Talk to the lighthouse keeper.");
 	
-		optional_task_entries.listAppend(ChecklistEntryMake("Island War Lighthouse", "bigisland.php?place=lighthouse", ChecklistSubentryMake("Island War Lighthouse Quest", listMake("+combat", "copies"), details), $locations[sonofa beach]));
+		optional_task_entries.listAppend(ChecklistEntryMake("Island War Lighthouse", "bigisland.php?place=lighthouse", ChecklistSubentryMake("Island War Lighthouse Quest", modifiers, details), $locations[sonofa beach]));
 	}
 	if (!base_quest_state.state_boolean["Arena Finished"])
 	{
@@ -582,7 +584,7 @@ void QLevel12GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 				subentry.entries.listAppend("Wossname time! Adventure on battlefield, use a flaregun.");
 			else if (!in_hardcore())
 				subentry.entries.listAppend("Pull a flaregun for wossname.");
-			else if (__misc_state["fax accessible"])
+			else if (__misc_state["fax equivalent accessible"])
 				subentry.entries.listAppend("Fax smarmy pirate, run +234% item (or YR) for flaregun for wossname.");
 			else
 				subentry.entries.listAppend("That almost was a wossname, but you needed more flare.");

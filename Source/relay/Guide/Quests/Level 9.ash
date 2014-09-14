@@ -216,32 +216,75 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
             boolean jar_completed = base_quest_state.state_boolean["Peak Jar Completed"];
             boolean init_completed = base_quest_state.state_boolean["Peak Init Completed"];
             
+            boolean can_complete_stench = false;
+            boolean can_complete_item = false;
+            boolean can_complete_jar = false;
+            boolean can_complete_init = false;
+            
+            boolean have_at_least_one_usable_option = false;
+            
+            if (!stench_completed && numeric_modifier("stench resistance") >= 4.0)
+                can_complete_stench = true;
+            if (!item_completed)
+                can_complete_item = true;
+            if (!jar_completed && $item[jar of oil].available_amount() > 0)
+                can_complete_jar = true;
+            if (!init_completed && (stench_completed && item_completed && jar_completed) && initiative_modifier() >= 40)
+                can_complete_init = true;
+            
+            if (can_complete_stench || can_complete_item || can_complete_jar || can_complete_init)
+                have_at_least_one_usable_option = true;
+            
+            if (!have_at_least_one_usable_option)
+                details.listAppend(HTMLGenerateSpanFont("Avoid adventuring in area until requirements met.", "red", ""));
             
             string [int] options_left;
             
             if (!stench_completed)
-                options_left.listAppend("investigate room 37");
-            if (!item_completed)
-                options_left.listAppend("search the pantry");
-            if (!jar_completed)
-                options_left.listAppend("follow the faint sound of music");
-            if (!init_completed)
-                options_left.listAppend("you");
-            
-            details.listAppend(options_left.listJoinComponents(", ", "and").capitalizeFirstLetter() + ".");
-            
-			if ($item[rusty hedge trimmers].available_amount() > 0)
             {
-                if ($item[rusty hedge trimmers].available_amount() > 1)
-                    details.listAppend("Use " + $item[rusty hedge trimmers].pluralize() + ".");
-                else
-                    details.listAppend("Use rusty hedge trimmers.");
+                string line = "investigate room 37";
+                if (options_left.count() == 0)
+                    line = line.capitalizeFirstLetter(); //have to pre-capitalize because of possible HTML later
+                if (!can_complete_stench)
+                    line = HTMLGenerateSpanFont(line, "gray", "");
+                options_left.listAppend(line);
             }
+            if (!item_completed)
+            {
+                string line = "search the pantry";
+                if (options_left.count() == 0)
+                    line = line.capitalizeFirstLetter();
+                if (!can_complete_item)
+                    line = HTMLGenerateSpanFont(line, "gray", "");
+                options_left.listAppend(line);
+            }
+            if (!jar_completed)
+            {
+                string line = "follow the faint sound of music";
+                if (options_left.count() == 0)
+                    line = line.capitalizeFirstLetter();
+                if (!can_complete_jar)
+                    line = HTMLGenerateSpanFont(line, "gray", "");
+                options_left.listAppend(line);
+            }
+            if (!init_completed)
+            {
+                string line = "you";
+                if (options_left.count() == 0)
+                    line = line.capitalizeFirstLetter();
+                if (!can_complete_init)
+                    line = HTMLGenerateSpanFont(line, "gray", "");
+                options_left.listAppend(line);
+            }
+            
+            details.listAppend(options_left.listJoinComponents(", ", "and") + ".");
+            
             boolean can_complete_using_trimmers = false;
             if ($item[rusty hedge trimmers].available_amount() >= options_left.count()) //purely trimmers, now
             {
                 can_complete_using_trimmers = true;
-                url = "inventory.php?which=3";
+                if (have_at_least_one_usable_option)
+                    url = "inventory.php?which=3";
             }
 			if (numeric_modifier("stench resistance") < 4.0 && !stench_completed)
             {
@@ -274,13 +317,27 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
                 if (options_left.count() > 1)
                     line = "+40% init will be required later.";
                 if ($familiar[oily woim].familiar_is_usable() && !($familiars[oily woim,happy medium] contains my_familiar()))
-                    line += "|Run " + $familiar[oily woim] + " for +init.";
+                {
+                    if (!(my_familiar() == lookupFamiliar("Xiblaxian Holo-Companion") && my_familiar() != $familiar[none]))
+                        line += "|Run " + $familiar[oily woim] + " for +init.";
+                }
 				details.listAppend(line);
+            }
+            
+			if ($item[rusty hedge trimmers].available_amount() > 0)
+            {
+                if (!have_at_least_one_usable_option)
+                    details.listAppend("Have " + $item[rusty hedge trimmers].pluralizeWordy() + ".");
+                else if ($item[rusty hedge trimmers].available_amount() > 1)
+                    details.listAppend("Use " + $item[rusty hedge trimmers].pluralizeWordy() + ".");
+                else
+                    details.listAppend("Use rusty hedge trimmers.");
             }
             
             int ncs_need_to_visit_by_hand = MAX(0, options_left.count() - $item[rusty hedge trimmers].available_amount());
             int ncs_need_to_visit_with_hedge = options_left.count() - ncs_need_to_visit_by_hand;
-            details.listAppend(generateTurnsToSeeNoncombat(80, ncs_need_to_visit_by_hand, "", 0, ncs_need_to_visit_with_hedge));
+            if (have_at_least_one_usable_option && !can_complete_using_trimmers)
+                details.listAppend(generateTurnsToSeeNoncombat(80, ncs_need_to_visit_by_hand, "", 0, ncs_need_to_visit_with_hedge));
             
             
 		}
@@ -299,9 +356,15 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
 		string [int] details;
 		string [int] modifiers;
         
-        int oil_ml = monster_level_adjustment_ignoring_plants();
-        if ($location[oil peak].locationHasPlant("Rabid Dogwood"))
-            oil_ml += 30;
+        int oil_ml = monster_level_adjustment_for_location($location[oil peak]);
+        
+        if (my_path_id() == PATH_HEAVY_RAINS)
+        {
+            //heavy rains ML doesn't affect which oil monster you get; cancel out the rain effect:
+            //int inherent_ml_reduction = monster_level_adjustment() - numeric_modifier("Monster Level");
+            //oil_ml -= inherent_ml_reduction;
+            //FIXME this is complicated
+        }
         
         int turns_remaining_at_current_ml = 0;
         if (base_quest_state.state_float["oil peak pressure"] > 0.0)

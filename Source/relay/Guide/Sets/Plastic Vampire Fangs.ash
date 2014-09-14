@@ -1,5 +1,7 @@
 void SPlasticVampireFangsGenerateResource(ChecklistEntry [int] available_resources_entries)
 {
+    if (!$item[plastic vampire fangs].is_unrestricted())
+        return;
     if ($items[plastic vampire fangs,Interview With You (a Vampire)].available_amount() == 0)
         return;
     item fang_source = $item[plastic vampire fangs];

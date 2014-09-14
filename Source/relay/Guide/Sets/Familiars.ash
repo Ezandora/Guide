@@ -34,7 +34,7 @@ void SFamiliarsGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [
         if (!__quest_state["Level 12"].state_boolean["Nuns Finished"] && have_outfit_components("Frat Warrior Fatigues") && have_outfit_components("War Hippy Fatigues")) //brigand trick
             potential_targets.listAppend("brigand");
         
-        if (!familiar_is_usable($familiar[angry jung man]) && in_hardcore() && !__quest_state["Level 13"].state_boolean["past keys"] && ($item[digital key].available_amount() + creatable_amount($item[digital key])) == 0 && __misc_state["fax accessible"])
+        if (!familiar_is_usable($familiar[angry jung man]) && in_hardcore() && !__quest_state["Level 13"].state_boolean["past keys"] && ($item[digital key].available_amount() + creatable_amount($item[digital key])) == 0 && __misc_state["fax equivalent accessible"])
             potential_targets.listAppend("ghost");
         
         if (__misc_state["In run"] && ($items[bricko eye brick,bricko airship,bricko bat,bricko cathedral,bricko elephant,bricko gargantuchicken,bricko octopus,bricko ooze,bricko oyster,bricko python,bricko turtle,bricko vacuum cleaner].available_amount() > 0 || $skill[summon brickos].have_skill()))
@@ -258,7 +258,7 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] available_resources_entries
     {
         string title;
         string [int] description;
-        string url = "familiar.php?action=chatgrim&pwd=" + my_hash();
+        string url = "familiar.php?action=chatgrim&amp;pwd=" + my_hash();
         
         title = "Chat with grim brother";
         

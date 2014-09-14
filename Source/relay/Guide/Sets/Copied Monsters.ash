@@ -30,15 +30,17 @@ float calculateCurrentNinjaAssassinMaxEnvironmentalDamage()
 {
     float v = 0.0;
     int ml_level = monster_level_adjustment_ignoring_plants();
-    if (ml_level >= 30 && false) //doesn't work yet
+    if (ml_level >= 25)
     {
-        //this is very, very unspaded, and this formula is likely hugely incorrect - it's a huge approximation that deliberately ignores a bunch of variables
-        //FIXME put in real numbers
         float expected_assassin_damage = 0.0;
         
-        expected_assassin_damage = 0.0021 * ml_level * ml_level + 0.287 * ml_level - 9.9;
+        expected_assassin_damage = ((150 + ml_level) * (ml_level - 25)).to_float() / 500.0;
         
+        expected_assassin_damage = expected_assassin_damage + ceiling(expected_assassin_damage / 11.0); //upper limit
+        
+        //FIXME add in resists later
         //Resists don't work properly. They have an effect, but it's different. I don't know how much exactly, so for now, ignore this:
+        //I think they're probably just -5 like above
         //expected_assassin_damage = damageTakenByElement(expected_assassin_damage, $element[cold]);
         
         expected_assassin_damage = ceil(expected_assassin_damage);
@@ -309,6 +311,12 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] available_resources_en
     {
 		available_resources_entries.listAppend(ChecklistEntryMake("__item sticky clay homunculus", "", ChecklistSubentryMake(pluralize($item[sticky clay homunculus].available_amount(), "sticky clay copy", "sticky clay copies") + " available", "", "Unlimited/day.")));
     }
+    if (!get_property_boolean("_crappyCameraUsed") && $item[crappy camera].available_amount() > 0)
+    {
+        string [int] description = listCopy(potential_copies);
+        description.listPrepend("50% success rate");
+		available_resources_entries.listAppend(ChecklistEntryMake("__item crappy camera", "", ChecklistSubentryMake("Crappy camera copy available", "", description)));
+    }
     
     //Copies made:
 
@@ -318,6 +326,8 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] available_resources_en
 	SCopiedMonstersGenerateResourceForCopyType(available_resources_entries, $item[spooky putty monster], "spooky putty", "spookyPuttyMonster");
     if (!get_property_boolean("_cameraUsed"))
         SCopiedMonstersGenerateResourceForCopyType(available_resources_entries, $item[shaking 4-d camera], "shaking 4-d camera", "cameraMonster");
+    if (!get_property_boolean("_crappyCameraUsed"))
+        SCopiedMonstersGenerateResourceForCopyType(available_resources_entries, $item[shaking crappy camera], "shaking crappy camera", "crappyCameraMonster");
 	if (!get_property_boolean("_photocopyUsed"))
 		SCopiedMonstersGenerateResourceForCopyType(available_resources_entries, $item[photocopied monster], "photocopied", "photocopyMonster");
 	if (!get_property_boolean("_envyfishEggUsed"))

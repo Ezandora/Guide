@@ -251,7 +251,7 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
             }
             else if (my_familiar() != bird_needed_familiar && bird_needed.available_amount() == 0)
             {
-                subentry.entries.listAppend("Bring along " + bird_needed_familiar + " to speed up quest.");
+                subentry.entries.listAppend(HTMLGenerateSpanFont("Bring along " + bird_needed_familiar + " to speed up quest.", "red", ""));
             }
             else if (my_familiar() == bird_needed_familiar && bird_needed.available_amount() > 0)
             {
@@ -669,7 +669,9 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
             //FIXME handle alternate route
             //step3 not supported yet, so we have this instead:
             if (base_quest_state.mafia_internal_step == 3)
+            {
                 subentry.entries.listAppend("Use 2 Love Me, Vol. 2, then talk to Mr. Alarm in his office. Then:");
+            }
             
             if ($item[wet stunt nut stew].available_amount() == 0)
             {
@@ -696,7 +698,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                             line += " (hound dog is useful for this)";
                         subentry.entries.listAppend(line);
                       
-                        if ($item[white page].available_amount() > 0)
+                        if (lookupItem("white page").available_amount() > 0)
                             subentry.entries.listAppend("Can use your white pages to dial them up.");
                       
                         subentry.modifiers.listAppend("+combat");
@@ -721,6 +723,8 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                 if ($item[talisman o' nam].equipped_amount() == 0)
                     subentry.entries.listAppend("Equip the Talisman o' Nam.");
             }
+            //if (7270.to_item() != $item[none] && 7270.to_item().available_amount() > 0)
+                //url = "place.php?whichplace=palindome";
         }
         else if (base_quest_state.mafia_internal_step == 3 || 7270.to_item().available_amount() > 0)
         {
@@ -1023,6 +1027,7 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         if (lookupItem("ornate dowsing rod").available_amount() > 0)
         {
             line = "Equip the ornate dowsing rod.";
+            url = "inventory.php?which=2";
         }
         else
         {
@@ -1036,6 +1041,8 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
                 }
               
                 line += " UV-resistant compass, equip for faster desert exploration. (shore vacation)";
+                if ($item[Shore Inc. Ship Trip Scrip].available_amount() > 0)
+                    url = "shop.php?whichshop=shore";
               
                 if (lookupItem("odd silver coin").available_amount() > 0 || lookupItem("grimstone mask").available_amount() > 0 || get_property("grimstoneMaskPath").length() > 0) //FIXME check for the correct grimstoneMaskPath
                 {
@@ -1046,6 +1053,7 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
             else if ($item[uv-resistant compass].available_amount() > 0)
             {
                 line = "Equip the UV-resistant compass.";
+                url = "inventory.php?which=2";
             }
         }
         if (line.length() > 0)
@@ -1194,7 +1202,7 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
                 }
                 else
                 {
-                    int ed_ml = 180 + monster_level_adjustment_ignoring_plants();
+                    int ed_ml = 180 + monster_level_adjustment_for_location($location[the lower chambers]);
                     task = "fight Ed in the lower chambers";
                     if (ed_ml > my_buffedstat($stat[moxie]))
                         task += " (" + ed_ml + " attack)";
@@ -1474,7 +1482,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 {
                     subentry.entries.listAppend("Need three more curses." + curse_details);
                 }
-                if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE && lookupSkill("Shake it off").have_skill())
+                if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE && $skill[Shake it off].have_skill())
                     subentry.entries.listAppend(HTMLGenerateSpanFont("Avoid using Shake It Off to heal", "red", "") + ", it'll remove the curse.");
         
                 if (__misc_state["have hipster"])
@@ -1597,13 +1605,14 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
             else
             {
                 int rolls_needed = 6 - bowling_progress;
-                
-                if (!(rolls_needed == 1 && $item[bowling ball].available_amount() > 0))
+                boolean worry_about_free_runs = false;
+                if (rolls_needed > $item[bowling ball].available_amount())
                 {
                     subentry.modifiers.listAppend("+150% item");
                     subentry.entries.listAppend("Olfact bowler, run +150% item.");
                     if (!$monster[pygmy orderlies].is_banished())
-                        subentry.entries.listAppend("Potentially banish pgymy orderlies.");
+                        subentry.entries.listAppend("Potentially banish pygmy orderlies.");
+                    worry_about_free_runs = true;
                 }
                 
                 string line;
@@ -1620,7 +1629,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 subentry.entries.listAppend(line);
                 
                 //FIXME pop up a reminder to acquire bowl of scorpions
-                if (__misc_state["free runs usable"])
+                if (__misc_state["free runs usable"] && worry_about_free_runs)
                 {
                     if (hidden_tavern_unlocked)
                     {

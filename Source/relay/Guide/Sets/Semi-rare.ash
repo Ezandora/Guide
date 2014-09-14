@@ -123,6 +123,15 @@ void SemirareGenerateDescription(string [int] description)
 			if (line.count() > 0)
 				semirares.listAppend(food_semirares);
 		}
+        
+        if (!__quest_state["Level 13"].state_boolean["past tower"] && $item[small golem].available_amount() == 0 && (get_property("grimstoneMaskPath") == "gnome" || $item[grimstone mask].available_amount() > 0))
+        {
+            boolean can_create_golem = false;
+            if ($item[clay].available_amount() >= 1 && ($item[leather].available_amount() >= 3 || $item[parchment].available_amount() >= 1))
+                can_create_golem = true;
+            if (!can_create_golem)
+                semirares.listAppend(SemirareMake($location[Ye Olde Medievale Villagee], "Small golem (towerkilling)", 0));
+        }
 	}
 		
 	//aftercore? sea quest, sand dollars, giant pearl
@@ -182,7 +191,14 @@ void SSemirareGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
     if (semirare_counter.CounterIsRange())
 	{
         Vec2i turn_range = semirare_counter.CounterGetWindowRange();
-        title = "[" + turn_range.x + " to " + turn_range.y + "] turns until semi-rare";
+        
+        string turn_range_x_string = turn_range.x;
+        if (turn_range.x == -1)
+            turn_range_x_string = "Past";
+        if (turn_range.x == 0)
+            turn_range_x_string = "Now";
+        
+        title = "[" + turn_range_x_string + " to " + turn_range.y + "] turns until semi-rare";
         
         min_turns_until = turn_range.x;
         

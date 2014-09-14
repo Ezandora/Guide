@@ -166,7 +166,7 @@ void QLevel8GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
                     CopiedMonstersGenerateDescriptionForMonster("ninja snowman assassin", assassin_description, true, false);
                     ninja_path.listAppend(assassin_description.listJoinComponents("|"));
                     if (combat_rate_modifier() < 0.0)
-                        ninja_path.listAppend("Need more +combat, assassins won't appear at " + combat_rate_modifier() + "% combat.");
+                        ninja_path.listAppend("Need more +combat, assassins won't appear at " + combat_rate_modifier().floor() + "% combat.");
                 }
             }
             

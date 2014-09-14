@@ -27,21 +27,67 @@ void QManorInit()
     
     //Hardcoded hacky test to see if we can reach -25% on skills alone. So far, this is only possible in one situation in sneaky pete.
     //We can also test this via equipment, but that takes up slots that may be needed for something else. (amulets, mohawk wigs, pirate fledges, war outfits...)
-    if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE && lookupSkill("Brood").have_skill() && mafiaIsPastRevision(13785) && get_property("peteMotorbikeMuffler") == "Extra-Quiet Muffler" && lookupSkill("Rev Engine").have_skill())
+    
+    int minus_combat_source_count = 0;
+    
+    int minus_combat_from_accessories =0;
+    //No silent beret, because mohawk wig:
+    //FIXME BUG: we don't detect if over-the-shoulder folder holder is a -combat source, because I'm not sure how to in ASH. But, we assume it does.
+    foreach it in $items[ring of conflict,red shoe,bram's choker,space trip safety headphones,fuzzy slippers of hatred,quiets-your-steps,over-the-shoulder folder holder]
+    {
+        if (!(it.can_equip() && it.available_amount() > 0))
+            continue;
+        if ($slots[acc1,acc2,acc3] contains it.to_slot())
+            minus_combat_from_accessories += 1;
+        else
+            minus_combat_source_count += 1;
+    }
+    //umm... is there any way to query the folder holder's current folders? can we just assume it's a -combat folder?
+    //numeric_modifier($item[over-the-shoulder folder holder], "Combat Rate") reports 0.0
+    
+    minus_combat_source_count += MIN(3, minus_combat_from_accessories); //three at most
+    
+    if ($skill[smooth movement].skill_is_usable())
+        minus_combat_source_count += 1;
+    if ($skill[the sonata of sneakiness].skill_is_usable())
+        minus_combat_source_count += 1;
+    if ($items[crown of thrones,buddy bjorn].available_amount() > 0 && $familiar[grimstone golem].have_familiar() && !__misc_state["familiars temporarily blocked"])
+        minus_combat_source_count += 1;
+    if (my_path_id() == PATH_AVATAR_OF_BORIS && $skill[song of solitude].skill_is_usable())
+        minus_combat_source_count += 4;
+    if (my_path_id() == PATH_ZOMBIE_SLAYER && $skill[disquiet riot].skill_is_usable())
+        minus_combat_source_count += 4;
+    if (my_path_id() == PATH_AVATAR_OF_JARLSBERG && $skill[chocolatesphere].skill_is_usable())
+        minus_combat_source_count += 3;
+    if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE)
+    {
+        if ($skill[Brood].skill_is_usable())
+            minus_combat_source_count += 2;
+        if (mafiaIsPastRevision(13785) && get_property("peteMotorbikeMuffler") == "Extra-Quiet Muffler" && $skill[Rev Engine].have_skill())
+            minus_combat_source_count += 3;
+    }
+    if (minus_combat_source_count >= 5)
         state.state_boolean["need ballroom song set"] = false;
+    
+    
     
     if (__misc_state_string["ballroom song"] == "-combat")
         state.state_boolean["need ballroom song set"] = false;
+    
+    if ($location[the haunted ballroom].delayRemainingInLocation() > 0)
+        state.state_boolean["ballroom needs delay burned"] = true;
     
     state.state_boolean["ballroom song effectively set"] = !state.state_boolean["need ballroom song set"];
     if (combat_rate_modifier() <= -25.0)
         state.state_boolean["ballroom song effectively set"] = true;
     if (__quest_state["Level 13"].in_progress || (__quest_state["Level 13"].finished && my_path_id() != PATH_BUGBEAR_INVASION))
-        state.state_boolean["ballroom song effectively set"] = false;
+        state.state_boolean["ballroom song effectively set"] = true;
     
     
     
-	if (locationAvailable($location[the haunted ballroom]) && !state.state_boolean["need ballroom song set"])
+    
+    
+	if (locationAvailable($location[the haunted ballroom]) && !(state.state_boolean["need ballroom song set"] || state.state_boolean["ballroom needs delay burned"]))
 		QuestStateParseMafiaQuestPropertyValue(state, "finished");
 	else
     {
@@ -259,21 +305,38 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
                     task_entries.listAppend(ChecklistEntryMake(image_name, url, subentries, relevant_locations));
                 }
             }
-            else if (base_quest_state.state_boolean["need ballroom song set"])
+            else
             {
-                subentry.header = "Possibly set -combat ballroom song";
-                url = $location[the haunted ballroom].getClickableURLForLocation();
-                image_name = "__item the Legendary Beat";
-                subentry.modifiers.listAppend("-combat");
-                
-                subentry.entries.listAppend("Adventure in the Haunted Ballroom. May not be relevant, depending on your path.");
-                
-                if (my_turncount() > 200 || base_quest_state.state_boolean["ballroom song effectively set"])
+                if (base_quest_state.state_boolean["ballroom needs delay burned"] && __quest_state["Level 11"].mafia_internal_step < 3)
                 {
-                    subentry.entries.listAppend("Well, unless you won't need -combat.");
-                    should_output_optionally = true;
+                    ChecklistSubentry [int] subentries2;
+                    string [int] modifiers2;
+                    if (__misc_state["have hipster"])
+                        modifiers2.listAppend(__misc_state_string["hipster name"]);
+                    if (__misc_state["free runs available"])
+                        modifiers2.listAppend("free runs");
+                        
+                    subentries2.listAppend(ChecklistSubentryMake("Burn " + pluralize($location[the haunted ballroom].delayRemainingInLocation(), "turn(?)", "turns(?)") + " delay in haunted ballroom", modifiers2, ""));
+                    ChecklistEntry entry2 = ChecklistEntryMake("__half Haunted Ballroom", $location[the haunted ballroom].getClickableURLForLocation(), subentries2, $locations[the haunted ballroom]);
+                    entry2.importance_level = 5;
+                    optional_task_entries.listAppend(entry2);
+                    //subentry.header = ;
                 }
-                subentry.entries.listAppend(generateTurnsToSeeNoncombat(80, 2, ""));
+                if (base_quest_state.state_boolean["need ballroom song set"])
+                {
+                    subentry.header = "Possibly set -combat ballroom song";
+                    url = $location[the haunted ballroom].getClickableURLForLocation();
+                    image_name = "__item the Legendary Beat";
+                    subentry.modifiers.listAppend("-combat");
+                    
+                    subentry.entries.listAppend("Adventure in the Haunted Ballroom. May not be relevant.");
+                    
+                    if (my_turncount() > 200 || base_quest_state.state_boolean["ballroom song effectively set"])
+                    {
+                        should_output_optionally = true;
+                    }
+                    subentry.entries.listAppend(generateTurnsToSeeNoncombat(80, 2, ""));
+                }
             }
         }
     }
@@ -291,6 +354,8 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         image_name = "__item tiny knife and fork";
         subentry.entries.listAppend("To unlock the Haunted Billiards Room.");
         
+        if (get_property("romanticTarget").to_monster() == $monster[writing desk])
+            subentry.entries.listAppend(HTMLGenerateSpanFont("Avoid adventuring here,", "red", "") + " as you seem to be using the writing desk trick?");
         
         float drawers_per_turn = 0.0;
         float hot_resistance = numeric_modifier("hot resistance");
@@ -411,7 +476,9 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
             int desired_drunkenness = MIN(inebriety_limit(), 10);
             if (missing_pool_skill > 0)
             {
-                subentry.entries.listAppend("Consider drinking " + MIN(missing_pool_skill, desired_drunkenness) + " more drunkenness.");
+                int more_drunkenness = MIN(missing_pool_skill, desired_drunkenness - my_inebriety());
+                if (more_drunkenness > 0)
+                    subentry.entries.listAppend("Consider drinking " + more_drunkenness + " more drunkenness.");
             }
             else if (my_inebriety() > desired_drunkenness)
                 subentry.entries.listAppend(HTMLGenerateSpanFont("Consider waiting for rollover for better pool skill.", "red", "") + " (you're over " + desired_drunkenness + " drunkenness.)");

@@ -4,6 +4,8 @@
 import "relay/Guide/Support/Error.ash"
 import "relay/Guide/Support/List.ash"
 import "relay/Guide/Support/Library.ash"
+import "relay/Guide/Settings.ash"
+import "relay/Guide/QuestState.ash"
 
 
 //Version compatibility locations:
@@ -271,6 +273,10 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
 			return questPropertyPastInternalStepNumber("questL07Cyrptic", 1) && get_property_int("cyrptNookEvilness") > 0;
 		case $location[south of the border]:
 			return $items[pumpkin carriage,desert bus pass, bitchin' meatcar, tin lizzie].available_amount() > 0;
+        case $location[Portal to Terrible Parents]:
+        case $location[Rumpelstiltskin's Workshop]:
+        case $location[Ye Olde Medievale Villagee]:
+            return (get_property("grimstoneMaskPath") == "gnome");
 		default:
 			break;
 	}
@@ -759,6 +765,7 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         lookup_map["The Cave Before Time"] = "place.php?whichplace=twitch";
         lookup_map["An Illicit Bohemian Party"] = "place.php?whichplace=twitch";
         lookup_map["Moonshiners' Woods"] = "place.php?whichplace=twitch";
+        lookup_map["The Roman Forum"] = "place.php?whichplace=twitch";
         lookup_map["The Fun-Guy Mansion"] = "place.php?whichplace=airport_sleaze";
         lookup_map["Sloppy Seconds Diner"] = "place.php?whichplace=airport_sleaze";
         lookup_map["The Sunken Party Yacht"] = "place.php?whichplace=airport_sleaze";

@@ -21,7 +21,7 @@ void SSneakyPeteGenerateResource(ChecklistEntry [int] available_resources_entrie
         
         int free_peel_outs_available = MAX(0, total_free_peel_outs_available - get_property_int("_petePeeledOut"));
         
-        if (lookupSkill("Peel Out").have_skill() && free_peel_outs_available > 0)
+        if ($skill[Peel Out].have_skill() && free_peel_outs_available > 0)
         {
             string [int] description;
             
@@ -37,7 +37,7 @@ void SSneakyPeteGenerateResource(ChecklistEntry [int] available_resources_entrie
         }
     }
     
-    if (lookupSkill("Fix Jukebox").have_skill() && get_property_int("_peteJukeboxFixed") < 3)
+    if ($skill[Fix Jukebox].have_skill() && get_property_int("_peteJukeboxFixed") < 3)
     {
         int uses_remaining = MAX(0, 3 - get_property_int("_peteJukeboxFixed"));
         
@@ -50,7 +50,7 @@ void SSneakyPeteGenerateResource(ChecklistEntry [int] available_resources_entrie
         
         string [int] targets;
         //√banshee, √a batrat for sonar, √harem girl (contested), √burly sidekick, √quiet healer, √filthworms, √f'c'le without natural dancer, √a-boo clues
-        if (!lookupSkill("Natural Dancer").have_skill() && !__quest_state["Pirate Quest"].finished && $item[talisman o' nam].available_amount() == 0)
+        if (!$skill[Natural Dancer].have_skill() && !__quest_state["Pirate Quest"].finished && $item[talisman o' nam].available_amount() == 0)
             targets.listAppend("Three times in the F'c'le, if you can't acquire Natural Dancer/+234% items.");
             
         if (!__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && !__quest_state["Level 11 Desert"].state_boolean["Killing Jar Given"] && $item[killing jar].available_amount() == 0)
@@ -77,7 +77,7 @@ void SSneakyPeteGenerateResource(ChecklistEntry [int] available_resources_entrie
         entry.subentries.listAppend(ChecklistSubentryMake(pluralize(uses_remaining, "jukebox fix", "jukebox fixes"), "25 MP", description));
     }
     
-    if (lookupSkill("Jump Shark").have_skill() && get_property_int("_peteJumpedShark") < 3)
+    if ($skill[Jump Shark].have_skill() && get_property_int("_peteJumpedShark") < 3)
     {
         int uses_remaining = MAX(0, 3 - get_property_int("_peteJumpedShark"));
         
@@ -161,7 +161,7 @@ void SSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
                 {
                     name = "Headlight";
                     
-                    if (lookupSkill("Flash Headlight").have_skill())
+                    if ($skill[Flash Headlight].have_skill())
                     {
                         options.listAppend("yellow ray from flash headlight");
                         options.listAppend("prismatic damage from flash headlight");
@@ -177,7 +177,7 @@ void SSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
                 else if (property_name == "peteMotorbikeMuffler")
                 {
                     name = "Muffler";
-                    if (lookupSkill("Rev Engine").have_skill())
+                    if ($skill[Rev Engine].have_skill())
                     {
                         options.listAppend("+combat% from rev engine");
                         options.listAppend("-combat% from rev engine");
@@ -187,7 +187,7 @@ void SSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
                         options.listAppend("+X% combat from rev engine (need skill)");
                         options.listAppend("-X% combat from rev engine (need skill)");
                     }
-                    if (lookupSkill("Peel Out").have_skill())
+                    if ($skill[Peel Out].have_skill())
                         options.listAppend("peel out banishes");
                     else
                         options.listAppend("peel out banishes (need skill)");
@@ -195,11 +195,11 @@ void SSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
                 else if (property_name == "peteMotorbikeTires")
                 {
                     name = "Tires";
-                    if (lookupSkill("Peel Out").have_skill())
+                    if ($skill[Peel Out].have_skill())
                         options.listAppend("extra free runs with peel out");
                     else
                         options.listAppend("extra free runs (need peel out)");
-                    if (lookupSkill("Pop Wheelie").have_skill())
+                    if ($skill[Pop Wheelie].have_skill())
                         options.listAppend("pop wheelie does more damage");
                     else
                         options.listAppend("pop wheelie does more damage (need skill)");
@@ -222,7 +222,7 @@ void SSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         }
     }
     
-    if (lookupSkill("Check Mirror").have_skill())
+    if ($skill[Check Mirror].have_skill())
     {
         boolean have_intrinsic = false;
         foreach s in $strings[Slicked-Back Do,Pompadour,Cowlick,Fauxhawk]

@@ -60,7 +60,7 @@ void generateDailyResources(Checklist [int] checklists)
 		available_resources_entries.listAppend(ChecklistEntryMake("__item inflatable duck", "", ChecklistSubentryMake("Dive for swimming pool item", "", "\"swim item\" in GCLI"), 5));
 	if (!get_property_boolean("_olympicSwimmingPool") && __misc_state["VIP available"])
 		available_resources_entries.listAppend(ChecklistEntryMake("__item inflatable duck", "clan_viplounge.php?action=swimmingpool", ChecklistSubentryMake("Swim in VIP pool", "50 turns", listMake("+20 ML, +30% init", "Or -combat")), 5));
-	if (!get_property_boolean("_aprilShower") && __misc_state["VIP available"] && !__misc_state["type 69 restrictions active"])
+	if (!get_property_boolean("_aprilShower") && __misc_state["VIP available"] && $item[Clan shower].is_unrestricted())
 	{
 		string [int] description;
 		if (__misc_state["need to level"])
@@ -81,7 +81,7 @@ void generateDailyResources(Checklist [int] checklists)
 		
 		available_resources_entries.listAppend(ChecklistEntryMake("__item shard of double-ice", "", ChecklistSubentryMake("Take a shower", description), 5));
 	}
-    if (__misc_state["VIP available"] && get_property_int("_poolGames") <3 && !__misc_state["type 69 restrictions active"])
+    if (__misc_state["VIP available"] && get_property_int("_poolGames") <3 && $item[Clan pool table].is_unrestricted())
     {
         int games_available = 3 - get_property_int("_poolGames");
         string [int] description;
@@ -124,7 +124,7 @@ void generateDailyResources(Checklist [int] checklists)
 	
 	
 	
-	if (!get_property_boolean("_madTeaParty") && __misc_state["VIP available"] && !__misc_state["type 69 restrictions active"])
+	if (!get_property_boolean("_madTeaParty") && __misc_state["VIP available"] && $item[Clan looking glass].is_unrestricted())
 	{
         string [int] description;
         string line = "Various effects.";
@@ -358,7 +358,7 @@ void generateDailyResources(Checklist [int] checklists)
     
     if (__misc_state["VIP available"])
     {
-        if (!get_property_boolean("_lookingGlass") && !__misc_state["type 69 restrictions active"])
+        if (!get_property_boolean("_lookingGlass") && $item[Clan looking glass].is_unrestricted())
         {
             available_resources_entries.listAppend(ChecklistEntryMake("__item &quot;DRINK ME&quot; potion", "clan_viplounge.php", ChecklistSubentryMake("A gaze into the looking glass", "", "Acquire a " + $item[&quot;DRINK ME&quot; potion] + "."), 10));
         }
@@ -393,7 +393,10 @@ void generateDailyResources(Checklist [int] checklists)
         
         if (casts_remaining > 0)
         {
-            available_resources_entries.listAppend(ChecklistEntryMake("__item Golden Mr. Accessory", "skills.php", ChecklistSubentryMake(pluralize(casts_remaining, "smile of the Mr. Accessory", "smiles of the Mr. Accessory"), "", "Give away sunshine."), 8));
+            string image_name = "__item Golden Mr. Accessory";
+            if (my_id() == 1043600)
+                image_name = "__item defective Golden Mr. Accessory"; //does not technically give out sunshine, but...
+            available_resources_entries.listAppend(ChecklistEntryMake(image_name, "skills.php", ChecklistSubentryMake(pluralize(casts_remaining, "smile of the Mr. Accessory", "smiles of the Mr. Accessory"), "", "Give away sunshine."), 8));
         }
     }
 	

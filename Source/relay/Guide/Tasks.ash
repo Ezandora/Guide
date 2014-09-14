@@ -116,6 +116,7 @@ void generateTasks(Checklist [int] checklists)
 		}
 		else
 		{
+            url = "shop.php?whichshop=shore";
 			subentry.entries.listAppend("Redeem scrip at shore for dinghy plans.");
 		}
         
@@ -262,7 +263,7 @@ void generateTasks(Checklist [int] checklists)
 		}
 	}
 	
-	if (!have_outfit_components("Filthy Hippy Disguise") && __misc_state["mysterious island available"] && __misc_state["In run"] && !__quest_state["Level 12"].finished)
+	if (!have_outfit_components("Filthy Hippy Disguise") && __misc_state["mysterious island available"] && __misc_state["In run"] && !__quest_state["Level 12"].finished && !__quest_state["Level 12"].state_boolean["War started"])
 	{
 		item [int] missing_pieces = missing_outfit_components("Filthy Hippy Disguise");
         

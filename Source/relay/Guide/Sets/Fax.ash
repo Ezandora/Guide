@@ -153,15 +153,21 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
         
         if (suggest_less_powerful_faxes)
         {
-            //FIXME add low-relevancy faxes for rain man:
             //giant swarm of ghuol whelps
             if (__quest_state["Level 7"].state_boolean["cranny needs speed tricks"])
-                potential_faxes.listAppend("Giant swarm of ghuol whelps - with a copy possibly");
+            {
+                string line = "Giant swarm of ghuol whelps - +ML - with a copy possibly";
+                if (!__quest_state["Level 7"].started)
+                {
+                    line = HTMLGenerateSpanFont(line + " (wait until quest started)", "gray", "");
+                }
+                potential_faxes.listAppend(line);
+            }
             //modern zmobie
             if (__quest_state["Level 7"].state_boolean["alcove needs speed tricks"])
             {
                 string line = "Modern zmobie - with copies/arrows";
-                if (!__quest_state["Level 7"].in_progress)
+                if (!__quest_state["Level 7"].started)
                 {
                     line = HTMLGenerateSpanFont(line + " (wait until quest started)", "gray", "");
                 }
@@ -191,7 +197,10 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
             //drunken half-orc hobo (smiths)
             if (in_hardcore() && $skill[summon smithsness].skill_is_usable() && $items[dirty hobo gloves,hand in glove].available_amount() == 0)
             {
-                potential_faxes.listAppend("Drunken half-orc hobo - run +234% item to make +ML smithness accessory.");
+                string hobo_name = "Drunken half-orc hobo";
+                if (my_ascensions() % 2 == 1)
+                    hobo_name = "Hung-over half-orc hobo";
+                potential_faxes.listAppend(hobo_name + " - run +234% item to make +ML smithness accessory.");
             }
             //nuns bandit for trickery
             if (!__quest_state["Level 12"].state_boolean["Nuns Finished"])
@@ -242,21 +251,22 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
             {
                 potential_faxes.listAppend("forest spirit - +234% item - forest tears can meatsmith into a muculent machete for dense liana");
             }
+            //baa'baa'bu'ran
+            //grungy pirate - for guitar (need 400% item/YR)
+            //harem girl
+            
             //FIXME rest
             //f'c'le - cleanly pirate/curmudgeonly pirate/that other pirate (and insults)
-            //baa'baa'bu'ran
             //KGE
             
-            //grungy pirate - for guitar (need 400% item/YR)
-            //dairy goat? mostly for milk of magnesium
-            //harem girl
+            //dairy goat? mostly for early milk of magnesium (stunt runs)
             //possessed wine rack / cabinet
             //pygmy shaman / accountant - if you absolutely have to
             //barret / aerith for equipment
             //racecar bob to olfact
             
             //brainsweeper for chef-in-the-box / bartender-in-the-box?
-            
+            //gremlins?
             
             //FIXME gate items?
             //FIXME handsome mariachi/etc?
@@ -288,9 +298,17 @@ void SFaxGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
     
 	if (__misc_state["fax available"] && $item[photocopied monster].available_amount() == 0)
         optional_task_entries.listAppend(ChecklistEntryMake("fax machine", url, ChecklistSubentryMake("Fax", "", listJoinComponents(SFaxGeneratePotentialFaxes(false), "<hr>"))));
-    if (lookupSkill("Rain Man").have_skill())
+    if (lookupSkill("Rain Man").have_skill() && my_rain() >= 50)
     {
-        optional_task_entries.listAppend(ChecklistEntryMake("__skill rain man", "skills.php", ChecklistSubentryMake("Rain man copy", "50 rain drops", listJoinComponents(SFaxGeneratePotentialFaxes(true), "<hr>"))));
+        ChecklistEntry entry = ChecklistEntryMake("__skill rain man", "skills.php", ChecklistSubentryMake("Rain man copy", "50 rain drops", listJoinComponents(SFaxGeneratePotentialFaxes(true), "<hr>")));
+        
+        if (my_rain() > 93)
+        {
+            entry.importance_level = -10;
+            task_entries.listAppend(entry);
+        }
+        else
+            optional_task_entries.listAppend(entry);
     }
 }
 

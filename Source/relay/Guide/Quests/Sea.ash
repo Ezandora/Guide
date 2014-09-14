@@ -114,7 +114,7 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
             else
             {
                 string shrap_suggestion = "Shrap is nice for this.";
-                if (!lookupSkill("shrap").have_skill())
+                if (!$skill[shrap].have_skill())
                 {
                     if (lookupItem("warbear metalworking primer (used)").available_amount() > 0)
                     {

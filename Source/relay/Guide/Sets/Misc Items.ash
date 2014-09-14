@@ -174,11 +174,11 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
 		available_resources_entries.listAppend(ChecklistEntryMake("__item polka pop", "", ChecklistSubentryMake(pluralize($item[polka pop]), "10 turns", description), importance_level_item));
 	}
         
-    if (lookupItem("frost flower").available_amount() > 0 && in_run)
+    if ($item[frost flower].available_amount() > 0 && in_run)
     {
         string [int] description;
         description.listAppend("+100% item, +200% meat, +25 ML, +100% init");
-        available_resources_entries.listAppend(ChecklistEntryMake("__item frost flower", "inventory.php?which=3", ChecklistSubentryMake(lookupItem("frost flower").pluralize(), "50 turns", description), importance_level_item));
+        available_resources_entries.listAppend(ChecklistEntryMake("__item frost flower", "inventory.php?which=3", ChecklistSubentryMake($item[frost flower].pluralize(), "50 turns", description), importance_level_item));
     }
 	if (in_run)
 	{
@@ -256,7 +256,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
         {
             string [int] details;
             details.listAppend("Lost pill bottle is mini-fridge, take a nap, open the pill bottle.");
-            if (!__quest_state["Level 13"].state_boolean["past tower"] && (__misc_state["type 69 restrictions active"] || !__misc_state["can eat just about anything"]))
+            if (!__quest_state["Level 13"].state_boolean["past tower"] && (!$item[munchies pill].is_unrestricted() || !__misc_state["can eat just about anything"]))
                 details.listAppend("The lost comb is turn on the TV, take a nap, pick up the comb. (towerkilling)");
 			available_resources_entries.listAppend(ChecklistEntryMake("__item lost key", "inventory.php?which=3", ChecklistSubentryMake(pluralize($item[lost key]), "", details), importance_level_item));
         }
@@ -447,7 +447,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
         string [int] description;
         description.listAppend("+5 to everything. (5 turns)");
         
-        available_resources_entries.listAppend(ChecklistEntryMake("__item defective Game Grid token", "", ChecklistSubentryMake("Defective Game Grid Token", "", description), importance_level_item));
+        available_resources_entries.listAppend(ChecklistEntryMake("__item defective Game Grid token", "inventory.php?which=3", ChecklistSubentryMake("Defective Game Grid Token", "", description), importance_level_item));
     }
     if ($item[Platinum Yendorian Express Card].available_amount() > 0 && !get_property_boolean("expressCardUsed"))
     {
@@ -509,8 +509,8 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
     {
         available_resources_entries.listAppend(ChecklistEntryMake("__item munchies pill", "", ChecklistSubentryMake(pluralize($item[munchies pill]), "", "+3 turns from fortune cookies and other low-fullness foods."), importance_level_unimportant_item));
     }
-    if (lookupItem("snow cleats").available_amount() > 0 && in_run)
-        available_resources_entries.listAppend(ChecklistEntryMake("__item snow cleats", "", ChecklistSubentryMake(pluralize(lookupItem("snow cleats")), "", "-5% combat, 30 turns."), importance_level_item));
+    if ($item[snow cleats].available_amount() > 0 && in_run)
+        available_resources_entries.listAppend(ChecklistEntryMake("__item snow cleats", "", ChecklistSubentryMake(pluralize($item[snow cleats]), "", "-5% combat, 30 turns."), importance_level_item));
         
     if ($item[vitachoconutriment capsule].available_amount() > 0 && get_property_int("_vitachocCapsulesUsed") <3 && in_run)
     {
@@ -660,7 +660,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
     }
     //Penultimate Fantasy chest?
     
-    item odd_silver_coin = lookupItem("odd silver coin");
+    item odd_silver_coin = $item[odd silver coin];
     if (odd_silver_coin.available_amount() > 0 && in_run)
     {
         string [int] description;
@@ -677,13 +677,13 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
             table.listAppend(listMake("solid gold rosary", "-4.5? evilness from cyrpt", "5 coins"));
         //ornate dowsing rod - 5 - better desert exploration (+2%)
         
-        if (!__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && lookupItem("ornate dowsing rod").available_amount() == 0)
+        if (!__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && $item[ornate dowsing rod].available_amount() == 0)
             table.listAppend(listMake("ornate dowsing rod", "+2% desert exploration", "5 coins"));
         description.listAppend(HTMLGenerateSimpleTableLines(table));
         
         available_resources_entries.listAppend(ChecklistEntryMake("__item " + odd_silver_coin, "shop.php?whichshop=cindy", ChecklistSubentryMake(odd_silver_coin.pluralize(), "", description), importance_level_item));
     }
-    item grimstone_mask = lookupItem("grimstone mask");
+    item grimstone_mask = $item[grimstone mask];
     if (grimstone_mask.available_amount() > 0 && in_run)
     {
         string [int] description;
@@ -691,7 +691,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
         description.listAppend("Wear to take you places.");
         description.listAppend("The prince's ball (stepmother) lets you find odd silver coins.|Up to six, one adventure each.");
         description.listAppend("Rumpelstiltskin's for towerkilling with small golem.|Small golem is a 5k/round combat item.|Involves the semi-rare in village. Don't know the details, sorry.");
-        if (lookupEffect("Human-Fish Hybrid").have_effect() == 0 && get_campground()[lookupItem("Little Geneticist DNA-Splicing Lab")] > 0 && !__misc_state["familiars temporarily blocked"])
+        if (lookupEffect("Human-Fish Hybrid").have_effect() == 0 && get_campground()[$item[Little Geneticist DNA-Splicing Lab]] > 0 && !__misc_state["familiars temporarily blocked"])
             description.listAppend("Candy witch for human-fish hybrid. (+10 familiar weight)");
         if (get_property("grimstoneMaskPath").length() > 0)
             description.listAppend("Currently on the path of " + get_property("grimstoneMaskPath") + ".");
@@ -712,16 +712,16 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
         available_resources_entries.listAppend(ChecklistEntryMake("__item chest of the Bonerdagon", "inventory.php?which=3", ChecklistSubentryMake("chest of the Bonerdagon", "", description), importance_level_unimportant_item));
     }
     
-    if (lookupItem("smoke grenade").available_amount() > 0 && in_run)
+    if ($item[smoke grenade].available_amount() > 0 && in_run)
     {
         string description = "Turn-costing banish. (lasts 20 turns, no stats, no items, no meat)";
-        available_resources_entries.listAppend(ChecklistEntryMake("__item smoke grenade", "", ChecklistSubentryMake(pluralize(lookupItem("Smoke grenade")), "", description), importance_level_unimportant_item));
+        available_resources_entries.listAppend(ChecklistEntryMake("__item smoke grenade", "", ChecklistSubentryMake(pluralize($item[Smoke grenade]), "", description), importance_level_unimportant_item));
     }
     
-    if (lookupItem("pile of ashes").available_amount() > 0 && in_run)
+    if ($item[pile of ashes].available_amount() > 0 && in_run)
     {
         string description = "-10% combat. (20 turns)";
-        available_resources_entries.listAppend(ChecklistEntryMake("__item pile of ashes", "inventory.php?which=3", ChecklistSubentryMake(pluralize(lookupItem("pile of ashes")), "", description), importance_level_unimportant_item));
+        available_resources_entries.listAppend(ChecklistEntryMake("__item pile of ashes", "inventory.php?which=3", ChecklistSubentryMake(pluralize($item[pile of ashes]), "", description), importance_level_unimportant_item));
     }
     if (lookupItem("7259").available_amount() > 0 && in_run)
     {
@@ -758,9 +758,9 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
             
         }
     }
-    if (lookupItem("burned government manual fragment").available_amount() > 0)
+    if ($item[burned government manual fragment].available_amount() > 0)
     {
-        available_resources_entries.listAppend(ChecklistEntryMake("__item burned government manual fragment", "inventory.php?which=3", ChecklistSubentryMake(pluralize(lookupItem("burned government manual fragment")), "", "Foreign language study.|Will disappear on ascension."), importance_level_unimportant_item));
+        available_resources_entries.listAppend(ChecklistEntryMake("__item burned government manual fragment", "inventory.php?which=3", ChecklistSubentryMake(pluralize($item[burned government manual fragment]), "", "Foreign language study.|Will disappear on ascension."), importance_level_unimportant_item));
     }
     
     if (in_run && $item[llama lama gong].available_amount() > 0)
@@ -820,7 +820,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
         
         if (__quest_state["Level 11 Manor"].mafia_internal_step < 2)
             element_options[$element[spooky]].listAppend("spookyraven ballroom");
-        if (get_property("questM20Necklace") != "finished" && lookupItem("Lady Spookyraven's powder puff").available_amount() == 0)
+        if (get_property("questM20Necklace") != "finished" && $item[Lady Spookyraven's powder puff].available_amount() == 0)
             element_options[$element[spooky]].listAppend("spookyraven bathroom");
             
             

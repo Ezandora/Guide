@@ -402,6 +402,30 @@ string listJoinComponents(item [int] list, string joining_string)
 	return listJoinComponents(list, joining_string, "");
 }
 
+string listJoinComponents(monster [int] list, string joining_string, string and_string)
+{
+	string [int] list_string;
+	foreach key in list
+		list_string.listAppend(list[key].to_string());
+	return listJoinComponents(list_string, joining_string, and_string);
+}
+string listJoinComponents(monster [int] list, string joining_string)
+{
+	return listJoinComponents(list, joining_string, "");
+}
+
+string listJoinComponents(effect [int] list, string joining_string, string and_string)
+{
+	string [int] list_string;
+	foreach key in list
+		list_string.listAppend(list[key].to_string());
+	return listJoinComponents(list_string, joining_string, and_string);
+}
+string listJoinComponents(effect [int] list, string joining_string)
+{
+	return listJoinComponents(list, joining_string, "");
+}
+
 
 
 string listJoinComponents(location [int] list, string joining_string, string and_string)
@@ -415,6 +439,19 @@ string listJoinComponents(location [int] list, string joining_string, string and
 }
 
 string listJoinComponents(location [int] list, string joining_string)
+{
+	return listJoinComponents(list, joining_string, "");
+}
+
+string listJoinComponents(phylum [int] list, string joining_string, string and_string)
+{
+	string [int] list_string;
+	foreach key in list
+		list_string.listAppend(list[key].to_string());
+	return listJoinComponents(list_string, joining_string, and_string);
+}
+
+string listJoinComponents(phylum [int] list, string joining_string)
 {
 	return listJoinComponents(list, joining_string, "");
 }
@@ -455,6 +492,15 @@ int listSum(int [int] list)
         v += list[key];
     }
     return v;
+}
+
+
+string [int] listCopy(string [int] l)
+{
+    string [int] result;
+    foreach key in l
+        result[key] = l[key];
+    return result;
 }
 
 //Strict, in this case, means the keys start at 0, and go up by one per entry. This allows easy consistent access
@@ -521,7 +567,7 @@ string [string] mapCopy(string [string] map)
     string [string] result;
     foreach key in map
         result[key] = map[key];
-    return map;
+    return result;
 }
 
 boolean [string] listGeneratePresenceMap(string [int] list)

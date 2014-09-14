@@ -49,8 +49,11 @@ void SHeavyRainsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         
         description_for_skill[lookupSkill("Thunder Clap")] = "Turn-costing banish. (lasts 40 turns, no stats, no items, no meat)";
         description_for_skill[lookupSkill("Thundercloud")] = "Water depth increasing effect";
+        description_for_skill[lookupSkill("Thunderheart")] = "+100% HP, surviving";
         description_for_skill[lookupSkill("Thunderstrike")] = "Monster stunning (towerkilling)";
         description_for_skill[lookupSkill("Thunder Thighs")] = "Thunder regen, passive";
+        description_for_skill[lookupSkill("Thunder Bird")] = "Monster deleveling";
+        
         
         description_for_skill[lookupSkill("Rain Man")] = "Fax any monster repeatedly";
         description_for_skill[lookupSkill("Rainy Day")] = "Water depth increasing effect";
@@ -64,7 +67,7 @@ void SHeavyRainsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         description_for_skill[lookupSkill("Riding the Lightning")] = "passive, +100% max MP";
         
         
-        //description_for_skill[lookupSkill("Sheet Lightning")] = "+100% spell damage effect";
+        description_for_skill[lookupSkill("Sheet Lightning")] = "+100% spell damage effect";
         //description_for_skill[lookupSkill("Thunder Down Underwear")] = "Summon once/day pants: +100 DA/HP, HP regen";
         //description_for_skill[lookupSkill("Rain Coat")] = "Summons once/day shirt: +40% init, +10% item, +2 resist all";
         //description_for_skill[lookupSkill("Lightning Rod")] = "Summons once/day weapon: +200% spell damage";
@@ -168,7 +171,7 @@ void SHeavyRainsGenerateResource(ChecklistEntry [int] available_resources_entrie
     
     int fishbone_amount = lookupItem("freshwater fishbone").available_amount();
     
-    if (fishbone_amount > 0)
+    if (fishbone_amount >= 5) //only show if there's something to buy
     {
         int [item] fishbone_item_costs;
         string [item] fishbone_item_descriptions;
@@ -216,5 +219,11 @@ void SHeavyRainsGenerateResource(ChecklistEntry [int] available_resources_entrie
             description.listAppend(pluralize(amount_to_make, it) + ": " + fishbone_item_descriptions[it]);
         }
         available_resources_entries.listAppend(ChecklistEntryMake("__item freshwater fishbone", "shop.php?whichshop=fishbones", ChecklistSubentryMake(pluralize(lookupItem("freshwater fishbone")), "", description), 7));
+    }
+    
+    if (lookupItem("catfish whiskers").available_amount() > 0)
+    {
+        //should we add in area suggestions?
+        available_resources_entries.listAppend(ChecklistEntryMake("__item catfish whiskers", "inventory.php?which=3", ChecklistSubentryMake(pluralize(lookupItem("catfish whiskers")), "", "40 turns of -washaway"), 7));
     }
 }

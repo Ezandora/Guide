@@ -69,7 +69,7 @@ void S8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             
             description.listAppend("Run +67% item, olfact bloopers.");
             description.listAppend(total_white_pixels + "/30 white pixels found.");
-            if (__misc_state["VIP available"] && __misc_state["fax accessible"])
+            if (__misc_state["VIP available"] && __misc_state["fax equivalent accessible"])
                 description.listAppend("Possibly consider faxing/copying a ghost. (+150% item, drops five white pixels)");
             if ($item[continuum transfunctioner].equipped_amount() == 0)
             {

@@ -182,10 +182,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		{
             subentry.modifiers.listAppend("-combat");
             subentry.modifiers.listAppend("+ML");
-            float monster_level = monster_level_adjustment_ignoring_plants();
-            
-            if ($location[the defiled cranny].locationHasPlant("Blustery Puffball"))
-                monster_level += 30;
+            float monster_level = monster_level_adjustment_for_location($location[the defiled cranny]);
             
             monster_level = MAX(monster_level, 0);
             
@@ -223,8 +220,11 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             //float combat_rate = clampNormalf(0.85 + combat_rate_modifier() / 100.0);
             //float nc_rate = 1.0 - combat_rate;
             
-            if ($familiar[oily woim].familiar_is_usable() && !($familiars[oily woim,happy medium] contains my_familiar()))
-                subentry.entries.listAppend("Run " + $familiar[oily woim] + ($familiar[happy medium].familiar_is_usable() ? "/medium" : "") + " for +init.");
+            if ($familiar[oily woim].familiar_is_usable() && !(($familiars[oily woim,happy medium] contains my_familiar())))
+            {
+                if (!(my_familiar() == lookupFamiliar("Xiblaxian Holo-Companion") && my_familiar() != $familiar[none]))
+                    subentry.entries.listAppend("Run " + $familiar[oily woim] + ($familiar[happy medium].familiar_is_usable() ? "/medium" : "") + (lookupFamiliar("Xiblaxian Holo-Companion").familiar_is_usable() ? "/holo-companion" : "") + " for +init.");
+            }
 			
             
 		}

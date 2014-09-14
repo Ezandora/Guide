@@ -1,35 +1,6 @@
 import "relay/Guide/Support/Math.ash"
 import "relay/Guide/Support/List.ash"
 
-
-
-//temporary placeholder until next point release:
-boolean is_unrestricted_passthrough(item v)
-{
-    //return is_unrestricted(v);
-    return true;
-}
-
-boolean is_unrestricted_passthrough(skill v)
-{
-    //return is_unrestricted(v);
-    return true;
-}
-
-boolean is_unrestricted_passthrough(familiar v)
-{
-    //return is_unrestricted(v);
-    return true;
-}
-
-boolean is_unrestricted_passthrough(string v)
-{
-    //return is_unrestricted(v);
-    return true;
-}
-
-
-
 //Additions to standard API:
 //Auto-conversion property functions:
 boolean get_property_boolean(string property)
@@ -148,7 +119,7 @@ boolean familiar_is_usable(familiar f)
     //r13998 has most of these
     if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE)
         return false;
-    if (!is_unrestricted_passthrough(f))
+    if (!is_unrestricted(f))
         return false;
 	int single_familiar_run = get_property_int("singleFamiliarRun");
 	if (single_familiar_run != -1 && my_turncount() >= 30) //after 30 turns, they're probably sure
@@ -175,7 +146,7 @@ boolean skill_is_usable(skill s)
 {
     if (!s.have_skill())
         return false;
-    if (!s.is_unrestricted_passthrough())
+    if (!s.is_unrestricted())
         return false;
     return true;
 }
@@ -192,7 +163,7 @@ boolean [item] makeConstantItemArrayMutable(boolean [item] array)
 {
     boolean [item] result;
     foreach l in array
-        array[l] = array[l];
+        result[l] = array[l];
     
     return result;
 }
@@ -259,8 +230,8 @@ string slot_to_string(slot s)
         return "fake hand";
     else if (s == $slot[crown-of-thrones])
         return "crown of thrones";
-    //else if (s == $slot[buddy-bjorn])
-        //return "buddy bjorn";
+    else if (s == $slot[buddy-bjorn])
+        return "buddy bjorn";
     return s;
 }
 
@@ -414,6 +385,7 @@ boolean stringHasPrefix(string s, string prefix)
 		return true;
 	return false;
 }
+
 boolean stringHasSuffix(string s, string suffix)
 {
 	if (s.length() < suffix.length())
@@ -905,7 +877,7 @@ int initiative_modifier_ignoring_plants()
     return init;
 }
 
-int monster_level_adjustment_ignoring_plants()
+int monster_level_adjustment_ignoring_plants() //this is unsafe to use in heavy rains
 {
     //FIXME strange bug possibly here, investigate
     int ml = monster_level_adjustment();
@@ -938,6 +910,34 @@ int monster_level_adjustment_for_location(location l)
     {
         ml += 30;
     }
+    
+    if (my_path_id() == PATH_HEAVY_RAINS)
+    {
+        //complicated:
+        //First, cancel out the my_location() rain:
+        int my_location_water_level_ml = monster_level_adjustment() - numeric_modifier("Monster Level");
+        ml -= my_location_water_level_ml;
+        //Now, calculate the water level for the location:
+        int water_level = 1;
+        if (l.recommended_stat >= 40) //FIXME is this threshold spaded?
+            water_level += 1;
+        if (l.environment == "indoor")
+            water_level += 2;
+        if (l.environment == "underground" || l == $location[the lower chambers]) //per-location fix
+            water_level += 4;
+        water_level += numeric_modifier("water level");
+        
+        water_level = clampi(water_level, 1, 6);
+        if (l.environment == "underwater") //or does the water get the rain instead? nobody knows, rain man
+            water_level = 0; //the aquaman hates rain man, they have a fight, aquaman wins
+        
+        //Add that as ML:
+        if (!($locations[oil peak,the typical tavern cellar] contains l)) //kind of hacky to put this here, sorry
+        {
+            ml += water_level * 10;
+        }
+    }
+    
     return ml;
 }
 

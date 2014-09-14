@@ -68,11 +68,17 @@ void generateMisc(Checklist [int] checklists)
         }
         
         //this could be better (i.e. checking against current shirt and looking in inventory, etc.)
-        if (lookupItem("Sneaky Pete's leather jacket (collar popped)").equipped_amount() > 0 && adventures_lost <= 0)
-            description.listAppend("Might want to unpop the collar. (+4 adventures)");
+        if ($item[Sneaky Pete's leather jacket (collar popped)].equipped_amount() > 0 && adventures_lost <= 0)
+            description.listAppend("Could unpop your collar. (+4 adventures)");
+        if ($item[Sneaky Pete's leather jacket].equipped_amount() > 0 && hippy_stone_broken())
+            description.listAppend("Could pop your collar. (+4 fights)");
         if (in_ronin() && pulls_remaining() > 0)
         {
             description.listAppend("Don't forget your " + pluralizeWordy(pulls_remaining(), "pull", "pulls") + ".");
+        }
+        if (!can_interact() && $item[resolution: be more adventurous].available_amount() > 0 && get_property_int("_resolutionAdv") < 5)
+        {
+            description.listAppend("Use resolution: be more adventurous.");
         }
         //FIXME resolution be more adventurous goes here
         

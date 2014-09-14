@@ -4,13 +4,6 @@ void STomesGenerateResource(ChecklistEntry [int] available_resources_entries)
 	{
 		ChecklistSubentry [int] subentries;		
 		
-        if (!can_interact())
-        {
-            int summons_remaining = 3 - get_property_int("tomeSummons");
-            subentries.listAppend(ChecklistSubentryMake(pluralize(summons_remaining, "tome summon", "tome summons") + " remaining", "", ""));
-        }
-		
-		
 		int tome_count = 0;
 		
 		string [skill] tome_summons_property_names;
@@ -21,7 +14,6 @@ void STomesGenerateResource(ChecklistEntry [int] available_resources_entries)
 		tome_summons_property_names[$skill[Summon Stickers]] = "_stickerSummons";
 		tome_summons_property_names[$skill[Summon Rad Libs]] = "_radlibSummons";
 		
-        boolean have_tome_summons = false;
 		int [skill] summons_available;
 		foreach s in tome_summons_property_names
 		{
@@ -34,13 +26,22 @@ void STomesGenerateResource(ChecklistEntry [int] available_resources_entries)
 				else
 					value = 3 - get_property_int(property_name);
                 if (value > 0)
-                    have_tome_summons = true;
+                {
+                    tome_count += 1;
+                }
 			}
 			summons_available[s] = value;
 		}
-        if (!have_tome_summons)
+        if (tome_count == 0)
             return;
 		
+        if (!can_interact())
+        {
+            int summons_remaining = 3 - get_property_int("tomeSummons");
+            subentries.listAppend(ChecklistSubentryMake(pluralize(summons_remaining, "tome summon", "tome summons") + " remaining", "", ""));
+        }
+        
+        
 		if (summons_available[$skill[Summon Smithsness]] > 0)
 		{
 			string [int] description;

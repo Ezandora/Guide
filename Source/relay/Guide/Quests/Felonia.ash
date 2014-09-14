@@ -139,7 +139,7 @@ void QFeloniaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                     if ($item[spooky fairy gravy].available_amount() > 0 && $item[small leather glove].available_amount() > 0)
                     {
                         url = "craft.php?mode=cook";
-                        subentry.entries.listAppend("Make a spooky glove. (cook spooky fairy gravy + small leather glove)");
+                        subentry.entries.listAppend("Make and wear a spooky glove. (cook spooky fairy gravy + small leather glove)");
                     }
                     else
                     {

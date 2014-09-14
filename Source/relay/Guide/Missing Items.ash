@@ -104,7 +104,7 @@ void generateMissingItems(Checklist [int] checklists)
             else
             {
                 options.listAppend("Fear man's level (jar)");
-                if (__misc_state["fax accessible"] && in_hardcore()) //not suggesting this in SC
+                if (__misc_state["fax equivalent accessible"] && in_hardcore()) //not suggesting this in SC
                     options.listAppend("Fax/copy a ghost");
                 options.listAppend("8-bit realm (olfact blooper, slow)");
             }
@@ -268,6 +268,8 @@ void generateMissingItems(Checklist [int] checklists)
         {
             for i from 1 to 6
             {
+                if (__quest_state["Level 13"].mafia_internal_step > i + 4)
+                    continue;
                 state_strings.listAppend("Tower monster item " + i);
                 state_ns13_lookup_booleans.listAppend("Past tower monster " + i);
             }

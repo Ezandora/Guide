@@ -17,7 +17,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             methods.listAppend("Soak in VIP hot tub.");
             url = "clan_viplounge.php";
         }
-        else if (lookupSkill("Shake it off").have_skill())
+        else if ($skill[Shake it off].have_skill())
         {
             methods.listAppend("Cast shake it off.");
             url = "skills.php";
@@ -47,8 +47,8 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         //Don't get poisoned.
         effect [int] poison_effects;
         poison_effects.listAppend($effect[Hardly poisoned at all]);
-        if (!hippy_stone_broken()) //FIXME remove next PVP season
-            poison_effects.listAppend($effect[A Little Bit Poisoned]);
+        //if (!hippy_stone_broken()) //FIXME remove next PVP season
+        poison_effects.listAppend($effect[A Little Bit Poisoned]);
         poison_effects.listAppend($effect[Somewhat Poisoned]);
         poison_effects.listAppend($effect[Really Quite Poisoned]);
         poison_effects.listAppend($effect[Majorly Poisoned]);
@@ -119,11 +119,11 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         task_entries.listAppend(ChecklistEntryMake("__item flaskfull of hollow", url, ChecklistSubentryMake("Drink " + $item[flaskfull of hollow], "", "Gives +25 smithsness"), -11));
     }
     
-	if ($effect[QWOPped Up].have_effect() > 0 && ((__misc_state["VIP available"] && __misc_state_int["hot tub soaks remaining"] > 0) || lookupSkill("Shake It Off").have_skill())) //only suggest if they have hot tub access; other route is a SGEEA, too valuable
+	if ($effect[QWOPped Up].have_effect() > 0 && ((__misc_state["VIP available"] && __misc_state_int["hot tub soaks remaining"] > 0) || $skill[Shake It Off].have_skill())) //only suggest if they have hot tub access; other route is a SGEEA, too valuable
     {
         string [int] description;
         string url = "";
-        if (lookupSkill("Shake It Off").have_skill())
+        if ($skill[Shake It Off].have_skill())
         {
             url = "skills.php";
             description.listAppend("Shake it off.");
@@ -176,8 +176,8 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             item_descriptions[$item[resolution: be sexier]] = "+2 moxie stats/fight (20 turns)";
             item_effects[$item[resolution: be sexier]] = $effect[Irresistible Resolve];
             
-            item_descriptions[lookupItem("old bronzer")] = "+2 moxie stats/fight (25 turns)";
-            item_effects[lookupItem("old bronzer")] = lookupEffect("Sepia Tan");
+            item_descriptions[$item[old bronzer]] = "+2 moxie stats/fight (25 turns)";
+            item_effects[$item[old bronzer]] = lookupEffect("Sepia Tan");
         }
 
         if (__misc_state["need to level muscle"])
@@ -190,8 +190,8 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             item_effects[$item[resolution: be stronger]] = $effect[Strong Resolve];
             
             
-            item_descriptions[lookupItem("old eyebrow pencil")] = "+2 muscle stats/fight (25 turns)";
-            item_effects[lookupItem("old eyebrow pencil")] = lookupEffect("Browbeaten");
+            item_descriptions[$item[old eyebrow pencil]] = "+2 muscle stats/fight (25 turns)";
+            item_effects[$item[old eyebrow pencil]] = lookupEffect("Browbeaten");
         }
         if (__misc_state["need to level mysticality"])
         {
@@ -203,8 +203,8 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             item_effects[$item[resolution: be smarter]] = $effect[Brilliant Resolve];
             
             
-            item_descriptions[lookupItem("old rosewater cream")] = "+2 mysticality stats/fight (25 turns)";
-            item_effects[lookupItem("old rosewater cream")] = lookupEffect("Rosewater Mark");
+            item_descriptions[$item[old rosewater cream]] = "+2 mysticality stats/fight (25 turns)";
+            item_effects[$item[old rosewater cream]] = lookupEffect("Rosewater Mark");
         }
         
         if (my_level() >= 11)
@@ -217,7 +217,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         string [int] relevant_descriptions;
         foreach it in item_descriptions
         {
-            if (it.available_amount() == 0)
+            if (it.item_amount() == 0)
                 continue;
             if (item_effects[it].have_effect() > 0)
                 continue;
@@ -263,8 +263,8 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         {
             string title;
             item compass_item = $item[UV-resistant compass];
-            if (lookupItem("ornate dowsing rod").available_amount() > 0)
-                compass_item = lookupItem("ornate dowsing rod");
+            if ($item[ornate dowsing rod].available_amount() > 0)
+                compass_item = $item[ornate dowsing rod];
             
             title = "Equip " + compass_item;
             if (compass_item.available_amount() == 0)
@@ -303,7 +303,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             curse_removal_method = "Relax in hot tub.";
             url = "clan_viplounge.php";
         }
-        if (lookupSkill("Shake It Off").have_skill())
+        if ($skill[Shake It Off].have_skill())
         {
             curse_removal_method = "Cast shake it off.";
             url = "skills.php";
@@ -317,17 +317,22 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     
     if (my_path_id() == PATH_HEAVY_RAINS && my_familiar() != $familiar[none] && $slot[familiar].equipped_item() == $item[none])
     {
-        //mafia has code to do this, but it doesn't always work - had it not equip on the blackbird once
-        //plus they have to buy one anyways
-        string url = "familiar.php";
-        string [int] description;
-        description.listAppend("Otherwise it'll (probably) be blocked.");
-        if (lookupItem("miniature life preserver").available_amount() == 0)
-        {
-            description.listAppend("Buy from the general store.");
-            url = "store.php?whichstore=m";
-        }
+        boolean [familiar] safely_underwater_familiars = $familiars[black cat,Barrrnacle,Emo Squid,Cuddlefish,Imitation Crab,Magic Dragonfish,Midget Clownfish,Rock Lobster,Urchin Urchin,Grouper Groupie,Squamous Gibberer,Dancing Frog,Adorable Space Buddy]; //cat can swim!
         
-        task_entries.listAppend(ChecklistEntryMake("__item miniature life preserver", url, ChecklistSubentryMake("Equip miniature life preserver", "", description), -11));
+        if (!(safely_underwater_familiars contains my_familiar()))
+        {
+            //mafia has code to do this, but it doesn't always work - had it not equip on the blackbird once, another time after the L13 entryway
+            //plus they have to buy one anyways
+            string url = "familiar.php";
+            string [int] description;
+            description.listAppend("Otherwise it'll (probably) be blocked.");
+            if (lookupItem("miniature life preserver").available_amount() == 0)
+            {
+                description.listAppend("Buy from the general store.");
+                url = "store.php?whichstore=m";
+            }
+            
+            task_entries.listAppend(ChecklistEntryMake("__item miniature life preserver", url, ChecklistSubentryMake(HTMLGenerateSpanFont("Equip miniature life preserver", "red", ""), "", description), -11));
+        }
     }
 }

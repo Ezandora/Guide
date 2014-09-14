@@ -152,7 +152,7 @@ boolean generateTowerFamiliarWeightMethod(string [int] how, string [int] immedia
         
     }
     //billiards
-    if (__misc_state["VIP available"] && get_property_int("_poolGames") <3 && !__misc_state["type 69 restrictions active"] || $effect[Billiards Belligerence].have_effect() > 0)
+    if (__misc_state["VIP available"] && get_property_int("_poolGames") <3 && $item[Clan pool table].is_unrestricted() || $effect[Billiards Belligerence].have_effect() > 0)
     {
         boolean have_effect = $effect[Billiards Belligerence].have_effect() > 0;
         weight_modifiers.listAppend(TFWMInternalModifierMake("VIP Pool (play aggressively)", have_effect, have_effect || (get_property_int("_poolGames") <3), true, 5.0));
@@ -284,6 +284,20 @@ boolean needMoreFamiliarWeightForTower()
 }
 
 
+            
+string generatePotatoSuggestion()
+{
+    if (familiar_is_usable($familiar[fancypants scarecrow]) && $item[swashbuckling pants].available_amount() > 0)
+        return "Run swashbuckling pants on scarecrow. (2x potato)";
+    else if (familiar_is_usable($familiar[fancypants scarecrow]) && $item[spangly mariachi pants].available_amount() > 0)
+        return "Run spangly mariachi pants on scarecrow. (2x potato)";
+    else if (familiar_is_usable($familiar[mad hatrack]) && $item[spangly sombrero].available_amount() > 0)
+        return "Run spangly sombrero on mad hatrack. (2x potato)";
+    else
+        return "Run a potato familiar if you can.";
+}
+
+
 void QLevel13Init()
 {
 	//questL13Final
@@ -300,7 +314,7 @@ void QLevel13Init()
 	state.state_boolean["past gates"] = (state.mafia_internal_step > 1);
 	state.state_boolean["past keys"] = (state.mafia_internal_step > 3);
 	state.state_boolean["past hedge maze"] = (state.mafia_internal_step > 4);
-	state.state_boolean["past tower"] = (state.mafia_internal_step > 5);
+	state.state_boolean["past tower"] = (state.mafia_internal_step > 10); //5
 	state.state_boolean["shadow will need to be defeated"] = !(state.mafia_internal_step < 9);
     //FIXME what paths don't fight the shadow?
     
@@ -405,39 +419,241 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 	}
 	else if (base_quest_state.mafia_internal_step > 4 && base_quest_state.mafia_internal_step < 11)
 	{
+        //step4 through step9 - 5 - 10
 		//at tower, time to kill monsters!
-		subentry.entries.listAppend("Tower monsters.");
-        
-        //extremely strange bug here - quest tracking is off for tower monsters. need testing
         
         
-        /*int level = -1;
+        int level = -1;
         
-        if (base_quest_state.mafia_internal_step == 8)
+        if (base_quest_state.mafia_internal_step == 5)
             level = 1;
-        else if (base_quest_state.mafia_internal_step == 9)
+        else if (base_quest_state.mafia_internal_step == 6)
             level = 2;
-        else if (base_quest_state.mafia_internal_step == 10)
+        else if (base_quest_state.mafia_internal_step == 7)
             level = 3;
-        else if (base_quest_state.mafia_internal_step == 11)
+        else if (base_quest_state.mafia_internal_step == 8)
             level = 4;
-        else if (base_quest_state.mafia_internal_step == 12)
+        else if (base_quest_state.mafia_internal_step == 9)
             level = 5;
-        else if (base_quest_state.mafia_internal_step == 13)
+        else if (base_quest_state.mafia_internal_step == 10)
             level = 6;
-        if (level != -1)
+        
+        boolean output_tower_killing_ideas = false;
+        item monster_item = __misc_state_string["Tower monster item " + level].to_item();
+        
+        subentry.entries.listAppend("Tower monster on floor " + level + ".");
+        if (monster_item != $item[none])
         {
-            string monster_item = __misc_state_string["Tower monster item " + level];
-            if (monster_item.length() > 0)
-                subentry.entries.listAppend("Level " + level + ", use " + monster_item + ".");
+            if (monster_item.available_amount() > 0)
+                subentry.entries.listAppend("Use " + HTMLGenerateSpanOfClass(monster_item, "r_bold") + ".");
             else
-                subentry.entries.listAppend("Level " + level + ".");
-            if (level <= 3)
-                url = "lair4.php";
+            {
+                subentry.entries.listAppend(HTMLGenerateSpanFont("Need " + HTMLGenerateSpanOfClass(monster_item, "r_bold") + ".", "red", ""));
+                output_tower_killing_ideas = true;
+            }
+        }
+        else
+        {
+            subentry.entries.listAppend(HTMLGenerateSpanFont("Need unknown item.", "red", ""));
+            output_tower_killing_ideas = true;
+        }
+        
+        if (output_tower_killing_ideas)
+        {
+            string [int] tower_killing_ideas;
+            
+            if (my_path_id() == PATH_HEAVY_RAINS && $skill[thunder bird].have_skill() && my_thunder() >= 5 && $skill[curse of weaksauce].have_skill())
+            {
+                string [int] line;
+                if ($skill[itchy curse finger].have_skill())
+                {
+                    line.listAppend("cast curse of weaksauce");
+                    line.listAppend("cast a stun");
+                }
+                else
+                {
+                    line.listAppend("cast a stun");
+                    line.listAppend("cast curse of weaksauce");
+                }
+                line.listAppend("cast thunder bird/stun/staggers repeatedly under defense is below zero");
+                line.listAppend("attack");
+                tower_killing_ideas.listAppend(line.listJoinComponents(", ", "then").capitalizeFirstLetter());
+            }
+            else if ($skill[curse of weaksauce].have_skill() && $item[crayon shavings].available_amount() >= 2) //currently disabled because while it'll work in theory, I haven't tested it
+            {
+                string [int] line;
+                if ($skill[itchy curse finger].have_skill())
+                {
+                    line.listAppend("cast curse of weaksauce");
+                    line.listAppend("cast a stun");
+                }
+                else
+                {
+                    line.listAppend("cast a stun");
+                    line.listAppend("cast curse of weaksauce");
+                }
+                line.listAppend("throw two crayon shavings");
+                line.listAppend("stagger/stun until defense is below zero");
+                
+                line.listAppend("attack");
+                tower_killing_ideas.listAppend(line.listJoinComponents(", ", "then").capitalizeFirstLetter());
+            }
+            
+            //Familiar sources:
+            if (!__misc_state["familiars temporarily blocked"])
+            {
+                string potato_suggestion = generatePotatoSuggestion();
+                tower_killing_ideas.listAppend(potato_suggestion);
+                
+                
+                //Bjorn:
+                if ($familiar[mariachi chihuahua].have_familiar())
+                {
+                    if ($item[buddy bjorn].available_amount() > 0)
+                    {
+                        if (my_bjorned_familiar() != $familiar[mariachi chihuahua])
+                            tower_killing_ideas.listAppend("Put your mariachi chihuahua in your buddy bjorn. (50% stagger)");
+                    }
+                    else if ($item[crown of thrones].available_amount() > 0)
+                    {
+                        if (my_enthroned_familiar() != $familiar[mariachi chihuahua])
+                            tower_killing_ideas.listAppend("Put your mariachi chihuahua in your crown of thrones. (50% stagger)");
+                    }
+                }
+            }
+            
+            if ($item[attorney's badge].available_amount() > 0 && $item[attorney's badge].equipped_amount() == 0)
+                tower_killing_ideas.listAppend("Could equip attorney's badge for more blocking.");
+            if ($item[navel ring of navel gazing].available_amount() > 0 && $item[navel ring of navel gazing].equipped_amount() == 0)
+                tower_killing_ideas.listAppend("Could equip navel ring of navel gazing for more blocking.");
+                
+                
+            
+            string [int] stun_sources;
+            string [int] stagger_sources;
+            
+            
+            //Stun/stagger sources:
+            //(this is not a comprehensive list)
+            //√shadow noodles, √thunderstrike, √soul bubble
+            //√potato, √bjorned chihuahua, √attorney's badge, √navel ring
+            
+            //√ply reality, √entangling noodles as not-pastamancer, √pantsgiving 2x, √deft hands, DNA...?, √3x disco dances...
+            //√airblaster gun
+            //√club foot IF seal clubber
+            //√Break It On Down
+            //√gob of wet hair, √gyroscope, √macrame net, √ornate picture frame, √palm-frond net(?), √Rain-Doh indigo cup, √superamplified boom box, √Throw Shield (OPS), √tongue depressor
+            
+            //√gas balloon, √brick of sand(?), √chloroform rag, naughty paper shuriken, √sausage bomb, √floorboard cruft
+            //√dumb mud will insta if available
+            //√finger cuffs (support acquiring)
+            //√Rain-Doh blue balls
+            //√CSA obedience grenade, √The Lost Comb
+            //Accordion Bash if AT wearing an accordion FIXME do that
+            //Shell Up(?)
+            //sooooooul finger? does it work? 40 saucery...
+            
+            if ($item[Game Grid ticket].item_amount() > 0 && $item[Game Grid ticket].is_unrestricted())
+                tower_killing_ideas.listAppend("Could acquire " + $item[Game Grid ticket].item_amount() + " finger cuffs. (stun)");
+            if ($skill[shadow noodles].have_skill())
+                stun_sources.listAppend("shadow noodles");
+            if ($skill[thunderstrike].have_skill())
+                stun_sources.listAppend("thunderstrike");
+            if ($skill[soul saucery].have_skill() && my_class() == $class[sauceror])
+                stun_sources.listAppend("soul bubble");
+                
+            foreach it in $items[gas balloon,brick of sand,chloroform rag,sausage bomb,floorboard cruft,finger cuffs,CSA obedience grenade,The Lost Comb]
+            {
+                if (it.item_amount() == 0 || !it.is_unrestricted())
+                    continue;
+                stun_sources.listAppend(it.pluralizeWordy());
+            }
+            if ($item[naughty paper shuriken].available_amount() > 0)
+                stun_sources.listAppend("naughty paper shuriken");
+            if ($item[Rain-Doh blue balls].available_amount() > 0)
+                stun_sources.listAppend("Rain-Doh blue balls");
+            
+            if ($item[thor's pliers].equipped_amount() > 0)
+                stagger_sources.listAppend("ply reality");
+            if (my_class() != $class[pastamancer] && $skill[entangling noodles].have_skill())
+                stagger_sources.listAppend("entangling noodles");
+            if ($item[pantsgiving].equipped_amount() > 0)
+            {
+                stagger_sources.listAppend("pocket crumbs");
+                stagger_sources.listAppend("air dirty laundry");
+            }
+            if (my_class() == $class[disco bandit] && $skill[deft hands].have_skill())
+                stagger_sources.listAppend("first combat item thrown");
+            if (my_class() == $class[disco bandit] && $skill[Disco State of Mind].have_skill() && $skill[Flashy Dancer].have_skill())
+            {
+                if ($skill[disco dance of doom].have_skill())
+                    stagger_sources.listAppend("disco dance");
+                if ($skill[Disco Dance II: Electric Boogaloo].have_skill())
+                    stagger_sources.listAppend("disco dance II");
+                if ($skill[Disco Dance 3: Back in the Habit].have_skill())
+                    stagger_sources.listAppend("disco dance 3");
+            }
+            if ($item[airblaster gun].equipped_amount() > 0)
+                stagger_sources.listAppend("air blast");
+            //FIXME not implemented because need to test for a club, plus it takes up fury
+            //if (my_class() == $class[seal clubber] && $skill[club foot].have_skill())
+                //stagger_sources.listAppend("");
+            if ($skill[Break It On Down].have_skill())
+                stagger_sources.listAppend("break it on down");
+            
+            foreach it in $items[gob of wet hair,gyroscope,macrame net,ornate picture frame,palm-frond net,superamplified boom box]
+            {
+                if (it.item_amount() == 0 || !it.is_unrestricted())
+                    continue;
+                stagger_sources.listAppend(it.pluralizeWordy());
+            }
+            if ($item[operation patriot shield].equipped_amount() > 0)
+                stagger_sources.listAppend("throw shield");
+            if ($item[Rain-Doh indigo cup].available_amount() > 0)
+                stagger_sources.listAppend("Rain-Doh indigo cup");
+            if ($item[tongue depressor].available_amount() > 0)
+                stagger_sources.listAppend("tongue depressor");
+                
+            if (stun_sources.count() > 0)
+                tower_killing_ideas.listAppend("Stuns: " + stun_sources.listJoinComponents(", ", "and"));
+            if (stagger_sources.count() > 0)
+                tower_killing_ideas.listAppend("Stagger sources: " + stagger_sources.listJoinComponents(", ", "and"));
+            
+            
+            
+            
+            if ($item[small golem].available_amount() > 0)
+            {
+                if ($skill[Ambidextrous Funkslinging].have_skill() && $item[slime stack].available_amount() > 0)
+                    tower_killing_ideas.listAppend("Small golem available. Funksling early in combat with a slime stack for 3k damage/round.");
+                else
+                    tower_killing_ideas.listAppend("Small golem available. Use early in combat for 3k damage/round.");
+            }
+            if ($item[slime stack].available_amount() > 0)
+                tower_killing_ideas.listAppend($item[slime stack].pluralize() + " available. (15% damage)");
+                
+            if ($skill[frigidalmatian].have_skill() && my_maxmp() >= 300 && $effect[Frigidalmatian].have_effect() == 0)
+                tower_killing_ideas.listAppend("Possibly cast Frigidalmatian.");
+                
+            if (monster_level_adjustment() > 0)
+                tower_killing_ideas.listAppend(HTMLGenerateSpanFont("Try to reduce your ML", "red", "") + ", as it reduces damage done to them.");
+                
+            if ((my_path_id() == PATH_HEAVY_RAINS || $item[water wings for babies].available_amount() >= 3) && $item[water wings for babies].equipped_amount() <3)
+                tower_killing_ideas.listAppend("Equip three water wings for babies to reduce ML. (increased damage)");
+            
+            if (tower_killing_ideas.count() > 0)
+                subentry.entries.listAppend("Or towerkill (very difficult):" + HTMLGenerateIndentedText(tower_killing_ideas.listJoinComponents("<hr>")));
             else
-                url = "lair5.php";
-        }*/
-		//FIXME show levels and... um... all that
+                subentry.entries.listAppend("Or towerkill.");
+                
+            if ($item[dumb mud].available_amount() > 0)
+                subentry.entries.listAppend("Or just use dumb mud, which will insta-kill a tower monster.");
+        }
+            
+        if (level <= 3)
+            url = "lair4.php";
+        else
+            url = "lair5.php";
 	}
 	else if (base_quest_state.mafia_internal_step == 11 || base_quest_state.mafia_internal_step == 12)
 	{
@@ -474,7 +690,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         if (healing_items_available.count() > 0)
             subentry.entries.listAppend("Healing items available: " + healing_items_available.listJoinComponents(", ", "and") + ".");
         else
-            subentry.entries.listAppend("Might want to go find some healing items.");
+            subentry.entries.listAppend("May want to go find some healing items.");
             
             
         int initiative_needed = total_initiative_needed - initiative_modifier();
@@ -563,26 +779,26 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             subentry.modifiers.listAppend("no buffs");
         }
 		subentry.entries.listAppend("She awaits.");
-        if (!__misc_state["familiars temporarily blocked"])
+        if (!__misc_state["familiars temporarily blocked"] && my_path_id() != PATH_HEAVY_RAINS)
         {
-            if (familiar_is_usable($familiar[fancypants scarecrow]) && $item[swashbuckling pants].available_amount() > 0)
-                subentry.entries.listAppend("Run swashbuckling pants on scarecrow. (2x potato)");
-            else if (familiar_is_usable($familiar[fancypants scarecrow]) && $item[spangly mariachi pants].available_amount() > 0)
-                subentry.entries.listAppend("Run spangly mariachi pants on scarecrow. (2x potato)");
-            else if (familiar_is_usable($familiar[mad hatrack]) && $item[spangly sombrero].available_amount() > 0)
-                subentry.entries.listAppend("Run spangly sombrero on mad hatrack. (2x potato)");
-            else
-                subentry.entries.listAppend("Run a potato familiar if you can.");
+            string potato_suggestion = generatePotatoSuggestion();
+            
+            subentry.entries.listAppend(potato_suggestion);
         }
         
         if (my_path_id() == PATH_HEAVY_RAINS)
         {
             subentry.modifiers.listAppend("many buffs");
+            if ($familiar[warbear drone].have_familiar())
+                subentry.entries.listAppend("Run a warbear drone if you can.");
+                
             subentry.entries.listAppend("Try to run as many buffs as you can. (one removed per round, have " + my_effects().count() + ")");
             subentry.entries.listAppend("Try to have as many damage sources as possible. (40? damage cap per source)");
             subentry.entries.listAppend("Only your weapon, offhand, and familiar equipment(?) are relevant this fight.");
             if ($item[crayon shavings].available_amount() > 0)
                 subentry.entries.listAppend("Try repeatedly using crayon shavings?");
+            if ($skill[frigidalmatian].have_skill() && my_maxmp() >= 300 && $effect[Frigidalmatian].have_effect() == 0)
+                subentry.entries.listAppend("Try casting Frigidalmatian.");
         }
         
 		image_name = "naughty sorceress";
@@ -601,6 +817,24 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         if (trophies_are_possible)
             task_entries.listAppend(ChecklistEntryMake("__item puzzling trophy", "trophy.php", ChecklistSubentryMake("Check for trophies", "10k meat, trophy requirements", "Certain trophies are missable after freeing the king")));
 		should_output_main_entry = false;
+        
+        
+        if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE)
+        {
+            if (availableDrunkenness() > 0)
+            {
+                task_entries.listAppend(ChecklistEntryMake("__item gibson", "inventory.php?which=1", ChecklistSubentryMake("Drink " + availableDrunkenness() + " drunkenness", "", "Freeing the king reduces your liver capacity.")));
+            }
+        }
+        
+        if (my_path_id() == PATH_HEAVY_RAINS)
+        {
+            if ($skill[rain dance].have_skill() && my_rain() >= 10)
+            {
+                int times = floor(my_rain().to_float() / 10.0);
+                task_entries.listAppend(ChecklistEntryMake("__effect Rain Dancin'", "skills.php", ChecklistSubentryMake("Cast Rain Dance " + pluralizeWordy(times, "time", "times"), "", "+20% item buff for aftercore.")));
+            }
+        }
 		
 	}
 	if (should_output_main_entry)

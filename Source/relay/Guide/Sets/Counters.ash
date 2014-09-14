@@ -13,16 +13,13 @@ string [int] SCountersGenerateDescriptionForRainMonster()
     
     string [int] waterbending_skills_can_cast;
     
-    int water_level_modifier = 0;
-    if (lookupEffect("Personal Thundercloud").have_effect() > 0)
-        water_level_modifier += 2;
-    else if (lookupSkill("Thundercloud").have_skill())
+    if (lookupEffect("Personal Thundercloud").have_effect() == 0 && lookupSkill("Thundercloud").have_skill())
         waterbending_skills_can_cast.listAppend("Thundercloud");
-    if (lookupEffect("The Rain In Loathing").have_effect() > 0)
-        water_level_modifier += 2;
-    else if (lookupSkill("Rainy Day").have_skill())
+    
+    if (lookupEffect("The Rain In Loathing").have_effect() == 0 && lookupSkill("Rainy Day").have_skill())
         waterbending_skills_can_cast.listAppend("Rainy Day");
     
+    int water_level_modifier = numeric_modifier("water level");
     
     string [string][int] monster_for_terrain_depth;
     int [string] base_depth_for_terrain;
@@ -65,7 +62,7 @@ string [int] SCountersGenerateDescriptionForRainMonster()
         //freshwater bonefish
         //alley catfish
         //piranhadon
-        foreach s in $strings[freshwater bonefish,alley catfish,piranhadon]
+        foreach s in $strings[gourmet gourami,freshwater bonefish,alley catfish,piranhadon]
         {
             monster_descriptions[s] = monster_descriptions[s] + " (fish DNA)";
         }
@@ -92,6 +89,8 @@ string [int] SCountersGenerateDescriptionForRainMonster()
             //line += " (" + monster_descriptions[line] + ")";
         if (monster_descriptions contains line)
             line = monster_descriptions[line];
+        if (last_terrain == terrain && (__last_adventure_location.recommended_stat < 40 || depth_min == depth_max))
+            line = HTMLGenerateSpanOfClass(line, "r_bold");
         terrain_monsters.listAppend(line);
         
         if (depth_min != depth_max)
@@ -101,15 +100,17 @@ string [int] SCountersGenerateDescriptionForRainMonster()
                 //line += " (" + monster_descriptions[line] + ")";
             if (monster_descriptions contains line)
                 line = monster_descriptions[line];
+            if (last_terrain == terrain && __last_adventure_location.recommended_stat >= 40)
+                line = HTMLGenerateSpanOfClass(line, "r_bold");
             terrain_monsters.listAppend(line);
         }
         
         line = terrain.capitalizeFirstLetter() + ": ";
-        if (!have_usable_last_terrain)
+        if (!have_usable_last_terrain || last_terrain == terrain)
             line = HTMLGenerateSpanOfClass(line, "r_bold");
         line += terrain_monsters.listJoinComponents(", ", "or");
-        if (last_terrain == terrain)
-            line = HTMLGenerateSpanOfClass(line, "r_bold");
+        //if (last_terrain == terrain)
+            //line = HTMLGenerateSpanOfClass(line, "r_bold");
         description.listAppend(line);
     }
     

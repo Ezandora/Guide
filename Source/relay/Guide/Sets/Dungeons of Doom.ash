@@ -28,7 +28,7 @@ void SDungeonsOfDoomGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
     if (__misc_state["In run"] && turns_attempted == 0) //in run, but they haven't gone there
     {
         //They haven't adventured there yet, so we should only suggest this if it's a good idea.
-        if (__misc_state["fax accessible"] && __misc_state["can use clovers"] || !in_hardcore()) //they can fax quantum mechanics and use clovers
+        if (__misc_state["fax equivalent accessible"] && __misc_state["can use clovers"] || !in_hardcore()) //they can fax quantum mechanics and use clovers
             return;
     }
     //They are in run, can't fax quantum mechanics and are in hardcore. So, we'll proceed.
@@ -59,7 +59,8 @@ void SDungeonsOfDoomGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
             //FIXME do more
             //Suggest identifying potions?
             //Actually. Suggest farming one large box and using a clover, unless bad moon or if they need potions right now and lack three spare drunkenness
-            boolean have_all_potions = ($items[bubbly potion,cloudy potion,dark potion,effervescent potion,fizzy potion,milky potion,murky potion,smoky potion,swirly potion].items_missing().count() == 0);
+            item [int] missing_potions = $items[bubbly potion,cloudy potion,dark potion,effervescent potion,fizzy potion,milky potion,murky potion,smoky potion,swirly potion].items_missing();
+            boolean have_all_potions = (missing_potions.count() == 0);
             if (__misc_state["can use clovers"])
             {
                 if ($items[blessed large box,large box].available_amount() > 0)
@@ -75,9 +76,18 @@ void SDungeonsOfDoomGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
             {
                 if (have_all_potions && bang_potions_identified == 9)
                     return;
+                should_output = true;
                 modifiers.listAppend("+150%/+400% item");
-                description.listAppend("Find potions, identify them in combat.|Or acquire one of each, then use with 3 drunkenness available.");
-                description.listAppend(bang_potions_identified + "/9 bang potions identified.");
+                if (bang_potions_identified == 9)
+                {
+                    description.listAppend("Collect potions. Missing " + missing_potions.listJoinComponents(", ", "and"));
+                    description.listAppend("All bang potions identified.");
+                }
+                else
+                {
+                    description.listAppend("Find potions, identify them in combat.|Or acquire one of each, then use with 3 drunkenness available.");
+                    description.listAppend(bang_potions_identified + "/9 bang potions identified.");
+                }
             }
         }
     }
