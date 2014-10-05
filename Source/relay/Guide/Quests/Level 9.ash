@@ -108,11 +108,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
 		modifiers.listAppend("+567% item");
 		details.listAppend(base_quest_state.state_int["a-boo peak hauntedness"] + "% hauntedness.");
         
-        float item_drop_multiplier = (100.0 + item_drop_modifier())/100.0;
-        if ($location[a-boo peak].locationHasPlant("Rutabeggar") && my_location() != $location[a-boo peak])
-        {
-            item_drop_multiplier += 0.25;
-        }
+        float item_drop_multiplier = (100.0 + $location[a-boo peak].item_drop_modifier_for_location())/100.0;
         
         if (true)
         {
@@ -201,6 +197,16 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
         else
             task_entries.listAppend(checklist_entry);
 	}
+    else if (!$location[a-boo peak].noncombat_queue.contains_text("Come On Ghosty, Light My Pyre"))
+    {
+		string [int] details;
+		string [int] modifiers;
+        
+        details.listAppend("Light the fire!");
+        
+        ChecklistEntry checklist_entry = ChecklistEntryMake("a-boo peak", "place.php?whichplace=highlands", ChecklistSubentryMake("A-Boo Peak", modifiers, details), $locations[a-boo peak]);
+        task_entries.listAppend(checklist_entry);
+    }
 	if (base_quest_state.state_int["twin peak progress"] < 15)
 	{
 		string [int] details;
@@ -223,10 +229,21 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
             
             boolean have_at_least_one_usable_option = false;
             
+            
             if (!stench_completed && numeric_modifier("stench resistance") >= 4.0)
                 can_complete_stench = true;
             if (!item_completed)
-                can_complete_item = true;
+            {
+                int effective_familiar_weight = my_familiar().familiar_weight() + numeric_modifier("familiar weight");
+                
+                int familiar_weight_from_familiar_equipment = $slot[familiar].equipped_item().numeric_modifier("familiar weight"); //need to cancel it out
+                
+                float familiar_item_drop = my_familiar().numeric_modifier("item drop", effective_familiar_weight - familiar_weight_from_familiar_equipment, $slot[familiar].equipped_item());
+                //FIXME implement item_drop_modifier_for_location (friars does not count for this test, so maybe item_drop_modifier_ignoring_plants())
+                float effective_non_familiar_item = $location[twin peak].item_drop_modifier_for_location() - familiar_item_drop + numeric_modifier("food drop");
+                if (effective_non_familiar_item >= 50.0)
+                    can_complete_item = true;
+            }
             if (!jar_completed && $item[jar of oil].available_amount() > 0)
                 can_complete_jar = true;
             if (!init_completed && (stench_completed && item_completed && jar_completed) && initiative_modifier() >= 40)
@@ -296,9 +313,8 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
                 modifiers.listAppend("+item");
             }
 				
-            if (!item_completed)
+            if (!item_completed && !can_complete_item)
             {
-                //don't know an easy way to test for non-familiar +item
                 details.listAppend("+50% non-familiar item required.");
             }
 			
@@ -441,7 +457,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
             }
             
             float crudes_per_adventure = 0.0;
-            float item_drop_rate_multiplier = (100.0 + item_drop_modifier()) / 100.0;
+            float item_drop_rate_multiplier = (100.0 + $location[oil peak].item_drop_modifier_for_location()) / 100.0;
             foreach key in drop_rates
             {
                 int rate = drop_rates[key];
@@ -464,6 +480,15 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
 		
 		task_entries.listAppend(ChecklistEntryMake("oil peak", "place.php?whichplace=highlands", ChecklistSubentryMake("Oil Peak", modifiers, details), $locations[oil peak]));
 	}
+    else if (!$location[oil peak].noncombat_queue.contains_text("Unimpressed with Pressure"))
+    {
+        string [int] details;
+        string [int] modifiers;
+        
+        details.listAppend("Light the fire!");
+        
+		task_entries.listAppend(ChecklistEntryMake("oil peak", "place.php?whichplace=highlands", ChecklistSubentryMake("Oil Peak", modifiers, details), $locations[oil peak]));
+    }
 }
 
 void QLevel9GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -549,7 +574,11 @@ void QLevel9GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	else if (base_quest_state.mafia_internal_step == 2 || base_quest_state.mafia_internal_step == 3)
 	{
 		//do three peaks:
-		subentry.entries.listAppend("Light the fires!");
+		//subentry.entries.listAppend("Light the fires!");
+        if ($location[oil peak].noncombat_queue.contains_text("Unimpressed with Pressure") && $location[a-boo peak].noncombat_queue.contains_text("Come On Ghosty, Light My Pyre") && base_quest_state.state_int["twin peak progress"] == 15)
+            subentry.entries.listAppend("Talk to Lord Angus to finish the quest.");
+        else
+            subentry.entries.listAppend("Light the fires!");
 		QLevel9GenerateTasksSidequests(task_entries, optional_task_entries, future_task_entries);
 	}
 	else if (base_quest_state.mafia_internal_step == 4)
@@ -559,5 +588,5 @@ void QLevel9GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	}
 	int tasks_after = task_entries.count() + optional_task_entries.count() + future_task_entries.count();
 	if (tasks_before == tasks_after) //if our sidequests didn't add anything, show something:
-		task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the smut orc logging camp]));
+		task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the smut orc logging camp,a-boo peak,oil peak,twin peak]));
 }

@@ -272,7 +272,7 @@ string generateRandomMessage()
     
     string [monster] monster_messages;
     //TODO add a message for the procrastination giant
-    foreach m in $monsters[The Temporal Bandit,crazy bastard,Knott Slanding,hockey elemental,Hypnotist of Hey Deze,infinite meat bug,QuickBASIC elemental,The Master Of Thieves,Baiowulf,Count Bakula] //Pooltergeist (Ultra-Rare)?
+    foreach m in $monsters[The Temporal Bandit,crazy bastard,Knott Slanding,hockey elemental,Hypnotist of Hey Deze,infinite meat bug,QuickBASIC elemental,The Master Of Thieves,Baiowulf,Count Bakula,the nuge] //Pooltergeist (Ultra-Rare)?
         monster_messages[m] = "an ultra rare! congratulations!";
     monster_messages[$monster[Dad Sea Monkee]] = "is always was always" + HTMLGenerateSpanFont(" is always was always", "#444444", "") + HTMLGenerateSpanFont(" is always was always", "#888888", "") + HTMLGenerateSpanFont(" is always was always", "#BBBBBB", "");
     
@@ -290,6 +290,8 @@ string generateRandomMessage()
     monster_messages[$monster[menacing thug]] = "watch your back";
     monster_messages[$monster[sea cowboy]] = "pardon me";
     monster_messages[$monster[topiary golem]] = "almost there";
+    if ($location[sorceress' hedge maze].turns_spent_temporary() >= 7)
+        monster_messages[$monster[topiary golem]] = "mean golems";
     monster_messages[$monster[the server]] = "console cowboy";
     monster_messages[$monster[Fickle Finger of F8]] = "f/8 and be there";
     monster_messages[$monster[malevolent crop circle]] = "I want to believe";
@@ -315,6 +317,8 @@ string generateRandomMessage()
     monster_messages[$monster[urge to stare at your hands]] = ".&#x20dd;.&#x20dd;"; //.⃝.⃝
     if (my_path_id() == PATH_HEAVY_RAINS)
         monster_messages[$monster[pygmy bowler]] = "right into the gutter"; //come back!
+    monster_messages[lookupMonster("extremely annoyed witch")] = "am I blue?"; //you dare to strike... quit it!
+    monster_messages[lookupMonster("surprised and annoyed witch")] = "these tears in my eyes, telling you";
     
     if (monster_messages contains last_monster() && last_monster() != $monster[none])
     {

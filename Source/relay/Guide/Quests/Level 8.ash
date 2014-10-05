@@ -165,8 +165,20 @@ void QLevel8GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
                     ninja_path.listAppend("Run +combat in Lair of the Ninja Snowmen, fight assassins.");
                     CopiedMonstersGenerateDescriptionForMonster("ninja snowman assassin", assassin_description, true, false);
                     ninja_path.listAppend(assassin_description.listJoinComponents("|"));
-                    if (combat_rate_modifier() < 0.0)
+                    if (combat_rate_modifier() <= 0.0)
                         ninja_path.listAppend("Need more +combat, assassins won't appear at " + combat_rate_modifier().floor() + "% combat.");
+                    else
+                    {
+                        int turns_spent = $location[lair of the ninja snowmen].turns_spent_temporary();
+                        if (turns_spent != -1)
+                        {
+                            float chance = combat_rate_modifier() / 200.0 + turns_spent * 0.015;
+                            if (turns_spent == 10 || turns_spent == 20 || turns_spent == 30 || chance >= 1.0)
+                                ninja_path.listAppend("Assassin will appear next turn.");
+                            else
+                                ninja_path.listAppend((chance * 100.0).roundForOutput(0) + "% chance of assassins.");
+                        }
+                    }
                 }
             }
             

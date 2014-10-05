@@ -1,6 +1,21 @@
 import "relay/Guide/Support/Math.ash"
 import "relay/Guide/Support/List.ash"
 
+boolean mafiaIsPastRevision(int revision_number)
+{
+    if (get_revision() <= 0) //get_revision reports zero in certain cases; assume they're on a recent version
+        return true;
+    return (get_revision() >= revision_number);
+}
+
+//Feel free to uncomment the first line for enhanced tracking! Umm... if you're reading this.
+//FIXME next point release remove this function etc
+int turns_spent_temporary(location l)
+{
+    //if (mafiaIsPastRevision(14792)) return l.turns_spent;
+    return -1;
+}
+
 //Additions to standard API:
 //Auto-conversion property functions:
 boolean get_property_boolean(string property)
@@ -332,21 +347,13 @@ boolean have_outfit_components(string outfit_name)
 
 string int_to_wordy(int v) //Not complete, only supports a handful:
 {
-    string [int] matches = split_string("zero,one,two,three,four,five,six,seven,eight,nine,ten,eleven,twelve,thirteen,fourteen,fifteen,sixteen,seventeen,eighteen,nineteen,twenty,twenty-one,twenty-two,twenty-three", ",");
+    string [int] matches = split_string("zero,one,two,three,four,five,six,seven,eight,nine,ten,eleven,twelve,thirteen,fourteen,fifteen,sixteen,seventeen,eighteen,nineteen,twenty,twenty-one,twenty-two,twenty-three,twenty-four,twenty-five,twenty-six,twenty-seven,twenty-eight,twenty-nine,thirty,thirty-one", ",");
     if (matches contains v)
         return matches[v];
     return v.to_string();
 }
 
 //Non-API-related functions:
-
-boolean mafiaIsPastRevision(int revision_number)
-{
-    if (get_revision() <= 0) //get_revision reports zero in certain cases; assume they're on a recent version
-        return true;
-    return (get_revision() >= revision_number);
-}
-
 
 boolean playerIsLoggedIn()
 {
@@ -479,6 +486,8 @@ int turnsAttemptedInLocation(location place)
 {
     if (place == $location[the haunted bedroom]) //special case - NCs don't count here
         return place.combatTurnsAttemptedInLocation();
+    if (place.turns_spent_temporary() != -1)
+        return place.turns_spent_temporary();
     return place.combatTurnsAttemptedInLocation() + place.noncombatTurnsAttemptedInLocation();
 }
 
@@ -572,6 +581,11 @@ int delayRemainingInLocation(location place)
         turns_attempted = place.combatTurnsAttemptedInLocation();
     else
         turns_attempted = place.turnsAttemptedInLocation();
+        
+    if (place.turns_spent_temporary() != -1)
+        turns_attempted = place.turns_spent_temporary();
+    else if (delay_for_place > 5 && turns_attempted >= 5) //FIXME hackish, can't track over five turns
+        return 0;
         
     return MAX(0, delay_for_place - turns_attempted);
 }
@@ -862,11 +876,11 @@ boolean locationHasPlant(location l, string plant_name)
     return false;
 }
 
-int initiative_modifier_ignoring_plants()
+float initiative_modifier_ignoring_plants()
 {
     //FIXME strange bug here, investigate
     //seen in cyrpt
-    int init = initiative_modifier();
+    float init = initiative_modifier();
     //if (mafiaIsPastRevision(13946))
         //return init;
     
@@ -875,6 +889,21 @@ int initiative_modifier_ignoring_plants()
         init -= 25.0;
     
     return init;
+}
+
+float item_drop_modifier_ignoring_plants()
+{
+    float modifier = item_drop_modifier();
+    
+    location my_location = my_location();
+    if (my_location != $location[none])
+    {
+        if (my_location.locationHasPlant("Rutabeggar") || my_location.locationHasPlant("Stealing Magnolia"))
+            modifier -= 25.0;
+        if (my_location.locationHasPlant("Kelptomaniac"))
+            modifier -= 40.0;
+    }
+    return modifier;
 }
 
 int monster_level_adjustment_ignoring_plants() //this is unsafe to use in heavy rains
@@ -901,6 +930,38 @@ int monster_level_adjustment_ignoring_plants() //this is unsafe to use in heavy 
     return ml;
 }
 
+int water_level_of_location(location l)
+{
+    int water_level = 1;
+    if (l.recommended_stat >= 40) //FIXME is this threshold spaded?
+        water_level += 1;
+    if (l.environment == "indoor")
+        water_level += 2;
+    if (l.environment == "underground" || l == $location[the lower chambers]) //per-location fix
+        water_level += 4;
+    water_level += numeric_modifier("water level");
+    
+    water_level = clampi(water_level, 1, 6);
+    if (l.environment == "underwater") //or does the water get the rain instead? nobody knows, rain man
+        water_level = 0; //the aquaman hates rain man, they have a fight, aquaman wins
+    return water_level;
+}
+
+float washaway_rate_of_location(location l)
+{
+    //Calculate washaway chance:
+    int current_water_level = l.water_level_of_location();
+    
+    int washaway_chance = current_water_level * 5;
+    if ($item[fishbone catcher's mitt].equipped_amount() > 0)
+        washaway_chance -= 15; //GUESS
+    
+    if ($effect[Fishy Whiskers].have_effect() > 0)
+    {
+        //washaway_chance -= ?; //needs spading
+    }
+    return clampNormalf(washaway_chance / 100.0);
+}
 
 int monster_level_adjustment_for_location(location l)
 {
@@ -917,19 +978,9 @@ int monster_level_adjustment_for_location(location l)
         //First, cancel out the my_location() rain:
         int my_location_water_level_ml = monster_level_adjustment() - numeric_modifier("Monster Level");
         ml -= my_location_water_level_ml;
-        //Now, calculate the water level for the location:
-        int water_level = 1;
-        if (l.recommended_stat >= 40) //FIXME is this threshold spaded?
-            water_level += 1;
-        if (l.environment == "indoor")
-            water_level += 2;
-        if (l.environment == "underground" || l == $location[the lower chambers]) //per-location fix
-            water_level += 4;
-        water_level += numeric_modifier("water level");
         
-        water_level = clampi(water_level, 1, 6);
-        if (l.environment == "underwater") //or does the water get the rain instead? nobody knows, rain man
-            water_level = 0; //the aquaman hates rain man, they have a fight, aquaman wins
+        //Now, calculate the water level for the location:
+        int water_level = water_level_of_location(l);
         
         //Add that as ML:
         if (!($locations[oil peak,the typical tavern cellar] contains l)) //kind of hacky to put this here, sorry
@@ -943,11 +994,20 @@ int monster_level_adjustment_for_location(location l)
 
 float initiative_modifier_for_location(location l)
 {
-    int base = initiative_modifier_ignoring_plants();
+    float base = initiative_modifier_ignoring_plants();
     
-    location my_location = my_location();
     if (l.locationHasPlant("Impatiens") || l.locationHasPlant("Shuffle Truffle"))
         base += 25.0;
+    return base;
+}
+
+float item_drop_modifier_for_location(location l)
+{
+    int base = item_drop_modifier_ignoring_plants();
+    if (l.locationHasPlant("Rutabeggar") || l.locationHasPlant("Stealing Magnolia"))
+        base += 25.0;
+    if (l.locationHasPlant("Kelptomaniac"))
+        base += 40.0;
     return base;
 }
 

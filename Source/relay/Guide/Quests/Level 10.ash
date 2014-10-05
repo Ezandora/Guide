@@ -60,12 +60,53 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         }
         else
         {
-            //FIXME check if enchanted bean used
-            subentry.modifiers.listAppend("-combat");
+            int turns_spent = $location[the penultimate fantasy airship].turns_spent_temporary();
+            int turns_delay = -1;
+            
+            boolean need_minus_combat = true;
+            if (turns_spent == -1)
+                need_minus_combat = true;
+            else if (turns_spent < 5)
+            {
+                need_minus_combat = false;
+                turns_delay = 5 - turns_spent;
+            }
+            else if (turns_spent < 10 && $item[Tissue Paper Immateria].available_amount() > 0)
+            {
+                need_minus_combat = false;
+                turns_delay = 10 - turns_spent;
+            }
+            else if (turns_spent < 15 && $item[Tin Foil Immateria].available_amount() > 0)
+            {
+                need_minus_combat = false;
+                turns_delay = 15 - turns_spent;
+            }
+            else if (turns_spent < 20 && $item[Gauze Immateria].available_amount() > 0)
+            {
+                need_minus_combat = false;
+                turns_delay = 20 - turns_spent;
+            }
+            else if (turns_spent < 25 && $item[Plastic Wrap Immateria].available_amount() > 0)
+            {
+                need_minus_combat = false;
+                turns_delay = 25 - turns_spent;
+            }
+            if ($item[model airship].available_amount() == 0 && turns_spent >= 5)
+                need_minus_combat = true;
+            
+            
+            if (need_minus_combat)
+                subentry.modifiers.listAppend("-combat");
+            else
+                subentry.modifiers.listAppend("possibly +combat");
+            
             if (__misc_state["free runs available"])
                 subentry.modifiers.listAppend("free runs");
-            if (__misc_state["have hipster"])
-                subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
+            if (turns_spent < 25)
+            {
+                if (__misc_state["have hipster"])
+                    subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
+            }
             
             string [int] things_we_want_item_for;
             
@@ -76,16 +117,34 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             //immateria:
             
             item [int] immaterias_missing = $items[Tissue Paper Immateria,Tin Foil Immateria,Gauze Immateria,Plastic Wrap Immateria].items_missing();
-            if (immaterias_missing.count() == 0)
-                subentry.entries.listAppend("Immateria found, find Cid (-combat)");
+            
+            if (turns_delay != -1 && !need_minus_combat)
+            {
+                //subentry.entries.listAppend(pluralizeWordy(turns_delay, "turn", "turns").capitalizeFirstLetter() + " delay until -combat relevant.");
+                string line = "After " + pluralizeWordy(turns_delay, "turn", "turns") + " delay, ";
+                if (immaterias_missing.count() == 0)
+                    subentry.entries.listAppend(line + "find Cid.");
+                else
+                    subentry.entries.listAppend(line + "find " + immaterias_missing.count().int_to_wordy() + " more immateria.");
+                    //subentry.entries.listAppend(line + "find the immateria: " + listJoinComponents(immaterias_missing, ", ", "and"));
+            }
             else
             {
-                subentry.entries.listAppend("Find the immateria (-combat): " + listJoinComponents(immaterias_missing, ", ", "and"));
+                if (immaterias_missing.count() == 0)
+                    subentry.entries.listAppend("Find Cid. (-combat)");
+                else
+                {
+                    subentry.entries.listAppend("Find " + immaterias_missing.count().int_to_wordy() + " more immateria. (-combat)");
+                    //subentry.entries.listAppend("Find the immateria (-combat): " + listJoinComponents(immaterias_missing, ", ", "and"));
+                }
             }
             
             
             //FIXME it would be nice to track this
-            subentry.entries.listAppend("25 total turns of delay.");
+            if (turns_spent == -1)
+                subentry.entries.listAppend("25 total turns of delay.");
+            else if (turns_spent < 25)
+                subentry.entries.listAppend(pluralize(25 - turns_spent, "turn", "turns") + " total delay remaining.");
             if ($skill[Transcendent Olfaction].have_skill() && !($effect[on the trail].have_effect() > 0 && get_property("olfactedMonster") == "Quiet Healer"))
                 subentry.entries.listAppend("Potentially olfact quiet healer for SGEEAs");
             
@@ -162,7 +221,19 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 		}
 		else if ($location[The Castle in the Clouds in the Sky (Ground floor)].locationAvailable())
 		{
-			subentry.entries.listAppend("Ground floor. Spend eleven turns here to unlock top floor.");
+            int turns_spent = $location[The Castle in the Clouds in the Sky (Ground floor)].turns_spent_temporary();
+            int turns_remaining = 11;
+            if (turns_spent != -1)
+            {
+                turns_remaining = 11 - turns_spent;
+                if (turns_remaining == 1)
+                    subentry.entries.listAppend("Ground floor. Spend One More Turn here to unlock top floor.");
+                else
+                    subentry.entries.listAppend("Ground floor. Spend " + pluralizeWordy(turns_remaining, "more turn", "more turns") + " here to unlock top floor.");
+            }
+            else
+                subentry.entries.listAppend("Ground floor. Spend eleven turns here to unlock top floor.");
+            
 			image_name = "castle stairs up";
             
             if (__misc_state["Need to level"])

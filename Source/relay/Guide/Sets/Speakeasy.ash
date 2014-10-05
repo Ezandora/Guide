@@ -15,8 +15,8 @@ void SSpeakeasyGenerateResource(ChecklistEntry [int] available_resources_entries
         Flivver - 20,000 meat epic 2-potency, restores mana (not useful in-run)
         √Hot Socks - awesome 3-potency, 50 turns of (+2 familiar experience, +10 familiar weight, +20 familiar damage)
         √Sloppy Jalopy - 100,000 meat awesome 5-potency, gives skill Hollow Leg (+1 liver capacity) for aftercore
-        Phonus Balonus - unknown, unspaded
-        Ish Kabibble - unknown, unspaded
+        Phonus Balonus - +fights/+adventures
+        Ish Kabibble - +3 all res, +DA/DR
     */
     int drinks_remaining = MAX(3 - get_property_int("_speakeasyDrinksDrunk"), 0);
     
@@ -88,7 +88,11 @@ void SSpeakeasyGenerateResource(ChecklistEntry [int] available_resources_entries
         }
         
     }
-    //FIXME prismatic feather peacock drink!
+    
+    if (hippy_stone_broken())
+    {
+        options.listAppend(listMake("Phonus Balonus", "3", "+fights/+adventures"));
+    }
     
     string [int] description;
     if (options.count() > 1)

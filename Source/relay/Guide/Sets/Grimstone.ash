@@ -281,5 +281,5 @@ void SGrimstoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     if (mask_path == "gnome")
         SGrimstoneGnomeGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     if (mask_path == "tuxedo")
-        task_entries.listAppend(ChecklistEntryMake("__item long-stemmed rose", "arcade.php", ChecklistSubentryMake("Believe in yourself", "", ""), -11));
+        task_entries.listAppend(ChecklistEntryMake("__item long-stemmed rose", "place.php?whichplace=arcade", ChecklistSubentryMake("Believe in yourself", "", ""), -11));
 }

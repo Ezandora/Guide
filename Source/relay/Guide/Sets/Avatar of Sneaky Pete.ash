@@ -4,7 +4,6 @@ void SSneakyPeteGenerateResource(ChecklistEntry [int] available_resources_entrie
 {
 	if (my_path_id() != PATH_AVATAR_OF_SNEAKY_PETE || !mafiaIsPastRevision(13785))
 		return;
-    //my_audience() whenever 16.3 is out
     
     
 	ChecklistEntry entry;

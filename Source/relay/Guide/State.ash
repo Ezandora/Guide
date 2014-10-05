@@ -609,6 +609,69 @@ void setUpState()
         //Moxie Experience Percent
     float dance_card_average_stat_gain = MIN(2.25 * my_basestat($stat[moxie]), 300.0) * __misc_state_float["Non-combat statgain multiplier"] * (1.0 + numeric_modifier("Moxie Experience Percent") / 100.0);
     __misc_state_float["dance card average stats"] = dance_card_average_stat_gain;
+    
+    
+    if (true)
+    {
+        //calculate if we need -combat sources:
+        int minus_combat_source_count = 0;
+        
+        int minus_combat_from_accessories =0;
+        //No silent beret, because mohawk wig:
+        boolean [item] minus_combat_items = $items[ring of conflict,red shoe,bram's choker,space trip safety headphones,fuzzy slippers of hatred,quiets-your-steps,over-the-shoulder folder holder].makeConstantItemArrayMutable();
+        
+        minus_combat_items[lookupItem("duonoculars")] = true;
+        minus_combat_items[lookupItem("Xiblaxian stealth vest")] = true;
+        //ignore Xiblaxian stealth cowl, Xiblaxian stealth trousers, and silent hat, because they take up valuable slots
+        foreach it in minus_combat_items
+        {
+            if (!(it.can_equip() && it.available_amount() > 0))
+                continue;
+            if (it == $item[none])
+                continue;
+            if (it == $item[over-the-shoulder folder holder])
+            {
+                //check if we have the -combat folder:
+                boolean [item] equipped_folders;
+                foreach s in $slots[folder1,folder2,folder3,folder4,folder5]
+                {
+                    equipped_folders[s.equipped_item()] = true;
+                }
+                if (equipped_folders contains $item[folder (Ex-Files)])
+                    continue;
+                if (!(equipped_folders contains $item[folder (skull and crossbones)]))
+                    continue;
+            }
+            if ($slots[acc1,acc2,acc3] contains it.to_slot())
+                minus_combat_from_accessories += 1;
+            else
+                minus_combat_source_count += 1;
+        }
+        
+        minus_combat_source_count += MIN(3, minus_combat_from_accessories); //three at most
+        
+        if ($skill[smooth movement].skill_is_usable())
+            minus_combat_source_count += 1;
+        if ($skill[the sonata of sneakiness].skill_is_usable())
+            minus_combat_source_count += 1;
+        if ($items[crown of thrones,buddy bjorn].available_amount() > 0 && $familiar[grimstone golem].have_familiar() && !__misc_state["familiars temporarily blocked"])
+            minus_combat_source_count += 1;
+        if (my_path_id() == PATH_AVATAR_OF_BORIS && $skill[song of solitude].skill_is_usable())
+            minus_combat_source_count += 4;
+        if (my_path_id() == PATH_ZOMBIE_SLAYER && $skill[disquiet riot].skill_is_usable())
+            minus_combat_source_count += 4;
+        if (my_path_id() == PATH_AVATAR_OF_JARLSBERG && $skill[chocolatesphere].skill_is_usable())
+            minus_combat_source_count += 3;
+        if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE)
+        {
+            if ($skill[Brood].skill_is_usable())
+                minus_combat_source_count += 2;
+            if (mafiaIsPastRevision(13785) && get_property("peteMotorbikeMuffler") == "Extra-Quiet Muffler" && $skill[Rev Engine].have_skill())
+                minus_combat_source_count += 3;
+        }
+        if (minus_combat_source_count >= 5)
+            __misc_state["can reasonably reach -25% combat"] = true;
+    }
 }
 
 

@@ -40,8 +40,10 @@ int __la_turncount_initialized_on = -1;
 
 //Takes into account banishes and olfactions.
 //Probably will be inaccurate in many corner cases, sorry.
+//There's an appearance_rates() function that takes into account queue effects, which we may consider using in the future?
 float [monster] appearance_rates_adjusted(location l)
 {
+    boolean appearance_rates_has_changed = mafiaIsPastRevision(14740); //not sure on the revision, but after a certain revision, appearance_rates() takes into account olfaction
     //FIXME domed city of ronald/grimacia doesn't take into account alien appearance rate
     float [monster] source = l.appearance_rates();
     
@@ -100,7 +102,37 @@ float [monster] appearance_rates_adjusted(location l)
             source_altered[m] = 0.0;
     }
     
-    if ($effect[on the trail].have_effect() > 0)
+    //umm... I'm not sure if appearance_rates() takes into account olfact all the time or not
+    //in the palindome, it didn't for some reason? but in another area I think it did. can't remember
+    /*
+    > get olfactedMonster
+    bob racecar
+    > ash $effect[on the trail].have_effect()
+    Returned: 35
+    > ash $location[inside the palindome].appearance_rates()
+    Returned: aggregate float [monster]
+    Bob Racecar => 9.0
+    Dr. Awkward => 0.0
+    Drab Bard => 9.0
+    Evil Olive => -3.0
+    Flock of Stab-Bats => 9.0
+    none => 55.0
+    Racecar Bob => 9.0
+    Taco Cat => 9.0
+    Tan Gnat => -3.0
+    */
+    //so, if appearance_rate() doesn't seem to be taking into account olfaction, force it?
+    if ($effect[on the trail].have_effect() > 0 && get_property("olfactedMonster").to_monster() != $monster[none])
+    {
+        monster olfacted_monster = get_property("olfactedMonster").to_monster();
+        if (source_altered contains olfacted_monster)
+        {
+            if (fabs(source_altered[olfacted_monster] - 1.0) < 0.01)
+                appearance_rates_has_changed = false;
+        }
+    }
+    
+    if ($effect[on the trail].have_effect() > 0 && !appearance_rates_has_changed)
     {
         monster olfacted_monster = get_property("olfactedMonster").to_monster();
         if (olfacted_monster != $monster[none])
@@ -137,7 +169,6 @@ float [monster] appearance_rates_adjusted(location l)
         total += v;
     }
     //oil peak goes here?
-    
     if (total > 0.0)
     {
         foreach m in source_altered
@@ -156,7 +187,7 @@ float [monster] appearance_rates_adjusted(location l)
 float [monster] appearance_rates_adjusted_cancel_nc(location l)
 {
     float [monster] base_rates = appearance_rates_adjusted(l);
-    float nc_rate = base_rates[$monster[none]];
+    float nc_rate = base_rates[$monster[none]] / 100.0;
     float nc_inverse_multiplier = 1.0;
     if (nc_rate != 1.0)
         nc_inverse_multiplier = 1.0 / (1.0 - nc_rate);
@@ -562,7 +593,7 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         lookup_map["A Barroom Brawl"] = "tavern.php";
         lookup_map["8-Bit Realm"] = "place.php?whichplace=woods";
         lookup_map["Whitey's Grove"] = "place.php?whichplace=woods";
-        lookup_map["The Road to White Citadel"] = "place.php?whichplace=woods";
+        lookup_map["The Road to the White Citadel"] = "place.php?whichplace=woods";
         lookup_map["The Black Forest"] = "place.php?whichplace=woods";
         lookup_map["The Old Landfill"] = "place.php?whichplace=woods";
         lookup_map["The Bat Hole Entrance"] = "place.php?whichplace=bathole";
@@ -762,13 +793,14 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         lookup_map["Unleash Your Inner Wolf"] = "place.php?whichplace=ioty2014_wolf";
         foreach s in $strings[Ye Olde Medievale Villagee,Portal to Terrible Parents,Rumpelstiltskin's Workshop]
             lookup_map[s] = "place.php?whichplace=ioty2014_rumple";
-        lookup_map["The Cave Before Time"] = "place.php?whichplace=twitch";
-        lookup_map["An Illicit Bohemian Party"] = "place.php?whichplace=twitch";
-        lookup_map["Moonshiners' Woods"] = "place.php?whichplace=twitch";
-        lookup_map["The Roman Forum"] = "place.php?whichplace=twitch";
-        lookup_map["The Fun-Guy Mansion"] = "place.php?whichplace=airport_sleaze";
-        lookup_map["Sloppy Seconds Diner"] = "place.php?whichplace=airport_sleaze";
-        lookup_map["The Sunken Party Yacht"] = "place.php?whichplace=airport_sleaze";
+            
+        foreach s in $strings[The Cave Before Time,An Illicit Bohemian Party,Moonshiners' Woods,The Roman Forum,The Post-Mall]
+            lookup_map[s] = "place.php?whichplace=twitch";
+        foreach s in $strings[The Fun-Guy Mansion,Sloppy Seconds Diner,The Sunken Party Yacht]
+            lookup_map[s] = "place.php?whichplace=airport_sleaze";
+        foreach s in $strings[The Mansion of Dr. Weirdeaux,The Deep Dark Jungle,The Secret Government Laboratory]
+            lookup_map[s] = "place.php?whichplace=airport_spooky";
+            
         lookup_map["Trick-or-treating"] = "town.php?action=trickortreat";
         //Conditionals:
         if ($location[cobb's knob barracks].locationAvailable())

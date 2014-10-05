@@ -162,7 +162,7 @@ buffer generateLocationBar(boolean displaying_navbar)
                     plant_data.listAppend("Unknown");
             }
         }
-        if (plant_data.count() == 0 && l.environment != "unknown" && l.environment != "none")
+        if (plant_data.count() == 0 && l.environment != "unknown" && l.environment != "none" && l.environment != "")
         {
             if (!($locations[The Prince's Restroom,The Prince's Dance Floor,The Prince's Kitchen,The Prince's Balcony,The Prince's Lounge,The Prince's Canapes table,the shore\, inc. travel agency] contains l))
                 plant_data.listAppend(l.environment.capitalizeFirstLetter());
@@ -373,17 +373,29 @@ buffer generateLocationBar(boolean displaying_navbar)
     string [int] location_data;
     string [int] location_urls;
     
+    if (__misc_state["In run"])
+    {
+        int turns_spent = l.turns_spent_temporary();
+        if (turns_spent > 0)
+        {
+            location_data.listAppend(pluralize(turns_spent, "turn", "turns"));
+        }
+    }
+    
     //easy list:
     //ashq foreach l in $locations[] if (l.appearance_rates().count() == 1 && l.appearance_rates()[$monster[none]] == 100.0) print(l);
     boolean [location] nc_blacklist = $locations[Pump Up Muscle,Pump Up Mysticality,Pump Up Moxie,The Shore\, Inc. Travel Agency,Goat Party,Pirate Party,Lemon Party,The Roulette Tables,The Poker Room,Anemone Mine (Mining),The Knob Shaft (Mining),Friar Ceremony Location,Itznotyerzitz Mine (in Disguise),The Prince's Restroom,The Prince's Dance Floor,The Prince's Kitchen,The Prince's Balcony,The Prince's Lounge,The Prince's Canapes table,Portal to Terrible Parents];
     
-    if ((my_buffedstat($stat[moxie]) < average_ml || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE) && sample_count > 0 && __misc_state["In run"])
+    if ((my_buffedstat($stat[moxie]) < average_ml || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE) && sample_count > 0 && __misc_state["In run"] && monster_level_adjustment() < 150)
     {
         //Init:
         //We only show this if the monsters out-moxie the player in-run. It feels as though it can easily be information overload otherwise.
         if (true)
         {
-            location_data.listAppend((chance_of_jump * 100.0).round() + "% jump");
+            if (chance_of_jump == 0 && false)
+                location_data.listAppend("No jump");
+            else
+                location_data.listAppend((chance_of_jump * 100.0).round() + "% jump");
         }
         else if (true)
         {
@@ -417,10 +429,53 @@ buffer generateLocationBar(boolean displaying_navbar)
         if (custom_location_url.length() > 0)
             location_urls[location_data.count() - 1] = custom_location_url;
     }
+    
+    if (my_path_id() == PATH_HEAVY_RAINS)
+    {
+        boolean has_items_that_will_wash_away = false;
+        
+        foreach key, m in l.get_monsters()
+        {
+            foreach it, drop_rate in m.item_drops()
+            {
+                if (drop_rate == 0)
+                    continue;
+                if (drop_rate == 100)
+                    continue;
+                if (it.quest)
+                    continue;
+                has_items_that_will_wash_away = true;
+                break;
+            }
+            if (has_items_that_will_wash_away)
+                break;
+        }
+        
+        if (has_items_that_will_wash_away)
+        {
+            //Calculate washaway chance:
+            boolean unknown_washaway = false;
+            int current_water_level = l.water_level_of_location();
+            
+            int washaway_chance = current_water_level * 5;
+            if ($item[fishbone catcher's mitt].equipped_amount() > 0)
+                washaway_chance -= 15; //GUESS
+            
+            if ($effect[Fishy Whiskers].have_effect() > 0)
+            {
+                //washaway_chance -= ?; //needs spading
+                unknown_washaway = true;
+            }
+            if (unknown_washaway)
+                location_data.listAppend("?% wash");
+            else
+                location_data.listAppend(washaway_chance + "% wash");
+        }
+    }
     if (__misc_state["In run"])
     {
         int area_delay = l.delayRemainingInLocation();
-        if (area_delay > 0 && !(l.totalDelayForLocation() > 5 && area_delay == 1)) //can't track delay over five
+        if (area_delay > 0)// && !(l.totalDelayForLocation() > 5 && area_delay == 1)) //can't track delay over five
             location_data.listAppend(pluralize(area_delay, "turn", "turns") + "<br>delay");
     }
     if (mpa != -1.0 && should_output_meat_drop)
@@ -448,6 +503,7 @@ buffer generateLocationBar(boolean displaying_navbar)
         
         line = plant_data.generateLocationBarModifierEntries();
         
+        
         if (__setting_location_bar_fixed_layout)
             line = HTMLGenerateDivOfClass(line, "r_location_bar_ellipsis_entry");
         location_data.listAppend(line);
@@ -465,7 +521,6 @@ buffer generateLocationBar(boolean displaying_navbar)
         bar.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_bottom_outer_container", "style", style)));
         bar.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_bottom_inner_container", "style", "background:white;")));
     }
-    
     
     buffer table_style;
     table_style.append("display:table;width:100%;height:100%;text-align:center;");

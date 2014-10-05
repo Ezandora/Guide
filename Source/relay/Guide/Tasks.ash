@@ -156,6 +156,54 @@ void generateTasks(Checklist [int] checklists)
             url = $location[the haunted bathroom].getClickableURLForLocation();
         else if (my_primestat() == $stat[moxie] && $location[the haunted bedroom].locationAvailable())
             url = $location[the haunted ballroom].getClickableURLForLocation();
+            
+        
+        //133.33333333333333 meat per stat
+        int maximum_allowed_to_donate = 10000 * my_level();
+        int cost_to_donate_for_level = ceil(substats_remaining.to_float() / 1.5) * 200.0;
+        int min_cost_to_donate_for_level = ceil(substats_remaining.to_float() / 2.0) * 200.0;
+        if (min_cost_to_donate_for_level <= my_meat() && min_cost_to_donate_for_level <= maximum_allowed_to_donate)
+        {
+            string statue_name = "";
+            if (my_primestat() == $stat[muscle] && $item[boris's key].available_amount() > 0)
+            {
+                statue_name = "Boris";
+                if (cost_to_donate_for_level < 2000)
+                    url = "da.php?place=gate1";
+            }
+            else if (my_primestat() == $stat[mysticality] && $item[jarlsberg's key].available_amount() > 0 && my_path_id() != PATH_AVATAR_OF_JARLSBERG)
+            {
+                statue_name = "Jarlsberg";
+                if (cost_to_donate_for_level < 2000)
+                    url = "da.php?place=gate2";
+            }
+            else if (my_primestat() == $stat[moxie] && $item[sneaky pete's key].available_amount() > 0 && my_path_id() != PATH_AVATAR_OF_SNEAKY_PETE)
+            {
+                statue_name = "Sneaky Pete";
+                if (cost_to_donate_for_level < 2000)
+                    url = "da.php?place=gate3";
+            }
+                
+            if (statue_name.length() > 0)
+            {
+                buffer line = "Possibly donate ".to_buffer();
+                if (cost_to_donate_for_level == min_cost_to_donate_for_level)
+                    line.append(cost_to_donate_for_level);
+                else
+                {
+                    line.append(min_cost_to_donate_for_level);
+                    line.append(" to ");
+                    line.append(cost_to_donate_for_level);
+                }
+                line.append(" meat to the statue of ");
+                line.append(statue_name);
+                line.append(".");
+                subentry.entries.listAppend(line);
+                
+            }
+        }
+        
+        
         
         string image_name = "player character";
         
@@ -227,7 +275,7 @@ void generateTasks(Checklist [int] checklists)
 		if (!__quest_state["Level 13"].state_boolean["past tower"])
 			potential_targets.listAppend("Tower items? Gate items?");
 		
-		if (item_drop_modifier() < 234.0 && !__misc_state["In aftercore"])
+		if (item_drop_modifier_ignoring_plants() < 234.0 && !__misc_state["In aftercore"])
 			potential_targets.listAppend("Anything with 30% drop if you can't 234%. (dwarf foreman, bob racecar, drum machines, etc)");
 		
 		optional_task_entries.listAppend(ChecklistEntryMake(__misc_state_string["yellow ray image name"], "", ChecklistSubentryMake("Fire yellow ray", "", potential_targets), 5));

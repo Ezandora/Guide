@@ -32,8 +32,8 @@ boolean CounterIsRange(Counter c)
 {
     if (!c.initialized)
         return false;
-    if (c.range_start_turn < 0 && c.range_end_turn < 0)
-        return false;
+    //if (c.range_start_turn < 0 && c.range_end_turn < 0) //seems to be an errornous test when we go past our window
+        //return false;
     if (c.exact_turns.count() == 0 && (c.found_start_turn_range || c.found_end_turn_range))
         return true;
     return false;
@@ -53,6 +53,7 @@ int CounterGetNextExactTurn(Counter c)
 
 boolean CounterMayHitNextTurn(Counter c)
 {
+    //FIXME use CounterMayHitInXTurns to implement this once we're sure it works
     if (!c.initialized)
         return false;
     if (c.exact_turns.count() > 0)
@@ -72,6 +73,36 @@ boolean CounterMayHitNextTurn(Counter c)
     else if (c.found_start_turn_range)
     {
         if (c.range_start_turn <= 0)
+            return true;
+        else
+            return false;
+    }
+    else if (c.found_end_turn_range)
+        return true; //maaaybe?
+    return false;
+}
+
+boolean CounterMayHitInXTurns(Counter c, int turns_limit)
+{
+    if (!c.initialized)
+        return false;
+    if (c.exact_turns.count() > 0)
+    {
+        foreach key, turn in c.exact_turns
+        {
+            if (turn <= turns_limit)
+                return true;
+        }
+        return false;
+    }
+    else if (!c.found_start_turn_range && !c.found_end_turn_range)
+    {
+        return false;
+    }
+    //turn range:
+    else if (c.found_start_turn_range)
+    {
+        if (c.range_start_turn <= turns_limit)
             return true;
         else
             return false;
@@ -318,11 +349,24 @@ void CountersReparse()
     CountersInit();
 }
 
+boolean [string] __wandering_monster_counter_names = $strings[Romantic Monster,Rain Monster,Holiday Monster,Nemesis Assassin,Bee];
+
 boolean CounterWanderingMonsterMayHitNextTurn()
 {
-    foreach s in $strings[Romantic Monster,Rain Monster,Holiday Monster,Nemesis Assassin,Bee]
+    //FIXME use CounterWanderingMonsterMayHitInXTurns to implement this once we're sure it works
+    foreach s in __wandering_monster_counter_names
     {
         if (CounterLookup(s).CounterExists() && CounterLookup(s).CounterMayHitNextTurn())
+            return true;
+    }
+    return false;
+}
+
+boolean CounterWanderingMonsterMayHitInXTurns(int turns)
+{
+    foreach s in __wandering_monster_counter_names
+    {
+        if (CounterLookup(s).CounterExists() && CounterLookup(s).CounterMayHitInXTurns(turns))
             return true;
     }
     return false;

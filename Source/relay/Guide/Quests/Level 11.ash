@@ -62,7 +62,8 @@ void QLevel11Init()
         state.state_boolean["Need instant camera"] = false;
         if (lookupItem("photograph of a dog").available_amount() + lookupItem("disposable instant camera").available_amount() == 0 && state.mafia_internal_step < 3 && mafiaIsPastRevision(13870))
             state.state_boolean["Need instant camera"] = true;
-        
+        if (7270.to_item().available_amount() > 0)
+            state.state_boolean["Need instant camera"] = false;
         
         state.state_boolean["dr. awkward's office unlocked"] = false;
         if (state.mafia_internal_step > 2)
@@ -333,6 +334,7 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
     {
         boolean use_fast_route = base_quest_state.state_boolean["Can use fast route"];
         boolean recipe_will_be_autoread = (mafiaIsPastRevision(14187) && ($item[lord spookyraven's spectacles].available_amount() > 0) && use_fast_route) && get_property_boolean("autoCraft");
+        boolean recipe_was_autoread = (get_property("spookyravenRecipeUsed") == "with_glasses");
         //FIXME spectacles first?
         if (!$location[the haunted ballroom].noncombat_queue.contains_text("We'll All Be Flat") && base_quest_state.mafia_internal_step < 2)
         {
@@ -355,13 +357,13 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
             url = "manor3.php";
             //FIXME can bees hate you use the fast path?
         
-            if (use_fast_route && $item[lord spookyraven's spectacles].available_amount() == 0)
+            if (use_fast_route && $item[lord spookyraven's spectacles].available_amount() == 0 && !recipe_was_autoread)
             {
                 url = $location[the haunted bedroom].getClickableURLForLocation();
                 subentry.entries.listAppend("Acquire Lord Spookyraven's spectacles from the haunted bedroom.");
                 image_name = "__item Lord Spookyraven's spectacles";
             }
-            else if (lookupItem("recipe: mortar-dissolving solution").available_amount() == 0 && !__setting_debug_mode)
+            else if (lookupItem("recipe: mortar-dissolving solution").available_amount() == 0 && !__setting_debug_mode && !recipe_was_autoread)
             {
                 if (recipe_will_be_autoread)
                 {
@@ -663,6 +665,11 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
             tasks.listAppend("fight Dr. Awkward in his office");
             subentry.entries.listAppend(tasks.listJoinComponents(", ", "then").capitalizeFirstLetter() + ".");
         }
+        else if (base_quest_state.mafia_internal_step == 3 && 7270.to_item().available_amount() > 0 && mafiaIsPastRevision(14644) && false)
+        {
+            //doesn't seem to work?
+            subentry.entries.listAppend("Use 2 Love Me, Vol. 2, then talk to Mr. Alarm in his office.");
+        }
         else if (base_quest_state.mafia_internal_step == 4 || base_quest_state.mafia_internal_step == 3)
         {
             //4 -> acquire wet stunt nut stew, give to mr. alarm
@@ -670,7 +677,8 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
             //step3 not supported yet, so we have this instead:
             if (base_quest_state.mafia_internal_step == 3)
             {
-                subentry.entries.listAppend("Use 2 Love Me, Vol. 2, then talk to Mr. Alarm in his office. Then:");
+                if (!(7270.to_item().available_amount() > 0 && mafiaIsPastRevision(14644) && false))
+                    subentry.entries.listAppend("Use 2 Love Me, Vol. 2, then talk to Mr. Alarm in his office. Then:");
             }
             
             if ($item[wet stunt nut stew].available_amount() == 0)
@@ -1131,7 +1139,7 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
                 subentry.modifiers.listAppend("olfact tomb rats");
                 subentry.entries.listAppend("Can find crumbling wooden wheels in the upper chamber (-combat), or tomb ratchets in the middle chamber (+400% item, olfact rats)");
             }
-            else if (get_property_boolean("lowerChamberUnlock") || $location[the middle chamber].noncombat_queue.contains_text("Further Down Dooby-Doo Down Down"))
+            /*else if (get_property_boolean("lowerChamberUnlock") || $location[the middle chamber].noncombat_queue.contains_text("Further Down Dooby-Doo Down Down"))
             {
                 //lower chamber unlocked:
                 subentry.entries.listAppend("Adventure in the middle chamber for five total turns to unlock the control room.");
@@ -1141,11 +1149,29 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
                     subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
                 if (__misc_state["free runs available"])
                     subentry.modifiers.listAppend("free runs");
-            }
+            }*/
             else
             {
                 //unlock lower chamber:
-                subentry.entries.listAppend("Adventure in the middle chamber for eleven total turns to unlock the control room.");
+                int turns_spent = $location[the middle chamber].turns_spent_temporary();
+                
+                if (turns_spent == -1)
+                {
+                    if (get_property_boolean("lowerChamberUnlock") || $location[the middle chamber].noncombat_queue.contains_text("Further Down Dooby-Doo Down Down"))
+                        subentry.entries.listAppend("Adventure in the middle chamber for five total turns to unlock the control room.");
+                    else
+                        subentry.entries.listAppend("Adventure in the middle chamber for eleven total turns to unlock the control room.");
+                }
+                else
+                {
+                    int turns_remaining = MAX(0, 11 - turns_spent);
+                    if (turns_remaining == 1)
+                        subentry.entries.listAppend("Adventure in the middle chamber for One More Turn to unlock the control room.");
+                    else
+                        subentry.entries.listAppend("Adventure in the middle chamber for " + pluralizeWordy(turns_remaining, "more turn", "more turns") + " to unlock the control room.");
+                    
+                    
+                }
                 subentry.modifiers.listAppend("+400% item");
                 subentry.modifiers.listAppend("olfact tomb rats");
                 if (__misc_state["have hipster"])
@@ -1162,7 +1188,17 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
         else
         {
             //unlock middle chamber:
-            subentry.entries.listAppend("Adventure in the upper chamber for six total turns to unlock the middle chamber.");
+            int turns_spent = $location[the upper chamber].turns_spent_temporary();
+            if (turns_spent == -1)
+                subentry.entries.listAppend("Adventure in the upper chamber for six total turns to unlock the middle chamber.");
+            else
+            {
+                int turns_remaining = MAX(0, 6 - turns_spent);
+                if (turns_remaining == 1)
+                    subentry.entries.listAppend("Adventure in the upper chamber for One More Turn to unlock the middle chamber.");
+                else
+                    subentry.entries.listAppend("Adventure in the upper chamber for " + pluralizeWordy(turns_remaining, "more turn", "more turns") + " to unlock the middle chamber.");
+            }
             subentry.modifiers.listAppend("-combat");
             if (__misc_state["have hipster"])
                 subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
@@ -1283,6 +1319,18 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
     task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the upper chamber,the lower chambers, the middle chamber]));
 }
 
+int numberOfDenseLianaFoughtInShrine(location shrine)
+{
+    //need to check the combat names due to wanderers:
+    int dense_liana_defeated = 0;
+    string [int] area_combats_seen = shrine.locationSeenCombats();
+    foreach key, s in area_combats_seen
+    {
+        if (s == "dense liana")
+            dense_liana_defeated += 1;
+    }
+    return dense_liana_defeated;
+}
 
 void generateHiddenAreaUnlockForShrine(string [int] description, location shrine)
 {
@@ -1295,7 +1343,9 @@ void generateHiddenAreaUnlockForShrine(string [int] description, location shrine
         if (it.equipped_amount() > 0)
             have_machete_equipped = true;
     }
-    int liana_remaining = MAX(0, 3 - shrine.combatTurnsAttemptedInLocation());
+    //int liana_remaining = MAX(0, 3 - shrine.combatTurnsAttemptedInLocation());
+    int liana_remaining = MAX(0, 3 - shrine.numberOfDenseLianaFoughtInShrine());
+    
     if (shrine != $location[a massive ziggurat])
         description.listAppend("Unlock by visiting " + shrine + ".");
     if (liana_remaining > 0 && shrine.noncombatTurnsAttemptedInLocation() == 0)
@@ -1386,7 +1436,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
             }
             else
             {
-                if ($location[a massive ziggurat].combatTurnsAttemptedInLocation() <3 && $location[a massive ziggurat].noncombatTurnsAttemptedInLocation() == 0)
+                if ($location[a massive ziggurat].numberOfDenseLianaFoughtInShrine() <3 && $location[a massive ziggurat].noncombatTurnsAttemptedInLocation() == 0)
                 {
                     generateHiddenAreaUnlockForShrine(subentry.entries,$location[a massive ziggurat]);
                 }
@@ -1451,7 +1501,18 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 subentry.entries.listAppend("Olfact shaman.");
                 //if (!$monster[pygmy witch lawyer].is_banished())
                     //subentry.entries.listAppend("Potentially banish lawyers.");
-                subentry.entries.listAppend("NC appears every 9th adventure.");
+                    
+                int turns_spent = $location[the hidden apartment building].turns_spent_temporary();
+                if (turns_spent == -1)
+                    subentry.entries.listAppend("NC appears every 9th adventure.");
+                else
+                {
+                    int turns_until_next_nc = (9 - (turns_spent % 9)) - 1;
+                    if (turns_until_next_nc == 0)
+                        subentry.entries.listAppend("Non-combat appears next turn.");
+                    else
+                        subentry.entries.listAppend("Non-combat appears after " + pluralizeWordy(turns_until_next_nc, "turn", "turns") + ".");
+                }
                 
                 string [int] curse_sources;
                 if (__misc_state["can drink just about anything"])
@@ -1506,10 +1567,10 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
             }
             else
             {
+                int files_found = $item[McClusky file (page 1)].available_amount() + $item[McClusky file (page 2)].available_amount() + $item[McClusky file (page 3)].available_amount() + $item[McClusky file (page 4)].available_amount() + $item[McClusky file (page 5)].available_amount();
+                int files_not_found = 5 - files_found;
                 if ($item[McClusky file (complete)].available_amount() == 0)
                 {
-                    int files_found = $item[McClusky file (page 1)].available_amount() + $item[McClusky file (page 2)].available_amount() + $item[McClusky file (page 3)].available_amount() + $item[McClusky file (page 4)].available_amount() + $item[McClusky file (page 5)].available_amount();
-                    int files_not_found = 5 - files_found;
                     if (files_not_found > 0)
                     {
                         subentry.entries.listAppend("Olfact accountant.");
@@ -1524,7 +1585,31 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 {
                     subentry.entries.listAppend("You have the complete McClusky files, fight boss.");
                 }
-                subentry.entries.listAppend("NC appears first on the 6th adventure, then every 5 adventures.");
+                
+                int turns_spent = $location[the hidden office building].turns_spent_temporary();
+                
+                if (turns_spent == -1)
+                    subentry.entries.listAppend("Non-combat appears first on the 6th adventure, then every 5 adventures.");
+                else
+                {
+                    int turns_until_next_nc = -1;
+                    if (turns_spent < 6)
+                        turns_until_next_nc = (6 - turns_spent) - 1;
+                    else
+                        turns_until_next_nc = (5 - ((turns_spent - 6) % 5)) - 1;
+                    if (turns_until_next_nc == 0)
+                        subentry.entries.listAppend("Non-combat appears next turn.");
+                    else
+                        subentry.entries.listAppend("Non-combat appears after " + pluralizeWordy(turns_until_next_nc, "turn", "turns") + ".");
+                        
+                    if (turns_until_next_nc == 0 && $item[McClusky file (complete)].available_amount() == 0 && $item[Boring binder clip].available_amount() > 0)
+                    {
+                        if (files_not_found > 0)
+                        {
+                            subentry.entries.listAppend(HTMLGenerateSpanFont("Go adventure in the apartment building for files instead.", "red", ""));
+                        }
+                    }
+                }
         
                 if (__misc_state["have hipster"])
                     subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
@@ -1650,7 +1735,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         
         if (!at_last_spirit)
         {
-            if ($location[a massive ziggurat].combatTurnsAttemptedInLocation() <3)
+            if ($location[a massive ziggurat].numberOfDenseLianaFoughtInShrine() <3)
             {
                 ChecklistSubentry subentry;
                 subentry.header = "Massive Ziggurat";

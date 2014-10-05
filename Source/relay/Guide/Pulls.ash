@@ -219,6 +219,33 @@ void generatePullList(Checklist [int] checklists)
         pullable_item_list.listAppend(GPItemMake($item[bottle of blank-out], "run away from your problems|expensive", 1));
 	
 	
+    if (!__quest_state["Level 11 Hidden City"].finished && !__quest_state["Level 11"].finished && (get_property_int("hiddenApartmentProgress") < 1 || get_property_int("hiddenBowlingAlleyProgress") < 1 || get_property_int("hiddenHospitalProgress") < 1 || get_property_int("hiddenOfficeProgress") < 1) && __misc_state["can equip just about any weapon"])
+    {
+        boolean have_machete = false;
+        foreach it in __dense_liana_machete_items
+        {
+            if (it.available_amount() > 0 && it.is_unrestricted())
+                have_machete = true;
+        }
+        if (!have_machete)
+        {
+            if (my_basestat($stat[muscle]) < 62 && $item[machetito].is_unrestricted())
+            {
+                //machetito
+                pullable_item_list.listAppend(GPItemMake($item[machetito], "Machete for dense liana", 1));
+            }
+            else if (my_basestat($stat[muscle]) < 62 && $item[muculent machete].is_unrestricted())
+            {
+                //muculent machete
+                pullable_item_list.listAppend(GPItemMake($item[muculent machete], "Machete for dense liana", 1));
+            }
+            else
+            {
+                //antique machete
+                pullable_item_list.listAppend(GPItemMake($item[antique machete], "Machete for dense liana", 1));
+            }
+        }
+    }
 	
 	//Quest-relevant items:
 	
@@ -287,7 +314,9 @@ void generatePullList(Checklist [int] checklists)
     //Ideas: Goat cheese, keepsake box, spooky-gro fertilizer, harem outfit, perfume, rusty hedge trimmers, bowling ball, surgeon gear, tomb ratchets or tangles, all the other pies
     //FIXME suggest ore when we don't have access to free mining
     
-    pullable_item_list.listAppend(GPItemMake($item[ring of conflict], "-combat"));
+    pullable_item_list.listAppend(GPItemMake(lookupItem("duonoculars"), "-combat, +5 ML"));
+    if (!__misc_state["can reasonably reach -25% combat"])
+        pullable_item_list.listAppend(GPItemMake($item[ring of conflict], "-combat"));
     
 	//FIXME suggest guitar if we're out of clovers, we need one, and we've gone past belowdecks already?
 	
@@ -361,10 +390,22 @@ void generatePullList(Checklist [int] checklists)
 			int actual_amount = pullable_amount(it, max_wanted);
 			if (actual_amount > 0)
 			{
+                string url = "storage.php";
+                if (it != $item[none])
+                {
+                    if (it.fullness > 0 || it.inebriety > 0)
+                        url = "storage.php?which=1";
+                    if (it.to_slot() != $slot[none])
+                        url = "storage.php?which=2";
+                }
+              
+                if (it.storage_amount() == 0 && (__pulls_reasonable_to_buy_in_run contains it) && it != $item[ten-leaf clover] && it != $item[none])
+                    url = "mall.php";
+              
 				if (max_wanted == 1)
-					pulls_entries.listAppend(ChecklistEntryMake(it, "storage.php", ChecklistSubentryMake(it, "", reason_list)));
+					pulls_entries.listAppend(ChecklistEntryMake(it, url, ChecklistSubentryMake(it, "", reason_list)));
 				else
-					pulls_entries.listAppend(ChecklistEntryMake(it, "storage.php", ChecklistSubentryMake(pluralize(actual_amount, it), "", reason_list)));
+					pulls_entries.listAppend(ChecklistEntryMake(it, url, ChecklistSubentryMake(pluralize(actual_amount, it), "", reason_list)));
 				break;
 			}
 		}
@@ -376,5 +417,5 @@ void generatePullList(Checklist [int] checklists)
 void PullsInit()
 {
     //Pulls which are reasonable to buy in the mall, then pull:
-	__pulls_reasonable_to_buy_in_run = $items[peppermint parasol,slimy alveolus,bottle of blank-out,disassembled clover,ten-leaf clover,ninja rope,ninja crampons,ninja carabiner,clockwork maid,sonar-in-a-biscuit,knob goblin perfume,chrome ore,linoleum ore,asbestos ore,goat cheese,enchanted bean,dusty bottle of Marsala,dusty bottle of Merlot,dusty bottle of Muscat,dusty bottle of Pinot Noir,dusty bottle of Port,dusty bottle of Zinfandel,ketchup hound,lion oil,bird rib,stunt nuts,drum machine,beer helmet,distressed denim pants,bejeweled pledge pin,reinforced beaded headband,bullet-proof corduroys,round purple sunglasses,wand of nagamar,ng,star crossbow,star hat,star staff,star sword,Star key lime pie,Boris's key lime pie,Jarlsberg's key lime pie,Sneaky Pete's key lime pie,tomb ratchet,tangle of rat tails,swashbuckling pants,stuffed shoulder parrot,eyepatch,Knob Goblin harem veil,knob goblin harem pants,knob goblin elite polearm,knob goblin elite pants,knob goblin elite helm,cyclops eyedrops,mick's icyvapohotness inhaler,large box,marzipan skull,jaba&ntilde;ero-flavored chewing gum,handsomeness potion,Meleegra&trade; pills,pickle-flavored chewing gum,lime-and-chile-flavored chewing gum,gremlin juice,wussiness potion,Mick's IcyVapoHotness Rub,super-spiky hair gel,adder bladder,black no. 2,skeleton,rock and roll legend,wet stew,glass of goat's milk,hot wing,frilly skirt,pygmy pygment,wussiness potion,gremlin juice,adder bladder,Angry Farmer candy,thin black candle,super-spiky hair gel,Black No. 2,Mick's IcyVapoHotness Rub,Frigid ninja stars,Spider web,Sonar-in-a-biscuit,Black pepper,Pygmy blowgun,Meat vortex,Chaos butterfly,Photoprotoneutron torpedo,Fancy bath salts,inkwell,Hair spray,disease,bronzed locust,Knob Goblin firecracker,powdered organs,leftovers of indeterminate origin,mariachi G-string,NG,plot hole,baseball,razor-sharp can lid,tropical orchid,stick of dynamite,barbed-wire fence,smut orc keepsake box,spooky-gro fertilizer];
+	__pulls_reasonable_to_buy_in_run = $items[peppermint parasol,slimy alveolus,bottle of blank-out,disassembled clover,ten-leaf clover,ninja rope,ninja crampons,ninja carabiner,clockwork maid,sonar-in-a-biscuit,knob goblin perfume,chrome ore,linoleum ore,asbestos ore,goat cheese,enchanted bean,dusty bottle of Marsala,dusty bottle of Merlot,dusty bottle of Muscat,dusty bottle of Pinot Noir,dusty bottle of Port,dusty bottle of Zinfandel,ketchup hound,lion oil,bird rib,stunt nuts,drum machine,beer helmet,distressed denim pants,bejeweled pledge pin,reinforced beaded headband,bullet-proof corduroys,round purple sunglasses,wand of nagamar,ng,star crossbow,star hat,star staff,star sword,Star key lime pie,Boris's key lime pie,Jarlsberg's key lime pie,Sneaky Pete's key lime pie,tomb ratchet,tangle of rat tails,swashbuckling pants,stuffed shoulder parrot,eyepatch,Knob Goblin harem veil,knob goblin harem pants,knob goblin elite polearm,knob goblin elite pants,knob goblin elite helm,cyclops eyedrops,mick's icyvapohotness inhaler,large box,marzipan skull,jaba&ntilde;ero-flavored chewing gum,handsomeness potion,Meleegra&trade; pills,pickle-flavored chewing gum,lime-and-chile-flavored chewing gum,gremlin juice,wussiness potion,Mick's IcyVapoHotness Rub,super-spiky hair gel,adder bladder,black no. 2,skeleton,rock and roll legend,wet stew,glass of goat's milk,hot wing,frilly skirt,pygmy pygment,wussiness potion,gremlin juice,adder bladder,Angry Farmer candy,thin black candle,super-spiky hair gel,Black No. 2,Mick's IcyVapoHotness Rub,Frigid ninja stars,Spider web,Sonar-in-a-biscuit,Black pepper,Pygmy blowgun,Meat vortex,Chaos butterfly,Photoprotoneutron torpedo,Fancy bath salts,inkwell,Hair spray,disease,bronzed locust,Knob Goblin firecracker,powdered organs,leftovers of indeterminate origin,mariachi G-string,NG,plot hole,baseball,razor-sharp can lid,tropical orchid,stick of dynamite,barbed-wire fence,smut orc keepsake box,spooky-gro fertilizer,machetito,muculent machete,antique machete];
 }

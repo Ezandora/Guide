@@ -27,7 +27,7 @@ void SWOTSFGenerateResource(ChecklistEntry [int] available_resources_entries)
 	teaching_properties_to_locations["fistTeachingsMenagerie"] = $location[Cobb's Knob Menagerie\, Level 2];
 	teaching_properties_to_locations["fistTeachingsNinjaSnowmen"] = $location[Lair of the Ninja Snowmen];
 	teaching_properties_to_locations["fistTeachingsPokerRoom"] = $location[The Poker Room];
-	teaching_properties_to_locations["fistTeachingsRoad"] = $location[The Road to White Citadel];
+	teaching_properties_to_locations["fistTeachingsRoad"] = lookupLocation("The Road to the White Citadel");
 	teaching_properties_to_locations["fistTeachingsSlums"] = $location[Pandamonium Slums];
 	
 	string [int] missing_areas;

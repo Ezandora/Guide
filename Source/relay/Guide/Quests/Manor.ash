@@ -24,49 +24,7 @@ void QManorInit()
     //L12: relevant (starting the war)
     //L13: relevant, but marginal (south of the border, zap wand)
     //Pirates: relevant (acquiring outfit)
-    
-    //Hardcoded hacky test to see if we can reach -25% on skills alone. So far, this is only possible in one situation in sneaky pete.
-    //We can also test this via equipment, but that takes up slots that may be needed for something else. (amulets, mohawk wigs, pirate fledges, war outfits...)
-    
-    int minus_combat_source_count = 0;
-    
-    int minus_combat_from_accessories =0;
-    //No silent beret, because mohawk wig:
-    //FIXME BUG: we don't detect if over-the-shoulder folder holder is a -combat source, because I'm not sure how to in ASH. But, we assume it does.
-    foreach it in $items[ring of conflict,red shoe,bram's choker,space trip safety headphones,fuzzy slippers of hatred,quiets-your-steps,over-the-shoulder folder holder]
-    {
-        if (!(it.can_equip() && it.available_amount() > 0))
-            continue;
-        if ($slots[acc1,acc2,acc3] contains it.to_slot())
-            minus_combat_from_accessories += 1;
-        else
-            minus_combat_source_count += 1;
-    }
-    //umm... is there any way to query the folder holder's current folders? can we just assume it's a -combat folder?
-    //numeric_modifier($item[over-the-shoulder folder holder], "Combat Rate") reports 0.0
-    
-    minus_combat_source_count += MIN(3, minus_combat_from_accessories); //three at most
-    
-    if ($skill[smooth movement].skill_is_usable())
-        minus_combat_source_count += 1;
-    if ($skill[the sonata of sneakiness].skill_is_usable())
-        minus_combat_source_count += 1;
-    if ($items[crown of thrones,buddy bjorn].available_amount() > 0 && $familiar[grimstone golem].have_familiar() && !__misc_state["familiars temporarily blocked"])
-        minus_combat_source_count += 1;
-    if (my_path_id() == PATH_AVATAR_OF_BORIS && $skill[song of solitude].skill_is_usable())
-        minus_combat_source_count += 4;
-    if (my_path_id() == PATH_ZOMBIE_SLAYER && $skill[disquiet riot].skill_is_usable())
-        minus_combat_source_count += 4;
-    if (my_path_id() == PATH_AVATAR_OF_JARLSBERG && $skill[chocolatesphere].skill_is_usable())
-        minus_combat_source_count += 3;
-    if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE)
-    {
-        if ($skill[Brood].skill_is_usable())
-            minus_combat_source_count += 2;
-        if (mafiaIsPastRevision(13785) && get_property("peteMotorbikeMuffler") == "Extra-Quiet Muffler" && $skill[Rev Engine].have_skill())
-            minus_combat_source_count += 3;
-    }
-    if (minus_combat_source_count >= 5)
+    if (__misc_state["can reasonably reach -25% combat"])
         state.state_boolean["need ballroom song set"] = false;
     
     
@@ -80,10 +38,11 @@ void QManorInit()
     state.state_boolean["ballroom song effectively set"] = !state.state_boolean["need ballroom song set"];
     if (combat_rate_modifier() <= -25.0)
         state.state_boolean["ballroom song effectively set"] = true;
-    if (__quest_state["Level 13"].in_progress || (__quest_state["Level 13"].finished && my_path_id() != PATH_BUGBEAR_INVASION))
+    if (__quest_state["Level 13"].in_progress || (__quest_state["Level 13"].finished && my_path_id() != PATH_BUGBEAR_INVASION) || questPropertyPastInternalStepNumber("questL13Final", 1))
         state.state_boolean["ballroom song effectively set"] = true;
     
-    
+    if (state.state_boolean["ballroom song effectively set"])
+        state.state_boolean["need ballroom song set"] = false;
     
     
     
@@ -174,130 +133,142 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         }
         else
         {
-            if (!ballroom_probably_open)
+            QuestState dance_quest_state;
+            QuestStateParseMafiaQuestProperty(dance_quest_state, "questM21Dance");
+            if (!dance_quest_state.finished && !($location[the haunted ballroom].noncombat_queue.contains_text("Having a Ball in the Ballroom")))
             {
                 ChecklistSubentry [int] subentries;
                 //Haunted gallery, bathroom, bedroom
                 url = $location[the haunted gallery].getClickableURLForLocation();
-                if (lookupItem("Lady Spookyraven's dancing shoes").available_amount() == 0)
+                
+                
+                if (dance_quest_state.mafia_internal_step <= 1)
                 {
-                    //NC (louvre or leave it) in gallery
-                    string [int] modifiers;
-                    string [int] description;
-                    
-                    description.listAppend("Find Lady Spookyraven's dancing shoes in the Louvre non-combat.");
-                    
-                    subentries.listAppend(ChecklistSubentryMake("Search in the Haunted Gallery", modifiers, description));
-                    if (image_name.length() == 0)
-                        image_name = "__item antique painting of a landscape";
-                    
-                    boolean garden_banished = CounterLookup("Garden Banished").CounterExists();
-                    
-                    boolean need_minus_combat = false;
-                        
-                    if (delayRemainingInLocation($location[the haunted gallery]) > 0)
-                    {
-                        string line = "Delay(?) for " + pluralize(delayRemainingInLocation($location[the haunted gallery]), "turn", "turns") + ".";
-                        if (__misc_state["have hipster"])
-                        {
-                            modifiers.listAppend(__misc_state_string["hipster name"]+"?");
-                        }
-                        if (!garden_banished)
-                        {
-                            line += " Try to find the garden NC to banish it.";
-                            need_minus_combat = true;
-                        }
-                        description.listAppend(line);
-                    }
-                    else
-                        need_minus_combat = true;
-                    
-                    if (need_minus_combat)
-                        modifiers.listAppend("-combat");
-                    
-                    modifiers.listAppend("+meat");
-                }
-                if (lookupItem("Lady Spookyraven's powder puff").available_amount() == 0)
-                {
-                    string [int] modifiers;
-                    string [int] description;
-                    description.listAppend("Find Lady Spookyraven's powder puff. (NC leads to cosmetics wraith)");
-                    //combat rate extremely approximate, needs spading
-                    description.listAppend(generateTurnsToSeeNoncombat(85, 1, "find cosmetics wraith", 10 - delayRemainingInLocation($location[the haunted bathroom]), delayRemainingInLocation($location[the haunted bathroom])));
-                    subentries.listAppend(ChecklistSubentryMake("Search in the Haunted Bathroom", modifiers, description));
-                    
-                    if (image_name.length() == 0)
-                        image_name = "__item bottle of Monsieur Bubble";
-                    if (delayRemainingInLocation($location[the haunted bathroom]) > 0)
-                    {
-                        string line = "Delay for " + pluralize(delayRemainingInLocation($location[the haunted bathroom]), "turn", "turns") + ".";
-                        if (__misc_state["have hipster"])
-                        {
-                            modifiers.listAppend(__misc_state_string["hipster name"]+"?");
-                        }
-                        description.listAppend(line);
-                    }
-                    else
-                        modifiers.listAppend("-combat");
-                }
-                if (lookupItem("Lady Spookyraven's finest gown").available_amount() == 0)
-                {
-                    //elegant nightstand in bedroom (banish?)
-                    //also acquire disposable instant camera. spectacles...?
-                    //banishing may not help much?
-                    string [int] modifiers;
-                    string [int] description;
-                    
-                    description.listAppend("Find Lady Spookyraven's finest gown in the elegant nightstand.");
-                    
-                    string [int] items_needed_from_ornate_drawer;
-                    
-                    if ($item[lord spookyraven's spectacles].available_amount() == 0 && __quest_state["Level 11 Manor"].state_boolean["Can use fast route"])
-                        items_needed_from_ornate_drawer.listAppend("lord spookyraven's spectacles");
-                    
-                    if (__quest_state["Level 11 Palindome"].state_boolean["Need instant camera"] && 7266.to_item().available_amount() == 0)
-                        items_needed_from_ornate_drawer.listAppend("disposable instant camera");
-                        
-                        
-                    if (items_needed_from_ornate_drawer.count() > 0)
-                    {
-                        description.listAppend("Banish non-ornate drawers.");
-                        modifiers.listAppend("banish non-ornate");
-                    }
-                    else
-                    {
-                        description.listAppend("Banish non-elegant drawers.");
-                        modifiers.listAppend("banish non-elegant");
-                    }
-                    
-                    if (items_needed_from_ornate_drawer.count() > 0)
-                        description.listAppend("Also acquire " + items_needed_from_ornate_drawer.listJoinComponents(", ", "and") + " from the ornate drawer.");
-                    
-                        
-                    if (delayRemainingInLocation($location[the haunted bedroom]) > 1)
-                    {
-                        string line = "Delay for " + pluralize(delayRemainingInLocation($location[the haunted bedroom]), "turn", "turns") + ".";
-                        if (__misc_state["have hipster"])
-                        {
-                            line += " (use " + __misc_state_string["hipster name"] + ")";
-                            modifiers.listAppend(__misc_state_string["hipster name"]);
-                        }
-                        description.listAppend(line);
-                    }
-                    
-                    
-                    subentries.listAppend(ChecklistSubentryMake("Search in the Haunted Bedroom", modifiers, description));
-                    if (image_name.length() == 0)
-                        image_name = "Haunted Bedroom";
-                    
-                }
-                if (lookupItem("Lady Spookyraven's dancing shoes").available_amount() > 0 && lookupItem("Lady Spookyraven's powder puff").available_amount() > 0 && lookupItem("Lady Spookyraven's finest gown").available_amount() > 0)
-                {
-                    subentry.header = "Dance with Lady Spookyraven";
-                    subentry.entries.listAppend("Adventure in the Haunted Ballroom.");
-                    subentry.entries.listAppend("Gives stats.");
-                    
+                    subentries.listAppend(ChecklistSubentryMake("Speak to Lady Spookyraven", "", ""));
                     image_name = "Lady Spookyraven";
+                }
+                else
+                {
+                    if (lookupItem("Lady Spookyraven's dancing shoes").available_amount() == 0)
+                    {
+                        //NC (louvre or leave it) in gallery
+                        string [int] modifiers;
+                        string [int] description;
+                        
+                        description.listAppend("Find Lady Spookyraven's dancing shoes in the Louvre non-combat.");
+                        
+                        subentries.listAppend(ChecklistSubentryMake("Search in the Haunted Gallery", modifiers, description));
+                        if (image_name.length() == 0)
+                            image_name = "__item antique painting of a landscape";
+                        
+                        boolean garden_banished = CounterLookup("Garden Banished").CounterExists();
+                        
+                        boolean need_minus_combat = false;
+                            
+                        if (delayRemainingInLocation($location[the haunted gallery]) > 0)
+                        {
+                            string line = "Delay(?) for " + pluralize(delayRemainingInLocation($location[the haunted gallery]), "turn", "turns") + ".";
+                            if (__misc_state["have hipster"])
+                            {
+                                modifiers.listAppend(__misc_state_string["hipster name"]+"?");
+                            }
+                            if (!garden_banished)
+                            {
+                                line += " Try to find the garden NC to banish it.";
+                                need_minus_combat = true;
+                            }
+                            description.listAppend(line);
+                        }
+                        else
+                            need_minus_combat = true;
+                        
+                        if (need_minus_combat)
+                            modifiers.listAppend("-combat");
+                        
+                        modifiers.listAppend("+meat");
+                    }
+                    if (lookupItem("Lady Spookyraven's powder puff").available_amount() == 0)
+                    {
+                        string [int] modifiers;
+                        string [int] description;
+                        description.listAppend("Find Lady Spookyraven's powder puff. (NC leads to cosmetics wraith)");
+                        //combat rate extremely approximate, needs spading
+                        description.listAppend(generateTurnsToSeeNoncombat(85, 1, "find cosmetics wraith", 10 - delayRemainingInLocation($location[the haunted bathroom]), delayRemainingInLocation($location[the haunted bathroom])));
+                        subentries.listAppend(ChecklistSubentryMake("Search in the Haunted Bathroom", modifiers, description));
+                        
+                        if (image_name.length() == 0)
+                            image_name = "__item bottle of Monsieur Bubble";
+                        if (delayRemainingInLocation($location[the haunted bathroom]) > 0)
+                        {
+                            string line = "Delay for " + pluralize(delayRemainingInLocation($location[the haunted bathroom]), "turn", "turns") + ".";
+                            if (__misc_state["have hipster"])
+                            {
+                                modifiers.listAppend(__misc_state_string["hipster name"]+"?");
+                            }
+                            description.listAppend(line);
+                        }
+                        else
+                            modifiers.listAppend("-combat");
+                    }
+                    if (lookupItem("Lady Spookyraven's finest gown").available_amount() == 0)
+                    {
+                        //elegant nightstand in bedroom (banish?)
+                        //also acquire disposable instant camera. spectacles...?
+                        //banishing may not help much?
+                        string [int] modifiers;
+                        string [int] description;
+                        
+                        description.listAppend("Find Lady Spookyraven's finest gown in the elegant nightstand.");
+                        
+                        string [int] items_needed_from_ornate_drawer;
+                        
+                        if ($item[lord spookyraven's spectacles].available_amount() == 0 && __quest_state["Level 11 Manor"].state_boolean["Can use fast route"])
+                            items_needed_from_ornate_drawer.listAppend("lord spookyraven's spectacles");
+                        
+                        if (__quest_state["Level 11 Palindome"].state_boolean["Need instant camera"] && 7266.to_item().available_amount() == 0)
+                            items_needed_from_ornate_drawer.listAppend("disposable instant camera");
+                            
+                            
+                        if (items_needed_from_ornate_drawer.count() > 0)
+                        {
+                            description.listAppend("Banish non-ornate drawers.");
+                            modifiers.listAppend("banish non-ornate");
+                        }
+                        else
+                        {
+                            description.listAppend("Banish non-elegant drawers.");
+                            modifiers.listAppend("banish non-elegant");
+                        }
+                        
+                        if (items_needed_from_ornate_drawer.count() > 0)
+                            description.listAppend("Also acquire " + items_needed_from_ornate_drawer.listJoinComponents(", ", "and") + " from the ornate drawer.");
+                        
+                            
+                        if (delayRemainingInLocation($location[the haunted bedroom]) > 0)
+                        {
+                            string line = "Delay for " + pluralize(delayRemainingInLocation($location[the haunted bedroom]), "turn", "turns") + ".";
+                            if (__misc_state["have hipster"])
+                            {
+                                line += " (use " + __misc_state_string["hipster name"] + ")";
+                                modifiers.listAppend(__misc_state_string["hipster name"]);
+                            }
+                            description.listAppend(line);
+                        }
+                        
+                        
+                        subentries.listAppend(ChecklistSubentryMake("Search in the Haunted Bedroom", modifiers, description));
+                        if (image_name.length() == 0)
+                            image_name = "Haunted Bedroom";
+                        
+                    }
+                    if (lookupItem("Lady Spookyraven's dancing shoes").available_amount() > 0 && lookupItem("Lady Spookyraven's powder puff").available_amount() > 0 && lookupItem("Lady Spookyraven's finest gown").available_amount() > 0 || dance_quest_state.mafia_internal_step == 4)
+                    {
+                        subentry.header = "Dance with Lady Spookyraven";
+                        subentry.entries.listAppend("Adventure in the Haunted Ballroom.");
+                        subentry.entries.listAppend("Gives stats.");
+                        
+                        image_name = "Lady Spookyraven";
+                    }
                 }
                 //FIXME suggest acquiring instant camera and spectacles
                 if (subentries.count() > 0)
@@ -354,7 +325,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         image_name = "__item tiny knife and fork";
         subentry.entries.listAppend("To unlock the Haunted Billiards Room.");
         
-        if (get_property("romanticTarget").to_monster() == $monster[writing desk])
+        if (get_property("romanticTarget").to_monster() == $monster[writing desk] && get_property_int("_romanticFightsLeft") > 0)
             subentry.entries.listAppend(HTMLGenerateSpanFont("Avoid adventuring here,", "red", "") + " as you seem to be using the writing desk trick?");
         
         float drawers_per_turn = 0.0;

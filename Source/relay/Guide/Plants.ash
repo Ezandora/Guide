@@ -91,11 +91,11 @@ void finalizeSetUpFloristState()
 		__plants_suggested_locations.listAppend(PlantSuggestionMake($location[the defiled alcove], "Shuffle Truffle", "+2.5% modern zmobie"));
 	}
 	//Horn of Plenty - underground, +item:
-	if (__quest_state["Level 7"].state_boolean["nook needs speed tricks"] && item_drop_modifier() < 400.0)
+	if (__quest_state["Level 7"].state_boolean["nook needs speed tricks"] && $location[the defiled nook].item_drop_modifier_for_location() < 400.0)
 	{
 		__plants_suggested_locations.listAppend(PlantSuggestionMake($location[the defiled nook], "horn of plenty", "Evil eye, 20% drop."));
 	}
-	if (!__quest_state["Level 11"].finished && item_drop_modifier() < 400.0)
+	if (!__quest_state["Level 11"].finished && $location[the middle chamber].item_drop_modifier_for_location() < 400.0)
 	{
 		__plants_suggested_locations.listAppend(PlantSuggestionMake($location[the middle chamber], "horn of plenty", "Tomb ratchets, 20% drop."));
 	}

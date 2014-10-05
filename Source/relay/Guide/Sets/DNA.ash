@@ -88,10 +88,9 @@ effect __current_dna_intrinsic = $effect[none];
 
 void SDNAInit()
 {
-
     if (!mafiaIsPastRevision(13918)) //minimum supported version
         return;
-    if (get_campground()[lookupItem("Little Geneticist DNA-Splicing Lab")] == 0)
+    if (get_campground()[$item[Little Geneticist DNA-Splicing Lab]] == 0)
         return;
 
 

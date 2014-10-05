@@ -44,7 +44,7 @@ void SLibramGenerateResource(ChecklistEntry [int] available_resources_entries)
 				ChecklistSubentry subentry;
 				subentry.header =  (3 - get_property_int("_brickoEyeSummons")) + " BRICKO&trade; eye bricks obtainable";
 				subentry.entries.listAppend("Cast Summon BRICKOs libram. (" + libram_mp_cost + " mp)");
-				available_resources_entries.listAppend(ChecklistEntryMake("__item bricko eye brick", "campground.php?action=bookshelf", subentry, 7));
+				available_resources_entries.listAppend(ChecklistEntryMake("__item bricko eye brick", "campground.php?action=bookshelf", subentry, 9));
 				
 			}
 		}

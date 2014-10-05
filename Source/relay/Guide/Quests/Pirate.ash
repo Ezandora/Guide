@@ -228,7 +228,7 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
                 subentry.modifiers.listAppend("+234% item");
                 subentry.modifiers.listAppend("+20% combat");
 				line += " Run +234% item, +combat, and collect " + missing_washing_items.listJoinComponents(", ", "and") + ".";
-				if (item_drop_modifier() < 234.0)
+				if ($location[the f'c'le].item_drop_modifier_for_location() < 234.0)
 					additional_line = "This location can be a nightmare without +234% item.";
 			}
             

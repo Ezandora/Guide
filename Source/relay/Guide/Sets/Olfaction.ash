@@ -79,6 +79,20 @@ void SOlfactionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         if (m == olfacted_monster)
             continue;
         
+        boolean all_other_monsters_banished = true;
+        foreach key, m2 in l.get_monsters()
+        {
+            if (m == m2)
+                continue;
+            if (!m2.is_banished())
+            {
+                all_other_monsters_banished = false;
+                break;
+            }
+        }
+        if (all_other_monsters_banished)
+            continue;
+        
         string [int] description;
         
         string line;

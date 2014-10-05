@@ -323,7 +323,7 @@ void QLevel13Init()
     
 	state.state_boolean["have relevant guitar"] = $items[acoustic guitarrr,heavy metal thunderrr guitarrr,stone banjo,Disco Banjo,Shagadelic Disco Banjo,Seeger's Unstoppable Banjo,Massive sitar,4-dimensional guitar,plastic guitar,half-sized guitar,out-of-tune biwa,Zim Merman's guitar,dueling banjo].available_amount() > 0;
     
-	state.state_boolean["have relevant accordion"] = $items[stolen accordion,calavera concertina,Rock and Roll Legend,Squeezebox of the Ages,The Trickster's Trikitixa,toy accordion].available_amount() > 0;
+	state.state_boolean["have relevant accordion"] = $items[stolen accordion,calavera concertina,Rock and Roll Legend,Squeezebox of the Ages,The Trickster's Trikitixa,toy accordion,antique accordion].available_amount() > 0;
 	state.state_boolean["have relevant drum"] = $items[tambourine, big bass drum, black kettle drum, bone rattle, hippy bongo, jungle drum].available_amount() > 0;
     
     if (state.state_boolean["past keys"])
@@ -398,8 +398,14 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         url = "lair3.php";
 		//at hedge maze
 		subentry.modifiers.listAppend("+67% item");
-		subentry.entries.listAppend("Hedge maze. Find puzzles.");
-		if (item_drop_modifier() < 66.666666667)
+        if ($item[hedge maze puzzle].available_amount() > 0)
+        {
+            url = "hedgepuzzle.php";
+            subentry.entries.listAppend("Hedge maze. Solve puzzle.");
+        }
+        else
+            subentry.entries.listAppend("Hedge maze. Find puzzles.");
+		if ($location[sorceress' hedge maze].item_drop_modifier_for_location() < 66.666666667)
 			subentry.entries.listAppend("Need more +item.");
         if ($item[hedge maze key].available_amount() == 0)
 			subentry.entries.listAppend("Find the key.");

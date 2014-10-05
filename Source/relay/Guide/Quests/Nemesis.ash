@@ -444,7 +444,7 @@ void QNemesisGenerateCaveTasks(ChecklistSubentry subentry, item legendary_epic_w
             subentry.modifiers.listAppend("+234% item");
             subentry.entries.listAppend("Run +234% item in the large chamber.");
             int strips_needed = MAX(8 - paper_strips_found, 0);
-            float average_turns = clampNormalf(0.3 * (1.0 + item_drop_modifier() / 100.0));
+            float average_turns = clampNormalf(0.3 * (1.0 + $location[nemesis cave].item_drop_modifier_for_location() / 100.0));
             if (average_turns != 0.0)
                 average_turns = strips_needed / average_turns;
             else

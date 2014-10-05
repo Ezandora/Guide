@@ -49,8 +49,7 @@ void generateMissingItems(Checklist [int] checklists)
 			guitar_options.listAppend("Massive sitar - hippy war store");
 			if (my_class() == $class[Turtle tamer])
 				guitar_options.listAppend("Dueling banjo - tame a turtle at whitey's grove");
-			if (my_primestat() == $stat[muscle])
-				guitar_options.listAppend("4-dimensional guitar - 5% drop, cubist bull, haunted gallery (yellow ray?)");
+            guitar_options.listAppend("4-dimensional guitar - 5% drop, cubist bull, haunted gallery (yellow ray?)");
 				
 			items_needed_entries.listAppend(ChecklistEntryMake("__item Acoustic guitarrr", "", ChecklistSubentryMake("Guitar", "", guitar_options)));
 		}
@@ -179,7 +178,7 @@ void generateMissingItems(Checklist [int] checklists)
 		else if (have_skill($skill[candyblast]))
 			telescope_item_suggestions[$item[Angry Farmer candy]] += "|*Cast candyblast";
 		else
-			telescope_item_suggestions[$item[Angry Farmer candy]] += "|*Raver giant, castle top floor, 30% drop"; //FIXME we need sugar rush, not angry farmer candy.
+			telescope_item_suggestions[$item[Angry Farmer candy]] += "|*Raver giant, castle top floor, 25% drop"; //FIXME we need sugar rush, not angry farmer candy.
 		telescope_item_suggestions[$item[thin black candle]] = "Goth Giant, Castle Top Floor, 30% drop|Non-combat on top floor. (slow)";
 		telescope_item_suggestions[$item[super-spiky hair gel]] = "Protagonist, Penultimate Fantasy Airship, 20% drop";
 		telescope_item_suggestions[$item[Black No. 2]] = "Black panther, black forest, 20% drop";

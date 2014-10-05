@@ -104,10 +104,8 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		if (evilness > 26)
 		{
             subentry.modifiers.listAppend("+400% item");
-            float item_drop = (100.0 + item_drop_modifier()) / 100.0;
+            float item_drop = (100.0 + $location[the defiled nook].item_drop_modifier_for_location()) / 100.0;
             
-            if ($location[the defiled nook].locationHasPlant("Horn of Plenty") && my_location() != $location[the defiled nook])
-                item_drop += .25;
 			float eyes_per_adventure = MIN(1.0, (item_drop) * 0.2);
             float eyes_value = 3.0;
             if (evilness < 29)

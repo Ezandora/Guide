@@ -21,8 +21,28 @@ float QLevel6TurnsToCompleteArea(location place)
     //First NC will always happen at 6, second at 11, third at 16.
     int turns_spent_in_zone = turnsAttemptedInLocation(place); //not always accurate
     int ncs_found = noncombatTurnsAttemptedInLocation(place);
+    
+    boolean [string] area_known_ncs;
+    if (place == $location[the dark neck of the woods])
+        area_known_ncs = $strings[How Do We Do It? Quaint and Curious Volume!,Strike One!,Dodecahedrariffic!];
+    if (place == $location[The Dark Heart of the Woods])
+        area_known_ncs = $strings[Moon Over the Dark Heart,Running the Lode,Imp Be Nimble\, Imp Be Quick];
+    if (place == $location[The Dark Elbow of the Woods])
+        area_known_ncs = $strings[Deep Imp Act,Imp Art\, Some Wisdom,Butter Knife? I'll Take the Knife];
+    
+    if (area_known_ncs.count() > 0)
+    {
+        ncs_found = 0;
+        string [int] location_ncs = place.locationSeenNoncombats();
+        foreach key, s in location_ncs
+        {
+            if (area_known_ncs contains s)
+                ncs_found += 1;
+        }
+    }
     if (ncs_found == 3)
         return 0.0;
+    
     float turns_remaining = 0.0;
     int ncs_remaining = MAX(0, 3 - ncs_found);
     

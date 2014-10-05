@@ -117,7 +117,7 @@ void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [in
 	{
 		string line;
 		boolean requirements_met = false;
-		if (item_drop_modifier() < 150.0)
+		if (item_drop_modifier_ignoring_plants() < 150.0)
 			line += "Need ";
 		else
 		{
@@ -155,6 +155,13 @@ void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [in
     {
         if (lookupItem("telegram from Lady Spookyraven").available_amount() > 0)
             description.listAppend(HTMLGenerateSpanFont("Read the telegram from Lady Spookyraven first.", "red", ""));
+
+    }
+    else if (monster_name == "Skinflute" || monster_name == "Camel's Toe")
+    {
+        description.listAppend("Have " + pluralize($item[star]) + " and " + pluralize($item[line]) + ".");
+		if (item_drop_modifier_ignoring_plants() < 234.0)
+			description.listAppend(HTMLGenerateSpanFont("Need +234% item.", "red", ""));
     }
 }
 
@@ -234,7 +241,8 @@ void SCopiedMonstersGenerateResourceForCopyType(ChecklistEntry [int] available_r
         monster_description.listAppend("Auto attack is on, disable it?");
     }
 	
-	string line = monster_name.capitalizeFirstLetter() + HTMLGenerateIndentedText(monster_description);
+	//string line = monster_name.capitalizeFirstLetter() + HTMLGenerateIndentedText(monster_description);
+    string line = HTMLGenerateSpanOfClass(monster_name.capitalizeFirstLetter(), "r_bold") + "<hr>" + monster_description.listJoinComponents("|");
 	
 	available_resources_entries.listAppend(ChecklistEntryMake(shaking_object, url, ChecklistSubentryMake(shaking_shorthand_name.capitalizeFirstLetter() + " monster trapped!", "", line)));
 }

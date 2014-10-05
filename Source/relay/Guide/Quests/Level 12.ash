@@ -101,6 +101,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 		if (__misc_state["yellow ray potentially available"])
 			modifiers.listAppend("potential YR");
 	
+        location next_location;
         monster pickpocket_monster = $monster[none];
         boolean need_gland = false;
 		if ($item[heart of the filthworm queen].available_amount() > 0)
@@ -118,6 +119,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 			modifiers.listClear();
             modifiers.listAppend("+meat");
 			details.listAppend("Defeat the filthworm queen in the queen's chamber.");
+            next_location = $location[the filthworm queen's chamber];
 		}
 		else if ($effect[Filthworm Drone Stench].have_effect() > 0 || $item[Filthworm drone scent gland].available_amount() > 0)
 		{
@@ -129,6 +131,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 			details.listAppend("Adventure with +item in the guards' chamber.");
             need_gland = true;
             pickpocket_monster = $monster[filthworm royal guard];
+            next_location = $location[the royal guard chamber];
 		}
 		else if ($effect[Filthworm Larva Stench].have_effect() > 0 || $item[filthworm hatchling scent gland].available_amount() > 0)
 		{
@@ -140,12 +143,14 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 			details.listAppend("Adventure with +item in the feeding chamber.");
             need_gland = true;
             pickpocket_monster = $monster[filthworm drone];
+            next_location = $location[the feeding chamber];
 		}
 		else
 		{
 			details.listAppend("Adventure with +item in the hatching chamber.");
             need_gland = true;
             pickpocket_monster = $monster[larval filthworm];
+            next_location = $location[the hatching chamber];
 		}
         
         if (__misc_state["can pickpocket"] && pickpocket_monster != $monster[none])
@@ -158,7 +163,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
         
         if (need_gland)
         {
-            float effective_item_drop = item_drop_modifier() / 100.0;
+            float effective_item_drop = next_location.item_drop_modifier_for_location() / 100.0;
             //FIXME take into account pickpocketing, init, etc.
             float average_glands_found_per_combat = MIN(1.0, (effective_item_drop + 1.0) * 0.1);
             float turns_per_gland = -1.0;
@@ -363,7 +368,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
             details.listAppend("~" + roundForOutput(turns_to_complete, 1) + " turns to complete quest at " + combat_rate_modifier().floor() + "% combat.|~" + roundForOutput(turns_per_lobster, 1) + " turns per lobster.");
         }
         else
-            details.listAppend("Talk to the lighthouse keeper.");
+            details.listAppend("Talk to the lighthouse keeper to finish quest.");
 	
 		optional_task_entries.listAppend(ChecklistEntryMake("Island War Lighthouse", "bigisland.php?place=lighthouse", ChecklistSubentryMake("Island War Lighthouse Quest", modifiers, details), $locations[sonofa beach]));
 	}

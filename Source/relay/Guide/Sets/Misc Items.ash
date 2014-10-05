@@ -439,7 +439,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
     
     if (!get_property_boolean("_defectiveTokenChecked") && get_property_int("lastArcadeAscension") == my_ascensions())
     {
-        available_resources_entries.listAppend(ChecklistEntryMake("__item jackass plumber home game", "arcade.php", ChecklistSubentryMake("Broken arcade game", "", "May find a defective game grid token."), importance_level_item));
+        available_resources_entries.listAppend(ChecklistEntryMake("__item jackass plumber home game", "place.php?whichplace=arcade", ChecklistSubentryMake("Broken arcade game", "", "May find a defective game grid token."), importance_level_item));
     
     }
     if ($item[defective Game Grid token].available_amount() > 0 && !get_property_boolean("_defectiveTokenUsed"))
@@ -547,7 +547,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
     if ($item[drum machine].available_amount() > 0 && in_run && (my_adventures() <= 1 || (availableDrunkenness() < 0 && availableDrunkenness() > -4)) && __quest_state["Level 11 Desert"].state_boolean["Desert Explored"])
     {
         //Daycount strategy that never works, suggest:
-        string line = (100.0 * ((item_drop_modifier() / 100.0 + 1.0) * (1.0 / 1000.0))).roundForOutput(2) + "% chance of spice melange.";
+        string line = (100.0 * ((item_drop_modifier_ignoring_plants() / 100.0 + 1.0) * (1.0 / 1000.0))).roundForOutput(2) + "% chance of spice melange.";
         if (my_adventures() == 0)
             line += "|Need one adventure.";
         available_resources_entries.listAppend(ChecklistEntryMake("__item drum machine", "inventory.php?which=3", ChecklistSubentryMake(pluralize($item[drum machine]), "", line), importance_level_unimportant_item));

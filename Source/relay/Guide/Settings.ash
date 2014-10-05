@@ -1,5 +1,5 @@
 //These settings are for development. Don't worry about editing them.
-string __version = "1.1.11";
+string __version = "1.1.12";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -23,7 +23,7 @@ boolean __setting_use_kol_css = false; //images/styles.css
 boolean __setting_show_location_bar = true;
 boolean __setting_location_bar_fixed_layout = true;
 boolean __setting_location_bar_limit_max_width = true;
-float __setting_location_bar_max_width_per_entry = 0.4;
+float __setting_location_bar_max_width_per_entry = 0.35;
 
 string __setting_unavailable_color = "#7F7F7F";
 string __setting_line_color = "#B2B2B2";
