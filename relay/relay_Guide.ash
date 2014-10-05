@@ -14031,25 +14031,30 @@ void QWhiteCitadelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
         
         subentry.entries.listAppend("Adventure on the Road to White Citadel, defeat " + int_to_wordy(burnouts_remaining) + " more burn-outs.");
         
-        if ($item[opium grenade].storage_amount() > 1 && pulls_remaining() == -1)
+        item opium_grenade = lookupItem("opium grenade");
+        
+        if (opium_grenade == $item[none])
+        {
+        }
+        else if (opium_grenade.storage_amount() > 1 && pulls_remaining() == -1)
             subentry.entries.listAppend("Pull some opium grenades from hagnk's.");
-        else if ($item[opium grenade].storage_amount() > 0 && pulls_remaining() == -1)
+        else if (opium_grenade.storage_amount() > 0 && pulls_remaining() == -1)
             subentry.entries.listAppend("Pull an opium grenade from hagnk's.");
-        else if ($item[opium grenade].available_amount() == 1)
+        else if (opium_grenade.available_amount() == 1)
             subentry.entries.listAppend("Throw an opium grenade at burnouts.");
-        else if ($item[opium grenade].available_amount() > 1)
+        else if (opium_grenade.available_amount() > 1)
             subentry.entries.listAppend("Throw opium grenades at burnouts.");
         
-        if ($item[poppy].available_amount() >= 2)
+        if (lookupItem("poppy").available_amount() >= 2)
         {
             string line = "Make opium grenade. (meatpaste poppy + poppy)";
-            if ($item[opium grenade].available_amount() == 0)
+            if (opium_grenade.available_amount() == 0)
                 line = HTMLGenerateSpanFont(line, "red", "");
             subentry.entries.listAppend(line);
         }
         
         //turn estimation why not?
-        float grenades_have_now = $item[opium grenade].available_amount().to_float() + $item[poppy].available_amount().to_float() * 0.5;
+        float grenades_have_now = opium_grenade.available_amount().to_float() + lookupItem("poppy").available_amount().to_float() * 0.5;
         
         float poppy_one_drop_rate = clampNormalf(0.3 * (1.0 + lookupLocation("the road to the white citadel").item_drop_modifier_for_location() / 100.0));
         float poppy_two_drop_rate = clampNormalf(0.1 * (1.0 + lookupLocation("the road to the white citadel").item_drop_modifier_for_location() / 100.0));
