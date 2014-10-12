@@ -193,7 +193,7 @@ void SSemirareGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
         Vec2i turn_range = semirare_counter.CounterGetWindowRange();
         
         string turn_range_x_string = turn_range.x;
-        if (turn_range.x == -1)
+        if (turn_range.x <= -1)
             turn_range_x_string = "Past";
         if (turn_range.x == 0)
             turn_range_x_string = "Now";
@@ -204,6 +204,8 @@ void SSemirareGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
         
         if (turn_range.x <= 0)
             very_important = true;
+        if (turn_range.y < 0)
+            return;
 	}
 	else if (semirare_counter.exact_turns.count() > 0)
 	{

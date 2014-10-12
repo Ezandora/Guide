@@ -272,7 +272,15 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         }
         
         if (!__quest_state["Level 13"].state_boolean["have relevant drum"])
-            subentry.entries.listAppend("Acquire a drum from the non-combat. (Church -> orchestra pit)");
+        {
+            boolean church_unlocked = (get_property_int("blackForestProgress") >= 4);
+            
+            string line = "Acquire a drum from the non-combat" + (church_unlocked ? "" : " once the church is unlocked") + ". (Church -> orchestra pit)";
+            if (!church_unlocked)
+                line = HTMLGenerateSpanFont(line, "gray", "");
+            
+            subentry.entries.listAppend(line);
+        }
     }
     else if (base_quest_state.mafia_internal_step < 3)
     {
@@ -1270,7 +1278,8 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
                     tasks.listAppend("spin the pyramid One More Time");
                 else
                     tasks.listAppend("spin the pyramid " + spins_needed.int_to_wordy() + " times");
-                url = "place.php?whichplace=pyramid&action=pyramid_control";
+                if ($item[tomb ratchet].available_amount() + lookupItem("crumbling wooden wheel").available_amount() > 0)
+                    url = "place.php?whichplace=pyramid&action=pyramid_control";
             }
             tasks.listAppend(task);
             
@@ -1461,7 +1470,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 {
                     int turns_remaining = MAX(0, 6 - $location[the hidden park].turnsAttemptedInLocation());
                     string line;
-                    line += "Adventure for " + turns_remaining.int_to_wordy() + " turns here for antique machete to clear dense lianas.";
+                    line += "Adventure for " + pluralizeWordy(turns_remaining, "turn", "turns") + " here for antique machete to clear dense lianas.";
                     if (canadia_available())
                         line += "|Or potentially use muculent machete by acquiring forest tears. (kodama, Outskirts of Camp Logging Camp, 30% drop or clover)";
                     subentry.entries.listAppend(line);
@@ -1710,6 +1719,17 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 
                 if ($item[bowling ball].available_amount() > 0)
                     line += "|Have " + pluralizeWordy($item[bowling ball]) + ".";
+                if ($item[bowling ball].available_amount() < rolls_needed)
+                {
+                    if ($item[bowling ball].closet_amount() > 0 && $item[bowling ball].available_amount() > 0)
+                        line += " (" + ($item[bowling ball].available_amount() + $item[bowling ball].closet_amount()).int_to_wordy() + " total with closet)";
+                    else if ($item[bowling ball].closet_amount() > 0)
+                    {
+                        line += "|Have " + pluralizeWordy($item[bowling ball].closet_amount(), $item[bowling ball]) + " in closet.";
+                        if ($item[bowling ball].closet_amount() >= rolls_needed)
+                            line += " (take them out!)";
+                    }
+                }
                 
                 subentry.entries.listAppend(line);
                 

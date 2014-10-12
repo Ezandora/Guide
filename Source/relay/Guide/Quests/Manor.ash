@@ -144,7 +144,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
                 
                 if (dance_quest_state.mafia_internal_step <= 1)
                 {
-                    subentries.listAppend(ChecklistSubentryMake("Speak to Lady Spookyraven", "", ""));
+                    subentries.listAppend(ChecklistSubentryMake("Speak to Lady Spookyraven", "", "To open the haunted gallery, bathroom, and bedroom."));
                     image_name = "Lady Spookyraven";
                 }
                 else

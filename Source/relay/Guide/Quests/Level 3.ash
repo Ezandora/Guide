@@ -43,7 +43,7 @@ void QLevel3GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	
     float combat_rate = clampNormalf((0.85 + combat_rate_modifier() / 100.0)); //15%? I can't remember...
     
-    float average_tangles_found = (clampNormalf(rat_king_chance * combat_rate * 8.5));
+    float average_tangles_found = (clampNormalf(rat_king_chance * combat_rate) * 8.5);
 	
 	if (wait_until_level_eleven)
 		subentry.entries.listAppend("May want to wait until level 11 for most +ML from aria");

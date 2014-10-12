@@ -393,6 +393,7 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 				if ($item[sea cowbell].available_amount() <3 )
                 {
                     int needed_amount = MAX(3 - $item[sea cowbell].available_amount(), 0);
+                    if (line.length() > 0) line += " ";
 					line += "Buy " + pluralizeWordy(needed_amount, "sea cowbell", "sea cowbells") + ".";
                 }
                 if (line.length() > 0)
@@ -470,7 +471,7 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
                 }
                 else if ($item[Mer-kin lockkey].available_amount() == 0)
                 {
-                    subentry.entries.listAppend("Adventure in the Mer-Kin outpost, acquire a lockkey.");
+                    subentry.entries.listAppend("Ask grandpa about his wife, then adventure in the Mer-Kin outpost to acquire a lockkey.");
                     subentry.entries.listAppend("Unless you unlocked the currents already, in which case go to the corral.");
                 }
                 else if ($item[Mer-kin stashbox].available_amount() == 0)
@@ -525,11 +526,19 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
             }
             else if (monkees_quest_state.mafia_internal_step == 1)
             {
-                //Talk to little brother
-                subentry.entries.listAppend("Talk to little brother.");
-                url = "monkeycastle.php";
+                if ($item[wriggling flytrap pellet].available_amount() > 0)
+                {
+                    url = "inventory.php?which=3";
+                    subentry.entries.listAppend("Open a wriggling flytrap pellet, talk to little brother.");
+                }
+                else
+                {
+                    //Talk to little brother
+                    subentry.entries.listAppend("Talk to little brother.");
+                    url = "monkeycastle.php";
+                }
             }
-            else if (monkees_quest_state.mafia_internal_step < 1)
+            else
             {
                 //Octopus's garden, obtain wriggling flytrap pellet
                 if ($item[wriggling flytrap pellet].available_amount() == 0)

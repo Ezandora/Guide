@@ -46,7 +46,7 @@ void QWhiteCitadelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
     {
         //1	Find the road to the White Citadel, somewhere in Whitey's Grove.
         //Unlock the road to white citadel:
-        subentry.modifiers.listAppend("-combat?");
+        subentry.modifiers.listAppend("+15% combat");
         subentry.modifiers.listAppend("free runs");
         subentry.entries.listAppend("Adventure in Whitey's Grove, unlock the road to the White Citadel.");
     }

@@ -242,7 +242,10 @@ void SCopiedMonstersGenerateResourceForCopyType(ChecklistEntry [int] available_r
     }
 	
 	//string line = monster_name.capitalizeFirstLetter() + HTMLGenerateIndentedText(monster_description);
-    string line = HTMLGenerateSpanOfClass(monster_name.capitalizeFirstLetter(), "r_bold") + "<hr>" + monster_description.listJoinComponents("|");
+    string line = HTMLGenerateSpanOfClass(monster_name.capitalizeFirstLetter(), "r_bold");
+    
+    if (monster_description.count() > 0)
+        line += "<hr>" + monster_description.listJoinComponents("|");
 	
 	available_resources_entries.listAppend(ChecklistEntryMake(shaking_object, url, ChecklistSubentryMake(shaking_shorthand_name.capitalizeFirstLetter() + " monster trapped!", "", line)));
 }

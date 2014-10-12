@@ -90,7 +90,7 @@ string generateRandomMessage()
     equipment_messages[$item[mr. accessory]] = "you can equip mr. accessories?";
     equipment_messages[$item[white hat hacker T-shirt]] = "hack the planet";
     equipment_messages[$item[heart necklace]] = "&#x2665;&#xfe0e;"; //♥︎
-    equipment_messages[$item[fleetwood chain]] = "run in the shadows";
+    equipment_messages[$item[fleetwood chain]] = "running in the shadows";
     equipment_messages[$item[liar's pants]] = "never tell the same lie twice";
     equipment_messages[$item[detective skull]] = HTMLGenerateSpanFont("too slow ascend faster", "#ACA200", ""); //speakeasy password
     equipment_messages[$item[gasmask]] = "are you my mummy?";
@@ -128,6 +128,7 @@ string generateRandomMessage()
     effect_messages[$effect[Neuromancy]] = "the silver paths";
     effect_messages[$effect[Teleportitis]] = "everywhere and nowhere";
     effect_messages[$effect[Form of...Bird!]] = "fiddle fiddle fiddle";
+    effect_messages[$effect[superstar]] = "&#9733;";
     
     
     foreach e in effect_messages

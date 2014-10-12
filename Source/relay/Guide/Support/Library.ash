@@ -730,6 +730,23 @@ location lookupLocation(string name)
     return name.to_location();
 }
 
+boolean [location] lookupLocations(string names_string)
+{
+    boolean [location] result;
+    
+    string [int] names = names_string.split_string();
+    foreach key, name in names
+    {
+        if (name.length() == 0)
+            continue;
+        location l = name.to_location();
+        if (l != $location[none])
+            result[l] = true;
+    }
+    
+    return result;
+}
+
 monster lookupMonster(string name)
 {
     return name.to_monster();

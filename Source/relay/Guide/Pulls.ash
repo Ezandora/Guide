@@ -175,8 +175,8 @@ void generatePullList(Checklist [int] checklists)
 	
 	if ($items[greatest american pants, navel ring of navel gazing].available_amount() + pullable_amount($item[greatest american pants]) + pullable_amount($item[navel ring of navel gazing]) == 0)
 		pullable_item_list.listAppend(GPItemMake($item[peppermint parasol], "free runaways", 1));
-		
-	
+    
+    
 	if (__misc_state["can eat just about anything"] && availableFullness() > 0)
 	{
         string [int] food_selections;
@@ -188,7 +188,22 @@ void generatePullList(Checklist [int] checklists)
             if ($item[moon pie].is_unrestricted() && !($skill[saucemaven].have_skill() && my_primestat() == $stat[mysticality]))
                 food_selections.listAppend("moon pies");
             else if ($skill[saucemaven].have_skill())
-                food_selections.listAppend("hi meins");
+            {
+                string hi_mein_types;
+                if (__misc_state["need to level"])
+                {
+                    if (my_primestat() == $stat[mysticality])
+                        hi_mein_types = "spooky/stinky";
+                    else if (my_primestat() == $stat[moxie])
+                        hi_mein_types = "sleazy";
+                    else if (my_primestat() == $stat[muscle])
+                        hi_mein_types = "cold/hot";
+                }
+                if (hi_mein_types.length() > 0)
+                    food_selections.listAppend(hi_mein_types + " hi meins");
+                else
+                    food_selections.listAppend("hi meins");
+            }
         }
         
         string description;

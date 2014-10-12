@@ -42,12 +42,21 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
         //ninja snowman assassin (copy only)
         if (!__quest_state["Level 8"].state_boolean["Mountain climbed"])
         {
-            if ($item[ninja carabiner].available_amount() + $item[ninja crampons].available_amount() + $item[ninja rope].available_amount() <3)
+            int equipment_missing_count = $items[ninja carabiner,ninja crampons,ninja rope].items_missing().count();
+            if (equipment_missing_count > 0)
             {
                 string fax = "";
-                fax += ChecklistGenerateModifierSpan("+150% init or more, two copies");
-                fax += "Copy twice for recreational mountain climbing";
-                fax += "<br>" + generateNinjaSafetyGuide(false);
+                string modifier_text = "+150% init or more";
+                if (equipment_missing_count == 3)
+                    modifier_text += ", two copies";
+                if (equipment_missing_count == 2)
+                    modifier_text += ", one copies";
+                fax += ChecklistGenerateModifierSpan(modifier_text);
+                if (equipment_missing_count == 3)
+                    fax += "Copy twice for recreational mountain climbing<br>";
+                else if (equipment_missing_count == 2)
+                    fax += "Copy once for recreational mountain climbing<br>";
+                fax += generateNinjaSafetyGuide(false);
                 if ($familiar[obtuse angel].familiar_is_usable() && $familiar[reanimated reanimator].familiar_is_usable())
                     fax += "<br>Make sure to copy with angel, not the reanimator.";
                 
@@ -90,9 +99,13 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
         
         if (!(__quest_state["Level 12"].finished || __quest_state["Level 12"].state_boolean["Lighthouse Finished"] || $item[barrel of gunpowder].available_amount() == 5))
         {
-            string line = "Lobsterfrogman (lighthouse quest; copy";
-            if (can_arrow)
-                line += "/arrow";
+            string line = "Lobsterfrogman (lighthouse quest";
+            if ($item[barrel of gunpowder].available_amount() < 4)
+            {
+                    line += "; copy";
+                if (can_arrow)
+                    line += "/arrow";
+            }
             line += ")";
             potential_faxes.listAppend(line);
         }
@@ -140,7 +153,7 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
             potential_faxes.listAppend(line);
         }
         
-        if ($item[Bram's choker].available_amount() == 0 && combat_rate_modifier() > -25.0 && !(__quest_state["Level 13"].in_progress || (__quest_state["Level 13"].finished && my_path_id() != PATH_BUGBEAR_INVASION)))
+        if (in_hardcore() && $item[Bram's choker].available_amount() == 0 && combat_rate_modifier() > -25.0 && !(__quest_state["Level 13"].in_progress || (__quest_state["Level 13"].finished && my_path_id() != PATH_BUGBEAR_INVASION)))
         {
             string line = "Bram the Stoker - drops a -5% combat accessory.";
             if (my_basestat($stat[mysticality]) < 50)
@@ -149,7 +162,12 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
         }
         
         if (!in_hardcore() && $item[richard's star key].available_amount() + $item[richard's star key].creatable_amount() == 0 && !__quest_state["Level 13"].state_boolean["past gates"])
-            potential_faxes.listAppend("Skinflute - +234% item, fight 4 times (arrow) to skip HITS with pulls.");
+        {
+            string copy_type = "arrow";
+            if (my_path_id() == PATH_HEAVY_RAINS) //arrows mean washaway in flooded areas
+                copy_type = "copy";
+            potential_faxes.listAppend("Skinflute - +234% item, fight 4 times (" + copy_type + ") to skip HITS with pulls.");
+        }
         
         if (suggest_less_powerful_faxes)
         {

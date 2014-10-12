@@ -184,12 +184,15 @@ boolean generateTowerFamiliarWeightMethod(string [int] how, string [int] immedia
         weight_modifiers.listAppend(TFWMInternalModifierMake("resolution: be kinder (summon)", false, false, true, 5.0));
     }
     //green candy heart
+    skill candy_hearts = lookupSkill("Summon Candy Hearts");
+    if (candy_hearts == $skill[none])
+        candy_hearts = lookupSkill("Summon Candy Heart");
     if ($item[green candy heart].available_amount() > 0 || $effect[Heart of Green].have_effect() > 0)
     {
         boolean have_effect = $effect[Heart of Green].have_effect() > 0;
         weight_modifiers.listAppend(TFWMInternalModifierMake("green candy heart", have_effect, true, true, 3.0));
     }
-    else if ($skill[Summon Candy Hearts].have_skill() && __misc_state["bookshelf accessible"])
+    else if (candy_hearts.have_skill() && __misc_state["bookshelf accessible"] && candy_hearts != $skill[none])
     {
         weight_modifiers.listAppend(TFWMInternalModifierMake("green candy heart (summon)", false, false, true, 3.0));
     }

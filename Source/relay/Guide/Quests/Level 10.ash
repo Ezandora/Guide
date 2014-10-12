@@ -91,8 +91,14 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 need_minus_combat = false;
                 turns_delay = 25 - turns_spent;
             }
+            
+            //boolean need_minus_combat_only_for_model_airship = false;
             if ($item[model airship].available_amount() == 0 && turns_spent >= 5)
+            {
+                //if (!need_minus_combat)
+                    //need_minus_combat_only_for_model_airship = true;
                 need_minus_combat = true;
+            }
             
             
             if (need_minus_combat)

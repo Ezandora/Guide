@@ -49,7 +49,20 @@ void QLevel5GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 				subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
 			if (__misc_state["free runs available"])
 				subentry.modifiers.listAppend("free runs");
-			subentry.entries.listAppend("Delay for ten turns in cobb's knob to unlock area.");
+                
+            int turns_spent = $location[the outskirts of cobb's knob].turns_spent_temporary();
+            if (turns_spent != -1)
+            {
+                int turns_remaining = 10 - turns_spent;
+                if (turns_remaining == 0)
+                    subentry.entries.listAppend("Map appears next turn in cobb's knob.");
+                else if (turns_remaining == 1)
+                    subentry.entries.listAppend("Delay for One More Turn in cobb's knob to unlock area.");
+                else
+                    subentry.entries.listAppend("Delay for " + turns_remaining.int_to_wordy() + " more turns in cobb's knob to unlock area.");
+            }
+            else
+                subentry.entries.listAppend("Delay for ten turns in cobb's knob to unlock area.");
             if ($classes[seal clubber, turtle tamer] contains my_class() && !guild_store_available()) //FIXME tracking guild quest being started
                 subentry.entries.listAppend("Possibly start your guild quest if you haven't.");
 		}

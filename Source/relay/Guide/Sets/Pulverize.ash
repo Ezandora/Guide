@@ -21,15 +21,28 @@ void listAppend(SmashedItem [int] list, SmashedItem entry)
 	list[position] = entry;
 }
 
+        
+void pulverizeAlterOutputList(string [int] output_list)
+{
+    //Alter lines so items aren't split up by word wrap:
+    int number_seen = 0;
+    foreach key in output_list
+    {
+        string line = output_list[key];
+        
+        if (number_seen < output_list.count() - 1) //comma needs to be part of the group
+            line += ",";
+        line = HTMLGenerateDivOfClass(line, "r_word_wrap_group");
+        
+        output_list[key] = line;
+        number_seen += 1;
+    }
+}
 void SPulverizeGenerateResource(ChecklistEntry [int] available_resources_entries)
 {
     if (!$skill[pulverize].have_skill())
         return;
     if (!in_ronin()) //list is far too long with your main inventory, and you can buy wads at this point
-        return;
-    if (availableSpleen() == 0) //only want wads for spleen. could disable this for planning? but information overload
-        return;
-    if (my_path_id() == PATH_SLOW_AND_STEADY)
         return;
     
     
@@ -143,25 +156,31 @@ void SPulverizeGenerateResource(ChecklistEntry [int] available_resources_entries
     }
     if (true)
     {
-        //Alter lines so items aren't split up by word wrap:
-        int number_seen = 0;
-        foreach key in spleen_wad_output_list
-        {
-            string line = spleen_wad_output_list[key];
-            
-            if (number_seen < spleen_wad_output_list.count() - 1) //comma needs to be part of the group
-                line += ",";
-            line = HTMLGenerateDivOfClass(line, "r_word_wrap_group");
-            
-            spleen_wad_output_list[key] = line;
-            number_seen += 1;
-        }
+        pulverizeAlterOutputList(spleen_wad_output_list);
     }
-    if (spleen_wad_output_list.count() > 0)
+    if (spleen_wad_output_list.count() > 0 && !(availableSpleen() == 0 || my_path_id() == PATH_SLOW_AND_STEADY))
         details.listAppend("Can smash " + spleen_wad_output_list.listJoinComponents(" ", "and").capitalizeFirstLetter() + " for spleen wads.");
     
     
-    if (spleen_wad_output_list.count() > 0)
+    string [int] coal_output_list;
+    
+    foreach it in $items[A Light that Never Goes Out,Frankly Mr. Shank,Hairpiece On Fire,Half a Purse,Hand in Glove,Hand that Rocks the Ladle,Meat Tenderizer is Murder,Ouija Board\, Ouija Board,Saucepanic,Shakespeare's Sister's Accordion,Sheila Take a Crossbow,Staff of the Headmaster's Victuals,Vicar's Tutu,Work is a Four Letter Sword]
+    {
+        if (it.available_amount() > 1)
+            coal_output_list.listAppend(it.pluralize());
+        else if (it.available_amount() > 0)
+            coal_output_list.listAppend(it);
+    }
+    if (true)
+    {
+        pulverizeAlterOutputList(coal_output_list);
+    }
+    if (coal_output_list.count() > 0)
+        details.listAppend("Can smash " + coal_output_list.listJoinComponents(" ", "and").capitalizeFirstLetter() + " for handful of smithereens.");
+    
+    
+    
+    if (details.count() > 0)
     {
         string title;
         title = "Pulverizable equipment";
