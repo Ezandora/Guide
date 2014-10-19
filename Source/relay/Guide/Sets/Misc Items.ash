@@ -258,6 +258,8 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
             details.listAppend("Lost pill bottle is mini-fridge, take a nap, open the pill bottle.");
             if (!__quest_state["Level 13"].state_boolean["past tower"] && (!$item[munchies pill].is_unrestricted() || !__misc_state["can eat just about anything"]))
                 details.listAppend("The lost comb is turn on the TV, take a nap, pick up the comb. (towerkilling)");
+            if ($classes[pastamancer,sauceror] contains my_class() && $skill[Transcendental Noodlecraft].have_skill() && $skill[The Way of Sauce].have_skill() && $skill[pulverize].have_skill())
+                details.listAppend("The lost glasses is mini-fridge, TV, glasses.|Smash for elemental nuggets for hi meins.");
 			available_resources_entries.listAppend(ChecklistEntryMake("__item lost key", "inventory.php?which=3", ChecklistSubentryMake(pluralize($item[lost key]), "", details), importance_level_item));
         }
 			

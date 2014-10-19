@@ -101,6 +101,14 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
             description.listAppend("Buff muscle, equip a powerful weapon.");
             description.listAppend("Delevel him with crayon shavings for a bit, then attack with your weapon.");
             description.listAppend("Make sure not to have anything along that will attack him. (saucespheres, familiars, hand in glove, etc)");
+            if ($item[dark porquoise ring].equipped_amount() == 0)
+            {
+                string line = "Possibly ";
+                if ($item[dark porquoise ring].available_amount() == 0)
+                    line += "acquire and ";
+                line += "equip a dark porquoise ring to use less crayon shavings.";
+                description.listAppend(line);
+            }
             if (my_mp() > 0)
                 description.listAppend("Try to reduce your MP to 0 before fighting him.");
         }

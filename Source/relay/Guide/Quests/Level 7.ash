@@ -159,6 +159,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         if (floor(turns_remaining) * 3 < evilness)
             turns_remaining = ceiling(turns_remaining);
         
+        
 		if (evilness > 26)
         {
             subentry.modifiers.listAppend("olfact dirty old lihc");
@@ -192,6 +193,8 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             
             float average_beeps_per_turn = cranny_beep_beep_beep * area_nc_rate + 1.0 * area_combat_rate;
             float average_turns_remaining = ((base_quest_state.state_int["cranny evilness"] - 25) / average_beeps_per_turn);
+            
+            average_turns_remaining = MAX(1, average_turns_remaining);
 			
 			subentry.entries.listAppend("~" + cranny_beep_beep_beep.roundForOutput(1) + " beeps per ghuol swarm. ~" + average_turns_remaining.roundForOutput(1) + " turns remain to boss.");
 		}

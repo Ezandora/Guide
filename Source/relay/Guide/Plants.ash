@@ -5,6 +5,8 @@ record PlantSuggestion
 	location loc;
 	string plant_name;
 	string details;
+    
+    boolean no_stat_remove; //for +ML plants mainly
 };
 
 PlantSuggestion PlantSuggestionMake(location loc, string plant_name, string details)
@@ -76,7 +78,7 @@ void finalizeSetUpFloristState()
 	
 	
 	__plant_output_order = split_string("Rabid Dogwood,Rutabeggar,Rad-ish Radish,Artichoker,Smoke-ra,Skunk Cabbage,Deadly Cinnamon,Celery Stalker,Lettuce Spray,Seltzer Watercress,War Lily,Stealing Magnolia,Canned Spinach,Impatiens,Spider Plant,Red Fern,BamBOO!,Arctic Moss,Aloe Guv'nor,Pitcher Plant,Blustery Puffball,Horn of Plenty,Wizard's Wig,Shuffle Truffle,Dis Lichen,Loose Morels,Foul Toadstool,Chillterelle,Portlybella,Max Headshroom,Spankton,Kelptomaniac,Crookweed,Electric Eelgrass,Duckweed,Orca Orchid,Sargassum,Sub-Sea Rose,Snori,Up Sea Daisy", ",");
-	
+    
 	//Go through all potentials:
 	boolean [string] plants_used;
 	if (true)
@@ -129,7 +131,9 @@ void finalizeSetUpFloristState()
 	//Blustery Puffball - underground, +ML:
 	if (__quest_state["Level 7"].state_int["cranny evilness"] > 25 + 3)
 	{
-		__plants_suggested_locations.listAppend(PlantSuggestionMake($location[the defiled cranny], "Blustery Puffball", "More beeps from swarm of ghuol whelps."));
+        PlantSuggestion ps = PlantSuggestionMake($location[the defiled cranny], "Blustery Puffball", "More beeps from swarm of ghuol whelps.");
+        ps.no_stat_remove = true;
+		__plants_suggested_locations.listAppend(ps);
 	}
 	//Canned Spinach - indoor, +5 muscle stats/fight:
     if (my_primestat() == $stat[muscle] && __misc_state["need to level"])
@@ -153,6 +157,7 @@ void finalizeSetUpFloristState()
     if (__misc_state["need to level"])
     {
         __plants_suggested_locations.listAppend(PlantSuggestionMake($location[The castle in the clouds in the sky (ground floor)], "War Lily", ""));
+        //Haunted bedroom?
     }
 	//Rad-ish Radish - outdoor, +5 moxie stats/fight:
     if (__misc_state["need to level moxie"])
@@ -170,7 +175,9 @@ void finalizeSetUpFloristState()
 	//Rabid Dogwood - outdoor, +ML:
 	if (__quest_state["Level 9"].state_float["oil peak pressure"] > 0 && monster_level_adjustment() < 100)
     {
-		__plants_suggested_locations.listAppend(PlantSuggestionMake($location[oil peak], "Rabid Dogwood", ""));
+        PlantSuggestion ps = PlantSuggestionMake($location[oil peak], "Rabid Dogwood", "");
+        ps.no_stat_remove = true;
+		__plants_suggested_locations.listAppend(ps);
     }
 	if (!__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && __misc_state["need to level"]) //you spend a lot of turns in the desert
 		__plants_suggested_locations.listAppend(PlantSuggestionMake($location[the arid, extra-dry desert], "Rabid Dogwood", ""));
@@ -210,6 +217,20 @@ void finalizeSetUpFloristState()
                 if (current_plants_used[suggestion.loc]["Blustery Puffball"])
                     area_has_ml_plant = true;
                 if (area_has_ml_plant)
+                    should_remove = true;
+            }
+            
+            //opposite:
+            if (suggestion.plant_name == "Rabid Dogwood" || suggestion.plant_name == "War Lily" || suggestion.plant_name == "Blustery Puffball")
+            {
+                boolean area_has_stat_plant = false;
+                if (current_plants_used[suggestion.loc]["Rad-ish Radish"])
+                    area_has_stat_plant = true;
+                if (current_plants_used[suggestion.loc]["Canned Spinach"])
+                    area_has_stat_plant = true;
+                if (current_plants_used[suggestion.loc]["Wizard's Wig"])
+                    area_has_stat_plant = true;
+                if (area_has_stat_plant && !suggestion.no_stat_remove)
                     should_remove = true;
             }
             

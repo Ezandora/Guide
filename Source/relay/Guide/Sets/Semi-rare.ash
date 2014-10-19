@@ -91,7 +91,10 @@ void SemirareGenerateDescription(string [int] description)
 			if (!have_outfit_components("Mining Gear") && !__quest_state["Level 8"].state_boolean["Past mine"])
 				semirares.listAppend(SemirareMake($location[Itznotyerzitz Mine], "|*Acquire mining gear for trapper quest.|*Run +234% item to get drop.", 0));
 		}
-		if ($item[stone wool].available_amount() < 2 && !locationAvailable($location[the hidden park]))
+        int wool_needed = 1;
+        if ($item[the nostril of the serpent].available_amount() == 0)
+            wool_needed += 1;
+		if ($item[stone wool].available_amount() < wool_needed && !locationAvailable($location[the hidden park]))
 		{
 			semirares.listAppend(SemirareMake($location[The Hidden Temple], "|*Acquire stone wool for unlocking hidden city.|*Run +100% item. (or up to +400% item for +3 adventures)", 0));
 		}

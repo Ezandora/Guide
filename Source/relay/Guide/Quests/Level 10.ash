@@ -60,7 +60,7 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         }
         else
         {
-            int turns_spent = $location[the penultimate fantasy airship].turns_spent_temporary();
+            int turns_spent = $location[the penultimate fantasy airship].turns_spent;
             int turns_delay = -1;
             
             boolean need_minus_combat = true;
@@ -154,6 +154,9 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             if ($skill[Transcendent Olfaction].have_skill() && !($effect[on the trail].have_effect() > 0 && get_property("olfactedMonster") == "Quiet Healer"))
                 subentry.entries.listAppend("Potentially olfact quiet healer for SGEEAs");
             
+            if ($items[amulet of extreme plot significance,mohawk wig].items_missing().count() > 0 && $familiar[slimeling].familiar_is_usable())
+                subentry.modifiers.listAppend("slimeling?");
+            
             if ($item[model airship].available_amount() == 0)
                 subentry.entries.listAppend("Acquire model airship from non-combat. (speeds up quest)");
             if ($item[amulet of extreme plot significance].available_amount() == 0)
@@ -227,7 +230,7 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 		}
 		else if ($location[The Castle in the Clouds in the Sky (Ground floor)].locationAvailable())
 		{
-            int turns_spent = $location[The Castle in the Clouds in the Sky (Ground floor)].turns_spent_temporary();
+            int turns_spent = $location[The Castle in the Clouds in the Sky (Ground floor)].turns_spent;
             int turns_remaining = 11;
             if (turns_spent != -1)
             {

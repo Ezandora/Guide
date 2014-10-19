@@ -16,32 +16,78 @@ void generateTasks(Checklist [int] checklists)
 	//Friar:
 	if (florist_available())
 	{
+        string image_name = "sunflower face";
 		ChecklistSubentry subentry;
 		subentry.header = "Plant florist plants in " + __last_adventure_location;
-		
-		string [int] examining_plants;
-		
-		foreach key in __plants_suggested_locations
+        
+        PlantSuggestion [int] area_relevant_suggestions;
+		foreach key, suggestion in __plants_suggested_locations
 		{
-			PlantSuggestion suggestion = __plants_suggested_locations[key];
 			
 			if (suggestion.loc != __last_adventure_location)
 				continue;
-				
+            
+            area_relevant_suggestions.listAppend(suggestion);
+        }
+        
+        boolean single_mode_only = false;
+        if (area_relevant_suggestions.count() == 1)
+        {
+            single_mode_only = true;
+			PlantSuggestion suggestion = area_relevant_suggestions[0];
+			string plant_name = suggestion.plant_name.capitalizeFirstLetter();
+        
+            subentry.header = "Plant " + plant_name + " in " + __last_adventure_location;
+        }
+		
+		foreach key, suggestion in area_relevant_suggestions
+		{
 			string plant_name = suggestion.plant_name.capitalizeFirstLetter();
 			Plant plant = __plant_properties[plant_name];
 			
-			string line = plant_name + " (" + plant.zone_effect + ", " + plant.terrain;
-			if (plant.territorial)
-				line = line + ", territorial";
+			string line;
+            
+            if (single_mode_only)
+            {
+                line = plant.zone_effect + ", " + plant.terrain;
+                if (plant.territorial)
+                    line = line + ", territorial";
+                
+                if (suggestion.details != "")
+                    line += "|*" + suggestion.details;
+            }
+            else
+            {
+                line = plant_name + " (" + plant.zone_effect + ", " + plant.terrain;
+                if (plant.territorial)
+                    line = line + ", territorial";
+                
+                line += ")";
+                if (suggestion.details != "")
+                    line += "|*" + suggestion.details;
+            }
 			
-			line += ")";
-			if (suggestion.details != "")
-				line += "|*" + suggestion.details;
+            if (plant_name == "War Lily" || plant_name == "Rabid Dogwood" || plant_name == "Blustery Puffball")
+            {
+                if (monster_level_adjustment() + 30 > 150)
+                {
+                    //subentry.header = "Optionally plant florist plants in " + __last_adventure_location;
+                    image_name = "__item pirate fledges";
+                    
+                    subentry.header += "?";
+                    line += "|" + HTMLGenerateSpanFont("Very dangerous", "red", "") + ", monsters ";
+                    if (monster_level_adjustment() > 150)
+                        line += "are";
+                    else
+                        line += "will be";
+                    line += " stagger immune.";
+                }
+            }
+            
 			subentry.entries.listAppend(line);
 		}
 		if (subentry.entries.count() > 0)
-			task_entries.listAppend(ChecklistEntryMake("sunflower face", "place.php?whichplace=forestvillage&amp;action=fv_friar", subentry, -11));
+			task_entries.listAppend(ChecklistEntryMake(image_name, "place.php?whichplace=forestvillage&amp;action=fv_friar", subentry, -11));
 	}
 	
 	QuestsGenerateTasks(task_entries, optional_task_entries, future_task_entries);
@@ -328,6 +374,8 @@ void generateTasks(Checklist [int] checklists)
 		{
 			description.listAppend("Otherwise, wait for level 9.");
 		}
+        if ($familiar[slimeling].familiar_is_usable())
+            modifiers.listAppend("slimeling?");
 		optional_task_entries.listAppend(ChecklistEntryMake("__item filthy knitted dread sack", "island.php", ChecklistSubentryMake("Acquire a filthy hippy disguise", modifiers, description), $locations[hippy camp]));
 	}
     

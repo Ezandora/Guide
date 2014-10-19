@@ -26,7 +26,7 @@ void QLevel3GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	boolean wait_until_level_eleven = false;
 	if (have_skill($skill[ur-kel's aria of annoyance]) && my_level() < 11)
 		wait_until_level_eleven = true;
-	
+    
 	ChecklistSubentry subentry;
 	subentry.header = base_quest_state.quest_name;
 	

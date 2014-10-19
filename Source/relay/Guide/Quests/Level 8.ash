@@ -114,6 +114,8 @@ void QLevel8GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 			if (need_outfit)
 			{
 				subentry.modifiers.listAppend("-combat");
+                if ($familiar[slimeling].familiar_is_usable())
+                    subentry.modifiers.listAppend("slimeling?");
 				ore_lines.listAppend("Mining outfit not available. Consider acquiring one via -combat in mine or the semi-rare (30% drop)");
 			}
 		
@@ -169,7 +171,7 @@ void QLevel8GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
                         ninja_path.listAppend("Need more +combat, assassins won't appear at " + combat_rate_modifier().floor() + "% combat.");
                     else
                     {
-                        int turns_spent = $location[lair of the ninja snowmen].turns_spent_temporary();
+                        int turns_spent = $location[lair of the ninja snowmen].turns_spent;
                         if (turns_spent != -1)
                         {
                             float chance = combat_rate_modifier() / 200.0 + turns_spent * 0.015;
@@ -215,6 +217,8 @@ void QLevel8GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
                 extreme_path.listAppend("Acquire outfit components: " + items_needed.listJoinComponents(", ", "and") + ".");
                 extreme_modifiers.listAppend("-combat");
                 extreme_modifiers.listAppend("+item");
+                if ($familiar[slimeling].familiar_is_usable())
+                    extreme_modifiers.listAppend("slimeling?");
                 extreme_path.listAppend("Run -combat and maybe +item on the eXtreme slope.");
             }
         

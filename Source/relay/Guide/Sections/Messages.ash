@@ -62,6 +62,9 @@ string generateRandomMessage()
     location_messages[$location[the middle chamber]] = "pyramid laundry machine";
     location_messages[$location[the arid, extra-dry desert]] = "can't remember your name";
     location_messages[$location[outside the club]] = "around the world around the world around the world around the world";
+    string conspiracy = "they know where you live, " + get_property("System.user.name").to_lower_case();
+    foreach s in $strings[The Mansion of Dr. Weirdeaux,The Deep Dark Jungle,The Secret Government Laboratory]
+        location_messages[lookupLocation(s)] = conspiracy;
     
     foreach l in $locations[The Prince's Restroom,The Prince's Dance Floor,The Prince's Kitchen,The Prince's Balcony,The Prince's Lounge,The Prince's Canapes table]
         location_messages[l] = "social sabotage";
@@ -291,7 +294,7 @@ string generateRandomMessage()
     monster_messages[$monster[menacing thug]] = "watch your back";
     monster_messages[$monster[sea cowboy]] = "pardon me";
     monster_messages[$monster[topiary golem]] = "almost there";
-    if ($location[sorceress' hedge maze].turns_spent_temporary() >= 7)
+    if ($location[sorceress' hedge maze].turns_spent >= 7)
         monster_messages[$monster[topiary golem]] = "mean golems";
     monster_messages[$monster[the server]] = "console cowboy";
     monster_messages[$monster[Fickle Finger of F8]] = "f/8 and be there";

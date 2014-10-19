@@ -375,7 +375,7 @@ buffer generateLocationBar(boolean displaying_navbar)
     
     if (__misc_state["In run"])
     {
-        int turns_spent = l.turns_spent_temporary();
+        int turns_spent = l.turns_spent;
         if (turns_spent > 0)
         {
             location_data.listAppend(pluralize(turns_spent, "turn", "turns"));

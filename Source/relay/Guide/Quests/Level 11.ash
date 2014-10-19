@@ -2,6 +2,19 @@
 boolean [item] __dense_liana_machete_items = $items[antique machete,Machetito,Muculent machete,Papier-m&acirc;ch&eacute;te];
 
 
+int numberOfDenseLianaFoughtInShrine(location shrine)
+{
+    //need to check the combat names due to wanderers:
+    int dense_liana_defeated = 0;
+    string [int] area_combats_seen = shrine.locationSeenCombats();
+    foreach key, s in area_combats_seen
+    {
+        if (s == "dense liana")
+            dense_liana_defeated += 1;
+    }
+    return dense_liana_defeated;
+}
+
 void QLevel11Init()
 {
 	//questL11MacGuffin, questL11Manor, questL11Palindome, questL11Pyramid, questL11Worship
@@ -146,6 +159,10 @@ void QLevel11Init()
                 break;
             }
         }
+        
+        if (get_property_int("hiddenBowlingAlleyProgress") >= 1 && get_property_int("hiddenHospitalProgress") >= 1 && get_property_int("hiddenApartmentProgress") >= 1 && get_property_int("hiddenOfficeProgress") >= 1 && $location[a massive Ziggurat].numberOfDenseLianaFoughtInShrine() >= 3 && state.mafia_internal_step >= 4)
+            state.state_boolean["need machete for liana"] = false;
+        
         if (!__misc_state["can equip just about any weapon"])
             state.state_boolean["need machete for liana"] = false;
         
@@ -605,6 +622,8 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                 {
                     line += ", and possibly run +400% item to find a guitar";
                     subentry.modifiers.listAppend("+400% item");
+                    if ($familiar[slimeling].familiar_is_usable())
+                        subentry.modifiers.listAppend("slimeling?");
                 }
                 line += ".";
                 subentry.entries.listAppend(line);
@@ -1161,7 +1180,7 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
             else
             {
                 //unlock lower chamber:
-                int turns_spent = $location[the middle chamber].turns_spent_temporary();
+                int turns_spent = $location[the middle chamber].turns_spent;
                 
                 if (turns_spent == -1)
                 {
@@ -1190,13 +1209,13 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
             }
             if ($item[tangle of rat tails].available_amount() > 0)
                 subentry.entries.listAppend("Use tangle of rat tails against tomb rats for more tomb ratchets.");
-            if (my_path_id() == PATH_HEAVY_RAINS && lookupItem("catfish whiskers").available_amount() > 0 && lookupEffect("Fishy Whiskers").have_effect() == 0)
+            if (my_path_id() == PATH_HEAVY_RAINS && lookupItem("catfish whiskers").available_amount() > 0 && lookupEffect("Fishy Whiskers").have_effect() == 0 && $item[tangle of rat tails].available_amount() > 0)
                 subentry.entries.listAppend("Possibly use catfish whiskers to find more tomb ratchets.");
         }
         else
         {
             //unlock middle chamber:
-            int turns_spent = $location[the upper chamber].turns_spent_temporary();
+            int turns_spent = $location[the upper chamber].turns_spent;
             if (turns_spent == -1)
                 subentry.entries.listAppend("Adventure in the upper chamber for six total turns to unlock the middle chamber.");
             else
@@ -1328,18 +1347,6 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
     task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the upper chamber,the lower chambers, the middle chamber]));
 }
 
-int numberOfDenseLianaFoughtInShrine(location shrine)
-{
-    //need to check the combat names due to wanderers:
-    int dense_liana_defeated = 0;
-    string [int] area_combats_seen = shrine.locationSeenCombats();
-    foreach key, s in area_combats_seen
-    {
-        if (s == "dense liana")
-            dense_liana_defeated += 1;
-    }
-    return dense_liana_defeated;
-}
 
 void generateHiddenAreaUnlockForShrine(string [int] description, location shrine)
 {
@@ -1428,6 +1435,9 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         int apartment_progress = get_property_int("hiddenApartmentProgress");
         int office_progress = get_property_int("hiddenOfficeProgress");
         
+        if (!base_quest_state.state_boolean["need machete for liana"])
+            have_machete = true;
+        
         boolean at_last_spirit = false;
         
         if (bowling_progress == 8 && hospital_progress == 8 && apartment_progress == 8 && office_progress == 8 || $item[stone triangle].available_amount() == 4)
@@ -1511,7 +1521,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 //if (!$monster[pygmy witch lawyer].is_banished())
                     //subentry.entries.listAppend("Potentially banish lawyers.");
                     
-                int turns_spent = $location[the hidden apartment building].turns_spent_temporary();
+                int turns_spent = $location[the hidden apartment building].turns_spent;
                 if (turns_spent == -1)
                     subentry.entries.listAppend("NC appears every 9th adventure.");
                 else
@@ -1595,7 +1605,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                     subentry.entries.listAppend("You have the complete McClusky files, fight boss.");
                 }
                 
-                int turns_spent = $location[the hidden office building].turns_spent_temporary();
+                int turns_spent = $location[the hidden office building].turns_spent;
                 
                 if (turns_spent == -1)
                     subentry.entries.listAppend("Non-combat appears first on the 6th adventure, then every 5 adventures.");

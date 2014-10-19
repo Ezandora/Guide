@@ -50,16 +50,14 @@ void QLevel5GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 			if (__misc_state["free runs available"])
 				subentry.modifiers.listAppend("free runs");
                 
-            int turns_spent = $location[the outskirts of cobb's knob].turns_spent_temporary();
+            int turns_spent = $location[the outskirts of cobb's knob].turns_spent;
             if (turns_spent != -1)
             {
-                int turns_remaining = 10 - turns_spent;
-                if (turns_remaining == 0)
+                int delay_turns_remaining = 10 - turns_spent;
+                if (delay_turns_remaining == 0)
                     subentry.entries.listAppend("Map appears next turn in cobb's knob.");
-                else if (turns_remaining == 1)
-                    subentry.entries.listAppend("Delay for One More Turn in cobb's knob to unlock area.");
                 else
-                    subentry.entries.listAppend("Delay for " + turns_remaining.int_to_wordy() + " more turns in cobb's knob to unlock area.");
+                    subentry.entries.listAppend("Delay for " + delay_turns_remaining.int_to_wordy() + " more turns in cobb's knob to unlock area.");
             }
             else
                 subentry.entries.listAppend("Delay for ten turns in cobb's knob to unlock area.");
@@ -104,6 +102,8 @@ void QLevel5GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 				harem_lines.listAppend("Need disguise.|*20% drop from harem girls (olfact)|*Or adventure in zone for eleven (or more) turns.");
 				harem_modifiers.listAppend("+400% item");
 				harem_modifiers.listAppend("olfact harem girls");
+                if ($familiar[slimeling].familiar_is_usable())
+                    harem_modifiers.listAppend("slimeling?");
 			}
 			else
 			{
@@ -147,6 +147,8 @@ void QLevel5GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 				//with banishes and slimeling and +item and?
                 //too complicated. Possibly remove?
 				kge_modifiers.listAppend("-combat");
+                if ($familiar[slimeling].familiar_is_usable())
+                    kge_modifiers.listAppend("slimeling?");
 				string line = "Need knob goblin elite guard uniform.|*Semi-rare in barracks.|*Or run -combat in barracks";
 				if (familiar_is_usable($familiar[slimeling]))
 					line += " with slimeling";

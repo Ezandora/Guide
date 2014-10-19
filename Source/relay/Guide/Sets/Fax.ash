@@ -50,12 +50,12 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
                 if (equipment_missing_count == 3)
                     modifier_text += ", two copies";
                 if (equipment_missing_count == 2)
-                    modifier_text += ", one copies";
+                    modifier_text += ", one copy";
                 fax += ChecklistGenerateModifierSpan(modifier_text);
                 if (equipment_missing_count == 3)
-                    fax += "Copy twice for recreational mountain climbing<br>";
+                    fax += "Copy twice for recreational mountain climbing.<br>";
                 else if (equipment_missing_count == 2)
-                    fax += "Copy once for recreational mountain climbing<br>";
+                    fax += "Copy once for recreational mountain climbing.<br>";
                 fax += generateNinjaSafetyGuide(false);
                 if ($familiar[obtuse angel].familiar_is_usable() && $familiar[reanimated reanimator].familiar_is_usable())
                     fax += "<br>Make sure to copy with angel, not the reanimator.";
@@ -211,7 +211,12 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
             
             //screambat for sonar replacement
             if ((3 - __quest_state["Level 4"].state_int["areas unlocked"]) > $item[sonar-in-a-biscuit].available_amount())
-                potential_faxes.listAppend("Screambat - unlocks a single bat lair area");
+            {
+                string description = "Screambat - unlocks a single bat lair area";
+                if (!__quest_state["Level 4"].in_progress)
+                    description = HTMLGenerateSpanFont(description, "gray", "");
+                potential_faxes.listAppend(description);
+            }
             //drunken half-orc hobo (smiths)
             if (in_hardcore() && $skill[summon smithsness].skill_is_usable() && $items[dirty hobo gloves,hand in glove].available_amount() == 0)
             {

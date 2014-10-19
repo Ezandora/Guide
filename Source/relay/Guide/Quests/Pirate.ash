@@ -93,6 +93,10 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		
 		subentry.modifiers.listAppend("+item");
 		subentry.modifiers.listAppend("-combat");
+        
+        if ($familiar[slimeling].familiar_is_usable())
+            subentry.modifiers.listAppend("slimeling?");
+        
         int ncs_relevant = 0; //out of six
         if ($item[stuffed shoulder parrot].available_amount() == 0 || $item[eyepatch].available_amount() == 0)
             ncs_relevant += 1;

@@ -53,6 +53,8 @@ void SHeavyRainsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         description_for_skill[lookupSkill("Thunderstrike")] = "Monster stunning (towerkilling)";
         description_for_skill[lookupSkill("Thunder Thighs")] = "Thunder regen, passive";
         description_for_skill[lookupSkill("Thunder Bird")] = "Monster deleveling";
+        if (in_hardcore())
+            description_for_skill[lookupSkill("Thunder Down Underwear")] = "safety pants (if you want to)";
         
         
         description_for_skill[lookupSkill("Rain Man")] = "Fax any monster repeatedly";

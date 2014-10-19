@@ -117,14 +117,14 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     if (get_property("questM20Necklace") == "finished") //mafia will erroneously set questM20Necklace to finished in certain (unknown) cases. could be an error in QuestDatabase.java's reset(), but I am uncertain what caused the bug locally (it also set lastSecondFloorUnlock to current, though it is not unlocked)
         second_floor_probably_open = true;
     
-    if (lookupItem("Lady Spookyraven's necklace").available_amount() > 0) //mostly
+    if ($item[Lady Spookyraven's necklace].available_amount() > 0) //mostly
         second_floor_probably_open = true;
-    if (lookupItem("telegram from Lady Spookyraven").available_amount() > 0)
+    if ($item[telegram from Lady Spookyraven].available_amount() > 0)
         second_floor_probably_open = false;
     
     if (second_floor_probably_open)
     {
-        if (lookupItem("Lady Spookyraven's necklace").available_amount() > 0 && get_property("questM20Necklace") != "finished")
+        if ($item[Lady Spookyraven's necklace].available_amount() > 0 && get_property("questM20Necklace") != "finished")
         {
             subentry.header = "Speak to Lady Spookyraven";
             url = $location[the haunted kitchen].getClickableURLForLocation();
@@ -149,7 +149,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
                 }
                 else
                 {
-                    if (lookupItem("Lady Spookyraven's dancing shoes").available_amount() == 0)
+                    if ($item[Lady Spookyraven's dancing shoes].available_amount() == 0)
                     {
                         //NC (louvre or leave it) in gallery
                         string [int] modifiers;
@@ -187,7 +187,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
                         
                         modifiers.listAppend("+meat");
                     }
-                    if (lookupItem("Lady Spookyraven's powder puff").available_amount() == 0)
+                    if ($item[Lady Spookyraven's powder puff].available_amount() == 0)
                     {
                         string [int] modifiers;
                         string [int] description;
@@ -210,7 +210,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
                         else
                             modifiers.listAppend("-combat");
                     }
-                    if (lookupItem("Lady Spookyraven's finest gown").available_amount() == 0)
+                    if ($item[Lady Spookyraven's finest gown].available_amount() == 0)
                     {
                         //elegant nightstand in bedroom (banish?)
                         //also acquire disposable instant camera. spectacles...?
@@ -261,12 +261,19 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
                             image_name = "Haunted Bedroom";
                         
                     }
-                    if (lookupItem("Lady Spookyraven's dancing shoes").available_amount() > 0 && lookupItem("Lady Spookyraven's powder puff").available_amount() > 0 && lookupItem("Lady Spookyraven's finest gown").available_amount() > 0 || dance_quest_state.mafia_internal_step == 4)
+                    if ($item[Lady Spookyraven's dancing shoes].available_amount() > 0 && $item[Lady Spookyraven's powder puff].available_amount() > 0 && $item[Lady Spookyraven's finest gown].available_amount() > 0 || dance_quest_state.mafia_internal_step == 4)
                     {
-                        subentry.header = "Dance with Lady Spookyraven";
-                        subentry.entries.listAppend("Adventure in the Haunted Ballroom.");
-                        subentry.entries.listAppend("Gives stats.");
-                        
+                        if (dance_quest_state.mafia_internal_step < 4)
+                        {
+                            subentry.header = "Speak with Lady Spookyraven";
+                            subentry.entries.listAppend("Dancing.");
+                        }
+                        else
+                        {
+                            subentry.header = "Dance with Lady Spookyraven";
+                            subentry.entries.listAppend("Adventure in the Haunted Ballroom.");
+                            subentry.entries.listAppend("Gives stats.");
+                        }
                         image_name = "Lady Spookyraven";
                     }
                 }
@@ -306,12 +313,12 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
                     {
                         should_output_optionally = true;
                     }
-                    subentry.entries.listAppend(generateTurnsToSeeNoncombat(80, 2, ""));
+                    subentry.entries.listAppend(generateTurnsToSeeNoncombat(90, 2, "")); //may be 90% now? is this worth setting anymore?
                 }
             }
         }
     }
-    else if (lookupItem("telegram from Lady Spookyraven").available_amount() > 0)
+    else if ($item[telegram from Lady Spookyraven].available_amount() > 0)
     {
         //telegram is removed on using it, even on old copies of mafia
         subentry.header = "Read telegram from Lady Spookyraven";

@@ -581,6 +581,11 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 stun_sources.listAppend("naughty paper shuriken");
             if ($item[Rain-Doh blue balls].available_amount() > 0)
                 stun_sources.listAppend("Rain-Doh blue balls");
+                
+            if ($skill[shell up].have_skill() && ($effect[Blessing of the Storm Tortoise].have_effect() > 0 || $effect[Grand Blessing of the Storm Tortoise].have_effect() > 0 || $effect[Glorious Blessing of the Storm Tortoise].have_effect() > 0))
+                stun_sources.listAppend("Shell Up");
+            if ($slot[weapon].equipped_item().item_type() == "accordion" && $skill[Accordion Bash].have_skill())
+                stun_sources.listAppend("Accordion Bash");
             
             if ($item[thor's pliers].equipped_amount() > 0)
                 stagger_sources.listAppend("ply reality");

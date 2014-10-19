@@ -535,6 +535,8 @@ void QLevel12GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 		{
             //FIXME suggest routes to doing both.
 			subentry.entries.listAppend("Need either the war hippy fatigues or frat warrior fatigues outfit.");
+            if ($familiar[slimeling].familiar_is_usable())
+                subentry.modifiers.listAppend("slimeling?");
 		}
 		else
         {

@@ -8,14 +8,6 @@ boolean mafiaIsPastRevision(int revision_number)
     return (get_revision() >= revision_number);
 }
 
-//Feel free to uncomment the first line for enhanced tracking! Umm... if you're reading this.
-//FIXME next point release remove this function etc
-int turns_spent_temporary(location l)
-{
-    //if (mafiaIsPastRevision(14792)) return l.turns_spent;
-    return -1;
-}
-
 //Additions to standard API:
 //Auto-conversion property functions:
 boolean get_property_boolean(string property)
@@ -248,6 +240,16 @@ string slot_to_string(slot s)
     else if (s == $slot[buddy-bjorn])
         return "buddy bjorn";
     return s;
+}
+
+int storage_amount(boolean [item] items)
+{
+    int count = 0;
+    foreach it in items
+    {
+        count += it.storage_amount();
+    }
+    return count;
 }
 
 int available_amount(boolean [item] items)
@@ -486,8 +488,8 @@ int turnsAttemptedInLocation(location place)
 {
     if (place == $location[the haunted bedroom]) //special case - NCs don't count here
         return place.combatTurnsAttemptedInLocation();
-    if (place.turns_spent_temporary() != -1)
-        return place.turns_spent_temporary();
+    if (place.turns_spent != -1)
+        return place.turns_spent;
     return place.combatTurnsAttemptedInLocation() + place.noncombatTurnsAttemptedInLocation();
 }
 
@@ -582,8 +584,8 @@ int delayRemainingInLocation(location place)
     else
         turns_attempted = place.turnsAttemptedInLocation();
         
-    if (place.turns_spent_temporary() != -1)
-        turns_attempted = place.turns_spent_temporary();
+    if (place.turns_spent != -1)
+        turns_attempted = place.turns_spent;
     else if (delay_for_place > 5 && turns_attempted >= 5) //FIXME hackish, can't track over five turns
         return 0;
         
