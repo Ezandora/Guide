@@ -22,7 +22,7 @@ void SSpeakeasyGenerateResource(ChecklistEntry [int] available_resources_entries
     
     string [int][int] options;
     
-    options.listAppend(listMake("<strong>Drink</strong>", "<strong>Potency</strong>", "<strong>Description</strong>"));
+    options.listAppend(listMake("<strong>Drink</strong>", "<strong>Size</strong>", "<strong>Description</strong>"));
     if (CounterLookup("Semi-rare").CounterIsRange())
         options.listAppend(listMake("Lucky Lindy", "1", "Semi-rare number"));
     

@@ -455,7 +455,7 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
                     if (!m.is_banished() && m != $monster[wild seahorse])
                         banish_monsters.listAppend(m.to_string());
                 }
-                if (banish_monsters.count() > 0)
+                if (banish_monsters.count() > 1)
                     subentry.entries.listAppend("Banish " + banish_monsters.listJoinComponents(", ", "and") + " with separate banish sources to speed up area.");
             }
             else if (false)

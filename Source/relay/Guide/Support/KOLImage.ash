@@ -344,6 +344,7 @@ KOLImage KOLImageLookup(string lookup_name)
 	return __kol_images[lookup_name];
 }
 
+Vec2i __kol_image_generate_image_html_return_final_size;
 buffer KOLImageGenerateImageHTML(string lookup_name, boolean should_center, Vec2i max_image_dimensions, string container_additional_class)
 {
     KOLImagesInit();
@@ -357,6 +358,7 @@ buffer KOLImageGenerateImageHTML(string lookup_name, boolean should_center, Vec2
         half_sized_output = true;
     }
     
+    __kol_image_generate_image_html_return_final_size = Vec2iZero();
     
 	KOLImage kol_image = KOLImageLookup(lookup_name);
 	buffer result;
@@ -483,6 +485,9 @@ buffer KOLImageGenerateImageHTML(string lookup_name, boolean should_center, Vec2
 	{
 		img_tag_attributes["width"] =  image_size.x;
 		img_tag_attributes["height"] =  image_size.y;
+        
+        __kol_image_generate_image_html_return_final_size = image_size;
+        
 	}
     
     //Needs to be optimized to use buffers first.
@@ -515,6 +520,10 @@ buffer KOLImageGenerateImageHTML(string lookup_name, boolean should_center, Vec2
 		int margin_left = -(image_crop.min_coordinate.x);
 		int margin_right = -(image_size.x - image_crop.max_coordinate.x);
 		img_tag_attributes["style"] = "margin: " + margin_top + "px " + margin_right + "px " + margin_bottom + "px " + margin_left + "px;";
+        
+        
+        
+        __kol_image_generate_image_html_return_final_size = Vec2iMake(right_edge - left_edge, bottom_edge - top_edge);
 	}
 	
 	if (__setting_show_alignment_guides)

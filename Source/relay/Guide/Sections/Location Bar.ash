@@ -375,18 +375,20 @@ buffer generateLocationBar(boolean displaying_navbar)
     
     if (__misc_state["In run"])
     {
+        int area_delay = l.delayRemainingInLocation();
+        
         int turns_spent = l.turns_spent;
-        if (turns_spent > 0)
-        {
+        if (area_delay > 0)
+            location_data.listAppend(pluralize(area_delay, "turn", "turns") + "<br>delay");
+        else if (turns_spent > 0)
             location_data.listAppend(pluralize(turns_spent, "turn", "turns"));
-        }
     }
     
     //easy list:
     //ashq foreach l in $locations[] if (l.appearance_rates().count() == 1 && l.appearance_rates()[$monster[none]] == 100.0) print(l);
     boolean [location] nc_blacklist = $locations[Pump Up Muscle,Pump Up Mysticality,Pump Up Moxie,The Shore\, Inc. Travel Agency,Goat Party,Pirate Party,Lemon Party,The Roulette Tables,The Poker Room,Anemone Mine (Mining),The Knob Shaft (Mining),Friar Ceremony Location,Itznotyerzitz Mine (in Disguise),The Prince's Restroom,The Prince's Dance Floor,The Prince's Kitchen,The Prince's Balcony,The Prince's Lounge,The Prince's Canapes table,Portal to Terrible Parents];
     
-    if ((my_buffedstat($stat[moxie]) < average_ml || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE) && sample_count > 0 && __misc_state["In run"] && monster_level_adjustment() < 150)
+    if ((my_buffedstat($stat[moxie]) < average_ml || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE) && sample_count > 0 && __misc_state["In run"] && monster_level_adjustment() < 100)
     {
         //Init:
         //We only show this if the monsters out-moxie the player in-run. It feels as though it can easily be information overload otherwise.
@@ -471,12 +473,6 @@ buffer generateLocationBar(boolean displaying_navbar)
             else
                 location_data.listAppend(washaway_chance + "% wash");
         }
-    }
-    if (__misc_state["In run"])
-    {
-        int area_delay = l.delayRemainingInLocation();
-        if (area_delay > 0)// && !(l.totalDelayForLocation() > 5 && area_delay == 1)) //can't track delay over five
-            location_data.listAppend(pluralize(area_delay, "turn", "turns") + "<br>delay");
     }
     if (mpa != -1.0 && should_output_meat_drop)
     {

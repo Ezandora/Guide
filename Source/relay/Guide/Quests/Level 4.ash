@@ -52,7 +52,7 @@ void QLevel4GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
     if (false) //mafia used to update to step4 upon acquiring the bandana - FIXME update to test for that when mafia updates for new boss bat
     {
         subentry.entries.listAppend("Quest finished, speak to the council of loathing.");
-        url = "town.php";
+        url = "place.php?whichplace=town";
     }
     else if ($location[the boss bat's lair].locationAvailable())
     {

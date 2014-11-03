@@ -236,7 +236,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	if (base_quest_state.mafia_internal_step == 2)
 	{
 		entry.subentries[0].entries.listAppend("Go talk to the council to finish the quest.");
-        entry.target_location = "town.php";
+        entry.target_location = "place.php?whichplace=town";
 	}
 	else if (base_quest_state.state_boolean["alcove finished"] && base_quest_state.state_boolean["cranny finished"] && base_quest_state.state_boolean["niche finished"] && base_quest_state.state_boolean["nook finished"])
 	{

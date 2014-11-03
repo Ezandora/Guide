@@ -113,25 +113,28 @@ buffer PageGenerate(Page page_in)
 		result.append("\n");
 	}
 	//Write CSS styles:
-    if (true)
+    if (page_in.defined_css_blocks.count() > 0)
     {
-        result.append("\t\t");
-        result.append(HTMLGenerateTagPrefix("style", mapMake("type", "text/css")));
-        result.append("\n");
+        if (true)
+        {
+            result.append("\t\t");
+            result.append(HTMLGenerateTagPrefix("style", mapMake("type", "text/css")));
+            result.append("\n");
+        }
+        result.append(page_in.defined_css_blocks[""].CSSBlockGenerate()); //write first
+        foreach identifier in page_in.defined_css_blocks
+        {
+            CSSBlock block = page_in.defined_css_blocks[identifier];
+            if (identifier == "") //skip, already written
+                continue;
+            result.append(block.CSSBlockGenerate());
+        }
+        if (true)
+        {
+            result.append("\t\t</style>\n");
+        }
     }
-    result.append(page_in.defined_css_blocks[""].CSSBlockGenerate()); //write first
-    foreach identifier in page_in.defined_css_blocks
-    {
-        CSSBlock block = page_in.defined_css_blocks[identifier];
-        if (identifier == "") //skip, already written
-            continue;
-        result.append(block.CSSBlockGenerate());
-    }
-    if (true)
-    {
-        result.append("\t\t</style>\n");
-    }
-	result.append("\t</head>\n");
+    result.append("\t</head>\n");
 	
 	//Body:
 	result.append("\t");

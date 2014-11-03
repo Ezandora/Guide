@@ -302,7 +302,7 @@ void generatePullList(Checklist [int] checklists)
     
     if (!__quest_state["Level 8"].state_boolean["Mountain climbed"] && !have_outfit_components("eXtreme Cold-Weather Gear"))
     {
-        item [int] missing_ninja_components = items_missing($items[ninja rope, ninja carabiner, ninja crampons]);
+        item [int] missing_ninja_components = items_missing($items[ninja carabiner, ninja crampons, ninja rope]);
         if (missing_ninja_components.count() > 0)
         {
             string description = missing_ninja_components.listJoinComponents(", ", "and").capitalizeFirstLetter() + ".";

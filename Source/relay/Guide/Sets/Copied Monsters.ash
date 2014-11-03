@@ -276,8 +276,6 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] available_resources_en
             potential_copies.listAppend("Gaudy pirate - copy once for extra key.");
         //√baa'baa. astronomer? √nuns trick brigand
         //FIXME astronomer when we can calculate that
-        if (__misc_state["need to level"])
-            potential_copies.listAppend("Baa'baa'bu'ran - stone wool for cave bar leveling.");
         if (!__quest_state["Level 12"].state_boolean["Nuns Finished"])
             potential_copies.listAppend("Brigand - nuns trick.");
         //possibly less relevant:

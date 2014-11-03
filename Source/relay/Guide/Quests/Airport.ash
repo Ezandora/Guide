@@ -53,7 +53,7 @@ void QSleazeAirportGenerateResource(ChecklistEntry [int] available_resources_ent
             if ($effect[fishy].have_effect() == 0)
                 description.listAppend("Possibly acquire fishy effect first.");
             
-            available_resources_entries.listAppend(ChecklistEntryMake("__item ultimate mind destroyer", $location[The Sunken Party Yacht].getClickableURLForLocation(), ChecklistSubentryMake("Ultimate Mind Destroyer collectable", "", description), $locations[The Sunken Party Yacht]));
+            available_resources_entries.listAppend(ChecklistEntryMake("__item ultimate mind destroyer", $location[The Sunken Party Yacht].getClickableURLForLocation(), ChecklistSubentryMake("Ultimate Mind Destroyer collectable", "free runs", description), $locations[The Sunken Party Yacht]));
         }
     }
 }
@@ -63,13 +63,13 @@ void QSleazeAirportGenerateResource(ChecklistEntry [int] available_resources_ent
 void QJunglePunGenerateTasks(ChecklistEntry [int] task_entries)
 {
     QuestState state;
-    state.image_name = "__item encrypted mini-cassette recorder";
+    state.image_name = "__item encrypted micro-cassette recorder";
     state.quest_name = "Pungle in the Jungle";
 	QuestStateParseMafiaQuestProperty(state, "questESpJunglePun");
     
     if (!state.in_progress)
         return;
-    item recorder = lookupItem("encrypted mini-cassette recorder");
+    item recorder = lookupItem("encrypted micro-cassette recorder");
     
     if (recorder.available_amount() == 0)
         return;
@@ -89,7 +89,7 @@ void QJunglePunGenerateTasks(ChecklistEntry [int] task_entries)
         string [int] items_to_equip;
         if (recorder.equipped_amount() == 0)
         {
-            items_to_equip.listAppend("encrypted mini-cassette recorder");
+            items_to_equip.listAppend("encrypted micro-cassette recorder");
         }
         if (items_to_equip.count() > 0)
         {

@@ -14,7 +14,7 @@ void SPlasticVampireFangsGenerateResource(ChecklistEntry [int] available_resourc
     }
     else
     {
-        url = "town.php";
+        url = "place.php?whichplace=town";
         if ($item[plastic vampire fangs].equipped_amount() == 0)
         {
             url = "inventory.php?which=2";

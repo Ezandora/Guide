@@ -94,7 +94,7 @@ void QGuildGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         {
             //haunted pantry
             active_url = $location[the haunted pantry].getClickableURLForLocation();
-            subentry.entries.listAppend("Adventure in the haunted pantry to exorcise the poltersandwich");
+            subentry.entries.listAppend("Adventure in the haunted pantry to exorcise the poltersandwich.");
             output_modifiers = true;
         }
         if ($classes[disco bandit,accordion thief] contains my_class())

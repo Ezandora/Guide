@@ -17,9 +17,9 @@ void SAftercoreGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         string [int] details;
         details.listAppend("+3 adventures/day.");
         
-        if ($item[hey deze nuts].available_amount() == 0)
+        if ($item[hey deze nuts].item_amount() == 0)
         {
-            if ($item[hey deze map].available_amount() == 0)
+            if ($item[hey deze map].item_amount() == 0)
             {
                 url = "pandamonium.php";
                 details.listAppend("Adventure in Pandamonium Slums for Hey Deze Map. (25% superlikely)");
@@ -28,11 +28,11 @@ void SAftercoreGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             {
                 string [int] things_to_do;
                 string [int] things_to_buy;
-                if ($item[heavy metal sonata].available_amount() == 0)
+                if ($item[heavy metal sonata].item_amount() == 0)
                     things_to_buy.listAppend("heavy metal sonata");
-                if ($item[heavy metal thunderrr guitarrr].available_amount() == 0)
+                if ($item[heavy metal thunderrr guitarrr].item_amount() == 0)
                     things_to_buy.listAppend("heavy metal thunderrr guitarrr");
-                if ($item[guitar pick].available_amount() == 0)
+                if ($item[guitar pick].item_amount() == 0)
                     things_to_buy.listAppend("guitar pick");
                 if (things_to_buy.count() > 0)
                     things_to_do.listAppend("buy " + things_to_buy.listJoinComponents(", ", "and") + " in mall, ");
@@ -40,9 +40,9 @@ void SAftercoreGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
 				details.listAppend(things_to_do.listJoinComponents("", "then").capitalizeFirstLetter() + ".");
             }
         }
-        if ($item[pagoda plans].available_amount() == 0)
+        if ($item[pagoda plans].item_amount() == 0)
         {
-            if ($item[Elf Farm Raffle ticket].available_amount() == 0)
+            if ($item[Elf Farm Raffle ticket].item_amount() == 0)
             {
                 details.listAppend("Buy a Elf Farm Raffle ticket from the mall.");
             }
@@ -60,13 +60,13 @@ void SAftercoreGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
                 }
             }
         }
-        if ($item[ketchup hound].available_amount() == 0)
+        if ($item[ketchup hound].item_amount() == 0)
         {
             if (url.length() == 0)
                 url = "mall.php";
             details.listAppend("Buy a ketchup hound from the mall.");
         }
-        if ($item[ketchup hound].available_amount() > 0 && $item[hey deze nuts].available_amount() > 0 && $item[pagoda plans].available_amount() > 0)
+        if ($item[ketchup hound].item_amount() > 0 && $item[hey deze nuts].item_amount() > 0 && $item[pagoda plans].item_amount() > 0)
         {
             if (url.length() == 0)
                 url = "inventory.php?which=3";

@@ -45,7 +45,7 @@ void QLevel2GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	if (base_quest_state.state_boolean["have mosquito"])
 	{
 		subentry.entries.listAppend("Finished, go chat with the council.");
-        url = "town.php";
+        url = "place.php?whichplace=town";
 	}
 	else
 	{

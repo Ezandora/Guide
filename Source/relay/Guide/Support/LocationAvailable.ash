@@ -801,7 +801,7 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         foreach s in $strings[The Mansion of Dr. Weirdeaux,The Deep Dark Jungle,The Secret Government Laboratory]
             lookup_map[s] = "place.php?whichplace=airport_spooky";
             
-        lookup_map["Trick-or-treating"] = "town.php?action=trickortreat";
+        lookup_map["Trick-or-treating"] = "place.php?whichplace=town&action=town_trickortreat";
         //Conditionals:
         if ($location[cobb's knob barracks].locationAvailable())
             lookup_map["The Outskirts of Cobb's Knob"] = "cobbsknob.php";

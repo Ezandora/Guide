@@ -333,7 +333,7 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         }
         else
         {
-            url = "town.php";
+            url = "place.php?whichplace=town";
             subentry.entries.listAppend("Speak to the council.");
         }
     }
@@ -669,18 +669,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
         
         */
         
-        if (!mafiaIsPastRevision(13870)) //not actually sure when palindome support went in, so just using a recent one
-        {
-            subentry.entries.listAppend("Update mafia to support revamp. Simple guide:");
-            subentry.entries.listAppend("First you adventure in the Palindome.|Find three photographs via non-combats(?), and take a picture of Bob Racecar/Racecar Bob with a disposable instant camera. (found in NC in haunted bedroom)|Olfact bob racecar/racecar bob.|Also, possibly find stunt nuts. (30% drop, +234% item)");
-            subentry.entries.listAppend("&quot;I Love Me, Vol.&quot; I will drop from the fifth dude-type monster. Read it to unlock Dr. Awkward's office.");
-            subentry.entries.listAppend("Place all four photographs on the shelves in the office.|Order is god, red nugget, dog, and ostrich egg.");
-            subentry.entries.listAppend("Read 2 Love Me, Vol. 2 to unlock Mr. Alarm's office.");
-            subentry.entries.listAppend("Talk to Mr. Alarm, unlock Whitey's Grove. Run +186% item, +combat to find lion oil and bird rib.|Or, alternatively, adventure in the palindome.");
-            subentry.entries.listAppend("Cook wet stunt nut stew, talk to Mr. Alarm. He'll give you the Mega Gem.");
-            subentry.entries.listAppend("Equip that to fight Dr. Awkward in his office.");
-        }
-        else if ($item[mega gem].available_amount() > 0 || base_quest_state.mafia_internal_step == 5)
+        if ($item[mega gem].available_amount() > 0 || base_quest_state.mafia_internal_step == 5)
         {
             //5 -> fight dr. awkward
             string [int] tasks;
@@ -1710,7 +1699,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
             {
                 int rolls_needed = 6 - bowling_progress;
                 boolean worry_about_free_runs = false;
-                if (rolls_needed > $item[bowling ball].available_amount())
+                if (rolls_needed > $item[bowling ball].available_amount_including_closet())
                 {
                     subentry.modifiers.listAppend("+150% item");
                     subentry.entries.listAppend("Olfact bowler, run +150% item.");
@@ -1727,12 +1716,12 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                     line = "One More Roll";
                 line += " until protector spirit fight.";
                 
-                if ($item[bowling ball].available_amount() > 0)
-                    line += "|Have " + pluralizeWordy($item[bowling ball]) + ".";
-                if ($item[bowling ball].available_amount() < rolls_needed)
+                if ($item[bowling ball].item_amount() > 0)
+                    line += "|Have " + pluralizeWordy($item[bowling ball].item_amount(), $item[bowling ball]) + ".";
+                if ($item[bowling ball].item_amount() < rolls_needed)
                 {
-                    if ($item[bowling ball].closet_amount() > 0 && $item[bowling ball].available_amount() > 0)
-                        line += " (" + ($item[bowling ball].available_amount() + $item[bowling ball].closet_amount()).int_to_wordy() + " total with closet)";
+                    if ($item[bowling ball].closet_amount() > 0 && $item[bowling ball].item_amount() > 0)
+                        line += " (" + ($item[bowling ball].item_amount() + $item[bowling ball].closet_amount()).int_to_wordy() + " total with closet)";
                     else if ($item[bowling ball].closet_amount() > 0)
                     {
                         line += "|Have " + pluralizeWordy($item[bowling ball].closet_amount(), $item[bowling ball]) + " in closet.";
@@ -1748,7 +1737,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 {
                     if (hidden_tavern_unlocked)
                     {
-                        if ($item[bowl of scorpions].available_amount() == 0 && !$monster[drunk pygmy].is_banished())
+                        if ($item[bowl of scorpions].item_amount() == 0 && !$monster[drunk pygmy].is_banished())
                             subentry.entries.listAppend(HTMLGenerateSpanFont("Buy a bowl of scorpions", "red", "") + " from the Hidden Tavern to free run from drunk pygmys.");
                     }
                     else

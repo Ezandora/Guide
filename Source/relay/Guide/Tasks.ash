@@ -196,7 +196,14 @@ void generateTasks(Checklist [int] checklists)
         
         string url = "";
         
-        if (my_primestat() == $stat[muscle] && $location[the haunted billiards room].locationAvailable())
+        
+        if (get_property_boolean("sleazeAirportAlways") || get_property_boolean("_sleazeAirportToday"))
+            url = $location[sloppy seconds diner].getClickableURLForLocation();
+        else if (get_property_boolean("spookyAirportAlways") || get_property_boolean("_spookyAirportToday"))
+            url = $location[the deep dark jungle].getClickableURLForLocation();
+        else if ($item[GameInformPowerDailyPro walkthru].available_amount() > 0)
+            url = $location[video game level 1].getClickableURLForLocation();
+        else if (my_primestat() == $stat[muscle] && $location[the haunted billiards room].locationAvailable())
             url = $location[the haunted gallery].getClickableURLForLocation();
         else if (my_primestat() == $stat[mysticality] && $location[the haunted bedroom].locationAvailable())
             url = $location[the haunted bathroom].getClickableURLForLocation();
@@ -406,9 +413,17 @@ void generateTasks(Checklist [int] checklists)
 		optional_task_entries.listAppend(ChecklistEntryMake("__item homoerotic frat-paddle", "island.php", ChecklistSubentryMake("Acquire a frat boy ensemble?", modifiers, description), $locations[frat house]));
     }
 		
-	if ($item[strange leaflet].available_amount() > 0 && $item[giant pinky ring].available_amount() == 0) //very hacky way of testing if leaflet quest was done - in theory, they could smash the ring or pull one (or be casual)
+	if ($item[strange leaflet].available_amount() > 0 && __misc_state["In run"])
 	{
-		optional_task_entries.listAppend(ChecklistEntryMake("__item strange leaflet", "", ChecklistSubentryMake("Strange leaflet quest", "", "Quests Menu" + __html_right_arrow_character + "Leaflet (With Stats)")));
+        boolean leaflet_quest_probably_finished = false;
+        
+        if ($item[giant pinky ring].available_amount() > 0) //invalid in casual, but eh
+            leaflet_quest_probably_finished = true;
+        if ($item[Frobozz Real-Estate Company Instant House (TM)].available_amount() > 0 || get_dwelling() == $item[Frobozz Real-Estate Company Instant House (TM)])
+            leaflet_quest_probably_finished = true;
+        
+        if (!leaflet_quest_probably_finished)
+            optional_task_entries.listAppend(ChecklistEntryMake("__item strange leaflet", "", ChecklistSubentryMake("Strange leaflet quest", "", "Quests Menu" + __html_right_arrow_character + "Leaflet (With Stats)")));
 	}
 	
 

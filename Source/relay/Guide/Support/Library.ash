@@ -148,7 +148,7 @@ boolean familiar_is_usable(familiar f)
 	return have_familiar(f);
 }
 
-//inigo's shows up as have_skill while under restrictions, possibly others
+//inigo's used to show up as have_skill while under restrictions, possibly others
 boolean skill_is_usable(skill s)
 {
     if (!s.have_skill())
@@ -157,8 +157,6 @@ boolean skill_is_usable(skill s)
         return false;
     return true;
 }
-
-//Possibly skill_is_usable as well, for trendy and such.
 
 boolean in_ronin()
 {
@@ -275,6 +273,22 @@ int available_amount(item [int] items)
     return count;
 }
 
+int available_amount_ignoring_closet(item it)
+{
+    if (get_property_boolean("autoSatisfyWithCloset"))
+        return it.available_amount() - it.closet_amount();
+    else
+        return it.available_amount();
+}
+
+int available_amount_including_closet(item it)
+{
+    if (get_property_boolean("autoSatisfyWithCloset"))
+        return it.available_amount();
+    else
+        return it.available_amount() + it.closet_amount();
+}
+
 int equipped_amount(boolean [item] items)
 {
     int count = 0;
@@ -347,11 +361,16 @@ boolean have_outfit_components(string outfit_name)
     return (outfit_name.missing_outfit_components().count() == 0);
 }
 
+
+string [int] __int_to_wordy_map;
 string int_to_wordy(int v) //Not complete, only supports a handful:
 {
-    string [int] matches = split_string("zero,one,two,three,four,five,six,seven,eight,nine,ten,eleven,twelve,thirteen,fourteen,fifteen,sixteen,seventeen,eighteen,nineteen,twenty,twenty-one,twenty-two,twenty-three,twenty-four,twenty-five,twenty-six,twenty-seven,twenty-eight,twenty-nine,thirty,thirty-one", ",");
-    if (matches contains v)
-        return matches[v];
+    if (__int_to_wordy_map.count() == 0)
+    {
+        __int_to_wordy_map = split_string("zero,one,two,three,four,five,six,seven,eight,nine,ten,eleven,twelve,thirteen,fourteen,fifteen,sixteen,seventeen,eighteen,nineteen,twenty,twenty-one,twenty-two,twenty-three,twenty-four,twenty-five,twenty-six,twenty-seven,twenty-eight,twenty-nine,thirty,thirty-one", ",");
+    }
+    if (__int_to_wordy_map contains v)
+        return __int_to_wordy_map[v];
     return v.to_string();
 }
 
@@ -406,7 +425,6 @@ boolean stringHasSuffix(string s, string suffix)
 	return false;
 }
 
-
 string capitalizeFirstLetter(string v)
 {
 	buffer buf = v.to_buffer();
@@ -415,8 +433,6 @@ string capitalizeFirstLetter(string v)
 	buf.replace(0, 1, buf.char_at(0).to_upper_case());
 	return buf.to_string();
 }
-
-
 
 item [int] missingComponentsToMakeItemPrivateImplementation(item it, int it_amounted_needed, int recursion_limit_remaining)
 {
@@ -467,7 +483,7 @@ int getMillisecondsOfToday()
 
 //WARNING: Only accurate for up to five turns.
 //It also will not work properly in certain areas, and possibly across day boundaries. Actually, it's kind of a hack.
-//It should be sufficient for most instances of delay(), I think?
+//But now we have turns_spent so no need to worry.
 int combatTurnsAttemptedInLocation(location place)
 {
     int count = 0;
@@ -486,11 +502,7 @@ int noncombatTurnsAttemptedInLocation(location place)
 
 int turnsAttemptedInLocation(location place)
 {
-    if (place == $location[the haunted bedroom]) //special case - NCs don't count here
-        return place.combatTurnsAttemptedInLocation();
-    if (place.turns_spent != -1)
-        return place.turns_spent;
-    return place.combatTurnsAttemptedInLocation() + place.noncombatTurnsAttemptedInLocation();
+    return place.turns_spent;
 }
 
 int turnsAttemptedInLocation(boolean [location] places)
@@ -536,6 +548,7 @@ int totalDelayForLocation(location place)
     place_delays[$location[the haunted gallery]] = 5; //FIXME this is a guess, spade
     place_delays[$location[the haunted bathroom]] = 5;
     place_delays[$location[the haunted ballroom]] = 5; //FIXME rumored
+    place_delays[$location[the penultimate fantasy airship]] = 25;
     //the haunted billiards room does not contain delay
     //yojimbos_law saw it on turn two on 2014-7-14, immediately after seeing the pool cue adventure, as have I
     //also failure at 16 skill
@@ -546,48 +559,14 @@ int totalDelayForLocation(location place)
     return -1;
 }
 
-boolean delayForLocationIsCombatOnly(location place)
-{
-    //mafia will sometimes put things in the noncombat_queue that aren't really there
-    //an example is "Pick a Part", but I have seen others
-    //fixing these could be difficult (I don't know), so manually blank them out
-    //using the queue is unreliable but...
-    boolean [location] place_combat_only;
-    
-    place_combat_only[$location[the spooky forest]] = true;
-    place_combat_only[$location[the haunted bedroom]] = true;
-    place_combat_only[$location[the boss bat's lair]] = true;
-    place_combat_only[$location[the oasis]] = true;
-    place_combat_only[$location[the hidden park]] = false;
-    place_combat_only[$location[the haunted gallery]] = true;
-    place_combat_only[$location[the haunted bathroom]] = true; //fairly certain that's true
-    //place_combat_only[$location[the haunted ballroom]] = false; //don't really know
-    
-    if (place_combat_only contains place)
-        return place_combat_only[place];
-    return false;
-}
-
 int delayRemainingInLocation(location place)
 {
     int delay_for_place = place.totalDelayForLocation();
-    boolean delay_is_combat_only = place.delayForLocationIsCombatOnly();
-    
     
     if (delay_for_place == -1)
         return -1;
     
-    int turns_attempted = 0;
-    
-    if (delay_is_combat_only)
-        turns_attempted = place.combatTurnsAttemptedInLocation();
-    else
-        turns_attempted = place.turnsAttemptedInLocation();
-        
-    if (place.turns_spent != -1)
-        turns_attempted = place.turns_spent;
-    else if (delay_for_place > 5 && turns_attempted >= 5) //FIXME hackish, can't track over five turns
-        return 0;
+    int turns_attempted = place.turns_spent;
         
     return MAX(0, delay_for_place - turns_attempted);
 }
@@ -900,8 +879,6 @@ float initiative_modifier_ignoring_plants()
     //FIXME strange bug here, investigate
     //seen in cyrpt
     float init = initiative_modifier();
-    //if (mafiaIsPastRevision(13946))
-        //return init;
     
     location my_location = my_location();
     if (my_location != $location[none] && (my_location.locationHasPlant("Impatiens") || my_location.locationHasPlant("Shuffle Truffle")))

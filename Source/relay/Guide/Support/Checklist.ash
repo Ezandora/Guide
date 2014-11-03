@@ -283,9 +283,9 @@ void ChecklistInit()
         PageAddCSSClass("hr", "r_cl_hr_extended", "margin-left:" + (__setting_indention_width_in_em / 2.0) + "em;", 0, __setting_media_query_medium_size);
         
         
-        PageAddCSSClass("div", "r_cl_l_left", "width:" + (__setting_image_width_small) + "px;margin-left:10px;", 0, __setting_media_query_small_size);
+        PageAddCSSClass("div", "r_cl_l_left", "width:" + (__setting_image_width_small) + "px;margin-left:5px;", 0, __setting_media_query_small_size);
         PageAddCSSClass("div", "r_cl_l_right_container", "margin-left:" + (-(__setting_image_width_small) - 10) + "px;", 0, __setting_media_query_small_size);
-        PageAddCSSClass("div", "r_cl_l_right_content", "margin-left:" + ((__setting_image_width_small) + 10 + 10) + "px;margin-right:3px;", 0, __setting_media_query_small_size);
+        PageAddCSSClass("div", "r_cl_l_right_content", "margin-left:" + ((__setting_image_width_small) + 10) + "px;margin-right:3px;", 0, __setting_media_query_small_size);
         PageAddCSSClass("hr", "r_cl_hr", "margin-left:0px;margin-right:0px;", 0, __setting_media_query_small_size);
         PageAddCSSClass("hr", "r_cl_hr_extended", "margin-left:0px;", 0, __setting_media_query_small_size);
         PageAddCSSClass("div", "r_cl_l_container", "padding-top:3px;padding-bottom:3px;", 0, __setting_media_query_small_size);
@@ -312,6 +312,22 @@ void ChecklistInit()
         PageAddCSSClass("", "r_cl_image_container_medium", "display:none;", 0, __setting_media_query_tiny_size);
         PageAddCSSClass("", "r_cl_image_container_small", "display:none;", 0, __setting_media_query_tiny_size);
         
+        PageAddCSSClass("", "r_small_float_indention", "display:none");
+        
+        PageAddCSSClass("", "r_indention_not_small", "margin-left:" + __setting_indention_width + ";");
+        if (__setting_small_size_uses_full_width)
+        {
+            PageAddCSSClass("div", "r_cl_l_right_content", "margin-left:10px;margin-right:3px;min-width:80%;", 0, __setting_media_query_small_size);
+            PageAddCSSClass("", "r_cl_image_container_small", "display:block;float:left;", 0, __setting_media_query_small_size);
+            //PageAddCSSClass("", "r_small_float_indention", "display:inline;width:0.5em;height:" + (__setting_image_width_small - 10) + "px;float:left;", 0, __setting_media_query_small_size);
+            PageAddCSSClass("", "r_small_float_indention", "display:inline;width:0.5em;float:left;", 0, __setting_media_query_small_size);
+            PageAddCSSClass("", "r_indention_not_small", "margin-left:0.75em;", 0, __setting_media_query_small_size);
+            PageAddCSSClass("", "r_indention_not_small", "margin-left:0.75em;", 0, __setting_media_query_tiny_size);
+        }
+        
+        
+        PageAddCSSClass("", "r_indention", "margin-left:0.75em;", 0, __setting_media_query_small_size);
+        PageAddCSSClass("", "r_indention", "margin-left:0.75em;", 0, __setting_media_query_tiny_size);
     }
 }
 
@@ -460,6 +476,8 @@ buffer ChecklistGenerate(Checklist cl, boolean output_borders)
 		Vec2i max_image_dimensions_large = Vec2iMake(__setting_image_width_large,75);
 		Vec2i max_image_dimensions_medium = Vec2iMake(__setting_image_width_medium,50);
 		Vec2i max_image_dimensions_small = Vec2iMake(__setting_image_width_small,50);
+        if (__setting_small_size_uses_full_width)
+            max_image_dimensions_small = Vec2iMake(__setting_image_width_small,__setting_image_width_small);
         
         string container_class = "r_cl_l_container";
         if (entry.should_highlight)
@@ -553,7 +571,8 @@ buffer ChecklistGenerate(Checklist cl, boolean output_borders)
                 
                 image_container.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_large, "r_cl_image_container_large"));
                 image_container.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_medium, "r_cl_image_container_medium"));
-                image_container.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_small, "r_cl_image_container_small"));
+                if (!__setting_small_size_uses_full_width)
+                    image_container.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_small, "r_cl_image_container_small"));
                 
                 if (outputting_anchor && !__setting_entire_area_clickable)
                     image_container.append(anchor_suffix_html);
@@ -570,6 +589,14 @@ buffer ChecklistGenerate(Checklist cl, boolean output_borders)
             if (outputting_anchor && !__setting_entire_area_clickable)
                 result.append(anchor_prefix_html);
 			result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_cl_l_right_content")));
+            
+            if (__setting_small_size_uses_full_width)
+            {
+                result.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_small, "r_cl_image_container_small"));
+                
+                result.append(HTMLGenerateTagWrap("div", "", mapMake("class", "r_small_float_indention", "style", "height: " + __kol_image_generate_image_html_return_final_size.y + "px;")));
+                //result.append(HTMLGenerateDivOfClass("", "r_small_float_indention")); //&nbsp; to have it display. hack
+            }
 			
 			boolean first = true;
 			foreach j in entry.subentries
@@ -593,7 +620,10 @@ buffer ChecklistGenerate(Checklist cl, boolean output_borders)
 					result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_indention")));
 				
 				result.append(HTMLGenerateSpanOfClass(subheader, "r_cl_subheader"));
-				result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_indention")));
+                if (__setting_small_size_uses_full_width)
+                    result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_indention_not_small")));
+                else
+                    result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_indention")));
 				if (subentry.modifiers.count() > 0)
 					result.append(ChecklistGenerateModifierSpan(listJoinComponents(subentry.modifiers, ", ")));
 				if (subentry.entries.count() > 0)

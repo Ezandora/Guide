@@ -57,7 +57,7 @@ void QLevel5GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
                 if (delay_turns_remaining == 0)
                     subentry.entries.listAppend("Map appears next turn in cobb's knob.");
                 else
-                    subentry.entries.listAppend("Delay for " + delay_turns_remaining.int_to_wordy() + " more turns in cobb's knob to unlock area.");
+                    subentry.entries.listAppend("Delay for " + pluralizeWordy(delay_turns_remaining, "more turn", "more turns") + " in cobb's knob to unlock area.");
             }
             else
                 subentry.entries.listAppend("Delay for ten turns in cobb's knob to unlock area.");

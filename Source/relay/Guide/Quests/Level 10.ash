@@ -181,7 +181,7 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         url = "place.php?whichplace=giantcastle";
         if (get_property("lastEncounter") == "Keep On Turnin' the Wheel in the Sky")
         {
-            url = "town.php";
+            url = "place.php?whichplace=town";
             subentry.entries.listAppend("Talk to the council to finish quest.");
         }
 		else if ($location[The Castle in the Clouds in the Sky (Top floor)].locationAvailable())

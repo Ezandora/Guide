@@ -268,7 +268,7 @@ string generateRandomMessage()
     string [class] class_messages;
     class_messages[$class[disco bandit]] = "making discos of your castles";
     class_messages[$class[seal clubber]] = "I &#x2663;&#xfe0e; seals";
-    class_messages[$class[turtle tamer]] = "turtles turtles every where";
+    class_messages[$class[turtle tamer]] = "friends everywhere you go";
     
     if (class_messages contains my_class())
         random_messages.listAppend(class_messages[my_class()]);

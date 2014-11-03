@@ -128,6 +128,7 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         if (!is_wearing_outfit("Swashbuckling Getup") && $item[pirate fledges].equipped_amount() == 0)
             url = "inventory.php?which=2";
             
+        boolean have_all_fcle_items = false;
         
 		if (base_quest_state.mafia_internal_step == 1)
 		{
@@ -224,8 +225,10 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             
 			if (missing_washing_items.count() == 0)
             {
+                have_all_fcle_items = true;
                 url = "inventory.php?which=3";
-				line += " " + HTMLGenerateSpanFont("Use rigging shampoo, mizzenmast mop, and ball polish", "red", "") + ", then adventure to complete quest.";
+                line += " Adventure once to complete quest.";
+				//line += " " + HTMLGenerateSpanFont("Use rigging shampoo, mizzenmast mop, and ball polish", "red", "") + ", then adventure to complete quest.";
             }
 			else
 			{
@@ -239,7 +242,7 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 			subentry.entries.listAppend(line);
 			if (additional_line != "")
 				subentry.entries.listAppend(additional_line);
-            if (!$monster[clingy pirate].is_banished() && $item[cocktail napkin].available_amount() > 0)
+            if (!$monster[clingy pirate].is_banished() && $item[cocktail napkin].available_amount() > 0 && !have_all_fcle_items)
             {
                 subentry.entries.listAppend("Use cocktail napkin on clingy pirate to " + (__misc_state["free runs usable"] ? "free run/" : "") + "banish.");
             }
@@ -251,7 +254,7 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         }
         
         
-        if (__misc_state["free runs available"] && !can_acquire_cocktail_napkins)
+        if (__misc_state["free runs available"] && !can_acquire_cocktail_napkins && !have_all_fcle_items)
             subentry.modifiers.listAppend("free runs");
 	}
 	boolean should_output_insult_data = false;

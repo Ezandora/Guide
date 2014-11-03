@@ -95,14 +95,14 @@ void SHolidayGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 if (missing_components.count() > 0)
                     description.listAppend("If you need an outfit, buy a " + missing_components.listJoinComponents(", ", "and") + " from the knoll.");
             }
-            optional_task_entries.listAppend(ChecklistEntryMake("__item plastic pumpkin bucket", "town.php?action=trickortreat", ChecklistSubentryMake("Trick or treat for one block", "+" + my_primestat().to_lower_case(), description), $locations[trick-or-treating]));
+            optional_task_entries.listAppend(ChecklistEntryMake("__item plastic pumpkin bucket", "place.php?whichplace=town&action=town_trickortreat", ChecklistSubentryMake("Trick or treat for one block", "+" + my_primestat().to_lower_case(), description), $locations[trick-or-treating]));
         }
         else
         {
             string [int] description;
             description.listAppend("Wear an outfit, go from house to house.");
             description.listAppend("Remember you can trick-or-treat while drunk.");
-            optional_task_entries.listAppend(ChecklistEntryMake("__item plastic pumpkin bucket", "town.php?action=trickortreat", ChecklistSubentryMake("Trick or treat", "", description), $locations[trick-or-treating]));
+            optional_task_entries.listAppend(ChecklistEntryMake("__item plastic pumpkin bucket", "place.php?whichplace=town&action=town_trickortreat", ChecklistSubentryMake("Trick or treat", "", description), $locations[trick-or-treating]));
         }
     }
     if (all_tomorrows_parties["Halloween"] && !__misc_state["In run"])

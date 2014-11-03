@@ -351,8 +351,30 @@ void CountersReparse()
 
 boolean [string] __wandering_monster_counter_names = $strings[Romantic Monster,Rain Monster,Holiday Monster,Nemesis Assassin,Bee];
 
+
+//This is for ascension automation scripts. Call this immediately before adventuring in an adventure.php zone.
+//This will enable tracking of zero-adventure encounters that mean a wandering monster will not appear next turn. Affects CounterWanderingMonsterMayHitNextTurn() only.
+int __last_turn_definitely_visited_adventure_php = -1;
+void CounterAdviseAboutToVisitAdventurePHP()
+{
+    __last_turn_definitely_visited_adventure_php = my_turncount();
+}
+
+void CounterAdviseLastTurnAttemptedAdventurePHP(int turn)
+{
+    __last_turn_definitely_visited_adventure_php = turn;
+}
+
 boolean CounterWanderingMonsterMayHitNextTurn()
 {
+    monster last_monster = get_property_monster("lastEncounter");
+    
+    if ($monsters[Black Crayon Beast,Black Crayon Beetle,Black Crayon Constellation,Black Crayon Golem,Black Crayon Demon,Black Crayon Man,Black Crayon Elemental,Black Crayon Crimbo Elf,Black Crayon Fish,Black Crayon Goblin,Black Crayon Hippy,Black Crayon Hobo,Black Crayon Shambling Monstrosity,Black Crayon Manloid,Black Crayon Mer-kin,Black Crayon Frat Orc,Black Crayon Penguin,Black Crayon Pirate,Black Crayon Flower,Black Crayon Slime,Black Crayon Undead Thing,Black Crayon Spiraling Shape,angry bassist,blue-haired girl,evil ex-girlfriend,peeved roommate,random scenester] contains last_monster) //bit of a hack - if they just fought a hipster monster (hopefully not faxing it), then the wandering monster isn't up this turn
+    {
+        return false;
+    }
+    if (my_turncount() == __last_turn_definitely_visited_adventure_php && __last_turn_definitely_visited_adventure_php != -1 && !get_property("lastEncounter").contains_text("Lights Out")) //that adventure didn't advance the counter; no wandering monsters. also, does lights out override wanderers?
+        return false;
     //FIXME use CounterWanderingMonsterMayHitInXTurns to implement this once we're sure it works
     foreach s in __wandering_monster_counter_names
     {

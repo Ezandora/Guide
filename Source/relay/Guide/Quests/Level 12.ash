@@ -253,20 +253,32 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
             location_monsters[$location[Near an Abandoned Refrigerator]] = listMake("tool spider", "batwinged");
             location_monsters[$location[Over Where the Old Tires Are]] = listMake("tool erudite", "spider");
             
-            location [monster] banishment_locations; //it's time we had a talk... about your hair! it's gone too far!
-            banishment_locations[$monster[batwinged gremlin]] = $location[Near an Abandoned Refrigerator];
-            banishment_locations[$monster[erudite gremlin]] = $location[Out By that Rusted-Out Car];
-            banishment_locations[$monster[spider gremlin]] = $location[Over Where the Old Tires Are];
-            banishment_locations[$monster[vegetable gremlin]] = $location[Next to that Barrel with Something Burning in it];
+            location [int][monster] banishment_locations; //it's time we had a talk... about your hair! it's gone too far!
+            banishment_locations[1][$monster[batwinged gremlin]] = $location[Near an Abandoned Refrigerator];
+            banishment_locations[1][$monster[erudite gremlin]] = $location[Out By that Rusted-Out Car];
+            banishment_locations[1][$monster[spider gremlin]] = $location[Over Where the Old Tires Are];
+            banishment_locations[1][$monster[vegetable gremlin]] = $location[Next to that Barrel with Something Burning in it];
             
-            foreach m in banishment_locations
+            
+            banishment_locations[0][$monster[batwinged gremlin]] = $location[Next to that Barrel with Something Burning in it];
+            banishment_locations[0][$monster[erudite gremlin]] = $location[Over Where the Old Tires Are];
+            banishment_locations[0][$monster[spider gremlin]] = $location[Near an Abandoned Refrigerator];
+            banishment_locations[0][$monster[vegetable gremlin]] = $location[Out By that Rusted-Out Car];
+            
+            foreach key in banishment_locations
             {
-                if (!m.is_banished())
-                    continue;
-                location l = banishment_locations[m];
-                location_monsters[l][1] = HTMLGenerateSpanFont(location_monsters[l][1], "grey", "");
+                foreach m in banishment_locations[key]
+                {
+                    if (!m.is_banished())
+                        continue;
+                    location l = banishment_locations[key][m];
+                    
+                    if (key == 0 && location_monsters[l][key].contains_text("tool "))
+                        location_monsters[l][key] = "tool " + HTMLGenerateSpanFont(location_monsters[l][key].replace_string("tool ", ""), "grey", "");
+                    else
+                        location_monsters[l][key] = HTMLGenerateSpanFont(location_monsters[l][key], "grey", "");
+                }
             }
-
 
 
             

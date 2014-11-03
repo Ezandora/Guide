@@ -503,6 +503,14 @@ string [int] listCopy(string [int] l)
     return result;
 }
 
+monster [int] listCopy(monster [int] l)
+{
+    monster [int] result;
+    foreach key in l
+        result[key] = l[key];
+    return result;
+}
+
 //Strict, in this case, means the keys start at 0, and go up by one per entry. This allows easy consistent access
 boolean listKeysMeetStrictRequirements(string [int] list)
 {
