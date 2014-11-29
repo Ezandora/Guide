@@ -43,7 +43,7 @@ void SemirareGenerateDescription(string [int] description)
                 line += ".";
             fortune_output = true;
         }
-        if (__misc_state["VIP available"] && __misc_state["can drink just about anything"])
+        if (__misc_state["VIP available"] && __misc_state["can drink just about anything"] && $item[Clan speakeasy].is_unrestricted())
         {
             if (fortune_output)
                 line += " Or drink a Lucky Lindy";

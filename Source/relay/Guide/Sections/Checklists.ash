@@ -44,7 +44,7 @@ void generateMisc(Checklist [int] checklists)
             url = "peevpee.php";
             
         description.listAppend(line);
-        if ($item[drunkula's wineglass].available_amount() > 0 && $item[drunkula's wineglass].can_equip())
+        if ($item[drunkula's wineglass].available_amount() > 0 && $item[drunkula's wineglass].can_equip() && my_adventures() > 0)
         {
             description.listAppend("Or equip your wineglass.");
         }
@@ -58,7 +58,7 @@ void generateMisc(Checklist [int] checklists)
         if (get_property_boolean("_borrowedTimeUsed"))
             rollover_adventures_gained -= 20;
         int adventures_lost = (my_adventures() + rollover_adventures_gained) - 200;
-        if (rollover_adventures_from_equipment == 0.0 && adventures_lost == 0)
+        if (rollover_adventures_from_equipment == 0.0 && adventures_lost == 0 && my_path_id() != PATH_SLOW_AND_STEADY)
         {
             description.listAppend("Possibly wear +adventures gear.");
         }
@@ -68,17 +68,20 @@ void generateMisc(Checklist [int] checklists)
         }
         
         //this could be better (i.e. checking against current shirt and looking in inventory, etc.)
-        if ($item[Sneaky Pete's leather jacket (collar popped)].equipped_amount() > 0 && adventures_lost <= 0)
-            description.listAppend("Could unpop your collar. (+4 adventures)");
-        if ($item[Sneaky Pete's leather jacket].equipped_amount() > 0 && hippy_stone_broken())
-            description.listAppend("Could pop your collar. (+4 fights)");
+        if (my_path_id() != PATH_SLOW_AND_STEADY)
+        {
+            if ($item[Sneaky Pete's leather jacket (collar popped)].equipped_amount() > 0 && adventures_lost <= 0)
+                description.listAppend("Could unpop your collar. (+4 adventures)");
+            if ($item[Sneaky Pete's leather jacket].equipped_amount() > 0 && hippy_stone_broken())
+                description.listAppend("Could pop your collar. (+4 fights)");
+            if (!can_interact() && $item[resolution: be more adventurous].available_amount() > 0 && get_property_int("_resolutionAdv") < 5)
+            {
+                description.listAppend("Use resolution: be more adventurous.");
+            }
+        }
         if (in_ronin() && pulls_remaining() > 0)
         {
             description.listAppend("Don't forget your " + pluralizeWordy(pulls_remaining(), "pull", "pulls") + ".");
-        }
-        if (!can_interact() && $item[resolution: be more adventurous].available_amount() > 0 && get_property_int("_resolutionAdv") < 5)
-        {
-            description.listAppend("Use resolution: be more adventurous.");
         }
         //FIXME resolution be more adventurous goes here
         
@@ -122,7 +125,7 @@ void generateChecklists(Checklist [int] ordered_output_checklists)
     {
         //Valhalla:
 		Checklist task_entries = lookupChecklist(checklists, "Tasks");
-        task_entries.entries.listAppend(ChecklistEntryMake("astral spirit", "", ChecklistSubentryMake("Ascend, spirit!", "", listMake("Perm skills.", "Buy consumables.", "Bring along a pet."))));
+        task_entries.entries.listAppend(ChecklistEntryMake("astral spirit", "", ChecklistSubentryMake("Start a new life", "", listMake("Perm skills.", "Buy consumables.", "Bring along a pet."))));
     }
     else
     {

@@ -100,7 +100,22 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
         {
             description.listAppend("Buff muscle, equip a powerful weapon.");
             description.listAppend("Delevel him with crayon shavings for a bit, then attack with your weapon.");
-            description.listAppend("Make sure not to have anything along that will attack him. (saucespheres, familiars, hand in glove, etc)");
+            description.listAppend("Make sure not to have anything along that will attack him. (familiars, etc)");
+            //umm... this probably won't be updated:
+            string [int] things_to_do;
+            foreach it in $items[hand in glove,MagiMechTech NanoMechaMech,bottle opener belt buckle,old-school calculator watch,ant hoe,ant pick,ant pitchfork,ant rake,ant sickle,fishy wand,moveable feast,oversized fish scaler,plastic pumpkin bucket,tiny bowler,cup of infinite pencils,double-ice box,smirking shrunken head,mr. haggis,stapler bear,dubious loincloth,muddy skirt,bottle of Goldschn&ouml;ckered,acid-squirting flower,ironic oversized sunglasses,hippy protest button,cannonball charrrm bracelet,groovy prism necklace,spiky turtle shoulderpads,double-ice cap,parasitic headgnawer,eelskin hat,balloon shield,hot plate,Ol' Scratch's stove door,Oscus's garbage can lid,eelskin shield,eelskin pants]
+            {
+                if (it.equipped_amount() > 0)
+                    things_to_do.listAppend("unequip " + it);
+            }
+            foreach e in $effects[Skeletal Warrior,Skeletal Cleric,Skeletal Wizard,Bone Homie,Burning\, Man,Biologically Shocked,EVISCERATE!,Fangs and Pangs,Permanent Halloween,Curse of the Black Pearl Onion,Long Live GORF,Apoplectic with Rage,Dizzy with Rage,Quivering with Rage,Jaba&ntilde;ero Saucesphere,Psalm of Pointiness,Drenched With Filth,Stuck-Up Hair,It's Electric!,Smokin',Jalape&ntilde;o Saucesphere,Scarysauce]
+            {
+                if (e.have_effect() > 0)
+                    things_to_do.listAppend("uneffect " + e);
+            }
+            if (things_to_do.count() > 0)
+                description.listAppend(HTMLGenerateSpanFont(things_to_do.listJoinComponents(", ", "and").capitalizeFirstLetter() + ".", "red", ""));
+            
             if ($item[dark porquoise ring].equipped_amount() == 0)
             {
                 string line = "Possibly ";
@@ -110,7 +125,7 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
                 description.listAppend(line);
             }
             if (my_mp() > 0)
-                description.listAppend("Try to reduce your MP to 0 before fighting him.");
+                description.listAppend(HTMLGenerateSpanFont("Try to reduce your MP to 0", "red", "") + " before fighting him.");
         }
         else
         {
@@ -153,7 +168,7 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
         {
             description.listAppend("Wear several mer-kin prayerbeads and possibly a mer-kin gutgirdle.");
             description.listAppend("Avoid wearing any +hp gear or buffs. Ideally, you want low HP.");
-            description.listAppend("Each round, use a different healing item, until you lose the Suckrament effect.|After that, your stats are restored. Fully heal, then " + HTMLGenerateSpanOfClass("attack with elemental damage", "r_bold") + ".");
+            description.listAppend("Each round, use a different healing item, until you lose the Suckrament effect.<br>After that, your stats are restored. Fully heal, then " + HTMLGenerateSpanOfClass("attack with elemental damage", "r_bold") + ".");
             string [item] potential_healers;
             potential_healers[$item[mer-kin healscroll]] = "mer-kin healscroll (full HP)";
             potential_healers[$item[scented massage oil]] = "scented massage oil (full HP)";
@@ -170,7 +185,7 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
             
             foreach it in potential_healers
             {
-                if (it.available_amount() > 0)
+                if (it.item_amount() > 0)
                     description_healers.listAppend(potential_healers[it]);
                 else
                     description_healers.listAppend(HTMLGenerateSpanFont(potential_healers[it], "red", ""));

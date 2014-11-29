@@ -148,3 +148,10 @@ boolean needTowerMonsterItem(string in_item_name)
 	}
 	return false;		
 }
+
+QuestState QuestState(string property_name)
+{
+	QuestState state;
+    QuestStateParseMafiaQuestProperty(state, property_name);
+    return state;
+}

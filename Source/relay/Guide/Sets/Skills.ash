@@ -36,6 +36,9 @@ void SSkillsGenerateResource(ChecklistEntry [int] available_resources_entries)
 	property_summons_to_skills["_lunchBreak"] = listMake($skill[lunch break]);
 	property_summons_to_skills["_psychokineticHugUsed"] = listMake($skill[Psychokinetic Hug]);
 	property_summons_to_skills["_pirateBellowUsed"] = listMake(lookupSkill("Pirate Bellow"));
+	property_summons_to_skills["_holidayFunUsed"] = listMake(lookupSkill("Summon Holiday Fun!"));
+    
+    
     
     if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE)
     {

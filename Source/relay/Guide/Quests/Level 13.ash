@@ -417,7 +417,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             
             
         monster pickpocket_monster = $monster[Topiary Golem];
-        if (__misc_state["can pickpocket"] && pickpocket_monster != $monster[none])
+        if (__misc_state["can pickpocket"] && pickpocket_monster != $monster[none] && __misc_state["free runs usable"])
         {
             int total_initiative_needed = pickpocket_monster.base_initiative;
             int initiative_needed = total_initiative_needed - initiative_modifier();
@@ -731,7 +731,10 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         url = "lair6.php";
 		//counter familiars
         
-        if (!__misc_state["familiars temporarily blocked"])
+        if (true)
+        {
+        }
+        else if (!__misc_state["familiars temporarily blocked"])
         {
             subentry.modifiers.listAppend("+familiar weight");
             subentry.entries.listAppend("Counter familiars. Need 20-pound familiars.");

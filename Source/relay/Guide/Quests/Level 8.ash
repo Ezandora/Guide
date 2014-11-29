@@ -206,11 +206,18 @@ void QLevel8GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         
             if (items_needed.count() == 0)
             {
+                string [int] things_to_do;
                 if (!is_wearing_outfit("eXtreme Cold-Weather Gear"))
-                    extreme_path.listAppend("Wear eXtreme Cold-Weather Gear, run -combat, become eXtreme, jump onto the mountain top.");
-                else
-                    extreme_path.listAppend("Run -combat, become eXtreme, jump onto the mountain top.");
-                extreme_modifiers.listAppend("-combat");
+                    things_to_do.listAppend("wear eXtreme Cold-Weather Gear");
+                
+                if (!$location[the extreme slope].noncombat_queue.contains_text("3 eXXXtreme 4ever 6pack"))
+                {
+                    things_to_do.listAppend("run -combat");
+                    things_to_do.listAppend("become eXtreme");
+                    extreme_modifiers.listAppend("-combat");
+                }
+                things_to_do.listAppend("jump onto the mountain top");
+                extreme_path.listAppend(things_to_do.listJoinComponents(", ", "and").capitalizeFirstLetter() + ".");
             }
             else
             {

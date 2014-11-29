@@ -146,23 +146,17 @@ void finalizeSetUpFloristState()
     }
 	
 	//Stealing Magnolia - indoor, +item:
-	//The haunted ballroom, except they may be changing that?
-    if (my_primestat() == $stat[moxie] && __misc_state["need to level"] && false) //disabled for now, not sure if it's a good idea or not
-    {
-        if (my_path_id() != PATH_CLASS_ACT_2)
-            __plants_suggested_locations.listAppend(PlantSuggestionMake($location[the haunted ballroom], "Stealing Magnolia", "Dance cards from waltzers, for power leveling.")); //FIXME if stat changes in the future, remove this suggestion
-        
-	}
 	//War Lily - indoor, +ML:
     if (__misc_state["need to level"])
     {
-        __plants_suggested_locations.listAppend(PlantSuggestionMake($location[The castle in the clouds in the sky (ground floor)], "War Lily", ""));
+        if (my_path_id() != PATH_PICKY || my_primestat() == $stat[moxie]) //nightmare in picky
+            __plants_suggested_locations.listAppend(PlantSuggestionMake($location[The castle in the clouds in the sky (ground floor)], "War Lily", ""));
         //Haunted bedroom?
     }
 	//Rad-ish Radish - outdoor, +5 moxie stats/fight:
     if (__misc_state["need to level moxie"])
     {
-        //you wouldn't plant +30ML at airship - because oil peak likely needs it today. FIXME suggest if oil peak done/planted? HCO I guess? I dunno
+        //you wouldn't plant +30ML at airship - because oil peak may need it today. FIXME suggest if oil peak done/planted? HCO I guess? I dunno
         __plants_suggested_locations.listAppend(PlantSuggestionMake($location[The Spooky Forest], "Rad-ish Radish", ""));
         __plants_suggested_locations.listAppend(PlantSuggestionMake($location[The Penultimate Fantasy Airship], "Rad-ish Radish", ""));
     }

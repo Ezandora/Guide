@@ -66,7 +66,6 @@ void QLevel4GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
     }
     else
     {
-        subentry.modifiers.listAppend("+566% item");
         int areas_unlocked = base_quest_state.state_int["areas unlocked"];
         int areas_locked = 3 - areas_unlocked;
         int sonars_needed = MAX(areas_locked - $item[sonar-in-a-biscuit].available_amount(), 0);
@@ -117,12 +116,29 @@ void QLevel4GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             else
                 subentry.entries.listAppend("When beanbat chamber is unlocked, run +100% item for a single turn there for enchanted bean (50% drop)");
         }
-        if (__misc_state["yellow ray available"] && sonars_needed > 0)
-            subentry.entries.listAppend("Potentially yellow ray for sonar-in-a-biscuit.");
-        if (sonars_needed > 0)
-            subentry.entries.listAppend("Run +item in the beanbat and batrat burrow for biscuits (15% drop)");
+        
+        int total_turns = $location[Guano Junction].turns_spent + $location[The Batrat and Ratbat Burrow].turns_spent + $location[The Beanbat Chamber].turns_spent;
+        int turns_until_next_screambat = 8 - (total_turns % 8);
+        if (turns_until_next_screambat == 8 && total_turns != 0) turns_until_next_screambat = 0;
+        boolean screambat_up_now = false;
+        
+        if (turns_until_next_screambat == 0)
+        {
+            screambat_up_now = true;
+            subentry.entries.listAppend("Screambat next turn.");
+        }
+        else
+            subentry.entries.listAppend("Screambat after " + pluralizeWordy(turns_until_next_screambat, "turn", "turns") + ".");
+        
+        if (!screambat_up_now)
+        {
+            if (__misc_state["yellow ray available"] && sonars_needed > 0)
+                subentry.entries.listAppend("Potentially yellow ray for sonar-in-a-biscuit.");
+            if (sonars_needed > 0)
+                subentry.entries.listAppend("Run +item in the beanbat and batrat burrow for biscuits. (15% drop)");
+            subentry.modifiers.listAppend("+566% item");
+        }
         //subentry.entries.listAppend("Run +meat in the boss bat's lair, if you wish. (250 meat drop)");
-        subentry.modifiers.listAppend("+meat");
 	}
     
 	task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the bat hole entrance, guano junction, the batrat and ratbat burrow, the beanbat chamber,the boss bat's lair]));

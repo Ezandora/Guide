@@ -172,6 +172,17 @@ void setUpState()
 	__misc_state_string["yellow ray source"] = yellow_ray_source;
 	__misc_state_string["yellow ray image name"] = yellow_ray_image_name;
 	__misc_state["yellow ray potentially available"] = yellow_ray_potentially_available;
+    
+    
+    int [item] campground_items = get_campground();
+    __misc_state["can cook for free"] = false;
+    if (campground_items[$item[chef-in-the-box]] > 0 || campground_items[$item[clockwork chef-in-the-box]] > 0 || $effect[Inigo's Incantation of Inspiration].have_effect() >= 5)
+        __misc_state["can cook for free"] = true;
+    
+    
+    __misc_state["can bartend for free"] = false;
+    if (campground_items[$item[bartender-in-the-box]] > 0 || campground_items[$item[clockwork bartender-in-the-box]] > 0 || $effect[Inigo's Incantation of Inspiration].have_effect() >= 5)
+        __misc_state["can bartend for free"] = true;
 	
 	boolean free_runs_usable = true;
 	if (my_path_id() == PATH_BIG)
@@ -295,24 +306,31 @@ void setUpState()
 	__misc_state_int["pulls available"] = pulls_available;
 	
     //Calculate free rests available:
-    int [skill] rests_granted_by_skills;
-    rests_granted_by_skills[$skill[disco nap]] = 1;
-    rests_granted_by_skills[$skill[adventurer of leisure]] = 2;
-    rests_granted_by_skills[$skill[dog tired]] = 5;
-    rests_granted_by_skills[$skill[executive narcolepsy]] = 1;
-    rests_granted_by_skills[$skill[food coma]] = 10;
-    
     int rests_used = get_property_int("timesRested");
     int total_rests_available = 0;
-    if ($familiar[unconscious collective].have_familiar_replacement())
-        total_rests_available += 3;
     
-    foreach s in rests_granted_by_skills
+    if (false)
     {
-        if (s.have_skill())
-            total_rests_available += rests_granted_by_skills[s];
+        //total_rests_available = total_free_rests(); //for release 16.7
     }
-    
+    else
+    {
+        int [skill] rests_granted_by_skills;
+        rests_granted_by_skills[$skill[disco nap]] = 1;
+        rests_granted_by_skills[$skill[adventurer of leisure]] = 2;
+        rests_granted_by_skills[$skill[dog tired]] = 5;
+        rests_granted_by_skills[$skill[executive narcolepsy]] = 1;
+        rests_granted_by_skills[$skill[food coma]] = 10;
+        
+        if ($familiar[unconscious collective].have_familiar_replacement())
+            total_rests_available += 3;
+        
+        foreach s in rests_granted_by_skills
+        {
+            if (s.have_skill())
+                total_rests_available += rests_granted_by_skills[s];
+        }
+    }
     __misc_state_int["total free rests possible"] = total_rests_available;
 	__misc_state_int["free rests remaining"] = MAX(total_rests_available - rests_used, 0);
 	
@@ -671,6 +689,12 @@ void setUpState()
         }
         if (minus_combat_source_count >= 5)
             __misc_state["can reasonably reach -25% combat"] = true;
+    }
+    
+    foreach s in $strings[spooky,sleaze,hot,cold,stench]
+    {
+        if (get_property_boolean(s + "AirportAlways") || get_property_boolean("_" + s + "AirportToday"))
+            __misc_state[s + " airport available"] = true;
     }
 }
 

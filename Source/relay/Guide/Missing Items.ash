@@ -332,7 +332,7 @@ void generateMissingItems(Checklist [int] checklists)
 		}
 	}
     
-    if (true)
+    if (false) //gone, gone!
     {
         FloatHandle missing_weight;
         string [int] familiar_weight_how;

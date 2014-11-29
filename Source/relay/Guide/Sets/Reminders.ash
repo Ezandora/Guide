@@ -136,9 +136,13 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         
 		task_entries.listAppend(ChecklistEntryMake("__effect qwopped up", url, ChecklistSubentryMake("Remove QWOPped up effect", "", description), -11));
     }
+    
+    boolean [monster] awkwards;
+    awkwards[$monster[dr. awkward]] = true;
+    if (lookupMonster("Dr. Aquard") != $monster[none])
+        awkwards[lookupMonster("Dr. Aquard")] = true;
 
-
-    if (get_property_monster("lastEncounter") == $monster[dr. awkward] && $item[mega gem].equipped_amount() > 0 && $items[staff of fats, Staff of Ed\, almost, Staff of Ed].available_amount() > 0)
+    if ((awkwards contains get_property_monster("lastEncounter")) && $item[mega gem].equipped_amount() > 0 && $items[staff of fats, Staff of Ed\, almost, Staff of Ed].available_amount() > 0)
     {
         //Just defeated Dr. Awkward.
         //This will disappear once they adventure somewhere else.
@@ -334,5 +338,29 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             
             task_entries.listAppend(ChecklistEntryMake("__item miniature life preserver", url, ChecklistSubentryMake(HTMLGenerateSpanFont("Equip miniature life preserver", "red", ""), "", description), -11));
         }
+    }
+    
+    Counter semirare_counter = CounterLookup("Semi-rare");
+    if (semirare_counter.CounterIsRange() && semirare_counter.range_start_turn <= 3 && semirare_counter.range_start_turn >= 1)
+    {
+        //can we reasonably discover the secret?
+        string [int] description;
+        int upcoming_in = semirare_counter.range_start_turn;
+        description.listAppend("Window starts after " + pluralizeWordy(upcoming_in, "turn", "turns") + ".");
+        
+        string [int] options;
+        if (__misc_state["can eat just about anything"])
+        {
+            options.listAppend("eat a fortune cookie");
+        }
+        if (__misc_state["VIP available"] && __misc_state["can drink just about anything"] && $item[Clan speakeasy].is_unrestricted())
+        {
+            options.listAppend("drink a lucky lindy");
+        }
+        
+        description.listAppend(options.listJoinComponents(", ", "or").capitalizeFirstLetter() + ".");
+        
+        if (options.count() > 0)
+            task_entries.listAppend(ChecklistEntryMake("__item fortune cookie", "", ChecklistSubentryMake(HTMLGenerateSpanFont("Learn semi-rare number", "red", ""), "", description), -11));
     }
 }

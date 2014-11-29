@@ -5,16 +5,13 @@ void QGuildInit()
         return;
 	//questM02Artist
 	QuestState state;
-	
-    if ($classes[seal clubber,turtle tamer] contains my_class())
-    {
-    }
     
+    if ($classes[seal clubber,turtle tamer] contains my_class())
+        QuestStateParseMafiaQuestProperty(state, "questG09Muscle");
     if ($classes[pastamancer,sauceror] contains my_class())
         QuestStateParseMafiaQuestProperty(state, "questG07Myst");
     if ($classes[disco bandit,accordion thief] contains my_class())
         QuestStateParseMafiaQuestProperty(state, "questG08Moxie");
-    
     if (guild_store_available())
         QuestStateParseMafiaQuestPropertyValue(state, "finished");
 	
@@ -63,7 +60,7 @@ void QGuildGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     if (__misc_state["In run"])
     {
     
-        if ($classes[seal clubber,turtle tamer] contains my_class()) //you always go here in ascension
+        if ($classes[seal clubber,turtle tamer] contains my_class() && !mafiaIsPastRevision(14934)) //you always go here in ascension
             return;
         
         if ($classes[pastamancer,sauceror] contains my_class() && $location[the haunted pantry].turnsAttemptedInLocation() == 0)
@@ -74,6 +71,7 @@ void QGuildGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
             return;
     }
 	
+    boolean [location] relevant_location;
     
     if (!base_quest_state.started)
     {
@@ -87,6 +85,7 @@ void QGuildGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         {
             //cobb's knob
             active_url = $location[the outskirts of Cobb's Knob].getClickableURLForLocation();
+            relevant_location[$location[the outskirts of Cobb's Knob]] = true;
             subentry.entries.listAppend("Adventure in the outskirts of Cobb's Knob to find the sausage.");
             output_modifiers = true;
         }
@@ -94,6 +93,7 @@ void QGuildGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         {
             //haunted pantry
             active_url = $location[the haunted pantry].getClickableURLForLocation();
+            relevant_location[$location[the haunted pantry]] = true;
             subentry.entries.listAppend("Adventure in the haunted pantry to exorcise the poltersandwich.");
             output_modifiers = true;
         }
@@ -101,6 +101,7 @@ void QGuildGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         {
             //sleazy back alley
             active_url = $location[the sleazy back alley].getClickableURLForLocation();
+            relevant_location[$location[the sleazy back alley]] = true;
             subentry.entries.listAppend("Adventure in the sleazy back alley to steal your own pants.");
             output_modifiers = true;
         }
@@ -123,5 +124,5 @@ void QGuildGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         active_url = "guild.php";
     }
 	
-	optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, active_url, subentry, $locations[the sleazy back alley, the outskirts of cobb's knob, the haunted pantry]));
+	optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, active_url, subentry, relevant_location));
 }

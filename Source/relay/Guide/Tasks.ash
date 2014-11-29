@@ -196,10 +196,13 @@ void generateTasks(Checklist [int] checklists)
         
         string url = "";
         
+        boolean spooky_airport_unlocked = __misc_state["spooky airport available"];
         
-        if (get_property_boolean("sleazeAirportAlways") || get_property_boolean("_sleazeAirportToday"))
+        if (spooky_airport_unlocked && $effect[jungle juiced].have_effect() > 0)
+            url = $location[the deep dark jungle].getClickableURLForLocation();
+        else if (__misc_state["sleaze airport available"])
             url = $location[sloppy seconds diner].getClickableURLForLocation();
-        else if (get_property_boolean("spookyAirportAlways") || get_property_boolean("_spookyAirportToday"))
+        else if (spooky_airport_unlocked)
             url = $location[the deep dark jungle].getClickableURLForLocation();
         else if ($item[GameInformPowerDailyPro walkthru].available_amount() > 0)
             url = $location[video game level 1].getClickableURLForLocation();

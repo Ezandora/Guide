@@ -12,9 +12,10 @@ void QLevel5Init()
 	if (my_level() >= 5)
 		state.startable = true;
 		
-	if (get_property("questL05Goblin") == "unstarted" && $item[knob goblin encryption key].available_amount() == 0 && my_level() < 5)
+	if (get_property("questL05Goblin") == "unstarted" && $item[knob goblin encryption key].available_amount() == 0)
 	{
 		//start the quest anyways, because they need to acquire the encryption key:
+        //there's also an edge case here in BIG!, where you want to avoid visiting the council for a while to yellow ray an outfit
 		QuestStateParseMafiaQuestPropertyValue(state, "started");
 	}
 		
@@ -160,10 +161,15 @@ void QLevel5GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 			}
 			else
 			{
-				string cook_cake_line  = "cook a knob cake (1 adventure";
-				if (skill_is_usable($skill[inigo's incantation of inspiration]))
-					cook_cake_line += ", can use inigo's";
-				cook_cake_line += ")";
+				string cook_cake_line  = "cook a knob cake";
+                
+                 if (!__misc_state["can cook for free"])
+                 {
+                    cook_cake_line += " (1 adventure";
+                    if (skill_is_usable($skill[inigo's incantation of inspiration]))
+                        cook_cake_line += ", can use inigo's";
+                    cook_cake_line += ")";
+                }
 				string [int] things_to_do_before_fighting_king;
 				if (!is_wearing_outfit("Knob Goblin Elite Guard Uniform"))
 					things_to_do_before_fighting_king.listAppend("wear knob goblin elite guard uniform");

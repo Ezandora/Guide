@@ -24,7 +24,7 @@ void QHitsInit()
     
     state.state_boolean["Need starfish"] = true;
 	
-    if ($familiar[star starfish].have_familiar_replacement() || __misc_state["familiars temporarily blocked"] || my_path_id() == PATH_ZOMBIE_SLAYER)
+    if ($familiar[star starfish].have_familiar_replacement() || __misc_state["familiars temporarily blocked"] || my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_PICKY)
         state.state_boolean["Need starfish"] = false;
 	
     

@@ -170,6 +170,8 @@ void SPulverizeGenerateResource(ChecklistEntry [int] available_resources_entries
         {
             if (it.available_amount() == 0)
                 continue;
+            if (blacklist[it])
+                continue;
             elemental_nuggets_list.listAppend(it);
         }
         

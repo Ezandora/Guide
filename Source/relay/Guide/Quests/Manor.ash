@@ -193,7 +193,9 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
                         string [int] description;
                         description.listAppend("Find Lady Spookyraven's powder puff. (NC leads to cosmetics wraith)");
                         //combat rate extremely approximate, needs spading
-                        description.listAppend(generateTurnsToSeeNoncombat(85, 1, "find cosmetics wraith", 10 - delayRemainingInLocation($location[the haunted bathroom]), delayRemainingInLocation($location[the haunted bathroom])));
+                        
+                        if (delayRemainingInLocation($location[the haunted bathroom]) == 0)
+                            description.listAppend(generateTurnsToSeeNoncombat(85, 1, "find cosmetics wraith", 10 - delayRemainingInLocation($location[the haunted bathroom]), delayRemainingInLocation($location[the haunted bathroom])));
                         subentries.listAppend(ChecklistSubentryMake("Search in the Haunted Bathroom", modifiers, description));
                         
                         if (image_name.length() == 0)

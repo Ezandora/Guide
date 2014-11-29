@@ -33,7 +33,7 @@ void QNemesisInit()
         class_epic_weapons[$class[disco bandit]] = $item[disco banjo];
         class_epic_weapons[$class[accordion thief]] = $item[rock and roll legend];
         item epic_weapon = class_epic_weapons[my_class()];
-        if (state.mafia_internal_step < 2 && epic_weapon.available_amount() > 0)
+        if (state.mafia_internal_step < 2 && epic_weapon.available_amount_ignoring_storage() > 0)
             state.mafia_internal_step = 2;
         
         
@@ -164,11 +164,11 @@ void QNemesisGenerateIslandTasks(ChecklistSubentry subentry)
     else if (my_class() == $class[accordion thief])
     {
         if ($item[hacienda key].available_amount() >= 5)
-            subentry.entries.listAppend("All keys found.");
+            subentry.entries.listAppend("All keys found. Fight in the Hacienda.");
         else
         {
             int keys_needed = MAX(0, 5 - $item[hacienda key].available_amount());
-            subentry.entries.listAppend(keys_needed.int_to_wordy().capitalizeFirstLetter() + " keys to go.");
+            subentry.entries.listAppend(pluralizeWordy(keys_needed, "key", "keys").capitalizeFirstLetter() + " to go.");
             subentry.entries.listAppend("Four are from the non-combat; one is from pick-pocketing a mariachi.");
         }
     }
@@ -237,10 +237,59 @@ void QNemesisGenerateIslandTasks(ChecklistSubentry subentry)
             subentry.entries.listAppend("Visit the boat.");
         else
         {
+            /*
+            lastSlimeVial3891(user, now 'intensity', default )
+            lastSlimeVial3892(user, now 'moxiousness', default )
+            lastSlimeVial3893(user, now 'eyesight', default )
+            lastSlimeVial3894(user, now 'mentalism', default )
+            lastSlimeVial3895(user, now 'muscle', default )
+            lastSlimeVial3896(user, now 'slimeform', default )
+            */
             if ($effect[slimeform].have_effect() > 0)
                 subentry.entries.listAppend("Wiggle into the lair.|Also, go visit your mom in the slimetube.");
             else
-                subentry.entries.listAppend("Use the " + $item[bottle of G&uuml;-Gone] + " on slime, make potions to get slimeform.");
+            {
+                
+                boolean [item] tertiary_potions = $items[vial of vermilion slime,vial of amber slime,vial of chartreuse slime,vial of teal slime,vial of purple slime,vial of indigo slime];
+                
+                item slimeform_potion = $item[none];
+                item [int] creatable_unknown_potions;
+                foreach potion in tertiary_potions
+                {
+                    string property_value = get_property("lastSlimeVial" + potion.to_int());
+                    if (property_value.length() == 0)
+                    {
+                        if (potion.available_amount() + potion.creatable_amount() > 0)
+                            creatable_unknown_potions.listAppend(potion);
+                    }
+                    else if (property_value == "slimeform")
+                        slimeform_potion = potion;
+                }
+                if (slimeform_potion != $item[none] && slimeform_potion.creatable_amount() + slimeform_potion.available_amount() > 0)
+                {
+                    subentry.entries.listAppend("Use a " + slimeform_potion + " to gain slimeform.");
+                    //FIXME URL
+                }
+                else
+                {
+                    subentry.entries.listAppend("Use the " + $item[bottle of G&uuml;-Gone] + " on slime, make potions to get slimeform.");
+                    if (creatable_unknown_potions.count() > 0 && slimeform_potion != $item[none])
+                    {
+                        boolean need_to_make = false;
+                        foreach key, it in creatable_unknown_potions
+                        {
+                            if (it.available_amount() == 0 && it.creatable_amount() > 0)
+                                need_to_make = true;
+                        }
+                        
+                        string line = "Try";
+                        if (need_to_make)
+                            line += " making and";
+                        line += " using " + creatable_unknown_potions.listJoinComponents(", ", "or") + ".";
+                        subentry.entries.listAppend(line);
+                    }
+                }
+            }
         }
     }
     else if (my_class() == $class[seal clubber])
@@ -538,9 +587,9 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     class_ultimate_legendary_epic_weapons[$class[accordion thief]] = $item[The Trickster's Trikitixa];
     item ultimate_legendary_epic_weapon = class_ultimate_legendary_epic_weapons[my_class()];
     
-    if (epic_weapon.available_amount() > 0)
+    if (epic_weapon.available_amount_ignoring_storage() > 0)
         have_epic_weapon = true;
-    if (legendary_epic_weapon.available_amount() > 0)
+    if (legendary_epic_weapon.available_amount_ignoring_storage() > 0)
         have_legendary_epic_weapon = true;
         
 	if (!__misc_state["In aftercore"] && !have_legendary_epic_weapon)
@@ -655,7 +704,34 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         }
         
         if (assassins_left != -1)
-            subentry.entries.listAppend("Wait for " + pluralizeWordy(assassins_left, "more assassin", "more assassins") + ".");
+        {
+            string line = "Wait for " + pluralizeWordy(assassins_left, "more assassin", "more assassins");
+            
+            //int min_turns_left = 0;
+            //int max_turns_left = 0;
+            float average_turns_left = 0;
+            
+            int effective_assassins_left = assassins_left;
+            //35 to 50
+            Counter nemesis_assassin_window = CounterLookup("Nemesis Assassin");
+            if (nemesis_assassin_window.CounterExists() && nemesis_assassin_window.CounterIsRange())
+            {
+                //min_turns_left += nemesis_assassin_window.range_start_turn;
+                //max_turns_left += nemesis_assassin_window.range_end_turn;
+                average_turns_left += (nemesis_assassin_window.range_start_turn + nemesis_assassin_window.range_end_turn).to_float() / 2.0;
+                effective_assassins_left -= 1;
+            }
+            
+            
+            effective_assassins_left = clampi(effective_assassins_left, 0, 4);
+            //min_turns_left += 35 * effective_assassins_left;
+            //max_turns_left += 50 * effective_assassins_left;
+            average_turns_left += 42.5 * effective_assassins_left.to_float();
+            
+            //I wonder if showing max_turns_left would be less confusing here...
+            line += " over ~" + average_turns_left.roundForOutput(0) + " turns.";
+            subentry.entries.listAppend(line);
+        }
         else
             subentry.entries.listAppend("Wait for assassins.");
             
@@ -715,11 +791,17 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         if (my_class() == $class[sauceror])
         {
             string [int] missing_saucespheres;
-            foreach e in $effects[elemental saucesphere,Jalape&ntilde;o Saucesphere,antibiotic saucesphere,scarysauce]
+            foreach s in $skills[elemental saucesphere,Jalape&ntilde;o Saucesphere,antibiotic saucesphere,scarysauce]
             {
+                effect e = s.to_effect();
                 if (e.have_effect() > 0)
                     continue;
-                missing_saucespheres.listAppend(e);
+                string line = s.to_string();
+                
+                if (!s.have_skill())
+                    line = HTMLGenerateSpanFont(line, "grey", "");
+                
+                missing_saucespheres.listAppend(line);
             }
             if (missing_saucespheres.count() > 0)
             {

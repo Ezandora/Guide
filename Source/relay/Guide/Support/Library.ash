@@ -63,6 +63,7 @@ int PATH_CLASS_ACT_2 = 19;
 int PATH_AVATAR_OF_SNEAKY_PETE = 20;
 int PATH_SLOW_AND_STEADY = 21;
 int PATH_HEAVY_RAINS = 22;
+int PATH_PICKY = 23;
 
 int __my_path_id_cached = -11;
 int my_path_id()
@@ -107,6 +108,8 @@ int my_path_id()
         __my_path_id_cached = PATH_SLOW_AND_STEADY;
     else if (path_name == "Heavy Rains")
         __my_path_id_cached = PATH_HEAVY_RAINS;
+    else if (path_name == "Picky")
+        __my_path_id_cached = PATH_PICKY;
     else
         __my_path_id_cached = PATH_UNKNOWN;
     return __my_path_id_cached;
@@ -273,6 +276,14 @@ int available_amount(item [int] items)
     return count;
 }
 
+int available_amount_ignoring_storage(item it)
+{
+    if (can_interact())
+        return it.available_amount() - it.storage_amount();
+    else
+        return it.available_amount();
+}
+
 int available_amount_ignoring_closet(item it)
 {
     if (get_property_boolean("autoSatisfyWithCloset"))
@@ -287,6 +298,13 @@ int available_amount_including_closet(item it)
         return it.available_amount();
     else
         return it.available_amount() + it.closet_amount();
+}
+
+//Display case, etc
+//WARNING: Does not take into account your shop. Conceptually, the shop is things you're getting rid of... and they might be gone already.
+int item_amount_almost_everywhere(item it)
+{
+    return it.closet_amount() + it.display_amount() + it.equipped_amount() + it.item_amount() + it.storage_amount();
 }
 
 int equipped_amount(boolean [item] items)

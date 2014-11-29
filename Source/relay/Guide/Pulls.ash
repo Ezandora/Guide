@@ -157,6 +157,11 @@ void generatePullList(Checklist [int] checklists)
         }
     }
     
+    if (__misc_state["spooky airport available"] && __misc_state["Need to level"] && __misc_state["can drink just about anything"] && lookupEffect("jungle juiced").have_effect() == 0)
+    {
+        pullable_item_list.listAppend(GPItemMake($item[jungle juice], "Drink that doubles stat-gain in the deep dark jungle.", 1));
+    }
+    
 	
 	boolean have_super_fairy = false;
 	if ((familiar_is_usable($familiar[fancypants scarecrow]) && $item[spangly mariachi pants].available_amount() > 0) || (familiar_is_usable($familiar[mad hatrack]) && $item[spangly sombrero].available_amount() > 0))
@@ -164,9 +169,9 @@ void generatePullList(Checklist [int] checklists)
 	if (!have_super_fairy)
 	{
 		if (familiar_is_usable($familiar[fancypants scarecrow]))
-			pullable_item_list.listAppend(GPItemMake($item[spangly mariachi pants], "2x fairy", 1));
+			pullable_item_list.listAppend(GPItemMake($item[spangly mariachi pants], "2x fairy on fancypants scarecrow", 1));
 		else if (familiar_is_usable($familiar[mad hatrack]))
-			pullable_item_list.listAppend(GPItemMake($item[spangly sombrero], "2x fairy", 1));
+			pullable_item_list.listAppend(GPItemMake($item[spangly sombrero], "2x fairy on mad hatrack", 1));
 	}
 	//pullable_item_list.listAppend(GPItemMake($item[jewel-eyed wizard hat], "a wizard is you!", 1));
 	//pullable_item_list.listAppend(GPItemMake($item[origami riding crop], "+5 stats/fight, but only if the monster dies quickly", 1)); //not useful?
@@ -182,7 +187,20 @@ void generatePullList(Checklist [int] checklists)
         string [int] food_selections;
         
         if (__misc_state_int["fat loot tokens needed"] > 0)
-            food_selections.listAppend("key lime pies");
+        {
+            string [int] which_pies;
+            if ($items[boris's key,boris's key lime pie].available_amount() == 0)
+                which_pies.listAppend("Boris");
+            if ($items[jarlsberg's key,jarlsberg's key lime pie].available_amount() == 0)
+                which_pies.listAppend("Jarlsberg");
+            if ($items[sneaky pete's key,sneaky pete's key lime pie].available_amount() == 0)
+                which_pies.listAppend("Sneaky Pete");
+            string line;
+            if (which_pies.count() > 0)
+                line += which_pies.listJoinComponents("/") + "'s ";
+            line += "key lime pies";
+            food_selections.listAppend(line);
+        }
         if (availableFullness() >= 5)
         {
             if ($item[moon pie].is_unrestricted() && !($skill[saucemaven].have_skill() && my_primestat() == $stat[mysticality]))
@@ -329,9 +347,11 @@ void generatePullList(Checklist [int] checklists)
     //Ideas: Goat cheese, keepsake box, spooky-gro fertilizer, harem outfit, perfume, rusty hedge trimmers, bowling ball, surgeon gear, tomb ratchets or tangles, all the other pies
     //FIXME suggest ore when we don't have access to free mining
     
-    pullable_item_list.listAppend(GPItemMake(lookupItem("duonoculars"), "-combat, +5 ML"));
     if (!__misc_state["can reasonably reach -25% combat"])
+    {
+        pullable_item_list.listAppend(GPItemMake(lookupItem("duonoculars"), "-combat, +5 ML"));
         pullable_item_list.listAppend(GPItemMake($item[ring of conflict], "-combat"));
+    }
     
 	//FIXME suggest guitar if we're out of clovers, we need one, and we've gone past belowdecks already?
 	

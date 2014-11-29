@@ -63,6 +63,11 @@ string generateRandomMessage()
     location_messages[$location[the arid, extra-dry desert]] = "can't remember your name";
     location_messages[$location[outside the club]] = "around the world around the world around the world around the world";
     string conspiracy = "they know where you live, " + get_property("System.user.name").to_lower_case();
+    if (my_class() == $class[disco bandit])
+    {
+        foreach l in $locations[The castle in the clouds in the sky (ground floor),The castle in the clouds in the sky (basement),The castle in the clouds in the sky (top floor)]
+            location_messages[l] = "making castles of your disco";
+    }
     foreach s in $strings[The Mansion of Dr. Weirdeaux,The Deep Dark Jungle,The Secret Government Laboratory]
         location_messages[lookupLocation(s)] = conspiracy;
     
@@ -150,6 +155,7 @@ string generateRandomMessage()
     random_messages.listAppend("click click click");
     
     string [int] paths;
+    paths[PATH_OXYGENARIAN] = "the slow path";
     paths[PATH_BEES_HATE_YOU] = "bzzzzzz";
     paths[PATH_WAY_OF_THE_SURPRISING_FIST] = "martial arts and crafts";
     paths[PATH_TRENDY] = "played out";
@@ -158,7 +164,7 @@ string generateRandomMessage()
     paths[PATH_ZOMBIE_SLAYER] = "consumerism metaphor";
     paths[PATH_CLASS_ACT] = "try the sequel";
     paths[PATH_AVATAR_OF_JARLSBERG] = "nerd";
-    paths[PATH_BIG] = "leveling is boring";
+    paths[PATH_BIG] = "everything's so tiny...";
     paths[PATH_KOLHS] = "did you study?";
     paths[PATH_CLASS_ACT_2] = "lonely guild trainer";
     paths[PATH_AVATAR_OF_SNEAKY_PETE] = "sunglasses at night";
@@ -167,10 +173,12 @@ string generateRandomMessage()
     else
         paths[PATH_SLOW_AND_STEADY] = "skip a day if you like";
     paths[PATH_HEAVY_RAINS] = "survive";
+    paths[PATH_PICKY] = "combinatorial ascension";
+    if ($skill[cannelloni cannon].have_skill() && !$skill[cannelloni cocoon].have_skill()) //such an easy mistake...
+        paths[PATH_PICKY] = "cannelloni confusion";
     //paths[PATH_CLASS_ACT_3] = "buttons for the people";
     //paths[PATH_AVATAR_OF_THE_NAUGHTY_SORCERESS] = "go forth to your lair! have some tea";
     
-    paths[PATH_OXYGENARIAN] = "the slow path";
     
     if (paths contains my_path_id())
         random_messages.listAppend(paths[my_path_id()]);
@@ -186,7 +194,29 @@ string generateRandomMessage()
     if (item_drop_modifier() <= -100.0)
         random_messages.listAppend("let go of your material posessions");
     if ($item[puppet strings].storage_amount() + $item[puppet strings].available_amount() > 0)
-        random_messages.listAppend(lowercase_player_name + " is totally awesome! hooray for " + lowercase_player_name + "!");
+    {
+        //full puppet string support:
+        string chosen_message;
+        switch (gameday_to_int() % 13)
+        {
+            case 0: chosen_message = "%playername% is easily the most great person ever! three cheers for %playername%!"; break;
+            case 1: chosen_message = "%playername% is my hero! don't you all agree?"; break;
+            case 2: chosen_message = "%playername% is such a sexy beast!"; break;
+            case 3: chosen_message = "%playername% is super-attractive and studly! don't you all agree?"; break;
+            case 4: chosen_message = "%playername% is super-attractive and studly! just saying that name makes me feel all tingly inside!"; break;
+            case 5: chosen_message = "who do I think is the best KoLer? obviously\, it's %playername%! how about a round of applause?"; break;
+            case 6: chosen_message = "I wish I was as good-looking as %playername%. hip hip hooray!"; break;
+            case 7: chosen_message = "I'm %playername%'s biggest fan! let's hear it for %playername%!"; break;
+            case 8: chosen_message = "I've never met anyone as attractive as %playername%! how about a round of applause?"; break;
+            case 9: chosen_message = "I've never met anyone as studly as %playername%! all the rest of us are totally lame in comparison!"; break;
+            case 10: chosen_message = "is anyone as fabulous as %playername%? I don't think so! just saying that name makes me feel all tingly inside!"; break;
+            case 11: chosen_message = "is anyone as intelligent as %playername%? I don't think so! hooray for %playername%!"; break;
+            default: chosen_message = "%playername% is totally awesome! hooray for %playername%!"; break;
+        }
+        chosen_message = chosen_message.replace_string("%playername%", lowercase_player_name);
+        random_messages.listAppend(chosen_message);
+        //random_messages.listAppend(lowercase_player_name + " is totally awesome! hooray for " + lowercase_player_name + "!");
+    }
 	
     if (__quest_state["Level 12"].in_progress && __quest_state["Level 12"].state_int["hippies left on battlefield"] < 1000 && __quest_state["Level 12"].state_int["frat boys left on battlefield"] < 1000)
         random_messages.listAppend("playing sides");
@@ -313,17 +343,17 @@ string generateRandomMessage()
     monster_messages[$monster[Black Crayon Spiraling Shape]] = "be what you're like";
     monster_messages[$monster[best-selling novelist]] = "fiction to escape reality";
     monster_messages[$monster[7-Foot Dwarf Replicant]] = "it's too bad she won't live<br>but then again, who does?";
-    monster_messages[lookupMonster("Avatar of Jarlsberg")] = "smoked cheese";
+    monster_messages[$monster[Avatar of Jarlsberg]] = "smoked cheese";
     monster_messages[$monster[giant sandworm]] = "walk without rhythm";
     monster_messages[$monster[bookbat]] = "tattered scrap of dignity";
-    if (!$skill[Transcendent Olfaction].have_skill() && __misc_state["In run"])
+    if (!$skill[Transcendent Olfaction].have_skill() && __misc_state["In run"] && in_hardcore())
         monster_messages[$monster[Astronomer]] = "nooo astronomer come back";
     monster_messages[$monster[urge to stare at your hands]] = ".&#x20dd;.&#x20dd;"; //.⃝.⃝
     if (my_path_id() == PATH_HEAVY_RAINS)
         monster_messages[$monster[pygmy bowler]] = "right into the gutter"; //come back!
     monster_messages[lookupMonster("extremely annoyed witch")] = "am I blue?"; //you dare to strike... quit it!
     monster_messages[lookupMonster("surprised and annoyed witch")] = "these tears in my eyes, telling you";
-    
+    monster_messages[$monster[Ron "The Weasel" Copperhead]] = "RONALD WEASLEY! HOW DARE YOU STEAL THAT ZEPPELIN<br>" + ChecklistGenerateModifierSpan("your father's now facing an inquiry at work and it's entirely YOUR FAULT");
     if (monster_messages contains last_monster() && last_monster() != $monster[none])
     {
 		random_messages.listClear();
