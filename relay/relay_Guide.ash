@@ -23735,6 +23735,8 @@ void SEventsCrimbo2014GenerateTasks(ChecklistEntry [int] task_entries, Checklist
         }
         else if (lookupItem("flask of mining oil").available_amount() > 0)
         {
+            if (oily_legs_effect == $effect[none]) //no auto-recognition of effects, so don't add
+                return;
             subentry.entries.listAppend("Use flask of mining oil to acquire a mining/camp farming effect.");
             url = "inventory.php?which=3";
         }
