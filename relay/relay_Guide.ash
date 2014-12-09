@@ -1,7 +1,7 @@
 //This script and its support scripts are in the public domain.
 
 //These settings are for development. Don't worry about editing them.
-string __version = "1.1.16";
+string __version = "1.1.17";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -54,6 +54,11 @@ boolean __setting_ios_appearance = false; //no don't
 //Runtime variables:
 string __relay_filename;
 location __last_adventure_location;
+//WARNING: All listAppend functions are flawed.
+//Specifically, there's a possibility of a hole that causes order to be incorrect.
+//But, the only way to fix that is to traverse the list to determine the maximum key.
+//That would take forever...
+
 string listLastObject(string [int] list)
 {
     if (list.count() == 0)
@@ -1986,6 +1991,24 @@ int monsterExtraInitForML(int ml)
 		return 200.0 + 5.0 * (ml - 100.0);
 }
 
+int stringCountSubstringMatches(string str, string substring)
+{
+    int count = 0;
+    int position = 0;
+    int breakout = 100;
+    int str_length = str.length(); //uncertain whether this is a constant time operation
+    while (breakout > 0 && position + 1 < str_length)
+    {
+        position = str.index_of(substring, position + 1);
+        if (position != -1)
+            count += 1;
+        else
+            break;
+        breakout -= 1;
+    }
+    return count;
+}
+
 
 
 
@@ -2507,6 +2530,18 @@ void CounterAdviseLastTurnAttemptedAdventurePHP(int turn)
     __last_turn_definitely_visited_adventure_php = turn;
 }
 
+boolean CounterWanderingMonsterMayHitInXTurns(int turns)
+{
+    foreach s in __wandering_monster_counter_names
+    {
+        if (CounterLookup(s).CounterExists() && CounterLookup(s).CounterMayHitInXTurns(turns))
+            return true;
+    }
+    if (get_property_int("_romanticFightsLeft") > 0 && !CounterLookup("Romantic Monster").CounterExists()) //mafia will clear the romantic monster window if it goes out of bounds
+        return true;
+    return false;
+}
+
 boolean CounterWanderingMonsterMayHitNextTurn()
 {
     monster last_monster = get_property_monster("lastEncounter");
@@ -2520,19 +2555,13 @@ boolean CounterWanderingMonsterMayHitNextTurn()
     //FIXME use CounterWanderingMonsterMayHitInXTurns to implement this once we're sure it works
     foreach s in __wandering_monster_counter_names
     {
-        if (CounterLookup(s).CounterExists() && CounterLookup(s).CounterMayHitNextTurn())
+        Counter c = CounterLookup(s);
+        if (c.CounterExists() && c.CounterMayHitNextTurn())
             return true;
     }
-    return false;
-}
-
-boolean CounterWanderingMonsterMayHitInXTurns(int turns)
-{
-    foreach s in __wandering_monster_counter_names
-    {
-        if (CounterLookup(s).CounterExists() && CounterLookup(s).CounterMayHitInXTurns(turns))
-            return true;
-    }
+    if (get_property_int("_romanticFightsLeft") > 0 && !CounterLookup("Romantic Monster").CounterExists()) //mafia will clear the romantic monster window if it goes out of bounds
+        return true;
+    
     return false;
 }
 
@@ -5171,6 +5200,9 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         lookup_map["The Prince's Canapes table"] = "place.php?whichplace=ioty2014_cindy";
         lookup_map["The Inner Wolf Gym"] = "place.php?whichplace=ioty2014_wolf";
         lookup_map["Unleash Your Inner Wolf"] = "place.php?whichplace=ioty2014_wolf";
+        lookup_map["The Crimbonium Mining Camp"] = "place.php?whichplace=desertbeach";
+        lookup_map["The Crimbonium Mine"] = "mining.php?mine=5";
+
         foreach s in $strings[Ye Olde Medievale Villagee,Portal to Terrible Parents,Rumpelstiltskin's Workshop]
             lookup_map[s] = "place.php?whichplace=ioty2014_rumple";
             
@@ -7806,7 +7838,9 @@ boolean QLevel11ShouldOutputCopperheadRoute(string which_route)
     
     //soooo...
     
-    if (which_route == "ron" && $location[a mob of zeppelin protesters].turns_spent + $location[the red zeppelin].turns_spent > 0)
+    if (which_route == "ron" && $location[the red zeppelin].turns_spent > 0)
+        return true;
+    if (which_route == "ron" && __last_adventure_location == $location[a mob of zeppelin protesters])
         return true;
     if (which_route == "shen" && $location[the copperhead club].turns_spent > 0)
         return true;
@@ -19914,7 +19948,7 @@ void SOldLevel9GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     }
     ChecklistSubentry [int] subentries;
     subentries.listAppend(ChecklistSubentryMake("A Quest, LOL", "", description));
-    optional_task_entries.listAppend(ChecklistEntryMake("__item 64735 scroll", "mountains.php", subentries, 10, $locations[the valley of rof l'm fao]));
+    optional_task_entries.listAppend(ChecklistEntryMake("__item 64735 scroll", "place.php?whichplace=mountains", subentries, 10, $locations[the valley of rof l'm fao]));
 }
 void generateGardenEntry(ChecklistEntry [int] available_resources_entries, boolean [item] garden_source_items, boolean [item] garden_creatable_items)
 {
@@ -21687,7 +21721,10 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             }
         }
         
-        if (methods.count() > 0 && $effect[thrice-cursed].have_effect() == 0)
+        boolean [location] ignoring_locations;
+        ignoring_locations[lookupLocation("The Crimbonium Mine")] = true;
+        
+        if (methods.count() > 0 && $effect[thrice-cursed].have_effect() == 0 && !((ignoring_locations contains __last_adventure_location) && __last_adventure_location != $location[none]))
             task_entries.listAppend(ChecklistEntryMake("__effect beaten up", url, ChecklistSubentryMake("Remove beaten up", "", methods), -11));
     }
     
@@ -22012,6 +22049,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         if (options.count() > 0)
             task_entries.listAppend(ChecklistEntryMake("__item fortune cookie", "", ChecklistSubentryMake(HTMLGenerateSpanFont("Learn semi-rare number", "red", ""), "", description), -11));
     }
+    
 }
 void SGrimstoneHareGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
@@ -22545,7 +22583,7 @@ void SSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         }
     }
     int audience_max = 30;
-    if (lookupItem("Sneaky Pete's leather jacket").equipped_amount() > 0 || lookupItem("Sneaky Pete's leather jacket (collar popped)").equipped_amount() > 0)
+    if ($item[Sneaky Pete's leather jacket].equipped_amount() > 0 || $item[Sneaky Pete's leather jacket (collar popped)].equipped_amount() > 0)
     {
         audience_max = 50;
     }
@@ -23578,6 +23616,158 @@ void SHeavyRainsGenerateResource(ChecklistEntry [int] available_resources_entrie
         available_resources_entries.listAppend(ChecklistEntryMake("__item catfish whiskers", "inventory.php?which=3", ChecklistSubentryMake(pluralize(lookupItem("catfish whiskers")), "", "40 turns of -washaway"), 7));
     }
 }
+void SEventsCrimbo2014GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    if (format_today_to_string("YYYY-MM") != "2014-12")
+        return;
+    
+    //Crimbo 2014:
+    effect oily_legs_effect = lookupEffect("Oily Legs");
+    effect crimbonar_effect = lookupEffect("Crimbonar");
+    effect loose_joints_effect = lookupEffect("Loose Joints");
+    
+    
+    if (oily_legs_effect == $effect[none] || crimbonar_effect == $effect[none] || loose_joints_effect == $effect[none]) //Older copy. We'll just not output anything - it's very hard to juggle not knowing about effects.
+        return;
+    
+    //Examine mine:
+    string mine_layout = get_property("mineLayout5");
+    int crimbonium_seen = stringCountSubstringMatches(mine_layout, "title=\"nugget of Crimbonium\"");
+
+    boolean should_output_new_cavern_suggestion = false;
+    boolean need_fast_suggestions = false;
+    if (__last_adventure_location != lookupLocation("The Crimbonium Mine"))
+    {
+        if (have_outfit_components("High-Radiation Mining Gear") && oily_legs_effect.have_effect() > 0 && oily_legs_effect != $effect[none])
+        {
+            need_fast_suggestions = true;
+        }
+    }
+    
+    if (__last_adventure_location == lookupLocation("The Crimbonium Mine") || need_fast_suggestions)
+    {
+        if (true)
+        {
+            
+            effect [int] need_mining_oil_for_effects;
+            string [int] effect_reasons;
+            
+            if (oily_legs_effect.have_effect() == 0 && oily_legs_effect != $effect[none])
+            {
+                need_mining_oil_for_effects.listAppend(oily_legs_effect);
+                effect_reasons.listAppend("free-mining");
+            }
+            if (crimbonar_effect.have_effect() == 0 && crimbonar_effect != $effect[none] && $effect[object detection].have_effect() == 0)
+            {
+                need_mining_oil_for_effects.listAppend(crimbonar_effect);
+                effect_reasons.listAppend("crimbonium locations");
+            }
+            
+            if (need_mining_oil_for_effects.count() > 0 && lookupItem("flask of mining oil").available_amount() > 0)
+            {
+                string description;
+                
+                description = "Gives " + need_mining_oil_for_effects.listJoinComponents("/") + " for " + effect_reasons.listJoinComponents(", ", "and") + ".";
+                
+                string url = "inventory.php?which=3";
+                task_entries.listAppend(ChecklistEntryMake("__item flask of mining oil", url, ChecklistSubentryMake(HTMLGenerateSpanFont("Use flask of mining oil before mining", "red", ""), "", HTMLGenerateSpanFont(description, "red", "")), -11));
+            }
+        }
+        if (crimbonium_seen >= 6)
+        {
+            string url = lookupLocation("The Crimbonium Mine").getClickableURLForLocation();
+            task_entries.listAppend(ChecklistEntryMake("__item nugget of Crimbonium", url, ChecklistSubentryMake(HTMLGenerateSpanFont("Find another mine", "red", ""), "", HTMLGenerateSpanFont("Only six nuggets of Crimbonium to a mine.", "red", "")), -11));
+        }
+    }
+    if (need_fast_suggestions)
+    {
+        //want here, after above warnings
+        string url = lookupLocation("The Crimbonium Mine").getClickableURLForLocation();
+        if (!is_wearing_outfit("High-Radiation Mining Gear"))
+            url = "inventory.php?which=2";
+        task_entries.listAppend(ChecklistEntryMake("__item nugget of Crimbonium", url, ChecklistSubentryMake(HTMLGenerateSpanFont("Mine for crimbonium", "red", ""), "", HTMLGenerateSpanFont("Will not cost a turn.", "red", "")), -11));
+    }
+    
+    //Main crimbo:
+    if (true)
+    {
+        //If they have oily legs, adventure in the mine.
+        //Else, if they have Loose Joints, adventure in the camp.
+        //Else, if they have a flask, use the flask and then mine.
+        //Else, adventure in the camp.
+        ChecklistSubentry subentry;
+        subentry.header = "Crimbo 2014";
+        
+        boolean [location] relevant_locations;
+        relevant_locations[lookupLocation("The Crimbonium Mine")] = true;
+        relevant_locations[lookupLocation("The Crimbonium Mining Camp")] = true;
+        
+        string url = "place.php?whichplace=desertbeach";
+        boolean should_output_camp_suggestions = false;
+        if (lookupItem("radiation-resistant helmet").available_amount() == 0 || lookupItem("high-energy mining laser").available_amount() == 0 || lookupItem("servo-assisted exo-pants").available_amount() == 0)
+        {
+            should_output_camp_suggestions = true;
+            subentry.entries.listAppend("Need to acquire High-Radiation Mining Gear. (low drop)");
+        }
+        else if (oily_legs_effect.have_effect() > 0)
+        {
+            url = lookupLocation("The Crimbonium Mine").getClickableURLForLocation();
+            if (my_hp() == 0)
+            {
+                url = "galaktik.php";
+                subentry.entries.listAppend("Restore HP at Doc Galaktik. (1 HP)");
+            }
+            else
+            {
+                if (!is_wearing_outfit("High-Radiation Mining Gear"))
+                    url = "inventory.php?which=2";
+                subentry.entries.listAppend("Mine in the mine for " + pluralizeWordy(oily_legs_effect.have_effect(), "more turn", "more turns") + ".");
+                if (crimbonar_effect.have_effect() > 0 || $effect[object detection].have_effect() > 0)
+                    subentry.entries.listAppend("Try to look for a large group of flashing spots. All the crimbonium is packed together.");
+                if (!is_wearing_outfit("High-Radiation Mining Gear"))
+                    subentry.entries.listAppend("Wear the High-Radiation Mining Gear outfit.");
+                if (crimbonium_seen >= 6)
+                    subentry.entries.listAppend("Find a new cavern.");
+                else if (crimbonium_seen >= 0)
+                    subentry.entries.listAppend(pluralizeWordy(6 - crimbonium_seen, "more nugget", "more nuggets").capitalizeFirstLetter() + " of crimbonium in mine.");
+            }
+            
+        }
+        else if (loose_joints_effect.have_effect() > 0)
+        {
+            should_output_camp_suggestions = true;
+        }
+        else if (lookupItem("flask of mining oil").available_amount() > 0)
+        {
+            subentry.entries.listAppend("Use flask of mining oil to acquire a mining/camp farming effect.");
+            url = "inventory.php?which=3";
+        }
+        else
+        {
+            should_output_camp_suggestions = true;
+        }
+        if (__misc_state["In run"])
+            optional_task_entries.listAppend(ChecklistEntryMake("__item nugget of Crimbonium", url, subentry, relevant_locations));
+        else
+            task_entries.listAppend(ChecklistEntryMake("__item nugget of Crimbonium", url, subentry, relevant_locations));
+        if (should_output_camp_suggestions)
+        {
+            subentry.modifiers.listAppend("+item");
+            string line = "Adventure in the Crimbonium Mining Camp";
+            if (loose_joints_effect.have_effect() > 0)
+                line += " for " + pluralizeWordy(loose_joints_effect.have_effect(), "more turn", "more turns");
+            line += ".";
+            subentry.entries.listPrepend(line);
+            if (is_wearing_outfit("High-Radiation Mining Gear"))
+                subentry.entries.listAppend("You don't need to wear mining gear there.");
+        }
+    }
+}
+
+void SEventsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    SEventsCrimbo2014GenerateTasks(task_entries, optional_task_entries, future_task_entries);
+}
 
 void SetsInit()
 {
@@ -23640,6 +23830,7 @@ void SetsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 	SSneakyPeteGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SDNAGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SHeavyRainsGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+	SEventsGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     
 }
 
@@ -25103,6 +25294,8 @@ void setUpState()
     float dance_card_average_stat_gain = MIN(2.25 * my_basestat($stat[moxie]), 300.0) * __misc_state_float["Non-combat statgain multiplier"] * (1.0 + numeric_modifier("Moxie Experience Percent") / 100.0);
     __misc_state_float["dance card average stats"] = dance_card_average_stat_gain;
     
+    //don't know if there's any way to query this information directly, so indirectly calculate it from scaling monsters in the area:
+    __misc_state_int["Basement Floor"] = MAX(1, round(powf(MAX(0.0, ($monster[Ghost of Fernswarthy's Grandfather].raw_defense - monster_level_adjustment()).to_float() / 2.0), 5.0 / 7.0)));
     
     if (true)
     {
@@ -26913,6 +27106,11 @@ string generateRandomMessage()
         random_messages.listAppend(monster_messages[last_monster()]);
     }
     
+    if (__misc_state_int["Basement Floor"] == 500)
+    {
+        random_messages.listClear();
+        random_messages.listAppend(HTMLGenerateTagWrap("a", "open it!", generateMainLinkMap("basement.php")));
+    }
     
     string [string] encounter_messages;
     encounter_messages["It's Always Swordfish"] = "one two three four five";
@@ -27765,6 +27963,10 @@ buffer generateLocationBar(boolean displaying_navbar)
         int turns_left = clampi(30 - get_property_int("rumpelstiltskinTurnsUsed"), 0, 30);
         custom_location_information = pluralize(turns_left, "turn", "turns") + " left";
     }
+    else if (l == $location[fernswarthy's basement])
+    {
+        custom_location_information = "Floor " + __misc_state_int["Basement Floor"];
+    }
         
     //else if (pressure_penalties contains l)
         //custom_location_information = pressure_penalties[l] + "% pressure";
@@ -27850,7 +28052,7 @@ buffer generateLocationBar(boolean displaying_navbar)
     
     //easy list:
     //ashq foreach l in $locations[] if (l.appearance_rates().count() == 1 && l.appearance_rates()[$monster[none]] == 100.0) print(l);
-    boolean [location] nc_blacklist = $locations[Pump Up Muscle,Pump Up Mysticality,Pump Up Moxie,The Shore\, Inc. Travel Agency,Goat Party,Pirate Party,Lemon Party,The Roulette Tables,The Poker Room,Anemone Mine (Mining),The Knob Shaft (Mining),Friar Ceremony Location,Itznotyerzitz Mine (in Disguise),The Prince's Restroom,The Prince's Dance Floor,The Prince's Kitchen,The Prince's Balcony,The Prince's Lounge,The Prince's Canapes table,Portal to Terrible Parents];
+    boolean [location] nc_blacklist = $locations[Pump Up Muscle,Pump Up Mysticality,Pump Up Moxie,The Shore\, Inc. Travel Agency,Goat Party,Pirate Party,Lemon Party,The Roulette Tables,The Poker Room,Anemone Mine (Mining),The Knob Shaft (Mining),Friar Ceremony Location,Itznotyerzitz Mine (in Disguise),The Prince's Restroom,The Prince's Dance Floor,The Prince's Kitchen,The Prince's Balcony,The Prince's Lounge,The Prince's Canapes table,Portal to Terrible Parents,fernswarthy's basement];
     
     if ((my_buffedstat($stat[moxie]) < average_ml || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE) && sample_count > 0 && __misc_state["In run"] && monster_level_adjustment() < 100)
     {
@@ -28236,7 +28438,8 @@ string [string] generateAPIResponse()
     
     if (true)
     {
-        boolean [string] relevant_mafia_properties = $strings[merkinQuestPath,questF01Primordial,questF02Hyboria,questF03Future,questF04Elves,questF05Clancy,questG01Meatcar,questG02Whitecastle,questG03Ego,questG04Nemesis,questG05Dark,questG06Delivery,questI01Scapegoat,questI02Beat,questL02Larva,questL03Rat,questL04Bat,questL05Goblin,questL06Friar,questL07Cyrptic,questL08Trapper,questL09Topping,questL10Garbage,questL11MacGuffin,questL11Manor,questL11Palindome,questL11Pyramid,questL11Worship,questL12War,questL13Final,questM01Untinker,questM02Artist,questM03Bugbear,questM04Galaktic,questM05Toot,questM06Gourd,questM07Hammer,questM08Baker,questM09Rocks,questM10Azazel,questM11Postal,questM12Pirate,questM13Escape,questM14Bounty,questM15Lol,questS01OldGuy,questS02Monkees,sidequestArenaCompleted,sidequestFarmCompleted,sidequestJunkyardCompleted,sidequestLighthouseCompleted,sidequestNunsCompleted,sidequestOrchardCompleted,cyrptAlcoveEvilness,cyrptCrannyEvilness,cyrptNicheEvilness,cyrptNookEvilness,desertExploration,gnasirProgress,relayCounters,timesRested,currentEasyBountyItem,currentHardBountyItem,currentSpecialBountyItem,volcanoMaze1,_lastDailyDungeonRoom,seahorseName,chasmBridgeProgress,_aprilShower,lastAdventure,lastEncounter,_floristPlantsUsed,_fireStartingKitUsed,_psychoJarUsed,hiddenHospitalProgress,hiddenBowlingAlleyProgress,hiddenApartmentProgress,hiddenOfficeProgress,pyramidPosition,parasolUsed,_discoKnife,lastPlusSignUnlock,olfactedMonster,photocopyMonster,lastTempleUnlock,volcanoMaze1,blankOutUsed,peteMotorbikeCowling,peteMotorbikeGasTank,peteMotorbikeHeadlight,peteMotorbikeMuffler,peteMotorbikeSeat,peteMotorbikeTires,_petePeeledOut,_navelRunaways,_peteRiotIncited,_petePartyThrown,hiddenTavernUnlock,_dnaPotionsMade,_psychokineticHugUsed,dnaSyringe,_warbearGyrocopterUsed,questM20Necklace,questM21Dance,grimstoneMaskPath,cinderellaMinutesToMidnight,merkinVocabularyMastery,_pirateBellowUsed,questM21Dance,_defectiveTokenChecked,questG07Myst,questG08Moxie,questESpClipper,questESpGore,questESpJunglePun,questESpFakeMedium,questESlMushStash,questESlAudit,questESlBacteria,questESlCheeseburger,questESlCocktail,questESlSprinkles,questESlSalt,questESlFish,questESlDebt,_pickyTweezersUsed];
+        boolean [string] relevant_mafia_properties = $strings[merkinQuestPath,questF01Primordial,questF02Hyboria,questF03Future,questF04Elves,questF05Clancy,questG01Meatcar,questG02Whitecastle,questG03Ego,questG04Nemesis,questG05Dark,questG06Delivery,questI01Scapegoat,questI02Beat,questL02Larva,questL03Rat,questL04Bat,questL05Goblin,questL06Friar,questL07Cyrptic,questL08Trapper,questL09Topping,questL10Garbage,questL11MacGuffin,questL11Manor,questL11Palindome,questL11Pyramid,questL11Worship,questL12War,questL13Final,questM01Untinker,questM02Artist,questM03Bugbear,questM04Galaktic,questM05Toot,questM06Gourd,questM07Hammer,questM08Baker,questM09Rocks,questM10Azazel,questM11Postal,questM12Pirate,questM13Escape,questM14Bounty,questM15Lol,questS01OldGuy,questS02Monkees,sidequestArenaCompleted,sidequestFarmCompleted,sidequestJunkyardCompleted,sidequestLighthouseCompleted,sidequestNunsCompleted,sidequestOrchardCompleted,cyrptAlcoveEvilness,cyrptCrannyEvilness,cyrptNicheEvilness,cyrptNookEvilness,desertExploration,gnasirProgress,relayCounters,timesRested,currentEasyBountyItem,currentHardBountyItem,currentSpecialBountyItem,volcanoMaze1,_lastDailyDungeonRoom,seahorseName,chasmBridgeProgress,_aprilShower,lastAdventure,lastEncounter,_floristPlantsUsed,_fireStartingKitUsed,_psychoJarUsed,hiddenHospitalProgress,hiddenBowlingAlleyProgress,hiddenApartmentProgress,hiddenOfficeProgress,pyramidPosition,parasolUsed,_discoKnife,lastPlusSignUnlock,olfactedMonster,photocopyMonster,lastTempleUnlock,volcanoMaze1,blankOutUsed,peteMotorbikeCowling,peteMotorbikeGasTank,peteMotorbikeHeadlight,peteMotorbikeMuffler,peteMotorbikeSeat,peteMotorbikeTires,_petePeeledOut,_navelRunaways,_peteRiotIncited,_petePartyThrown,hiddenTavernUnlock,_dnaPotionsMade,_psychokineticHugUsed,dnaSyringe,_warbearGyrocopterUsed,questM20Necklace,questM21Dance,grimstoneMaskPath,cinderellaMinutesToMidnight,merkinVocabularyMastery,_pirateBellowUsed,questM21Dance,_defectiveTokenChecked,questG07Myst,questG08Moxie,questESpClipper,questESpGore,questESpJunglePun,questESpFakeMedium,questESlMushStash,questESlAudit,questESlBacteria,questESlCheeseburger,questESlCocktail,questESlSprinkles,questESlSalt,questESlFish,questESlDebt,_pickyTweezersUsed,mineLayout5];
+        //FIXME remove mineLayout5 after crimbo
         
         if (false)
         {
@@ -28256,13 +28459,11 @@ string [string] generateAPIResponse()
             boolean first = true;
             foreach property_name in relevant_mafia_properties
             {
-                string v = get_property(property_name);
-                
                 if (first)
                     first = false;
                 else
                     mafia_properties.append(",");
-                mafia_properties.append(v);
+                mafia_properties.append(get_property(property_name));
             }
             result["mafia properties"] = mafia_properties.to_string();
         }
