@@ -23626,6 +23626,10 @@ void SEventsCrimbo2014GenerateTasks(ChecklistEntry [int] task_entries, Checklist
     effect crimbonar_effect = lookupEffect("Crimbonar");
     effect loose_joints_effect = lookupEffect("Loose Joints");
     
+    
+    if (oily_legs_effect == $effect[none] || crimbonar_effect == $effect[none] || loose_joints_effect == $effect[none]) //Older copy. We'll just not output anything - it's very hard to juggle not knowing about effects.
+        return;
+    
     //Examine mine:
     string mine_layout = get_property("mineLayout5");
     int crimbonium_seen = stringCountSubstringMatches(mine_layout, "title=\"nugget of Crimbonium\"");
@@ -23735,8 +23739,6 @@ void SEventsCrimbo2014GenerateTasks(ChecklistEntry [int] task_entries, Checklist
         }
         else if (lookupItem("flask of mining oil").available_amount() > 0)
         {
-            if (oily_legs_effect == $effect[none]) //no auto-recognition of effects, so don't add
-                return;
             subentry.entries.listAppend("Use flask of mining oil to acquire a mining/camp farming effect.");
             url = "inventory.php?which=3";
         }
