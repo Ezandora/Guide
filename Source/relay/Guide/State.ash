@@ -628,6 +628,8 @@ void setUpState()
     float dance_card_average_stat_gain = MIN(2.25 * my_basestat($stat[moxie]), 300.0) * __misc_state_float["Non-combat statgain multiplier"] * (1.0 + numeric_modifier("Moxie Experience Percent") / 100.0);
     __misc_state_float["dance card average stats"] = dance_card_average_stat_gain;
     
+    //don't know if there's any way to query this information directly, so indirectly calculate it from scaling monsters in the area:
+    __misc_state_int["Basement Floor"] = MAX(1, round(powf(MAX(0.0, ($monster[Ghost of Fernswarthy's Grandfather].raw_defense - monster_level_adjustment()).to_float() / 2.0), 5.0 / 7.0)));
     
     if (true)
     {

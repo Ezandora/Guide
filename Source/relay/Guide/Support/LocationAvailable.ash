@@ -791,6 +791,9 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         lookup_map["The Prince's Canapes table"] = "place.php?whichplace=ioty2014_cindy";
         lookup_map["The Inner Wolf Gym"] = "place.php?whichplace=ioty2014_wolf";
         lookup_map["Unleash Your Inner Wolf"] = "place.php?whichplace=ioty2014_wolf";
+        lookup_map["The Crimbonium Mining Camp"] = "place.php?whichplace=desertbeach";
+        lookup_map["The Crimbonium Mine"] = "mining.php?mine=5";
+
         foreach s in $strings[Ye Olde Medievale Villagee,Portal to Terrible Parents,Rumpelstiltskin's Workshop]
             lookup_map[s] = "place.php?whichplace=ioty2014_rumple";
             

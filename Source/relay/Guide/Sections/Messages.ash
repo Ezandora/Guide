@@ -360,6 +360,11 @@ string generateRandomMessage()
         random_messages.listAppend(monster_messages[last_monster()]);
     }
     
+    if (__misc_state_int["Basement Floor"] == 500)
+    {
+        random_messages.listClear();
+        random_messages.listAppend(HTMLGenerateTagWrap("a", "open it!", generateMainLinkMap("basement.php")));
+    }
     
     string [string] encounter_messages;
     encounter_messages["It's Always Swordfish"] = "one two three four five";

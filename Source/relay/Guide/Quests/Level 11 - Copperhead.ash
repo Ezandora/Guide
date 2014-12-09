@@ -42,7 +42,9 @@ boolean QLevel11ShouldOutputCopperheadRoute(string which_route)
     
     //soooo...
     
-    if (which_route == "ron" && $location[a mob of zeppelin protesters].turns_spent + $location[the red zeppelin].turns_spent > 0)
+    if (which_route == "ron" && $location[the red zeppelin].turns_spent > 0)
+        return true;
+    if (which_route == "ron" && __last_adventure_location == $location[a mob of zeppelin protesters])
         return true;
     if (which_route == "shen" && $location[the copperhead club].turns_spent > 0)
         return true;

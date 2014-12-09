@@ -1040,3 +1040,21 @@ int monsterExtraInitForML(int ml)
 	else
 		return 200.0 + 5.0 * (ml - 100.0);
 }
+
+int stringCountSubstringMatches(string str, string substring)
+{
+    int count = 0;
+    int position = 0;
+    int breakout = 100;
+    int str_length = str.length(); //uncertain whether this is a constant time operation
+    while (breakout > 0 && position + 1 < str_length)
+    {
+        position = str.index_of(substring, position + 1);
+        if (position != -1)
+            count += 1;
+        else
+            break;
+        breakout -= 1;
+    }
+    return count;
+}

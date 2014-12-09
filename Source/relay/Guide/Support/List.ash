@@ -1,3 +1,8 @@
+//WARNING: All listAppend functions are flawed.
+//Specifically, there's a possibility of a hole that causes order to be incorrect.
+//But, the only way to fix that is to traverse the list to determine the maximum key.
+//That would take forever...
+
 string listLastObject(string [int] list)
 {
     if (list.count() == 0)

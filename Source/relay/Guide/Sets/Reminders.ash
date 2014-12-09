@@ -38,7 +38,10 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             }
         }
         
-        if (methods.count() > 0 && $effect[thrice-cursed].have_effect() == 0)
+        boolean [location] ignoring_locations;
+        ignoring_locations[lookupLocation("The Crimbonium Mine")] = true;
+        
+        if (methods.count() > 0 && $effect[thrice-cursed].have_effect() == 0 && !((ignoring_locations contains __last_adventure_location) && __last_adventure_location != $location[none]))
             task_entries.listAppend(ChecklistEntryMake("__effect beaten up", url, ChecklistSubentryMake("Remove beaten up", "", methods), -11));
     }
     
@@ -363,4 +366,5 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         if (options.count() > 0)
             task_entries.listAppend(ChecklistEntryMake("__item fortune cookie", "", ChecklistSubentryMake(HTMLGenerateSpanFont("Learn semi-rare number", "red", ""), "", description), -11));
     }
+    
 }

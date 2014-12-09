@@ -63,6 +63,7 @@ void SetsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 	SSneakyPeteGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SDNAGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SHeavyRainsGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+	SEventsGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     
 }
 

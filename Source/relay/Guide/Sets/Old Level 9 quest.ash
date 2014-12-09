@@ -54,5 +54,5 @@ void SOldLevel9GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     }
     ChecklistSubentry [int] subentries;
     subentries.listAppend(ChecklistSubentryMake("A Quest, LOL", "", description));
-    optional_task_entries.listAppend(ChecklistEntryMake("__item 64735 scroll", "mountains.php", subentries, 10, $locations[the valley of rof l'm fao]));
+    optional_task_entries.listAppend(ChecklistEntryMake("__item 64735 scroll", "place.php?whichplace=mountains", subentries, 10, $locations[the valley of rof l'm fao]));
 }

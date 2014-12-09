@@ -365,6 +365,18 @@ void CounterAdviseLastTurnAttemptedAdventurePHP(int turn)
     __last_turn_definitely_visited_adventure_php = turn;
 }
 
+boolean CounterWanderingMonsterMayHitInXTurns(int turns)
+{
+    foreach s in __wandering_monster_counter_names
+    {
+        if (CounterLookup(s).CounterExists() && CounterLookup(s).CounterMayHitInXTurns(turns))
+            return true;
+    }
+    if (get_property_int("_romanticFightsLeft") > 0 && !CounterLookup("Romantic Monster").CounterExists()) //mafia will clear the romantic monster window if it goes out of bounds
+        return true;
+    return false;
+}
+
 boolean CounterWanderingMonsterMayHitNextTurn()
 {
     monster last_monster = get_property_monster("lastEncounter");
@@ -378,19 +390,13 @@ boolean CounterWanderingMonsterMayHitNextTurn()
     //FIXME use CounterWanderingMonsterMayHitInXTurns to implement this once we're sure it works
     foreach s in __wandering_monster_counter_names
     {
-        if (CounterLookup(s).CounterExists() && CounterLookup(s).CounterMayHitNextTurn())
+        Counter c = CounterLookup(s);
+        if (c.CounterExists() && c.CounterMayHitNextTurn())
             return true;
     }
-    return false;
-}
-
-boolean CounterWanderingMonsterMayHitInXTurns(int turns)
-{
-    foreach s in __wandering_monster_counter_names
-    {
-        if (CounterLookup(s).CounterExists() && CounterLookup(s).CounterMayHitInXTurns(turns))
-            return true;
-    }
+    if (get_property_int("_romanticFightsLeft") > 0 && !CounterLookup("Romantic Monster").CounterExists()) //mafia will clear the romantic monster window if it goes out of bounds
+        return true;
+    
     return false;
 }
 
