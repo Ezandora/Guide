@@ -38,7 +38,7 @@ void SSpeakeasyGenerateResource(ChecklistEntry [int] available_resources_entries
         options.listAppend(listMake("Hot Socks", "3", description.listJoinComponents("|")));
     }
     
-    if (!__misc_state["In run"] && !lookupSkill("Hollow Leg").have_skill())
+    if (!__misc_state["In run"] && !lookupSkill("Hollow Leg").skill_is_usable())
         options.listAppend(listMake("Sloppy Jalopy", "5", "+1 liver capacity skill|Very expensive"));
     
     
@@ -52,6 +52,9 @@ void SSpeakeasyGenerateResource(ChecklistEntry [int] available_resources_entries
         if (!can_skip_cold || !can_skip_hot || !can_skip_spooky || !can_skip_stench)
             reasons_to_sockdollager.listAppend("tavern NC skipping");
     }
+    
+    if (!__quest_state["Level 13"].state_boolean["Elemental damage race completed"])
+        reasons_to_sockdollager.listAppend("Elemental damage race");
     
     if (my_path_id() == PATH_HEAVY_RAINS && !__quest_state["Level 13"].finished)
         reasons_to_sockdollager.listAppend("fighting rain king");

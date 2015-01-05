@@ -37,7 +37,7 @@ void SFamiliarsGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [
         if (!familiar_is_usable($familiar[angry jung man]) && in_hardcore() && !__quest_state["Level 13"].state_boolean["past keys"] && ($item[digital key].available_amount() + creatable_amount($item[digital key])) == 0 && __misc_state["fax equivalent accessible"])
             potential_targets.listAppend("ghost");
         
-        if (__misc_state["In run"] && ($items[bricko eye brick,bricko airship,bricko bat,bricko cathedral,bricko elephant,bricko gargantuchicken,bricko octopus,bricko ooze,bricko oyster,bricko python,bricko turtle,bricko vacuum cleaner].available_amount() > 0 || $skill[summon brickos].have_skill()))
+        if (__misc_state["In run"] && ($items[bricko eye brick,bricko airship,bricko bat,bricko cathedral,bricko elephant,bricko gargantuchicken,bricko octopus,bricko ooze,bricko oyster,bricko python,bricko turtle,bricko vacuum cleaner].available_amount() > 0 || $skill[summon brickos].skill_is_usable()))
             potential_targets.listAppend("BRICKO monster");
         
         if (potential_targets.count() > 0)
@@ -45,11 +45,33 @@ void SFamiliarsGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [
         
 		optional_task_entries.listAppend(ChecklistEntryMake(familiar_image, url, ChecklistSubentryMake(title, "", description), 6));
 	}
+    
+    
+    if (lookupFamiliar("Crimbo Shrub").familiar_is_usable())
+    {
+        if (get_property("shrubGifts") == "meat" && $effect[everything looks red].have_effect() == 0)
+        {
+            string url = "";
+            string title = "Open a Big Red Present in combat";
+            if (!from_task)
+                title = "Big Red Present openable in combat";
+            string description = "Gives 2.5k meat.";
+            if (my_familiar() != lookupFamiliar("Crimbo Shrub"))
+            {
+                url = "familiar.php";
+                if (from_task)
+                    title = "Switch to Crimbo Shrub to open a big red present";
+                else
+                    description = "Switch to Crimbo Shrub first.|" + description;
+            }
+            optional_task_entries.listAppend(ChecklistEntryMake("__item dense meat stack", url, ChecklistSubentryMake(title, "", description), 6));
+        }
+    }
 }
 
 void SFamiliarsGenerateResource(ChecklistEntry [int] available_resources_entries)
 {
-	if (__misc_state["free runs usable"] && ($familiar[pair of stomping boots].familiar_is_usable() || (have_skill($skill[the ode to booze]) && $familiar[Frumious Bandersnatch].familiar_is_usable())))
+	if (__misc_state["free runs usable"] && ($familiar[pair of stomping boots].familiar_is_usable() || ($skill[the ode to booze].skill_is_usable() && $familiar[Frumious Bandersnatch].familiar_is_usable())))
 	{
 		int runaways_used = get_property_int("_banderRunaways");
 		string name = runaways_used + " familiar runaways used";
@@ -58,7 +80,7 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] available_resources_entries
         
         string url = "";
 		
-		if ($familiar[Frumious Bandersnatch].familiar_is_usable() && $skill[the ode to booze].have_skill())
+		if ($familiar[Frumious Bandersnatch].familiar_is_usable() && $skill[the ode to booze].skill_is_usable())
 		{
 			image_name = "Frumious Bandersnatch";
 		}
@@ -278,5 +300,52 @@ void SFamiliarsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
 		string image_name = "black cat";
 		optional_task_entries.listAppend(ChecklistEntryMake(image_name, "familiar.php", ChecklistSubentryMake("Bring along a familiar", "", "")));
 	}
+    
+    if (lookupFamiliar("Crimbo Shrub").familiar_is_usable())
+    {
+        boolean configured = get_property("shrubGarland").length() > 0 || get_property("shrubGifts").length() > 0 || get_property("shrubLights").length() > 0 || get_property("shrubTopper").length() > 0;
+        if (my_daycount() == 1 && get_property("_shrubDecorated") == "false") //default configuration exists, but
+            configured = false;
+        if (!configured && (__misc_state["In run"] || my_familiar() == lookupFamiliar("Crimbo Shrub")) && get_property("_shrubDecorated") == "false")
+        {
+            string [int] description;
+            
+            string [int] configuration_idea;
+            if (my_primestat() == $stat[muscle])
+                configuration_idea.listAppend("Veiny Star");
+            else if (my_primestat() == $stat[mysticality])
+                configuration_idea.listAppend("LED Mandala");
+            else if (my_primestat() == $stat[moxie])
+                configuration_idea.listAppend("Angel With Sunglasses");
+            
+            configuration_idea.listAppend("Frosted Lights"); //random pick really
+            
+            if (hippy_stone_broken())
+                configuration_idea.listAppend("Barbed Wire");
+            else
+                configuration_idea.listAppend("Popcorn Strands");
+            
+            if (!__misc_state["yellow ray potentially available"])
+                configuration_idea.listAppend("Big Yellow-Wrapped Presents");
+            else
+                configuration_idea.listAppend("Big Red-Wrapped Presents");
+            
+            description.listAppend("Maybe " + configuration_idea.listJoinComponents(" / ") + "?");
+            
+            string url = "familiar.php";
+            
+            if (lookupItem("box of old Crimbo decorations").available_amount() > 0)
+                url = "inv_use.php?pwd=" + my_hash() + "&whichitem=7958";
+            
+            optional_task_entries.listAppend(ChecklistEntryMake("__item box of old Crimbo decorations", url, ChecklistSubentryMake("Configure your Crimbo Shrub", "", description), 6));
+        }
+        /*
+        shrubGarland(user, now 'PvP', default )
+        shrubGifts(user, now 'meat', default )
+        shrubLights(user, now 'Cold', default )
+        shrubTopper(user, now 'Moxie', default )
+        */
+    }
+    
 	SFamiliarsGenerateEntry(task_entries, optional_task_entries, true);
 }

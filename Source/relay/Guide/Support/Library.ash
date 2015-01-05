@@ -64,6 +64,7 @@ int PATH_AVATAR_OF_SNEAKY_PETE = 20;
 int PATH_SLOW_AND_STEADY = 21;
 int PATH_HEAVY_RAINS = 22;
 int PATH_PICKY = 23;
+int PATH_STANDARD = 24;
 
 int __my_path_id_cached = -11;
 int my_path_id()
@@ -110,6 +111,8 @@ int my_path_id()
         __my_path_id_cached = PATH_HEAVY_RAINS;
     else if (path_name == "Picky")
         __my_path_id_cached = PATH_PICKY;
+    else if (path_name == "Standard")
+        __my_path_id_cached = PATH_STANDARD;
     else
         __my_path_id_cached = PATH_UNKNOWN;
     return __my_path_id_cached;
@@ -305,6 +308,24 @@ int available_amount_including_closet(item it)
 int item_amount_almost_everywhere(item it)
 {
     return it.closet_amount() + it.display_amount() + it.equipped_amount() + it.item_amount() + it.storage_amount();
+}
+
+//Similar to item_amount_almost_everywhere, but won't trigger a display case load unless it has to:
+boolean haveAtLeastXOfItemEverywhere(item it, int amount)
+{
+    int total = 0;
+    total += it.item_amount();
+    if (total >= amount) return true;
+    total += it.equipped_amount();
+    if (total >= amount) return true;
+    total += it.closet_amount();
+    if (total >= amount) return true;
+    total += it.storage_amount();
+    if (total >= amount) return true;
+    total += it.display_amount();
+    if (total >= amount) return true;
+    
+    return false;
 }
 
 int equipped_amount(boolean [item] items)
@@ -1057,4 +1078,9 @@ int stringCountSubstringMatches(string str, string substring)
         breakout -= 1;
     }
     return count;
+}
+
+effect to_effect(item it)
+{
+	return effect_modifier(it, "effect");
 }

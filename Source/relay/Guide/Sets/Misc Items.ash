@@ -256,14 +256,15 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
         {
             string [int] details;
             details.listAppend("Lost pill bottle is mini-fridge, take a nap, open the pill bottle.");
-            if (!__quest_state["Level 13"].state_boolean["past tower"] && (!$item[munchies pill].is_unrestricted() || !__misc_state["can eat just about anything"]))
-                details.listAppend("The lost comb is turn on the TV, take a nap, pick up the comb. (towerkilling)");
-            if ($classes[pastamancer,sauceror] contains my_class() && $skill[Transcendental Noodlecraft].have_skill() && $skill[The Way of Sauce].have_skill() && $skill[pulverize].have_skill())
+            //FIXME does stunning work on tower monsters?
+            //if (!__quest_state["Level 13"].state_boolean["past tower"] && (!$item[munchies pill].is_unrestricted() || !__misc_state["can eat just about anything"]))
+                //details.listAppend("The lost comb is turn on the TV, take a nap, pick up the comb. (towerkilling)");
+            if ($classes[pastamancer,sauceror] contains my_class() && $skill[Transcendental Noodlecraft].skill_is_usable() && $skill[The Way of Sauce].skill_is_usable() && $skill[pulverize].skill_is_usable())
                 details.listAppend("The lost glasses is mini-fridge, TV, glasses.|Smash for elemental nuggets for hi meins.");
 			available_resources_entries.listAppend(ChecklistEntryMake("__item lost key", "inventory.php?which=3", ChecklistSubentryMake(pluralize($item[lost key]), "", details), importance_level_item));
         }
 			
-		if ($item[soft green echo eyedrop antidote].available_amount() > 0 && have_skill($skill[Transcendent Olfaction]))
+		if ($item[soft green echo eyedrop antidote].available_amount() > 0 && $skill[Transcendent Olfaction].skill_is_usable())
 			available_resources_entries.listAppend(ChecklistEntryMake("__item soft green echo eyedrop antidote", "", ChecklistSubentryMake(pluralize($item[soft green echo eyedrop antidote]), "", "Removes on the trail, teleportitis"), importance_level_unimportant_item));
 			
 		if ($item[sack lunch].available_amount() > 0)
@@ -318,8 +319,6 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
 		subentry.header = pluralize(clovers_available, "clover", "clovers") + " available";
         
 		
-		if (!__quest_state["Level 13"].state_boolean["past gates"] && $item[blessed large box].available_amount() == 0)
-			subentry.entries.listAppend("Blessed large box");
 		if (!__quest_state["Level 9"].state_boolean["bridge complete"])
 			subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Orc logging camp, for bridge building", $location[the smut orc logging camp]));
 		if (__quest_state["Level 9"].state_int["a-boo peak hauntedness"] > 0 || !__quest_state["Level 9"].state_boolean["bridge complete"])
@@ -327,8 +326,6 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
 		if (__misc_state["wand of nagamar needed"])
 			subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Wand of nagamar components (castle basement)", $location[the castle in the clouds in the sky (basement)]));
 		boolean have_all_gum = $item[pack of chewing gum].available_amount() > 0 || ($item[jaba&ntilde;ero-flavored chewing gum].available_amount() > 0 && $item[lime-and-chile-flavored chewing gum].available_amount() > 0 && $item[pickle-flavored chewing gum].available_amount() > 0 && $item[tamarind-flavored chewing gum].available_amount() > 0);
-		if (!__quest_state["Level 13"].state_boolean["past gates"] && !have_all_gum && !gnomads_available())
-			subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Potential gate border gum", $location[south of the border]));
 		if (__quest_state["Level 4"].state_int["areas unlocked"] + $item[sonar-in-a-biscuit].available_amount() < 2)
 			subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("2 sonar-in-a-biscuit (Guano Junction)", $location[guano junction]));
 		if (!__quest_state["Level 11 Desert"].state_boolean["Desert Explored"])
@@ -344,8 +341,6 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
                 l = $location[the haunted gallery];
 			subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Powerlevelling (" + l + ")", l));
         }
-        if (!__quest_state["Level 13"].state_boolean["have relevant guitar"] && $item[big rock].available_amount() == 0)
-			subentry.entries.listAppend("Possible guitar, via big rock");
 		//put relevant tower items here
 		
 		available_resources_entries.listAppend(ChecklistEntryMake("clover", "", subentry, 7));
@@ -799,8 +794,6 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
                 possible_pickpocket_locations.listAppend("Cyrpt Nook");
             if (!__quest_state["Level 12"].state_boolean["Orchard Finished"])
                 possible_pickpocket_locations.listAppend("filthworms");
-            if (!__quest_state["Level 13"].state_boolean["past hedge maze"])
-                possible_pickpocket_locations.listAppend("Hedge Maze");
                 
             if (possible_pickpocket_locations.count() == 0)
                 birdform_description.listAppend("Gives pickpocketing ability.");
@@ -883,5 +876,27 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
         
         available_resources_entries.listAppend(ChecklistEntryMake("__item llama lama gong", "inventory.php?which=3", ChecklistSubentryMake(pluralize($item[llama lama gong]), "", description), importance_level_item));
         
+    }
+    
+    if (!in_run && get_property("_bittycar").length() == 0 && $items[BittyCar HotCar, BittyCar MeatCar,BittyCar SoulCar].available_amount() > 0 && mafiaIsPastRevision(15028))
+    {
+        string [int] available_items;
+        string [int] available_descriptions;
+        string [item] item_descriptions;
+        item_descriptions[$item[BittyCar HotCar]] = "hot damage";
+        item_descriptions[$item[BittyCar MeatCar]] = "extra meat";
+        item_descriptions[$item[BittyCar SoulCar]] = "HP/MP";
+        
+        
+        foreach it in $items[BittyCar MeatCar,BittyCar SoulCar,BittyCar HotCar]
+        {
+            if (it.available_amount() > 0)
+            {
+                available_items.listAppend(it.to_string().replace_string("BittyCar ", ""));
+                available_descriptions.listAppend(item_descriptions[it]);
+            }
+        }
+        string description = "Reusable once/day for occasional " + available_descriptions.listJoinComponents(", ", "or") + " in combat.";
+        available_resources_entries.listAppend(ChecklistEntryMake("__item BittyCar MeatCar", "inventory.php?which=3", ChecklistSubentryMake("BittyCar " + available_items.listJoinComponents(", ", "or") + " usable", "", description), importance_level_unimportant_item));
     }
 }

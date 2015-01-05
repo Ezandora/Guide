@@ -198,14 +198,16 @@ void generatePullList(Checklist [int] checklists)
             string line;
             if (which_pies.count() > 0)
                 line += which_pies.listJoinComponents("/") + "'s ";
-            line += "key lime pies";
+            line += "key lime pie";
+            if (which_pies.count() > 1)
+                line += "s";
             food_selections.listAppend(line);
         }
         if (availableFullness() >= 5)
         {
-            if ($item[moon pie].is_unrestricted() && !($skill[saucemaven].have_skill() && my_primestat() == $stat[mysticality]))
+            if ($item[moon pie].is_unrestricted() && !($skill[saucemaven].skill_is_usable() && my_primestat() == $stat[mysticality]))
                 food_selections.listAppend("moon pies");
-            else if ($skill[saucemaven].have_skill())
+            else if ($skill[saucemaven].skill_is_usable())
             {
                 string hi_mein_types;
                 if (__misc_state["need to level"])
@@ -242,14 +244,11 @@ void generatePullList(Checklist [int] checklists)
 		pullable_item_list.listAppend(GPItemMake("Drink", "gibson", description));
 	}
     
-    if (__misc_state["In run"] && !__quest_state["Level 13"].state_boolean["past gates"] && ($items[large box, blessed large box].available_amount() == 0 && $items[bubbly potion,cloudy potion,dark potion,effervescent potion,fizzy potion,milky potion,murky potion,smoky potion,swirly potion].items_missing().count() > 0))
-        pullable_item_list.listAppend(GPItemMake($item[large box], "Combine with clover for blessed large box", 1));
-    
     //pullable_item_list.listAppend(GPItemMake($item[slimy alveolus], "40 turns of +50ML (" + floor(40 * 50 * __misc_state_float["ML to mainstat multiplier"]) +" mainstat total, cave bar levelling)|1 spleen", 3)); //marginal now. low-skill oil peak/cyrpt?
 	
 	
     if (!get_property_boolean("_blankOutUsed") && __misc_state["free runs usable"])
-        pullable_item_list.listAppend(GPItemMake($item[bottle of blank-out], "run away from your problems|expensive", 1));
+        pullable_item_list.listAppend(GPItemMake($item[bottle of blank-out], "run away from your problems", 1));
 	
 	
     if (!__quest_state["Level 11 Hidden City"].finished && !__quest_state["Level 11"].finished && (get_property_int("hiddenApartmentProgress") < 1 || get_property_int("hiddenBowlingAlleyProgress") < 1 || get_property_int("hiddenHospitalProgress") < 1 || get_property_int("hiddenOfficeProgress") < 1) && __misc_state["can equip just about any weapon"])
@@ -294,12 +293,6 @@ void generatePullList(Checklist [int] checklists)
 	if (!__quest_state["Level 11 Palindome"].finished && $item[mega gem].available_amount() == 0 && ($item[wet stew].available_amount() + $item[wet stunt nut stew].available_amount() + $item[wet stew].creatable_amount() == 0))
 		pullable_item_list.listAppend(GPItemMake($item[wet stew], "make into wet stunt nut stew|skip whitey's grove", 1));
     
-    if (!__quest_state["Level 13"].state_boolean["Past keys"])
-    {
-        pullable_item_list.listAppend(GPItemMake($item[star hat], "speed up hole in the sky", 1));
-        if ($items[star crossbow, star staff, star sword].available_amount() == 0 && __misc_state["can equip just about any weapon"])
-            pullable_item_list.listAppend(GPItemMake($item[star crossbow], "speed up hole in the sky", 1));
-	}
     if (__quest_state["Level 11"].mafia_internal_step < 2)
         pullable_item_list.listAppend(GPItemMake($item[blackberry galoshes], "speed up black forest by 2-3? turns", 1));
         
@@ -314,9 +307,6 @@ void generatePullList(Checklist [int] checklists)
         item [int] missing_frat_components = missing_outfit_components("Frat Warrior Fatigues");
         pullable_item_list.listAppend(GPItemMake("Island War Outfit", "__item round purple sunglasses", "<strong>Hippy</strong>: " + missing_hippy_components.listJoinComponents(", ", "and") + ".|<strong>Frat boy</strong>: " + missing_frat_components.listJoinComponents(", ", "and") + "."));
     }
-    
-    if (!__quest_state["Level 13"].state_boolean["past gates"] && !gnomads_available())
-        pullable_item_list.listAppend(GPItemMake("Unknown gate item", "__item pickle-flavored chewing gum", "Skips south of the border."));
     
     if (!__quest_state["Level 8"].state_boolean["Mountain climbed"] && !have_outfit_components("eXtreme Cold-Weather Gear"))
     {

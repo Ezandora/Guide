@@ -20,7 +20,7 @@ void SSneakyPeteGenerateResource(ChecklistEntry [int] available_resources_entrie
         
         int free_peel_outs_available = MAX(0, total_free_peel_outs_available - get_property_int("_petePeeledOut"));
         
-        if ($skill[Peel Out].have_skill() && free_peel_outs_available > 0)
+        if ($skill[Peel Out].skill_is_usable() && free_peel_outs_available > 0)
         {
             string [int] description;
             
@@ -36,7 +36,7 @@ void SSneakyPeteGenerateResource(ChecklistEntry [int] available_resources_entrie
         }
     }
     
-    if ($skill[Fix Jukebox].have_skill() && get_property_int("_peteJukeboxFixed") < 3)
+    if ($skill[Fix Jukebox].skill_is_usable() && get_property_int("_peteJukeboxFixed") < 3)
     {
         int uses_remaining = MAX(0, 3 - get_property_int("_peteJukeboxFixed"));
         
@@ -49,7 +49,7 @@ void SSneakyPeteGenerateResource(ChecklistEntry [int] available_resources_entrie
         
         string [int] targets;
         //√banshee, √a batrat for sonar, √harem girl (contested), √burly sidekick, √quiet healer, √filthworms, √f'c'le without natural dancer, √a-boo clues
-        if (!$skill[Natural Dancer].have_skill() && !__quest_state["Pirate Quest"].finished && $item[talisman o' nam].available_amount() == 0)
+        if (!$skill[Natural Dancer].skill_is_usable() && !__quest_state["Pirate Quest"].finished && $item[talisman o' nam].available_amount() == 0)
             targets.listAppend("Three times in the F'c'le, if you can't acquire Natural Dancer/+234% items.");
             
         if (!__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && !__quest_state["Level 11 Desert"].state_boolean["Killing Jar Given"] && $item[killing jar].available_amount() == 0)
@@ -76,7 +76,7 @@ void SSneakyPeteGenerateResource(ChecklistEntry [int] available_resources_entrie
         entry.subentries.listAppend(ChecklistSubentryMake(pluralize(uses_remaining, "jukebox fix", "jukebox fixes"), "25 MP", description));
     }
     
-    if ($skill[Jump Shark].have_skill() && get_property_int("_peteJumpedShark") < 3)
+    if ($skill[Jump Shark].skill_is_usable() && get_property_int("_peteJumpedShark") < 3)
     {
         int uses_remaining = MAX(0, 3 - get_property_int("_peteJumpedShark"));
         
@@ -160,7 +160,7 @@ void SSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
                 {
                     name = "Headlight";
                     
-                    if ($skill[Flash Headlight].have_skill())
+                    if ($skill[Flash Headlight].skill_is_usable())
                     {
                         options.listAppend("yellow ray from flash headlight");
                         options.listAppend("prismatic damage from flash headlight");
@@ -176,7 +176,7 @@ void SSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
                 else if (property_name == "peteMotorbikeMuffler")
                 {
                     name = "Muffler";
-                    if ($skill[Rev Engine].have_skill())
+                    if ($skill[Rev Engine].skill_is_usable())
                     {
                         options.listAppend("+combat% from rev engine");
                         options.listAppend("-combat% from rev engine");
@@ -186,7 +186,7 @@ void SSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
                         options.listAppend("+X% combat from rev engine (need skill)");
                         options.listAppend("-X% combat from rev engine (need skill)");
                     }
-                    if ($skill[Peel Out].have_skill())
+                    if ($skill[Peel Out].skill_is_usable())
                         options.listAppend("peel out banishes");
                     else
                         options.listAppend("peel out banishes (need skill)");
@@ -194,11 +194,11 @@ void SSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
                 else if (property_name == "peteMotorbikeTires")
                 {
                     name = "Tires";
-                    if ($skill[Peel Out].have_skill())
+                    if ($skill[Peel Out].skill_is_usable())
                         options.listAppend("extra free runs with peel out");
                     else
                         options.listAppend("extra free runs (need peel out)");
-                    if ($skill[Pop Wheelie].have_skill())
+                    if ($skill[Pop Wheelie].skill_is_usable())
                         options.listAppend("pop wheelie does more damage");
                     else
                         options.listAppend("pop wheelie does more damage (need skill)");
@@ -221,7 +221,7 @@ void SSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         }
     }
     
-    if ($skill[Check Mirror].have_skill())
+    if ($skill[Check Mirror].skill_is_usable())
     {
         boolean have_intrinsic = false;
         foreach s in $strings[Slicked-Back Do,Pompadour,Cowlick,Fauxhawk]
@@ -249,9 +249,9 @@ void SSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
     {
         audience_max = 50;
     }
-    if ($skill[Throw Party].have_skill() && my_audience() == audience_max && !get_property_boolean("_petePartyThrown"))
+    if ($skill[Throw Party].skill_is_usable() && my_audience() == audience_max && !get_property_boolean("_petePartyThrown"))
         task_entries.listAppend(ChecklistEntryMake("__item party hat", "skills.php", ChecklistSubentryMake("Throw a party!", "", "Drinks."), -11));
-    if ($skill[Incite Riot].have_skill() && my_audience() == -audience_max && !get_property_boolean("_peteRiotIncited"))
+    if ($skill[Incite Riot].skill_is_usable() && my_audience() == -audience_max && !get_property_boolean("_peteRiotIncited"))
         task_entries.listAppend(ChecklistEntryMake("__item fire", "skills.php", ChecklistSubentryMake("Incite a riot", "", "Breaking the law, breaking the law."), -11));
     
     //sneakyPetePoints first
@@ -261,7 +261,7 @@ void SSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
     //foreach s in lookupSkills("Catchphrase,Mixologist,Throw Party,Fix Jukebox,Snap Fingers,Shake It Off,Check Hair,Cocktail Magic,Make Friends,Natural Dancer,Rev Engine,Born Showman,Pop Wheelie,Rowdy Drinker,Peel Out,Easy Riding,Check Mirror,Riding Tall,Biker Swagger,Flash Headlight,Insult,Live Fast,Incite Riot,Jump Shark,Animal Magnetism,Smoke Break,Hard Drinker,Unrepentant Thief,Brood,Walk Away From Explosion")
     foreach s in lookupSkillsInt($ints[15027,15019,15012,15028,15001,15007,15017,15008,15016,15004,15020,15025,15031,15021,15024,15023,15009,15002,15010,15015,15013,15011,15018,15014,15006,15026,15005,15003,15032,15030])
     {
-        if (s.have_skill())
+        if (s.skill_is_usable())
             skills_have += 1;
     }
     

@@ -132,7 +132,7 @@ void generateChecklists(Checklist [int] ordered_output_checklists)
         generateDailyResources(checklists);
         
         generateTasks(checklists);
-        if (__misc_state["Example mode"] || !get_property_boolean("kingLiberated"))
+        if (__misc_state["Example mode"] || !__misc_state["In aftercore"])
         {
             generateMissingItems(checklists);
             generatePullList(checklists);

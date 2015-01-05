@@ -25,7 +25,10 @@ string generateRandomMessage()
             random_messages.listAppend("you are ascending at a reasonable pace, could do better");
         else
             random_messages.listAppend("you are ascending too slowly, ascend faster!");
-        random_messages.listAppend("every spreadsheet you make saves a turn");
+        if ($item[optimal spreadsheet].equipped_amount() > 0)
+            random_messages.listAppend("every spreadsheet you wear saves a turn"); //sure, why not?
+        else
+            random_messages.listAppend("every spreadsheet you make saves a turn");
     }
     
     string [string] holiday_messages;
@@ -70,6 +73,11 @@ string generateRandomMessage()
     }
     foreach s in $strings[The Mansion of Dr. Weirdeaux,The Deep Dark Jungle,The Secret Government Laboratory]
         location_messages[lookupLocation(s)] = conspiracy;
+    foreach s in $strings[anemone mine (mining),itznotyerzitz mine (in disguise),the knob shaft (mining),The Crimbonium Mine]
+        location_messages[lookupLocation(s)] = "street sneaky pete don't you call me cause I can't go";
+    location_messages[$location[sonar]] = "one ping only";
+    location_messages[$location[galley]] = "hungry?";
+    location_messages[$location[science lab]] = "poetry in motion";
     
     foreach l in $locations[The Prince's Restroom,The Prince's Dance Floor,The Prince's Kitchen,The Prince's Balcony,The Prince's Lounge,The Prince's Canapes table]
         location_messages[l] = "social sabotage";
@@ -174,7 +182,7 @@ string generateRandomMessage()
         paths[PATH_SLOW_AND_STEADY] = "skip a day if you like";
     paths[PATH_HEAVY_RAINS] = "survive";
     paths[PATH_PICKY] = "combinatorial ascension";
-    if ($skill[cannelloni cannon].have_skill() && !$skill[cannelloni cocoon].have_skill()) //such an easy mistake...
+    if ($skill[cannelloni cannon].skill_is_usable() && !$skill[cannelloni cocoon].skill_is_usable()) //such an easy mistake...
         paths[PATH_PICKY] = "cannelloni confusion";
     //paths[PATH_CLASS_ACT_3] = "buttons for the people";
     //paths[PATH_AVATAR_OF_THE_NAUGHTY_SORCERESS] = "go forth to your lair! have some tea";
@@ -226,7 +234,7 @@ string generateRandomMessage()
     
 	if (!__misc_state["skills temporarily missing"])
 	{
-		if (!$skill[Transcendent Olfaction].have_skill())
+		if (!$skill[Transcendent Olfaction].skill_is_usable())
             random_messages.listAppend(HTMLGenerateTagWrap("a", "visit the bounty hunter hunter sometime", generateMainLinkMap("bounty.php")));
 	}
     if (__misc_state["in aftercore"])
@@ -290,7 +298,7 @@ string generateRandomMessage()
     random_messages.listAppend(HTMLGenerateTagWrap("a", "&#x266b;", mapMake("class", "r_a_undecorated", "href", "http://www.kingdomofloathing.com/radio.php", "target", "_blank")));
     
     if (__misc_state_int["free rests remaining"] > 0)
-        random_messages.listAppend(HTMLGenerateTagWrap("a", "dream your life away", generateMainLinkMap("campground.php")));
+        random_messages.listAppend(HTMLGenerateTagWrap("a", "dream your life away", generateMainLinkMap(__misc_state_string["resting url"])));
     
     if (get_property_int("cinderellaScore") >= 32)
         random_messages.listAppend("mother knows best");
@@ -346,8 +354,6 @@ string generateRandomMessage()
     monster_messages[$monster[Avatar of Jarlsberg]] = "smoked cheese";
     monster_messages[$monster[giant sandworm]] = "walk without rhythm";
     monster_messages[$monster[bookbat]] = "tattered scrap of dignity";
-    if (!$skill[Transcendent Olfaction].have_skill() && __misc_state["In run"] && in_hardcore())
-        monster_messages[$monster[Astronomer]] = "nooo astronomer come back";
     monster_messages[$monster[urge to stare at your hands]] = ".&#x20dd;.&#x20dd;"; //.⃝.⃝
     if (my_path_id() == PATH_HEAVY_RAINS)
         monster_messages[$monster[pygmy bowler]] = "right into the gutter"; //come back!
@@ -368,6 +374,7 @@ string generateRandomMessage()
     
     string [string] encounter_messages;
     encounter_messages["It's Always Swordfish"] = "one two three four five";
+    encounter_messages["Meet Frank"] = "don't trust the skull";
     
     if (encounter_messages contains get_property("lastEncounter"))
     {

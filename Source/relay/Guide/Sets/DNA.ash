@@ -218,7 +218,7 @@ void SDNAInit()
     {
         __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[pirate], "+50% gear drop", "war outfit?"));
     }
-    if (__quest_state["Level 11 Palindome"].mafia_internal_step < 5 && $item[mega gem].available_amount() == 0 && in_hardcore() && !($skill[Check Hair].have_skill() && $skill[Natural Dancer].have_skill())) //avatar of sneaky pete usually can cap this easily... usually
+    if (__quest_state["Level 11 Palindome"].mafia_internal_step < 5 && $item[mega gem].available_amount() == 0 && in_hardcore() && !($skill[Check Hair].skill_is_usable() && $skill[Natural Dancer].skill_is_usable())) //avatar of sneaky pete usually can cap this easily... usually
     {
         if ($item[wet stunt nut stew].available_amount() == 0 && !(($item[bird rib].available_amount() > 0 && $item[lion oil].available_amount() > 0 || $item[wet stew].available_amount() > 0)))
         {
@@ -261,7 +261,10 @@ void SDNAInit()
             if (!__misc_state["In run"] || my_path_id() == PATH_HEAVY_RAINS)
                 __dna_intrinsic_ideas.listAppend(DNABoldPhylumIfCurrentMonster($phylum[fish]) + " (+10 familiar weight)");
             else if ($item[grimstone mask].available_amount() > 0)
+            {
                 __dna_intrinsic_ideas.listAppend(DNABoldPhylumIfCurrentMonster($phylum[fish]) + " (+10 familiar weight, via grimstone mask candy witch's lake)");
+                __dna_intrinsic_ideas.listAppend(DNABoldPhylumIfCurrentMonster($phylum[construct]) + " (+5 familiar weight)");
+            }
             else
                 __dna_intrinsic_ideas.listAppend(DNABoldPhylumIfCurrentMonster($phylum[construct]) + " (+5 familiar weight)");
         }
@@ -273,6 +276,10 @@ void SDNAInit()
                 if (!$familiar[astral badger].familiar_is_usable() || $item[astral mushroom].available_amount() > 0)
                     method = "astral mushroom";
                 __dna_intrinsic_ideas.listAppend(DNABoldPhylumIfCurrentMonster($phylum[weird]) + " (+4 stats/fight, via " + method + ")");
+            }
+            else if (__misc_state["sleaze airport available"])
+            {
+                __dna_intrinsic_ideas.listAppend(DNABoldPhylumIfCurrentMonster($phylum[weird]) + " (+4 stats/fight, via sloppy seconds diner)");
             }
         }
         __dna_intrinsic_ideas.listAppend(DNABoldPhylumIfCurrentMonster($phylum[dude]) + " (+10% item)");

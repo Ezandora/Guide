@@ -63,7 +63,7 @@ void QLevel6GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	if (!__quest_state["Level 6"].in_progress)
 		return;
 	boolean want_hell_ramen = false;
-	if (have_skill($skill[pastamastery]) && have_skill($skill[Advanced Saucecrafting]))
+	if ($skill[pastamastery].skill_is_usable() && $skill[Advanced Saucecrafting].skill_is_usable())
 		want_hell_ramen = true;
     if (my_path_id() == PATH_SLOW_AND_STEADY)
         want_hell_ramen = false;

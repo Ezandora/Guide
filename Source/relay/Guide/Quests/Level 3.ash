@@ -24,7 +24,7 @@ void QLevel3GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		return;
 	QuestState base_quest_state = __quest_state["Level 3"];
 	boolean wait_until_level_eleven = false;
-	if (have_skill($skill[ur-kel's aria of annoyance]) && my_level() < 11)
+	if ($skill[ur-kel's aria of annoyance].skill_is_usable() && my_level() < 11)
 		wait_until_level_eleven = true;
     
 	ChecklistSubentry subentry;
@@ -57,7 +57,7 @@ void QLevel3GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		elemental_sources_available.listAppend("+" + MIN(11, my_level()) + " piddles");
 	
 	
-	if (have_skill($skill[Benetton's Medley of Diversity]) && my_level() >= 15 && get_property_int("_benettonsCasts") < 10)
+	if ($skill[Benetton's Medley of Diversity].skill_is_usable() && my_level() >= 15 && get_property_int("_benettonsCasts") < 10)
 		elemental_sources_available.listAppend("+15 Benetton's Medley of Diversity");
 	
 	string elemental_sources_available_string;

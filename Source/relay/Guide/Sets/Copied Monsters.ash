@@ -226,7 +226,7 @@ void generateCopiedMonstersEntry(ChecklistEntry [int] task_entries, ChecklistEnt
 
 void SCopiedMonstersGenerateResourceForCopyType(ChecklistEntry [int] available_resources_entries, item shaking_object, string shaking_shorthand_name, string monster_name_property_name)
 {
-	if (shaking_object.available_amount() == 0)
+	if (shaking_object.available_amount() == 0 && shaking_object != $item[none])
 		return;
     
     string url = "inventory.php?which=3";
@@ -246,8 +246,15 @@ void SCopiedMonstersGenerateResourceForCopyType(ChecklistEntry [int] available_r
     
     if (monster_description.count() > 0)
         line += "<hr>" + monster_description.listJoinComponents("|");
+    
+    string image_name = "__item " + shaking_object;
+    if (shaking_shorthand_name == "chateau painting")
+    {
+        image_name = "__item fancy oil painting";
+        url = "place.php?whichplace=chateau";
+    }
 	
-	available_resources_entries.listAppend(ChecklistEntryMake(shaking_object, url, ChecklistSubentryMake(shaking_shorthand_name.capitalizeFirstLetter() + " monster trapped!", "", line)));
+	available_resources_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(shaking_shorthand_name.capitalizeFirstLetter() + " monster trapped!", "", line)));
 }
 
 void SCopiedMonstersGenerateResource(ChecklistEntry [int] available_resources_entries)
@@ -284,7 +291,7 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] available_resources_en
         //if (!__quest_state["Level 13"].state_boolean["past keys"] && ($item[digital key].available_amount() + creatable_amount($item[digital key])) == 0)
             //potential_copies.listAppend("Ghosts/morbid skulls/bloopers, for digital key. (marginal?)");
         //bricko bats, if they have bricko...?
-        //if (__misc_state["bookshelf accessible"] && $skill[summon brickos].have_skill())
+        //if (__misc_state["bookshelf accessible"] && $skill[summon brickos].skill_is_usable())
             //potential_copies.listAppend("Bricko bats...?");
     }
 	if (copies_left > 0)
@@ -312,10 +319,6 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] available_resources_en
     {
 		available_resources_entries.listAppend(ChecklistEntryMake("__item unfinished ice sculpture", "", ChecklistSubentryMake("Ice sculpture copy available", "", potential_copies)));
     }
-    if (my_path_id() == PATH_BUGBEAR_INVASION && $item[crayon shavings].available_amount() > 0)
-    {
-		available_resources_entries.listAppend(ChecklistEntryMake("__item crayon shavings", "", ChecklistSubentryMake(pluralize($item[crayon shavings].available_amount(), "crayon shaving copy", "crayon shaving copies") + " available", "", "Bugbears only.")));
-    }
     if ($item[sticky clay homunculus].available_amount() > 0)
     {
 		available_resources_entries.listAppend(ChecklistEntryMake("__item sticky clay homunculus", "", ChecklistSubentryMake(pluralize($item[sticky clay homunculus].available_amount(), "sticky clay copy", "sticky clay copies") + " available", "", "Unlimited/day.")));
@@ -325,6 +328,39 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] available_resources_en
         string [int] description = listCopy(potential_copies);
         description.listPrepend("50% success rate");
 		available_resources_entries.listAppend(ChecklistEntryMake("__item crappy camera", "", ChecklistSubentryMake("Crappy camera copy available", "", description)));
+    }
+    if (get_property_boolean("chateauAvailable") && !get_property_boolean("_chateauMonsterFought") && mafiaIsPastRevision(15115))
+    {
+        string url = "place.php?whichplace=chateau";
+        string header = "Chateau painting copy";
+        string [int] description;
+        monster current_monster = get_property_monster("chateauMonster");
+        
+        if (current_monster == $monster[none])
+            header += " available";
+        else
+            header += " fightable";
+        
+        string line;
+        if (current_monster == $monster[none])
+            line += "Options:";
+        else
+            line += "Other options:";
+        
+        if (lookupItem("alpine watercolor set").available_amount() == 0)
+        {
+            //url = "shop.php?whichshop=chateau";
+            line += " (buy alpine watercolor set first)";
+        }
+        else
+            line += " (copy with alpine watercolor set)";
+        
+        line += "|*" + potential_copies.listJoinComponents("|*");
+        description.listAppend(line);
+        
+        if (current_monster != $monster[none])
+            description.listPrepend(HTMLGenerateSpanOfClass("Currently have " + current_monster.to_string() + ".", "r_bold"));
+		available_resources_entries.listAppend(ChecklistEntryMake("__item fancy oil painting", url, ChecklistSubentryMake(header, "", description)));
     }
     
     //Copies made:
@@ -343,6 +379,9 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] available_resources_en
 		SCopiedMonstersGenerateResourceForCopyType(available_resources_entries, $item[envyfish egg], "envyfish egg", "envyfishMonster");
 	if (!get_property_boolean("_iceSculptureUsed"))
 		SCopiedMonstersGenerateResourceForCopyType(available_resources_entries, lookupItem("ice sculpture"), "ice sculpture", "iceSculptureMonster");
+        
+	//if (get_property_boolean("chateauAvailable") && !get_property_boolean("_chateauMonsterFought") && mafiaIsPastRevision(15115))
+		//SCopiedMonstersGenerateResourceForCopyType(available_resources_entries, $item[none], "chateau painting", "chateauMonster");
     
     SCopiedMonstersGenerateResourceForCopyType(available_resources_entries, $item[wax bugbear], "wax bugbear", "waxMonster");
     SCopiedMonstersGenerateResourceForCopyType(available_resources_entries, $item[crude monster sculpture], "crude sculpture", "crudeMonster");

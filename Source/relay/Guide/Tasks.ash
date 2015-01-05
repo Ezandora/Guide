@@ -170,17 +170,6 @@ void generateTasks(Checklist [int] checklists)
             subentry.entries.listAppend("Possibly upgrade your motorcycle's gas tank. (extra-buoyant)");
 		task_entries.listAppend(ChecklistEntryMake("__item dingy dinghy", url, subentry, $locations[the shore\, inc. travel agency]));
 	}
-
-
-
-	
-	
-	
-	if (my_path_id() == PATH_BUGBEAR_INVASION)
-	{
-		
-		task_entries.listAppend(ChecklistEntryMake("bugbear", "", ChecklistSubentryMake("Bugbears!", "", "I have no idea.")));
-	}
 	
 	
 	if (__misc_state["need to level"])
@@ -301,7 +290,7 @@ void generateTasks(Checklist [int] checklists)
 		if (!have_outfit_components("War Hippy Fatigues") && !have_outfit_components("Frat Warrior Fatigues"))
 			potential_targets.listAppend("Hippy/frat war outfit?");
 		//fax targets?
-		if (__misc_state["fax available"] || lookupSkill("Rain Man").have_skill())
+		if (__misc_state["fax available"] || lookupSkill("Rain Man").skill_is_usable())
 		{
 			potential_targets.listAppend("Anything on the fax list.");
 		}
@@ -326,10 +315,6 @@ void generateTasks(Checklist [int] checklists)
 				potential_targets.listAppend("A bat. (sonar-in-a-biscuit)");
 		}
 		
-		if (!__quest_state["Level 13"].state_boolean["have relevant guitar"] && !__quest_state["Level 13"].state_boolean["past keys"])
-			potential_targets.listAppend("Grungy pirate. (guitar)");
-		if (!__quest_state["Level 13"].state_boolean["past tower"])
-			potential_targets.listAppend("Tower items? Gate items?");
 		
 		if (item_drop_modifier_ignoring_plants() < 234.0 && !__misc_state["In aftercore"])
 			potential_targets.listAppend("Anything with 30% drop if you can't 234%. (dwarf foreman, bob racecar, drum machines, etc)");
@@ -434,7 +419,7 @@ void generateTasks(Checklist [int] checklists)
 	
 
     
-    boolean have_spaghetti_breakfast = (($skill[spaghetti breakfast].have_skill() && !get_property_boolean("_spaghettiBreakfast")) || $item[spaghetti breakfast].available_amount() > 0);
+    boolean have_spaghetti_breakfast = (($skill[spaghetti breakfast].skill_is_usable() && !get_property_boolean("_spaghettiBreakfast")) || $item[spaghetti breakfast].available_amount() > 0);
     if (__misc_state["In run"] && __misc_state["can eat just about anything"] && !get_property_boolean("_spaghettiBreakfastEaten") && my_fullness() == 0 && have_spaghetti_breakfast && my_path_id() != PATH_SLOW_AND_STEADY)
     {
     

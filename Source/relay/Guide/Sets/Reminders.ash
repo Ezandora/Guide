@@ -7,7 +7,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     {
         string [int] methods;
         string url;
-        if ($skill[tongue of the walrus].have_skill())
+        if ($skill[tongue of the walrus].skill_is_usable())
         {
             methods.listAppend("Cast Tongue of the Walrus.");
             url = "skills.php";
@@ -17,15 +17,15 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             methods.listAppend("Soak in VIP hot tub.");
             url = "clan_viplounge.php";
         }
-        else if ($skill[Shake it off].have_skill())
+        else if ($skill[Shake it off].skill_is_usable())
         {
             methods.listAppend("Cast shake it off.");
             url = "skills.php";
         }
         else if (__misc_state_int["free rests remaining"] > 0)
         {
-            methods.listAppend("Free rest at your campsite.");
-            url = "campground.php";
+            methods.listAppend("Free rest at " + __misc_state_string["resting description"] + ".");
+            url = __misc_state_string["resting url"];
         }
         
         foreach it in $items[tiny house,space tours tripple,personal massager,forest tears,csa all-purpose soap]
@@ -72,7 +72,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             string url = "";
             string [int] methods;
             
-            /*if ($skill[disco nap].have_skill() && $skill[adventurer of leisure].have_skill())
+            /*if ($skill[disco nap].skill_is_usable() && $skill[adventurer of leisure].skill_is_usable())
             {
                 url = "skills.php";
                 methods.listAppend("Cast Disco Nap.");
@@ -89,7 +89,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             task_entries.listAppend(ChecklistEntryMake("__effect " + have_poison, url, ChecklistSubentryMake("Remove " + have_poison, "", methods), -11));
         }
 	}
-        if ($effect[Cunctatitis].have_effect() > 0 && $skill[disco nap].have_skill() && $skill[adventurer of leisure].have_skill())
+        if ($effect[Cunctatitis].have_effect() > 0 && $skill[disco nap].skill_is_usable() && $skill[adventurer of leisure].skill_is_usable())
     {
         string url = "skills.php";
         string method = "Cast disco nap.";
@@ -122,11 +122,11 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         task_entries.listAppend(ChecklistEntryMake("__item flaskfull of hollow", url, ChecklistSubentryMake("Drink " + $item[flaskfull of hollow], "", "Gives +25 smithsness"), -11));
     }
     
-	if ($effect[QWOPped Up].have_effect() > 0 && ((__misc_state["VIP available"] && __misc_state_int["hot tub soaks remaining"] > 0) || $skill[Shake It Off].have_skill())) //only suggest if they have hot tub access; other route is a SGEEA, too valuable
+	if ($effect[QWOPped Up].have_effect() > 0 && ((__misc_state["VIP available"] && __misc_state_int["hot tub soaks remaining"] > 0) || $skill[Shake It Off].skill_is_usable())) //only suggest if they have hot tub access; other route is a SGEEA, too valuable
     {
         string [int] description;
         string url = "";
-        if ($skill[Shake It Off].have_skill())
+        if ($skill[Shake It Off].skill_is_usable())
         {
             url = "skills.php";
             description.listAppend("Shake it off.");
@@ -183,8 +183,11 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             item_descriptions[$item[resolution: be sexier]] = "+2 moxie stats/fight (20 turns)";
             item_effects[$item[resolution: be sexier]] = $effect[Irresistible Resolve];
             
-            item_descriptions[$item[old bronzer]] = "+2 moxie stats/fight (25 turns)";
-            item_effects[$item[old bronzer]] = lookupEffect("Sepia Tan");
+            if (!can_interact())
+            {
+                item_descriptions[$item[old bronzer]] = "+2 moxie stats/fight (25 turns)";
+                item_effects[$item[old bronzer]] = lookupEffect("Sepia Tan");
+            }
         }
 
         if (__misc_state["need to level muscle"])
@@ -197,8 +200,11 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             item_effects[$item[resolution: be stronger]] = $effect[Strong Resolve];
             
             
-            item_descriptions[$item[old eyebrow pencil]] = "+2 muscle stats/fight (25 turns)";
-            item_effects[$item[old eyebrow pencil]] = lookupEffect("Browbeaten");
+            if (!can_interact())
+            {
+                item_descriptions[$item[old eyebrow pencil]] = "+2 muscle stats/fight (25 turns)";
+                item_effects[$item[old eyebrow pencil]] = lookupEffect("Browbeaten");
+            }
         }
         if (__misc_state["need to level mysticality"])
         {
@@ -210,8 +216,11 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             item_effects[$item[resolution: be smarter]] = $effect[Brilliant Resolve];
             
             
-            item_descriptions[$item[old rosewater cream]] = "+2 mysticality stats/fight (25 turns)";
-            item_effects[$item[old rosewater cream]] = lookupEffect("Rosewater Mark");
+            if (!can_interact())
+            {
+                item_descriptions[$item[old rosewater cream]] = "+2 mysticality stats/fight (25 turns)";
+                item_effects[$item[old rosewater cream]] = lookupEffect("Rosewater Mark");
+            }
         }
         
         if (my_level() >= 11)
@@ -310,7 +319,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             curse_removal_method = "Relax in hot tub.";
             url = "clan_viplounge.php";
         }
-        if ($skill[Shake It Off].have_skill())
+        if ($skill[Shake It Off].skill_is_usable())
         {
             curse_removal_method = "Cast shake it off.";
             url = "skills.php";
@@ -365,6 +374,11 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         
         if (options.count() > 0)
             task_entries.listAppend(ChecklistEntryMake("__item fortune cookie", "", ChecklistSubentryMake(HTMLGenerateSpanFont("Learn semi-rare number", "red", ""), "", description), -11));
+    }
+    
+    if (__last_adventure_location == $location[a maze of sewer tunnels] && $item[hobo code binder].equipped_amount() == 0 && haveAtLeastXOfItemEverywhere($item[hobo code binder], 1))
+    {
+        task_entries.listAppend(ChecklistEntryMake("__item hobo code binder", "inventory.php?which=2", ChecklistSubentryMake(HTMLGenerateSpanFont("Equip hobo code binder", "red", ""), "", "Speeds up sewer tunnel exploration."), -11));
     }
     
 }

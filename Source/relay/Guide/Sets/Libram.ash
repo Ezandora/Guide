@@ -10,7 +10,7 @@ void SLibramGenerateResource(ChecklistEntry [int] available_resources_entries)
 		string [int] librams_usable;
 		foreach s in $skills[]
         {
-			if (s.libram && s.have_skill())
+			if (s.libram && s.skill_is_usable())
 				librams_usable.listAppend(s.to_string());
         }
 		if (libram_mp_cost <= my_maxmp() && librams_usable.count() > 0)
@@ -37,7 +37,7 @@ void SLibramGenerateResource(ChecklistEntry [int] available_resources_entries)
 		}
 		
 		
-		if ($skill[summon brickos].have_skill())
+		if ($skill[summon brickos].skill_is_usable())
 		{
 			if (get_property_int("_brickoEyeSummons") <3)
 			{

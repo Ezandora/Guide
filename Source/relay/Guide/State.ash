@@ -25,11 +25,57 @@ void setUpExampleState()
 }
 
 
+//We call this twice - once at the start, once after __quest_state["Level 13"] becomes available. I would just call it once but that could break things? (very old code)
+void computeFatLootTokens()
+{
+    int dd_tokens_and_keys_available = 0;
+    int tokens_needed = 0;
+    boolean need_boris_key = true;
+    boolean need_jarlsberg_key = true;
+    boolean need_sneaky_pete_key = true;
+    
+    if ($item[boris's key].available_amount() > 0)
+        need_boris_key = false;
+    if ($item[jarlsberg's key].available_amount() > 0)
+        need_jarlsberg_key = false;
+    if ($item[sneaky pete's key].available_amount() > 0)
+        need_sneaky_pete_key = false;
+    
+    if (__quest_state["Level 13"].state_boolean["past keys"])
+    {
+        need_boris_key = false;
+        need_jarlsberg_key = false;
+        need_sneaky_pete_key = false;
+    }
+    
+    if (need_boris_key)
+        tokens_needed += 1;
+    if (need_jarlsberg_key)
+        tokens_needed += 1;
+    if (need_sneaky_pete_key)
+        tokens_needed += 1;
+        
+    tokens_needed -= $item[fat loot token].available_amount();
+    tokens_needed = MAX(0, tokens_needed);
+    
+    dd_tokens_and_keys_available += $item[fat loot token].available_amount();
+    dd_tokens_and_keys_available += $item[boris's key].available_amount();
+    dd_tokens_and_keys_available += $item[jarlsberg's key].available_amount();
+    dd_tokens_and_keys_available += $item[sneaky pete's key].available_amount();
+
+    __misc_state_int["fat loot tokens needed"] = MAX(0, tokens_needed);
+    
+    __misc_state_int["DD Tokens and keys available"] = dd_tokens_and_keys_available;
+}
+
+
 void setUpState()
 {
 	__last_adventure_location = get_property_location("lastAdventure");
     
 	__misc_state["In aftercore"] = get_property_boolean("kingLiberated");
+    //if (get_property_int("lastKingLiberation") == my_ascensions() && my_ascensions() != 0)
+        //__misc_state["In aftercore"] = true;
 	__misc_state["In run"] = !__misc_state["In aftercore"];
     if (__misc_state["Example mode"])
         __misc_state["In run"] = true;
@@ -60,7 +106,7 @@ void setUpState()
 	__misc_state["fax available"] = fax_available;
     
     __misc_state["fax equivalent accessible"] = __misc_state["fax available"];
-    if (my_path_id() == PATH_HEAVY_RAINS && $skill[rain man].have_skill())
+    if (my_path_id() == PATH_HEAVY_RAINS && $skill[rain man].skill_is_usable())
         __misc_state["fax equivalent accessible"] = true;
 	
     if (__misc_state["VIP available"])
@@ -102,7 +148,7 @@ void setUpState()
 	{
 		if (!s.combat)
 			continue;
-		if (!s.have_skill())
+		if (!s.skill_is_usable())
 			continue;
 		if (s.class == $class[accordion thief] || s.class == $class[disco bandit])
 			__misc_state["have moxie class combat skill"] = true;
@@ -116,7 +162,7 @@ void setUpState()
 	
 	boolean yellow_ray_available = false;
 	string yellow_ray_source = "";
-	string yellow_ray_image_name = "";
+	string yellow_ray_image_name = "__effect everything looks yellow";
 	boolean yellow_ray_potentially_available = false;
     
     string [int] item_sources = split_string_alternate("4766,5229,6673,7013", ",");
@@ -131,6 +177,12 @@ void setUpState()
 		yellow_ray_image_name = "__item " + source.to_string();
     }
     
+    if (lookupFamiliar("Crimbo Shrub").familiar_is_usable() && get_property("shrubGifts") == "yellow" && !(my_daycount() == 1 && get_property("_shrubDecorated") == "false"))
+    {
+        yellow_ray_available = true;
+        yellow_ray_source = "Crimbo Shrub";
+        yellow_ray_image_name = "__item DNOTC Box"; //uncertain
+    }
 	if (familiar_is_usable($familiar[nanorhino]) && __misc_state["have moxie class combat skill"] && get_property_int("_nanorhinoCharge") == 100)
 	{
 		yellow_ray_available = true;
@@ -138,7 +190,7 @@ void setUpState()
 		yellow_ray_image_name = "nanorhino";
 		
 	}
-    if (lookupSkill("Ball Lightning").have_skill() && my_path_id() == PATH_HEAVY_RAINS && my_lightning() >= 5)
+    if (lookupSkill("Ball Lightning").skill_is_usable() && my_path_id() == PATH_HEAVY_RAINS && my_lightning() >= 5)
     {
         yellow_ray_available = true;
         yellow_ray_source = "Ball Lightning";
@@ -150,7 +202,7 @@ void setUpState()
 		yellow_ray_source = "He-Boulder";
 		yellow_ray_image_name = "he-boulder";
 	}
-    if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE && $skill[Flash Headlight].have_skill() && get_property("peteMotorbikeHeadlight") == "Ultrabright Yellow Bulb")
+    if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE && $skill[Flash Headlight].skill_is_usable() && get_property("peteMotorbikeHeadlight") == "Ultrabright Yellow Bulb")
     {
 		yellow_ray_available = true;
 		yellow_ray_source = "Flash Headlight";
@@ -183,6 +235,12 @@ void setUpState()
     __misc_state["can bartend for free"] = false;
     if (campground_items[$item[bartender-in-the-box]] > 0 || campground_items[$item[clockwork bartender-in-the-box]] > 0 || $effect[Inigo's Incantation of Inspiration].have_effect() >= 5)
         __misc_state["can bartend for free"] = true;
+    
+    if (lookupSkill("Rapid Prototyping").skill_is_usable() && get_property_int("_rapidPrototypingUsed") < 5)
+    {
+        __misc_state["can cook for free"] = true;
+        __misc_state["can bartend for free"] = true;
+    }
 	
 	boolean free_runs_usable = true;
 	if (my_path_id() == PATH_BIG)
@@ -198,7 +256,7 @@ void setUpState()
 	
 	
 	boolean free_runs_available = false;
-	if (familiar_is_usable($familiar[pair of stomping boots]) || (have_skill($skill[the ode to booze]) && familiar_is_usable($familiar[Frumious Bandersnatch])))
+	if (familiar_is_usable($familiar[pair of stomping boots]) || ($skill[the ode to booze].skill_is_usable() && familiar_is_usable($familiar[Frumious Bandersnatch])))
 		free_runs_available = true;
 	if ($item[goto].available_amount() > 0 || $item[tattered scrap of paper].available_amount() > 0)
 		free_runs_available = true;
@@ -213,7 +271,7 @@ void setUpState()
 		if ($item[bottle of Blank-Out].available_amount() > 0 || get_property_int("blankOutUsed") > 0)
 			free_runs_available = true;
 	}
-    if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE && mafiaIsPastRevision(13783) && $skill[Peel Out].have_skill())
+    if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE && mafiaIsPastRevision(13783) && $skill[Peel Out].skill_is_usable())
     {
         
         int total_free_peel_outs_available = 10;
@@ -223,7 +281,7 @@ void setUpState()
         if (free_peel_outs_available > 0)
             free_runs_available = true;
     }
-    if (my_path_id() == PATH_HEAVY_RAINS && lookupSkill("Lightning Strike").have_skill())
+    if (my_path_id() == PATH_HEAVY_RAINS && lookupSkill("Lightning Strike").skill_is_usable())
         free_runs_available = true;
 	if (!free_runs_usable)
 		free_runs_available = false;
@@ -232,7 +290,7 @@ void setUpState()
 	
 	string olfacted_monster = "";
 	boolean some_olfact_available = false;
-	if (have_skill($skill[Transcendent Olfaction]))
+	if ($skill[Transcendent Olfaction].skill_is_usable())
     {
 		some_olfact_available = true;
         if ($effect[on the trail].have_effect() > 0)
@@ -307,111 +365,19 @@ void setUpState()
 	
     //Calculate free rests available:
     int rests_used = get_property_int("timesRested");
-    int total_rests_available = 0;
+    int total_rests_available = total_free_rests();
     
-    if (false)
-    {
-        //total_rests_available = total_free_rests(); //for release 16.7
-    }
-    else
-    {
-        int [skill] rests_granted_by_skills;
-        rests_granted_by_skills[$skill[disco nap]] = 1;
-        rests_granted_by_skills[$skill[adventurer of leisure]] = 2;
-        rests_granted_by_skills[$skill[dog tired]] = 5;
-        rests_granted_by_skills[$skill[executive narcolepsy]] = 1;
-        rests_granted_by_skills[$skill[food coma]] = 10;
-        
-        if ($familiar[unconscious collective].have_familiar_replacement())
-            total_rests_available += 3;
-        
-        foreach s in rests_granted_by_skills
-        {
-            if (s.have_skill())
-                total_rests_available += rests_granted_by_skills[s];
-        }
-    }
     __misc_state_int["total free rests possible"] = total_rests_available;
 	__misc_state_int["free rests remaining"] = MAX(total_rests_available - rests_used, 0);
+    
 	
 	//monster.monster_initiative() is usually what you need, but just in case:
     __misc_state_float["init ML penalty"] = monsterExtraInitForML(monster_level_adjustment_ignoring_plants());
+
 	
-	
-	//tower items:
-	//telescope1 to telescope7
-	item [string] telescope_to_item_map;
-	telescope_to_item_map["an armchair"] = $item[pygmy pygment];
-	telescope_to_item_map["a cowardly-looking man"] = $item[wussiness potion];
-	telescope_to_item_map["a banana peel"] = $item[gremlin juice];
-	telescope_to_item_map["a coiled viper"] = $item[adder bladder];
-	telescope_to_item_map["a rose"] = $item[Angry Farmer candy];
-	telescope_to_item_map["a glum teenager"] = $item[thin black candle];
-	telescope_to_item_map["a hedgehog"] = $item[super-spiky hair gel];
-	telescope_to_item_map["a raven"] = $item[Black No. 2];
-	telescope_to_item_map["a smiling man smoking a pipe"] = $item[Mick's IcyVapoHotness Rub];
-	telescope_to_item_map["catch a glimpse of a flaming katana"] = $item[Frigid ninja stars];
-	telescope_to_item_map["catch a glimpse of a translucent wing"] = $item[Spider web];
-	telescope_to_item_map["see a fancy-looking tophat"] = $item[Sonar-in-a-biscuit];
-	telescope_to_item_map["see a flash of albumen"] = $item[Black pepper];
-	telescope_to_item_map["see a giant white ear"] = $item[Pygmy blowgun];
-	telescope_to_item_map["see a huge face made of Meat"] = $item[Meat vortex];
-	telescope_to_item_map["see a large cowboy hat"] = $item[Chaos butterfly];
-	telescope_to_item_map["see a periscope"] = $item[Photoprotoneutron torpedo];
-	telescope_to_item_map["see a slimy eyestalk"] = $item[Fancy bath salts];
-	telescope_to_item_map["see a strange shadow"] = $item[inkwell];
-	telescope_to_item_map["see moonlight reflecting off of what appears to be ice"] = $item[Hair spray];
-	telescope_to_item_map["see part of a tall wooden frame"] = $item[disease];
-	telescope_to_item_map["see some amber waves of grain"] = $item[bronzed locust];
-	telescope_to_item_map["see some long coattails"] = $item[Knob Goblin firecracker];
-	telescope_to_item_map["see some pipes with steam shooting out of them"] = $item[powdered organs];
-	telescope_to_item_map["see some sort of bronze figure holding a spatula"] = $item[leftovers of indeterminate origin];
-	telescope_to_item_map["see the neck of a huge bass guitar"] = $item[mariachi G-string];
-	telescope_to_item_map["see what appears to be the North Pole"] = $item[NG];
-	telescope_to_item_map["see what looks like a writing desk"] = $item[plot hole];
-	telescope_to_item_map["see the tip of a baseball bat"] = $item[baseball];
-	telescope_to_item_map["see what seems to be a giant cuticle"] = $item[razor-sharp can lid];
-	
-	telescope_to_item_map["see a formidable stinger"] = $item[tropical orchid];
-	telescope_to_item_map["see a wooden beam"] = $item[stick of dynamite];
-	telescope_to_item_map["see a pair of horns"] = $item[barbed-wire fence];
-	
-	
-	
-	__misc_state_string["Gate item"] = telescope_to_item_map[get_property("telescope1")];
-	__misc_state_string["Tower monster item 1"] = telescope_to_item_map[get_property("telescope2")];
-	__misc_state_string["Tower monster item 2"] = telescope_to_item_map[get_property("telescope3")];
-	__misc_state_string["Tower monster item 3"] = telescope_to_item_map[get_property("telescope4")];
-	__misc_state_string["Tower monster item 4"] = telescope_to_item_map[get_property("telescope5")];
-	__misc_state_string["Tower monster item 5"] = telescope_to_item_map[get_property("telescope6")];
-	__misc_state_string["Tower monster item 6"] = telescope_to_item_map[get_property("telescope7")];
-	
-	if (my_path_id() == PATH_BEES_HATE_YOU)
-	{
-		__misc_state_string["Tower monster item 1"] = "tropical orchid";
-		__misc_state_string["Tower monster item 2"] = "tropical orchid";
-		__misc_state_string["Tower monster item 3"] = "tropical orchid";
-		__misc_state_string["Tower monster item 4"] = "tropical orchid";
-		__misc_state_string["Tower monster item 5"] = "tropical orchid";
-		__misc_state_string["Tower monster item 6"] = "tropical orchid";
-	}
 	
 	int ngs_needed = 0;
-	if (__misc_state_string["Tower monster item 1"] == "NG")
-		ngs_needed += 1;
-	if (__misc_state_string["Tower monster item 2"] == "NG")
-		ngs_needed += 1;
-	if (__misc_state_string["Tower monster item 3"] == "NG")
-		ngs_needed += 1;
-	if (__misc_state_string["Tower monster item 4"] == "NG")
-		ngs_needed += 1;
-	if (__misc_state_string["Tower monster item 5"] == "NG")
-		ngs_needed += 1;
-	if (__misc_state_string["Tower monster item 6"] == "NG")
-		ngs_needed += 1;
 	
-	
-    
     //stats:
     
 	if (my_level() < 13 && !__misc_state["In aftercore"])
@@ -493,44 +459,7 @@ void setUpState()
 	__misc_state_int["original g needed"] = letters_needed["g"];
 	
 	
-	int dd_tokens_and_keys_available = 0;
-	int tokens_needed = 0;
-    boolean need_boris_key = true;
-    boolean need_jarlsberg_key = true;
-    boolean need_sneaky_pete_key = true;
-    
-    if ($items[fishbowl,boris's key,makeshift scuba gear,hosed fishbowl].available_amount() > 0)
-        need_boris_key = false;
-    if ($items[fishtank,jarlsberg's key,makeshift scuba gear,hosed tank].available_amount() > 0)
-        need_jarlsberg_key = false;
-    if ($items[fish hose,sneaky pete's key,makeshift scuba gear,hosed fishbowl,hosed tank].available_amount() > 0)
-        need_sneaky_pete_key = false;
-    
-    if (__quest_state["Level 13"].state_boolean["past keys"])
-    {
-        need_boris_key = false;
-        need_jarlsberg_key = false;
-        need_sneaky_pete_key = false;
-    }
-    
-    if (need_boris_key)
-        tokens_needed += 1;
-    if (need_jarlsberg_key)
-        tokens_needed += 1;
-    if (need_sneaky_pete_key)
-        tokens_needed += 1;
-        
-	tokens_needed -= $item[fat loot token].available_amount();
-    tokens_needed = MAX(0, tokens_needed);
-	
-	dd_tokens_and_keys_available += $item[fat loot token].available_amount();
-	dd_tokens_and_keys_available += $item[boris's key].available_amount();
-	dd_tokens_and_keys_available += $item[jarlsberg's key].available_amount();
-	dd_tokens_and_keys_available += $item[sneaky pete's key].available_amount();
-	
-	__misc_state_int["fat loot tokens needed"] = MAX(0, tokens_needed);
-	
-	__misc_state_int["DD Tokens and keys available"] = dd_tokens_and_keys_available;
+    computeFatLootTokens();
 	
 	boolean mysterious_island_unlocked = false;
 	if ($items[dingy dinghy, skeletal skiff, junk junk].available_amount() > 0)
@@ -577,7 +506,7 @@ void setUpState()
 	__misc_state_string["ballroom song"] = ballroom_song;
 	
 	__misc_state["Torso aware"] = false;
-    if ($skill[Torso Awaregness].have_skill() || $skill[Best Dressed].have_skill())
+    if ($skill[Torso Awaregness].skill_is_usable() || $skill[Best Dressed].skill_is_usable())
         __misc_state["Torso aware"] = true;
 	
 	int hipster_fights_used = get_property_int("_hipsterAdv");
@@ -686,7 +615,7 @@ void setUpState()
         {
             if ($skill[Brood].skill_is_usable())
                 minus_combat_source_count += 2;
-            if (mafiaIsPastRevision(13785) && get_property("peteMotorbikeMuffler") == "Extra-Quiet Muffler" && $skill[Rev Engine].have_skill())
+            if (mafiaIsPastRevision(13785) && get_property("peteMotorbikeMuffler") == "Extra-Quiet Muffler" && $skill[Rev Engine].skill_is_usable())
                 minus_combat_source_count += 3;
         }
         if (minus_combat_source_count >= 5)
@@ -697,6 +626,17 @@ void setUpState()
     {
         if (get_property_boolean(s + "AirportAlways") || get_property_boolean("_" + s + "AirportToday"))
             __misc_state[s + " airport available"] = true;
+    }
+    
+    
+    __misc_state_string["resting url"] = "campground.php";
+    __misc_state_string["resting description"] = "your campsite";
+    __misc_state["recommend resting at campsite"] = true;
+    if (get_property_boolean("chateauAvailable") && (__misc_state["need to level"] || $item[pantsgiving].available_amount() == 0))
+    {
+        __misc_state_string["resting url"] = "place.php?whichplace=chateau";
+        __misc_state_string["resting description"] = "Chateau Mantegna";
+        __misc_state["recommend resting at campsite"] = false;
     }
 }
 
@@ -743,6 +683,7 @@ void finalizeSetUpState()
 	{
 		PullsInit();
 	}
+    computeFatLootTokens();
 	
 	finalizeSetUpFloristState();
 }

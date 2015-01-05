@@ -1,6 +1,6 @@
 void SEventsCrimbo2014GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-    if (format_today_to_string("YYYY-MM") != "2014-12")
+    if (format_today_to_string("yyyy-MM") != "2014-12")
         return;
     
     //Crimbo 2014:
@@ -122,6 +122,7 @@ void SEventsCrimbo2014GenerateTasks(ChecklistEntry [int] task_entries, Checklist
         else if (lookupItem("flask of mining oil").available_amount() > 0)
         {
             subentry.entries.listAppend("Use flask of mining oil to acquire a mining/camp farming effect.");
+            subentry.entries.listAppend("Cylindrical molds stop dropping after around two hundred adventures in the area, per day.");
             url = "inventory.php?which=3";
         }
         else
@@ -136,9 +137,11 @@ void SEventsCrimbo2014GenerateTasks(ChecklistEntry [int] task_entries, Checklist
         {
             subentry.modifiers.listAppend("+item");
             string line = "Adventure in the Crimbonium Mining Camp";
-            if (loose_joints_effect.have_effect() > 0)
-                line += " for " + pluralizeWordy(loose_joints_effect.have_effect(), "more turn", "more turns");
-            line += ".";
+            if (loose_joints_effect.have_effect() >= 200)
+                line += " for a few hundred turns";
+            else if (loose_joints_effect.have_effect() > 0)
+                line += " for possibly " + pluralizeWordy(loose_joints_effect.have_effect(), "more turn", "more turns");
+            line += ".|Cylindrical molds stop dropping after around two hundred adventures in the area, per day.";
             subentry.entries.listPrepend(line);
             if (is_wearing_outfit("High-Radiation Mining Gear"))
                 subentry.entries.listAppend("You don't need to wear mining gear there.");

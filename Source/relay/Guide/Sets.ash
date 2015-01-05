@@ -34,6 +34,7 @@ void SetsGenerateResources(ChecklistEntry [int] available_resources_entries)
     SPlasticVampireFangsGenerateResource(available_resources_entries);
     SSpeakeasyGenerateResource(available_resources_entries);
     SHeavyRainsGenerateResource(available_resources_entries);
+    SBugbearInvasionGenerateResource(available_resources_entries);
     
 }
 
@@ -64,6 +65,7 @@ void SetsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 	SDNAGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SHeavyRainsGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SEventsGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+	SBugbearInvasionGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     
 }
 

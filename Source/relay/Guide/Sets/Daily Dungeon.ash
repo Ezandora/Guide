@@ -34,17 +34,17 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 		}
 		if (!__misc_state["skills temporarily missing"])
 		{
-			if (!have_skill($skill[singer's faithful ocelot]) && $item[Spellbook: Singer's Faithful Ocelot].available_amount() == 0)
+			if (!$skill[singer's faithful ocelot].skill_is_usable() && $item[Spellbook: Singer's Faithful Ocelot].available_amount() == 0)
 			{
 				daily_dungeon_aftercore_items_wanted.listAppend("Singer's faithful ocelot");
 				tokens_needed += 15;
 			}
-			if (!have_skill($skill[Drescher's Annoying Noise]) && $item[Spellbook: Drescher's Annoying Noise].available_amount() == 0)
+			if (!$skill[Drescher's Annoying Noise].skill_is_usable() && $item[Spellbook: Drescher's Annoying Noise].available_amount() == 0)
 			{
 				daily_dungeon_aftercore_items_wanted.listAppend("Drescher's Annoying Noise");
 				tokens_needed += 15;
 			}
-			if (!have_skill($skill[Walberg's Dim Bulb]) && $item[Spellbook: Walberg's Dim Bulb].available_amount() == 0)
+			if (!$skill[Walberg's Dim Bulb].skill_is_usable() && $item[Spellbook: Walberg's Dim Bulb].available_amount() == 0)
 			{
 				daily_dungeon_aftercore_items_wanted.listAppend("Walberg's Dim Bulb");
 				tokens_needed += 15;

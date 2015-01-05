@@ -45,8 +45,6 @@ void QGuildInit()
 
 void QGuildGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-    if ($classes[seal clubber,turtle tamer] contains my_class()) //untested, and tracking isn't available yet, so...
-        return;
 	QuestState base_quest_state = __quest_state["Guild"];
 	if (base_quest_state.finished)
 		return;
@@ -59,7 +57,6 @@ void QGuildGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     
     if (__misc_state["In run"])
     {
-    
         if ($classes[seal clubber,turtle tamer] contains my_class() && !mafiaIsPastRevision(14934)) //you always go here in ascension
             return;
         
@@ -67,7 +64,7 @@ void QGuildGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
             return;
         if ($classes[disco bandit,accordion thief] contains my_class() && $location[the sleazy back alley].turnsAttemptedInLocation() == 0)
             return;
-        if (!base_quest_state.started)
+        if (!base_quest_state.started && !($classes[seal clubber,turtle tamer] contains my_class()))
             return;
     }
 	

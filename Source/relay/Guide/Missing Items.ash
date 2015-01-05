@@ -38,45 +38,6 @@ void generateMissingItems(Checklist [int] checklists)
 	if (!__quest_state["Level 13"].state_boolean["past keys"])
 	{
 		//Key items:
-		if (!__quest_state["Level 13"].state_boolean["have relevant guitar"])
-		{
-			string [int] guitar_options;
-			guitar_options.listAppend("For gate mariachis");
-			if (__misc_state_int["pulls available"] > 0)
-				guitar_options.listAppend("Pull");
-			guitar_options.listAppend("Acoustic guitar - 20% drop, grungy pirate, belowdecks (4 monster location, yellow ray?)");
-			guitar_options.listAppend("Stone banjo - one clover");
-			guitar_options.listAppend("Massive sitar - hippy war store");
-			if (my_class() == $class[Turtle tamer])
-				guitar_options.listAppend("Dueling banjo - tame a turtle at whitey's grove");
-            guitar_options.listAppend("4-dimensional guitar - 5% drop, cubist bull, haunted gallery (yellow ray?)");
-				
-			items_needed_entries.listAppend(ChecklistEntryMake("__item Acoustic guitarrr", "", ChecklistSubentryMake("Guitar", "", guitar_options)));
-		}
-		
-		if (!__quest_state["Level 13"].state_boolean["have relevant accordion"])
-		{
-            string url = "store.php?whichstore=z";
-            string accordion_source = "Toy accordion, 150 meat";
-            if (my_path_id() == PATH_ZOMBIE_SLAYER)
-            {
-                accordion_source = "Stolen accordion, from chewing gum on a string";
-                url = "store.php?whichstore=m";
-            }
-			items_needed_entries.listAppend(ChecklistEntryMake("__item stolen accordion", url, ChecklistSubentryMake("Accordion", "", accordion_source)));
-		}
-		
-		if (!__quest_state["Level 13"].state_boolean["have relevant drum"])
-		{
-			string [int] suggestions;
-			suggestions.listAppend("Black kettle drum - run -combat in the black forest, choose Church->Orchestra Pit in the NC.");
-			if ($item[broken skull].available_amount() > 0)
-				suggestions.listAppend(HTMLGenerateSpanOfClass("Bone rattle (paste skeleton bone + broken skull)", "r_bold"));
-			suggestions.listAppend("Jungle drum (pygmy assault squad, hidden park, 10% drop)");
-			suggestions.listAppend("Hippy bongo (YR hippy)");
-			suggestions.listAppend("tambourine?");
-			items_needed_entries.listAppend(ChecklistEntryMake("__item hippy bongo", $location[the black forest].getClickableURLForLocation(), ChecklistSubentryMake("Drum", "", suggestions)));
-		}
 		
 		if ($item[skeleton key].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["past keys"])
 		{
@@ -139,221 +100,6 @@ void generateMissingItems(Checklist [int] checklists)
 		}
 	}
 	
-	//Tower items:
-	if (!__quest_state["Level 13"].state_boolean["past tower"])
-	{
-		string [item] telescope_item_suggestions;
-        
-        string [item] telescope_item_url;
-		
-		//FIXME support __misc_state["can use clovers"] for these
-		telescope_item_suggestions[$item[mick's icyvapohotness rub]] = "Raver giant, top floor of castle, 20%? drop";
-		telescope_item_suggestions[$item[leftovers of indeterminate origin]] = "Demonic icebox, haunted kitchen (5 monster location), 40% drop|Or clover haunted kitchen";
-		telescope_item_suggestions[$item[NG]] = "Clover castle basement";
-		telescope_item_suggestions[$item[adder bladder]] = "Black adder, black forest, 30% drop";
-		telescope_item_suggestions[$item[plot hole]] = "Possibility giant, castle ground floor, 20% drop";
-		telescope_item_suggestions[$item[chaos butterfly]] = "Possibility giant, castle ground floor, 20% drop";
-		telescope_item_suggestions[$item[pygmy pygment]] = "Pygmy assault squad, hidden park, 25% drop";
-		telescope_item_suggestions[$item[baseball]] = "Baseball bat, guano junction, 30% drop, 6 monsters (i.e. a lot)|Clover guano junction if you have any sonars-in-a-biscuit";
-		telescope_item_suggestions[$item[frigid ninja stars]] = "Any ninja, Lair of the Ninja Snowmen, 20% drop";
-		telescope_item_suggestions[$item[hair spray]] = "General store";
-		
-		telescope_item_suggestions[$item[spider web]] = "Spiders, sleazy back alley, 25% drop (2x)";
-		
-		
-		telescope_item_suggestions[$item[black pepper]] = "Black picnic basket, black widow, black forest, 15% drop.|46%? open success rate.|Possibly clover black forest for one basket.|Possibly zap ancient spice/dehydrated caviar for it.";
-		telescope_item_suggestions[$item[powdered organs]] = "Canopic jar, Tomb servant, Upper/Middle chamber, 30% drop.|~50% open success rate.";
-		
-		telescope_item_suggestions[$item[photoprotoneutron torpedo]] = "MagiMechTech MechaMech, fantasy airship, 30% drop";
-		
-		telescope_item_suggestions[$item[wussiness potion]] = "W imp, Dark Neck of the Woods/Pandamonium slums, 30% drop";
-		
-		telescope_item_suggestions[$item[gremlin juice]] = "Any gremlin, Junkyard, 3% drop (yellow ray)";
-		telescope_item_suggestions[$item[Angry Farmer candy]] = "Need sugar rush";
-		
-        if (gnomads_available())
-            telescope_item_suggestions[$item[Angry Farmer candy]] += "|*Marzipan skull, bought from Gno-Mart";
-		if (have_skill($skill[summon crimbo candy]))
-			telescope_item_suggestions[$item[Angry Farmer candy]] += "|*Summon crimbo candy";
-		else if (have_skill($skill[candyblast]))
-			telescope_item_suggestions[$item[Angry Farmer candy]] += "|*Cast candyblast";
-		else
-			telescope_item_suggestions[$item[Angry Farmer candy]] += "|*Raver giant, castle top floor, 25% drop"; //FIXME we need sugar rush, not angry farmer candy.
-		telescope_item_suggestions[$item[thin black candle]] = "Goth Giant, Castle Top Floor, 30% drop|Non-combat on top floor. (slow)";
-		telescope_item_suggestions[$item[super-spiky hair gel]] = "Protagonist, Penultimate Fantasy Airship, 20% drop";
-		telescope_item_suggestions[$item[Black No. 2]] = "Black panther, black forest, 20% drop";
-		telescope_item_suggestions[$item[Sonar-in-a-biscuit]] = "Bats, Batrat and Ratbat Burrow, 15% drop|Clover Guano Junction";
-		telescope_item_suggestions[$item[Pygmy blowgun]] = "Pygmy blowgunner, hidden park, 30% drop";
-		telescope_item_suggestions[$item[Meat vortex]] = "Me4t begZ0r, The Valley of Rof L'm Fao (7 monster location), 100% drop";
-		telescope_item_suggestions[$item[Fancy bath salts]] = "Claw-foot bathtub, haunted bathroom, 35% drop";
-		telescope_item_suggestions[$item[inkwell]] = "Writing desk, haunted library, 30% drop";
-		telescope_item_suggestions[$item[disease]] = "Knob Goblin Harem Girl, Harem, 10% drop (YR)";
-		if (locationAvailable($location[the "fun" house]))
-			telescope_item_suggestions[$item[disease]] += "|Disease-in-the-box, fun house (6 monsters), 40% drop";
-		telescope_item_suggestions[$item[bronzed locust]] = "Plaque of locusts, extra-dry desert, 20% drop";
-		telescope_item_suggestions[$item[Knob Goblin firecracker]] = "Sub-Assistant Knob Mad Scientist, Outskirts of Cobb's Knob, 100% drop";
-		telescope_item_suggestions[$item[mariachi G-string]] = "Irate mariachi, South of The Border, 30% drop (5 monster location, run +combat)";
-		telescope_item_suggestions[$item[razor-sharp can lid]] = "Can of asparagus/can of tomatoes, Haunted Pantry, 40%/45% drop|NC in haunted pantry";
-		
-		
-		
-		telescope_item_suggestions[$item[tropical orchid]] = "Tropical island souvenir crate (vacation)";
-		telescope_item_suggestions[$item[stick of dynamite]] = "Dude ranch souvenir crate (vacation)";
-		telescope_item_suggestions[$item[barbed-wire fence]] = "Ski resort souvenir crate (vacation)";
-        
-        
-        telescope_item_url[$item[razor-sharp can lid]] = $location[the haunted pantry].getClickableURLForLocation();
-        telescope_item_url[$item[spider web]] = $location[the sleazy back alley].getClickableURLForLocation();
-        telescope_item_url[$item[frigid ninja stars]] = $location[lair of the ninja snowmen].getClickableURLForLocation();
-        telescope_item_url[$item[hair spray]] = "store.php?whichstore=m";
-        telescope_item_url[$item[baseball]] = $location[guano junction].getClickableURLForLocation();
-        telescope_item_url[$item[sonar-in-a-biscuit]] = $location[the batrat and ratbat burrow].getClickableURLForLocation();
-        telescope_item_url[$item[NG]] = $location[the castle in the clouds in the sky (basement)].getClickableURLForLocation();
-        telescope_item_url[$item[disease]] = $location[cobb's knob harem].getClickableURLForLocation();
-        telescope_item_url[$item[photoprotoneutron torpedo]] = $location[the penultimate fantasy airship].getClickableURLForLocation();
-        telescope_item_url[$item[chaos butterfly]] = $location[the castle in the clouds in the sky (ground floor)].getClickableURLForLocation();
-        telescope_item_url[$item[leftovers of indeterminate origin]] = $location[the haunted kitchen].getClickableURLForLocation();
-        telescope_item_url[$item[powdered organs]] = $location[the upper chamber].getClickableURLForLocation();
-        telescope_item_url[$item[plot hole]] = $location[the castle in the clouds in the sky (ground floor)].getClickableURLForLocation();
-        telescope_item_url[$item[inkwell]] = $location[the haunted library].getClickableURLForLocation();
-        telescope_item_url[$item[Knob Goblin firecracker]] = $location[the outskirts of cobb's knob].getClickableURLForLocation();
-        telescope_item_url[$item[mariachi G-string]] = $location[south of the border].getClickableURLForLocation();
-        telescope_item_url[$item[pygmy blowgun]] = $location[the hidden park].getClickableURLForLocation();
-        telescope_item_url[$item[fancy bath salts]] = $location[the haunted bathroom].getClickableURLForLocation();
-        telescope_item_url[$item[black pepper]] = $location[the black forest].getClickableURLForLocation();
-        telescope_item_url[$item[bronzed locust]] = $location[the arid\, extra-dry desert].getClickableURLForLocation();
-        telescope_item_url[$item[meat vortex]] = $location[The valley of rof l'm fao].getClickableURLForLocation();
-        telescope_item_url[$item[barbed-wire fence]] = $location[The Shore\, Inc. Travel Agency].getClickableURLForLocation();
-        telescope_item_url[$item[stick of dynamite]] = $location[The Shore\, Inc. Travel Agency].getClickableURLForLocation();
-        telescope_item_url[$item[tropical orchid]] = $location[The Shore\, Inc. Travel Agency].getClickableURLForLocation();
-        if (__quest_state["Level 6"].finished)
-            telescope_item_url[$item[wussiness potion]] = $location[pandamonium slums].getClickableURLForLocation();
-        else
-            telescope_item_url[$item[wussiness potion]] = $location[The Dark Neck of the Woods].getClickableURLForLocation();
-        if (__quest_state["Level 12"].finished)
-            telescope_item_url[$item[gremlin juice]] = $location[post-war junkyard].getClickableURLForLocation();
-        else
-            telescope_item_url[$item[gremlin juice]] = $location[next to that barrel with something burning in it].getClickableURLForLocation();
-        if (gnomads_available())
-            telescope_item_url[$item[Angry Farmer candy]] = ""; //need the URL to gno-mart
-        else
-            telescope_item_url[$item[Angry Farmer candy]] = $location[the castle in the clouds in the sky (top floor)].getClickableURLForLocation();
-        telescope_item_url[$item[thin black candle]] = $location[the castle in the clouds in the sky (top floor)].getClickableURLForLocation();
-        telescope_item_url[$item[Mick's IcyVapoHotness Rub]] = $location[the castle in the clouds in the sky (basement)].getClickableURLForLocation();
-        telescope_item_url[$item[pygmy pygment]] = $location[the hidden park].getClickableURLForLocation();
-        telescope_item_url[$item[super-spiky hair gel]] = $location[the penultimate fantasy airship].getClickableURLForLocation();
-        telescope_item_url[$item[adder bladder]] = $location[the black forest].getClickableURLForLocation();
-        telescope_item_url[$item[Black No. 2]] = $location[the black forest].getClickableURLForLocation();
-        
-		
-		if (familiar_is_usable($familiar[gelatinous cubeling]))
-		{
-			foreach it in $items[knob goblin firecracker,razor-sharp can lid,spider web]
-			{
-				if (it == $item[none])
-					continue;
-				telescope_item_suggestions[it] += "|Or potentially bring along the gelatinous cubeling. (~18 turns)";
-			}
-		}
-		
-		QuestState ns13_quest = __quest_state["Level 13"];
-		
-		string [int] state_strings;
-		string [int] state_ns13_lookup_booleans;
-		if (!ns13_quest.state_boolean["past gates"])
-			state_strings.listAppend("Gate item");
-		state_ns13_lookup_booleans.listAppend("Past gate");
-        if (!__quest_state["Level 13"].state_boolean["past tower"])
-        {
-            for i from 1 to 6
-            {
-                if (__quest_state["Level 13"].mafia_internal_step > i + 4)
-                    continue;
-                state_strings.listAppend("Tower monster item " + i);
-                state_ns13_lookup_booleans.listAppend("Past tower monster " + i);
-            }
-        }
-        
-        //state_string["Tower monster item 1"] through 6
-        //state_boolean["Past tower monster 1"] through 6
-		
-		item [item][int] item_equivalents_lookup;
-		item_equivalents_lookup[$item[angry farmer candy]] = listMakeBlankItem();
-        foreach it in $items[that gum you like,Crimbo fudge,Crimbo peppermint bark,Crimbo candied pecan,cold hots candy,Daffy Taffy,Senior Mints,Wint-O-Fresh mint,stick of &quot;gum&quot;,pack of KWE trading card]
-            item_equivalents_lookup[$item[angry farmer candy]].listAppend(it);
-		
-		int [item] towergate_items_needed_count; //bees hate you has duplicates
-		foreach i in state_strings
-		{
-			if (ns13_quest.state_boolean[state_ns13_lookup_booleans[i]])
-				continue;
-			
-			item it = __misc_state_string[state_strings[i]].to_item();
-			
-			if (it == $item[none])
-			{
-				string subentry_string = "Or towerkill";
-				if (state_strings[i] == "Gate item")
-					subentry_string = "";
-				//unknown
-                //FIXME mention looking into your telescope on the first entry
-				items_needed_entries.listAppend(ChecklistEntryMake("Unknown", "", ChecklistSubentryMake("Unknown " + to_lower_case(state_strings[i]), "", subentry_string)));
-			}
-			else
-			{
-				int total_available_amount = it.available_amount() + closet_amount(it) - towergate_items_needed_count[it];
-				
-				if (item_equivalents_lookup[it].count() > 0)
-				{
-					foreach key in item_equivalents_lookup[it]
-					{
-						item it2 = item_equivalents_lookup[it][key];
-						total_available_amount += it2.available_amount() + closet_amount(it2);
-					}
-				}
-				if (total_available_amount <= 0)
-				{
-					string [int] details;
-					if (state_strings[i] == "Gate item")
-						details.listAppend("Gate item");
-					else
-						details.listAppend("Tower item - towerkill?");
-					if (telescope_item_suggestions contains it)
-						details.listAppend(telescope_item_suggestions[it]);
-                    string url = "";
-                    if (telescope_item_url contains it)
-                        url = telescope_item_url[it];
-                    
-					items_needed_entries.listAppend(ChecklistEntryMake(it, url, ChecklistSubentryMake(it, "", details)));
-				}
-				
-			}
-			towergate_items_needed_count[it] = towergate_items_needed_count[it] + 1;
-		}
-	}
-    
-    if (false) //gone, gone!
-    {
-        FloatHandle missing_weight;
-        string [int] familiar_weight_how;
-        string [int] familiar_weight_immediately_obtainable;
-        string [int] familiar_weight_missing_potentials;
-        boolean have_familiar_weight_for_tower = generateTowerFamiliarWeightMethod(familiar_weight_how, familiar_weight_immediately_obtainable, familiar_weight_missing_potentials,missing_weight);
-        if (!have_familiar_weight_for_tower)
-        {
-            string [int] description;
-            description.listAppend("For the sorceress's tower familiars.");
-            if (familiar_weight_how.count() > 0)
-                description.listAppend("Have " + familiar_weight_how.listJoinComponents(", ", "and") + ".");
-            if (familiar_weight_immediately_obtainable.count() > 0)
-                description.listAppend("Could use " + familiar_weight_immediately_obtainable.listJoinComponents(", ", "and") + ".");
-            if (familiar_weight_missing_potentials.count() > 0)
-                description.listAppend("Could acquire " + familiar_weight_missing_potentials.listJoinComponents(", ", "or") + ".");
-            
-            items_needed_entries.listAppend(ChecklistEntryMake("__familiar Sabre-Toothed Lime", "", ChecklistSubentryMake("+" + missing_weight.f.ceil() + " familiar weight buffs", "", description)));
-        }
-    }
-	
 	if ($item[lord spookyraven's spectacles].available_amount() == 0 && __quest_state["Level 11 Manor"].state_boolean["Can use fast route"] && !__quest_state["Level 11 Manor"].finished)
 		items_needed_entries.listAppend(ChecklistEntryMake("__item lord spookyraven's spectacles", $location[the haunted bedroom].getClickableURLForLocation(), ChecklistSubentryMake("lord spookyraven's spectacles", "", "Found in Haunted Bedroom")));
     
@@ -379,6 +125,55 @@ void generateMissingItems(Checklist [int] checklists)
         {
             items_needed_entries.listAppend(ChecklistEntryMake("__item " + camera, $location[the haunted bedroom].getClickableURLForLocation(), ChecklistSubentryMake("Disposable instant camera", "", "Found in the Haunted Bedroom.")));
         }
+    }
+    
+    if (lookupItem("electric boning knife").available_amount() == 0 && __quest_state["Level 13"].state_boolean["wall of bones will need to be defeated"])
+    {
+        items_needed_entries.listAppend(ChecklistEntryMake("__item electric boning knife", $location[the castle in the clouds in the sky (ground floor)].getClickableURLForLocation(), ChecklistSubentryMake("Electric boning knife", "-combat", listMake("Found from an NC on the ground floor of the castle in the clouds in the sky.", "Or towerkill."))));
+    }
+    if (lookupItem("beehive").available_amount() == 0 && __quest_state["Level 13"].state_boolean["wall of skin will need to be defeated"])
+    {
+        string [int] description;
+        
+        description.listAppend("Found from an NC in the black forest.");
+        
+        if (get_property_int("blackForestProgress") >= 1)
+            description.listAppend(listMake("Head toward the blackberry patch", "Head toward the buzzing sound", "Keep going", "Almost... there...").listJoinComponents(__html_right_arrow_character));
+        else
+            description.listAppend("Not available yet.");
+        description.listAppend("Or towerkill.");
+        
+        items_needed_entries.listAppend(ChecklistEntryMake("__item beehive", $location[the black forest].getClickableURLForLocation(), ChecklistSubentryMake("Beehive", "-combat", description)));
+    }
+    
+    if (!__quest_state["Level 13"].state_boolean["Init race completed"])
+    {
+        ChecklistSubentry subentry = ChecklistSubentryMake("Sources", "", "For the lair races.");
+        string [int] sources;
+        if (!__quest_state["Level 13"].state_boolean["Init race completed"])
+        {
+            subentry.modifiers.listAppend("+init");
+            sources.listAppend("init");
+            //subentries.listAppend(ChecklistSubentryMake("+init sources", "+init", "For the lair races."));
+        }
+        if (!__quest_state["Level 13"].state_boolean["Stat race completed"] && __quest_state["Level 13"].state_string["Stat race type"].length() > 0)
+        {
+            //
+            subentry.modifiers.listAppend("+" + __quest_state["Level 13"].state_string["Stat race type"]);
+            sources.listAppend(__quest_state["Level 13"].state_string["Stat race type"]);
+        }
+        if (!__quest_state["Level 13"].state_boolean["Elemental damage race completed"] && __quest_state["Level 13"].state_string["Elemental damage race type"].length() > 0)
+        {
+            //
+            string type = __quest_state["Level 13"].state_string["Elemental damage race type"];
+            string type_class = "r_element_" + type + "_desaturated";
+            subentry.modifiers.listAppend(HTMLGenerateSpanOfClass("+" + type + " damage", type_class));
+            subentry.modifiers.listAppend(HTMLGenerateSpanOfClass("+" + type + " spell damage", type_class));
+            sources.listAppend(type);
+        }
+        subentry.header = sources.listJoinComponents(", ", "and").capitalizeFirstLetter() + " sources";
+        if (subentry.modifiers.count() > 0)
+            items_needed_entries.listAppend(ChecklistEntryMake("__item vial of patchouli oil", "", subentry));
     }
                                
     SetsGenerateMissingItems(items_needed_entries);

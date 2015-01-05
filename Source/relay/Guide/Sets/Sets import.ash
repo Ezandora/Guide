@@ -36,3 +36,4 @@ import "relay/Guide/Sets/Plastic Vampire Fangs.ash";
 import "relay/Guide/Sets/Speakeasy.ash";
 import "relay/Guide/Sets/Heavy Rains.ash";
 import "relay/Guide/Sets/Events.ash";
+import "relay/Guide/Sets/Bugbear Invasion.ash";

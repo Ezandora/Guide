@@ -13,10 +13,10 @@ string [int] SCountersGenerateDescriptionForRainMonster()
     
     string [int] waterbending_skills_can_cast;
     
-    if (lookupEffect("Personal Thundercloud").have_effect() == 0 && lookupSkill("Thundercloud").have_skill())
+    if (lookupEffect("Personal Thundercloud").have_effect() == 0 && lookupSkill("Thundercloud").skill_is_usable())
         waterbending_skills_can_cast.listAppend("Thundercloud");
     
-    if (lookupEffect("The Rain In Loathing").have_effect() == 0 && lookupSkill("Rainy Day").have_skill())
+    if (lookupEffect("The Rain In Loathing").have_effect() == 0 && lookupSkill("Rainy Day").skill_is_usable())
         waterbending_skills_can_cast.listAppend("Rainy Day");
     
     int water_level_modifier = numeric_modifier("water level");

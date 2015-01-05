@@ -1,3 +1,16 @@
+string [int] SSkillsPotentialCraftingOptions()
+{
+    string [int] potential_options;
+    if ($item[knob cake].available_amount() == 0 && !__quest_state["Level 6"].finished)
+        potential_options.listAppend("knob cake");
+    if (__misc_state["can eat just about anything"])
+        potential_options.listAppend("food");
+    if (__misc_state["can drink just about anything"])
+        potential_options.listAppend("drink");
+    if ($skill[advanced saucecrafting].skill_is_usable())
+        potential_options.listAppend("sauceror potions");
+    return potential_options;
+}
 
 void SSkillsGenerateResource(ChecklistEntry [int] available_resources_entries)
 {
@@ -5,20 +18,18 @@ void SSkillsGenerateResource(ChecklistEntry [int] available_resources_entries)
 	if (skill_is_usable($skill[inigo's incantation of inspiration]))
 	{
 		int inigos_casts_remaining = 5 - get_property_int("_inigosCasts");
-		string description = "";
-		string [int] potential_options;
-		if ($item[knob cake].available_amount() == 0 && !__quest_state["Level 6"].finished)
-			potential_options.listAppend("knob cake");
-		if (__misc_state["can eat just about anything"])
-			potential_options.listAppend("food");
-		if (__misc_state["can drink just about anything"])
-			potential_options.listAppend("drink");
-		if (have_skill($skill[advanced saucecrafting]))
-			potential_options.listAppend("sauceror potions");
-		description = potential_options.listJoinComponents(", ").capitalizeFirstLetter();
+		string description = SSkillsPotentialCraftingOptions().listJoinComponents(", ").capitalizeFirstLetter();
 		if (inigos_casts_remaining > 0)
 			available_resources_entries.listAppend(ChecklistEntryMake("__effect Inigo's Incantation of Inspiration", "skills.php", ChecklistSubentryMake(pluralize(inigos_casts_remaining, "Inigo's cast", "Inigo's casts") + " remaining", "", description), 4));
 	}
+    if (lookupSkill("rapid prototyping").skill_is_usable())
+    {
+        int casts_remaining = clampi(5 - get_property_int("_rapidPrototypingUsed"), 0, 5);
+		string description = SSkillsPotentialCraftingOptions().listJoinComponents(", ").capitalizeFirstLetter();
+		if (casts_remaining > 0)
+			available_resources_entries.listAppend(ChecklistEntryMake("__item tenderizing hammer", "", ChecklistSubentryMake(pluralize(casts_remaining, "free craft", "free crafts") + " remaining", "", description), 4));
+        
+    }
 	ChecklistSubentry [int] subentries;
 	int importance = 11;
 	
@@ -118,7 +129,7 @@ void SSkillsGenerateResource(ChecklistEntry [int] available_resources_entries)
 		foreach key in property_summons_to_skills[property]
 		{
 			skill s = property_summons_to_skills[property][key];
-			if (!s.have_skill())
+			if (!s.skill_is_usable())
 				continue;
 				
 			string line = s.to_string();

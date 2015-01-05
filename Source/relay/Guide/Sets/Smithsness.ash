@@ -51,14 +51,14 @@ void smithsnessGenerateCoalSuggestions(string [int] coal_suggestions)
 			coal_item_suggestions[$item[Vicar's Tutu]] = coal_item_suggestions[$item[Vicar's Tutu]] + ", +3 PVP fights";
 	}
 	
-	if (have_skill($skill[pulverize]))
+	if ($skill[pulverize].skill_is_usable())
 		coal_suggestions.listAppend("Smash smithed weapon for more smithereens");
 	foreach it in coal_item_suggestions
 	{
 		int number_wanted_max = 1;
 		if (it.to_slot() == $slot[weapon] && it.weapon_hands() == 1)
 		{
-			if (have_skill($skill[double-fisted skull smashing]))
+			if ($skill[double-fisted skull smashing].skill_is_usable())
 				number_wanted_max += 1;
 			if (familiar_is_usable($familiar[disembodied hand]))
 				number_wanted_max += 1;

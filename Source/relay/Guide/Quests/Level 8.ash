@@ -67,7 +67,7 @@ void QLevel8GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 				subentry.modifiers.listAppend("olfact dairy goats");
 			
 				
-			if (have_skill($skill[Advanced Saucecrafting]) && fullness_limit() > 0 && __misc_state["can eat just about anything"] && my_path_id() != PATH_SLOW_AND_STEADY)
+			if ($skill[Advanced Saucecrafting].skill_is_usable() && fullness_limit() > 0 && __misc_state["can eat just about anything"] && my_path_id() != PATH_SLOW_AND_STEADY)
 				cheese_lines.listAppend("Have " + pluralize($item[glass of goat's milk]) + " for magnesium (20% drop)");
 		}
 		
@@ -103,13 +103,13 @@ void QLevel8GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 			if (my_path_id() == PATH_WAY_OF_THE_SURPRISING_FIST)
 			{
 				string have_skill_text = "";
-				if (!have_skill($skill[worldpunch]))
+				if (!skill_is_usable($skill[worldpunch]))
 					have_skill_text = " (you do not have this skill yet)";
 				potential_ore_sources.listAppend("Earthen Fist will allow mining." + have_skill_text);
 				need_outfit = false;
 			}
 			ore_lines.listAppend("Potential sources of ore:" + HTMLGenerateIndentedText(potential_ore_sources));
-			if (have_skill($skill[unaccompanied miner]))
+			if (skill_is_usable($skill[unaccompanied miner]))
 				ore_lines.listAppend("You can free mine. Consider splitting mining over several days for zero-adventure cost.");
 			if (need_outfit)
 			{

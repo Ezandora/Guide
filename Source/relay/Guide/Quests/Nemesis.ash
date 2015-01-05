@@ -75,7 +75,7 @@ void QNemesisInit()
             if (state.mafia_internal_step < 16 && $location[The Nemesis' Lair].turnsAttemptedInLocation() > 0)
                 state.mafia_internal_step = 16;
         }
-        if (state.mafia_internal_step < 16 && $skill[Gothy Handwave].have_skill())
+        if (state.mafia_internal_step < 16 && $skill[Gothy Handwave].skill_is_usable())
             state.mafia_internal_step = 16;
         if (state.mafia_internal_step < 16 && $items[Fouet de tortue-dressage,encoded cult documents,cult memo,spaghetti cult robe,hacienda key,bottle of G&uuml;-Gone].available_amount() > 0)
             state.mafia_internal_step = 16;
@@ -95,11 +95,11 @@ void QNemesisGenerateIslandTasks(ChecklistSubentry subentry)
     if (my_class() == $class[disco bandit])
     {
         skill [int] rave_skills_needed;
-        if (!$skill[Break It On Down].have_skill())
+        if (!$skill[Break It On Down].skill_is_usable())
             rave_skills_needed.listAppend($skill[Break It On Down]);
-        if (!$skill[Pop and Lock It].have_skill())
+        if (!$skill[Pop and Lock It].skill_is_usable())
             rave_skills_needed.listAppend($skill[Pop and Lock It]);
-        if (!$skill[Run Like the Wind].have_skill())
+        if (!$skill[Run Like the Wind].skill_is_usable())
             rave_skills_needed.listAppend($skill[Run Like the Wind]);
         
         monster [skill] rave_skills_to_monster;
@@ -108,7 +108,7 @@ void QNemesisGenerateIslandTasks(ChecklistSubentry subentry)
         rave_skills_to_monster[$skill[run like the wind]] = $monster[running man];
         
         boolean have_all_rave_skills = (rave_skills_needed.count() == 0);
-        if (!$skill[gothy handwave].have_skill())
+        if (!$skill[gothy handwave].skill_is_usable())
         {
             subentry.entries.listAppend("Talk to the girl in a black dress.");
         }
@@ -181,7 +181,7 @@ void QNemesisGenerateIslandTasks(ChecklistSubentry subentry)
             else
                 subentry.entries.listAppend("Enter the lair.");
         }
-        else if (my_thrall() == my_thrall())
+        else if (my_thrall() == $thrall[spaghetti elemental])
         {
             string [int] tasks;
             if ($thrall[spaghetti elemental].level <3)
@@ -192,13 +192,12 @@ void QNemesisGenerateIslandTasks(ChecklistSubentry subentry)
             
             subentry.entries.listAppend(tasks.listJoinComponents(", ", "then").capitalizeFirstLetter() + ".");
         }
-        else if ($skill[Bind Spaghetti Elemental].have_skill())
+        else if ($skill[Bind Spaghetti Elemental].skill_is_usable())
         {
             subentry.entries.listAppend("Cast Bind Spaghetti Elemental.");
         }
         else
         {
-            subentry.entries.listAppend("cult memos");
             if ($item[decoded cult documents].available_amount() > 0)
             {
                 subentry.entries.listAppend("Use decoded cult documents.");
@@ -211,7 +210,7 @@ void QNemesisGenerateIslandTasks(ChecklistSubentry subentry)
                 int missing_cult_memos = MAX(0, 5 - $item[cult memo].available_amount());
                 if (missing_cult_memos > 0)
                 {
-                    subentry.entries.listAppend("Acquire " + pluralize(missing_cult_memos, $item[cult memo]) + ".");
+                    subentry.entries.listAppend("Acquire " + pluralize(missing_cult_memos, $item[cult memo]) + " more from middle-managers.");
                 }
                 else if ($item[encoded cult documents].available_amount() > 0)
                 {
@@ -296,7 +295,7 @@ void QNemesisGenerateIslandTasks(ChecklistSubentry subentry)
     {
         //FIXME make this work
         subentry.entries.listAppend("Don't quite know how this works. Here, have some text borrowed from the wiki:");
-        subentry.entries.listAppend("Damage hellseal pups in combat to attract mother hellseals. If you kill the pups in one hit, the mother hellseals will never appear. Equip a club and kill mother hellseals using only weapon-based attacks to get 6 hellseal brains, 6 hellseal hides and 6 hellseal sinews. Do NOT use an attack familiar while fighting mother hellseals, or the bits you need will be ruined. (The Adorable Seal Larva you just received will not attack hellseals.)");
+        subentry.entries.listAppend("Damage hellseal pups in combat to attract mother hellseals. If you kill the pups in one hit, the mother hellseals will never appear. Equip a club and kill mother hellseals using only weapon-based attacks to get 6 hellseal brains, 6 hellseal hides and 6 hellseal sinews. Do NOT use an attack familiar while fighting mother hellseals, or the bits you need will be ruined.");
     }
 }
 
@@ -592,7 +591,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     if (legendary_epic_weapon.available_amount_ignoring_storage() > 0)
         have_legendary_epic_weapon = true;
         
-	if (!__misc_state["In aftercore"] && !have_legendary_epic_weapon)
+	if (!__misc_state["In aftercore"] && !have_legendary_epic_weapon && $location[the "fun" house].turns_spent == 0)
 		return;
         
         
@@ -604,7 +603,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     first_boss_name[$class[Disco Bandit]] = "The Spirit of New Wave";
     first_boss_name[$class[Accordion Thief]] = "Somerset Lopez, Dread Mariachi";
     
-    if (base_quest_state.mafia_internal_step <= 1)
+    if (base_quest_state.mafia_internal_step <= 1 && !have_epic_weapon)
     {
         //1	One of your guild leaders has tasked you to recover a mysterious and unnamed artifact stolen by your Nemesis. Your first step is to smith an Epic Weapon
         if (have_epic_weapon)
@@ -615,7 +614,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         else
             subentry.entries.listAppend("Acquire epic weapon. (" + epic_weapon + ")");
     }
-    else if (base_quest_state.mafia_internal_step == 2)
+    else if (base_quest_state.mafia_internal_step <= 2)
     {
         //2	To unlock the full power of the Legendary Epic Weapon, you must defeat Beelzebozo, the Clown Prince of Darkness,
         QNemesisGenerateClownTasks(subentry);
@@ -798,7 +797,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                     continue;
                 string line = s.to_string();
                 
-                if (!s.have_skill())
+                if (!s.skill_is_usable())
                     line = HTMLGenerateSpanFont(line, "grey", "");
                 
                 missing_saucespheres.listAppend(line);

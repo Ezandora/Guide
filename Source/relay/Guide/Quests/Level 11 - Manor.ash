@@ -36,6 +36,8 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
         boolean recipe_will_be_autoread = (mafiaIsPastRevision(14187) && ($item[lord spookyraven's spectacles].available_amount() > 0) && use_fast_route) && get_property_boolean("autoCraft");
         boolean recipe_was_autoread = (get_property("spookyravenRecipeUsed") == "with_glasses");
         //FIXME spectacles first?
+        if (!$location[the haunted ballroom].locationAvailable())
+            return;
         if (!$location[the haunted ballroom].noncombat_queue.contains_text("We'll All Be Flat") && base_quest_state.mafia_internal_step < 2)
         {
             url = "place.php?whichplace=manor2";

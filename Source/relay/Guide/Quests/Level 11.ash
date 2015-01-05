@@ -54,17 +54,23 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     ChecklistSubentry subentry;
     subentry.header = base_quest_state.quest_name;
     string url = "";
+    string image_name = base_quest_state.image_name;
     boolean make_entry_future = false;
+    
     if (base_quest_state.mafia_internal_step < 2)
     {
+        subentry.header = "Unlock the Black Market";
+        image_name = "Black Forest";
         //This needs better spading.
         //Side info: in the livestream, the flag [blackforestexplore] => 55 was visible, as well as [blackforestprogress] => 5
         
         //Unlock black market:
         url = "place.php?whichplace=woods";
         
-        subentry.modifiers.listAppend("+5% combat");
-        subentry.entries.listAppend("Unlock the black market by adventuring in the Black Forest with +5% combat.");
+        string combat_rate_string = "+5% combat";
+        
+        subentry.modifiers.listAppend(combat_rate_string);
+        subentry.entries.listAppend("Adventure in the Black Forest with " + combat_rate_string + ".");
         
         if ($item[blackberry galoshes].available_amount() > 0)
         {
@@ -130,16 +136,9 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
                 line += " Parts needed: " + missing_components.listJoinComponents(", ", "and");
             subentry.entries.listAppend(line);
         }
-        
-        if (!__quest_state["Level 13"].state_boolean["have relevant drum"])
+        if (get_property_int("blackForestProgress") >= 1 && __quest_state["Level 13"].state_boolean["wall of skin will need to be defeated"] && lookupItem("beehive").available_amount() == 0)
         {
-            boolean church_unlocked = (get_property_int("blackForestProgress") >= 4);
-            
-            string line = "Acquire a drum from the non-combat" + (church_unlocked ? "" : " once the church is unlocked") + ". (Church -> orchestra pit)";
-            if (!church_unlocked)
-                line = HTMLGenerateSpanFont(line, "gray", "");
-            
-            subentry.entries.listAppend(line);
+            subentry.entries.listAppend("Find a beehive for the tower, from the non-combat.|*" + listMake("Head toward the blackberry patch", "Head toward the buzzing sound", "Keep going", "Almost... there...").listJoinComponents(__html_right_arrow_character) + "|*Costs three turns. Skip if you're towerkilling.");
         }
     }
     else if (base_quest_state.mafia_internal_step < 3)
@@ -147,8 +146,10 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         //Vacation:
         if ($item[forged identification documents].available_amount() == 0)
         {
+            subentry.header = "Buy forged identification documents";
+            image_name = "__item forged identification documents";
             url = "shop.php?whichshop=blackmarket";
-            subentry.entries.listAppend("Buy forged identification documents from the black market.");
+            subentry.entries.listAppend("From the black market");
             if ($item[can of black paint].available_amount() == 0)
                 subentry.entries.listAppend("Also buy a can of black paint while you're there, for the desert quest.");
         }
@@ -156,12 +157,17 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         {
             if (CounterLookup("Semi-rare").CounterWillHitExactlyInTurnRange(0,2))
             {
-                subentry.entries.listAppend(HTMLGenerateSpanFont("Avoid vacationing; will override semi-rare.", "red", ""));
+                image_name = "__item fortune cookie";
+                subentry.header = HTMLGenerateSpanFont("Avoid vacationing at the shore", "red", "");
+                subentry.entries.listAppend("Will override semi-rare.");
+                //subentry.entries.listAppend(HTMLGenerateSpanFont("Avoid vacationing; will override semi-rare.", "red", ""));
             }
             else
             {
                 url = "place.php?whichplace=desertbeach";
-                subentry.entries.listAppend("Vacation at the shore, read diary.");
+                subentry.header = "Vacation at the shore";
+                image_name = "__item your father's MacGuffin diary";
+                subentry.entries.listAppend("To acquire your father's diary.");
             }
         }
     }
@@ -181,9 +187,9 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         }
     }
     if (make_entry_future)
-        future_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the black forest]));
+        future_task_entries.listAppend(ChecklistEntryMake(image_name, url, subentry, $locations[the black forest]));
     else
-        task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the black forest]));
+        task_entries.listAppend(ChecklistEntryMake(image_name, url, subentry, $locations[the black forest]));
 }
 
 void QLevel11GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)

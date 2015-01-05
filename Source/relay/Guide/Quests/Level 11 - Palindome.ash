@@ -50,13 +50,6 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
             {
                 subentry.modifiers.listAppend("olfact gaudy pirate");
                 string line = "Olfact/copy gaudy pirate belowdecks";
-                if (!__quest_state["Level 13"].state_boolean["have relevant guitar"])
-                {
-                    line += ", and possibly run +400% item to find a guitar";
-                    subentry.modifiers.listAppend("+400% item");
-                    if ($familiar[slimeling].familiar_is_usable())
-                        subentry.modifiers.listAppend("slimeling?");
-                }
                 line += ".";
                 subentry.entries.listAppend(line);
             }

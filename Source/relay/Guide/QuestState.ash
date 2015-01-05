@@ -136,17 +136,7 @@ void QuestStateParseMafiaQuestProperty(QuestState state, string property_name)
 
 boolean needTowerMonsterItem(string in_item_name)
 {
-	if (in_item_name.to_item().available_amount() > 0)
-		return false;
-	for i from 1 to 6
-	{
-		string item_name = __misc_state_string["Tower monster item " + i];
-		if (__quest_state["Level 13"].state_boolean["Past tower monster " + i])
-			continue;
-		if (in_item_name == item_name)
-			return true;
-	}
-	return false;		
+    return false;
 }
 
 QuestState QuestState(string property_name)

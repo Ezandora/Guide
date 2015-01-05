@@ -66,20 +66,8 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
             }
         }
         
-        
-        //quantum mechanic
-        if (!__quest_state["Level 13"].state_boolean["past gates"] && !(__misc_state["dungeons of doom unlocked"]) && __misc_state["can use clovers"] && $item[Blessed large box].available_amount() == 0 && $item[large box].available_amount() == 0 && in_hardcore())
-        {
-            string fax = "";			
-            fax += ChecklistGenerateModifierSpan("+150% item, clover with result, 3 drunkenness.");
-            fax += "Blessed large box. (skips opening dungeons of doom for NS gate)";
-        
-            fax = "quantum mechanic" + HTMLGenerateIndentedText(fax);
-            potential_faxes.listAppend(fax);
-        }
-        
         int missing_ore = MAX(0, 3 - __quest_state["Level 8"].state_string["ore needed"].to_item().available_amount());
-        if (!__quest_state["Level 8"].state_boolean["Past mine"] && missing_ore > 0 && !$skill[unaccompanied miner].have_skill())
+        if (!__quest_state["Level 8"].state_boolean["Past mine"] && missing_ore > 0 && !$skill[unaccompanied miner].skill_is_usable())
         {
             string fax = "";			
             fax += ChecklistGenerateModifierSpan("+150% item or more");
@@ -128,7 +116,6 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
             if (!locationAvailable($location[the hidden park]) && ($item[stone wool].available_amount()) < (2 - MIN(1, $item[the nostril of the serpent].available_amount())))
                 potential_faxes.listAppend("Baa'baa'bu'ran - Stone wool for hidden city unlock. Need +100% items (or as much as you can get for extra wool)");
         }
-        //sorceress tower/gate item monsters (so many, list them all)
         
         if (!familiar_is_usable($familiar[angry jung man]) && in_hardcore())
         {
@@ -161,7 +148,7 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
             potential_faxes.listAppend(line);
         }
         
-        if (!in_hardcore() && $item[richard's star key].available_amount() + $item[richard's star key].creatable_amount() == 0 && !__quest_state["Level 13"].state_boolean["past gates"])
+        if (!in_hardcore() && $item[richard's star key].available_amount() + $item[richard's star key].creatable_amount() == 0 && !__quest_state["Level 13"].state_boolean["past keys"])
         {
             string copy_type = "arrow";
             if (my_path_id() == PATH_HEAVY_RAINS) //arrows mean washaway in flooded areas
@@ -291,7 +278,6 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
             //brainsweeper for chef-in-the-box / bartender-in-the-box?
             //gremlins?
             
-            //FIXME gate items?
             //FIXME handsome mariachi/etc?
         }
     }
@@ -321,7 +307,7 @@ void SFaxGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
     
 	if (__misc_state["fax available"] && $item[photocopied monster].available_amount() == 0)
         optional_task_entries.listAppend(ChecklistEntryMake("fax machine", url, ChecklistSubentryMake("Fax", "", listJoinComponents(SFaxGeneratePotentialFaxes(false), "<hr>"))));
-    if (lookupSkill("Rain Man").have_skill() && my_rain() >= 50)
+    if (lookupSkill("Rain Man").skill_is_usable() && my_rain() >= 50)
     {
         ChecklistEntry entry = ChecklistEntryMake("__skill rain man", "skills.php", ChecklistSubentryMake("Rain man copy", "50 rain drops", listJoinComponents(SFaxGeneratePotentialFaxes(true), "<hr>")));
         

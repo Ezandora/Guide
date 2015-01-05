@@ -269,7 +269,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 {
                     subentry.entries.listAppend("Need three more curses." + curse_details);
                 }
-                if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE && $skill[Shake it off].have_skill())
+                if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE && $skill[Shake it off].skill_is_usable())
                     subentry.entries.listAppend(HTMLGenerateSpanFont("Avoid using Shake It Off to heal", "red", "") + ", it'll remove the curse.");
         
                 if (__misc_state["have hipster"])
@@ -502,7 +502,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                         if (apartment_progress < 8)
                             tavern_provides.listAppend("Curses for hidden apartment.");
                         int adventures_given = 15;
-                        if (have_skill($skill[the ode to booze]))
+                        if ($skill[the ode to booze].skill_is_usable())
                             adventures_given += 6;
                         
                         if (my_path_id() != PATH_SLOW_AND_STEADY)

@@ -451,8 +451,6 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         
         if (inebriety_limit() > 0)
         {
-            //Drunkenness's effect is currently unknown FIXME
-            //(last checked, it had zero effect on the listed pool skill, but they may have changed that or it's a hidden modifier ooOoOo)
             int desired_drunkenness = MIN(inebriety_limit(), 10);
             if (missing_pool_skill > 0)
             {

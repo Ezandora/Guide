@@ -22,17 +22,27 @@ void QHitsInit()
     state.image_name = "Hole in the Sky";
     
     
-    state.state_boolean["Need starfish"] = true;
-	
-    if ($familiar[star starfish].have_familiar_replacement() || __misc_state["familiars temporarily blocked"] || my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_PICKY)
-        state.state_boolean["Need starfish"] = false;
-	
+    int charts_want = 0;
+    int stars_want = 0;
+    int lines_want = 0;
     
-    if (__quest_state["Level 13"].state_boolean["past keys"])
+	if ($item[richard's star key].available_amount() == 0)
     {
-        state.state_boolean["Need starfish"] = false;
+		charts_want += 1;
+		stars_want += 8;
+		lines_want += 7;
     }
-    //FIXME rest
+    
+    if (!HITSStillRelevant())
+    {
+        charts_want = 0;
+        stars_want = 0;
+        lines_want = 0;
+    }
+    
+    state.state_int["star charts needed"] = MAX(0, charts_want - $item[star chart].available_amount());
+    state.state_int["stars needed"] = MAX(0, stars_want - $item[star].available_amount());
+    state.state_int["lines needed"] = MAX(0, lines_want - $item[line].available_amount());
     
 	__quest_state["Hole in the Sky"] = state;
 }
@@ -47,6 +57,7 @@ void QHitsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] 
 	
     string active_url = "";
     //Super unclear code. Sorry.
+    //FIXME rewrite now that we don't need equipment
     
     int star_charts_needed = 0;
     int stars_needed_base = 0;
@@ -61,43 +72,9 @@ void QHitsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] 
 		lines_needed_base += 7;
 		item_names_needed.listAppend($item[richard's star key]);
 	}
-	if ($item[star hat].available_amount() == 0)
-	{
-		star_charts_needed += 1;
-		stars_needed_base += 5;
-		lines_needed_base += 3;
-		item_names_needed.listAppend($item[star hat]);
-	}
-	if (__quest_state["Hole in the Sky"].state_boolean["Need starfish"])
-	{
-		star_charts_needed += 1;
-		stars_needed_base += 6;
-		lines_needed_base += 4;
-		item_names_needed.listAppend($item[star starfish]);
-	}
     int [int] stars_needed_options;
     int [int] lines_needed_options;
     string [int] needed_options_names;
-	if (__misc_state["can equip just about any weapon"])
-	{
-		if ($item[Star crossbow].available_amount() == 0 && $item[Star staff].available_amount() == 0 && $item[Star sword].available_amount() == 0)
-		{
-			star_charts_needed += 1;
-			//Three paths:
-			stars_needed_options.listAppend(stars_needed_base + 5);
-			lines_needed_options.listAppend(lines_needed_base + 6);
-			needed_options_names.listAppend("star crossbow");
-			
-			stars_needed_options.listAppend(stars_needed_base + 6);
-			lines_needed_options.listAppend(lines_needed_base + 5);
-			needed_options_names.listAppend("star staff");
-			
-			stars_needed_options.listAppend(stars_needed_base + 7);
-			lines_needed_options.listAppend(lines_needed_base + 4);
-			needed_options_names.listAppend("star sword");
-			
-		}
-	}
 	if (needed_options_names.count() == 0)
 	{
 		stars_needed_options.listAppend(stars_needed_base + 0);
@@ -202,23 +179,28 @@ void QHitsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] 
 		}
 		if (required_components.count() > 0)
 		{
+            if (star_charts_remaining == 1 && have_met_stars_requirement && have_met_lines_requirement && !in_hardcore())
+            {
+                subentry.entries.listAppend("Can pull a star chart.");
+            }
 			//require more components:
 			if (remaining_options_names.count() <= 1)
 				subentry.entries.listAppend("Need " + required_components.listJoinComponents(", ", ""));
 			else
 				subentry.entries.listAppend("Need:|*" + required_components.listJoinComponents("|*", "or"));
-			
-			if (star_charts_remaining > 1)
-			{
-				subentry.entries.listAppend("Olfact astronomers.");
-			}
-			else if (star_charts_remaining == 0) //no need for astronomers
-			{
-				if (my_ascensions() % 2 == 0)
-					subentry.entries.listAppend("Olfact skinflute.");
-				else
-					subentry.entries.listAppend("Olfact camel's toe.");
-			}
+        
+            //FIXME if we need only one type, recommend a different monster to olfact
+            
+            if (star_charts_remaining > 0 && in_hardcore())
+            {
+                //olfact nothing, interferes with astronomers
+                //they prefer interferometry
+            }
+            else if (my_ascensions() % 2 == 0)
+                subentry.entries.listAppend("Olfact skinflute.");
+            else
+                subentry.entries.listAppend("Olfact camel's toe.");
+            
 			if (!have_met_stars_requirement || !have_met_lines_requirement)
 				subentry.modifiers.listAppend("+234% item");
 		}
@@ -247,37 +229,5 @@ void QHitsGenerateMissingItems(ChecklistEntry [int] items_needed_entries)
 		oh_my_stars_and_gauze_garters.listAppend($item[star].available_amount() + "/8 stars");
 		oh_my_stars_and_gauze_garters.listAppend($item[line].available_amount() + "/7 lines");
 		items_needed_entries.listAppend(ChecklistEntryMake("__item richard's star key", url, ChecklistSubentryMake("Richard's star key", "", oh_my_stars_and_gauze_garters.listJoinComponents(", ", "and"))));
-	}
-	
-	if ($item[star hat].available_amount() == 0)
-	{
-		string [int] oh_my_stars_and_gauze_garters;
-		oh_my_stars_and_gauze_garters.listAppend($item[star chart].available_amount() + "/1 star chart");
-		oh_my_stars_and_gauze_garters.listAppend($item[star].available_amount() + "/5 stars");
-		oh_my_stars_and_gauze_garters.listAppend($item[line].available_amount() + "/3 lines");
-		items_needed_entries.listAppend(ChecklistEntryMake("__item star hat", url, ChecklistSubentryMake("Star hat", "", oh_my_stars_and_gauze_garters.listJoinComponents(", ", "and"))));
-	}
-	if ($item[star crossbow].available_amount() + $item[star staff].available_amount() + $item[star sword].available_amount() == 0)
-	{
-		string [int] oh_my_stars_and_gauze_garters;
-		oh_my_stars_and_gauze_garters.listAppend($item[star chart].available_amount() + "/1 star chart");
-		oh_my_stars_and_gauze_garters.listAppend($item[star].available_amount() + "/[5, 6, or 7] stars");
-		oh_my_stars_and_gauze_garters.listAppend($item[line].available_amount() + "/[6, 5, or 4] lines");
-		items_needed_entries.listAppend(ChecklistEntryMake("__item star crossbow", url, ChecklistSubentryMake("Star crossbow, staff, or sword", "", oh_my_stars_and_gauze_garters.listJoinComponents(", ", "and"))));
-	}
-	if (__quest_state["Hole in the Sky"].state_boolean["Need starfish"])
-	{
-		if ($item[star starfish].available_amount() > 0)
-		{
-			items_needed_entries.listAppend(ChecklistEntryMake("__item star starfish", url, ChecklistSubentryMake("Star starfish", "", "You have one, use it.")));
-		}
-		else
-		{
-			string [int] oh_my_stars_and_gauze_garters;
-			oh_my_stars_and_gauze_garters.listAppend($item[star chart].available_amount() + "/1 star chart");
-			oh_my_stars_and_gauze_garters.listAppend($item[star].available_amount() + "/6 stars");
-			oh_my_stars_and_gauze_garters.listAppend($item[line].available_amount() + "/4 lines");
-			items_needed_entries.listAppend(ChecklistEntryMake("__item star starfish", url, ChecklistSubentryMake("Star starfish", "", oh_my_stars_and_gauze_garters.listJoinComponents(", ", "and"))));
-		}
 	}
 }

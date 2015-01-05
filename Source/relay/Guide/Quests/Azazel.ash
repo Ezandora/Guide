@@ -62,7 +62,7 @@ void QAzazelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		return;
     
     
-    if ($skill[Stomach of Steel].have_skill() || $skill[Liver of Steel].have_skill() || $skill[Spleen of Steel].have_skill())
+    if ($skill[Stomach of Steel].skill_is_usable() || $skill[Liver of Steel].skill_is_usable() || $skill[Spleen of Steel].skill_is_usable())
         return;
     
     

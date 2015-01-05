@@ -40,7 +40,7 @@ void pulverizeAlterOutputList(string [int] output_list)
 }
 void SPulverizeGenerateResource(ChecklistEntry [int] available_resources_entries)
 {
-    if (!$skill[pulverize].have_skill())
+    if (!$skill[pulverize].skill_is_usable())
         return;
     if (!in_ronin()) //list is far too long with your main inventory, and you can buy wads at this point
         return;
@@ -95,8 +95,6 @@ void SPulverizeGenerateResource(ChecklistEntry [int] available_resources_entries
     
     string blacklist_string = "fireman's helmet,fire axe,enchanted fire extinguisher,fire hose,rainbow pearl earring,rainbow pearl necklace,rainbow pearl ring,steaming evil,ring of detect boring doors,giant discarded torn-up glove,giant discarded plastic fork,giant discarded bottlecap,toy ray gun,toy space helmet,toy jet pack,MagiMechTech NanoMechaMech,astronaut pants,ancient hot dog wrapper";
     
-    if (!__quest_state["Level 13"].state_boolean["past keys"])
-        blacklist_string += ",Tambourine,jungle drum,hippy bongo,bone rattle,black kettle drum,big bass drum";
     if (!__quest_state["Level 12"].finished)
         blacklist_string += ",reinforced beaded headband,bullet-proof corduroys,round purple sunglasses,beer helmet,distressed denim pants,bejeweled pledge pin";
     if (!__quest_state["Level 11 Hidden City"].state_boolean["Hospital finished"])
@@ -162,7 +160,7 @@ void SPulverizeGenerateResource(ChecklistEntry [int] available_resources_entries
         details.listAppend("Can smash " + spleen_wad_output_list.listJoinComponents(" ", "and").capitalizeFirstLetter() + " for spleen wads.");
     
     
-    if (($classes[sauceror,pastamancer] contains my_class()) && guild_store_available() && $skill[Transcendental Noodlecraft].have_skill() && $skill[The Way of Sauce].have_skill()) //can make hi mein?
+    if (($classes[sauceror,pastamancer] contains my_class()) && guild_store_available() && $skill[Transcendental Noodlecraft].skill_is_usable() && $skill[The Way of Sauce].skill_is_usable()) //can make hi mein?
     {
         string [int] elemental_nuggets_list;
         

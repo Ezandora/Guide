@@ -335,8 +335,8 @@ void QSpookyAirportJunglePunGenerateTasks(ChecklistEntry [int] task_entries)
     int puns_remaining = 11 - get_property_int("junglePuns");
     if (state.mafia_internal_step <= 2 && puns_remaining > 0)
     {
-        subentry.entries.listAppend("Adventure in the The Deep Dark Jungle.");
-        subentry.modifiers.listAppend("+myst?");
+        subentry.entries.listAppend("Adventure in The Deep Dark Jungle.");
+        subentry.modifiers.listAppend("+myst");
         
         string [int] items_to_equip;
         if (recorder.equipped_amount() == 0)
@@ -377,7 +377,11 @@ void QSpookyAirportFakeMediumGenerateTasks(ChecklistEntry [int] task_entries)
     
     if (state.mafia_internal_step == 1 && collar.available_amount() == 0)
     {
-        subentry.entries.listAppend("Adventure in the The Secret Government Laboratory, find a non-combat every twenty turns.");
+        subentry.entries.listAppend("Adventure in The Secret Government Laboratory, find a non-combat every twenty turns.");
+		if (__misc_state["free runs available"])
+			subentry.modifiers.listAppend("free runs");
+		if (__misc_state["have hipster"])
+			subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
         
         string [int,int] solutions;
         
@@ -431,7 +435,7 @@ void QSpookyAirportClipperGenerateTasks(ChecklistEntry [int] task_entries)
     int fingernails_remaining = 23 - get_property_int("fingernailsClipped");
     if (state.mafia_internal_step == 1 && fingernails_remaining > 0)
     {
-        subentry.entries.listAppend("Adventure in the The Mansion of Dr. Weirdeaux, use the military-grade fingernail clippers on the monsters three times per fight.");
+        subentry.entries.listAppend("Adventure in The Mansion of Dr. Weirdeaux, use the military-grade fingernail clippers on the monsters three times per fight.");
         
         int turns_remaining = ceil(fingernails_remaining.to_float() / 3.0);
         
@@ -442,6 +446,80 @@ void QSpookyAirportClipperGenerateTasks(ChecklistEntry [int] task_entries)
     
 	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, lookupLocations("The Mansion of Dr. Weirdeaux")));
 }
+
+void QSpookyAirportEveGenerateTasks(ChecklistEntry [int] task_entries)
+{
+    QuestState state;
+    state.image_name = "__item vial of patchouli oil"; //science lab
+    state.quest_name = "Choking on the Rind";
+	QuestStateParseMafiaQuestProperty(state, "questESpEVE");
+    
+    if (!state.in_progress)
+        return;
+    
+	ChecklistSubentry subentry;
+	
+	subentry.header = state.quest_name;
+	string url = "place.php?whichplace=airport_spooky";
+    
+    
+    if (state.mafia_internal_step < 2)
+    {
+        subentry.entries.listAppend("Adventure in The Secret Government Laboratory for twenty turns.|At the choice adventure, choose " + listMake("Left", "Left", "Right", "Left", "Right").listJoinComponents(__html_right_arrow_character) + ".");
+		if (__misc_state["free runs available"])
+			subentry.modifiers.listAppend("free runs");
+		if (__misc_state["have hipster"])
+			subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
+        string [int] items_to_equip;
+        if (lookupItem("Personal Ventilation Unit").equipped_amount() == 0 && lookupItem("Personal Ventilation Unit").available_amount() > 0)
+        {
+            items_to_equip.listAppend("Personal Ventilation Unit");
+        }
+        if (items_to_equip.count() > 0)
+        {
+            subentry.entries.listAppend(HTMLGenerateSpanFont("Equip the " + items_to_equip.listJoinComponents(", ", "and") + ".", "red", ""));
+            url = "inventory.php?which=2";
+        }
+    }
+    else
+        subentry.entries.listAppend("Return to the radio and reply.");
+	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, lookupLocations("The Secret Government Laboratory")));
+}
+
+
+
+void QSpookyAirportSmokesGenerateTasks(ChecklistEntry [int] task_entries)
+{
+    QuestState state;
+    state.image_name = "__item pack of smokes";
+    state.quest_name = "Everyone's Running Out of Smokes";
+	QuestStateParseMafiaQuestProperty(state, "questESpSmokes");
+    
+    if (!state.in_progress)
+        return;
+    
+	ChecklistSubentry subentry;
+	
+	subentry.header = state.quest_name;
+	string url = "place.php?whichplace=airport_spooky";
+    
+    item smokes = lookupItem("pack of smokes");
+    
+    if (state.mafia_internal_step < 2 && smokes.available_amount() < 10)
+    {
+        subentry.entries.listAppend("Adventure in The Deep Dark Jungle and collect smokes from the smoke monster.");
+        subentry.modifiers.listAppend("olfact smoke monster");
+        
+        if (smokes != $item[none])
+        {
+            subentry.entries.listAppend(pluralizeWordy(clampi(10 - smokes.available_amount(), 0, 10), "more pack of smokes", "more packs of smokes").capitalizeFirstLetter() + " remaining.");
+        }
+    }
+    else
+        subentry.entries.listAppend("Return to the radio and reply.");
+	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, lookupLocations("The Deep Dark Jungle")));
+}
+
 
 void QSpookyAirportGoreGenerateTasks(ChecklistEntry [int] task_entries)
 {
@@ -466,7 +544,7 @@ void QSpookyAirportGoreGenerateTasks(ChecklistEntry [int] task_entries)
     int gore_remaining = 100 - get_property_int("goreCollected");
     if (state.mafia_internal_step <= 2 && gore_remaining > 0)
     {
-        subentry.entries.listAppend("Adventure in the The Secret Government Laboratory.");
+        subentry.entries.listAppend("Adventure in The Secret Government Laboratory.");
         subentry.modifiers.listAppend("+meat");
         string [int] items_to_equip;
         if (bucket.equipped_amount() == 0)
@@ -489,24 +567,95 @@ void QSpookyAirportGoreGenerateTasks(ChecklistEntry [int] task_entries)
 	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, lookupLocations("The Secret Government Laboratory")));
 }
 
+
+void QSpookyAirportOutOfOrderGenerateTasks(ChecklistEntry [int] task_entries)
+{
+    QuestState state;
+    state.image_name = "__item GPS-tracking wristwatch";
+    state.quest_name = "Out of Order";
+	QuestStateParseMafiaQuestProperty(state, "questESpOutOfOrder");
+    
+    if (!state.in_progress)
+        return;
+    item wristwatch = lookupItem("GPS-tracking wristwatch");
+    
+    if (wristwatch.available_amount() == 0)
+        return;
+    
+	ChecklistSubentry subentry;
+	
+	subentry.header = state.quest_name;
+	string url = "place.php?whichplace=airport_spooky";
+    
+    
+    if (state.mafia_internal_step <= 2 && lookupItem("Project T. L. B.").item_amount() == 0)
+    {
+        subentry.modifiers.listAppend("+init");
+        
+        string [int] items_to_equip;
+        if (wristwatch.equipped_amount() == 0)
+        {
+            items_to_equip.listAppend(wristwatch);
+        }
+        if (items_to_equip.count() > 0)
+        {
+            subentry.entries.listAppend(HTMLGenerateSpanFont("Equip the " + items_to_equip.listJoinComponents(", ", "and") + ".", "red", ""));
+            url = "inventory.php?which=2";
+        }
+        else
+            subentry.entries.listAppend("Adventure in The Deep Dark Jungle.");
+    }
+    else
+        subentry.entries.listAppend("Return to the radio and reply.");
+    
+	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, lookupLocations("The Deep Dark Jungle")));
+}
+
+
+void QSpookyAirportSerumGenerateTasks(ChecklistEntry [int] task_entries)
+{
+    QuestState state;
+    state.image_name = "__item experimental serum P-00";
+    state.quest_name = "Serum Sortie";
+	QuestStateParseMafiaQuestProperty(state, "questESpSerum");
+    
+    if (!state.in_progress)
+        return;
+    item serum = lookupItem("experimental serum P-00");
+    
+    if (serum == $item[none])
+        return;
+    
+	ChecklistSubentry subentry;
+	
+	subentry.header = state.quest_name;
+	string url = "place.php?whichplace=airport_spooky";
+    
+    
+    if (state.mafia_internal_step <= 2 && serum.available_amount() < 5)
+    {
+        subentry.modifiers.listAppend("+item");
+        
+        subentry.entries.listAppend("Adventure in The Mansion of Dr. Weirdeaux, collect " + int_to_wordy(5 - serum.available_amount()) + " more " + serum.plural + ".");
+    }
+    else
+        subentry.entries.listAppend("Return to the radio and reply.");
+    
+	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, lookupLocations("The Mansion of Dr. Weirdeaux")));
+}
+
 void QSpookyAirportGenerateTasks(ChecklistEntry [int] task_entries)
 {
     if (!__misc_state["spooky airport available"])
         return;
-    /*
-    questESpEVE
-    questESpSmokes
-    questESpSerum
-    questESpOutOfOrder
-    */
     if (__misc_state["In run"] && !(lookupLocations("the mansion of dr. weirdeaux,the secret government lab,the deep dark jungle") contains __last_adventure_location)) //a common strategy is to accept an island quest in-run, then finish it upon prism break to do two quests in a day. so, don't clutter their interface unless they're adventuring there? hmm...
         return;
     
     QSpookyAirportClipperGenerateTasks(task_entries);
-    //QSpookyAirportEVEGenerateTasks(task_entries);
-    //QSpookyAirportSmokesGenerateTasks(task_entries);
-    //QSpookyAirportSerumGenerateTasks(task_entries);
-    //QSpookyAirportOutOfOrderGenerateTasks(task_entries);
+    QSpookyAirportEVEGenerateTasks(task_entries);
+    QSpookyAirportSmokesGenerateTasks(task_entries);
+    QSpookyAirportSerumGenerateTasks(task_entries);
+    QSpookyAirportOutOfOrderGenerateTasks(task_entries);
     QSpookyAirportFakeMediumGenerateTasks(task_entries);
     QSpookyAirportGoreGenerateTasks(task_entries);
     QSpookyAirportJunglePunGenerateTasks(task_entries);

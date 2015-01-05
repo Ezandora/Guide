@@ -197,6 +197,9 @@ void KOLImagesInit()
 	__kol_images["Wine Racks"].erase_zones.listAppend(RectMake(94, 45, 97, 54));
 	__kol_images["Wine Racks"].erase_zones.listAppend(RectMake(17, 49, 18, 53));
     
+    
+	__kol_images["black forest"] = KOLImageMake("images/otherimages/woods/bforest.gif", Vec2iMake(100,100), RectMake(0, 19, 99, 99));
+    
 	__kol_images["possessed wine rack"] = KOLImageMake("images/adventureimages/winerack.gif", Vec2iMake(100,100), RectMake(0, 0, 99, 99));
 	__kol_images["cabinet of Dr. Limpieza"] = KOLImageMake("images/adventureimages/laundrycabinet.gif", Vec2iMake(100,100), RectMake(0, 0, 99, 99));
 	__kol_images["monstrous boiler"] = KOLImageMake("images/adventureimages/boiler.gif", Vec2iMake(100,100), RectMake(0, 0, 99, 99));
@@ -290,6 +293,7 @@ KOLImage KOLImageLookup(string lookup_name)
 		item it = lookup_name.to_item();
 		familiar f = lookup_name.to_familiar();
 		effect e = lookup_name.to_effect();
+        monster m = $monster[none];
         string secondary_lookup_name = lookup_name;
         if (lookup_name.stringHasPrefix("__item "))
         {
@@ -312,6 +316,14 @@ KOLImage KOLImageLookup(string lookup_name)
             it = $item[none];
             e = secondary_lookup_name.to_effect();
         }
+        if (lookup_name.stringHasPrefix("__monster "))
+        {
+            secondary_lookup_name = lookup_name.substring(10);
+            f = $familiar[none];
+            it = $item[none];
+            e = $effect[none];
+            m = secondary_lookup_name.to_monster();
+        }
         //Disabled for now - skill images are a new feature.
         /*if (lookup_name.stringHasPrefix("__skill "))
         {
@@ -333,6 +345,10 @@ KOLImage KOLImageLookup(string lookup_name)
         else if (e != $effect[none] && e.image != "" && e.to_string().to_lower_case() == secondary_lookup_name)
         {
             __kol_images[lookup_name] = KOLImageMake(e.image, Vec2iMake(30,30));
+        }
+        else if (m != $monster[none] && m.image.length() > 0 && m.to_string().to_lower_case() == secondary_lookup_name)
+        {
+            __kol_images[lookup_name] = KOLImageMake("images/adventureimages/" + m.image, Vec2iMake(100, 100));
         }
 		else
 		{

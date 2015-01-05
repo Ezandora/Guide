@@ -250,6 +250,10 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
             return questPropertyPastInternalStepNumber("questL04Bat", 2);
         case $location[the beanbat chamber]:
             return questPropertyPastInternalStepNumber("questL04Bat", 3);
+        case $location[pre-cyrpt cemetary]:
+            return get_property("questL07Cyrptic") != "finished"; //FIXME is this always open?
+        case $location[post-cyrpt cemetary]:
+            return get_property("questL07Cyrptic") == "finished";
         case $location[the boss bat's lair]:
             if ($location[the boss bat's lair].combatTurnsAttemptedInLocation() > 0)
                 return true;
@@ -275,6 +279,9 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
 			if ($item[map to Vanya's Castle].available_amount() > 0)
 				return true;
 			return false;
+		case $location[lair of the ninja snowmen]:
+		case $location[the extreme slope]:
+			return questPropertyPastInternalStepNumber("questL08Trapper", 3);
 		case $location[the hidden park]:
 			return questPropertyPastInternalStepNumber("questL11Worship", 4);
         case $location[the hidden temple]:
@@ -347,6 +354,7 @@ void locationAvailablePrivateInit()
 	item [string] zones_unlocked_by_item;
 	effect [string] zones_unlocked_by_effect;
 	
+	locations_unlocked_by_item[$location[Cobb's Knob Laboratory]] = $item[Cobb's Knob lab key];
 	locations_unlocked_by_item[$location[Cobb's Knob Menagerie\, Level 1]] = $item[Cobb's Knob Menagerie key];
 	locations_unlocked_by_item[$location[Cobb's Knob Menagerie\, Level 2]] = $item[Cobb's Knob Menagerie key];
 	locations_unlocked_by_item[$location[Cobb's Knob Menagerie\, Level 3]] = $item[Cobb's Knob Menagerie key];
@@ -803,6 +811,9 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
             lookup_map[s] = "place.php?whichplace=airport_sleaze";
         foreach s in $strings[The Mansion of Dr. Weirdeaux,The Deep Dark Jungle,The Secret Government Laboratory]
             lookup_map[s] = "place.php?whichplace=airport_spooky";
+        
+        foreach s in $strings[Medbay,Waste Processing,Sonar,Science Lab,Morgue,Special Ops,Engineering,Navigation,Galley]
+            lookup_map[s] = "place.php?whichplace=bugbearship";
             
         lookup_map["Trick-or-treating"] = "place.php?whichplace=town&action=town_trickortreat";
         //Conditionals:

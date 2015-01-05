@@ -82,7 +82,7 @@ void SAftercoreThingsToDoGenerateTasks(ChecklistEntry [int] task_entries, Checkl
         item [int] relevant_rewards;
         foreach it in grimstone_paths
         {
-            if (it.item_amount_almost_everywhere() > 0)
+            if (haveAtLeastXOfItemEverywhere(it, 1))
                 continue;
             relevant_grimstone_paths.listAppend(grimstone_paths[it]);
             relevant_rewards.listAppend(it);
@@ -119,7 +119,7 @@ void SAftercoreThingsToDoGenerateTasks(ChecklistEntry [int] task_entries, Checkl
         }
         foreach loathing_piece in loathing_craftable_items
         {
-            if (loathing_piece.item_amount_almost_everywhere() > 0)
+            if (haveAtLeastXOfItemEverywhere(loathing_piece, 1))
                 continue;
             int [item] components = loathing_piece.get_ingredients();
             foreach component in components

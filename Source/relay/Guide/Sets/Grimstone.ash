@@ -25,13 +25,13 @@ void SGrimstoneHareGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
     elemental_descriptions["sleaze"] = HTMLGenerateSpanOfClass("sleaze", "r_element_sleaze");
     
     
-    boolean have_shrap = lookupSkill("shrap").have_skill();
+    boolean have_shrap = lookupSkill("shrap").skill_is_usable();
     
     if (have_shrap && $effect[hotform].have_effect() > 0)
         elemental_descriptions["hot"] = "Shrap (" + elemental_descriptions["hot"] + ")";
-    else if ($skill[volcanometeor showeruption].have_skill())
+    else if ($skill[volcanometeor showeruption].skill_is_usable())
         elemental_descriptions["hot"] = "Volcanometeor Showeruption (" + elemental_descriptions["hot"] + ")";
-    else if ($skill[Awesome Balls of Fire].have_skill())
+    else if ($skill[Awesome Balls of Fire].skill_is_usable())
         elemental_descriptions["hot"] = "Awesome Balls of Fire (" + elemental_descriptions["hot"] + ")";
     else
         missing_hobopolis_spells.listAppend("Awesome Balls of Fire");
@@ -39,21 +39,21 @@ void SGrimstoneHareGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
     
     if (have_shrap && $effect[coldform].have_effect() > 0)
         elemental_descriptions["cold"] = "Shrap (" + elemental_descriptions["cold"] + ")";
-    else if ($skill[Snowclone].have_skill())
+    else if ($skill[Snowclone].skill_is_usable())
         elemental_descriptions["cold"] = "Snowclone (" + elemental_descriptions["cold"] + ")";
     else
         missing_hobopolis_spells.listAppend("Snowclone");
     
     if (have_shrap && $effect[spookyform].have_effect() > 0)
         elemental_descriptions["spooky"] = "Shrap (" + elemental_descriptions["spooky"] + ")";
-    else if ($skill[Raise Backup Dancer].have_skill())
+    else if ($skill[Raise Backup Dancer].skill_is_usable())
         elemental_descriptions["spooky"] = "Raise Backup Dancer (" + elemental_descriptions["spooky"] + ")";
     else
         missing_hobopolis_spells.listAppend("Raise Backup Dancer");
     
     if (have_shrap && $effect[stenchform].have_effect() > 0)
         elemental_descriptions["stench"] = "Shrap (" + elemental_descriptions["stench"] + ")";
-    else if ($skill[Eggsplosion].have_skill())
+    else if ($skill[Eggsplosion].skill_is_usable())
         elemental_descriptions["stench"] = "Eggsplosion (" + elemental_descriptions["stench"] + ")";
     else
         missing_hobopolis_spells.listAppend("Eggsplosion");
@@ -61,7 +61,7 @@ void SGrimstoneHareGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
     
     if (have_shrap && $effect[sleazeform].have_effect() > 0)
         elemental_descriptions["sleaze"] = "Shrap (" + elemental_descriptions["sleaze"] + ")";
-    else if ($skill[Grease Lightning].have_skill())
+    else if ($skill[Grease Lightning].skill_is_usable())
         elemental_descriptions["sleaze"] = "Grease Lightning (" + elemental_descriptions["sleaze"] + ")";
     else
         missing_hobopolis_spells.listAppend("Grease Lightning");
@@ -106,7 +106,7 @@ void SGrimstoneHareGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
     if (missing_hobopolis_spells.count() > 0)
         description.listAppend("Could acquire " + missing_hobopolis_spells.listJoinComponents(", ", "or") + " from the mall.");
     
-    if ($skill[frigidalmatian].have_skill() && $effect[frigidalmatian].have_effect() == 0)
+    if ($skill[frigidalmatian].skill_is_usable() && $effect[frigidalmatian].have_effect() == 0)
         description.listAppend("Could cast frigidalmatian. (expensive)");
     
     if (my_basestat($stat[mysticality]) < 400)

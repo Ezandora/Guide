@@ -105,10 +105,6 @@ void SemirareGenerateDescription(string [int] description)
 		if ($item[cyclops eyedrops].available_amount() == 0 && $effect[One Very Clear Eye].have_effect() == 0)
 			semirares.listAppend(SemirareMake($location[the limerick dungeon], "|*+100% items eyedrops (10 turns), for tomb rats and low drops.", 0));
 	
-        if (needMoreFamiliarWeightForTower())
-        {
-			semirares.listAppend(SemirareMake($location[cobb's knob menagerie\, level 2], "|*+10 familiar weight, for tower familiars.", 0));
-        }
 		//three turn generation SRs go here
 		if (my_path_id() != PATH_SLOW_AND_STEADY)
 		{
@@ -127,14 +123,15 @@ void SemirareGenerateDescription(string [int] description)
 				semirares.listAppend(food_semirares);
 		}
         
-        if (!__quest_state["Level 13"].state_boolean["past tower"] && $item[small golem].available_amount() == 0 && (get_property("grimstoneMaskPath") == "gnome" || $item[grimstone mask].available_amount() > 0))
+        //FIXME does small golem cause the wall of bones to reform?
+        /*if (!__quest_state["Level 13"].state_boolean["past tower"] && $item[small golem].available_amount() == 0 && (get_property("grimstoneMaskPath") == "gnome" || $item[grimstone mask].available_amount() > 0))
         {
             boolean can_create_golem = false;
             if ($item[clay].available_amount() >= 1 && ($item[leather].available_amount() >= 3 || $item[parchment].available_amount() >= 1))
                 can_create_golem = true;
             if (!can_create_golem)
                 semirares.listAppend(SemirareMake($location[Ye Olde Medievale Villagee], "Small golem (towerkilling)", 0));
-        }
+        }*/
 	}
 		
 	//aftercore? sea quest, sand dollars, giant pearl

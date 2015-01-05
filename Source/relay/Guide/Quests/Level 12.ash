@@ -220,11 +220,11 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
         if ($item[ice nine].available_amount() == 0 && __misc_state["can equip just about any weapon"] && $item[ice harvest].available_amount() >= 9 && $item[ice nine].is_unrestricted()) //is this safe? unfinished ice sculpture is really nice, and ice bucket in sneaky pete...
             details.listAppend("Possibly make and equip an ice nine. (+30% meat 1h weapon)");
                 
-        if ($effect[Sinuses For Miles].have_effect() > 0 && get_property_int("lastTempleAdventures") != my_ascensions() && $item[stone wool].available_amount() > 0)
+        if ($effect[Sinuses For Miles].have_effect() > 0 && get_property_int("lastTempleAdventures") != my_ascensions() && $item[stone wool].available_amount() > 0 && get_property_int("lastTempleUnlock") == my_ascensions())
             details.listAppend("Potentially use stone wool and visit the hidden temple to extend Sinuses for Miles for 3 turns.");
         
         
-        if (my_path_id() == PATH_HEAVY_RAINS && lookupSkill("Make it Rain").have_skill() && turn_range.y > 1)
+        if (my_path_id() == PATH_HEAVY_RAINS && lookupSkill("Make it Rain").skill_is_usable() && turn_range.y > 1)
             details.listAppend("Cast Make it Rain each fight. (+300%? meat)");
         if (lookupItem("Sneaky Pete's leather jacket (collar popped)").equipped_amount() > 0 && turn_range.y > 1)
             details.listAppend("Could unpop your collar. (+20% meat)");
@@ -325,7 +325,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
                 {
                     details.listAppend("Use your seal tooth to stasis gremlins.");
                 }
-                else if ($skill[suckerpunch].have_skill())
+                else if ($skill[suckerpunch].skill_is_usable())
                 {
                     details.listAppend("Cast suckerpunch to stasis gremlins.");
                 }
@@ -485,33 +485,12 @@ void QLevel12GenerateBattlefieldDescription(ChecklistSubentry subentry, string s
     if (enemies_remaining == 0)
     {
         string [int] items_to_turn_in_for;
-        if (!__quest_state["Level 13"].finished)
+        if (__quest_state["Level 13"].state_boolean["shadow will need to be defeated"])
         {
             if (side == "hippy")
                 items_to_turn_in_for.listAppend("filthy poultices for shadow");
             else
                 items_to_turn_in_for.listAppend("gauze garters for shadow");
-        }
-        if (!__quest_state["Level 13"].state_boolean["have relevant guitar"] && side == "hippy")
-            items_to_turn_in_for.listAppend("massive sitar");
-            
-        if (!__quest_state["Level 13"].state_boolean["past tower"]) //bugbears will have this true
-        {
-            int missing_tower_items = 0;
-            for i from 1 to 6
-            {
-                item tower_item = __misc_state_string["Tower monster item " + i].to_item();
-                if (tower_item.available_amount() == 0 || tower_item == $item[none])
-                    missing_tower_items += 1;
-            }
-            
-            if (missing_tower_items > 0)
-            {
-                if (side == "hippy")
-                    items_to_turn_in_for.listAppend("macrame net for tower stunning");
-                else
-                    items_to_turn_in_for.listAppend("boom boxes for tower stunning");
-            }
         }
         
         string line2 = "Also, turn in gear to your home camp.";

@@ -83,7 +83,7 @@ void SHeavyRainsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
             foreach key in skills_for_item[it]
             {
                 skill s = skills_for_item[it][key];
-                if (s.have_skill())
+                if (s.skill_is_usable())
                     continue;
                 max_available_skills_for_item[it] += 1;
                 available_skills_for_item[it] = MIN(max_available_skills_for_item[it], it.available_amount());
@@ -138,7 +138,7 @@ void SHeavyRainsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
             foreach key in skills_for_item[it]
             {
                 skill s = skills_for_item[it][key];
-                if (s.have_skill())
+                if (s.skill_is_usable())
                     continue;
                 if (!(description_for_skill contains s))
                 {

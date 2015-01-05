@@ -62,7 +62,7 @@ TFWMInternalModifier TFWMInternalModifierMake(skill s)
     else
         weight_modifier = s.numeric_modifier("familiar weight");
     
-    return TFWMInternalModifierMake(description, s.have_skill(), s.have_skill(), s.have_skill(), weight_modifier);
+    return TFWMInternalModifierMake(description, s.skill_is_usable(), s.skill_is_usable(), s.skill_is_usable(), weight_modifier);
 }
 
 TFWMInternalModifier TFWMInternalModifierMake(item equippable_item)
@@ -96,10 +96,18 @@ void listAppend(TFWMInternalModifier [int] list, TFWMInternalModifier entry)
 
 
 //Returns TRUE if they currently have, or can easily have, enough to pass.
+//Example use:
+/*
+    string [int] how;
+    string [int] immediately_obtainable;
+    string [int] missing_potentials;
+    FloatHandle missing_weight;
+    return !generateTowerFamiliarWeightMethod(how, immediately_obtainable, missing_potentials, missing_weight);
+*/
 boolean generateTowerFamiliarWeightMethod(string [int] how, string [int] immediately_obtainable, string [int] missing_potentials, FloatHandle missing_weight)
 {
     missing_weight.f = 0.0;
-    if (__quest_state["Level 13"].mafia_internal_step > 9) //no need
+    if (__quest_state["Level 13"].finished) //no need
         return true;
     if (!__misc_state["In run"])
         return true;
@@ -179,7 +187,7 @@ boolean generateTowerFamiliarWeightMethod(string [int] how, string [int] immedia
         boolean have_effect = $effect[Kindly Resolve].have_effect() > 0;
         weight_modifiers.listAppend(TFWMInternalModifierMake("resolution: be kinder", have_effect, true, true, 5.0));
     }
-    else if ($skill[summon resolutions].have_skill() && __misc_state["bookshelf accessible"])
+    else if ($skill[summon resolutions].skill_is_usable() && __misc_state["bookshelf accessible"])
     {
         weight_modifiers.listAppend(TFWMInternalModifierMake("resolution: be kinder (summon)", false, false, true, 5.0));
     }
@@ -192,7 +200,7 @@ boolean generateTowerFamiliarWeightMethod(string [int] how, string [int] immedia
         boolean have_effect = $effect[Heart of Green].have_effect() > 0;
         weight_modifiers.listAppend(TFWMInternalModifierMake("green candy heart", have_effect, true, true, 3.0));
     }
-    else if (candy_hearts.have_skill() && __misc_state["bookshelf accessible"] && candy_hearts != $skill[none])
+    else if (candy_hearts.skill_is_usable() && __misc_state["bookshelf accessible"] && candy_hearts != $skill[none])
     {
         weight_modifiers.listAppend(TFWMInternalModifierMake("green candy heart (summon)", false, false, true, 3.0));
     }
@@ -206,7 +214,7 @@ boolean generateTowerFamiliarWeightMethod(string [int] how, string [int] immedia
         {
             weight_modifiers.listAppend(TFWMInternalModifierMake("sugar shield (use sugar sheet)", false, true, true, 10.0, true));
         }
-        else if ($skill[Summon Sugar Sheets].have_skill() && __misc_state["bookshelf accessible"])
+        else if ($skill[Summon Sugar Sheets].skill_is_usable() && __misc_state["bookshelf accessible"])
         {
             //TFWMInternalModifier TFWMInternalModifierMake(string description, boolean have, boolean obtainable_now, boolean obtainable_theoretically, float bonus)
             weight_modifiers.listAppend(TFWMInternalModifierMake("sugar shield (summon sugar sheet)", false, false, true, 10.0, true));
@@ -277,15 +285,6 @@ boolean generateTowerFamiliarWeightMethod(string [int] how, string [int] immedia
         return false;
 }
 
-boolean needMoreFamiliarWeightForTower()
-{
-    string [int] how;
-    string [int] immediately_obtainable;
-    string [int] missing_potentials;
-    FloatHandle missing_weight;
-    return !generateTowerFamiliarWeightMethod(how, immediately_obtainable, missing_potentials, missing_weight);
-}
-
 
             
 string generatePotatoSuggestion()
@@ -307,35 +306,90 @@ void QLevel13Init()
     
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL13Final");
-    if (my_path_id() == PATH_BUGBEAR_INVASION)
+    if (my_path_id() == PATH_BUGBEAR_INVASION || __misc_state["In aftercore"])
         QuestStateParseMafiaQuestPropertyValue(state, "finished"); //never will start
 	state.quest_name = "Naughty Sorceress Quest";
 	state.image_name = "naughty sorceress lair";
 	state.council_quest = true;
-	//alternate idea: gate, mirror, stone mariachis, courtyard, tower... hmm, no
 	
-	state.state_boolean["past gates"] = (state.mafia_internal_step > 1);
-	state.state_boolean["past keys"] = (state.mafia_internal_step > 3);
-	state.state_boolean["past hedge maze"] = (state.mafia_internal_step > 4);
-	state.state_boolean["past tower"] = (state.mafia_internal_step > 10); //5
-	state.state_boolean["shadow will need to be defeated"] = !(state.mafia_internal_step < 9);
+    state.state_string["Stat race type"] = ""; //telescope1
+    state.state_string["Elemental damage race type"] = ""; //telescope2
+    
+    //FIXME these all need checking:
+    string [string] telescope1_messages_to_type;
+    telescope1_messages_to_type["all wearing sunglasses and dancing"] = "moxie";
+    telescope1_messages_to_type["standing around flexing their muscles and using grip exercisers"] = "muscle"; //???
+    //telescope1_messages_to_type["?"] = "mysticality"; //FIXME add
+    
+    string [string] telescope2_messages_to_type;
+    telescope2_messages_to_type["greasy-looking people furtively skulking around"] = "sleaze";
+    telescope2_messages_to_type["people, all of whom appear to be on fire"] = "hot"; //???
+    //telescope2_messages_to_type["?"] = "cold"; //???
+    telescope2_messages_to_type["people, surrounded by a cloud of eldritch mist"] = "spooky"; //???
+    //telescope2_messages_to_type["?"] = "stench"; //???
+    
+    string [string] telescope3_messages_to_type;
+    string [string] telescope4_messages_to_type;
+    string [string] telescope5_messages_to_type;
+    
+    telescope3_messages_to_type["creepy-looking black bushes on the outskirts of a hedge maze"] = "spooky";
+    //telescope3_messages_to_type["nasty-looking, dripping green bushes on the outskirts of a hedge maze"] = "stench"; //stench? sleaze?
+    
+    telescope4_messages_to_type["a greasy purple cloud hanging over the center of the maze"] = "sleaze";
+    //telescope4_messages_to_type["smoke rising from deeper within the maze"] = "hot"; //????
+    
+    telescope5_messages_to_type["occasionally disgorging a bunch of ice cubes"] = "cold";
+    //telescope5_messages_to_type["that occasionally vomits out a greasy ball of hair"] = "sleaze"; //???
+    
+    state.state_string["Stat race type"] = telescope1_messages_to_type[get_property("telescope1")];
+    state.state_string["Elemental damage race type"] = telescope2_messages_to_type[get_property("telescope2")];
+    
+    string [int] elements_needed = listMake(telescope3_messages_to_type[get_property("telescope3")], telescope4_messages_to_type[get_property("telescope4")], telescope5_messages_to_type[get_property("telescope5")]);
+    
+    boolean have_all_elements = true;
+    foreach key, e in elements_needed
+    {
+        if (e.length() == 0)
+        {
+            have_all_elements = false;
+            break;
+        }
+    }
+    state.state_string["Hedge maze elements needed"] = "";
+    if (have_all_elements)
+        state.state_string["Hedge maze elements needed"] = elements_needed.listJoinComponents("|");
+    
+    
+    state.state_boolean["Init race completed"] = false; //FIXME SET THIS
+    state.state_boolean["Stat race completed"] = false; //FIXME SET THIS
+    state.state_boolean["Elemental damage race completed"] = false; //FIXME SET THIS
+    if (state.finished)
+    {
+        state.state_boolean["Init race completed"] = true;
+        state.state_boolean["Stat race completed"] = true;
+        state.state_boolean["Elemental damage race completed"] = true;
+    }
+    state.state_boolean["past races"] = (state.state_boolean["Init race completed"] && state.state_boolean["Stat race completed"] && state.state_boolean["Elemental damage race completed"]); //FIXME handle this
+    
+	state.state_boolean["past hedge maze"] = state.finished; //FIXME handle this
+	state.state_boolean["past keys"] = state.finished; //FIXME handle this
+    
+    state.state_boolean["past tower level 1"] = state.finished; //FIXME handle this
+    state.state_boolean["past tower level 2"] = state.finished; //FIXME handle this
+    state.state_boolean["past tower level 3"] = state.finished; //FIXME handle this
+    state.state_boolean["past tower level 4"] = state.finished; //FIXME handle this
+    state.state_boolean["past tower level 5"] = state.finished; //FIXME handle this
+    
+	state.state_boolean["past tower"] = state.finished; //5
+	state.state_boolean["wall of skin will need to be defeated"] = !state.state_boolean["past tower level 1"];
+	state.state_boolean["wall of meat will need to be defeated"] = !state.state_boolean["past tower level 2"];
+	state.state_boolean["wall of bones will need to be defeated"] = !state.state_boolean["past tower level 3"];
+	state.state_boolean["shadow will need to be defeated"] = !state.state_boolean["past tower level 5"];
+    
     //FIXME what paths don't fight the shadow?
     
-	state.state_boolean["king waiting to be freed"] = (state.mafia_internal_step == 17);
+	state.state_boolean["king waiting to be freed"] = (state.mafia_internal_step == 17); //FIXME handle this
     
-    
-	state.state_boolean["have relevant guitar"] = $items[acoustic guitarrr,heavy metal thunderrr guitarrr,stone banjo,Disco Banjo,Shagadelic Disco Banjo,Seeger's Unstoppable Banjo,Massive sitar,4-dimensional guitar,plastic guitar,half-sized guitar,out-of-tune biwa,Zim Merman's guitar,dueling banjo].available_amount() > 0;
-    
-	state.state_boolean["have relevant accordion"] = $items[stolen accordion,calavera concertina,Rock and Roll Legend,Squeezebox of the Ages,The Trickster's Trikitixa,toy accordion,antique accordion].available_amount() > 0;
-	state.state_boolean["have relevant drum"] = $items[tambourine, big bass drum, black kettle drum, bone rattle, hippy bongo, jungle drum].available_amount() > 0;
-    
-    if (state.state_boolean["past keys"])
-    {
-        state.state_boolean["have relevant guitar"] = true;
-        
-        state.state_boolean["have relevant accordion"] = true;
-        state.state_boolean["have relevant drum"] = true;
-    }
 	state.state_boolean["digital key used"] = state.state_boolean["past keys"]; //FIXME be finer-grained?
     
     boolean other_quests_completed = true;
@@ -360,71 +414,59 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 	QuestState base_quest_state = __quest_state["Level 13"];
 	ChecklistSubentry subentry;
 	subentry.header = base_quest_state.quest_name;
-    string url = "lair.php";
+    string url = "place.php?whichplace=nstower";
 	
 	string image_name = base_quest_state.image_name;
     
 	boolean should_output_main_entry = true;
-	if (base_quest_state.mafia_internal_step == 1)
-	{
-		//at three gates
-		subentry.entries.listAppend("At three gates.");
-        if (__misc_state["can use clovers"] && (availableDrunkenness() >= 3 || inebriety_limit() == 0))
+    if (true)
+    {
+        //early support:
+        string [int] race_types;
+        race_types.listAppend("init");
+        if (base_quest_state.state_string["Stat race type"].length() > 0)
+            race_types.listAppend(base_quest_state.state_string["Stat race type"]);
+        else
+            race_types.listAppend("? stat");
+        if (base_quest_state.state_string["Elemental damage race type"].length() > 0)
+            race_types.listAppend(base_quest_state.state_string["Elemental damage race type"] + " damage/spell damage");
+        else
+            race_types.listAppend("? element damage and element spell damage");
+        
+        subentry.entries.listAppend("Compete in three races. (" + race_types.listJoinComponents(", ", "and") + ")");
+        
+        string elemental_resistance_to_run_string = "+elemental resistance";
+        
+        string [int] resists_needed_for_hedge_maze = base_quest_state.state_string["Hedge maze elements needed"].split_string_alternate("\\|");
+        if (resists_needed_for_hedge_maze.count() > 0)
         {
-            //FIXME be better
-            if ($items[large box,blessed large box].available_amount() == 0 && $items[bubbly potion,cloudy potion,dark potion,effervescent potion,fizzy potion,milky potion,murky potion,smoky potion,swirly potion].items_missing().count() > 0)
+            elemental_resistance_to_run_string = "";
+            foreach key, e in resists_needed_for_hedge_maze
             {
-                if (in_hardcore())
-                    subentry.entries.listAppend("For potions, acquire a large box (fax, dungeons of doom) and meatpaste with a clover.");
-                else
-                    subentry.entries.listAppend("For potions, pull a large box and meatpaste with a clover.");
+                if (elemental_resistance_to_run_string.length() != 0)
+                    elemental_resistance_to_run_string += ", ";
+                elemental_resistance_to_run_string += HTMLGenerateSpanOfClass("+" + e + " resistance", "r_element_" + e);
             }
         }
-        else
-            subentry.entries.listAppend("For potions, visit the dungeons of doom.");
-        url = "lair1.php";
+        
+        subentry.entries.listAppend("Then make it through the hedge maze. Run " + elemental_resistance_to_run_string + " and ignore the skull's directions for the fastest route.|Or take his advice to acquire a unique item.");
+        subentry.entries.listAppend("Then use six keys on the perplexing door: Boris's, Jarlsberg's, Sneaky Pete's, star, skull, and digital");
+        subentry.entries.listAppend("Then make it through the tower. Use a beehive against the first monster, +meat against the second, and the electric boning knife against the third.|Smash the mirror to save a turn, if you can handle a more difficult naughty sorceress. (?)|Then fight your shadow.");
+        subentry.entries.listAppend("Then fight the naughty sorceress. Run a potato familiar and +moxie.");
+        if (__misc_state["wand of nagamar needed"])
+            subentry.entries.listAppend("Make sure to acquire a wand of nagamar.");
+    }
+	else if (base_quest_state.mafia_internal_step == 1)
+	{
 	}
 	else if (base_quest_state.mafia_internal_step == 2)
 	{
-		//past three gates, at mirror
-		subentry.entries.listAppend("At mirror.");
-        url = "lair1.php";
 	}
 	else if (base_quest_state.mafia_internal_step == 3)
 	{
-		//past mirror, at six keys
-		subentry.entries.listAppend("Six keys.");
-        url = "lair2.php";
 	}
 	else if (base_quest_state.mafia_internal_step == 4)
 	{
-        url = "lair3.php";
-		//at hedge maze
-		subentry.modifiers.listAppend("+67% item");
-        if ($item[hedge maze puzzle].available_amount() > 0)
-        {
-            url = "hedgepuzzle.php";
-            subentry.entries.listAppend("Hedge maze. Solve puzzle.");
-        }
-        else
-            subentry.entries.listAppend("Hedge maze. Find puzzles.");
-		if ($location[sorceress' hedge maze].item_drop_modifier_for_location() < 66.666666667)
-			subentry.entries.listAppend("Need more +item.");
-        if ($item[hedge maze key].available_amount() == 0)
-			subentry.entries.listAppend("Find the key.");
-        else
-			subentry.entries.listAppend("Find the way out.");
-            
-            
-        monster pickpocket_monster = $monster[Topiary Golem];
-        if (__misc_state["can pickpocket"] && pickpocket_monster != $monster[none] && __misc_state["free runs usable"])
-        {
-            int total_initiative_needed = pickpocket_monster.base_initiative;
-            int initiative_needed = total_initiative_needed - initiative_modifier();
-            if (initiative_needed > 0)
-                subentry.entries.listAppend("Need " + initiative_needed + "% more initiative to pickpocket every turn.");
-        }
-		
 	}
 	else if (base_quest_state.mafia_internal_step > 4 && base_quest_state.mafia_internal_step < 11)
 	{
@@ -471,10 +513,10 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         {
             string [int] tower_killing_ideas;
             
-            if (my_path_id() == PATH_HEAVY_RAINS && $skill[thunder bird].have_skill() && my_thunder() >= 5 && $skill[curse of weaksauce].have_skill())
+            if (my_path_id() == PATH_HEAVY_RAINS && $skill[thunder bird].skill_is_usable() && my_thunder() >= 5 && $skill[curse of weaksauce].skill_is_usable())
             {
                 string [int] line;
-                if ($skill[itchy curse finger].have_skill())
+                if ($skill[itchy curse finger].skill_is_usable())
                 {
                     line.listAppend("cast curse of weaksauce");
                     line.listAppend("cast a stun");
@@ -488,10 +530,10 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 line.listAppend("attack");
                 tower_killing_ideas.listAppend(line.listJoinComponents(", ", "then").capitalizeFirstLetter());
             }
-            else if ($skill[curse of weaksauce].have_skill() && $item[crayon shavings].available_amount() >= 2) //currently disabled because while it'll work in theory, I haven't tested it
+            else if ($skill[curse of weaksauce].skill_is_usable() && $item[crayon shavings].available_amount() >= 2) //currently disabled because while it'll work in theory, I haven't tested it
             {
                 string [int] line;
-                if ($skill[itchy curse finger].have_skill())
+                if ($skill[itchy curse finger].skill_is_usable())
                 {
                     line.listAppend("cast curse of weaksauce");
                     line.listAppend("cast a stun");
@@ -564,11 +606,11 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             
             if ($item[Game Grid ticket].item_amount() > 0 && $item[Game Grid ticket].is_unrestricted())
                 tower_killing_ideas.listAppend("Could acquire " + $item[Game Grid ticket].item_amount() + " finger cuffs. (stun)");
-            if ($skill[shadow noodles].have_skill())
+            if ($skill[shadow noodles].skill_is_usable())
                 stun_sources.listAppend("shadow noodles");
-            if ($skill[thunderstrike].have_skill())
+            if ($skill[thunderstrike].skill_is_usable())
                 stun_sources.listAppend("thunderstrike");
-            if ($skill[soul saucery].have_skill() && my_class() == $class[sauceror])
+            if ($skill[soul saucery].skill_is_usable() && my_class() == $class[sauceror])
                 stun_sources.listAppend("soul bubble");
                 
             foreach it in $items[gas balloon,brick of sand,chloroform rag,sausage bomb,floorboard cruft,finger cuffs,CSA obedience grenade,The Lost Comb]
@@ -582,9 +624,9 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             if ($item[Rain-Doh blue balls].available_amount() > 0)
                 stun_sources.listAppend("Rain-Doh blue balls");
                 
-            if ($skill[shell up].have_skill() && ($effect[Blessing of the Storm Tortoise].have_effect() > 0 || $effect[Grand Blessing of the Storm Tortoise].have_effect() > 0 || $effect[Glorious Blessing of the Storm Tortoise].have_effect() > 0))
+            if ($skill[shell up].skill_is_usable() && ($effect[Blessing of the Storm Tortoise].have_effect() > 0 || $effect[Grand Blessing of the Storm Tortoise].have_effect() > 0 || $effect[Glorious Blessing of the Storm Tortoise].have_effect() > 0))
                 stun_sources.listAppend("Shell Up");
-            if ($skill[Accordion Bash].have_skill())
+            if ($skill[Accordion Bash].skill_is_usable())
             {
                 string line = "Accordion Bash";
                 if ($slot[weapon].equipped_item().item_type() != "accordion")
@@ -594,27 +636,27 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             
             if ($item[thor's pliers].equipped_amount() > 0)
                 stagger_sources.listAppend("ply reality");
-            if (my_class() != $class[pastamancer] && $skill[entangling noodles].have_skill())
+            if (my_class() != $class[pastamancer] && $skill[entangling noodles].skill_is_usable())
                 stagger_sources.listAppend("entangling noodles");
             if ($item[pantsgiving].equipped_amount() > 0)
             {
                 stagger_sources.listAppend("pocket crumbs");
                 stagger_sources.listAppend("air dirty laundry");
             }
-            if (my_class() == $class[disco bandit] && $skill[deft hands].have_skill())
+            if (my_class() == $class[disco bandit] && $skill[deft hands].skill_is_usable())
                 stagger_sources.listAppend("first combat item thrown");
-            if (my_class() == $class[disco bandit] && $skill[Disco State of Mind].have_skill() && $skill[Flashy Dancer].have_skill())
+            if (my_class() == $class[disco bandit] && $skill[Disco State of Mind].skill_is_usable() && $skill[Flashy Dancer].skill_is_usable())
             {
-                if ($skill[disco dance of doom].have_skill())
+                if ($skill[disco dance of doom].skill_is_usable())
                     stagger_sources.listAppend("disco dance");
-                if ($skill[Disco Dance II: Electric Boogaloo].have_skill())
+                if ($skill[Disco Dance II: Electric Boogaloo].skill_is_usable())
                     stagger_sources.listAppend("disco dance II");
-                if ($skill[Disco Dance 3: Back in the Habit].have_skill())
+                if ($skill[Disco Dance 3: Back in the Habit].skill_is_usable())
                     stagger_sources.listAppend("disco dance 3");
             }
             if ($item[airblaster gun].equipped_amount() > 0)
                 stagger_sources.listAppend("air blast");
-            if (my_class() == $class[seal clubber] && $skill[club foot].have_skill())
+            if (my_class() == $class[seal clubber] && $skill[club foot].skill_is_usable())
             {
                 int stun_rounds = 0;
                 
@@ -627,7 +669,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 else if (stun_rounds > 1)
                     stun_sources.listAppend("club foot");
             }
-            if ($skill[Break It On Down].have_skill())
+            if ($skill[Break It On Down].skill_is_usable())
                 stagger_sources.listAppend("break it on down");
             
             foreach it in $items[gob of wet hair,gyroscope,macrame net,ornate picture frame,palm-frond net,superamplified boom box]
@@ -653,7 +695,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             
             if ($item[small golem].available_amount() > 0)
             {
-                if ($skill[Ambidextrous Funkslinging].have_skill() && $item[slime stack].available_amount() > 0)
+                if ($skill[Ambidextrous Funkslinging].skill_is_usable() && $item[slime stack].available_amount() > 0)
                     tower_killing_ideas.listAppend("Small golem available. Funksling early in combat with a slime stack for 3k damage/round.");
                 else
                     tower_killing_ideas.listAppend("Small golem available. Use early in combat for 3k damage/round.");
@@ -661,7 +703,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             if ($item[slime stack].available_amount() > 0)
                 tower_killing_ideas.listAppend($item[slime stack].pluralize() + " available. (15% damage)");
                 
-            if ($skill[frigidalmatian].have_skill() && my_maxmp() >= 300 && $effect[Frigidalmatian].have_effect() == 0)
+            if ($skill[frigidalmatian].skill_is_usable() && my_maxmp() >= 300 && $effect[Frigidalmatian].have_effect() == 0)
                 tower_killing_ideas.listAppend("Possibly cast Frigidalmatian.");
                 
             if (monster_level_adjustment() > 0)
@@ -686,14 +728,9 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 	}
 	else if (base_quest_state.mafia_internal_step == 11 || base_quest_state.mafia_internal_step == 12)
 	{
-        url = "lair6.php";
-		//past tower, at some sort of door code
-		subentry.entries.listAppend("Puzzles.");
-		subentry.entries.listAppend("Have mafia do it: Quests" + __html_right_arrow_character + "Tower (to shadow)");
 	}
 	else if (base_quest_state.mafia_internal_step == 13)
 	{
-        url = "lair6.php";
 		//at top of tower (fight shadow??)
 		//8 -> fight shadow
         int total_initiative_needed = $monster[Your Shadow].monster_initiative();
@@ -723,87 +760,14 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             
             
         int initiative_needed = total_initiative_needed - initiative_modifier();
-        if (initiative_needed > 0 && !$skill[Ambidextrous Funkslinging].have_skill())
+        if (initiative_needed > 0 && !$skill[Ambidextrous Funkslinging].skill_is_usable())
             subentry.entries.listAppend("Need " + initiative_needed + "% more initiative.");
 	}
 	else if (base_quest_state.mafia_internal_step == 14 || base_quest_state.mafia_internal_step == 15)
 	{
-        url = "lair6.php";
-		//counter familiars
-        
-        if (true)
-        {
-        }
-        else if (!__misc_state["familiars temporarily blocked"])
-        {
-            subentry.modifiers.listAppend("+familiar weight");
-            subentry.entries.listAppend("Counter familiars. Need 20-pound familiars.");
-            subentry.entries.listAppend("Have mafia do it: Quests" + __html_right_arrow_character + "Tower (complete)");
-            familiar [int] missing_familiars;
-            foreach f in $familiars[Mosquito,Angry Goat,Barrrnacle,Sabre-Toothed Lime,Levitating Potato]
-            {
-                if (f.have_familiar_replacement())
-                    continue;
-                missing_familiars.listAppend(f);
-            }
-            if (missing_familiars.count() > 0)
-            {
-                string [item] where_to_find_hatchlings;
-                where_to_find_hatchlings[$item[mosquito larva]] = "Spooky forest."; //should have it
-                where_to_find_hatchlings[$item[goat]] = "Combine goat cheese (goatlet, dairy goat, 40% drop) with anti-cheese from the atomic testing house in the desert beach.";
-                where_to_find_hatchlings[$item[barrrnacle]] = "Find from a crusty pirate in the f'c'le. (15% drop)";
-                where_to_find_hatchlings[$item[sabre-toothed lime cub]] = "Combine saber teeth (goatlet, sabre-toothed goat, 5% drop, or stone age hippy camp, 20% drop) with a lime. (Menagerie level 1, fruit golem, 15% drop)";
-                where_to_find_hatchlings[$item[potato sprout]] = "Complete the daily dungeon, visit vending machine.";
-                if (in_bad_moon())
-                    where_to_find_hatchlings[$item[potato sprout]] += " Alternatively, adventure in the haunted conservatory.";
-                    
-                string [int] missing_description;
-                foreach key in missing_familiars
-                {
-                    familiar f = missing_familiars[key];
-                    
-                    string line;
-                    if (missing_description.count() > 0)
-                        line += "<hr>";
-                    line += f.hatchling.capitalizeFirstLetter();
-                    if (f.hatchling.available_amount() > 0)
-                    {
-                        line += "|*Use your " + f.hatchling + ".";
-                    }
-                    else
-                    {
-                        line += "|*" + where_to_find_hatchlings[f.hatchling];
-                    }
-                    missing_description.listAppend(line);
-                }
-                subentry.entries.listAppend("Missing familiars: " + HTMLGenerateIndentedText(missing_description));
-            }
-            
-            FloatHandle missing_weight;
-            string [int] familiar_weight_how;
-            string [int] familiar_weight_immediately_obtainable;
-            string [int] familiar_weight_missing_potentials;
-            boolean have_familiar_weight_for_tower = generateTowerFamiliarWeightMethod(familiar_weight_how, familiar_weight_immediately_obtainable, familiar_weight_missing_potentials,missing_weight);
-            if (!have_familiar_weight_for_tower)
-            {
-                string [int] description;
-                description.listAppend("Need +" + missing_weight.f.floor() + " familiar weight.");
-                if (familiar_weight_how.count() > 0)
-                    description.listAppend("Have " + familiar_weight_how.listJoinComponents(", ", "and") + ".");
-                if (familiar_weight_immediately_obtainable.count() > 0)
-                    description.listAppend("Could use " + familiar_weight_immediately_obtainable.listJoinComponents(", ", "and") + ".");
-                if (familiar_weight_missing_potentials.count() > 0 && missing_weight.f > 0.0)
-                    description.listAppend("Could acquire " + familiar_weight_missing_potentials.listJoinComponents(", ", "or") + ".");
-                
-                subentry.entries.listAppend(description.listJoinComponents("|*"));
-            }
-        }
-        else
-            subentry.entries.listAppend("Counter familiars.");
 	}
 	else if (base_quest_state.mafia_internal_step == 16)
 	{
-        url = "lair6.php";
 		//At NS. Good luck, we're all counting on you.
         if (my_path_id() != PATH_HEAVY_RAINS)
         {
@@ -829,7 +793,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             subentry.entries.listAppend("Only your weapon, offhand, and familiar equipment(?) are relevant this fight.");
             if ($item[crayon shavings].available_amount() > 0)
                 subentry.entries.listAppend("Try repeatedly using crayon shavings?");
-            if ($skill[frigidalmatian].have_skill() && my_maxmp() >= 300 && $effect[Frigidalmatian].have_effect() == 0)
+            if ($skill[frigidalmatian].skill_is_usable() && my_maxmp() >= 300 && $effect[Frigidalmatian].have_effect() == 0)
                 subentry.entries.listAppend("Try casting Frigidalmatian.");
         }
         
@@ -837,7 +801,6 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 	}
 	else if (base_quest_state.mafia_internal_step == 17)
 	{
-        url = "lair6.php";
 		//King is waiting in his prism.
         
         boolean trophies_are_possible = false;
@@ -861,7 +824,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         
         if (my_path_id() == PATH_HEAVY_RAINS)
         {
-            if ($skill[rain dance].have_skill() && my_rain() >= 10)
+            if ($skill[rain dance].skill_is_usable() && my_rain() >= 10)
             {
                 int times = floor(my_rain().to_float() / 10.0);
                 task_entries.listAppend(ChecklistEntryMake("__effect Rain Dancin'", "skills.php", ChecklistSubentryMake("Cast Rain Dance " + pluralizeWordy(times, "time", "times"), "", "+20% item buff for aftercore.")));

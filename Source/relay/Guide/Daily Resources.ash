@@ -49,6 +49,8 @@ void generateDailyResources(Checklist [int] checklists)
                 options.listAppend(generateHotDogLine("One with everything", "+50% mysticality, 50 turns.", 2));
             if (my_primestat() == $stat[moxie])
                 options.listAppend(generateHotDogLine("Sly Dog", "+50% moxie, 50 turns.", 2));
+            if (__misc_state["need to level"] && get_property_boolean("chateauAvailable"))
+                options.listAppend(generateHotDogLine("Sleeping dog", "5 free rests/day (stats at chateau)", 2));
         }
 			
         description.listAppend(HTMLGenerateSimpleTableLines(options));
@@ -223,62 +225,76 @@ void generateDailyResources(Checklist [int] checklists)
     
     if (__misc_state_int["free rests remaining"] > 0)
     {
-        float resting_hp_percent = numeric_modifier("resting hp percent") / 100.0;
-        float resting_mp_percent = numeric_modifier("resting mp percent") / 100.0;
         
-        //FIXME trace down every rest effect and make this more accurate, instead of an initial guess.
-        
-        //If grimace or ronald is full, they double the gains of everything else.
-        //This is reported as a modifier of +100% - so with pagoda, that's +200% HP
-        //But, it's actually +300%, or 400% total. I could be wrong about this - my knowledge of rest mechanics is limited.
-        //So, we'll explicitly check for grimace or ronald being full, then recalculate. Not great, but should work okay?
-        //This is probably inaccurate in a great number of cases, due to the complication of resting.
-        
-        float overall_multiplier_hp = 1.0;
-        float overall_multiplier_mp = 1.0;
-        float bonus_resting_hp = numeric_modifier("bonus resting hp");
-        float after_bonus_resting_hp = 0.0;
-        int grimace_light = moon_phase() / 2;
-        int ronald_light = moon_phase() % 8;
-        if (grimace_light == 4)
-        {
-            resting_hp_percent -= 1.0;
-            overall_multiplier_hp += 1.0;
-        }
-        if (ronald_light == 4)
-        {
-            resting_mp_percent -= 1.0;
-            overall_multiplier_mp += 1.0;
-        }
-        
-        if ($effect[L'instinct F&eacute;lin].have_effect() > 0) //not currently tracked by mafia. Seems to triple HP/MP gains.
-        {
-            overall_multiplier_hp *= 3.0;
-            overall_multiplier_mp *= 3.0;
-        }
-        
-        if ((get_campground() contains $item[gauze hammock]))
-        {
-            //Gauze hammock appears to be a flat addition applied after everything else, including grimace, pagoda, and l'instinct.
-            //It shows up it bonus resting hp - we'll remove that, and add it back at the end.
-            bonus_resting_hp -= 60.0;
-            after_bonus_resting_hp += 60.0;
-        }
-        
-        float rest_hp_restore = after_bonus_resting_hp + overall_multiplier_hp * (numeric_modifier("base resting hp") * (1.0 + resting_hp_percent) + bonus_resting_hp);
-        float rest_mp_restore = overall_multiplier_mp * (numeric_modifier("base resting mp") * (1.0 + resting_mp_percent) + numeric_modifier("bonus resting mp"));
         string [int] description;
-        description.listAppend(rest_hp_restore.floor() + " HP, " + rest_mp_restore.floor() + " MP");
         
-        if ($item[pantsgiving].available_amount() > 0)
+        if (__misc_state["recommend resting at campsite"])
         {
-            if ($item[pantsgiving].equipped_amount() == 0)
-                description.listAppend("Wear pantsgiving for extra HP/MP.");
-            if (availableFullness() > 0)
-                description.listAppend("Eat more for +" + (availableFullness() * 5) + " extra HP/MP.");
+            float resting_hp_percent = numeric_modifier("resting hp percent") / 100.0;
+            float resting_mp_percent = numeric_modifier("resting mp percent") / 100.0;
+            
+            //FIXME trace down every rest effect and make this more accurate, instead of an initial guess.
+            
+            //If grimace or ronald is full, they double the gains of everything else.
+            //This is reported as a modifier of +100% - so with pagoda, that's +200% HP
+            //But, it's actually +300%, or 400% total. I could be wrong about this - my knowledge of rest mechanics is limited.
+            //So, we'll explicitly check for grimace or ronald being full, then recalculate. Not great, but should work okay?
+            //This is probably inaccurate in a great number of cases, due to the complication of resting.
+            
+            float overall_multiplier_hp = 1.0;
+            float overall_multiplier_mp = 1.0;
+            float bonus_resting_hp = numeric_modifier("bonus resting hp");
+            float after_bonus_resting_hp = 0.0;
+            int grimace_light = moon_phase() / 2;
+            int ronald_light = moon_phase() % 8;
+            if (grimace_light == 4)
+            {
+                resting_hp_percent -= 1.0;
+                overall_multiplier_hp += 1.0;
+            }
+            if (ronald_light == 4)
+            {
+                resting_mp_percent -= 1.0;
+                overall_multiplier_mp += 1.0;
+            }
+            
+            if ($effect[L'instinct F&eacute;lin].have_effect() > 0) //not currently tracked by mafia. Seems to triple HP/MP gains.
+            {
+                overall_multiplier_hp *= 3.0;
+                overall_multiplier_mp *= 3.0;
+            }
+            
+            if ((get_campground() contains $item[gauze hammock]))
+            {
+                //Gauze hammock appears to be a flat addition applied after everything else, including grimace, pagoda, and l'instinct.
+                //It shows up it bonus resting hp - we'll remove that, and add it back at the end.
+                bonus_resting_hp -= 60.0;
+                after_bonus_resting_hp += 60.0;
+            }
+            
+            //FIXME chateau restore is different
+            float rest_hp_restore = after_bonus_resting_hp + overall_multiplier_hp * (numeric_modifier("base resting hp") * (1.0 + resting_hp_percent) + bonus_resting_hp);
+            float rest_mp_restore = overall_multiplier_mp * (numeric_modifier("base resting mp") * (1.0 + resting_mp_percent) + numeric_modifier("bonus resting mp"));
+            description.listAppend(rest_hp_restore.floor() + " HP, " + rest_mp_restore.floor() + " MP");
+            
+            if ($item[pantsgiving].available_amount() > 0) //FIXME is pantsgiving intended to help at chateau?
+            {
+                if ($item[pantsgiving].equipped_amount() == 0)
+                    description.listAppend("Wear pantsgiving for extra HP/MP.");
+                if (availableFullness() > 0)
+                    description.listAppend("Eat more for +" + (availableFullness() * 5) + " extra HP/MP.");
+            }
+        }
+        else if (__misc_state_string["resting description"] == "Chateau Mantegna")
+        {
+            //FIXME what goes here
+            //FIXME 16.8 show which stats you get
+            description.listAppend("HP/MP/stats.");
+            if (my_level() < 8)
+                description.listAppend("May want to wait until level 8(?) for more stats from resting.");
         }
         
-		available_resources_entries.listAppend(ChecklistEntryMake("__effect sleepy", "campground.php", ChecklistSubentryMake(pluralizeWordy(__misc_state_int["free rests remaining"], "free rest", "free rests").capitalizeFirstLetter(), "", description), 10));
+		available_resources_entries.listAppend(ChecklistEntryMake("__effect sleepy", __misc_state_string["resting url"], ChecklistSubentryMake(pluralizeWordy(__misc_state_int["free rests remaining"], "free rest", "free rests").capitalizeFirstLetter(), "", description), 10));
     }
     
     if (in_bad_moon() && !get_property_boolean("styxPixieVisited"))
@@ -329,18 +345,25 @@ void generateDailyResources(Checklist [int] checklists)
     {
         //Seal summons:
         //FIXME suggest they equip a club (support swords with iron palms)
+        string [int] description;
+        
         int seal_summon_limit = 5;
         if ($item[Claw of the Infernal Seal].available_amount() > 0)
+        {
             seal_summon_limit = 10;
+            if ($item[Claw of the Infernal Seal].item_amount() + $item[Claw of the Infernal Seal].equipped_amount() == 0 && $item[Claw of the Infernal Seal].storage_amount() > 0)
+                description.listAppend("Pull the Claw of the Infernal Seal from hangk's.");
+        }
         int seals_summoned = get_property_int("_sealsSummoned");
         int summons_remaining = MAX(seal_summon_limit - seals_summoned, 0);
         
-        string [int] description;
         
         //description left blank, due to possible revamp?
-        
+        string url = "";
+        if (guild_store_available())
+            url = "store.php?whichstore=3";
         if (summons_remaining > 0)
-            available_resources_entries.listAppend(ChecklistEntryMake("__item figurine of an ancient seal", "", ChecklistSubentryMake(pluralize(summons_remaining, "seal summon", "seal summons"), "", description), 10));
+            available_resources_entries.listAppend(ChecklistEntryMake("__item figurine of an ancient seal", url, ChecklistSubentryMake(pluralize(summons_remaining, "seal summon", "seal summons"), "", description), 10));
     }
     
     if (__last_adventure_location == $location[The Red Queen's Garden])

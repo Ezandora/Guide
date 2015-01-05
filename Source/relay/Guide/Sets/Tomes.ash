@@ -19,7 +19,7 @@ void STomesGenerateResource(ChecklistEntry [int] available_resources_entries)
 		{
 			string property_name = tome_summons_property_names[s];
 			int value = 0;
-			if (s.have_skill())
+			if (s.skill_is_usable())
 			{
 				if (in_ronin())
 					value = 3 - get_property_int("tomeSummons");
@@ -103,7 +103,7 @@ void STomesGenerateResource(ChecklistEntry [int] available_resources_entries)
                     
                 if ($item[bucket of wine].available_amount() == 0 && __misc_state["can drink just about anything"])
                 {
-                    if (have_skill($skill[the ode to booze]))
+                    if ($skill[the ode to booze].skill_is_usable())
                         description.listAppend("Bucket of wine: 28 adventures nightcap with ode");
                     else if (get_property_int("hiddenTavernUnlock") != my_ascensions() && $item[ye olde meade].available_amount() == 0) //just use fog murderers or meade instead, about the same
                         description.listAppend("Bucket of wine: 18 adventures nightcap");
@@ -114,7 +114,7 @@ void STomesGenerateResource(ChecklistEntry [int] available_resources_entries)
                 if (true)
                 {
                     string line = "Crystal skull: banish in high monster count zones";
-                    if (have_skill($skill[Summon Smithsness]) && !__misc_state["In aftercore"])
+                    if ($skill[Summon Smithsness].skill_is_usable() && !__misc_state["In aftercore"])
                         line += "|*Smith's Tome has a better one";
                     description.listAppend(line);
                 }
