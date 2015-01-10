@@ -1,7 +1,7 @@
 //This script and its support scripts are in the public domain.
 
 //These settings are for development. Don't worry about editing them.
-string __version = "1.1.18";
+string __version = "1.1.19";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -517,6 +517,20 @@ string listJoinComponents(phylum [int] list, string joining_string)
 	return listJoinComponents(list, joining_string, "");
 }
 
+
+
+string listJoinComponents(skill [int] list, string joining_string, string and_string)
+{
+	string [int] list_string;
+	foreach key in list
+		list_string.listAppend(list[key].to_string());
+	return listJoinComponents(list_string, joining_string, and_string);
+}
+
+string listJoinComponents(skill [int] list, string joining_string)
+{
+	return listJoinComponents(list, joining_string, "");
+}
 
 string listJoinComponents(int [int] list, string joining_string, string and_string)
 {
@@ -5573,7 +5587,7 @@ void QLevel4GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	subentry.header = base_quest_state.quest_name;
     string url = "place.php?whichplace=bathole";
 	
-    if (false) //mafia used to update to step4 upon acquiring the bandana - FIXME update to test for that when mafia updates for new boss bat
+    if (base_quest_state.mafia_internal_step >= 5)
     {
         subentry.entries.listAppend("Quest finished, speak to the council of loathing.");
         url = "place.php?whichplace=town";
@@ -6079,6 +6093,10 @@ void QLevel7Init()
     {
         boolean need_speeding_up = false;
         int evilness = state.state_int[l + " evilness"];
+        
+        if (l == "alcove" && get_property_monster("romanticTarget") == $monster[modern zmobie])
+            evilness -= 5 * get_property_int("_romanticFightsLeft");
+        
         if (evilness <= 26)
             need_speeding_up = false;
         else
@@ -6248,7 +6266,17 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		int evilness = base_quest_state.state_int["alcove evilness"];
 		subentry.header = "Defiled Alcove";
 		subentry.entries.listAppend(evilness_text["cyrptAlcoveEvilness"]);
-		if (evilness > 26)
+        
+        
+        int evilness_after_arrow = evilness;
+        if (get_property_monster("romanticTarget") == $monster[modern zmobie])
+            evilness_after_arrow -= 5 * get_property_int("_romanticFightsLeft");
+        
+        if (evilness_after_arrow <= 25 && evilness > 25)
+        {
+            subentry.entries.listAppend("Wait for modern zmobie arrows.");
+        }
+		else if (evilness > 26)
 		{
             subentry.modifiers.listAppend("+init");
             subentry.modifiers.listAppend("-combat");
@@ -11107,20 +11135,24 @@ void QLevel13Init()
     telescope2_messages_to_type["people, all of whom appear to be on fire"] = "hot"; //???
     //telescope2_messages_to_type["?"] = "cold"; //???
     telescope2_messages_to_type["people, surrounded by a cloud of eldritch mist"] = "spooky"; //???
-    //telescope2_messages_to_type["?"] = "stench"; //???
+    telescope2_messages_to_type["people, surrounded by garbage and clouds of flies"] = "stench"; //???
     
     string [string] telescope3_messages_to_type;
     string [string] telescope4_messages_to_type;
     string [string] telescope5_messages_to_type;
     
     telescope3_messages_to_type["creepy-looking black bushes on the outskirts of a hedge maze"] = "spooky";
-    //telescope3_messages_to_type["nasty-looking, dripping green bushes on the outskirts of a hedge maze"] = "stench"; //stench? sleaze?
+    telescope3_messages_to_type["nasty-looking, dripping green bushes on the outskirts of a hedge maze"] = "stench"; //stench? sleaze?
+    telescope3_messages_to_type["purplish, greasy-looking hedges"] = "sleaze"; //???
     
     telescope4_messages_to_type["a greasy purple cloud hanging over the center of the maze"] = "sleaze";
-    //telescope4_messages_to_type["smoke rising from deeper within the maze"] = "hot"; //????
+    telescope4_messages_to_type["smoke rising from deeper within the maze"] = "hot"; //????
+    telescope4_messages_to_type["a miasma of eldritch vapors rising from deeper within the maze"] = "spooky"; //????
     
     telescope5_messages_to_type["occasionally disgorging a bunch of ice cubes"] = "cold";
     //telescope5_messages_to_type["that occasionally vomits out a greasy ball of hair"] = "sleaze"; //???
+    telescope5_messages_to_type["surrounded by creepy black mist"] = "spooky"; //???
+    telescope5_messages_to_type["disgorging a really surprising amount of sewage"] = "stench"; //???
     
     state.state_string["Stat race type"] = telescope1_messages_to_type[get_property("telescope1")];
     state.state_string["Elemental damage race type"] = telescope2_messages_to_type[get_property("telescope2")];
@@ -15927,7 +15959,7 @@ void QSpookyAirportEveGenerateTasks(ChecklistEntry [int] task_entries)
     
     if (state.mafia_internal_step < 2)
     {
-        subentry.entries.listAppend("Adventure in The Secret Government Laboratory for twenty turns.|At the choice adventure, choose " + listMake("Left", "Left", "Right", "Left", "Right").listJoinComponents(__html_right_arrow_character) + ".");
+        subentry.entries.listAppend("Adventure in The Secret Government Laboratory, find a non-combat every twenty turns.|At the choice adventure, choose " + listMake("Left", "Left", "Right", "Left", "Right").listJoinComponents(__html_right_arrow_character) + ".");
 		if (__misc_state["free runs available"])
 			subentry.modifiers.listAppend("free runs");
 		if (__misc_state["have hipster"])
@@ -19285,7 +19317,7 @@ void SLibramGenerateResource(ChecklistEntry [int] available_resources_entries)
 
 void S8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	int total_white_pixels = $item[white pixel].available_amount() + creatable_amount($item[white pixel]);
+	int total_white_pixels = $item[white pixel].available_amount() + $item[white pixel].creatable_amount();
 	if (__quest_state["Level 13"].state_boolean["digital key used"] || (total_white_pixels >= 30 || $item[digital key].available_amount() > 0))
         return;
     boolean need_route_output = true;
@@ -21649,15 +21681,12 @@ void SOlfactionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             location_wanted_monster[$location[The Haunted Pantry]] = $monster[drunken half-orc hobo];
         }
         location_wanted_monster[$location[fear man's level]] = $monster[morbid skull];
-        location_wanted_monster[$location[8-bit realm]] = $monster[blooper];
+        if ($item[digital key].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["digital key used"] && $item[white pixel].available_amount() + $item[white pixel].creatable_amount() < 27)
+            location_wanted_monster[$location[8-bit realm]] = $monster[blooper];
         
         
         if (!__quest_state["Level 11 Pyramid"].finished && olfacted_monster != $monster[tomb servant])
             location_wanted_monster[$location[the middle chamber]] = $monster[tomb rat];
-
-        //FIXME make astronomer suggestions finer-grained
-        if (!($monsters[One-Eyed Willie,Burrowing Bishop,Family Jewels,Hooded Warrior,Junk,Pork Sword,Skinflute,Trouser Snake,Twig and Berries,Axe Wound,Beaver,Box,Bush,Camel's Toe,Flange,Honey Pot,Little Man in the Canoe,Muff] contains olfacted_monster))
-            location_wanted_monster[$location[the hole in the sky]] = $monster[astronomer];
     }
     
     if (!($monsters[ferocious roc,giant man-eating shark,Bristled Man-O-War,The Cray-Kin,Deadly Hydra] contains olfacted_monster))
@@ -23009,6 +23038,29 @@ void SDNAInit()
             __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[construct], "+5 familiar weight, DR/DA", "", true));
         if (__current_dna_intrinsic != __dna_phylum_to_effect[$phylum[dude]])
             __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[dude], "+10% item", "", true));
+        
+        if (!__quest_state["Level 13"].state_boolean["Elemental damage race completed"])
+        {
+            string element_needed = __quest_state["Level 13"].state_string["Elemental damage race type"];
+            DNASuggestion element_suggestion;
+            string suggestion_effect = "+" + HTMLGenerateSpanOfClass(element_needed, "r_element_" + element_needed + "_desaturated") + " damage/spell damage";
+            string suggestion_description = "Lair race";
+            if (element_needed == "hot")
+                element_suggestion = DNASuggestionMake($phylum[demon], suggestion_effect, suggestion_description, true);
+            else if (element_needed == "cold")
+                element_suggestion = DNASuggestionMake($phylum[plant], suggestion_effect, suggestion_description, true);
+            else if (element_needed == "sleaze")
+                element_suggestion = DNASuggestionMake($phylum[slime], suggestion_effect, suggestion_description, true);
+            else if (element_needed == "spooky")
+                element_suggestion = DNASuggestionMake($phylum[undead], suggestion_effect, suggestion_description, true);
+            else if (element_needed == "stench")
+                element_suggestion = DNASuggestionMake($phylum[hobo], suggestion_effect, suggestion_description, true);
+            if (element_suggestion.phylums.count() > 0 && element_needed.length() > 0)
+            {
+                __phylum_potion_suggestions.listAppend(element_suggestion);
+                __phylum_potion_reminder_suggestions.listAppend(element_suggestion);
+            }
+        }
     }
     else
     {
@@ -26419,7 +26471,9 @@ void generateTasks(Checklist [int] checklists)
         
         boolean spooky_airport_unlocked = __misc_state["spooky airport available"];
         
-        if (spooky_airport_unlocked && $effect[jungle juiced].have_effect() > 0)
+        if (get_property_boolean("chateauAvailable") && __misc_state_int["free rests remaining"] > 0)
+            url = "place.php?whichplace=chateau";
+        else if (spooky_airport_unlocked && $effect[jungle juiced].have_effect() > 0)
             url = $location[the deep dark jungle].getClickableURLForLocation();
         else if (__misc_state["sleaze airport available"])
             url = $location[sloppy seconds diner].getClickableURLForLocation();
@@ -26445,19 +26499,19 @@ void generateTasks(Checklist [int] checklists)
             if (my_primestat() == $stat[muscle] && $item[boris's key].available_amount() > 0)
             {
                 statue_name = "Boris";
-                if (cost_to_donate_for_level < 2000)
+                if (cost_to_donate_for_level < 2000 || cost_to_donate_for_level < my_meat() * 0.2)
                     url = "da.php?place=gate1";
             }
             else if (my_primestat() == $stat[mysticality] && $item[jarlsberg's key].available_amount() > 0 && my_path_id() != PATH_AVATAR_OF_JARLSBERG)
             {
                 statue_name = "Jarlsberg";
-                if (cost_to_donate_for_level < 2000)
+                if (cost_to_donate_for_level < 2000 || cost_to_donate_for_level < my_meat() * 0.2)
                     url = "da.php?place=gate2";
             }
             else if (my_primestat() == $stat[moxie] && $item[sneaky pete's key].available_amount() > 0 && my_path_id() != PATH_AVATAR_OF_SNEAKY_PETE)
             {
                 statue_name = "Sneaky Pete";
-                if (cost_to_donate_for_level < 2000)
+                if (cost_to_donate_for_level < 2000 || cost_to_donate_for_level < my_meat() * 0.2)
                     url = "da.php?place=gate3";
             }
                 
@@ -27506,9 +27560,7 @@ string generateRandomMessage()
     monster_messages[$monster[quiet healer]] = "...";
     monster_messages[$monster[menacing thug]] = "watch your back";
     monster_messages[$monster[sea cowboy]] = "pardon me";
-    monster_messages[$monster[topiary golem]] = "almost there";
-    if ($location[sorceress' hedge maze].turns_spent >= 7)
-        monster_messages[$monster[topiary golem]] = "mean golems";
+    monster_messages[$monster[topiary golem]] = "almost ther... wait, golems?";
     monster_messages[$monster[the server]] = "console cowboy";
     monster_messages[$monster[Fickle Finger of F8]] = "f/8 and be there";
     monster_messages[$monster[malevolent crop circle]] = "I want to believe";
