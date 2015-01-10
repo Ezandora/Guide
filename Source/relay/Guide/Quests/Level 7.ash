@@ -40,6 +40,10 @@ void QLevel7Init()
     {
         boolean need_speeding_up = false;
         int evilness = state.state_int[l + " evilness"];
+        
+        if (l == "alcove" && get_property_monster("romanticTarget") == $monster[modern zmobie])
+            evilness -= 5 * get_property_int("_romanticFightsLeft");
+        
         if (evilness <= 26)
             need_speeding_up = false;
         else
@@ -209,7 +213,17 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		int evilness = base_quest_state.state_int["alcove evilness"];
 		subentry.header = "Defiled Alcove";
 		subentry.entries.listAppend(evilness_text["cyrptAlcoveEvilness"]);
-		if (evilness > 26)
+        
+        
+        int evilness_after_arrow = evilness;
+        if (get_property_monster("romanticTarget") == $monster[modern zmobie])
+            evilness_after_arrow -= 5 * get_property_int("_romanticFightsLeft");
+        
+        if (evilness_after_arrow <= 25 && evilness > 25)
+        {
+            subentry.entries.listAppend("Wait for modern zmobie arrows.");
+        }
+		else if (evilness > 26)
 		{
             subentry.modifiers.listAppend("+init");
             subentry.modifiers.listAppend("-combat");

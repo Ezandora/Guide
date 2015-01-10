@@ -2,7 +2,7 @@
 
 void S8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	int total_white_pixels = $item[white pixel].available_amount() + creatable_amount($item[white pixel]);
+	int total_white_pixels = $item[white pixel].available_amount() + $item[white pixel].creatable_amount();
 	if (__quest_state["Level 13"].state_boolean["digital key used"] || (total_white_pixels >= 30 || $item[digital key].available_amount() > 0))
         return;
     boolean need_route_output = true;

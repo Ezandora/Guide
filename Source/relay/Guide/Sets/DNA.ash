@@ -245,6 +245,29 @@ void SDNAInit()
             __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[construct], "+5 familiar weight, DR/DA", "", true));
         if (__current_dna_intrinsic != __dna_phylum_to_effect[$phylum[dude]])
             __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[dude], "+10% item", "", true));
+        
+        if (!__quest_state["Level 13"].state_boolean["Elemental damage race completed"])
+        {
+            string element_needed = __quest_state["Level 13"].state_string["Elemental damage race type"];
+            DNASuggestion element_suggestion;
+            string suggestion_effect = "+" + HTMLGenerateSpanOfClass(element_needed, "r_element_" + element_needed + "_desaturated") + " damage/spell damage";
+            string suggestion_description = "Lair race";
+            if (element_needed == "hot")
+                element_suggestion = DNASuggestionMake($phylum[demon], suggestion_effect, suggestion_description, true);
+            else if (element_needed == "cold")
+                element_suggestion = DNASuggestionMake($phylum[plant], suggestion_effect, suggestion_description, true);
+            else if (element_needed == "sleaze")
+                element_suggestion = DNASuggestionMake($phylum[slime], suggestion_effect, suggestion_description, true);
+            else if (element_needed == "spooky")
+                element_suggestion = DNASuggestionMake($phylum[undead], suggestion_effect, suggestion_description, true);
+            else if (element_needed == "stench")
+                element_suggestion = DNASuggestionMake($phylum[hobo], suggestion_effect, suggestion_description, true);
+            if (element_suggestion.phylums.count() > 0 && element_needed.length() > 0)
+            {
+                __phylum_potion_suggestions.listAppend(element_suggestion);
+                __phylum_potion_reminder_suggestions.listAppend(element_suggestion);
+            }
+        }
     }
     else
     {

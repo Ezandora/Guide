@@ -54,15 +54,12 @@ void SOlfactionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             location_wanted_monster[$location[The Haunted Pantry]] = $monster[drunken half-orc hobo];
         }
         location_wanted_monster[$location[fear man's level]] = $monster[morbid skull];
-        location_wanted_monster[$location[8-bit realm]] = $monster[blooper];
+        if ($item[digital key].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["digital key used"] && $item[white pixel].available_amount() + $item[white pixel].creatable_amount() < 27)
+            location_wanted_monster[$location[8-bit realm]] = $monster[blooper];
         
         
         if (!__quest_state["Level 11 Pyramid"].finished && olfacted_monster != $monster[tomb servant])
             location_wanted_monster[$location[the middle chamber]] = $monster[tomb rat];
-
-        //FIXME make astronomer suggestions finer-grained
-        if (!($monsters[One-Eyed Willie,Burrowing Bishop,Family Jewels,Hooded Warrior,Junk,Pork Sword,Skinflute,Trouser Snake,Twig and Berries,Axe Wound,Beaver,Box,Bush,Camel's Toe,Flange,Honey Pot,Little Man in the Canoe,Muff] contains olfacted_monster))
-            location_wanted_monster[$location[the hole in the sky]] = $monster[astronomer];
     }
     
     if (!($monsters[ferocious roc,giant man-eating shark,Bristled Man-O-War,The Cray-Kin,Deadly Hydra] contains olfacted_monster))

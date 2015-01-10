@@ -462,6 +462,20 @@ string listJoinComponents(phylum [int] list, string joining_string)
 }
 
 
+
+string listJoinComponents(skill [int] list, string joining_string, string and_string)
+{
+	string [int] list_string;
+	foreach key in list
+		list_string.listAppend(list[key].to_string());
+	return listJoinComponents(list_string, joining_string, and_string);
+}
+
+string listJoinComponents(skill [int] list, string joining_string)
+{
+	return listJoinComponents(list, joining_string, "");
+}
+
 string listJoinComponents(int [int] list, string joining_string, string and_string)
 {
 	//lazy:

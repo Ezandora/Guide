@@ -331,9 +331,7 @@ string generateRandomMessage()
     monster_messages[$monster[quiet healer]] = "...";
     monster_messages[$monster[menacing thug]] = "watch your back";
     monster_messages[$monster[sea cowboy]] = "pardon me";
-    monster_messages[$monster[topiary golem]] = "almost there";
-    if ($location[sorceress' hedge maze].turns_spent >= 7)
-        monster_messages[$monster[topiary golem]] = "mean golems";
+    monster_messages[$monster[topiary golem]] = "almost ther... wait, golems?";
     monster_messages[$monster[the server]] = "console cowboy";
     monster_messages[$monster[Fickle Finger of F8]] = "f/8 and be there";
     monster_messages[$monster[malevolent crop circle]] = "I want to believe";

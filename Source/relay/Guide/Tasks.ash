@@ -187,7 +187,9 @@ void generateTasks(Checklist [int] checklists)
         
         boolean spooky_airport_unlocked = __misc_state["spooky airport available"];
         
-        if (spooky_airport_unlocked && $effect[jungle juiced].have_effect() > 0)
+        if (get_property_boolean("chateauAvailable") && __misc_state_int["free rests remaining"] > 0)
+            url = "place.php?whichplace=chateau";
+        else if (spooky_airport_unlocked && $effect[jungle juiced].have_effect() > 0)
             url = $location[the deep dark jungle].getClickableURLForLocation();
         else if (__misc_state["sleaze airport available"])
             url = $location[sloppy seconds diner].getClickableURLForLocation();
@@ -213,19 +215,19 @@ void generateTasks(Checklist [int] checklists)
             if (my_primestat() == $stat[muscle] && $item[boris's key].available_amount() > 0)
             {
                 statue_name = "Boris";
-                if (cost_to_donate_for_level < 2000)
+                if (cost_to_donate_for_level < 2000 || cost_to_donate_for_level < my_meat() * 0.2)
                     url = "da.php?place=gate1";
             }
             else if (my_primestat() == $stat[mysticality] && $item[jarlsberg's key].available_amount() > 0 && my_path_id() != PATH_AVATAR_OF_JARLSBERG)
             {
                 statue_name = "Jarlsberg";
-                if (cost_to_donate_for_level < 2000)
+                if (cost_to_donate_for_level < 2000 || cost_to_donate_for_level < my_meat() * 0.2)
                     url = "da.php?place=gate2";
             }
             else if (my_primestat() == $stat[moxie] && $item[sneaky pete's key].available_amount() > 0 && my_path_id() != PATH_AVATAR_OF_SNEAKY_PETE)
             {
                 statue_name = "Sneaky Pete";
-                if (cost_to_donate_for_level < 2000)
+                if (cost_to_donate_for_level < 2000 || cost_to_donate_for_level < my_meat() * 0.2)
                     url = "da.php?place=gate3";
             }
                 

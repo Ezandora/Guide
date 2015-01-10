@@ -326,20 +326,24 @@ void QLevel13Init()
     telescope2_messages_to_type["people, all of whom appear to be on fire"] = "hot"; //???
     //telescope2_messages_to_type["?"] = "cold"; //???
     telescope2_messages_to_type["people, surrounded by a cloud of eldritch mist"] = "spooky"; //???
-    //telescope2_messages_to_type["?"] = "stench"; //???
+    telescope2_messages_to_type["people, surrounded by garbage and clouds of flies"] = "stench"; //???
     
     string [string] telescope3_messages_to_type;
     string [string] telescope4_messages_to_type;
     string [string] telescope5_messages_to_type;
     
     telescope3_messages_to_type["creepy-looking black bushes on the outskirts of a hedge maze"] = "spooky";
-    //telescope3_messages_to_type["nasty-looking, dripping green bushes on the outskirts of a hedge maze"] = "stench"; //stench? sleaze?
+    telescope3_messages_to_type["nasty-looking, dripping green bushes on the outskirts of a hedge maze"] = "stench"; //stench? sleaze?
+    telescope3_messages_to_type["purplish, greasy-looking hedges"] = "sleaze"; //???
     
     telescope4_messages_to_type["a greasy purple cloud hanging over the center of the maze"] = "sleaze";
-    //telescope4_messages_to_type["smoke rising from deeper within the maze"] = "hot"; //????
+    telescope4_messages_to_type["smoke rising from deeper within the maze"] = "hot"; //????
+    telescope4_messages_to_type["a miasma of eldritch vapors rising from deeper within the maze"] = "spooky"; //????
     
     telescope5_messages_to_type["occasionally disgorging a bunch of ice cubes"] = "cold";
     //telescope5_messages_to_type["that occasionally vomits out a greasy ball of hair"] = "sleaze"; //???
+    telescope5_messages_to_type["surrounded by creepy black mist"] = "spooky"; //???
+    telescope5_messages_to_type["disgorging a really surprising amount of sewage"] = "stench"; //???
     
     state.state_string["Stat race type"] = telescope1_messages_to_type[get_property("telescope1")];
     state.state_string["Elemental damage race type"] = telescope2_messages_to_type[get_property("telescope2")];

@@ -49,7 +49,7 @@ void QLevel4GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	subentry.header = base_quest_state.quest_name;
     string url = "place.php?whichplace=bathole";
 	
-    if (false) //mafia used to update to step4 upon acquiring the bandana - FIXME update to test for that when mafia updates for new boss bat
+    if (base_quest_state.mafia_internal_step >= 5)
     {
         subentry.entries.listAppend("Quest finished, speak to the council of loathing.");
         url = "place.php?whichplace=town";

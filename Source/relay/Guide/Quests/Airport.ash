@@ -465,7 +465,7 @@ void QSpookyAirportEveGenerateTasks(ChecklistEntry [int] task_entries)
     
     if (state.mafia_internal_step < 2)
     {
-        subentry.entries.listAppend("Adventure in The Secret Government Laboratory for twenty turns.|At the choice adventure, choose " + listMake("Left", "Left", "Right", "Left", "Right").listJoinComponents(__html_right_arrow_character) + ".");
+        subentry.entries.listAppend("Adventure in The Secret Government Laboratory, find a non-combat every twenty turns.|At the choice adventure, choose " + listMake("Left", "Left", "Right", "Left", "Right").listJoinComponents(__html_right_arrow_character) + ".");
 		if (__misc_state["free runs available"])
 			subentry.modifiers.listAppend("free runs");
 		if (__misc_state["have hipster"])
