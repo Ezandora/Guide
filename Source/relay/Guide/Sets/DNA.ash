@@ -446,28 +446,26 @@ void SDNAGenerateResource(ChecklistEntry [int] available_resources_entries)
     if (potions_left == 0 && __current_dna_intrinsic != $effect[none]) //no potions, already a hybrid
         importance = 8;
     
-    if (subentries.count() > 0)
-        available_resources_entries.listAppend(ChecklistEntryMake("__effect Human-Human Hybrid", "campground.php?action=workshed", subentries, importance));
-    
-    
-    
+    string image_name = "__effect Human-Human Hybrid";
     
     if (__misc_state["In run"])
     {
-        ChecklistSubentry [int] potions;
         foreach p in __dna_phylum_to_item
         {
             item it = __dna_phylum_to_item[p];
             if (it.available_amount() == 0)
                 continue;
-            potions.listAppend(ChecklistSubentryMake(it.pluralize(), "", __dna_phylum_to_description_colorless[p]));
+            if (subentries.count() == 0)
+                image_name = "__item Gene Tonic: Constellation";
+            subentries.listAppend(ChecklistSubentryMake(it.pluralize(), "", __dna_phylum_to_description_colorless[p]));
             
         }
-        if (potions.count() > 0)
-        {
-            available_resources_entries.listAppend(ChecklistEntryMake("__item Gene Tonic: Dude", "inventory.php?which=3", potions, 7));
-        }
     }
+    
+    if (subentries.count() > 0)
+        available_resources_entries.listAppend(ChecklistEntryMake(image_name, "campground.php?action=workshed", subentries, importance));
+    
+    
 }
 
 void SDNAGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)

@@ -5,7 +5,7 @@ boolean HITSStillRelevant()
 		return true;
 	if (!__misc_state["In run"])
 		return false;
-	if (__quest_state["Level 13"].state_boolean["past keys"])
+	if (__quest_state["Level 13"].state_boolean["Richard's star key used"])
 		return false;
 	if (!__quest_state["Level 10"].finished)
 		return false;
@@ -215,7 +215,7 @@ void QHitsGenerateMissingItems(ChecklistEntry [int] items_needed_entries)
 {
 	if (!__misc_state["In run"] && !__misc_state["Example mode"])
 		return;
-	if (__quest_state["Level 13"].state_boolean["past keys"])
+	if (__quest_state["Level 13"].state_boolean["Richard's star key used"])
 		return;
 	//is this the best way to convey this information?
 	//maybe all together instead? complicated...

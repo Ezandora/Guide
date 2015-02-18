@@ -253,6 +253,12 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 string curse_details = "";
                 curse_details = " Acquired from " + curse_sources.listJoinComponents(", ", "or") + ".";
                 
+                if (my_class() == $class[pastamancer] && my_thrall() == $thrall[Vampieroghi] && my_thrall().level >= 5)
+                {
+                    //FIXME should this be a reminder too, if adventuring there? hmm...
+                    subentry.entries.listAppend(HTMLGenerateSpanFont("Change your thrall - Vampieroghi will remove curses.", "red", ""));
+                }
+                
                 if ($effect[thrice-cursed].have_effect() > 0)
                 {
                     subentry.entries.listAppend("You're thrice-cursed. Fight the protector spirit!");
@@ -358,9 +364,12 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
             }
             else
             {
-                subentry.entries.listAppend("Olfact surgeon.");
-                if (!$monster[pygmy orderlies].is_banished())
-                    subentry.entries.listAppend("Potentially banish pygmy orderlies.");
+                if ($items[surgical apron,bloodied surgical dungarees,surgical mask,head mirror,half-size scalpel].items_missing().count() > 0)
+                {
+                    subentry.entries.listAppend("Olfact surgeon.");
+                    if (!$monster[pygmy orderlies].is_banished())
+                        subentry.entries.listAppend("Potentially banish pygmy orderlies.");
+                }
                 
         
                 string [int] items_we_have_unequipped;
@@ -495,7 +504,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                         subentry.entries.listAppend("Possibly acquire and use book of matches from janitors. (Pygmy janitors, everywhere in the hidden city, 20% drop)");
                     
                     string [int] tavern_provides;
-                    if (bowling_progress < 8 && __misc_state["free runs usable"])
+                    if (bowling_progress < 7 && __misc_state["free runs usable"])
                         tavern_provides.listAppend("Free runs from drunk pygmys.");
                     if (__misc_state["can drink just about anything"])
                     {

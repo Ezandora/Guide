@@ -30,7 +30,7 @@ void SPShadyPastGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         {
             //at least one gold piece from a desperate gold farmer is under 21.89% drop rate
             //needs spading
-            description.listAppend("Adventure in the chinatown tenement, acquire " + pluralize(gold_pieces_needed, $item[gold piece]) + ".");
+            description.listAppend("Adventure in the chinatown tenement, acquire " + pluralize(gold_pieces_needed, "more gold piece", "more gold pieces") + ".");
             modifiers.listAppend("+400%? item");
             
             if (__misc_state["have olfaction equivalent"])
@@ -76,11 +76,11 @@ void SPShadyPastGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         //Make yakuza mask.
         if ($item[makeshift yakuza mask].available_amount() == 0)
         {
-            string line = "Assemble a makeshift yazuka mask with items from the chinatown shops.";
+            string line = "Assemble a makeshift yakuza mask with items from the chinatown shops.";
             
             item [int] missing_parts_list = missingComponentsToMakeItem($item[makeshift yakuza mask]);
             if (missing_parts_list.count() == 0)
-                line = "Assemble a makeshift yazuka mask.|(rhinoceros horn + rhinoceros horn) + (furry pink pillow + bottle of limeade)";
+                line = "Assemble a makeshift yakuza mask.|(rhinoceros horn + rhinoceros horn) + (furry pink pillow + bottle of limeade)";
             else
                 line += "|Missing " + missing_parts_list.listJoinComponents(", ", "and") + ".";
             

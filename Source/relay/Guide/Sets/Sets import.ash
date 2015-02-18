@@ -37,3 +37,6 @@ import "relay/Guide/Sets/Speakeasy.ash";
 import "relay/Guide/Sets/Heavy Rains.ash";
 import "relay/Guide/Sets/Events.ash";
 import "relay/Guide/Sets/Bugbear Invasion.ash";
+import "relay/Guide/Sets/Classes.ash";
+import "relay/Guide/Sets/Equipment.ash";
+import "relay/Guide/Sets/Actually Ed the Undying.ash";

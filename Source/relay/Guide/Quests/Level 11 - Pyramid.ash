@@ -22,7 +22,7 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
     if (!__quest_state["Level 11 Desert"].state_boolean["Desert Explored"])
         return;
     //Desert explored.
-    if ($item[staff of ed].available_amount() + $item[staff of ed].creatable_amount() == 0)
+    if (lookupItem("2325").available_amount() + lookupItem("2325").creatable_amount() == 0)
     {
         //Staff of ed.
         //subentry.entries.listAppend("Find the Staff of Ed.");

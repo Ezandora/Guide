@@ -49,7 +49,7 @@ void generateDailyResources(Checklist [int] checklists)
                 options.listAppend(generateHotDogLine("One with everything", "+50% mysticality, 50 turns.", 2));
             if (my_primestat() == $stat[moxie])
                 options.listAppend(generateHotDogLine("Sly Dog", "+50% moxie, 50 turns.", 2));
-            if (__misc_state["need to level"] && get_property_boolean("chateauAvailable"))
+            if (__misc_state["need to level"] && get_property_boolean("chateauAvailable") && !$skill[Dog Tired].have_skill())
                 options.listAppend(generateHotDogLine("Sleeping dog", "5 free rests/day (stats at chateau)", 2));
         }
 			
@@ -73,7 +73,7 @@ void generateDailyResources(Checklist [int] checklists)
             reasons.listAppend("nice hat");
         if ($familiar[fancypants scarecrow].familiar_is_usable() && $item[double-ice britches].available_amount() == 0)
             reasons.listAppend("scarecrow pants");
-        if (!__quest_state["Level 13"].state_boolean["past tower"])
+        if (!__quest_state["Level 13"].state_boolean["past tower monsters"])
             reasons.listAppend("situational tower killing");
         
         if (reasons.count() > 0)
@@ -213,14 +213,13 @@ void generateDailyResources(Checklist [int] checklists)
     }
     
     //Not sure how I feel about this. It's kind of extraneous?
-    //Disabled for now, errors in 16.2 release.
-    /*if (get_property_int("telescopeUpgrades") > 0 && !get_property_boolean("telescopeLookedHigh") && __misc_state["In run"])
+    if (get_property_int("telescopeUpgrades") > 0 && !get_property_boolean("telescopeLookedHigh") && __misc_state["In run"] && availableDrunkenness() < 0)
     {
         string [int] description;
         int percentage = 5 * get_property_int("telescopeUpgrades");
-        description.listAppend("+" + percentage + "% to all attributes. (10 turns)");
+        description.listAppend("+" + (percentage == 25 ? "35% or +25" : percentage) + "% to all attributes. (10 turns)");
 		available_resources_entries.listAppend(ChecklistEntryMake("__effect Starry-Eyed", "campground.php?action=telescope", ChecklistSubentryMake("Telescope buff", "", description), 10));
-    }*/
+    }
     
     
     if (__misc_state_int["free rests remaining"] > 0)
@@ -341,31 +340,6 @@ void generateDailyResources(Checklist [int] checklists)
 		available_resources_entries.listAppend(ChecklistEntryMake("Superhuman Cocktailcrafting", "shop.php?whichshop=still", ChecklistSubentryMake(pluralize(stills_available(), "still use", "still uses"), "", description), 10));
     }
     
-    if (my_class() == $class[seal clubber])
-    {
-        //Seal summons:
-        //FIXME suggest they equip a club (support swords with iron palms)
-        string [int] description;
-        
-        int seal_summon_limit = 5;
-        if ($item[Claw of the Infernal Seal].available_amount() > 0)
-        {
-            seal_summon_limit = 10;
-            if ($item[Claw of the Infernal Seal].item_amount() + $item[Claw of the Infernal Seal].equipped_amount() == 0 && $item[Claw of the Infernal Seal].storage_amount() > 0)
-                description.listAppend("Pull the Claw of the Infernal Seal from hangk's.");
-        }
-        int seals_summoned = get_property_int("_sealsSummoned");
-        int summons_remaining = MAX(seal_summon_limit - seals_summoned, 0);
-        
-        
-        //description left blank, due to possible revamp?
-        string url = "";
-        if (guild_store_available())
-            url = "store.php?whichstore=3";
-        if (summons_remaining > 0)
-            available_resources_entries.listAppend(ChecklistEntryMake("__item figurine of an ancient seal", url, ChecklistSubentryMake(pluralize(summons_remaining, "seal summon", "seal summons"), "", description), 10));
-    }
-    
     if (__last_adventure_location == $location[The Red Queen's Garden])
     {
         string will_need_effect = "";
@@ -421,6 +395,14 @@ void generateDailyResources(Checklist [int] checklists)
                 image_name = "__item defective Golden Mr. Accessory"; //does not technically give out sunshine, but...
             available_resources_entries.listAppend(ChecklistEntryMake(image_name, "skills.php", ChecklistSubentryMake(pluralize(casts_remaining, "smile of the Mr. Accessory", "smiles of the Mr. Accessory"), "", "Give away sunshine."), 8));
         }
+    }
+    
+    if (get_property_boolean("chateauAvailable") && !get_property_boolean("_chateauDeskHarvested") && mafiaIsPastRevision(15191))
+    {
+        string image_name = "__item disintegrating quill pen";
+        if (lookupItem("fancy calligraphy pen").image.length() > 0)
+            image_name = "__item fancy calligraphy pen";
+        available_resources_entries.listAppend(ChecklistEntryMake(image_name, "place.php?whichplace=chateau", ChecklistSubentryMake("Chateau desk openable", "", "Daily collectable."), 8));
     }
 	
 	checklists.listAppend(ChecklistMake("Resources", available_resources_entries));

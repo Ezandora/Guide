@@ -78,6 +78,13 @@ void QLevel9Init()
     state.state_boolean["Peak Jar Completed"] = (twin_progress & 4) > 0;
     state.state_boolean["Peak Init Completed"] = (twin_progress & 8) > 0;
     
+    state.state_int["peak tests remaining"] = 0;
+    foreach s in $strings[Peak Stench Completed,Peak Item Completed,Peak Jar Completed,Peak Init Completed]
+    {
+        if (!state.state_boolean[s])
+            state.state_int["peak tests remaining"] += 1;
+    }
+    
 	__quest_state["Level 9"] = state;
 	__quest_state["Highland Lord"] = state;
 }

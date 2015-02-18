@@ -1,3 +1,5 @@
+import "relay/Guide/Support/Banishers.ash";
+
 void generateImageTest(Checklist [int] checklists)
 {
 	ChecklistEntry [int] image_test_entries;
@@ -166,7 +168,7 @@ void generateSelfDataTest(Checklist [int] checklists)
         {
             if (!(missing_location_links_description contains l.zone))
                 missing_location_links_description[l.zone] = listMakeBlankString();
-            missing_location_links_description[l.zone].listAppend("case $location[" + l.to_string() + "]:");
+            missing_location_links_description[l.zone].listAppend("lookup_map[\"" + l.to_string() + "\"] = \"REPLACEME\";");
         }
     }
     if (missing_available_locations.count() > 0)
@@ -182,4 +184,32 @@ void generateSelfDataTest(Checklist [int] checklists)
         checklist_entries.listAppend(ChecklistEntryMake("__item reflection of a map", "", ChecklistSubentryMake("Missing getClickableURLForLocation() locations", "", description)));
     }
 	checklists.listAppend(ChecklistMake("Self data tests", checklist_entries));
+}
+
+
+void generateBanishTest(Checklist [int] checklists)
+{
+	ChecklistEntry [int] checklist_entries;
+    
+    string [int][int] banish_table;
+    banish_table.listAppend(listMake("<strong>Monster</strong>", "<strong>Source</strong>", "<strong>On turn</strong>", "<strong>Turn length</strong>", "<strong>Reset conditions</strong>"));
+    foreach key, b in BanishesActive()
+    {
+        banish_table.listAppend(listMake(b.banished_monster, b.banish_source, b.turn_banished, b.banish_turn_length, b.custom_reset_conditions));
+    }
+    if (banish_table.count() > 1)
+    {
+        checklist_entries.listAppend(ChecklistEntryMake("__item ice house", "", ChecklistSubentryMake("Banishes", "", HTMLGenerateSimpleTableLines(banish_table))));
+    }
+    
+	checklists.listAppend(ChecklistMake("Banishes", checklist_entries));
+}
+
+void generateAllTests(Checklist [int] checklists)
+{
+    generateImageTest(checklists);
+    generateStateTest(checklists);
+    generateCounterTest(checklists);
+    generateBanishTest(checklists);
+    generateSelfDataTest(checklists);
 }

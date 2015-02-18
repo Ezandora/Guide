@@ -65,6 +65,7 @@ int PATH_SLOW_AND_STEADY = 21;
 int PATH_HEAVY_RAINS = 22;
 int PATH_PICKY = 23;
 int PATH_STANDARD = 24;
+int PATH_ACTUALLY_ED_THE_UNDYING = 25;
 
 int __my_path_id_cached = -11;
 int my_path_id()
@@ -113,6 +114,8 @@ int my_path_id()
         __my_path_id_cached = PATH_PICKY;
     else if (path_name == "Standard")
         __my_path_id_cached = PATH_STANDARD;
+    else if (path_name == "Actually Ed the Undying")
+        __my_path_id_cached = PATH_ACTUALLY_ED_THE_UNDYING;
     else
         __my_path_id_cached = PATH_UNKNOWN;
     return __my_path_id_cached;
@@ -130,7 +133,7 @@ boolean have_familiar_replacement(familiar f)
 boolean familiar_is_usable(familiar f)
 {
     //r13998 has most of these
-    if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE)
+    if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
         return false;
     if (!is_unrestricted(f))
         return false;
@@ -1083,4 +1086,69 @@ int stringCountSubstringMatches(string str, string substring)
 effect to_effect(item it)
 {
 	return effect_modifier(it, "effect");
+}
+
+
+
+boolean weapon_is_club(item it)
+{
+    if (it.to_slot() != $slot[weapon]) return false;
+    if (it.item_type() == "club")
+        return true;
+    if (it.item_type() == "sword" && $effect[Iron Palms].have_effect() > 0)
+        return true;
+    return false;
+}
+
+buffer prepend(buffer in_buffer, buffer value)
+{
+    buffer result;
+    result.append(value);
+    result.append(in_buffer);
+    in_buffer.set_length(0);
+    in_buffer.append(result);
+    return result;
+}
+
+buffer prepend(buffer in_buffer, string value)
+{
+    return prepend(in_buffer, value.to_buffer());
+}
+
+float pressurePenaltyForLocation(location l, Error could_get_value)
+{
+    float pressure_penalty = 0.0;
+    
+    if (my_location() != l)
+    {
+        ErrorSet(could_get_value);
+        return -1.0;
+    }
+    
+    pressure_penalty = MAX(0, -numeric_modifier("item drop penalty"));
+    return pressure_penalty;
+}
+
+int XiblaxianHoloWristPuterTurnsUntilNextItem()
+{
+    int drops = get_property_int("_holoWristDrops");
+    int progress = get_property_int("_holoWristProgress");
+    
+    //_holoWristProgress resets when drop happens
+    if (!mafiaIsPastRevision(15148))
+        return -1;
+    //int next_turn_hit = (drops + 1) * (5 * (drops + 1) + 17)/2;
+    int next_turn_hit = 5 * (drops + 1) + 6 + 1;
+    if (drops == 0)
+        next_turn_hit = 5 * 1 + 6;
+    return MAX(0, next_turn_hit - progress);
+}
+
+int ka_dropped(monster m)
+{
+    if (m.phylum == $phylum[dude] || m.phylum == $phylum[hobo] || m.phylum == $phylum[hippy] || m.phylum == $phylum[pirate])
+        return 2;
+    if (m.phylum == $phylum[goblin] || m.phylum == $phylum[humanoid] || m.phylum == $phylum[beast] || m.phylum == $phylum[bug] || m.phylum == $phylum[orc] || m.phylum == $phylum[elemental])
+        return 1;
+    return 0;
 }

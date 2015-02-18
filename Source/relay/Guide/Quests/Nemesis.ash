@@ -272,7 +272,7 @@ void QNemesisGenerateIslandTasks(ChecklistSubentry subentry)
                 else
                 {
                     subentry.entries.listAppend("Use the " + $item[bottle of G&uuml;-Gone] + " on slime, make potions to get slimeform.");
-                    if (creatable_unknown_potions.count() > 0 && slimeform_potion != $item[none])
+                    if (creatable_unknown_potions.count() > 0 && slimeform_potion == $item[none])
                     {
                         boolean need_to_make = false;
                         foreach key, it in creatable_unknown_potions
@@ -293,9 +293,68 @@ void QNemesisGenerateIslandTasks(ChecklistSubentry subentry)
     }
     else if (my_class() == $class[seal clubber])
     {
-        //FIXME make this work
-        subentry.entries.listAppend("Don't quite know how this works. Here, have some text borrowed from the wiki:");
-        subentry.entries.listAppend("Damage hellseal pups in combat to attract mother hellseals. If you kill the pups in one hit, the mother hellseals will never appear. Equip a club and kill mother hellseals using only weapon-based attacks to get 6 hellseal brains, 6 hellseal hides and 6 hellseal sinews. Do NOT use an attack familiar while fighting mother hellseals, or the bits you need will be ruined.");
+        if ($item[hellseal disguise].available_amount() > 0)
+        {
+            subentry.entries.listAppend("Approach the dark cave.");
+        }
+        else if ($item[hellseal hide].available_amount() >= 6 && $item[hellseal sinew].available_amount() >= 6 && $item[hellseal brain].available_amount() >= 6)
+        {
+            subentry.entries.listAppend("Speak with Phineas.");
+        }
+        else
+        {
+            int seal_screeches = get_property_int("_sealScreeches");
+            string screech_name = "screech";
+            if (my_path_id() == PATH_KOLHS) //KOLHS support
+                screech_name = "samuel powers";
+            if ($item[seal tooth].available_amount() == 0)
+            {
+                subentry.entries.listAppend("Acquire a seal tooth from the hermit.");
+            }
+            else
+                subentry.entries.listAppend("Use a seal tooth to damage the hellseal pups until they screech, once each.");
+            if ($skill[lunging thrust-smack].have_skill())
+            {
+                subentry.entries.listAppend("Use lunging thrust-smack against the mother hell seals.");
+            }
+            else
+            {
+                subentry.entries.listAppend("Buy lunging thrust-smack from your guild.");
+            }
+            subentry.entries.listAppend(pluralizeWordy(seal_screeches, "seal " + screech_name, "seal " + screech_name + "es").capitalizeFirstLetter() + ".");
+            
+            
+            int sinew_need = clampi(6 - $item[hellseal sinew].available_amount(), 0, 6);
+            int brains_have = clampi(6 - $item[hellseal brain].available_amount(), 0, 6);
+            int hides_have = clampi(6 - $item[hellseal hide].available_amount(), 0, 6);
+            
+            string [int] items_needed_list;
+            foreach it in $items[hellseal sinew,hellseal brain,hellseal hide]
+            {
+                int remaining = clampi(6 - it.available_amount(), 0, 6);
+                if (remaining == 0) continue;
+                string name_short = it.to_string().replace_string("hellseal ", "");
+                string name_short_plural = it.plural.to_string().replace_string("hellseal ", "");
+                items_needed_list.listAppend(pluralizeWordy(remaining, "more " + name_short, "more " + name_short_plural));
+            }
+            if (items_needed_list.count() == 0)
+            {
+            }
+            else
+            {
+                subentry.entries.listAppend("Need " + items_needed_list.listJoinComponents(", ", "and") + ".");
+            }
+            
+            
+            string [int] passive_uneffect_description = PDSGenerateDescriptionToUneffectPassives();
+            if (passive_uneffect_description.count() > 0)
+                subentry.entries.listAppend(HTMLGenerateSpanFont(passive_uneffect_description.listJoinComponents("|"), "red", ""));
+                
+            if (!$slot[weapon].equipped_item().weapon_is_club())
+            {
+                subentry.entries.listAppend(HTMLGenerateSpanFont("Equip a club" + ($effect[Iron Palms].have_effect() > 0 ? " or sword" : "") + " first.", "red", ""));
+            }
+        }
     }
 }
 
@@ -471,6 +530,16 @@ void QNemesisGenerateCaveTasks(ChecklistSubentry subentry, item legendary_epic_w
                 door_unlockers.listAppend("polka of plenty buffed on you");
         }
         
+        foreach key, v in door_unlockers
+        {
+            item it = v.to_item();
+            if (it == $item[none]) continue;
+            if (it.to_string().to_lower_case() != v.to_lower_case())
+                continue;
+            if (it.item_amount() == 0)
+                door_unlockers[key] = HTMLGenerateSpanFont(door_unlockers[key], "grey", "");
+        }
+        
         subentry.entries.listAppend("Open doors via " + door_unlockers.listJoinComponents(", then ") + ".");
     }
     else if (state.mafia_internal_step == 4 || state.mafia_internal_step == 5)
@@ -544,6 +613,8 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 		return;
     if (!($classes[seal clubber,turtle tamer,pastamancer,sauceror,disco bandit,accordion thief] contains my_class()))
         return;
+    if (!__misc_state["guild open"])
+        return;
     
 	ChecklistSubentry subentry;
 	
@@ -603,7 +674,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     first_boss_name[$class[Disco Bandit]] = "The Spirit of New Wave";
     first_boss_name[$class[Accordion Thief]] = "Somerset Lopez, Dread Mariachi";
     
-    if (base_quest_state.mafia_internal_step <= 1 && !have_epic_weapon)
+    if (base_quest_state.mafia_internal_step <= 1)
     {
         //1	One of your guild leaders has tasked you to recover a mysterious and unnamed artifact stolen by your Nemesis. Your first step is to smith an Epic Weapon
         if (have_epic_weapon)
@@ -747,21 +818,8 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     {
         //15	Now that you've dealt with your Nemesis' assassins and found a map to the secret tropical island volcano lair, it's time to take the fight to your foe. Booyah
         //find island
-        if ($item[pirate fledges].available_amount() == 0)
-        {
-            subentry.entries.listAppend("Finish pirate quest first.");
-        }
-        else
-        {
-            url = "place.php?whichplace=cove";
-            subentry.entries.listAppend("Ask the pirates how to find the island.");
-            if ($item[pirate fledges].equipped_amount() == 0 && !is_wearing_outfit("Swashbuckling Getup"))
-            {
-                url = "inventory.php?which=2";
-                subentry.entries.listAppend("Wear pirate fledges.");
-            }
-            subentry.modifiers.listAppend("-combat");
-        }
+        url = "inventory.php?which=3";
+        subentry.entries.listAppend("Use the secret tropical island volcano lair map.");
     }
     else if (base_quest_state.mafia_internal_step == 16)
     {
@@ -784,7 +842,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             subentry.entries.listAppend("Solve the volcano maze, then fight your nemesis.");
         else
             subentry.entries.listAppend("Fight your nemesis.");
-        url = "volcanoisland.php";
+        url = "volcanomaze.php";
         if (legendary_epic_weapon.equipped_amount() == 0 && ultimate_legendary_epic_weapon.equipped_amount() == 0)
             subentry.entries.listAppend("Equip " + legendary_epic_weapon + ".");
         if (my_class() == $class[sauceror])

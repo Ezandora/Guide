@@ -155,6 +155,9 @@ void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [in
     {
         if (lookupItem("telegram from Lady Spookyraven").available_amount() > 0)
             description.listAppend(HTMLGenerateSpanFont("Read the telegram from Lady Spookyraven first.", "red", ""));
+        int desks_remaining = clampi(5 - get_property_int("writingDesksDefeated"), 0, 5);
+        if (desks_remaining > 0 && get_property_int("lastSecondFloorUnlock") != my_ascensions() && $item[Lady Spookyraven's necklace].available_amount() == 0 && get_property("questM20Necklace") != "finished" && mafiaIsPastRevision(15244))
+            description.listAppend(pluralizeWordy(desks_remaining, "desk", "desks").capitalizeFirstLetter() + " remaining.");
 
     }
     else if (monster_name == "Skinflute" || monster_name == "Camel's Toe")
@@ -190,7 +193,17 @@ void generateCopiedMonstersEntry(ChecklistEntry [int] task_entries, ChecklistEnt
         
         int fights_left = get_property_int("_romanticFightsLeft");
         if (fights_left > 1)
-            description.listAppend(fights_left + " fights left.");
+        {
+            string line = fights_left + " fights left";
+            
+            Vec2i estimated_range = Vec2iMake(15 * (fights_left - 1), 25 * (fights_left - 1));
+            estimated_range.x += turn_range.x;
+            estimated_range.y += turn_range.y;
+            
+            line += " over ~" + (estimated_range.x + estimated_range.y) / 2 + " turns.";
+            
+            description.listAppend(line);
+        }
         else if (fights_left == 1)
             description.listAppend("Last fight.");
         
@@ -341,25 +354,35 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] available_resources_en
         else
             header += " fightable";
         
-        string line;
-        if (current_monster == $monster[none])
-            line += "Options:";
-        else
-            line += "Other options:";
-        
-        if (lookupItem("alpine watercolor set").available_amount() == 0)
+        if (__misc_state["In run"])
         {
-            //url = "shop.php?whichshop=chateau";
-            line += " (buy alpine watercolor set first)";
-        }
-        else
-            line += " (copy with alpine watercolor set)";
+            string line;
+            if (current_monster == $monster[none])
+                line += "Options:";
+            else
+                line += "Other options:";
+            
+            if (lookupItem("alpine watercolor set").available_amount() == 0)
+            {
+                //url = "shop.php?whichshop=chateau";
+                line += " (buy alpine watercolor set first)";
+            }
+            else
+                line += " (copy with alpine watercolor set)";
         
-        line += "|*" + potential_copies.listJoinComponents("|*");
-        description.listAppend(line);
+            line += "|*" + potential_copies.listJoinComponents("|*");
+            description.listAppend(line);
+        }
         
         if (current_monster != $monster[none])
-            description.listPrepend(HTMLGenerateSpanOfClass("Currently have " + current_monster.to_string() + ".", "r_bold"));
+        {
+            string [int] monster_description;
+            CopiedMonstersGenerateDescriptionForMonster(current_monster, monster_description, true, true);
+            string line = HTMLGenerateSpanOfClass("Currently have " + current_monster.to_string() + ".", "r_bold");
+            if (monster_description.count() > 0)
+                line += "|*" + monster_description.listJoinComponents("|*");
+            description.listPrepend(line);
+        }
 		available_resources_entries.listAppend(ChecklistEntryMake("__item fancy oil painting", url, ChecklistSubentryMake(header, "", description)));
     }
     

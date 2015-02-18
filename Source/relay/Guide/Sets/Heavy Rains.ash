@@ -50,7 +50,7 @@ void SHeavyRainsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         description_for_skill[lookupSkill("Thunder Clap")] = "Turn-costing banish. (lasts 40 turns, no stats, no items, no meat)";
         description_for_skill[lookupSkill("Thundercloud")] = "Water depth increasing effect";
         description_for_skill[lookupSkill("Thunderheart")] = "+100% HP, surviving";
-        description_for_skill[lookupSkill("Thunderstrike")] = "Monster stunning (towerkilling)";
+        description_for_skill[lookupSkill("Thunderstrike")] = "Monster stunning";
         description_for_skill[lookupSkill("Thunder Thighs")] = "Thunder regen, passive";
         description_for_skill[lookupSkill("Thunder Bird")] = "Monster deleveling";
         if (in_hardcore())

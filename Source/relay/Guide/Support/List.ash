@@ -56,6 +56,14 @@ void listAppend(location [int] list, location entry)
 	list[position] = entry;
 }
 
+void listAppend(element [int] list, element entry)
+{
+	int position = list.count();
+	while (list contains position)
+		position += 1;
+	list[position] = entry;
+}
+
 void listAppendList(location [int] list, location [int] entries)
 {
 	foreach key in entries
@@ -113,12 +121,34 @@ void listAppend(string [int][int] list, string [int] entry)
 	list[position] = entry;
 }
 
+void listAppend(skill [int][int] list, skill [int] entry)
+{
+	int position = list.count();
+	while (list contains position)
+		position += 1;
+	list[position] = entry;
+}
+
 void listPrepend(string [int] list, string entry)
 {
 	int position = 0;
 	while (list contains position)
 		position -= 1;
 	list[position] = entry;
+}
+
+void listPrepend(skill [int] list, skill entry)
+{
+	int position = 0;
+	while (list contains position)
+		position -= 1;
+	list[position] = entry;
+}
+
+void listAppendList(skill [int] list, skill [int] entries)
+{
+	foreach key in entries
+        list.listAppend(entries[key]);
 }
 
 
@@ -129,6 +159,7 @@ void listClear(string [int] list)
 		remove list[i];
 	}
 }
+
 void listClear(int [int] list)
 {
 	foreach i in list
@@ -136,6 +167,7 @@ void listClear(int [int] list)
 		remove list[i];
 	}
 }
+
 void listClear(location [int] list)
 {
 	foreach i in list
@@ -143,6 +175,24 @@ void listClear(location [int] list)
 		remove list[i];
 	}
 }
+
+void listClear(skill [int] list)
+{
+	foreach i in list
+	{
+		remove list[i];
+	}
+}
+
+
+void listClear(boolean [string] list)
+{
+	foreach i in list
+	{
+		remove list[i];
+	}
+}
+
 
 string [int] listMakeBlankString()
 {
@@ -530,6 +580,22 @@ monster [int] listCopy(monster [int] l)
     return result;
 }
 
+element [int] listCopy(element [int] l)
+{
+    element [int] result;
+    foreach key in l
+        result[key] = l[key];
+    return result;
+}
+
+skill [int] listCopy(skill [int] l)
+{
+    skill [int] result;
+    foreach key in l
+        result[key] = l[key];
+    return result;
+}
+
 //Strict, in this case, means the keys start at 0, and go up by one per entry. This allows easy consistent access
 boolean listKeysMeetStrictRequirements(string [int] list)
 {
@@ -653,6 +719,18 @@ int listKeyForIndex(string [int] list, int index)
 	return -1;
 }
 
+int listKeyForIndex(location [int] list, int index)
+{
+	int i = 0;
+	foreach key in list
+	{
+		if (i == index)
+			return key;
+		i += 1;
+	}
+	return -1;
+}
+
 int llistKeyForIndex(string [int][int] list, int index)
 {
 	int i = 0;
@@ -672,4 +750,24 @@ string listGetRandomObject(string [int] list)
     if (list.count() == 1)
     	return list[listKeyForIndex(list, 0)];
     return list[listKeyForIndex(list, random(list.count()))];
+}
+
+location listGetRandomObject(location [int] list)
+{
+    if (list.count() == 0)
+        return $location[none];
+    if (list.count() == 1)
+    	return list[listKeyForIndex(list, 0)];
+    return list[listKeyForIndex(list, random(list.count()))];
+}
+
+
+boolean listContainsValue(monster [int] list, monster vo)
+{
+    foreach key, v2 in list
+    {
+        if (v2 == vo)
+            return true;
+    }
+    return false;
 }

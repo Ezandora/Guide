@@ -98,6 +98,11 @@ int pow2i(int v)
 	return v * v;
 }
 
+float pow2f(float v)
+{
+	return v * v;
+}
+
 //x^p
 float powf(float x, float p)
 {
@@ -136,6 +141,38 @@ Vec2i Vec2iZero()
 }
 
 boolean Vec2iValueInRange(Vec2i v, int value)
+{
+    if (value >= v.x && value <= v.y)
+        return true;
+    return false;
+}
+
+record Vec2f
+{
+	float x; //or width
+	float y; //or height
+};
+
+Vec2f Vec2fMake(float x, float y)
+{
+	Vec2f result;
+	result.x = x;
+	result.y = y;
+	
+	return result;
+}
+
+Vec2f Vec2fCopy(Vec2f v)
+{
+    return Vec2fMake(v.x, v.y);
+}
+
+Vec2f Vec2fZero()
+{
+	return Vec2fMake(0.0, 0.0);
+}
+
+boolean Vec2fValueInRange(Vec2f v, float value)
 {
     if (value >= v.x && value <= v.y)
         return true;
@@ -200,4 +237,57 @@ string roundForOutput(float v, int additional_fractional_digits)
 		return vi.to_string();
 	else
 		return v.to_string();
+}
+
+
+float floor(float v, int additional_fractional_digits)
+{
+	if (additional_fractional_digits < 1)
+		return v.floor().to_float();
+	float multiplier = powf(10.0, additional_fractional_digits);
+	return to_float(floor(v * multiplier)) / multiplier;
+}
+
+string floorForOutput(float v, int additional_fractional_digits)
+{
+	v = floor(v, additional_fractional_digits);
+	int vi = v.to_int();
+	if (vi.to_float() == v)
+		return vi.to_string();
+	else
+		return v.to_string();
+}
+
+
+float TriangularDistributionCalculateCDF(float x, float min, float max, float centre)
+{
+    //print("TriangularDistributionCalculateCDF(" + x + ", " + min + ", " + max + ", " + centre + ")");
+    //piecewise function:
+    if (x < min) return 0.0;
+    else if (x > max) return 1.0;
+    else if (x >= min && x <= centre)
+    {
+        float divisor = (max - min) * (centre - min);
+        if (divisor == 0.0)
+            return 0.0;
+        
+        return pow2f(x - min) / divisor;
+    }
+    else if (x <= max && x > centre)
+    {
+        float divisor = (max - min) * (max - centre);
+        if (divisor == 0.0)
+            return 0.0;
+        
+            
+        return 1.0 - pow2f(max - x) / divisor;
+    }
+    else //probably only happens with weird floating point values, assume chance of zero:
+        return 0.0;
+}
+
+//assume a centre equidistant from min and max
+float TriangularDistributionCalculateCDF(float x, float min, float max)
+{
+    return TriangularDistributionCalculateCDF(x, min, max, (min + max) * 0.5);
 }

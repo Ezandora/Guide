@@ -1,85 +1,16 @@
-string generateLocationBarModifierEntries(string [int] entries_in)
-{
-    if (entries_in.count() == 1)
-        return entries_in.listJoinComponents(", ");
-    
-    //Returns entries using a minimum-width algorithm designed to use two lines.
-    
-    string [int] entries = entries_in;
-    if (!entries.listKeysMeetStrictRequirements()) //insure we can test [key + 1] and such
-        entries = entries.listCopyStrictRequirements();
-    
-    int [int] entries_length;
-    foreach key in entries
-    {
-        entries_length[key] = entries[key].HTMLStripTags().length();
-    }
-    
-    int calculating_sum = 0;
-    
-    int smallest_length = 0;
-    int smallest_length_index = -1;
-    foreach key in entries
-    {
-        if (key == entries.count() - 1)
-            continue;
-        
-        calculating_sum += entries_length[key];
-        //If we split at the end of this entry, what will be our length?
-        int line_1_length = calculating_sum;
-        int line_2_length = 0;
-        foreach key2 in entries
-        {
-            if (key2 <= key)
-                continue;
-            line_2_length += entries_length[key2];
-        }
-        int line_length = MAX(line_1_length, line_2_length);
-        
-        if (smallest_length_index == -1)
-        {
-            smallest_length = line_length;
-            smallest_length_index = key;
-        }
-        else
-        {
-            if (smallest_length >= line_length)
-            {
-                smallest_length_index = key;
-                smallest_length = line_length;
-            }
-        }
-    }
-    //Split after smallest_length:
-    buffer result;
-    foreach key in entries
-    {
-        result.append(entries[key]);
-        boolean should_br = false;
-        if (key == smallest_length_index)
-            should_br = true;
-        if (key != entries.count() - 1)
-        {
-            if (should_br)
-                result.append(",");
-            else
-                result.append(", ");
-        }
-        if (should_br)
-            result.append("<br>");
-        
-    }
-    return result;
-}
+import "relay/Guide/Sections/Location Bar Popup.ash";
 
 buffer generateLocationBar(boolean displaying_navbar)
 {
     buffer bar;
     location l = __last_adventure_location;
+    if (!__setting_location_bar_uses_last_location)
+        l = my_location();
     //l = my_location();
     
-    if (l == $location[none])
+    if (l == $location[none] || __misc_state["In valhalla"])
         return "".to_buffer();
+    
     
     string url = l.getClickableURLForLocation();
     
@@ -164,7 +95,9 @@ buffer generateLocationBar(boolean displaying_navbar)
         }
         if (plant_data.count() == 0 && l.environment != "unknown" && l.environment != "none" && l.environment != "")
         {
-            if (!($locations[The Prince's Restroom,The Prince's Dance Floor,The Prince's Kitchen,The Prince's Balcony,The Prince's Lounge,The Prince's Canapes table,the shore\, inc. travel agency] contains l))
+            if (l == $location[The Valley of Rof L'm Fao])
+                plant_data.listAppend(l.environment.replace_string("o", "0"));
+            else if (!($locations[The Prince's Restroom,The Prince's Dance Floor,The Prince's Kitchen,The Prince's Balcony,The Prince's Lounge,The Prince's Canapes table,the shore\, inc. travel agency] contains l))
                 plant_data.listAppend(l.environment.capitalizeFirstLetter());
         }
     }
@@ -284,11 +217,16 @@ buffer generateLocationBar(boolean displaying_navbar)
         custom_location_information = pluralize(__quest_state["Level 12"].state_int["hippies left on battlefield"], "hippy", "hippies");
     else if ($locations[The Briny Deeps,The Brinier Deepers,The Briniest Deepests,An Octopus's Garden,The Wreck of the Edgar Fitzsimmons,Madness Reef,The Mer-Kin Outpost,The Skate Park,The Coral Corral,Mer-kin Colosseum,Mer-kin Library,Mer-kin Gymnasium,Mer-kin Elementary School,The Marinara Trench,Anemone Mine,The Dive Bar,The Caliginous Abyss] contains l)
     {
-        int pressure_penalty = MAX(0, -numeric_modifier("item drop penalty"));
+        Error error;
+        float pressure_penalty = l.pressurePenaltyForLocation(error);
+        custom_location_information = pressure_penalty.floor() + "% pressure";
+        if (error.was_error)
+            custom_location_information = "Unknown pressure";
+        /*int pressure_penalty = MAX(0, -numeric_modifier("item drop penalty"));
         if (l == my_location())
             custom_location_information = pressure_penalty + "% pressure";
         else //numeric_modifier is location sensitive
-            custom_location_information = "Unknown pressure";
+            custom_location_information = "Unknown pressure";*/
     }
     else if ($locations[The Prince's Restroom,The Prince's Dance Floor,The Prince's Kitchen,The Prince's Balcony,The Prince's Lounge,The Prince's Canapes table] contains l)
     {
@@ -486,6 +424,22 @@ buffer generateLocationBar(boolean displaying_navbar)
     {
         location_data.listAppend(pluralize(monster_data.count(), "monster", "monsters"));
     }
+    if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
+    {
+        float average_coins_gained = 0.0;
+        foreach m, rate in monster_appearance_rates
+        {
+            //print_html(m + " rate = " + rate);
+            if (rate <= 0) continue;
+            float coin_from_monster = m.ka_dropped();
+            //NC should already be included in appearance rates?
+            average_coins_gained += coin_from_monster * rate / 100.0;
+        }
+        if (average_coins_gained <= 0.0)
+            location_data.listAppend("No ka");
+        else
+            location_data.listAppend(average_coins_gained.roundForOutput(1) + " ka");
+    }
     
     boolean [location] powerleveling_locations = $locations[hamburglaris shield generator,video game level 1,video game level 2,video game level 3];
     
@@ -518,15 +472,30 @@ buffer generateLocationBar(boolean displaying_navbar)
             style += "bottom:" + __setting_navbar_height + ";";
         else
             style += "bottom:0px;";
-        bar.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_bottom_outer_container", "style", style)));
+        
+        string onmouseenter_code;
+        string onmouseleave_code;
+        
+        if (__setting_enable_location_popup_box)
+        {
+            onmouseenter_code = "if (document.getElementById('r_location_popup_box') != undefined) { document.getElementById('r_location_popup_box').style.display = 'inline'; document.getElementById('r_location_popup_blackout').style.display = 'inline'; }";
+            onmouseleave_code = "document.getElementById('r_location_popup_box').style.display = 'none'; document.getElementById('r_location_popup_blackout').style.display = 'none';";
+        }
+            
+        if (true)
+        {
+            string [string] outer_containiner_map = mapMake("class", "r_bottom_outer_container", "style", style);
+            if (onmouseenter_code.length() > 0)
+                outer_containiner_map["onmouseenter"] = onmouseenter_code;
+            if (onmouseleave_code.length() > 0)
+                outer_containiner_map["onmouseleave"] = onmouseleave_code;
+            bar.append(HTMLGenerateTagPrefix("div", outer_containiner_map));
+        }
         bar.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_bottom_inner_container", "style", "background:white;")));
     }
     
-    buffer table_style;
-    table_style.append("display:table;width:100%;height:100%;text-align:center;");
-    if (__setting_location_bar_fixed_layout)
-        table_style.append("table-layout:fixed;");
-    bar.append(HTMLGenerateTagPrefix("div", mapMake("style", table_style))); //
+    
+    
     
     
     string [int] table_entries;
@@ -534,6 +503,7 @@ buffer generateLocationBar(boolean displaying_navbar)
     string [int] table_entry_styles;
     string [int] table_entry_classes;
     float [int] table_entry_width_weight;
+    float [int] table_entry_fixed_width_percentage;
     if (true)
     {
         buffer style;
@@ -566,104 +536,23 @@ buffer generateLocationBar(boolean displaying_navbar)
         table_entry_width_weight[key + 1] = 0.8;
     }
     
-    int [int] table_entry_widths;
-    if (__setting_location_bar_fixed_layout)
-    {
-        int [int] table_entry_character_length;
-        foreach key in table_entries
-        {
-            //Complicated:
-            string entry = table_entries[key];
-            string [int] lines = entry.split_string("<br>");
-            int max_length = 0;
-            foreach key2 in lines
-            {
-                //Remove HTML:
-                string l = HTMLStripTags(lines[key2]);
-                max_length = MAX(max_length, l.length());
-            }
-            if (table_entry_width_weight contains key)
-                max_length = round(max_length.to_float() * table_entry_width_weight[key]);
-            table_entry_character_length[key] = max_length;
-        }
-        int total_character_count = listSum(table_entry_character_length);
-        int [int] proportional_character_lengths;
-        foreach key in table_entry_character_length
-        {
-            int v = table_entry_character_length[key];
-            if (total_character_count != 0 && __setting_location_bar_limit_max_width)
-            {
-                if (v.to_float() / total_character_count.to_float() >= __setting_location_bar_max_width_per_entry)
-                {
-                    v = floor(total_character_count.to_float() * __setting_location_bar_max_width_per_entry);
-                }
-            }
-            proportional_character_lengths[key] = v;
-        }
-        
-        int proportional_total = listSum(proportional_character_lengths);
-        foreach key in proportional_character_lengths
-        {
-            int v = proportional_character_lengths[key];
-            int width = 25;
-            if (proportional_character_lengths.count() > 0)
-                width = floor(100.0 / proportional_character_lengths.count().to_float()); //backup
-            if (proportional_total != 0)
-            {
-                width = v.to_float() / proportional_total.to_float() * 100;
-            }
-            table_entry_widths[key] = width;
-        }
-    }
     
-    if (table_entry_widths.listSum() > 100)
-    {
-        //Safety backup. Renormalize:
-        int current_sum = table_entry_widths.listSum();
-        foreach key in table_entry_widths
-        {
-            if (current_sum != 0) //not strictly necessary, will always be true (as the code currently is)
-                table_entry_widths[key] = floor(table_entry_widths[key].to_float() / current_sum.to_float() * 100.0);
-        }
-    }
     
-    foreach key in table_entries
-    {
-        string s = table_entries[key];
-        string entry_url = url;
-        if (table_entry_urls contains key)
-            entry_url = table_entry_urls[key];
-        
-        string [string] map = generateMainLinkMap(entry_url);
-        map["class"] += " r_location_bar_table_entry";
-        if (table_entry_classes contains key)
-            map["class"] += " " + table_entry_classes[key];
-        if (table_entry_styles contains key)
-            map["style"] += table_entry_styles[key];
-        
-        if (table_entry_widths contains key)
-            map["style"] += "width:" + table_entry_widths[key] + "%;";
-        
-        if (entry_url.length() != 0)
-            bar.append(HTMLGenerateTagPrefix("a", map));
-        else
-            bar.append(HTMLGenerateTagPrefix("div", map));
-        
-        if (table_entry_classes contains key)
-            bar.append(s);
-        else
-            bar.append(HTMLGenerateTagWrap("div", s, mapMake("class", "r_cl_modifier_inline"))); //r_cl_modifier_inline needs its own div due to CSS class order precedence
-        if (entry_url.length() != 0)
-        {
-            bar.append("</a>");
-        }
-        else
-            bar.append("</div>");
-    }
-    bar.append("</div>");
+    bar.append(generateLocationBarTable(table_entries, table_entry_urls, table_entry_styles, table_entry_classes, table_entry_width_weight, table_entry_fixed_width_percentage, url));
+    
+    
+
+    //bar.append("</div>");
+    
+    
     
     
     bar.append("</div>");
     bar.append("</div>");
+    
+    float bottom_coordinates = __setting_navbar_height_in_em;
+    if (displaying_navbar)
+        bottom_coordinates = __setting_navbar_height_in_em * 2.0;
+    bar.append(generateLocationPopup(bottom_coordinates));
     return bar;
 }

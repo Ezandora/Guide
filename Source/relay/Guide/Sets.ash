@@ -35,7 +35,9 @@ void SetsGenerateResources(ChecklistEntry [int] available_resources_entries)
     SSpeakeasyGenerateResource(available_resources_entries);
     SHeavyRainsGenerateResource(available_resources_entries);
     SBugbearInvasionGenerateResource(available_resources_entries);
-    
+    SClassesGenerateResource(available_resources_entries);
+    SEquipmentGenerateResource(available_resources_entries);
+    SActuallyEdtheUndyingGenerateResource(available_resources_entries);
 }
 
 void SetsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -66,6 +68,9 @@ void SetsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 	SHeavyRainsGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SEventsGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SBugbearInvasionGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+	SClassesGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+	SEquipmentGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+	SActuallyEdtheUndyingGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     
 }
 

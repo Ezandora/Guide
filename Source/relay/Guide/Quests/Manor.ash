@@ -26,10 +26,14 @@ void QManorInit()
     //Pirates: relevant (acquiring outfit)
     if (__misc_state["can reasonably reach -25% combat"])
         state.state_boolean["need ballroom song set"] = false;
-    
+    if (my_turncount() >= 200)
+        state.state_boolean["need ballroom song set"] = false;
     
     
     if (__misc_state_string["ballroom song"] == "-combat")
+        state.state_boolean["need ballroom song set"] = false;
+    
+    if ($location[the haunted ballroom].delayRemainingInLocation() == 0) //probably not worth it anymore
         state.state_boolean["need ballroom song set"] = false;
     
     if ($location[the haunted ballroom].delayRemainingInLocation() > 0)
@@ -149,7 +153,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
                 }
                 else
                 {
-                    if ($item[Lady Spookyraven's dancing shoes].available_amount() == 0)
+                    if ($item[Lady Spookyraven's dancing shoes].available_amount() == 0 && dance_quest_state.mafia_internal_step < 4)
                     {
                         //NC (louvre or leave it) in gallery
                         string [int] modifiers;
@@ -187,7 +191,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
                         
                         modifiers.listAppend("+meat");
                     }
-                    if ($item[Lady Spookyraven's powder puff].available_amount() == 0)
+                    if ($item[Lady Spookyraven's powder puff].available_amount() == 0 && dance_quest_state.mafia_internal_step < 4)
                     {
                         string [int] modifiers;
                         string [int] description;
@@ -212,7 +216,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
                         else
                             modifiers.listAppend("-combat");
                     }
-                    if ($item[Lady Spookyraven's finest gown].available_amount() == 0)
+                    if ($item[Lady Spookyraven's finest gown].available_amount() == 0 && dance_quest_state.mafia_internal_step < 4)
                     {
                         //elegant nightstand in bedroom (banish?)
                         //also acquire disposable instant camera. spectacles...?
@@ -334,8 +338,10 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         image_name = "__item tiny knife and fork";
         subentry.entries.listAppend("To unlock the Haunted Billiards Room.");
         
-        if (get_property("romanticTarget").to_monster() == $monster[writing desk] && get_property_int("_romanticFightsLeft") > 0)
-            subentry.entries.listAppend(HTMLGenerateSpanFont("Avoid adventuring here,", "red", "") + " as you seem to be using the writing desk trick?");
+        if (get_property("romanticTarget").to_monster() == $monster[writing desk] && get_property_int("_romanticFightsLeft") > 0 || get_property_int("writingDesksDefeated") > 0)
+        {
+            subentry.entries.listAppend(HTMLGenerateSpanFont("Avoid adventuring here,", "red", "") + " as you seem to be using the writing desk trick?|Need to fight " + pluralizeWordy(clampi(5 - get_property_int("writingDesksDefeated"), 0, 5), "more writing desk.", "more writing desks."));
+        }
         
         float drawers_per_turn = 0.0;
         float hot_resistance = numeric_modifier("hot resistance");

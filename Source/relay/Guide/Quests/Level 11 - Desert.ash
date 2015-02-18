@@ -14,12 +14,15 @@ void QLevel11DesertInit()
     state.state_boolean["Wormridden"] = (gnasir_progress & 16) > 0;
     
     state.state_int["Desert Exploration"] = get_property_int("desertExploration");
+    if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
+        state.state_int["Desert Exploration"] = 100;
     state.state_boolean["Desert Explored"] = (state.state_int["Desert Exploration"] == 100);
     if (state.finished) //in case mafia doesn't detect it properly
     {
         state.state_int["Desert Exploration"] = 100;
         state.state_boolean["Desert Explored"] = true;
     }
+        
     
     
     boolean have_uv_compass_equipped = false;

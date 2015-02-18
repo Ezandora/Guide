@@ -160,7 +160,7 @@ void SPulverizeGenerateResource(ChecklistEntry [int] available_resources_entries
         details.listAppend("Can smash " + spleen_wad_output_list.listJoinComponents(" ", "and").capitalizeFirstLetter() + " for spleen wads.");
     
     
-    if (($classes[sauceror,pastamancer] contains my_class()) && guild_store_available() && $skill[Transcendental Noodlecraft].skill_is_usable() && $skill[The Way of Sauce].skill_is_usable()) //can make hi mein?
+    if (($classes[sauceror,pastamancer] contains my_class()) && __misc_state["guild open"] && $skill[Transcendental Noodlecraft].skill_is_usable() && $skill[The Way of Sauce].skill_is_usable()) //can make hi mein?
     {
         string [int] elemental_nuggets_list;
         
@@ -203,7 +203,7 @@ void SPulverizeGenerateResource(ChecklistEntry [int] available_resources_entries
         string url = "craft.php?mode=smith";
         if ($item[tenderizing hammer].available_amount() == 0)
         {
-            url = "store.php?whichstore=s";
+            url = "shop.php?whichshop=meatsmith";
             details.listAppend("Acquire a tenderizing hammer.");
         }
         available_resources_entries.listAppend(ChecklistEntryMake("pulverize", url, ChecklistSubentryMake(title, "", details), 10));

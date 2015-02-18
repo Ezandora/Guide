@@ -24,6 +24,8 @@ void QWhiteCitadelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 {
     if (!mafiaIsPastRevision(14794))
         return;
+    if (!__misc_state["guild open"]) //bugged
+        return;
 	QuestState base_quest_state = __quest_state["White Citadel"];
 	if (!base_quest_state.in_progress)
 		return;

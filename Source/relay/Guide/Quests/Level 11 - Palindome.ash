@@ -23,11 +23,13 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
 
 	if (!__quest_state["Level 11 Palindome"].in_progress && __quest_state["Level 11"].mafia_internal_step <3) //questL11Palindome unstarted until uncertain time
         return;
+    if (__quest_state["Level 11 Palindome"].finished)
+        return;
     if (__quest_state["Level 11"].finished)
         return;
     if (__quest_state["Level 11"].mafia_internal_step <3 )
         return;
-    if ($items[staff of fats,Staff of Ed\, almost,Staff of Ed].available_amount() > 0)
+    if (($item[Staff of Ed\, almost].available_amount() > 0 || lookupItem("2325").available_amount() > 0 || lookupItem("2268").available_amount() > 0) && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING)
         return;
     
     QuestState base_quest_state = __quest_state["Level 11 Palindome"];
@@ -142,7 +144,16 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                             components.listAppend($item[bird rib]);
                         if ($item[lion oil].available_amount() == 0)
                             components.listAppend($item[lion oil]);
-                        string line = "Adventure in Whitey's Grove to acquire " + components.listJoinComponents("", "and") + ".|Need +300% item and +combat.";
+                        string line = "Adventure in Whitey's Grove to acquire " + components.listJoinComponents("", "and") + ".";
+                      
+                        line += "|";
+                        if ($location[whitey's grove].item_drop_modifier_for_location() + numeric_modifier("food drop") >= 300.0)
+                        {
+                            line += "Have +300% item";
+                        }
+                        else
+                            line += HTMLGenerateSpanFont("Need +300% item", "red", "");
+                        line += " and +combat.";
                         if (familiar_is_usable($familiar[jumpsuited hound dog]))
                             line += " (hound dog is useful for this)";
                         subentry.entries.listAppend(line);

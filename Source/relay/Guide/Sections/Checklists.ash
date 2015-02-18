@@ -49,6 +49,20 @@ void generateMisc(Checklist [int] checklists)
             description.listAppend("Or equip your wineglass.");
         }
         
+        if (__misc_state["In run"])
+        {
+            int adventures_after_rollover = my_adventures() + 40;
+            if (my_path_id() != PATH_SLOW_AND_STEADY)
+                adventures_after_rollover += numeric_modifier("adventures");
+            if (get_property_boolean("_borrowedTimeUsed"))
+                adventures_after_rollover -= 20;
+            
+            adventures_after_rollover = clampi(adventures_after_rollover, 0, 200);
+            if (getHolidaysTomorrow()["Labór Day"] && my_path_id() != PATH_SLOW_AND_STEADY)
+                adventures_after_rollover += 10;
+            description.listAppend("Will start with " + adventures_after_rollover + " adventures tomorrow.");
+        }
+        
         int rollover_adventures_from_equipment = 0;
         foreach s in $slots[]
             rollover_adventures_from_equipment += s.equipped_item().numeric_modifier("adventures").to_int();
@@ -90,7 +104,7 @@ void generateMisc(Checklist [int] checklists)
         {
             string url = "shop.php?whichshop=still";
             if ($item[soda water].available_amount() == 0)
-                url = "store.php?whichstore=m";
+                url = "shop.php?whichshop=generalstore";
             task_entries.entries.listAppend(ChecklistEntryMake("__item tonic water", url, ChecklistSubentryMake("Make " + pluralize(stills_available(), $item[tonic water]), "", listMake("Tonic water is a ~40MP restore, improved from soda water.", "Or improve drinks.")), -11));
         }
 	}
@@ -139,10 +153,7 @@ void generateChecklists(Checklist [int] ordered_output_checklists)
         }
         if (__setting_debug_show_all_internal_states && __setting_debug_mode)
         {
-            generateImageTest(checklists);
-            generateStateTest(checklists);
-            generateCounterTest(checklists);
-            generateSelfDataTest(checklists);
+            generateAllTests(checklists);
         }
         generateFloristFriar(checklists);
         

@@ -84,9 +84,13 @@ float [monster] appearance_rates_adjusted(location l)
     if (l == $location[the hidden park])
     {
         if (janitors_relocated)
-            source_altered[$monster[pygmy janitor]] += 1.0;
+            source_altered[$monster[pygmy janitor]] = 1.0;
+        else if (source_altered contains $monster[pygmy janitor])
+            remove source_altered[$monster[pygmy janitor]];
         if (lawyers_relocated)
-            source_altered[$monster[pygmy witch lawyer]] += 1.0;
+            source_altered[$monster[pygmy witch lawyer]] = 1.0;
+        else if (source_altered contains $monster[pygmy witch lawyer])
+            remove source_altered[$monster[pygmy witch lawyer]];
     }
     if (($locations[The Hidden Apartment Building,The Hidden Bowling Alley,The Hidden Hospital,The Hidden Office Building] contains l))
     {
@@ -96,10 +100,65 @@ float [monster] appearance_rates_adjusted(location l)
             remove source_altered[$monster[pygmy witch lawyer]];
     }
     
-    foreach m in source_altered
+    if (l == $location[nemesis cave])
     {
-        if (m.is_banished())
-            source_altered[m] = 0.0;
+        boolean [monster] all_monsters_to_remove = $monsters[infernal seal larva,infernal seal spawn,vengeful turtle spectre,haunted soup tureen,evil spaghetti cultist,evil spaghetti cult priest,pernicious puddle of pesto,slithering hollandaise glob,psychedelic fur,talking head,evil trumpet-playing mariachi,evil vihuela-playing mariachi];
+        
+        boolean [monster] monsters_not_to_remove;
+        if (my_class() == $class[seal clubber])
+            monsters_not_to_remove = $monsters[infernal seal larva,infernal seal spawn];
+        else if (my_class() == $class[turtle tamer])
+            monsters_not_to_remove = $monsters[vengeful turtle spectre,haunted soup tureen];
+        else if (my_class() == $class[pastamancer])
+            monsters_not_to_remove = $monsters[evil spaghetti cultist,evil spaghetti cult priest];
+        else if (my_class() == $class[sauceror])
+            monsters_not_to_remove = $monsters[pernicious puddle of pesto,slithering hollandaise glob];
+        else if (my_class() == $class[disco bandit])
+            monsters_not_to_remove = $monsters[psychedelic fur,talking head];
+        else if (my_class() == $class[accordion thief])
+            monsters_not_to_remove = $monsters[evil trumpet-playing mariachi,evil vihuela-playing mariachi];
+        foreach m in all_monsters_to_remove
+        {
+            if (monsters_not_to_remove contains m)
+                continue;
+            remove source_altered[m];
+        }
+    }
+    if (l == $location[The Nemesis' Lair])
+    {
+        boolean [monster] all_monsters_to_remove = $monsters[hellseal guardian,Gorgolok\, the Infernal Seal (Inner Sanctum),warehouse worker,Stella\, the Turtle Poacher (Inner Sanctum),evil spaghetti cult zealot,Spaghetti Elemental (Inner Sanctum),security slime,Lumpy\, the Sinister Sauceblob (Inner Sanctum),daft punk,Spirit of New Wave (Inner Sanctum),mariachi bruiser,Somerset Lopez\, Dread Mariachi (Inner Sanctum)];
+        
+        boolean [monster] monsters_not_to_remove;
+        if (my_class() == $class[seal clubber])
+            monsters_not_to_remove = $monsters[hellseal guardian,Gorgolok\, the Infernal Seal (Inner Sanctum)];
+        else if (my_class() == $class[turtle tamer])
+            monsters_not_to_remove = $monsters[warehouse worker,Stella\, the Turtle Poacher (Inner Sanctum)];
+        else if (my_class() == $class[pastamancer])
+            monsters_not_to_remove = $monsters[evil spaghetti cult zealot,Spaghetti Elemental (Inner Sanctum)];
+        else if (my_class() == $class[sauceror])
+            monsters_not_to_remove = $monsters[security slime,Lumpy\, the Sinister Sauceblob (Inner Sanctum)];
+        else if (my_class() == $class[disco bandit])
+            monsters_not_to_remove = $monsters[daft punk,Spirit of New Wave (Inner Sanctum)];
+        else if (my_class() == $class[accordion thief])
+            monsters_not_to_remove = $monsters[mariachi bruiser,Somerset Lopez\, Dread Mariachi (Inner Sanctum)];
+        foreach m in all_monsters_to_remove
+        {
+            if (monsters_not_to_remove contains m)
+                continue;
+            remove source_altered[m];
+        }
+    }
+    
+    boolean banishes_are_possible = true;
+    if ($locations[the secret government laboratory,sloppy seconds diner] contains l)
+        banishes_are_possible = false;
+    if (banishes_are_possible)
+    {
+        foreach m in source_altered
+        {
+            if (m.is_banished())
+                source_altered[m] = 0.0;
+        }
     }
     
     //umm... I'm not sure if appearance_rates() takes into account olfact all the time or not
@@ -513,6 +572,7 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         //Initialize:
         //We use to_location() lookups here because $location[] will halt the script if the location name changes.
         //Probably could coalese these into foreach s in $strings[] loops, or move this to an external data file.
+        //Also static, but some of these use my_hash()...
         string [string] lookup_map;
         lookup_map["Pump Up Muscle"] = "place.php?whichplace=knoll_friendly&action=dk_gym";
         lookup_map["Richard's Hobo Mysticality"] = "clan_hobopolis.php?place=3";
@@ -613,10 +673,10 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         lookup_map["The Clumsiness Grove"] = "suburbandis.php";
         lookup_map["The Maelstrom of Lovers"] = "suburbandis.php";
         lookup_map["The Glacier of Jerks"] = "suburbandis.php";
-        lookup_map["The Degrassi Knoll Restroom"] = "bigisland.php?place=orchard";
-        lookup_map["The Degrassi Knoll Bakery"] = "bigisland.php?place=orchard";
-        lookup_map["The Degrassi Knoll Gym"] = "bigisland.php?place=orchard";
-        lookup_map["The Degrassi Knoll Garage"] = "bigisland.php?place=orchard";
+        lookup_map["The Degrassi Knoll Restroom"] = "place.php?whichplace=knoll_hostile";
+        lookup_map["The Degrassi Knoll Bakery"] = "place.php?whichplace=knoll_hostile";
+        lookup_map["The Degrassi Knoll Gym"] = "place.php?whichplace=knoll_hostile";
+        lookup_map["The Degrassi Knoll Garage"] = "place.php?whichplace=knoll_hostile";
         lookup_map["The \"Fun\" House"] = "place.php?whichplace=plains";
         lookup_map["Pre-Cyrpt Cemetary"] = "place.php?whichplace=plains";
         lookup_map["Post-Cyrpt Cemetary"] = "place.php?whichplace=plains";
@@ -707,7 +767,6 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         lookup_map["The Castle in the Clouds in the Sky (Ground Floor)"] = "place.php?whichplace=giantcastle";
         lookup_map["The Castle in the Clouds in the Sky (Top Floor)"] = "place.php?whichplace=giantcastle";
         lookup_map["The Hole in the Sky"] = "place.php?whichplace=beanstalk";
-        lookup_map["Sorceress' Hedge Maze"] = "lair3.php";
         lookup_map["The Broodling Grounds"] = "volcanoisland.php";
         lookup_map["The Outer Compound"] = "volcanoisland.php";
         lookup_map["The Temple Portico"] = "volcanoisland.php";
@@ -715,8 +774,8 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         lookup_map["Outside the Club"] = "volcanoisland.php";
         lookup_map["The Island Barracks"] = "volcanoisland.php";
         lookup_map["The Nemesis' Lair"] = "volcanoisland.php";
-        lookup_map["The Bugbear Pen"] = "bigisland.php?place=orchard";
-        lookup_map["The Spooky Gravy Burrow"] = "bigisland.php?place=orchard";
+        lookup_map["The Bugbear Pen"] = "place.php?whichplace=knoll_friendly";
+        lookup_map["The Spooky Gravy Burrow"] = "place.php?whichplace=knoll_friendly";
         lookup_map["The Stately Pleasure Dome"] = "place.php?whichplace=wormwood";
         lookup_map["The Mouldering Mansion"] = "place.php?whichplace=wormwood";
         lookup_map["The Rogue Windmill"] = "place.php?whichplace=wormwood";
@@ -802,6 +861,8 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         lookup_map["The Crimbonium Mining Camp"] = "place.php?whichplace=desertbeach";
         lookup_map["The Crimbonium Mine"] = "mining.php?mine=5";
 
+        foreach s in $strings[The Edge of the Swamp,The Dark and Spooky Swamp,The Corpse Bog,The Ruined Wizard Tower,The Wildlife Sanctuarrrrrgh,Swamp Beaver Territory,The Weird Swamp Village]
+            lookup_map[s] = "place.php?whichplace=marais";
         foreach s in $strings[Ye Olde Medievale Villagee,Portal to Terrible Parents,Rumpelstiltskin's Workshop]
             lookup_map[s] = "place.php?whichplace=ioty2014_rumple";
             
@@ -814,6 +875,11 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         
         foreach s in $strings[Medbay,Waste Processing,Sonar,Science Lab,Morgue,Special Ops,Engineering,Navigation,Galley]
             lookup_map[s] = "place.php?whichplace=bugbearship";
+        foreach s in $strings[Sweet-Ade Lake,Eager Rice Burrows,Gumdrop Forest]
+            lookup_map[s] = "place.php?whichplace=ioty2014_candy";
+            
+        foreach s in $strings[Fastest Adventurer Contest,Strongest Adventurer Contest,Smartest Adventurer Contest,Smoothest Adventurer Contest,A Crowd of (Stat) Adventurers,Hottest Adventurer Contest,Coldest Adventurer Contest,Spookiest Adventurer Contest,Stinkiest Adventurer Contest,Sleaziest Adventurer Contest,A Crowd of (Element) Adventurers,The Hedge Maze,Tower Level 1,Tower Level 2,Tower Level 3,Tower Level 4,Tower Level 5,The Naughty Sorceress' Chamber]
+            lookup_map[s] = "place.php?whichplace=nstower";
             
         lookup_map["Trick-or-treating"] = "place.php?whichplace=town&action=town_trickortreat";
         //Conditionals:
@@ -831,7 +897,13 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
             lookup_map["Palindome"] = "place.php?whichplace=palindome";
         else
             lookup_map["Palindome"] = "inventory.php?which=2";
+            
         
+        //antique maps are weird:
+        lookup_map["The Electric Lemonade Acid Parade"] = "inv_use.php?pwd=" + my_hash() + "&whichitem=4613";
+        foreach s in $strings[Professor Jacking's Small-O-Fier,Professor Jacking's Huge-A-Ma-tron]
+            lookup_map[s] = "inv_use.php?pwd=" + my_hash() + "&whichitem=4560";
+            
         //Parse into locations:
         foreach location_name in lookup_map
         {

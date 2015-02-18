@@ -34,7 +34,7 @@ void SFamiliarsGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [
         if (!__quest_state["Level 12"].state_boolean["Nuns Finished"] && have_outfit_components("Frat Warrior Fatigues") && have_outfit_components("War Hippy Fatigues")) //brigand trick
             potential_targets.listAppend("brigand");
         
-        if (!familiar_is_usable($familiar[angry jung man]) && in_hardcore() && !__quest_state["Level 13"].state_boolean["past keys"] && ($item[digital key].available_amount() + creatable_amount($item[digital key])) == 0 && __misc_state["fax equivalent accessible"])
+        if (!familiar_is_usable($familiar[angry jung man]) && in_hardcore() && !__quest_state["Level 13"].state_boolean["digital key used"] && ($item[digital key].available_amount() + creatable_amount($item[digital key])) == 0 && __misc_state["fax equivalent accessible"])
             potential_targets.listAppend("ghost");
         
         if (__misc_state["In run"] && ($items[bricko eye brick,bricko airship,bricko bat,bricko cathedral,bricko elephant,bricko gargantuchicken,bricko octopus,bricko ooze,bricko oyster,bricko python,bricko turtle,bricko vacuum cleaner].available_amount() > 0 || $skill[summon brickos].skill_is_usable()))
@@ -49,7 +49,18 @@ void SFamiliarsGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [
     
     if (lookupFamiliar("Crimbo Shrub").familiar_is_usable())
     {
-        if (get_property("shrubGifts") == "meat" && $effect[everything looks red].have_effect() == 0)
+        boolean should_output = false;
+        if (__misc_state["In run"])
+        {
+            if (from_task)
+                should_output = true;
+        }
+        else
+        {
+            if (!from_task)
+                should_output = true;
+        }
+        if (get_property("shrubGifts") == "meat" && $effect[everything looks red].have_effect() == 0 && should_output)
         {
             string url = "";
             string title = "Open a Big Red Present in combat";

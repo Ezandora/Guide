@@ -1,10 +1,10 @@
-import "Level 11 - Copperhead.ash";
-import "Level 11 - Pyramid.ash";
-import "Level 11 - Desert.ash";
-import "Level 11 - Palindome.ash";
-import "Level 11 - Manor.ash";
-import "Level 11 - Hidden City.ash";
-import "Level 11 - Hidden Temple.ash";
+import "relay/Guide/Quests/Level 11 - Copperhead.ash";
+import "relay/Guide/Quests/Level 11 - Pyramid.ash";
+import "relay/Guide/Quests/Level 11 - Desert.ash";
+import "relay/Guide/Quests/Level 11 - Palindome.ash";
+import "relay/Guide/Quests/Level 11 - Manor.ash";
+import "relay/Guide/Quests/Level 11 - Hidden City.ash";
+import "relay/Guide/Quests/Level 11 - Hidden Temple.ash";
 
 void QLevel11Init()
 {
@@ -138,7 +138,7 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         }
         if (get_property_int("blackForestProgress") >= 1 && __quest_state["Level 13"].state_boolean["wall of skin will need to be defeated"] && lookupItem("beehive").available_amount() == 0)
         {
-            subentry.entries.listAppend("Find a beehive for the tower, from the non-combat.|*" + listMake("Head toward the blackberry patch", "Head toward the buzzing sound", "Keep going", "Almost... there...").listJoinComponents(__html_right_arrow_character) + "|*Costs three turns. Skip if you're towerkilling.");
+            subentry.entries.listAppend("Find a beehive for the tower, from the non-combat.|*" + listMake("Head toward the blackberry patch", "Head toward the buzzing sound", "Keep going", "Almost... there...").listJoinComponents(__html_right_arrow_character) + "|*Costs two extra turns. Skip if you're towerkilling.");
         }
     }
     else if (base_quest_state.mafia_internal_step < 3)

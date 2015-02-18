@@ -15,19 +15,21 @@ void generateMissingItems(Checklist [int] checklists)
 	{
 		ChecklistSubentry [int] subentries;
 		
-		subentries[subentries.count()] = ChecklistSubentryMake("Wand of Nagamar", "", "");
+		subentries.listAppend(ChecklistSubentryMake("Wand of Nagamar", "", ""));
 		
 		if (__misc_state_int["ruby w needed"] > 0)
-			subentries[subentries.count()] = ChecklistSubentryMake("ruby W", "Clover or +234% item", listMake("Clover the castle basement", "W Imp - Dark Neck of the Woods/Pandamonium Slums - 30% drop"));
+			subentries.listAppend(ChecklistSubentryMake("ruby W", "Clover or +234% item", listMake("Clover the castle basement", "W Imp - Dark Neck of the Woods/Pandamonium Slums - 30% drop")));
 		if (__misc_state_int["metallic a needed"] > 0)
-			subentries[subentries.count()] = ChecklistSubentryMake("metallic A", "Clover or +234% item", listMake("Clover the castle basement", "MagiMechTech MechaMech - Penultimate Fantasy Airship - 30% drop"));
+			subentries.listAppend(ChecklistSubentryMake("metallic A", "Clover or +234% item", listMake("Clover the castle basement", "MagiMechTech MechaMech - Penultimate Fantasy Airship - 30% drop")));
 		if (__misc_state_int["lowercase n needed"] > 0 && __misc_state_int["lowercase n available"] == 0)
 		{
 			string name = "lowercase N";
-			subentries[subentries.count()] = ChecklistSubentryMake(name, "Clover or +234% item", listMake("Clover the castle basement", "XXX pr0n - Valley of Rof L'm Fao - 30% drop"));
+			subentries.listAppend(ChecklistSubentryMake(name, "Clover or +234% item", listMake("Clover the castle basement", "XXX pr0n - Valley of Rof L'm Fao - 30% drop")));
 		}
 		if (__misc_state_int["heavy d needed"] > 0)
-			subentries[subentries.count()] = ChecklistSubentryMake("heavy D", "Clover or +150% item", listMake("Clover the castle basement", "Alphabet Giant - Castle Basement - 40% drop"));
+			subentries.listAppend(ChecklistSubentryMake("heavy D", "Clover or +150% item", listMake("Clover the castle basement", "Alphabet Giant - Castle Basement - 40% drop")));
+        if (subentries.count() == 1)
+            subentries[0].entries.listAppend("Can create it.");
 			
 		ChecklistEntry entry = ChecklistEntryMake("__item wand of nagamar", $location[the castle in the clouds in the sky (basement)].getClickableURLForLocation(), subentries);
 		entry.should_indent_after_first_subentry = true;
@@ -39,7 +41,7 @@ void generateMissingItems(Checklist [int] checklists)
 	{
 		//Key items:
 		
-		if ($item[skeleton key].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["past keys"])
+		if ($item[skeleton key].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["skeleton key used"])
 		{
 			string line = "loose teeth";
 			if ($item[loose teeth].available_amount() == 0)
@@ -54,7 +56,7 @@ void generateMissingItems(Checklist [int] checklists)
 			items_needed_entries.listAppend(ChecklistEntryMake("__item skeleton key", $location[the defiled nook].getClickableURLForLocation(), ChecklistSubentryMake("Skeleton key", "", line)));
 		}
 		
-		if ($item[digital key].available_amount() == 0)
+		if ($item[digital key].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["digital key used"])
 		{
 			string [int] options;
             if ($item[digital key].creatable_amount() > 0)
@@ -74,7 +76,7 @@ void generateMissingItems(Checklist [int] checklists)
 		string from_daily_dungeon_string = "From daily dungeon";
 		if ($item[fat loot token].available_amount() > 0)
 			from_daily_dungeon_string += "|" + pluralize($item[fat loot token]) + " available";
-		if ($item[sneaky pete's key].available_amount() == 0)
+		if ($item[sneaky pete's key].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["Sneaky Pete's key used"])
 		{
 			string [int] options;
 			options.listAppend(from_daily_dungeon_string);
@@ -82,7 +84,7 @@ void generateMissingItems(Checklist [int] checklists)
 				options.listAppend("From key lime pie");
 			items_needed_entries.listAppend(ChecklistEntryMake("__item Sneaky Pete's key", "da.php", ChecklistSubentryMake("Sneaky Pete's key", "", options)));
 		}
-		if ($item[jarlsberg's key].available_amount() == 0)
+		if ($item[jarlsberg's key].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["Jarlsberg's key used"])
 		{
 			string [int] options;
 			options.listAppend(from_daily_dungeon_string);
@@ -90,7 +92,7 @@ void generateMissingItems(Checklist [int] checklists)
 				options.listAppend("From key lime pie");
 			items_needed_entries.listAppend(ChecklistEntryMake("__item jarlsberg's key", "da.php", ChecklistSubentryMake("Jarlsberg's key", "", options)));
 		}
-		if ($item[Boris's key].available_amount() == 0)
+		if ($item[Boris's key].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["Boris's key used"])
 		{
 			string [int] options;
 			options.listAppend(from_daily_dungeon_string);

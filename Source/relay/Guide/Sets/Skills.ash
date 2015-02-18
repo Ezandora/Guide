@@ -48,6 +48,9 @@ void SSkillsGenerateResource(ChecklistEntry [int] available_resources_entries)
 	property_summons_to_skills["_psychokineticHugUsed"] = listMake($skill[Psychokinetic Hug]);
 	property_summons_to_skills["_pirateBellowUsed"] = listMake(lookupSkill("Pirate Bellow"));
 	property_summons_to_skills["_holidayFunUsed"] = listMake(lookupSkill("Summon Holiday Fun!"));
+	property_summons_to_skills["_summonCarrotUsed"] = listMake(lookupSkill("Summon Carrot"));
+    
+    
     
     
     

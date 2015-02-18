@@ -20,7 +20,8 @@ void QLevel10Init()
         beanstalk_grown = true;
     
     state.state_boolean["Beanstalk grown"] = beanstalk_grown;
-	
+    if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
+        state.state_boolean["Beanstalk grown"] = true;
 	
 	if (my_level() >= 10)
 		state.startable = true;
@@ -179,7 +180,7 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 	else
 	{
         url = "place.php?whichplace=giantcastle";
-        if (get_property("lastEncounter") == "Keep On Turnin' the Wheel in the Sky")
+        if (base_quest_state.mafia_internal_step >= 11) //(get_property("lastEncounter") == "Keep On Turnin' the Wheel in the Sky")
         {
             url = "place.php?whichplace=town";
             subentry.entries.listAppend("Talk to the council to finish quest.");

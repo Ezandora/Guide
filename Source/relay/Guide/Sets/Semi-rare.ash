@@ -124,7 +124,7 @@ void SemirareGenerateDescription(string [int] description)
 		}
         
         //FIXME does small golem cause the wall of bones to reform?
-        /*if (!__quest_state["Level 13"].state_boolean["past tower"] && $item[small golem].available_amount() == 0 && (get_property("grimstoneMaskPath") == "gnome" || $item[grimstone mask].available_amount() > 0))
+        /*if (!__quest_state["Level 13"].state_boolean["past tower monsters"] && $item[small golem].available_amount() == 0 && (get_property("grimstoneMaskPath") == "gnome" || $item[grimstone mask].available_amount() > 0))
         {
             boolean can_create_golem = false;
             if ($item[clay].available_amount() >= 1 && ($item[leather].available_amount() >= 3 || $item[parchment].available_amount() >= 1))

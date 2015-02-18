@@ -40,14 +40,14 @@ void computeFatLootTokens()
         need_jarlsberg_key = false;
     if ($item[sneaky pete's key].available_amount() > 0)
         need_sneaky_pete_key = false;
-    
-    if (__quest_state["Level 13"].state_boolean["past keys"])
-    {
-        need_boris_key = false;
-        need_jarlsberg_key = false;
+        
+    if (__quest_state["Level 13"].state_boolean["Sneaky Pete's key used"])
         need_sneaky_pete_key = false;
-    }
-    
+    if (__quest_state["Level 13"].state_boolean["Boris's key used"])
+        need_boris_key = false;
+    if (__quest_state["Level 13"].state_boolean["Jarlsberg's key used"])
+        need_jarlsberg_key = false;
+        
     if (need_boris_key)
         tokens_needed += 1;
     if (need_jarlsberg_key)
@@ -71,7 +71,22 @@ void computeFatLootTokens()
 
 void setUpState()
 {
+    __misc_state.listClear();
 	__last_adventure_location = get_property_location("lastAdventure");
+    if (__misc_state["Example mode"])
+    {
+        int wanted_index = random_safe($locations[].count());
+        int i = 0;
+        foreach l in $locations[]
+        {
+            if (i == wanted_index)
+            {
+                __last_adventure_location = l;
+                break;
+            }
+            i += 1;
+        }
+    }
     
 	__misc_state["In aftercore"] = get_property_boolean("kingLiberated");
     //if (get_property_int("lastKingLiberation") == my_ascensions() && my_ascensions() != 0)
@@ -315,7 +330,7 @@ void setUpState()
 		skills_temporarily_missing = true;
 		familiars_temporarily_missing = true;
 	}
-	if (my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE)
+	if (my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
 	{
 		skills_temporarily_missing = true;
 		familiars_temporarily_missing = true;
@@ -410,7 +425,7 @@ void setUpState()
 	//wand
 	
 	boolean wand_of_nagamar_needed = true;
-	if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_BUGBEAR_INVASION || my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_KOLHS || my_path_id() == PATH_HEAVY_RAINS)
+	if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_BUGBEAR_INVASION || my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_KOLHS || my_path_id() == PATH_HEAVY_RAINS || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
 		wand_of_nagamar_needed = false;
 		
 	int ruby_w_needed = 1;
@@ -618,6 +633,11 @@ void setUpState()
             if (mafiaIsPastRevision(13785) && get_property("peteMotorbikeMuffler") == "Extra-Quiet Muffler" && $skill[Rev Engine].skill_is_usable())
                 minus_combat_source_count += 3;
         }
+        if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
+        {
+            if (lookupSkill("Shelter of Shed").have_skill())
+                minus_combat_source_count += 4;
+        }
         if (minus_combat_source_count >= 5)
             __misc_state["can reasonably reach -25% combat"] = true;
     }
@@ -638,6 +658,69 @@ void setUpState()
         __misc_state_string["resting description"] = "Chateau Mantegna";
         __misc_state["recommend resting at campsite"] = false;
     }
+    
+    if ($classes[seal clubber,turtle tamer] contains my_class())
+        __misc_state["guild open"] = QuestState("questG09Muscle").finished;
+    else if ($classes[pastamancer,sauceror] contains my_class())
+        __misc_state["guild open"] = QuestState("questG07Myst").finished;
+    else if ($classes[disco bandit,accordion thief] contains my_class())
+        __misc_state["guild open"] = QuestState("questG08Moxie").finished;
+    if (guild_store_available())
+        __misc_state["guild open"] = true;
+    
+    
+    __misc_state["muscle guild store available"] = false;
+    __misc_state["mysticality guild store available"] = false;
+    __misc_state["moxie guild store available"] = false;
+    if (guild_store_available())
+    {
+        if ($classes[seal clubber, turtle tamer] contains my_class())
+            __misc_state["muscle guild store available"] = true;
+        if ($classes[pastamancer, sauceror] contains my_class())
+            __misc_state["mysticality guild store available"] = true;
+        if ($classes[disco bandit,accordion thief] contains my_class())
+            __misc_state["moxie guild store available"] = true;
+        
+        if (my_class() == $class[accordion thief] && my_level() >= 9)
+        {
+            __misc_state["muscle guild store available"] = true;
+            __misc_state["mysticality guild store available"] = true;
+        }
+    }
+
+    __misc_state["can purchase magical mystery juice"] = __misc_state["mysticality guild store available"];
+    __misc_state["have some reasonable way of restoring MP"] = false;
+    
+    if (__misc_state["can purchase magical mystery juice"] || black_market_available() || dispensary_available())
+        __misc_state["have some reasonable way of restoring MP"] = true;
+        
+    
+    __misc_state_float["meat per MP"] = 17.0;
+    if (QuestState("questM04Galaktic").finished)
+        __misc_state_float["meat per MP"] = MIN(__misc_state_float["meat per MP"], 12.0);
+    
+    float soda_cost = -1.0;
+    if (black_market_available())
+        soda_cost = $item[black cherry soda].npc_price();
+    else if (dispensary_available())
+        soda_cost = $item[knob goblin seltzer].npc_price();
+    else if (can_interact())
+        soda_cost = $item[knob goblin seltzer].mall_price();
+    
+    if (soda_cost > 0.0)
+    {
+        __misc_state_float["meat per MP"] = MIN(__misc_state_float["meat per MP"], soda_cost / 10.0);
+    }
+    
+    if (__misc_state["can purchase magical mystery juice"])
+    {
+        float juice_cost = $item[magical mystery juice].npc_price();
+        float mp_restored = 5.0 + my_level().to_float() * 1.5;
+        
+        if (juice_cost > 0.0)
+            __misc_state_float["meat per MP"] = MIN(__misc_state_float["meat per MP"], juice_cost / mp_restored);
+    }
+
 }
 
 

@@ -160,6 +160,7 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
         
         
         ChecklistSubentry subentry;
+        string url;
         subentry.header = window_name;
         
         
@@ -176,6 +177,20 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
             subentry.entries = SCountersGenerateDescriptionForRainMonster();
         }
         
+        if (turn_range.x <= 0)
+        {
+            if (get_property_boolean("dailyDungeonDone"))
+            {
+                url = "da.php";
+                subentry.entries.listAppend("Could check for free in the daily dungeon.");
+            }
+            else if (get_property_int("hiddenApartmentProgress") >= 1 && get_property_int("hiddenBowlingAlleyProgress") >= 1 && get_property_int("hiddenHospitalProgress") >= 1 && get_property_int("hiddenOfficeProgress") >= 1) //we could support suggesting each shrine individually, but effort
+            {
+                url = $location[the hidden park].getClickableURLForLocation();
+                subentry.entries.listAppend("Could check for free in one of the shrines.");
+            }
+        }
+        
         string image_name = "__item Pok&euml;mann figurine: Frank"; //default - some person
         if (window_image_names contains window_name)
             image_name = window_image_names[window_name];
@@ -183,7 +198,7 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
         int importance = 10;
         if (very_important)
             importance = -11;
-        ChecklistEntry entry = ChecklistEntryMake(image_name, "", subentry, importance);
+        ChecklistEntry entry = ChecklistEntryMake(image_name, url, subentry, importance);
         
         if (very_important)
             task_entries.listAppend(entry);

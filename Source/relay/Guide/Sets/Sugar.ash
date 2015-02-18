@@ -5,7 +5,7 @@ void SugarGenerateSuggestions(string [int] suggestions)
         return;
     if ($item[sugar shield].available_amount() == 0 && $item[snow suit].available_amount() == 0)
         suggestions.listAppend("Sugar shield: +10 familiar weight equip");
-    if ($item[sugar chapeau].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["past tower"])
+    if ($item[sugar chapeau].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["past tower monsters"])
         suggestions.listAppend("Sugar chapeau: +50% spell damage (tower killing)");
 }
 

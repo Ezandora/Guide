@@ -14,6 +14,8 @@ boolean [string] getHolidaysForDate(string realworld_date, int game_day)
         holidays["Halloween"] = true;
     else if (realworld_date == "0214")
         holidays["Valentine's Day"] = true;
+    else if (realworld_date == "0525")
+        holidays["Towel Day"] = true;
     
     //Crimbo
     if (now_to_string("M").to_int_silent() == 12)
@@ -107,4 +109,54 @@ void SHolidayGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     }
     if (all_tomorrows_parties["Halloween"] && !__misc_state["In run"])
         optional_task_entries.listAppend(ChecklistEntryMake("__item plastic pumpkin bucket", "", ChecklistSubentryMake("Save turns for Halloween tomorrow", "", ""), 8));
+    
+    if (todays_holidays["Arrrbor Day"])
+    {
+        string [int] description;
+        boolean [item] outfit_pieces_needed;
+        foreach it in $items[crotchety pants,Saccharine Maple pendant,willowy bonnet]
+        {
+            if (!it.haveAtLeastXOfItemEverywhere(1))
+                outfit_pieces_needed[it] = true;
+        }
+        //FIXME detect collecting reward?
+        if ($items[bag of Crotchety Pine saplings,bag of Saccharine Maple saplings,bag of Laughing Willow saplings].available_amount() == 0)
+        {
+            description.listAppend("Choose a sapling type.");
+            string [int] suggestions;
+            if (outfit_pieces_needed[$item[crotchety pants]])
+                suggestions.listAppend("Crotchety Pine");
+            if (outfit_pieces_needed[$item[Saccharine Maple pendant]])
+                suggestions.listAppend("Saccharine Maple");
+            if (outfit_pieces_needed[$item[willowy bonnet]])
+                suggestions.listAppend("Laughing Willow");
+            if (suggestions.count() > 0)
+                description.listAppend("Could try " + suggestions.listJoinComponents(", ", "or") + " for the reward item" + (suggestions.count() > 1 ? "s" : "") + ".");
+        }
+        else
+        {
+            item [int] bag_types;
+            boolean have_a_bag_equipped = false;
+            foreach it in $items[bag of Crotchety Pine saplings,bag of Saccharine Maple saplings,bag of Laughing Willow saplings]
+            {
+                if (it.available_amount() > 0)
+                    bag_types.listAppend(it);
+                if (it.equipped_amount() > 0)
+                    have_a_bag_equipped = true;
+            }
+            if (!have_a_bag_equipped)
+            {
+                description.listAppend("Equip your " + bag_types.listJoinComponents(", ", "or") + ".");
+            }
+            else if (outfit_pieces_needed.count() > 0)
+            {
+                description.listAppend("Adventure for at least one hundred adventures to collect the outfit piece next holiday.");
+            }
+            else
+            {
+                description.listAppend("Adventure for at least two adventures to collect the potion reward next holiday.");
+            }
+        }
+        optional_task_entries.listAppend(ChecklistEntryMake("__item spooky sapling", "place.php?whichplace=woods", ChecklistSubentryMake("Plant trees", "", description), 8));
+    }
 }

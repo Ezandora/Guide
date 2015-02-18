@@ -52,13 +52,13 @@ void QLevel7Init()
             
     }
     
-	if (state.state_int["alcove evilness"] == 0)
+	if (state.state_int["alcove evilness"] <= 0)
 		state.state_boolean["alcove finished"] = true;
-	if (state.state_int["cranny evilness"] == 0)
+	if (state.state_int["cranny evilness"] <= 0)
 		state.state_boolean["cranny finished"] = true;
-	if (state.state_int["niche evilness"]  == 0)
+	if (state.state_int["niche evilness"] <= 0)
 		state.state_boolean["niche finished"] = true;
-	if (state.state_int["nook evilness"] == 0)
+	if (state.state_int["nook evilness"] <= 0)
 		state.state_boolean["nook finished"] = true;
 		
 		

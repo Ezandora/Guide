@@ -240,7 +240,20 @@ void SSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
             string [int] description;
             
             description.listAppend("One adventure cost for an intrinsic.");
-            description.listAppend("Potential options:|*+3 all resistances|*+3 stats/fight (best)|*+50% meat (requires 20 love)|*+50% init (requires 20 hate)");
+            string [int] options;
+            options.listAppend("+3 all resistances (slicked-back do)");
+            options.listAppend("+3 stats/fight (best, pompadour)");
+            if (my_audience() >= 20)
+                options.listAppend("+50% meat (cowlick)");
+            else
+                options.listAppend(HTMLGenerateSpanFont("+50% meat (requires 20 love)", "grey", ""));
+            if (my_audience() <= -20)
+                options.listAppend("+50% init (fauxhawk)");
+            else
+                options.listAppend(HTMLGenerateSpanFont("+50% init (requires 20 hate)", "grey", ""));
+                
+            //description.listAppend("Potential options:|*|*|*+|*");
+            description.listAppend("Potential options:|*" + options.listJoinComponents("|*"));
             optional_task_entries.listAppend(ChecklistEntryMake("__skill Check Mirror", "skills.php", ChecklistSubentryMake("Check mirror", "", description), 11));
         }
     }

@@ -55,7 +55,7 @@ void QGuildGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 	
 	string active_url = "";
     
-    if (__misc_state["In run"])
+    if (__misc_state["In run"] && my_path_id() != PATH_PICKY && !in_bad_moon())
     {
         if ($classes[seal clubber,turtle tamer] contains my_class() && !mafiaIsPastRevision(14934)) //you always go here in ascension
             return;
@@ -97,10 +97,18 @@ void QGuildGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         if ($classes[disco bandit,accordion thief] contains my_class())
         {
             //sleazy back alley
-            active_url = $location[the sleazy back alley].getClickableURLForLocation();
             relevant_location[$location[the sleazy back alley]] = true;
-            subentry.entries.listAppend("Adventure in the sleazy back alley to steal your own pants.");
-            output_modifiers = true;
+            if ($slot[pants].equipped_item() == $item[none])
+            {
+                active_url = "inventory.php?which=2";
+                subentry.entries.listAppend("Equip some pants.");
+            }
+            else
+            {
+                active_url = $location[the sleazy back alley].getClickableURLForLocation();
+                subentry.entries.listAppend("Adventure in the sleazy back alley to steal your own pants.");
+                output_modifiers = true;
+            }
         }
         
         if (output_modifiers)

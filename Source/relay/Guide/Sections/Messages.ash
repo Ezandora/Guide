@@ -35,6 +35,8 @@ string generateRandomMessage()
     holiday_messages["Groundhog Day"] = "it's cold out there every day";
     holiday_messages["Crimbo"] = "merry crimbo";
     holiday_messages["April Fool's Day"] = "you are ascending too quickly, ascend slower!";
+    holiday_messages["Valentine's Day"] = HTMLGenerateSpanFont("&#x2665;&#xfe0e;", "pink", "3.0em");
+    holiday_messages["Towel Day"] = "don't panic";
     
     boolean [string] holidays_today = getHolidaysToday();
     foreach holiday in holidays_today
@@ -60,8 +62,9 @@ string generateRandomMessage()
     location_messages[$location[The Arrrboretum]] = "save the planet";
     location_messages[$location[the red queen's garden]] = "curiouser and curiouser";
     location_messages[$location[A Massive Ziggurat]] = "1.21 ziggurats";
-    location_messages[$location[McMillicancuddy's Barn]] = "dooks";
-    location_messages[$location[the battlefield (hippy uniform)]] = "love and war";
+    location_messages[lookupLocation("McMillicancuddy's Barn")] = "dooks";
+    location_messages[lookupLocation("The Roman Forum")] = "they go the house";
+    location_messages[lookupLocation("the battlefield (hippy uniform)")] = "love and war";
     location_messages[$location[the middle chamber]] = "pyramid laundry machine";
     location_messages[$location[the arid, extra-dry desert]] = "can't remember your name";
     location_messages[$location[outside the club]] = "around the world around the world around the world around the world";
@@ -136,7 +139,7 @@ string generateRandomMessage()
     
     effect_messages[$effect[consumed by anger]] = "don't ascend angry";
     effect_messages[$effect[consumed by regret]] = "wasted potential";
-    effect_messages[lookupEffect("All Revved Up")] = "vroom";
+    effect_messages[$effect[All Revved Up]] = "vroom";
     if (my_path_id() != PATH_WAY_OF_THE_SURPRISING_FIST)
         effect_messages[$effect[Expert Timing]] = "martial arts and crafts";
     effect_messages[$effect[apathy]] = "";
@@ -145,6 +148,7 @@ string generateRandomMessage()
     effect_messages[$effect[Teleportitis]] = "everywhere and nowhere";
     effect_messages[$effect[Form of...Bird!]] = "fiddle fiddle fiddle";
     effect_messages[$effect[superstar]] = "&#9733;";
+    effect_messages[$effect[hopped up on goofballs]] = "a massive drug deficiency";
     
     
     foreach e in effect_messages
@@ -184,9 +188,10 @@ string generateRandomMessage()
     paths[PATH_PICKY] = "combinatorial ascension";
     if ($skill[cannelloni cannon].skill_is_usable() && !$skill[cannelloni cocoon].skill_is_usable()) //such an easy mistake...
         paths[PATH_PICKY] = "cannelloni confusion";
+    paths[PATH_STANDARD] = "no past no path";
+    paths[PATH_ACTUALLY_ED_THE_UNDYING] = "UNDYING!";
     //paths[PATH_CLASS_ACT_3] = "buttons for the people";
     //paths[PATH_AVATAR_OF_THE_NAUGHTY_SORCERESS] = "go forth to your lair! have some tea";
-    
     
     if (paths contains my_path_id())
         random_messages.listAppend(paths[my_path_id()]);
@@ -288,6 +293,8 @@ string generateRandomMessage()
     familiar_messages[$familiar[reanimated reanimator]] = "weird science";
     familiar_messages[lookupFamiliar("Twitching Space Critter")] = "right right right right down right agh";
     familiar_messages[$familiar[slimeling]] = "lost mother";
+    if (format_today_to_string("MM") == "07")
+        familiar_messages[lookupFamiliar("Crimbo Shrub")] = "crimbo in july";
     
     if (familiar_messages contains my_familiar() && !__misc_state["familiars temporarily blocked"])
         random_messages.listAppend(familiar_messages[my_familiar()]);
@@ -336,7 +343,10 @@ string generateRandomMessage()
     monster_messages[$monster[Fickle Finger of F8]] = "f/8 and be there";
     monster_messages[$monster[malevolent crop circle]] = "I want to believe";
     monster_messages[$monster[enraged cow]] = "moo";
-    monster_messages[$monster[Claybender Sorcerer Ghost]] = "accio blank-out";
+    if ($item[bottle of blank-out].is_unrestricted())
+        monster_messages[$monster[Claybender Sorcerer Ghost]] = "accio blank-out";
+    else
+        monster_messages[$monster[Claybender Sorcerer Ghost]] = "leaderboardus totalus";
     monster_messages[$monster[Whatsian Commando Ghost]] = "captain jack hotness";
     monster_messages[$monster[Space Tourist Explorer Ghost]] = "oh my";
     monster_messages[$monster[Battlie Knight Ghost]] = "boring conversation anyway";
@@ -349,7 +359,7 @@ string generateRandomMessage()
     monster_messages[$monster[Black Crayon Spiraling Shape]] = "be what you're like";
     monster_messages[$monster[best-selling novelist]] = "fiction to escape reality";
     monster_messages[$monster[7-Foot Dwarf Replicant]] = "it's too bad she won't live<br>but then again, who does?";
-    monster_messages[$monster[Avatar of Jarlsberg]] = "smoked cheese";
+    monster_messages[lookupMonster("Avatar of Jarlsberg")] = "smoked cheese";
     monster_messages[$monster[giant sandworm]] = "walk without rhythm";
     monster_messages[$monster[bookbat]] = "tattered scrap of dignity";
     monster_messages[$monster[urge to stare at your hands]] = ".&#x20dd;.&#x20dd;"; //.⃝.⃝
@@ -358,11 +368,17 @@ string generateRandomMessage()
     monster_messages[lookupMonster("extremely annoyed witch")] = "am I blue?"; //you dare to strike... quit it!
     monster_messages[lookupMonster("surprised and annoyed witch")] = "these tears in my eyes, telling you";
     monster_messages[$monster[Ron "The Weasel" Copperhead]] = "RONALD WEASLEY! HOW DARE YOU STEAL THAT ZEPPELIN<br>" + ChecklistGenerateModifierSpan("your father's now facing an inquiry at work and it's entirely YOUR FAULT");
+    monster_messages[lookupMonster("Mr. Loathing")] = HTMLGenerateTagWrap("a", "ruuun! go! get to the towah!", generateMainLinkMap("place.php?whichplace=nstower"));
+    if (my_hp() < my_maxhp())
+        monster_messages[lookupMonster("smooth criminal")] = "you've been hit by<br>you've been struck by<br><i>a smooth criminal</i>";
     if (monster_messages contains last_monster() && last_monster() != $monster[none])
     {
 		random_messages.listClear();
         random_messages.listAppend(monster_messages[last_monster()]);
     }
+    
+    
+    
     
     if (__misc_state_int["Basement Floor"] == 500)
     {
@@ -479,5 +495,6 @@ string generateRandomMessage()
 	int current_minute = now_to_string("mm").to_int_silent();
 	int minute_of_day = current_hour * 60 + current_minute;
 	chosen_message = random_messages[minute_of_day % random_messages.count()];
+    
     return chosen_message;
 }

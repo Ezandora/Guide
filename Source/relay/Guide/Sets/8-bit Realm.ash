@@ -65,9 +65,9 @@ void S8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             string [int] description;
             string [int] modifiers;
             modifiers.listAppend("olfact bloopers");
-            modifiers.listAppend("+67% item");
+            modifiers.listAppend("+100% item");
             
-            description.listAppend("Run +67% item, olfact bloopers.");
+            description.listAppend("Run +100% item, olfact bloopers.");
             description.listAppend(total_white_pixels + "/30 white pixels found.");
             if (__misc_state["VIP available"] && __misc_state["fax equivalent accessible"])
                 description.listAppend("Possibly consider faxing/copying a ghost. (+150% item, drops five white pixels)");

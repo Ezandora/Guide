@@ -30,9 +30,14 @@ void smithsnessGenerateCoalSuggestions(string [int] coal_suggestions)
 			coal_item_suggestions[$item[Work is a Four Letter Sword]] = "weapon, +2x smithsness weapon damage";
 		else if (my_primestat() == $stat[moxie])
 			coal_item_suggestions[$item[Sheila Take a Crossbow]] = "weapon, +smithsness initiative";
-            
+        
+        string [int] sheila_reasons;
         if (__quest_state["Level 7"].state_boolean["alcove needs speed tricks"])
-			coal_item_suggestions[$item[Sheila Take a Crossbow]] = "weapon, +smithsness initiative (useful for modern zmobies)";
+			sheila_reasons.listAppend("modern zmobies");
+        if (!__quest_state["Level 13"].state_boolean["Init race completed"])
+            sheila_reasons.listAppend("lair init race");
+        if (sheila_reasons.count() > 0)
+            coal_item_suggestions[$item[Sheila Take a Crossbow]] = "weapon, +smithsness initiative (useful for " + sheila_reasons.listJoinComponents(", ", "and") + ")";
 			
 			
 	}
@@ -58,7 +63,7 @@ void smithsnessGenerateCoalSuggestions(string [int] coal_suggestions)
 		int number_wanted_max = 1;
 		if (it.to_slot() == $slot[weapon] && it.weapon_hands() == 1)
 		{
-			if ($skill[double-fisted skull smashing].skill_is_usable())
+			if ($skill[double-fisted skull smashing].skill_is_usable() && it.item_type() != "accordion")
 				number_wanted_max += 1;
 			if (familiar_is_usable($familiar[disembodied hand]))
 				number_wanted_max += 1;

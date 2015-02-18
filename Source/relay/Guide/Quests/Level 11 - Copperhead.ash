@@ -198,8 +198,17 @@ void QLevel11RonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
             subentry.modifiers.listAppend("olfact red butler");
         
         
-        if (!__quest_state["Level 11 Shen"].finished && $items[priceless diamond,red zeppelin ticket].available_amount() == 0)
-            subentry.entries.listAppend("Could adventure in the Copperhead Club first for a ticket. (greatly speeds up area)");
+        if ($item[red zeppelin ticket].available_amount() == 0)
+        {
+            if ($item[priceless diamond].available_amount() > 0)
+                subentry.entries.listAppend("Trade in your priceless diamond for a red zeppelin ticket.");
+            else if (my_meat() >= $item[red zeppelin ticket].npc_price() && my_meat() >= 4000)
+                subentry.entries.listAppend("Purchase a red zeppelin ticket in the black market.");
+            else if (!__quest_state["Level 11 Shen"].finished)
+                subentry.entries.listAppend("Could adventure in the Copperhead Club first for a ticket. (greatly speeds up area)");
+            else
+                subentry.entries.listAppend("No ticket.");
+        }
             
         if ($skill[Transcendent Olfaction].skill_is_usable() && !($effect[on the trail].have_effect() > 0 && get_property_monster("olfactedMonster") == $monster[red butler]))
             subentry.entries.listAppend("Olfact red butlers for glark cables.");
@@ -327,6 +336,8 @@ void QLevel11ShenGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         
         if ($items[priceless diamond,Red Zeppelin ticket].available_amount() == 0 && __quest_state["Level 11 Ron"].mafia_internal_step < 5)
             need_diamond = true;
+        if (my_meat() >= 5000)
+            need_diamond = false;
         if (__quest_state["Level 11 Ron"].state_boolean["need protestor speed tricks"])
             need_flaming_whathisname = true;
         

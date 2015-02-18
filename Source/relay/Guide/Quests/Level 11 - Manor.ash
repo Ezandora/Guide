@@ -5,7 +5,7 @@ void QLevel11ManorInit()
     state.quest_name = "Lord Spookyraven Quest";
     state.image_name = "Spookyraven manor";
     
-    if ($items[Eye of Ed,Headpiece of the Staff of Ed,Staff of Ed].available_amount() > 0)
+    if (($items[Eye of Ed,Headpiece of the Staff of Ed].available_amount() > 0 || lookupItem("2325").available_amount() > 0) && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING)
         QuestStateParseMafiaQuestPropertyValue(state, "finished");
     
     
@@ -235,12 +235,19 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                 }
                 if (output_final_fight_info)
                 {
-                    subentry.modifiers.listAppend("elemental resistance");
-                    subentry.entries.listAppend("Fight Lord Spookyraven.");
-                    
-                    if ($effect[Red Door Syndrome].have_effect() == 0 && my_meat() > 1000)
+                    if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
                     {
-                        subentry.entries.listAppend("A can of black paint can help with fighting him. Bit pricy. (1k meat)");
+                        subentry.entries.listAppend("Talk to Lord Spookyraven.");
+                    }
+                    else
+                    {
+                        subentry.modifiers.listAppend("elemental resistance");
+                        subentry.entries.listAppend("Fight Lord Spookyraven.");
+                        
+                        if ($effect[Red Door Syndrome].have_effect() == 0 && my_meat() > 1000)
+                        {
+                            subentry.entries.listAppend("A can of black paint can help with fighting him. Bit pricy. (1k meat)");
+                        }
                     }
                 }
                 if (use_fast_route)

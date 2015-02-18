@@ -1,3 +1,8 @@
+import "relay/Guide/Support/Spell Damage.ash"
+import "relay/Guide/Support/Passive Damage.ash"
+import "relay/Guide/Support/Item Filter.ash"
+
+
 Record TFWMInternalModifier
 {
     string description;
@@ -306,8 +311,10 @@ void QLevel13Init()
     
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL13Final");
-    if (my_path_id() == PATH_BUGBEAR_INVASION || __misc_state["In aftercore"])
+    if (my_path_id() == PATH_BUGBEAR_INVASION || __misc_state["In aftercore"] || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING) //FIXME mafia may track the ed L13 quest under this variable
         QuestStateParseMafiaQuestPropertyValue(state, "finished"); //never will start
+	if (__misc_state["Example mode"])
+        QuestStateParseMafiaQuestPropertyValue(state, "step6");
 	state.quest_name = "Naughty Sorceress Quest";
 	state.image_name = "naughty sorceress lair";
 	state.council_quest = true;
@@ -318,15 +325,15 @@ void QLevel13Init()
     //FIXME these all need checking:
     string [string] telescope1_messages_to_type;
     telescope1_messages_to_type["all wearing sunglasses and dancing"] = "moxie";
-    telescope1_messages_to_type["standing around flexing their muscles and using grip exercisers"] = "muscle"; //???
-    //telescope1_messages_to_type["?"] = "mysticality"; //FIXME add
+    telescope1_messages_to_type["standing around flexing their muscles and using grip exercisers"] = "muscle";
+    telescope1_messages_to_type["sitting around playing chess and solving complicated-looking logic puzzles"] = "mysticality";
     
     string [string] telescope2_messages_to_type;
     telescope2_messages_to_type["greasy-looking people furtively skulking around"] = "sleaze";
     telescope2_messages_to_type["people, all of whom appear to be on fire"] = "hot"; //???
-    //telescope2_messages_to_type["?"] = "cold"; //???
+    telescope2_messages_to_type["people, clustered around a group of igloos"] = "cold";
     telescope2_messages_to_type["people, surrounded by a cloud of eldritch mist"] = "spooky"; //???
-    telescope2_messages_to_type["people, surrounded by garbage and clouds of flies"] = "stench"; //???
+    telescope2_messages_to_type["people, surrounded by garbage and clouds of flies"] = "stench";
     
     string [string] telescope3_messages_to_type;
     string [string] telescope4_messages_to_type;
@@ -335,18 +342,27 @@ void QLevel13Init()
     telescope3_messages_to_type["creepy-looking black bushes on the outskirts of a hedge maze"] = "spooky";
     telescope3_messages_to_type["nasty-looking, dripping green bushes on the outskirts of a hedge maze"] = "stench"; //stench? sleaze?
     telescope3_messages_to_type["purplish, greasy-looking hedges"] = "sleaze"; //???
+    telescope3_messages_to_type["smoldering bushes on the outskirts of a hedge maze"] = "hot"; //???
+    telescope3_messages_to_type["frost-rimed bushes on the outskirts of a hedge maze"] = "cold";
     
     telescope4_messages_to_type["a greasy purple cloud hanging over the center of the maze"] = "sleaze";
     telescope4_messages_to_type["smoke rising from deeper within the maze"] = "hot"; //????
     telescope4_messages_to_type["a miasma of eldritch vapors rising from deeper within the maze"] = "spooky"; //????
+    telescope4_messages_to_type["a cloud of green gas hovering over the maze"] = "stench"; //????
+    telescope4_messages_to_type["wintry mists rising from deeper within the maze"] = "cold";
     
     telescope5_messages_to_type["occasionally disgorging a bunch of ice cubes"] = "cold";
-    //telescope5_messages_to_type["that occasionally vomits out a greasy ball of hair"] = "sleaze"; //???
+    telescope5_messages_to_type["that occasionally vomits out a greasy ball of hair"] = "sleaze"; //???
     telescope5_messages_to_type["surrounded by creepy black mist"] = "spooky"; //???
     telescope5_messages_to_type["disgorging a really surprising amount of sewage"] = "stench"; //???
+    telescope5_messages_to_type["with lava slowly oozing out of it"] = "hot"; //???
     
-    state.state_string["Stat race type"] = telescope1_messages_to_type[get_property("telescope1")];
-    state.state_string["Elemental damage race type"] = telescope2_messages_to_type[get_property("telescope2")];
+    state.state_string["Stat race type"] = get_property("nsChallenge1"); //telescope1_messages_to_type[get_property("telescope1")];
+    if (state.state_string["Stat race type"] == "none")
+        state.state_string["Stat race type"] = "";
+    state.state_string["Elemental damage race type"] = get_property("nsChallenge2"); //telescope2_messages_to_type[get_property("telescope2")];
+    if (state.state_string["Elemental damage race type"] == "none")
+        state.state_string["Elemental damage race type"] = "";
     
     string [int] elements_needed = listMake(telescope3_messages_to_type[get_property("telescope3")], telescope4_messages_to_type[get_property("telescope4")], telescope5_messages_to_type[get_property("telescope5")]);
     
@@ -363,38 +379,62 @@ void QLevel13Init()
     if (have_all_elements)
         state.state_string["Hedge maze elements needed"] = elements_needed.listJoinComponents("|");
     
+    state.state_boolean["past races"] = state.mafia_internal_step >= 2;
     
-    state.state_boolean["Init race completed"] = false; //FIXME SET THIS
-    state.state_boolean["Stat race completed"] = false; //FIXME SET THIS
-    state.state_boolean["Elemental damage race completed"] = false; //FIXME SET THIS
-    if (state.finished)
+    state.state_boolean["Init race completed"] = get_property_int("nsContestants1") != -1 && mafiaIsPastRevision(15310);
+    state.state_boolean["Stat race completed"] = get_property_int("nsContestants2") != -1 && mafiaIsPastRevision(15310);
+    state.state_boolean["Elemental damage race completed"] = get_property_int("nsContestants3") != -1 && mafiaIsPastRevision(15310);
+    if (state.finished || state.state_boolean["past races"])
     {
         state.state_boolean["Init race completed"] = true;
         state.state_boolean["Stat race completed"] = true;
         state.state_boolean["Elemental damage race completed"] = true;
     }
-    state.state_boolean["past races"] = (state.state_boolean["Init race completed"] && state.state_boolean["Stat race completed"] && state.state_boolean["Elemental damage race completed"]); //FIXME handle this
     
-	state.state_boolean["past hedge maze"] = state.finished; //FIXME handle this
-	state.state_boolean["past keys"] = state.finished; //FIXME handle this
+	state.state_boolean["past hedge maze"] = state.mafia_internal_step >= 4;
+	state.state_boolean["past keys"] = state.mafia_internal_step >= 5;
     
-    state.state_boolean["past tower level 1"] = state.finished; //FIXME handle this
-    state.state_boolean["past tower level 2"] = state.finished; //FIXME handle this
-    state.state_boolean["past tower level 3"] = state.finished; //FIXME handle this
-    state.state_boolean["past tower level 4"] = state.finished; //FIXME handle this
-    state.state_boolean["past tower level 5"] = state.finished; //FIXME handle this
+    state.state_boolean["past tower level 1"] = state.mafia_internal_step >= 6;
+    state.state_boolean["past tower level 2"] = state.mafia_internal_step >= 7;
+    state.state_boolean["past tower level 3"] = state.mafia_internal_step >= 8;
+    state.state_boolean["past tower level 4"] = state.mafia_internal_step >= 9;
+    state.state_boolean["past tower level 5"] = state.mafia_internal_step >= 10;
     
-	state.state_boolean["past tower"] = state.finished; //5
+	state.state_boolean["past tower monsters"] = state.state_boolean["past tower level 3"]; //5
 	state.state_boolean["wall of skin will need to be defeated"] = !state.state_boolean["past tower level 1"];
 	state.state_boolean["wall of meat will need to be defeated"] = !state.state_boolean["past tower level 2"];
 	state.state_boolean["wall of bones will need to be defeated"] = !state.state_boolean["past tower level 3"];
 	state.state_boolean["shadow will need to be defeated"] = !state.state_boolean["past tower level 5"];
-    
     //FIXME what paths don't fight the shadow?
+	state.state_boolean["king waiting to be freed"] = (state.mafia_internal_step == 11);
     
-	state.state_boolean["king waiting to be freed"] = (state.mafia_internal_step == 17); //FIXME handle this
     
-	state.state_boolean["digital key used"] = state.state_boolean["past keys"]; //FIXME be finer-grained?
+    boolean [string] known_key_names = $strings[Boris's key,Jarlsberg's key,Sneaky Pete's key,Richard's star key,skeleton key,digital key];
+    foreach key_name in known_key_names
+    {
+        state.state_boolean[key_name + " used"] = state.state_boolean["past keys"];
+    }
+    
+    if (mafiaIsPastRevision(15177) && !state.state_boolean["past keys"])
+    {
+        //nsTowerDoorKeysUsed
+        //nsTowerDoorKeysUsed(user, now 'Boris's key,Jarlsberg's key,Sneaky Pete's key,Richard's star key,digital key,skeleton key', default )
+        
+        string [int] keys_used = split_string_alternate(get_property("nsTowerDoorKeysUsed"), ",");
+        
+        foreach index, key_name in keys_used
+        {
+            //FIXME implement this
+            //Boris's, Jarlsberg's, Sneaky Pete's, star, skeleton key, and digital
+            if (!(known_key_names contains key_name))
+            {
+                continue;
+            }
+            state.state_boolean[key_name + " used"] = true;
+        }
+    }
+    
+    //Silent, Shell Up, Sauceshell
     
     boolean other_quests_completed = true;
     for i from 2 to 12
@@ -417,13 +457,15 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 		return;
 	QuestState base_quest_state = __quest_state["Level 13"];
 	ChecklistSubentry subentry;
+    ChecklistSubentry [int] subentries;
+    subentries.listAppend(subentry);
 	subentry.header = base_quest_state.quest_name;
     string url = "place.php?whichplace=nstower";
 	
 	string image_name = base_quest_state.image_name;
     
 	boolean should_output_main_entry = true;
-    if (true)
+    if (!mafiaIsPastRevision(15310))
     {
         //early support:
         string [int] race_types;
@@ -454,25 +496,609 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         }
         
         subentry.entries.listAppend("Then make it through the hedge maze. Run " + elemental_resistance_to_run_string + " and ignore the skull's directions for the fastest route.|Or take his advice to acquire a unique item.");
-        subentry.entries.listAppend("Then use six keys on the perplexing door: Boris's, Jarlsberg's, Sneaky Pete's, star, skull, and digital");
+        
+        string [int] keys_to_use;
+        
+        boolean [string] known_key_names = $strings[Boris's key,Jarlsberg's key,Sneaky Pete's key,Richard's star key,skeleton key,digital key];
+        foreach key_name in known_key_names
+        {
+            if (!base_quest_state.state_boolean[key_name + " used"])
+            {
+                keys_to_use.listAppend(key_name.replace_string(" key", ""));
+            }
+        }
+        
+        //subentry.entries.listAppend("Then use six keys on the perplexing door: Boris's, Jarlsberg's, Sneaky Pete's, star, skeleton, and digital.");
+        
+        if (keys_to_use.count() == 0)
+        {
+            subentry.entries.listClear();
+        }
+        else if (keys_to_use.count() < 6)
+        {
+            subentry.entries.listClear();
+            subentry.entries.listAppend("Use " + pluralizeWordy(keys_to_use.count(), "more key", "more keys") + " on the perplexing door: " + keys_to_use.listJoinComponents(", ", "and") + ".");
+            url = "place.php?whichplace=nstower_door";
+        }
+        else
+            subentry.entries.listAppend("Then use six keys on the perplexing door: " + keys_to_use.listJoinComponents(", ", "and") + " .");
         subentry.entries.listAppend("Then make it through the tower. Use a beehive against the first monster, +meat against the second, and the electric boning knife against the third.|Smash the mirror to save a turn, if you can handle a more difficult naughty sorceress. (?)|Then fight your shadow.");
         subentry.entries.listAppend("Then fight the naughty sorceress. Run a potato familiar and +moxie.");
         if (__misc_state["wand of nagamar needed"])
             subentry.entries.listAppend("Make sure to acquire a wand of nagamar.");
     }
-	else if (base_quest_state.mafia_internal_step == 1)
-	{
+    else if (!base_quest_state.state_boolean["past races"] && (base_quest_state.state_string["Stat race type"].length() == 0 || base_quest_state.state_string["Elemental damage race type"].length() == 0))
+    {
+        subentry.header = "Visit the registration desk";
+        subentry.entries.listAppend("Find out what the races are, first.");
+        image_name = "lair registration desk";
+    }
+    else if (!base_quest_state.state_boolean["past races"])
+    {
+        image_name = "lair registration desk";
+        //FIXME REST
+        //subentry.header = "it's time for the wacky races";
+        remove subentries[0];
+        
+        //FIXME support suggesting pulling potions in softcore
+        //(warbear rejuvenation potion is an excellent example)
+        if (!base_quest_state.state_boolean["Init race completed"])
+        {
+            string [int] description;
+            float current_value = numeric_modifier("initiative");
+            
+            description.listAppend("Currently " + current_value.floor() + "%.");
+            
+            if (current_value < 400.0)
+            {
+                description.listAppend("Need " + (400.0 - current_value).roundForOutput(1) + "% more initiative for #2.");
+                
+                if (!($familiars[oily woim,Xiblaxian Holo-Companion] contains my_familiar()) && !__misc_state["familiars temporarily blocked"])
+                {
+                    foreach f in $familiars[oily woim,Xiblaxian Holo-Companion]
+                    {
+                        if (f.familiar_is_usable())
+                        {
+                            description.listAppend("Try switching to your " + f + ".");
+                            break;
+                        }
+                    }
+                }
+                if (__misc_state_int["pulls available"] > 0)
+                {
+                    boolean [item] blacklist = $items[hare brush,freddie's blessing of mercury,ruby on canes];
+                    item [int] relevant_potions = ItemFilterGetPotionsCouldPullToAddToNumericModifier("Initiative", 30, blacklist);
+                    string [int] relevant_potions_output;
+                    foreach key, it in relevant_potions
+                    {
+                        relevant_potions_output.listAppend(it + " (" + it.to_effect().numeric_modifier("Initiative").roundForOutput(0) + "%)");
+                    }
+                    
+                    if (relevant_potions_output.count() > 0)
+                        description.listAppend("Could try pulling " + relevant_potions_output.listJoinComponents(", ", "or") + ".");
+                }
+            }
+            else
+                description.listAppend("Take the test now, you should(?) make second place.");
+            
+            subentries.listAppend(ChecklistSubentryMake("Compete in the init race", "+init", description));
+        }
+        if (!base_quest_state.state_boolean["Stat race completed"])
+        {
+            stat stat_type = base_quest_state.state_string["Stat race type"].to_stat();
+            string [int] description;
+            float current_value = my_buffedstat(stat_type);
+            
+            
+            //FIXME find this value; current is a guess
+            //highest seen #3 is 577 moxie
+            if (current_value < 600.0)
+            {
+                description.listAppend("Need " + (600.0 - current_value).roundForOutput(1) + " more " + stat_type.to_lower_case() + " for #2.");
+            }
+            else
+                description.listAppend("Take the test now, you should(?) make second place.");
+            
+            subentries.listAppend(ChecklistSubentryMake("Compete in the " + stat_type + " race", "+" + stat_type.to_string().to_lower_case(), description));
+        }
+        if (!base_quest_state.state_boolean["Elemental damage race completed"])
+        {
+            element element_type = base_quest_state.state_string["Elemental damage race type"].to_element();
+            string [int] description;
+            
+            string element_class = "r_element_" + element_type;
+            string element_class_desaturated = element_class + "_desaturated";
+            
+            float current_value = numeric_modifier(element_type + " damage") + numeric_modifier(element_type + " spell damage");
+            
+            if (current_value < 100.0)
+            {
+                description.listAppend("Need " + (100.0 - current_value).roundForOutput(1) + " more " + HTMLGenerateSpanOfClass(element_type + " damage ", element_class) + " + " + HTMLGenerateSpanOfClass(element_type + " spell damage", element_class) + " for #2.");
+            }
+            else
+                description.listAppend("Take the test now, you should(?) make second place.");
+            description.listAppend("Currently " + current_value.roundForOutput(1) + ".");
+            
+            subentries.listAppend(ChecklistSubentryMake("Compete in the " + HTMLGenerateSpanOfClass(element_type + " damage", element_class) + " race", listMake("+" + HTMLGenerateSpanOfClass(element_type + " damage", element_class_desaturated), "+" + HTMLGenerateSpanOfClass(element_type + " spell damage", element_class_desaturated)), description));
+        }
+        
+        int total_contestants_to_fight = 0;
+        foreach s in $strings[nsContestants1,nsContestants2,nsContestants3]
+        {
+            if (get_property_int(s) > 0)
+                total_contestants_to_fight += get_property_int(s);
+        }
+        if (total_contestants_to_fight > 0)
+        {
+            subentries.listAppend(ChecklistSubentryMake("Fight " + pluralizeWordy(total_contestants_to_fight, "more contestant", "more contestants"), "", ""));
+        }
+        else if (subentries.count() == 0)
+        {
+            //hmm...
+            subentries.listAppend(ChecklistSubentryMake("Visit the registration desk", "", "Claim your prize!"));
+        }
+        //nsContestants1 - default -1
+        //nsContestants2 - default -1
+        //nsContestants3 - default -1
+    }
+    else if (base_quest_state.mafia_internal_step == 2) //???? FIXME
+    {
+        subentry.header = "Attend your coronation";
+        image_name = "__item Snow Queen Crown";
+    }
+    else if (!base_quest_state.state_boolean["past hedge maze"])
+    {
+        //FIXME individualised room support
+        //need X more hot resistance, Y more Z resistance to pass elemental tests
+        subentry.header = "Find your way through the Hedge Maze";
+        image_name = "__item hedge maze puzzle";
+        int current_room = get_property_int("currentHedgeMazeRoom");
+        if (current_room >= 9)
+        {
+            subentry.entries.listAppend("Almost there...");
+        }
+        else
+        {
+            int [element] elements_needed_to_pass;
+            string [int] resists_needed_for_hedge_maze = base_quest_state.state_string["Hedge maze elements needed"].split_string_alternate("\\|");
+            if (resists_needed_for_hedge_maze.count() > 0)
+            {
+                foreach key, element_name in resists_needed_for_hedge_maze
+                {
+                    element e = element_name.to_element();
+                    if (e == $element[none]) //wha?
+                        continue;
+                    elements_needed_to_pass[e] = 7;
+                }
+            }
+            else
+            {
+                elements_needed_to_pass[$element[hot]] = 7;
+                elements_needed_to_pass[$element[stench]] = 7;
+                elements_needed_to_pass[$element[spooky]] = 7;
+                elements_needed_to_pass[$element[cold]] = 7;
+                elements_needed_to_pass[$element[sleaze]] = 7;
+            }
+            
+            int [element] amount_missing;
+            foreach e, amount_needed in elements_needed_to_pass
+            {
+                subentry.modifiers.listAppend("+" + HTMLGenerateSpanOfClass(amount_needed + " " + e + " resistance", "r_element_" + e + "_desaturated"));
+                float amount_have = numeric_modifier(e + " resistance");
+                if (amount_have < amount_needed)
+                {
+                    amount_missing[e] = amount_needed - amount_have;
+                }
+            }
+            if (amount_missing.count() > 0)
+            {
+                if ($familiar[exotic parrot].familiar_is_usable() && !__misc_state["familiars temporarily blocked"])
+                    subentry.entries.listAppend("Potentially switch to the exotic parrot.");
+                
+                string [int] amount_missing_string;
+                foreach e, amount in amount_missing
+                {
+                    amount_missing_string.listAppend(HTMLGenerateSpanOfClass(amount + " more " + e + " resistance", "r_element_" + e));
+                }
+                subentry.entries.listAppend("Need " + amount_missing_string.listJoinComponents(", ", "and") + " to safely make it through the maze quickly.");
+            }
+            else
+            {
+                subentry.modifiers.listClear();
+                subentry.entries.listAppend("Choose the second option each time to save the most turns.");
+            }
+            if (my_hp() < my_maxhp() && current_room <= 1)
+            {
+                //FIXME only output this if we won't make it.
+                subentry.entries.listAppend(HTMLGenerateSpanFont("Restore your HP first.", "red", ""));
+            }
+        }
+            
+        //elemental tests are 1, 4, 7
+        //9 is escape
+        //subentry.entries.listAppend("currentHedgeMazeRoom = " + get_property_int("currentHedgeMazeRoom"));
+    }
+    else if (!base_quest_state.state_boolean["past keys"])
+    {
+        url = "place.php?whichplace=nstower_door";
+        subentry.header = "Open the tower door";
+        
+        string [int] keys_to_use;
+        item [int] missing_keys;
+        boolean [string] known_key_names = $strings[Boris's key,Jarlsberg's key,Sneaky Pete's key,Richard's star key,skeleton key,digital key];
+        foreach key_name in known_key_names
+        {
+            if (!base_quest_state.state_boolean[key_name + " used"])
+            {
+                item key_item = key_name.to_item();
+                string key_name_output = key_name.replace_string(" key", "");
+                if (key_item.available_amount() == 0)
+                {
+                    key_name_output = HTMLGenerateSpanFont(key_name_output, "grey", "");
+                    missing_keys.listAppend(key_item);
+                }
+                keys_to_use.listAppend(key_name_output);
+            }
+        }
+        
+        if (keys_to_use.count() == 0)
+        {
+            subentry.entries.listAppend("Open the doorknob.");
+        }
+        else
+        {
+            subentry.entries.listAppend("Use " + pluralizeWordy(keys_to_use.count(), "more key", "more keys") + " on the perplexing door: " + keys_to_use.listJoinComponents(", ", "and") + ".");
+        }
+        if (missing_keys.count() > 0)
+        {
+            subentry.entries.listAppend("Find the " + missing_keys.listJoinComponents(", ", "and") + ".");
+        }
+    }
+    else if (!base_quest_state.state_boolean["past tower level 1"])
+    {
+        //wall of skin
+        subentry.header = "Defeat the Wall of Skin";
+        if (lookupItem("beehive").available_amount() > 0)
+        {
+            subentry.entries.listAppend("Use the beehive against it.");
+        }
+        else
+        {
+            subentry.entries.listAppend("Either find the beehive in the black forest (-combat), or towerkill.");
+            subentry.entries.listAppend("Lots of passive damage sources.");
+            subentry.entries.listAppend("This will be suggested in a future version, sorry...|Good luck!");
+            //FIXME REST
+            //adding passive damage sources, calculating their effect
+            //possibly do it externally, such that we can reuse it for the sea and removing it for level three?
+            if (my_hp() < my_maxhp())
+            {
+                //FIXME only output this if we won't make it.
+                subentry.entries.listAppend(HTMLGenerateSpanFont("Restore your HP first.", "red", ""));
+            }
+        }
+    }
+    else if (!base_quest_state.state_boolean["past tower level 2"])
+    {
+        //wall of meat
+        //current assumption is it's a [160, 240] drop, and you need to clear one thousand (thousand slimy) meats
+        subentry.header = "Defeat the Wall of Meat";
+        subentry.modifiers.listAppend("+526% meat");
+        
+        float current_value = numeric_modifier("meat drop");
+        if (current_value < 526.0)
+        {
+            subentry.entries.listAppend("Need " + (526.0 - current_value).roundForOutput(0) + "% more meat drop to always complete in a single turn.");
+            
+            float meat_multiplier = 1.0 + current_value / 100.0;
+            float chance = 1.0 - TriangularDistributionCalculateCDF(1001.0, 160.0 * meat_multiplier, 240.0 * meat_multiplier);
+            if (chance > 0.0)
+                subentry.entries.listAppend((chance * 100.0).floorForOutput(1) + "% chance of completing in one turn.");
+        }
+        else
+            subentry.entries.listAppend("Should take one turn.");
+        
+        if (__misc_state_int["pulls available"] > 0 && current_value < 526.0)
+        {
+            boolean [item] blacklist = $items[uncle greenspan's bathroom finance guide,black snowcone];
+            item [int] relevant_potions = ItemFilterGetPotionsCouldPullToAddToNumericModifier("Meat Drop", 25, blacklist);
+            string [int] relevant_potions_output;
+            foreach key, it in relevant_potions
+            {
+                relevant_potions_output.listAppend(it + " (" + it.to_effect().numeric_modifier("meat drop").roundForOutput(0) + "%)");
+            }
+            
+            if (relevant_potions_output.count() > 0)
+                subentry.entries.listAppend("Could try pulling " + relevant_potions_output.listJoinComponents(", ", "or") + ".");
+        }
+        //FIXME does mafia have a tracking variable for meat dropped?
+        //FIXME REST
+        //estimated turns?
+        if (my_hp() < my_maxhp())
+        {
+            subentry.entries.listAppend(HTMLGenerateSpanFont("Restore your HP first.", "red", ""));
+        }
+    }
+    else if (!base_quest_state.state_boolean["past tower level 3"])
+    {
+        subentry.header = "Defeat the Wall of Bones";
+        //wall of bones
+        if (lookupItem("electric boning knife").available_amount() > 0)
+        {
+            subentry.entries.listAppend("Use the electric boning knife against it.");
+        }
+        else
+        {
+            //suggest towerkilling methods
+            //removing passive damage sources
+            //support saucegeyser, intimidating mien, grease up, and future airport skills (or lack thereof)
+            //strategy: saucegeyser three times, then either saucegeyser One More Time or unleash grease up/intimidating mien/future airport skills
+            //FIXME REST
+            subentry.entries.listAppend("Either find the electric boning knife on the ground floor of the castle in the clouds in the sky (-combat), or towerkill:");
+            subentry.entries.listAppend("Make sure to remove all sources of passive damage.");
+            
+            string [int] passives_to_remove = PDSGenerateDescriptionToUneffectPassives();
+            if (passives_to_remove.count() > 0)
+                subentry.entries.listAppend(HTMLGenerateSpanFont(passives_to_remove.listJoinComponents("|"), "red", ""));
+            //FIXME HACK USE A LIBRARY
+            /*string [int] things_to_do;
+            foreach it in $items[hand in glove,MagiMechTech NanoMechaMech,bottle opener belt buckle,old-school calculator watch,ant hoe,ant pick,ant pitchfork,ant rake,ant sickle,fishy wand,moveable feast,oversized fish scaler,plastic pumpkin bucket,tiny bowler,cup of infinite pencils,double-ice box,smirking shrunken head,mr. haggis,stapler bear,dubious loincloth,muddy skirt,bottle of Goldschn&ouml;ckered,acid-squirting flower,ironic oversized sunglasses,hippy protest button,cannonball charrrm bracelet,groovy prism necklace,spiky turtle shoulderpads,double-ice cap,parasitic headgnawer,eelskin hat,balloon shield,hot plate,Ol' Scratch's stove door,Oscus's garbage can lid,eelskin shield,eelskin pants,buddy bjorn]
+            {
+                if (it.equipped_amount() > 0)
+                    things_to_do.listAppend("unequip " + it);
+            }
+            foreach e in $effects[Skeletal Warrior,Skeletal Cleric,Skeletal Wizard,Bone Homie,Burning\, Man,Biologically Shocked,EVISCERATE!,Fangs and Pangs,Permanent Halloween,Curse of the Black Pearl Onion,Long Live GORF,Apoplectic with Rage,Dizzy with Rage,Quivering with Rage,Jaba&ntilde;ero Saucesphere,Psalm of Pointiness,Drenched With Filth,Stuck-Up Hair,It's Electric!,Smokin',Jalape&ntilde;o Saucesphere,Scarysauce,spiky shell]
+            {
+                if (e.have_effect() > 0)
+                    things_to_do.listAppend("uneffect " + e);
+            }
+            if (things_to_do.count() > 0)
+                subentry.entries.listAppend(HTMLGenerateSpanFont(things_to_do.listJoinComponents(", ", "and").capitalizeFirstLetter() + ".", "red", ""));*/
+            
+            
+            if ($skill[saucegeyser].have_skill())
+            {
+                boolean need_modifier_output = true;
+                if (my_familiar() != $familiar[magic dragonfish] && $familiar[magic dragonfish].familiar_is_usable() && !__misc_state["familiars temporarily blocked"])
+                    subentry.entries.listAppend("Potentially switch to the magic dragonfish.");
+                    
+                //Calculate saucegeyser damage:
+                float expected_saucegeyser_damage = skillExpectedDamageRange(lookupMonster("wall of bones"), $skill[saucegeyser]).x;
+                
+                subentry.entries.listAppend("Expected saucegeyser minimum damage: " + expected_saucegeyser_damage.roundForOutput(0));
+                if (expected_saucegeyser_damage >= 5000.0)
+                {
+                    subentry.entries.listAppend("Cast saucegeyser four times.");
+                    need_modifier_output = false;
+                }
+                else
+                {
+                    float hp_remaining = 20000.0 - expected_saucegeyser_damage * 3.0;
+                    
+                    float [skill] airport_skill_per_turn_damage_multiplier;
+                    float [skill] airport_skill_base_damage;
+                    
+                    airport_skill_per_turn_damage_multiplier[$skill[grease up]] = 5.0;
+                    airport_skill_base_damage[$skill[grease up]] = 30.0;
+                    
+                    airport_skill_per_turn_damage_multiplier[lookupSkill("Intimidating Mien")] = 2.0;
+                    airport_skill_base_damage[lookupSkill("Intimidating Mien")] = 15.0;
+                    
+                    string [skill] airport_skill_name_of_combat_skill;
+                    
+                    airport_skill_name_of_combat_skill[$skill[grease up]] = "Unleash the Greash";
+                    airport_skill_name_of_combat_skill[lookupSkill("Intimidating Mien")] = "Thousand-Yard Stare";
+                    
+                    
+                    float ml_damage_multiplier = MLDamageMultiplier();
+                    if (ml_damage_multiplier != 1.0)
+                    {
+                        //FIXME this is correct... right? hmm...
+                        foreach s in airport_skill_base_damage
+                        {
+                            airport_skill_base_damage[s] *= ml_damage_multiplier;
+                            airport_skill_per_turn_damage_multiplier[s] *= ml_damage_multiplier;
+                        }
+                    }
+                    
+                    skill chosen_skill = $skill[none];
+                    int chosen_skill_total_mp_cost = 0;
+                    int chosen_skill_turns_left_to_cast = 0;
+                    foreach s in airport_skill_base_damage
+                    {
+                        if (!s.skill_is_usable())
+                            continue;
+                        float base_damage = airport_skill_base_damage[s];
+                        float variable_damage = airport_skill_per_turn_damage_multiplier[s];
+                        effect skill_effect = s.to_effect();
+                        
+                        if (variable_damage == 0.0)
+                            continue;
+                        int total_turns_needed_of_effect = ceil((hp_remaining - base_damage) / variable_damage);
+                        int turns_to_cast = MAX(0, total_turns_needed_of_effect - skill_effect.have_effect());
+                        
+                        int mp_cost = MAX(0, s.mp_cost() * turns_to_cast / MAX(1.0, s.turns_per_cast().to_float()));
+                        
+                        if (chosen_skill == $skill[none] || chosen_skill_total_mp_cost > mp_cost)
+                        {
+                            chosen_skill = s;
+                            chosen_skill_total_mp_cost = mp_cost;
+                            chosen_skill_turns_left_to_cast = turns_to_cast;
+                        }
+                    }
+                    if (chosen_skill != $skill[none])
+                    {
+                        if (chosen_skill_turns_left_to_cast > 0)
+                        {
+                            string expected_meat_cost = ceil(chosen_skill_total_mp_cost * __misc_state_float["meat per MP"]);
+                            
+                            //string line = "Acquire " + chosen_skill_turns_left_to_cast + " more turns of " + chosen_skill + ".|Expected meat cost: ";
+                            string line = "Cast " + chosen_skill + " ";
+                            int cast_amount = ceil(chosen_skill_turns_left_to_cast.to_float() / MAX(1.0, chosen_skill.turns_per_cast().to_float()));
+                            
+                            if (cast_amount == 1)
+                                line += "One More Time.";
+                            else
+                                line += cast_amount + " more times.";
+                            
+                            line += "|Expected meat cost: ";
+                            
+                            if (expected_meat_cost > my_meat())
+                                line += HTMLGenerateSpanFont(expected_meat_cost, "red", "");
+                            else
+                                line += expected_meat_cost;
+                            subentry.modifiers.listAppend("-mana cost");
+                            subentry.entries.listAppend(line);
+                        }
+                        else
+                        {
+                            subentry.entries.listAppend("Cast saucegeyser three times, then cast " + airport_skill_name_of_combat_skill[chosen_skill] + ".");
+                            need_modifier_output = false;
+                        }
+                    }
+                    else
+                    {
+                        subentry.entries.listAppend("Cast saucegeyser three times, then an airport skill?");
+                    }
+                }
+                if (my_hp() < my_maxhp())
+                {
+                    subentry.entries.listAppend(HTMLGenerateSpanFont("Restore your HP first.", "red", ""));
+                }
+                if (my_mp() < $skill[saucegeyser].mp_cost() * 4.0)
+                    subentry.entries.listAppend(HTMLGenerateSpanFont("Restore some MP first.", "red", ""));
+                if (need_modifier_output)
+                {
+                    subentry.modifiers.listAppend("mysticality");
+                    subentry.modifiers.listAppend("spell damage");
+                    subentry.modifiers.listAppend("spell damage percent");
+                    if (monster_level_adjustment() > 0)
+                        subentry.modifiers.listAppend("-ML");
+                }
+            }
+        }
+    }
+    else if (!base_quest_state.state_boolean["past tower level 4"])
+    {
+        //stare into the looking glass, or break it
+        subentry.header = "Face the looking glass";
+        subentry.entries.listAppend("Two options here.");
+        subentry.entries.listAppend("Gazing upon the looking glass will cost a turn, but makes the naughty sorceress much easier.");
+        subentry.entries.listAppend("Breaking the mirror will save a turn, but makes the NS fight much more difficult.");
+    }
+    else if (!base_quest_state.state_boolean["past tower level 5"])
+    {
+		//at top of tower (fight shadow??)
+		//8 -> fight shadow
+        int total_initiative_needed = $monster[Your Shadow].monster_initiative();
+		subentry.modifiers.listAppend("+HP");
+		subentry.modifiers.listAppend("+" + total_initiative_needed + "% init");
+		subentry.header = "Fight your shadow";
+        foreach it in $items[attorney's badge, navel ring of navel gazing]
+        {
+            if (it.available_amount() > 0 && it.equipped_amount() == 0)
+                subentry.entries.listAppend("Possibly equip your " + it + ". (blocks shadow)");
+        }
+        
+        string [int] healing_items_available;
+        foreach it in $items[filthy poultice,gauze garter,red pixel potion,Dreadsylvanian seed pod,soggy used band-aid,Mer-kin healscroll,scented massage oil,extra-strength red potion,red potion]
+        {
+            if (it.available_amount() == 0)
+                continue;
+            if (it.available_amount() == 1)
+                healing_items_available.listAppend(it.to_string());
+            else
+                healing_items_available.listAppend(it.pluralize());
+        }
+        if (healing_items_available.count() > 0)
+            subentry.entries.listAppend("Healing items available: " + healing_items_available.listJoinComponents(", ", "and") + ".");
+        else
+            subentry.entries.listAppend("May want to go find some healing items.");
+            
+            
+        int initiative_needed = total_initiative_needed - initiative_modifier();
+        if (initiative_needed > 0 && !$skill[Ambidextrous Funkslinging].skill_is_usable())
+            subentry.entries.listAppend("Need " + initiative_needed + "% more initiative.");
+        if (my_hp() < my_maxhp())
+        {
+            //FIXME only output this if we won't make it.
+            subentry.entries.listAppend(HTMLGenerateSpanFont("Restore your HP first.", "red", ""));
+        }
 	}
-	else if (base_quest_state.mafia_internal_step == 2)
+    else if (!base_quest_state.state_boolean["king waiting to be freed"])
 	{
+		//At NS. Good luck, we're all counting on you.
+        if (my_path_id() != PATH_HEAVY_RAINS)
+        {
+            subentry.modifiers.listAppend("+moxie, DA equipment");
+            subentry.modifiers.listAppend("no buffs");
+            if (!__misc_state["familiars temporarily blocked"])
+                subentry.modifiers.listAppend("attack familiar");
+        }
+		subentry.header = "She awaits";
+        //don't think blocking works anymore? not sure
+        /*if (!__misc_state["familiars temporarily blocked"] && my_path_id() != PATH_HEAVY_RAINS)
+        {
+            string potato_suggestion = generatePotatoSuggestion();
+            
+            subentry.entries.listAppend(potato_suggestion);
+        }*/
+        
+        if (my_path_id() == PATH_HEAVY_RAINS)
+        {
+            subentry.modifiers.listAppend("many buffs");
+            if ($familiar[warbear drone].have_familiar())
+                subentry.entries.listAppend("Run a warbear drone if you can.");
+                
+            subentry.entries.listAppend("Try to run as many buffs as you can. (one removed per round, have " + my_effects().count() + ")");
+            subentry.entries.listAppend("Try to have as many damage sources as possible. (40? damage cap per source)");
+            subentry.entries.listAppend("Only your weapon, offhand, and familiar equipment(?) are relevant this fight.");
+            if ($item[crayon shavings].available_amount() > 0)
+                subentry.entries.listAppend("Try repeatedly using crayon shavings?");
+            if ($skill[frigidalmatian].skill_is_usable() && my_maxmp() >= 300 && $effect[Frigidalmatian].have_effect() == 0)
+                subentry.entries.listAppend("Try casting Frigidalmatian.");
+        }
+        if (my_hp() < my_maxhp() && !get_property("lastEncounter").contains_text("The Naughty Sorceress") && __last_adventure_location != lookupLocation("The Naughty Sorceress' Chamber"))
+        {
+            subentry.entries.listAppend(HTMLGenerateSpanFont("Restore your HP first.", "red", ""));
+        }
+        
+		image_name = "naughty sorceress";
 	}
-	else if (base_quest_state.mafia_internal_step == 3)
+	else if (base_quest_state.state_boolean["king waiting to be freed"])
 	{
+		//King is waiting in his prism.
+        
+        boolean trophies_are_possible = false;
+        
+        //ehh, disable displaying this, mostly because it's in the way
+        //if (in_hardcore())
+            //trophies_are_possible = true; //Gourdcore, Golden Meat Stack
+        
+        if (trophies_are_possible)
+            task_entries.listAppend(ChecklistEntryMake("__item puzzling trophy", "trophy.php", ChecklistSubentryMake("Check for trophies", "10k meat, trophy requirements", "Certain trophies are missable after freeing the king")));
+		should_output_main_entry = false;
+        
+        
+        if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE)
+        {
+            if (availableDrunkenness() > 0)
+            {
+                task_entries.listAppend(ChecklistEntryMake("__item gibson", "inventory.php?which=1", ChecklistSubentryMake("Drink " + availableDrunkenness() + " drunkenness", "", "Freeing the king reduces your liver capacity.")));
+            }
+        }
+        
+        if (my_path_id() == PATH_HEAVY_RAINS)
+        {
+            if ($skill[rain dance].skill_is_usable() && my_rain() >= 10)
+            {
+                int times = floor(my_rain().to_float() / 10.0);
+                task_entries.listAppend(ChecklistEntryMake("__effect Rain Dancin'", "skills.php", ChecklistSubentryMake("Cast Rain Dance " + pluralizeWordy(times, "time", "times"), "", "+20% item buff for aftercore.")));
+            }
+        }
+		
 	}
-	else if (base_quest_state.mafia_internal_step == 4)
-	{
-	}
-	else if (base_quest_state.mafia_internal_step > 4 && base_quest_state.mafia_internal_step < 11)
+    //I need to delete this code, but I love it so much. Look at all that towerkilling suggestions! sob
+	/*else if (base_quest_state.mafia_internal_step > 4 && base_quest_state.mafia_internal_step < 11)
 	{
         //step4 through step9 - 5 - 10
 		//at tower, time to kill monsters!
@@ -729,113 +1355,8 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             url = "lair4.php";
         else
             url = "lair5.php";
-	}
-	else if (base_quest_state.mafia_internal_step == 11 || base_quest_state.mafia_internal_step == 12)
-	{
-	}
-	else if (base_quest_state.mafia_internal_step == 13)
-	{
-		//at top of tower (fight shadow??)
-		//8 -> fight shadow
-        int total_initiative_needed = $monster[Your Shadow].monster_initiative();
-		subentry.modifiers.listAppend("+HP");
-		subentry.modifiers.listAppend("+" + total_initiative_needed + "% init");
-		subentry.entries.listAppend("Fight your shadow.");
-        foreach it in $items[attorney's badge, navel ring of navel gazing]
-        {
-            if (it.available_amount() > 0 && it.equipped_amount() == 0)
-                subentry.entries.listAppend("Possibly equip your " + it + ". (blocks shadow)");
-        }
-        
-        string [int] healing_items_available;
-        foreach it in $items[filthy poultice,gauze garter,red pixel potion,Dreadsylvanian seed pod,soggy used band-aid,Mer-kin healscroll,scented massage oil,extra-strength red potion,red potion]
-        {
-            if (it.available_amount() == 0)
-                continue;
-            if (it.available_amount() == 1)
-                healing_items_available.listAppend(it.to_string());
-            else
-                healing_items_available.listAppend(it.pluralize());
-        }
-        if (healing_items_available.count() > 0)
-            subentry.entries.listAppend("Healing items available: " + healing_items_available.listJoinComponents(", ", "and") + ".");
-        else
-            subentry.entries.listAppend("May want to go find some healing items.");
-            
-            
-        int initiative_needed = total_initiative_needed - initiative_modifier();
-        if (initiative_needed > 0 && !$skill[Ambidextrous Funkslinging].skill_is_usable())
-            subentry.entries.listAppend("Need " + initiative_needed + "% more initiative.");
-	}
-	else if (base_quest_state.mafia_internal_step == 14 || base_quest_state.mafia_internal_step == 15)
-	{
-	}
-	else if (base_quest_state.mafia_internal_step == 16)
-	{
-		//At NS. Good luck, we're all counting on you.
-        if (my_path_id() != PATH_HEAVY_RAINS)
-        {
-            subentry.modifiers.listAppend("+moxie equipment");
-            subentry.modifiers.listAppend("no buffs");
-        }
-		subentry.entries.listAppend("She awaits.");
-        if (!__misc_state["familiars temporarily blocked"] && my_path_id() != PATH_HEAVY_RAINS)
-        {
-            string potato_suggestion = generatePotatoSuggestion();
-            
-            subentry.entries.listAppend(potato_suggestion);
-        }
-        
-        if (my_path_id() == PATH_HEAVY_RAINS)
-        {
-            subentry.modifiers.listAppend("many buffs");
-            if ($familiar[warbear drone].have_familiar())
-                subentry.entries.listAppend("Run a warbear drone if you can.");
-                
-            subentry.entries.listAppend("Try to run as many buffs as you can. (one removed per round, have " + my_effects().count() + ")");
-            subentry.entries.listAppend("Try to have as many damage sources as possible. (40? damage cap per source)");
-            subentry.entries.listAppend("Only your weapon, offhand, and familiar equipment(?) are relevant this fight.");
-            if ($item[crayon shavings].available_amount() > 0)
-                subentry.entries.listAppend("Try repeatedly using crayon shavings?");
-            if ($skill[frigidalmatian].skill_is_usable() && my_maxmp() >= 300 && $effect[Frigidalmatian].have_effect() == 0)
-                subentry.entries.listAppend("Try casting Frigidalmatian.");
-        }
-        
-		image_name = "naughty sorceress";
-	}
-	else if (base_quest_state.mafia_internal_step == 17)
-	{
-		//King is waiting in his prism.
-        
-        boolean trophies_are_possible = false;
-        
-        //ehh, disable displaying this, mostly because it's in the way
-        //if (in_hardcore())
-            //trophies_are_possible = true; //Gourdcore, Golden Meat Stack
-        
-        if (trophies_are_possible)
-            task_entries.listAppend(ChecklistEntryMake("__item puzzling trophy", "trophy.php", ChecklistSubentryMake("Check for trophies", "10k meat, trophy requirements", "Certain trophies are missable after freeing the king")));
-		should_output_main_entry = false;
-        
-        
-        if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE)
-        {
-            if (availableDrunkenness() > 0)
-            {
-                task_entries.listAppend(ChecklistEntryMake("__item gibson", "inventory.php?which=1", ChecklistSubentryMake("Drink " + availableDrunkenness() + " drunkenness", "", "Freeing the king reduces your liver capacity.")));
-            }
-        }
-        
-        if (my_path_id() == PATH_HEAVY_RAINS)
-        {
-            if ($skill[rain dance].skill_is_usable() && my_rain() >= 10)
-            {
-                int times = floor(my_rain().to_float() / 10.0);
-                task_entries.listAppend(ChecklistEntryMake("__effect Rain Dancin'", "skills.php", ChecklistSubentryMake("Cast Rain Dance " + pluralizeWordy(times, "time", "times"), "", "+20% item buff for aftercore.")));
-            }
-        }
-		
-	}
+	}*/
+
 	if (should_output_main_entry)
-		task_entries.listAppend(ChecklistEntryMake(image_name, url, subentry));
+		task_entries.listAppend(ChecklistEntryMake(image_name, url, subentries));
 }

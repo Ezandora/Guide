@@ -61,7 +61,7 @@ void setUpCSSStyles()
             __setting_navbar_background_color = __setting_page_background_color;
         }
     }
-    PageAddCSSClass("div", "r_bottom_outer_container", "height:" + __setting_navbar_height + ";position:fixed;z-index:4;width:100%;overflow:hidden;");
+    PageAddCSSClass("div", "r_bottom_outer_container", "height:" + __setting_navbar_height + ";position:fixed;z-index:6;width:100%;overflow:hidden;");
     if (true)
     {
         //Second holding container:
@@ -77,8 +77,29 @@ void setUpCSSStyles()
         style += "border-top:1px solid;border-color:" + __setting_line_color + ";";
         PageAddCSSClass("div", "r_bottom_inner_container", style);
     }
-    PageAddCSSClass("", "r_location_bar_table_entry", "vertical-align:middle;padding-left:0.5em;display:table-cell;");
+    //PageAddCSSClass("", "r_location_bar_table_entry", "vertical-align:middle;padding-left:0.5em;display:table-cell;");
+    PageAddCSSClass("", "r_location_bar_table_entry", "vertical-align:middle;padding-left:0.5em;padding-right:0.5em;display:table-cell;");
     PageAddCSSClass("", "r_location_bar_ellipsis_entry", "overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;");
+    
+    PageAddCSSClass("", "r_location_popup_item_holding_block", "display:inline-block;padding-right:0.5em;width:31%", 0, __setting_media_query_large_size);
+    PageAddCSSClass("", "r_location_popup_item_holding_block", "display:inline-block;padding-right:0.5em;width:31%", 0, __setting_media_query_medium_size);
+    PageAddCSSClass("", "r_location_popup_item_holding_block", "display:inline-block;padding-right:0.25em;width:31%;", 0, __setting_media_query_small_size);
+    PageAddCSSClass("", "r_location_popup_item_holding_block", "display:inline-block;padding-right:0.25em;width:100%;", 0, __setting_media_query_tiny_size);
+    
+    PageAddCSSClass("", "r_location_popup_item_holding_block_2x", "display:inline-block;padding-right:0.5em;width:47%", 0, __setting_media_query_large_size);
+    PageAddCSSClass("", "r_location_popup_item_holding_block_2x", "display:inline-block;padding-right:0.5em;width:47%", 0, __setting_media_query_medium_size);
+    PageAddCSSClass("", "r_location_popup_item_holding_block_2x", "display:inline-block;padding-right:0.25em;width:47%;", 0, __setting_media_query_small_size);
+    PageAddCSSClass("", "r_location_popup_item_holding_block_2x", "display:inline-block;padding-right:0.25em;width:100%;", 0, __setting_media_query_tiny_size);
+    
+    PageAddCSSClass("", "r_location_popup_item_holding_block_1x", "display:inline-block;padding-right:0.5em;width:100%", 0, __setting_media_query_large_size);
+    PageAddCSSClass("", "r_location_popup_item_holding_block_1x", "display:inline-block;padding-right:0.5em;width:100%", 0, __setting_media_query_medium_size);
+    PageAddCSSClass("", "r_location_popup_item_holding_block_1x", "display:inline-block;padding-right:0.25em;width:100%;", 0, __setting_media_query_small_size);
+    PageAddCSSClass("", "r_location_popup_item_holding_block_1x", "display:inline-block;padding-right:0.25em;width:100%;", 0, __setting_media_query_tiny_size);
+    
+    
+    //PageAddCSSClass("", "r_location_bar_background_blur", "background:rgba(255, 255, 255, 0.95);box-shadow:0px 0px 0px 2px rgba(255, 255, 255, 0.95);");
+    PageAddCSSClass("", "r_location_bar_background_blur", "background:rgba(255, 255, 255, 0.95);box-shadow:0px 0px 1px 2px rgba(255, 255, 255, 0.95);");
+    
     
     PageAddCSSClass("img", "", "border:0px;");
 }

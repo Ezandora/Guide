@@ -108,7 +108,7 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
                 if (it.equipped_amount() > 0)
                     things_to_do.listAppend("unequip " + it);
             }
-            foreach e in $effects[Skeletal Warrior,Skeletal Cleric,Skeletal Wizard,Bone Homie,Burning\, Man,Biologically Shocked,EVISCERATE!,Fangs and Pangs,Permanent Halloween,Curse of the Black Pearl Onion,Long Live GORF,Apoplectic with Rage,Dizzy with Rage,Quivering with Rage,Jaba&ntilde;ero Saucesphere,Psalm of Pointiness,Drenched With Filth,Stuck-Up Hair,It's Electric!,Smokin',Jalape&ntilde;o Saucesphere,Scarysauce]
+            foreach e in $effects[Skeletal Warrior,Skeletal Cleric,Skeletal Wizard,Bone Homie,Burning\, Man,Biologically Shocked,EVISCERATE!,Fangs and Pangs,Permanent Halloween,Curse of the Black Pearl Onion,Long Live GORF,Apoplectic with Rage,Dizzy with Rage,Quivering with Rage,Jaba&ntilde;ero Saucesphere,Psalm of Pointiness,Drenched With Filth,Stuck-Up Hair,It's Electric!,Smokin',Jalape&ntilde;o Saucesphere,Scarysauce,spiky shell]
             {
                 if (e.have_effect() > 0)
                     things_to_do.listAppend("uneffect " + e);
@@ -123,6 +123,21 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
                     line += "acquire and ";
                 line += "equip a dark porquoise ring to use less crayon shavings.";
                 description.listAppend(line);
+            }
+            if (lookupEffect("Ruthlessly Efficient").have_effect() == 0)
+            {
+                if (lookupSkill("Ruthless Efficiency").have_skill())
+                {
+                    description.listAppend("Possibly cast Ruthless Efficiency to delevel faster.");
+                }
+                else if (lookupItem("Crimbot ROM: Ruthless Efficiency (dirty)").available_amount() > 0)
+                {
+                    description.listAppend("Possibly use Crimbot ROM: Ruthless Efficiency (dirty) and cast it to delevel faster.");
+                }
+                else if (lookupItem("Crimbot ROM: Ruthless Efficiency").available_amount() > 0)
+                {
+                    description.listAppend("Possibly use Crimbot ROM: Ruthless Efficiency and cast it to delevel faster.");
+                }
             }
             if (my_mp() > 0)
                 description.listAppend(HTMLGenerateSpanFont("Try to reduce your MP to 0", "red", "") + " before fighting him.");

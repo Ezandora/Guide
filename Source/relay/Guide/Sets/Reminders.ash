@@ -145,7 +145,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     if (lookupMonster("Dr. Aquard") != $monster[none])
         awkwards[lookupMonster("Dr. Aquard")] = true;
 
-    if ((awkwards contains get_property_monster("lastEncounter")) && $item[mega gem].equipped_amount() > 0 && $items[staff of fats, Staff of Ed\, almost, Staff of Ed].available_amount() > 0)
+    if ((awkwards contains get_property_monster("lastEncounter")) && $item[mega gem].equipped_amount() > 0 && ($items[staff of fats, Staff of Ed\, almost].available_amount() > 0 || lookupItem("2325").available_amount() > 0))
     {
         //Just defeated Dr. Awkward.
         //This will disappear once they adventure somewhere else.
@@ -172,6 +172,11 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         {
             item_descriptions[$item[orange snowcone]] = "+1.5 mainstat/fight (20 turns)";
             item_effects[$item[orange snowcone]] = $effect[Orange Tongue];
+        }
+        
+        if (!can_interact())
+        {
+            item_descriptions[$item[Effermint&trade; tablets]] = "+1.5 mainstat/fight (10 turns)";
         }
         
         if (__misc_state["need to level moxie"])
@@ -235,7 +240,10 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         {
             if (it.item_amount() == 0)
                 continue;
-            if (item_effects[it].have_effect() > 0)
+            effect e = item_effects[it];
+            if (e == $effect[none])
+                e = it.to_effect();
+            if (e.have_effect() > 0)
                 continue;
             if (stat_items.image_lookup_name.length() == 0)
                 stat_items.image_lookup_name = "__item " + it;
@@ -345,7 +353,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             if (lookupItem("miniature life preserver").available_amount() == 0)
             {
                 description.listAppend("Buy from the general store.");
-                url = "store.php?whichstore=m";
+                url = "shop.php?whichshop=generalstore";
             }
             
             task_entries.listAppend(ChecklistEntryMake("__item miniature life preserver", url, ChecklistSubentryMake(HTMLGenerateSpanFont("Equip miniature life preserver", "red", ""), "", description), -11));

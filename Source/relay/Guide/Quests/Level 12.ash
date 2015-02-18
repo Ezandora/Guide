@@ -1,3 +1,4 @@
+import "relay/Guide/Support/Item Filter.ash"
 
 void QLevel12Init()
 {
@@ -229,6 +230,20 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
         if (lookupItem("Sneaky Pete's leather jacket (collar popped)").equipped_amount() > 0 && turn_range.y > 1)
             details.listAppend("Could unpop your collar. (+20% meat)");
 	
+        if (__misc_state_int["pulls available"] > 0 && meat_drop_modifier() < 500.0)
+        {
+            boolean [item] blacklist = $items[uncle greenspan's bathroom finance guide,black snowcone];
+            item [int] relevant_potions = ItemFilterGetPotionsCouldPullToAddToNumericModifier("Meat Drop", 50.0, blacklist);
+            string [int] relevant_potions_output;
+            foreach key, it in relevant_potions
+            {
+                relevant_potions_output.listAppend(it + " (" + it.to_effect().numeric_modifier("meat drop").roundForOutput(0) + "%)");
+            }
+            
+            if (relevant_potions_output.count() > 0)
+                details.listAppend("Could try pulling " + relevant_potions_output.listJoinComponents(", ", "or") + ".");
+        }
+        
 		optional_task_entries.listAppend(ChecklistEntryMake("Island War Nuns", "bigisland.php?place=nunnery", ChecklistSubentryMake("Island War Nuns Quest", "+meat", details), $locations[the themthar hills]));
 	}
 	if (!base_quest_state.state_boolean["Junkyard Finished"])
@@ -449,6 +464,14 @@ void QLevel12GenerateBattlefieldDescription(ChecklistSubentry subentry, string s
         }
     }
     
+    if (my_path_id() != PATH_BUGBEAR_INVASION) //FIXME test against trendy bugbear chef being needed
+    {
+        if (side == "frat boy" && __misc_state["free runs usable"])
+            subentry.modifiers.listAppend("possibly olfact Green Ops Soldier");
+        else if (side == "hippy")
+            subentry.modifiers.listAppend("possibly olfact Sorority Operator");
+    }
+    
     int [int] unlock_threshold;
     unlock_threshold[0] = 64;
     unlock_threshold[1] = 192;
@@ -570,11 +593,13 @@ void QLevel12GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         }
         
         
+        subentry.modifiers.listAppend("+item");
+		if (hippies_left < 1000 || (frat_boys_left == 1000 && hippies_left == 1000) || sides_completed_frat > 0)
+            QLevel12GenerateBattlefieldDescription(subentry, "frat boy", hippies_left, hippies_defeated_per_combat, "hippy", "hippies", "The Big Wisniewski", listMake("Orchard", "Nuns", "Farm"), listMake("Lighthouse", "Junkyard", "Arena"));
+            
 		if (frat_boys_left < 1000 || (frat_boys_left == 1000 && hippies_left == 1000) || sides_completed_hippy > 0)
             QLevel12GenerateBattlefieldDescription(subentry, "hippy", frat_boys_left, frat_boys_defeated_per_combat, "frat boy", "frat boys", "The Man", listMake("Lighthouse", "Junkyard", "Arena"), listMake("Orchard", "Nuns", "Farm"));
             
-		if (hippies_left < 1000 || (frat_boys_left == 1000 && hippies_left == 1000) || sides_completed_frat > 0)
-            QLevel12GenerateBattlefieldDescription(subentry, "frat boy", hippies_left, hippies_defeated_per_combat, "hippy", "hippies", "The Big Wisniewski", listMake("Orchard", "Nuns", "Farm"), listMake("Lighthouse", "Junkyard", "Arena"));
         
         if (frat_boys_left == 1 && hippies_left == 1)
 		{

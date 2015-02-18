@@ -119,7 +119,7 @@ void generateTasks(Checklist [int] checklists)
 		}
 		else
 		{
-            url = "store.php?whichstore=4";
+            url = "shop.php?whichshop=gnoll";
 			int meatcar_price = $item[spring].npc_price() + $item[sprocket].npc_price() + $item[cog].npc_price() + $item[empty meat tank].npc_price() + 100 + $item[tires].npc_price() + $item[sweet rims].npc_price() + $item[spring].npc_price();
 			subentry.entries.listAppend("Build a bitchin' meatcar. (" + meatcar_price + " meat)");
 		}
@@ -145,7 +145,7 @@ void generateTasks(Checklist [int] checklists)
             }
             else
             {
-                url = "store.php?whichstore=m";
+                url = "shop.php?whichshop=generalstore";
                 subentry.entries.listAppend("Buy dingy planks, then build dinghy dinghy.");
             }
                 
@@ -189,8 +189,10 @@ void generateTasks(Checklist [int] checklists)
         
         if (get_property_boolean("chateauAvailable") && __misc_state_int["free rests remaining"] > 0)
             url = "place.php?whichplace=chateau";
-        else if (spooky_airport_unlocked && $effect[jungle juiced].have_effect() > 0)
+        else if (spooky_airport_unlocked && ($effect[jungle juiced].have_effect() > 0 || ($item[jungle juice].available_amount() > 0 && availableDrunkenness() > 0 && __misc_state["can drink just about anything"])))
             url = $location[the deep dark jungle].getClickableURLForLocation();
+        else if (get_property_boolean("chateauAvailable"))
+            url = "place.php?whichplace=chateau";
         else if (__misc_state["sleaze airport available"])
             url = $location[sloppy seconds diner].getClickableURLForLocation();
         else if (spooky_airport_unlocked)
@@ -302,13 +304,6 @@ void generateTasks(Checklist [int] checklists)
 		if (!__quest_state["Level 12"].state_boolean["Orchard Finished"])
 			potential_targets.listAppend("Filthworms.");
 		
-		if (needTowerMonsterItem("disease"))
-		{
-			if (__quest_state["Level 5"].finished)
-				potential_targets.listAppend("Knob goblin harem girl. (disease for tower, unless tower killing)");
-			else
-				potential_targets.listAppend("Knob goblin harem girl. (outfit for quest, disease for tower, unless tower killing)");
-		}
 		if (__quest_state["Boss Bat"].state_int["areas unlocked"] + $item[sonar-in-a-biscuit].available_amount() <3)
 		{
 			if ($item[enchanted bean].available_amount() == 0 && !__misc_state["beanstalk grown"])
@@ -345,7 +340,7 @@ void generateTasks(Checklist [int] checklists)
             if ($item[detuned radio].available_amount() > 0)
                 url = "inventory.php?which=3";
             else
-                url = "store.php?whichstore=4";
+                url = "shop.php?whichshop=gnoll";
         }
         //FIXME URLs for the other ones
 		if (current_mcd() < mcd_max_limit && have_mcd && monster_level_adjustment() < 150)
@@ -385,7 +380,7 @@ void generateTasks(Checklist [int] checklists)
 		{
 			modifiers.listAppend(__misc_state_string["hipster name"]);
 		}
-		optional_task_entries.listAppend(ChecklistEntryMake("__item dead guy's watch", "", ChecklistSubentryMake("Use rollover runaway", modifiers, listMake("At the end of the day, enter a combat, but don't finish it. Rollover will end it for you.", "This gives an extra chance to look for a non-comba t.")), 8));
+		optional_task_entries.listAppend(ChecklistEntryMake("__item dead guy's watch", "", ChecklistSubentryMake("Use rollover runaway", modifiers, listMake("At the end of the day, enter a combat, but don't finish it. Rollover will end it for you.", "This gives an extra chance to look for a non-combat.")), 8));
     }
     
     //I'm not sure if you ever need a frat boy ensemble in-run, even if you're doing the hippy side on the war? If you need war hippy fatigues, the faster (?) way is acquire hippy outfit -> frat warrior fatigues -> start the war / use desert adventure for hippy fatigues. But if they're sure...
