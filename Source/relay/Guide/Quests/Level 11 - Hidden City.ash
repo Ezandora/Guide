@@ -168,8 +168,15 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 }
                 else
                 {
-                    subentry.modifiers.listAppend("elemental damage");
-                    subentry.entries.listAppend("Fight the protector spectre!");
+                    if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
+                    {
+                        subentry.entries.listAppend("Talk to the protector spectre.");
+                    }
+                    else
+                    {
+                        subentry.modifiers.listAppend("elemental damage");
+                        subentry.entries.listAppend("Fight the protector spectre!");
+                    }
                 }
             }
         

@@ -176,6 +176,25 @@ void STurtleTamerGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     }
 }
 
+void SDiscoBanditGenerateResource(ChecklistEntry [int] available_resources_entries)
+{
+    if (my_class() != $class[disco bandit])
+        return;
+    if ($skill[Break It On Down].have_skill() && $skill[Run Like the Wind].have_skill() && $skill[Pop and Lock It].have_skill())
+    {
+        int steals_done = get_property_int("_raveStealCount");
+        int steals_remaining = clampi(30 - steals_done, 0, 30);
+        if (steals_done > 0)
+        {
+            string [int] description;
+            description.listAppend("Knocks loose a pickpocketable item.");
+            //raveCombo5 is rave steal
+            //FIXME list combo order
+            available_resources_entries.listAppend(ChecklistEntryMake("__skill Disco Dance 3: Back in the Habit", "", ChecklistSubentryMake(pluralize(steals_remaining, "Rave Steal", "Rave Steals"), "", description), 8));
+        }
+    }
+}
+
 void SClassesGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     STurtleTamerGenerateTasks(task_entries, optional_task_entries, future_task_entries);
@@ -184,4 +203,5 @@ void SClassesGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 void SClassesGenerateResource(ChecklistEntry [int] available_resources_entries)
 {
     SSealClubberGenerateResource(available_resources_entries);
+    SDiscoBanditGenerateResource(available_resources_entries);
 }

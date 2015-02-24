@@ -237,6 +237,35 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 				line += " Run +234% item, +combat, and collect " + missing_washing_items.listJoinComponents(", ", "and") + ".";
 				if ($location[the f'c'le].item_drop_modifier_for_location() < 234.0)
 					additional_line = "This location can be a nightmare without +234% item.";
+                    
+                if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
+                {
+                    monster [int] monsters_left;
+                    if ($item[rigging shampoo].available_amount() == 0)
+                        monsters_left.listAppend($monster[cleanly pirate]);
+                    if ($item[mizzenmast mop].available_amount() == 0)
+                        monsters_left.listAppend($monster[curmudgeonly pirate]);
+                    if ($item[ball polish].available_amount() == 0)
+                        monsters_left.listAppend($monster[creamy pirate]);
+                    if (monsters_left.count() > 0)
+                    {
+                        string [int] monsters_left_string;
+                        foreach key, m in monsters_left
+                        {
+                            if (last_monster() == m)
+                                monsters_left_string.listAppend(HTMLGenerateSpanOfClass(m, "r_bold"));
+                            else
+                                monsters_left_string.listAppend(m);
+                        }
+                        string line2 = "Use";
+                        if (lookupItem("Talisman of Renenutet").available_amount() == 0)
+                            line2 = "Acquire and use";
+                        line2 += " the Talisman of Renenutet on " + monsters_left_string.listJoinComponents(", ", "and") + ".";
+                        if (lookupItem("Talisman of Renenutet").available_amount() == 0)
+                            line2 = HTMLGenerateSpanFont(line2, "red", "");
+                        subentry.entries.listAppend(line2);
+                    }
+                }
 			}
             
 			subentry.entries.listAppend(line);

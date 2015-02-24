@@ -849,6 +849,7 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         lookup_map["2nd Floor, Shiawase-Mitsuhama Building"] = "place.php?whichplace=junggate_1";
         lookup_map["3rd Floor, Shiawase-Mitsuhama Building"] = "place.php?whichplace=junggate_1";
         lookup_map["Chinatown Tenement"] = "place.php?whichplace=junggate_1";
+        lookup_map["The Gourd!"] = "place.php?whichplace=junggate_2";
         lookup_map["A Deserted Stretch of I-911"] = "place.php?whichplace=ioty2014_hare";
         lookup_map["The Prince's Restroom"] = "place.php?whichplace=ioty2014_cindy";
         lookup_map["The Prince's Dance Floor"] = "place.php?whichplace=ioty2014_cindy";
@@ -860,6 +861,7 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         lookup_map["Unleash Your Inner Wolf"] = "place.php?whichplace=ioty2014_wolf";
         lookup_map["The Crimbonium Mining Camp"] = "place.php?whichplace=desertbeach";
         lookup_map["The Crimbonium Mine"] = "mining.php?mine=5";
+        lookup_map["The Secret Council Warehouse"] = "tutorial.php";
 
         foreach s in $strings[The Edge of the Swamp,The Dark and Spooky Swamp,The Corpse Bog,The Ruined Wizard Tower,The Wildlife Sanctuarrrrrgh,Swamp Beaver Territory,The Weird Swamp Village]
             lookup_map[s] = "place.php?whichplace=marais";

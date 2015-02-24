@@ -211,6 +211,12 @@ void setUpState()
         yellow_ray_source = "Ball Lightning";
         yellow_ray_image_name = "__skill Ball Lightning";
     }
+    if (lookupSkill("wrath of ra").skill_is_usable() && my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
+    {
+        yellow_ray_available = true;
+        yellow_ray_source = "Wrath of Ra";
+        yellow_ray_image_name = "__skill wrath of ra";
+    }
 	if (familiar_is_usable($familiar[he-boulder]))
 	{
 		yellow_ray_available = true;

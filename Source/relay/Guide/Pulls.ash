@@ -104,7 +104,57 @@ void generatePullList(Checklist [int] checklists)
 		pullable_item_list.listAppend(GPItemMake($item[can of rain-doh], "5 copies/day|everything really", 1));
 	if ($items[empty rain-doh can,can of rain-doh,spooky putty monster].available_amount() == 0)
 		pullable_item_list.listAppend(GPItemMake($item[spooky putty sheet], "5 copies/day", 1));
-	pullable_item_list.listAppend(GPItemMake($item[over-the-shoulder folder holder], "So many things!", 1));
+    if (true)
+    {
+        string line = "So many things!";
+        if ($item[over-the-shoulder folder holder].storage_amount() > 0)
+        {
+            string [int] description;
+            string [item] folder_descriptions;
+            
+            folder_descriptions[$item[folder (red)]] = "+20 muscle";
+            folder_descriptions[$item[folder (blue)]] = "+20 myst";
+            folder_descriptions[$item[folder (green)]] = "+20 moxie";
+            folder_descriptions[$item[folder (magenta)]] = "+15 muscle +15 myst";
+            folder_descriptions[$item[folder (cyan)]] = "+15 myst +15 moxie";
+            folder_descriptions[$item[folder (yellow)]] = "+15 muscle +15 moxie";
+            folder_descriptions[$item[folder (smiley face)]] = "+2 muscle stat/fight";
+            folder_descriptions[$item[folder (wizard)]] = "+2 myst stat/fight";
+            folder_descriptions[$item[folder (space skeleton)]] = "+2 moxie stat/fight";
+            folder_descriptions[$item[folder (D-Team)]] = "+1 stat/fight";
+            folder_descriptions[$item[folder (Ex-Files)]] = "+5% combat";
+            folder_descriptions[$item[folder (skull and crossbones)]] = "-5% combat";
+            folder_descriptions[$item[folder (Knight Writer)]] = "+40% init";
+            folder_descriptions[$item[folder (Jackass Plumber)]] = "+25 ML";
+            folder_descriptions[$item[folder (holographic fractal)]] = "+4 all res";
+            folder_descriptions[$item[folder (barbarian)]] = "stinging damage";
+            folder_descriptions[$item[folder (rainbow unicorn)]] = "prismatic stinging damage";
+            folder_descriptions[$item[folder (Seawolf)]] = "-pressure penalty";
+            folder_descriptions[$item[folder (dancing dolphins)]] = "+50% item (underwater)";
+            folder_descriptions[$item[folder (catfish)]] = "+15 familiar weight (underwater)";
+            folder_descriptions[$item[folder (tranquil landscape)]] = "15 DR / 15 HP & MP regen";
+            folder_descriptions[$item[folder (owl)]] = "+500% item (dreadsylvania)";
+            folder_descriptions[$item[folder (Stinky Trash Kid)]] = "passive stench damage";
+            folder_descriptions[$item[folder (sports car)]] = "+5 adv";
+            folder_descriptions[$item[folder (sportsballs)]] = "+5 PVP fights";
+            folder_descriptions[$item[folder (heavy metal)]] = "+5 familiar weight";
+            folder_descriptions[$item[folder (Yedi)]] = "+50% spell damage";
+            folder_descriptions[$item[folder (KOLHS)]] = "+50% item (KOLHS)";
+            
+            foreach s in $slots[folder1,folder2,folder3]
+            {
+                item folder = s.equipped_item();
+                if (folder == $item[none]) continue;
+                
+                if (folder_descriptions contains folder)
+                    description.listAppend(folder_descriptions[folder]);
+            }
+            if (description.count() > 0)
+                line = description.listJoinComponents(" / ");
+        }
+        pullable_item_list.listAppend(GPItemMake($item[over-the-shoulder folder holder], line, 1));
+    }
+    
 	pullable_item_list.listAppend(GPItemMake($item[pantsgiving], "5x banish/day|+2 stats/fight|+15% items|2 extra fullness (realistically)", 1));
     if (!__misc_state["familiars temporarily blocked"]) //relevant in heavy rains, on the +item/+meat underwater familiars
         pullable_item_list.listAppend(GPItemMake($item[snow suit], "+20 familiar weight for a while" + (__misc_state["free runs usable"] ? ", +4 free runs" : "") + "|+10% item|spleen items", 1));

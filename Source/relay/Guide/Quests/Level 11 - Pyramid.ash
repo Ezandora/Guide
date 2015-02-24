@@ -22,7 +22,12 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
     if (!__quest_state["Level 11 Desert"].state_boolean["Desert Explored"])
         return;
     //Desert explored.
-    if (lookupItem("2325").available_amount() + lookupItem("2325").creatable_amount() == 0)
+    
+    boolean definitely_have_staff_of_ed = false;
+    if (2286.to_item().available_amount() > 0 && 2268.to_item().available_amount() > 0 && 2180.to_item().available_amount() > 0)
+        definitely_have_staff_of_ed = true;
+    
+    if (lookupItem("2325").available_amount() + lookupItem("2325").creatable_amount() + lookupItem("7961").available_amount() + lookupItem("7961").creatable_amount() == 0 && !definitely_have_staff_of_ed)
     {
         //Staff of ed.
         //subentry.entries.listAppend("Find the Staff of Ed.");

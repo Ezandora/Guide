@@ -207,10 +207,36 @@ void SPGourdGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
     modifiers.listAppend("+item?");
     description.listAppend("Adventure in the gourd.");
     if ($item[truthsayer].available_amount() == 0)
-        description.listAppend("Truthsayer is (sharp tin strip + wad of spider silk + goblin collarbone), found from gourd monsters.");
+    {
+        string [int] components;
+        boolean [item] items_implicitly_have;
+        if ($item[loose blade].available_amount() > 0)
+        {
+            items_implicitly_have[$item[goblin collarbone]] = true;
+            items_implicitly_have[$item[sharp tin strip]] = true;
+        }
+        if ($item[goblin bone hilt].available_amount() > 0)
+        {
+            items_implicitly_have[$item[goblin collarbone]] = true;
+            items_implicitly_have[$item[wad of spider silk]] = true;
+        }
+        if ($item[sticky sword blade].available_amount() > 0)
+        {
+            items_implicitly_have[$item[sharp tin strip]] = true;
+            items_implicitly_have[$item[wad of spider silk]] = true;
+        }
+        foreach it in $items[sharp tin strip, wad of spider silk, goblin collarbone]
+        {
+            string line = it;
+            if (it.available_amount() == 0 && !(items_implicitly_have contains it))
+                line = HTMLGenerateSpanFont(line, "grey", "");
+            components.listAppend(line);
+        }
+        description.listAppend("Truthsayer is (" + components.listJoinComponents(" + ") + "), found from gourd monsters.");
+    }
     
         
-	optional_task_entries.listAppend(ChecklistEntryMake("__item gourd potion", "", ChecklistSubentryMake("The Gourd", modifiers, description),$locations[The gourd!]));
+	optional_task_entries.listAppend(ChecklistEntryMake("__item gourd potion", "place.php?whichplace=junggate_2", ChecklistSubentryMake("The Gourd", modifiers, description),$locations[The gourd!]));
 }
 
 void SPCrackpotGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)

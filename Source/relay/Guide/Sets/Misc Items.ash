@@ -937,4 +937,40 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
         
         available_resources_entries.listAppend(ChecklistEntryMake("__item tonic djinn", "inventory.php?which=3", ChecklistSubentryMake("Tonic djinn", "", description), importance_level_unimportant_item));
     }
+    
+    if ($item[cosmic calorie].available_amount() > 0 && in_run)
+    {
+        string [int][int] table;
+        table.listAppend(listMake("Cost", "Item", "Effect"));
+        
+        string [item] celestial_descriptions;
+        celestial_descriptions[$item[celestial olive oil]] = "+1 all res";
+        celestial_descriptions[$item[celestial carrot juice]] = "+30% item";
+        celestial_descriptions[$item[celestial au jus]] = "+5% combat";
+        celestial_descriptions[$item[celestial squid ink]] = "-5% combat";
+        int [item] calories_required;
+        calories_required[$item[celestial olive oil]] = 20;
+        calories_required[$item[celestial carrot juice]] = 30;
+        calories_required[$item[celestial au jus]] = 50;
+        calories_required[$item[celestial squid ink]] = 60;
+        foreach it in $items[celestial olive oil,celestial carrot juice,celestial au jus,celestial squid ink]
+        {
+            int amount = it.creatable_amount() + it.available_amount();
+                
+            string [int] line;
+            line = listMake(calories_required[it], it, celestial_descriptions[it]);
+            if (amount == 0)
+            {
+                foreach key, s in line
+                {
+                    line[key] = HTMLGenerateSpanFont(s, "grey", "");
+                }
+            }
+            table.listAppend(line);
+        }
+        string [int] description;
+        description.listAppend(HTMLGenerateSimpleTableLines(table));
+        available_resources_entries.listAppend(ChecklistEntryMake("__item cosmic calorie", "inventory.php?which=3", ChecklistSubentryMake(pluralize($item[cosmic calorie]), "", description), importance_level_item));
+        
+    }
 }

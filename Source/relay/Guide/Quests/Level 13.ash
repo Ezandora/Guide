@@ -311,7 +311,7 @@ void QLevel13Init()
     
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL13Final");
-    if (my_path_id() == PATH_BUGBEAR_INVASION || __misc_state["In aftercore"] || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING) //FIXME mafia may track the ed L13 quest under this variable
+    if (my_path_id() == PATH_BUGBEAR_INVASION || __misc_state["In aftercore"] || (!state.in_progress && my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)) //FIXME mafia may track the ed L13 quest under this variable
         QuestStateParseMafiaQuestPropertyValue(state, "finished"); //never will start
 	if (__misc_state["Example mode"])
         QuestStateParseMafiaQuestPropertyValue(state, "step6");
@@ -379,11 +379,11 @@ void QLevel13Init()
     if (have_all_elements)
         state.state_string["Hedge maze elements needed"] = elements_needed.listJoinComponents("|");
     
-    state.state_boolean["past races"] = state.mafia_internal_step >= 2;
+    state.state_boolean["past races"] = state.mafia_internal_step >= 4;
     
-    state.state_boolean["Init race completed"] = get_property_int("nsContestants1") != -1 && mafiaIsPastRevision(15310);
-    state.state_boolean["Stat race completed"] = get_property_int("nsContestants2") != -1 && mafiaIsPastRevision(15310);
-    state.state_boolean["Elemental damage race completed"] = get_property_int("nsContestants3") != -1 && mafiaIsPastRevision(15310);
+    state.state_boolean["Init race completed"] = get_property_int("nsContestants1") != -1 && mafiaIsPastRevision(15408);
+    state.state_boolean["Stat race completed"] = get_property_int("nsContestants2") != -1 && mafiaIsPastRevision(15408);
+    state.state_boolean["Elemental damage race completed"] = get_property_int("nsContestants3") != -1 && mafiaIsPastRevision(15408);
     if (state.finished || state.state_boolean["past races"])
     {
         state.state_boolean["Init race completed"] = true;
@@ -391,14 +391,14 @@ void QLevel13Init()
         state.state_boolean["Elemental damage race completed"] = true;
     }
     
-	state.state_boolean["past hedge maze"] = state.mafia_internal_step >= 4;
-	state.state_boolean["past keys"] = state.mafia_internal_step >= 5;
+	state.state_boolean["past hedge maze"] = state.mafia_internal_step >= 6;
+	state.state_boolean["past keys"] = state.mafia_internal_step >= 7;
     
-    state.state_boolean["past tower level 1"] = state.mafia_internal_step >= 6;
-    state.state_boolean["past tower level 2"] = state.mafia_internal_step >= 7;
-    state.state_boolean["past tower level 3"] = state.mafia_internal_step >= 8;
-    state.state_boolean["past tower level 4"] = state.mafia_internal_step >= 9;
-    state.state_boolean["past tower level 5"] = state.mafia_internal_step >= 10;
+    state.state_boolean["past tower level 1"] = state.mafia_internal_step >= 8;
+    state.state_boolean["past tower level 2"] = state.mafia_internal_step >= 9;
+    state.state_boolean["past tower level 3"] = state.mafia_internal_step >= 10;
+    state.state_boolean["past tower level 4"] = state.mafia_internal_step >= 11;
+    state.state_boolean["past tower level 5"] = state.mafia_internal_step >= 12;
     
 	state.state_boolean["past tower monsters"] = state.state_boolean["past tower level 3"]; //5
 	state.state_boolean["wall of skin will need to be defeated"] = !state.state_boolean["past tower level 1"];
@@ -406,7 +406,7 @@ void QLevel13Init()
 	state.state_boolean["wall of bones will need to be defeated"] = !state.state_boolean["past tower level 3"];
 	state.state_boolean["shadow will need to be defeated"] = !state.state_boolean["past tower level 5"];
     //FIXME what paths don't fight the shadow?
-	state.state_boolean["king waiting to be freed"] = (state.mafia_internal_step == 11);
+	state.state_boolean["king waiting to be freed"] = (state.mafia_internal_step == 13);
     
     
     boolean [string] known_key_names = $strings[Boris's key,Jarlsberg's key,Sneaky Pete's key,Richard's star key,skeleton key,digital key];
@@ -465,7 +465,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 	string image_name = base_quest_state.image_name;
     
 	boolean should_output_main_entry = true;
-    if (!mafiaIsPastRevision(15310))
+    if (!mafiaIsPastRevision(15408))
     {
         //early support:
         string [int] race_types;
@@ -533,6 +533,12 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         subentry.entries.listAppend("Find out what the races are, first.");
         image_name = "lair registration desk";
     }
+    else if (base_quest_state.mafia_internal_step == 3)
+    {
+        image_name = "lair registration desk";
+        subentry.header = "Visit the registration desk";
+        subentry.entries.listAppend("Claim your prize!");
+    }
     else if (!base_quest_state.state_boolean["past races"])
     {
         image_name = "lair registration desk";
@@ -598,6 +604,36 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             }
             else
                 description.listAppend("Take the test now, you should(?) make second place.");
+                
+            if (stat_type != $stat[none])
+            {
+                if (__misc_state_int["pulls available"] > 0)
+                {
+                    float base_stat = MAX(1.0, my_basestat(stat_type));
+                    
+                    boolean [item] blacklist = $items[R&uuml;mpelstiltz,gummi snake,banana smoothie,banana supersucker,ennui-flavored potato chips,moonds,handful of laughing willow bark,ultrasoldier serum,kumquat supersucker,dennis's blessing of minerva,smart watch,mer-kin smartjuice,lump of saccharine maple sap,burt's blessing of bacchus,augmented-reality shades,mer-kin cooljuice,lobos mints,mariachi toothpaste,disco horoscope (virgo),pressurized potion of pulchritude,pressurized potion of perspicacity,pressurized potion of puissance,handful of crotchety pine needles,bruno's blessing of mars,fitness wristband,gummi salamander,bottle of fire,mer-kin strongjuice]; //limited/expensive content
+                    item [int] relevant_potions = ItemFilterGetPotionsCouldPullToAddToNumericModifier(stat_type, 50, blacklist);
+                    item [int] relevant_potions_source_2 = ItemFilterGetPotionsCouldPullToAddToNumericModifier(stat_type + " percent", 50.0 / base_stat * 100.0, blacklist);
+                    
+                    relevant_potions.listAppendList(relevant_potions_source_2);
+                    
+                    sort relevant_potions by -(value.to_effect().numeric_modifier(stat_type) + (value.to_effect().numeric_modifier(stat_type + " percent") / 100.0 * my_basestat(stat_type)));
+                    
+                    
+                    string [int] relevant_potions_output;
+                    foreach key, it in relevant_potions
+                    {
+                        float total = (it.to_effect().numeric_modifier(stat_type) + (it.to_effect().numeric_modifier(stat_type + " percent") / 100.0 * my_basestat(stat_type)));
+                        string line = it + " (" + total.roundForOutput(1) + ")";
+                        //if (it.mall_price() >= 15000) //for internal use, to fill out the blacklist
+                            //line = HTMLGenerateSpanFont(line, "red", "");
+                        relevant_potions_output.listAppend(line);
+                    }
+                    
+                    if (relevant_potions_output.count() > 0)
+                        description.listAppend("Could try pulling " + relevant_potions_output.listJoinComponents(", ", "or") + ".");
+                }
+            }
             
             subentries.listAppend(ChecklistSubentryMake("Compete in the " + stat_type + " race", "+" + stat_type.to_string().to_lower_case(), description));
         }
@@ -641,7 +677,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         //nsContestants2 - default -1
         //nsContestants3 - default -1
     }
-    else if (base_quest_state.mafia_internal_step == 2) //???? FIXME
+    else if (base_quest_state.mafia_internal_step == 4)
     {
         subentry.header = "Attend your coronation";
         image_name = "__item Snow Queen Crown";
@@ -799,7 +835,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         
         if (__misc_state_int["pulls available"] > 0 && current_value < 526.0)
         {
-            boolean [item] blacklist = $items[uncle greenspan's bathroom finance guide,black snowcone];
+            boolean [item] blacklist = $items[uncle greenspan's bathroom finance guide,black snowcone,sorority brain,blue grass,salt wages];
             item [int] relevant_potions = ItemFilterGetPotionsCouldPullToAddToNumericModifier("Meat Drop", 25, blacklist);
             string [int] relevant_potions_output;
             foreach key, it in relevant_potions
@@ -1034,7 +1070,13 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             if (!__misc_state["familiars temporarily blocked"])
                 subentry.modifiers.listAppend("attack familiar");
         }
+		image_name = "naughty sorceress";
 		subentry.header = "She awaits";
+        if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
+        {
+            subentry.header = "You await";
+            image_name = "Disco Bandit";
+        }
         //don't think blocking works anymore? not sure
         /*if (!__misc_state["familiars temporarily blocked"] && my_path_id() != PATH_HEAVY_RAINS)
         {
@@ -1057,12 +1099,11 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             if ($skill[frigidalmatian].skill_is_usable() && my_maxmp() >= 300 && $effect[Frigidalmatian].have_effect() == 0)
                 subentry.entries.listAppend("Try casting Frigidalmatian.");
         }
-        if (my_hp() < my_maxhp() && !get_property("lastEncounter").contains_text("The Naughty Sorceress") && __last_adventure_location != lookupLocation("The Naughty Sorceress' Chamber"))
+        if (my_hp() < my_maxhp() && !get_property("lastEncounter").contains_text("The Naughty Sorceress") && __last_adventure_location != lookupLocation("The Naughty Sorceress' Chamber") && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING)
         {
             subentry.entries.listAppend(HTMLGenerateSpanFont("Restore your HP first.", "red", ""));
         }
         
-		image_name = "naughty sorceress";
 	}
 	else if (base_quest_state.state_boolean["king waiting to be freed"])
 	{

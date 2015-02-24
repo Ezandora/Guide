@@ -39,19 +39,29 @@ void QLevel3GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
     boolean can_skip_stench = numeric_modifier("Stench Damage") >= 20.0;
     
     
-	float rat_king_chance = clampNormalf(monster_level_adjustment_for_location($location[the typical tavern cellar]) / 300.0);
 	
     float combat_rate = clampNormalf((0.85 + combat_rate_modifier() / 100.0)); //15%? I can't remember...
     
-    float average_tangles_found = (clampNormalf(rat_king_chance * combat_rate) * 8.5);
-	
-	if (wait_until_level_eleven)
-		subentry.entries.listAppend("May want to wait until level 11 for most +ML from aria");
-	string line = "Run +ML for tangles (" + roundForOutput(rat_king_chance * 100.0, 0) + "% rat king chance, " + average_tangles_found.roundForOutput(1) + " tangles on average";
-	line += ")";
-	
-	subentry.entries.listAppend(line);
-	
+    boolean need_to_complete_pyramid = true;
+    
+    //FIXME test properly
+    if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
+        need_to_complete_pyramid = false;
+    if (__quest_state["Level 11"].finished)
+        need_to_complete_pyramid = false;
+    if (need_to_complete_pyramid)
+    {
+        float rat_king_chance = clampNormalf(monster_level_adjustment_for_location($location[the typical tavern cellar]) / 300.0);
+        float average_tangles_found = (clampNormalf(rat_king_chance * combat_rate) * 8.5);
+        
+        if (wait_until_level_eleven)
+            subentry.entries.listAppend("May want to wait until level 11 for most +ML from aria");
+        string line = "Run +ML for tangles (" + roundForOutput(rat_king_chance * 100.0, 0) + "% rat king chance, " + average_tangles_found.roundForOutput(1) + " tangles on average";
+        line += ")";
+        
+        subentry.entries.listAppend(line);
+	}
+    
 	string [int] elemental_sources_available;
 	if ($item[piddles].available_amount() > 0 && $effect[Belch the Rainbow&trade;].have_effect() == 0)
 		elemental_sources_available.listAppend("+" + MIN(11, my_level()) + " piddles");
@@ -88,7 +98,7 @@ void QLevel3GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         //drunken rat kings seem to happen after the combat/non-combat check, so recommend +combat if they need tangles:
         
         string combat_type_to_run = "-combat/maybe +combat";
-        if (ncs_skippable > 0 && ($item[tangle of rat tails].available_amount() * 3 + $item[tomb ratchet].available_amount() >= 11 || __quest_state["Level 11"].finished)) //technically should check if we're done with the pyramid moving, not level 11 finished, but that's harder to test
+        if (ncs_skippable > 0 && ($item[tangle of rat tails].available_amount() * 3 + $item[tomb ratchet].available_amount() >= 11 || !need_to_complete_pyramid)) //technically should check if we're done with the pyramid moving, not level 11 finished, but that's harder to test
             combat_type_to_run = "-combat";
         string line;
         if (additionals.count() > 0)
@@ -108,12 +118,13 @@ void QLevel3GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         subentry.modifiers.listAppend(combat_type_to_run);
         subentry.entries.listAppend(line);
         
-        if ($item[tangle of rat tails].available_amount() > 0 && !__quest_state["Level 11"].finished)
+        if ($item[tangle of rat tails].available_amount() > 0 && need_to_complete_pyramid)
         {
             subentry.entries.listAppend(pluralize($item[tangle of rat tails]) + " found.");
         }
     }
-    subentry.modifiers.listAppend("+300 ML");
+    if (need_to_complete_pyramid)
+        subentry.modifiers.listAppend("+300 ML");
     
     string url = "tavern.php";
     

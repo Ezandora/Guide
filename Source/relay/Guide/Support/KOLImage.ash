@@ -319,6 +319,7 @@ KOLImage KOLImageLookup(string lookup_name)
 		familiar f = lookup_name.to_familiar();
 		effect e = lookup_name.to_effect();
         monster m = $monster[none];
+        skill s = $skill[none];
         string secondary_lookup_name = lookup_name;
         if (lookup_name.stringHasPrefix("__item "))
         {
@@ -334,20 +335,28 @@ KOLImage KOLImageLookup(string lookup_name)
             e = $effect[none];
             f = secondary_lookup_name.to_familiar();
         }
-        if (lookup_name.stringHasPrefix("__effect "))
+        else if (lookup_name.stringHasPrefix("__effect "))
         {
             secondary_lookup_name = lookup_name.substring(9);
             f = $familiar[none];
             it = $item[none];
             e = secondary_lookup_name.to_effect();
         }
-        if (lookup_name.stringHasPrefix("__monster "))
+        else if (lookup_name.stringHasPrefix("__monster "))
         {
             secondary_lookup_name = lookup_name.substring(10);
             f = $familiar[none];
             it = $item[none];
             e = $effect[none];
             m = secondary_lookup_name.to_monster();
+        }
+        else if (lookup_name.stringHasPrefix("__skill "))
+        {
+            secondary_lookup_name = lookup_name.substring(8);
+            f = $familiar[none];
+            it = $item[none];
+            e = $effect[none];
+            s = secondary_lookup_name.to_skill();
         }
         //Disabled for now - skill images are a new feature.
         /*if (lookup_name.stringHasPrefix("__skill "))
@@ -374,6 +383,10 @@ KOLImage KOLImageLookup(string lookup_name)
         else if (m != $monster[none] && m.image.length() > 0 && m.to_string().to_lower_case() == secondary_lookup_name)
         {
             __kol_images[lookup_name] = KOLImageMake("images/adventureimages/" + m.image, Vec2iMake(100, 100));
+        }
+        else if (s != $skill[none] && s.image.length() > 0 && s.to_string().to_lower_case() == secondary_lookup_name)
+        {
+			__kol_images[lookup_name] = KOLImageMake("images/itemimages/" + s.image, Vec2iMake(30,30));
         }
 		else
 		{

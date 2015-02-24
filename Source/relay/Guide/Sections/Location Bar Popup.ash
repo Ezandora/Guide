@@ -327,7 +327,7 @@ buffer generateLocationPopup(float bottom_coordinates)
         foreach m in $monsters[oil slick,oil tycoon,oil baron,oil cartel]
         {
             if (m != correct_monster)
-                monsters_that_we_cannot_encounter[m] = "ML";
+                monsters_that_we_cannot_encounter[m] = "ML based";
         }
     }
     //FIXME other defileds
@@ -508,7 +508,7 @@ buffer generateLocationPopup(float bottom_coordinates)
             monster_cannot_be_encountered = true;
             reason_monster_cannot_be_encountered = monsters_that_we_cannot_encounter[m];
         }
-        else if (appearance_rates_adjusted[$monster[none]] >= 100.0)
+        else if (appearance_rates_adjusted[$monster[none]] >= 100.0 && !(possible_alien_monsters contains m))
         {
             monster_cannot_be_encountered = true;
             reason_monster_cannot_be_encountered = "no combats";
@@ -533,8 +533,8 @@ buffer generateLocationPopup(float bottom_coordinates)
         {
             //FIXME centre image if it's small? maybe a table? more tables!
             boolean from_bottom_instead = false;
-            if ($strings[images/adventureimages/lower_b.gif,images/adventureimages/lower_k.gif,images/adventureimages/lower_h.gif,images/adventureimages/upper_q.gif,images/adventureimages/aswarm.gif,images/adventureimages/lowerm.gif,images/adventureimages/dad_machine.gif] contains monster_image_url && monster_image_stats.maximum_y_coordinate != -1 && monster_image_stats.height != -1) //dungeons of doom, dad sea monkee
-                from_bottom_instead = true;
+            //if ($strings[images/adventureimages/lower_b.gif,images/adventureimages/lower_k.gif,images/adventureimages/lower_h.gif,images/adventureimages/upper_q.gif,images/adventureimages/aswarm.gif,images/adventureimages/lowerm.gif,images/adventureimages/dad_machine.gif] contains monster_image_url && monster_image_stats.maximum_y_coordinate != -1 && monster_image_stats.height != -1) //dungeons of doom, dad sea monkee
+                //from_bottom_instead = true;
             
             
             float max_height = 100;
@@ -558,7 +558,7 @@ buffer generateLocationPopup(float bottom_coordinates)
                 image_style += "opacity:0.1;";
             else
                 image_style += "opacity:0.5;";
-            if (from_bottom_instead)
+            if (from_bottom_instead && false) //disabled, no longer works
             {
                 float location_of_first_bottom_pixel = monster_image_stats.maximum_y_coordinate;
                 float margin_bottom = monster_image_stats.height - location_of_first_bottom_pixel;

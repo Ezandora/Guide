@@ -21,6 +21,48 @@ void SActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, Check
         description.listAppend("At least " + pluralizeWordy(skills_available - skills_have, "skill", "skills") + " available.");
         optional_task_entries.listAppend(ChecklistEntryMake(image_name, "place.php?whichplace=edbase&action=edbase_book", ChecklistSubentryMake("Buy Undying skills", "", description), 11));
     }
+    
+    if (my_level() >= 13 && QuestState("questL13Final").finished)
+    {
+        if (lookupItem("7965").available_amount() > 0 || lookupItem("2334").available_amount() > 0) //holy macguffins
+        {
+            string [int] description;
+            description.listAppend("Finishes the path.");
+            if (availableSpleen() > 0)
+                description.listAppend("May want to fill your " + availableSpleen() + " extra spleen first.");
+            task_entries.listAppend(ChecklistEntryMake("Pyramid", "place.php?whichplace=edbase&action=edbase_altar", ChecklistSubentryMake("Put back the Holy MacGuffin", "", description), -10));
+        }
+        else
+        {
+            //tutorial.php
+            string [int] modifiers;
+            string [int] description;
+            string url = "tutorial.php";
+            
+            if (!lookupMonster("warehouse janitor").is_banished())
+                modifiers.listAppend("banish janitor");
+            
+            description.listAppend("Adventure in the Secret Government Warehouse.");
+            
+            if (lookupItem("warehouse inventory page").available_amount() > 0 && lookupItem("warehouse map page").available_amount() > 0)
+            {
+                description.listClear();
+                description.listAppend("Use warehouse inventory page.");
+                url = "inventory.php?which=3";
+            }
+            else if (lookupSkill("Lash of the Cobra").have_skill())
+            {
+                description.listAppend("Use lash of the cobra on the clerk and guard, use the items you find.");
+            }
+            else
+            {
+                modifiers.listAppend("+item");
+                description.listAppend("Use the items you find.");
+            }
+            
+            task_entries.listAppend(ChecklistEntryMake("__item holy macguffin", url, ChecklistSubentryMake("Retrieve the Holy MacGuffin", modifiers, description), lookupLocations("The Secret Council Warehouse")));
+        }
+    }
 }
 
 void SActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] available_resources_entries)
@@ -43,7 +85,7 @@ void SActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] available_resour
                 name = pluralize(haunches_want, lookupItem("mummified beef haunch"));
             else
                 name = "mummified beef haunch";
-            ka_table.listAppend(listMake(name, 5, "best spleen consumable"));
+            ka_table.listAppend(listMake(name, 15, "best spleen consumable"));
         }
         if (lookupItem("linen bandages").available_amount() == 0 && lookupItem("cotton bandages").available_amount() == 0 && lookupItem("silk bandages").available_amount() == 0)
         {

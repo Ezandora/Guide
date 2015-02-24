@@ -186,7 +186,12 @@ void QNemesisGenerateIslandTasks(ChecklistSubentry subentry)
             string [int] tasks;
             if ($thrall[spaghetti elemental].level <3)
             {
-                tasks.listAppend("level your cute and adorable spaghetti elemental to 3");
+                string line = "level your cute and adorable spaghetti elemental to 3";
+                if ($item[experimental carbon fiber pasta additive].available_amount() > 0)
+                {
+                    line += " (use the experimental carbon fiber pasta additive)";
+                }
+                tasks.listAppend(line);
             }
             tasks.listAppend("defeat a cult member");
             
@@ -812,6 +817,10 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         if (my_basestat(my_primestat()) < 90)
             subentry.entries.listAppend("Level to 90 " + my_primestat().to_lower_case() + ".");
         
+        if (my_class() == $class[pastamancer] && my_thrall() != $thrall[spaghetti elemental] && $skill[bind spaghetti elemental].have_skill() && $thrall[spaghetti elemental].level < 3)
+        {
+            subentry.entries.listAppend("Cast Bind Spaghetti Elemental to level up your spaghetti elemental to three in advance.");
+        }
         
     }
     else if (base_quest_state.mafia_internal_step == 15)

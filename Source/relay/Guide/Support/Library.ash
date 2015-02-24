@@ -437,6 +437,7 @@ int availableFullness()
 
 int availableDrunkenness()
 {
+    if (inebriety_limit() == 0) return 0; //certain edge cases
 	return inebriety_limit() - my_inebriety();
 }
 
@@ -1148,7 +1149,7 @@ int ka_dropped(monster m)
 {
     if (m.phylum == $phylum[dude] || m.phylum == $phylum[hobo] || m.phylum == $phylum[hippy] || m.phylum == $phylum[pirate])
         return 2;
-    if (m.phylum == $phylum[goblin] || m.phylum == $phylum[humanoid] || m.phylum == $phylum[beast] || m.phylum == $phylum[bug] || m.phylum == $phylum[orc] || m.phylum == $phylum[elemental])
+    if (m.phylum == $phylum[goblin] || m.phylum == $phylum[humanoid] || m.phylum == $phylum[beast] || m.phylum == $phylum[bug] || m.phylum == $phylum[orc] || m.phylum == $phylum[elemental] || m.phylum == $phylum[elf] || m.phylum == $phylum[penguin])
         return 1;
     return 0;
 }

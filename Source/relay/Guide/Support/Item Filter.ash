@@ -6,7 +6,7 @@ static
     
     void ItemFilterInitialise()
     {
-        boolean [string] modifier_names = $strings[Meat Drop,Initiative];
+        boolean [string] modifier_names = $strings[Meat Drop,Initiative,Muscle,Mysticality,Moxie,Muscle Percent,Mysticality Percent,Moxie Percent];
         
         foreach modifier in modifier_names
         {
