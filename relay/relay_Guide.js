@@ -134,11 +134,11 @@ function verifyKOLPageIsUnaltered()
                 __guide_observed_long_charpane_size = long_matches[1];
             }
         }
-        if (rootset_cols.match(__guide_colset_short_kol_default_regex))
+        else if (rootset_cols.match(__guide_colset_short_kol_default_regex))
             __guide_colset_type = 2;
-        if (rootset_cols === __guide_colset_long_kol_default)
+        else if (rootset_cols === __guide_colset_long_kol_default)
             __guide_colset_type = 1;
-        if (rootset_cols === __guide_colset_short_kol_default)
+        else if (rootset_cols === __guide_colset_short_kol_default)
             __guide_colset_type = 2;
         
         if (__guide_colset_type === -1)
