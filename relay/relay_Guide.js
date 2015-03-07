@@ -13,12 +13,21 @@ var __guide_importance_bar_visible = false;
 var __guide_colset_type = -1; //1 for long, 2 for short
 
 var __guide_colset_long_kol_default = "200,3*,*";
-var __guide_colset_long_2 = "200,3*,25%,20%";
-var __guide_colset_long_3_chatpane_slightly_visible = "200,3*,30%,0%";
-var __guide_colset_long_3_chatpane_invisible = "200,3*,30%";
+//var __guide_colset_long_kol_default_regex = /([0-9][0-9]*),3\*,[\*0123456789][0-9]*/;
+var __guide_colset_long_kol_default_regex = /([0-9][0-9]*),(3\*|[0-9][0-9]*%),[\*0123456789][0-9]*/; //firefox generic matching
+var __guide_colset_long_2 = ",3*,25%,20%";
+var __guide_colset_long_3_chatpane_slightly_visible = ",3*,30%,0%";
+var __guide_colset_long_3_chatpane_invisible = ",3*,30%";
+
+var __guide_colset_long_2_regex = /[0-9][0-9]*,3\*,25%,20%/;
+var __guide_colset_long_3_chatpane_slightly_visible_regex = /[0-9][0-9]*,3\*,30%,0%/;
+var __guide_colset_long_3_chatpane_invisible_regex = /[0-9][0-9]*,3\*,30%/;
+var __guide_observed_long_charpane_size = 200;
 
 
 var __guide_colset_short_kol_default = "4*,*";
+//var __guide_colset_short_kol_default_regex = /4\*,[\*0123456789][0-9]*/;
+var __guide_colset_short_kol_default_regex = /(4\*|[0-9][0-9]*%),[\*0123456789][0-9]*/; //firefox generic matching
 var __guide_colset_short_2 = "*,25%,20%";
 var __guide_colset_short_3_chatpane_slightly_visible = "*,30%,0%";
 var __guide_colset_short_3_chatpane_invisible = "*,30%";
@@ -51,10 +60,24 @@ function removeInstalledFrame()
         if (rootset == undefined)
             return;
         
+        var saved_colset = undefined;
+        try
+        {
+            //storage API requires try
+            saved_colset = sessionStorage.getItem("Guide initial colset");
+        }
+        catch (e)
+        {
+        }
+        
         if (overall_window.frames["Guide Frame"] == undefined)
             return;
         rootset.removeChild(rootset.children["Guide Frame"]);
-        if (__guide_colset_type == 2)
+        
+        
+        if (saved_colset != undefined)
+            rootset.cols = saved_colset;
+        else if (__guide_colset_type == 2)
             rootset.cols = __guide_colset_short_kol_default;
         else
             rootset.cols = __guide_colset_long_kol_default;
@@ -101,9 +124,21 @@ function verifyKOLPageIsUnaltered()
     {
         //if (mainWindow().frames["rootset"].cols != "4*,*")
         __guide_colset_type = -1;
-        if (mainWindow().frames["rootset"].cols === __guide_colset_long_kol_default)
+        var rootset_cols = mainWindow().frames["rootset"].cols;
+        var long_matches = rootset_cols.match(__guide_colset_long_kol_default_regex);
+        if (long_matches)
+        {
             __guide_colset_type = 1;
-        if (mainWindow().frames["rootset"].cols === __guide_colset_short_kol_default)
+            if (long_matches.length >= 2)
+            {
+                __guide_observed_long_charpane_size = long_matches[1];
+            }
+        }
+        if (rootset_cols.match(__guide_colset_short_kol_default_regex))
+            __guide_colset_type = 2;
+        if (rootset_cols === __guide_colset_long_kol_default)
+            __guide_colset_type = 1;
+        if (rootset_cols === __guide_colset_short_kol_default)
             __guide_colset_type = 2;
         
         if (__guide_colset_type === -1)
@@ -128,12 +163,12 @@ function getCurrentInstalledFramePosition()
             return
         //Bit hacky, examine what we've done to cols:
         var rootset = mainWindow().frames["rootset"];
-        if (rootset.cols === __guide_colset_long_2)
+        if (rootset.cols.match(__guide_colset_long_2_regex))
         {
             __guide_colset_type = 1;
             return 2;
         }
-        else if (rootset.cols == __guide_colset_long_3_chatpane_slightly_visible || rootset.cols == __guide_colset_long_3_chatpane_invisible)
+        else if (rootset.cols.match(__guide_colset_long_3_chatpane_slightly_visible_regex) || rootset.cols.match(__guide_colset_long_3_chatpane_invisible_regex))
         {
             __guide_colset_type = 1;
             return 3;
@@ -149,12 +184,6 @@ function getCurrentInstalledFramePosition()
             __guide_colset_type = 2;
             return 3;
         }
-        //else if (rootset.cols == "*,30%,0%" || rootset.cols == "*,30%")
-            //return 3;
-        /*if (rootset.cols == "*,25%,20%")
-            return 2;
-        else if (rootset.cols == "*,30%,0%" || rootset.cols == "*,30%")
-            return 3;*/
     }
 	catch (e)
     {
@@ -177,9 +206,12 @@ function installFrame(position)
             return;
         
         var chat_active = getChatIsCurrentlyActive();
-        
+        var avoid_storing_session_data = false;
         if (overall_window.frames["Guide Frame"] != undefined)
+        {
             removeInstalledFrame();
+            avoid_storing_session_data = true;
+        }
 
         
         //Positions:
@@ -188,7 +220,18 @@ function installFrame(position)
         //2 - Left of chat pane, chat pane visible
         //3 - Left of chat pane, chat pane invisible
         //4 - Right of everything. Disabled for now.
-            
+        if (!avoid_storing_session_data)
+        {
+            try
+            {
+                //the storage API does not seem to have a way to detect if this method throws an exception, so specifically catch it:
+                sessionStorage.setItem("Guide initial colset", rootset.cols);
+            }
+            catch (e)
+            {
+            }
+        }
+        
         var new_frame = overall_window.document.createElement("frame");
         new_frame.name = "Guide Frame";
         new_frame.id = "Guide Frame";
@@ -197,7 +240,7 @@ function installFrame(position)
         {
             rootset.insertBefore(new_frame, rootset.children["chatpane"]);
             if (__guide_colset_type === 1)
-                rootset.cols = __guide_colset_long_2;
+                rootset.cols = __guide_observed_long_charpane_size + __guide_colset_long_2;
             else if (__guide_colset_type === 2)
                 rootset.cols = __guide_colset_short_2;
             //rootset.cols = "*,25%,20%";
@@ -208,14 +251,14 @@ function installFrame(position)
             if (chat_active)
             {
                 if (__guide_colset_type === 1)
-                    rootset.cols = __guide_colset_long_3_chatpane_slightly_visible;
+                    rootset.cols = __guide_observed_long_charpane_size + __guide_colset_long_3_chatpane_slightly_visible;
                 else if (__guide_colset_type === 2)
                     rootset.cols = __guide_colset_short_3_chatpane_slightly_visible;
             }
             else
             {
                 if (__guide_colset_type === 1)
-                    rootset.cols = __guide_colset_long_3_chatpane_invisible;
+                    rootset.cols = __guide_observed_long_charpane_size + __guide_colset_long_3_chatpane_invisible;
                 else if (__guide_colset_type === 2)
                     rootset.cols = __guide_colset_short_3_chatpane_invisible;
             }
@@ -303,7 +346,7 @@ function writePageExtras()
 	var did_output_install_to_window_link = false;
     
     var page_unaltered = verifyKOLPageIsUnaltered();
-    if (true && getCurrentlyInsideMainpane() && page_unaltered)
+    if (getCurrentlyInsideMainpane() && page_unaltered)
     {
         //auto install:
         installFrameDefault();

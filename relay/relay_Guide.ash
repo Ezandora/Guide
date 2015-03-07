@@ -1,7 +1,7 @@
 //This script and its support scripts are in the public domain.
 
 //These settings are for development. Don't worry about editing them.
-string __version = "1.1.21";
+string __version = "1.1.22";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -2292,10 +2292,12 @@ int XiblaxianHoloWristPuterTurnsUntilNextItem()
     //_holoWristProgress resets when drop happens
     if (!mafiaIsPastRevision(15148))
         return -1;
-    //int next_turn_hit = (drops + 1) * (5 * (drops + 1) + 17)/2;
-    int next_turn_hit = 5 * (drops + 1) + 6 + 1;
-    if (drops == 0)
-        next_turn_hit = 5 * 1 + 6;
+    int next_turn_hit = 5 * (drops + 1) + 6;
+    if (!mafiaIsPastRevision(15493)) //old behaviour
+    {
+        if (drops != 0)
+            next_turn_hit += 1;
+    }
     return MAX(0, next_turn_hit - progress);
 }
 
@@ -5100,14 +5102,26 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
 		case $location[The Haunted Billiards Room]:
             if (lookupItem("7301").available_amount() > 0)
                 return true;
+            else
+                return false;
 			//return get_property_int("lastManorUnlock") == my_ascensions();
 		case $location[The Haunted Bedroom]:
 		case $location[The Haunted Bathroom]:
         case $location[the haunted gallery]:
             //FIXME detect this
-			return get_property_int("lastSecondFloorUnlock") == my_ascensions();
+			return get_property_int("lastSecondFloorUnlock") == my_ascensions(); //FIXME test against questM21Dance
         case $location[the haunted ballroom]:
             return questPropertyPastInternalStepNumber("questM21Dance", 4);
+        case $location[The Haunted Laboratory]:
+        case $location[The Haunted Nursery]:
+        case $location[The Haunted Storage Room]:
+            return questPropertyPastInternalStepNumber("questM17Babies", 1);
+        case $location[The Haunted Boiler Room]:
+        case $location[The Haunted Laundry Room]:
+        case $location[The Haunted Wine Cellar]:
+            return questPropertyPastInternalStepNumber("questL11Manor", 2);
+        case $location[summoning chamber]:
+            return get_property("questL11Manor") == "finished";
         case $location[the batrat and ratbat burrow]:
             return questPropertyPastInternalStepNumber("questL04Bat", 2);
         case $location[the beanbat chamber]:
@@ -5665,6 +5679,7 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         lookup_map["The Crimbonium Mining Camp"] = "place.php?whichplace=desertbeach";
         lookup_map["The Crimbonium Mine"] = "mining.php?mine=5";
         lookup_map["The Secret Council Warehouse"] = "tutorial.php";
+        lookup_map["The Skeleton Store"] = "place.php?whichplace=town_market";
 
         foreach s in $strings[The Edge of the Swamp,The Dark and Spooky Swamp,The Corpse Bog,The Ruined Wizard Tower,The Wildlife Sanctuarrrrrgh,Swamp Beaver Territory,The Weird Swamp Village]
             lookup_map[s] = "place.php?whichplace=marais";
@@ -8341,6 +8356,8 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             {
                 boolean have_usable_umbrella = (__misc_state["can equip just about any weapon"] && $item[titanium assault umbrella].available_amount() > 0);
                 
+                if (!in_hardcore())
+                    subentry.entries.listAppend("Potentially pull and wear an amulet of extreme plot significance.");
                 if (have_usable_umbrella && $item[titanium assault umbrella].equipped_amount() == 0)
                     subentry.entries.listAppend("Equip your titanium assault umbrella.");
                 if ($item[massive dumbbell].available_amount() == 0)
@@ -11251,7 +11268,7 @@ void QLevel12GenerateBattlefieldDescription(ChecklistSubentry subentry, string s
     {
         item [int] missing_outfit_components = missing_outfit_components(outfit_name);
         if (missing_outfit_components.count() > 0)
-            line += "|*Missing outfit pieces " + missing_outfit_components.listJoinComponents(", ", "and") + ".";
+            line += "|*Missing outfit piece" + (missing_outfit_components.count() > 1 ? "s" : "") + " " + missing_outfit_components.listJoinComponents(", ", "and") + ".";
     }
     int turns_remaining = ceiling(enemies_remaining.to_float() / enemies_defeated_per_combat.to_float());
     if (turns_remaining > 0)
@@ -14325,6 +14342,7 @@ void QNemesisGenerateIslandTasks(ChecklistSubentry subentry)
             subentry.entries.listAppend("All keys found. Fight in the Hacienda.");
         else
         {
+            subentry.modifiers.listAppend("-combat");
             int keys_needed = MAX(0, 5 - $item[hacienda key].available_amount());
             subentry.entries.listAppend(pluralizeWordy(keys_needed, "key", "keys").capitalizeFirstLetter() + " to go.");
             subentry.entries.listAppend("Four are from the non-combat; one is from pick-pocketing a mariachi.");
@@ -16827,9 +16845,8 @@ void QSpookyravenLightsOutGenerateEntry(ChecklistEntry [int] task_entries, Check
     //nextSpookyravenElizabethRoom
     //nextSpookyravenStephenRoom
     
-    //FIXME determine when to hide
-    //if (get_property("lastEncounter").contains_text("Lights Out in the"))
-        //return;
+    if (get_property_int("lastLightsOutTurn") >= total_turns_played())
+        return;
     
     string next_elizabeth_room = get_property("nextSpookyravenElizabethRoom");
     string next_stephen_room = get_property("nextSpookyravenStephenRoom");
@@ -16838,7 +16855,9 @@ void QSpookyravenLightsOutGenerateEntry(ChecklistEntry [int] task_entries, Check
     
     int turns_until_next_lights_out = -1;
     
-    //turns_until_next_lights_out = 37 - total_turns_played() % 37; //FIXME uncomment next point release
+    //Thought about enabling this, but it's better to only show it when they ask for spookyraven tracking, I think...
+    //then again, spookyraven tracking doesn't work well with automation (auto-aborts, even if adventuring in relevant locations)
+    //turns_until_next_lights_out = 37 - total_turns_played() % 37;
     
     Counter lights_out_counter = CounterLookup("Spookyraven Lights Out");
     if (lights_out_counter.CounterExists() && !lights_out_counter.CounterIsRange())
@@ -18190,6 +18209,81 @@ void QMartyGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     
 }
 
+void QMeatsmithInit()
+{
+	//questM23Meatsmith
+	QuestState state;
+	
+	QuestStateParseMafiaQuestProperty(state, "questM23Meatsmith");
+	
+	state.quest_name = "Helping Make Ends Meat";
+	state.image_name = "__item gnawed-up dog bone";
+	
+	state.startable = true;
+	
+	__quest_state["Meatsmith"] = state;
+}
+
+
+void QMeatsmithGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+	QuestState base_quest_state = __quest_state["Meatsmith"];
+    
+    if (__last_adventure_location != lookupLocation("the skeleton store") || __last_adventure_location == $location[none])
+        return;
+		
+	ChecklistSubentry subentry;
+	
+	subentry.header = base_quest_state.quest_name;
+	
+	string active_url = "place.php?whichplace=town_market";
+    
+    boolean have_reason_to_add = false;
+    
+	if (!base_quest_state.started)
+    {
+        have_reason_to_add = true;
+        subentry.entries.listAppend("Go talk to the meatsmith to start the quest.");
+    }
+    else if (base_quest_state.mafia_internal_step == 1)
+    {
+        have_reason_to_add = true;
+        if (lookupItem("skeleton store office key").available_amount() == 0)
+        {
+            subentry.entries.listAppend("Check out the cash register at the NC.");
+        }
+        else
+        {
+            subentry.entries.listAppend("Head into the manager's office at the NC.");
+        }
+    }
+    else if (base_quest_state.mafia_internal_step == 2)
+    {
+        have_reason_to_add = true;
+    }
+    
+    if (lookupItem("ring of telling skeletons what to do").item_amount() == 0)
+    {
+        if (!have_reason_to_add)
+            subentry.header = "The Skeleton Store";
+        string line = "Could acquire a ring of telling skeletons what to do, by opening the chest at the NC";
+        if ($item[skeleton key].item_amount() == 0)
+            line += HTMLGenerateSpanFont(" after acquiring a skeleton key", "red", "");
+            
+        line += ".";
+        subentry.entries.listAppend(line);
+        have_reason_to_add = true;
+    }
+    
+    subentry.entries.listAppend("Non-combat appears every fourth adventure."); //except the first time for some reason? needs spading
+    
+    boolean [location] relevant_locations;
+    relevant_locations[lookupLocation("the skeleton store")] = true;
+    
+    if (have_reason_to_add)
+        optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, active_url, subentry, relevant_locations));
+}
+
 
 void QuestsInit()
 {
@@ -18220,6 +18314,7 @@ void QuestsInit()
     QGuildInit();
     QSubject37Init();
     QMartyInit();
+    QMeatsmithInit();
     
     //has to happen after level 13 init... or not?
 	QManorInit();
@@ -18261,6 +18356,7 @@ void QuestsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     QAirportGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     QSubject37GenerateTasks(task_entries, optional_task_entries, future_task_entries);
     QMartyGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+    QMeatsmithGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 }
 
 void QuestsGenerateResources(ChecklistEntry [int] available_resources_entries)
@@ -26812,12 +26908,18 @@ void SDiscoBanditGenerateResource(ChecklistEntry [int] available_resources_entri
     {
         int steals_done = get_property_int("_raveStealCount");
         int steals_remaining = clampi(30 - steals_done, 0, 30);
-        if (steals_done > 0)
+        if (steals_done > 0 && steals_remaining > 0)
         {
             string [int] description;
             description.listAppend("Knocks loose a pickpocketable item.");
             //raveCombo5 is rave steal
             //FIXME list combo order
+            string rave_combo_number_5 = get_property("raveCombo5");
+            if (rave_combo_number_5.length() > 0)
+            {
+                string [int] skill_order = rave_combo_number_5.split_string(",");
+                description.listAppend(skill_order.listJoinComponents(__html_right_arrow_character).capitalizeFirstLetter() + ".");
+            }
             available_resources_entries.listAppend(ChecklistEntryMake("__skill Disco Dance 3: Back in the Habit", "", ChecklistSubentryMake(pluralize(steals_remaining, "Rave Steal", "Rave Steals"), "", description), 8));
         }
     }
@@ -27101,8 +27203,8 @@ void SActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] available_resour
         string image_name = "";
         string [item] path_relevant_items;
         
-        path_relevant_items[lookupItem("talisman of Renenutet")] = "+lots item in a single combat";
-        path_relevant_items[lookupItem("talisman of Horus")] = "+lots combat potion";
+        path_relevant_items[lookupItem("talisman of Renenutet")] = "+lots% item in a single combat";
+        path_relevant_items[lookupItem("talisman of Horus")] = "+lots% combat potion";
         path_relevant_items[lookupItem("ancient cure-all")] = "SGEEA-equivalent?";
         foreach s in $strings[linen bandages,cotton bandages,silk bandages]
         {
@@ -27116,7 +27218,7 @@ void SActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] available_resour
         {
             if (it.available_amount() > 0)
             {
-                subentries.listAppend(ChecklistSubentryMake(pluralize(it), "", reason));
+                subentries.listAppend(ChecklistSubentryMake(pluralize(it), "", reason.capitalizeFirstLetter() + "."));
                 if (image_name.length() == 0)
                     image_name = "__item " + it;
             }
@@ -27629,6 +27731,24 @@ void generatePullList(Checklist [int] checklists)
 	{
 		pullable_item_list.listAppend(GPItemMake($item[Shore Inc. Ship Trip Scrip], "Saves three turns each|" + scrip_reasons.listJoinComponents(", ", "and").capitalizeFirstLetter() + ".", scrip_needed));
 	}
+    
+    if (__misc_state["Need to level"] && get_property_boolean("chateauAvailable") && __misc_state_int["free rests remaining"] > 0 && false)
+    {
+        //This is not currently suggested because I'm not sure if it's worth it for anyone but unrestricted or the very high end speed ascension.
+        //It seems to give about as much stats as a good clover, which you can also pull, and are much cheaper.
+        //Unrestricted has up to 17 free rests. That's around 680 extra stats, which is fairly good. But leveling isn't as much of a problem either... or is it?
+        item dis_item = $item[none];
+        if (my_primestat() == $stat[muscle])
+            dis_item = $item[baobab sap];
+        else if (my_primestat() == $stat[mysticality])
+            dis_item = $item[desktop zen garden];
+        else if (my_primestat() == $stat[moxie])
+            dis_item = $item[Marvin's marvelous pill];
+        int ideal_extra_stats_worth = 20 * (__misc_state_int["free rests remaining"] + total_free_rests());
+        if (dis_item != $item[none] && dis_item.to_effect().have_effect() == 0)
+            pullable_item_list.listAppend(GPItemMake(dis_item, "+20% mainstat gain.|Use with Chateau resting; at the end of the day, rest with this potion active to gain extra stats.<br>Then rest again after rollover.<br>Worth up to " + ideal_extra_stats_worth + " " + my_primestat() + ".", 1));
+        
+    }
 	
 	
 	boolean currently_trendy = (my_path_id() == PATH_TRENDY);
@@ -29908,8 +30028,11 @@ void generateDailyResources(Checklist [int] checklists)
         //_deluxeKlawSummons?
         //_crimboTree?
         int soaks_remaining = __misc_state_int["hot tub soaks remaining"];
-        if (__misc_state["In run"] && soaks_remaining > 0)
-            available_resources_entries.listAppend(ChecklistEntryMake("__effect blessing of squirtlcthulli", "clan_viplounge.php", ChecklistSubentryMake(pluralize(soaks_remaining, "hot tub soak", "hot tub soaks"), "", "Restore all HP, removes most bad effects."), 8));
+        if (__misc_state["In run"] && soaks_remaining > 0 && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING)
+        {
+            string description = "Restore all HP, removes most bad effects.";
+            available_resources_entries.listAppend(ChecklistEntryMake("__effect blessing of squirtlcthulli", "clan_viplounge.php", ChecklistSubentryMake(pluralize(soaks_remaining, "hot tub soak", "hot tub soaks"), "", description), 8));
+        }
         
         
     }
@@ -30522,6 +30645,7 @@ static
     __banish_source_length["thunder clap"] = 40;
     __banish_source_length["v for vivala mask"] = 10;
     __banish_source_length["walk away from explosion"] = 30;
+    __banish_source_length["curse of vacation"] = -1;
 }
 
 Banish [int] BanishesActive()
@@ -30650,6 +30774,8 @@ int currentBanishSourceCountForLocation(location l)
         }
     }
     
+    if (lookupSkill("curse of vacation").have_skill() && !banishers_used["curse of vacation"])
+        count += 1;
     if ($skill[Thunder Clap].have_skill() && my_thunder() >= 40 && !banishers_used["thunder clap"])
         count += 1;
     if ($item[louder than bomb].item_amount() > 0 && !banishers_used["louder than bomb"])
@@ -30691,7 +30817,10 @@ boolean [string] activeBanishNamesForLocation(location l)
 
 int BanishLength(string banish_name)
 {
-    return __banish_source_length[banish_name];
+    int length = __banish_source_length[banish_name];
+    if (length < 0)
+        length = 2147483647;
+    return length;
 }
 
 void generateImageTest(Checklist [int] checklists)
@@ -31428,8 +31557,6 @@ buffer generateLocationPopup(float bottom_coordinates)
     float [monster] appearance_rates_next_turn = l.appearance_rates(true);
     //should we take into account the combat queue, etc?
     
-    //buf.append("appearance_rates_next_turn = " + appearance_rates_next_turn.to_json() + "<br>");
-    
     string [monster] monsters_that_we_cannot_encounter;
     if (lookupEffect("Ancient Annoying Serpent Poison").have_effect() == 0)
     {
@@ -31534,7 +31661,6 @@ buffer generateLocationPopup(float bottom_coordinates)
                 appearance_rates_next_turn[m] *= inverse;
         }
     }
-    //buf.append("appearance_rates_next_turn = " + appearance_rates_next_turn.to_json());
     
     monster [int] monster_display_order;
     boolean rates_are_equal = true;
@@ -31592,10 +31718,6 @@ buffer generateLocationPopup(float bottom_coordinates)
         sort monster_display_order by -appearance_rates_adjusted[value] - (possible_alien_monsters[value] ? -100.0 : 0);
         sort monster_display_order by -appearance_rates_next_turn[value] - (possible_alien_monsters[value] ? -100.0 : 0);
     }
-    /*if (try_for_minimal_display)
-        sort monster_display_order by appearance_rates_next_turn[value];
-    else
-        sort monster_display_order by -appearance_rates_next_turn[value];*/
     int monsters_displayed = 0;
     
     boolean can_display_as_2x = true;
@@ -31657,17 +31779,7 @@ buffer generateLocationPopup(float bottom_coordinates)
         monsters_displayed += 1;
         if (monsters_displayed > 1)
             buf.append(HTMLGenerateTagPrefix("hr", mapMake("style", "margin:0px;")));
-        //buf.append(HTMLGenerateTagPrefix("span", mapMake("style", "width:100%;display:inline-block;")));
-        
-        //Layer hack - we want a white blurred background for text, to put over the monster image, but text-shadow is limited
-        //So, layer a bunch of individual text shadows. WARNING: performance will be bad?
-        //Text shadow disabled, doesn't look too good
-        /*string text_shadow_base_string = "0px 0px 1em rgba(255,255,255,1.0)";
-        string [int] layered_shadows;
-        for i from 0 to 32
-            layered_shadows.listAppend(text_shadow_base_string);*/
-        
-        //buf.append(HTMLGenerateTagPrefix("div", mapMake("style", "width:100%;display:table;padding:0.25em;z-index:7;position:relative;text-shadow:" + layered_shadows.listJoinComponents(", ") + ";"))); //text-shadow:0px 0px 11px #FFFFFF; -webkit-text-fill-color:#000000;-webkit-text-stroke-width:1em;-webkit-text-stroke-color:#007FFF;
+            
         boolean avoid_outputting_conditional = false;
         boolean monster_cannot_be_encountered = false;
         string reason_monster_cannot_be_encountered = "";
@@ -31699,9 +31811,6 @@ buffer generateLocationPopup(float bottom_coordinates)
                 style += "min-height:100px;";
             buf.append(HTMLGenerateTagPrefix("div", mapMake("style", style)));
         }
-        
-        //fade at the bottom. doesn't look good:
-        //buf.append(HTMLGenerateTagWrap("span", "", mapMake("src", monster_image_url, "style", "position:absolute;bottom:0px;width:100%;display:block;height:25px;z-index:-1;background: -moz-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 90%, rgba(255,255,255,1) 100%);background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,0)), color-stop(90%,rgba(255,255,255,1)), color-stop(100%,rgba(255,255,255,1)));background: -webkit-linear-gradient(top, rgba(255,255,255,0) 0%,rgba(255,255,255,1) 90%,rgba(255,255,255,1) 100%);background: -o-linear-gradient(top, rgba(255,255,255,0) 0%,rgba(255,255,255,1) 90%,rgba(255,255,255,1) 100%);background: -ms-linear-gradient(top, rgba(255,255,255,0) 0%,rgba(255,255,255,1) 90%,rgba(255,255,255,1) 100%);background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1) 90%,rgba(255,255,255,1) 100%);filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00ffffff', endColorstr='#ffffff',GradientType=0 );")));
         if (!monster_image_url.contains_text("nopic.gif") && monster_image_url.length() > 0)
         {
             //FIXME centre image if it's small? maybe a table? more tables!
@@ -31720,7 +31829,6 @@ buffer generateLocationPopup(float bottom_coordinates)
             
             if (height_fraction > 0)
                 max_height = 100.0 / height_fraction;
-            //buf.append("height_fraction = " + height_fraction);
             
             string image_style = "position:absolute;right:0px;top:0px;max-height:" + max_height.ceil() + "px;z-index:-3;";
             if (monster_cannot_be_encountered)
@@ -31762,20 +31870,6 @@ buffer generateLocationPopup(float bottom_coordinates)
             buf.append(HTMLGenerateTagPrefix("img", mapMake("src", monster_image_url, "style", image_style)));
         }
         
-        //buf.append(HTMLGenerateTagPrefix("div", mapMake("style", "float:left;display:inline-block;")));
-        //buf.append(HTMLGenerateTagPrefix("div", mapMake("style", "display:table-cell;vertical-align:top;padding-left:0.5em;")));
-        
-        /*if (try_for_minimal_display)
-            buf.append(HTMLGenerateTagPrefix("div", mapMake("style", "display:table;")));
-        else
-        {
-            int min_height = 30;
-            if (monster_cannot_be_encountered)
-                min_height = 0;
-            buf.append(HTMLGenerateTagPrefix("div", mapMake("style", "display:table;min-height:" + min_height + "px;")));
-        }
-        buf.append(HTMLGenerateTagPrefix("div", mapMake("style", "display:table-cell;vertical-align:middle;")));*/
-        
         if (true)
         {
             string style;
@@ -31793,8 +31887,6 @@ buffer generateLocationPopup(float bottom_coordinates)
             fl_entries.listAppend(m.capitalizeFirstLetter());
             fl_entry_classes[fl_entries.count() - 1] = "r_bold r_location_bar_ellipsis_entry";
             fl_entry_styles[fl_entries.count() - 1] = style;
-            //fl_entry_fixed_width_percentage[fl_entries.count() - 1] = 0.33;
-            //fl_entry_fixed_width_percentage[fl_entries.count() - 1] = 0.4;
             fl_entry_width_weight[fl_entries.count() - 1] = width_weight;
         }
         
@@ -31865,7 +31957,6 @@ buffer generateLocationPopup(float bottom_coordinates)
                 rate_buffer.append("elsewhere");
             else if (!avoid_outputting_conditional)
                 rate_buffer.append("conditional");
-            //rate_buffer.append(" ("); rate_buffer.append(rate); rate_buffer.append(")");
         }
         //seen values for rate:
         //0.0 for bosses
@@ -31873,15 +31964,10 @@ buffer generateLocationPopup(float bottom_coordinates)
         
         if (rate_buffer.length() > 0)
         {
-            //buf.append(" ");
-            //buf.append(rate_buffer);
             fl_entries.listAppend(rate_buffer);
-            //fl_entry_styles[fl_entries.count() - 1] = "text-align:left;";
         }
         if (monster_cannot_be_encountered && reason_monster_cannot_be_encountered != "banished")
         {
-            //buf.append(" ");
-            //buf.append(reason_monster_cannot_be_encountered);
             fl_entries.listAppend(reason_monster_cannot_be_encountered);
         }
         
@@ -31894,14 +31980,10 @@ buffer generateLocationPopup(float bottom_coordinates)
         if (item_count_displaying > 0 && try_for_minimal_display && !monster_cannot_be_encountered)
         {
             fl_entries.listAppend(pluralize(item_count_displaying, "item", "items"));
-            /*item [int] items_dropped;
-            foreach key, r in m.item_drops_array()
-                items_dropped.listAppend(r.drop);
-            buf.append(items_dropped.listJoinComponents(", "));*/
         }
         
         
-        if (true)
+        if (!monster_cannot_be_encountered)
         {
             string [int] stats_l1;
             string [int] stats_l2;
@@ -31937,7 +32019,7 @@ buffer generateLocationPopup(float bottom_coordinates)
                     stats_l1.listAppend(ka_dropped + " ka");
             }
             
-            if (m.expected_damage() > 1 && m.expected_damage() > my_hp().to_float() * 0.75)
+            if (m.expected_damage() > 1 && (m.expected_damage() > my_hp().to_float() * 0.75 || ($monsters[spider gremlin,batwinged gremlin,erudite gremlin,vegetable gremlin] contains m)))
             {
                 string damage_text = m.expected_damage() + " dmg";
                 if (m.expected_damage() >= 0.75 * my_hp())
@@ -31945,10 +32027,15 @@ buffer generateLocationPopup(float bottom_coordinates)
                 stats_l2.listAppend(damage_text);
             }
             
-            if (stats_l2.count() == 0 && stats_l1.count() == 2) //hack
+            if (stats_l2.count() == 0 && stats_l1.count() == 2) //rebalance hack
             {
-                stats_l2.listAppend(stats_l1[1]);
+                stats_l2.listPrepend(stats_l1[1]);
                 remove stats_l1[1];
+            }
+            if (stats_l2.count() == 1 && stats_l1.count() == 3) //rebalance hack
+            {
+                stats_l2.listPrepend(stats_l1[2]);
+                remove stats_l1[2];
             }
             
             string line = stats_l1.listJoinComponents(" / ");
@@ -31956,14 +32043,10 @@ buffer generateLocationPopup(float bottom_coordinates)
                 line += "<br>" + stats_l2.listJoinComponents(" / ");
             fl_entries.listAppend(line);
             fl_entry_styles[fl_entries.count() - 1] = "text-align:right;";
-            //fl_entry_fixed_width_percentage[fl_entries.count() - 1] = 0.4;
             fl_entry_width_weight[fl_entries.count() - 1] = 1.4;
         }
         
-        //buf.append(HTMLGenerateTagSuffix("div"));
-        //buf.append(HTMLGenerateTagSuffix("div"));
         //add background blur:
-        //FIXME use a CSS class
         if (true)
         {
             foreach key, entry in fl_entries
@@ -31985,20 +32068,11 @@ buffer generateLocationPopup(float bottom_coordinates)
         }
             //remove fl_entry_fixed_width_percentage[0];
         
-        //buf.append(HTMLGenerateTagPrefix("div", mapMake("style", "background:rgba(222, 222, 222 ,0.9);")));
         buf.append(generateLocationBarTable(fl_entries, fl_entry_urls, fl_entry_styles, fl_entry_classes, fl_entry_width_weight, fl_entry_fixed_width_percentage, ""));
-        //buf.append(HTMLGenerateTagSuffix("div"));
         
         
-        //buf.append(HTMLGenerateIndentedText(m.to_json()));
-        if (item_count_displaying > 0 && !try_for_minimal_display && !monster_cannot_be_encountered)
+        if (item_count_displaying > 0 && !try_for_minimal_display && !monster_cannot_be_encountered && true)
         {
-            //buf.append(HTMLGenerateTagPrefix("hr", mapMake("style", "margin-left:10px;")));
-            //buf.append("<hr>");
-            //buf.append(HTMLGenerateIndentedText(m.item_drops().to_json()));
-            
-            //buf.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_indention")));
-            //buf.append(HTMLGenerateTagPrefix("div", mapMake("style", "margin-left:30px;")));
             boolean want_item_minimal_display = false;
             if (try_for_minimal_display || monsters_to_display_items_minimally[m] || monsters_to_display_items_minimally.count() > 2)
                 want_item_minimal_display = true;
@@ -32006,13 +32080,9 @@ buffer generateLocationPopup(float bottom_coordinates)
             if (true)
             {
                 string style;
-                //style += "line-height:.9em;";
-                //style += "line-height:0px;";
                 style += "font-size:0;";
                 if (want_item_minimal_display)
                     item_font_size = "0.8rem;";
-                //if (want_item_minimal_display)
-                    //style += "font-size:0.8em;display:inline;";
                 if (style.length() > 0)
                     buf.append(HTMLGenerateTagPrefix("div", mapMake("style", style)));
                 else
@@ -32026,7 +32096,6 @@ buffer generateLocationPopup(float bottom_coordinates)
             }
             
             foreach key, r in m.item_drops_array()
-            //foreach key, r in item_drops_array
             {
                 //when "r.type" == "0", I think that means the drop rate is unknown
                 item it = r.drop;
@@ -32083,8 +32152,6 @@ buffer generateLocationPopup(float bottom_coordinates)
                     trailing_buffer_loop.prepend(HTMLGenerateTagSuffix("span"));
                 }
                 
-                //buf.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_word_wrap_group", "style", "width:49%;")));
-                //buf.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_word_wrap_group", "style", "width:49%;")));
                 int items_per_line = 1;
                 string holder_class_name = "r_word_wrap_group";
                 if (try_for_minimal_display)
@@ -32094,7 +32161,6 @@ buffer generateLocationPopup(float bottom_coordinates)
                     holder_class_name = "r_location_popup_item_holding_block_1x";
                     items_per_line = 1;
                 }
-                //else if ((item_count_displaying == 2 || (item_count_displaying % 2 == 0 && item_count_displaying % 3 != 0)) && can_display_as_2x)
                 else if (item_count_displaying == 2 || ceil(item_count_displaying.to_float() / 2.0) == ceil(item_count_displaying.to_float() / 3.0))
                 {
                     holder_class_name = "r_location_popup_item_holding_block_2x";
@@ -32109,9 +32175,6 @@ buffer generateLocationPopup(float bottom_coordinates)
                 if (true)
                 {
                     string style;
-                    //style += "background:rgba(255, 255, 255, 0.95);box-shadow:0px 0px 2px 2px rgba(255, 255, 255, 0.95);";
-                    //style += "background:teal;";
-                    //style += "font-size:0;";
                     buf.append(HTMLGenerateTagPrefix("div", mapMake("class", holder_class_name, "style", style)));
                 }
                 
@@ -32119,21 +32182,17 @@ buffer generateLocationPopup(float bottom_coordinates)
                 
                 boolean use_tables_here = true;
                 
-                //buf.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_word_wrap_group", "style", "padding-right:0.5em")));
                 if (true)
                 {
                     string style;
                     if (use_tables_here)
                        style += "display:table;";
-                    //style += "background:rgba(255, 255, 255, 0.95);box-shadow:0px 0px 2px 2px rgba(255, 255, 255, 0.95);";
                     style += "margin:0px;padding:0px;border-spacing:0px;";
                     buf.append(HTMLGenerateTagPrefix("div", mapMake("style", style)));
-                    //style = "background:rgba(0, 127, 255, 0.75);";
                     trailing_buffer_loop.prepend(HTMLGenerateTagSuffix("div"));
                     if (use_tables_here)
                     {
                         buf.append(HTMLGenerateTagPrefix("div", mapMake("style", "display:table-row;")));
-                        //style = "background:rgba(0, 127, 255, 0.75);";
                         trailing_buffer_loop.prepend(HTMLGenerateTagSuffix("div"));
                     }
                 }
@@ -32163,7 +32222,6 @@ buffer generateLocationPopup(float bottom_coordinates)
                 if (use_tables_here)
                 {
                     string style = "display:table-cell;vertical-align:middle;padding-left:0.25em;font-size:" + item_font_size + ";";
-                    //style += "background:rgba(255, 255, 255, 0.95);box-shadow:0px 0px 2px 2px rgba(255, 255, 255, 0.95);";
                     buf.append(HTMLGenerateTagPrefix("div", mapMake("style", style)));
                     trailing_buffer_loop.prepend(HTMLGenerateTagSuffix("div"));
                     
@@ -32224,7 +32282,6 @@ buffer generateLocationPopup(float bottom_coordinates)
                         if (it.candy)
                             item_modifier += numeric_modifier("Candy Drop");
                     }
-                    //FIXME slimeling?
                     //FIXME pickpocketting...?
                     
                     effective_drop_rate *= 1.0 + item_modifier / 100.0;
