@@ -3,9 +3,8 @@ void QSpookyravenLightsOutGenerateEntry(ChecklistEntry [int] task_entries, Check
     //nextSpookyravenElizabethRoom
     //nextSpookyravenStephenRoom
     
-    //FIXME determine when to hide
-    //if (get_property("lastEncounter").contains_text("Lights Out in the"))
-        //return;
+    if (get_property_int("lastLightsOutTurn") >= total_turns_played())
+        return;
     
     string next_elizabeth_room = get_property("nextSpookyravenElizabethRoom");
     string next_stephen_room = get_property("nextSpookyravenStephenRoom");
@@ -14,7 +13,9 @@ void QSpookyravenLightsOutGenerateEntry(ChecklistEntry [int] task_entries, Check
     
     int turns_until_next_lights_out = -1;
     
-    //turns_until_next_lights_out = 37 - total_turns_played() % 37; //FIXME uncomment next point release
+    //Thought about enabling this, but it's better to only show it when they ask for spookyraven tracking, I think...
+    //then again, spookyraven tracking doesn't work well with automation (auto-aborts, even if adventuring in relevant locations)
+    //turns_until_next_lights_out = 37 - total_turns_played() % 37;
     
     Counter lights_out_counter = CounterLookup("Spookyraven Lights Out");
     if (lights_out_counter.CounterExists() && !lights_out_counter.CounterIsRange())

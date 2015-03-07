@@ -197,8 +197,8 @@ void SActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] available_resour
         string image_name = "";
         string [item] path_relevant_items;
         
-        path_relevant_items[lookupItem("talisman of Renenutet")] = "+lots item in a single combat";
-        path_relevant_items[lookupItem("talisman of Horus")] = "+lots combat potion";
+        path_relevant_items[lookupItem("talisman of Renenutet")] = "+lots% item in a single combat";
+        path_relevant_items[lookupItem("talisman of Horus")] = "+lots% combat potion";
         path_relevant_items[lookupItem("ancient cure-all")] = "SGEEA-equivalent?";
         foreach s in $strings[linen bandages,cotton bandages,silk bandages]
         {
@@ -212,7 +212,7 @@ void SActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] available_resour
         {
             if (it.available_amount() > 0)
             {
-                subentries.listAppend(ChecklistSubentryMake(pluralize(it), "", reason));
+                subentries.listAppend(ChecklistSubentryMake(pluralize(it), "", reason.capitalizeFirstLetter() + "."));
                 if (image_name.length() == 0)
                     image_name = "__item " + it;
             }

@@ -1138,10 +1138,12 @@ int XiblaxianHoloWristPuterTurnsUntilNextItem()
     //_holoWristProgress resets when drop happens
     if (!mafiaIsPastRevision(15148))
         return -1;
-    //int next_turn_hit = (drops + 1) * (5 * (drops + 1) + 17)/2;
-    int next_turn_hit = 5 * (drops + 1) + 6 + 1;
-    if (drops == 0)
-        next_turn_hit = 5 * 1 + 6;
+    int next_turn_hit = 5 * (drops + 1) + 6;
+    if (!mafiaIsPastRevision(15493)) //old behaviour
+    {
+        if (drops != 0)
+            next_turn_hit += 1;
+    }
     return MAX(0, next_turn_hit - progress);
 }
 

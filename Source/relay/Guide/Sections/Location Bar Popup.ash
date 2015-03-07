@@ -255,8 +255,6 @@ buffer generateLocationPopup(float bottom_coordinates)
     float [monster] appearance_rates_next_turn = l.appearance_rates(true);
     //should we take into account the combat queue, etc?
     
-    //buf.append("appearance_rates_next_turn = " + appearance_rates_next_turn.to_json() + "<br>");
-    
     string [monster] monsters_that_we_cannot_encounter;
     if (lookupEffect("Ancient Annoying Serpent Poison").have_effect() == 0)
     {
@@ -361,7 +359,6 @@ buffer generateLocationPopup(float bottom_coordinates)
                 appearance_rates_next_turn[m] *= inverse;
         }
     }
-    //buf.append("appearance_rates_next_turn = " + appearance_rates_next_turn.to_json());
     
     monster [int] monster_display_order;
     boolean rates_are_equal = true;
@@ -419,10 +416,6 @@ buffer generateLocationPopup(float bottom_coordinates)
         sort monster_display_order by -appearance_rates_adjusted[value] - (possible_alien_monsters[value] ? -100.0 : 0);
         sort monster_display_order by -appearance_rates_next_turn[value] - (possible_alien_monsters[value] ? -100.0 : 0);
     }
-    /*if (try_for_minimal_display)
-        sort monster_display_order by appearance_rates_next_turn[value];
-    else
-        sort monster_display_order by -appearance_rates_next_turn[value];*/
     int monsters_displayed = 0;
     
     boolean can_display_as_2x = true;
@@ -484,17 +477,7 @@ buffer generateLocationPopup(float bottom_coordinates)
         monsters_displayed += 1;
         if (monsters_displayed > 1)
             buf.append(HTMLGenerateTagPrefix("hr", mapMake("style", "margin:0px;")));
-        //buf.append(HTMLGenerateTagPrefix("span", mapMake("style", "width:100%;display:inline-block;")));
-        
-        //Layer hack - we want a white blurred background for text, to put over the monster image, but text-shadow is limited
-        //So, layer a bunch of individual text shadows. WARNING: performance will be bad?
-        //Text shadow disabled, doesn't look too good
-        /*string text_shadow_base_string = "0px 0px 1em rgba(255,255,255,1.0)";
-        string [int] layered_shadows;
-        for i from 0 to 32
-            layered_shadows.listAppend(text_shadow_base_string);*/
-        
-        //buf.append(HTMLGenerateTagPrefix("div", mapMake("style", "width:100%;display:table;padding:0.25em;z-index:7;position:relative;text-shadow:" + layered_shadows.listJoinComponents(", ") + ";"))); //text-shadow:0px 0px 11px #FFFFFF; -webkit-text-fill-color:#000000;-webkit-text-stroke-width:1em;-webkit-text-stroke-color:#007FFF;
+            
         boolean avoid_outputting_conditional = false;
         boolean monster_cannot_be_encountered = false;
         string reason_monster_cannot_be_encountered = "";
@@ -526,9 +509,6 @@ buffer generateLocationPopup(float bottom_coordinates)
                 style += "min-height:100px;";
             buf.append(HTMLGenerateTagPrefix("div", mapMake("style", style)));
         }
-        
-        //fade at the bottom. doesn't look good:
-        //buf.append(HTMLGenerateTagWrap("span", "", mapMake("src", monster_image_url, "style", "position:absolute;bottom:0px;width:100%;display:block;height:25px;z-index:-1;background: -moz-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 90%, rgba(255,255,255,1) 100%);background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,0)), color-stop(90%,rgba(255,255,255,1)), color-stop(100%,rgba(255,255,255,1)));background: -webkit-linear-gradient(top, rgba(255,255,255,0) 0%,rgba(255,255,255,1) 90%,rgba(255,255,255,1) 100%);background: -o-linear-gradient(top, rgba(255,255,255,0) 0%,rgba(255,255,255,1) 90%,rgba(255,255,255,1) 100%);background: -ms-linear-gradient(top, rgba(255,255,255,0) 0%,rgba(255,255,255,1) 90%,rgba(255,255,255,1) 100%);background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1) 90%,rgba(255,255,255,1) 100%);filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00ffffff', endColorstr='#ffffff',GradientType=0 );")));
         if (!monster_image_url.contains_text("nopic.gif") && monster_image_url.length() > 0)
         {
             //FIXME centre image if it's small? maybe a table? more tables!
@@ -547,7 +527,6 @@ buffer generateLocationPopup(float bottom_coordinates)
             
             if (height_fraction > 0)
                 max_height = 100.0 / height_fraction;
-            //buf.append("height_fraction = " + height_fraction);
             
             string image_style = "position:absolute;right:0px;top:0px;max-height:" + max_height.ceil() + "px;z-index:-3;";
             if (monster_cannot_be_encountered)
@@ -589,20 +568,6 @@ buffer generateLocationPopup(float bottom_coordinates)
             buf.append(HTMLGenerateTagPrefix("img", mapMake("src", monster_image_url, "style", image_style)));
         }
         
-        //buf.append(HTMLGenerateTagPrefix("div", mapMake("style", "float:left;display:inline-block;")));
-        //buf.append(HTMLGenerateTagPrefix("div", mapMake("style", "display:table-cell;vertical-align:top;padding-left:0.5em;")));
-        
-        /*if (try_for_minimal_display)
-            buf.append(HTMLGenerateTagPrefix("div", mapMake("style", "display:table;")));
-        else
-        {
-            int min_height = 30;
-            if (monster_cannot_be_encountered)
-                min_height = 0;
-            buf.append(HTMLGenerateTagPrefix("div", mapMake("style", "display:table;min-height:" + min_height + "px;")));
-        }
-        buf.append(HTMLGenerateTagPrefix("div", mapMake("style", "display:table-cell;vertical-align:middle;")));*/
-        
         if (true)
         {
             string style;
@@ -620,8 +585,6 @@ buffer generateLocationPopup(float bottom_coordinates)
             fl_entries.listAppend(m.capitalizeFirstLetter());
             fl_entry_classes[fl_entries.count() - 1] = "r_bold r_location_bar_ellipsis_entry";
             fl_entry_styles[fl_entries.count() - 1] = style;
-            //fl_entry_fixed_width_percentage[fl_entries.count() - 1] = 0.33;
-            //fl_entry_fixed_width_percentage[fl_entries.count() - 1] = 0.4;
             fl_entry_width_weight[fl_entries.count() - 1] = width_weight;
         }
         
@@ -692,7 +655,6 @@ buffer generateLocationPopup(float bottom_coordinates)
                 rate_buffer.append("elsewhere");
             else if (!avoid_outputting_conditional)
                 rate_buffer.append("conditional");
-            //rate_buffer.append(" ("); rate_buffer.append(rate); rate_buffer.append(")");
         }
         //seen values for rate:
         //0.0 for bosses
@@ -700,15 +662,10 @@ buffer generateLocationPopup(float bottom_coordinates)
         
         if (rate_buffer.length() > 0)
         {
-            //buf.append(" ");
-            //buf.append(rate_buffer);
             fl_entries.listAppend(rate_buffer);
-            //fl_entry_styles[fl_entries.count() - 1] = "text-align:left;";
         }
         if (monster_cannot_be_encountered && reason_monster_cannot_be_encountered != "banished")
         {
-            //buf.append(" ");
-            //buf.append(reason_monster_cannot_be_encountered);
             fl_entries.listAppend(reason_monster_cannot_be_encountered);
         }
         
@@ -721,14 +678,10 @@ buffer generateLocationPopup(float bottom_coordinates)
         if (item_count_displaying > 0 && try_for_minimal_display && !monster_cannot_be_encountered)
         {
             fl_entries.listAppend(pluralize(item_count_displaying, "item", "items"));
-            /*item [int] items_dropped;
-            foreach key, r in m.item_drops_array()
-                items_dropped.listAppend(r.drop);
-            buf.append(items_dropped.listJoinComponents(", "));*/
         }
         
         
-        if (true)
+        if (!monster_cannot_be_encountered)
         {
             string [int] stats_l1;
             string [int] stats_l2;
@@ -764,7 +717,7 @@ buffer generateLocationPopup(float bottom_coordinates)
                     stats_l1.listAppend(ka_dropped + " ka");
             }
             
-            if (m.expected_damage() > 1 && m.expected_damage() > my_hp().to_float() * 0.75)
+            if (m.expected_damage() > 1 && (m.expected_damage() > my_hp().to_float() * 0.75 || ($monsters[spider gremlin,batwinged gremlin,erudite gremlin,vegetable gremlin] contains m)))
             {
                 string damage_text = m.expected_damage() + " dmg";
                 if (m.expected_damage() >= 0.75 * my_hp())
@@ -772,10 +725,15 @@ buffer generateLocationPopup(float bottom_coordinates)
                 stats_l2.listAppend(damage_text);
             }
             
-            if (stats_l2.count() == 0 && stats_l1.count() == 2) //hack
+            if (stats_l2.count() == 0 && stats_l1.count() == 2) //rebalance hack
             {
-                stats_l2.listAppend(stats_l1[1]);
+                stats_l2.listPrepend(stats_l1[1]);
                 remove stats_l1[1];
+            }
+            if (stats_l2.count() == 1 && stats_l1.count() == 3) //rebalance hack
+            {
+                stats_l2.listPrepend(stats_l1[2]);
+                remove stats_l1[2];
             }
             
             string line = stats_l1.listJoinComponents(" / ");
@@ -783,14 +741,10 @@ buffer generateLocationPopup(float bottom_coordinates)
                 line += "<br>" + stats_l2.listJoinComponents(" / ");
             fl_entries.listAppend(line);
             fl_entry_styles[fl_entries.count() - 1] = "text-align:right;";
-            //fl_entry_fixed_width_percentage[fl_entries.count() - 1] = 0.4;
             fl_entry_width_weight[fl_entries.count() - 1] = 1.4;
         }
         
-        //buf.append(HTMLGenerateTagSuffix("div"));
-        //buf.append(HTMLGenerateTagSuffix("div"));
         //add background blur:
-        //FIXME use a CSS class
         if (true)
         {
             foreach key, entry in fl_entries
@@ -812,20 +766,11 @@ buffer generateLocationPopup(float bottom_coordinates)
         }
             //remove fl_entry_fixed_width_percentage[0];
         
-        //buf.append(HTMLGenerateTagPrefix("div", mapMake("style", "background:rgba(222, 222, 222 ,0.9);")));
         buf.append(generateLocationBarTable(fl_entries, fl_entry_urls, fl_entry_styles, fl_entry_classes, fl_entry_width_weight, fl_entry_fixed_width_percentage, ""));
-        //buf.append(HTMLGenerateTagSuffix("div"));
         
         
-        //buf.append(HTMLGenerateIndentedText(m.to_json()));
-        if (item_count_displaying > 0 && !try_for_minimal_display && !monster_cannot_be_encountered)
+        if (item_count_displaying > 0 && !try_for_minimal_display && !monster_cannot_be_encountered && true)
         {
-            //buf.append(HTMLGenerateTagPrefix("hr", mapMake("style", "margin-left:10px;")));
-            //buf.append("<hr>");
-            //buf.append(HTMLGenerateIndentedText(m.item_drops().to_json()));
-            
-            //buf.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_indention")));
-            //buf.append(HTMLGenerateTagPrefix("div", mapMake("style", "margin-left:30px;")));
             boolean want_item_minimal_display = false;
             if (try_for_minimal_display || monsters_to_display_items_minimally[m] || monsters_to_display_items_minimally.count() > 2)
                 want_item_minimal_display = true;
@@ -833,13 +778,9 @@ buffer generateLocationPopup(float bottom_coordinates)
             if (true)
             {
                 string style;
-                //style += "line-height:.9em;";
-                //style += "line-height:0px;";
                 style += "font-size:0;";
                 if (want_item_minimal_display)
                     item_font_size = "0.8rem;";
-                //if (want_item_minimal_display)
-                    //style += "font-size:0.8em;display:inline;";
                 if (style.length() > 0)
                     buf.append(HTMLGenerateTagPrefix("div", mapMake("style", style)));
                 else
@@ -853,7 +794,6 @@ buffer generateLocationPopup(float bottom_coordinates)
             }
             
             foreach key, r in m.item_drops_array()
-            //foreach key, r in item_drops_array
             {
                 //when "r.type" == "0", I think that means the drop rate is unknown
                 item it = r.drop;
@@ -910,8 +850,6 @@ buffer generateLocationPopup(float bottom_coordinates)
                     trailing_buffer_loop.prepend(HTMLGenerateTagSuffix("span"));
                 }
                 
-                //buf.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_word_wrap_group", "style", "width:49%;")));
-                //buf.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_word_wrap_group", "style", "width:49%;")));
                 int items_per_line = 1;
                 string holder_class_name = "r_word_wrap_group";
                 if (try_for_minimal_display)
@@ -921,7 +859,6 @@ buffer generateLocationPopup(float bottom_coordinates)
                     holder_class_name = "r_location_popup_item_holding_block_1x";
                     items_per_line = 1;
                 }
-                //else if ((item_count_displaying == 2 || (item_count_displaying % 2 == 0 && item_count_displaying % 3 != 0)) && can_display_as_2x)
                 else if (item_count_displaying == 2 || ceil(item_count_displaying.to_float() / 2.0) == ceil(item_count_displaying.to_float() / 3.0))
                 {
                     holder_class_name = "r_location_popup_item_holding_block_2x";
@@ -936,9 +873,6 @@ buffer generateLocationPopup(float bottom_coordinates)
                 if (true)
                 {
                     string style;
-                    //style += "background:rgba(255, 255, 255, 0.95);box-shadow:0px 0px 2px 2px rgba(255, 255, 255, 0.95);";
-                    //style += "background:teal;";
-                    //style += "font-size:0;";
                     buf.append(HTMLGenerateTagPrefix("div", mapMake("class", holder_class_name, "style", style)));
                 }
                 
@@ -946,21 +880,17 @@ buffer generateLocationPopup(float bottom_coordinates)
                 
                 boolean use_tables_here = true;
                 
-                //buf.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_word_wrap_group", "style", "padding-right:0.5em")));
                 if (true)
                 {
                     string style;
                     if (use_tables_here)
                        style += "display:table;";
-                    //style += "background:rgba(255, 255, 255, 0.95);box-shadow:0px 0px 2px 2px rgba(255, 255, 255, 0.95);";
                     style += "margin:0px;padding:0px;border-spacing:0px;";
                     buf.append(HTMLGenerateTagPrefix("div", mapMake("style", style)));
-                    //style = "background:rgba(0, 127, 255, 0.75);";
                     trailing_buffer_loop.prepend(HTMLGenerateTagSuffix("div"));
                     if (use_tables_here)
                     {
                         buf.append(HTMLGenerateTagPrefix("div", mapMake("style", "display:table-row;")));
-                        //style = "background:rgba(0, 127, 255, 0.75);";
                         trailing_buffer_loop.prepend(HTMLGenerateTagSuffix("div"));
                     }
                 }
@@ -990,7 +920,6 @@ buffer generateLocationPopup(float bottom_coordinates)
                 if (use_tables_here)
                 {
                     string style = "display:table-cell;vertical-align:middle;padding-left:0.25em;font-size:" + item_font_size + ";";
-                    //style += "background:rgba(255, 255, 255, 0.95);box-shadow:0px 0px 2px 2px rgba(255, 255, 255, 0.95);";
                     buf.append(HTMLGenerateTagPrefix("div", mapMake("style", style)));
                     trailing_buffer_loop.prepend(HTMLGenerateTagSuffix("div"));
                     
@@ -1051,7 +980,6 @@ buffer generateLocationPopup(float bottom_coordinates)
                         if (it.candy)
                             item_modifier += numeric_modifier("Candy Drop");
                     }
-                    //FIXME slimeling?
                     //FIXME pickpocketting...?
                     
                     effective_drop_rate *= 1.0 + item_modifier / 100.0;

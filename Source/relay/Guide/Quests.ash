@@ -32,6 +32,7 @@ void QuestsInit()
     QGuildInit();
     QSubject37Init();
     QMartyInit();
+    QMeatsmithInit();
     
     //has to happen after level 13 init... or not?
 	QManorInit();
@@ -73,6 +74,7 @@ void QuestsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     QAirportGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     QSubject37GenerateTasks(task_entries, optional_task_entries, future_task_entries);
     QMartyGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+    QMeatsmithGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 }
 
 void QuestsGenerateResources(ChecklistEntry [int] available_resources_entries)

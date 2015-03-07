@@ -457,7 +457,7 @@ void QLevel12GenerateBattlefieldDescription(ChecklistSubentry subentry, string s
     {
         item [int] missing_outfit_components = missing_outfit_components(outfit_name);
         if (missing_outfit_components.count() > 0)
-            line += "|*Missing outfit pieces " + missing_outfit_components.listJoinComponents(", ", "and") + ".";
+            line += "|*Missing outfit piece" + (missing_outfit_components.count() > 1 ? "s" : "") + " " + missing_outfit_components.listJoinComponents(", ", "and") + ".";
     }
     int turns_remaining = ceiling(enemies_remaining.to_float() / enemies_defeated_per_combat.to_float());
     if (turns_remaining > 0)

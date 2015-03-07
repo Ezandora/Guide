@@ -424,6 +424,24 @@ void generatePullList(Checklist [int] checklists)
 	{
 		pullable_item_list.listAppend(GPItemMake($item[Shore Inc. Ship Trip Scrip], "Saves three turns each|" + scrip_reasons.listJoinComponents(", ", "and").capitalizeFirstLetter() + ".", scrip_needed));
 	}
+    
+    if (__misc_state["Need to level"] && get_property_boolean("chateauAvailable") && __misc_state_int["free rests remaining"] > 0 && false)
+    {
+        //This is not currently suggested because I'm not sure if it's worth it for anyone but unrestricted or the very high end speed ascension.
+        //It seems to give about as much stats as a good clover, which you can also pull, and are much cheaper.
+        //Unrestricted has up to 17 free rests. That's around 680 extra stats, which is fairly good. But leveling isn't as much of a problem either... or is it?
+        item dis_item = $item[none];
+        if (my_primestat() == $stat[muscle])
+            dis_item = $item[baobab sap];
+        else if (my_primestat() == $stat[mysticality])
+            dis_item = $item[desktop zen garden];
+        else if (my_primestat() == $stat[moxie])
+            dis_item = $item[Marvin's marvelous pill];
+        int ideal_extra_stats_worth = 20 * (__misc_state_int["free rests remaining"] + total_free_rests());
+        if (dis_item != $item[none] && dis_item.to_effect().have_effect() == 0)
+            pullable_item_list.listAppend(GPItemMake(dis_item, "+20% mainstat gain.|Use with Chateau resting; at the end of the day, rest with this potion active to gain extra stats.<br>Then rest again after rollover.<br>Worth up to " + ideal_extra_stats_worth + " " + my_primestat() + ".", 1));
+        
+    }
 	
 	
 	boolean currently_trendy = (my_path_id() == PATH_TRENDY);

@@ -184,12 +184,18 @@ void SDiscoBanditGenerateResource(ChecklistEntry [int] available_resources_entri
     {
         int steals_done = get_property_int("_raveStealCount");
         int steals_remaining = clampi(30 - steals_done, 0, 30);
-        if (steals_done > 0)
+        if (steals_done > 0 && steals_remaining > 0)
         {
             string [int] description;
             description.listAppend("Knocks loose a pickpocketable item.");
             //raveCombo5 is rave steal
             //FIXME list combo order
+            string rave_combo_number_5 = get_property("raveCombo5");
+            if (rave_combo_number_5.length() > 0)
+            {
+                string [int] skill_order = rave_combo_number_5.split_string(",");
+                description.listAppend(skill_order.listJoinComponents(__html_right_arrow_character).capitalizeFirstLetter() + ".");
+            }
             available_resources_entries.listAppend(ChecklistEntryMake("__skill Disco Dance 3: Back in the Habit", "", ChecklistSubentryMake(pluralize(steals_remaining, "Rave Steal", "Rave Steals"), "", description), 8));
         }
     }

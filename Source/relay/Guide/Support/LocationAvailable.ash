@@ -297,14 +297,26 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
 		case $location[The Haunted Billiards Room]:
             if (lookupItem("7301").available_amount() > 0)
                 return true;
+            else
+                return false;
 			//return get_property_int("lastManorUnlock") == my_ascensions();
 		case $location[The Haunted Bedroom]:
 		case $location[The Haunted Bathroom]:
         case $location[the haunted gallery]:
             //FIXME detect this
-			return get_property_int("lastSecondFloorUnlock") == my_ascensions();
+			return get_property_int("lastSecondFloorUnlock") == my_ascensions(); //FIXME test against questM21Dance
         case $location[the haunted ballroom]:
             return questPropertyPastInternalStepNumber("questM21Dance", 4);
+        case $location[The Haunted Laboratory]:
+        case $location[The Haunted Nursery]:
+        case $location[The Haunted Storage Room]:
+            return questPropertyPastInternalStepNumber("questM17Babies", 1);
+        case $location[The Haunted Boiler Room]:
+        case $location[The Haunted Laundry Room]:
+        case $location[The Haunted Wine Cellar]:
+            return questPropertyPastInternalStepNumber("questL11Manor", 2);
+        case $location[summoning chamber]:
+            return get_property("questL11Manor") == "finished";
         case $location[the batrat and ratbat burrow]:
             return questPropertyPastInternalStepNumber("questL04Bat", 2);
         case $location[the beanbat chamber]:
@@ -862,6 +874,7 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         lookup_map["The Crimbonium Mining Camp"] = "place.php?whichplace=desertbeach";
         lookup_map["The Crimbonium Mine"] = "mining.php?mine=5";
         lookup_map["The Secret Council Warehouse"] = "tutorial.php";
+        lookup_map["The Skeleton Store"] = "place.php?whichplace=town_market";
 
         foreach s in $strings[The Edge of the Swamp,The Dark and Spooky Swamp,The Corpse Bog,The Ruined Wizard Tower,The Wildlife Sanctuarrrrrgh,Swamp Beaver Territory,The Weird Swamp Village]
             lookup_map[s] = "place.php?whichplace=marais";

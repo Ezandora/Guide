@@ -167,6 +167,7 @@ void QNemesisGenerateIslandTasks(ChecklistSubentry subentry)
             subentry.entries.listAppend("All keys found. Fight in the Hacienda.");
         else
         {
+            subentry.modifiers.listAppend("-combat");
             int keys_needed = MAX(0, 5 - $item[hacienda key].available_amount());
             subentry.entries.listAppend(pluralizeWordy(keys_needed, "key", "keys").capitalizeFirstLetter() + " to go.");
             subentry.entries.listAppend("Four are from the non-combat; one is from pick-pocketing a mariachi.");

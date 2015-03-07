@@ -48,6 +48,7 @@ static
     __banish_source_length["thunder clap"] = 40;
     __banish_source_length["v for vivala mask"] = 10;
     __banish_source_length["walk away from explosion"] = 30;
+    __banish_source_length["curse of vacation"] = -1;
 }
 
 Banish [int] BanishesActive()
@@ -176,6 +177,8 @@ int currentBanishSourceCountForLocation(location l)
         }
     }
     
+    if (lookupSkill("curse of vacation").have_skill() && !banishers_used["curse of vacation"])
+        count += 1;
     if ($skill[Thunder Clap].have_skill() && my_thunder() >= 40 && !banishers_used["thunder clap"])
         count += 1;
     if ($item[louder than bomb].item_amount() > 0 && !banishers_used["louder than bomb"])
@@ -217,5 +220,8 @@ boolean [string] activeBanishNamesForLocation(location l)
 
 int BanishLength(string banish_name)
 {
-    return __banish_source_length[banish_name];
+    int length = __banish_source_length[banish_name];
+    if (length < 0)
+        length = 2147483647;
+    return length;
 }

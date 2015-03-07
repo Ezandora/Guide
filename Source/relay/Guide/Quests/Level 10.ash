@@ -288,6 +288,8 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             {
                 boolean have_usable_umbrella = (__misc_state["can equip just about any weapon"] && $item[titanium assault umbrella].available_amount() > 0);
                 
+                if (!in_hardcore())
+                    subentry.entries.listAppend("Potentially pull and wear an amulet of extreme plot significance.");
                 if (have_usable_umbrella && $item[titanium assault umbrella].equipped_amount() == 0)
                     subentry.entries.listAppend("Equip your titanium assault umbrella.");
                 if ($item[massive dumbbell].available_amount() == 0)
