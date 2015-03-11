@@ -314,6 +314,8 @@ void SDNAGenerateResource(ChecklistEntry [int] available_resources_entries)
 {
     if (!mafiaIsPastRevision(13918)) //minimum supported version
         return;
+    if (__misc_state["campground unavailable"])
+        return;
     if (get_campground()[lookupItem("Little Geneticist DNA-Splicing Lab")] == 0)
         return;
     
@@ -470,6 +472,8 @@ void SDNAGenerateResource(ChecklistEntry [int] available_resources_entries)
 
 void SDNAGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
+    if (__misc_state["campground unavailable"])
+        return;
     if (!(mafiaIsPastRevision(13918) && get_campground()[lookupItem("Little Geneticist DNA-Splicing Lab")] > 0))
         return;
     

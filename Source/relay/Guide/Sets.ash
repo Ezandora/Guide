@@ -71,6 +71,7 @@ void SetsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 	SClassesGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SEquipmentGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SActuallyEdtheUndyingGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+	SMiscItemsGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     
 }
 

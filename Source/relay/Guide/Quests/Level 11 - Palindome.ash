@@ -14,6 +14,8 @@ void QLevel11PalindomeInit()
     state.state_boolean["dr. awkward's office unlocked"] = false;
     if (state.mafia_internal_step > 2)
         state.state_boolean["dr. awkward's office unlocked"] = true;
+    if (get_property_int("palindomeDudesDefeated") >= 5 && 7262.to_item().available_amount() == 0) //inference
+        state.state_boolean["dr. awkward's office unlocked"] = true;
     __quest_state["Level 11 Palindome"] = state;
 }
 
@@ -282,17 +284,32 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
             //This must be after all other need_to_adventure_in_palindome checks:
             if (7262.to_item().available_amount() == 0 && !dr_awkwards_office_unlocked) //I love me, Vol. I
             {
-                if (__misc_state["have olfaction equivalent"] && __misc_state_string["olfaction equivalent monster"] != "Racecar Bob" && __misc_state_string["olfaction equivalent monster"] != "Bob Racecar" && __misc_state_string["olfaction equivalent monster"] != "Drab Bard")
+                int dudes_left = 5;
+                boolean dudes_tracked = false;
+                if (mafiaIsPastRevision(15549))
+                {
+                    dudes_left = clampi(5 - get_property_int("palindomeDudesDefeated"), 0, 5);
+                    dudes_tracked = true;
+                }
+                    
+                if (__misc_state["have olfaction equivalent"] && __misc_state_string["olfaction equivalent monster"] != "Racecar Bob" && __misc_state_string["olfaction equivalent monster"] != "Bob Racecar" && __misc_state_string["olfaction equivalent monster"] != "Drab Bard" && dudes_left > 1)
                 {
                     subentry.modifiers.listAppend("olfact racecar");
                     subentry.entries.listAppend("Olfact Bob Racecar or Racecar Bob.");
                 }
-                string line = "Find I Love Me, Vol. I in-combat. Fifth dude-type monster.";
-                if (!need_to_adventure_in_palindome) //counts stunt nuts and photographs
-                    line += "|Well, unless you have already. If so, place the photographs in Dr. Awkward's Office.";
+                if (!dudes_tracked)
+                {
+                    string line = "Find I Love Me, Vol. I in-combat. Fifth dude-type monster.";
+                    if (!need_to_adventure_in_palindome) //counts stunt nuts and photographs
+                        line += "|Well, unless you have already. If so, place the photographs in Dr. Awkward's Office.";
+                    else
+                        line += "|Well, unless you have already.";
+                    subentry.entries.listAppend(line);
+                }
                 else
-                    line += "|Well, unless you have already.";
-                subentry.entries.listAppend(line);
+                {
+                    subentry.entries.listAppend("Defeat " + pluralizeWordy(dudes_left, "more dude", "more dudes") + " in the palindome.");
+                }
                 need_to_adventure_in_palindome = true;
             }
             else if (7262.to_item().available_amount() > 0)
@@ -304,7 +321,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                 }
                 else
                 {
-                    subentry.entries.listAppend("Have I Love Me, Vol. I. Collect photographs and such in the Palindome first..");
+                    subentry.entries.listAppend("Have I Love Me, Vol. I. Collect photographs and such in the Palindome first.");
                 }
             }
             

@@ -321,12 +321,13 @@ void setUpState()
         some_olfact_available = true;
     if ($familiar[nosy nose].familiar_is_usable()) //weakened, but still relevant
         some_olfact_available = true;
-    if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_ZOMBIE_SLAYER)
+    if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
         some_olfact_available = true;
-		
 	__misc_state["have olfaction equivalent"] = some_olfact_available;
     __misc_state_string["olfaction equivalent monster"] = olfacted_monster;
 	
+    if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
+        __misc_state["campground unavailable"] = true;
 	
 	boolean skills_temporarily_missing = false;
 	boolean familiars_temporarily_blocked = false;

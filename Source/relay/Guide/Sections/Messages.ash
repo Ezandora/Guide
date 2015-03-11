@@ -391,6 +391,7 @@ string generateRandomMessage()
     string [string] encounter_messages;
     encounter_messages["It's Always Swordfish"] = "one two three four five";
     encounter_messages["Meet Frank"] = "don't trust the skull";
+    encounter_messages["The Mirror in the Tower has the View that is True"] = "shatter the false reality";
     
     if (encounter_messages contains get_property("lastEncounter"))
     {

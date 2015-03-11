@@ -192,9 +192,14 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 subentry.modifiers.listAppend("-combat");
                 if (!have_machete)
                 {
-                    int turns_remaining = MAX(0, 6 - $location[the hidden park].turnsAttemptedInLocation());
+                    int turns_remaining = MAX(0, 7 - $location[the hidden park].turnsAttemptedInLocation());
                     string line;
-                    line += "Adventure for " + pluralizeWordy(turns_remaining, "turn", "turns") + " here for antique machete to clear dense lianas.";
+                    line += "Adventure for ";
+                    if (turns_remaining == 1)
+                        line += "One More Turn";
+                    else
+                        line += turns_remaining.int_to_wordy() + " more turns";
+                    line += " here for antique machete to clear dense lianas.";
                     if (canadia_available())
                         line += "|Or potentially use muculent machete by acquiring forest tears. (kodama, Outskirts of Camp Logging Camp, 30% drop or clover)";
                     subentry.entries.listAppend(line);
@@ -533,39 +538,6 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 if (should_output)
                     entry.subentries.listAppend(subentry);
             }
-        }
-    
-    
-        if (false) //debug internals
-        {
-            ChecklistSubentry subentry;
-            subentry.header = "Debug";
-            string [int] show_properties = split_string_alternate("hiddenApartmentProgress,hiddenBowlingAlleyProgress,hiddenHospitalProgress,hiddenOfficeProgress", ","); //8,8,8,8 when finished
-            foreach key in show_properties
-                subentry.entries.listAppend(show_properties[key] + " = " + get_property(show_properties[key]).HTMLEscapeString());
-        
-            if (get_property_int("hiddenTavernUnlock") == my_ascensions())
-                subentry.entries.listAppend("hidden tavern unlocked");
-            else
-                subentry.entries.listAppend("hidden tavern not yet");
-        
-            if (get_property_int("relocatePygmyJanitor") == my_ascensions())
-                subentry.entries.listAppend("Janitors relocated to park");
-            else
-                subentry.entries.listAppend("JANITORS EVERYWHERE");
-        
-        
-            if (get_property_int("relocatePygmyLawyer") == my_ascensions())
-                subentry.entries.listAppend("Lawyers relocated");
-            else
-                subentry.entries.listAppend("Lawyers still around");
-        
-            string [int] saving_lines;
-            saving_lines.listAppendList(subentry.entries);
-            subentry.entries.listClear();
-            subentry.entries.listAppend(saving_lines.listJoinComponents("|"));
-
-            entry.subentries.listAppend(subentry);
         }
     }
     if (entry.subentries.count() > 0)

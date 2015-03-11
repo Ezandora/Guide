@@ -220,4 +220,36 @@ void SActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] available_resour
         if (subentries.count() > 0)
             available_resources_entries.listAppend(ChecklistEntryMake(image_name, "", subentries, 6));
     }
+    
+    if (lookupSkill("Lash of the cobra").have_skill() && mafiaIsPastRevision(15553) || true)
+    {
+        int lashes_remaining = 30 - get_property_int("_edLashCount");
+        if (lashes_remaining > 0)
+        {
+            string [int] description;
+            string [int] stealables;
+            //Stuff:
+            //snake +ML
+            //badge of authority (HC)
+            //warehouse
+            //barret, aerith
+            //pygmy witch lawyers
+            //filthworms
+            //war hippy drill sergeant
+            //war outfit (if wrath of ra not available)
+            //pirate outfit? specific monsters left
+            //hot wings from p imp / g imp
+            //beanbats (if unlocked, else batrats/ratbats, else guano junction)
+            //skeletons in the nook
+            //topiary animals in twin peak
+            //dusken raider ghost (if oil needed)
+            //oil cartel(?)
+            if (stealables.count() > 0)
+                description.listAppend("Steals a random item:|*" + stealables.listJoinComponents("|*"));
+            else
+                description.listAppend("Steals a random item.");
+                
+            available_resources_entries.listAppend(ChecklistEntryMake("__item cool whip", "", ChecklistSubentryMake(pluralize(lashes_remaining, "lash", "lashes") + " of the cobra left", "", description), 6));
+        }
+    }
 }

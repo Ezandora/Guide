@@ -1,3 +1,25 @@
+void SMiscItemsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    if (lookupItem("the crown of ed the undying").equipped_amount() > 0 && mafiaIsPastRevision(15561) && get_property("edPiece").length() == 0)
+    {
+        string [int] description;
+        
+        if (__misc_state["need to level"])
+        {
+            if (my_primestat() == $stat[muscle])
+                description.listAppend("Bear - +2 mainstat/fight");
+            else if (my_primestat() == $stat[mysticality])
+                description.listAppend("Owl - +2 mainstat/fight");
+            else if (my_primestat() == $stat[moxie])
+                description.listAppend("Puma - +2 mainstat/fight");
+            description.listAppend("Hyena - +20 ML");
+        }
+        description.listAppend("Mouse - +10% item, +20% meat");
+        description.listAppend("Weasel - survive first hit, regenerate HP");
+        optional_task_entries.listAppend(ChecklistEntryMake("__item the crown of ed the undying", "inventory.php?action=activateedhat", ChecklistSubentryMake("Configure the Crown of Ed the Undying", "", description), 5));
+    }
+}
+
 void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries)
 {
 	int importance_level_item = 7;
