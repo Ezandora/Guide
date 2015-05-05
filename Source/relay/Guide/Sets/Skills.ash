@@ -35,6 +35,7 @@ void SSkillsGenerateResource(ChecklistEntry [int] available_resources_entries)
 	
 	string [skill] skills_to_details;
 	string [skill] skills_to_urls;
+    string [skill] skills_to_title_notes;
 	skill [string][int] property_summons_to_skills;
 	int [string] property_summon_limits;
 	
@@ -49,6 +50,8 @@ void SSkillsGenerateResource(ChecklistEntry [int] available_resources_entries)
 	property_summons_to_skills["_pirateBellowUsed"] = listMake(lookupSkill("Pirate Bellow"));
 	property_summons_to_skills["_holidayFunUsed"] = listMake(lookupSkill("Summon Holiday Fun!"));
 	property_summons_to_skills["_summonCarrotUsed"] = listMake(lookupSkill("Summon Carrot"));
+	property_summons_to_skills["_summonAnnoyanceUsed"] = listMake($skill[summon annoyance]);
+    skills_to_title_notes[$skill[summon annoyance]] = get_property_int("summonAnnoyanceCost") + " swagger";
     
     
     
@@ -142,6 +145,10 @@ void SSkillsGenerateResource(ChecklistEntry [int] available_resources_entries)
 				line += " (" + s.mp_cost() + " MP)";
 				//description.listAppend(s.mp_cost() + " MP");
 			}
+            if (skills_to_title_notes contains s)
+            {
+				line += " (" + skills_to_title_notes[s] + " )";
+            }
 			string details = skills_to_details[s];
 			if (details != "")
 				description.listAppend(details);

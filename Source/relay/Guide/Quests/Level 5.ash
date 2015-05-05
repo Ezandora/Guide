@@ -210,7 +210,25 @@ void QLevel5GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 			}
 			subentry.entries.listAppend("Guard route:|*" + ChecklistGenerateModifierSpan(kge_modifiers) + kge_lines.listJoinComponents("|*"));
 		}
+        if (!__quest_state["Level 13"].state_boolean["Stat race completed"] && __quest_state["Level 13"].state_string["Stat race type"].length() > 0)
+        {
+            stat stat_race_type = __quest_state["Level 13"].state_string["Stat race type"].to_stat();
+            
+            int change_mcd_to = -1;
+            if (stat_race_type == $stat[muscle] && (current_mcd() == 3 || current_mcd() == 7))
+                change_mcd_to = -2;
+            else if (stat_race_type == $stat[mysticality])
+                change_mcd_to = 3;
+            else if (stat_race_type == $stat[moxie])
+                change_mcd_to = 7;
+                
+            if (change_mcd_to != -1 && change_mcd_to != current_mcd())
+            {
+                subentry.entries.listAppend("For the king fight, change MCD to " + change_mcd_to + " for the tower stat test. (+" + stat_race_type.to_lower_case() + ")");
+            }
+        }
 	}
+    
 	
 	if (should_output)
 		task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[cobb's knob barracks, cobb's knob kitchens, cobb's knob harem, the outskirts of cobb's knob]));

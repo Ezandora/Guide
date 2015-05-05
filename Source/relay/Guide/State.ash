@@ -369,7 +369,7 @@ void setUpState()
 	
 	
     __misc_state_float["Non-combat statgain multiplier"] = 1.0;
-	__misc_state_float["ML to mainstat multiplier"] = 1.0 / (2.0  * 4.0);
+	__misc_state_float["ML to mainstat multiplier"] = 1.0 / (2.0 * 3.0);
 	/*if (my_path_id() == PATH_CLASS_ACT_2)
 	{
 		__misc_state_float["ML to mainstat multiplier"] = 1.0 / (2.0 * 2.0);
@@ -698,13 +698,14 @@ void setUpState()
     __misc_state["can purchase magical mystery juice"] = __misc_state["mysticality guild store available"];
     __misc_state["have some reasonable way of restoring MP"] = false;
     
-    if (__misc_state["can purchase magical mystery juice"] || black_market_available() || dispensary_available())
+    if (__misc_state["can purchase magical mystery juice"] || black_market_available() || dispensary_available() || true)
         __misc_state["have some reasonable way of restoring MP"] = true;
         
     
-    __misc_state_float["meat per MP"] = 17.0;
-    if (QuestState("questM04Galaktic").finished)
-        __misc_state_float["meat per MP"] = MIN(__misc_state_float["meat per MP"], 12.0);
+    int tonic_price = lookupItem("Doc Galaktik's Invigorating Tonic").npc_price();
+    if (tonic_price == 0)
+        tonic_price = 90; //wrong, but w/e
+    __misc_state_float["meat per MP"] = tonic_price.to_float() / 10.0;
     
     float soda_cost = -1.0;
     if (black_market_available())

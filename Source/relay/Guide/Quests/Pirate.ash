@@ -39,7 +39,7 @@ void QPirateInit()
         QuestStateParseMafiaQuestPropertyValue(state, "step2");
     
 	//Certain characters are in weird states, I think?
-    if ($item[pirate fledges].available_amount() > 0 || $item[talisman o' nam].available_amount() > 0)
+    if ($item[pirate fledges].available_amount() > 0 || lookupItem("talisman o' nam").available_amount() > 0)
         QuestStateParseMafiaQuestPropertyValue(state, "finished");
 	__quest_state["Pirate Quest"] = state;
 }

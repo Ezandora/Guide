@@ -440,7 +440,9 @@ void QLevel13Init()
     for i from 2 to 12
     {
         if (!__quest_state["Level " + i].finished)
+        {
             other_quests_completed = false;
+        }
     }
     if (other_quests_completed && my_level() >= 13)
         state.startable = true;
@@ -538,16 +540,13 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         image_name = "lair registration desk";
         subentry.header = "Visit the registration desk";
         subentry.entries.listAppend("Claim your prize!");
+        url = "place.php?whichplace=nstower&action=ns_01_contestbooth";
     }
     else if (!base_quest_state.state_boolean["past races"])
     {
         image_name = "lair registration desk";
-        //FIXME REST
-        //subentry.header = "it's time for the wacky races";
         remove subentries[0];
         
-        //FIXME support suggesting pulling potions in softcore
-        //(warbear rejuvenation potion is an excellent example)
         if (!base_quest_state.state_boolean["Init race completed"])
         {
             string [int] description;
@@ -561,7 +560,10 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 
                 if (!($familiars[oily woim,Xiblaxian Holo-Companion] contains my_familiar()) && !__misc_state["familiars temporarily blocked"])
                 {
-                    foreach f in $familiars[oily woim,Xiblaxian Holo-Companion]
+                    familiar [int] init_familiar_evaluation_order;
+                    init_familiar_evaluation_order.listAppend($familiar[Xiblaxian Holo-Companion]);
+                    init_familiar_evaluation_order.listAppend($familiar[oily woim]);
+                    foreach key, f in init_familiar_evaluation_order
                     {
                         if (f.familiar_is_usable())
                         {
@@ -605,7 +607,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             else
                 description.listAppend("Take the test now, you should(?) make second place.");
                 
-            if (stat_type != $stat[none])
+            if (stat_type != $stat[none] && current_value < 600.0)
             {
                 if (__misc_state_int["pulls available"] > 0)
                 {
@@ -640,16 +642,31 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         if (!base_quest_state.state_boolean["Elemental damage race completed"])
         {
             element element_type = base_quest_state.state_string["Elemental damage race type"].to_element();
+            
             string [int] description;
             
             string element_class = "r_element_" + element_type;
             string element_class_desaturated = element_class + "_desaturated";
             
             float current_value = numeric_modifier(element_type + " damage") + numeric_modifier(element_type + " spell damage");
-            
             if (current_value < 100.0)
             {
                 description.listAppend("Need " + (100.0 - current_value).roundForOutput(1) + " more " + HTMLGenerateSpanOfClass(element_type + " damage ", element_class) + " + " + HTMLGenerateSpanOfClass(element_type + " spell damage", element_class) + " for #2.");
+                
+                
+                if (__misc_state_int["pulls available"] > 0)
+                {
+                    boolean [item] blacklist = $items[witch's brew,boiling seal blood];
+                    item [int] relevant_potions = ItemFilterGetPotionsCouldPullToAddToNumericModifier(listMake(element_type + " damage", element_type + " spell damage"), 30, blacklist);
+                    string [int] relevant_potions_output;
+                    foreach key, it in relevant_potions
+                    {
+                        relevant_potions_output.listAppend(it + " (" + (it.to_effect().numeric_modifier(element_type + " damage") + it.to_effect().numeric_modifier(element_type + " spell damage")).roundForOutput(0) + ")");
+                    }
+                    
+                    if (relevant_potions_output.count() > 0)
+                        description.listAppend("Could try pulling " + relevant_potions_output.listJoinComponents(", ", "or") + ".");
+                }
             }
             else
                 description.listAppend("Take the test now, you should(?) make second place.");
@@ -672,7 +689,10 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         {
             //hmm...
             subentries.listAppend(ChecklistSubentryMake("Visit the registration desk", "", "Claim your prize!"));
+            url = "place.php?whichplace=nstower&action=ns_01_contestbooth";
         }
+        else if (total_contestants_to_fight == 0)
+            url = "place.php?whichplace=nstower&action=ns_01_contestbooth";
         //nsContestants1 - default -1
         //nsContestants2 - default -1
         //nsContestants3 - default -1
@@ -835,7 +855,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         
         if (__misc_state_int["pulls available"] > 0 && current_value < 526.0)
         {
-            boolean [item] blacklist = $items[uncle greenspan's bathroom finance guide,black snowcone,sorority brain,blue grass,salt wages];
+            boolean [item] blacklist = $items[uncle greenspan's bathroom finance guide,black snowcone,sorority brain,blue grass,salt wages,perl necklace];
             item [int] relevant_potions = ItemFilterGetPotionsCouldPullToAddToNumericModifier("Meat Drop", 25, blacklist);
             string [int] relevant_potions_output;
             foreach key, it in relevant_potions
@@ -890,8 +910,46 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             if (things_to_do.count() > 0)
                 subentry.entries.listAppend(HTMLGenerateSpanFont(things_to_do.listJoinComponents(", ", "and").capitalizeFirstLetter() + ".", "red", ""));*/
             
-            
-            if ($skill[saucegeyser].have_skill())
+            if (lookupSkill("Garbage Nova").have_skill() && false) //calculations are incorrect
+            {
+                float spell_damage_percent = numeric_modifier("spell damage percent");
+                float spell_damage_multiplier = (1.0 + spell_damage_percent / 100.0);
+                string [int] tasks;
+                
+                //Formula:
+                //damage = 50 * (1 + spell_damage_percent / 100.0) * (45 + floor(0.4 * myst))
+                //damage must be >= 5k
+                
+                //FIXME this is not correct
+                //predicted minimum value: 59495
+                //actual: 56948
+                int min_myst_needed = 138;
+                
+                if (spell_damage_multiplier != 0)
+                    min_myst_needed = MAX(ceil((20000.0 / 4.0 / 50.0 / spell_damage_multiplier - 45.0) / 0.4), 0);
+                    
+                
+                int per_round_damage = 50 * spell_damage_multiplier * (45 + floor(0.4 * my_buffedstat($stat[mysticality])));
+                int casts_needed = 4;
+                if (per_round_damage != 0)
+                    casts_needed = clampi(20000.0 / to_float(per_round_damage), 1, 4);
+                
+                int mp_needed = casts_needed * 50;
+                if (my_mp() < mp_needed)
+                    tasks.listAppend(HTMLGenerateSpanFont("Acquire " + mp_needed + " MP", "red", ""));
+                if (my_buffedstat($stat[mysticality]) < min_myst_needed)
+                {
+                    tasks.listAppend(HTMLGenerateSpanFont("buff up to " + min_myst_needed + " mysticality", "red", ""));
+                }
+                tasks.listAppend("cast garbage nova " + pluralizeWordy(casts_needed, "time", "times"));
+                
+                
+                    
+                subentry.entries.listAppend(tasks.listJoinComponents(", ", "then").capitalizeFirstLetter() + ".");
+                
+                subentry.entries.listAppend(per_round_damage + " damage/round.");
+            }
+            else if ($skill[saucegeyser].have_skill())
             {
                 boolean need_modifier_output = true;
                 if (my_familiar() != $familiar[magic dragonfish] && $familiar[magic dragonfish].familiar_is_usable() && !__misc_state["familiars temporarily blocked"])
@@ -1083,6 +1141,16 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             string potato_suggestion = generatePotatoSuggestion();
             
             subentry.entries.listAppend(potato_suggestion);
+        }*/
+        
+        if (lookupItem("The Lot's engagement ring").equipped_amount() > 0)
+        {
+            subentry.entries.listAppend("You and her? Good luck!");
+        }
+        
+        /*if (lookupItem("The Lot's engagement ring").available_amount() > 0 && lookupItem("The Lot's engagement ring").equipped_amount() == 0)
+        {
+            subentry.entries.listAppend("Potentially equip the lot's engagement ring for an alternate ending.|<small>(sigh... if only)<small>");
         }*/
         
         if (my_path_id() == PATH_HEAVY_RAINS)

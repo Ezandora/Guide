@@ -29,3 +29,4 @@ import "relay/Guide/Quests/Airport.ash";
 import "relay/Guide/Quests/Subject 37.ash";
 import "relay/Guide/Quests/Marty.ash";
 import "relay/Guide/Quests/Meatsmith.ash";
+import "relay/Guide/Quests/Intergalaktik.ash";

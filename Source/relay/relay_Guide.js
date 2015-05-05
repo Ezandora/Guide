@@ -420,8 +420,44 @@ function updatePageHTML(body_response_string)
 	if (body_response_string.length < 11)
 		return;
 	//Somewhat hacky way of reloading the page:
+    
+    //Save display style for two tags:
+    //r_location_popup_blackout r_location_popup_box
+    var elements_to_save_visibility_of = ["r_location_popup_blackout", "r_location_popup_box"];
+    var saved_visibility_of_element = [];
+    
+    for (var i = 0; i < elements_to_save_visibility_of.length; i++)
+    {
+        var element_id = elements_to_save_visibility_of[i];
+        var element = document.getElementById(element_id);
+        if (element == undefined)
+            continue;
+        if (element.style == undefined)
+            continue;
+        saved_visibility_of_element[element_id] = element.style.display;
+    }
+    
     window.onscroll = undefined;
-	document.body.innerHTML = body_response_string;
+    
+    document.body.innerHTML = body_response_string;
+    
+    
+    //Restore style tag:
+    for (var element_id in saved_visibility_of_element)
+    {
+        if (!saved_visibility_of_element.hasOwnProperty(element_id))
+            continue;
+        
+        var visibility = saved_visibility_of_element[element_id];
+        if (visibility == null)
+            continue;
+        var element = document.getElementById(element_id);
+        if (element == undefined)
+            continue;
+        if (element.style == undefined)
+            continue;
+        element.style.display = visibility;
+    }
     writePageExtras();
 }
 
@@ -515,6 +551,7 @@ function parseAPIResponseAndFireTimer(response_string)
             }
         }
     }
+    //should_update = true; //temporary constant refresh
 	if (should_update)
 	{
         if (should_save)

@@ -81,7 +81,36 @@ void setUpCSSStyles()
     PageAddCSSClass("", "r_location_bar_table_entry", "vertical-align:middle;padding-left:0.5em;padding-right:0.5em;display:table-cell;");
     PageAddCSSClass("", "r_location_bar_ellipsis_entry", "overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;");
     
-    PageAddCSSClass("", "r_location_popup_item_holding_block", "display:inline-block;padding-right:0.5em;width:31%", 0, __setting_media_query_large_size);
+    PageAddCSSClass("", "r_only_display_if_not_large", "");
+    PageAddCSSClass("", "r_only_display_if_not_large", "display:none !important;", 0, __setting_media_query_large_size);
+    
+    PageAddCSSClass("", "r_only_display_if_not_medium", "");
+    PageAddCSSClass("", "r_only_display_if_not_medium", "display:none !important;", 0, __setting_media_query_medium_size);
+    
+    PageAddCSSClass("", "r_only_display_if_not_tiny", "");
+    PageAddCSSClass("", "r_only_display_if_not_tiny", "display:none !important;", 0, __setting_media_query_tiny_size);
+    
+    PageAddCSSClass("", "r_only_display_if_not_small", "");
+    PageAddCSSClass("", "r_only_display_if_not_small", "display:none !important;", 0, __setting_media_query_small_size);
+    
+    PageAddCSSClass("", "r_only_display_if_small", "display:none !important;", 0, __setting_media_query_large_size);
+    PageAddCSSClass("", "r_only_display_if_small", "display:none !important;", 0,__setting_media_query_medium_size);
+    PageAddCSSClass("", "r_only_display_if_small", "", 0, __setting_media_query_small_size);
+    PageAddCSSClass("", "r_only_display_if_small", "display:none !important;", 0,__setting_media_query_tiny_size);
+    
+    PageAddCSSClass("", "r_only_display_if_tiny", "display:none !important;", 0, __setting_media_query_large_size);
+    PageAddCSSClass("", "r_only_display_if_tiny", "display:none !important;", 0,__setting_media_query_medium_size);
+    PageAddCSSClass("", "r_only_display_if_tiny", "display:none !important;", 0, __setting_media_query_small_size);
+    PageAddCSSClass("", "r_only_display_if_tiny", "", 0, __setting_media_query_tiny_size);
+    
+    
+    PageAddCSSClass("", "r_do_not_display_if_media_queries_unsupported", "display:none;");
+    PageAddCSSClass("", "r_do_not_display_if_media_queries_unsupported", "", 0, __setting_media_query_large_size);
+    PageAddCSSClass("", "r_do_not_display_if_media_queries_unsupported", "", 0,__setting_media_query_medium_size);
+    PageAddCSSClass("", "r_do_not_display_if_media_queries_unsupported", "", 0, __setting_media_query_small_size);
+    PageAddCSSClass("", "r_do_not_display_if_media_queries_unsupported", "", 0, __setting_media_query_tiny_size);
+    
+    /*PageAddCSSClass("", "r_location_popup_item_holding_block", "display:inline-block;padding-right:0.5em;width:31%", 0, __setting_media_query_large_size);
     PageAddCSSClass("", "r_location_popup_item_holding_block", "display:inline-block;padding-right:0.5em;width:31%", 0, __setting_media_query_medium_size);
     PageAddCSSClass("", "r_location_popup_item_holding_block", "display:inline-block;padding-right:0.25em;width:31%;", 0, __setting_media_query_small_size);
     PageAddCSSClass("", "r_location_popup_item_holding_block", "display:inline-block;padding-right:0.25em;width:100%;", 0, __setting_media_query_tiny_size);
@@ -94,11 +123,12 @@ void setUpCSSStyles()
     PageAddCSSClass("", "r_location_popup_item_holding_block_1x", "display:inline-block;padding-right:0.5em;width:100%", 0, __setting_media_query_large_size);
     PageAddCSSClass("", "r_location_popup_item_holding_block_1x", "display:inline-block;padding-right:0.5em;width:100%", 0, __setting_media_query_medium_size);
     PageAddCSSClass("", "r_location_popup_item_holding_block_1x", "display:inline-block;padding-right:0.25em;width:100%;", 0, __setting_media_query_small_size);
-    PageAddCSSClass("", "r_location_popup_item_holding_block_1x", "display:inline-block;padding-right:0.25em;width:100%;", 0, __setting_media_query_tiny_size);
+    PageAddCSSClass("", "r_location_popup_item_holding_block_1x", "display:inline-block;padding-right:0.25em;width:100%;", 0, __setting_media_query_tiny_size);*/
     
     
     //PageAddCSSClass("", "r_location_bar_background_blur", "background:rgba(255, 255, 255, 0.95);box-shadow:0px 0px 0px 2px rgba(255, 255, 255, 0.95);");
     PageAddCSSClass("", "r_location_bar_background_blur", "background:rgba(255, 255, 255, 0.95);box-shadow:0px 0px 1px 2px rgba(255, 255, 255, 0.95);");
+    PageAddCSSClass("", "r_location_bar_background_blur_small", "background:rgba(255, 255, 255, 0.95);box-shadow:0px 0px 0.5px 1px rgba(255, 255, 255, 0.95);");
     
     
     PageAddCSSClass("img", "", "border:0px;");

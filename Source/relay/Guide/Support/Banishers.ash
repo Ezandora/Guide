@@ -17,6 +17,8 @@ void listAppend(Banish [int] list, Banish entry)
 
 int BanishTurnsLeft(Banish b)
 {
+    if (b.banish_turn_length == -1)
+        return 2147483647;
     return b.turn_banished + b.banish_turn_length - my_turncount();
 }
 
@@ -131,70 +133,6 @@ string BanishSourceForMonster(monster m)
 {
     return BanishForMonster(m).banish_source;
 }
-
-
-int currentBanishSourceCountForLocation(location l)
-{
-    /*
-    FIXME support all of these:
-    
-    banishing shout
-    batter up!
-    chatterboxing
-    classy monkey
-    cocktail napkin
-    crystal skull
-    deathchucks
-    dirty stinkbomb
-    divine champagne popper
-    harold's bell
-    howl of the alpha
-    ice house
-    louder than bomb
-    nanorhino
-    pantsgiving
-    peel out
-    pulled indigo taffy
-    smoke grenade
-    spooky music box mechanism
-    staff of the standalone cheese
-    stinky cheese eye
-    thunder clap
-    v for vivala mask
-    walk away from explosion
-    */
-    int count = 0;
-    boolean [string] banishers_used;
-    
-    //Banish [int] banishes_active = BanishesActive();
-    
-    foreach key, m in l.get_monsters()
-    {
-        if (m.is_banished())
-        {
-            count += 1;
-            banishers_used[m.BanishSourceForMonster()] = true;
-        }
-    }
-    
-    if (lookupSkill("curse of vacation").have_skill() && !banishers_used["curse of vacation"])
-        count += 1;
-    if ($skill[Thunder Clap].have_skill() && my_thunder() >= 40 && !banishers_used["thunder clap"])
-        count += 1;
-    if ($item[louder than bomb].item_amount() > 0 && !banishers_used["louder than bomb"])
-        count += 1;
-    if ($item[pantsgiving].equipped_amount() > 0 && get_property_int("_pantsgivingBanish") < 5 && !banishers_used["pantsgiving"])
-        count += 1;
-    if ($item[smoke grenade].item_amount() > 0 && !banishers_used["smoke grenade"])
-        count += 1;
-    if (my_class() == $class[seal clubber] && my_fury() >= 5 && $skill[batter up!].have_skill() && !banishers_used["batter up"])
-        count += 1;
-    if ($skill[walk away from explosion].have_skill() && $effect[Bored With Explosions].have_effect() == 0)
-        count += 1;
-    
-    return count;
-}
-
 
 boolean [string] activeBanishNamesForLocation(location l)
 {

@@ -152,7 +152,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         string [int] description;
         
         description.listAppend("It's not useful now, wear a better accessory?");
-        if ($item[talisman o' nam].equipped_amount() > 0)
+        if (lookupItem("talisman o' nam").equipped_amount() > 0)
             description.listAppend("Possibly the talisman as well.");
     
 		task_entries.listAppend(ChecklistEntryMake("__item mega gem", "inventory.php?which=2", ChecklistSubentryMake("Possibly unequip the Mega Gem", "", description), -11));

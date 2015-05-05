@@ -395,11 +395,13 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         subentry.entries.listAppend("To unlock the Haunted Library.");
         
         int estimated_pool_skill = get_property_int("poolSkill");
-        
+        //FIXME numeric_modifier("pool skill") exists, so change to use that (once we can make sure everything works properly with it)
         if ($effect[chalky hand].have_effect() > 0)
             estimated_pool_skill += 3;
             
         if ($item[staff of fats].equipped_amount() > 0)
+            estimated_pool_skill += 5;
+        if (lookupItem("7961").equipped_amount() > 0)
             estimated_pool_skill += 5;
         if ($item[pool cue].equipped_amount() > 0)
             estimated_pool_skill += 3;

@@ -135,11 +135,21 @@ void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [in
     }
     else if (monster_name == "Lobsterfrogman" && show_details)
     {
+        string line;
+    
+        if (!__quest_state["Level 12"].state_boolean["Lighthouse Finished"] && $item[barrel of gunpowder].available_amount() < 5)
+        {
+            int number_to_fight = clampi(5 - $item[barrel of gunpowder].available_amount(), 0, 5);
+            line += number_to_fight.int_to_wordy().capitalizeFirstLetter() + " more to defeat. ";
+        }
+        
         int lfm_attack = $monster[lobsterfrogman].base_attack + 5.0;
-        string line = lfm_attack + " attack.";
+        string attack_text = lfm_attack + " attack.";
         
 		if (my_buffedstat($stat[moxie]) < lfm_attack)
-			line = HTMLGenerateSpanFont(line, "red", "");
+			attack_text = HTMLGenerateSpanFont(attack_text, "red", "");
+        
+        line += attack_text;
         description.listAppend(line);
     }
     else if (monster_name == "Big swarm of ghuol whelps" || monster_name == "Swarm of ghuol whelps" || monster_name == "Giant swarm of ghuol whelps")
@@ -292,7 +302,7 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] available_resources_en
             potential_copies.listAppend("Modern zmobies.");
         if (!__quest_state["Level 8"].state_boolean["Mountain climbed"] && $items[ninja rope,ninja carabiner,ninja crampons].available_amount() == 0 && !have_outfit_components("eXtreme Cold-Weather Gear"))
             potential_copies.listAppend("Ninja assassin.");
-        if (!__quest_state["Level 11"].finished && !__quest_state["Level 11 Palindome"].finished && $item[talisman o' nam].available_amount() == 0 && $items[gaudy key,snakehead charrrm].available_amount() < 2)
+        if (!__quest_state["Level 11"].finished && !__quest_state["Level 11 Palindome"].finished && lookupItem("talisman o' nam").available_amount() == 0 && $items[gaudy key,snakehead charrrm].available_amount() < 2)
             potential_copies.listAppend("Gaudy pirate - copy once for extra key.");
         //√baa'baa. astronomer? √nuns trick brigand
         //FIXME astronomer when we can calculate that

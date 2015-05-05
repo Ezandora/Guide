@@ -49,7 +49,7 @@ void SSneakyPeteGenerateResource(ChecklistEntry [int] available_resources_entrie
         
         string [int] targets;
         //√banshee, √a batrat for sonar, √harem girl (contested), √burly sidekick, √quiet healer, √filthworms, √f'c'le without natural dancer, √a-boo clues
-        if (!$skill[Natural Dancer].skill_is_usable() && !__quest_state["Pirate Quest"].finished && $item[talisman o' nam].available_amount() == 0)
+        if (!$skill[Natural Dancer].skill_is_usable() && !__quest_state["Pirate Quest"].finished && lookupItem("talisman o' nam").available_amount() == 0)
             targets.listAppend("Three times in the F'c'le, if you can't acquire Natural Dancer/+234% items.");
             
         if (!__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && !__quest_state["Level 11 Desert"].state_boolean["Killing Jar Given"] && $item[killing jar].available_amount() == 0)

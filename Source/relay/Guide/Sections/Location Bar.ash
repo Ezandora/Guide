@@ -3,6 +3,8 @@ import "relay/Guide/Sections/Location Bar Popup.ash";
 buffer generateLocationBar(boolean displaying_navbar)
 {
     buffer bar;
+    if (!playerIsLoggedIn())
+        return bar;
     location l = __last_adventure_location;
     if (!__setting_location_bar_uses_last_location)
         l = my_location();
@@ -482,16 +484,15 @@ buffer generateLocationBar(boolean displaying_navbar)
             onmouseleave_code = "document.getElementById('r_location_popup_box').style.display = 'none'; document.getElementById('r_location_popup_blackout').style.display = 'none';";
         }
             
-        if (true)
-        {
-            string [string] outer_containiner_map = mapMake("class", "r_bottom_outer_container", "style", style);
-            if (onmouseenter_code.length() > 0)
-                outer_containiner_map["onmouseenter"] = onmouseenter_code;
-            if (onmouseleave_code.length() > 0)
-                outer_containiner_map["onmouseleave"] = onmouseleave_code;
-            bar.append(HTMLGenerateTagPrefix("div", outer_containiner_map));
-        }
-        bar.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_bottom_inner_container", "style", "background:white;")));
+        string [string] outer_containiner_map = mapMake("class", "r_bottom_outer_container", "style", style);
+        bar.append(HTMLGenerateTagPrefix("div", outer_containiner_map));
+        
+        string [string] inner_containiner_map = mapMake("class", "r_bottom_inner_container", "style", "background:white;");
+        if (onmouseenter_code.length() > 0)
+            inner_containiner_map["onmouseenter"] = onmouseenter_code;
+        if (onmouseleave_code.length() > 0)
+            inner_containiner_map["onmouseleave"] = onmouseleave_code;
+        bar.append(HTMLGenerateTagPrefix("div", inner_containiner_map));
     }
     
     

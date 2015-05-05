@@ -129,6 +129,27 @@ void listAppend(skill [int][int] list, skill [int] entry)
 	list[position] = entry;
 }
 
+void listAppend(familiar [int][int] list, familiar [int] entry)
+{
+	int position = list.count();
+	while (list contains position)
+		position += 1;
+	list[position] = entry;
+}
+
+
+void listAppend(skill [int] list, boolean [skill] entry)
+{
+    foreach v in entry
+        list.listAppend(v);
+}
+
+void listAppend(item [int] list, boolean [item] entry)
+{
+    foreach v in entry
+        list.listAppend(v);
+}
+
 void listPrepend(string [int] list, string entry)
 {
 	int position = 0;
@@ -221,6 +242,12 @@ location [int] listMakeBlankLocation()
 monster [int] listMakeBlankMonster()
 {
 	monster [int] result;
+	return result;
+}
+
+familiar [int] listMakeBlankFamiliar()
+{
+	familiar [int] result;
 	return result;
 }
 
@@ -731,6 +758,18 @@ int listKeyForIndex(location [int] list, int index)
 	return -1;
 }
 
+int listKeyForIndex(familiar [int] list, int index)
+{
+	int i = 0;
+	foreach key in list
+	{
+		if (i == index)
+			return key;
+		i += 1;
+	}
+	return -1;
+}
+
 int llistKeyForIndex(string [int][int] list, int index)
 {
 	int i = 0;
@@ -756,6 +795,15 @@ location listGetRandomObject(location [int] list)
 {
     if (list.count() == 0)
         return $location[none];
+    if (list.count() == 1)
+    	return list[listKeyForIndex(list, 0)];
+    return list[listKeyForIndex(list, random(list.count()))];
+}
+
+familiar listGetRandomObject(familiar [int] list)
+{
+    if (list.count() == 0)
+        return $familiar[none];
     if (list.count() == 1)
     	return list[listKeyForIndex(list, 0)];
     return list[listKeyForIndex(list, random(list.count()))];

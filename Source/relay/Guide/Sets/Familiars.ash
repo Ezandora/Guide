@@ -102,16 +102,19 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] available_resources_entries
         
         if (!($familiars[Frumious Bandersnatch, pair of stomping boots] contains my_familiar()))
             url = "familiar.php";
-		int snow_suit_runs = floor(numeric_modifier($item[snow suit], "familiar weight") / 5.0);
-		
-		if ($item[snow suit].available_amount() == 0)
-			snow_suit_runs = 0;
-			
-		if (snow_suit_runs >= 2)
-			description.listAppend("Snow Suit available (+" + snow_suit_runs + " runs)");
-		else if ($item[sugar shield].available_amount() > 0)
-			description.listAppend("Sugar shield available (+2 runs)");
-			
+        
+        if (my_path_id() != PATH_HEAVY_RAINS)
+        {
+            int snow_suit_runs = floor(numeric_modifier($item[snow suit], "familiar weight") / 5.0);
+            
+            if ($item[snow suit].available_amount() == 0)
+                snow_suit_runs = 0;
+                
+            if (snow_suit_runs >= 2)
+                description.listAppend("Snow Suit available (+" + snow_suit_runs + " runs)");
+            else if ($item[sugar shield].available_amount() > 0)
+                description.listAppend("Sugar shield available (+2 runs)");
+        }
 			
 		available_resources_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(name, "", description)));
 	}
@@ -125,7 +128,7 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] available_resources_entries
 			string name = "";
 			string [int] description;
 				
-			name = pluralize(hipster_fights_available, __misc_state_string["hipster name"] + " fight", __misc_state_string["hipster name"] + " fights") + " available";
+			name = pluralize(hipster_fights_available, __misc_state_string["hipster name"] + " fight", __misc_state_string["hipster name"] + " fights");
 			
 			int [int] hipster_chances;
 			hipster_chances[7] = 50;

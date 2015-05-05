@@ -29,7 +29,7 @@ void QLevel11Init()
 		state.quest_name = "MacGuffin Quest";
 		state.image_name = "MacGuffin";
 		state.council_quest = true;
-	
+        
 		if (my_level() >= 11)
 			state.startable = true;
 		__quest_state["Level 11"] = state;
@@ -76,7 +76,15 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         {
             if ($item[blackberry galoshes].equipped_amount() == 0)
             {
-                subentry.entries.listAppend(HTMLGenerateSpanFont("Equip blackberry galoshes", "red", "") + " to speed up exploration.");
+                string line = HTMLGenerateSpanFont("Equip blackberry galoshes", "red", "") + " to speed up exploration";
+                
+                if (!$item[blackberry galoshes].can_equip())
+                {
+                    make_entry_future = true;
+                    line += ", once you can equip them";
+                }
+                line += ".";
+                subentry.entries.listAppend(line);
             }
         }
         else
@@ -174,7 +182,7 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     else if (base_quest_state.mafia_internal_step < 4)
     {
         //Have diary:
-        if ($item[holy macguffin].available_amount() == 0)
+        if (lookupItem("2334").available_amount() == 0) //$item[holy macguffin] has shadow aliasing problem
         {
             //nothing to say
             //subentry.entries.listAppend("Retrieve the MacGuffin.");

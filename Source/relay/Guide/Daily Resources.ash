@@ -73,15 +73,15 @@ void generateDailyResources(Checklist [int] checklists)
             reasons.listAppend("nice hat");
         if ($familiar[fancypants scarecrow].familiar_is_usable() && $item[double-ice britches].available_amount() == 0)
             reasons.listAppend("scarecrow pants");
-        if (!__quest_state["Level 13"].state_boolean["past tower monsters"])
-            reasons.listAppend("situational tower killing");
+        //if (!__quest_state["Level 13"].state_boolean["past tower monsters"]) //don't think this is true
+            //reasons.listAppend("situational tower killing");
         
         if (reasons.count() > 0)
             description.listAppend("Double-ice. (" + reasons.listJoinComponents(", ", "and") + ")");
         else
             description.listAppend("Double-ice.");
 		
-		available_resources_entries.listAppend(ChecklistEntryMake("__item shard of double-ice", "", ChecklistSubentryMake("Take a shower", description), 5));
+		available_resources_entries.listAppend(ChecklistEntryMake("__item shard of double-ice", "clan_viplounge.php?action=shower", ChecklistSubentryMake("Take a shower", description), 5));
 	}
     if (__misc_state["VIP available"] && get_property_int("_poolGames") <3 && $item[Clan pool table].is_unrestricted())
     {

@@ -42,7 +42,7 @@ void SActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, Check
             if (!lookupMonster("warehouse janitor").is_banished())
                 modifiers.listAppend("banish janitor");
             
-            description.listAppend("Adventure in the Secret Government Warehouse.");
+            description.listAppend("Adventure in the Secret Government Warehouse, use the items you find.");
             
             if (lookupItem("warehouse inventory page").available_amount() > 0 && lookupItem("warehouse map page").available_amount() > 0)
             {
@@ -52,13 +52,65 @@ void SActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, Check
             }
             else if (lookupSkill("Lash of the Cobra").have_skill())
             {
-                description.listAppend("Use lash of the cobra on the clerk and guard, use the items you find.");
+                description.listAppend("Use lash of the cobra on the clerk and guard.");
             }
             else
             {
                 modifiers.listAppend("+item");
-                description.listAppend("Use the items you find.");
             }
+            
+            string [int] items_available;
+            foreach it in lookupItems("warehouse inventory page,warehouse map page")
+            {
+                if (it.available_amount() > 0)
+                    items_available.listAppend(pluralizeWordy(it));
+            }
+            if (items_available.count() > 0)
+            {
+                description.listAppend(items_available.listJoinComponents(", ", "and").capitalizeFirstLetter() + " available.");
+            }
+            
+            int progress_remaining = clampi(40 - get_property_int("warehouseProgress"), 0, 40);
+            string line;// = pluralizeWordy(progress_remaining, "remaining aisle", "remaining aisles").capitalizeFirstLetter() + ".";
+            if (progress_remaining <= 0)
+                line += "MacGuffin next turn.";
+            else
+                line += "Fight " + progress_remaining + " more combats";
+            if (progress_remaining > 1)
+            {
+                int page_pairs_remaining = ceil(progress_remaining.to_float() / 8.0);
+                
+                /*string [int] bring_me_the_red_pages;
+                
+                int first_value = -1;
+                boolean identical_twins = false;
+                foreach it in lookupItems("warehouse inventory page,warehouse map page")
+                {
+                    int pages_remaining = page_pairs_remaining - it.available_amount();
+                    if (pages_remaining > 0)
+                    {
+                        if (first_value == -1)
+                            first_value = pages_remaining;
+                        else if (first_value == pages_remaining)
+                        {
+                            identical_twins = true;
+                            bring_me_the_red_pages.listAppend(it);
+                            continue;
+                        }
+                        bring_me_the_red_pages.listAppend(pluralizeWordy(pages_remaining, it));
+                    }
+                }
+                
+                if (identical_twins)
+                    line += bring_me_the_red_pages.listJoinComponents("/");
+                else
+                    line += bring_me_the_red_pages.listJoinComponents(", ", "and");*/
+                    
+                line += " or collect ";
+                line += pluralizeWordy(page_pairs_remaining, "more page pair", "more page pairs");
+            }
+            line += ".";
+            description.listAppend(line);
             
             task_entries.listAppend(ChecklistEntryMake("__item holy macguffin", url, ChecklistSubentryMake("Retrieve the Holy MacGuffin", modifiers, description), lookupLocations("The Secret Council Warehouse")));
         }
@@ -100,7 +152,7 @@ void SActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] available_resour
             talismen_of_horus_wanted += 2;
         if (!__quest_state["Level 12"].state_boolean["Lighthouse Finished"] && $item[barrel of gunpowder].available_amount() < 5)
             talismen_of_horus_wanted += 2;
-        if ($item[pirate fledges].available_amount() == 0 && $item[Talisman o' Nam].available_amount() == 0)
+        if ($item[pirate fledges].available_amount() == 0 && lookupItem("talisman o' nam").available_amount() == 0)
             talismen_of_horus_wanted += 2;
         if (talismen_of_horus_wanted == 0) //where else do you need +combat? pirate's cove?
             talismen_of_horus_wanted = 1;

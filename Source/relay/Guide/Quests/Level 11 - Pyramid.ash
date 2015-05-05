@@ -87,10 +87,7 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
                 int turns_spent = $location[the middle chamber].turns_spent;
                 
                 int turns_remaining = MAX(0, 11 - turns_spent);
-                if (turns_remaining == 1)
-                    subentry.entries.listAppend("Adventure in the middle chamber for One More Turn to unlock the control room.");
-                else
-                    subentry.entries.listAppend("Adventure in the middle chamber for " + pluralizeWordy(turns_remaining, "more turn", "more turns") + " to unlock the control room.");
+                subentry.entries.listAppend("Adventure in the middle chamber for " + pluralizeWordy(turns_remaining, "more turn", "more turns") + " to unlock the control room.");
             
                 subentry.modifiers.listAppend("+400% item");
                 subentry.modifiers.listAppend("olfact tomb rats");
@@ -110,10 +107,7 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
             //unlock middle chamber:
             int turns_spent = $location[the upper chamber].turns_spent;
             int turns_remaining = MAX(0, 6 - turns_spent);
-            if (turns_remaining == 1)
-                subentry.entries.listAppend("Adventure in the upper chamber for One More Turn to unlock the middle chamber.");
-            else
-                subentry.entries.listAppend("Adventure in the upper chamber for " + pluralizeWordy(turns_remaining, "more turn", "more turns") + " to unlock the middle chamber.");
+            subentry.entries.listAppend("Adventure in the upper chamber for " + pluralizeWordy(turns_remaining, "more turn", "more turns") + " to unlock the middle chamber.");
             subentry.modifiers.listAppend("-combat");
             if (__misc_state["have hipster"])
                 subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
@@ -121,62 +115,67 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
                 subentry.modifiers.listAppend("free runs");
         }
         
-        //Pyramid unlocked:
-        if (should_generate_control_room_information)
+        
+        //Generate spin cycle:
+
+        //this is not very good code:
+        boolean have_pyramid_position = false;
+        int pyramid_position = get_property_int("pyramidPosition");
+        
+        //Uncertain:
+        //if (get_property_int("lastPyramidReset") == my_ascensions())
+        if (pyramid_position > 0 && mafiaIsPastRevision(14319)) //does this work?
+            have_pyramid_position = true;
+        
+        //I think there are... five positions?
+        //1=Ed, 2=bad, 3=vending machine, 4=token, 5=bad
+        int next_position_needed = -1;
+        int additional_turns_after_that = 0;
+        string task;
+        done_with_wheel_turning = false;
+        if (2318.to_item().available_amount() > 0 || ed_chamber_open)
         {
-            //this is not very good code:
-            boolean have_pyramid_position = false;
-            int pyramid_position = get_property_int("pyramidPosition");
+            //need 1
+            next_position_needed = 1;
+            additional_turns_after_that = 0;
             
-            //Uncertain:
-            //if (get_property_int("lastPyramidReset") == my_ascensions())
-            if (pyramid_position > 0 && mafiaIsPastRevision(14319)) //does this work?
-                have_pyramid_position = true;
+            boolean delay_for_semirare = CounterLookup("Semi-rare").CounterWillHitExactlyInTurnRange(0, 6);
             
-            //I think there are... five positions?
-            //1=Ed, 2=bad, 3=vending machine, 4=token, 5=bad
-            int next_position_needed = -1;
-            int additional_turns_after_that = 0;
-            string task;
-            done_with_wheel_turning = false;
-            if (2318.to_item().available_amount() > 0 || ed_chamber_open)
+            if (delay_for_semirare)
             {
-                //need 1
-                next_position_needed = 1;
-                additional_turns_after_that = 0;
-                
-                boolean delay_for_semirare = CounterLookup("Semi-rare").CounterWillHitExactlyInTurnRange(0, 6);
-                
-                if (delay_for_semirare)
-                {
-                    task = HTMLGenerateSpanFont("Avoid fighting Ed the Undying, semi-rare coming up ", "red", "");
-                }
-                else
-                {
-                    int ed_ml = 180 + monster_level_adjustment_for_location($location[the lower chambers]);
-                    task = "fight Ed in the lower chambers";
-                    if (ed_ml > my_buffedstat($stat[moxie]))
-                        task += " (" + ed_ml + " attack)";
-                }
-                if (ed_chamber_open)
-                    done_with_wheel_turning = true;
-            }
-            else if ($item[ancient bronze token].available_amount() > 0)
-            {
-                //need 3
-                next_position_needed = 3;
-                additional_turns_after_that = 3;
-                task = "acquire " + 2318.to_item().to_string() + " in lower chamber";
+                task = HTMLGenerateSpanFont("Avoid fighting Ed the Undying, semi-rare coming up ", "red", "");
             }
             else
             {
-                //need 4
-                next_position_needed = 4;
-                additional_turns_after_that = 3 + 4;
-                task = "acquire token in lower chamber";
+                int ed_ml = 180 + monster_level_adjustment_for_location($location[the lower chambers]);
+                task = "fight Ed in the lower chambers";
+                if (ed_ml > my_buffedstat($stat[moxie]))
+                    task += " (" + ed_ml + " attack)";
             }
-            
-            int spins_needed = (next_position_needed - pyramid_position + 10) % 5;
+            if (ed_chamber_open)
+                done_with_wheel_turning = true;
+        }
+        else if ($item[ancient bronze token].available_amount() > 0)
+        {
+            //need 3
+            next_position_needed = 3;
+            additional_turns_after_that = 3;
+            task = "acquire " + 2318.to_item().to_string() + " in lower chamber";
+        }
+        else
+        {
+            //need 4
+            next_position_needed = 4;
+            additional_turns_after_that = 3 + 4;
+            task = "acquire token in lower chamber";
+        }
+        
+        int spins_needed = (next_position_needed - pyramid_position + 10) % 5;
+        int total_spins_needed = spins_needed + additional_turns_after_that;
+        
+        //Pyramid unlocked:
+        if (should_generate_control_room_information)
+        {
             
             string [int] tasks;
             if (spins_needed > 0)
@@ -212,8 +211,14 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
         if (!done_with_wheel_turning)
         {
             int amount = $item[tomb ratchet].available_amount() + lookupItem("crumbling wooden wheel").available_amount();
-            if (amount > 0)
-                subentry.entries.listAppend(pluralize(amount, "wheel turn", "wheel turns") + " available.");
+            
+            int extra_spin_sources_needed = clampi(total_spins_needed - amount, 0, 11);
+            if (extra_spin_sources_needed > 0)
+                subentry.entries.listAppend("Need " + HTMLGenerateSpanFont(int_to_wordy(extra_spin_sources_needed), "red", "") + " more ratchet/wheel" + ((extra_spin_sources_needed > 1) ? "s" : "") + ".");
+            else
+                subentry.entries.listAppend("Have enough wheels.");
+            /*if (amount > 0)
+                subentry.entries.listAppend(pluralize(amount, "wheel turn", "wheel turns") + " available.");*/
             if ($item[tangle of rat tails].available_amount() > 0)
                 subentry.entries.listAppend(pluralize($item[tangle of rat tails]) + " available.");
         }

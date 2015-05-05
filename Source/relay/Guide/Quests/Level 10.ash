@@ -41,6 +41,7 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 	string image_name = base_quest_state.image_name;
     string url = "place.php?whichplace=beanstalk";
 	
+    boolean add_as_future_task = false;
 	if ($item[s.o.c.k.].available_amount() == 0)
 	{
         //FIXME delay if ballroom song not set
@@ -197,7 +198,16 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 			subentry.modifiers.listAppend("-combat");
 			subentry.entries.listAppend("Top floor. Run -combat.");
             if ($item[mohawk wig].equipped_amount() == 0 && $item[mohawk wig].available_amount() > 0)
-                subentry.entries.listAppend(HTMLGenerateSpanFont("Wear your mohawk wig.", "red", ""));
+            {
+                string line = "Wear your mohawk wig";
+                if (!$item[mohawk wig].can_equip())
+                {
+                    add_as_future_task = true;
+                    line += ", once you can equip it";
+                }
+                line += ".";
+                subentry.entries.listAppend(HTMLGenerateSpanFont(line, "red", ""));
+            }
             if ($item[mohawk wig].available_amount() == 0 && !in_hardcore())
                 subentry.entries.listAppend("Potentially pull and wear a mohawk wig.");
             if ($item[model airship].available_amount() == 0)
@@ -236,10 +246,7 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             if (turns_spent != -1)
             {
                 turns_remaining = 11 - turns_spent;
-                if (turns_remaining == 1)
-                    subentry.entries.listAppend("Ground floor. Spend One More Turn here to unlock top floor.");
-                else
-                    subentry.entries.listAppend("Ground floor. Spend " + pluralizeWordy(turns_remaining, "more turn", "more turns") + " here to unlock top floor.");
+                subentry.entries.listAppend("Ground floor. Spend " + pluralizeWordy(turns_remaining, "more turn", "more turns") + " here to unlock top floor.");
             }
             else
                 subentry.entries.listAppend("Ground floor. Spend eleven turns here to unlock top floor.");
@@ -249,7 +256,7 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             if (__misc_state["Need to level"])
                 subentry.entries.listAppend("Possibly acquire the very overdue library book from a non-combat. (stats)");
             
-            if (lookupItem("electric boning knife").available_amount() == 0 && __quest_state["Level 13"].state_boolean["wall of bones will need to be defeated"])
+            if (lookupItem("electric boning knife").available_amount() == 0 && __quest_state["Level 13"].state_boolean["wall of bones will need to be defeated"] && !lookupSkill("garbage nova").skill_is_usable())
             {
                 subentry.modifiers.listAppend("-combat");
                 subentry.entries.listAppend("Try to acquire the electric boning knife if you see it. (foodie NC)");
@@ -323,6 +330,10 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 			image_name = "lift, bro";
 		}
 	}
-	
-	task_entries.listAppend(ChecklistEntryMake(image_name, url, subentry, $locations[the penultimate fantasy airship, the castle in the clouds in the sky (basement), the castle in the clouds in the sky (ground floor), the castle in the clouds in the sky (top floor)]));
+    
+	ChecklistEntry entry = ChecklistEntryMake(image_name, url, subentry, $locations[the penultimate fantasy airship, the castle in the clouds in the sky (basement), the castle in the clouds in the sky (ground floor), the castle in the clouds in the sky (top floor)]);
+    if (add_as_future_task)
+        future_task_entries.listAppend(entry);
+    else
+        task_entries.listAppend(entry);
 }

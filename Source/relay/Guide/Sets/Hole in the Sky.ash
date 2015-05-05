@@ -196,10 +196,13 @@ void QHitsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] 
                 //olfact nothing, interferes with astronomers
                 //they prefer interferometry
             }
-            else if (my_ascensions() % 2 == 0)
-                subentry.entries.listAppend("Olfact skinflute.");
-            else
-                subentry.entries.listAppend("Olfact camel's toe.");
+            else if (!have_met_stars_requirement || !have_met_lines_requirement)
+            {
+                if (my_ascensions() % 2 == 0)
+                    subentry.entries.listAppend("Olfact skinflute.");
+                else
+                    subentry.entries.listAppend("Olfact camel's toe.");
+            }
             
 			if (!have_met_stars_requirement || !have_met_lines_requirement)
 				subentry.modifiers.listAppend("+234% item");

@@ -386,6 +386,14 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
         case $location[Rumpelstiltskin's Workshop]:
         case $location[Ye Olde Medievale Villagee]:
             return (get_property("grimstoneMaskPath") == "gnome");
+        case $location[the mansion of dr. weirdeaux]:
+        case $location[the secret government laboratory]:
+        case $location[the deep dark jungle]:
+            return (get_property_boolean("_spookyAirportToday") || get_property_boolean("spookyAirportAlways"));
+        case $location[the fun-guy mansion]:
+        case $location[sloppy seconds diner]:
+        case $location[the sunken party yacht]:
+            return (get_property_boolean("_sleazeAirportToday") || get_property_boolean("sleazeAirportAlways"));
 		default:
 			break;
 	}
@@ -872,6 +880,7 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         lookup_map["The Inner Wolf Gym"] = "place.php?whichplace=ioty2014_wolf";
         lookup_map["Unleash Your Inner Wolf"] = "place.php?whichplace=ioty2014_wolf";
         lookup_map["The Crimbonium Mining Camp"] = "place.php?whichplace=desertbeach";
+        lookup_map["Kokomo Resort"] = "place.php?whichplace=desertbeach";
         lookup_map["The Crimbonium Mine"] = "mining.php?mine=5";
         lookup_map["The Secret Council Warehouse"] = "tutorial.php";
         lookup_map["The Skeleton Store"] = "place.php?whichplace=town_market";
@@ -887,6 +896,8 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
             lookup_map[s] = "place.php?whichplace=airport_sleaze";
         foreach s in $strings[The Mansion of Dr. Weirdeaux,The Deep Dark Jungle,The Secret Government Laboratory]
             lookup_map[s] = "place.php?whichplace=airport_spooky";
+        foreach s in $strings[Pirates of the Garbage Barges,Barf Mountain,The Toxic Teacups,Uncle Gator's Fun-Time Liquid Waste Sluice]
+            lookup_map[s] = "place.php?whichplace=airport_stench";
         
         foreach s in $strings[Medbay,Waste Processing,Sonar,Science Lab,Morgue,Special Ops,Engineering,Navigation,Galley]
             lookup_map[s] = "place.php?whichplace=bugbearship";
@@ -908,7 +919,7 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         else
             lookup_map["Post-Quest Bugbear Pens"] =  "place.php?whichplace=knoll_hostile";
             
-        if ($item[talisman o' nam].equipped_amount() > 0)
+        if (lookupItem("talisman o' nam").equipped_amount() > 0)
             lookup_map["Palindome"] = "place.php?whichplace=palindome";
         else
             lookup_map["Palindome"] = "inventory.php?which=2";

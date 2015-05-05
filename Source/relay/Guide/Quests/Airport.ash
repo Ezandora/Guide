@@ -661,6 +661,371 @@ void QSpookyAirportGenerateTasks(ChecklistEntry [int] task_entries)
     QSpookyAirportJunglePunGenerateTasks(task_entries);
 }
 
+void QStenchAirportFishTrashGenerateTasks(ChecklistEntry [int] task_entries)
+{
+    QuestState state;
+    state.image_name = "__item trash net";
+    state.quest_name = "Teach a Man to Fish Trash";
+	QuestStateParseMafiaQuestProperty(state, "questEStFishTrash");
+    
+    if (!state.in_progress)
+        return;
+    item trash_net = lookupItem("trash net");
+    
+    if (trash_net.available_amount() == 0)
+        return;
+    
+	ChecklistSubentry subentry;
+	
+	subentry.header = state.quest_name;
+	string url = "place.php?whichplace=airport_stench";
+    
+    
+    if (state.mafia_internal_step <= 2)
+    {
+        string [int] items_to_equip;
+        if (trash_net.equipped_amount() == 0)
+        {
+            items_to_equip.listAppend(trash_net);
+        }
+        if (items_to_equip.count() > 0)
+        {
+            subentry.entries.listAppend(HTMLGenerateSpanFont("Equip the " + items_to_equip.listJoinComponents(", ", "and") + ".", "red", ""));
+            url = "inventory.php?which=2";
+        }
+        else
+        {
+            int turns_remaining = clampi(get_property_int("dinseyFilthLevel") / 5, 0, 20);
+            subentry.entries.listAppend("Adventure in Pirates of the Garbage Barges for " + pluralizeWordy(turns_remaining, "more turn", "more turns") + ".");
+        }
+    }
+    else
+    {
+        subentry.entries.listAppend("Collect wages from the employee assignment kiosk.");
+        state.image_name = "stench airport kiosk";
+        url = "place.php?whichplace=airport_stench&action=airport3_kiosk";
+    }
+        
+	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, lookupLocations("pirates of the garbage barges")));
+}
+
+void QStenchAirportNastyBearsGenerateTasks(ChecklistEntry [int] task_entries)
+{
+    QuestState state;
+    state.image_name = "__item black picnic basket";
+    state.quest_name = "Nasty, Nasty Bears";
+	QuestStateParseMafiaQuestProperty(state, "questEStNastyBears");
+    
+    if (!state.in_progress)
+        return;
+    
+	ChecklistSubentry subentry;
+	
+	subentry.header = state.quest_name;
+	string url = "place.php?whichplace=airport_stench";
+    
+    
+    int bears_left = 8 - get_property_int("dinseyNastyBearsDefeated");
+    if (state.mafia_internal_step < 3 && bears_left > 0)
+    {
+        subentry.entries.listAppend("Adventure in Gator's Country Fun-Time Liquid Waste Sluice, defeat " + pluralizeWordy(bears_left, "more nasty bear", "more nasty bears") + ".");
+        
+        if (__misc_state["have olfaction equivalent"])
+            subentry.modifiers.listAppend("olfact nasty bears?");
+    }
+    else
+    {
+        subentry.entries.listAppend("Collect wages from the employee assignment kiosk.");
+        state.image_name = "stench airport kiosk";
+        url = "place.php?whichplace=airport_stench&action=airport3_kiosk";
+    }
+    
+	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, lookupLocations("Gator's Country Fun-Time Liquid Waste Sluice")));
+}
+
+void QStenchAirportSocialJusticeIGenerateTasks(ChecklistEntry [int] task_entries)
+{
+    QuestState state;
+    state.image_name = "__item ms. accessory";
+    state.quest_name = "Social Justice Adventurer I";
+	QuestStateParseMafiaQuestProperty(state, "questEStSocialJusticeI");
+    
+    if (!state.in_progress)
+        return;
+    
+	ChecklistSubentry subentry;
+	
+	subentry.header = state.quest_name;
+	string url = "place.php?whichplace=airport_stench";
+    
+    
+    int adventures_left = 15 - get_property_int("dinseySocialJusticeIProgress");
+    if (state.mafia_internal_step < 2 && adventures_left > 0)
+    {
+        subentry.entries.listAppend("Adventure in Pirates of the Garbage Barges " + pluralizeWordy(adventures_left, "more time", "more times") + ".");
+    }
+    else
+    {
+        subentry.entries.listAppend("Collect wages from the employee assignment kiosk.");
+        state.image_name = "stench airport kiosk";
+        url = "place.php?whichplace=airport_stench&action=airport3_kiosk";
+    }
+    
+	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, lookupLocations("Pirates of the Garbage Barges")));
+}
+
+void QStenchAirportSocialJusticeIIGenerateTasks(ChecklistEntry [int] task_entries)
+{
+    QuestState state;
+    state.image_name = "__monster black knight";
+    state.quest_name = "Social Justice Adventurer II";
+	QuestStateParseMafiaQuestProperty(state, "questEStSocialJusticeII");
+    
+    if (!state.in_progress)
+        return;
+    
+	ChecklistSubentry subentry;
+	
+	subentry.header = state.quest_name;
+	string url = "place.php?whichplace=airport_stench";
+    
+    
+    if (state.mafia_internal_step < 2)
+    {
+        int adventures_left = 15 - get_property_int("dinseySocialJusticeIIProgress");
+        subentry.entries.listAppend("Adventure in Uncle Gator's Country Fun-Time Liquid Waste Sluice " + pluralizeWordy(adventures_left, "more time", "more times") + ".");
+    }
+    else
+    {
+        subentry.entries.listAppend("Collect wages from the employee assignment kiosk.");
+        state.image_name = "stench airport kiosk";
+        url = "place.php?whichplace=airport_stench&action=airport3_kiosk";
+    }
+    
+	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, lookupLocations("Gator's Country Fun-Time Liquid Waste Sluice")));
+}
+
+void QStenchAirportSuperLuberGenerateTasks(ChecklistEntry [int] task_entries)
+{
+    QuestState state;
+    state.image_name = "__item lube-shoes";
+    state.quest_name = "Super Luber";
+	QuestStateParseMafiaQuestProperty(state, "questEStSuperLuber");
+    
+    if (!state.in_progress)
+        return;
+    item quest_item = lookupItem("lube-shoes");
+    
+    if (quest_item.available_amount() == 0)
+        return;
+    
+	ChecklistSubentry subentry;
+	
+	subentry.header = state.quest_name;
+	string url = "place.php?whichplace=airport_stench";
+    
+    
+    if (state.mafia_internal_step <= 2)
+    {
+        string [int] items_to_equip;
+        if (quest_item.equipped_amount() == 0)
+        {
+            items_to_equip.listAppend(quest_item);
+        }
+        if (items_to_equip.count() > 0)
+        {
+            subentry.entries.listAppend(HTMLGenerateSpanFont("Equip the " + items_to_equip.listJoinComponents(", ", "and") + ".", "red", ""));
+            url = "inventory.php?which=2";
+        }
+        else
+        {
+            subentry.entries.listAppend("Adventure in Barf Mountain, return to the kiosk after riding the rollercoaster.");
+            subentry.modifiers.listAppend("optional +meat");
+            if (lookupEffect("How to Scam Tourists").have_effect() == 0 && lookupItem("How to Avoid Scams").available_amount() > 0)
+                subentry.entries.listAppend("Use How to Avoid Scams to farm extra meat, if you want.");
+            
+        }
+    }
+    else
+    {
+        subentry.entries.listAppend("Collect wages from the employee assignment kiosk.");
+        state.image_name = "stench airport kiosk";
+        url = "place.php?whichplace=airport_stench&action=airport3_kiosk";
+    }
+        
+	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, lookupLocations("barf mountain")));
+}
+
+void QStenchAirportZippityDooDahGenerateTasks(ChecklistEntry [int] task_entries)
+{
+    QuestState state;
+    state.image_name = "__item tea for one";
+    state.quest_name = "Whistling Zippity-Doo-Dah";
+	QuestStateParseMafiaQuestProperty(state, "questEStZippityDooDah");
+    
+    if (!state.in_progress)
+        return;
+    item quest_item = lookupItem("Dinsey mascot mask");
+    
+    if (quest_item.available_amount() == 0)
+        return;
+    
+	ChecklistSubentry subentry;
+	
+	subentry.header = state.quest_name;
+	string url = "place.php?whichplace=airport_stench";
+    
+    int turns_remaining = clampi(15 - get_property_int("dinseyFunProgress"), 0, 15);
+    
+    if (state.mafia_internal_step <= 2)
+    {
+        string [int] items_to_equip;
+        if (quest_item.equipped_amount() == 0)
+        {
+            items_to_equip.listAppend(quest_item);
+        }
+        if (items_to_equip.count() > 0)
+        {
+            subentry.entries.listAppend(HTMLGenerateSpanFont("Equip the " + items_to_equip.listJoinComponents(", ", "and") + ".", "red", ""));
+            url = "inventory.php?which=2";
+        }
+        else
+        {
+            subentry.entries.listAppend("Adventure in the Toxic Teacups for " + pluralizeWordy(turns_remaining, "more turn", "more turns") + ".");
+        }
+    }
+    else
+    {
+        subentry.entries.listAppend("Collect wages from the employee assignment kiosk.");
+        state.image_name = "stench airport kiosk";
+        url = "place.php?whichplace=airport_stench&action=airport3_kiosk";
+    }
+        
+	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, lookupLocations("toxic teacups")));
+}
+
+void QStenchAirportWillWorkForFoodGenerateTasks(ChecklistEntry [int] task_entries)
+{
+    QuestState state;
+    state.image_name = "__item complimentary Dinsey refreshments";
+    state.quest_name = "Will Work With Food";
+	QuestStateParseMafiaQuestProperty(state, "questEStWorkWithFood");
+    
+    if (!state.in_progress)
+        return;
+        
+    item quest_item = lookupItem("complimentary Dinsey refreshments");
+    
+    if (quest_item.available_amount() == 0)
+        return;
+    
+	ChecklistSubentry subentry;
+	
+	subentry.header = state.quest_name;
+	string url = "place.php?whichplace=airport_stench";
+    
+    int tourists_to_feed = clampi(30 - get_property_int("dinseyTouristsFed"), 0, 30);
+    if (state.mafia_internal_step == 1)
+    {
+        subentry.entries.listAppend("Adventure in Barf Mountain, use complimentary Dinsey refreshments on garbage/angry tourists.");
+        subentry.entries.listAppend(pluralizeWordy(tourists_to_feed, "more remains", "more remain").capitalizeFirstLetter() + ".");
+        subentry.modifiers.listAppend("olfact garbage tourists");
+        
+    }
+    else
+    {
+        subentry.entries.listAppend("Collect wages from the employee assignment kiosk.");
+        state.image_name = "stench airport kiosk";
+        url = "place.php?whichplace=airport_stench&action=airport3_kiosk";
+    }
+        
+	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, lookupLocations("barf mountain")));
+}
+
+void QStenchAirportGiveMeFuelGenerateTasks(ChecklistEntry [int] task_entries)
+{
+    QuestState state;
+    state.image_name = "__item toxic globule";
+    state.quest_name = "Give me fuel";
+	QuestStateParseMafiaQuestProperty(state, "questEStGiveMeFuel");
+    
+    if (!state.in_progress)
+        return;
+    
+	ChecklistSubentry subentry;
+	
+	subentry.header = state.quest_name;
+	string url = "place.php?whichplace=airport_stench";
+    
+    if (lookupItem("toxic globule").available_amount() < 20)
+    {
+        int globules_needed = clampi(20 - lookupItem("toxic globule").available_amount(), 0, 20);
+        if (can_interact())
+        {
+            subentry.entries.listAppend("Buy " + pluralize(globules_needed, "more toxic globule", "more toxic globules") + " in the mall.");
+            url = "mall.php";
+        }
+        else
+        {
+            subentry.modifiers.listAppend("+unknown");
+            subentry.entries.listAppend("Adventure in the Toxic Teacups and collect " + pluralize(globules_needed, "more toxic globule", "more toxic globules") + ".");
+        }
+    }
+    else
+    {
+        if (lookupItem("toxic globule").item_amount() < 20)
+        {
+            int globules_needed = clampi(20 - lookupItem("toxic globule").item_amount(), 0, 20);
+            subentry.entries.listAppend("Pull " + pluralize(globules_needed, "more toxic globule", "more toxic globules") + ".");
+        }
+        else
+        {
+            subentry.entries.listAppend("Collect wages from the employee assignment kiosk.");
+            state.image_name = "stench airport kiosk";
+            url = "place.php?whichplace=airport_stench&action=airport3_kiosk";
+        }
+    }
+    
+	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, lookupLocations("toxic teacups")));
+}
+
+void QStenchAirportGarbageGenerateTasks(ChecklistEntry [int] task_entries)
+{
+    if (get_property_boolean("_dinseyGarbageDisposed"))
+        return;
+    ChecklistSubentry subentry;
+    /*subentry.header = "Turn in garbage";
+    subentry.entries.listAppend("Maintenance Tunnels Access" + __html_right_arrow_character + "Waste Disposal.");
+    task_entries.listAppend(ChecklistEntryMake("__item bag of park garbage", "place.php?whichplace=airport_stench&action=airport3_tunnels", subentry));*/
+    if (lookupItem("bag of park garbage").item_amount() > 0)
+    {
+    }
+    else if (lookupItem("bag of park garbage").available_amount() > 0)
+    {
+    }
+    else if (can_interact())
+    {
+        
+    }
+}
+
+void QStenchAirportGenerateTasks(ChecklistEntry [int] task_entries)
+{
+    if (!__misc_state["stench airport available"])
+        return;
+    if (__misc_state["In run"] && !(lookupLocations("Pirates of the Garbage Barges,Barf Mountain,The Toxic Teacups,Uncle Gator's Fun-Time Liquid Waste Sluice") contains __last_adventure_location))
+        return;
+    QStenchAirportFishTrashGenerateTasks(task_entries);
+    QStenchAirportNastyBearsGenerateTasks(task_entries);
+    QStenchAirportSocialJusticeIGenerateTasks(task_entries);
+    QStenchAirportSocialJusticeIIGenerateTasks(task_entries);
+    QStenchAirportSuperLuberGenerateTasks(task_entries);
+    QStenchAirportZippityDooDahGenerateTasks(task_entries);
+    QStenchAirportGarbageGenerateTasks(task_entries);
+    QStenchAirportGiveMeFuelGenerateTasks(task_entries);
+    QStenchAirportWillWorkForFoodGenerateTasks(task_entries);
+}
+
 void QAirportGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     ChecklistEntry [int] chosen_entries = optional_task_entries;
@@ -669,6 +1034,7 @@ void QAirportGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     
     QSleazeAirportGenerateTasks(chosen_entries);
     QSpookyAirportGenerateTasks(chosen_entries);
+    QStenchAirportGenerateTasks(chosen_entries);
 }
 
 void QAirportGenerateResource(ChecklistEntry [int] available_resources_entries)

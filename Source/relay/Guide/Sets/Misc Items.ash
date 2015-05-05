@@ -960,6 +960,67 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
         available_resources_entries.listAppend(ChecklistEntryMake("__item tonic djinn", "inventory.php?which=3", ChecklistSubentryMake("Tonic djinn", "", description), importance_level_unimportant_item));
     }
     
+    if ($item[V for Vivala mask].available_amount() > 0 && $item[V for Vivala mask].is_unrestricted() && !get_property_boolean("_vmaskBanisherUsed") && in_run)
+    {
+        string url;
+        string [int] description;
+        if (__misc_state["free runs usable"])
+            description.listAppend("Once/day free run/banisher. (combat skill)");
+        else
+            description.listAppend("Once/day banisher. (combat skill)");
+        
+        if ($item[V for Vivala mask].equipped_amount() == 0)
+        {
+            description.listAppend("Equip V for Vivala mask first.");
+            url = "inventory.php?which=2";
+        }
+        string line = "Costs ";
+        if (my_mp() < 30)
+            line += HTMLGenerateSpanFont("30 MP", "red", "");
+        else
+            line += "30 MP";
+        line += ".";
+        description.listAppend(line);
+        available_resources_entries.listAppend(ChecklistEntryMake("__item V for Vivala mask", url, ChecklistSubentryMake("Creepy Grin usable", "", description), importance_level_item));
+    }
+    
+    if ($item[moveable feast].available_amount() > 0 && $item[moveable feast].is_unrestricted() && get_property_int("_feastUsed") < 5)
+    {
+        string [int] description;
+        string url = "inventory.php?which=2";
+        int feastings_left = clampi(5 - get_property_int("_feastUsed"), 0, 5);
+        
+        description.listAppend("Gives +10 familiar weight for twenty turns to a specific familiar.");
+        string [int] familiars_used_on = get_property("_feastedFamiliars").split_string_alternate(";"); //separator: ";"
+        if (in_run && __misc_state["free runs usable"])
+        {
+            string [int] familiars_could_imbue_for_del_shannon;
+            boolean [familiar] familiars_used_on_inverse;
+            foreach key, f_name in familiars_used_on
+            {
+                familiar f = f_name.to_familiar();
+                if (f != $familiar[none])
+                    familiars_used_on_inverse[f] = true;
+            }
+            foreach f in $familiars[pair of stomping boots,Frumious Bandersnatch]
+            {
+                if (f.familiar_is_usable() && !(familiars_used_on_inverse contains f))
+                {
+                    familiars_could_imbue_for_del_shannon.listAppend(f);
+                }
+            }
+            if (familiars_could_imbue_for_del_shannon.count() > 0)
+            {
+                description.listAppend("Could feed " + familiars_could_imbue_for_del_shannon.listJoinComponents(", ", "or") + " for +2 free runs.");
+            }
+        }
+        
+        if (familiars_used_on.count() > 0)
+            description.listAppend("Already used on " + familiars_used_on.listJoinComponents(", ", "and") + ".");
+        available_resources_entries.listAppend(ChecklistEntryMake("__item moveable feast", url, ChecklistSubentryMake(pluralize(feastings_left, "moveable feasting", "moveable feastings"), "", description), importance_level_item));
+        //_feastedFamiliars
+    }
+    
     if ($item[cosmic calorie].available_amount() > 0 && in_run)
     {
         string [int][int] table;

@@ -169,7 +169,8 @@ void generatePullList(Checklist [int] checklists)
     if (__misc_state["need to level"])
     {
         pullable_item_list.listAppend(GPItemMake($item[plastic vampire fangs], "Large stat gain, once/day.", 1));
-        pullable_item_list.listAppend(GPItemMake($item[operation patriot shield], "?", 1));
+        pullable_item_list.listAppend(GPItemMake($item[operation patriot shield], "+america", 1));
+        pullable_item_list.listAppend(GPItemMake(lookupItem("the crown of ed the undying"), "Various in-run modifiers. (init, HP, ML/item/meat/etc)", 1));
     }
     pullable_item_list.listAppend(GPItemMake($item[v for vivala mask], "?", 1));
 	
@@ -376,7 +377,7 @@ void generatePullList(Checklist [int] checklists)
             pullable_item_list.listAppend(GPItemMake("Ninja peak climbing", "__item " + missing_ninja_components[0], description));
         }
     }
-    if ($item[talisman o' nam].available_amount() == 0 && !have_outfit_components("Swashbuckling Getup") && $item[pirate fledges].available_amount() == 0 && !__quest_state["Pirate Quest"].finished)
+    if (lookupItem("talisman o' nam").available_amount() == 0 && !have_outfit_components("Swashbuckling Getup") && $item[pirate fledges].available_amount() == 0 && !__quest_state["Pirate Quest"].finished)
     {
         item [int] missing_outfit_components = missing_outfit_components("Swashbuckling Getup");
         if (missing_outfit_components.count() > 0)

@@ -68,12 +68,12 @@ string generateRandomMessage()
     location_messages[$location[the middle chamber]] = "pyramid laundry machine";
     location_messages[$location[the arid, extra-dry desert]] = "can't remember your name";
     location_messages[$location[outside the club]] = "around the world around the world around the world around the world";
-    string conspiracy = "they know where you live, " + get_property("System.user.name").to_lower_case();
     if (my_class() == $class[disco bandit])
     {
         foreach l in $locations[The castle in the clouds in the sky (ground floor),The castle in the clouds in the sky (basement),The castle in the clouds in the sky (top floor)]
             location_messages[l] = "making castles of your disco";
     }
+    string conspiracy = "they know where you live, " + get_property("System.user.name").to_lower_case();
     foreach s in $strings[The Mansion of Dr. Weirdeaux,The Deep Dark Jungle,The Secret Government Laboratory]
         location_messages[lookupLocation(s)] = conspiracy;
     foreach s in $strings[anemone mine (mining),itznotyerzitz mine (in disguise),the knob shaft (mining),The Crimbonium Mine]
@@ -103,7 +103,7 @@ string generateRandomMessage()
     equipment_messages[$item[yearbook club camera]] = "rule of thirds";
     equipment_messages[$item[happiness]] = "bang bang";
     equipment_messages[$item[mysterious silver lapel pin]] = "be seeing you";
-    equipment_messages[$item[Moonthril Circlet]] = "moon tiara";
+    equipment_messages[$item[Moonthril Circlet]] = "moon tiara"; //action!
     equipment_messages[$item[numberwang]] = "simply everyone";
     equipment_messages[$item[Mark V Steam-Hat]] = "girl genius";
     equipment_messages[$item[mr. accessory]] = "you can equip mr. accessories?";
@@ -125,6 +125,8 @@ string generateRandomMessage()
 	
 	if (my_ascensions() == 0)
 		random_messages.listAppend("welcome to the kingdom!");
+    else if (my_ascensions() == 1)
+        random_messages.listAppend("run, while you still have the chance!");
         
     if (__misc_state["In run"])
         random_messages.listAppend("perfect runs are overrated");
@@ -206,7 +208,7 @@ string generateRandomMessage()
         random_messages.listAppend("speed ascension is all I have left, " + lowercase_player_name);
     if (item_drop_modifier() <= -100.0)
         random_messages.listAppend("let go of your material posessions");
-    if ($item[puppet strings].storage_amount() + $item[puppet strings].available_amount() > 0)
+    if ($item[puppet strings].item_amount() > 0)
     {
         //full puppet string support:
         string chosen_message;
@@ -317,7 +319,12 @@ string generateRandomMessage()
     
     if (class_messages contains my_class())
         random_messages.listAppend(class_messages[my_class()]);
-    
+        
+    if (last_monster().phylum == $phylum[penguin])
+    {
+        random_messages.listClear(); //sufficiently rare
+        random_messages.listAppend("dood");
+    }
     
     string [monster] monster_messages;
     //TODO add a message for the procrastination giant
@@ -328,7 +335,12 @@ string generateRandomMessage()
     foreach m in $monsters[Ed the Undying (1),Ed the Undying (2),Ed the Undying (3),Ed the Undying (4),Ed the Undying (5),Ed the Undying (6),Ed the Undying (7)]
         monster_messages[m] = "UNDYING!";
     foreach m in $monsters[Naughty Sorceress, Naughty Sorceress (2), Naughty Sorceress (3)]
-        monster_messages[m] = "she isn't all that bad";
+    {
+        if (holidays_today["Valentine's Day"])
+            monster_messages[m] = "please be mine, sorceress";
+        else
+            monster_messages[m] = "she isn't all that bad";
+    }
     foreach m in $monsters[Shub-Jigguwatt\, Elder God of Violence,Yog-Urt\, Elder Goddess of Hatred]
         monster_messages[m] = "strange aeons";
     monster_messages[$monster[daft punk]] = "can you feel it?";
@@ -373,13 +385,12 @@ string generateRandomMessage()
     monster_messages[lookupMonster("Mr. Loathing")] = HTMLGenerateTagWrap("a", "ruuun! go! get to the towah!", generateMainLinkMap("place.php?whichplace=nstower"));
     if (my_hp() < my_maxhp())
         monster_messages[lookupMonster("smooth criminal")] = "you've been hit by<br>you've been struck by<br><i>a smooth criminal</i>";
+    monster_messages[$monster[demonic icebox]] = "zuul";
     if (monster_messages contains last_monster() && last_monster() != $monster[none])
     {
 		random_messages.listClear();
         random_messages.listAppend(monster_messages[last_monster()]);
     }
-    
-    
     
     
     if (__misc_state_int["Basement Floor"] == 500)
@@ -459,7 +470,7 @@ string generateRandomMessage()
         
     
     
-    foreach s in $strings[rainDohMonster,spookyPuttyMonster,cameraMonster,photocopyMonster,envyfishMonster,iceSculptureMonster,crudeMonster,crappyCameraMonster,romanticTarget]
+    foreach s in $strings[rainDohMonster,spookyPuttyMonster,cameraMonster,photocopyMonster,envyfishMonster,iceSculptureMonster,crudeMonster,crappyCameraMonster,romanticTarget,chateauMonster]
     {
         if (get_property(s) == "Quiet Healer")
         {
@@ -477,7 +488,7 @@ string generateRandomMessage()
 	{
 		random_messages.listClear();
         monster last_monster = get_property_monster("lastEncounter");
-        if (last_monster == lookupMonster("storm cow") && last_monster != $monster[none])
+        if (last_monster == $monster[storm cow] && last_monster != $monster[none])
             random_messages.listAppend("<pre>^__^            <br>(oo)\\_______    <br>(__)\\       )\\/\\<br>    ||----w |   <br>    ||     ||   </pre>");
         else
             random_messages.listAppend("ow");

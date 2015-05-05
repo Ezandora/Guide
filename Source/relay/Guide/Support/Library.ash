@@ -181,11 +181,21 @@ boolean [item] makeConstantItemArrayMutable(boolean [item] array)
     
     return result;
 }
+
 boolean [location] makeConstantLocationArrayMutable(boolean [location] locations)
 {
     boolean [location] result;
     foreach l in locations
         result[l] = locations[l];
+    
+    return result;
+}
+
+boolean [skill] makeConstantSkillArrayMutable(boolean [skill] array)
+{
+    boolean [skill] result;
+    foreach l in array
+        result[l] = array[l];
     
     return result;
 }
@@ -653,7 +663,13 @@ string pluralize(effect e)
 string pluralizeWordy(int value, string non_plural, string plural)
 {
 	if (value == 1)
+    {
+        if (non_plural == "more time") //we're gonna celebrate
+            return "One More Time";
+        else if (non_plural == "more turn")
+            return "One More Turn";
 		return value.int_to_wordy() + " " + non_plural;
+    }
 	else
 		return value.int_to_wordy() + " " + plural;
 }
@@ -1154,4 +1170,10 @@ int ka_dropped(monster m)
     if (m.phylum == $phylum[goblin] || m.phylum == $phylum[humanoid] || m.phylum == $phylum[beast] || m.phylum == $phylum[bug] || m.phylum == $phylum[orc] || m.phylum == $phylum[elemental] || m.phylum == $phylum[elf] || m.phylum == $phylum[penguin])
         return 1;
     return 0;
+}
+
+
+boolean is_underwater_familiar(familiar f)
+{
+    return $familiars[Barrrnacle,Emo Squid,Cuddlefish,Imitation Crab,Magic Dragonfish,Midget Clownfish,Rock Lobster,Urchin Urchin,Grouper Groupie,Squamous Gibberer,Dancing Frog,Adorable Space Buddy] contains f;
 }

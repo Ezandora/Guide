@@ -39,7 +39,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
     subentry.header = base_quest_state.quest_name;
     string url;
     
-    if (base_quest_state.mafia_internal_step < 2 && $item[talisman o' nam].available_amount() == 0)
+    if (base_quest_state.mafia_internal_step < 2 && lookupItem("talisman o' nam").available_amount() == 0)
     {
         //1 -> find palindome
         url = "place.php?whichplace=cove";
@@ -67,13 +67,33 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
             subentry.modifiers.listAppend("-combat");
             subentry.entries.listAppend("Run -combat on the Poop Deck to unlock belowdecks.");
             subentry.entries.listAppend(generateTurnsToSeeNoncombat(80, 1, "unlock belowdecks"));
+            
+            if (__misc_state["need to level"] && $location[the poop deck].noncombat_queue.contains_text("O Cap'm"))
+            {
+                if (my_meat() < 977)
+                {
+                    subentry.entries.listAppend(HTMLGenerateSpanFont("Possibly acquire 977 meat first", "red", "") + ", to gain extra stats from the other NC.");
+                }
+                else
+                {
+                    string coordinates;
+                    if (my_primestat() == $stat[muscle])
+                        coordinates = "(56, 14)";
+                    else if (my_primestat() == $stat[mysticality])
+                        coordinates = "(3, 35)";
+                    else if (my_primestat() == $stat[moxie])
+                        coordinates = "(5, 39)";
+                    if (coordinates.length() > 0)
+                        subentry.entries.listAppend("If you encounter the wheel/O Cap'm adventure, take the helm, and sail to " + coordinates + ".");
+                }
+            }
         }
             
     }
     else
     {
         url = "place.php?whichplace=palindome";
-        if ($item[talisman o' nam].equipped_amount() == 0)
+        if (lookupItem("talisman o' nam").equipped_amount() == 0)
             url = "inventory.php?which=2";
         
         
@@ -102,7 +122,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
         {
             //5 -> fight dr. awkward
             string [int] tasks;
-            if ($item[talisman o' nam].equipped_amount() == 0)
+            if (lookupItem("talisman o' nam").equipped_amount() == 0)
                 tasks.listAppend("equip the Talisman o' Nam");
             if ($item[mega gem].equipped_amount() == 0)
                 tasks.listAppend("equip the Mega Gem");
@@ -182,7 +202,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
             else
             {
                 subentry.entries.listAppend("Talk to Mr. Alarm.");
-                if ($item[talisman o' nam].equipped_amount() == 0)
+                if (lookupItem("talisman o' nam").equipped_amount() == 0)
                     subentry.entries.listAppend("Equip the Talisman o' Nam.");
             }
             //if (7270.to_item() != $item[none] && 7270.to_item().available_amount() > 0)
@@ -203,7 +223,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                 tasks.listAppend("talk to Mr. Alarm to unlock Whitey's Grove");
                 
             subentry.entries.listAppend(tasks.listJoinComponents(", ", "and").capitalizeFirstLetter() + ".");
-            if ($item[talisman o' nam].equipped_amount() == 0)
+            if (lookupItem("talisman o' nam").equipped_amount() == 0)
                 subentry.entries.listAppend("Equip the Talisman o' Nam.");
         }
         else
@@ -342,7 +362,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                 subentry.entries.listClear();
                 subentry.entries.listAppend(single_entry_mode);
             }
-            if (need_palindome_location && $item[talisman o' nam].equipped_amount() == 0)
+            if (need_palindome_location && lookupItem("talisman o' nam").equipped_amount() == 0)
                 subentry.entries.listAppend("Equip the Talisman o' Nam.");
         }
     }

@@ -20,6 +20,664 @@ static
     initialiseItemsThatCraftFood();
 }
 
+//Delete in the future:
+/*buffer generateItemInformationMethod1(location l, monster m, boolean try_for_minimal_display, boolean [monster] monsters_to_display_items_minimally)
+{
+    buffer buf;
+
+    boolean want_item_minimal_display = false;
+    if (try_for_minimal_display || monsters_to_display_items_minimally[m] || monsters_to_display_items_minimally.count() > 2)
+        want_item_minimal_display = true;
+    string item_font_size = "medium";
+    if (true)
+    {
+        string style;
+        style += "font-size:0;";
+        if (want_item_minimal_display)
+            item_font_size = "0.8rem;";
+        if (style.length() > 0)
+            buf.append(HTMLGenerateTagPrefix("div", mapMake("style", style)));
+        else
+            buf.append(HTMLGenerateTagPrefix("div"));
+    }
+    int number_of_slimeling_eligible_items = 0;
+    foreach key, r in m.item_drops_array()
+    {
+        if ($slots[hat,weapon,off-hand,back,shirt,pants,acc1,acc2,acc3] contains r.drop.to_slot())
+            number_of_slimeling_eligible_items += 1;
+    }
+    
+    foreach key, r in m.item_drops_array()
+    {
+        //when "r.type" == "0", I think that means the drop rate is unknown
+        item it = r.drop;
+        int drop_rate = r.rate;
+        int adjusted_base_drop_rate = drop_rate;
+        boolean drop_rate_is_actually_zero = false;
+        boolean drop_rate_is_guess = false;
+        
+        boolean item_is_conditional = r.type.contains_text("c");
+        boolean item_is_stealable_accordion = r.type.contains_text("a");
+        boolean item_is_pickpockable_only = r.type.contains_text("p");
+        boolean item_cannot_be_pickpocketed = r.type.contains_text("n"); //FIXME use this for anything?
+        boolean item_rate_is_fixed = r.type.contains_text("f");
+        buffer trailing_buffer_loop;
+        boolean grey_out_item = false;
+        if (item_is_stealable_accordion && my_class() != $class[accordion thief])
+        {
+            grey_out_item = true;
+            adjusted_base_drop_rate = 0;
+            drop_rate_is_actually_zero = true;
+        }
+        if (item_is_pickpockable_only && !__misc_state["can pickpocket"])
+        {
+            grey_out_item = true;
+            adjusted_base_drop_rate = 0;
+            drop_rate_is_actually_zero = true;
+        }
+        if (it == $item[reflection of a map] && get_property_int("pendingMapReflections") == 0)
+        {
+            grey_out_item = true;
+            adjusted_base_drop_rate = 0;
+            drop_rate_is_actually_zero = true;
+        }
+        if (($items[folder (red),folder (blue),folder (green),folder (magenta),folder (cyan),folder (yellow),folder (smiley face),folder (wizard),folder (space skeleton),folder (D-Team),folder (Ex-Files),folder (skull and crossbones),folder (Knight Writer),folder (Jackass Plumber),folder (holographic fractal),folder (barbarian),folder (rainbow unicorn),folder (Seawolf),folder (dancing dolphins),folder (catfish),folder (tranquil landscape),folder (owl),folder (Stinky Trash Kid),folder (sports car),folder (sportsballs),folder (heavy metal),folder (Yedi),folder (KOLHS)] contains it))
+        {
+            if (drop_rate <= 0)
+            {
+                drop_rate = 5; //assumed
+                adjusted_base_drop_rate = drop_rate; //assumed
+                drop_rate_is_guess = true;
+            }
+            if ($item[over-the-shoulder folder holder].equipped_amount() == 0)
+            {
+                grey_out_item = true;
+                adjusted_base_drop_rate = 0;
+                drop_rate_is_actually_zero = true;
+                drop_rate_is_guess = false;
+            }
+        }
+        
+        if (grey_out_item)
+        {
+            buf.append(HTMLGenerateTagPrefix("span", mapMake("style", "color:grey;")));
+            trailing_buffer_loop.prepend(HTMLGenerateTagSuffix("span"));
+        }
+        
+        int item_count_displaying = m.item_drops_array().count();
+        int items_per_line = 1;
+        string holder_class_name = "r_word_wrap_group";
+        if (try_for_minimal_display)
+            holder_class_name = "r_word_wrap_group";
+        else if (item_count_displaying == 1)
+        {
+            holder_class_name = "r_location_popup_item_holding_block_1x";
+            items_per_line = 1;
+        }
+        else if (item_count_displaying == 2 || ceil(item_count_displaying.to_float() / 2.0) == ceil(item_count_displaying.to_float() / 3.0))
+        {
+            holder_class_name = "r_location_popup_item_holding_block_2x";
+            items_per_line = 2;
+        }
+        else
+        {
+            holder_class_name = "r_location_popup_item_holding_block";
+            items_per_line = 3;
+        }
+        
+        if (true)
+        {
+            string style;
+            buf.append(HTMLGenerateTagPrefix("div", mapMake("class", holder_class_name, "style", style)));
+        }
+        
+        trailing_buffer_loop.prepend(HTMLGenerateTagSuffix("div"));
+        
+        boolean use_tables_here = true;
+        
+        if (true)
+        {
+            string style;
+            if (use_tables_here)
+               style += "display:table;";
+            style += "margin:0px;padding:0px;border-spacing:0px;";
+            buf.append(HTMLGenerateTagPrefix("div", mapMake("style", style)));
+            trailing_buffer_loop.prepend(HTMLGenerateTagSuffix("div"));
+            if (use_tables_here)
+            {
+                buf.append(HTMLGenerateTagPrefix("div", mapMake("style", "display:table-row;")));
+                trailing_buffer_loop.prepend(HTMLGenerateTagSuffix("div"));
+            }
+        }
+        
+        string image_url = "images/itemimages/" + it.smallimage;
+        if (it.smallimage.contains_text("/"))
+            image_url = "images/" + it.smallimage;
+        if (it.image.length() > 0 && !try_for_minimal_display)
+        {
+            if (use_tables_here)
+            {
+                buf.append(HTMLGenerateTagPrefix("div", mapMake("style", "display:table-cell;vertical-align:middle;", "class", "r_location_bar_background_blur")));
+            }
+            int image_size = 30;
+            if (want_item_minimal_display)
+                image_size = 15;
+            string [string] image_map = mapMake("src", image_url, "width", image_size, "height", image_size);
+            image_map["style"] += "display:block;"; //removes implicit pixels around image
+            if (grey_out_item)
+                image_map["style"] += "opacity:0.5;";
+            buf.append(HTMLGenerateTagPrefix("img", image_map));
+            if (use_tables_here)
+            {
+                buf.append(HTMLGenerateTagSuffix("div"));
+            }
+        }
+        if (use_tables_here)
+        {
+            string style = "display:table-cell;vertical-align:middle;padding-left:0.25em;font-size:" + item_font_size + ";";
+            buf.append(HTMLGenerateTagPrefix("div", mapMake("style", style)));
+            trailing_buffer_loop.prepend(HTMLGenerateTagSuffix("div"));
+            
+            buf.append(HTMLGenerateTagPrefix("span", mapMake("class", "r_location_bar_background_blur")));
+            trailing_buffer_loop.prepend(HTMLGenerateTagSuffix("span"));
+        }
+        if (false)
+        {
+            buf.append(HTMLGenerateTagPrefix("div", mapMake("style", "display:none;")));
+            trailing_buffer_loop.prepend(HTMLGenerateTagSuffix("div"));
+        }
+        
+        string [int] item_display_properties;
+        if (adjusted_base_drop_rate == 0 && !drop_rate_is_actually_zero)
+        {
+            if (!item_is_stealable_accordion)
+            {
+                buf.append("?%");
+                buf.append(" ");
+            }
+        }
+        else if (adjusted_base_drop_rate < 100)
+        {
+            float effective_drop_rate = adjusted_base_drop_rate;
+            float item_modifier = l.item_drop_modifier_for_location();
+            if (it.fullness > 0 || (__items_that_craft_food contains it))
+                item_modifier += numeric_modifier("Food Drop");
+            if (it.inebriety > 0)
+                item_modifier += numeric_modifier("Booze Drop");
+            if (it.to_slot() == $slot[hat])
+                item_modifier += numeric_modifier("Hat Drop");
+            if (it.to_slot() == $slot[weapon])
+                item_modifier += numeric_modifier("Weapon Drop");
+            if (it.to_slot() == $slot[off-hand])
+                item_modifier += numeric_modifier("Offhand Drop");
+            if (it.to_slot() == $slot[shirt])
+                item_modifier += numeric_modifier("Shirt Drop");
+            if (it.to_slot() == $slot[pants])
+                item_modifier += numeric_modifier("Pants Drop");
+            if ($slots[acc1,acc2,acc3] contains it.to_slot())
+                item_modifier += numeric_modifier("Accessory Drop");
+            if (it.candy)
+                item_modifier += numeric_modifier("Candy Drop");
+            if ($slots[hat,weapon,off-hand,back,shirt,pants,acc1,acc2,acc3] contains it.to_slot()) //assuming familiar equipment isn't "gear"
+                item_modifier += numeric_modifier("Gear Drop");
+            if (item_is_pickpockable_only)
+            {
+                if (__misc_state["can pickpocket"])
+                    item_modifier = numeric_modifier("pickpocket chance");
+                else
+                    item_modifier = 0.0;
+            }
+            if (item_rate_is_fixed)
+                item_modifier = 0.0;
+            if ($locations[sweet-ade lake,Eager Rice Burrows,Gumdrop Forest] contains l)
+            {
+                item_modifier = 0.0;
+                if (it.candy)
+                    item_modifier += numeric_modifier("Candy Drop");
+            }
+            //FIXME pickpocketting...?
+            
+            effective_drop_rate *= 1.0 + item_modifier / 100.0;
+            if (my_path_id() == PATH_HEAVY_RAINS)
+            {
+                effective_drop_rate = clampf(floor(effective_drop_rate), 0.0, 100.0);
+                float washaway_rate = l.washaway_rate_of_location();
+                effective_drop_rate *= (1.0 - washaway_rate);
+            }
+            if (my_familiar() == $familiar[slimeling] && ($slots[hat,weapon,off-hand,back,shirt,pants,acc1,acc2,acc3] contains it.to_slot()) && effective_drop_rate < 100.0)
+            {
+                effective_drop_rate = clampf(floor(effective_drop_rate), 0.0, 100.0);
+                //number_of_slimeling_eligible_items
+                float slimeling_chance = 0.0;
+                if (number_of_slimeling_eligible_items > 0)
+                    slimeling_chance = 1.0 / number_of_slimeling_eligible_items.to_float();
+                
+                int effective_familiar_weight = my_familiar().familiar_weight() + numeric_modifier("familiar weight");
+                int familiar_weight_from_familiar_equipment = $slot[familiar].equipped_item().numeric_modifier("familiar weight"); //need to cancel it out
+                
+                float slimeling_base_drop_rate = my_familiar().numeric_modifier("item drop", effective_familiar_weight - familiar_weight_from_familiar_equipment, $slot[familiar].equipped_item());
+                if ($slot[familiar].equipped_item() == $item[undissolvable contact lenses])
+                    slimeling_base_drop_rate += 25.0;
+                
+                slimeling_chance *= adjusted_base_drop_rate.to_float() * (1.0 + slimeling_base_drop_rate / 100.0);
+                effective_drop_rate += (100.0 - effective_drop_rate) * (slimeling_chance / 100.0);
+            }
+            
+            effective_drop_rate = clampf(floor(effective_drop_rate), 0.0, 100.0);
+            
+            
+            if (!grey_out_item)
+            {
+                buf.append(effective_drop_rate.floor());
+                if (drop_rate_is_guess)
+                    buf.append("?");
+                buf.append("% ");
+            }
+            
+            if (fabs(effective_drop_rate - drop_rate.to_float()) > 0.01)
+            {
+                buffer line;
+                line.append(drop_rate);
+                line.append("%");
+                if (drop_rate_is_guess)
+                    line.append("?");
+                item_display_properties.listAppend(line.to_string());
+            }
+        }
+        buf.append(it);
+        if (item_is_conditional)
+        {
+            item_display_properties.listAppend("conditional");
+        }
+        if (item_is_stealable_accordion)
+            item_display_properties.listAppend("stealable");
+        if (item_is_pickpockable_only)
+            item_display_properties.listAppend("pickpocket");
+        if (item_rate_is_fixed)
+            item_display_properties.listAppend("unaffected by +item");
+        if (item_display_properties.count() > 0)
+        {
+            buf.append(HTMLGenerateTagPrefix("span", mapMake("class", "r_cl_modifier_inline")));
+            buf.append(" (");
+            buf.append(item_display_properties.listJoinComponents(", "));
+            buf.append(")");
+            buf.append(HTMLGenerateTagSuffix("span"));
+        }
+        buf.append(trailing_buffer_loop);
+    }
+    buf.append(HTMLGenerateTagSuffix("div"));
+    
+    return buf;
+}*/
+
+
+Record LBPItemInformation
+{
+    string image_url;
+    boolean should_display_drop_current;
+    string item_drop_current_information;
+    string item_name;
+    boolean should_display_drop_base;
+    string item_drop_base_information;
+    string [int] tags;
+    boolean greyed_out;
+};
+
+void listAppend(LBPItemInformation [int] list, LBPItemInformation entry)
+{
+	int position = list.count();
+	while (list contains position)
+		position += 1;
+	list[position] = entry;
+}
+
+buffer createItemInformationTableMethod2(int columns, LBPItemInformation [int] items_presenting, boolean want_item_minimal_display, string table_class, string table_style)
+{
+    buffer output_buffer;
+
+    string [string] table_map;
+    table_map = mapMake("style", "display:table;");
+    if (table_style.length() > 0)
+        table_map["style"] += table_style;
+    if (table_class.length() > 0)
+        table_map["class"] = table_class;
+    output_buffer.append(HTMLGenerateTagPrefix("div", table_map));
+    
+    
+    foreach key, info in items_presenting
+    {
+        if (key % columns == 0)
+        {
+            if (key != 0)
+            {
+                output_buffer.append("</div>");
+            }
+            output_buffer.append(HTMLGenerateTagPrefix("div", mapMake("style", "display:table-row;")));
+        }
+        int image_size = 30;
+        if (want_item_minimal_display)
+            image_size = 15;
+        
+        //hack?
+        float percentage = 33;
+        if (columns == 2)
+            percentage = 50;
+        if (columns == 1)
+            percentage = 100;
+        
+        
+        int [int] image_sizes;
+        string [int] image_classes;
+        
+        image_classes.listAppend("r_only_display_if_not_tiny"); // r_only_display_if_not_small");
+        image_sizes.listAppend(image_size);
+        
+        //image_classes.listAppend("r_only_display_if_small");
+        //image_sizes.listAppend(MIN(image_size, 20));
+        
+        string image_url = info.image_url;
+        if (image_url.length() == 0)
+        {
+            image_url = "images/itemimages/confused.gif";
+        }
+        
+        foreach key in image_sizes
+        {
+            int using_size = image_sizes[key];
+            string image_class = image_classes[key];
+            output_buffer.append(HTMLGenerateTagPrefix("div", mapMake("style", "display:table-cell;max-width:" + using_size + ";max-height:" + using_size + ";min-width:" + using_size + ";min-height:" + using_size + ";padding-left:3px;padding-right:3px;vertical-align:middle;", "class", image_class)));
+            
+            //Generate image:
+            string [string] image_map = mapMake("src", image_url, "width", using_size, "height", using_size);
+            
+            image_map["style"] += "display:block;"; //removes implicit pixels around image
+            if (info.greyed_out)
+                image_map["style"] += "opacity:0.5;";
+            image_map["alt"] = info.item_name;
+            output_buffer.append(HTMLGenerateTagPrefix("img", image_map));
+            output_buffer.append("</div>");
+        }
+        
+        
+        string main_tag_style = "display:table-cell;width:" + percentage + "%;vertical-align:middle;";
+        if (info.greyed_out)
+            main_tag_style += "color:gray;";
+        if (want_item_minimal_display)
+            main_tag_style += "font-size:0.9em;";
+        output_buffer.append(HTMLGenerateTagPrefix("div", mapMake("style", main_tag_style)));
+        if (want_item_minimal_display)
+            output_buffer.append(HTMLGenerateTagPrefix("span", mapMake("class", "r_location_bar_background_blur_small")));
+        else
+            output_buffer.append(HTMLGenerateTagPrefix("span", mapMake("class", "r_location_bar_background_blur")));
+        
+        if (info.should_display_drop_current)
+        {
+            output_buffer.append(info.item_drop_current_information);
+            output_buffer.append(" ");
+        }
+        output_buffer.append(info.item_name);
+        
+        string [int] secondary_line;
+        if (info.should_display_drop_base)
+            secondary_line.listAppend(info.item_drop_base_information);
+        if (info.tags.count() > 0)
+            secondary_line.listAppendList(info.tags);
+        
+        if (secondary_line.count() > 0)
+        {
+            string [string] tag_map = mapMake("class", "r_cl_modifier_inline");
+            if (info.greyed_out)
+                tag_map["style"] += "color:gray;";
+            string wrap_type = "span"; //"div";
+            if (want_item_minimal_display)
+                wrap_type = "span";
+            else
+                tag_map["style"] += "display:block;";
+            
+            output_buffer.append(HTMLGenerateTagPrefix(wrap_type, tag_map));
+            if (!want_item_minimal_display)
+                output_buffer.append(HTMLGenerateTagPrefix("span", mapMake("class", "r_location_bar_background_blur")));
+            if (want_item_minimal_display)
+                output_buffer.append(" (");
+            output_buffer.append(secondary_line.listJoinComponents(", "));
+            if (want_item_minimal_display)
+                output_buffer.append(")");
+            if (!want_item_minimal_display)
+                output_buffer.append("</span>");
+            output_buffer.append(HTMLGenerateTagSuffix(wrap_type));
+        }
+        
+        output_buffer.append("</span>");
+        output_buffer.append("</div>");
+    }
+    output_buffer.append("</div>"); //row
+    output_buffer.append("</div>"); //table
+    return output_buffer;
+}
+
+
+buffer generateItemInformationMethod2(location l, monster m, boolean try_for_minimal_display, boolean [monster] monsters_to_display_items_minimally)
+{
+    int number_of_slimeling_eligible_items = 0;
+    foreach key, r in m.item_drops_array()
+    {
+        if ($slots[hat,weapon,off-hand,back,shirt,pants,acc1,acc2,acc3] contains r.drop.to_slot())
+            number_of_slimeling_eligible_items += 1;
+    }
+    
+    
+    LBPItemInformation [int] items_presenting;
+    
+    foreach key, r in m.item_drops_array()
+    {
+        item it = r.drop;
+        int base_drop_rate = r.rate;
+        
+        
+        
+        int adjusted_base_drop_rate = base_drop_rate;
+        boolean drop_rate_is_actually_zero = false;
+        boolean drop_rate_is_guess = false;
+        
+        //r-type?
+        boolean item_is_conditional = r.type.contains_text("c");
+        boolean item_is_stealable_accordion = r.type.contains_text("a");
+        boolean item_is_pickpockable_only = r.type.contains_text("p");
+        boolean item_cannot_be_pickpocketed = r.type.contains_text("n"); //FIXME use this for anything?
+        boolean item_rate_is_fixed = r.type.contains_text("f");
+        boolean grey_out_item = false;
+        if (item_is_stealable_accordion && my_class() != $class[accordion thief])
+        {
+            grey_out_item = true;
+            adjusted_base_drop_rate = 0;
+            drop_rate_is_actually_zero = true;
+        }
+        if (item_is_pickpockable_only && !__misc_state["can pickpocket"])
+        {
+            grey_out_item = true;
+            adjusted_base_drop_rate = 0;
+            drop_rate_is_actually_zero = true;
+        }
+        if (it == $item[reflection of a map] && get_property_int("pendingMapReflections") == 0)
+        {
+            grey_out_item = true;
+            adjusted_base_drop_rate = 0;
+            drop_rate_is_actually_zero = true;
+        }
+        if (($items[folder (red),folder (blue),folder (green),folder (magenta),folder (cyan),folder (yellow),folder (smiley face),folder (wizard),folder (space skeleton),folder (D-Team),folder (Ex-Files),folder (skull and crossbones),folder (Knight Writer),folder (Jackass Plumber),folder (holographic fractal),folder (barbarian),folder (rainbow unicorn),folder (Seawolf),folder (dancing dolphins),folder (catfish),folder (tranquil landscape),folder (owl),folder (Stinky Trash Kid),folder (sports car),folder (sportsballs),folder (heavy metal),folder (Yedi),folder (KOLHS)] contains it))
+        {
+            if (base_drop_rate <= 0)
+            {
+                base_drop_rate = 5; //assumed
+                adjusted_base_drop_rate = base_drop_rate; //assumed
+                drop_rate_is_guess = true;
+            }
+            if ($item[over-the-shoulder folder holder].equipped_amount() == 0)
+            {
+                grey_out_item = true;
+                adjusted_base_drop_rate = 0;
+                drop_rate_is_actually_zero = true;
+                drop_rate_is_guess = false;
+            }
+        }
+        
+        if (adjusted_base_drop_rate > 0 && adjusted_base_drop_rate < 100)
+        {
+
+            float effective_drop_rate = adjusted_base_drop_rate;
+            float item_modifier = l.item_drop_modifier_for_location();
+            if (it.fullness > 0 || (__items_that_craft_food contains it))
+                item_modifier += numeric_modifier("Food Drop");
+            if (it.inebriety > 0)
+                item_modifier += numeric_modifier("Booze Drop");
+            if (it.to_slot() == $slot[hat])
+                item_modifier += numeric_modifier("Hat Drop");
+            if (it.to_slot() == $slot[weapon])
+                item_modifier += numeric_modifier("Weapon Drop");
+            if (it.to_slot() == $slot[off-hand])
+                item_modifier += numeric_modifier("Offhand Drop");
+            if (it.to_slot() == $slot[shirt])
+                item_modifier += numeric_modifier("Shirt Drop");
+            if (it.to_slot() == $slot[pants])
+                item_modifier += numeric_modifier("Pants Drop");
+            if ($slots[acc1,acc2,acc3] contains it.to_slot())
+                item_modifier += numeric_modifier("Accessory Drop");
+            if (it.candy)
+                item_modifier += numeric_modifier("Candy Drop");
+            if ($slots[hat,weapon,off-hand,back,shirt,pants,acc1,acc2,acc3] contains it.to_slot()) //assuming familiar equipment isn't "gear"
+                item_modifier += numeric_modifier("Gear Drop");
+            //does Bear Essence give special picnic baskets you find, or does it affect picnic baskets in-game?
+            if (item_is_pickpockable_only)
+            {
+                if (__misc_state["can pickpocket"])
+                    item_modifier = numeric_modifier("pickpocket chance");
+                else
+                    item_modifier = 0.0;
+            }
+            if (item_rate_is_fixed)
+                item_modifier = 0.0;
+            if ($locations[sweet-ade lake,Eager Rice Burrows,Gumdrop Forest] contains l)
+            {
+                item_modifier = 0.0;
+                if (it.candy)
+                    item_modifier += numeric_modifier("Candy Drop");
+            }
+            //FIXME pickpocketting...?
+            
+            effective_drop_rate *= 1.0 + item_modifier / 100.0;
+            if (my_path_id() == PATH_HEAVY_RAINS)
+            {
+                effective_drop_rate = clampf(floor(effective_drop_rate), 0.0, 100.0);
+                float washaway_rate = l.washaway_rate_of_location();
+                effective_drop_rate *= (1.0 - washaway_rate);
+            }
+            if (my_familiar() == $familiar[slimeling] && ($slots[hat,weapon,off-hand,back,shirt,pants,acc1,acc2,acc3] contains it.to_slot()) && effective_drop_rate < 100.0)
+            {
+                effective_drop_rate = clampf(floor(effective_drop_rate), 0.0, 100.0);
+                //number_of_slimeling_eligible_items
+                float slimeling_chance = 0.0;
+                if (number_of_slimeling_eligible_items > 0)
+                    slimeling_chance = 1.0 / number_of_slimeling_eligible_items.to_float();
+                
+                int effective_familiar_weight = my_familiar().familiar_weight() + numeric_modifier("familiar weight");
+                int familiar_weight_from_familiar_equipment = $slot[familiar].equipped_item().numeric_modifier("familiar weight"); //need to cancel it out
+                
+                float slimeling_base_drop_rate = my_familiar().numeric_modifier("item drop", effective_familiar_weight - familiar_weight_from_familiar_equipment, $slot[familiar].equipped_item());
+                if ($slot[familiar].equipped_item() == $item[undissolvable contact lenses])
+                    slimeling_base_drop_rate += 25.0;
+                
+                slimeling_chance *= adjusted_base_drop_rate.to_float() * (1.0 + slimeling_base_drop_rate / 100.0);
+                effective_drop_rate += (100.0 - effective_drop_rate) * (slimeling_chance / 100.0);
+            }
+            
+            effective_drop_rate = clampf(floor(effective_drop_rate), 0.0, 100.0);
+            adjusted_base_drop_rate = effective_drop_rate;
+            
+            if (l.environment == "underwater") //FIXME underwater drops are complicated and I'd have to look deeply into this to verify, so we just list a ? for now
+                adjusted_base_drop_rate = -1;
+        }
+
+        
+        
+        //FIXME implement this
+        LBPItemInformation info;
+        
+        info.image_url = "images/itemimages/" + it.smallimage;
+        if (it.smallimage.contains_text("/"))
+            info.image_url = "images/" + it.smallimage;
+        
+        if (!grey_out_item)
+        {
+            if (adjusted_base_drop_rate <= 0)
+            {
+                info.should_display_drop_current = true;
+                info.item_drop_current_information = "?%";
+            }
+            else if (adjusted_base_drop_rate < 100 || base_drop_rate < 100)
+            {
+                info.should_display_drop_current = true;
+                if (drop_rate_is_guess)
+                    info.item_drop_current_information = adjusted_base_drop_rate + "?%";
+                else
+                    info.item_drop_current_information = adjusted_base_drop_rate + "%";
+            }
+        }
+        info.item_name = it;
+        if (it.available_amount() == 0)
+            info.item_name = "<i>" + info.item_name + "</i>";
+        
+        if (base_drop_rate != adjusted_base_drop_rate && base_drop_rate > 0 && base_drop_rate < 100 && !grey_out_item)
+        {
+            info.should_display_drop_base = true;
+            if (drop_rate_is_guess)
+                info.item_drop_base_information = base_drop_rate + "?%";
+            else
+                info.item_drop_base_information = base_drop_rate + "%";
+        }
+        if (item_is_conditional)
+            info.tags.listAppend("conditional");
+        if (item_is_pickpockable_only)
+            info.tags.listAppend("pickpocket");
+        if (item_rate_is_fixed)
+            info.tags.listAppend("unaffected by +item");
+        info.greyed_out = grey_out_item;
+        
+        items_presenting.listAppend(info);
+    }
+
+    
+    int columns = 3;
+    if (items_presenting.count() % 2 == 0 && items_presenting.count() % 3 != 0 && items_presenting.count() < 8)
+        columns = 2;
+    if (items_presenting.count() < columns)
+        columns = 1;
+    
+    boolean want_item_minimal_display = false;
+    if (try_for_minimal_display || monsters_to_display_items_minimally[m] || monsters_to_display_items_minimally.count() > 2)
+        want_item_minimal_display = true;
+    
+    boolean display_alternate_for_smaller_sizes = (columns == 3);
+    
+    buffer output_buffer;
+    output_buffer.append(HTMLGenerateTagPrefix("div", mapMake("style", "padding-left:" + (__setting_indention_width_in_em * 0.5) + "em;")));
+    string table_class = "";
+    if (display_alternate_for_smaller_sizes)
+        table_class = "r_only_display_if_not_tiny r_only_display_if_not_small";
+    
+    output_buffer.append(createItemInformationTableMethod2(columns, items_presenting, want_item_minimal_display, table_class, ""));
+    
+    if (display_alternate_for_smaller_sizes)
+    {
+        int maximum_columns = 2;
+        if (items_presenting.count() >= 7 || monsters_to_display_items_minimally.count() >= 5) //hippy camp
+            maximum_columns = 3;
+        output_buffer.append(createItemInformationTableMethod2(MIN(columns, maximum_columns), items_presenting, want_item_minimal_display, "r_only_display_if_not_large r_only_display_if_not_medium r_do_not_display_if_media_queries_unsupported", "")); //font-size:0.95em;
+    }
+    output_buffer.append("</div>"); //container
+    
+    return output_buffer;
+}
+
 string generateLocationBarModifierEntries(string [int] entries_in)
 {
     if (entries_in.count() == 1)
@@ -416,11 +1074,12 @@ buffer generateLocationPopup(float bottom_coordinates)
         sort monster_display_order by -appearance_rates_adjusted[value] - (possible_alien_monsters[value] ? -100.0 : 0);
         sort monster_display_order by -appearance_rates_next_turn[value] - (possible_alien_monsters[value] ? -100.0 : 0);
     }
+    int entries_displayed = 0;
     int monsters_displayed = 0;
     
     boolean can_display_as_2x = true;
     
-    if (false) //trying with it off - it feels better to use layout more effectively, rather than try to line up everything. example area: domed city of grimacia
+    /*if (false) //trying with it off - it feels better to use layout more effectively, rather than try to line up everything. example area: domed city of grimacia
     {
         foreach key, m in monster_display_order
         {
@@ -434,7 +1093,7 @@ buffer generateLocationPopup(float bottom_coordinates)
             else
                 can_display_as_2x = false;
         }
-    }
+    }*/
     
     float rate_nc_cancel_multiplier = 1.0;
     if (appearance_rates_adjusted[$monster[none]] > 0.0)
@@ -457,8 +1116,6 @@ buffer generateLocationPopup(float bottom_coordinates)
         if (m.item_drops_array().count() > item_minimal_display_limit && total_string_length >= 100)
             monsters_to_display_items_minimally[m] = true;
     }
-    
-    
     foreach key, m in monster_display_order
     {
         string [int] fl_entries;
@@ -469,14 +1126,17 @@ buffer generateLocationPopup(float bottom_coordinates)
         float [int] fl_entry_fixed_width_percentage;
         
         string monster_image_url = "images/adventureimages/" + m.image;
+        if (m.image == "toxbeast1.gif")
+            monster_image_url = "images/adventureimages/toxbeast3.gif";
         if (m.image.length() == 0)
             monster_image_url = "";
         ServerImageStats monster_image_stats = ServerImageStatsOfImageURL(monster_image_url);
         float rate = appearance_rates_adjusted[m] * rate_nc_cancel_multiplier;
         float next_rate = appearance_rates_next_turn[m]; //already normalised for monsters
-        monsters_displayed += 1;
-        if (monsters_displayed > 1)
+        if (entries_displayed > 0)
             buf.append(HTMLGenerateTagPrefix("hr", mapMake("style", "margin:0px;")));
+        entries_displayed += 1;
+        monsters_displayed += 1;
             
         boolean avoid_outputting_conditional = false;
         boolean monster_cannot_be_encountered = false;
@@ -565,7 +1225,7 @@ buffer generateLocationPopup(float bottom_coordinates)
                 if (location_of_first_top_pixel > 0)
                     image_style += "margin-top:-" + location_of_first_top_pixel + "px;";
             }
-            buf.append(HTMLGenerateTagPrefix("img", mapMake("src", monster_image_url, "style", image_style)));
+            buf.append(HTMLGenerateTagPrefix("img", mapMake("src", monster_image_url, "style", image_style, "alt", m)));
         }
         
         if (true)
@@ -579,8 +1239,7 @@ buffer generateLocationPopup(float bottom_coordinates)
             }
             else
                 style = "font-size:1.2em;";
-            style += "text-align:left;";
-            //buf.append(HTMLGenerateTagWrap("span", m.capitalizeFirstLetter(), mapMake("class", "r_bold", "style", style)));
+            style += "text-align:left;padding-top:2px;";
             
             fl_entries.listAppend(m.capitalizeFirstLetter());
             fl_entry_classes[fl_entries.count() - 1] = "r_bold r_location_bar_ellipsis_entry";
@@ -689,7 +1348,10 @@ buffer generateLocationPopup(float bottom_coordinates)
                 //stats_l1.listAppend(m.base_hp + " HP");
             if (m.phylum != $phylum[none])
             {
-                string line = m.phylum;
+                string line;
+                if ($monsters[broodling seal] contains m)
+                    line = "<del>cute</del><br>";
+                line += m.phylum;
                 if (true && m.attack_element != $element[none])
                     line = HTMLGenerateSpanOfClass(line, "r_element_" + m.attack_element + "_desaturated");
                 stats_l1.listAppend(line);
@@ -702,11 +1364,16 @@ buffer generateLocationPopup(float bottom_coordinates)
             {
                 float average_meat = (m.min_meat + m.max_meat) * 0.5;
                 average_meat *= (1.0 + meat_drop_modifier() / 100.0);
-                if (average_meat > 0)
-                    stats_l1.listAppend(average_meat.round() + " meat");
+                if (average_meat >= 25) //ignore really low amounts
+                {
+                    if (l.environment == "underwater") //FIXME calculate this properly
+                        stats_l1.listAppend("? meat");
+                    else
+                        stats_l1.listAppend(average_meat.round() + " meat");
+                }
             }
-            if (m.raw_attack > 0 && false) //is this really useful?
-                stats_l2.listAppend(m.raw_attack + " ML");
+            //if (m.raw_attack > 0 && false) //is this really useful?
+                //stats_l2.listAppend(m.raw_attack + " ML");
             //if (m.raw_defense > 0)
                 //stats_l2.listAppend(m.raw_defense + " def");
             
@@ -736,12 +1403,15 @@ buffer generateLocationPopup(float bottom_coordinates)
                 remove stats_l1[2];
             }
             
-            string line = stats_l1.listJoinComponents(" / ");
-            if (stats_l2.count() > 0)
-                line += "<br>" + stats_l2.listJoinComponents(" / ");
-            fl_entries.listAppend(line);
-            fl_entry_styles[fl_entries.count() - 1] = "text-align:right;";
-            fl_entry_width_weight[fl_entries.count() - 1] = 1.4;
+            if (stats_l1.count() + stats_l2.count() > 0)
+            {
+                string line = stats_l1.listJoinComponents(" / ");
+                if (stats_l2.count() > 0)
+                    line += "<br>" + stats_l2.listJoinComponents(" / ");
+                fl_entries.listAppend(line);
+                fl_entry_styles[fl_entries.count() - 1] = "text-align:right;";
+                fl_entry_width_weight[fl_entries.count() - 1] = 1.4;
+            }
         }
         
         //add background blur:
@@ -763,6 +1433,13 @@ buffer generateLocationPopup(float bottom_coordinates)
                 fl_entry_fixed_width_percentage[1] = 0.2;
                 fl_entry_fixed_width_percentage[2] = 0.3;
             }
+            else if (fl_entries.count() == 4)
+            {
+                fl_entry_fixed_width_percentage[0] = 0.40;
+                fl_entry_fixed_width_percentage[1] = 0.2;
+                fl_entry_fixed_width_percentage[2] = 0.15;
+                fl_entry_fixed_width_percentage[3] = 0.25;
+            }
         }
             //remove fl_entry_fixed_width_percentage[0];
         
@@ -771,296 +1448,100 @@ buffer generateLocationPopup(float bottom_coordinates)
         
         if (item_count_displaying > 0 && !try_for_minimal_display && !monster_cannot_be_encountered && true)
         {
-            boolean want_item_minimal_display = false;
-            if (try_for_minimal_display || monsters_to_display_items_minimally[m] || monsters_to_display_items_minimally.count() > 2)
-                want_item_minimal_display = true;
-            string item_font_size = "medium";
-            if (true)
-            {
-                string style;
-                style += "font-size:0;";
-                if (want_item_minimal_display)
-                    item_font_size = "0.8rem;";
-                if (style.length() > 0)
-                    buf.append(HTMLGenerateTagPrefix("div", mapMake("style", style)));
-                else
-                    buf.append(HTMLGenerateTagPrefix("div"));
-            }
-            int number_of_slimeling_eligible_items = 0;
-            foreach key, r in m.item_drops_array()
-            {
-                if ($slots[hat,weapon,off-hand,back,shirt,pants,acc1,acc2,acc3] contains r.drop.to_slot())
-                    number_of_slimeling_eligible_items += 1;
-            }
-            
-            foreach key, r in m.item_drops_array()
-            {
-                //when "r.type" == "0", I think that means the drop rate is unknown
-                item it = r.drop;
-                int drop_rate = r.rate;
-                int adjusted_base_drop_rate = drop_rate;
-                boolean drop_rate_is_actually_zero = false;
-                boolean drop_rate_is_guess = false;
-                
-                boolean item_is_conditional = r.type.contains_text("c");
-                boolean item_is_stealable_accordion = r.type.contains_text("a");
-                boolean item_is_pickpockable_only = r.type.contains_text("p");
-                boolean item_cannot_be_pickpocketed = r.type.contains_text("n"); //FIXME use this for anything?
-                boolean item_rate_is_fixed = r.type.contains_text("f");
-                buffer trailing_buffer_loop;
-                boolean grey_out_item = false;
-                if (item_is_stealable_accordion && my_class() != $class[accordion thief])
-                {
-                    grey_out_item = true;
-                    adjusted_base_drop_rate = 0;
-                    drop_rate_is_actually_zero = true;
-                }
-                if (item_is_pickpockable_only && !__misc_state["can pickpocket"])
-                {
-                    grey_out_item = true;
-                    adjusted_base_drop_rate = 0;
-                    drop_rate_is_actually_zero = true;
-                }
-                if (it == $item[reflection of a map] && get_property_int("pendingMapReflections") == 0)
-                {
-                    grey_out_item = true;
-                    adjusted_base_drop_rate = 0;
-                    drop_rate_is_actually_zero = true;
-                }
-                if (($items[folder (red),folder (blue),folder (green),folder (magenta),folder (cyan),folder (yellow),folder (smiley face),folder (wizard),folder (space skeleton),folder (D-Team),folder (Ex-Files),folder (skull and crossbones),folder (Knight Writer),folder (Jackass Plumber),folder (holographic fractal),folder (barbarian),folder (rainbow unicorn),folder (Seawolf),folder (dancing dolphins),folder (catfish),folder (tranquil landscape),folder (owl),folder (Stinky Trash Kid),folder (sports car),folder (sportsballs),folder (heavy metal),folder (Yedi),folder (KOLHS)] contains it))
-                {
-                    if (drop_rate <= 0)
-                    {
-                        drop_rate = 5; //assumed
-                        adjusted_base_drop_rate = drop_rate; //assumed
-                        drop_rate_is_guess = true;
-                    }
-                    if ($item[over-the-shoulder folder holder].equipped_amount() == 0)
-                    {
-                        grey_out_item = true;
-                        adjusted_base_drop_rate = 0;
-                        drop_rate_is_actually_zero = true;
-                        drop_rate_is_guess = false;
-                    }
-                }
-                
-                if (grey_out_item)
-                {
-                    buf.append(HTMLGenerateTagPrefix("span", mapMake("style", "color:grey;")));
-                    trailing_buffer_loop.prepend(HTMLGenerateTagSuffix("span"));
-                }
-                
-                int items_per_line = 1;
-                string holder_class_name = "r_word_wrap_group";
-                if (try_for_minimal_display)
-                    holder_class_name = "r_word_wrap_group";
-                else if (item_count_displaying == 1)
-                {
-                    holder_class_name = "r_location_popup_item_holding_block_1x";
-                    items_per_line = 1;
-                }
-                else if (item_count_displaying == 2 || ceil(item_count_displaying.to_float() / 2.0) == ceil(item_count_displaying.to_float() / 3.0))
-                {
-                    holder_class_name = "r_location_popup_item_holding_block_2x";
-                    items_per_line = 2;
-                }
-                else
-                {
-                    holder_class_name = "r_location_popup_item_holding_block";
-                    items_per_line = 3;
-                }
-                
-                if (true)
-                {
-                    string style;
-                    buf.append(HTMLGenerateTagPrefix("div", mapMake("class", holder_class_name, "style", style)));
-                }
-                
-                trailing_buffer_loop.prepend(HTMLGenerateTagSuffix("div"));
-                
-                boolean use_tables_here = true;
-                
-                if (true)
-                {
-                    string style;
-                    if (use_tables_here)
-                       style += "display:table;";
-                    style += "margin:0px;padding:0px;border-spacing:0px;";
-                    buf.append(HTMLGenerateTagPrefix("div", mapMake("style", style)));
-                    trailing_buffer_loop.prepend(HTMLGenerateTagSuffix("div"));
-                    if (use_tables_here)
-                    {
-                        buf.append(HTMLGenerateTagPrefix("div", mapMake("style", "display:table-row;")));
-                        trailing_buffer_loop.prepend(HTMLGenerateTagSuffix("div"));
-                    }
-                }
-                
-                string image_url = "images/itemimages/" + it.smallimage;
-                if (it.smallimage.contains_text("/"))
-                    image_url = "images/" + it.smallimage;
-                if (it.image.length() > 0 && !try_for_minimal_display)
-                {
-                    if (use_tables_here)
-                    {
-                        buf.append(HTMLGenerateTagPrefix("div", mapMake("style", "display:table-cell;vertical-align:middle;", "class", "r_location_bar_background_blur")));
-                    }
-                    int image_size = 30;
-                    if (want_item_minimal_display)
-                        image_size = 15;
-                    string [string] image_map = mapMake("src", image_url, "width", image_size, "height", image_size);
-                    image_map["style"] += "display:block;"; //removes implicit pixels around image. css
-                    if (grey_out_item)
-                        image_map["style"] += "opacity:0.5;";
-                    buf.append(HTMLGenerateTagPrefix("img", image_map));
-                    if (use_tables_here)
-                    {
-                        buf.append(HTMLGenerateTagSuffix("div"));
-                    }
-                }
-                if (use_tables_here)
-                {
-                    string style = "display:table-cell;vertical-align:middle;padding-left:0.25em;font-size:" + item_font_size + ";";
-                    buf.append(HTMLGenerateTagPrefix("div", mapMake("style", style)));
-                    trailing_buffer_loop.prepend(HTMLGenerateTagSuffix("div"));
-                    
-                    buf.append(HTMLGenerateTagPrefix("span", mapMake("class", "r_location_bar_background_blur")));
-                    trailing_buffer_loop.prepend(HTMLGenerateTagSuffix("span"));
-                }
-                if (false)
-                {
-                    buf.append(HTMLGenerateTagPrefix("div", mapMake("style", "display:none;")));
-                    trailing_buffer_loop.prepend(HTMLGenerateTagSuffix("div"));
-                }
-                
-                string [int] item_display_properties;
-                if (adjusted_base_drop_rate == 0 && !drop_rate_is_actually_zero)
-                {
-                    if (!item_is_stealable_accordion)
-                    {
-                        buf.append("?%");
-                        buf.append(" ");
-                    }
-                }
-                else if (adjusted_base_drop_rate < 100)
-                {
-                    float effective_drop_rate = adjusted_base_drop_rate;
-                    float item_modifier = l.item_drop_modifier_for_location();
-                    if (it.fullness > 0 || (__items_that_craft_food contains it))
-                        item_modifier += numeric_modifier("Food Drop");
-                    if (it.inebriety > 0)
-                        item_modifier += numeric_modifier("Booze Drop");
-                    if (it.to_slot() == $slot[hat])
-                        item_modifier += numeric_modifier("Hat Drop");
-                    if (it.to_slot() == $slot[weapon])
-                        item_modifier += numeric_modifier("Weapon Drop");
-                    if (it.to_slot() == $slot[off-hand])
-                        item_modifier += numeric_modifier("Offhand Drop");
-                    if (it.to_slot() == $slot[shirt])
-                        item_modifier += numeric_modifier("Shirt Drop");
-                    if (it.to_slot() == $slot[pants])
-                        item_modifier += numeric_modifier("Pants Drop");
-                    if ($slots[acc1,acc2,acc3] contains it.to_slot())
-                        item_modifier += numeric_modifier("Accessory Drop");
-                    if (it.candy)
-                        item_modifier += numeric_modifier("Candy Drop");
-                    if ($slots[hat,weapon,off-hand,back,shirt,pants,acc1,acc2,acc3] contains it.to_slot()) //assuming familiar equipment isn't "gear"
-                        item_modifier += numeric_modifier("Gear Drop");
-                    if (item_is_pickpockable_only)
-                    {
-                        if (__misc_state["can pickpocket"])
-                            item_modifier = numeric_modifier("pickpocket chance");
-                        else
-                            item_modifier = 0.0;
-                    }
-                    if (item_rate_is_fixed)
-                        item_modifier = 0.0;
-                    if ($locations[sweet-ade lake,Eager Rice Burrows,Gumdrop Forest] contains l)
-                    {
-                        item_modifier = 0.0;
-                        if (it.candy)
-                            item_modifier += numeric_modifier("Candy Drop");
-                    }
-                    //FIXME pickpocketting...?
-                    
-                    effective_drop_rate *= 1.0 + item_modifier / 100.0;
-                    if (my_path_id() == PATH_HEAVY_RAINS)
-                    {
-                        effective_drop_rate = clampf(floor(effective_drop_rate), 0.0, 100.0);
-                        float washaway_rate = l.washaway_rate_of_location();
-                        effective_drop_rate *= (1.0 - washaway_rate);
-                    }
-                    if (my_familiar() == $familiar[slimeling] && ($slots[hat,weapon,off-hand,back,shirt,pants,acc1,acc2,acc3] contains it.to_slot()) && effective_drop_rate < 100.0)
-                    {
-                        effective_drop_rate = clampf(floor(effective_drop_rate), 0.0, 100.0);
-                        //number_of_slimeling_eligible_items
-                        float slimeling_chance = 0.0;
-                        if (number_of_slimeling_eligible_items > 0)
-                            slimeling_chance = 1.0 / number_of_slimeling_eligible_items.to_float();
-                        
-                        int effective_familiar_weight = my_familiar().familiar_weight() + numeric_modifier("familiar weight");
-                        int familiar_weight_from_familiar_equipment = $slot[familiar].equipped_item().numeric_modifier("familiar weight"); //need to cancel it out
-                        
-                        float slimeling_base_drop_rate = my_familiar().numeric_modifier("item drop", effective_familiar_weight - familiar_weight_from_familiar_equipment, $slot[familiar].equipped_item());
-                        if ($slot[familiar].equipped_item() == $item[undissolvable contact lenses])
-                            slimeling_base_drop_rate += 25.0;
-                        
-                        slimeling_chance *= adjusted_base_drop_rate.to_float() * (1.0 + slimeling_base_drop_rate / 100.0);
-                        effective_drop_rate += (100.0 - effective_drop_rate) * (slimeling_chance / 100.0);
-                    }
-                    
-                    effective_drop_rate = clampf(floor(effective_drop_rate), 0.0, 100.0);
-                    
-                    
-                    if (!grey_out_item)
-                    {
-                        buf.append(effective_drop_rate.floor());
-                        if (drop_rate_is_guess)
-                            buf.append("?");
-                        buf.append("% ");
-                    }
-                    
-                    if (fabs(effective_drop_rate - drop_rate.to_float()) > 0.01)
-                    {
-                        buffer line;
-                        line.append(drop_rate);
-                        line.append("%");
-                        if (drop_rate_is_guess)
-                            line.append("?");
-                        item_display_properties.listAppend(line.to_string());
-                    }
-                }
-                buf.append(it);
-                if (item_is_conditional)
-                {
-                    item_display_properties.listAppend("conditional");
-                }
-                if (item_is_stealable_accordion)
-                    item_display_properties.listAppend("stealable");
-                if (item_is_pickpockable_only)
-                    item_display_properties.listAppend("pickpocket");
-                if (item_rate_is_fixed)
-                    item_display_properties.listAppend("unaffected by +item");
-                if (item_display_properties.count() > 0)
-                {
-                    buf.append(HTMLGenerateTagPrefix("span", mapMake("class", "r_cl_modifier_inline")));
-                    buf.append(" (");
-                    buf.append(item_display_properties.listJoinComponents(", "));
-                    buf.append(")");
-                    buf.append(HTMLGenerateTagSuffix("span"));
-                }
-                buf.append(trailing_buffer_loop);
-            }
-            buf.append(HTMLGenerateTagSuffix("div"));
+            buf.append(generateItemInformationMethod2(l, m, try_for_minimal_display,monsters_to_display_items_minimally));
         }
         
         //buf.append(HTMLGenerateTagSuffix("div"));
         buf.append(HTMLGenerateTagSuffix("div"));
         //break;
     }
-    if (monsters_displayed == 0)
+    
+    boolean output_hr_override = false;
+    
+    if (false)
+    {
+        string [int] lines;
+        string [int] lines_offscreen;
+        if (l.parentdesc.length() > 0 && l.parentdesc != "No Category")
+            lines.listAppend(l.parentdesc);
+        if (!__misc_state["In run"] && l.turns_spent > 0)
+            lines_offscreen.listAppend(pluralize(l.turns_spent, "turn spent", "turns spent"));
+        
+        if (lines.count() + lines_offscreen.count() > 0)
+        {
+            if (entries_displayed >= 1)
+                buf.append(HTMLGenerateTagPrefix("hr", mapMake("style", "margin:0px;")));
+            buf.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_cl_modifier_inline r_center", "style", "height:1.1em;")));
+            buf.append(lines.listJoinComponents(" - "));
+            buf.append("</div>");
+            if (lines_offscreen.count() > 0)
+            {
+                buf.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_cl_modifier_inline", "style", "position:absolute;right:0px;top:0px;")));
+                buf.append(lines_offscreen.listJoinComponents(" - "));
+                buf.append("</div>");
+            }
+            entries_displayed += 1;
+        }
+    }
+    if (false)
+    {
+        string [int] fl_entries;
+        string [int] fl_entry_urls;
+        string [int] fl_entry_styles;
+        string [int] fl_entry_classes;
+        float [int] fl_entry_width_weight;
+        float [int] fl_entry_fixed_width_percentage;
+        
+        if (l.parentdesc.length() > 0 && l.parentdesc != "No Category")
+            fl_entries.listAppend(l.parentdesc);
+        else
+            fl_entries.listAppend("");
+        
+        /*Error err;
+        if (!l.locationAvailable(err))
+        {
+            if (!err.was_error)
+                fl_entries.listAppend("Inaccessible"); //doesn't make any sense unless we add that one feature
+        }*/
+        
+        if (!__misc_state["In run"] && l.turns_spent > 0)
+            fl_entries.listAppend(pluralize(l.turns_spent, "turn spent", "turns spent"));
+            
+        
+        if (fl_entries.count() == 1)
+            fl_entries.listAppend("");
+        
+        boolean all_entries_blank = true;
+        foreach key, entry in fl_entries
+        {
+            if (entry.length() > 0)
+                all_entries_blank = false;
+        }
+        if (fl_entries.count() > 0 && !all_entries_blank)
+        {
+            if (entries_displayed >= 1)
+                buf.append(HTMLGenerateTagPrefix("hr", mapMake("style", "margin:0px;")));
+            /*if (fl_entries.count() == 2)
+            {
+                fl_entry_styles[1] += "text-align:right;";
+            }*/
+            fl_entry_styles[0] += "text-align:left;";
+            fl_entry_styles[0] += "padding-left:" + __setting_indention_width + ";";
+            foreach key in fl_entries
+                fl_entry_styles[key] += "height:1.25em;";
+            buf.append(generateLocationBarTable(fl_entries, fl_entry_urls, fl_entry_styles, fl_entry_classes, fl_entry_width_weight, fl_entry_fixed_width_percentage, ""));
+            entries_displayed += 1;
+            
+            //output_hr_override = true;
+        }
+        
+    }
+    
+    if (entries_displayed == 0)
         return "".to_buffer();
-    //buf.append(l.appearance_rates(true).to_json());
     buf.append(HTMLGenerateTagSuffix("div"));
+    //if (output_hr_override)
+            //buf.append("<div style=\"position:absolute;bottom:-1px;min-height:2px;width:100%;z-index:10000;background:blue;\"></div>");
     buf.append(HTMLGenerateTagSuffix("div"));
     
     return buf;

@@ -131,7 +131,13 @@ void generateMissingItems(Checklist [int] checklists)
     
     if (lookupItem("electric boning knife").available_amount() == 0 && __quest_state["Level 13"].state_boolean["wall of bones will need to be defeated"])
     {
-        items_needed_entries.listAppend(ChecklistEntryMake("__item electric boning knife", $location[the castle in the clouds in the sky (ground floor)].getClickableURLForLocation(), ChecklistSubentryMake("Electric boning knife", "-combat", listMake("Found from an NC on the ground floor of the castle in the clouds in the sky.", "Or towerkill."))));
+        string [int] description;
+        description.listAppend("Found from an NC on the ground floor of the castle in the clouds in the sky.");
+        if (lookupSkill("garbage nova").skill_is_usable())
+            description.listAppend("Ignore this, you can towerkill with Garbage Nova.");
+        else
+            description.listAppend("Or towerkill.");
+        items_needed_entries.listAppend(ChecklistEntryMake("__item electric boning knife", $location[the castle in the clouds in the sky (ground floor)].getClickableURLForLocation(), ChecklistSubentryMake("Electric boning knife", "-combat", description)));
     }
     if (lookupItem("beehive").available_amount() == 0 && __quest_state["Level 13"].state_boolean["wall of skin will need to be defeated"])
     {

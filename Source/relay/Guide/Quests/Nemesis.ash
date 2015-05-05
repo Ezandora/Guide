@@ -689,7 +689,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             url = "guild.php";
         }
         else
-            subentry.entries.listAppend("Acquire epic weapon. (" + epic_weapon + ")");
+            subentry.entries.listAppend("Acquire " + epic_weapon + ".");
     }
     else if (base_quest_state.mafia_internal_step <= 2)
     {
@@ -824,14 +824,14 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         }
         
     }
-    else if (base_quest_state.mafia_internal_step == 15)
+    else if (base_quest_state.mafia_internal_step == 15 && false)
     {
         //15	Now that you've dealt with your Nemesis' assassins and found a map to the secret tropical island volcano lair, it's time to take the fight to your foe. Booyah
         //find island
         url = "inventory.php?which=3";
         subentry.entries.listAppend("Use the secret tropical island volcano lair map.");
     }
-    else if (base_quest_state.mafia_internal_step == 16)
+    else if (base_quest_state.mafia_internal_step == 16 || base_quest_state.mafia_internal_step == 15) //mafia bug - doesn't advance properly
     {
         //16	You've arrived at the secret tropical island volcano lair, and it's time to finally put a stop to this Nemesis nonsense once and for all. As soon as you can find where they're hiding. Maybe you can find someone to ask
         if ($location[The Nemesis' Lair].turnsAttemptedInLocation() > 0)
