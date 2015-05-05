@@ -18486,9 +18486,9 @@ void QStenchAirportGiveMeFuelGenerateTasks(ChecklistEntry [int] task_entries)
 	subentry.header = state.quest_name;
 	string url = "place.php?whichplace=airport_stench";
     
-    if ($item[toxic globule].available_amount() < 20)
+    if (lookupItem("toxic globule").available_amount() < 20)
     {
-        int globules_needed = clampi(20 - $item[toxic globule].available_amount(), 0, 20);
+        int globules_needed = clampi(20 - lookupItem("toxic globule").available_amount(), 0, 20);
         if (can_interact())
         {
             subentry.entries.listAppend("Buy " + pluralize(globules_needed, "more toxic globule", "more toxic globules") + " in the mall.");
@@ -18502,9 +18502,9 @@ void QStenchAirportGiveMeFuelGenerateTasks(ChecklistEntry [int] task_entries)
     }
     else
     {
-        if ($item[toxic globule].item_amount() < 20)
+        if (lookupItem("toxic globule").item_amount() < 20)
         {
-            int globules_needed = clampi(20 - $item[toxic globule].item_amount(), 0, 20);
+            int globules_needed = clampi(20 - lookupItem("toxic globule").item_amount(), 0, 20);
             subentry.entries.listAppend("Pull " + pluralize(globules_needed, "more toxic globule", "more toxic globules") + ".");
         }
         else
