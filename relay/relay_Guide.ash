@@ -1,7 +1,7 @@
 //This script and its support scripts are in the public domain.
 
 //These settings are for development. Don't worry about editing them.
-string __version = "1.1.23";
+string __version = "1.2";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -23,7 +23,7 @@ boolean __setting_gray_navbar = true;
 boolean __use_table_based_layouts = false; //backup implementation
 boolean __setting_use_kol_css = false; //images/styles.css
 boolean __setting_show_location_bar = true;
-boolean __setting_enable_location_popup_box = false; //not fully implemented yet. enable if you want!
+boolean __setting_enable_location_popup_box = true;
 boolean __setting_location_bar_uses_last_location = true;
 boolean __setting_location_bar_fixed_layout = true;
 boolean __setting_location_bar_limit_max_width = true;
@@ -187,6 +187,27 @@ void listAppend(skill [int][int] list, skill [int] entry)
 	list[position] = entry;
 }
 
+void listAppend(familiar [int][int] list, familiar [int] entry)
+{
+	int position = list.count();
+	while (list contains position)
+		position += 1;
+	list[position] = entry;
+}
+
+
+void listAppend(skill [int] list, boolean [skill] entry)
+{
+    foreach v in entry
+        list.listAppend(v);
+}
+
+void listAppend(item [int] list, boolean [item] entry)
+{
+    foreach v in entry
+        list.listAppend(v);
+}
+
 void listPrepend(string [int] list, string entry)
 {
 	int position = 0;
@@ -279,6 +300,12 @@ location [int] listMakeBlankLocation()
 monster [int] listMakeBlankMonster()
 {
 	monster [int] result;
+	return result;
+}
+
+familiar [int] listMakeBlankFamiliar()
+{
+	familiar [int] result;
 	return result;
 }
 
@@ -789,6 +816,18 @@ int listKeyForIndex(location [int] list, int index)
 	return -1;
 }
 
+int listKeyForIndex(familiar [int] list, int index)
+{
+	int i = 0;
+	foreach key in list
+	{
+		if (i == index)
+			return key;
+		i += 1;
+	}
+	return -1;
+}
+
 int llistKeyForIndex(string [int][int] list, int index)
 {
 	int i = 0;
@@ -814,6 +853,15 @@ location listGetRandomObject(location [int] list)
 {
     if (list.count() == 0)
         return $location[none];
+    if (list.count() == 1)
+    	return list[listKeyForIndex(list, 0)];
+    return list[listKeyForIndex(list, random(list.count()))];
+}
+
+familiar listGetRandomObject(familiar [int] list)
+{
+    if (list.count() == 0)
+        return $familiar[none];
     if (list.count() == 1)
     	return list[listKeyForIndex(list, 0)];
     return list[listKeyForIndex(list, random(list.count()))];
@@ -1335,11 +1383,21 @@ boolean [item] makeConstantItemArrayMutable(boolean [item] array)
     
     return result;
 }
+
 boolean [location] makeConstantLocationArrayMutable(boolean [location] locations)
 {
     boolean [location] result;
     foreach l in locations
         result[l] = locations[l];
+    
+    return result;
+}
+
+boolean [skill] makeConstantSkillArrayMutable(boolean [skill] array)
+{
+    boolean [skill] result;
+    foreach l in array
+        result[l] = array[l];
     
     return result;
 }
@@ -1807,7 +1865,13 @@ string pluralize(effect e)
 string pluralizeWordy(int value, string non_plural, string plural)
 {
 	if (value == 1)
+    {
+        if (non_plural == "more time") //we're gonna celebrate
+            return "One More Time";
+        else if (non_plural == "more turn")
+            return "One More Turn";
 		return value.int_to_wordy() + " " + non_plural;
+    }
 	else
 		return value.int_to_wordy() + " " + plural;
 }
@@ -2308,6 +2372,12 @@ int ka_dropped(monster m)
     if (m.phylum == $phylum[goblin] || m.phylum == $phylum[humanoid] || m.phylum == $phylum[beast] || m.phylum == $phylum[bug] || m.phylum == $phylum[orc] || m.phylum == $phylum[elemental] || m.phylum == $phylum[elf] || m.phylum == $phylum[penguin])
         return 1;
     return 0;
+}
+
+
+boolean is_underwater_familiar(familiar f)
+{
+    return $familiars[Barrrnacle,Emo Squid,Cuddlefish,Imitation Crab,Magic Dragonfish,Midget Clownfish,Rock Lobster,Urchin Urchin,Grouper Groupie,Squamous Gibberer,Dancing Frog,Adorable Space Buddy] contains f;
 }
 
 
@@ -2847,7 +2917,7 @@ boolean CounterWanderingMonsterMayHitNextTurn()
 {
     monster last_monster = get_property_monster("lastEncounter");
     
-    if ($monsters[Black Crayon Beast,Black Crayon Beetle,Black Crayon Constellation,Black Crayon Golem,Black Crayon Demon,Black Crayon Man,Black Crayon Elemental,Black Crayon Crimbo Elf,Black Crayon Fish,Black Crayon Goblin,Black Crayon Hippy,Black Crayon Hobo,Black Crayon Shambling Monstrosity,Black Crayon Manloid,Black Crayon Mer-kin,Black Crayon Frat Orc,Black Crayon Penguin,Black Crayon Pirate,Black Crayon Flower,Black Crayon Slime,Black Crayon Undead Thing,Black Crayon Spiraling Shape,angry bassist,blue-haired girl,evil ex-girlfriend,peeved roommate,random scenester] contains last_monster) //bit of a hack - if they just fought a hipster monster (hopefully not faxing it), then the wandering monster isn't up this turn
+    if ($monsters[Black Crayon Beast,Black Crayon Beetle,Black Crayon Constellation,Black Crayon Golem,Black Crayon Demon,Black Crayon Man,Black Crayon Elemental,Black Crayon Crimbo Elf,Black Crayon Fish,Black Crayon Goblin,Black Crayon Hippy,Black Crayon Hobo,Black Crayon Shambling Monstrosity,Black Crayon Manloid,Black Crayon Mer-kin,Black Crayon Frat Orc,Black Crayon Penguin,Black Crayon Pirate,Black Crayon Flower,Black Crayon Slime,Black Crayon Undead Thing,Black Crayon Spiraling Shape,angry bassist,blue-haired girl,evil ex-girlfriend,peeved roommate,random scenester] contains last_monster) //bit of a hack - if they just fought a hipster monster (hopefully not faxing it), then the wandering monster isn't up this turn. though... __last_turn_definitely_visited_adventure_php should handle that...
     {
         return false;
     }
@@ -3727,6 +3797,7 @@ void KOLImagesInit()
 	__kol_images["Lady Spookyraven"] = KOLImageMake("images/otherimages/spookyraven/sr_ladys.gif", Vec2iMake(65,65), RectMake(0, 0, 64, 37));
 	__kol_images["Yeti"] = KOLImageMake("images/adventureimages/yeti.gif", Vec2iMake(100,100), RectMake(12, 0, 80, 98));
 	__kol_images["Lights Out"] = KOLImageMake("images/adventureimages/lightning.gif", Vec2iMake(100,100), RectMake(0, 10, 99, 96));
+	__kol_images["stench airport kiosk"] = KOLImageMake("images/otherimages/dinseylandfill_bg.gif", Vec2iMake(500,500), RectMake(163, 438, 225, 494));
     
 	
 	string class_name = my_class().to_string();
@@ -4091,8 +4162,7 @@ static
         ServerImageStats [string] ism;
         int [string] ysm;
         
-ism["borgelf1.gif"] = im(11, 74);ism["borgelf4.gif"] = im(19, 82);ism["borgelf2.gif"] = im(25, 87);ism["borgelf3.gif"] = im(14, 78);ism["handymanjay.gif"] = im(5, 92);ism["1335.gif"] = im(7, 93);ism["miner.gif"] = im(1, 95);ism["foreman.gif"] = im(2, 94);ism["gremlinamc.gif"] = im(12, 78);ism["abcrusher.gif"] = im(12, 89);ism["adv_smart4.gif"] = im(13, 97);ism["lower_b.gif"] = im(16, 74);ism["electriceel.gif"] = im(1, 98);ism["1boy2cups.gif"] = im(2, 91);ism["advecho.gif"] = im(0, 99);ism["whitebat.gif"] = im(33, 70);ism["mar_alert.gif"] = im(0, 99);ism["alielf.gif"] = im(4, 95);ism["spelunkalien.gif"] = im(17, 81);ism["muthamster.gif"] = im(5, 95);ism["spelunkalienq.gif"] = im(150, 150, 17, 141);ism["spelunkufo.gif"] = im(21, 78);ism["steve.gif"] = im(0, 98);ism["catfish.gif"] = im(41, 91);ism["giant_alphabet.gif"] = im(1, 97);ism["elf_amateur.gif"] = im(10, 83);ism["ninja.gif"] = im(13, 85);ism["pirate2.gif"] = im(6, 93);ism["crimbominer3.gif"] = im(2, 97);ism["amokputty.gif"] = im(5, 84);ism["srpainting2.gif"] = im(20, 82);ism["regret3.gif"] = im(27, 79);ism["oldguardstatue.gif"] = im(0, 97);ism["pebbleman.gif"] = im(2, 89);ism["mariner.gif"] = im(5, 93);ism["protspirit.gif"] = im(7, 86);ism["guardstatue.gif"] = im(0, 98);ism["bb_horror.gif"] = im(125, 100, 5, 89);ism["anemone.gif"] = im(0, 97);ism["bb_doctor.gif"] = im(7, 83);ism["angel.gif"] = im(6, 87);ism["angerman.gif"] = im(200, 250, 15, 242);ism["anglerbush.gif"] = im(0, 97);ism["mh_bassist.gif"] = im(2, 97);ism["angbugbear.gif"] = im(6, 91);ism["bb_caveman.gif"] = im(4, 92);ism["pinata.gif"] = im(0, 97);ism["madpoet.gif"] = im(7, 93);ism["raccoon.gif"] = im(6, 93);ism["hunter7.gif"] = im(0, 98);ism["nightstand2.gif"] = im(13, 91);ism["darkstand.gif"] = im(1, 98);ism["nightstand.gif"] = im(2, 96);ism["nightstand4.gif"] = im(1, 99);ism["fear2.gif"] = im(1, 95);ism["nightstand3.gif"] = im(7, 95);ism["spittoon.gif"] = im(3, 99);ism["smiley.gif"] = im(30, 67);ism["annoyfairy.gif"] = im(15, 76);ism["spiderserver.gif"] = im(7, 94);ism["lizardman.gif"] = im(4, 94);ism["aquabat.gif"] = im(150, 100, 15, 79);ism["aquaconda.gif"] = im(5, 91);ism["aquagoblin.gif"] = im(0, 99);ism["2headseal.gif"] = im(9, 81);ism["adv_spooky4.gif"] = im(4, 96);ism["adv_stench3.gif"] = im(5, 95);ism["astronomer.gif"] = im(6, 93);ism["aquadargon.gif"] = im(200, 200, 6, 190);ism["elf_auteur.gif"] = im(15, 78);ism["aojarls.gif"] = im(6, 93);ism["disco_awkward.gif"] = im(4, 95);ism["axehandle.gif"] = im(9, 89);ism["axewound.gif"] = im(9, 87);ism["saucezombie.gif"] = im(0, 97);ism["stone_serpent.gif"] = im(0, 98);ism["stone_sheep.gif"] = im(21, 81);ism["baconsnake.gif"] = im(4, 96);ism["badascii.gif"] = im(35, 61);ism["pa_potatoes.gif"] = im(8, 95);ism["warhipmo.gif"] = im(44, 98);ism["baiowulf.gif"] = im(8, 94);ism["spelbanana.gif"] = im(30, 30, 29, 30);ism["bangyomama.gif"] = im(2, 89);ism["banjowizard.gif"] = im(0, 99);ism["banshee.gif"] = im(6, 98);ism["bar.gif"] = im(13, 88);ism["ratsworth.gif"] = im(0, 96);ism["ballbat.gif"] = im(7, 60);ism["basicgolem.gif"] = im(6, 89);ism["spelunkbat.gif"] = im(15, 77);ism["bb_bat.gif"] = im(27, 81);ism["adv_spooky3.gif"] = im(1, 93);ism["batrat.gif"] = im(25, 75);ism["snakeboss5.gif"] = im(150, 150, 13, 141);ism["bb_mech.gif"] = im(1, 98);ism["aboo_wars.gif"] = im(3, 98);ism["gremlinbat.gif"] = im(11, 83);ism["bazookafish.gif"] = im(25, 68);ism["beanbat.gif"] = im(28, 63);ism["topi2.gif"] = im(9, 93);ism["earbeast.gif"] = im(14, 80);ism["eyebeast.gif"] = im(17, 99);ism["beaver.gif"] = im(13, 77);ism["spelunkbee.gif"] = im(3, 86);ism["beeswarm.gif"] = im(3, 97);ism["beethoven.gif"] = im(5, 94);ism["beebeegunner.gif"] = im(16, 70);ism["beebeeking.gif"] = im(16, 79);ism["beebeequeue.gif"] = im(4, 97);ism["beefybat.gif"] = im(18, 58);ism["beelephant.gif"] = im(0, 89);ism["batter.gif"] = im(0, 99);ism["warfratbg.gif"] = im(0, 95);ism["straw_stench.gif"] = im(15, 93);ism["bellhop.gif"] = im(17, 89);ism["carpet.gif"] = im(33, 75);ism["novelist.gif"] = im(2, 92);ism["wraith2.gif"] = im(15, 89);ism["biclops.gif"] = im(4, 92);ism["spider1.gif"] = im(15, 78);ism["bigmeat.gif"] = im(0, 94);ism["whelps2.gif"] = im(1, 98);ism["twins_bigwheel.gif"] = im(200, 100, 5, 95);ism["aquaniewski.gif"] = im(0, 97);ism["bigface.gif"] = im(14, 92);ism["vib2.gif"] = im(3, 97);ism["blimp.gif"] = im(8, 94);ism["blackadder.gif"] = im(12, 79);ism["blackcat.gif"] = im(4, 90);ism["cray_beast.gif"] = im(200, 200, 41, 171);ism["cray_bug.gif"] = im(200, 200, 43, 152);ism["cray_const.gif"] = im(200, 200, 15, 193);ism["cray_elf.gif"] = im(200, 200, 22, 181);ism["cray_demon.gif"] = im(200, 200, 32, 178);ism["cray_elemental.gif"] = im(200, 200, 8, 191);ism["cray_fish.gif"] = im(200, 200, 30, 145);ism["cray_plant.gif"] = im(200, 200, 9, 184);ism["cray_orc.gif"] = im(200, 200, 32, 169);ism["cray_goblin.gif"] = im(200, 200, 32, 167);ism["cray_construct.gif"] = im(200, 200, 23, 183);ism["cray_hippy.gif"] = im(200, 200, 19, 163);ism["cray_hobo.gif"] = im(200, 200, 1, 198);ism["cray_dude.gif"] = im(200, 200, 7, 182);ism["cray_humanoid.gif"] = im(200, 200, 12, 188);ism["cray_merkin.gif"] = im(200, 200, 17, 172);ism["cray_penguin.gif"] = im(200, 200, 31, 185);ism["cray_pirate.gif"] = im(200, 200, 18, 179);ism["cray_horror.gif"] = im(200, 200, 1, 197);ism["cray_slime.gif"] = im(200, 200, 61, 166);ism["cray_weird.gif"] = im(200, 200, 27, 186);ism["cray_undead.gif"] = im(200, 200, 22, 162);ism["blackfriar.gif"] = im(5, 97);ism["blknight.gif"] = im(4, 90);ism["witchywoman.gif"] = im(1, 99);ism["bb_ninja.gif"] = im(5, 91);ism["panther.gif"] = im(11, 93);ism["blpudding.gif"] = im(47, 98);ism["blackwidow.gif"] = im(0, 99);ism["pengblackop.gif"] = im(3, 98);ism["blackbush.gif"] = im(15, 98);ism["squid.gif"] = im(3, 95);ism["bluecultist.gif"] = im(0, 99);ism["mh_bluehair.gif"] = im(1, 98);ism["blur.gif"] = im(4, 97);ism["boaraffe.gif"] = im(0, 99);ism["bobrace.gif"] = im(11, 92);ism["bogleech.gif"] = im(10, 91);ism["bogskeleton.gif"] = im(1, 95);ism["bogart.gif"] = im(11, 91);ism["elf_boltcutters.gif"] = im(5, 78);ism["foss_wyrm.gif"] = im(200, 200, 0, 196);ism["bookbat.gif"] = im(22, 65);ism["boothslime.gif"] = im(2, 97);ism["bootycrab.gif"] = im(20, 85);ism["boozegiant.gif"] = im(5, 92);ism["bossbat.gif"] = im(26, 73);ism["crimonster3.gif"] = im(4, 96);ism["cricket.gif"] = im(5, 97);ism["box.gif"] = im(9, 87);ism["pa_muffin.gif"] = im(13, 87);ism["mystwander5.gif"] = im(5, 99);ism["broombrain.gif"] = im(6, 95);ism["bram.gif"] = im(8, 92);ism["breadgolem.gif"] = im(6, 90);ism["breakdancer.gif"] = im(0, 97);ism["brick_sleaze.gif"] = im(24, 96);ism["brick_cold.gif"] = im(1, 95);ism["brick_hot.gif"] = im(0, 99);ism["brick_spooky.gif"] = im(4, 95);ism["brick_stench.gif"] = im(4, 94);ism["brickoairship.gif"] = im(300, 300, 6, 295);ism["brickobat.gif"] = im(3, 68);ism["brickocathedral.gif"] = im(500, 450, 17, 443);ism["brickoelephant.gif"] = im(150, 150, 34, 132);ism["brickogchicken.gif"] = im(600, 450, 15, 444);ism["brickoctopus.gif"] = im(150, 150, 9, 143);ism["brickoblob.gif"] = im(57, 94);ism["brickooyster.gif"] = im(16, 91);ism["brickopython.gif"] = im(450, 100, 11, 87);ism["brickoturtle.gif"] = im(22, 77);ism["brickovacuum.gif"] = im(200, 200, 17, 182);ism["casebat.gif"] = im(40, 63);ism["bath_bubble.gif"] = im(17, 76);ism["iceguy5.gif"] = im(0, 97);ism["broctopus.gif"] = im(0, 99);ism["bronzechef.gif"] = im(0, 99);ism["babyseal.gif"] = im(6, 84);ism["togafrat.gif"] = im(2, 96);ism["twins_bubble.gif"] = im(13, 94);ism["bb_ghost.gif"] = im(5, 89);ism["bb_captain.gif"] = im(150, 150, 3, 143);ism["bb_drone.gif"] = im(2, 97);ism["bb_mortician.gif"] = im(9, 91);ism["robosurgeon.gif"] = im(14, 88);ism["bb_science.gif"] = im(6, 88);ism["binbox.gif"] = im(4, 91);ism["bugbugbear.gif"] = im(6, 91);ism["bulletbill.gif"] = im(15, 83);ism["bullseal.gif"] = im(9, 95);ism["ratbunch.gif"] = im(1, 92);ism["pa_meat.gif"] = im(5, 96);ism["bunsen.gif"] = im(9, 87);ism["sidekick.gif"] = im(5, 97);ism["adv_hot3.gif"] = im(18, 95);ism["snakeboss4.gif"] = im(150, 150, 19, 133);ism["bishop.gif"] = im(54, 94);ism["bush.gif"] = im(8, 93);ism["bushippy.gif"] = im(8, 94);ism["hedgerow.gif"] = im(25, 79);ism["pa_knife.gif"] = im(1, 87);ism["buzzerker.gif"] = im(11, 84);ism["buzzy.gif"] = im(0, 97);ism["chum2.gif"] = im(2, 89);ism["chumchief.gif"] = im(7, 94);ism["carnivore.gif"] = im(6, 96);ism["laundrycabinet.gif"] = im(1, 98);ism["cactuary.gif"] = im(0, 97);ism["cameltoe.gif"] = im(5, 97);ism["cancan.gif"] = im(4, 97);ism["pecantree.gif"] = im(1, 98);ism["yamgolem.gif"] = im(0, 97);ism["gourd_cangoblin.gif"] = im(9, 88);ism["carbuncletop.gif"] = im(1, 92);ism["cargocrab.gif"] = im(7, 94);ism["dillplant.gif"] = im(2, 99);ism["carniv.gif"] = im(5, 94);ism["pa_eggs.gif"] = im(22, 86);ism["thecastle.gif"] = im(21, 78);ism["catalien.gif"] = im(21, 89);ism["spelunkcaveman.gif"] = im(7, 91);ism["cavedan.gif"] = im(0, 97);ism["cavefrat.gif"] = im(2, 95);ism["cavehippy.gif"] = im(0, 97);ism["cavesorority.gif"] = im(0, 95);ism["cavewomyn.gif"] = im(0, 94);ism["butt.gif"] = im(16, 81);ism["pengcement.gif"] = im(2, 97);ism["centurion.gif"] = im(7, 80);ism["adv_hot2.gif"] = im(2, 96);ism["chimp.gif"] = im(6, 90);ism["chalkdust.gif"] = im(6, 98);ism["hunter10.gif"] = im(1, 97);ism["c10chatty.gif"] = im(0, 96);ism["strix.gif"] = im(4, 93);ism["adv_stench2.gif"] = im(1, 97);ism["adv_fast1.gif"] = im(4, 93);ism["chefboy.gif"] = im(0, 98);ism["chester.gif"] = im(1, 97);ism["robotceo.gif"] = im(5, 92);ism["chocohare.gif"] = im(23, 93);ism["ccprairie.gif"] = im(1, 97);ism["soupgolem.gif"] = im(3, 93);ism["ciggirl.gif"] = im(0, 99);ism["animelf3.gif"] = im(19, 80);ism["cavebars.gif"] = im(0, 98);ism["clancy.gif"] = im(9, 94);ism["bathtub.gif"] = im(50, 97);ism["claygolem.gif"] = im(1, 98);ism["aboo_wiz.gif"] = im(3, 96);ism["cleanroomdemon.gif"] = im(5, 95);ism["cleanpirate.gif"] = im(3, 94);ism["girlpirate.gif"] = im(7, 91);ism["colaoff1.gif"] = im(4, 94);ism["colasol1.gif"] = im(6, 96);ism["rock_hopper.gif"] = im(0, 99);ism["whiskers.gif"] = im(8, 84);ism["clubfish.gif"] = im(1, 90);ism["prim_bact.gif"] = im(0, 98);ism["coaltergeist.gif"] = im(5, 91);ism["kg_oven.gif"] = im(8, 97);ism["spelunkcobra.gif"] = im(14, 77);ism["cocktailshrimp.gif"] = im(0, 99);ism["dvcoldbear1.gif"] = im(3, 97);ism["coldcutter.gif"] = im(2, 94);ism["dvcoldghost1.gif"] = im(0, 96);ism["coldhobo5.gif"] = im(2, 92);ism["wood_cold.gif"] = im(13, 96);ism["dvcoldskel1.gif"] = im(1, 95);ism["dvcoldvamp1.gif"] = im(3, 94);ism["dvcoldwolf1.gif"] = im(1, 98);ism["dvcoldzom1.gif"] = im(5, 98);ism["minegolem.gif"] = im(4, 89);ism["spider2.gif"] = im(20, 83);ism["pianist.gif"] = im(0, 98);ism["lilgoth.gif"] = im(19, 96);ism["2zombies.gif"] = im(6, 92);ism["conhippy.gif"] = im(2, 94);ism["regret1.gif"] = im(2, 90);ism["pa_cutter.gif"] = im(21, 76);ism["crimonster2.gif"] = im(0, 99);ism["coppertender.gif"] = im(6, 91);ism["fatzombie.gif"] = im(9, 93);ism["prim_alga.gif"] = im(0, 98);ism["makeupwraith.gif"] = im(11, 81);ism["bakula.gif"] = im(7, 90);ism["drunkula.gif"] = im(100, 175, 5, 166);ism["drunkula_hm.gif"] = im(300, 175, 2, 159);ism["courtesan.gif"] = im(5, 95);ism["cowskeleton.gif"] = im(1, 97);ism["craggybart.gif"] = im(3, 91);ism["crate.gif"] = im(10, 89);ism["stone_raven.gif"] = im(21, 85);ism["bastard.gif"] = im(3, 94);ism["adv_smooth2.gif"] = im(3, 94);ism["clown.gif"] = im(3, 97);ism["creepydoll.gif"] = im(4, 96);ism["dianoga.gif"] = im(11, 87);ism["twins_ginger.gif"] = im(1, 98);ism["creepygirl.gif"] = im(32, 97);ism["pa_torch.gif"] = im(3, 92);ism["crimbomega.gif"] = im(400, 550, 7, 545);ism["spelunkcroc.gif"] = im(6, 89);ism["croqueteer.gif"] = im(1, 90);ism["dustmote.gif"] = im(20, 86);ism["hippy3.gif"] = im(8, 94);ism["crustpirate.gif"] = im(1, 95);ism["crys_rock.gif"] = im(200, 150, 2, 137);ism["cubistbull.gif"] = im(0, 99);ism["spelunkhawk.gif"] = im(3, 95);ism["curmpirate.gif"] = im(6, 93);ism["cybercop.gif"] = im(2, 97);ism["prim_cyru.gif"] = im(0, 98);ism["dad_machine.gif"] = im(400, 300, 6, 294);ism["daftpunk.gif"] = im(3, 97);ism["biggoat.gif"] = im(2, 98);ism["ooze.gif"] = im(45, 93);ism["dirtyape.gif"] = im(0, 99);ism["chad.gif"] = im(3, 93);ism["rorshach.gif"] = im(8, 79);ism["bath_showerhead.gif"] = im(2, 97);ism["venomtrout.gif"] = im(47, 99);ism["vice.gif"] = im(20, 85);ism["shiv_dead.gif"] = im(3, 94);ism["lumberjack.gif"] = im(5, 92);ism["whiteshark.gif"] = im(15, 71);ism["5_4a.gif"] = im(200, 200, 0, 197);ism["demfridge.gif"] = im(1, 99);ism["jigsaw.gif"] = im(12, 83);ism["demoninja.gif"] = im(17, 89);ism["liana.gif"] = im(13, 90);ism["wanderacc1.gif"] = im(1, 97);ism["hunter8.gif"] = im(0, 97);ism["goldfarmer.gif"] = im(9, 91);ism["spelunkdevil.gif"] = im(0, 99);ism["digitalug.gif"] = im(17, 87);ism["hippy2.gif"] = im(8, 93);ism["dirtyoldlihc.gif"] = im(6, 99);ism["bandit.gif"] = im(1, 95);ism["dinbox.gif"] = im(16, 91);ism["c10files.gif"] = im(7, 98);ism["divingbelle.gif"] = im(0, 99);ism["js_oh.gif"] = im(5, 91);ism["pede.gif"] = im(20, 81);ism["dogalien.gif"] = im(3, 92);ism["catdog.gif"] = im(17, 85);ism["iceguy2.gif"] = im(8, 97);ism["doncrimbo.gif"] = im(0, 99);ism["dwarf_dopey.gif"] = im(0, 99);ism["doubtman.gif"] = im(200, 200, 2, 193);ism["doughbat.gif"] = im(41, 63);ism["aquard.gif"] = im(0, 99);ism["drawkward.gif"] = im(4, 95);ism["drabbard.gif"] = im(8, 91);ism["droll.gif"] = im(18, 87);ism["dropbase.gif"] = im(12, 80);ism["drownedsailor.gif"] = im(1, 97);ism["drownedbeat.gif"] = im(0, 95);ism["ducknicedrunk.gif"] = im(1, 94);ism["drunkgoat.gif"] = im(2, 98);ism["pyg_drunk.gif"] = im(9, 99);ism["drunkminer.gif"] = im(0, 98);ism["hobo.gif"] = im(5, 91);ism["rat.gif"] = im(33, 67);ism["ratking.gif"] = im(200, 200, 7, 185);ism["aboo_dipshit.gif"] = im(1, 97);ism["straw_spooky.gif"] = im(39, 91);ism["dwarfgnome.gif"] = im(17, 84);ism["dweebie.gif"] = im(5, 94);ism["colaoff2.gif"] = im(4, 94);ism["colasol2.gif"] = im(6, 96);ism["eve.gif"] = im(0, 93);ism["eagle.gif"] = im(0, 98);ism["ed.gif"] = im(1, 98);ism["ed2.gif"] = im(1, 98);ism["ed3.gif"] = im(1, 98);ism["ed4.gif"] = im(1, 98);ism["ed5.gif"] = im(1, 98);ism["ed6.gif"] = im(22, 98);ism["ed7.gif"] = im(46, 98);ism["edwing.gif"] = im(24, 83);ism["eldiablo.gif"] = im(0, 99);ism["elders.gif"] = im(11, 85);ism["submarine.gif"] = im(8, 86);ism["nightstand5.gif"] = im(22, 82);ism["topi3.gif"] = im(7, 90);ism["elfhobo7.gif"] = im(42, 96);ism["warfratbg2.gif"] = im(0, 95);ism["elp_and_cros.gif"] = im(300, 150, 5, 146);ism["armor.gif"] = im(0, 98);ism["inflatiger.gif"] = im(7, 98);ism["c10confcall.gif"] = im(2, 94);ism["grayblob3.gif"] = im(150, 200, 21, 178);ism["cow.gif"] = im(0, 99);ism["adv_strong3.gif"] = im(9, 91);ism["gremlinglasses.gif"] = im(7, 94);ism["stairmaster.gif"] = im(12, 94);ism["mc_respect3.gif"] = im(4, 94);ism["mc_soy3.gif"] = im(0, 97);ism["mc_tofu3.gif"] = im(1, 98);ism["cultist.gif"] = im(3, 98);ism["mh_evilex.gif"] = im(0, 99);ism["evilolive.gif"] = im(15, 83);ism["spagcult2.gif"] = im(1, 95);ism["spagcult3.gif"] = im(0, 99);ism["spagcult1.gif"] = im(0, 98);ism["spagcult2k.gif"] = im(1, 95);ism["spagcult4.gif"] = im(0, 99);ism["spagcult1k.gif"] = im(0, 98);ism["trumpetmariachi.gif"] = im(2, 97);ism["vihuelamariachi.gif"] = im(2, 96);ism["crimbominer1.gif"] = im(0, 99);ism["skihippy.gif"] = im(3, 94);ism["fratboard.gif"] = im(3, 91);ism["wcorcs.gif"] = im(0, 97);ism["witchy2.gif"] = im(0, 99);ism["darkeye.gif"] = im(5, 91);ism["guai.gif"] = im(11, 85);ism["archfiend.gif"] = im(10, 84);ism["fallsfromsky.gif"] = im(100, 150, 2, 143);ism["fallsfromsky_hm.gif"] = im(200, 300, 7, 285);ism["jewels.gif"] = im(8, 82);ism["kobolds.gif"] = im(0, 97);ism["fandancer.gif"] = im(6, 91);ism["fanslime.gif"] = im(2, 94);ism["bathslug.gif"] = im(1, 98);ism["hunter5.gif"] = im(1, 98);ism["hunter9.gif"] = im(1, 93);ism["fearman.gif"] = im(200, 200, 12, 185);ism["bath_octopus.gif"] = im(0, 98);ism["wacken.gif"] = im(200, 200, 23, 186);ism["manyeyes.gif"] = im(4, 81);ism["felonia.gif"] = im(0, 98);ism["haiku2.gif"] = im(6, 91);ism["bath_pelican.gif"] = im(1, 97);ism["ferrelf.gif"] = im(5, 90);ism["finger.gif"] = im(2, 96);ism["asparagus.gif"] = im(9, 89);ism["duckskate.gif"] = im(2, 98);ism["filthworm2.gif"] = im(24, 75);ism["filthworm3.gif"] = im(19, 70);ism["hippy1.gif"] = im(8, 89);ism["adv_hot1.gif"] = im(1, 97);ism["firetruck.gif"] = im(300, 150, 7, 145);ism["duckfirebreath.gif"] = im(7, 91);ism["fisherfish.gif"] = im(3, 97);ism["giant_fitness.gif"] = im(9, 97);ism["bigskeleton5.gif"] = im(250, 100, 0, 99);ism["meatblob.gif"] = im(10, 79);ism["samurai.gif"] = im(0, 99);ism["flametroll.gif"] = im(1, 96);ism["flange.gif"] = im(12, 78);ism["cvfleaman.gif"] = im(5, 90);ism["woodsman.gif"] = im(9, 96);ism["disco_flexible.gif"] = im(3, 97);ism["caveelf3.gif"] = im(25, 85);ism["horstray.gif"] = im(19, 89);ism["seagulls.gif"] = im(3, 91);ism["stabbats.gif"] = im(0, 97);ism["bunny.gif"] = im(49, 94);ism["gourd_fnord.gif"] = im(200, 200, 23, 171);ism["giant_foodie.gif"] = im(4, 97);ism["forspirit.gif"] = im(21, 74);ism["bigskeleton4.gif"] = im(200, 100, 0, 99);ism["mime.gif"] = im(0, 97);ism["artteacher.gif"] = im(4, 95);ism["accboss.gif"] = im(0, 98);ism["warfrata.gif"] = im(1, 96);ism["frenchturtle.gif"] = im(19, 72);ism["bonefish.gif"] = im(40, 97);ism["frog.gif"] = im(53, 99);ism["frosty.gif"] = im(0, 99);ism["straw_cold.gif"] = im(12, 91);ism["mystwander3.gif"] = im(8, 94);ism["duckfrozen.gif"] = im(2, 96);ism["snakeboss1.gif"] = im(150, 150, 21, 133);ism["fruitgolem.gif"] = im(8, 97);ism["anger3.gif"] = im(0, 99);ism["fudgemonkey2.gif"] = im(0, 99);ism["fudgeoyster.gif"] = im(0, 99);ism["fudgepoodle.gif"] = im(2, 96);ism["fudgevulture.gif"] = im(0, 99);ism["fudgeweasel.gif"] = im(11, 86);ism["bigmirror.gif"] = im(0, 99);ism["fun-gal1.gif"] = im(0, 99);ism["funkparticle.gif"] = im(8, 94);ism["solebrother.gif"] = im(19, 76);ism["shiv_fur.gif"] = im(1, 94);ism["giant_furry.gif"] = im(0, 98);ism["gimp.gif"] = im(15, 90);ism["gamblinman.gif"] = im(1, 95);ism["muggers.gif"] = im(2, 98);ism["ganger.gif"] = im(16, 88);ism["gargantulihc.gif"] = im(1, 93);ism["ghuol_skinny.gif"] = im(16, 90);ism["gelcube.gif"] = im(12, 97);ism["generalseal.gif"] = im(150, 100, 2, 97);ism["duckgeneric.gif"] = im(4, 94);ism["merkinballer2.gif"] = im(1, 99);ism["phantom.gif"] = im(1, 95);ism["cvghost.gif"] = im(4, 92);ism["ghostminer.gif"] = im(1, 98);ism["elizabeth.gif"] = im(10, 86);ism["fernghost.gif"] = im(1, 92);ism["worker.gif"] = im(2, 94);ism["adv_spooky1.gif"] = im(8, 91);ism["ghuol_reg.gif"] = im(11, 85);ism["giantbee.gif"] = im(2, 84);ism["pterodactyl.gif"] = im(6, 91);ism["globe.gif"] = im(0, 95);ism["friedegg.gif"] = im(2, 82);ism["centipede.gif"] = im(21, 81);ism["moth.gif"] = im(5, 95);ism["isopod.gif"] = im(35, 95);ism["python.gif"] = im(4, 93);ism["bath_whale.gif"] = im(14, 82);ism["manyspiders.gif"] = im(1, 94);ism["watertentacle.gif"] = im(6, 93);ism["tweezers.gif"] = im(6, 93);ism["headpumpkin.gif"] = im(5, 96);ism["rubberspider.gif"] = im(15, 84);ism["sandworm.gif"] = im(2, 99);ism["giantskel.gif"] = im(0, 99);ism["tarantula.gif"] = im(1, 97);ism["giantsquid.gif"] = im(0, 98);ism["whelps3.gif"] = im(0, 99);ism["tardigrade.gif"] = im(4, 91);ism["zomfish.gif"] = im(2, 86);ism["crimonster5.gif"] = im(0, 92);ism["gladiator.gif"] = im(1, 96);ism["juiceglass.gif"] = im(12, 87);ism["wood_hot.gif"] = im(3, 95);ism["ghuol_fat.gif"] = im(13, 87);ism["gnarlgnome.gif"] = im(9, 79);ism["gnasgnome.gif"] = im(6, 77);ism["gnefgnome.gif"] = im(12, 83);ism["dk_builder.gif"] = im(9, 97);ism["dk_cross.gif"] = im(3, 94);ism["dk_swatter.gif"] = im(3, 95);ism["dk_gearhead.gif"] = im(1, 97);ism["dk_piechef.gif"] = im(0, 99);ism["dk_plunger.gif"] = im(3, 93);ism["gnollmage.gif"] = im(3, 95);ism["dk_juggler.gif"] = im(1, 97);ism["dk_warchef.gif"] = im(0, 98);ism["gnomester.gif"] = im(5, 91);ism["gnugnome.gif"] = im(10, 84);ism["gourd_goblin.gif"] = im(7, 92);ism["goomba.gif"] = im(9, 89);ism["1_4a.gif"] = im(200, 200, 2, 198);ism["1_1.gif"] = im(18, 93);ism["1_2.gif"] = im(10, 92);ism["1_3.gif"] = im(10, 93);ism["giant_goth.gif"] = im(3, 96);ism["gourami.gif"] = im(51, 93);ism["gov_agent.gif"] = im(11, 94);ism["scientist.gif"] = im(3, 95);ism["adv_stench1.gif"] = im(6, 97);ism["grasselemental.gif"] = im(0, 99);ism["grasspirate.gif"] = im(0, 95);ism["rober.gif"] = im(8, 91);ism["zomshovel.gif"] = im(4, 94);ism["adv_sleaze1.gif"] = im(3, 90);ism["duckgreasy.gif"] = im(0, 91);ism["wolfoftheair.gif"] = im(200, 150, 8, 136);ism["wolfoftheair_hm.gif"] = im(200, 150, 7, 135);ism["warhipgr.gif"] = im(5, 93);ism["porkbun.gif"] = im(14, 79);ism["gritpirate.gif"] = im(1, 97);ism["surv_grizzled.gif"] = im(3, 91);ism["wingedyeti.gif"] = im(200, 100, 0, 99);ism["groast.gif"] = im(5, 94);ism["grouchewie.gif"] = im(7, 90);ism["cultistgroup.gif"] = im(4, 96);ism["groupie.gif"] = im(16, 85);ism["dwarf_grumpy.gif"] = im(0, 99);ism["grungypirate.gif"] = im(11, 95);ism["guardturtle4.gif"] = im(37, 94);ism["plesio.gif"] = im(1, 98);ism["gurgle.gif"] = im(150, 100, 0, 99);ism["beeguy.gif"] = im(0, 96);ism["gothic.gif"] = im(4, 96);ism["adv_sleaze2.gif"] = im(6, 89);ism["drunkyam.gif"] = im(0, 99);ism["hamsterpus.gif"] = im(2, 88);ism["mariachi1.gif"] = im(2, 97);ism["shiv_hangman.gif"] = im(3, 93);ism["hunter12.gif"] = im(3, 97);ism["skullabra.gif"] = im(1, 91);ism["tureen.gif"] = im(6, 87);ism["heatseal.gif"] = im(0, 99);ism["warfratar2.gif"] = im(10, 88);ism["nachogolem.gif"] = im(0, 98);ism["hellion.gif"] = im(3, 95);ism["sealguard.gif"] = im(13, 95);ism["sealpup.gif"] = im(29, 81);ism["hepcat.gif"] = im(1, 98);ism["hunter6.gif"] = im(3, 96);ism["hermeticseal.gif"] = im(5, 88);ism["c10slideshow.gif"] = im(10, 89);ism["highpriest.gif"] = im(0, 99);ism["warbear31.gif"] = im(0, 99);ism["snakes.gif"] = im(2, 83);ism["elfhobo8.gif"] = im(30, 99);ism["hockeyelem.gif"] = im(6, 90);ism["hodgman.gif"] = im(1, 96);ism["holoarmy.gif"] = im(2, 92);ism["honeypot.gif"] = im(5, 92);ism["hooded.gif"] = im(4, 96);ism["prim_amoe.gif"] = im(0, 98);ism["dvhotbear1.gif"] = im(5, 94);ism["dvhotghost1.gif"] = im(4, 93);ism["hothobo3.gif"] = im(0, 97);ism["dvhotskel1.gif"] = im(13, 99);ism["dvhotvamp1.gif"] = im(0, 98);ism["dvhotwolf1.gif"] = im(12, 98);ism["dvhotzom1.gif"] = im(1, 98);ism["ghuol_huge.gif"] = im(5, 95);ism["giantmosquito.gif"] = im(0, 98);ism["iceguy1.gif"] = im(1, 98);ism["vib6.gif"] = im(7, 98);ism["caveelf2.gif"] = im(18, 73);ism["huntingseal.gif"] = im(9, 85);ism["poolghost.gif"] = im(0, 99);ism["hypnotist.gif"] = im(0, 97);ism["medicus.gif"] = im(3, 92);ism["bb_vamp.gif"] = im(3, 93);ism["adv_cold2.gif"] = im(0, 98);ism["icecreamtruck.gif"] = im(400, 150, 9, 142);ism["icecube.gif"] = im(12, 94);ism["iceskate.gif"] = im(4, 96);ism["adv_cold3.gif"] = im(8, 93);ism["mummycat.gif"] = im(1, 96);ism["illegal_alien.gif"] = im(24, 96);ism["vib3.gif"] = im(0, 99);ism["drunktofurkey.gif"] = im(0, 99);ism["seal_larva.gif"] = im(63, 93);ism["seal_baby.gif"] = im(47, 93);ism["meatbug.gif"] = im(7, 89);ism["inkubus.gif"] = im(7, 97);ism["mariachi2.gif"] = im(2, 91);ism["adv_strong2.gif"] = im(5, 92);ism["encount.gif"] = im(3, 93);ism["jacobsadder.gif"] = im(0, 99);ism["orquette1.gif"] = im(13, 86);ism["jamfish.gif"] = im(0, 98);ism["pilot.gif"] = im(3, 97);ism["jetski.gif"] = im(15, 94);ism["jockohomo.gif"] = im(0, 98);ism["merkindragger2.gif"] = im(1, 99);ism["doubt3.gif"] = im(0, 99);ism["orangutan.gif"] = im(8, 97);ism["scabie_jungle.gif"] = im(2, 92);ism["thejunk.gif"] = im(19, 86);ism["js_bender.gif"] = im(5, 91);ism["js_melter.gif"] = im(11, 95);ism["js_sharpener.gif"] = im(7, 90);ism["orquette2.gif"] = im(13, 86);ism["keese.gif"] = im(25, 66);ism["tooold.gif"] = im(1, 97);ism["clownfish.gif"] = im(22, 82);ism["snaknight.gif"] = im(0, 97);ism["wolfknight.gif"] = im(3, 97);ism["knight.gif"] = im(7, 91);ism["kg_accountant.gif"] = im(12, 98);ism["kg_alchemist.gif"] = im(15, 94);ism["kg_asstchef.gif"] = im(0, 99);ism["kg_bbqteam.gif"] = im(1, 99);ism["kg_beancounter.gif"] = im(12, 97);ism["kg_guard.gif"] = im(10, 94);ism["kg_guardcaptain.gif"] = im(10, 94);ism["kg_embezzler.gif"] = im(12, 97);ism["kg_haremgirl.gif"] = im(15, 89);ism["kg_haremguard.gif"] = im(14, 94);ism["kg_king.gif"] = im(0, 98);ism["kg_madsci.gif"] = im(11, 91);ism["kg_madam.gif"] = im(16, 97);ism["kg_masterchef.gif"] = im(0, 99);ism["kg_mba.gif"] = im(16, 98);ism["kg_mutant.gif"] = im(13, 97);ism["kg_poseur.gif"] = im(28, 94);ism["kg_souschef.gif"] = im(0, 98);ism["kg_verymadsci.gif"] = im(15, 92);ism["slanding.gif"] = im(5, 91);ism["yeti.gif"] = im(1, 95);ism["koopa.gif"] = im(5, 93);ism["kublakhan.gif"] = im(5, 92);ism["adv_fast3.gif"] = im(4, 92);ism["limp.gif"] = im(8, 94);ism["labmonkey.gif"] = im(16, 91);ism["n00b.gif"] = im(6, 91);ism["lower_k.gif"] = im(7, 81);ism["headwolf.gif"] = im(0, 98);ism["grayblob2.gif"] = im(9, 93);ism["larrysignfield.gif"] = im(9, 95);ism["filthworm1.gif"] = im(49, 83);ism["statbike.gif"] = im(2, 96);ism["linbox.gif"] = im(17, 91);ism["lemonfish.gif"] = im(17, 74);ism["adv_sleaze4.gif"] = im(3, 97);ism["lfruitgol.gif"] = im(33, 84);ism["licosnake.gif"] = im(5, 94);ism["lich.gif"] = im(3, 98);ism["bb_liquidmetal.gif"] = im(7, 92);ism["liquidmetal.gif"] = im(1, 97);ism["grayblob1.gif"] = im(40, 88);ism["canoeman.gif"] = im(13, 66);ism["wanderacc2.gif"] = im(1, 98);ism["pa_bread.gif"] = im(7, 95);ism["lobsterman.gif"] = im(1, 98);ism["lollicat.gif"] = im(12, 91);ism["lolligator.gif"] = im(18, 85);ism["lollipede.gif"] = im(11, 77);ism["lolliphaunt.gif"] = im(12, 91);ism["spelunklolm.gif"] = im(250, 300, 3, 269);ism["lollirus2.gif"] = im(9, 91);ism["vib5.gif"] = im(1, 97);ism["coalition.gif"] = im(2, 89);ism["soggyraven.gif"] = im(0, 99);ism["lordspooky.gif"] = im(7, 97);ism["lizardfish.gif"] = im(31, 61);ism["regret2.gif"] = im(1, 95);ism["lower_h.gif"] = im(13, 87);ism["catstatue.gif"] = im(15, 84);ism["lumbersup.gif"] = im(5, 92);ism["lumberjill.gif"] = im(5, 92);ism["lumberjuan.gif"] = im(0, 92);ism["4_4a.gif"] = im(200, 200, 13, 168);ism["4_1.gif"] = im(21, 70);ism["4_2.gif"] = im(19, 92);ism["4_3.gif"] = im(3, 97);ism["lynyrd.gif"] = im(9, 91);ism["skinner.gif"] = im(2, 96);ism["adv_strong1.gif"] = im(5, 94);ism["madbugbear.gif"] = im(6, 95);ism["prim_flag.gif"] = im(0, 98);ism["madwino.gif"] = im(6, 94);ism["madiator.gif"] = im(2, 96);ism["dragonfish.gif"] = im(0, 99);ism["mech.gif"] = im(1, 98);ism["spelunkmagma.gif"] = im(7, 84);ism["cropcircle.gif"] = im(2, 93);ism["hairclog.gif"] = im(0, 94);ism["magfield.gif"] = im(1, 93);ism["tofurkey.gif"] = im(2, 92);ism["mammon.gif"] = im(200, 200, 11, 193);ism["redbuttons.gif"] = im(1, 93);ism["audrey.gif"] = im(0, 98);ism["wraith5.gif"] = im(10, 90);ism["bandolero.gif"] = im(0, 99);ism["mar_bruiser.gif"] = im(4, 93);ism["mariachi3.gif"] = im(1, 96);ism["wraith3.gif"] = im(9, 88);ism["promoter.gif"] = im(2, 93);ism["wasp.gif"] = im(13, 96);ism["mayorghost.gif"] = im(200, 150, 3, 146);ism["mayorghost_hm.gif"] = im(200, 150, 5, 147);ism["beggar.gif"] = im(0, 98);ism["duckmeandrunk.gif"] = im(3, 96);ism["med_dung.gif"] = im(5, 94);ism["med_mugman.gif"] = im(3, 92);ism["med_muggirl.gif"] = im(5, 89);ism["med_potter.gif"] = im(3, 91);ism["med_strawman.gif"] = im(0, 97);ism["med_stucco.gif"] = im(12, 96);ism["cvmedusa.gif"] = im(4, 91);ism["megafrog.gif"] = im(15, 89);ism["vib1.gif"] = im(0, 98);ism["lawngnome1.gif"] = im(14, 80);ism["nemesisthug.gif"] = im(7, 90);ism["merkinalphabet.gif"] = im(6, 93);ism["merkinballer.gif"] = im(4, 98);ism["merkinswitcher.gif"] = im(4, 98);ism["merkinburglar.gif"] = im(1, 95);ism["merkindiver.gif"] = im(1, 95);ism["merkindrifter.gif"] = im(4, 98);ism["merkinhealer.gif"] = im(3, 95);ism["merkinjuicer.gif"] = im(4, 98);ism["merkinminer.gif"] = im(1, 95);ism["merkinmonitor.gif"] = im(6, 93);ism["merkindragger.gif"] = im(4, 98);ism["merkinposeur.gif"] = im(1, 95);ism["merkinpunisher.gif"] = im(1, 95);ism["merkinraider.gif"] = im(3, 95);ism["merkinresearcher.gif"] = im(6, 93);ism["merkinspear.gif"] = im(1, 95);ism["merkinscav.gif"] = im(1, 95);ism["merkinghost.gif"] = im(13, 85);ism["merkinteacher.gif"] = im(2, 99);ism["merkintippler.gif"] = im(1, 99);ism["merkintrainer.gif"] = im(4, 98);ism["mercenary.gif"] = im(6, 95);ism["pengmesmer.gif"] = im(3, 99);ism["adv_fast2.gif"] = im(1, 96);ism["lowerm.gif"] = im(9, 90);ism["barrel.gif"] = im(7, 91);ism["minecrab.gif"] = im(0, 99);ism["twins_mism.gif"] = im(100, 200, 17, 198);ism["badportrait.gif"] = im(0, 98);ism["pengarson.gif"] = im(2, 97);ism["mobcapo.gif"] = im(8, 95);ism["pengcapo.gif"] = im(3, 98);ism["pengdemo.gif"] = im(2, 98);ism["pengthug.gif"] = im(2, 98);ism["peng_ent.gif"] = im(3, 98);ism["pengbook.gif"] = im(2, 98);ism["penggun.gif"] = im(3, 98);ism["pengpsycho.gif"] = im(3, 98);ism["pengracket.gif"] = im(3, 99);ism["pengsmasher.gif"] = im(0, 98);ism["hazmatpeng.gif"] = im(0, 98);ism["pengphone.gif"] = im(0, 98);ism["warhipar2.gif"] = im(6, 89);ism["modelskeleton.gif"] = im(1, 99);ism["modernzombie.gif"] = im(8, 91);ism["moyster.gif"] = im(7, 93);ism["moneybee.gif"] = im(11, 75);ism["elf_wrench.gif"] = im(17, 87);ism["monsterhearse.gif"] = im(250, 200, 22, 186);ism["boiler.gif"] = im(4, 95);ism["monty.gif"] = im(4, 95);ism["moonshriner.gif"] = im(0, 99);ism["fear1.gif"] = im(0, 99);ism["wraith1.gif"] = im(8, 83);ism["motherseal.gif"] = im(9, 91);ism["../otherimages/slimetube/stboss.gif"] = im(200, 200, 22, 175);ism["motorhead.gif"] = im(2, 95);ism["mountainman.gif"] = im(3, 97);ism["lawngnome3.gif"] = im(1, 99);ism["lawngnome2.gif"] = im(26, 98);ism["adv_strong4.gif"] = im(17, 91);ism["adv_cold4.gif"] = im(0, 99);ism["chemteacher.gif"] = im(0, 98);ism["swampturtle.gif"] = im(0, 99);ism["muff.gif"] = im(10, 78);ism["mumblebee.gif"] = im(27, 74);ism["spelunkmumm.gif"] = im(3, 92);ism["antlerelf.gif"] = im(12, 97);ism["elfblob.gif"] = im(5, 98);ism["elflimbs.gif"] = im(17, 97);ism["elfclaw.gif"] = im(25, 96);ism["elfhulk.gif"] = im(3, 97);ism["alielephant.gif"] = im(10, 97);ism["mutantalielf.gif"] = im(1, 97);ism["bb_vassist.gif"] = im(3, 95);ism["fear3.gif"] = im(1, 99);ism["sorcform1.gif"] = im(0, 99);ism["sorcblob.gif"] = im(200, 200, 28, 197);ism["bigsaus.gif"] = im(39, 59);ism["warfratmd2.gif"] = im(2, 96);ism["navyseal.gif"] = im(0, 98);ism["giant_neckbeard.gif"] = im(3, 95);ism["neil.gif"] = im(6, 95);ism["flytrap.gif"] = im(0, 96);ism["mc_respect2.gif"] = im(0, 97);ism["mc_respect1.gif"] = im(0, 97);ism["snakenest.gif"] = im(8, 88);ism["newt.gif"] = im(43, 97);ism["emofrat.gif"] = im(0, 97);ism["ninjawaiter.gif"] = im(5, 95);ism["ninjarice.gif"] = im(7, 95);ism["snowman.gif"] = im(7, 95);ism["ninja_ass.gif"] = im(3, 91);ism["ninjamop.gif"] = im(10, 98);ism["ninjacloud.gif"] = im(3, 97);ism["nhobo2.gif"] = im(2, 93);ism["hunter2.gif"] = im(0, 99);ism["novia.gif"] = im(5, 99);ism["novio.gif"] = im(11, 97);ism["nurseshark.gif"] = im(15, 71);ism["whirlwind.gif"] = im(8, 91);ism["tourist.gif"] = im(9, 92);ism["octopus.gif"] = im(0, 96);ism["octorok.gif"] = im(10, 93);ism["headghost.gif"] = im(4, 94);ism["dv_stench4.gif"] = im(30, 30, 29, 30);ism["kg_offdutyguard.gif"] = im(13, 95);ism["officialseal.gif"] = im(17, 91);ism["oilbaron.gif"] = im(0, 99);ism["oilcartel2.gif"] = im(200, 100, 5, 97);ism["oilslick.gif"] = im(29, 61);ism["oiltycoon.gif"] = im(1, 99);ism["straw_sleaze.gif"] = im(37, 93);ism["olscratch.gif"] = im(2, 97);ism["nopic.gif"] = im(10, 98);ism["dk_oneeye.gif"] = im(2, 95);ism["oneeyed.gif"] = im(4, 91);ism["fratboy.gif"] = im(2, 91);ism["fratskirt.gif"] = im(2, 91);ism["fratbong.gif"] = im(2, 91);ism["lilfratboy.gif"] = im(7, 86);ism["oscus.gif"] = im(5, 97);ism["bandsaw.gif"] = im(11, 87);ism["tableoutlaw.gif"] = im(8, 93);ism["outlawboss.gif"] = im(0, 97);ism["surv_overarmed.gif"] = im(0, 98);ism["pimp.gif"] = im(17, 90);ism["elpriest.gif"] = im(1, 97);ism["stonebros.gif"] = im(2, 96);ism["warfratpr.gif"] = im(19, 85);ism["ptowels.gif"] = im(0, 99);ism["hunter3.gif"] = im(1, 99);ism["peanut.gif"] = im(0, 98);ism["mh_roommate.gif"] = im(2, 97);ism["pencil.gif"] = im(5, 93);ism["defense_sphere.gif"] = im(3, 97);ism["pestopuddle.gif"] = im(46, 91);ism["perpbat.gif"] = im(5, 88);ism["bystander.gif"] = im(1, 96);ism["somepig.gif"] = im(3, 88);ism["pinebat.gif"] = im(33, 69);ism["piranhadon.gif"] = im(29, 97);ism["wood_stench.gif"] = im(3, 90);ism["adv_spooky2.gif"] = im(4, 95);ism["plaidghost.gif"] = im(7, 95);ism["plaque.gif"] = im(0, 99);ism["drunkcrancan.gif"] = im(1, 99);ism["drunkfrat.gif"] = im(1, 96);ism["animelf2.gif"] = im(20, 81);ism["poolter.gif"] = im(1, 97);ism["poolter2.gif"] = im(2, 98);ism["popnlocker.gif"] = im(0, 98);ism["porkbutterfly.gif"] = im(9, 88);ism["porksword.gif"] = im(17, 87);ism["adv_sleaze3.gif"] = im(8, 90);ism["abom.gif"] = im(6, 95);ism["crancan.gif"] = im(21, 95);ism["mystwander2.gif"] = im(9, 95);ism["mystwander1.gif"] = im(8, 95);ism["tomatosoup.gif"] = im(6, 89);ism["eyewash.gif"] = im(11, 91);ism["mystwander4.gif"] = im(1, 97);ism["mangler.gif"] = im(5, 95);ism["organ.gif"] = im(1, 99);ism["silverware.gif"] = im(0, 99);ism["toybox.gif"] = im(7, 89);ism["winerack.gif"] = im(4, 98);ism["question.gif"] = im(0, 86);ism["pouooze.gif"] = im(33, 88);ism["primp.gif"] = im(7, 90);ism["fly.gif"] = im(4, 92);ism["surv_primitive.gif"] = im(2, 91);ism["chalmers.gif"] = im(1, 98);ism["bigskeleton.gif"] = im(0, 98);ism["giant_procrast.gif"] = im(5, 98);ism["profjacking.gif"] = im(2, 96);ism["elf_propaganda.gif"] = im(11, 84);ism["protag.gif"] = im(6, 95);ism["protspect.gif"] = im(0, 99);ism["spurt.gif"] = im(0, 99);ism["elf_provocateur.gif"] = im(10, 83);ism["pterodact.gif"] = im(250, 150, 14, 136);ism["pufferfish.gif"] = im(0, 98);ism["pumpedbass.gif"] = im(17, 69);ism["shiv_pumpkin.gif"] = im(6, 97);ism["giant_punk.gif"] = im(0, 98);ism["pyg_squad.gif"] = im(0, 99);ism["pyg_blowgunner.gif"] = im(31, 99);ism["pyg_bowler.gif"] = im(29, 98);ism["pyg_headhunter.gif"] = im(28, 99);ism["pyg_janitor.gif"] = im(41, 99);ism["pyg_orderlies.gif"] = im(18, 98);ism["pyg_shaman.gif"] = im(24, 97);ism["pyg_acct.gif"] = im(33, 99);ism["pyg_lawyer.gif"] = im(27, 98);ism["pyg_nurse.gif"] = im(20, 98);ism["pyg_surgeon.gif"] = im(21, 99);ism["wood_spooky.gif"] = im(28, 90);ism["animelf4.gif"] = im(19, 78);ism["upper_q.gif"] = im(8, 88);ism["beequeen.gif"] = im(13, 87);ism["spelunkbeeq.gif"] = im(200, 150, 5, 149);ism["filthworm4.gif"] = im(0, 97);ism["qbasicele.gif"] = im(0, 97);ism["healer.gif"] = im(9, 93);ism["wanderacc3.gif"] = im(0, 99);ism["mmoaddict.gif"] = im(12, 94);ism["racebob.gif"] = im(11, 92);ism["weightrack.gif"] = im(27, 95);ism["elf_raconteur.gif"] = im(7, 80);ism["radiator.gif"] = im(0, 99);ism["hunter13.gif"] = im(7, 93);ism["anger1.gif"] = im(0, 99);ism["ragingbull.gif"] = im(2, 94);ism["adding.gif"] = im(2, 89);ism["mh_scenester.gif"] = im(1, 96);ism["ratbat.gif"] = im(19, 67);ism["duckrattle.gif"] = im(2, 96);ism["raven.gif"] = im(18, 93);ism["giant_raver.gif"] = im(0, 99);ism["wallpaper.gif"] = im(17, 83);ism["foss_baboon.gif"] = im(1, 97);ism["foss_bat.gif"] = im(38, 69);ism["foss_demon.gif"] = im(150, 150, 2, 130);ism["foss_spider.gif"] = im(150, 150, 32, 130);ism["foss_serpent.gif"] = im(1, 96);ism["redbutler.gif"] = im(4, 95);ism["redfox.gif"] = im(5, 94);ism["redherring.gif"] = im(7, 94);ism["redskeleton.gif"] = im(5, 97);ism["redsnapper.gif"] = im(6, 90);ism["regretman.gif"] = im(200, 200, 9, 180);ism["regbat.gif"] = im(35, 66);ism["mistress.gif"] = im(2, 99);ism["giant_renfair.gif"] = im(1, 97);ism["reneccorman.gif"] = im(1, 97);ism["doubt2.gif"] = im(6, 92);ism["revbugbear.gif"] = im(1, 98);ism["merkinswitcher2.gif"] = im(1, 99);ism["duckgolem.gif"] = im(2, 92);ism["rock_guy.gif"] = im(31, 96);ism["popweasel.gif"] = im(0, 99);ism["scorpion.gif"] = im(8, 91);ism["rock_snake.gif"] = im(1, 97);ism["caveelf1.gif"] = im(21, 78);ism["rock_fish.gif"] = im(24, 77);ism["rollerskate.gif"] = im(2, 92);ism["muse.gif"] = im(2, 96);ism["rollingstone.gif"] = im(4, 90);ism["roncopper.gif"] = im(3, 96);ism["realdolphin.gif"] = im(14, 92);ism["duckfat.gif"] = im(0, 99);ism["rudolfus.gif"] = im(3, 97);ism["rulergolem.gif"] = im(0, 99);ism["runningman.gif"] = im(2, 94);ism["bum.gif"] = im(8, 95);ism["elf_saboteur.gif"] = im(22, 79);ism["ferret.gif"] = im(2, 90);ism["toothgoat.gif"] = im(0, 95);ism["stkiwi.gif"] = im(8, 85);ism["lime.gif"] = im(15, 77);ism["sadiator.gif"] = im(3, 92);ism["safarijack.gif"] = im(1, 97);ism["salamander.gif"] = im(51, 97);ism["salaminder.gif"] = im(26, 88);ism["salaryninja.gif"] = im(4, 96);ism["pirate1.gif"] = im(6, 93);ism["adv_smooth1.gif"] = im(5, 92);ism["zompirate.gif"] = im(7, 93);ism["bb_scav.gif"] = im(7, 93);ism["gummifish.gif"] = im(0, 99);ism["schoolofmany.gif"] = im(3, 94);ism["wizardfish.gif"] = im(1, 99);ism["scimitarfish.gif"] = im(16, 73);ism["duckscorch.gif"] = im(0, 98);ism["spelunkscorp.gif"] = im(3, 89);ism["hunter4.gif"] = im(2, 92);ism["scoutseal.gif"] = im(12, 86);ism["screambat.gif"] = im(24, 79);ism["screwgolem.gif"] = im(3, 98);ism["seacow.gif"] = im(17, 73);ism["seacowboy.gif"] = im(0, 98);ism["adv_smooth4.gif"] = im(2, 95);ism["secrobot.gif"] = im(11, 87);ism["securityslime.gif"] = im(4, 96);ism["crimbominer2.gif"] = im(9, 81);ism["sadpoet.gif"] = im(5, 93);ism["atm.gif"] = im(7, 94);ism["serialbus.gif"] = im(1, 94);ism["grodseal.gif"] = im(3, 93);ism["fireservant1.gif"] = im(0, 99);ism["sewergator.gif"] = im(11, 78);ism["sewertruck.gif"] = im(400, 150, 6, 143);ism["sororghost2.gif"] = im(7, 92);ism["sororeton2.gif"] = im(3, 94);ism["sororpire1.gif"] = im(7, 97);ism["sororwolf3.gif"] = im(5, 96);ism["sororbie3.gif"] = im(3, 95);ism["shadowseal.gif"] = im(8, 91);ism["sheetghost.gif"] = im(5, 95);ism["shopkeep.gif"] = im(7, 91);ism["shub-jigguwatt.gif"] = im(300, 300, 20, 283);ism["tacoelf_sign.gif"] = im(27, 94);ism["caveelf4.gif"] = im(14, 77);ism["sk8gnome.gif"] = im(23, 77);ism["boardskate.gif"] = im(3, 91);ism["catskel.gif"] = im(20, 84);ism["hamskel.gif"] = im(73, 95);ism["monkeyskel.gif"] = im(17, 77);ism["crimonster6.gif"] = im(3, 95);ism["steward.gif"] = im(3, 97);ism["spelunkskel.gif"] = im(10, 91);ism["mopskeleton.gif"] = im(6, 96);ism["buttleton.gif"] = im(3, 97);ism["sketchyvan.gif"] = im(200, 100, 0, 99);ism["skinflute.gif"] = im(27, 76);ism["skeleton.gif"] = im(6, 93);ism["skullbat.gif"] = im(31, 66);ism["skulldozer.gif"] = im(450, 300, 12, 278);ism["skullery.gif"] = im(0, 97);ism["dvsleazebear1.gif"] = im(5, 89);ism["dvsleazeghost1.gif"] = im(11, 88);ism["slhobo4.gif"] = im(2, 93);ism["dvsleazeskel1.gif"] = im(9, 92);ism["dvsleazevamp1.gif"] = im(3, 96);ism["dvsleazewolf1.gif"] = im(2, 97);ism["dvsleazezom1.gif"] = im(4, 93);ism["kg_sleepingguard.gif"] = im(0, 98);ism["dwarf_sleepy.gif"] = im(37, 95);ism["mar_sleepy.gif"] = im(0, 99);ism["slime1_1.gif"] = im(0, 98);ism["slime2_1.gif"] = im(0, 96);ism["slime3_1.gif"] = im(2, 97);ism["slime4_1.gif"] = im(3, 95);ism["slime5_1.gif"] = im(0, 98);ism["wood_sleaze.gif"] = im(16, 79);ism["holglob.gif"] = im(34, 89);ism["slithering.gif"] = im(15, 81);ism["ssd_burger.gif"] = im(0, 99);ism["ssd_cocktail.gif"] = im(0, 98);ism["ssd_sundae.gif"] = im(1, 98);ism["eliot.gif"] = im(5, 97);ism["smartskel.gif"] = im(4, 94);ism["smellothewisp.gif"] = im(4, 98);ism["smokemonster.gif"] = im(5, 96);ism["adv_smooth3.gif"] = im(3, 97);ism["scabie_jazz.gif"] = im(2, 89);ism["smutorc_jacker.gif"] = im(6, 95);ism["smutorc_nailer.gif"] = im(8, 96);ism["smutorc_pervert.gif"] = im(7, 93);ism["smutorc_layer.gif"] = im(5, 97);ism["smutorc_screwer.gif"] = im(9, 97);ism["spelunksnake.gif"] = im(20, 83);ism["snakeboss6.gif"] = im(150, 150, 26, 131);ism["snapdragon.gif"] = im(1, 98);ism["snowqueen.gif"] = im(0, 98);ism["adv_cold1.gif"] = im(9, 93);ism["sodium.gif"] = im(3, 92);ism["6_4a.gif"] = im(200, 200, 11, 189);ism["6_1.gif"] = im(10, 91);ism["6_2.gif"] = im(3, 96);ism["6_3.gif"] = im(2, 98);ism["sonofsailor.gif"] = im(1, 99);ism["warfratmd.gif"] = im(4, 96);ism["warfratcm.gif"] = im(1, 96);ism["tree_hickory.gif"] = im(0, 98);ism["drunkstuffing.gif"] = im(0, 99);ism["spacebeast3.gif"] = im(14, 91);ism["spacemarine.gif"] = im(1, 95);ism["aboo_trek.gif"] = im(1, 97);ism["3_4a.gif"] = im(200, 200, 3, 193);ism["3_1.gif"] = im(2, 95);ism["3_2.gif"] = im(4, 97);ism["3_3.gif"] = im(0, 93);ism["spamwitch.gif"] = im(3, 95);ism["pa_spatula.gif"] = im(7, 98);ism["wretchedseal.gif"] = im(54, 94);ism["hunter11.gif"] = im(3, 95);ism["jellyfish.gif"] = im(6, 96);ism["spelastronaut.gif"] = im(2, 96);ism["spelunkspider.gif"] = im(21, 88);ism["topi1.gif"] = im(3, 93);ism["gourd_spider.gif"] = im(10, 83);ism["gremlinspider.gif"] = im(7, 88);ism["gourd_spidergob.gif"] = im(1, 97);ism["spiderhut.gif"] = im(200, 150, 9, 140);ism["bb_spider.gif"] = im(125, 100, 3, 86);ism["spikeskel.gif"] = im(7, 92);ism["spiritalclock.gif"] = im(0, 99);ism["spiritbug.gif"] = im(10, 92);ism["spiritfaucet.gif"] = im(5, 93);ism["5_1.gif"] = im(3, 99);ism["5_2.gif"] = im(0, 99);ism["5_3.gif"] = im(0, 99);ism["spiritpea.gif"] = im(18, 78);ism["sponge.gif"] = im(0, 98);ism["dvspookybear1.gif"] = im(1, 95);ism["dvspookyghost1.gif"] = im(4, 94);ism["sgguard.gif"] = im(16, 77);ism["sgninja.gif"] = im(22, 80);ism["sgwarlock.gif"] = im(8, 83);ism["spookyhobo1.gif"] = im(3, 89);ism["mummy.gif"] = im(6, 89);ism["musicbox.gif"] = im(2, 90);ism["dvspookyskel1.gif"] = im(13, 97);ism["vampire.gif"] = im(10, 91);ism["dvspookyvamp1.gif"] = im(35, 65);ism["dvspookywolf1.gif"] = im(8, 94);ism["dvspookyzom1.gif"] = im(39, 93);ism["manor.gif"] = im(12, 89);ism["sporto.gif"] = im(1, 99);ism["princess.gif"] = im(8, 95);ism["steamelemental.gif"] = im(3, 94);ism["straw_hot.gif"] = im(5, 91);ism["giant_steampunk.gif"] = im(0, 99);ism["2_4a.gif"] = im(200, 200, 11, 189);ism["2_1.gif"] = im(10, 90);ism["2_2.gif"] = im(12, 96);ism["2_3.gif"] = im(16, 93);ism["dvstenchbear1.gif"] = im(1, 99);ism["dvstenchghost1.gif"] = im(0, 97);ism["stenchhobo1.gif"] = im(12, 97);ism["dvstenchskel1.gif"] = im(2, 99);ism["dvstenchvamp1.gif"] = im(0, 98);ism["dvstenchwolf1.gif"] = im(1, 99);ism["dvstenchzom1.gif"] = im(0, 98);ism["steven.gif"] = im(5, 91);ism["stickymummy.gif"] = im(3, 94);ism["crimboelf.gif"] = im(27, 96);ism["stone_pirate.gif"] = im(3, 93);ism["stormcow.gif"] = im(0, 99);ism["algae.gif"] = im(1, 97);ism["moosehead.gif"] = im(7, 93);ism["stuffgolem.gif"] = im(3, 91);ism["paulblart.gif"] = im(2, 99);ism["suckubus.gif"] = im(6, 92);ism["tree_juniper.gif"] = im(0, 99);ism["colasoldier.gif"] = im(1, 95);ism["supervirus.gif"] = im(9, 95);ism["witchy1.gif"] = im(0, 99);ism["mar_surprised.gif"] = im(0, 99);ism["mc_soy2.gif"] = im(0, 94);ism["mc_soy1.gif"] = im(0, 98);ism["beav_jack.gif"] = im(9, 92);ism["beav_shaman.gif"] = im(0, 97);ism["beav_warrior.gif"] = im(7, 90);ism["duckstinky.gif"] = im(0, 98);ism["swampentity.gif"] = im(5, 95);ism["swampgator.gif"] = im(19, 81);ism["swamphag.gif"] = im(0, 97);ism["swampowl.gif"] = im(0, 99);ism["swampskunk.gif"] = im(3, 95);ism["ralphbat.gif"] = im(2, 84);ism["ants.gif"] = im(1, 97);ism["fudgewasps.gif"] = im(0, 98);ism["whelps1.gif"] = im(10, 85);ism["aswarm.gif"] = im(7, 93);ism["kg_lice.gif"] = im(3, 93);ism["beatles.gif"] = im(5, 94);ism["cacotat.gif"] = im(9, 85);ism["tacofish.gif"] = im(17, 82);ism["tacoelf_taco.gif"] = im(12, 86);ism["tacoelf_cart.gif"] = im(9, 82);ism["kasemhead.gif"] = im(2, 96);ism["biggnat.gif"] = im(21, 70);ism["hatskel.gif"] = im(0, 99);ism["adv_fast4.gif"] = im(11, 86);ism["c10spreadsheet.gif"] = im(8, 98);ism["tektite.gif"] = im(21, 77);ism["terrorbot.gif"] = im(5, 88);ism["tetched.gif"] = im(1, 98);ism["madpirate.gif"] = im(6, 93);ism["fudgeman.gif"] = im(200, 200, 19, 186);ism["theaquaman.gif"] = im(0, 99);ism["boris.gif"] = im(6, 89);ism["sneakypete.gif"] = im(13, 90);ism["batinspats.gif"] = im(200, 100, 6, 96);ism["beefhemoth.gif"] = im(200, 100, 0, 98);ism["c10bge.gif"] = im(11, 86);ism["thisdude.gif"] = im(0, 93);ism["c10faces.gif"] = im(0, 99);ism["beelzebozo.gif"] = im(0, 98);ism["colollilossus.gif"] = im(270, 270, 3, 264);ism["bath_craykin.gif"] = im(0, 99);ism["darkness.gif"] = im(0, 98);ism["snakeboss2.gif"] = im(5, 94);ism["hunter15.gif"] = im(0, 92);ism["fudgewizard.gif"] = im(0, 99);ism["bunionghost.gif"] = im(4, 92);ism["thegunk.gif"] = im(3, 95);ism["landscaper.gif"] = im(0, 99);ism["snitch.gif"] = im(150, 300, 13, 275);ism["adv_hot4.gif"] = im(10, 97);ism["theluter.gif"] = im(11, 93);ism["theman.gif"] = im(0, 94);ism["darkmariachi.gif"] = im(2, 97);ism["masterat.gif"] = im(40, 97);ism["thenuge.gif"] = im(4, 94);ism["rainking.gif"] = im(250, 300, 10, 287);ism["sagittarian.gif"] = im(3, 95);ism["theserver.gif"] = im(0, 97);ism["sierpinski.gif"] = im(0, 89);ism["snakeboss3.gif"] = im(150, 150, 5, 136);ism["timebandit.gif"] = im(9, 88);ism["thepinch.gif"] = im(100, 150, 4, 147);ism["thething.gif"] = im(250, 200, 3, 195);ism["thethorax.gif"] = im(200, 100, 4, 92);ism["c10tropes.gif"] = im(0, 99);ism["ukskeleton.gif"] = im(200, 200, 15, 187);ism["ukskeleton_hm.gif"] = im(200, 200, 2, 195);ism["c10cooler.gif"] = im(0, 98);ism["wholekingdom.gif"] = im(200, 200, 2, 195);ism["they.gif"] = im(0, 99);ism["tnbot2.gif"] = im(4, 88);ism["tnbot1.gif"] = im(1, 95);ism["tnbot3.gif"] = im(1, 99);ism["bigskeleton3.gif"] = im(150, 100, 0, 99);ism["thug1thug2.gif"] = im(200, 100, 1, 93);ism["anger2.gif"] = im(0, 99);ism["tigerlily.gif"] = im(1, 96);ism["spelunktiki.gif"] = im(1, 93);ism["mc_tofu2.gif"] = im(2, 97);ism["mc_tofu1.gif"] = im(2, 95);ism["gourd_can.gif"] = im(14, 90);ism["gourd_canspider.gif"] = im(150, 100, 9, 87);ism["animelf1.gif"] = im(19, 79);ism["tipsypirate.gif"] = im(0, 98);ism["tpgeist.gif"] = im(0, 97);ism["shiv_tp.gif"] = im(6, 94);ism["tombasp.gif"] = im(0, 99);ism["mummybat.gif"] = im(34, 60);ism["tombrat.gif"] = im(33, 78);ism["tombratking.gif"] = im(200, 200, 17, 176);ism["tombguy.gif"] = im(0, 98);ism["mastiff.gif"] = im(34, 95);ism["toothpirate.gif"] = im(2, 96);ism["toothskel.gif"] = im(5, 90);ism["topiarychi.gif"] = im(2, 95);ism["topiaryduck.gif"] = im(10, 89);ism["topiary.gif"] = im(0, 98);ism["topiarygopher.gif"] = im(7, 93);ism["topiarykiwi.gif"] = im(17, 92);ism["tree_baobab.gif"] = im(3, 96);ism["c10tmz.gif"] = im(0, 99);ism["orquette3.gif"] = im(6, 92);ism["vib4.gif"] = im(2, 96);ism["animelf5.gif"] = im(18, 76);ism["crimonster1.gif"] = im(1, 98);ism["treadmill.gif"] = im(9, 91);ism["bb_chef.gif"] = im(5, 92);ism["triadwizard.gif"] = im(1, 96);ism["tribalgoblin.gif"] = im(11, 89);ism["trixiepixie.gif"] = im(6, 99);ism["triffid.gif"] = im(2, 96);ism["tarkinhead.gif"] = im(0, 98);ism["monahead.gif"] = im(0, 99);ism["twins_troll.gif"] = im(0, 98);ism["trollipop.gif"] = im(100, 150, 5, 145);ism["trophyfish.gif"] = im(0, 98);ism["tsnake.gif"] = im(5, 94);ism["tumbleweed.gif"] = im(4, 93);ism["turtletrapper.gif"] = im(1, 95);ism["twigberry.gif"] = im(3, 89);ism["bigskeleton2.gif"] = im(0, 99);ism["tex.gif"] = im(0, 98);ism["unclehobo.gif"] = im(10, 92);ism["macaroni.gif"] = im(4, 84);ism["pengundercover.gif"] = im(2, 98);ism["shiv_underworld.gif"] = im(200, 200, 17, 170);ism["ellsburyboss.gif"] = im(150, 150, 15, 124);ism["lensgoblin.gif"] = im(3, 94);ism["surv_unhinged.gif"] = im(6, 95);ism["unholydiver.gif"] = im(0, 99);ism["surv_unlikely.gif"] = im(7, 89);ism["c10database.gif"] = im(2, 95);ism["unstill.gif"] = im(8, 92);ism["ram.gif"] = im(13, 85);ism["urchin.gif"] = im(10, 90);ism["eyesdown.gif"] = im(45, 62);ism["usher.gif"] = im(11, 88);ism["spelunkvampire.gif"] = im(13, 85);ism["vampclam.gif"] = im(11, 91);ism["duckvampire.gif"] = im(3, 95);ism["vandalkid.gif"] = im(9, 91);ism["cvcreature.gif"] = im(100, 200, 4, 196);ism["gremlinveg.gif"] = im(5, 93);ism["velvetug.gif"] = im(19, 91);ism["vendorslime.gif"] = im(0, 95);ism["turtleghost.gif"] = im(23, 84);ism["mantrap.gif"] = im(4, 97);ism["easel.gif"] = im(5, 95);ism["gnauga.gif"] = im(14, 92);ism["victor.gif"] = im(15, 88);ism["faq_boss3.gif"] = im(150, 150, 0, 144);ism["faq_miniboss2.gif"] = im(0, 98);ism["faq_mushroom1.gif"] = im(7, 89);ism["faq_ghost2.gif"] = im(11, 88);ism["faq_blob3.gif"] = im(8, 89);ism["gar.gif"] = im(6, 93);ism["prim_fung.gif"] = im(0, 98);ism["music.gif"] = im(2, 95);ism["iceguy4.gif"] = im(7, 98);ism["smallartist.gif"] = im(40, 97);ism["wimp.gif"] = im(15, 90);ism["wackypirate.gif"] = im(1, 97);ism["iceguy3.gif"] = im(1, 98);ism["waiterninja.gif"] = im(5, 95);ism["wallofbones.gif"] = im(250, 150, 3, 138);ism["noart.gif"] = im(7, 91);ism["wallofskin.gif"] = im(250, 125, 1, 115);ism["warfratc.gif"] = im(1, 95);ism["warfrata2.gif"] = im(1, 96);ism["warfratb.gif"] = im(0, 95);ism["warfratc2.gif"] = im(1, 95);ism["warfratb2.gif"] = im(0, 95);ism["warfratsp2.gif"] = im(0, 97);ism["warfratgr.gif"] = im(5, 96);ism["warfratar.gif"] = im(5, 89);ism["warfratmo.gif"] = im(24, 89);ism["warfratgr2.gif"] = im(2, 91);ism["streaker.gif"] = im(3, 95);ism["warfratsp.gif"] = im(3, 98);ism["warhipb.gif"] = im(6, 96);ism["warhipac2.gif"] = im(1, 96);ism["warhipar.gif"] = im(0, 99);ism["warhipds.gif"] = im(8, 93);ism["warhipsh2.gif"] = im(0, 98);ism["warhipfs2.gif"] = im(3, 95);ism["warhipc2.gif"] = im(5, 94);ism["warhipa2.gif"] = im(0, 98);ism["warhipfs.gif"] = im(2, 94);ism["warhipb2.gif"] = im(6, 96);ism["warhipmd.gif"] = im(0, 90);ism["warhipa.gif"] = im(0, 98);ism["warhipmd2.gif"] = im(0, 91);ism["warhipc.gif"] = im(5, 92);ism["warhipsh.gif"] = im(1, 97);ism["warhipac.gif"] = im(5, 96);ism["hippyspy.gif"] = im(8, 89);ism["warhipcm.gif"] = im(2, 94);ism["warbear12.gif"] = im(0, 99);ism["warbear23.gif"] = im(1, 97);ism["nightstand1.gif"] = im(4, 96);ism["warehouseguy.gif"] = im(3, 94);ism["wartpirate.gif"] = im(2, 92);ism["werewolf.gif"] = im(4, 98);ism["wigwasp.gif"] = im(8, 93);ism["wastoid.gif"] = im(8, 93);ism["waterspider.gif"] = im(23, 80);ism["waterseal.gif"] = im(0, 99);ism["richpirate.gif"] = im(3, 93);ism["weatherug.gif"] = im(3, 91);ism["weremoose.gif"] = im(2, 90);ism["weretaco.gif"] = im(29, 82);ism["hunter14.gif"] = im(4, 95);ism["wetseal.gif"] = im(6, 80);ism["aboo_who.gif"] = im(2, 97);ism["tree_willow.gif"] = im(2, 95);ism["surv_whiny.gif"] = im(3, 91);ism["pa_whisk.gif"] = im(4, 91);ism["whitebonedemon.gif"] = im(200, 100, 12, 98);ism["chocgolem.gif"] = im(9, 92);ism["whiteelephant.gif"] = im(11, 88);ism["lion.gif"] = im(6, 93);ism["whitesnake.gif"] = im(10, 87);ism["wildgirl.gif"] = im(0, 97);ism["seahorse.gif"] = im(4, 96);ism["wiresculpture.gif"] = im(0, 97);ism["elf_wires.gif"] = im(12, 89);ism["tree_magnolia.gif"] = im(1, 99);ism["wraith4.gif"] = im(14, 81);ism["doubt1.gif"] = im(0, 98);ism["ravendesk.gif"] = im(0, 94);ism["susguy.gif"] = im(1, 96);ism["wumpus.gif"] = im(0, 99);ism["beergolem.gif"] = im(4, 97);ism["stonegolem.gif"] = im(3, 97);ism["dimhorror.gif"] = im(2, 96);ism["shopteacher.gif"] = im(1, 98);ism["hydra.gif"] = im(6, 99);ism["polprisoner.gif"] = im(9, 89);ism["pr0n.gif"] = im(11, 87);ism["yakisoba.gif"] = im(0, 97);ism["yakcourier.gif"] = im(3, 96);ism["yakguard.gif"] = im(3, 96);ism["yeastbeast.gif"] = im(4, 93);ism["spelunkyeti.gif"] = im(1, 97);ism["yog-urt.gif"] = im(300, 300, 107, 290);ism["c10inbox.gif"] = im(9, 94);ism["../otherimages/shadows/20.gif"] = im(60, 100, 2, 90);ism["zrex.gif"] = im(150, 100, 0, 99);ism["zimmerman.gif"] = im(4, 98);ism["zombie2.gif"] = im(5, 94);ism["zombie.gif"] = im(3, 84);ism["zol.gif"] = im(11, 90);ism["zmobaby.gif"] = im(2, 86);ism["zombiechef.gif"] = im(1, 97);ism["duckzombie.gif"] = im(1, 96);ism["zombiehoa.gif"] = im(150, 150, 1, 148);ism["zombiehoa_hm.gif"] = im(200, 200, 0, 199);ism["zomwaltz.gif"] = im(0, 97);ism["hunter1.gif"] = im(3, 96);ism["zombo.gif"] = im(0, 98);
-
+ism["borgelf1.gif"] = im(11, 74);ism["borgelf4.gif"] = im(19, 82);ism["borgelf2.gif"] = im(25, 87);ism["borgelf3.gif"] = im(14, 78);ism["handymanjay.gif"] = im(5, 92);ism["1335.gif"] = im(7, 93);ism["miner.gif"] = im(1, 95);ism["foreman.gif"] = im(2, 94);ism["gremlinamc.gif"] = im(12, 78);ism["abcrusher.gif"] = im(12, 89);ism["adv_smart1.gif"] = im(0, 97);ism["lower_b.gif"] = im(16, 74);ism["electriceel.gif"] = im(1, 98);ism["1boy2cups.gif"] = im(2, 91);ism["advecho.gif"] = im(0, 99);ism["whitebat.gif"] = im(33, 70);ism["mar_alert.gif"] = im(0, 99);ism["alielf.gif"] = im(4, 95);ism["spelunkalien.gif"] = im(17, 81);ism["muthamster.gif"] = im(5, 95);ism["spelunkalienq.gif"] = im(150, 150, 17, 141);ism["spelunkufo.gif"] = im(21, 78);ism["steve.gif"] = im(0, 98);ism["catfish.gif"] = im(41, 91);ism["giant_alphabet.gif"] = im(1, 97);ism["elf_amateur.gif"] = im(10, 83);ism["ninja.gif"] = im(13, 85);ism["pirate2.gif"] = im(6, 93);ism["crimbominer3.gif"] = im(2, 97);ism["amokputty.gif"] = im(5, 84);ism["srpainting2.gif"] = im(20, 82);ism["regret3.gif"] = im(27, 79);ism["oldguardstatue.gif"] = im(0, 97);ism["pebbleman.gif"] = im(2, 89);ism["mariner.gif"] = im(5, 93);ism["protspirit.gif"] = im(7, 86);ism["guardstatue.gif"] = im(0, 98);ism["bb_horror.gif"] = im(125, 100, 5, 89);ism["anemone.gif"] = im(0, 97);ism["bb_doctor.gif"] = im(7, 83);ism["angel.gif"] = im(6, 87);ism["angerman.gif"] = im(200, 250, 15, 242);ism["anglerbush.gif"] = im(0, 97);ism["mh_bassist.gif"] = im(2, 97);ism["angbugbear.gif"] = im(6, 91);ism["bb_caveman.gif"] = im(4, 92);ism["pinata.gif"] = im(0, 97);ism["madpoet.gif"] = im(7, 93);ism["raccoon.gif"] = im(6, 93);ism["hunter7.gif"] = im(0, 98);ism["stenchtourist.gif"] = im(0, 93);ism["nightstand2.gif"] = im(13, 91);ism["darkstand.gif"] = im(1, 98);ism["nightstand.gif"] = im(2, 96);ism["nightstand4.gif"] = im(1, 99);ism["fear2.gif"] = im(1, 95);ism["nightstand3.gif"] = im(7, 95);ism["spittoon.gif"] = im(3, 99);ism["smiley.gif"] = im(30, 67);ism["annoyfairy.gif"] = im(15, 76);ism["spiderserver.gif"] = im(7, 94);ism["lizardman.gif"] = im(4, 94);ism["aquabat.gif"] = im(150, 100, 15, 79);ism["aquaconda.gif"] = im(5, 91);ism["aquagoblin.gif"] = im(0, 99);ism["2headseal.gif"] = im(9, 81);ism["adv_spooky4.gif"] = im(4, 96);ism["adv_stench3.gif"] = im(5, 95);ism["astronomer.gif"] = im(6, 93);ism["aquadargon.gif"] = im(200, 200, 6, 190);ism["elf_auteur.gif"] = im(15, 78);ism["disco_awkward.gif"] = im(4, 95);ism["axehandle.gif"] = im(9, 89);ism["axewound.gif"] = im(9, 87);ism["saucezombie.gif"] = im(0, 97);ism["stone_serpent.gif"] = im(0, 98);ism["stone_sheep.gif"] = im(21, 81);ism["baconsnake.gif"] = im(4, 96);ism["badascii.gif"] = im(35, 61);ism["pa_potatoes.gif"] = im(8, 95);ism["warhipmo.gif"] = im(44, 98);ism["baiowulf.gif"] = im(8, 94);ism["spelbanana.gif"] = im(30, 30, 29, 30);ism["bangyomama.gif"] = im(2, 89);ism["banjowizard.gif"] = im(0, 99);ism["banshee.gif"] = im(6, 98);ism["bar.gif"] = im(13, 88);ism["ratsworth.gif"] = im(0, 96);ism["ballbat.gif"] = im(7, 60);ism["basicgolem.gif"] = im(6, 89);ism["spelunkbat.gif"] = im(15, 77);ism["bb_bat.gif"] = im(27, 81);ism["adv_spooky3.gif"] = im(1, 93);ism["batrat.gif"] = im(25, 75);ism["snakeboss5.gif"] = im(150, 150, 13, 141);ism["bb_mech.gif"] = im(1, 98);ism["aboo_wars.gif"] = im(3, 98);ism["gremlinbat.gif"] = im(11, 83);ism["bazookafish.gif"] = im(25, 68);ism["beanbat.gif"] = im(28, 63);ism["topi2.gif"] = im(9, 93);ism["earbeast.gif"] = im(14, 80);ism["eyebeast.gif"] = im(17, 99);ism["beaver.gif"] = im(13, 77);ism["spelunkbee.gif"] = im(3, 86);ism["beeswarm.gif"] = im(3, 97);ism["beethoven.gif"] = im(5, 94);ism["beebeegunner.gif"] = im(16, 70);ism["beebeeking.gif"] = im(16, 79);ism["beebeequeue.gif"] = im(4, 97);ism["beefybat.gif"] = im(18, 58);ism["beelephant.gif"] = im(0, 89);ism["batter.gif"] = im(0, 99);ism["warfratbg.gif"] = im(0, 95);ism["straw_stench.gif"] = im(15, 93);ism["bellhop.gif"] = im(17, 89);ism["carpet.gif"] = im(33, 75);ism["novelist.gif"] = im(2, 92);ism["wraith2.gif"] = im(15, 89);ism["biclops.gif"] = im(4, 92);ism["spider1.gif"] = im(15, 78);ism["bigmeat.gif"] = im(0, 94);ism["whelps2.gif"] = im(1, 98);ism["twins_bigwheel.gif"] = im(200, 100, 5, 95);ism["aquaniewski.gif"] = im(0, 97);ism["bigface.gif"] = im(14, 92);ism["vib2.gif"] = im(3, 97);ism["blimp.gif"] = im(8, 94);ism["blackadder.gif"] = im(12, 79);ism["blackcat.gif"] = im(4, 90);ism["cray_beast.gif"] = im(200, 200, 41, 171);ism["cray_bug.gif"] = im(200, 200, 43, 152);ism["cray_const.gif"] = im(200, 200, 15, 193);ism["cray_elf.gif"] = im(200, 200, 22, 181);ism["cray_demon.gif"] = im(200, 200, 32, 178);ism["cray_elemental.gif"] = im(200, 200, 8, 191);ism["cray_fish.gif"] = im(200, 200, 30, 145);ism["cray_plant.gif"] = im(200, 200, 9, 184);ism["cray_orc.gif"] = im(200, 200, 32, 169);ism["cray_goblin.gif"] = im(200, 200, 32, 167);ism["cray_construct.gif"] = im(200, 200, 23, 183);ism["cray_hippy.gif"] = im(200, 200, 19, 163);ism["cray_hobo.gif"] = im(200, 200, 1, 198);ism["cray_dude.gif"] = im(200, 200, 7, 182);ism["cray_humanoid.gif"] = im(200, 200, 12, 188);ism["cray_merkin.gif"] = im(200, 200, 17, 172);ism["cray_penguin.gif"] = im(200, 200, 31, 185);ism["cray_pirate.gif"] = im(200, 200, 18, 179);ism["cray_horror.gif"] = im(200, 200, 1, 197);ism["cray_slime.gif"] = im(200, 200, 61, 166);ism["cray_weird.gif"] = im(200, 200, 27, 186);ism["cray_undead.gif"] = im(200, 200, 22, 162);ism["blackfriar.gif"] = im(5, 97);ism["blknight.gif"] = im(4, 90);ism["witchywoman.gif"] = im(1, 99);ism["bb_ninja.gif"] = im(5, 91);ism["panther.gif"] = im(11, 93);ism["blpudding.gif"] = im(47, 98);ism["blackwidow.gif"] = im(0, 99);ism["pengblackop.gif"] = im(3, 98);ism["blackbush.gif"] = im(15, 98);ism["squid.gif"] = im(3, 95);ism["bluecultist.gif"] = im(0, 99);ism["mh_bluehair.gif"] = im(1, 98);ism["blur.gif"] = im(4, 97);ism["boaraffe.gif"] = im(0, 99);ism["bobrace.gif"] = im(11, 92);ism["bogleech.gif"] = im(10, 91);ism["bogskeleton.gif"] = im(1, 95);ism["bogart.gif"] = im(11, 91);ism["elf_boltcutters.gif"] = im(5, 78);ism["foss_wyrm.gif"] = im(200, 200, 0, 196);ism["bookbat.gif"] = im(22, 65);ism["boothslime.gif"] = im(2, 97);ism["bootycrab.gif"] = im(20, 85);ism["boozegiant.gif"] = im(5, 92);ism["bossbat.gif"] = im(26, 73);ism["deadbossbat.gif"] = im(7, 94);ism["crimonster3.gif"] = im(4, 96);ism["cricket.gif"] = im(5, 97);ism["box.gif"] = im(9, 87);ism["pa_muffin.gif"] = im(13, 87);ism["mystwander5.gif"] = im(5, 99);ism["broombrain.gif"] = im(6, 95);ism["bram.gif"] = im(8, 92);ism["breadgolem.gif"] = im(6, 90);ism["breakdancer.gif"] = im(0, 97);ism["brick_sleaze.gif"] = im(24, 96);ism["brick_cold.gif"] = im(1, 95);ism["brick_hot.gif"] = im(0, 99);ism["brick_spooky.gif"] = im(4, 95);ism["brick_stench.gif"] = im(4, 94);ism["brickoairship.gif"] = im(300, 300, 6, 295);ism["brickobat.gif"] = im(3, 68);ism["brickocathedral.gif"] = im(500, 450, 17, 443);ism["brickoelephant.gif"] = im(150, 150, 34, 132);ism["brickogchicken.gif"] = im(600, 450, 15, 444);ism["brickoctopus.gif"] = im(150, 150, 9, 143);ism["brickoblob.gif"] = im(57, 94);ism["brickooyster.gif"] = im(16, 91);ism["brickopython.gif"] = im(450, 100, 11, 87);ism["brickoturtle.gif"] = im(22, 77);ism["brickovacuum.gif"] = im(200, 200, 17, 182);ism["casebat.gif"] = im(40, 63);ism["bath_bubble.gif"] = im(17, 76);ism["iceguy5.gif"] = im(0, 97);ism["broctopus.gif"] = im(0, 99);ism["bronzechef.gif"] = im(0, 99);ism["babyseal.gif"] = im(6, 84);ism["togafrat.gif"] = im(2, 96);ism["twins_bubble.gif"] = im(13, 94);ism["bb_ghost.gif"] = im(5, 89);ism["bb_captain.gif"] = im(150, 150, 3, 143);ism["bb_drone.gif"] = im(2, 97);ism["bb_mortician.gif"] = im(9, 91);ism["robosurgeon.gif"] = im(14, 88);ism["bb_science.gif"] = im(6, 88);ism["binbox.gif"] = im(4, 91);ism["bugbugbear.gif"] = im(6, 91);ism["bulletbill.gif"] = im(15, 83);ism["bullseal.gif"] = im(9, 95);ism["ratbunch.gif"] = im(1, 92);ism["pa_meat.gif"] = im(5, 96);ism["bunsen.gif"] = im(9, 87);ism["sidekick.gif"] = im(5, 97);ism["adv_hot3.gif"] = im(18, 95);ism["snakeboss4.gif"] = im(150, 150, 19, 133);ism["bishop.gif"] = im(54, 94);ism["bush.gif"] = im(8, 93);ism["bushippy.gif"] = im(8, 94);ism["hedgerow.gif"] = im(25, 79);ism["pa_knife.gif"] = im(1, 87);ism["buzzerker.gif"] = im(11, 84);ism["buzzy.gif"] = im(0, 97);ism["chum2.gif"] = im(2, 89);ism["chumchief.gif"] = im(7, 94);ism["carnivore.gif"] = im(6, 96);ism["animbear.gif"] = im(0, 99);ism["laundrycabinet.gif"] = im(1, 98);ism["cactuary.gif"] = im(0, 97);ism["cameltoe.gif"] = im(5, 97);ism["cancan.gif"] = im(4, 97);ism["pecantree.gif"] = im(1, 98);ism["yamgolem.gif"] = im(0, 97);ism["gourd_cangoblin.gif"] = im(9, 88);ism["carbuncletop.gif"] = im(1, 92);ism["cargocrab.gif"] = im(7, 94);ism["dillplant.gif"] = im(2, 99);ism["carniv.gif"] = im(5, 94);ism["pa_eggs.gif"] = im(22, 86);ism["thecastle.gif"] = im(21, 78);ism["catalien.gif"] = im(21, 89);ism["spelunkcaveman.gif"] = im(7, 91);ism["cavedan.gif"] = im(0, 97);ism["cavefrat.gif"] = im(2, 95);ism["cavehippy.gif"] = im(0, 97);ism["cavesorority.gif"] = im(0, 95);ism["cavewomyn.gif"] = im(0, 94);ism["butt.gif"] = im(16, 81);ism["pengcement.gif"] = im(2, 97);ism["centurion.gif"] = im(7, 80);ism["adv_hot2.gif"] = im(2, 96);ism["chimp.gif"] = im(6, 90);ism["chalkdust.gif"] = im(6, 98);ism["hunter10.gif"] = im(1, 97);ism["c10chatty.gif"] = im(0, 96);ism["strix.gif"] = im(4, 93);ism["adv_stench2.gif"] = im(1, 97);ism["adv_fast1.gif"] = im(4, 93);ism["chefboy.gif"] = im(0, 98);ism["chester.gif"] = im(1, 97);ism["robotceo.gif"] = im(5, 92);ism["chocohare.gif"] = im(23, 93);ism["ccprairie.gif"] = im(1, 97);ism["soupgolem.gif"] = im(3, 93);ism["ciggirl.gif"] = im(0, 99);ism["animelf3.gif"] = im(19, 80);ism["cavebars.gif"] = im(0, 98);ism["clancy.gif"] = im(9, 94);ism["bathtub.gif"] = im(50, 97);ism["claygolem.gif"] = im(1, 98);ism["aboo_wiz.gif"] = im(3, 96);ism["cleanroomdemon.gif"] = im(5, 95);ism["cleanpirate.gif"] = im(3, 94);ism["girlpirate.gif"] = im(7, 91);ism["colaoff1.gif"] = im(4, 94);ism["colasol1.gif"] = im(6, 96);ism["rock_hopper.gif"] = im(0, 99);ism["whiskers.gif"] = im(8, 84);ism["clubfish.gif"] = im(1, 90);ism["prim_bact.gif"] = im(0, 98);ism["coaltergeist.gif"] = im(5, 91);ism["kg_oven.gif"] = im(8, 97);ism["spelunkcobra.gif"] = im(14, 77);ism["cocktailshrimp.gif"] = im(0, 99);ism["dvcoldbear1.gif"] = im(3, 97);ism["coldcutter.gif"] = im(2, 94);ism["dvcoldghost1.gif"] = im(0, 96);ism["coldhobo5.gif"] = im(2, 92);ism["wood_cold.gif"] = im(13, 96);ism["dvcoldskel1.gif"] = im(1, 95);ism["dvcoldvamp1.gif"] = im(3, 94);ism["dvcoldwolf1.gif"] = im(1, 98);ism["dvcoldzom1.gif"] = im(5, 98);ism["minegolem.gif"] = im(4, 89);ism["spider2.gif"] = im(20, 83);ism["pianist.gif"] = im(0, 98);ism["lilgoth.gif"] = im(19, 96);ism["2zombies.gif"] = im(6, 92);ism["conhippy.gif"] = im(2, 94);ism["regret1.gif"] = im(2, 90);ism["pa_cutter.gif"] = im(21, 76);ism["crimonster2.gif"] = im(0, 99);ism["coolerwino.gif"] = im(0, 97);ism["coppertender.gif"] = im(6, 91);ism["fatzombie.gif"] = im(9, 93);ism["prim_alga.gif"] = im(0, 98);ism["makeupwraith.gif"] = im(11, 81);ism["bakula.gif"] = im(7, 90);ism["drunkula.gif"] = im(100, 175, 5, 166);ism["drunkula_hm.gif"] = im(300, 175, 2, 159);ism["courtesan.gif"] = im(5, 95);ism["cowskeleton.gif"] = im(1, 97);ism["craggybart.gif"] = im(3, 91);ism["crate.gif"] = im(10, 89);ism["stone_raven.gif"] = im(21, 85);ism["bastard.gif"] = im(3, 94);ism["adv_smooth2.gif"] = im(3, 94);ism["clown.gif"] = im(3, 97);ism["creepydoll.gif"] = im(4, 96);ism["dianoga.gif"] = im(11, 87);ism["twins_ginger.gif"] = im(1, 98);ism["creepygirl.gif"] = im(32, 97);ism["pa_torch.gif"] = im(3, 92);ism["crimbomega.gif"] = im(400, 550, 7, 545);ism["spelunkcroc.gif"] = im(6, 89);ism["croqueteer.gif"] = im(1, 90);ism["dustmote.gif"] = im(20, 86);ism["hippy3.gif"] = im(8, 94);ism["crustpirate.gif"] = im(1, 95);ism["crys_rock.gif"] = im(200, 150, 2, 137);ism["cubistbull.gif"] = im(0, 99);ism["spelunkhawk.gif"] = im(3, 95);ism["curmpirate.gif"] = im(6, 93);ism["cybercop.gif"] = im(2, 97);ism["prim_cyru.gif"] = im(0, 98);ism["dad_machine.gif"] = im(400, 300, 6, 294);ism["daftpunk.gif"] = im(3, 97);ism["biggoat.gif"] = im(2, 98);ism["ooze.gif"] = im(45, 93);ism["dirtyape.gif"] = im(0, 99);ism["chad.gif"] = im(3, 93);ism["rorshach.gif"] = im(8, 79);ism["bath_showerhead.gif"] = im(2, 97);ism["venomtrout.gif"] = im(47, 99);ism["vice.gif"] = im(20, 85);ism["shiv_dead.gif"] = im(3, 94);ism["lumberjack.gif"] = im(5, 92);ism["whiteshark.gif"] = im(15, 71);ism["5_4a.gif"] = im(200, 200, 0, 197);ism["demfridge.gif"] = im(1, 99);ism["jigsaw.gif"] = im(12, 83);ism["demoninja.gif"] = im(17, 89);ism["liana.gif"] = im(13, 90);ism["wanderacc1.gif"] = im(1, 97);ism["hunter8.gif"] = im(0, 97);ism["goldfarmer.gif"] = im(9, 91);ism["spelunkdevil.gif"] = im(0, 99);ism["digitalug.gif"] = im(17, 87);ism["direpigeon.gif"] = im(0, 98);ism["hippy2.gif"] = im(8, 93);ism["dirtyoldlihc.gif"] = im(6, 99);ism["bandit.gif"] = im(1, 95);ism["dinbox.gif"] = im(16, 91);ism["c10files.gif"] = im(7, 98);ism["divingbelle.gif"] = im(0, 99);ism["js_oh.gif"] = im(5, 91);ism["pede.gif"] = im(20, 81);ism["dogalien.gif"] = im(3, 92);ism["catdog.gif"] = im(17, 85);ism["iceguy2.gif"] = im(8, 97);ism["doncrimbo.gif"] = im(0, 99);ism["donerbagon.gif"] = im(200, 200, 1, 189);ism["dwarf_dopey.gif"] = im(0, 99);ism["doubtman.gif"] = im(200, 200, 2, 193);ism["doughbat.gif"] = im(41, 63);ism["aquard.gif"] = im(0, 99);ism["drawkward.gif"] = im(4, 95);ism["drabbard.gif"] = im(8, 91);ism["droll.gif"] = im(18, 87);ism["dropbase.gif"] = im(12, 80);ism["drownedsailor.gif"] = im(1, 97);ism["drownedbeat.gif"] = im(0, 95);ism["ducknicedrunk.gif"] = im(1, 94);ism["drunkgoat.gif"] = im(2, 98);ism["pyg_drunk.gif"] = im(9, 99);ism["drunkminer.gif"] = im(0, 98);ism["hobo.gif"] = im(5, 91);ism["rat.gif"] = im(33, 67);ism["ratking.gif"] = im(200, 200, 7, 185);ism["aboo_dipshit.gif"] = im(1, 97);ism["straw_spooky.gif"] = im(39, 91);ism["dwarfgnome.gif"] = im(17, 84);ism["dweebie.gif"] = im(5, 94);ism["colaoff2.gif"] = im(4, 94);ism["colasol2.gif"] = im(6, 96);ism["eve.gif"] = im(0, 93);ism["eagle.gif"] = im(0, 98);ism["ed.gif"] = im(1, 98);ism["ed2.gif"] = im(1, 98);ism["ed3.gif"] = im(1, 98);ism["ed4.gif"] = im(1, 98);ism["ed5.gif"] = im(1, 98);ism["ed6.gif"] = im(22, 98);ism["ed7.gif"] = im(46, 98);ism["edwing.gif"] = im(24, 83);ism["eldiablo.gif"] = im(0, 99);ism["elders.gif"] = im(11, 85);ism["submarine.gif"] = im(8, 86);ism["nightstand5.gif"] = im(22, 82);ism["topi3.gif"] = im(7, 90);ism["elfhobo7.gif"] = im(42, 96);ism["warfratbg2.gif"] = im(0, 95);ism["elp_and_cros.gif"] = im(300, 150, 5, 146);ism["armor.gif"] = im(0, 98);ism["inflatiger.gif"] = im(7, 98);ism["c10confcall.gif"] = im(2, 94);ism["grayblob3.gif"] = im(150, 200, 21, 178);ism["cow.gif"] = im(0, 99);ism["adv_strong3.gif"] = im(9, 91);ism["gremlinglasses.gif"] = im(7, 94);ism["stairmaster.gif"] = im(12, 94);ism["mc_respect3.gif"] = im(4, 94);ism["mc_soy3.gif"] = im(0, 97);ism["mc_tofu3.gif"] = im(1, 98);ism["cultist.gif"] = im(3, 98);ism["mh_evilex.gif"] = im(0, 99);ism["evilolive.gif"] = im(15, 83);ism["spagcult2.gif"] = im(1, 95);ism["spagcult3.gif"] = im(0, 99);ism["spagcult1.gif"] = im(0, 98);ism["spagcult2k.gif"] = im(1, 95);ism["spagcult4.gif"] = im(0, 99);ism["spagcult1k.gif"] = im(0, 98);ism["trumpetmariachi.gif"] = im(2, 97);ism["vihuelamariachi.gif"] = im(2, 96);ism["crimbominer1.gif"] = im(0, 99);ism["skihippy.gif"] = im(3, 94);ism["fratboard.gif"] = im(3, 91);ism["wcorcs.gif"] = im(0, 97);ism["witchy2.gif"] = im(0, 99);ism["darkeye.gif"] = im(5, 91);ism["guai.gif"] = im(11, 85);ism["badskel1.gif"] = im(20, 84);ism["archfiend.gif"] = im(10, 84);ism["fallsfromsky.gif"] = im(100, 150, 2, 143);ism["fallsfromsky_hm.gif"] = im(200, 300, 7, 285);ism["jewels.gif"] = im(8, 82);ism["kobolds.gif"] = im(0, 97);ism["fandancer.gif"] = im(6, 91);ism["fanslime.gif"] = im(2, 94);ism["bathslug.gif"] = im(1, 98);ism["hunter5.gif"] = im(1, 98);ism["hunter9.gif"] = im(1, 93);ism["fearman.gif"] = im(200, 200, 12, 185);ism["bath_octopus.gif"] = im(0, 98);ism["wacken.gif"] = im(200, 200, 23, 186);ism["manyeyes.gif"] = im(4, 81);ism["felonia.gif"] = im(0, 98);ism["haiku2.gif"] = im(6, 91);ism["bath_pelican.gif"] = im(1, 97);ism["ferrelf.gif"] = im(5, 90);ism["finger.gif"] = im(2, 96);ism["asparagus.gif"] = im(9, 89);ism["duckskate.gif"] = im(2, 98);ism["filthworm2.gif"] = im(24, 75);ism["filthworm3.gif"] = im(19, 70);ism["hippy1.gif"] = im(8, 89);ism["stinkpirate1.gif"] = im(3, 97);ism["adv_hot1.gif"] = im(1, 97);ism["firetruck.gif"] = im(300, 150, 7, 145);ism["duckfirebreath.gif"] = im(7, 91);ism["fisherfish.gif"] = im(3, 97);ism["stinkpirate3.gif"] = im(1, 93);ism["giant_fitness.gif"] = im(9, 97);ism["bigskeleton5.gif"] = im(250, 100, 0, 99);ism["meatblob.gif"] = im(10, 79);ism["samurai.gif"] = im(0, 99);ism["flametroll.gif"] = im(1, 96);ism["flange.gif"] = im(12, 78);ism["flashypirate.gif"] = im(4, 94);ism["cvfleaman.gif"] = im(5, 90);ism["woodsman.gif"] = im(9, 96);ism["disco_flexible.gif"] = im(3, 97);ism["caveelf3.gif"] = im(25, 85);ism["horstray.gif"] = im(19, 89);ism["seagulls.gif"] = im(3, 91);ism["stabbats.gif"] = im(0, 97);ism["bunny.gif"] = im(49, 94);ism["gourd_fnord.gif"] = im(200, 200, 23, 171);ism["giant_foodie.gif"] = im(4, 97);ism["forspirit.gif"] = im(21, 74);ism["bigskeleton4.gif"] = im(200, 100, 0, 99);ism["mime.gif"] = im(0, 97);ism["artteacher.gif"] = im(4, 95);ism["accboss.gif"] = im(0, 98);ism["warfrata.gif"] = im(1, 96);ism["frenchturtle.gif"] = im(19, 72);ism["bonefish.gif"] = im(40, 97);ism["frog.gif"] = im(53, 99);ism["frosty.gif"] = im(0, 99);ism["straw_cold.gif"] = im(12, 91);ism["mystwander3.gif"] = im(8, 94);ism["duckfrozen.gif"] = im(2, 96);ism["snakeboss1.gif"] = im(150, 150, 21, 133);ism["fruitgolem.gif"] = im(8, 97);ism["anger3.gif"] = im(0, 99);ism["fudgemonkey2.gif"] = im(0, 99);ism["fudgeoyster.gif"] = im(0, 99);ism["fudgepoodle.gif"] = im(2, 96);ism["fudgevulture.gif"] = im(0, 99);ism["fudgeweasel.gif"] = im(11, 86);ism["bigmirror.gif"] = im(0, 99);ism["fun-gal1.gif"] = im(0, 99);ism["funkparticle.gif"] = im(8, 94);ism["solebrother.gif"] = im(19, 76);ism["stinkpirate2.gif"] = im(3, 96);ism["shiv_fur.gif"] = im(1, 94);ism["giant_furry.gif"] = im(0, 98);ism["gimp.gif"] = im(15, 90);ism["gamblinman.gif"] = im(1, 95);ism["muggers.gif"] = im(2, 98);ism["ganger.gif"] = im(16, 88);ism["garbagetourist.gif"] = im(3, 94);ism["gargantulihc.gif"] = im(1, 93);ism["ghuol_skinny.gif"] = im(16, 90);ism["gelcube.gif"] = im(12, 97);ism["generalseal.gif"] = im(150, 100, 2, 97);ism["duckgeneric.gif"] = im(4, 94);ism["merkinballer2.gif"] = im(1, 99);ism["phantom.gif"] = im(1, 95);ism["cvghost.gif"] = im(4, 92);ism["spelunkghost.gif"] = im(11, 91);ism["ghostminer.gif"] = im(1, 98);ism["elizabeth.gif"] = im(10, 86);ism["fernghost.gif"] = im(1, 92);ism["worker.gif"] = im(2, 94);ism["adv_spooky1.gif"] = im(8, 91);ism["ghuol_reg.gif"] = im(11, 85);ism["giantbee.gif"] = im(2, 84);ism["pterodactyl.gif"] = im(6, 91);ism["globe.gif"] = im(0, 95);ism["friedegg.gif"] = im(2, 82);ism["centipede.gif"] = im(21, 81);ism["moth.gif"] = im(5, 95);ism["isopod.gif"] = im(35, 95);ism["python.gif"] = im(4, 93);ism["bath_whale.gif"] = im(14, 82);ism["manyspiders.gif"] = im(1, 94);ism["watertentacle.gif"] = im(6, 93);ism["tweezers.gif"] = im(6, 93);ism["headpumpkin.gif"] = im(5, 96);ism["rubberspider.gif"] = im(15, 84);ism["sandworm.gif"] = im(2, 99);ism["giantskel.gif"] = im(0, 99);ism["tarantula.gif"] = im(1, 97);ism["giantsquid.gif"] = im(0, 98);ism["whelps3.gif"] = im(0, 99);ism["tardigrade.gif"] = im(4, 91);ism["zomfish.gif"] = im(2, 86);ism["crimonster5.gif"] = im(0, 92);ism["gladiator.gif"] = im(1, 96);ism["juiceglass.gif"] = im(12, 87);ism["wood_hot.gif"] = im(3, 95);ism["ghuol_fat.gif"] = im(13, 87);ism["gnarlgnome.gif"] = im(9, 79);ism["gnasgnome.gif"] = im(6, 77);ism["gnefgnome.gif"] = im(12, 83);ism["dk_builder.gif"] = im(9, 97);ism["dk_cross.gif"] = im(3, 94);ism["dk_swatter.gif"] = im(3, 95);ism["dk_gearhead.gif"] = im(1, 97);ism["dk_piechef.gif"] = im(0, 99);ism["dk_plunger.gif"] = im(3, 93);ism["gnollmage.gif"] = im(3, 95);ism["dk_juggler.gif"] = im(1, 97);ism["dk_warchef.gif"] = im(0, 98);ism["gnomester.gif"] = im(5, 91);ism["gnugnome.gif"] = im(10, 84);ism["gourd_goblin.gif"] = im(7, 92);ism["goomba.gif"] = im(9, 89);ism["1_4a.gif"] = im(200, 200, 2, 198);ism["1_1.gif"] = im(18, 93);ism["1_2.gif"] = im(10, 92);ism["1_3.gif"] = im(10, 93);ism["giant_goth.gif"] = im(3, 96);ism["gourami.gif"] = im(51, 93);ism["gov_agent.gif"] = im(11, 94);ism["scientist.gif"] = im(3, 95);ism["adv_stench1.gif"] = im(6, 97);ism["grasselemental.gif"] = im(0, 99);ism["grasspirate.gif"] = im(0, 95);ism["rober.gif"] = im(8, 91);ism["zomshovel.gif"] = im(4, 94);ism["adv_sleaze1.gif"] = im(3, 90);ism["duckgreasy.gif"] = im(0, 91);ism["wolfoftheair.gif"] = im(200, 150, 8, 136);ism["wolfoftheair_hm.gif"] = im(200, 150, 7, 135);ism["warhipgr.gif"] = im(5, 93);ism["porkbun.gif"] = im(14, 79);ism["gritpirate.gif"] = im(1, 97);ism["surv_grizzled.gif"] = im(3, 91);ism["wingedyeti.gif"] = im(200, 100, 0, 99);ism["groast.gif"] = im(5, 94);ism["grouchewie.gif"] = im(7, 90);ism["cultistgroup.gif"] = im(4, 96);ism["groupie.gif"] = im(16, 85);ism["dwarf_grumpy.gif"] = im(0, 99);ism["grungypirate.gif"] = im(11, 95);ism["guardturtle4.gif"] = im(37, 94);ism["plesio.gif"] = im(1, 98);ism["gurgle.gif"] = im(150, 100, 0, 99);ism["animturtle.gif"] = im(100, 120, 4, 118);ism["beeguy.gif"] = im(0, 96);ism["gothic.gif"] = im(4, 96);ism["adv_sleaze2.gif"] = im(6, 89);ism["drunkyam.gif"] = im(0, 99);ism["hamsterpus.gif"] = im(2, 88);ism["mariachi1.gif"] = im(2, 97);ism["shiv_hangman.gif"] = im(3, 93);ism["hunter12.gif"] = im(3, 97);ism["skullabra.gif"] = im(1, 91);ism["tureen.gif"] = im(6, 87);ism["heatseal.gif"] = im(0, 99);ism["warfratar2.gif"] = im(10, 88);ism["nachogolem.gif"] = im(0, 98);ism["hellion.gif"] = im(3, 95);ism["sealguard.gif"] = im(13, 95);ism["sealpup.gif"] = im(29, 81);ism["hepcat.gif"] = im(1, 98);ism["hunter6.gif"] = im(3, 96);ism["hermeticseal.gif"] = im(5, 88);ism["c10slideshow.gif"] = im(10, 89);ism["highpriest.gif"] = im(0, 99);ism["warbear31.gif"] = im(0, 99);ism["snakes.gif"] = im(2, 83);ism["elfhobo8.gif"] = im(30, 99);ism["hockeyelem.gif"] = im(6, 90);ism["hodgman.gif"] = im(1, 96);ism["holoarmy.gif"] = im(2, 92);ism["honeypot.gif"] = im(5, 92);ism["hooded.gif"] = im(4, 96);ism["stenchfamily.gif"] = im(4, 96);ism["prim_amoe.gif"] = im(0, 98);ism["dvhotbear1.gif"] = im(5, 94);ism["dvhotghost1.gif"] = im(4, 93);ism["hothobo3.gif"] = im(0, 97);ism["dvhotskel1.gif"] = im(13, 99);ism["dvhotvamp1.gif"] = im(0, 98);ism["dvhotwolf1.gif"] = im(12, 98);ism["dvhotzom1.gif"] = im(1, 98);ism["ghuol_huge.gif"] = im(5, 95);ism["giantmosquito.gif"] = im(0, 98);ism["iceguy1.gif"] = im(1, 98);ism["bridgetroll.gif"] = im(2, 97);ism["vib6.gif"] = im(7, 98);ism["caveelf2.gif"] = im(18, 73);ism["huntingseal.gif"] = im(9, 85);ism["poolghost.gif"] = im(0, 99);ism["hypnotist.gif"] = im(0, 97);ism["medicus.gif"] = im(3, 92);ism["bb_vamp.gif"] = im(3, 93);ism["adv_cold2.gif"] = im(0, 98);ism["icecreamtruck.gif"] = im(400, 150, 9, 142);ism["icecube.gif"] = im(12, 94);ism["iceskate.gif"] = im(4, 96);ism["adv_cold3.gif"] = im(8, 93);ism["mummycat.gif"] = im(1, 96);ism["illegal_alien.gif"] = im(24, 96);ism["vib3.gif"] = im(0, 99);ism["drunktofurkey.gif"] = im(0, 99);ism["seal_larva.gif"] = im(63, 93);ism["seal_baby.gif"] = im(47, 93);ism["meatbug.gif"] = im(7, 89);ism["inkubus.gif"] = im(7, 97);ism["mariachi2.gif"] = im(2, 91);ism["adv_strong2.gif"] = im(5, 92);ism["encount.gif"] = im(3, 93);ism["jacobsadder.gif"] = im(0, 99);ism["orquette1.gif"] = im(13, 86);ism["jamfish.gif"] = im(0, 98);ism["pilot.gif"] = im(3, 97);ism["jetski.gif"] = im(15, 94);ism["jockohomo.gif"] = im(0, 98);ism["merkindragger2.gif"] = im(1, 99);ism["doubt3.gif"] = im(0, 99);ism["orangutan.gif"] = im(8, 97);ism["scabie_jungle.gif"] = im(2, 92);ism["thejunk.gif"] = im(19, 86);ism["js_bender.gif"] = im(5, 91);ism["js_melter.gif"] = im(11, 95);ism["js_sharpener.gif"] = im(7, 90);ism["orquette2.gif"] = im(13, 86);ism["keese.gif"] = im(25, 66);ism["tooold.gif"] = im(1, 97);ism["clownfish.gif"] = im(22, 82);ism["adv_smart3.gif"] = im(15, 94);ism["snaknight.gif"] = im(0, 97);ism["wolfknight.gif"] = im(3, 97);ism["knight.gif"] = im(7, 91);ism["kg_accountant.gif"] = im(12, 98);ism["kg_alchemist.gif"] = im(15, 94);ism["kg_asstchef.gif"] = im(0, 99);ism["kg_bbqteam.gif"] = im(1, 99);ism["kg_beancounter.gif"] = im(12, 97);ism["kg_guard.gif"] = im(10, 94);ism["kg_guardcaptain.gif"] = im(10, 94);ism["kg_embezzler.gif"] = im(12, 97);ism["kg_haremgirl.gif"] = im(15, 89);ism["kg_haremguard.gif"] = im(14, 94);ism["kg_king.gif"] = im(0, 98);ism["kg_madsci.gif"] = im(11, 91);ism["kg_madam.gif"] = im(16, 97);ism["kg_masterchef.gif"] = im(0, 99);ism["kg_mba.gif"] = im(16, 98);ism["kg_mutant.gif"] = im(13, 97);ism["kg_poseur.gif"] = im(28, 94);ism["kg_souschef.gif"] = im(0, 98);ism["kg_verymadsci.gif"] = im(15, 92);ism["slanding.gif"] = im(5, 91);ism["yeti.gif"] = im(1, 95);ism["koopa.gif"] = im(5, 93);ism["kublakhan.gif"] = im(5, 92);ism["adv_fast3.gif"] = im(4, 92);ism["limp.gif"] = im(8, 94);ism["labmonkey.gif"] = im(16, 91);ism["n00b.gif"] = im(6, 91);ism["lower_k.gif"] = im(7, 81);ism["headwolf.gif"] = im(0, 98);ism["grayblob2.gif"] = im(9, 93);ism["larrysignfield.gif"] = im(9, 95);ism["filthworm1.gif"] = im(49, 83);ism["statbike.gif"] = im(2, 96);ism["linbox.gif"] = im(17, 91);ism["lemonfish.gif"] = im(17, 74);ism["adv_sleaze4.gif"] = im(3, 97);ism["lfruitgol.gif"] = im(33, 84);ism["licosnake.gif"] = im(5, 94);ism["lich.gif"] = im(3, 98);ism["bb_liquidmetal.gif"] = im(7, 92);ism["liquidmetal.gif"] = im(1, 97);ism["grayblob1.gif"] = im(40, 88);ism["canoeman.gif"] = im(13, 66);ism["wanderacc2.gif"] = im(1, 98);ism["pa_bread.gif"] = im(7, 95);ism["lobsterman.gif"] = im(1, 98);ism["lollicat.gif"] = im(12, 91);ism["lolligator.gif"] = im(18, 85);ism["lollipede.gif"] = im(11, 77);ism["lolliphaunt.gif"] = im(12, 91);ism["spelunklolm.gif"] = im(250, 300, 3, 269);ism["lollirus2.gif"] = im(9, 91);ism["vib5.gif"] = im(1, 97);ism["coalition.gif"] = im(2, 89);ism["soggyraven.gif"] = im(0, 99);ism["lordspooky.gif"] = im(7, 97);ism["lotswife.gif"] = im(1, 97);ism["lizardfish.gif"] = im(31, 61);ism["regret2.gif"] = im(1, 95);ism["lower_h.gif"] = im(13, 87);ism["catstatue.gif"] = im(15, 84);ism["lumbersup.gif"] = im(5, 92);ism["lumberjill.gif"] = im(5, 92);ism["lumberjuan.gif"] = im(0, 92);ism["4_4a.gif"] = im(200, 200, 13, 168);ism["4_1.gif"] = im(21, 70);ism["4_2.gif"] = im(19, 92);ism["4_3.gif"] = im(3, 97);ism["lynyrd.gif"] = im(9, 91);ism["skinner.gif"] = im(2, 96);ism["adv_strong1.gif"] = im(5, 94);ism["madbugbear.gif"] = im(6, 95);ism["prim_flag.gif"] = im(0, 98);ism["madwino.gif"] = im(6, 94);ism["madiator.gif"] = im(2, 96);ism["dragonfish.gif"] = im(0, 99);ism["mech.gif"] = im(1, 98);ism["spelunkmagma.gif"] = im(7, 84);ism["cropcircle.gif"] = im(2, 93);ism["hairclog.gif"] = im(0, 94);ism["magfield.gif"] = im(1, 93);ism["tofurkey.gif"] = im(2, 92);ism["maltliquorgolem.gif"] = im(0, 99);ism["mammon.gif"] = im(200, 200, 11, 193);ism["redbuttons.gif"] = im(1, 93);ism["audrey.gif"] = im(0, 98);ism["wraith5.gif"] = im(10, 90);ism["bandolero.gif"] = im(0, 99);ism["mar_bruiser.gif"] = im(4, 93);ism["mariachi3.gif"] = im(1, 96);ism["wraith3.gif"] = im(9, 88);ism["promoter.gif"] = im(2, 93);ism["wasp.gif"] = im(13, 96);ism["mayorghost.gif"] = im(200, 150, 3, 146);ism["mayorghost_hm.gif"] = im(200, 150, 5, 147);ism["beggar.gif"] = im(0, 98);ism["duckmeandrunk.gif"] = im(3, 96);ism["med_dung.gif"] = im(5, 94);ism["med_mugman.gif"] = im(3, 92);ism["med_muggirl.gif"] = im(5, 89);ism["med_potter.gif"] = im(3, 91);ism["med_strawman.gif"] = im(0, 97);ism["med_stucco.gif"] = im(12, 96);ism["cvmedusa.gif"] = im(4, 91);ism["megafrog.gif"] = im(15, 89);ism["vib1.gif"] = im(0, 98);ism["lawngnome1.gif"] = im(14, 80);ism["nemesisthug.gif"] = im(7, 90);ism["merkinalphabet.gif"] = im(6, 93);ism["merkinballer.gif"] = im(4, 98);ism["merkinswitcher.gif"] = im(4, 98);ism["merkinburglar.gif"] = im(1, 95);ism["merkindiver.gif"] = im(1, 95);ism["merkindrifter.gif"] = im(4, 98);ism["merkinhealer.gif"] = im(3, 95);ism["merkinjuicer.gif"] = im(4, 98);ism["merkinminer.gif"] = im(1, 95);ism["merkinmonitor.gif"] = im(6, 93);ism["merkindragger.gif"] = im(4, 98);ism["merkinposeur.gif"] = im(1, 95);ism["merkinpunisher.gif"] = im(1, 95);ism["merkinraider.gif"] = im(3, 95);ism["merkinresearcher.gif"] = im(6, 93);ism["merkinspear.gif"] = im(1, 95);ism["merkinscav.gif"] = im(1, 95);ism["merkinghost.gif"] = im(13, 85);ism["merkinteacher.gif"] = im(2, 99);ism["merkintippler.gif"] = im(1, 99);ism["merkintrainer.gif"] = im(4, 98);ism["mercenary.gif"] = im(6, 95);ism["pengmesmer.gif"] = im(3, 99);ism["adv_smart2.gif"] = im(6, 98);ism["adv_fast2.gif"] = im(1, 96);ism["lowerm.gif"] = im(9, 90);ism["barrel.gif"] = im(7, 91);ism["minecrab.gif"] = im(0, 99);ism["twins_mism.gif"] = im(100, 200, 17, 198);ism["badportrait.gif"] = im(0, 98);ism["pengarson.gif"] = im(2, 97);ism["mobcapo.gif"] = im(8, 95);ism["pengcapo.gif"] = im(3, 98);ism["pengdemo.gif"] = im(2, 98);ism["pengthug.gif"] = im(2, 98);ism["peng_ent.gif"] = im(3, 98);ism["pengbook.gif"] = im(2, 98);ism["penggun.gif"] = im(3, 98);ism["pengpsycho.gif"] = im(3, 98);ism["pengracket.gif"] = im(3, 99);ism["pengsmasher.gif"] = im(0, 98);ism["hazmatpeng.gif"] = im(0, 98);ism["pengphone.gif"] = im(0, 98);ism["warhipar2.gif"] = im(6, 89);ism["modelskeleton.gif"] = im(1, 99);ism["modernzombie.gif"] = im(8, 91);ism["moyster.gif"] = im(7, 93);ism["moneybee.gif"] = im(11, 75);ism["elf_wrench.gif"] = im(17, 87);ism["monsterhearse.gif"] = im(250, 200, 22, 186);ism["boiler.gif"] = im(4, 95);ism["monty.gif"] = im(4, 95);ism["moonshriner.gif"] = im(0, 99);ism["fear1.gif"] = im(0, 99);ism["wraith1.gif"] = im(8, 83);ism["motherseal.gif"] = im(9, 91);ism["../otherimages/slimetube/stboss.gif"] = im(200, 200, 22, 175);ism["motorhead.gif"] = im(2, 95);ism["mountainman.gif"] = im(3, 97);ism["lawngnome3.gif"] = im(1, 99);ism["lawngnome2.gif"] = im(26, 98);ism["adv_strong4.gif"] = im(17, 91);ism["adv_cold4.gif"] = im(0, 99);ism["chemteacher.gif"] = im(0, 98);ism["swampturtle.gif"] = im(0, 99);ism["muff.gif"] = im(10, 78);ism["mumblebee.gif"] = im(27, 74);ism["spelunkmumm.gif"] = im(3, 92);ism["antlerelf.gif"] = im(12, 97);ism["elfblob.gif"] = im(5, 98);ism["elflimbs.gif"] = im(17, 97);ism["elfclaw.gif"] = im(25, 96);ism["elfhulk.gif"] = im(3, 97);ism["alielephant.gif"] = im(10, 97);ism["mutantalielf.gif"] = im(1, 97);ism["bb_vassist.gif"] = im(3, 95);ism["nastybear.gif"] = im(1, 97);ism["fear3.gif"] = im(1, 99);ism["sorcform1.gif"] = im(0, 99);ism["sorcblob.gif"] = im(200, 200, 28, 197);ism["bigsaus.gif"] = im(39, 59);ism["warfratmd2.gif"] = im(2, 96);ism["navyseal.gif"] = im(0, 98);ism["giant_neckbeard.gif"] = im(3, 95);ism["neil.gif"] = im(6, 95);ism["flytrap.gif"] = im(0, 96);ism["mc_respect2.gif"] = im(0, 97);ism["mc_respect1.gif"] = im(0, 97);ism["snakenest.gif"] = im(8, 88);ism["newt.gif"] = im(43, 97);ism["emofrat.gif"] = im(0, 97);ism["ninjawaiter.gif"] = im(5, 95);ism["ninjarice.gif"] = im(7, 95);ism["snowman.gif"] = im(7, 95);ism["ninja_ass.gif"] = im(3, 91);ism["ninjamop.gif"] = im(10, 98);ism["ninjacloud.gif"] = im(3, 97);ism["nhobo2.gif"] = im(2, 93);ism["hunter2.gif"] = im(0, 99);ism["tropicalskel.gif"] = im(0, 98);ism["novia.gif"] = im(5, 99);ism["novio.gif"] = im(11, 97);ism["nurseshark.gif"] = im(15, 71);ism["whirlwind.gif"] = im(8, 91);ism["tourist.gif"] = im(9, 92);ism["octopus.gif"] = im(0, 96);ism["octorok.gif"] = im(10, 93);ism["headghost.gif"] = im(4, 94);ism["adv_stench4.gif"] = im(0, 97);ism["kg_offdutyguard.gif"] = im(13, 95);ism["officialseal.gif"] = im(17, 91);ism["oilbaron.gif"] = im(0, 99);ism["oilcartel2.gif"] = im(200, 100, 5, 97);ism["oilslick.gif"] = im(29, 61);ism["oiltycoon.gif"] = im(1, 99);ism["straw_sleaze.gif"] = im(37, 93);ism["olscratch.gif"] = im(2, 97);ism["nopic.gif"] = im(10, 98);ism["dk_oneeye.gif"] = im(2, 95);ism["oneeyed.gif"] = im(4, 91);ism["fratboy.gif"] = im(2, 91);ism["fratskirt.gif"] = im(2, 91);ism["fratbong.gif"] = im(2, 91);ism["lilfratboy.gif"] = im(7, 86);ism["oscus.gif"] = im(5, 97);ism["bandsaw.gif"] = im(11, 87);ism["tableoutlaw.gif"] = im(8, 93);ism["outlawboss.gif"] = im(0, 97);ism["surv_overarmed.gif"] = im(0, 98);ism["pimp.gif"] = im(17, 90);ism["elpriest.gif"] = im(1, 97);ism["stonebros.gif"] = im(2, 96);ism["warfratpr.gif"] = im(19, 85);ism["ptowels.gif"] = im(0, 99);ism["hunter3.gif"] = im(1, 99);ism["peanut.gif"] = im(0, 98);ism["mh_roommate.gif"] = im(2, 97);ism["pencil.gif"] = im(5, 93);ism["defense_sphere.gif"] = im(3, 97);ism["pestopuddle.gif"] = im(46, 91);ism["perpbat.gif"] = im(5, 88);ism["bystander.gif"] = im(1, 96);ism["somepig.gif"] = im(3, 88);ism["pinebat.gif"] = im(33, 69);ism["piranhadon.gif"] = im(29, 97);ism["wood_stench.gif"] = im(3, 90);ism["adv_spooky2.gif"] = im(4, 95);ism["plaidghost.gif"] = im(7, 95);ism["plaque.gif"] = im(0, 99);ism["drunkcrancan.gif"] = im(1, 99);ism["drunkfrat.gif"] = im(1, 96);ism["animelf2.gif"] = im(20, 81);ism["poolter.gif"] = im(1, 97);ism["poolter2.gif"] = im(2, 98);ism["popnlocker.gif"] = im(0, 98);ism["porkbutterfly.gif"] = im(9, 88);ism["porksword.gif"] = im(17, 87);ism["adv_sleaze3.gif"] = im(8, 90);ism["abom.gif"] = im(6, 95);ism["crancan.gif"] = im(21, 95);ism["mystwander2.gif"] = im(9, 95);ism["mystwander1.gif"] = im(8, 95);ism["tomatosoup.gif"] = im(6, 89);ism["eyewash.gif"] = im(11, 91);ism["mystwander4.gif"] = im(1, 97);ism["mangler.gif"] = im(5, 95);ism["organ.gif"] = im(1, 99);ism["silverware.gif"] = im(0, 99);ism["toybox.gif"] = im(7, 89);ism["winerack.gif"] = im(4, 98);ism["question.gif"] = im(0, 86);ism["pouooze.gif"] = im(33, 88);ism["primp.gif"] = im(7, 90);ism["fly.gif"] = im(4, 92);ism["surv_primitive.gif"] = im(2, 91);ism["chalmers.gif"] = im(1, 98);ism["bigskeleton.gif"] = im(0, 98);ism["giant_procrast.gif"] = im(5, 98);ism["profjacking.gif"] = im(2, 96);ism["elf_propaganda.gif"] = im(11, 84);ism["protag.gif"] = im(6, 95);ism["protspect.gif"] = im(0, 99);ism["spurt.gif"] = im(0, 99);ism["elf_provocateur.gif"] = im(10, 83);ism["pterodact.gif"] = im(250, 150, 14, 136);ism["pufferfish.gif"] = im(0, 98);ism["pumpedbass.gif"] = im(17, 69);ism["shiv_pumpkin.gif"] = im(6, 97);ism["giant_punk.gif"] = im(0, 98);ism["pyg_squad.gif"] = im(0, 99);ism["pyg_blowgunner.gif"] = im(31, 99);ism["pyg_bowler.gif"] = im(29, 98);ism["pyg_headhunter.gif"] = im(28, 99);ism["pyg_janitor.gif"] = im(41, 99);ism["pyg_orderlies.gif"] = im(18, 98);ism["pyg_shaman.gif"] = im(24, 97);ism["pyg_acct.gif"] = im(33, 99);ism["pyg_lawyer.gif"] = im(27, 98);ism["pyg_nurse.gif"] = im(20, 98);ism["pyg_surgeon.gif"] = im(21, 99);ism["wood_spooky.gif"] = im(28, 90);ism["animelf4.gif"] = im(19, 78);ism["upper_q.gif"] = im(8, 88);ism["beequeen.gif"] = im(13, 87);ism["spelunkbeeq.gif"] = im(200, 150, 5, 149);ism["filthworm4.gif"] = im(0, 97);ism["qbasicele.gif"] = im(0, 97);ism["healer.gif"] = im(9, 93);ism["wanderacc3.gif"] = im(0, 99);ism["mmoaddict.gif"] = im(12, 94);ism["racebob.gif"] = im(11, 92);ism["weightrack.gif"] = im(27, 95);ism["elf_raconteur.gif"] = im(7, 80);ism["radiator.gif"] = im(0, 99);ism["hunter13.gif"] = im(7, 93);ism["anger1.gif"] = im(0, 99);ism["ragingbull.gif"] = im(2, 94);ism["adding.gif"] = im(2, 89);ism["mh_scenester.gif"] = im(1, 96);ism["ratbat.gif"] = im(19, 67);ism["duckrattle.gif"] = im(2, 96);ism["raven.gif"] = im(18, 93);ism["giant_raver.gif"] = im(0, 99);ism["wallpaper.gif"] = im(17, 83);ism["foss_baboon.gif"] = im(1, 97);ism["foss_bat.gif"] = im(38, 69);ism["foss_demon.gif"] = im(150, 150, 2, 130);ism["foss_spider.gif"] = im(150, 150, 32, 130);ism["foss_serpent.gif"] = im(1, 96);ism["redbutler.gif"] = im(4, 95);ism["redfox.gif"] = im(5, 94);ism["redherring.gif"] = im(7, 94);ism["redskeleton.gif"] = im(5, 97);ism["redsnapper.gif"] = im(6, 90);ism["regretman.gif"] = im(200, 200, 9, 180);ism["regbat.gif"] = im(35, 66);ism["headlessskel.gif"] = im(15, 89);ism["mistress.gif"] = im(2, 99);ism["giant_renfair.gif"] = im(1, 97);ism["reneccorman.gif"] = im(1, 97);ism["doubt2.gif"] = im(6, 92);ism["revbugbear.gif"] = im(1, 98);ism["merkinswitcher2.gif"] = im(1, 99);ism["duckgolem.gif"] = im(2, 92);ism["rock_guy.gif"] = im(31, 96);ism["popweasel.gif"] = im(0, 99);ism["scorpion.gif"] = im(8, 91);ism["rock_snake.gif"] = im(1, 97);ism["caveelf1.gif"] = im(21, 78);ism["rock_fish.gif"] = im(24, 77);ism["rollerskate.gif"] = im(2, 92);ism["muse.gif"] = im(2, 96);ism["rollingstone.gif"] = im(4, 90);ism["roncopper.gif"] = im(3, 96);ism["realdolphin.gif"] = im(14, 92);ism["duckfat.gif"] = im(0, 99);ism["rudolfus.gif"] = im(3, 97);ism["rulergolem.gif"] = im(0, 99);ism["runningman.gif"] = im(2, 94);ism["bum.gif"] = im(8, 95);ism["elf_saboteur.gif"] = im(22, 79);ism["ferret.gif"] = im(2, 90);ism["toothgoat.gif"] = im(0, 95);ism["stkiwi.gif"] = im(8, 85);ism["lime.gif"] = im(15, 77);ism["sadiator.gif"] = im(3, 92);ism["safarijack.gif"] = im(1, 97);ism["salamander.gif"] = im(51, 97);ism["salaminder.gif"] = im(26, 88);ism["salaryninja.gif"] = im(4, 96);ism["pirate1.gif"] = im(6, 93);ism["adv_smooth1.gif"] = im(5, 92);ism["zompirate.gif"] = im(7, 93);ism["bb_scav.gif"] = im(7, 93);ism["gummifish.gif"] = im(0, 99);ism["schoolofmany.gif"] = im(3, 94);ism["wizardfish.gif"] = im(1, 99);ism["scimitarfish.gif"] = im(16, 73);ism["duckscorch.gif"] = im(0, 98);ism["spelunkscorp.gif"] = im(3, 89);ism["hunter4.gif"] = im(2, 92);ism["scoutseal.gif"] = im(12, 86);ism["screambat.gif"] = im(24, 79);ism["screwgolem.gif"] = im(3, 98);ism["seacow.gif"] = im(17, 73);ism["seacowboy.gif"] = im(0, 98);ism["adv_smooth4.gif"] = im(2, 95);ism["secrobot.gif"] = im(11, 87);ism["securityslime.gif"] = im(4, 96);ism["crimbominer2.gif"] = im(9, 81);ism["sadpoet.gif"] = im(5, 93);ism["atm.gif"] = im(7, 94);ism["serialbus.gif"] = im(1, 94);ism["grodseal.gif"] = im(3, 93);ism["fireservant1.gif"] = im(0, 99);ism["sewergator.gif"] = im(11, 78);ism["sewersnake.gif"] = im(5, 91);ism["sewertruck.gif"] = im(400, 150, 6, 143);ism["sororghost2.gif"] = im(7, 92);ism["sororeton2.gif"] = im(3, 94);ism["sororpire1.gif"] = im(7, 97);ism["sororwolf3.gif"] = im(5, 96);ism["sororbie3.gif"] = im(3, 95);ism["shadowseal.gif"] = im(8, 91);ism["sheetghost.gif"] = im(5, 95);ism["shopkeep.gif"] = im(7, 91);ism["shub-jigguwatt.gif"] = im(300, 300, 20, 283);ism["tacoelf_sign.gif"] = im(27, 94);ism["caveelf4.gif"] = im(14, 77);ism["sk8gnome.gif"] = im(23, 77);ism["boardskate.gif"] = im(3, 91);ism["animrat.gif"] = im(1, 93);ism["catskel.gif"] = im(20, 84);ism["hamskel.gif"] = im(73, 95);ism["monkeyskel.gif"] = im(17, 77);ism["crimonster6.gif"] = im(3, 95);ism["steward.gif"] = im(3, 97);ism["spelunkskel.gif"] = im(10, 91);ism["mopskeleton.gif"] = im(6, 96);ism["buttleton.gif"] = im(3, 97);ism["sketchyvan.gif"] = im(200, 100, 0, 99);ism["skinflute.gif"] = im(27, 76);ism["skeleton.gif"] = im(6, 93);ism["skullbat.gif"] = im(31, 66);ism["skulldozer.gif"] = im(450, 300, 12, 278);ism["skullery.gif"] = im(0, 97);ism["dvsleazebear1.gif"] = im(5, 89);ism["dvsleazeghost1.gif"] = im(11, 88);ism["slhobo4.gif"] = im(2, 93);ism["dvsleazeskel1.gif"] = im(9, 92);ism["dvsleazevamp1.gif"] = im(3, 96);ism["dvsleazewolf1.gif"] = im(2, 97);ism["dvsleazezom1.gif"] = im(4, 93);ism["kg_sleepingguard.gif"] = im(0, 98);ism["dwarf_sleepy.gif"] = im(37, 95);ism["mar_sleepy.gif"] = im(0, 99);ism["slime1_1.gif"] = im(0, 98);ism["slime2_1.gif"] = im(0, 96);ism["slime3_1.gif"] = im(2, 97);ism["slime4_1.gif"] = im(3, 95);ism["slime5_1.gif"] = im(0, 98);ism["wood_sleaze.gif"] = im(16, 79);ism["holglob.gif"] = im(34, 89);ism["slithering.gif"] = im(15, 81);ism["ssd_burger.gif"] = im(0, 99);ism["ssd_cocktail.gif"] = im(0, 98);ism["ssd_sundae.gif"] = im(1, 98);ism["eliot.gif"] = im(5, 97);ism["smartskel.gif"] = im(4, 94);ism["smellothewisp.gif"] = im(4, 98);ism["smokemonster.gif"] = im(5, 96);ism["adv_smooth3.gif"] = im(3, 97);ism["scabie_jazz.gif"] = im(2, 89);ism["smutorc_jacker.gif"] = im(6, 95);ism["smutorc_nailer.gif"] = im(8, 96);ism["smutorc_pervert.gif"] = im(7, 93);ism["smutorc_layer.gif"] = im(5, 97);ism["smutorc_screwer.gif"] = im(9, 97);ism["spelunksnake.gif"] = im(20, 83);ism["snakeboss6.gif"] = im(150, 150, 26, 131);ism["snapdragon.gif"] = im(1, 98);ism["snowqueen.gif"] = im(0, 98);ism["adv_cold1.gif"] = im(9, 93);ism["sodium.gif"] = im(3, 92);ism["6_4a.gif"] = im(200, 200, 11, 189);ism["6_1.gif"] = im(10, 91);ism["6_2.gif"] = im(3, 96);ism["6_3.gif"] = im(2, 98);ism["sonofsailor.gif"] = im(1, 99);ism["warfratmd.gif"] = im(4, 96);ism["warfratcm.gif"] = im(1, 96);ism["tree_hickory.gif"] = im(0, 98);ism["drunkstuffing.gif"] = im(0, 99);ism["spacebeast3.gif"] = im(14, 91);ism["spacemarine.gif"] = im(1, 95);ism["aboo_trek.gif"] = im(1, 97);ism["3_4a.gif"] = im(200, 200, 3, 193);ism["3_1.gif"] = im(2, 95);ism["3_2.gif"] = im(4, 97);ism["3_3.gif"] = im(0, 93);ism["spamwitch.gif"] = im(3, 95);ism["pa_spatula.gif"] = im(7, 98);ism["wretchedseal.gif"] = im(54, 94);ism["hunter11.gif"] = im(3, 95);ism["jellyfish.gif"] = im(6, 96);ism["spelastronaut.gif"] = im(2, 96);ism["spelunkspider.gif"] = im(21, 88);ism["topi1.gif"] = im(3, 93);ism["gourd_spider.gif"] = im(10, 83);ism["gremlinspider.gif"] = im(7, 88);ism["gourd_spidergob.gif"] = im(1, 97);ism["spiderhut.gif"] = im(200, 150, 9, 140);ism["bb_spider.gif"] = im(125, 100, 3, 86);ism["spikeskel.gif"] = im(7, 92);ism["spiritalclock.gif"] = im(0, 99);ism["spiritbug.gif"] = im(10, 92);ism["spiritfaucet.gif"] = im(5, 93);ism["5_1.gif"] = im(3, 99);ism["5_2.gif"] = im(0, 99);ism["5_3.gif"] = im(0, 99);ism["spiritpea.gif"] = im(18, 78);ism["sponge.gif"] = im(0, 98);ism["dvspookybear1.gif"] = im(1, 95);ism["dvspookyghost1.gif"] = im(4, 94);ism["sgguard.gif"] = im(16, 77);ism["sgninja.gif"] = im(22, 80);ism["sgwarlock.gif"] = im(8, 83);ism["spookyhobo1.gif"] = im(3, 89);ism["mummy.gif"] = im(6, 89);ism["musicbox.gif"] = im(2, 90);ism["dvspookyskel1.gif"] = im(13, 97);ism["vampire.gif"] = im(10, 91);ism["dvspookyvamp1.gif"] = im(35, 65);ism["dvspookywolf1.gif"] = im(8, 94);ism["dvspookyzom1.gif"] = im(39, 93);ism["manor.gif"] = im(12, 89);ism["sporto.gif"] = im(1, 99);ism["princess.gif"] = im(8, 95);ism["steamelemental.gif"] = im(3, 94);ism["straw_hot.gif"] = im(5, 91);ism["giant_steampunk.gif"] = im(0, 99);ism["2_4a.gif"] = im(200, 200, 11, 189);ism["2_1.gif"] = im(10, 90);ism["2_2.gif"] = im(12, 96);ism["2_3.gif"] = im(16, 93);ism["dvstenchbear1.gif"] = im(1, 99);ism["dvstenchghost1.gif"] = im(0, 97);ism["stenchhobo1.gif"] = im(12, 97);ism["dvstenchskel1.gif"] = im(2, 99);ism["dvstenchvamp1.gif"] = im(0, 98);ism["dvstenchwolf1.gif"] = im(1, 99);ism["dvstenchzom1.gif"] = im(0, 98);ism["steven.gif"] = im(5, 91);ism["stickymummy.gif"] = im(3, 94);ism["crimboelf.gif"] = im(27, 96);ism["stone_pirate.gif"] = im(3, 93);ism["stormcow.gif"] = im(0, 99);ism["algae.gif"] = im(1, 97);ism["moosehead.gif"] = im(7, 93);ism["stuffgolem.gif"] = im(3, 91);ism["paulblart.gif"] = im(2, 99);ism["suckubus.gif"] = im(6, 92);ism["tree_juniper.gif"] = im(0, 99);ism["colasoldier.gif"] = im(1, 95);ism["supervirus.gif"] = im(9, 95);ism["witchy1.gif"] = im(0, 99);ism["mar_surprised.gif"] = im(0, 99);ism["mc_soy2.gif"] = im(0, 94);ism["mc_soy1.gif"] = im(0, 98);ism["beav_jack.gif"] = im(9, 92);ism["beav_shaman.gif"] = im(0, 97);ism["beav_warrior.gif"] = im(7, 90);ism["duckstinky.gif"] = im(0, 98);ism["swampentity.gif"] = im(5, 95);ism["swampgator.gif"] = im(19, 81);ism["swamphag.gif"] = im(0, 97);ism["swampowl.gif"] = im(0, 99);ism["swampskunk.gif"] = im(3, 95);ism["ralphbat.gif"] = im(2, 84);ism["ants.gif"] = im(1, 97);ism["fudgewasps.gif"] = im(0, 98);ism["whelps1.gif"] = im(10, 85);ism["aswarm.gif"] = im(7, 93);ism["kg_lice.gif"] = im(3, 93);ism["beatles.gif"] = im(5, 94);ism["skullswarm.gif"] = im(50, 93);ism["t9000.gif"] = im(3, 99);ism["cacotat.gif"] = im(9, 85);ism["tacofish.gif"] = im(17, 82);ism["tacoelf_taco.gif"] = im(12, 86);ism["tacoelf_cart.gif"] = im(9, 82);ism["kasemhead.gif"] = im(2, 96);ism["biggnat.gif"] = im(21, 70);ism["hatskel.gif"] = im(0, 99);ism["c10spreadsheet.gif"] = im(8, 98);ism["tektite.gif"] = im(21, 77);ism["terrorbot.gif"] = im(5, 88);ism["tetched.gif"] = im(1, 98);ism["madpirate.gif"] = im(6, 93);ism["fudgeman.gif"] = im(200, 200, 19, 186);ism["theaquaman.gif"] = im(0, 99);ism["boris.gif"] = im(6, 89);ism["aojarls.gif"] = im(6, 93);ism["sneakypete.gif"] = im(13, 90);ism["batinspats.gif"] = im(200, 100, 6, 96);ism["beefhemoth.gif"] = im(200, 100, 0, 98);ism["c10bge.gif"] = im(11, 86);ism["thisdude.gif"] = im(0, 93);ism["c10faces.gif"] = im(0, 99);ism["beelzebozo.gif"] = im(0, 98);ism["colollilossus.gif"] = im(270, 270, 3, 264);ism["bath_craykin.gif"] = im(0, 99);ism["darkness.gif"] = im(0, 98);ism["skelmanager.gif"] = im(5, 97);ism["snakeboss2.gif"] = im(5, 94);ism["hunter15.gif"] = im(0, 92);ism["fudgewizard.gif"] = im(0, 99);ism["bunionghost.gif"] = im(4, 92);ism["thegunk.gif"] = im(3, 95);ism["landscaper.gif"] = im(0, 99);ism["snitch.gif"] = im(150, 300, 13, 275);ism["adv_hot4.gif"] = im(10, 97);ism["theluter.gif"] = im(11, 93);ism["theman.gif"] = im(0, 94);ism["darkmariachi.gif"] = im(2, 97);ism["masterat.gif"] = im(40, 97);ism["adv_smart4.gif"] = im(13, 97);ism["thenuge.gif"] = im(4, 94);ism["rainking.gif"] = im(250, 300, 10, 287);ism["sagittarian.gif"] = im(3, 95);ism["theserver.gif"] = im(0, 97);ism["sierpinski.gif"] = im(0, 89);ism["snakeboss3.gif"] = im(150, 150, 5, 136);ism["adv_fast4.gif"] = im(11, 86);ism["timebandit.gif"] = im(9, 88);ism["thepinch.gif"] = im(100, 150, 4, 147);ism["thething.gif"] = im(250, 200, 3, 195);ism["thethorax.gif"] = im(200, 100, 4, 92);ism["c10tropes.gif"] = im(0, 99);ism["ukskeleton.gif"] = im(200, 200, 15, 187);ism["ukskeleton_hm.gif"] = im(200, 200, 2, 195);ism["c10cooler.gif"] = im(0, 98);ism["wholekingdom.gif"] = im(200, 200, 2, 195);ism["they.gif"] = im(0, 99);ism["tnbot2.gif"] = im(4, 88);ism["tnbot1.gif"] = im(1, 95);ism["tnbot3.gif"] = im(1, 99);ism["bigskeleton3.gif"] = im(150, 100, 0, 99);ism["thug1thug2.gif"] = im(200, 100, 1, 93);ism["anger2.gif"] = im(0, 99);ism["tigerlily.gif"] = im(1, 96);ism["spelunktiki.gif"] = im(1, 93);ism["mc_tofu2.gif"] = im(2, 97);ism["mc_tofu1.gif"] = im(2, 95);ism["gourd_can.gif"] = im(14, 90);ism["gourd_canspider.gif"] = im(150, 100, 9, 87);ism["animelf1.gif"] = im(19, 79);ism["tipsypirate.gif"] = im(0, 98);ism["tpgeist.gif"] = im(0, 97);ism["shiv_tp.gif"] = im(6, 94);ism["tombasp.gif"] = im(0, 99);ism["mummybat.gif"] = im(34, 60);ism["tombrat.gif"] = im(33, 78);ism["tombratking.gif"] = im(200, 200, 17, 176);ism["tombguy.gif"] = im(0, 98);ism["mastiff.gif"] = im(34, 95);ism["toothpirate.gif"] = im(2, 96);ism["toothskel.gif"] = im(5, 90);ism["topiarychi.gif"] = im(2, 95);ism["topiaryduck.gif"] = im(10, 89);ism["topiary.gif"] = im(0, 98);ism["topiarygopher.gif"] = im(7, 93);ism["topiarykiwi.gif"] = im(17, 92);ism["tree_baobab.gif"] = im(3, 96);ism["c10tmz.gif"] = im(0, 99);ism["orquette3.gif"] = im(6, 92);ism["vib4.gif"] = im(2, 96);ism["toxbeast1.gif"] = im(2, 98);ism["animelf5.gif"] = im(18, 76);ism["crimonster1.gif"] = im(1, 98);ism["treadmill.gif"] = im(9, 91);ism["bb_chef.gif"] = im(5, 92);ism["triadwizard.gif"] = im(1, 96);ism["tribalgoblin.gif"] = im(11, 89);ism["trixiepixie.gif"] = im(6, 99);ism["triffid.gif"] = im(2, 96);ism["tarkinhead.gif"] = im(0, 98);ism["monahead.gif"] = im(0, 99);ism["twins_troll.gif"] = im(0, 98);ism["trollipop.gif"] = im(100, 150, 5, 145);ism["trophyfish.gif"] = im(0, 98);ism["tsnake.gif"] = im(5, 94);ism["tumbleweed.gif"] = im(4, 93);ism["turtletrapper.gif"] = im(1, 95);ism["twigberry.gif"] = im(3, 89);ism["bigskeleton2.gif"] = im(0, 99);ism["tex.gif"] = im(0, 98);ism["unclehobo.gif"] = im(10, 92);ism["macaroni.gif"] = im(4, 84);ism["pengundercover.gif"] = im(2, 98);ism["shiv_underworld.gif"] = im(200, 200, 17, 170);ism["ellsburyboss.gif"] = im(150, 150, 15, 124);ism["lensgoblin.gif"] = im(3, 94);ism["surv_unhinged.gif"] = im(6, 95);ism["unholydiver.gif"] = im(0, 99);ism["surv_unlikely.gif"] = im(7, 89);ism["c10database.gif"] = im(2, 95);ism["unstill.gif"] = im(8, 92);ism["ram.gif"] = im(13, 85);ism["urchin.gif"] = im(10, 90);ism["eyesdown.gif"] = im(45, 62);ism["usher.gif"] = im(11, 88);ism["spelunkvampire.gif"] = im(13, 85);ism["vampclam.gif"] = im(11, 91);ism["duckvampire.gif"] = im(3, 95);ism["vandalkid.gif"] = im(9, 91);ism["cvcreature.gif"] = im(100, 200, 4, 196);ism["gremlinveg.gif"] = im(5, 93);ism["velvetug.gif"] = im(19, 91);ism["vendorslime.gif"] = im(0, 95);ism["turtleghost.gif"] = im(23, 84);ism["mantrap.gif"] = im(4, 97);ism["easel.gif"] = im(5, 95);ism["gnauga.gif"] = im(14, 92);ism["victor.gif"] = im(15, 88);ism["faq_boss3.gif"] = im(150, 150, 0, 144);ism["faq_miniboss2.gif"] = im(0, 98);ism["faq_mushroom1.gif"] = im(7, 89);ism["faq_ghost2.gif"] = im(11, 88);ism["faq_blob3.gif"] = im(8, 89);ism["gar.gif"] = im(6, 93);ism["prim_fung.gif"] = im(0, 98);ism["music.gif"] = im(2, 95);ism["iceguy4.gif"] = im(7, 98);ism["smallartist.gif"] = im(40, 97);ism["wimp.gif"] = im(15, 90);ism["wackypirate.gif"] = im(1, 97);ism["iceguy3.gif"] = im(1, 98);ism["waiterninja.gif"] = im(5, 95);ism["wallofbones.gif"] = im(250, 150, 3, 138);ism["noart.gif"] = im(7, 91);ism["wallofskin.gif"] = im(250, 125, 1, 115);ism["warfratc.gif"] = im(1, 95);ism["warfrata2.gif"] = im(1, 96);ism["warfratb.gif"] = im(0, 95);ism["warfratc2.gif"] = im(1, 95);ism["warfratb2.gif"] = im(0, 95);ism["warfratsp2.gif"] = im(0, 97);ism["warfratgr.gif"] = im(5, 96);ism["warfratar.gif"] = im(5, 89);ism["warfratmo.gif"] = im(24, 89);ism["warfratgr2.gif"] = im(2, 91);ism["streaker.gif"] = im(3, 95);ism["warfratsp.gif"] = im(3, 98);ism["warhipb.gif"] = im(6, 96);ism["warhipac2.gif"] = im(1, 96);ism["warhipar.gif"] = im(0, 99);ism["warhipds.gif"] = im(8, 93);ism["warhipsh2.gif"] = im(0, 98);ism["warhipfs2.gif"] = im(3, 95);ism["warhipc2.gif"] = im(5, 94);ism["warhipa2.gif"] = im(0, 98);ism["warhipfs.gif"] = im(2, 94);ism["warhipb2.gif"] = im(6, 96);ism["warhipmd.gif"] = im(0, 90);ism["warhipa.gif"] = im(0, 98);ism["warhipmd2.gif"] = im(0, 91);ism["warhipc.gif"] = im(5, 92);ism["warhipsh.gif"] = im(1, 97);ism["warhipac.gif"] = im(5, 96);ism["hippyspy.gif"] = im(8, 89);ism["warhipcm.gif"] = im(2, 94);ism["warbear12.gif"] = im(0, 99);ism["warbear23.gif"] = im(1, 97);ism["nightstand1.gif"] = im(4, 96);ism["warehouseclerk.gif"] = im(2, 95);ism["warehouseguy.gif"] = im(3, 94);ism["wartdinsey.gif"] = im(150, 150, 0, 148);ism["wartpirate.gif"] = im(2, 92);ism["werewolf.gif"] = im(4, 98);ism["wigwasp.gif"] = im(8, 93);ism["wastoid.gif"] = im(8, 93);ism["waterspider.gif"] = im(23, 80);ism["waterseal.gif"] = im(0, 99);ism["richpirate.gif"] = im(3, 93);ism["weatherug.gif"] = im(3, 91);ism["weremoose.gif"] = im(2, 90);ism["weretaco.gif"] = im(29, 82);ism["hunter14.gif"] = im(4, 95);ism["wetseal.gif"] = im(6, 80);ism["aboo_who.gif"] = im(2, 97);ism["tree_willow.gif"] = im(2, 95);ism["surv_whiny.gif"] = im(3, 91);ism["pa_whisk.gif"] = im(4, 91);ism["whitebonedemon.gif"] = im(200, 100, 12, 98);ism["chocgolem.gif"] = im(9, 92);ism["whiteelephant.gif"] = im(11, 88);ism["lion.gif"] = im(6, 93);ism["whitesnake.gif"] = im(10, 87);ism["wildgirl.gif"] = im(0, 97);ism["seahorse.gif"] = im(4, 96);ism["wiresculpture.gif"] = im(0, 97);ism["elf_wires.gif"] = im(12, 89);ism["tree_magnolia.gif"] = im(1, 99);ism["wraith4.gif"] = im(14, 81);ism["doubt1.gif"] = im(0, 98);ism["ravendesk.gif"] = im(0, 94);ism["susguy.gif"] = im(1, 96);ism["wumpus.gif"] = im(0, 99);ism["beergolem.gif"] = im(4, 97);ism["stonegolem.gif"] = im(3, 97);ism["dimhorror.gif"] = im(2, 96);ism["shopteacher.gif"] = im(1, 98);ism["hydra.gif"] = im(6, 99);ism["polprisoner.gif"] = im(9, 89);ism["pr0n.gif"] = im(11, 87);ism["yakisoba.gif"] = im(0, 97);ism["yakcourier.gif"] = im(3, 96);ism["yakguard.gif"] = im(3, 96);ism["yeastbeast.gif"] = im(4, 93);ism["spelunkyeti.gif"] = im(1, 97);ism["yog-urt.gif"] = im(300, 300, 107, 290);ism["yomamma.gif"] = im(30, 30, 29, 30);ism["c10inbox.gif"] = im(9, 94);ism["../otherimages/shadows/20.gif"] = im(60, 100, 2, 90);ism["zrex.gif"] = im(150, 100, 0, 99);ism["zimmerman.gif"] = im(4, 98);ism["zombie2.gif"] = im(5, 94);ism["zombie.gif"] = im(3, 84);ism["zol.gif"] = im(11, 90);ism["zmobaby.gif"] = im(2, 86);ism["zombiechef.gif"] = im(1, 97);ism["duckzombie.gif"] = im(1, 96);ism["zombiehoa.gif"] = im(150, 150, 1, 148);ism["zombiehoa_hm.gif"] = im(200, 200, 0, 199);ism["zomwaltz.gif"] = im(0, 97);ism["hunter1.gif"] = im(3, 96);ism["zombo.gif"] = im(0, 98);
         
         
         foreach s, v in ysm
@@ -5191,6 +5261,14 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
         case $location[Rumpelstiltskin's Workshop]:
         case $location[Ye Olde Medievale Villagee]:
             return (get_property("grimstoneMaskPath") == "gnome");
+        case $location[the mansion of dr. weirdeaux]:
+        case $location[the secret government laboratory]:
+        case $location[the deep dark jungle]:
+            return (get_property_boolean("_spookyAirportToday") || get_property_boolean("spookyAirportAlways"));
+        case $location[the fun-guy mansion]:
+        case $location[sloppy seconds diner]:
+        case $location[the sunken party yacht]:
+            return (get_property_boolean("_sleazeAirportToday") || get_property_boolean("sleazeAirportAlways"));
 		default:
 			break;
 	}
@@ -5677,6 +5755,7 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         lookup_map["The Inner Wolf Gym"] = "place.php?whichplace=ioty2014_wolf";
         lookup_map["Unleash Your Inner Wolf"] = "place.php?whichplace=ioty2014_wolf";
         lookup_map["The Crimbonium Mining Camp"] = "place.php?whichplace=desertbeach";
+        lookup_map["Kokomo Resort"] = "place.php?whichplace=desertbeach";
         lookup_map["The Crimbonium Mine"] = "mining.php?mine=5";
         lookup_map["The Secret Council Warehouse"] = "tutorial.php";
         lookup_map["The Skeleton Store"] = "place.php?whichplace=town_market";
@@ -5692,6 +5771,8 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
             lookup_map[s] = "place.php?whichplace=airport_sleaze";
         foreach s in $strings[The Mansion of Dr. Weirdeaux,The Deep Dark Jungle,The Secret Government Laboratory]
             lookup_map[s] = "place.php?whichplace=airport_spooky";
+        foreach s in $strings[Pirates of the Garbage Barges,Barf Mountain,The Toxic Teacups,Uncle Gator's Fun-Time Liquid Waste Sluice]
+            lookup_map[s] = "place.php?whichplace=airport_stench";
         
         foreach s in $strings[Medbay,Waste Processing,Sonar,Science Lab,Morgue,Special Ops,Engineering,Navigation,Galley]
             lookup_map[s] = "place.php?whichplace=bugbearship";
@@ -5713,7 +5794,7 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         else
             lookup_map["Post-Quest Bugbear Pens"] =  "place.php?whichplace=knoll_hostile";
             
-        if ($item[talisman o' nam].equipped_amount() > 0)
+        if (lookupItem("talisman o' nam").equipped_amount() > 0)
             lookup_map["Palindome"] = "place.php?whichplace=palindome";
         else
             lookup_map["Palindome"] = "inventory.php?which=2";
@@ -5903,7 +5984,7 @@ void QLevel3GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         float average_tangles_found = (clampNormalf(rat_king_chance * combat_rate) * 8.5);
         
         if (wait_until_level_eleven)
-            subentry.entries.listAppend("May want to wait until level 11 for most +ML from aria");
+            subentry.entries.listAppend("May want to wait until level 11 for most +ML from aria.");
         string line = "Run +ML for tangles (" + roundForOutput(rat_king_chance * 100.0, 0) + "% rat king chance, " + average_tangles_found.roundForOutput(1) + " tangles on average";
         line += ")";
         
@@ -6341,7 +6422,25 @@ void QLevel5GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 			}
 			subentry.entries.listAppend("Guard route:|*" + ChecklistGenerateModifierSpan(kge_modifiers) + kge_lines.listJoinComponents("|*"));
 		}
+        if (!__quest_state["Level 13"].state_boolean["Stat race completed"] && __quest_state["Level 13"].state_string["Stat race type"].length() > 0)
+        {
+            stat stat_race_type = __quest_state["Level 13"].state_string["Stat race type"].to_stat();
+            
+            int change_mcd_to = -1;
+            if (stat_race_type == $stat[muscle] && (current_mcd() == 3 || current_mcd() == 7))
+                change_mcd_to = -2;
+            else if (stat_race_type == $stat[mysticality])
+                change_mcd_to = 3;
+            else if (stat_race_type == $stat[moxie])
+                change_mcd_to = 7;
+                
+            if (change_mcd_to != -1 && change_mcd_to != current_mcd())
+            {
+                subentry.entries.listAppend("For the king fight, change MCD to " + change_mcd_to + " for the tower stat test. (+" + stat_race_type.to_lower_case() + ")");
+            }
+        }
 	}
+    
 	
 	if (should_output)
 		task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[cobb's knob barracks, cobb's knob kitchens, cobb's knob harem, the outskirts of cobb's knob]));
@@ -6906,11 +7005,21 @@ void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [in
     }
     else if (monster_name == "Lobsterfrogman" && show_details)
     {
+        string line;
+    
+        if (!__quest_state["Level 12"].state_boolean["Lighthouse Finished"] && $item[barrel of gunpowder].available_amount() < 5)
+        {
+            int number_to_fight = clampi(5 - $item[barrel of gunpowder].available_amount(), 0, 5);
+            line += number_to_fight.int_to_wordy().capitalizeFirstLetter() + " more to defeat. ";
+        }
+        
         int lfm_attack = $monster[lobsterfrogman].base_attack + 5.0;
-        string line = lfm_attack + " attack.";
+        string attack_text = lfm_attack + " attack.";
         
 		if (my_buffedstat($stat[moxie]) < lfm_attack)
-			line = HTMLGenerateSpanFont(line, "red", "");
+			attack_text = HTMLGenerateSpanFont(attack_text, "red", "");
+        
+        line += attack_text;
         description.listAppend(line);
     }
     else if (monster_name == "Big swarm of ghuol whelps" || monster_name == "Swarm of ghuol whelps" || monster_name == "Giant swarm of ghuol whelps")
@@ -7063,7 +7172,7 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] available_resources_en
             potential_copies.listAppend("Modern zmobies.");
         if (!__quest_state["Level 8"].state_boolean["Mountain climbed"] && $items[ninja rope,ninja carabiner,ninja crampons].available_amount() == 0 && !have_outfit_components("eXtreme Cold-Weather Gear"))
             potential_copies.listAppend("Ninja assassin.");
-        if (!__quest_state["Level 11"].finished && !__quest_state["Level 11 Palindome"].finished && $item[talisman o' nam].available_amount() == 0 && $items[gaudy key,snakehead charrrm].available_amount() < 2)
+        if (!__quest_state["Level 11"].finished && !__quest_state["Level 11 Palindome"].finished && lookupItem("talisman o' nam").available_amount() == 0 && $items[gaudy key,snakehead charrrm].available_amount() < 2)
             potential_copies.listAppend("Gaudy pirate - copy once for extra key.");
         //√baa'baa. astronomer? √nuns trick brigand
         //FIXME astronomer when we can calculate that
@@ -8109,6 +8218,7 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 	string image_name = base_quest_state.image_name;
     string url = "place.php?whichplace=beanstalk";
 	
+    boolean add_as_future_task = false;
 	if ($item[s.o.c.k.].available_amount() == 0)
 	{
         //FIXME delay if ballroom song not set
@@ -8265,7 +8375,16 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 			subentry.modifiers.listAppend("-combat");
 			subentry.entries.listAppend("Top floor. Run -combat.");
             if ($item[mohawk wig].equipped_amount() == 0 && $item[mohawk wig].available_amount() > 0)
-                subentry.entries.listAppend(HTMLGenerateSpanFont("Wear your mohawk wig.", "red", ""));
+            {
+                string line = "Wear your mohawk wig";
+                if (!$item[mohawk wig].can_equip())
+                {
+                    add_as_future_task = true;
+                    line += ", once you can equip it";
+                }
+                line += ".";
+                subentry.entries.listAppend(HTMLGenerateSpanFont(line, "red", ""));
+            }
             if ($item[mohawk wig].available_amount() == 0 && !in_hardcore())
                 subentry.entries.listAppend("Potentially pull and wear a mohawk wig.");
             if ($item[model airship].available_amount() == 0)
@@ -8304,10 +8423,7 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             if (turns_spent != -1)
             {
                 turns_remaining = 11 - turns_spent;
-                if (turns_remaining == 1)
-                    subentry.entries.listAppend("Ground floor. Spend One More Turn here to unlock top floor.");
-                else
-                    subentry.entries.listAppend("Ground floor. Spend " + pluralizeWordy(turns_remaining, "more turn", "more turns") + " here to unlock top floor.");
+                subentry.entries.listAppend("Ground floor. Spend " + pluralizeWordy(turns_remaining, "more turn", "more turns") + " here to unlock top floor.");
             }
             else
                 subentry.entries.listAppend("Ground floor. Spend eleven turns here to unlock top floor.");
@@ -8317,7 +8433,7 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             if (__misc_state["Need to level"])
                 subentry.entries.listAppend("Possibly acquire the very overdue library book from a non-combat. (stats)");
             
-            if (lookupItem("electric boning knife").available_amount() == 0 && __quest_state["Level 13"].state_boolean["wall of bones will need to be defeated"])
+            if (lookupItem("electric boning knife").available_amount() == 0 && __quest_state["Level 13"].state_boolean["wall of bones will need to be defeated"] && !lookupSkill("garbage nova").skill_is_usable())
             {
                 subentry.modifiers.listAppend("-combat");
                 subentry.entries.listAppend("Try to acquire the electric boning knife if you see it. (foodie NC)");
@@ -8391,8 +8507,12 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 			image_name = "lift, bro";
 		}
 	}
-	
-	task_entries.listAppend(ChecklistEntryMake(image_name, url, subentry, $locations[the penultimate fantasy airship, the castle in the clouds in the sky (basement), the castle in the clouds in the sky (ground floor), the castle in the clouds in the sky (top floor)]));
+    
+	ChecklistEntry entry = ChecklistEntryMake(image_name, url, subentry, $locations[the penultimate fantasy airship, the castle in the clouds in the sky (basement), the castle in the clouds in the sky (ground floor), the castle in the clouds in the sky (top floor)]);
+    if (add_as_future_task)
+        future_task_entries.listAppend(entry);
+    else
+        task_entries.listAppend(entry);
 }
 //Our strategy for the copperhead quest is probably not very good. Largely because it looks complicated and I made a few guesses.
 
@@ -8633,7 +8753,7 @@ void QLevel11RonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
     
     ChecklistEntry entry = ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[A Mob of Zeppelin Protesters,The Red Zeppelin]);
     
-    if (!__misc_state["In run"] || $item[talisman o' nam].available_amount() > 0)
+    if (!__misc_state["In run"] || lookupItem("talisman o' nam").available_amount() > 0)
         optional_task_entries.listAppend(entry);
     else
         task_entries.listAppend(entry);
@@ -8750,7 +8870,7 @@ void QLevel11ShenGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     
 	ChecklistEntry entry = ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the copperhead club]);
     
-    if (!__misc_state["In run"] || $item[talisman o' nam].available_amount() > 0)
+    if (!__misc_state["In run"] || lookupItem("talisman o' nam").available_amount() > 0)
         optional_task_entries.listAppend(entry);
     else
         task_entries.listAppend(entry);
@@ -8844,10 +8964,7 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
                 int turns_spent = $location[the middle chamber].turns_spent;
                 
                 int turns_remaining = MAX(0, 11 - turns_spent);
-                if (turns_remaining == 1)
-                    subentry.entries.listAppend("Adventure in the middle chamber for One More Turn to unlock the control room.");
-                else
-                    subentry.entries.listAppend("Adventure in the middle chamber for " + pluralizeWordy(turns_remaining, "more turn", "more turns") + " to unlock the control room.");
+                subentry.entries.listAppend("Adventure in the middle chamber for " + pluralizeWordy(turns_remaining, "more turn", "more turns") + " to unlock the control room.");
             
                 subentry.modifiers.listAppend("+400% item");
                 subentry.modifiers.listAppend("olfact tomb rats");
@@ -8867,10 +8984,7 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
             //unlock middle chamber:
             int turns_spent = $location[the upper chamber].turns_spent;
             int turns_remaining = MAX(0, 6 - turns_spent);
-            if (turns_remaining == 1)
-                subentry.entries.listAppend("Adventure in the upper chamber for One More Turn to unlock the middle chamber.");
-            else
-                subentry.entries.listAppend("Adventure in the upper chamber for " + pluralizeWordy(turns_remaining, "more turn", "more turns") + " to unlock the middle chamber.");
+            subentry.entries.listAppend("Adventure in the upper chamber for " + pluralizeWordy(turns_remaining, "more turn", "more turns") + " to unlock the middle chamber.");
             subentry.modifiers.listAppend("-combat");
             if (__misc_state["have hipster"])
                 subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
@@ -8878,62 +8992,67 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
                 subentry.modifiers.listAppend("free runs");
         }
         
-        //Pyramid unlocked:
-        if (should_generate_control_room_information)
+        
+        //Generate spin cycle:
+
+        //this is not very good code:
+        boolean have_pyramid_position = false;
+        int pyramid_position = get_property_int("pyramidPosition");
+        
+        //Uncertain:
+        //if (get_property_int("lastPyramidReset") == my_ascensions())
+        if (pyramid_position > 0 && mafiaIsPastRevision(14319)) //does this work?
+            have_pyramid_position = true;
+        
+        //I think there are... five positions?
+        //1=Ed, 2=bad, 3=vending machine, 4=token, 5=bad
+        int next_position_needed = -1;
+        int additional_turns_after_that = 0;
+        string task;
+        done_with_wheel_turning = false;
+        if (2318.to_item().available_amount() > 0 || ed_chamber_open)
         {
-            //this is not very good code:
-            boolean have_pyramid_position = false;
-            int pyramid_position = get_property_int("pyramidPosition");
+            //need 1
+            next_position_needed = 1;
+            additional_turns_after_that = 0;
             
-            //Uncertain:
-            //if (get_property_int("lastPyramidReset") == my_ascensions())
-            if (pyramid_position > 0 && mafiaIsPastRevision(14319)) //does this work?
-                have_pyramid_position = true;
+            boolean delay_for_semirare = CounterLookup("Semi-rare").CounterWillHitExactlyInTurnRange(0, 6);
             
-            //I think there are... five positions?
-            //1=Ed, 2=bad, 3=vending machine, 4=token, 5=bad
-            int next_position_needed = -1;
-            int additional_turns_after_that = 0;
-            string task;
-            done_with_wheel_turning = false;
-            if (2318.to_item().available_amount() > 0 || ed_chamber_open)
+            if (delay_for_semirare)
             {
-                //need 1
-                next_position_needed = 1;
-                additional_turns_after_that = 0;
-                
-                boolean delay_for_semirare = CounterLookup("Semi-rare").CounterWillHitExactlyInTurnRange(0, 6);
-                
-                if (delay_for_semirare)
-                {
-                    task = HTMLGenerateSpanFont("Avoid fighting Ed the Undying, semi-rare coming up ", "red", "");
-                }
-                else
-                {
-                    int ed_ml = 180 + monster_level_adjustment_for_location($location[the lower chambers]);
-                    task = "fight Ed in the lower chambers";
-                    if (ed_ml > my_buffedstat($stat[moxie]))
-                        task += " (" + ed_ml + " attack)";
-                }
-                if (ed_chamber_open)
-                    done_with_wheel_turning = true;
-            }
-            else if ($item[ancient bronze token].available_amount() > 0)
-            {
-                //need 3
-                next_position_needed = 3;
-                additional_turns_after_that = 3;
-                task = "acquire " + 2318.to_item().to_string() + " in lower chamber";
+                task = HTMLGenerateSpanFont("Avoid fighting Ed the Undying, semi-rare coming up ", "red", "");
             }
             else
             {
-                //need 4
-                next_position_needed = 4;
-                additional_turns_after_that = 3 + 4;
-                task = "acquire token in lower chamber";
+                int ed_ml = 180 + monster_level_adjustment_for_location($location[the lower chambers]);
+                task = "fight Ed in the lower chambers";
+                if (ed_ml > my_buffedstat($stat[moxie]))
+                    task += " (" + ed_ml + " attack)";
             }
-            
-            int spins_needed = (next_position_needed - pyramid_position + 10) % 5;
+            if (ed_chamber_open)
+                done_with_wheel_turning = true;
+        }
+        else if ($item[ancient bronze token].available_amount() > 0)
+        {
+            //need 3
+            next_position_needed = 3;
+            additional_turns_after_that = 3;
+            task = "acquire " + 2318.to_item().to_string() + " in lower chamber";
+        }
+        else
+        {
+            //need 4
+            next_position_needed = 4;
+            additional_turns_after_that = 3 + 4;
+            task = "acquire token in lower chamber";
+        }
+        
+        int spins_needed = (next_position_needed - pyramid_position + 10) % 5;
+        int total_spins_needed = spins_needed + additional_turns_after_that;
+        
+        //Pyramid unlocked:
+        if (should_generate_control_room_information)
+        {
             
             string [int] tasks;
             if (spins_needed > 0)
@@ -8969,8 +9088,14 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
         if (!done_with_wheel_turning)
         {
             int amount = $item[tomb ratchet].available_amount() + lookupItem("crumbling wooden wheel").available_amount();
-            if (amount > 0)
-                subentry.entries.listAppend(pluralize(amount, "wheel turn", "wheel turns") + " available.");
+            
+            int extra_spin_sources_needed = clampi(total_spins_needed - amount, 0, 11);
+            if (extra_spin_sources_needed > 0)
+                subentry.entries.listAppend("Need " + HTMLGenerateSpanFont(int_to_wordy(extra_spin_sources_needed), "red", "") + " more ratchet/wheel" + ((extra_spin_sources_needed > 1) ? "s" : "") + ".");
+            else
+                subentry.entries.listAppend("Have enough wheels.");
+            /*if (amount > 0)
+                subentry.entries.listAppend(pluralize(amount, "wheel turn", "wheel turns") + " available.");*/
             if ($item[tangle of rat tails].available_amount() > 0)
                 subentry.entries.listAppend(pluralize($item[tangle of rat tails]) + " available.");
         }
@@ -9251,7 +9376,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
     subentry.header = base_quest_state.quest_name;
     string url;
     
-    if (base_quest_state.mafia_internal_step < 2 && $item[talisman o' nam].available_amount() == 0)
+    if (base_quest_state.mafia_internal_step < 2 && lookupItem("talisman o' nam").available_amount() == 0)
     {
         //1 -> find palindome
         url = "place.php?whichplace=cove";
@@ -9279,13 +9404,33 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
             subentry.modifiers.listAppend("-combat");
             subentry.entries.listAppend("Run -combat on the Poop Deck to unlock belowdecks.");
             subentry.entries.listAppend(generateTurnsToSeeNoncombat(80, 1, "unlock belowdecks"));
+            
+            if (__misc_state["need to level"] && $location[the poop deck].noncombat_queue.contains_text("O Cap'm"))
+            {
+                if (my_meat() < 977)
+                {
+                    subentry.entries.listAppend(HTMLGenerateSpanFont("Possibly acquire 977 meat first", "red", "") + ", to gain extra stats from the other NC.");
+                }
+                else
+                {
+                    string coordinates;
+                    if (my_primestat() == $stat[muscle])
+                        coordinates = "(56, 14)";
+                    else if (my_primestat() == $stat[mysticality])
+                        coordinates = "(3, 35)";
+                    else if (my_primestat() == $stat[moxie])
+                        coordinates = "(5, 39)";
+                    if (coordinates.length() > 0)
+                        subentry.entries.listAppend("If you encounter the wheel/O Cap'm adventure, take the helm, and sail to " + coordinates + ".");
+                }
+            }
         }
             
     }
     else
     {
         url = "place.php?whichplace=palindome";
-        if ($item[talisman o' nam].equipped_amount() == 0)
+        if (lookupItem("talisman o' nam").equipped_amount() == 0)
             url = "inventory.php?which=2";
         
         
@@ -9314,7 +9459,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
         {
             //5 -> fight dr. awkward
             string [int] tasks;
-            if ($item[talisman o' nam].equipped_amount() == 0)
+            if (lookupItem("talisman o' nam").equipped_amount() == 0)
                 tasks.listAppend("equip the Talisman o' Nam");
             if ($item[mega gem].equipped_amount() == 0)
                 tasks.listAppend("equip the Mega Gem");
@@ -9394,7 +9539,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
             else
             {
                 subentry.entries.listAppend("Talk to Mr. Alarm.");
-                if ($item[talisman o' nam].equipped_amount() == 0)
+                if (lookupItem("talisman o' nam").equipped_amount() == 0)
                     subentry.entries.listAppend("Equip the Talisman o' Nam.");
             }
             //if (7270.to_item() != $item[none] && 7270.to_item().available_amount() > 0)
@@ -9415,7 +9560,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                 tasks.listAppend("talk to Mr. Alarm to unlock Whitey's Grove");
                 
             subentry.entries.listAppend(tasks.listJoinComponents(", ", "and").capitalizeFirstLetter() + ".");
-            if ($item[talisman o' nam].equipped_amount() == 0)
+            if (lookupItem("talisman o' nam").equipped_amount() == 0)
                 subentry.entries.listAppend("Equip the Talisman o' Nam.");
         }
         else
@@ -9554,7 +9699,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                 subentry.entries.listClear();
                 subentry.entries.listAppend(single_entry_mode);
             }
-            if (need_palindome_location && $item[talisman o' nam].equipped_amount() == 0)
+            if (need_palindome_location && lookupItem("talisman o' nam").equipped_amount() == 0)
                 subentry.entries.listAppend("Equip the Talisman o' Nam.");
         }
     }
@@ -10537,7 +10682,7 @@ void QLevel11Init()
 		state.quest_name = "MacGuffin Quest";
 		state.image_name = "MacGuffin";
 		state.council_quest = true;
-	
+        
 		if (my_level() >= 11)
 			state.startable = true;
 		__quest_state["Level 11"] = state;
@@ -10584,7 +10729,15 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         {
             if ($item[blackberry galoshes].equipped_amount() == 0)
             {
-                subentry.entries.listAppend(HTMLGenerateSpanFont("Equip blackberry galoshes", "red", "") + " to speed up exploration.");
+                string line = HTMLGenerateSpanFont("Equip blackberry galoshes", "red", "") + " to speed up exploration";
+                
+                if (!$item[blackberry galoshes].can_equip())
+                {
+                    make_entry_future = true;
+                    line += ", once you can equip them";
+                }
+                line += ".";
+                subentry.entries.listAppend(line);
             }
         }
         else
@@ -10682,7 +10835,7 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     else if (base_quest_state.mafia_internal_step < 4)
     {
         //Have diary:
-        if ($item[holy macguffin].available_amount() == 0)
+        if (lookupItem("2334").available_amount() == 0) //$item[holy macguffin] has shadow aliasing problem
         {
             //nothing to say
             //subentry.entries.listAppend("Retrieve the MacGuffin.");
@@ -10750,37 +10903,44 @@ static
 
 
 
-item [int] ItemFilterGetPotionsWithNumericModifier(string modifier)
+item [int] ItemFilterGetPotionsWithNumericModifiers(string [int] modifiers)
 {
     item [int] potions;
-    item [int] first_layer_list;
-    if (__if_potions_with_numeric_modifiers contains modifier)
-        first_layer_list = __if_potions_with_numeric_modifiers[modifier];
-    else
+    boolean [item] seen_potions;
+    foreach key, modifier in modifiers
     {
-        foreach it in $items[]
+        item [int] first_layer_list;
+        if (__if_potions_with_numeric_modifiers contains modifier)
+            first_layer_list = __if_potions_with_numeric_modifiers[modifier];
+        else
         {
-            if (it.inebriety > 0 || it.fullness > 0 || it.spleen > 0) continue;
-            effect e = it.to_effect();
-            if (e == $effect[none]) continue;
-            if (e.numeric_modifier(modifier) > 0.0)
-                first_layer_list.listAppend(it);
+            foreach it in $items[]
+            {
+                if (it.inebriety > 0 || it.fullness > 0 || it.spleen > 0) continue;
+                effect e = it.to_effect();
+                if (e == $effect[none]) continue;
+                if (e.numeric_modifier(modifier) > 0.0)
+                    first_layer_list.listAppend(it);
+            }
         }
-    }
-    
-    foreach key, it in first_layer_list
-    {
-        if (!it.is_unrestricted())
-            continue;
-        potions.listAppend(it);
+        
+        foreach key, it in first_layer_list
+        {
+            if (!it.is_unrestricted())
+                continue;
+            if (seen_potions contains it)
+                continue;
+            potions.listAppend(it);
+            seen_potions[it] = true;
+        }
     }
     
     return potions;
 }
 
-item [int] ItemFilterGetPotionsCouldPullToAddToNumericModifier(string modifier, float minimum_modifier, boolean [item] blacklist)
+item [int] ItemFilterGetPotionsCouldPullToAddToNumericModifier(string [int] modifiers, float minimum_modifier, boolean [item] blacklist)
 {
-    item [int] relevant_potions_first_layer = ItemFilterGetPotionsWithNumericModifier(modifier);
+    item [int] relevant_potions_first_layer = ItemFilterGetPotionsWithNumericModifiers(modifiers);
     
     item [int] relevant_potions;
     foreach key, it in relevant_potions_first_layer
@@ -10789,15 +10949,26 @@ item [int] ItemFilterGetPotionsCouldPullToAddToNumericModifier(string modifier, 
         if (!it.tradeable && it.storage_amount() == 0) continue;
         effect e = it.to_effect();
         if (e.have_effect() > 0) continue;
-        float v = e.numeric_modifier(modifier);
+        float v = 0;
+        foreach key, modifier in modifiers
+            v += e.numeric_modifier(modifier);
         if (v > 0.0 && v >= minimum_modifier && !(blacklist contains it))
         {
             relevant_potions.listAppend(it);
         }
     }
-    sort relevant_potions by -value.effect_modifier("effect").numeric_modifier(modifier);
+    if (modifiers.count() == 2)
+        sort relevant_potions by -(value.effect_modifier("effect").numeric_modifier(modifiers[0]) + value.effect_modifier("effect").numeric_modifier(modifiers[1]));
+    else
+        sort relevant_potions by -value.effect_modifier("effect").numeric_modifier(modifiers[0]);
     
     return relevant_potions;
+}
+
+
+item [int] ItemFilterGetPotionsCouldPullToAddToNumericModifier(string modifier, float minimum_modifier, boolean [item] blacklist)
+{
+    return ItemFilterGetPotionsCouldPullToAddToNumericModifier(listMake(modifier), minimum_modifier, blacklist);
 }
 
 void QLevel12Init()
@@ -11381,7 +11552,7 @@ void QLevel12GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             //need 70 moxie, 70 myst
             
         }
-        if ($item[Talisman o' Nam].available_amount() == 0 && !__quest_state["Level 11 Palindome"].finished)
+        if (lookupItem("talisman o' nam").available_amount() == 0 && !__quest_state["Level 11 Palindome"].finished)
         {
             subentry.entries.listAppend("May want to " + HTMLGenerateSpanFont("acquire the Talisman o' Nam", "red", "") + " first.");
         }
@@ -12352,7 +12523,9 @@ void QLevel13Init()
     for i from 2 to 12
     {
         if (!__quest_state["Level " + i].finished)
+        {
             other_quests_completed = false;
+        }
     }
     if (other_quests_completed && my_level() >= 13)
         state.startable = true;
@@ -12450,16 +12623,13 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         image_name = "lair registration desk";
         subentry.header = "Visit the registration desk";
         subentry.entries.listAppend("Claim your prize!");
+        url = "place.php?whichplace=nstower&action=ns_01_contestbooth";
     }
     else if (!base_quest_state.state_boolean["past races"])
     {
         image_name = "lair registration desk";
-        //FIXME REST
-        //subentry.header = "it's time for the wacky races";
         remove subentries[0];
         
-        //FIXME support suggesting pulling potions in softcore
-        //(warbear rejuvenation potion is an excellent example)
         if (!base_quest_state.state_boolean["Init race completed"])
         {
             string [int] description;
@@ -12473,7 +12643,10 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 
                 if (!($familiars[oily woim,Xiblaxian Holo-Companion] contains my_familiar()) && !__misc_state["familiars temporarily blocked"])
                 {
-                    foreach f in $familiars[oily woim,Xiblaxian Holo-Companion]
+                    familiar [int] init_familiar_evaluation_order;
+                    init_familiar_evaluation_order.listAppend($familiar[Xiblaxian Holo-Companion]);
+                    init_familiar_evaluation_order.listAppend($familiar[oily woim]);
+                    foreach key, f in init_familiar_evaluation_order
                     {
                         if (f.familiar_is_usable())
                         {
@@ -12517,7 +12690,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             else
                 description.listAppend("Take the test now, you should(?) make second place.");
                 
-            if (stat_type != $stat[none])
+            if (stat_type != $stat[none] && current_value < 600.0)
             {
                 if (__misc_state_int["pulls available"] > 0)
                 {
@@ -12552,16 +12725,31 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         if (!base_quest_state.state_boolean["Elemental damage race completed"])
         {
             element element_type = base_quest_state.state_string["Elemental damage race type"].to_element();
+            
             string [int] description;
             
             string element_class = "r_element_" + element_type;
             string element_class_desaturated = element_class + "_desaturated";
             
             float current_value = numeric_modifier(element_type + " damage") + numeric_modifier(element_type + " spell damage");
-            
             if (current_value < 100.0)
             {
                 description.listAppend("Need " + (100.0 - current_value).roundForOutput(1) + " more " + HTMLGenerateSpanOfClass(element_type + " damage ", element_class) + " + " + HTMLGenerateSpanOfClass(element_type + " spell damage", element_class) + " for #2.");
+                
+                
+                if (__misc_state_int["pulls available"] > 0)
+                {
+                    boolean [item] blacklist = $items[witch's brew,boiling seal blood];
+                    item [int] relevant_potions = ItemFilterGetPotionsCouldPullToAddToNumericModifier(listMake(element_type + " damage", element_type + " spell damage"), 30, blacklist);
+                    string [int] relevant_potions_output;
+                    foreach key, it in relevant_potions
+                    {
+                        relevant_potions_output.listAppend(it + " (" + (it.to_effect().numeric_modifier(element_type + " damage") + it.to_effect().numeric_modifier(element_type + " spell damage")).roundForOutput(0) + ")");
+                    }
+                    
+                    if (relevant_potions_output.count() > 0)
+                        description.listAppend("Could try pulling " + relevant_potions_output.listJoinComponents(", ", "or") + ".");
+                }
             }
             else
                 description.listAppend("Take the test now, you should(?) make second place.");
@@ -12584,7 +12772,10 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         {
             //hmm...
             subentries.listAppend(ChecklistSubentryMake("Visit the registration desk", "", "Claim your prize!"));
+            url = "place.php?whichplace=nstower&action=ns_01_contestbooth";
         }
+        else if (total_contestants_to_fight == 0)
+            url = "place.php?whichplace=nstower&action=ns_01_contestbooth";
         //nsContestants1 - default -1
         //nsContestants2 - default -1
         //nsContestants3 - default -1
@@ -12747,7 +12938,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         
         if (__misc_state_int["pulls available"] > 0 && current_value < 526.0)
         {
-            boolean [item] blacklist = $items[uncle greenspan's bathroom finance guide,black snowcone,sorority brain,blue grass,salt wages];
+            boolean [item] blacklist = $items[uncle greenspan's bathroom finance guide,black snowcone,sorority brain,blue grass,salt wages,perl necklace];
             item [int] relevant_potions = ItemFilterGetPotionsCouldPullToAddToNumericModifier("Meat Drop", 25, blacklist);
             string [int] relevant_potions_output;
             foreach key, it in relevant_potions
@@ -12802,8 +12993,46 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             if (things_to_do.count() > 0)
                 subentry.entries.listAppend(HTMLGenerateSpanFont(things_to_do.listJoinComponents(", ", "and").capitalizeFirstLetter() + ".", "red", ""));*/
             
-            
-            if ($skill[saucegeyser].have_skill())
+            if (lookupSkill("Garbage Nova").have_skill() && false) //calculations are incorrect
+            {
+                float spell_damage_percent = numeric_modifier("spell damage percent");
+                float spell_damage_multiplier = (1.0 + spell_damage_percent / 100.0);
+                string [int] tasks;
+                
+                //Formula:
+                //damage = 50 * (1 + spell_damage_percent / 100.0) * (45 + floor(0.4 * myst))
+                //damage must be >= 5k
+                
+                //FIXME this is not correct
+                //predicted minimum value: 59495
+                //actual: 56948
+                int min_myst_needed = 138;
+                
+                if (spell_damage_multiplier != 0)
+                    min_myst_needed = MAX(ceil((20000.0 / 4.0 / 50.0 / spell_damage_multiplier - 45.0) / 0.4), 0);
+                    
+                
+                int per_round_damage = 50 * spell_damage_multiplier * (45 + floor(0.4 * my_buffedstat($stat[mysticality])));
+                int casts_needed = 4;
+                if (per_round_damage != 0)
+                    casts_needed = clampi(20000.0 / to_float(per_round_damage), 1, 4);
+                
+                int mp_needed = casts_needed * 50;
+                if (my_mp() < mp_needed)
+                    tasks.listAppend(HTMLGenerateSpanFont("Acquire " + mp_needed + " MP", "red", ""));
+                if (my_buffedstat($stat[mysticality]) < min_myst_needed)
+                {
+                    tasks.listAppend(HTMLGenerateSpanFont("buff up to " + min_myst_needed + " mysticality", "red", ""));
+                }
+                tasks.listAppend("cast garbage nova " + pluralizeWordy(casts_needed, "time", "times"));
+                
+                
+                    
+                subentry.entries.listAppend(tasks.listJoinComponents(", ", "then").capitalizeFirstLetter() + ".");
+                
+                subentry.entries.listAppend(per_round_damage + " damage/round.");
+            }
+            else if ($skill[saucegeyser].have_skill())
             {
                 boolean need_modifier_output = true;
                 if (my_familiar() != $familiar[magic dragonfish] && $familiar[magic dragonfish].familiar_is_usable() && !__misc_state["familiars temporarily blocked"])
@@ -12995,6 +13224,16 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             string potato_suggestion = generatePotatoSuggestion();
             
             subentry.entries.listAppend(potato_suggestion);
+        }*/
+        
+        if (lookupItem("The Lot's engagement ring").equipped_amount() > 0)
+        {
+            subentry.entries.listAppend("You and her? Good luck!");
+        }
+        
+        /*if (lookupItem("The Lot's engagement ring").available_amount() > 0 && lookupItem("The Lot's engagement ring").equipped_amount() == 0)
+        {
+            subentry.entries.listAppend("Potentially equip the lot's engagement ring for an alternate ending.|<small>(sigh... if only)<small>");
         }*/
         
         if (my_path_id() == PATH_HEAVY_RAINS)
@@ -13710,11 +13949,13 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         subentry.entries.listAppend("To unlock the Haunted Library.");
         
         int estimated_pool_skill = get_property_int("poolSkill");
-        
+        //FIXME numeric_modifier("pool skill") exists, so change to use that (once we can make sure everything works properly with it)
         if ($effect[chalky hand].have_effect() > 0)
             estimated_pool_skill += 3;
             
         if ($item[staff of fats].equipped_amount() > 0)
+            estimated_pool_skill += 5;
+        if (lookupItem("7961").equipped_amount() > 0)
             estimated_pool_skill += 5;
         if ($item[pool cue].equipped_amount() > 0)
             estimated_pool_skill += 3;
@@ -13871,7 +14112,7 @@ void QPirateInit()
         QuestStateParseMafiaQuestPropertyValue(state, "step2");
     
 	//Certain characters are in weird states, I think?
-    if ($item[pirate fledges].available_amount() > 0 || $item[talisman o' nam].available_amount() > 0)
+    if ($item[pirate fledges].available_amount() > 0 || lookupItem("talisman o' nam").available_amount() > 0)
         QuestStateParseMafiaQuestPropertyValue(state, "finished");
 	__quest_state["Pirate Quest"] = state;
 }
@@ -14853,7 +15094,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             url = "guild.php";
         }
         else
-            subentry.entries.listAppend("Acquire epic weapon. (" + epic_weapon + ")");
+            subentry.entries.listAppend("Acquire " + epic_weapon + ".");
     }
     else if (base_quest_state.mafia_internal_step <= 2)
     {
@@ -14988,14 +15229,14 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         }
         
     }
-    else if (base_quest_state.mafia_internal_step == 15)
+    else if (base_quest_state.mafia_internal_step == 15 && false)
     {
         //15	Now that you've dealt with your Nemesis' assassins and found a map to the secret tropical island volcano lair, it's time to take the fight to your foe. Booyah
         //find island
         url = "inventory.php?which=3";
         subentry.entries.listAppend("Use the secret tropical island volcano lair map.");
     }
-    else if (base_quest_state.mafia_internal_step == 16)
+    else if (base_quest_state.mafia_internal_step == 16 || base_quest_state.mafia_internal_step == 15) //mafia bug - doesn't advance properly
     {
         //16	You've arrived at the secret tropical island volcano lair, and it's time to finally put a stop to this Nemesis nonsense once and for all. As soon as you can find where they're hiding. Maybe you can find someone to ask
         if ($location[The Nemesis' Lair].turnsAttemptedInLocation() > 0)
@@ -17949,6 +18190,371 @@ void QSpookyAirportGenerateTasks(ChecklistEntry [int] task_entries)
     QSpookyAirportJunglePunGenerateTasks(task_entries);
 }
 
+void QStenchAirportFishTrashGenerateTasks(ChecklistEntry [int] task_entries)
+{
+    QuestState state;
+    state.image_name = "__item trash net";
+    state.quest_name = "Teach a Man to Fish Trash";
+	QuestStateParseMafiaQuestProperty(state, "questEStFishTrash");
+    
+    if (!state.in_progress)
+        return;
+    item trash_net = lookupItem("trash net");
+    
+    if (trash_net.available_amount() == 0)
+        return;
+    
+	ChecklistSubentry subentry;
+	
+	subentry.header = state.quest_name;
+	string url = "place.php?whichplace=airport_stench";
+    
+    
+    if (state.mafia_internal_step <= 2)
+    {
+        string [int] items_to_equip;
+        if (trash_net.equipped_amount() == 0)
+        {
+            items_to_equip.listAppend(trash_net);
+        }
+        if (items_to_equip.count() > 0)
+        {
+            subentry.entries.listAppend(HTMLGenerateSpanFont("Equip the " + items_to_equip.listJoinComponents(", ", "and") + ".", "red", ""));
+            url = "inventory.php?which=2";
+        }
+        else
+        {
+            int turns_remaining = clampi(get_property_int("dinseyFilthLevel") / 5, 0, 20);
+            subentry.entries.listAppend("Adventure in Pirates of the Garbage Barges for " + pluralizeWordy(turns_remaining, "more turn", "more turns") + ".");
+        }
+    }
+    else
+    {
+        subentry.entries.listAppend("Collect wages from the employee assignment kiosk.");
+        state.image_name = "stench airport kiosk";
+        url = "place.php?whichplace=airport_stench&action=airport3_kiosk";
+    }
+        
+	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, lookupLocations("pirates of the garbage barges")));
+}
+
+void QStenchAirportNastyBearsGenerateTasks(ChecklistEntry [int] task_entries)
+{
+    QuestState state;
+    state.image_name = "__item black picnic basket";
+    state.quest_name = "Nasty, Nasty Bears";
+	QuestStateParseMafiaQuestProperty(state, "questEStNastyBears");
+    
+    if (!state.in_progress)
+        return;
+    
+	ChecklistSubentry subentry;
+	
+	subentry.header = state.quest_name;
+	string url = "place.php?whichplace=airport_stench";
+    
+    
+    int bears_left = 8 - get_property_int("dinseyNastyBearsDefeated");
+    if (state.mafia_internal_step < 3 && bears_left > 0)
+    {
+        subentry.entries.listAppend("Adventure in Gator's Country Fun-Time Liquid Waste Sluice, defeat " + pluralizeWordy(bears_left, "more nasty bear", "more nasty bears") + ".");
+        
+        if (__misc_state["have olfaction equivalent"])
+            subentry.modifiers.listAppend("olfact nasty bears?");
+    }
+    else
+    {
+        subentry.entries.listAppend("Collect wages from the employee assignment kiosk.");
+        state.image_name = "stench airport kiosk";
+        url = "place.php?whichplace=airport_stench&action=airport3_kiosk";
+    }
+    
+	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, lookupLocations("Gator's Country Fun-Time Liquid Waste Sluice")));
+}
+
+void QStenchAirportSocialJusticeIGenerateTasks(ChecklistEntry [int] task_entries)
+{
+    QuestState state;
+    state.image_name = "__item ms. accessory";
+    state.quest_name = "Social Justice Adventurer I";
+	QuestStateParseMafiaQuestProperty(state, "questEStSocialJusticeI");
+    
+    if (!state.in_progress)
+        return;
+    
+	ChecklistSubentry subentry;
+	
+	subentry.header = state.quest_name;
+	string url = "place.php?whichplace=airport_stench";
+    
+    
+    int adventures_left = 15 - get_property_int("dinseySocialJusticeIProgress");
+    if (state.mafia_internal_step < 2 && adventures_left > 0)
+    {
+        subentry.entries.listAppend("Adventure in Pirates of the Garbage Barges " + pluralizeWordy(adventures_left, "more time", "more times") + ".");
+    }
+    else
+    {
+        subentry.entries.listAppend("Collect wages from the employee assignment kiosk.");
+        state.image_name = "stench airport kiosk";
+        url = "place.php?whichplace=airport_stench&action=airport3_kiosk";
+    }
+    
+	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, lookupLocations("Pirates of the Garbage Barges")));
+}
+
+void QStenchAirportSocialJusticeIIGenerateTasks(ChecklistEntry [int] task_entries)
+{
+    QuestState state;
+    state.image_name = "__monster black knight";
+    state.quest_name = "Social Justice Adventurer II";
+	QuestStateParseMafiaQuestProperty(state, "questEStSocialJusticeII");
+    
+    if (!state.in_progress)
+        return;
+    
+	ChecklistSubentry subentry;
+	
+	subentry.header = state.quest_name;
+	string url = "place.php?whichplace=airport_stench";
+    
+    
+    if (state.mafia_internal_step < 2)
+    {
+        int adventures_left = 15 - get_property_int("dinseySocialJusticeIIProgress");
+        subentry.entries.listAppend("Adventure in Uncle Gator's Country Fun-Time Liquid Waste Sluice " + pluralizeWordy(adventures_left, "more time", "more times") + ".");
+    }
+    else
+    {
+        subentry.entries.listAppend("Collect wages from the employee assignment kiosk.");
+        state.image_name = "stench airport kiosk";
+        url = "place.php?whichplace=airport_stench&action=airport3_kiosk";
+    }
+    
+	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, lookupLocations("Gator's Country Fun-Time Liquid Waste Sluice")));
+}
+
+void QStenchAirportSuperLuberGenerateTasks(ChecklistEntry [int] task_entries)
+{
+    QuestState state;
+    state.image_name = "__item lube-shoes";
+    state.quest_name = "Super Luber";
+	QuestStateParseMafiaQuestProperty(state, "questEStSuperLuber");
+    
+    if (!state.in_progress)
+        return;
+    item quest_item = lookupItem("lube-shoes");
+    
+    if (quest_item.available_amount() == 0)
+        return;
+    
+	ChecklistSubentry subentry;
+	
+	subentry.header = state.quest_name;
+	string url = "place.php?whichplace=airport_stench";
+    
+    
+    if (state.mafia_internal_step <= 2)
+    {
+        string [int] items_to_equip;
+        if (quest_item.equipped_amount() == 0)
+        {
+            items_to_equip.listAppend(quest_item);
+        }
+        if (items_to_equip.count() > 0)
+        {
+            subentry.entries.listAppend(HTMLGenerateSpanFont("Equip the " + items_to_equip.listJoinComponents(", ", "and") + ".", "red", ""));
+            url = "inventory.php?which=2";
+        }
+        else
+        {
+            subentry.entries.listAppend("Adventure in Barf Mountain, return to the kiosk after riding the rollercoaster.");
+            subentry.modifiers.listAppend("optional +meat");
+            if (lookupEffect("How to Scam Tourists").have_effect() == 0 && lookupItem("How to Avoid Scams").available_amount() > 0)
+                subentry.entries.listAppend("Use How to Avoid Scams to farm extra meat, if you want.");
+            
+        }
+    }
+    else
+    {
+        subentry.entries.listAppend("Collect wages from the employee assignment kiosk.");
+        state.image_name = "stench airport kiosk";
+        url = "place.php?whichplace=airport_stench&action=airport3_kiosk";
+    }
+        
+	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, lookupLocations("barf mountain")));
+}
+
+void QStenchAirportZippityDooDahGenerateTasks(ChecklistEntry [int] task_entries)
+{
+    QuestState state;
+    state.image_name = "__item tea for one";
+    state.quest_name = "Whistling Zippity-Doo-Dah";
+	QuestStateParseMafiaQuestProperty(state, "questEStZippityDooDah");
+    
+    if (!state.in_progress)
+        return;
+    item quest_item = lookupItem("Dinsey mascot mask");
+    
+    if (quest_item.available_amount() == 0)
+        return;
+    
+	ChecklistSubentry subentry;
+	
+	subentry.header = state.quest_name;
+	string url = "place.php?whichplace=airport_stench";
+    
+    int turns_remaining = clampi(15 - get_property_int("dinseyFunProgress"), 0, 15);
+    
+    if (state.mafia_internal_step <= 2)
+    {
+        string [int] items_to_equip;
+        if (quest_item.equipped_amount() == 0)
+        {
+            items_to_equip.listAppend(quest_item);
+        }
+        if (items_to_equip.count() > 0)
+        {
+            subentry.entries.listAppend(HTMLGenerateSpanFont("Equip the " + items_to_equip.listJoinComponents(", ", "and") + ".", "red", ""));
+            url = "inventory.php?which=2";
+        }
+        else
+        {
+            subentry.entries.listAppend("Adventure in the Toxic Teacups for " + pluralizeWordy(turns_remaining, "more turn", "more turns") + ".");
+        }
+    }
+    else
+    {
+        subentry.entries.listAppend("Collect wages from the employee assignment kiosk.");
+        state.image_name = "stench airport kiosk";
+        url = "place.php?whichplace=airport_stench&action=airport3_kiosk";
+    }
+        
+	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, lookupLocations("toxic teacups")));
+}
+
+void QStenchAirportWillWorkForFoodGenerateTasks(ChecklistEntry [int] task_entries)
+{
+    QuestState state;
+    state.image_name = "__item complimentary Dinsey refreshments";
+    state.quest_name = "Will Work With Food";
+	QuestStateParseMafiaQuestProperty(state, "questEStWorkWithFood");
+    
+    if (!state.in_progress)
+        return;
+        
+    item quest_item = lookupItem("complimentary Dinsey refreshments");
+    
+    if (quest_item.available_amount() == 0)
+        return;
+    
+	ChecklistSubentry subentry;
+	
+	subentry.header = state.quest_name;
+	string url = "place.php?whichplace=airport_stench";
+    
+    int tourists_to_feed = clampi(30 - get_property_int("dinseyTouristsFed"), 0, 30);
+    if (state.mafia_internal_step == 1)
+    {
+        subentry.entries.listAppend("Adventure in Barf Mountain, use complimentary Dinsey refreshments on garbage/angry tourists.");
+        subentry.entries.listAppend(pluralizeWordy(tourists_to_feed, "more remains", "more remain").capitalizeFirstLetter() + ".");
+        subentry.modifiers.listAppend("olfact garbage tourists");
+        
+    }
+    else
+    {
+        subentry.entries.listAppend("Collect wages from the employee assignment kiosk.");
+        state.image_name = "stench airport kiosk";
+        url = "place.php?whichplace=airport_stench&action=airport3_kiosk";
+    }
+        
+	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, lookupLocations("barf mountain")));
+}
+
+void QStenchAirportGiveMeFuelGenerateTasks(ChecklistEntry [int] task_entries)
+{
+    QuestState state;
+    state.image_name = "__item toxic globule";
+    state.quest_name = "Give me fuel";
+	QuestStateParseMafiaQuestProperty(state, "questEStGiveMeFuel");
+    
+    if (!state.in_progress)
+        return;
+    
+	ChecklistSubentry subentry;
+	
+	subentry.header = state.quest_name;
+	string url = "place.php?whichplace=airport_stench";
+    
+    if (lookupItem("toxic globule").available_amount() < 20)
+    {
+        int globules_needed = clampi(20 - lookupItem("toxic globule").available_amount(), 0, 20);
+        if (can_interact())
+        {
+            subentry.entries.listAppend("Buy " + pluralize(globules_needed, "more toxic globule", "more toxic globules") + " in the mall.");
+            url = "mall.php";
+        }
+        else
+        {
+            subentry.modifiers.listAppend("+unknown");
+            subentry.entries.listAppend("Adventure in the Toxic Teacups and collect " + pluralize(globules_needed, "more toxic globule", "more toxic globules") + ".");
+        }
+    }
+    else
+    {
+        if (lookupItem("toxic globule").item_amount() < 20)
+        {
+            int globules_needed = clampi(20 - lookupItem("toxic globule").item_amount(), 0, 20);
+            subentry.entries.listAppend("Pull " + pluralize(globules_needed, "more toxic globule", "more toxic globules") + ".");
+        }
+        else
+        {
+            subentry.entries.listAppend("Collect wages from the employee assignment kiosk.");
+            state.image_name = "stench airport kiosk";
+            url = "place.php?whichplace=airport_stench&action=airport3_kiosk";
+        }
+    }
+    
+	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, lookupLocations("toxic teacups")));
+}
+
+void QStenchAirportGarbageGenerateTasks(ChecklistEntry [int] task_entries)
+{
+    if (get_property_boolean("_dinseyGarbageDisposed"))
+        return;
+    ChecklistSubentry subentry;
+    /*subentry.header = "Turn in garbage";
+    subentry.entries.listAppend("Maintenance Tunnels Access" + __html_right_arrow_character + "Waste Disposal.");
+    task_entries.listAppend(ChecklistEntryMake("__item bag of park garbage", "place.php?whichplace=airport_stench&action=airport3_tunnels", subentry));*/
+    if (lookupItem("bag of park garbage").item_amount() > 0)
+    {
+    }
+    else if (lookupItem("bag of park garbage").available_amount() > 0)
+    {
+    }
+    else if (can_interact())
+    {
+        
+    }
+}
+
+void QStenchAirportGenerateTasks(ChecklistEntry [int] task_entries)
+{
+    if (!__misc_state["stench airport available"])
+        return;
+    if (__misc_state["In run"] && !(lookupLocations("Pirates of the Garbage Barges,Barf Mountain,The Toxic Teacups,Uncle Gator's Fun-Time Liquid Waste Sluice") contains __last_adventure_location))
+        return;
+    QStenchAirportFishTrashGenerateTasks(task_entries);
+    QStenchAirportNastyBearsGenerateTasks(task_entries);
+    QStenchAirportSocialJusticeIGenerateTasks(task_entries);
+    QStenchAirportSocialJusticeIIGenerateTasks(task_entries);
+    QStenchAirportSuperLuberGenerateTasks(task_entries);
+    QStenchAirportZippityDooDahGenerateTasks(task_entries);
+    QStenchAirportGarbageGenerateTasks(task_entries);
+    QStenchAirportGiveMeFuelGenerateTasks(task_entries);
+    QStenchAirportWillWorkForFoodGenerateTasks(task_entries);
+}
+
 void QAirportGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     ChecklistEntry [int] chosen_entries = optional_task_entries;
@@ -17957,6 +18563,7 @@ void QAirportGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     
     QSleazeAirportGenerateTasks(chosen_entries);
     QSpookyAirportGenerateTasks(chosen_entries);
+    QStenchAirportGenerateTasks(chosen_entries);
 }
 
 void QAirportGenerateResource(ChecklistEntry [int] available_resources_entries)
@@ -18272,6 +18879,62 @@ void QMeatsmithGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     if (have_reason_to_add)
         optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, active_url, subentry, relevant_locations));
 }
+void QGalaktikInit()
+{
+	QuestState state;
+	
+	QuestStateParseMafiaQuestProperty(state, "questM24Doc");
+    
+	
+	state.quest_name = "What's Up, Doc?";
+	state.image_name = "__item pretty flower";
+	
+	state.startable = true;
+	
+	__quest_state["Galaktik"] = state;
+}
+
+
+void QGalaktikGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+	QuestState base_quest_state = __quest_state["Galaktik"];
+	if (!base_quest_state.in_progress)
+		return;
+		
+	ChecklistSubentry subentry;
+	
+	subentry.header = base_quest_state.quest_name;
+	
+	string active_url = "place.php?whichplace=town_wrong";
+    string image_name = base_quest_state.image_name;
+    
+    string [int] missing_item_descriptions;
+    foreach it in $items[swindleblossom,fraudwort,shysterweed]
+    {
+        if (it.available_amount() >= 3)
+            continue;
+        missing_item_descriptions.listAppend(pluralizeWordy(3 - it.available_amount(), "more " + it, "more " + it.plural));
+    }
+    
+    if (missing_item_descriptions.count() > 0)
+    {
+        subentry.entries.listAppend("Collect " + missing_item_descriptions.listJoinComponents(", ", "and") + " in the overgrown lot.");
+        if (lookupItem("brown paper bag mask").available_amount() > 0 && lookupItem("brown paper bag mask").equipped_amount() == 0)
+            subentry.entries.listAppend("Could equip the brown paper bag mask to meet the Lot's wife, if you haven't already.");
+        
+        if (__misc_state["In run"] && __last_adventure_location != lookupLocation("the overgrown lot") && !in_bad_moon())
+            return;
+    }
+    else
+    {
+        //shop.php?whichshop=doc&action=talk
+        active_url = "shop.php?whichshop=doc&action=talk";
+        subentry.entries.listAppend("Return to Doc Galaktik.");
+        //image_name = "__familiar o.a.f.";
+    }
+	
+	optional_task_entries.listAppend(ChecklistEntryMake(image_name, active_url, subentry, lookupLocations("the overgrown lot")));
+}
 
 
 void QuestsInit()
@@ -18304,6 +18967,7 @@ void QuestsInit()
     QSubject37Init();
     QMartyInit();
     QMeatsmithInit();
+    QGalaktikInit();
     
     //has to happen after level 13 init... or not?
 	QManorInit();
@@ -18346,6 +19010,7 @@ void QuestsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     QSubject37GenerateTasks(task_entries, optional_task_entries, future_task_entries);
     QMartyGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     QMeatsmithGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+    QGalaktikGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 }
 
 void QuestsGenerateResources(ChecklistEntry [int] available_resources_entries)
@@ -18964,10 +19629,13 @@ void QHitsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] 
                 //olfact nothing, interferes with astronomers
                 //they prefer interferometry
             }
-            else if (my_ascensions() % 2 == 0)
-                subentry.entries.listAppend("Olfact skinflute.");
-            else
-                subentry.entries.listAppend("Olfact camel's toe.");
+            else if (!have_met_stars_requirement || !have_met_lines_requirement)
+            {
+                if (my_ascensions() % 2 == 0)
+                    subentry.entries.listAppend("Olfact skinflute.");
+                else
+                    subentry.entries.listAppend("Olfact camel's toe.");
+            }
             
 			if (!have_met_stars_requirement || !have_met_lines_requirement)
 				subentry.modifiers.listAppend("+234% item");
@@ -19103,16 +19771,19 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] available_resources_entries
         
         if (!($familiars[Frumious Bandersnatch, pair of stomping boots] contains my_familiar()))
             url = "familiar.php";
-		int snow_suit_runs = floor(numeric_modifier($item[snow suit], "familiar weight") / 5.0);
-		
-		if ($item[snow suit].available_amount() == 0)
-			snow_suit_runs = 0;
-			
-		if (snow_suit_runs >= 2)
-			description.listAppend("Snow Suit available (+" + snow_suit_runs + " runs)");
-		else if ($item[sugar shield].available_amount() > 0)
-			description.listAppend("Sugar shield available (+2 runs)");
-			
+        
+        if (my_path_id() != PATH_HEAVY_RAINS)
+        {
+            int snow_suit_runs = floor(numeric_modifier($item[snow suit], "familiar weight") / 5.0);
+            
+            if ($item[snow suit].available_amount() == 0)
+                snow_suit_runs = 0;
+                
+            if (snow_suit_runs >= 2)
+                description.listAppend("Snow Suit available (+" + snow_suit_runs + " runs)");
+            else if ($item[sugar shield].available_amount() > 0)
+                description.listAppend("Sugar shield available (+2 runs)");
+        }
 			
 		available_resources_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(name, "", description)));
 	}
@@ -19126,7 +19797,7 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] available_resources_entries
 			string name = "";
 			string [int] description;
 				
-			name = pluralize(hipster_fights_available, __misc_state_string["hipster name"] + " fight", __misc_state_string["hipster name"] + " fights") + " available";
+			name = pluralize(hipster_fights_available, __misc_state_string["hipster name"] + " fight", __misc_state_string["hipster name"] + " fights");
 			
 			int [int] hipster_chances;
 			hipster_chances[7] = 50;
@@ -19444,6 +20115,7 @@ void SSkillsGenerateResource(ChecklistEntry [int] available_resources_entries)
 	
 	string [skill] skills_to_details;
 	string [skill] skills_to_urls;
+    string [skill] skills_to_title_notes;
 	skill [string][int] property_summons_to_skills;
 	int [string] property_summon_limits;
 	
@@ -19458,6 +20130,8 @@ void SSkillsGenerateResource(ChecklistEntry [int] available_resources_entries)
 	property_summons_to_skills["_pirateBellowUsed"] = listMake(lookupSkill("Pirate Bellow"));
 	property_summons_to_skills["_holidayFunUsed"] = listMake(lookupSkill("Summon Holiday Fun!"));
 	property_summons_to_skills["_summonCarrotUsed"] = listMake(lookupSkill("Summon Carrot"));
+	property_summons_to_skills["_summonAnnoyanceUsed"] = listMake($skill[summon annoyance]);
+    skills_to_title_notes[$skill[summon annoyance]] = get_property_int("summonAnnoyanceCost") + " swagger";
     
     
     
@@ -19551,6 +20225,10 @@ void SSkillsGenerateResource(ChecklistEntry [int] available_resources_entries)
 				line += " (" + s.mp_cost() + " MP)";
 				//description.listAppend(s.mp_cost() + " MP");
 			}
+            if (skills_to_title_notes contains s)
+            {
+				line += " (" + skills_to_title_notes[s] + " )";
+            }
 			string details = skills_to_details[s];
 			if (details != "")
 				description.listAppend(details);
@@ -20537,6 +21215,67 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
         description.listAppend("Use for " + possibilities.listJoinComponents(", ", "or"));
         
         available_resources_entries.listAppend(ChecklistEntryMake("__item tonic djinn", "inventory.php?which=3", ChecklistSubentryMake("Tonic djinn", "", description), importance_level_unimportant_item));
+    }
+    
+    if ($item[V for Vivala mask].available_amount() > 0 && $item[V for Vivala mask].is_unrestricted() && !get_property_boolean("_vmaskBanisherUsed") && in_run)
+    {
+        string url;
+        string [int] description;
+        if (__misc_state["free runs usable"])
+            description.listAppend("Once/day free run/banisher. (combat skill)");
+        else
+            description.listAppend("Once/day banisher. (combat skill)");
+        
+        if ($item[V for Vivala mask].equipped_amount() == 0)
+        {
+            description.listAppend("Equip V for Vivala mask first.");
+            url = "inventory.php?which=2";
+        }
+        string line = "Costs ";
+        if (my_mp() < 30)
+            line += HTMLGenerateSpanFont("30 MP", "red", "");
+        else
+            line += "30 MP";
+        line += ".";
+        description.listAppend(line);
+        available_resources_entries.listAppend(ChecklistEntryMake("__item V for Vivala mask", url, ChecklistSubentryMake("Creepy Grin usable", "", description), importance_level_item));
+    }
+    
+    if ($item[moveable feast].available_amount() > 0 && $item[moveable feast].is_unrestricted() && get_property_int("_feastUsed") < 5)
+    {
+        string [int] description;
+        string url = "inventory.php?which=2";
+        int feastings_left = clampi(5 - get_property_int("_feastUsed"), 0, 5);
+        
+        description.listAppend("Gives +10 familiar weight for twenty turns to a specific familiar.");
+        string [int] familiars_used_on = get_property("_feastedFamiliars").split_string_alternate(";"); //separator: ";"
+        if (in_run && __misc_state["free runs usable"])
+        {
+            string [int] familiars_could_imbue_for_del_shannon;
+            boolean [familiar] familiars_used_on_inverse;
+            foreach key, f_name in familiars_used_on
+            {
+                familiar f = f_name.to_familiar();
+                if (f != $familiar[none])
+                    familiars_used_on_inverse[f] = true;
+            }
+            foreach f in $familiars[pair of stomping boots,Frumious Bandersnatch]
+            {
+                if (f.familiar_is_usable() && !(familiars_used_on_inverse contains f))
+                {
+                    familiars_could_imbue_for_del_shannon.listAppend(f);
+                }
+            }
+            if (familiars_could_imbue_for_del_shannon.count() > 0)
+            {
+                description.listAppend("Could feed " + familiars_could_imbue_for_del_shannon.listJoinComponents(", ", "or") + " for +2 free runs.");
+            }
+        }
+        
+        if (familiars_used_on.count() > 0)
+            description.listAppend("Already used on " + familiars_used_on.listJoinComponents(", ", "and") + ".");
+        available_resources_entries.listAppend(ChecklistEntryMake("__item moveable feast", url, ChecklistSubentryMake(pluralize(feastings_left, "moveable feasting", "moveable feastings"), "", description), importance_level_item));
+        //_feastedFamiliars
     }
     
     if ($item[cosmic calorie].available_amount() > 0 && in_run)
@@ -22601,11 +23340,17 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
         
         if (lookupItem("7301").available_amount() == 0 && get_property("questM20Necklace") != "finished" && lookupItem("Lady Spookyraven's necklace").available_amount() == 0)
         {
-            string line = "Writing desk - <strong>only if you can copy it four times</strong>. Skips the manor's first floor if you fight five total.";
-            
-            if (lookupItem("telegram from Lady Spookyraven").available_amount() > 0)
-                line += HTMLGenerateSpanFont("<br>Read the telegram from Lady Spookyraven first.", "red", "");
-            potential_faxes.listAppend(line);
+            int effective_writing_desks_encountering = get_property_int("writingDesksDefeated");
+            if (get_property_monster("romanticTarget") == $monster[writing desk])
+                effective_writing_desks_encountering += get_property_int("_romanticFightsLeft");
+            if (effective_writing_desks_encountering < 5)
+            {
+                string line = "Writing desk - <strong>only if you can copy it four times</strong>. Skips the manor's first floor if you fight five total.";
+                
+                if (lookupItem("telegram from Lady Spookyraven").available_amount() > 0)
+                    line += HTMLGenerateSpanFont("<br>Read the telegram from Lady Spookyraven first.", "red", "");
+                potential_faxes.listAppend(line);
+            }
         }
         
         if (in_hardcore() && $item[Bram's choker].available_amount() == 0 && combat_rate_modifier() > -25.0 && !(__quest_state["Level 13"].in_progress || (__quest_state["Level 13"].finished && my_path_id() != PATH_BUGBEAR_INVASION)))
@@ -22648,7 +23393,7 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
                 potential_faxes.listAppend(line);
             }
             //gaudy pirate (use for insults!)
-            if (!__quest_state["Level 11 Palindome"].finished && $item[talisman o' nam].available_amount() == 0 && $items[snakehead charrrm,gaudy key].available_amount() < 2 && $items[Copperhead Charm,Copperhead Charm (rampant)].available_amount() < 2)
+            if (!__quest_state["Level 11 Palindome"].finished && lookupItem("talisman o' nam").available_amount() == 0 && $items[snakehead charrrm,gaudy key].available_amount() < 2 && $items[Copperhead Charm,Copperhead Charm (rampant)].available_amount() < 2)
             {
                 string description = "Gaudy pirate - two fights for talisman o' nam. (copy once)";
                 if ($items[snakehead charrrm,gaudy key].available_amount() == 1)
@@ -22774,7 +23519,7 @@ void SFaxGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
     }
     
 	if (__misc_state["fax available"] && $item[photocopied monster].available_amount() == 0)
-        optional_task_entries.listAppend(ChecklistEntryMake("fax machine", url, ChecklistSubentryMake("Fax", "", listJoinComponents(SFaxGeneratePotentialFaxes(false), "<hr>"))));
+        optional_task_entries.listAppend(ChecklistEntryMake("fax machine", url, ChecklistSubentryMake("Fax", "", listJoinComponents(SFaxGeneratePotentialFaxes(true), "<hr>"))));
     if (lookupSkill("Rain Man").skill_is_usable() && my_rain() >= 50)
     {
         ChecklistEntry entry = ChecklistEntryMake("__skill rain man", "skills.php", ChecklistSubentryMake("Rain man copy", "50 rain drops", listJoinComponents(SFaxGeneratePotentialFaxes(true), "<hr>")));
@@ -23794,7 +24539,7 @@ void SOlfactionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     
     if (__misc_state["In run"])
     {
-        if ($item[Talisman o' Nam].available_amount() == 0 && !__quest_state["Level 11 Palindome"].finished)
+        if (lookupItem("talisman o' nam").available_amount() == 0 && !__quest_state["Level 11 Palindome"].finished)
             location_wanted_monster[$location[belowdecks]] = $monster[gaudy pirate];
         if (!__quest_state["Level 8"].state_boolean["Past mine"])
             location_wanted_monster[$location[the goatlet]] = $monster[dairy goat];
@@ -23960,7 +24705,10 @@ boolean [string] getHolidaysForDate(string realworld_date, int game_day)
 
 boolean [string] getHolidaysToday()
 {
-    return getHolidaysForDate(format_today_to_string("MMdd"), gameday_to_int()); //FIXME Y10K error
+    boolean [string] holidays = getHolidaysForDate(format_today_to_string("MMdd"), gameday_to_int()); //FIXME Y10K error
+    if (holiday().length() > 0)
+        holidays[holiday()] = true;
+    return holidays;
 }
 
 boolean [string] getHolidaysTomorrow()
@@ -24203,7 +24951,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         string [int] description;
         
         description.listAppend("It's not useful now, wear a better accessory?");
-        if ($item[talisman o' nam].equipped_amount() > 0)
+        if (lookupItem("talisman o' nam").equipped_amount() > 0)
             description.listAppend("Possibly the talisman as well.");
     
 		task_entries.listAppend(ChecklistEntryMake("__item mega gem", "inventory.php?which=2", ChecklistSubentryMake("Possibly unequip the Mega Gem", "", description), -11));
@@ -24777,7 +25525,7 @@ void SSneakyPeteGenerateResource(ChecklistEntry [int] available_resources_entrie
         
         string [int] targets;
         //√banshee, √a batrat for sonar, √harem girl (contested), √burly sidekick, √quiet healer, √filthworms, √f'c'le without natural dancer, √a-boo clues
-        if (!$skill[Natural Dancer].skill_is_usable() && !__quest_state["Pirate Quest"].finished && $item[talisman o' nam].available_amount() == 0)
+        if (!$skill[Natural Dancer].skill_is_usable() && !__quest_state["Pirate Quest"].finished && lookupItem("talisman o' nam").available_amount() == 0)
             targets.listAppend("Three times in the F'c'le, if you can't acquire Natural Dancer/+234% items.");
             
         if (!__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && !__quest_state["Level 11 Desert"].state_boolean["Killing Jar Given"] && $item[killing jar].available_amount() == 0)
@@ -27063,7 +27811,7 @@ void SActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, Check
             if (!lookupMonster("warehouse janitor").is_banished())
                 modifiers.listAppend("banish janitor");
             
-            description.listAppend("Adventure in the Secret Government Warehouse.");
+            description.listAppend("Adventure in the Secret Government Warehouse, use the items you find.");
             
             if (lookupItem("warehouse inventory page").available_amount() > 0 && lookupItem("warehouse map page").available_amount() > 0)
             {
@@ -27073,13 +27821,65 @@ void SActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, Check
             }
             else if (lookupSkill("Lash of the Cobra").have_skill())
             {
-                description.listAppend("Use lash of the cobra on the clerk and guard, use the items you find.");
+                description.listAppend("Use lash of the cobra on the clerk and guard.");
             }
             else
             {
                 modifiers.listAppend("+item");
-                description.listAppend("Use the items you find.");
             }
+            
+            string [int] items_available;
+            foreach it in lookupItems("warehouse inventory page,warehouse map page")
+            {
+                if (it.available_amount() > 0)
+                    items_available.listAppend(pluralizeWordy(it));
+            }
+            if (items_available.count() > 0)
+            {
+                description.listAppend(items_available.listJoinComponents(", ", "and").capitalizeFirstLetter() + " available.");
+            }
+            
+            int progress_remaining = clampi(40 - get_property_int("warehouseProgress"), 0, 40);
+            string line;// = pluralizeWordy(progress_remaining, "remaining aisle", "remaining aisles").capitalizeFirstLetter() + ".";
+            if (progress_remaining <= 0)
+                line += "MacGuffin next turn.";
+            else
+                line += "Fight " + progress_remaining + " more combats";
+            if (progress_remaining > 1)
+            {
+                int page_pairs_remaining = ceil(progress_remaining.to_float() / 8.0);
+                
+                /*string [int] bring_me_the_red_pages;
+                
+                int first_value = -1;
+                boolean identical_twins = false;
+                foreach it in lookupItems("warehouse inventory page,warehouse map page")
+                {
+                    int pages_remaining = page_pairs_remaining - it.available_amount();
+                    if (pages_remaining > 0)
+                    {
+                        if (first_value == -1)
+                            first_value = pages_remaining;
+                        else if (first_value == pages_remaining)
+                        {
+                            identical_twins = true;
+                            bring_me_the_red_pages.listAppend(it);
+                            continue;
+                        }
+                        bring_me_the_red_pages.listAppend(pluralizeWordy(pages_remaining, it));
+                    }
+                }
+                
+                if (identical_twins)
+                    line += bring_me_the_red_pages.listJoinComponents("/");
+                else
+                    line += bring_me_the_red_pages.listJoinComponents(", ", "and");*/
+                    
+                line += " or collect ";
+                line += pluralizeWordy(page_pairs_remaining, "more page pair", "more page pairs");
+            }
+            line += ".";
+            description.listAppend(line);
             
             task_entries.listAppend(ChecklistEntryMake("__item holy macguffin", url, ChecklistSubentryMake("Retrieve the Holy MacGuffin", modifiers, description), lookupLocations("The Secret Council Warehouse")));
         }
@@ -27121,7 +27921,7 @@ void SActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] available_resour
             talismen_of_horus_wanted += 2;
         if (!__quest_state["Level 12"].state_boolean["Lighthouse Finished"] && $item[barrel of gunpowder].available_amount() < 5)
             talismen_of_horus_wanted += 2;
-        if ($item[pirate fledges].available_amount() == 0 && $item[Talisman o' Nam].available_amount() == 0)
+        if ($item[pirate fledges].available_amount() == 0 && lookupItem("talisman o' nam").available_amount() == 0)
             talismen_of_horus_wanted += 2;
         if (talismen_of_horus_wanted == 0) //where else do you need +combat? pirate's cove?
             talismen_of_horus_wanted = 1;
@@ -27274,6 +28074,50 @@ void SActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] available_resour
         }
     }
 }
+void SMayoClinicGenerateResource(ChecklistEntry [int] available_resources_entries)
+{
+    if (!mafiaIsPastRevision(15790)) //minimum supported version
+        return;
+    if (__misc_state["campground unavailable"])
+        return;
+    if (get_campground()[lookupItem("portable Mayo Clinic")] == 0)
+        return;
+    
+    //mayoLevel
+    
+    if (availableFullness() > 0)
+    {
+        //stuff:
+        //Mayonex - food adventures -> blood mayo (???)
+        //Mayodiol -> one fullness becomes one drunkenness
+        //Mayostat -> one-fullness same quality restore
+        //Mayozapine -> increased stat gains
+        //Mayoflex -> +1 adventure
+        //Mayo Minder™ -> um... I guess it uses the above things for you. reminds me of buying the autorefueler in EV..
+    }
+    
+    if (!get_property_boolean("_mayoDeviceRented"))
+    {
+        //sphygmayomanometer - +X% stats (mayo level)
+        //tomayohawk-style reflex hammer - stagger, mayo-level sleaze damage
+        //mayo lance - YR combat item
+        //miracle whip - nice day two/three equip. +50% init, +50% item, +100% meat, +100% wait, I only get one of these a run?
+        
+        if (!get_property_boolean("mayoWhipRented"))
+        {
+        }
+    }
+    if (!get_property_boolean("_mayoTankSoaked"))
+    {
+        string [int] description;
+        string [int] benefits;
+        if (__misc_state["in run"] && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING)
+            benefits.listAppend("HP restore");
+        benefits.listAppend("+2 all resistance");
+        description.listAppend("Gives " + benefits.listJoinComponents(", ", "and") + ".");
+        available_resources_entries.listAppend(ChecklistEntryMake("__item bubblin' chemistry solution", "campground.php?action=workshed", ChecklistSubentryMake("Mayo Tank Soak", "", description), 8));
+    }
+}
 
 void SetsInit()
 {
@@ -27311,6 +28155,7 @@ void SetsGenerateResources(ChecklistEntry [int] available_resources_entries)
     SClassesGenerateResource(available_resources_entries);
     SEquipmentGenerateResource(available_resources_entries);
     SActuallyEdtheUndyingGenerateResource(available_resources_entries);
+    SMayoClinicGenerateResource(available_resources_entries);
 }
 
 void SetsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -27524,7 +28369,8 @@ void generatePullList(Checklist [int] checklists)
     if (__misc_state["need to level"])
     {
         pullable_item_list.listAppend(GPItemMake($item[plastic vampire fangs], "Large stat gain, once/day.", 1));
-        pullable_item_list.listAppend(GPItemMake($item[operation patriot shield], "?", 1));
+        pullable_item_list.listAppend(GPItemMake($item[operation patriot shield], "+america", 1));
+        pullable_item_list.listAppend(GPItemMake(lookupItem("the crown of ed the undying"), "Various in-run modifiers. (init, HP, ML/item/meat/etc)", 1));
     }
     pullable_item_list.listAppend(GPItemMake($item[v for vivala mask], "?", 1));
 	
@@ -27731,7 +28577,7 @@ void generatePullList(Checklist [int] checklists)
             pullable_item_list.listAppend(GPItemMake("Ninja peak climbing", "__item " + missing_ninja_components[0], description));
         }
     }
-    if ($item[talisman o' nam].available_amount() == 0 && !have_outfit_components("Swashbuckling Getup") && $item[pirate fledges].available_amount() == 0 && !__quest_state["Pirate Quest"].finished)
+    if (lookupItem("talisman o' nam").available_amount() == 0 && !have_outfit_components("Swashbuckling Getup") && $item[pirate fledges].available_amount() == 0 && !__quest_state["Pirate Quest"].finished)
     {
         item [int] missing_outfit_components = missing_outfit_components("Swashbuckling Getup");
         if (missing_outfit_components.count() > 0)
@@ -28026,7 +28872,7 @@ void finalizeSetUpFloristState()
 	//War Lily - indoor, +ML:
     if (__misc_state["need to level"])
     {
-        if (my_path_id() != PATH_PICKY || my_primestat() == $stat[moxie]) //nightmare in picky
+        if ((my_path_id() != PATH_PICKY || my_primestat() == $stat[moxie]) && $location[The Castle in the Clouds in the Sky (Ground Floor)].turns_spent < 11) //nightmare in picky
             __plants_suggested_locations.listAppend(PlantSuggestionMake($location[The castle in the clouds in the sky (ground floor)], "War Lily", ""));
         //Haunted bedroom?
     }
@@ -28615,7 +29461,7 @@ void setUpState()
 	
 	
     __misc_state_float["Non-combat statgain multiplier"] = 1.0;
-	__misc_state_float["ML to mainstat multiplier"] = 1.0 / (2.0  * 4.0);
+	__misc_state_float["ML to mainstat multiplier"] = 1.0 / (2.0 * 3.0);
 	/*if (my_path_id() == PATH_CLASS_ACT_2)
 	{
 		__misc_state_float["ML to mainstat multiplier"] = 1.0 / (2.0 * 2.0);
@@ -28944,13 +29790,14 @@ void setUpState()
     __misc_state["can purchase magical mystery juice"] = __misc_state["mysticality guild store available"];
     __misc_state["have some reasonable way of restoring MP"] = false;
     
-    if (__misc_state["can purchase magical mystery juice"] || black_market_available() || dispensary_available())
+    if (__misc_state["can purchase magical mystery juice"] || black_market_available() || dispensary_available() || true)
         __misc_state["have some reasonable way of restoring MP"] = true;
         
     
-    __misc_state_float["meat per MP"] = 17.0;
-    if (QuestState("questM04Galaktic").finished)
-        __misc_state_float["meat per MP"] = MIN(__misc_state_float["meat per MP"], 12.0);
+    int tonic_price = lookupItem("Doc Galaktik's Invigorating Tonic").npc_price();
+    if (tonic_price == 0)
+        tonic_price = 90; //wrong, but w/e
+    __misc_state_float["meat per MP"] = tonic_price.to_float() / 10.0;
     
     float soda_cost = -1.0;
     if (black_market_available())
@@ -29163,7 +30010,13 @@ void generateMissingItems(Checklist [int] checklists)
     
     if (lookupItem("electric boning knife").available_amount() == 0 && __quest_state["Level 13"].state_boolean["wall of bones will need to be defeated"])
     {
-        items_needed_entries.listAppend(ChecklistEntryMake("__item electric boning knife", $location[the castle in the clouds in the sky (ground floor)].getClickableURLForLocation(), ChecklistSubentryMake("Electric boning knife", "-combat", listMake("Found from an NC on the ground floor of the castle in the clouds in the sky.", "Or towerkill."))));
+        string [int] description;
+        description.listAppend("Found from an NC on the ground floor of the castle in the clouds in the sky.");
+        if (lookupSkill("garbage nova").skill_is_usable())
+            description.listAppend("Ignore this, you can towerkill with Garbage Nova.");
+        else
+            description.listAppend("Or towerkill.");
+        items_needed_entries.listAppend(ChecklistEntryMake("__item electric boning knife", $location[the castle in the clouds in the sky (ground floor)].getClickableURLForLocation(), ChecklistSubentryMake("Electric boning knife", "-combat", description)));
     }
     if (lookupItem("beehive").available_amount() == 0 && __quest_state["Level 13"].state_boolean["wall of skin will need to be defeated"])
     {
@@ -29564,7 +30417,7 @@ void generateTasks(Checklist [int] checklists)
         //FIXME URLs for the other ones
 		if (current_mcd() < mcd_max_limit && have_mcd && monster_level_adjustment() < 150)
 		{
-			optional_task_entries.listAppend(ChecklistEntryMake("__item detuned radio", url, ChecklistSubentryMake("Set monster control device to " + mcd_max_limit, "", (mcd_max_limit * __misc_state_float["ML to mainstat multiplier"]) + " mainstats/turn")));
+			optional_task_entries.listAppend(ChecklistEntryMake("__item detuned radio", url, ChecklistSubentryMake("Set monster control device to " + mcd_max_limit, "", roundForOutput(mcd_max_limit * __misc_state_float["ML to mainstat multiplier"], 2) + " mainstats/turn")));
 		}
 	}
 	
@@ -29788,15 +30641,15 @@ void generateDailyResources(Checklist [int] checklists)
             reasons.listAppend("nice hat");
         if ($familiar[fancypants scarecrow].familiar_is_usable() && $item[double-ice britches].available_amount() == 0)
             reasons.listAppend("scarecrow pants");
-        if (!__quest_state["Level 13"].state_boolean["past tower monsters"])
-            reasons.listAppend("situational tower killing");
+        //if (!__quest_state["Level 13"].state_boolean["past tower monsters"]) //don't think this is true
+            //reasons.listAppend("situational tower killing");
         
         if (reasons.count() > 0)
             description.listAppend("Double-ice. (" + reasons.listJoinComponents(", ", "and") + ")");
         else
             description.listAppend("Double-ice.");
 		
-		available_resources_entries.listAppend(ChecklistEntryMake("__item shard of double-ice", "", ChecklistSubentryMake("Take a shower", description), 5));
+		available_resources_entries.listAppend(ChecklistEntryMake("__item shard of double-ice", "clan_viplounge.php?action=shower", ChecklistSubentryMake("Take a shower", description), 5));
 	}
     if (__misc_state["VIP available"] && get_property_int("_poolGames") <3 && $item[Clan pool table].is_unrestricted())
     {
@@ -30212,12 +31065,12 @@ string generateRandomMessage()
     location_messages[$location[the middle chamber]] = "pyramid laundry machine";
     location_messages[$location[the arid, extra-dry desert]] = "can't remember your name";
     location_messages[$location[outside the club]] = "around the world around the world around the world around the world";
-    string conspiracy = "they know where you live, " + get_property("System.user.name").to_lower_case();
     if (my_class() == $class[disco bandit])
     {
         foreach l in $locations[The castle in the clouds in the sky (ground floor),The castle in the clouds in the sky (basement),The castle in the clouds in the sky (top floor)]
             location_messages[l] = "making castles of your disco";
     }
+    string conspiracy = "they know where you live, " + get_property("System.user.name").to_lower_case();
     foreach s in $strings[The Mansion of Dr. Weirdeaux,The Deep Dark Jungle,The Secret Government Laboratory]
         location_messages[lookupLocation(s)] = conspiracy;
     foreach s in $strings[anemone mine (mining),itznotyerzitz mine (in disguise),the knob shaft (mining),The Crimbonium Mine]
@@ -30247,7 +31100,7 @@ string generateRandomMessage()
     equipment_messages[$item[yearbook club camera]] = "rule of thirds";
     equipment_messages[$item[happiness]] = "bang bang";
     equipment_messages[$item[mysterious silver lapel pin]] = "be seeing you";
-    equipment_messages[$item[Moonthril Circlet]] = "moon tiara";
+    equipment_messages[$item[Moonthril Circlet]] = "moon tiara"; //action!
     equipment_messages[$item[numberwang]] = "simply everyone";
     equipment_messages[$item[Mark V Steam-Hat]] = "girl genius";
     equipment_messages[$item[mr. accessory]] = "you can equip mr. accessories?";
@@ -30269,6 +31122,8 @@ string generateRandomMessage()
 	
 	if (my_ascensions() == 0)
 		random_messages.listAppend("welcome to the kingdom!");
+    else if (my_ascensions() == 1)
+        random_messages.listAppend("run, while you still have the chance!");
         
     if (__misc_state["In run"])
         random_messages.listAppend("perfect runs are overrated");
@@ -30350,7 +31205,7 @@ string generateRandomMessage()
         random_messages.listAppend("speed ascension is all I have left, " + lowercase_player_name);
     if (item_drop_modifier() <= -100.0)
         random_messages.listAppend("let go of your material posessions");
-    if ($item[puppet strings].storage_amount() + $item[puppet strings].available_amount() > 0)
+    if ($item[puppet strings].item_amount() > 0)
     {
         //full puppet string support:
         string chosen_message;
@@ -30461,7 +31316,12 @@ string generateRandomMessage()
     
     if (class_messages contains my_class())
         random_messages.listAppend(class_messages[my_class()]);
-    
+        
+    if (last_monster().phylum == $phylum[penguin])
+    {
+        random_messages.listClear(); //sufficiently rare
+        random_messages.listAppend("dood");
+    }
     
     string [monster] monster_messages;
     //TODO add a message for the procrastination giant
@@ -30472,7 +31332,12 @@ string generateRandomMessage()
     foreach m in $monsters[Ed the Undying (1),Ed the Undying (2),Ed the Undying (3),Ed the Undying (4),Ed the Undying (5),Ed the Undying (6),Ed the Undying (7)]
         monster_messages[m] = "UNDYING!";
     foreach m in $monsters[Naughty Sorceress, Naughty Sorceress (2), Naughty Sorceress (3)]
-        monster_messages[m] = "she isn't all that bad";
+    {
+        if (holidays_today["Valentine's Day"])
+            monster_messages[m] = "please be mine, sorceress";
+        else
+            monster_messages[m] = "she isn't all that bad";
+    }
     foreach m in $monsters[Shub-Jigguwatt\, Elder God of Violence,Yog-Urt\, Elder Goddess of Hatred]
         monster_messages[m] = "strange aeons";
     monster_messages[$monster[daft punk]] = "can you feel it?";
@@ -30517,13 +31382,12 @@ string generateRandomMessage()
     monster_messages[lookupMonster("Mr. Loathing")] = HTMLGenerateTagWrap("a", "ruuun! go! get to the towah!", generateMainLinkMap("place.php?whichplace=nstower"));
     if (my_hp() < my_maxhp())
         monster_messages[lookupMonster("smooth criminal")] = "you've been hit by<br>you've been struck by<br><i>a smooth criminal</i>";
+    monster_messages[$monster[demonic icebox]] = "zuul";
     if (monster_messages contains last_monster() && last_monster() != $monster[none])
     {
 		random_messages.listClear();
         random_messages.listAppend(monster_messages[last_monster()]);
     }
-    
-    
     
     
     if (__misc_state_int["Basement Floor"] == 500)
@@ -30603,7 +31467,7 @@ string generateRandomMessage()
         
     
     
-    foreach s in $strings[rainDohMonster,spookyPuttyMonster,cameraMonster,photocopyMonster,envyfishMonster,iceSculptureMonster,crudeMonster,crappyCameraMonster,romanticTarget]
+    foreach s in $strings[rainDohMonster,spookyPuttyMonster,cameraMonster,photocopyMonster,envyfishMonster,iceSculptureMonster,crudeMonster,crappyCameraMonster,romanticTarget,chateauMonster]
     {
         if (get_property(s) == "Quiet Healer")
         {
@@ -30621,7 +31485,7 @@ string generateRandomMessage()
 	{
 		random_messages.listClear();
         monster last_monster = get_property_monster("lastEncounter");
-        if (last_monster == lookupMonster("storm cow") && last_monster != $monster[none])
+        if (last_monster == $monster[storm cow] && last_monster != $monster[none])
             random_messages.listAppend("<pre>^__^            <br>(oo)\\_______    <br>(__)\\       )\\/\\<br>    ||----w |   <br>    ||     ||   </pre>");
         else
             random_messages.listAppend("ow");
@@ -30664,6 +31528,8 @@ void listAppend(Banish [int] list, Banish entry)
 
 int BanishTurnsLeft(Banish b)
 {
+    if (b.banish_turn_length == -1)
+        return 2147483647;
     return b.turn_banished + b.banish_turn_length - my_turncount();
 }
 
@@ -30778,70 +31644,6 @@ string BanishSourceForMonster(monster m)
 {
     return BanishForMonster(m).banish_source;
 }
-
-
-int currentBanishSourceCountForLocation(location l)
-{
-    /*
-    FIXME support all of these:
-    
-    banishing shout
-    batter up!
-    chatterboxing
-    classy monkey
-    cocktail napkin
-    crystal skull
-    deathchucks
-    dirty stinkbomb
-    divine champagne popper
-    harold's bell
-    howl of the alpha
-    ice house
-    louder than bomb
-    nanorhino
-    pantsgiving
-    peel out
-    pulled indigo taffy
-    smoke grenade
-    spooky music box mechanism
-    staff of the standalone cheese
-    stinky cheese eye
-    thunder clap
-    v for vivala mask
-    walk away from explosion
-    */
-    int count = 0;
-    boolean [string] banishers_used;
-    
-    //Banish [int] banishes_active = BanishesActive();
-    
-    foreach key, m in l.get_monsters()
-    {
-        if (m.is_banished())
-        {
-            count += 1;
-            banishers_used[m.BanishSourceForMonster()] = true;
-        }
-    }
-    
-    if (lookupSkill("curse of vacation").have_skill() && !banishers_used["curse of vacation"])
-        count += 1;
-    if ($skill[Thunder Clap].have_skill() && my_thunder() >= 40 && !banishers_used["thunder clap"])
-        count += 1;
-    if ($item[louder than bomb].item_amount() > 0 && !banishers_used["louder than bomb"])
-        count += 1;
-    if ($item[pantsgiving].equipped_amount() > 0 && get_property_int("_pantsgivingBanish") < 5 && !banishers_used["pantsgiving"])
-        count += 1;
-    if ($item[smoke grenade].item_amount() > 0 && !banishers_used["smoke grenade"])
-        count += 1;
-    if (my_class() == $class[seal clubber] && my_fury() >= 5 && $skill[batter up!].have_skill() && !banishers_used["batter up"])
-        count += 1;
-    if ($skill[walk away from explosion].have_skill() && $effect[Bored With Explosions].have_effect() == 0)
-        count += 1;
-    
-    return count;
-}
-
 
 boolean [string] activeBanishNamesForLocation(location l)
 {
@@ -31372,6 +32174,664 @@ static
     initialiseItemsThatCraftFood();
 }
 
+//Delete in the future:
+/*buffer generateItemInformationMethod1(location l, monster m, boolean try_for_minimal_display, boolean [monster] monsters_to_display_items_minimally)
+{
+    buffer buf;
+
+    boolean want_item_minimal_display = false;
+    if (try_for_minimal_display || monsters_to_display_items_minimally[m] || monsters_to_display_items_minimally.count() > 2)
+        want_item_minimal_display = true;
+    string item_font_size = "medium";
+    if (true)
+    {
+        string style;
+        style += "font-size:0;";
+        if (want_item_minimal_display)
+            item_font_size = "0.8rem;";
+        if (style.length() > 0)
+            buf.append(HTMLGenerateTagPrefix("div", mapMake("style", style)));
+        else
+            buf.append(HTMLGenerateTagPrefix("div"));
+    }
+    int number_of_slimeling_eligible_items = 0;
+    foreach key, r in m.item_drops_array()
+    {
+        if ($slots[hat,weapon,off-hand,back,shirt,pants,acc1,acc2,acc3] contains r.drop.to_slot())
+            number_of_slimeling_eligible_items += 1;
+    }
+    
+    foreach key, r in m.item_drops_array()
+    {
+        //when "r.type" == "0", I think that means the drop rate is unknown
+        item it = r.drop;
+        int drop_rate = r.rate;
+        int adjusted_base_drop_rate = drop_rate;
+        boolean drop_rate_is_actually_zero = false;
+        boolean drop_rate_is_guess = false;
+        
+        boolean item_is_conditional = r.type.contains_text("c");
+        boolean item_is_stealable_accordion = r.type.contains_text("a");
+        boolean item_is_pickpockable_only = r.type.contains_text("p");
+        boolean item_cannot_be_pickpocketed = r.type.contains_text("n"); //FIXME use this for anything?
+        boolean item_rate_is_fixed = r.type.contains_text("f");
+        buffer trailing_buffer_loop;
+        boolean grey_out_item = false;
+        if (item_is_stealable_accordion && my_class() != $class[accordion thief])
+        {
+            grey_out_item = true;
+            adjusted_base_drop_rate = 0;
+            drop_rate_is_actually_zero = true;
+        }
+        if (item_is_pickpockable_only && !__misc_state["can pickpocket"])
+        {
+            grey_out_item = true;
+            adjusted_base_drop_rate = 0;
+            drop_rate_is_actually_zero = true;
+        }
+        if (it == $item[reflection of a map] && get_property_int("pendingMapReflections") == 0)
+        {
+            grey_out_item = true;
+            adjusted_base_drop_rate = 0;
+            drop_rate_is_actually_zero = true;
+        }
+        if (($items[folder (red),folder (blue),folder (green),folder (magenta),folder (cyan),folder (yellow),folder (smiley face),folder (wizard),folder (space skeleton),folder (D-Team),folder (Ex-Files),folder (skull and crossbones),folder (Knight Writer),folder (Jackass Plumber),folder (holographic fractal),folder (barbarian),folder (rainbow unicorn),folder (Seawolf),folder (dancing dolphins),folder (catfish),folder (tranquil landscape),folder (owl),folder (Stinky Trash Kid),folder (sports car),folder (sportsballs),folder (heavy metal),folder (Yedi),folder (KOLHS)] contains it))
+        {
+            if (drop_rate <= 0)
+            {
+                drop_rate = 5; //assumed
+                adjusted_base_drop_rate = drop_rate; //assumed
+                drop_rate_is_guess = true;
+            }
+            if ($item[over-the-shoulder folder holder].equipped_amount() == 0)
+            {
+                grey_out_item = true;
+                adjusted_base_drop_rate = 0;
+                drop_rate_is_actually_zero = true;
+                drop_rate_is_guess = false;
+            }
+        }
+        
+        if (grey_out_item)
+        {
+            buf.append(HTMLGenerateTagPrefix("span", mapMake("style", "color:grey;")));
+            trailing_buffer_loop.prepend(HTMLGenerateTagSuffix("span"));
+        }
+        
+        int item_count_displaying = m.item_drops_array().count();
+        int items_per_line = 1;
+        string holder_class_name = "r_word_wrap_group";
+        if (try_for_minimal_display)
+            holder_class_name = "r_word_wrap_group";
+        else if (item_count_displaying == 1)
+        {
+            holder_class_name = "r_location_popup_item_holding_block_1x";
+            items_per_line = 1;
+        }
+        else if (item_count_displaying == 2 || ceil(item_count_displaying.to_float() / 2.0) == ceil(item_count_displaying.to_float() / 3.0))
+        {
+            holder_class_name = "r_location_popup_item_holding_block_2x";
+            items_per_line = 2;
+        }
+        else
+        {
+            holder_class_name = "r_location_popup_item_holding_block";
+            items_per_line = 3;
+        }
+        
+        if (true)
+        {
+            string style;
+            buf.append(HTMLGenerateTagPrefix("div", mapMake("class", holder_class_name, "style", style)));
+        }
+        
+        trailing_buffer_loop.prepend(HTMLGenerateTagSuffix("div"));
+        
+        boolean use_tables_here = true;
+        
+        if (true)
+        {
+            string style;
+            if (use_tables_here)
+               style += "display:table;";
+            style += "margin:0px;padding:0px;border-spacing:0px;";
+            buf.append(HTMLGenerateTagPrefix("div", mapMake("style", style)));
+            trailing_buffer_loop.prepend(HTMLGenerateTagSuffix("div"));
+            if (use_tables_here)
+            {
+                buf.append(HTMLGenerateTagPrefix("div", mapMake("style", "display:table-row;")));
+                trailing_buffer_loop.prepend(HTMLGenerateTagSuffix("div"));
+            }
+        }
+        
+        string image_url = "images/itemimages/" + it.smallimage;
+        if (it.smallimage.contains_text("/"))
+            image_url = "images/" + it.smallimage;
+        if (it.image.length() > 0 && !try_for_minimal_display)
+        {
+            if (use_tables_here)
+            {
+                buf.append(HTMLGenerateTagPrefix("div", mapMake("style", "display:table-cell;vertical-align:middle;", "class", "r_location_bar_background_blur")));
+            }
+            int image_size = 30;
+            if (want_item_minimal_display)
+                image_size = 15;
+            string [string] image_map = mapMake("src", image_url, "width", image_size, "height", image_size);
+            image_map["style"] += "display:block;"; //removes implicit pixels around image
+            if (grey_out_item)
+                image_map["style"] += "opacity:0.5;";
+            buf.append(HTMLGenerateTagPrefix("img", image_map));
+            if (use_tables_here)
+            {
+                buf.append(HTMLGenerateTagSuffix("div"));
+            }
+        }
+        if (use_tables_here)
+        {
+            string style = "display:table-cell;vertical-align:middle;padding-left:0.25em;font-size:" + item_font_size + ";";
+            buf.append(HTMLGenerateTagPrefix("div", mapMake("style", style)));
+            trailing_buffer_loop.prepend(HTMLGenerateTagSuffix("div"));
+            
+            buf.append(HTMLGenerateTagPrefix("span", mapMake("class", "r_location_bar_background_blur")));
+            trailing_buffer_loop.prepend(HTMLGenerateTagSuffix("span"));
+        }
+        if (false)
+        {
+            buf.append(HTMLGenerateTagPrefix("div", mapMake("style", "display:none;")));
+            trailing_buffer_loop.prepend(HTMLGenerateTagSuffix("div"));
+        }
+        
+        string [int] item_display_properties;
+        if (adjusted_base_drop_rate == 0 && !drop_rate_is_actually_zero)
+        {
+            if (!item_is_stealable_accordion)
+            {
+                buf.append("?%");
+                buf.append(" ");
+            }
+        }
+        else if (adjusted_base_drop_rate < 100)
+        {
+            float effective_drop_rate = adjusted_base_drop_rate;
+            float item_modifier = l.item_drop_modifier_for_location();
+            if (it.fullness > 0 || (__items_that_craft_food contains it))
+                item_modifier += numeric_modifier("Food Drop");
+            if (it.inebriety > 0)
+                item_modifier += numeric_modifier("Booze Drop");
+            if (it.to_slot() == $slot[hat])
+                item_modifier += numeric_modifier("Hat Drop");
+            if (it.to_slot() == $slot[weapon])
+                item_modifier += numeric_modifier("Weapon Drop");
+            if (it.to_slot() == $slot[off-hand])
+                item_modifier += numeric_modifier("Offhand Drop");
+            if (it.to_slot() == $slot[shirt])
+                item_modifier += numeric_modifier("Shirt Drop");
+            if (it.to_slot() == $slot[pants])
+                item_modifier += numeric_modifier("Pants Drop");
+            if ($slots[acc1,acc2,acc3] contains it.to_slot())
+                item_modifier += numeric_modifier("Accessory Drop");
+            if (it.candy)
+                item_modifier += numeric_modifier("Candy Drop");
+            if ($slots[hat,weapon,off-hand,back,shirt,pants,acc1,acc2,acc3] contains it.to_slot()) //assuming familiar equipment isn't "gear"
+                item_modifier += numeric_modifier("Gear Drop");
+            if (item_is_pickpockable_only)
+            {
+                if (__misc_state["can pickpocket"])
+                    item_modifier = numeric_modifier("pickpocket chance");
+                else
+                    item_modifier = 0.0;
+            }
+            if (item_rate_is_fixed)
+                item_modifier = 0.0;
+            if ($locations[sweet-ade lake,Eager Rice Burrows,Gumdrop Forest] contains l)
+            {
+                item_modifier = 0.0;
+                if (it.candy)
+                    item_modifier += numeric_modifier("Candy Drop");
+            }
+            //FIXME pickpocketting...?
+            
+            effective_drop_rate *= 1.0 + item_modifier / 100.0;
+            if (my_path_id() == PATH_HEAVY_RAINS)
+            {
+                effective_drop_rate = clampf(floor(effective_drop_rate), 0.0, 100.0);
+                float washaway_rate = l.washaway_rate_of_location();
+                effective_drop_rate *= (1.0 - washaway_rate);
+            }
+            if (my_familiar() == $familiar[slimeling] && ($slots[hat,weapon,off-hand,back,shirt,pants,acc1,acc2,acc3] contains it.to_slot()) && effective_drop_rate < 100.0)
+            {
+                effective_drop_rate = clampf(floor(effective_drop_rate), 0.0, 100.0);
+                //number_of_slimeling_eligible_items
+                float slimeling_chance = 0.0;
+                if (number_of_slimeling_eligible_items > 0)
+                    slimeling_chance = 1.0 / number_of_slimeling_eligible_items.to_float();
+                
+                int effective_familiar_weight = my_familiar().familiar_weight() + numeric_modifier("familiar weight");
+                int familiar_weight_from_familiar_equipment = $slot[familiar].equipped_item().numeric_modifier("familiar weight"); //need to cancel it out
+                
+                float slimeling_base_drop_rate = my_familiar().numeric_modifier("item drop", effective_familiar_weight - familiar_weight_from_familiar_equipment, $slot[familiar].equipped_item());
+                if ($slot[familiar].equipped_item() == $item[undissolvable contact lenses])
+                    slimeling_base_drop_rate += 25.0;
+                
+                slimeling_chance *= adjusted_base_drop_rate.to_float() * (1.0 + slimeling_base_drop_rate / 100.0);
+                effective_drop_rate += (100.0 - effective_drop_rate) * (slimeling_chance / 100.0);
+            }
+            
+            effective_drop_rate = clampf(floor(effective_drop_rate), 0.0, 100.0);
+            
+            
+            if (!grey_out_item)
+            {
+                buf.append(effective_drop_rate.floor());
+                if (drop_rate_is_guess)
+                    buf.append("?");
+                buf.append("% ");
+            }
+            
+            if (fabs(effective_drop_rate - drop_rate.to_float()) > 0.01)
+            {
+                buffer line;
+                line.append(drop_rate);
+                line.append("%");
+                if (drop_rate_is_guess)
+                    line.append("?");
+                item_display_properties.listAppend(line.to_string());
+            }
+        }
+        buf.append(it);
+        if (item_is_conditional)
+        {
+            item_display_properties.listAppend("conditional");
+        }
+        if (item_is_stealable_accordion)
+            item_display_properties.listAppend("stealable");
+        if (item_is_pickpockable_only)
+            item_display_properties.listAppend("pickpocket");
+        if (item_rate_is_fixed)
+            item_display_properties.listAppend("unaffected by +item");
+        if (item_display_properties.count() > 0)
+        {
+            buf.append(HTMLGenerateTagPrefix("span", mapMake("class", "r_cl_modifier_inline")));
+            buf.append(" (");
+            buf.append(item_display_properties.listJoinComponents(", "));
+            buf.append(")");
+            buf.append(HTMLGenerateTagSuffix("span"));
+        }
+        buf.append(trailing_buffer_loop);
+    }
+    buf.append(HTMLGenerateTagSuffix("div"));
+    
+    return buf;
+}*/
+
+
+Record LBPItemInformation
+{
+    string image_url;
+    boolean should_display_drop_current;
+    string item_drop_current_information;
+    string item_name;
+    boolean should_display_drop_base;
+    string item_drop_base_information;
+    string [int] tags;
+    boolean greyed_out;
+};
+
+void listAppend(LBPItemInformation [int] list, LBPItemInformation entry)
+{
+	int position = list.count();
+	while (list contains position)
+		position += 1;
+	list[position] = entry;
+}
+
+buffer createItemInformationTableMethod2(int columns, LBPItemInformation [int] items_presenting, boolean want_item_minimal_display, string table_class, string table_style)
+{
+    buffer output_buffer;
+
+    string [string] table_map;
+    table_map = mapMake("style", "display:table;");
+    if (table_style.length() > 0)
+        table_map["style"] += table_style;
+    if (table_class.length() > 0)
+        table_map["class"] = table_class;
+    output_buffer.append(HTMLGenerateTagPrefix("div", table_map));
+    
+    
+    foreach key, info in items_presenting
+    {
+        if (key % columns == 0)
+        {
+            if (key != 0)
+            {
+                output_buffer.append("</div>");
+            }
+            output_buffer.append(HTMLGenerateTagPrefix("div", mapMake("style", "display:table-row;")));
+        }
+        int image_size = 30;
+        if (want_item_minimal_display)
+            image_size = 15;
+        
+        //hack?
+        float percentage = 33;
+        if (columns == 2)
+            percentage = 50;
+        if (columns == 1)
+            percentage = 100;
+        
+        
+        int [int] image_sizes;
+        string [int] image_classes;
+        
+        image_classes.listAppend("r_only_display_if_not_tiny"); // r_only_display_if_not_small");
+        image_sizes.listAppend(image_size);
+        
+        //image_classes.listAppend("r_only_display_if_small");
+        //image_sizes.listAppend(MIN(image_size, 20));
+        
+        string image_url = info.image_url;
+        if (image_url.length() == 0)
+        {
+            image_url = "images/itemimages/confused.gif";
+        }
+        
+        foreach key in image_sizes
+        {
+            int using_size = image_sizes[key];
+            string image_class = image_classes[key];
+            output_buffer.append(HTMLGenerateTagPrefix("div", mapMake("style", "display:table-cell;max-width:" + using_size + ";max-height:" + using_size + ";min-width:" + using_size + ";min-height:" + using_size + ";padding-left:3px;padding-right:3px;vertical-align:middle;", "class", image_class)));
+            
+            //Generate image:
+            string [string] image_map = mapMake("src", image_url, "width", using_size, "height", using_size);
+            
+            image_map["style"] += "display:block;"; //removes implicit pixels around image
+            if (info.greyed_out)
+                image_map["style"] += "opacity:0.5;";
+            image_map["alt"] = info.item_name;
+            output_buffer.append(HTMLGenerateTagPrefix("img", image_map));
+            output_buffer.append("</div>");
+        }
+        
+        
+        string main_tag_style = "display:table-cell;width:" + percentage + "%;vertical-align:middle;";
+        if (info.greyed_out)
+            main_tag_style += "color:gray;";
+        if (want_item_minimal_display)
+            main_tag_style += "font-size:0.9em;";
+        output_buffer.append(HTMLGenerateTagPrefix("div", mapMake("style", main_tag_style)));
+        if (want_item_minimal_display)
+            output_buffer.append(HTMLGenerateTagPrefix("span", mapMake("class", "r_location_bar_background_blur_small")));
+        else
+            output_buffer.append(HTMLGenerateTagPrefix("span", mapMake("class", "r_location_bar_background_blur")));
+        
+        if (info.should_display_drop_current)
+        {
+            output_buffer.append(info.item_drop_current_information);
+            output_buffer.append(" ");
+        }
+        output_buffer.append(info.item_name);
+        
+        string [int] secondary_line;
+        if (info.should_display_drop_base)
+            secondary_line.listAppend(info.item_drop_base_information);
+        if (info.tags.count() > 0)
+            secondary_line.listAppendList(info.tags);
+        
+        if (secondary_line.count() > 0)
+        {
+            string [string] tag_map = mapMake("class", "r_cl_modifier_inline");
+            if (info.greyed_out)
+                tag_map["style"] += "color:gray;";
+            string wrap_type = "span"; //"div";
+            if (want_item_minimal_display)
+                wrap_type = "span";
+            else
+                tag_map["style"] += "display:block;";
+            
+            output_buffer.append(HTMLGenerateTagPrefix(wrap_type, tag_map));
+            if (!want_item_minimal_display)
+                output_buffer.append(HTMLGenerateTagPrefix("span", mapMake("class", "r_location_bar_background_blur")));
+            if (want_item_minimal_display)
+                output_buffer.append(" (");
+            output_buffer.append(secondary_line.listJoinComponents(", "));
+            if (want_item_minimal_display)
+                output_buffer.append(")");
+            if (!want_item_minimal_display)
+                output_buffer.append("</span>");
+            output_buffer.append(HTMLGenerateTagSuffix(wrap_type));
+        }
+        
+        output_buffer.append("</span>");
+        output_buffer.append("</div>");
+    }
+    output_buffer.append("</div>"); //row
+    output_buffer.append("</div>"); //table
+    return output_buffer;
+}
+
+
+buffer generateItemInformationMethod2(location l, monster m, boolean try_for_minimal_display, boolean [monster] monsters_to_display_items_minimally)
+{
+    int number_of_slimeling_eligible_items = 0;
+    foreach key, r in m.item_drops_array()
+    {
+        if ($slots[hat,weapon,off-hand,back,shirt,pants,acc1,acc2,acc3] contains r.drop.to_slot())
+            number_of_slimeling_eligible_items += 1;
+    }
+    
+    
+    LBPItemInformation [int] items_presenting;
+    
+    foreach key, r in m.item_drops_array()
+    {
+        item it = r.drop;
+        int base_drop_rate = r.rate;
+        
+        
+        
+        int adjusted_base_drop_rate = base_drop_rate;
+        boolean drop_rate_is_actually_zero = false;
+        boolean drop_rate_is_guess = false;
+        
+        //r-type?
+        boolean item_is_conditional = r.type.contains_text("c");
+        boolean item_is_stealable_accordion = r.type.contains_text("a");
+        boolean item_is_pickpockable_only = r.type.contains_text("p");
+        boolean item_cannot_be_pickpocketed = r.type.contains_text("n"); //FIXME use this for anything?
+        boolean item_rate_is_fixed = r.type.contains_text("f");
+        boolean grey_out_item = false;
+        if (item_is_stealable_accordion && my_class() != $class[accordion thief])
+        {
+            grey_out_item = true;
+            adjusted_base_drop_rate = 0;
+            drop_rate_is_actually_zero = true;
+        }
+        if (item_is_pickpockable_only && !__misc_state["can pickpocket"])
+        {
+            grey_out_item = true;
+            adjusted_base_drop_rate = 0;
+            drop_rate_is_actually_zero = true;
+        }
+        if (it == $item[reflection of a map] && get_property_int("pendingMapReflections") == 0)
+        {
+            grey_out_item = true;
+            adjusted_base_drop_rate = 0;
+            drop_rate_is_actually_zero = true;
+        }
+        if (($items[folder (red),folder (blue),folder (green),folder (magenta),folder (cyan),folder (yellow),folder (smiley face),folder (wizard),folder (space skeleton),folder (D-Team),folder (Ex-Files),folder (skull and crossbones),folder (Knight Writer),folder (Jackass Plumber),folder (holographic fractal),folder (barbarian),folder (rainbow unicorn),folder (Seawolf),folder (dancing dolphins),folder (catfish),folder (tranquil landscape),folder (owl),folder (Stinky Trash Kid),folder (sports car),folder (sportsballs),folder (heavy metal),folder (Yedi),folder (KOLHS)] contains it))
+        {
+            if (base_drop_rate <= 0)
+            {
+                base_drop_rate = 5; //assumed
+                adjusted_base_drop_rate = base_drop_rate; //assumed
+                drop_rate_is_guess = true;
+            }
+            if ($item[over-the-shoulder folder holder].equipped_amount() == 0)
+            {
+                grey_out_item = true;
+                adjusted_base_drop_rate = 0;
+                drop_rate_is_actually_zero = true;
+                drop_rate_is_guess = false;
+            }
+        }
+        
+        if (adjusted_base_drop_rate > 0 && adjusted_base_drop_rate < 100)
+        {
+
+            float effective_drop_rate = adjusted_base_drop_rate;
+            float item_modifier = l.item_drop_modifier_for_location();
+            if (it.fullness > 0 || (__items_that_craft_food contains it))
+                item_modifier += numeric_modifier("Food Drop");
+            if (it.inebriety > 0)
+                item_modifier += numeric_modifier("Booze Drop");
+            if (it.to_slot() == $slot[hat])
+                item_modifier += numeric_modifier("Hat Drop");
+            if (it.to_slot() == $slot[weapon])
+                item_modifier += numeric_modifier("Weapon Drop");
+            if (it.to_slot() == $slot[off-hand])
+                item_modifier += numeric_modifier("Offhand Drop");
+            if (it.to_slot() == $slot[shirt])
+                item_modifier += numeric_modifier("Shirt Drop");
+            if (it.to_slot() == $slot[pants])
+                item_modifier += numeric_modifier("Pants Drop");
+            if ($slots[acc1,acc2,acc3] contains it.to_slot())
+                item_modifier += numeric_modifier("Accessory Drop");
+            if (it.candy)
+                item_modifier += numeric_modifier("Candy Drop");
+            if ($slots[hat,weapon,off-hand,back,shirt,pants,acc1,acc2,acc3] contains it.to_slot()) //assuming familiar equipment isn't "gear"
+                item_modifier += numeric_modifier("Gear Drop");
+            //does Bear Essence give special picnic baskets you find, or does it affect picnic baskets in-game?
+            if (item_is_pickpockable_only)
+            {
+                if (__misc_state["can pickpocket"])
+                    item_modifier = numeric_modifier("pickpocket chance");
+                else
+                    item_modifier = 0.0;
+            }
+            if (item_rate_is_fixed)
+                item_modifier = 0.0;
+            if ($locations[sweet-ade lake,Eager Rice Burrows,Gumdrop Forest] contains l)
+            {
+                item_modifier = 0.0;
+                if (it.candy)
+                    item_modifier += numeric_modifier("Candy Drop");
+            }
+            //FIXME pickpocketting...?
+            
+            effective_drop_rate *= 1.0 + item_modifier / 100.0;
+            if (my_path_id() == PATH_HEAVY_RAINS)
+            {
+                effective_drop_rate = clampf(floor(effective_drop_rate), 0.0, 100.0);
+                float washaway_rate = l.washaway_rate_of_location();
+                effective_drop_rate *= (1.0 - washaway_rate);
+            }
+            if (my_familiar() == $familiar[slimeling] && ($slots[hat,weapon,off-hand,back,shirt,pants,acc1,acc2,acc3] contains it.to_slot()) && effective_drop_rate < 100.0)
+            {
+                effective_drop_rate = clampf(floor(effective_drop_rate), 0.0, 100.0);
+                //number_of_slimeling_eligible_items
+                float slimeling_chance = 0.0;
+                if (number_of_slimeling_eligible_items > 0)
+                    slimeling_chance = 1.0 / number_of_slimeling_eligible_items.to_float();
+                
+                int effective_familiar_weight = my_familiar().familiar_weight() + numeric_modifier("familiar weight");
+                int familiar_weight_from_familiar_equipment = $slot[familiar].equipped_item().numeric_modifier("familiar weight"); //need to cancel it out
+                
+                float slimeling_base_drop_rate = my_familiar().numeric_modifier("item drop", effective_familiar_weight - familiar_weight_from_familiar_equipment, $slot[familiar].equipped_item());
+                if ($slot[familiar].equipped_item() == $item[undissolvable contact lenses])
+                    slimeling_base_drop_rate += 25.0;
+                
+                slimeling_chance *= adjusted_base_drop_rate.to_float() * (1.0 + slimeling_base_drop_rate / 100.0);
+                effective_drop_rate += (100.0 - effective_drop_rate) * (slimeling_chance / 100.0);
+            }
+            
+            effective_drop_rate = clampf(floor(effective_drop_rate), 0.0, 100.0);
+            adjusted_base_drop_rate = effective_drop_rate;
+            
+            if (l.environment == "underwater") //FIXME underwater drops are complicated and I'd have to look deeply into this to verify, so we just list a ? for now
+                adjusted_base_drop_rate = -1;
+        }
+
+        
+        
+        //FIXME implement this
+        LBPItemInformation info;
+        
+        info.image_url = "images/itemimages/" + it.smallimage;
+        if (it.smallimage.contains_text("/"))
+            info.image_url = "images/" + it.smallimage;
+        
+        if (!grey_out_item)
+        {
+            if (adjusted_base_drop_rate <= 0)
+            {
+                info.should_display_drop_current = true;
+                info.item_drop_current_information = "?%";
+            }
+            else if (adjusted_base_drop_rate < 100 || base_drop_rate < 100)
+            {
+                info.should_display_drop_current = true;
+                if (drop_rate_is_guess)
+                    info.item_drop_current_information = adjusted_base_drop_rate + "?%";
+                else
+                    info.item_drop_current_information = adjusted_base_drop_rate + "%";
+            }
+        }
+        info.item_name = it;
+        if (it.available_amount() == 0)
+            info.item_name = "<i>" + info.item_name + "</i>";
+        
+        if (base_drop_rate != adjusted_base_drop_rate && base_drop_rate > 0 && base_drop_rate < 100 && !grey_out_item)
+        {
+            info.should_display_drop_base = true;
+            if (drop_rate_is_guess)
+                info.item_drop_base_information = base_drop_rate + "?%";
+            else
+                info.item_drop_base_information = base_drop_rate + "%";
+        }
+        if (item_is_conditional)
+            info.tags.listAppend("conditional");
+        if (item_is_pickpockable_only)
+            info.tags.listAppend("pickpocket");
+        if (item_rate_is_fixed)
+            info.tags.listAppend("unaffected by +item");
+        info.greyed_out = grey_out_item;
+        
+        items_presenting.listAppend(info);
+    }
+
+    
+    int columns = 3;
+    if (items_presenting.count() % 2 == 0 && items_presenting.count() % 3 != 0 && items_presenting.count() < 8)
+        columns = 2;
+    if (items_presenting.count() < columns)
+        columns = 1;
+    
+    boolean want_item_minimal_display = false;
+    if (try_for_minimal_display || monsters_to_display_items_minimally[m] || monsters_to_display_items_minimally.count() > 2)
+        want_item_minimal_display = true;
+    
+    boolean display_alternate_for_smaller_sizes = (columns == 3);
+    
+    buffer output_buffer;
+    output_buffer.append(HTMLGenerateTagPrefix("div", mapMake("style", "padding-left:" + (__setting_indention_width_in_em * 0.5) + "em;")));
+    string table_class = "";
+    if (display_alternate_for_smaller_sizes)
+        table_class = "r_only_display_if_not_tiny r_only_display_if_not_small";
+    
+    output_buffer.append(createItemInformationTableMethod2(columns, items_presenting, want_item_minimal_display, table_class, ""));
+    
+    if (display_alternate_for_smaller_sizes)
+    {
+        int maximum_columns = 2;
+        if (items_presenting.count() >= 7 || monsters_to_display_items_minimally.count() >= 5) //hippy camp
+            maximum_columns = 3;
+        output_buffer.append(createItemInformationTableMethod2(MIN(columns, maximum_columns), items_presenting, want_item_minimal_display, "r_only_display_if_not_large r_only_display_if_not_medium r_do_not_display_if_media_queries_unsupported", "")); //font-size:0.95em;
+    }
+    output_buffer.append("</div>"); //container
+    
+    return output_buffer;
+}
+
 string generateLocationBarModifierEntries(string [int] entries_in)
 {
     if (entries_in.count() == 1)
@@ -31768,11 +33228,12 @@ buffer generateLocationPopup(float bottom_coordinates)
         sort monster_display_order by -appearance_rates_adjusted[value] - (possible_alien_monsters[value] ? -100.0 : 0);
         sort monster_display_order by -appearance_rates_next_turn[value] - (possible_alien_monsters[value] ? -100.0 : 0);
     }
+    int entries_displayed = 0;
     int monsters_displayed = 0;
     
     boolean can_display_as_2x = true;
     
-    if (false) //trying with it off - it feels better to use layout more effectively, rather than try to line up everything. example area: domed city of grimacia
+    /*if (false) //trying with it off - it feels better to use layout more effectively, rather than try to line up everything. example area: domed city of grimacia
     {
         foreach key, m in monster_display_order
         {
@@ -31786,7 +33247,7 @@ buffer generateLocationPopup(float bottom_coordinates)
             else
                 can_display_as_2x = false;
         }
-    }
+    }*/
     
     float rate_nc_cancel_multiplier = 1.0;
     if (appearance_rates_adjusted[$monster[none]] > 0.0)
@@ -31809,8 +33270,6 @@ buffer generateLocationPopup(float bottom_coordinates)
         if (m.item_drops_array().count() > item_minimal_display_limit && total_string_length >= 100)
             monsters_to_display_items_minimally[m] = true;
     }
-    
-    
     foreach key, m in monster_display_order
     {
         string [int] fl_entries;
@@ -31821,14 +33280,17 @@ buffer generateLocationPopup(float bottom_coordinates)
         float [int] fl_entry_fixed_width_percentage;
         
         string monster_image_url = "images/adventureimages/" + m.image;
+        if (m.image == "toxbeast1.gif")
+            monster_image_url = "images/adventureimages/toxbeast3.gif";
         if (m.image.length() == 0)
             monster_image_url = "";
         ServerImageStats monster_image_stats = ServerImageStatsOfImageURL(monster_image_url);
         float rate = appearance_rates_adjusted[m] * rate_nc_cancel_multiplier;
         float next_rate = appearance_rates_next_turn[m]; //already normalised for monsters
-        monsters_displayed += 1;
-        if (monsters_displayed > 1)
+        if (entries_displayed > 0)
             buf.append(HTMLGenerateTagPrefix("hr", mapMake("style", "margin:0px;")));
+        entries_displayed += 1;
+        monsters_displayed += 1;
             
         boolean avoid_outputting_conditional = false;
         boolean monster_cannot_be_encountered = false;
@@ -31917,7 +33379,7 @@ buffer generateLocationPopup(float bottom_coordinates)
                 if (location_of_first_top_pixel > 0)
                     image_style += "margin-top:-" + location_of_first_top_pixel + "px;";
             }
-            buf.append(HTMLGenerateTagPrefix("img", mapMake("src", monster_image_url, "style", image_style)));
+            buf.append(HTMLGenerateTagPrefix("img", mapMake("src", monster_image_url, "style", image_style, "alt", m)));
         }
         
         if (true)
@@ -31931,8 +33393,7 @@ buffer generateLocationPopup(float bottom_coordinates)
             }
             else
                 style = "font-size:1.2em;";
-            style += "text-align:left;";
-            //buf.append(HTMLGenerateTagWrap("span", m.capitalizeFirstLetter(), mapMake("class", "r_bold", "style", style)));
+            style += "text-align:left;padding-top:2px;";
             
             fl_entries.listAppend(m.capitalizeFirstLetter());
             fl_entry_classes[fl_entries.count() - 1] = "r_bold r_location_bar_ellipsis_entry";
@@ -32041,7 +33502,10 @@ buffer generateLocationPopup(float bottom_coordinates)
                 //stats_l1.listAppend(m.base_hp + " HP");
             if (m.phylum != $phylum[none])
             {
-                string line = m.phylum;
+                string line;
+                if ($monsters[broodling seal] contains m)
+                    line = "<del>cute</del><br>";
+                line += m.phylum;
                 if (true && m.attack_element != $element[none])
                     line = HTMLGenerateSpanOfClass(line, "r_element_" + m.attack_element + "_desaturated");
                 stats_l1.listAppend(line);
@@ -32054,11 +33518,16 @@ buffer generateLocationPopup(float bottom_coordinates)
             {
                 float average_meat = (m.min_meat + m.max_meat) * 0.5;
                 average_meat *= (1.0 + meat_drop_modifier() / 100.0);
-                if (average_meat > 0)
-                    stats_l1.listAppend(average_meat.round() + " meat");
+                if (average_meat >= 25) //ignore really low amounts
+                {
+                    if (l.environment == "underwater") //FIXME calculate this properly
+                        stats_l1.listAppend("? meat");
+                    else
+                        stats_l1.listAppend(average_meat.round() + " meat");
+                }
             }
-            if (m.raw_attack > 0 && false) //is this really useful?
-                stats_l2.listAppend(m.raw_attack + " ML");
+            //if (m.raw_attack > 0 && false) //is this really useful?
+                //stats_l2.listAppend(m.raw_attack + " ML");
             //if (m.raw_defense > 0)
                 //stats_l2.listAppend(m.raw_defense + " def");
             
@@ -32088,12 +33557,15 @@ buffer generateLocationPopup(float bottom_coordinates)
                 remove stats_l1[2];
             }
             
-            string line = stats_l1.listJoinComponents(" / ");
-            if (stats_l2.count() > 0)
-                line += "<br>" + stats_l2.listJoinComponents(" / ");
-            fl_entries.listAppend(line);
-            fl_entry_styles[fl_entries.count() - 1] = "text-align:right;";
-            fl_entry_width_weight[fl_entries.count() - 1] = 1.4;
+            if (stats_l1.count() + stats_l2.count() > 0)
+            {
+                string line = stats_l1.listJoinComponents(" / ");
+                if (stats_l2.count() > 0)
+                    line += "<br>" + stats_l2.listJoinComponents(" / ");
+                fl_entries.listAppend(line);
+                fl_entry_styles[fl_entries.count() - 1] = "text-align:right;";
+                fl_entry_width_weight[fl_entries.count() - 1] = 1.4;
+            }
         }
         
         //add background blur:
@@ -32115,6 +33587,13 @@ buffer generateLocationPopup(float bottom_coordinates)
                 fl_entry_fixed_width_percentage[1] = 0.2;
                 fl_entry_fixed_width_percentage[2] = 0.3;
             }
+            else if (fl_entries.count() == 4)
+            {
+                fl_entry_fixed_width_percentage[0] = 0.40;
+                fl_entry_fixed_width_percentage[1] = 0.2;
+                fl_entry_fixed_width_percentage[2] = 0.15;
+                fl_entry_fixed_width_percentage[3] = 0.25;
+            }
         }
             //remove fl_entry_fixed_width_percentage[0];
         
@@ -32123,296 +33602,100 @@ buffer generateLocationPopup(float bottom_coordinates)
         
         if (item_count_displaying > 0 && !try_for_minimal_display && !monster_cannot_be_encountered && true)
         {
-            boolean want_item_minimal_display = false;
-            if (try_for_minimal_display || monsters_to_display_items_minimally[m] || monsters_to_display_items_minimally.count() > 2)
-                want_item_minimal_display = true;
-            string item_font_size = "medium";
-            if (true)
-            {
-                string style;
-                style += "font-size:0;";
-                if (want_item_minimal_display)
-                    item_font_size = "0.8rem;";
-                if (style.length() > 0)
-                    buf.append(HTMLGenerateTagPrefix("div", mapMake("style", style)));
-                else
-                    buf.append(HTMLGenerateTagPrefix("div"));
-            }
-            int number_of_slimeling_eligible_items = 0;
-            foreach key, r in m.item_drops_array()
-            {
-                if ($slots[hat,weapon,off-hand,back,shirt,pants,acc1,acc2,acc3] contains r.drop.to_slot())
-                    number_of_slimeling_eligible_items += 1;
-            }
-            
-            foreach key, r in m.item_drops_array()
-            {
-                //when "r.type" == "0", I think that means the drop rate is unknown
-                item it = r.drop;
-                int drop_rate = r.rate;
-                int adjusted_base_drop_rate = drop_rate;
-                boolean drop_rate_is_actually_zero = false;
-                boolean drop_rate_is_guess = false;
-                
-                boolean item_is_conditional = r.type.contains_text("c");
-                boolean item_is_stealable_accordion = r.type.contains_text("a");
-                boolean item_is_pickpockable_only = r.type.contains_text("p");
-                boolean item_cannot_be_pickpocketed = r.type.contains_text("n"); //FIXME use this for anything?
-                boolean item_rate_is_fixed = r.type.contains_text("f");
-                buffer trailing_buffer_loop;
-                boolean grey_out_item = false;
-                if (item_is_stealable_accordion && my_class() != $class[accordion thief])
-                {
-                    grey_out_item = true;
-                    adjusted_base_drop_rate = 0;
-                    drop_rate_is_actually_zero = true;
-                }
-                if (item_is_pickpockable_only && !__misc_state["can pickpocket"])
-                {
-                    grey_out_item = true;
-                    adjusted_base_drop_rate = 0;
-                    drop_rate_is_actually_zero = true;
-                }
-                if (it == $item[reflection of a map] && get_property_int("pendingMapReflections") == 0)
-                {
-                    grey_out_item = true;
-                    adjusted_base_drop_rate = 0;
-                    drop_rate_is_actually_zero = true;
-                }
-                if (($items[folder (red),folder (blue),folder (green),folder (magenta),folder (cyan),folder (yellow),folder (smiley face),folder (wizard),folder (space skeleton),folder (D-Team),folder (Ex-Files),folder (skull and crossbones),folder (Knight Writer),folder (Jackass Plumber),folder (holographic fractal),folder (barbarian),folder (rainbow unicorn),folder (Seawolf),folder (dancing dolphins),folder (catfish),folder (tranquil landscape),folder (owl),folder (Stinky Trash Kid),folder (sports car),folder (sportsballs),folder (heavy metal),folder (Yedi),folder (KOLHS)] contains it))
-                {
-                    if (drop_rate <= 0)
-                    {
-                        drop_rate = 5; //assumed
-                        adjusted_base_drop_rate = drop_rate; //assumed
-                        drop_rate_is_guess = true;
-                    }
-                    if ($item[over-the-shoulder folder holder].equipped_amount() == 0)
-                    {
-                        grey_out_item = true;
-                        adjusted_base_drop_rate = 0;
-                        drop_rate_is_actually_zero = true;
-                        drop_rate_is_guess = false;
-                    }
-                }
-                
-                if (grey_out_item)
-                {
-                    buf.append(HTMLGenerateTagPrefix("span", mapMake("style", "color:grey;")));
-                    trailing_buffer_loop.prepend(HTMLGenerateTagSuffix("span"));
-                }
-                
-                int items_per_line = 1;
-                string holder_class_name = "r_word_wrap_group";
-                if (try_for_minimal_display)
-                    holder_class_name = "r_word_wrap_group";
-                else if (item_count_displaying == 1)
-                {
-                    holder_class_name = "r_location_popup_item_holding_block_1x";
-                    items_per_line = 1;
-                }
-                else if (item_count_displaying == 2 || ceil(item_count_displaying.to_float() / 2.0) == ceil(item_count_displaying.to_float() / 3.0))
-                {
-                    holder_class_name = "r_location_popup_item_holding_block_2x";
-                    items_per_line = 2;
-                }
-                else
-                {
-                    holder_class_name = "r_location_popup_item_holding_block";
-                    items_per_line = 3;
-                }
-                
-                if (true)
-                {
-                    string style;
-                    buf.append(HTMLGenerateTagPrefix("div", mapMake("class", holder_class_name, "style", style)));
-                }
-                
-                trailing_buffer_loop.prepend(HTMLGenerateTagSuffix("div"));
-                
-                boolean use_tables_here = true;
-                
-                if (true)
-                {
-                    string style;
-                    if (use_tables_here)
-                       style += "display:table;";
-                    style += "margin:0px;padding:0px;border-spacing:0px;";
-                    buf.append(HTMLGenerateTagPrefix("div", mapMake("style", style)));
-                    trailing_buffer_loop.prepend(HTMLGenerateTagSuffix("div"));
-                    if (use_tables_here)
-                    {
-                        buf.append(HTMLGenerateTagPrefix("div", mapMake("style", "display:table-row;")));
-                        trailing_buffer_loop.prepend(HTMLGenerateTagSuffix("div"));
-                    }
-                }
-                
-                string image_url = "images/itemimages/" + it.smallimage;
-                if (it.smallimage.contains_text("/"))
-                    image_url = "images/" + it.smallimage;
-                if (it.image.length() > 0 && !try_for_minimal_display)
-                {
-                    if (use_tables_here)
-                    {
-                        buf.append(HTMLGenerateTagPrefix("div", mapMake("style", "display:table-cell;vertical-align:middle;", "class", "r_location_bar_background_blur")));
-                    }
-                    int image_size = 30;
-                    if (want_item_minimal_display)
-                        image_size = 15;
-                    string [string] image_map = mapMake("src", image_url, "width", image_size, "height", image_size);
-                    image_map["style"] += "display:block;"; //removes implicit pixels around image. css
-                    if (grey_out_item)
-                        image_map["style"] += "opacity:0.5;";
-                    buf.append(HTMLGenerateTagPrefix("img", image_map));
-                    if (use_tables_here)
-                    {
-                        buf.append(HTMLGenerateTagSuffix("div"));
-                    }
-                }
-                if (use_tables_here)
-                {
-                    string style = "display:table-cell;vertical-align:middle;padding-left:0.25em;font-size:" + item_font_size + ";";
-                    buf.append(HTMLGenerateTagPrefix("div", mapMake("style", style)));
-                    trailing_buffer_loop.prepend(HTMLGenerateTagSuffix("div"));
-                    
-                    buf.append(HTMLGenerateTagPrefix("span", mapMake("class", "r_location_bar_background_blur")));
-                    trailing_buffer_loop.prepend(HTMLGenerateTagSuffix("span"));
-                }
-                if (false)
-                {
-                    buf.append(HTMLGenerateTagPrefix("div", mapMake("style", "display:none;")));
-                    trailing_buffer_loop.prepend(HTMLGenerateTagSuffix("div"));
-                }
-                
-                string [int] item_display_properties;
-                if (adjusted_base_drop_rate == 0 && !drop_rate_is_actually_zero)
-                {
-                    if (!item_is_stealable_accordion)
-                    {
-                        buf.append("?%");
-                        buf.append(" ");
-                    }
-                }
-                else if (adjusted_base_drop_rate < 100)
-                {
-                    float effective_drop_rate = adjusted_base_drop_rate;
-                    float item_modifier = l.item_drop_modifier_for_location();
-                    if (it.fullness > 0 || (__items_that_craft_food contains it))
-                        item_modifier += numeric_modifier("Food Drop");
-                    if (it.inebriety > 0)
-                        item_modifier += numeric_modifier("Booze Drop");
-                    if (it.to_slot() == $slot[hat])
-                        item_modifier += numeric_modifier("Hat Drop");
-                    if (it.to_slot() == $slot[weapon])
-                        item_modifier += numeric_modifier("Weapon Drop");
-                    if (it.to_slot() == $slot[off-hand])
-                        item_modifier += numeric_modifier("Offhand Drop");
-                    if (it.to_slot() == $slot[shirt])
-                        item_modifier += numeric_modifier("Shirt Drop");
-                    if (it.to_slot() == $slot[pants])
-                        item_modifier += numeric_modifier("Pants Drop");
-                    if ($slots[acc1,acc2,acc3] contains it.to_slot())
-                        item_modifier += numeric_modifier("Accessory Drop");
-                    if (it.candy)
-                        item_modifier += numeric_modifier("Candy Drop");
-                    if ($slots[hat,weapon,off-hand,back,shirt,pants,acc1,acc2,acc3] contains it.to_slot()) //assuming familiar equipment isn't "gear"
-                        item_modifier += numeric_modifier("Gear Drop");
-                    if (item_is_pickpockable_only)
-                    {
-                        if (__misc_state["can pickpocket"])
-                            item_modifier = numeric_modifier("pickpocket chance");
-                        else
-                            item_modifier = 0.0;
-                    }
-                    if (item_rate_is_fixed)
-                        item_modifier = 0.0;
-                    if ($locations[sweet-ade lake,Eager Rice Burrows,Gumdrop Forest] contains l)
-                    {
-                        item_modifier = 0.0;
-                        if (it.candy)
-                            item_modifier += numeric_modifier("Candy Drop");
-                    }
-                    //FIXME pickpocketting...?
-                    
-                    effective_drop_rate *= 1.0 + item_modifier / 100.0;
-                    if (my_path_id() == PATH_HEAVY_RAINS)
-                    {
-                        effective_drop_rate = clampf(floor(effective_drop_rate), 0.0, 100.0);
-                        float washaway_rate = l.washaway_rate_of_location();
-                        effective_drop_rate *= (1.0 - washaway_rate);
-                    }
-                    if (my_familiar() == $familiar[slimeling] && ($slots[hat,weapon,off-hand,back,shirt,pants,acc1,acc2,acc3] contains it.to_slot()) && effective_drop_rate < 100.0)
-                    {
-                        effective_drop_rate = clampf(floor(effective_drop_rate), 0.0, 100.0);
-                        //number_of_slimeling_eligible_items
-                        float slimeling_chance = 0.0;
-                        if (number_of_slimeling_eligible_items > 0)
-                            slimeling_chance = 1.0 / number_of_slimeling_eligible_items.to_float();
-                        
-                        int effective_familiar_weight = my_familiar().familiar_weight() + numeric_modifier("familiar weight");
-                        int familiar_weight_from_familiar_equipment = $slot[familiar].equipped_item().numeric_modifier("familiar weight"); //need to cancel it out
-                        
-                        float slimeling_base_drop_rate = my_familiar().numeric_modifier("item drop", effective_familiar_weight - familiar_weight_from_familiar_equipment, $slot[familiar].equipped_item());
-                        if ($slot[familiar].equipped_item() == $item[undissolvable contact lenses])
-                            slimeling_base_drop_rate += 25.0;
-                        
-                        slimeling_chance *= adjusted_base_drop_rate.to_float() * (1.0 + slimeling_base_drop_rate / 100.0);
-                        effective_drop_rate += (100.0 - effective_drop_rate) * (slimeling_chance / 100.0);
-                    }
-                    
-                    effective_drop_rate = clampf(floor(effective_drop_rate), 0.0, 100.0);
-                    
-                    
-                    if (!grey_out_item)
-                    {
-                        buf.append(effective_drop_rate.floor());
-                        if (drop_rate_is_guess)
-                            buf.append("?");
-                        buf.append("% ");
-                    }
-                    
-                    if (fabs(effective_drop_rate - drop_rate.to_float()) > 0.01)
-                    {
-                        buffer line;
-                        line.append(drop_rate);
-                        line.append("%");
-                        if (drop_rate_is_guess)
-                            line.append("?");
-                        item_display_properties.listAppend(line.to_string());
-                    }
-                }
-                buf.append(it);
-                if (item_is_conditional)
-                {
-                    item_display_properties.listAppend("conditional");
-                }
-                if (item_is_stealable_accordion)
-                    item_display_properties.listAppend("stealable");
-                if (item_is_pickpockable_only)
-                    item_display_properties.listAppend("pickpocket");
-                if (item_rate_is_fixed)
-                    item_display_properties.listAppend("unaffected by +item");
-                if (item_display_properties.count() > 0)
-                {
-                    buf.append(HTMLGenerateTagPrefix("span", mapMake("class", "r_cl_modifier_inline")));
-                    buf.append(" (");
-                    buf.append(item_display_properties.listJoinComponents(", "));
-                    buf.append(")");
-                    buf.append(HTMLGenerateTagSuffix("span"));
-                }
-                buf.append(trailing_buffer_loop);
-            }
-            buf.append(HTMLGenerateTagSuffix("div"));
+            buf.append(generateItemInformationMethod2(l, m, try_for_minimal_display,monsters_to_display_items_minimally));
         }
         
         //buf.append(HTMLGenerateTagSuffix("div"));
         buf.append(HTMLGenerateTagSuffix("div"));
         //break;
     }
-    if (monsters_displayed == 0)
+    
+    boolean output_hr_override = false;
+    
+    if (false)
+    {
+        string [int] lines;
+        string [int] lines_offscreen;
+        if (l.parentdesc.length() > 0 && l.parentdesc != "No Category")
+            lines.listAppend(l.parentdesc);
+        if (!__misc_state["In run"] && l.turns_spent > 0)
+            lines_offscreen.listAppend(pluralize(l.turns_spent, "turn spent", "turns spent"));
+        
+        if (lines.count() + lines_offscreen.count() > 0)
+        {
+            if (entries_displayed >= 1)
+                buf.append(HTMLGenerateTagPrefix("hr", mapMake("style", "margin:0px;")));
+            buf.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_cl_modifier_inline r_center", "style", "height:1.1em;")));
+            buf.append(lines.listJoinComponents(" - "));
+            buf.append("</div>");
+            if (lines_offscreen.count() > 0)
+            {
+                buf.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_cl_modifier_inline", "style", "position:absolute;right:0px;top:0px;")));
+                buf.append(lines_offscreen.listJoinComponents(" - "));
+                buf.append("</div>");
+            }
+            entries_displayed += 1;
+        }
+    }
+    if (false)
+    {
+        string [int] fl_entries;
+        string [int] fl_entry_urls;
+        string [int] fl_entry_styles;
+        string [int] fl_entry_classes;
+        float [int] fl_entry_width_weight;
+        float [int] fl_entry_fixed_width_percentage;
+        
+        if (l.parentdesc.length() > 0 && l.parentdesc != "No Category")
+            fl_entries.listAppend(l.parentdesc);
+        else
+            fl_entries.listAppend("");
+        
+        /*Error err;
+        if (!l.locationAvailable(err))
+        {
+            if (!err.was_error)
+                fl_entries.listAppend("Inaccessible"); //doesn't make any sense unless we add that one feature
+        }*/
+        
+        if (!__misc_state["In run"] && l.turns_spent > 0)
+            fl_entries.listAppend(pluralize(l.turns_spent, "turn spent", "turns spent"));
+            
+        
+        if (fl_entries.count() == 1)
+            fl_entries.listAppend("");
+        
+        boolean all_entries_blank = true;
+        foreach key, entry in fl_entries
+        {
+            if (entry.length() > 0)
+                all_entries_blank = false;
+        }
+        if (fl_entries.count() > 0 && !all_entries_blank)
+        {
+            if (entries_displayed >= 1)
+                buf.append(HTMLGenerateTagPrefix("hr", mapMake("style", "margin:0px;")));
+            /*if (fl_entries.count() == 2)
+            {
+                fl_entry_styles[1] += "text-align:right;";
+            }*/
+            fl_entry_styles[0] += "text-align:left;";
+            fl_entry_styles[0] += "padding-left:" + __setting_indention_width + ";";
+            foreach key in fl_entries
+                fl_entry_styles[key] += "height:1.25em;";
+            buf.append(generateLocationBarTable(fl_entries, fl_entry_urls, fl_entry_styles, fl_entry_classes, fl_entry_width_weight, fl_entry_fixed_width_percentage, ""));
+            entries_displayed += 1;
+            
+            //output_hr_override = true;
+        }
+        
+    }
+    
+    if (entries_displayed == 0)
         return "".to_buffer();
-    //buf.append(l.appearance_rates(true).to_json());
     buf.append(HTMLGenerateTagSuffix("div"));
+    //if (output_hr_override)
+            //buf.append("<div style=\"position:absolute;bottom:-1px;min-height:2px;width:100%;z-index:10000;background:blue;\"></div>");
     buf.append(HTMLGenerateTagSuffix("div"));
     
     return buf;
@@ -32421,6 +33704,8 @@ buffer generateLocationPopup(float bottom_coordinates)
 buffer generateLocationBar(boolean displaying_navbar)
 {
     buffer bar;
+    if (!playerIsLoggedIn())
+        return bar;
     location l = __last_adventure_location;
     if (!__setting_location_bar_uses_last_location)
         l = my_location();
@@ -32900,16 +34185,15 @@ buffer generateLocationBar(boolean displaying_navbar)
             onmouseleave_code = "document.getElementById('r_location_popup_box').style.display = 'none'; document.getElementById('r_location_popup_blackout').style.display = 'none';";
         }
             
-        if (true)
-        {
-            string [string] outer_containiner_map = mapMake("class", "r_bottom_outer_container", "style", style);
-            if (onmouseenter_code.length() > 0)
-                outer_containiner_map["onmouseenter"] = onmouseenter_code;
-            if (onmouseleave_code.length() > 0)
-                outer_containiner_map["onmouseleave"] = onmouseleave_code;
-            bar.append(HTMLGenerateTagPrefix("div", outer_containiner_map));
-        }
-        bar.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_bottom_inner_container", "style", "background:white;")));
+        string [string] outer_containiner_map = mapMake("class", "r_bottom_outer_container", "style", style);
+        bar.append(HTMLGenerateTagPrefix("div", outer_containiner_map));
+        
+        string [string] inner_containiner_map = mapMake("class", "r_bottom_inner_container", "style", "background:white;");
+        if (onmouseenter_code.length() > 0)
+            inner_containiner_map["onmouseenter"] = onmouseenter_code;
+        if (onmouseleave_code.length() > 0)
+            inner_containiner_map["onmouseleave"] = onmouseleave_code;
+        bar.append(HTMLGenerateTagPrefix("div", inner_containiner_map));
     }
     
     
@@ -33066,7 +34350,7 @@ string [string] generateAPIResponse()
     else if (true)
     {
         //Checking every item is slow. But certain items won't trigger a reload, but need to. So:
-        boolean [item] relevant_items = $items[photocopied monster,4-d camera,pagoda plans,Elf Farm Raffle ticket,skeleton key,heavy metal thunderrr guitarrr,heavy metal sonata,Hey Deze nuts,rave whistle,damp old boot,map to Professor Jacking's laboratory,world's most unappetizing beverage,squirmy violent party snack,White Citadel Satisfaction Satchel,rusty screwdriver,giant pinky ring,The Lost Pill Bottle,GameInformPowerDailyPro magazine,dungeoneering kit,Knob Goblin encryption key,dinghy plans,Sneaky Pete's key,Jarlsberg's key,Boris's key,fat loot token,bridge,chrome ore,asbestos ore,linoleum ore,csa fire-starting kit,tropical orchid,stick of dynamite,barbed-wire fence,psychoanalytic jar,digital key,Richard's star key,star hat,star crossbow,star staff,star sword,Wand of Nagamar,Azazel's tutu,Azazel's unicorn,Azazel's lollipop,smut orc keepsake box,blessed large box,massive sitar,hammer of smiting,chelonian morningstar,greek pasta of peril,17-alarm saucepan,shagadelic disco banjo,squeezebox of the ages,E.M.U. helmet,E.M.U. harness,E.M.U. joystick,E.M.U. rocket thrusters,E.M.U. unit,wriggling flytrap pellet,Mer-kin trailmap,Mer-kin stashbox,Makeshift yakuza mask,Novelty tattoo sleeves,strange goggles,zaibatsu level 2 card,zaibatsu level 3 card,flickering pixel,jar of oil,bowl of scorpions,molybdenum magnet,steel lasagna,steel margarita,steel-scented air freshener,Grandma's Map,mer-kin healscroll,scented massage oil,soggy used band-aid,extra-strength red potion,red pixel potion,red potion,filthy poultice,gauze garter,green pixel potion,cartoon heart,red plastic oyster egg,Manual of Dexterity,Manual of Labor,Manual of Transmission,wet stunt nut stew,bjorn's hammer,mace of the tortoise,pasta of peril,5-alarm saucepan,disco banjo,rock and roll legend,lost key,resolution: be more adventurous,sugar sheet,sack lunch,glob of Blank-Out,gaudy key,talisman o' nam,plus sign,Newbiesport&trade; tent,Frobozz Real-Estate Company Instant House (TM),dry cleaning receipt,book of matches,rock band flyers,jam band flyers,disassembled clover,continuum transfunctioner,UV-resistant compass,eyepatch,carton of astral energy drinks,astral hot dog dinner,astral six-pack,gym membership card,tattered scrap of paper,bowling ball, snow boards,reassembled blackbird,reconstituted crow,louder than bomb,odd silver coin,grimstone mask,empty rain-doh can,Lord Spookyraven's spectacles,lump of Brituminous coal,bone rattle,mer-kin knucklebone,spooky glove,steam-powered model rocketship,crappy camera,shaking crappy camera,hedge maze puzzle,ghost of a necklace,telegram from Lady Spookyraven,Lady Spookyraven's finest gown,recipe: mortar-dissolving solution,disposable instant camera,unstable fulminate,thunder thigh,aquaconda brain,lightning milk,White Citadel Satisfaction Satchel,handful of smithereens,Loathing Legion jackhammer,lynyrd skin,red zeppelin ticket,lynyrd snare,glark cable,Fernswarthy's key,bottle of G&uuml;-Gone,BURT,handful of juicy garbage,Jeff Goldblum larva,imbued seal-blubber candle,claw of the infernal seal];
+        boolean [item] relevant_items = $items[photocopied monster,4-d camera,pagoda plans,Elf Farm Raffle ticket,skeleton key,heavy metal thunderrr guitarrr,heavy metal sonata,Hey Deze nuts,rave whistle,damp old boot,map to Professor Jacking's laboratory,world's most unappetizing beverage,squirmy violent party snack,White Citadel Satisfaction Satchel,rusty screwdriver,giant pinky ring,The Lost Pill Bottle,GameInformPowerDailyPro magazine,dungeoneering kit,Knob Goblin encryption key,dinghy plans,Sneaky Pete's key,Jarlsberg's key,Boris's key,fat loot token,bridge,chrome ore,asbestos ore,linoleum ore,csa fire-starting kit,tropical orchid,stick of dynamite,barbed-wire fence,psychoanalytic jar,digital key,Richard's star key,star hat,star crossbow,star staff,star sword,Wand of Nagamar,Azazel's tutu,Azazel's unicorn,Azazel's lollipop,smut orc keepsake box,blessed large box,massive sitar,hammer of smiting,chelonian morningstar,greek pasta of peril,17-alarm saucepan,shagadelic disco banjo,squeezebox of the ages,E.M.U. helmet,E.M.U. harness,E.M.U. joystick,E.M.U. rocket thrusters,E.M.U. unit,wriggling flytrap pellet,Mer-kin trailmap,Mer-kin stashbox,Makeshift yakuza mask,Novelty tattoo sleeves,strange goggles,zaibatsu level 2 card,zaibatsu level 3 card,flickering pixel,jar of oil,bowl of scorpions,molybdenum magnet,steel lasagna,steel margarita,steel-scented air freshener,Grandma's Map,mer-kin healscroll,scented massage oil,soggy used band-aid,extra-strength red potion,red pixel potion,red potion,filthy poultice,gauze garter,green pixel potion,cartoon heart,red plastic oyster egg,Manual of Dexterity,Manual of Labor,Manual of Transmission,wet stunt nut stew,bjorn's hammer,mace of the tortoise,pasta of peril,5-alarm saucepan,disco banjo,rock and roll legend,lost key,resolution: be more adventurous,sugar sheet,sack lunch,glob of Blank-Out,gaudy key,plus sign,Newbiesport&trade; tent,Frobozz Real-Estate Company Instant House (TM),dry cleaning receipt,book of matches,rock band flyers,jam band flyers,disassembled clover,continuum transfunctioner,UV-resistant compass,eyepatch,carton of astral energy drinks,astral hot dog dinner,astral six-pack,gym membership card,tattered scrap of paper,bowling ball, snow boards,reassembled blackbird,reconstituted crow,louder than bomb,odd silver coin,grimstone mask,empty rain-doh can,Lord Spookyraven's spectacles,lump of Brituminous coal,bone rattle,mer-kin knucklebone,spooky glove,steam-powered model rocketship,crappy camera,shaking crappy camera,hedge maze puzzle,ghost of a necklace,telegram from Lady Spookyraven,Lady Spookyraven's finest gown,recipe: mortar-dissolving solution,disposable instant camera,unstable fulminate,thunder thigh,aquaconda brain,lightning milk,White Citadel Satisfaction Satchel,handful of smithereens,Loathing Legion jackhammer,lynyrd skin,red zeppelin ticket,lynyrd snare,glark cable,Fernswarthy's key,bottle of G&uuml;-Gone,BURT,handful of juicy garbage,Jeff Goldblum larva,imbued seal-blubber candle,claw of the infernal seal];
         
         
         int [int] output;
@@ -33077,7 +34361,7 @@ string [string] generateAPIResponse()
                 output[it.to_int()] = it.available_amount();
         }
         
-        boolean [item] relevant_items_strings = lookupItemsArray($strings[poppy,opium grenade]);
+        boolean [item] relevant_items_strings = lookupItemsArray($strings[poppy,opium grenade,talisman o' nam,toxic globule]);
         foreach it in relevant_items_strings
         {
             if (it.available_amount() > 0)
@@ -33090,7 +34374,7 @@ string [string] generateAPIResponse()
     
     if (true)
     {
-        boolean [string] relevant_mafia_properties = $strings[merkinQuestPath,questF01Primordial,questF02Hyboria,questF03Future,questF04Elves,questF05Clancy,questG01Meatcar,questG02Whitecastle,questG03Ego,questG04Nemesis,questG05Dark,questG06Delivery,questI01Scapegoat,questI02Beat,questL02Larva,questL03Rat,questL04Bat,questL05Goblin,questL06Friar,questL07Cyrptic,questL08Trapper,questL09Topping,questL10Garbage,questL11MacGuffin,questL11Manor,questL11Palindome,questL11Pyramid,questL11Worship,questL12War,questL13Final,questM01Untinker,questM02Artist,questM03Bugbear,questM04Galaktic,questM05Toot,questM06Gourd,questM07Hammer,questM08Baker,questM09Rocks,questM10Azazel,questM11Postal,questM12Pirate,questM13Escape,questM14Bounty,questM15Lol,questS01OldGuy,questS02Monkees,sidequestArenaCompleted,sidequestFarmCompleted,sidequestJunkyardCompleted,sidequestLighthouseCompleted,sidequestNunsCompleted,sidequestOrchardCompleted,cyrptAlcoveEvilness,cyrptCrannyEvilness,cyrptNicheEvilness,cyrptNookEvilness,desertExploration,gnasirProgress,relayCounters,timesRested,currentEasyBountyItem,currentHardBountyItem,currentSpecialBountyItem,volcanoMaze1,_lastDailyDungeonRoom,seahorseName,chasmBridgeProgress,_aprilShower,lastAdventure,lastEncounter,_floristPlantsUsed,_fireStartingKitUsed,_psychoJarUsed,hiddenHospitalProgress,hiddenBowlingAlleyProgress,hiddenApartmentProgress,hiddenOfficeProgress,pyramidPosition,parasolUsed,_discoKnife,lastPlusSignUnlock,olfactedMonster,photocopyMonster,lastTempleUnlock,volcanoMaze1,blankOutUsed,peteMotorbikeCowling,peteMotorbikeGasTank,peteMotorbikeHeadlight,peteMotorbikeMuffler,peteMotorbikeSeat,peteMotorbikeTires,_petePeeledOut,_navelRunaways,_peteRiotIncited,_petePartyThrown,hiddenTavernUnlock,_dnaPotionsMade,_psychokineticHugUsed,dnaSyringe,_warbearGyrocopterUsed,questM20Necklace,questM21Dance,grimstoneMaskPath,cinderellaMinutesToMidnight,merkinVocabularyMastery,_pirateBellowUsed,questM21Dance,_defectiveTokenChecked,questG07Myst,questG08Moxie,questESpClipper,questESpGore,questESpJunglePun,questESpFakeMedium,questESlMushStash,questESlAudit,questESlBacteria,questESlCheeseburger,questESlCocktail,questESlSprinkles,questESlSalt,questESlFish,questESlDebt,_pickyTweezersUsed,_bittycar,questESpSerum,questESpOutOfOrder,_shrubDecorated,questESpEVE,questESpSmokes,questG09Muscle,_rapidPrototypingUsed,nsTowerDoorKeysUsed,_chateauDeskHarvested,lastGoofballBuy,nsChallenge1,nsChallenge2,nsContestants1,nsContestants2,nsContestants3,lastDesertUnlock,questM18Swamp,edPiece];
+        boolean [string] relevant_mafia_properties = $strings[merkinQuestPath,questF01Primordial,questF02Hyboria,questF03Future,questF04Elves,questF05Clancy,questG01Meatcar,questG02Whitecastle,questG03Ego,questG04Nemesis,questG05Dark,questG06Delivery,questI01Scapegoat,questI02Beat,questL02Larva,questL03Rat,questL04Bat,questL05Goblin,questL06Friar,questL07Cyrptic,questL08Trapper,questL09Topping,questL10Garbage,questL11MacGuffin,questL11Manor,questL11Palindome,questL11Pyramid,questL11Worship,questL12War,questL13Final,questM01Untinker,questM02Artist,questM03Bugbear,questM04Galaktic,questM05Toot,questM06Gourd,questM07Hammer,questM08Baker,questM09Rocks,questM10Azazel,questM11Postal,questM12Pirate,questM13Escape,questM14Bounty,questM15Lol,questS01OldGuy,questS02Monkees,sidequestArenaCompleted,sidequestFarmCompleted,sidequestJunkyardCompleted,sidequestLighthouseCompleted,sidequestNunsCompleted,sidequestOrchardCompleted,cyrptAlcoveEvilness,cyrptCrannyEvilness,cyrptNicheEvilness,cyrptNookEvilness,desertExploration,gnasirProgress,relayCounters,timesRested,currentEasyBountyItem,currentHardBountyItem,currentSpecialBountyItem,volcanoMaze1,_lastDailyDungeonRoom,seahorseName,chasmBridgeProgress,_aprilShower,lastAdventure,lastEncounter,_floristPlantsUsed,_fireStartingKitUsed,_psychoJarUsed,hiddenHospitalProgress,hiddenBowlingAlleyProgress,hiddenApartmentProgress,hiddenOfficeProgress,pyramidPosition,parasolUsed,_discoKnife,lastPlusSignUnlock,olfactedMonster,photocopyMonster,lastTempleUnlock,volcanoMaze1,blankOutUsed,peteMotorbikeCowling,peteMotorbikeGasTank,peteMotorbikeHeadlight,peteMotorbikeMuffler,peteMotorbikeSeat,peteMotorbikeTires,_petePeeledOut,_navelRunaways,_peteRiotIncited,_petePartyThrown,hiddenTavernUnlock,_dnaPotionsMade,_psychokineticHugUsed,dnaSyringe,_warbearGyrocopterUsed,questM20Necklace,questM21Dance,grimstoneMaskPath,cinderellaMinutesToMidnight,merkinVocabularyMastery,_pirateBellowUsed,questM21Dance,_defectiveTokenChecked,questG07Myst,questG08Moxie,questESpClipper,questESpGore,questESpJunglePun,questESpFakeMedium,questESlMushStash,questESlAudit,questESlBacteria,questESlCheeseburger,questESlCocktail,questESlSprinkles,questESlSalt,questESlFish,questESlDebt,_pickyTweezersUsed,_bittycar,questESpSerum,questESpOutOfOrder,_shrubDecorated,questESpEVE,questESpSmokes,questG09Muscle,_rapidPrototypingUsed,nsTowerDoorKeysUsed,_chateauDeskHarvested,lastGoofballBuy,nsChallenge1,nsChallenge2,nsContestants1,nsContestants2,nsContestants3,lastDesertUnlock,questM18Swamp,edPiece,warehouseProgress,questEStFishTrash,questEStNastyBears,questEStSocialJusticeI,questEStSocialJusticeII,questEStSuperLuber,questEStZippityDooDah,_summonAnnoyanceUsed,questEStWorkWithFood,questM24Doc,questEStGiveMeFuel,_mayoTankSoaked,_feastUsed];
         
         if (false)
         {
@@ -33327,7 +34611,36 @@ void setUpCSSStyles()
     PageAddCSSClass("", "r_location_bar_table_entry", "vertical-align:middle;padding-left:0.5em;padding-right:0.5em;display:table-cell;");
     PageAddCSSClass("", "r_location_bar_ellipsis_entry", "overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;");
     
-    PageAddCSSClass("", "r_location_popup_item_holding_block", "display:inline-block;padding-right:0.5em;width:31%", 0, __setting_media_query_large_size);
+    PageAddCSSClass("", "r_only_display_if_not_large", "");
+    PageAddCSSClass("", "r_only_display_if_not_large", "display:none !important;", 0, __setting_media_query_large_size);
+    
+    PageAddCSSClass("", "r_only_display_if_not_medium", "");
+    PageAddCSSClass("", "r_only_display_if_not_medium", "display:none !important;", 0, __setting_media_query_medium_size);
+    
+    PageAddCSSClass("", "r_only_display_if_not_tiny", "");
+    PageAddCSSClass("", "r_only_display_if_not_tiny", "display:none !important;", 0, __setting_media_query_tiny_size);
+    
+    PageAddCSSClass("", "r_only_display_if_not_small", "");
+    PageAddCSSClass("", "r_only_display_if_not_small", "display:none !important;", 0, __setting_media_query_small_size);
+    
+    PageAddCSSClass("", "r_only_display_if_small", "display:none !important;", 0, __setting_media_query_large_size);
+    PageAddCSSClass("", "r_only_display_if_small", "display:none !important;", 0,__setting_media_query_medium_size);
+    PageAddCSSClass("", "r_only_display_if_small", "", 0, __setting_media_query_small_size);
+    PageAddCSSClass("", "r_only_display_if_small", "display:none !important;", 0,__setting_media_query_tiny_size);
+    
+    PageAddCSSClass("", "r_only_display_if_tiny", "display:none !important;", 0, __setting_media_query_large_size);
+    PageAddCSSClass("", "r_only_display_if_tiny", "display:none !important;", 0,__setting_media_query_medium_size);
+    PageAddCSSClass("", "r_only_display_if_tiny", "display:none !important;", 0, __setting_media_query_small_size);
+    PageAddCSSClass("", "r_only_display_if_tiny", "", 0, __setting_media_query_tiny_size);
+    
+    
+    PageAddCSSClass("", "r_do_not_display_if_media_queries_unsupported", "display:none;");
+    PageAddCSSClass("", "r_do_not_display_if_media_queries_unsupported", "", 0, __setting_media_query_large_size);
+    PageAddCSSClass("", "r_do_not_display_if_media_queries_unsupported", "", 0,__setting_media_query_medium_size);
+    PageAddCSSClass("", "r_do_not_display_if_media_queries_unsupported", "", 0, __setting_media_query_small_size);
+    PageAddCSSClass("", "r_do_not_display_if_media_queries_unsupported", "", 0, __setting_media_query_tiny_size);
+    
+    /*PageAddCSSClass("", "r_location_popup_item_holding_block", "display:inline-block;padding-right:0.5em;width:31%", 0, __setting_media_query_large_size);
     PageAddCSSClass("", "r_location_popup_item_holding_block", "display:inline-block;padding-right:0.5em;width:31%", 0, __setting_media_query_medium_size);
     PageAddCSSClass("", "r_location_popup_item_holding_block", "display:inline-block;padding-right:0.25em;width:31%;", 0, __setting_media_query_small_size);
     PageAddCSSClass("", "r_location_popup_item_holding_block", "display:inline-block;padding-right:0.25em;width:100%;", 0, __setting_media_query_tiny_size);
@@ -33340,11 +34653,12 @@ void setUpCSSStyles()
     PageAddCSSClass("", "r_location_popup_item_holding_block_1x", "display:inline-block;padding-right:0.5em;width:100%", 0, __setting_media_query_large_size);
     PageAddCSSClass("", "r_location_popup_item_holding_block_1x", "display:inline-block;padding-right:0.5em;width:100%", 0, __setting_media_query_medium_size);
     PageAddCSSClass("", "r_location_popup_item_holding_block_1x", "display:inline-block;padding-right:0.25em;width:100%;", 0, __setting_media_query_small_size);
-    PageAddCSSClass("", "r_location_popup_item_holding_block_1x", "display:inline-block;padding-right:0.25em;width:100%;", 0, __setting_media_query_tiny_size);
+    PageAddCSSClass("", "r_location_popup_item_holding_block_1x", "display:inline-block;padding-right:0.25em;width:100%;", 0, __setting_media_query_tiny_size);*/
     
     
     //PageAddCSSClass("", "r_location_bar_background_blur", "background:rgba(255, 255, 255, 0.95);box-shadow:0px 0px 0px 2px rgba(255, 255, 255, 0.95);");
     PageAddCSSClass("", "r_location_bar_background_blur", "background:rgba(255, 255, 255, 0.95);box-shadow:0px 0px 1px 2px rgba(255, 255, 255, 0.95);");
+    PageAddCSSClass("", "r_location_bar_background_blur_small", "background:rgba(255, 255, 255, 0.95);box-shadow:0px 0px 0.5px 1px rgba(255, 255, 255, 0.95);");
     
     
     PageAddCSSClass("img", "", "border:0px;");
