@@ -65,10 +65,12 @@ void QAzazelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
     if ($skill[Stomach of Steel].skill_is_usable() || $skill[Liver of Steel].skill_is_usable() || $skill[Spleen of Steel].skill_is_usable())
         return;
     
+    if (!__quest_state["Level 6"].finished)
+        return;
     
     //We don't suggest or give advice on this quest in-run unless the player spends an adventure in one of the zones.
     //If that happens, they're probably sure they want the consumable items.
-	if (!__misc_state["In aftercore"] && $locations[The Laugh Floor, Infernal Rackets Backstage].turnsAttemptedInLocation() == 0 && $items[Azazel's unicorn,Azazel's lollipop,Azazel's tutu].available_amount() == 0)
+	if (!__misc_state["In aftercore"] && $locations[The Laugh Floor, Infernal Rackets Backstage].turnsAttemptedInLocation() == 0 && $items[Azazel's unicorn,Azazel's lollipop,Azazel's tutu].available_amount() == 0 && my_path_id() != PATH_ONE_CRAZY_RANDOM_SUMMER)
 		return;
     
         

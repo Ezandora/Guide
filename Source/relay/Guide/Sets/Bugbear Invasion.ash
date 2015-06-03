@@ -117,12 +117,13 @@ void SBugbearInvasionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistE
             
             boolean [location] unavailable_locations_to_show = $locations[The Sleazy Back Alley,The Spooky Forest,cobb's knob Laboratory,The Defiled Nook,Lair of the Ninja Snowmen,The Penultimate Fantasy Airship,The Haunted Gallery,The Battlefield (Frat Uniform)];
             
-            boolean [location] relevant_locations = $locations[The Sleazy Back Alley,The Spooky Forest,The Bat Hole Entrance,The Batrat and Ratbat Burrow,Guano Junction,The Beanbat Chamber,cobb's knob Laboratory,post-cyrpt cemetary,Lair of the Ninja Snowmen,The Penultimate Fantasy Airship,The Haunted Gallery,The Battlefield (Frat Uniform),The Orcish Frat House (Bombed Back to the Stone Age),The Hippy Camp (Bombed Back to the Stone Age)].makeConstantLocationArrayMutable();  //FIXME the battlefield (hippy uniform)?
+            boolean [location] relevant_locations = $locations[The Sleazy Back Alley,The Spooky Forest,The Bat Hole Entrance,The Batrat and Ratbat Burrow,Guano Junction,The Beanbat Chamber,cobb's knob Laboratory,Lair of the Ninja Snowmen,The Penultimate Fantasy Airship,The Haunted Gallery,The Battlefield (Frat Uniform),The Orcish Frat House (Bombed Back to the Stone Age),The Hippy Camp (Bombed Back to the Stone Age)].makeConstantLocationArrayMutable();  //FIXME the battlefield (hippy uniform)?
+            relevant_locations[lookupLocation("the very unquiet garves")] = true;
             
             if (defiled_nook_open)
                 relevant_locations[$location[the defiled nook]] = true;
             else
-                relevant_locations[$location[post-cyrpt cemetary]] = true;
+                relevant_locations[lookupLocation("The VERY Unquiet Garves")] = true;
             
             //FIXME always URL in areas we have olfacted...?
             foreach l in relevant_locations
@@ -132,7 +133,7 @@ void SBugbearInvasionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistE
                 if (!l.locationAvailable())
                 {
                     if (unavailable_locations_to_show contains l)
-                        source_locations_unavailable.listAppend(HTMLGenerateSpanFont(place, "grey", ""));
+                        source_locations_unavailable.listAppend(HTMLGenerateSpanFont(place, "grey"));
                 }
                 else
                 {
@@ -212,7 +213,7 @@ void SBugbearInvasionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistE
         if (defiled_nook_open)
             locations_relevant_to_acquire_biodata[$location[Morgue]].listAppend($location[the defiled nook]);
         else
-            locations_relevant_to_acquire_biodata[$location[Morgue]].listAppend($location[post-cyrpt cemetary]);
+            locations_relevant_to_acquire_biodata[$location[Morgue]].listAppend(lookupLocation("The VERY Unquiet Garves"));
         
         string url = "";
         boolean do_not_override_url = false;
@@ -278,7 +279,7 @@ void SBugbearInvasionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistE
                 if (!tracking_works)
                     line += "|Umm... unless you already did that. (no tracking)";
                 if (!at_least_one_area_open)
-                    line = HTMLGenerateSpanFont(line, "grey", "");
+                    line = HTMLGenerateSpanFont(line, "grey");
                 description.listAppend(line);
             }
         }
@@ -287,7 +288,7 @@ void SBugbearInvasionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistE
             if ($item[crayon shavings].available_amount() > 0)
                 description.listPrepend($item[crayon shavings].available_amount().int_to_wordy().capitalizeFirstLetter() + " crayon shavings available for copying bugbears.");
             if ($item[bugbear detector].available_amount() > 0 && $item[bugbear detector].equipped_amount() == 0)
-                description.listPrepend(HTMLGenerateSpanFont("Equip bugbear detector first.", "red", ""));
+                description.listPrepend(HTMLGenerateSpanFont("Equip bugbear detector first.", "red"));
             task_entries.listAppend(ChecklistEntryMake("__item software glitch", url, ChecklistSubentryMake("Collect biodata", "", description), relevant_locations));
         }
     }
@@ -382,7 +383,7 @@ void SBugbearInvasionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistE
                         items_to_equip.listAppend(it);
                 }
                 if (items_to_equip.count() > 0)
-                    description.listAppend(HTMLGenerateSpanFont("Equip your " + items_to_equip.listJoinComponents(", ", "and") + ".", "red", ""));
+                    description.listAppend(HTMLGenerateSpanFont("Equip your " + items_to_equip.listJoinComponents(", ", "and") + ".", "red"));
                 if ($item[uv monocular].available_amount() == 0 && $item[uv monocular].creatable_amount() > 0)
                     description.listAppend("Could create the UV Monocular with your BURTs.");
                 
@@ -520,7 +521,7 @@ void SBugbearInvasionGenerateResource(ChecklistEntry [int] available_resources_e
             line += item_reason[it] + ".";
             
             if (it.creatable_amount() == 0)
-                line = HTMLGenerateSpanFont(line, "grey", "");
+                line = HTMLGenerateSpanFont(line, "grey");
             description.listAppend(line);
         }
 		available_resources_entries.listAppend(ChecklistEntryMake("__item BURT", "inv_use.php?pwd=" + my_hash() + "&whichitem=5683", ChecklistSubentryMake(pluralize($item[BURT]) + " available", "", description), 8));

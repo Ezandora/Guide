@@ -58,7 +58,7 @@ ChecklistEntry QSleazeAirportGenerateQuestFramework(ChecklistEntry [int] task_en
         subentry.entries.listAppend(line);
         
         if (item_to_equip != $item[none] && item_to_equip.available_amount() > 0 && item_to_equip.equipped_amount() == 0)
-            subentry.entries.listAppend(HTMLGenerateSpanFont("Equip the " + item_to_equip + ".", "red", ""));
+            subentry.entries.listAppend(HTMLGenerateSpanFont("Equip the " + item_to_equip + ".", "red"));
         if (target_location == $location[The Sunken Party Yacht] && $effect[fishy].have_effect() == 0)
         {
             subentry.entries.listAppend("Try to acquire Fishy effect.");
@@ -126,7 +126,7 @@ void QSleazeAirportAuditGenerateTasks(ChecklistEntry [int] task_entries)
     
     if ($effect[sleight of mind].have_effect() == 0 && $item[sleight-of-hand mushroom].available_amount() > 0)
     {
-        entry.subentries[0].entries.listAppend(HTMLGenerateSpanFont("Use sleight-of-hand mushroom", "red", "") + " to acquire receipts.");
+        entry.subentries[0].entries.listAppend(HTMLGenerateSpanFont("Use sleight-of-hand mushroom", "red") + " to acquire receipts.");
     }
 }
 
@@ -345,7 +345,7 @@ void QSpookyAirportJunglePunGenerateTasks(ChecklistEntry [int] task_entries)
         }
         if (items_to_equip.count() > 0)
         {
-            subentry.entries.listAppend(HTMLGenerateSpanFont("Equip the " + items_to_equip.listJoinComponents(", ", "and") + ".", "red", ""));
+            subentry.entries.listAppend(HTMLGenerateSpanFont("Equip the " + items_to_equip.listJoinComponents(", ", "and") + ".", "red"));
             url = "inventory.php?which=2";
         }
         
@@ -401,7 +401,7 @@ void QSpookyAirportFakeMediumGenerateTasks(ChecklistEntry [int] task_entries)
         }
         if (items_to_equip.count() > 0)
         {
-            subentry.entries.listAppend(HTMLGenerateSpanFont("Equip the " + items_to_equip.listJoinComponents(", ", "and") + ".", "red", ""));
+            subentry.entries.listAppend(HTMLGenerateSpanFont("Equip the " + items_to_equip.listJoinComponents(", ", "and") + ".", "red"));
             url = "inventory.php?which=2";
         }
     }
@@ -477,7 +477,7 @@ void QSpookyAirportEveGenerateTasks(ChecklistEntry [int] task_entries)
         }
         if (items_to_equip.count() > 0)
         {
-            subentry.entries.listAppend(HTMLGenerateSpanFont("Equip the " + items_to_equip.listJoinComponents(", ", "and") + ".", "red", ""));
+            subentry.entries.listAppend(HTMLGenerateSpanFont("Equip the " + items_to_equip.listJoinComponents(", ", "and") + ".", "red"));
             url = "inventory.php?which=2";
         }
     }
@@ -557,7 +557,7 @@ void QSpookyAirportGoreGenerateTasks(ChecklistEntry [int] task_entries)
         }
         if (items_to_equip.count() > 0)
         {
-            subentry.entries.listAppend(HTMLGenerateSpanFont("Equip the " + items_to_equip.listJoinComponents(", ", "and") + ".", "red", ""));
+            subentry.entries.listAppend(HTMLGenerateSpanFont("Equip the " + items_to_equip.listJoinComponents(", ", "and") + ".", "red"));
             url = "inventory.php?which=2";
         }
         subentry.entries.listAppend(pluralize(gore_remaining, "pound", "pounds") + " remaining.");
@@ -599,7 +599,7 @@ void QSpookyAirportOutOfOrderGenerateTasks(ChecklistEntry [int] task_entries)
         }
         if (items_to_equip.count() > 0)
         {
-            subentry.entries.listAppend(HTMLGenerateSpanFont("Equip the " + items_to_equip.listJoinComponents(", ", "and") + ".", "red", ""));
+            subentry.entries.listAppend(HTMLGenerateSpanFont("Equip the " + items_to_equip.listJoinComponents(", ", "and") + ".", "red"));
             url = "inventory.php?which=2";
         }
         else
@@ -690,7 +690,7 @@ void QStenchAirportFishTrashGenerateTasks(ChecklistEntry [int] task_entries)
         }
         if (items_to_equip.count() > 0)
         {
-            subentry.entries.listAppend(HTMLGenerateSpanFont("Equip the " + items_to_equip.listJoinComponents(", ", "and") + ".", "red", ""));
+            subentry.entries.listAppend(HTMLGenerateSpanFont("Equip the " + items_to_equip.listJoinComponents(", ", "and") + ".", "red"));
             url = "inventory.php?which=2";
         }
         else
@@ -834,7 +834,7 @@ void QStenchAirportSuperLuberGenerateTasks(ChecklistEntry [int] task_entries)
         }
         if (items_to_equip.count() > 0)
         {
-            subentry.entries.listAppend(HTMLGenerateSpanFont("Equip the " + items_to_equip.listJoinComponents(", ", "and") + ".", "red", ""));
+            subentry.entries.listAppend(HTMLGenerateSpanFont("Equip the " + items_to_equip.listJoinComponents(", ", "and") + ".", "red"));
             url = "inventory.php?which=2";
         }
         else
@@ -886,7 +886,7 @@ void QStenchAirportZippityDooDahGenerateTasks(ChecklistEntry [int] task_entries)
         }
         if (items_to_equip.count() > 0)
         {
-            subentry.entries.listAppend(HTMLGenerateSpanFont("Equip the " + items_to_equip.listJoinComponents(", ", "and") + ".", "red", ""));
+            subentry.entries.listAppend(HTMLGenerateSpanFont("Equip the " + items_to_equip.listJoinComponents(", ", "and") + ".", "red"));
             url = "inventory.php?which=2";
         }
         else

@@ -222,7 +222,7 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         if (line.length() > 0)
         {
             if (should_output_compass_in_red)
-                line = HTMLGenerateSpanFont(line, "red", "");
+                line = HTMLGenerateSpanFont(line, "red");
             line += line_extra;
             subentry.entries.listAppend(line);
         }

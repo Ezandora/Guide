@@ -1,5 +1,5 @@
 //These settings are for development. Don't worry about editing them.
-string __version = "1.2";
+string __version = "1.2.1";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -22,7 +22,7 @@ boolean __use_table_based_layouts = false; //backup implementation
 boolean __setting_use_kol_css = false; //images/styles.css
 boolean __setting_show_location_bar = true;
 boolean __setting_enable_location_popup_box = true;
-boolean __setting_location_bar_uses_last_location = true;
+boolean __setting_location_bar_uses_last_location = false; //nextAdventure otherwise
 boolean __setting_location_bar_fixed_layout = true;
 boolean __setting_location_bar_limit_max_width = true;
 float __setting_location_bar_max_width_per_entry = 0.35;

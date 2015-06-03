@@ -307,7 +307,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         boolean delay_for_semirare = CounterLookup("Semi-rare").CounterWillHitExactlyInTurnRange(3, 3);
         
         if (delay_for_semirare)
-            task_entries.listAppend(ChecklistEntryMake("__item " + $item[dance card], "", ChecklistSubentryMake(HTMLGenerateSpanFont("Avoid using " + $item[dance card], "red", ""), "", HTMLGenerateSpanFont("You have a semi-rare coming up then, wait a turn first.", "red", "")), -11));
+            task_entries.listAppend(ChecklistEntryMake("__item " + $item[dance card], "", ChecklistSubentryMake(HTMLGenerateSpanFont("Avoid using " + $item[dance card], "red"), "", HTMLGenerateSpanFont("You have a semi-rare coming up then, wait a turn first.", "red")), -11));
         else
         {
             string [int] description;
@@ -356,7 +356,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
                 url = "shop.php?whichshop=generalstore";
             }
             
-            task_entries.listAppend(ChecklistEntryMake("__item miniature life preserver", url, ChecklistSubentryMake(HTMLGenerateSpanFont("Equip miniature life preserver", "red", ""), "", description), -11));
+            task_entries.listAppend(ChecklistEntryMake("__item miniature life preserver", url, ChecklistSubentryMake(HTMLGenerateSpanFont("Equip miniature life preserver", "red"), "", description), -11));
         }
     }
     
@@ -381,12 +381,12 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         description.listAppend(options.listJoinComponents(", ", "or").capitalizeFirstLetter() + ".");
         
         if (options.count() > 0)
-            task_entries.listAppend(ChecklistEntryMake("__item fortune cookie", "", ChecklistSubentryMake(HTMLGenerateSpanFont("Learn semi-rare number", "red", ""), "", description), -11));
+            task_entries.listAppend(ChecklistEntryMake("__item fortune cookie", "", ChecklistSubentryMake(HTMLGenerateSpanFont("Learn semi-rare number", "red"), "", description), -11));
     }
     
     if (__last_adventure_location == $location[a maze of sewer tunnels] && $item[hobo code binder].equipped_amount() == 0 && haveAtLeastXOfItemEverywhere($item[hobo code binder], 1))
     {
-        task_entries.listAppend(ChecklistEntryMake("__item hobo code binder", "inventory.php?which=2", ChecklistSubentryMake(HTMLGenerateSpanFont("Equip hobo code binder", "red", ""), "", "Speeds up sewer tunnel exploration."), -11));
+        task_entries.listAppend(ChecklistEntryMake("__item hobo code binder", "inventory.php?which=2", ChecklistSubentryMake(HTMLGenerateSpanFont("Equip hobo code binder", "red"), "", "Speeds up sewer tunnel exploration."), -11));
     }
     
 }

@@ -152,6 +152,14 @@ boolean [string] activeBanishNamesForLocation(location l)
     {
         if (names contains m)
             banish_names[names[m]] = true;
+        if (my_path_id() == PATH_ONE_CRAZY_RANDOM_SUMMER)
+        {
+            foreach m2 in names
+            {
+                if (m2.to_string().to_lower_case().contains_text(m.to_string().to_lower_case())) //FIXME complete hack, wrong, substrings, 1337, etc
+                    banish_names[names[m2]] = true;
+            }
+        }
     }
     return banish_names;
 }

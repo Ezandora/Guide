@@ -228,7 +228,7 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
                 have_all_fcle_items = true;
                 url = "inventory.php?which=3";
                 line += " Adventure once to complete quest.";
-				//line += " " + HTMLGenerateSpanFont("Use rigging shampoo, mizzenmast mop, and ball polish", "red", "") + ", then adventure to complete quest.";
+				//line += " " + HTMLGenerateSpanFont("Use rigging shampoo, mizzenmast mop, and ball polish", "red") + ", then adventure to complete quest.";
             }
 			else
 			{
@@ -262,7 +262,7 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
                             line2 = "Acquire and use";
                         line2 += " the Talisman of Renenutet on " + monsters_left_string.listJoinComponents(", ", "and") + ".";
                         if (lookupItem("Talisman of Renenutet").available_amount() == 0)
-                            line2 = HTMLGenerateSpanFont(line2, "red", "");
+                            line2 = HTMLGenerateSpanFont(line2, "red");
                         subentry.entries.listAppend(line2);
                     }
                 }
@@ -300,7 +300,7 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		subentry.entries.listAppend(line);
 	}
 	if ($item[the big book of pirate insults].available_amount() == 0 && base_quest_state.mafia_internal_step < 6 && have_outfit)
-		subentry.entries.listAppend(HTMLGenerateSpanFont("Buy the big book of pirate insults.", "red", ""));
+		subentry.entries.listAppend(HTMLGenerateSpanFont("Buy the big book of pirate insults.", "red"));
 	
     if (can_acquire_cocktail_napkins && $item[cocktail napkin].available_amount() == 0)
     {

@@ -157,7 +157,7 @@ void generatePullList(Checklist [int] checklists)
     
 	pullable_item_list.listAppend(GPItemMake($item[pantsgiving], "5x banish/day|+2 stats/fight|+15% items|2 extra fullness (realistically)", 1));
     if (!__misc_state["familiars temporarily blocked"]) //relevant in heavy rains, on the +item/+meat underwater familiars
-        pullable_item_list.listAppend(GPItemMake($item[snow suit], "+20 familiar weight for a while" + (__misc_state["free runs usable"] ? ", +4 free runs" : "") + "|+10% item|spleen items", 1));
+        pullable_item_list.listAppend(GPItemMake($item[snow suit], "+20 familiar weight for a while" + (($familiar[pair of stomping boots].is_unrestricted() && __misc_state["free runs usable"]) ? ", +4 free runs" : "") + "|+10% item|spleen items", 1));
     if (!__misc_state["familiars temporarily blocked"])
     {
         if ($item[Buddy Bjorn].storage_amount() > 0)
@@ -426,7 +426,7 @@ void generatePullList(Checklist [int] checklists)
 		pullable_item_list.listAppend(GPItemMake($item[Shore Inc. Ship Trip Scrip], "Saves three turns each|" + scrip_reasons.listJoinComponents(", ", "and").capitalizeFirstLetter() + ".", scrip_needed));
 	}
     
-    if (__misc_state["Need to level"] && get_property_boolean("chateauAvailable") && __misc_state_int["free rests remaining"] > 0 && false)
+    if (__misc_state["Need to level"] && __misc_state["Chateau Mantegna available"] && __misc_state_int["free rests remaining"] > 0 && false)
     {
         //This is not currently suggested because I'm not sure if it's worth it for anyone but unrestricted or the very high end speed ascension.
         //It seems to give about as much stats as a good clover, which you can also pull, and are much cheaper.

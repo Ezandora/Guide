@@ -91,7 +91,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		if (evilness == 0)
 			text = "Finished";
 		else if (evilness <= 25)
-			text = HTMLGenerateSpanFont("At boss", "red", "");
+			text = HTMLGenerateSpanFont("At boss", "red");
 		else
 			text = (evilness - 25) + " evilness to boss.";
 		evilness_text[property] = text;

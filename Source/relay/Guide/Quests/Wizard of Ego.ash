@@ -20,9 +20,9 @@ void QWizardOfEgoInit()
         {
             state.mafia_internal_step = 7;
         }
-        if (state.mafia_internal_step < 1 && $location[pre-cyrpt cemetary].noncombat_queue.contains_text("A Grave Mistake") || $location[post-cyrpt cemetary].noncombat_queue.contains_text("A Grave Mistake"))
+        if (state.mafia_internal_step < 1 && lookupLocation("The Unquiet Garves").noncombat_queue.contains_text("A Grave Mistake") || lookupLocation("The VERY Unquiet Garves").noncombat_queue.contains_text("A Grave Mistake"))
             state.mafia_internal_step = 1;
-        if (state.mafia_internal_step < 2 && $location[pre-cyrpt cemetary].noncombat_queue.contains_text("A Grave Situation") || $location[post-cyrpt cemetary].noncombat_queue.contains_text("A Grave Situation"))
+        if (state.mafia_internal_step < 2 && lookupLocation("The Unquiet Garves").noncombat_queue.contains_text("A Grave Situation") || lookupLocation("The VERY Unquiet Garves").noncombat_queue.contains_text("A Grave Situation"))
             state.mafia_internal_step = 2;
         
         if (state.mafia_internal_step < 2 && $item[Fernswarthy's key].available_amount() > 0)
@@ -85,7 +85,7 @@ void QWizardOfEgoGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         }
         else
         {
-            subentry.entries.listAppend("Adventure at the misspelled cemetary.");
+            subentry.entries.listAppend("Adventure at the unquiet garves.");
         }
     }
     else if (base_quest_state.mafia_internal_step == 2)
@@ -120,5 +120,9 @@ void QWizardOfEgoGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         subentry.entries.listAppend("Adventure in the tower ruins. One more non-combat remain.");
     }
     
-	optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[pre-cyrpt cemetary,post-cyrpt cemetary, tower ruins]));
+    boolean [location] relevant_locations;
+    relevant_locations[lookupLocation("The Unquiet Garves")] = true;
+    relevant_locations[lookupLocation("The VERY Unquiet Garves")] = true;
+    
+	optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, relevant_locations));
 }

@@ -246,11 +246,11 @@ void SSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
             if (my_audience() >= 20)
                 options.listAppend("+50% meat (cowlick)");
             else
-                options.listAppend(HTMLGenerateSpanFont("+50% meat (requires 20 love)", "grey", ""));
+                options.listAppend(HTMLGenerateSpanFont("+50% meat (requires 20 love)", "grey"));
             if (my_audience() <= -20)
                 options.listAppend("+50% init (fauxhawk)");
             else
-                options.listAppend(HTMLGenerateSpanFont("+50% init (requires 20 hate)", "grey", ""));
+                options.listAppend(HTMLGenerateSpanFont("+50% init (requires 20 hate)", "grey"));
                 
             //description.listAppend("Potential options:|*|*|*+|*");
             description.listAppend("Potential options:|*" + options.listJoinComponents("|*"));

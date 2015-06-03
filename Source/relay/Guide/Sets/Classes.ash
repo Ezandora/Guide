@@ -124,7 +124,7 @@ void SSealClubberInfernalSealsGenerateResource(ChecklistEntry [int] available_re
         
         string candles_required = summon.seal_clubber_candles_required;
         if ($item[seal-blubber candle].available_amount() < summon.seal_clubber_candles_required)
-            candles_required = HTMLGenerateSpanFont(candles_required, "grey", "");
+            candles_required = HTMLGenerateSpanFont(candles_required, "grey");
         if (summon.imbued_seal_blubber_candles_required > 0)
         {
             candles_required = "imbued";
@@ -147,7 +147,7 @@ void SSealClubberInfernalSealsGenerateResource(ChecklistEntry [int] available_re
         {
             foreach key, s in option
             {
-                option[key] = HTMLGenerateSpanFont(s, "grey", "");
+                option[key] = HTMLGenerateSpanFont(s, "grey");
             }
         }
         options.listAppend(option);

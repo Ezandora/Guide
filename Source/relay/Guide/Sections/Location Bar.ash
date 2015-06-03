@@ -7,7 +7,7 @@ buffer generateLocationBar(boolean displaying_navbar)
         return bar;
     location l = __last_adventure_location;
     if (!__setting_location_bar_uses_last_location)
-        l = my_location();
+        l = get_property_location("nextAdventure");
     //l = my_location();
     
     if (l == $location[none] || __misc_state["In valhalla"])

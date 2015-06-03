@@ -256,6 +256,8 @@ void SSemirareGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
 	{
 		SemirareGenerateDescription(description);
 	}
+    if (very_important && __misc_state["monsters can be nearly impossible to kill"] && monster_level_adjustment() > 0)
+        description.listAppend(HTMLGenerateSpanFont("Possibly remove +ML to survive. (at +" + monster_level_adjustment() + " ML)", "red"));
 	
 	if (title != "")
 	{

@@ -75,7 +75,7 @@ void generateTasks(Checklist [int] checklists)
                     image_name = "__item pirate fledges";
                     
                     subentry.header += "?";
-                    line += "|" + HTMLGenerateSpanFont("Very dangerous", "red", "") + ", monsters ";
+                    line += "|" + HTMLGenerateSpanFont("Very dangerous", "red") + ", monsters ";
                     if (monster_level_adjustment() > 150)
                         line += "are";
                     else
@@ -187,11 +187,11 @@ void generateTasks(Checklist [int] checklists)
         
         boolean spooky_airport_unlocked = __misc_state["spooky airport available"];
         
-        if (get_property_boolean("chateauAvailable") && __misc_state_int["free rests remaining"] > 0)
+        if (__misc_state["Chateau Mantegna available"] && __misc_state_int["free rests remaining"] > 0)
             url = "place.php?whichplace=chateau";
         else if (spooky_airport_unlocked && ($effect[jungle juiced].have_effect() > 0 || ($item[jungle juice].available_amount() > 0 && availableDrunkenness() > 0 && __misc_state["can drink just about anything"])))
             url = $location[the deep dark jungle].getClickableURLForLocation();
-        else if (get_property_boolean("chateauAvailable"))
+        else if (__misc_state["Chateau Mantegna available"])
             url = "place.php?whichplace=chateau";
         else if (__misc_state["sleaze airport available"])
             url = $location[sloppy seconds diner].getClickableURLForLocation();

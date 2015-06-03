@@ -76,7 +76,7 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         {
             if ($item[blackberry galoshes].equipped_amount() == 0)
             {
-                string line = HTMLGenerateSpanFont("Equip blackberry galoshes", "red", "") + " to speed up exploration";
+                string line = HTMLGenerateSpanFont("Equip blackberry galoshes", "red") + " to speed up exploration";
                 
                 if (!$item[blackberry galoshes].can_equip())
                 {
@@ -126,7 +126,7 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
             }
             else if (my_familiar() != bird_needed_familiar && bird_needed.available_amount() == 0)
             {
-                subentry.entries.listAppend(HTMLGenerateSpanFont("Bring along " + bird_needed_familiar + " to speed up quest.", "red", ""));
+                subentry.entries.listAppend(HTMLGenerateSpanFont("Bring along " + bird_needed_familiar + " to speed up quest.", "red"));
             }
             else if (my_familiar() == bird_needed_familiar && bird_needed.available_amount() > 0)
             {
@@ -166,9 +166,9 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
             if (CounterLookup("Semi-rare").CounterWillHitExactlyInTurnRange(0,2))
             {
                 image_name = "__item fortune cookie";
-                subentry.header = HTMLGenerateSpanFont("Avoid vacationing at the shore", "red", "");
+                subentry.header = HTMLGenerateSpanFont("Avoid vacationing at the shore", "red");
                 subentry.entries.listAppend("Will override semi-rare.");
-                //subentry.entries.listAppend(HTMLGenerateSpanFont("Avoid vacationing; will override semi-rare.", "red", ""));
+                //subentry.entries.listAppend(HTMLGenerateSpanFont("Avoid vacationing; will override semi-rare.", "red"));
             }
             else
             {

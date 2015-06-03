@@ -100,10 +100,11 @@ void SSkillsGenerateResource(ChecklistEntry [int] available_resources_entries)
     property_summons_to_skills["_grimoireGeekySummons"] = listMake($skill[Summon Geeky Gifts]);
     if (mafiaIsPastRevision(14300))
     {
-        property_summons_to_skills["_grimoireConfiscatorSummons"] = listMake(lookupSkill("Summon Confiscated Things"));
+        property_summons_to_skills["_grimoireConfiscatorSummons"] = listMake($skill[Summon Confiscated Things]);
         skills_to_urls[lookupSkill("Summon Confiscated Things")] = "campground.php?action=bookshelf";
     }
     property_summons_to_skills["_candySummons"] = listMake($skill[Summon Crimbo Candy]);
+    property_summons_to_skills["_summonResortPassUsed"] = listMake(lookupSkill("Summon Kokomo Resort Pass"));
     
     foreach s in $skills[Summon Hilarious Objects,Summon Tasteful Items,Summon Alice's Army Cards,Summon Geeky Gifts]
         skills_to_urls[s] = "campground.php?action=bookshelf";

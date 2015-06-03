@@ -49,7 +49,7 @@ void generateDailyResources(Checklist [int] checklists)
                 options.listAppend(generateHotDogLine("One with everything", "+50% mysticality, 50 turns.", 2));
             if (my_primestat() == $stat[moxie])
                 options.listAppend(generateHotDogLine("Sly Dog", "+50% moxie, 50 turns.", 2));
-            if (__misc_state["need to level"] && get_property_boolean("chateauAvailable") && !$skill[Dog Tired].have_skill())
+            if (__misc_state["need to level"] && __misc_state["Chateau Mantegna available"] && !$skill[Dog Tired].have_skill())
                 options.listAppend(generateHotDogLine("Sleeping dog", "5 free rests/day (stats at chateau)", 2));
         }
 			
@@ -289,8 +289,8 @@ void generateDailyResources(Checklist [int] checklists)
             //FIXME what goes here
             //FIXME 16.8 show which stats you get
             description.listAppend("HP/MP/stats.");
-            if (my_level() < 8)
-                description.listAppend("May want to wait until level 8(?) for more stats from resting.");
+            if (my_level() < 9)
+                description.listAppend("May want to wait until level 9(?) for more stats from resting.");
         }
         
 		available_resources_entries.listAppend(ChecklistEntryMake("__effect sleepy", __misc_state_string["resting url"], ChecklistSubentryMake(pluralizeWordy(__misc_state_int["free rests remaining"], "free rest", "free rests").capitalizeFirstLetter(), "", description), 10));
@@ -400,7 +400,7 @@ void generateDailyResources(Checklist [int] checklists)
         }
     }
     
-    if (get_property_boolean("chateauAvailable") && !get_property_boolean("_chateauDeskHarvested") && mafiaIsPastRevision(15191))
+    if (__misc_state["Chateau Mantegna available"] && !get_property_boolean("_chateauDeskHarvested") && mafiaIsPastRevision(15191))
     {
         string image_name = "__item disintegrating quill pen";
         if (lookupItem("fancy calligraphy pen").image.length() > 0)

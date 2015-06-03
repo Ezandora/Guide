@@ -101,7 +101,7 @@ string [string] generateAPIResponse()
                 output[it.to_int()] = it.available_amount();
         }
         
-        boolean [item] relevant_items_strings = lookupItemsArray($strings[poppy,opium grenade,talisman o' nam,toxic globule]);
+        boolean [item] relevant_items_strings = lookupItemsArray($strings[poppy,opium grenade,talisman o' nam,toxic globule,yellow pixel]);
         foreach it in relevant_items_strings
         {
             if (it.available_amount() > 0)

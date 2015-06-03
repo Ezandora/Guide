@@ -651,7 +651,10 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
     {
         string image_name = "";
         string [int] autosell_list;
-        foreach it in $items[meat stack, dense meat stack, really dense meat stack, solid gold bowling ball, fancy seashell necklace, commemorative war stein,huge gold coin]
+        boolean [item] autosellable_items = $items[meat stack, dense meat stack, really dense meat stack, solid gold bowling ball, fancy seashell necklace, commemorative war stein,huge gold coin].makeConstantItemArrayMutable();
+        if (lookupItem("pixel coin") != $item[none])
+            autosellable_items[lookupItem("pixel coin")] = true;
+        foreach it in autosellable_items
         {
             if (it.available_amount() == 0)
                 continue;
@@ -660,6 +663,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
             if (image_name.length() == 0)
                 image_name = "__item " + it;
         }
+            
         string [int] open_list;
         foreach it in $items[old coin purse, old leather wallet, black pension check, ancient vinyl coin purse, warm subject gift certificate,shiny stones]
         {
@@ -976,7 +980,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
         }
         string line = "Costs ";
         if (my_mp() < 30)
-            line += HTMLGenerateSpanFont("30 MP", "red", "");
+            line += HTMLGenerateSpanFont("30 MP", "red");
         else
             line += "30 MP";
         line += ".";
@@ -1046,7 +1050,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] available_resources_entries
             {
                 foreach key, s in line
                 {
-                    line[key] = HTMLGenerateSpanFont(s, "grey", "");
+                    line[key] = HTMLGenerateSpanFont(s, "grey");
                 }
             }
             table.listAppend(line);

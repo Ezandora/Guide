@@ -655,11 +655,16 @@ void setUpState()
             __misc_state[s + " airport available"] = true;
     }
     
+    if (get_property_boolean("chateauAvailable") && !in_bad_moon() && $item[Chateau Mantegna room key].is_unrestricted())
+    {
+        __misc_state["Chateau Mantegna available"] = true;
+    }
+    
     
     __misc_state_string["resting url"] = "campground.php";
     __misc_state_string["resting description"] = "your campsite";
     __misc_state["recommend resting at campsite"] = true;
-    if (get_property_boolean("chateauAvailable") && (__misc_state["need to level"] || $item[pantsgiving].available_amount() == 0))
+    if (__misc_state["Chateau Mantegna available"] && (__misc_state["need to level"] || $item[pantsgiving].available_amount() == 0))
     {
         __misc_state_string["resting url"] = "place.php?whichplace=chateau";
         __misc_state_string["resting description"] = "Chateau Mantegna";
@@ -700,7 +705,9 @@ void setUpState()
     
     if (__misc_state["can purchase magical mystery juice"] || black_market_available() || dispensary_available() || true)
         __misc_state["have some reasonable way of restoring MP"] = true;
-        
+    
+    if (my_path_id() == PATH_ONE_CRAZY_RANDOM_SUMMER)
+        __misc_state["monsters can be nearly impossible to kill"] = true;
     
     int tonic_price = lookupItem("Doc Galaktik's Invigorating Tonic").npc_price();
     if (tonic_price == 0)

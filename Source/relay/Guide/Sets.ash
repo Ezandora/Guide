@@ -39,6 +39,7 @@ void SetsGenerateResources(ChecklistEntry [int] available_resources_entries)
     SEquipmentGenerateResource(available_resources_entries);
     SActuallyEdtheUndyingGenerateResource(available_resources_entries);
     SMayoClinicGenerateResource(available_resources_entries);
+    S8bitRealmGenerateResource(available_resources_entries);
 }
 
 void SetsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)

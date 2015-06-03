@@ -129,6 +129,11 @@ buffer HTMLGenerateSpanFont(string source, string font_color, string font_size)
 	return HTMLGenerateSpanOfStyle(source, style);
 }
 
+buffer HTMLGenerateSpanFont(string source, string font_color)
+{
+    return HTMLGenerateSpanFont(source, font_color, "");
+}
+
 string HTMLConvertStringToAnchorID(string id)
 {
     if (id.length() == 0)

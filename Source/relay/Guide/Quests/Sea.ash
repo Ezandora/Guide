@@ -114,7 +114,7 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
                     things_to_do.listAppend("uneffect " + e);
             }
             if (things_to_do.count() > 0)
-                description.listAppend(HTMLGenerateSpanFont(things_to_do.listJoinComponents(", ", "and").capitalizeFirstLetter() + ".", "red", ""));
+                description.listAppend(HTMLGenerateSpanFont(things_to_do.listJoinComponents(", ", "and").capitalizeFirstLetter() + ".", "red"));
             
             if ($item[dark porquoise ring].equipped_amount() == 0)
             {
@@ -140,7 +140,7 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
                 }
             }
             if (my_mp() > 0)
-                description.listAppend(HTMLGenerateSpanFont("Try to reduce your MP to 0", "red", "") + " before fighting him.");
+                description.listAppend(HTMLGenerateSpanFont("Try to reduce your MP to 0", "red") + " before fighting him.");
         }
         else
         {
@@ -203,7 +203,7 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
                 if (it.item_amount() > 0)
                     description_healers.listAppend(potential_healers[it]);
                 else
-                    description_healers.listAppend(HTMLGenerateSpanFont(potential_healers[it], "red", ""));
+                    description_healers.listAppend(HTMLGenerateSpanFont(potential_healers[it], "red"));
             }
             description.listAppend("Potential healing items:|*" + description_healers.listJoinComponents("|*"));
         }
@@ -413,7 +413,7 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 			{
 				string line = "";
 				if ($item[sea lasso].available_amount() == 0)
-					line += HTMLGenerateSpanFont("Buy and use a sea lasso in each combat.", "red", "");
+					line += HTMLGenerateSpanFont("Buy and use a sea lasso in each combat.", "red");
 				else
 					line += "Use a sea lasso in each combat.";
 				if ($item[sea cowboy hat].equipped_amount() == 0)

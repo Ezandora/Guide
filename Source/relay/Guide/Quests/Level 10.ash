@@ -206,7 +206,7 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                     line += ", once you can equip it";
                 }
                 line += ".";
-                subentry.entries.listAppend(HTMLGenerateSpanFont(line, "red", ""));
+                subentry.entries.listAppend(HTMLGenerateSpanFont(line, "red"));
             }
             if ($item[mohawk wig].available_amount() == 0 && !in_hardcore())
                 subentry.entries.listAppend("Potentially pull and wear a mohawk wig.");
@@ -236,7 +236,7 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             {
                 subentry.modifiers.listClear();
                 subentry.entries.listClear();
-                subentry.entries.listAppend(HTMLGenerateSpanFont("Avoid adventuring here; wheel will override semi-rare.", "red", ""));
+                subentry.entries.listAppend(HTMLGenerateSpanFont("Avoid adventuring here; wheel will override semi-rare.", "red"));
             }
 		}
 		else if ($location[The Castle in the Clouds in the Sky (Ground floor)].locationAvailable())
@@ -284,7 +284,7 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             if ($item[amulet of extreme plot significance].available_amount() > 0)
             {
                 if ($item[amulet of extreme plot significance].equipped_amount() == 0)
-                    subentry.entries.listAppend("Possibly " + HTMLGenerateSpanFont("wear the amulet of extreme plot significance.", "red", "") + "|Or search for the non-combat, skip it, equip the amulet, and adventure again.");
+                    subentry.entries.listAppend("Possibly " + HTMLGenerateSpanFont("wear the amulet of extreme plot significance.", "red") + "|Or search for the non-combat, skip it, equip the amulet, and adventure again.");
                 
                 if (non_combat_rate != 0.0)
                     turn_estimation = 1.0 / non_combat_rate;

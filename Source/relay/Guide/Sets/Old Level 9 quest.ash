@@ -9,24 +9,27 @@ void SOldLevel9GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
 	QuestStateParseMafiaQuestProperty(state, "questM15Lol", false); //don't issue a quest log load for this, no information gained
     if (!state.in_progress)
         return;
+        
+    string url = "place.php?whichplace=mountains";
     
     string [int] description;
     
-    if ($item[64735 scroll].available_amount() > 0)
+    if ($item[64735 scroll].item_amount() > 0)
     {
         description.listAppend("Use the 64735 scroll.");
+        url = "inventory.php?which=3";
     }
     else
     {
         description.listAppend("Make the 64735 scroll using the rampaging adding machine.");
         
         item [int] components_testing;
-        if ($item[64067 scroll].available_amount() == 0)
+        if ($item[64067 scroll].item_amount() == 0)
         {
             components_testing.listAppend($item[30669 scroll]);
             components_testing.listAppend($item[33398 scroll]);
         }
-        if ($item[668 scroll].available_amount() == 0)
+        if ($item[668 scroll].item_amount() == 0)
         {
             components_testing.listAppend($item[334 scroll]);
             components_testing.listAppend($item[334 scroll]);
@@ -36,7 +39,7 @@ void SOldLevel9GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         foreach key in components_testing
         {
             item it = components_testing[key];
-            if (it.available_amount() - amount_used[it] <= 0)
+            if (it.item_amount() - amount_used[it] <= 0)
             {
                 components_needed.listAppend(it.to_string());
             }
@@ -54,5 +57,5 @@ void SOldLevel9GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     }
     ChecklistSubentry [int] subentries;
     subentries.listAppend(ChecklistSubentryMake("A Quest, LOL", "", description));
-    optional_task_entries.listAppend(ChecklistEntryMake("__item 64735 scroll", "place.php?whichplace=mountains", subentries, 10, $locations[the valley of rof l'm fao]));
+    optional_task_entries.listAppend(ChecklistEntryMake("__item 64735 scroll", url, subentries, 10, $locations[the valley of rof l'm fao]));
 }

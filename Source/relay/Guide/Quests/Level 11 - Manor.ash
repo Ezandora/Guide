@@ -103,7 +103,7 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                         if (lookupItem("unstable fulminate").equipped_amount() == 0)
                         {
                             url = "inventory.php?which=2";
-                            tasks.listAppend(HTMLGenerateSpanFont("Equip unstable fulminate", "red", ""));
+                            tasks.listAppend(HTMLGenerateSpanFont("Equip unstable fulminate", "red"));
                         }
                         image_name = "monstrous boiler";
                         

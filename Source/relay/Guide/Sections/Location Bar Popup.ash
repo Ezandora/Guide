@@ -875,7 +875,7 @@ buffer generateLocationBarTable(string [int] table_entries, string [int] table_e
         if (table_entry_classes contains key)
             bar.append(s);
         else
-            bar.append(HTMLGenerateTagWrap("div", s, mapMake("class", "r_cl_modifier_inline"))); //r_cl_modifier_inline needs its own div due to CSS class order precedence
+            bar.append(HTMLGenerateTagWrap("div", s, mapMake("class", "r_cl_modifier_inline", "style", "color:black;"))); //r_cl_modifier_inline needs its own div due to CSS class order precedence
         if (entry_url.length() != 0)
         {
             bar.append("</a>");
@@ -898,6 +898,8 @@ buffer generateLocationPopup(float bottom_coordinates)
 {
     buffer buf;
     location l = __last_adventure_location;
+    if (!__setting_location_bar_uses_last_location)
+        l = get_property_location("nextAdventure");
     if (!__setting_location_bar_uses_last_location)
         l = my_location();
     if (!__setting_enable_location_popup_box)
@@ -1192,11 +1194,11 @@ buffer generateLocationPopup(float bottom_coordinates)
             if (monster_cannot_be_encountered)
                 image_style += "opacity:0.1;";
             else if (last_monster() == m)
-                image_style += "opacity:1.0;";
+                image_style += "opacity:0.5;"; //1.0
             else if (m.attributes.contains_text("ULTRARARE"))
                 image_style += "opacity:0.1;";
             else
-                image_style += "opacity:0.5;";
+                image_style += "opacity:0.2;"; //0.5
             if (from_bottom_instead && false) //disabled, no longer works
             {
                 float location_of_first_bottom_pixel = monster_image_stats.maximum_y_coordinate;

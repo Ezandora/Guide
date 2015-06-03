@@ -173,7 +173,7 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] available_resources_entries
 		if (!$familiar[he-boulder].familiar_is_usable() && __misc_state["have moxie class combat skill"] && __misc_state["In run"])
         {
             if ($effect[everything looks yellow].have_effect() > 0)
-                subentries.listAppend(ChecklistSubentryMake(HTMLGenerateSpanFont("Nanorhino Yellow Ray", "gray", ""), "", HTMLGenerateSpanFont("Cast moxie combat skill once everything looks yellow is gone.", "gray", "")));
+                subentries.listAppend(ChecklistSubentryMake(HTMLGenerateSpanFont("Nanorhino Yellow Ray", "gray"), "", HTMLGenerateSpanFont("Cast moxie combat skill once everything looks yellow is gone.", "gray")));
             else
                 subentries.listAppend(ChecklistSubentryMake("Nanorhino Yellow Ray", "", "Cast moxie combat skill."));
         }
@@ -301,6 +301,69 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] available_resources_entries
         description.listAppend("30 turns of +20% init or +HP/MP or +damage.");
         int importance = 9;
         available_resources_entries.listAppend(ChecklistEntryMake("__familiar grim brother", url, ChecklistSubentryMake(title, "", description), importance));
+    }
+    
+    item yellow_pixel = lookupItem("yellow pixel");
+    if (yellow_pixel != $item[none] && yellow_pixel.available_amount() > 0 && __misc_state["in run"])
+    {
+        string title = pluralize(yellow_pixel);
+        string [int] description;
+        string url = "place.php?whichplace=forestvillage&action=fv_mystic"; //"shop.php?whichshop=mystic";
+        //Pixel coin - 10 yellow pixels - 2k autosell (marginal)
+        //power pill - 25 yellow pixels - instakill
+        //pixel star - 15 yellow pixels, 2 black pixels - 30 turns of +100% HP/MP/spell damage/weapon damage
+        //pixel banana - 10 yellow pixels, 1 black pixel - 2-size awesome food, 10 turns of +30% item
+        //pixel beer - 10 yellow pixels, 5 white pixels - 2-size awesome drunk, 10 turns of +3 stats/fight (15 mainstat)
+        boolean [item] items_to_always_show;
+        items_to_always_show[lookupItem("power pill")] = true;
+        
+        item [int] evalulation_order;
+        evalulation_order.listAppend(lookupItem("power pill"));
+        
+        string [item] reasons;
+        if (my_meat() < 20000)
+            reasons[lookupItem("pixel coin")] = "Autosells 2000 meat. (marginal)";
+        reasons[lookupItem("power pill")] = "Zero-turn instakill.";
+        reasons[lookupItem("pixel star")] = "+100% HP/MP/spell/weapon damage. (30 turns)";
+        //these (should) show up in mafia's consumption manager and they are fairly marginal, so disabled
+        /*if (__misc_state["can eat just about anything"])
+            reasons[lookupItem("pixel banana")] = "2-size awesome food, 10 turns of +30% item.";
+        if (__misc_state["can drink just about anything"])
+            reasons[lookupItem("pixel beer")] = "2-size awesome drunk, 10 turns of +3 stats/fight.";*/
+        
+        boolean [item] evaluated;
+        foreach key, it in evalulation_order
+            evaluated[it] = true;
+        foreach it in reasons
+        {
+            if (!(evaluated contains it))
+            {
+                evaluated[it] = true;
+                evalulation_order.listAppend(it);
+            }
+        }
+        
+        foreach key, it in evalulation_order
+        {
+            string reason = reasons[it];
+            if (reason.length() == 0)
+                continue;
+            if (it == $item[none])
+                continue;
+            if (it.creatable_amount() == 0 && !items_to_always_show[it])
+                continue;
+            string line;
+            line = it.capitalizeFirstLetter() + ": " + reason;
+            if (it.creatable_amount() == 0)
+                line = HTMLGenerateSpanFont(line, "grey");
+            description.listAppend(line);
+        }
+        int importance = 9;
+        available_resources_entries.listAppend(ChecklistEntryMake("__familiar ms. puck man", url, ChecklistSubentryMake(title, "", description), importance));
+    }
+    if (lookupItem("power pill").available_amount() > 0 && __misc_state["in run"])
+    {
+        available_resources_entries.listAppend(ChecklistEntryMake("__item power pill", "", ChecklistSubentryMake(lookupItem("power pill").pluralize().capitalizeFirstLetter(), "", "Use in combat to instakill without costing a turn."), 9));
     }
     
     //FIXME small medium, organ grinder, charged boots

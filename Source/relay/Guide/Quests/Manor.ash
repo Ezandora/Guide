@@ -340,7 +340,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         
         if (get_property("romanticTarget").to_monster() == $monster[writing desk] && get_property_int("_romanticFightsLeft") > 0 || get_property_int("writingDesksDefeated") > 0)
         {
-            subentry.entries.listAppend(HTMLGenerateSpanFont("Avoid adventuring here,", "red", "") + " as you seem to be using the writing desk trick?|Need to fight " + pluralizeWordy(clampi(5 - get_property_int("writingDesksDefeated"), 0, 5), "more writing desk.", "more writing desks."));
+            subentry.entries.listAppend(HTMLGenerateSpanFont("Avoid adventuring here,", "red") + " as you seem to be using the writing desk trick?|Need to fight " + pluralizeWordy(clampi(5 - get_property_int("writingDesksDefeated"), 0, 5), "more writing desk.", "more writing desks."));
         }
         
         float drawers_per_turn = 0.0;
@@ -383,7 +383,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
             subentry.entries.listAppend("Possibly bring along your exotic parrot.");
         }
         
-        if (inebriety_limit() > 0 && my_inebriety() < 10)
+        if (inebriety_limit() > 10 && my_inebriety() < 10)
             subentry.entries.listAppend("Try not to drink past ten, the billiards room is next.");
     }
     else if (lookupItem("7302").available_amount() == 0) //Spookyraven library key
@@ -452,7 +452,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
             }
             if ($effect[chalky hand].have_effect() == 0& $item[handful of hand chalk].available_amount() > 0)
             {
-                subentry.entries.listAppend(HTMLGenerateSpanFont("Use handful of hand chalk", "red", "") + " for +pool skill and faster pool skill training.");
+                subentry.entries.listAppend(HTMLGenerateSpanFont("Use handful of hand chalk", "red") + " for +pool skill and faster pool skill training.");
                 url = "inventory.php?which=3";
             }
         }
@@ -467,7 +467,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
                     subentry.entries.listAppend("Consider drinking " + more_drunkenness + " more drunkenness.");
             }
             else if (my_inebriety() > desired_drunkenness)
-                subentry.entries.listAppend(HTMLGenerateSpanFont("Consider waiting for rollover for better pool skill.", "red", "") + " (you're over " + desired_drunkenness + " drunkenness.)");
+                subentry.entries.listAppend(HTMLGenerateSpanFont("Consider waiting for rollover for better pool skill.", "red") + " (you're over " + desired_drunkenness + " drunkenness.)");
         }
         if (my_inebriety() > 0 && false)
         {
@@ -490,8 +490,9 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         image_name = "__item very overdue library book";
         subentry.modifiers.listAppend("olfact writing desk");
         
+        int desks_remaining = clampi(5 - get_property_int("writingDesksDefeated"), 0, 5);
         subentry.entries.listAppend("To unlock the second floor.");
-        subentry.entries.listAppend("Lady Spookyraven's Necklace drops from the fifth writing desk you encounter.");
+        subentry.entries.listAppend("Defeat " + pluralizeWordy(desks_remaining, "more writing desk", "more writing desks") + " to acquire a necklace.");
         
         boolean need_killing_jar = false;
         if ($item[killing jar].available_amount() == 0 && !__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && !__quest_state["Level 11 Desert"].state_boolean["Killing Jar Given"])

@@ -111,8 +111,10 @@ string generateRandomMessage()
     equipment_messages[$item[heart necklace]] = "&#x2665;&#xfe0e;"; //♥︎
     equipment_messages[$item[fleetwood chain]] = "running in the shadows";
     equipment_messages[$item[liar's pants]] = "never tell the same lie twice";
-    equipment_messages[$item[detective skull]] = HTMLGenerateSpanFont("too slow ascend faster", "#ACA200", ""); //speakeasy password
+    equipment_messages[$item[detective skull]] = HTMLGenerateSpanFont("too slow ascend faster", "#ACA200"); //speakeasy password
     equipment_messages[$item[gasmask]] = "are you my mummy?";
+    foreach it in $items[twisted-up wet towel,sommelier's towel,time bandit time towel]
+        equipment_messages[it] = "don't panic";
     
     foreach it in equipment_messages
     {
@@ -192,6 +194,7 @@ string generateRandomMessage()
         paths[PATH_PICKY] = "cannelloni confusion";
     paths[PATH_STANDARD] = "no past no path";
     paths[PATH_ACTUALLY_ED_THE_UNDYING] = "UNDYING!";
+    paths[PATH_ONE_CRAZY_RANDOM_SUMMER] = "dance the mersenne twist";
     //paths[PATH_CLASS_ACT_3] = "buttons for the people";
     //paths[PATH_AVATAR_OF_THE_NAUGHTY_SORCERESS] = "go forth to your lair! have some tea";
     
@@ -297,6 +300,8 @@ string generateRandomMessage()
     familiar_messages[$familiar[slimeling]] = "lost mother";
     if (format_today_to_string("MM") == "07")
         familiar_messages[lookupFamiliar("Crimbo Shrub")] = "crimbo in july";
+    familiar_messages[lookupFamiliar("Ms. Puck Man")] = "&#5607; &bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;";
+    familiar_messages[lookupFamiliar("Puck Man")] = familiar_messages[lookupFamiliar("Ms. Puck Man")];
     
     if (familiar_messages contains my_familiar() && !__misc_state["familiars temporarily blocked"])
         random_messages.listAppend(familiar_messages[my_familiar()]);
@@ -316,6 +321,7 @@ string generateRandomMessage()
     class_messages[$class[disco bandit]] = "making discos of your castles";
     class_messages[$class[seal clubber]] = "I &#x2663;&#xfe0e; seals";
     class_messages[$class[turtle tamer]] = "friends everywhere you go";
+    class_messages[$class[sauceror]] = "journey of the sauceror";
     
     if (class_messages contains my_class())
         random_messages.listAppend(class_messages[my_class()]);
@@ -330,7 +336,7 @@ string generateRandomMessage()
     //TODO add a message for the procrastination giant
     foreach m in $monsters[The Temporal Bandit,crazy bastard,Knott Slanding,hockey elemental,Hypnotist of Hey Deze,infinite meat bug,QuickBASIC elemental,The Master Of Thieves,Baiowulf,Count Bakula,the nuge] //Pooltergeist (Ultra-Rare)?
         monster_messages[m] = "an ultra rare! congratulations!";
-    monster_messages[$monster[Dad Sea Monkee]] = "is always was always" + HTMLGenerateSpanFont(" is always was always", "#444444", "") + HTMLGenerateSpanFont(" is always was always", "#888888", "") + HTMLGenerateSpanFont(" is always was always", "#BBBBBB", "");
+    monster_messages[$monster[Dad Sea Monkee]] = "is always was always" + HTMLGenerateSpanFont(" is always was always", "#444444") + HTMLGenerateSpanFont(" is always was always", "#888888") + HTMLGenerateSpanFont(" is always was always", "#BBBBBB");
     
     foreach m in $monsters[Ed the Undying (1),Ed the Undying (2),Ed the Undying (3),Ed the Undying (4),Ed the Undying (5),Ed the Undying (6),Ed the Undying (7)]
         monster_messages[m] = "UNDYING!";
@@ -498,6 +504,14 @@ string generateRandomMessage()
 		random_messages.listClear();
 		random_messages.listAppend("find yourself<br>starting back");
 	}
+    if (format_today_to_string("YYYYMMdd") == "20151021") //october 21st, 2015
+    {
+		random_messages.listClear();
+        if (get_property("System.user.country.format") == "US")
+            random_messages.listAppend("88 MPH");
+        else
+            random_messages.listAppend("142 KPH");
+    }
     
     
     //Choose:

@@ -80,7 +80,11 @@ void generateHiddenAreaUnlockForShrine(string [int] description, location shrine
             if (machete_available == $item[none])
                 line += " Acquire a machete first.";
             else if (!have_machete_equipped)
+            {
                 line += " Equip " + machete_available + " first.";
+                if (!machete_available.can_equip())
+                    line += " (not yet equippable)";
+            }
         }
         description.listAppend(line);
     }
@@ -268,7 +272,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 if (my_class() == $class[pastamancer] && my_thrall() == $thrall[Vampieroghi] && my_thrall().level >= 5)
                 {
                     //FIXME should this be a reminder too, if adventuring there? hmm...
-                    subentry.entries.listAppend(HTMLGenerateSpanFont("Change your thrall - Vampieroghi will remove curses.", "red", ""));
+                    subentry.entries.listAppend(HTMLGenerateSpanFont("Change your thrall - Vampieroghi will remove curses.", "red"));
                 }
                 
                 if ($effect[thrice-cursed].have_effect() > 0)
@@ -288,7 +292,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                     subentry.entries.listAppend("Need three more curses." + curse_details);
                 }
                 if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE && $skill[Shake it off].skill_is_usable())
-                    subentry.entries.listAppend(HTMLGenerateSpanFont("Avoid using Shake It Off to heal", "red", "") + ", it'll remove the curse.");
+                    subentry.entries.listAppend(HTMLGenerateSpanFont("Avoid using Shake It Off to heal", "red") + ", it'll remove the curse.");
         
                 if (__misc_state["have hipster"])
                     subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
@@ -350,7 +354,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                     {
                         if (files_not_found > 0)
                         {
-                            subentry.entries.listAppend(HTMLGenerateSpanFont("Go adventure in the apartment building for files instead.", "red", ""));
+                            subentry.entries.listAppend(HTMLGenerateSpanFont("Go adventure in the apartment building for files instead.", "red"));
                         }
                     }
                 }
@@ -477,7 +481,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                     if (hidden_tavern_unlocked)
                     {
                         if ($item[bowl of scorpions].item_amount() == 0 && !$monster[drunk pygmy].is_banished())
-                            subentry.entries.listAppend(HTMLGenerateSpanFont("Buy a bowl of scorpions", "red", "") + " from the Hidden Tavern to free run from drunk pygmys.");
+                            subentry.entries.listAppend(HTMLGenerateSpanFont("Buy a bowl of scorpions", "red") + " from the Hidden Tavern to free run from drunk pygmys.");
                     }
                     else
                     {
@@ -507,7 +511,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 boolean should_output = true;
             
                 if ($item[book of matches].available_amount() > 0)
-                    subentry.entries.listAppend(HTMLGenerateSpanFont("Use book of matches.", "red", ""));
+                    subentry.entries.listAppend(HTMLGenerateSpanFont("Use book of matches.", "red"));
                 else
                 {
                     if (janitors_relocated_to_park)

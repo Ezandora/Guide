@@ -58,7 +58,7 @@ void QMeatsmithGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             subentry.header = "The Skeleton Store";
         string line = "Could acquire a ring of telling skeletons what to do, by opening the chest at the NC";
         if ($item[skeleton key].item_amount() == 0)
-            line += HTMLGenerateSpanFont(" after acquiring a skeleton key", "red", "");
+            line += HTMLGenerateSpanFont(" after acquiring a skeleton key", "red");
             
         line += ".";
         subentry.entries.listAppend(line);

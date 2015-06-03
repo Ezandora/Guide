@@ -321,9 +321,9 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
             return questPropertyPastInternalStepNumber("questL04Bat", 2);
         case $location[the beanbat chamber]:
             return questPropertyPastInternalStepNumber("questL04Bat", 3);
-        case $location[pre-cyrpt cemetary]:
-            return get_property("questL07Cyrptic") != "finished"; //FIXME is this always open?
-        case $location[post-cyrpt cemetary]:
+        case lookupLocation("The Unquiet Garves"):
+            return true;
+        case lookupLocation("The VERY Unquiet Garves"):
             return get_property("questL07Cyrptic") == "finished";
         case $location[the boss bat's lair]:
             if ($location[the boss bat's lair].combatTurnsAttemptedInLocation() > 0)
@@ -394,11 +394,104 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
         case $location[sloppy seconds diner]:
         case $location[the sunken party yacht]:
             return (get_property_boolean("_sleazeAirportToday") || get_property_boolean("sleazeAirportAlways"));
+        case lookupLocation("Pirates of the Garbage Barges"):
+        case lookupLocation("Barf Mountain"):
+        case lookupLocation("The Toxic Teacups"):
+        case lookupLocation("Uncle Gator's Country Fun-Time Liquid Waste Sluice"):
+            return (get_property_boolean("_stenchAirportToday") || get_property_boolean("stenchAirportAlways"));
+        case lookupLocation("Kokomo Resort"):
+            return lookupEffect("Tropical Contact High").have_effect() > 0;
+        case $location[Dreadsylvanian Woods]:
+        case $location[Dreadsylvanian Village]:
+        case $location[Dreadsylvanian Castle]:
+            //FIXME not correct - does not take account whether the dungeon is open and the areas are unlocked
+            return get_clan_id() > 0 && my_level() >= 15;
+        case $location[A Barroom Brawl]:
+            return questPropertyPastInternalStepNumber("questL03Rat", 1);
+        case $location[The Laugh Floor]:
+        case $location[Pandamonium Slums]:
+        case $location[Infernal Rackets Backstage]:
+            return questPropertyPastInternalStepNumber("questM10Azazel", 1);
+        case $location[The Degrassi Knoll Restroom]:
+        case $location[The Degrassi Knoll Bakery]:
+        case $location[The Degrassi Knoll Gym]:
+        case $location[The Degrassi Knoll Garage]:
+            return !knoll_available();
+        case $location[Thugnderdome]:
+            return gnomads_available() && my_basestat(my_primestat()) >= 25;
+        case $location[outskirts of camp logging camp]:
+        case $location[camp logging camp]:
+            return canadia_available();
+        ///FIXME test grimstone masks against their progress?
+        case $location[Sweet-Ade Lake]:
+        case $location[Eager Rice Burrows]:
+        case $location[Gumdrop Forest]:
+            return get_property("grimstoneMaskPath") == "witch";
+        case $location[The Inner Wolf Gym]:
+        case $location[Unleash Your Inner Wolf]:
+            return get_property("grimstoneMaskPath") == "wolf";
+        case $location[A Deserted Stretch of I-911]:
+            return get_property("grimstoneMaskPath") == "hare";
+        case $location[A-Boo Peak]:
+        case $location[Twin Peak]:
+        case $location[Oil Peak]:
+            return questPropertyPastInternalStepNumber("questL09Topping", 2);
+        case $location[The Icy Peak]:
+            return get_property("questL08Trapper") == "finished"; //FIXME is it finished, or after defeating groar?
+        case $location[the bugbear pen]:
+            return knoll_available() && questPropertyPastInternalStepNumber("questM03Bugbear", 1) && get_property("questM03Bugbear") != "finished";
+        case $location[post-quest bugbear pens]:
+            return knoll_available() && get_property("questM03Bugbear") == "finished";
+        case $location[the thinknerd warehouse]:
+            return questPropertyPastInternalStepNumber("questM22Shirt", 1);
+        case lookupLocation("The Overgrown Lot"):
+            return questPropertyPastInternalStepNumber("questM24Doc", 1);
+        case lookupLocation("The Skeleton Store"):
+            if (questPropertyPastInternalStepNumber("questM23Meatsmith", 1))
+                return true;
+            //otherwise, don't know
+            break;
+        case $location[the old landfill]:
+            return questPropertyPastInternalStepNumber("questM19Hippy", 1);
+        case $location[The Hidden Apartment Building]:
+            return get_property_int("hiddenApartmentProgress") >= 1;
+        case $location[The Hidden Bowling Alley]:
+            return get_property_int("hiddenBowlingAlleyProgress") >= 1;
+        case $location[The Hidden Hospital]:
+            return get_property_int("hiddenHospitalProgress") >= 1;
+        case $location[The Hidden Office Building]:
+            return get_property_int("hiddenOfficeProgress") >= 1;
+        case $location[The Enormous Greater-Than Sign]:
+            return my_basestat(my_primestat()) >= 45 && get_property_int("lastPlusSignUnlock") != my_ascensions();
+        case $location[The dungeons of doom]:
+            return my_basestat(my_primestat()) >= 45 && get_property_int("lastPlusSignUnlock") == my_ascensions();
+        case $location[The "Fun" House]:
+            return questPropertyPastInternalStepNumber("questG04Nemesis", 2); //FIXME is 2 correct?
+        case $location[The Dark Neck of the Woods]:
+        case $location[The Dark Heart of the Woods]:
+        case $location[The Dark Elbow of the Woods]:
+            return QuestState("questL06Friar").in_progress;
+        case $location[The Goatlet]:
+            return questPropertyPastInternalStepNumber("questL08Trapper", 1);
+        case $location[The Penultimate Fantasy Airship]:
+            return questPropertyPastInternalStepNumber("questL10Garbage", 2);
+        case $location[anger man's level]:
+        case $location[fear man's level]:
+        case $location[doubt man's level]:
+        case $location[regret man's level]:
+            return get_campground()[$item[jar of psychoses (The Crackpot Mystic)]] > 0;
+        case $location[the gourd!]:
+            return get_campground()[$item[jar of psychoses (The Captain of the Gourd)]] > 0;
+        case $location[The Nightmare Meatrealm]:
+            return get_campground()[$item[jar of psychoses (The Meatsmith)]] > 0;
+        case $location[A Kitchen Drawer]:
+        case $location[A Grocery Bag]:
+            return get_campground()[$item[jar of psychoses (The Pretentious Artist)]] > 0;
 		default:
 			break;
 	}
-    if (loc.turnsAttemptedInLocation() > 0) //FIXME make this finer-grained, this is hacky
-        return true;
+    //if (loc.turnsAttemptedInLocation() > 0) //FIXME make this finer-grained, this is hacky
+        //return true;
 	
 	ErrorSet(able_to_find, "");
 	return false;
@@ -463,9 +556,13 @@ void locationAvailablePrivateInit()
 	string [int] zones_never_accessible = split_string_alternate(zones_never_accessible_string, ",");
 	
 	boolean [string] zone_accessibility_status = zones_never_accessible.listGeneratePresenceMap();
+    foreach s in zone_accessibility_status //invert
+    {
+        zone_accessibility_status[s] = false;
+    }
 	
 	
-	foreach loc in $locations[Shivering Timbers,A Skeleton Invasion!,The Cannon Museum,A Swarm of Yeti-Mounted Skeletons,The Bonewall,A Massive Flying Battleship,A Supply Train,The Bone Star,Grim Grimacite Site,A Pile of Old Servers,The Haunted Sorority House,Fightin' Fire,Super-Intense Mega-Grassfire,Fierce Flying Flames,Lord Flameface's Castle Entryway,Lord Flameface's Castle Belfry,Lord Flameface's Throne Room,A Stinking Abyssal Portal,A Scorching Abyssal Portal,A Terrifying Abyssal Portal,A Freezing Abyssal Portal,An Unsettling Abyssal Portal,A Yawning Abyssal Portal,The Space Odyssey Discotheque,The Spirit World]
+	foreach loc in $locations[Shivering Timbers,A Skeleton Invasion!,The Cannon Museum,A Swarm of Yeti-Mounted Skeletons,The Bonewall,A Massive Flying Battleship,A Supply Train,The Bone Star,Grim Grimacite Site,A Pile of Old Servers,The Haunted Sorority House,Fightin' Fire,Super-Intense Mega-Grassfire,Fierce Flying Flames,Lord Flameface's Castle Entryway,Lord Flameface's Castle Belfry,Lord Flameface's Throne Room,A Stinking Abyssal Portal,A Scorching Abyssal Portal,A Terrifying Abyssal Portal,A Freezing Abyssal Portal,An Unsettling Abyssal Portal,A Yawning Abyssal Portal,The Space Odyssey Discotheque,The Spirit World,The Crimbonium Mining Camp,WarBear Fortress (First Level),WarBear Fortress (Second Level),WarBear Fortress (Third Level)]
 	{
 		__la_location_is_available[loc] = false;
 	}
@@ -499,7 +596,6 @@ void locationAvailablePrivateInit()
 		else
 			zone_accessibility_status[zone] = false;
 	}
-	
 	
 	
 	
@@ -698,8 +794,8 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         lookup_map["The Degrassi Knoll Gym"] = "place.php?whichplace=knoll_hostile";
         lookup_map["The Degrassi Knoll Garage"] = "place.php?whichplace=knoll_hostile";
         lookup_map["The \"Fun\" House"] = "place.php?whichplace=plains";
-        lookup_map["Pre-Cyrpt Cemetary"] = "place.php?whichplace=plains";
-        lookup_map["Post-Cyrpt Cemetary"] = "place.php?whichplace=plains";
+        lookup_map["The Unquiet Garves"] = "place.php?whichplace=plains";
+        lookup_map["The VERY Unquiet Garves"] = "place.php?whichplace=plains";
         lookup_map["Tower Ruins"] = "fernruin.php";
         lookup_map["Fernswarthy's Basement"] = "basement.php";
         lookup_map["Cobb's Knob Barracks"] = "cobbsknob.php";
@@ -896,7 +992,7 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
             lookup_map[s] = "place.php?whichplace=airport_sleaze";
         foreach s in $strings[The Mansion of Dr. Weirdeaux,The Deep Dark Jungle,The Secret Government Laboratory]
             lookup_map[s] = "place.php?whichplace=airport_spooky";
-        foreach s in $strings[Pirates of the Garbage Barges,Barf Mountain,The Toxic Teacups,Uncle Gator's Fun-Time Liquid Waste Sluice]
+        foreach s in $strings[Pirates of the Garbage Barges,Barf Mountain,The Toxic Teacups,Uncle Gator's Country Fun-Time Liquid Waste Sluice]
             lookup_map[s] = "place.php?whichplace=airport_stench";
         
         foreach s in $strings[Medbay,Waste Processing,Sonar,Science Lab,Morgue,Special Ops,Engineering,Navigation,Galley]

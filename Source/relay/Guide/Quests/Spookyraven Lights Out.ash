@@ -56,7 +56,7 @@ void QSpookyravenLightsOutGenerateEntry(ChecklistEntry [int] task_entries, Check
                     first_line += "Situationally useful (+familiar weight) in-run. ";
             }
             if (next_stephen_location == lookupLocation("The Haunted Laboratory"))
-                first_line += HTMLGenerateSpanFont("Will take a turn.", "red", "");
+                first_line += HTMLGenerateSpanFont("Will take a turn.", "red");
             else
                 first_line += "Will not take a turn.";
             
@@ -93,7 +93,7 @@ void QSpookyravenLightsOutGenerateEntry(ChecklistEntry [int] task_entries, Check
             if (__misc_state["In run"])
                 first_line += "Not useful in-run. ";
             if (next_elizabeth_location == $location[The Haunted Gallery])
-                first_line += HTMLGenerateSpanFont("Will take a turn.", "red", "");
+                first_line += HTMLGenerateSpanFont("Will take a turn.", "red");
             else
                 first_line += "Will not take a turn.";
             

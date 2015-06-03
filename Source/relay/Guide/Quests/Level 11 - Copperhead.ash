@@ -105,12 +105,12 @@ void QLevel11RonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         
         if ($item[lynyrd musk].available_amount() > 0 && $effect[Musky].have_effect() == 0)
         {
-            subentry.entries.listAppend(HTMLGenerateSpanFont("Use lynyrd musk.", "red", ""));
+            subentry.entries.listAppend(HTMLGenerateSpanFont("Use lynyrd musk.", "red"));
             url = "inventory.php?which=3";
         }
         if ($item[cigarette lighter].available_amount() > 0 && base_quest_state.state_boolean["need protestor speed tricks"])
         {
-            subentry.entries.listAppend(HTMLGenerateSpanFont("Use cigarette lighter in-combat.", "red", ""));
+            subentry.entries.listAppend(HTMLGenerateSpanFont("Use cigarette lighter in-combat.", "red"));
         }
         if ($item[lynyrd snare].available_amount() > 0 && $items[lynyrdskin cap,lynyrdskin tunic,lynyrdskin breeches].items_missing().count() > 0) //FIXME daily tracking
         {
@@ -215,7 +215,7 @@ void QLevel11RonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         
         if ($item[glark cable].available_amount() > 0)
         {
-            subentry.entries.listAppend(HTMLGenerateSpanFont("Use glark cable in-combat.", "red", ""));
+            subentry.entries.listAppend(HTMLGenerateSpanFont("Use glark cable in-combat.", "red"));
         }
             
         if ($item[priceless diamond].available_amount() > 0 && $item[red zeppelin ticket].available_amount() == 0)

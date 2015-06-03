@@ -76,7 +76,7 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
             {
                 string arrow_text = " (arrow?)";
                 if (get_property_int("_badlyRomanticArrows") > 0)
-                    arrow_text = HTMLGenerateSpanFont(arrow_text, "gray", "");
+                    arrow_text = HTMLGenerateSpanFont(arrow_text, "gray");
                 fax += arrow_text;
             }
         
@@ -141,7 +141,7 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
                 string line = "Writing desk - <strong>only if you can copy it four times</strong>. Skips the manor's first floor if you fight five total.";
                 
                 if (lookupItem("telegram from Lady Spookyraven").available_amount() > 0)
-                    line += HTMLGenerateSpanFont("<br>Read the telegram from Lady Spookyraven first.", "red", "");
+                    line += HTMLGenerateSpanFont("<br>Read the telegram from Lady Spookyraven first.", "red");
                 potential_faxes.listAppend(line);
             }
         }
@@ -170,7 +170,7 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
                 string line = "Giant swarm of ghuol whelps - +ML - with a copy possibly";
                 if (!__quest_state["Level 7"].started)
                 {
-                    line = HTMLGenerateSpanFont(line + " (wait until quest started)", "gray", "");
+                    line = HTMLGenerateSpanFont(line + " (wait until quest started)", "gray");
                 }
                 potential_faxes.listAppend(line);
             }
@@ -180,7 +180,7 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
                 string line = "Modern zmobie - with copies/arrows";
                 if (!__quest_state["Level 7"].started)
                 {
-                    line = HTMLGenerateSpanFont(line + " (wait until quest started)", "gray", "");
+                    line = HTMLGenerateSpanFont(line + " (wait until quest started)", "gray");
                 }
                 
                 potential_faxes.listAppend(line);
@@ -207,7 +207,7 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
             {
                 string description = "Screambat - unlocks a single bat lair area";
                 if (!__quest_state["Level 4"].in_progress)
-                    description = HTMLGenerateSpanFont(description, "gray", "");
+                    description = HTMLGenerateSpanFont(description, "gray");
                 potential_faxes.listAppend(description);
             }
             //drunken half-orc hobo (smiths)
@@ -223,7 +223,7 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
             {
                 string description = "Dirty thieving brigand - nuns trick.";
                 if (!__quest_state["Level 12"].state_boolean["War started"])
-                    description = HTMLGenerateSpanFont(description, "gray", "");
+                    description = HTMLGenerateSpanFont(description, "gray");
                 potential_faxes.listAppend(description);
             }
             //monstrous boiler
@@ -231,7 +231,7 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
             {
                 string description = "Monstrous boiler - charge up unstable fulminate.";
                 if (lookupItem("unstable fulminate").available_amount() == 0)
-                    description = HTMLGenerateSpanFont(description, "gray", "");
+                    description = HTMLGenerateSpanFont(description, "gray");
                 potential_faxes.listAppend(description);
             }
             if (true) //not sure about this

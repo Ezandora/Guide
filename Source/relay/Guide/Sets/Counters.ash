@@ -71,7 +71,7 @@ string [int] SCountersGenerateDescriptionForRainMonster()
     
     if (my_mp() > 50)
     {
-        monster_descriptions["storm cow"] += HTMLGenerateSpanFont(", burn MP to 50 to survive", "red", "");
+        monster_descriptions["storm cow"] += HTMLGenerateSpanFont(", burn MP to 50 to survive", "red");
     }
     
     boolean have_usable_last_terrain = (last_terrain == "outdoor" || last_terrain == "indoor" || last_terrain == "underground");

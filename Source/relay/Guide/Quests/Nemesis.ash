@@ -354,11 +354,11 @@ void QNemesisGenerateIslandTasks(ChecklistSubentry subentry)
             
             string [int] passive_uneffect_description = PDSGenerateDescriptionToUneffectPassives();
             if (passive_uneffect_description.count() > 0)
-                subentry.entries.listAppend(HTMLGenerateSpanFont(passive_uneffect_description.listJoinComponents("|"), "red", ""));
+                subentry.entries.listAppend(HTMLGenerateSpanFont(passive_uneffect_description.listJoinComponents("|"), "red"));
                 
             if (!$slot[weapon].equipped_item().weapon_is_club())
             {
-                subentry.entries.listAppend(HTMLGenerateSpanFont("Equip a club" + ($effect[Iron Palms].have_effect() > 0 ? " or sword" : "") + " first.", "red", ""));
+                subentry.entries.listAppend(HTMLGenerateSpanFont("Equip a club" + ($effect[Iron Palms].have_effect() > 0 ? " or sword" : "") + " first.", "red"));
             }
         }
     }
@@ -428,7 +428,7 @@ void QNemesisGenerateClownTasks(ChecklistSubentry subentry)
             {
                 string line2 = "Equip " + suggested_outfit.listJoinComponents(", ", "and") + ".";
                 if (__last_adventure_location == $location[The "Fun" House])
-                    line2 = HTMLGenerateSpanFont(line2, "red", "");
+                    line2 = HTMLGenerateSpanFont(line2, "red");
                 line += "|" + line2;
             }
             else
@@ -522,12 +522,16 @@ void QNemesisGenerateCaveTasks(ChecklistSubentry subentry, item legendary_epic_w
                 string suggested_drink = "pink pony";
                 int suggested_drink_amount = 0;
                 
-                foreach it in $items[a little sump'm sump'm,bungle in the jungle,calle de miel,ducha de oro,fuzzbump,horizontal tango,ocean motion,perpendicular hula,pink pony,rockin' wagon,roll in the hay,slap and tickle,slip 'n' slide,tropical swill]
+                foreach it in $items[a little sump'm sump'm,bungle in the jungle,calle de miel,ducha de oro,fuzzbump,horizontal tango,ocean motion,perpendicular hula,pink pony,rockin' wagon,roll in the hay,slap and tickle,slip 'n' slide] //NOT tropical swill
                 {
                     if (it.available_amount() > suggested_drink_amount)
                     {
                         suggested_drink_amount = it.available_amount();
                         suggested_drink = it;
+                    }
+                    if (suggested_drink_amount == 0 && it.creatable_amount() > 0)
+                    {
+                        suggested_drink = it + " (make first)";
                     }
                 }
                 door_unlockers.listAppend(suggested_drink);
@@ -543,7 +547,7 @@ void QNemesisGenerateCaveTasks(ChecklistSubentry subentry, item legendary_epic_w
             if (it.to_string().to_lower_case() != v.to_lower_case())
                 continue;
             if (it.item_amount() == 0)
-                door_unlockers[key] = HTMLGenerateSpanFont(door_unlockers[key], "grey", "");
+                door_unlockers[key] = HTMLGenerateSpanFont(door_unlockers[key], "grey");
         }
         
         subentry.entries.listAppend("Open doors via " + door_unlockers.listJoinComponents(", then ") + ".");
@@ -689,7 +693,11 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             url = "guild.php";
         }
         else
+        {
             subentry.entries.listAppend("Acquire " + epic_weapon + ".");
+            subentry.entries.listAppend("Adventure in the Unquiet Garves until you unlock the tomb of the unknown, then solve the three puzzles.");
+            url = "place.php?whichplace=cemetery";
+        }
     }
     else if (base_quest_state.mafia_internal_step <= 2)
     {
@@ -866,7 +874,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 string line = s.to_string();
                 
                 if (!s.skill_is_usable())
-                    line = HTMLGenerateSpanFont(line, "grey", "");
+                    line = HTMLGenerateSpanFont(line, "grey");
                 
                 missing_saucespheres.listAppend(line);
             }

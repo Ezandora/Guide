@@ -166,7 +166,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
             int hp_damage_taken = spooky_damage_levels[4] + cold_damage_levels[4] + 2;
             string hp_string = hp_damage_taken + " HP";
             if (hp_damage_taken >= my_hp())
-                hp_string = HTMLGenerateSpanFont(hp_string, "red", "");
+                hp_string = HTMLGenerateSpanFont(hp_string, "red");
             
             if (hp_damage_taken <= my_maxhp())
                 can_survive_clues_now = true;
@@ -176,7 +176,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
                 hp_damage_taken = spooky_damage_levels[3] + cold_damage_levels[3] + 2;
                 string hp_string = hp_damage_taken + " HP";
                 if (hp_damage_taken >= my_hp())
-                    hp_string = HTMLGenerateSpanFont(hp_string, "red", "");
+                    hp_string = HTMLGenerateSpanFont(hp_string, "red");
                 
                 line += "|Or ";
                 line += hp_string;
@@ -260,7 +260,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
                 have_at_least_one_usable_option = true;
             
             if (!have_at_least_one_usable_option)
-                details.listAppend(HTMLGenerateSpanFont("Avoid adventuring in area until requirements met.", "red", ""));
+                details.listAppend(HTMLGenerateSpanFont("Avoid adventuring in area until requirements met.", "red"));
             
             string [int] options_left;
             
@@ -270,7 +270,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
                 if (options_left.count() == 0)
                     line = line.capitalizeFirstLetter(); //have to pre-capitalize because of possible HTML later
                 if (!can_complete_stench)
-                    line = HTMLGenerateSpanFont(line, "gray", "");
+                    line = HTMLGenerateSpanFont(line, "gray");
                 options_left.listAppend(line);
             }
             if (!item_completed)
@@ -279,7 +279,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
                 if (options_left.count() == 0)
                     line = line.capitalizeFirstLetter();
                 if (!can_complete_item)
-                    line = HTMLGenerateSpanFont(line, "gray", "");
+                    line = HTMLGenerateSpanFont(line, "gray");
                 options_left.listAppend(line);
             }
             if (!jar_completed)
@@ -288,7 +288,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
                 if (options_left.count() == 0)
                     line = line.capitalizeFirstLetter();
                 if (!can_complete_jar)
-                    line = HTMLGenerateSpanFont(line, "gray", "");
+                    line = HTMLGenerateSpanFont(line, "gray");
                 options_left.listAppend(line);
             }
             if (!init_completed)
@@ -297,7 +297,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
                 if (options_left.count() == 0)
                     line = line.capitalizeFirstLetter();
                 if (!can_complete_init)
-                    line = HTMLGenerateSpanFont(line, "gray", "");
+                    line = HTMLGenerateSpanFont(line, "gray");
                 options_left.listAppend(line);
             }
             
@@ -327,7 +327,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
 			
 			if ($item[jar of oil].available_amount() == 0 && !jar_completed)
             {
-                string line = HTMLGenerateSpanFont("Jar of oil required", "red", "") + ".";
+                string line = HTMLGenerateSpanFont("Jar of oil required", "red") + ".";
                 if ($item[bubblin' crude].available_amount() >= 12)
                     line += " Can make by multi-using 12 bubblin' crude.";
                 else
@@ -398,7 +398,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
             string line = "Run +" + HTMLGenerateSpanFont("20/50", "", "0.8em") + "/100 ML (at ";
             string adjustment = "+" + oil_ml + " ML";
             if (oil_ml < 100)
-                adjustment = HTMLGenerateSpanFont(adjustment, "red", "");
+                adjustment = HTMLGenerateSpanFont(adjustment, "red");
             adjustment += ")";
             details.listAppend(line + adjustment);
             

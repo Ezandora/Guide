@@ -31,11 +31,11 @@ void SMayoClinicGenerateResource(ChecklistEntry [int] available_resources_entrie
         {
         }
     }
-    if (!get_property_boolean("_mayoTankSoaked"))
+    if (!get_property_boolean("_mayoTankSoaked") && __misc_state["in run"])
     {
         string [int] description;
         string [int] benefits;
-        if (__misc_state["in run"] && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING)
+        if (my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING)
             benefits.listAppend("HP restore");
         benefits.listAppend("+2 all resistance");
         description.listAppend("Gives " + benefits.listJoinComponents(", ", "and") + ".");

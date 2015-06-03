@@ -766,7 +766,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             if (my_hp() < my_maxhp() && current_room <= 1)
             {
                 //FIXME only output this if we won't make it.
-                subentry.entries.listAppend(HTMLGenerateSpanFont("Restore your HP first.", "red", ""));
+                subentry.entries.listAppend(HTMLGenerateSpanFont("Restore your HP first.", "red"));
             }
         }
             
@@ -790,7 +790,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 string key_name_output = key_name.replace_string(" key", "");
                 if (key_item.available_amount() == 0)
                 {
-                    key_name_output = HTMLGenerateSpanFont(key_name_output, "grey", "");
+                    key_name_output = HTMLGenerateSpanFont(key_name_output, "grey");
                     missing_keys.listAppend(key_item);
                 }
                 keys_to_use.listAppend(key_name_output);
@@ -829,7 +829,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             if (my_hp() < my_maxhp())
             {
                 //FIXME only output this if we won't make it.
-                subentry.entries.listAppend(HTMLGenerateSpanFont("Restore your HP first.", "red", ""));
+                subentry.entries.listAppend(HTMLGenerateSpanFont("Restore your HP first.", "red"));
             }
         }
     }
@@ -871,7 +871,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         //estimated turns?
         if (my_hp() < my_maxhp())
         {
-            subentry.entries.listAppend(HTMLGenerateSpanFont("Restore your HP first.", "red", ""));
+            subentry.entries.listAppend(HTMLGenerateSpanFont("Restore your HP first.", "red"));
         }
     }
     else if (!base_quest_state.state_boolean["past tower level 3"])
@@ -894,7 +894,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             
             string [int] passives_to_remove = PDSGenerateDescriptionToUneffectPassives();
             if (passives_to_remove.count() > 0)
-                subentry.entries.listAppend(HTMLGenerateSpanFont(passives_to_remove.listJoinComponents("|"), "red", ""));
+                subentry.entries.listAppend(HTMLGenerateSpanFont(passives_to_remove.listJoinComponents("|"), "red"));
             //FIXME HACK USE A LIBRARY
             /*string [int] things_to_do;
             foreach it in $items[hand in glove,MagiMechTech NanoMechaMech,bottle opener belt buckle,old-school calculator watch,ant hoe,ant pick,ant pitchfork,ant rake,ant sickle,fishy wand,moveable feast,oversized fish scaler,plastic pumpkin bucket,tiny bowler,cup of infinite pencils,double-ice box,smirking shrunken head,mr. haggis,stapler bear,dubious loincloth,muddy skirt,bottle of Goldschn&ouml;ckered,acid-squirting flower,ironic oversized sunglasses,hippy protest button,cannonball charrrm bracelet,groovy prism necklace,spiky turtle shoulderpads,double-ice cap,parasitic headgnawer,eelskin hat,balloon shield,hot plate,Ol' Scratch's stove door,Oscus's garbage can lid,eelskin shield,eelskin pants,buddy bjorn]
@@ -908,7 +908,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                     things_to_do.listAppend("uneffect " + e);
             }
             if (things_to_do.count() > 0)
-                subentry.entries.listAppend(HTMLGenerateSpanFont(things_to_do.listJoinComponents(", ", "and").capitalizeFirstLetter() + ".", "red", ""));*/
+                subentry.entries.listAppend(HTMLGenerateSpanFont(things_to_do.listJoinComponents(", ", "and").capitalizeFirstLetter() + ".", "red"));*/
             
             if (lookupSkill("Garbage Nova").have_skill() && false) //calculations are incorrect
             {
@@ -936,10 +936,10 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 
                 int mp_needed = casts_needed * 50;
                 if (my_mp() < mp_needed)
-                    tasks.listAppend(HTMLGenerateSpanFont("Acquire " + mp_needed + " MP", "red", ""));
+                    tasks.listAppend(HTMLGenerateSpanFont("Acquire " + mp_needed + " MP", "red"));
                 if (my_buffedstat($stat[mysticality]) < min_myst_needed)
                 {
-                    tasks.listAppend(HTMLGenerateSpanFont("buff up to " + min_myst_needed + " mysticality", "red", ""));
+                    tasks.listAppend(HTMLGenerateSpanFont("buff up to " + min_myst_needed + " mysticality", "red"));
                 }
                 tasks.listAppend("cast garbage nova " + pluralizeWordy(casts_needed, "time", "times"));
                 
@@ -1037,7 +1037,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                             line += "|Expected meat cost: ";
                             
                             if (expected_meat_cost > my_meat())
-                                line += HTMLGenerateSpanFont(expected_meat_cost, "red", "");
+                                line += HTMLGenerateSpanFont(expected_meat_cost, "red");
                             else
                                 line += expected_meat_cost;
                             subentry.modifiers.listAppend("-mana cost");
@@ -1056,10 +1056,10 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 }
                 if (my_hp() < my_maxhp())
                 {
-                    subentry.entries.listAppend(HTMLGenerateSpanFont("Restore your HP first.", "red", ""));
+                    subentry.entries.listAppend(HTMLGenerateSpanFont("Restore your HP first.", "red"));
                 }
                 if (my_mp() < $skill[saucegeyser].mp_cost() * 4.0)
-                    subentry.entries.listAppend(HTMLGenerateSpanFont("Restore some MP first.", "red", ""));
+                    subentry.entries.listAppend(HTMLGenerateSpanFont("Restore some MP first.", "red"));
                 if (need_modifier_output)
                 {
                     subentry.modifiers.listAppend("mysticality");
@@ -1115,7 +1115,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         if (my_hp() < my_maxhp())
         {
             //FIXME only output this if we won't make it.
-            subentry.entries.listAppend(HTMLGenerateSpanFont("Restore your HP first.", "red", ""));
+            subentry.entries.listAppend(HTMLGenerateSpanFont("Restore your HP first.", "red"));
         }
 	}
     else if (!base_quest_state.state_boolean["king waiting to be freed"])
@@ -1169,7 +1169,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         }
         if (my_hp() < my_maxhp() && !get_property("lastEncounter").contains_text("The Naughty Sorceress") && __last_adventure_location != lookupLocation("The Naughty Sorceress' Chamber") && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING)
         {
-            subentry.entries.listAppend(HTMLGenerateSpanFont("Restore your HP first.", "red", ""));
+            subentry.entries.listAppend(HTMLGenerateSpanFont("Restore your HP first.", "red"));
         }
         
 	}
@@ -1238,13 +1238,13 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 subentry.entries.listAppend("Use " + HTMLGenerateSpanOfClass(monster_item, "r_bold") + ".");
             else
             {
-                subentry.entries.listAppend(HTMLGenerateSpanFont("Need " + HTMLGenerateSpanOfClass(monster_item, "r_bold") + ".", "red", ""));
+                subentry.entries.listAppend(HTMLGenerateSpanFont("Need " + HTMLGenerateSpanOfClass(monster_item, "r_bold") + ".", "red"));
                 output_tower_killing_ideas = true;
             }
         }
         else
         {
-            subentry.entries.listAppend(HTMLGenerateSpanFont("Need unknown item.", "red", ""));
+            subentry.entries.listAppend(HTMLGenerateSpanFont("Need unknown item.", "red"));
             output_tower_killing_ideas = true;
         }
         
@@ -1369,7 +1369,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             {
                 string line = "Accordion Bash";
                 if ($slot[weapon].equipped_item().item_type() != "accordion")
-                    line = HTMLGenerateSpanFont(line + " (equip accordion)", "gray", "");
+                    line = HTMLGenerateSpanFont(line + " (equip accordion)", "gray");
                 stun_sources.listAppend(line);
             }
             
@@ -1446,7 +1446,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 tower_killing_ideas.listAppend("Possibly cast Frigidalmatian.");
                 
             if (monster_level_adjustment() > 0)
-                tower_killing_ideas.listAppend(HTMLGenerateSpanFont("Try to reduce your ML", "red", "") + ", as it reduces damage done to them.");
+                tower_killing_ideas.listAppend(HTMLGenerateSpanFont("Try to reduce your ML", "red") + ", as it reduces damage done to them.");
                 
             if ((my_path_id() == PATH_HEAVY_RAINS || $item[water wings for babies].available_amount() >= 3) && $item[water wings for babies].equipped_amount() <3)
                 tower_killing_ideas.listAppend("Equip three water wings for babies to reduce ML. (increased damage)");

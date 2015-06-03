@@ -52,13 +52,13 @@ void SEventsCrimbo2014GenerateTasks(ChecklistEntry [int] task_entries, Checklist
                 description = "Gives " + need_mining_oil_for_effects.listJoinComponents("/") + " for " + effect_reasons.listJoinComponents(", ", "and") + ".";
                 
                 string url = "inventory.php?which=3";
-                task_entries.listAppend(ChecklistEntryMake("__item flask of mining oil", url, ChecklistSubentryMake(HTMLGenerateSpanFont("Use flask of mining oil before mining", "red", ""), "", HTMLGenerateSpanFont(description, "red", "")), -11));
+                task_entries.listAppend(ChecklistEntryMake("__item flask of mining oil", url, ChecklistSubentryMake(HTMLGenerateSpanFont("Use flask of mining oil before mining", "red"), "", HTMLGenerateSpanFont(description, "red")), -11));
             }
         }
         if (crimbonium_seen >= 6)
         {
             string url = lookupLocation("The Crimbonium Mine").getClickableURLForLocation();
-            task_entries.listAppend(ChecklistEntryMake("__item nugget of Crimbonium", url, ChecklistSubentryMake(HTMLGenerateSpanFont("Find another mine", "red", ""), "", HTMLGenerateSpanFont("Only six nuggets of Crimbonium to a mine.", "red", "")), -11));
+            task_entries.listAppend(ChecklistEntryMake("__item nugget of Crimbonium", url, ChecklistSubentryMake(HTMLGenerateSpanFont("Find another mine", "red"), "", HTMLGenerateSpanFont("Only six nuggets of Crimbonium to a mine.", "red")), -11));
         }
     }
     if (need_fast_suggestions)
@@ -67,7 +67,7 @@ void SEventsCrimbo2014GenerateTasks(ChecklistEntry [int] task_entries, Checklist
         string url = lookupLocation("The Crimbonium Mine").getClickableURLForLocation();
         if (!is_wearing_outfit("High-Radiation Mining Gear"))
             url = "inventory.php?which=2";
-        task_entries.listAppend(ChecklistEntryMake("__item nugget of Crimbonium", url, ChecklistSubentryMake(HTMLGenerateSpanFont("Mine for crimbonium", "red", ""), "", HTMLGenerateSpanFont("Will not cost a turn.", "red", "")), -11));
+        task_entries.listAppend(ChecklistEntryMake("__item nugget of Crimbonium", url, ChecklistSubentryMake(HTMLGenerateSpanFont("Mine for crimbonium", "red"), "", HTMLGenerateSpanFont("Will not cost a turn.", "red")), -11));
     }
     
     //Main crimbo:

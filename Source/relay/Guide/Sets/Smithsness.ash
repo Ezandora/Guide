@@ -93,7 +93,7 @@ void smithsnessGenerateSmithereensSuggestions(string [int] smithereen_suggestion
     {
         string line = "Golden Light: Yellow ray";
         if ($effect[everything looks yellow].have_effect() > 0)
-            line = HTMLGenerateSpanFont(line, "gray", "");
+            line = HTMLGenerateSpanFont(line, "gray");
 		smithereen_suggestions.listAppend(line);
     }
     

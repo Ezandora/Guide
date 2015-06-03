@@ -230,10 +230,13 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
         if (lookupItem("Sneaky Pete's leather jacket (collar popped)").equipped_amount() > 0 && turn_range.y > 1)
             details.listAppend("Could unpop your collar. (+20% meat)");
 	
-        if (__misc_state_int["pulls available"] > 0 && meat_drop_modifier() < 500.0)
+        if (__misc_state_int["pulls available"] > 0 && meat_drop_modifier() < 1000.0)
         {
+            int limit = 100;
+            if (meat_drop_modifier() < 600.0)
+                limit = 50;
             boolean [item] blacklist = $items[uncle greenspan's bathroom finance guide,black snowcone];
-            item [int] relevant_potions = ItemFilterGetPotionsCouldPullToAddToNumericModifier("Meat Drop", 50.0, blacklist);
+            item [int] relevant_potions = ItemFilterGetPotionsCouldPullToAddToNumericModifier("Meat Drop", limit, blacklist);
             string [int] relevant_potions_output;
             foreach key, it in relevant_potions
             {
@@ -291,7 +294,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
                     if (key == 0 && location_monsters[l][key].contains_text("tool "))
                         location_monsters[l][key] = "tool " + HTMLGenerateSpanFont(location_monsters[l][key].replace_string("tool ", ""), "grey", "");
                     else
-                        location_monsters[l][key] = HTMLGenerateSpanFont(location_monsters[l][key], "grey", "");
+                        location_monsters[l][key] = HTMLGenerateSpanFont(location_monsters[l][key], "grey");
                 }
             }
 
@@ -336,6 +339,10 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
                 {
                     details.listAppend("Read from the dictionary to stasis gremlins.");
                 }
+                else if ($item[facsimile dictionary].available_amount() > 0)
+                {
+                    details.listAppend("Read from the facsimile dictionary to stasis gremlins.");
+                }
                 else if ($item[seal tooth].available_amount() > 0)
                 {
                     details.listAppend("Use your seal tooth to stasis gremlins.");
@@ -345,7 +352,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
                     details.listAppend("Cast suckerpunch to stasis gremlins.");
                 }
                 else
-                    details.listAppend(HTMLGenerateSpanFont("Acquire a seal tooth", "red", "") + " to stasis gremlins. (from hermit)");
+                    details.listAppend(HTMLGenerateSpanFont("Acquire a seal tooth", "red") + " to stasis gremlins. (from hermit)");
                 if (!$monster[a.m.c. gremlin].is_banished())
                     details.listAppend("Potentially banish A.M.C. Gremlin.");
             }
@@ -583,7 +590,7 @@ void QLevel12GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         }
         if (lookupItem("talisman o' nam").available_amount() == 0 && !__quest_state["Level 11 Palindome"].finished)
         {
-            subentry.entries.listAppend("May want to " + HTMLGenerateSpanFont("acquire the Talisman o' Nam", "red", "") + " first.");
+            subentry.entries.listAppend("May want to " + HTMLGenerateSpanFont("acquire the Talisman o' Nam", "red") + " first.");
         }
         
         subentry.entries.listAppend(generateTurnsToSeeNoncombat(85, 3, "start war"));

@@ -215,7 +215,7 @@ void outputChecklists(Checklist [int] ordered_output_checklists)
     
     string chosen_message = generateRandomMessage();
     if (chosen_message.length() > 0)
-        PageWrite(HTMLGenerateDiv(chosen_message));
+        PageWrite(HTMLGenerateDivOfStyle(chosen_message, "padding-left:20px;padding-right:20px;"));
     PageWrite(HTMLGenerateTagWrap("div", "", mapMake("id", "extra_words_at_top")));
 	
 	

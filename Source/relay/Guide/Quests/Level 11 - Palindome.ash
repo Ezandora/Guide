@@ -72,7 +72,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
             {
                 if (my_meat() < 977)
                 {
-                    subentry.entries.listAppend(HTMLGenerateSpanFont("Possibly acquire 977 meat first", "red", "") + ", to gain extra stats from the other NC.");
+                    subentry.entries.listAppend(HTMLGenerateSpanFont("Possibly acquire 977 meat first", "red") + ", to gain extra stats from the other NC.");
                 }
                 else
                 {
@@ -174,7 +174,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                             line += "Have +300% item";
                         }
                         else
-                            line += HTMLGenerateSpanFont("Need +300% item", "red", "");
+                            line += HTMLGenerateSpanFont("Need +300% item", "red");
                         line += " and +combat.";
                         if (familiar_is_usable($familiar[jumpsuited hound dog]))
                             line += " (hound dog is useful for this)";
@@ -265,7 +265,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                 }
                 else
                 {
-                    subentry.entries.listAppend(HTMLGenerateSpanFont("Photograph Bob Racecar or Racecar Bob", "red", "") + " with disposable instant camera.");
+                    subentry.entries.listAppend(HTMLGenerateSpanFont("Photograph Bob Racecar or Racecar Bob", "red") + " with disposable instant camera.");
                     need_to_adventure_in_palindome = true;
                 }
             }

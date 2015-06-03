@@ -44,21 +44,24 @@ void SActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, Check
             
             description.listAppend("Adventure in the Secret Government Warehouse, use the items you find.");
             
+            int progress_remaining = clampi(40 - get_property_int("warehouseProgress"), 0, 40);
             if (lookupItem("warehouse inventory page").available_amount() > 0 && lookupItem("warehouse map page").available_amount() > 0)
             {
                 description.listClear();
                 description.listAppend("Use warehouse inventory page.");
                 url = "inventory.php?which=3";
             }
-            else if (lookupSkill("Lash of the Cobra").have_skill())
+            else if (progress_remaining > 0)
             {
-                description.listAppend("Use lash of the cobra on the clerk and guard.");
+                if (lookupSkill("Lash of the Cobra").have_skill())
+                {
+                    description.listAppend("Use lash of the cobra on the clerk and guard.");
+                }
+                else
+                {
+                    modifiers.listAppend("+item");
+                }
             }
-            else
-            {
-                modifiers.listAppend("+item");
-            }
-            
             string [int] items_available;
             foreach it in lookupItems("warehouse inventory page,warehouse map page")
             {
@@ -70,10 +73,9 @@ void SActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, Check
                 description.listAppend(items_available.listJoinComponents(", ", "and").capitalizeFirstLetter() + " available.");
             }
             
-            int progress_remaining = clampi(40 - get_property_int("warehouseProgress"), 0, 40);
             string line;// = pluralizeWordy(progress_remaining, "remaining aisle", "remaining aisles").capitalizeFirstLetter() + ".";
             if (progress_remaining <= 0)
-                line += "MacGuffin next turn.";
+                line += "MacGuffin next turn";
             else
                 line += "Fight " + progress_remaining + " more combats";
             if (progress_remaining > 1)
@@ -197,7 +199,7 @@ void SActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] available_resour
             
             /*string line = "Could upgrade your body with " + s + ".";
             if (ka_cost > ka.available_amount())
-                line = HTMLGenerateSpanFont(line, "grey", "");
+                line = HTMLGenerateSpanFont(line, "grey");
             description.listAppend(line);*/
             ka_table.listAppend(listMake(s, ka_cost, reason));
             break;
@@ -212,7 +214,7 @@ void SActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] available_resour
                 {
                     foreach key2 in ka_table[key]
                     {
-                        ka_table[key][key2] = HTMLGenerateSpanFont(ka_table[key][key2], "grey", "");
+                        ka_table[key][key2] = HTMLGenerateSpanFont(ka_table[key][key2], "grey");
                     }
                 }
             }

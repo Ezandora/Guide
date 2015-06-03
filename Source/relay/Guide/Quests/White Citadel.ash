@@ -82,7 +82,7 @@ void QWhiteCitadelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
         {
             string line = "Make opium grenade. (meatpaste poppy + poppy)";
             if (opium_grenade.available_amount() == 0)
-                line = HTMLGenerateSpanFont(line, "red", "");
+                line = HTMLGenerateSpanFont(line, "red");
             subentry.entries.listAppend(line);
         }
         
@@ -141,7 +141,7 @@ void QWhiteCitadelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
         
         line = "Careful: this will turn your familiars into pigs";
         if (!using_black_cat_equivalent)
-            line = HTMLGenerateSpanFont(line, "red", ""); //ruby red spanners
+            line = HTMLGenerateSpanFont(line, "red"); //ruby red spanners
         line += ", who are unable to do anything, until you defeat Circe.";
         
         if (using_black_cat_equivalent)

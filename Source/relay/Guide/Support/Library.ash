@@ -66,6 +66,7 @@ int PATH_HEAVY_RAINS = 22;
 int PATH_PICKY = 23;
 int PATH_STANDARD = 24;
 int PATH_ACTUALLY_ED_THE_UNDYING = 25;
+int PATH_ONE_CRAZY_RANDOM_SUMMER = 26;
 
 int __my_path_id_cached = -11;
 int my_path_id()
@@ -116,6 +117,8 @@ int my_path_id()
         __my_path_id_cached = PATH_STANDARD;
     else if (path_name == "Actually Ed the Undying")
         __my_path_id_cached = PATH_ACTUALLY_ED_THE_UNDYING;
+    else if (path_name == "One Crazy Random Summer")
+        __my_path_id_cached = PATH_ONE_CRAZY_RANDOM_SUMMER;
     else
         __my_path_id_cached = PATH_UNKNOWN;
     return __my_path_id_cached;
@@ -597,7 +600,7 @@ int totalDelayForLocation(location place)
     place_delays[$location[the haunted bedroom]] = 6; //a guess from spading
     place_delays[$location[the boss bat's lair]] = 4;
     place_delays[$location[the oasis]] = 5;
-    place_delays[$location[the hidden park]] = 5;
+    //place_delays[$location[the hidden park]] = 5; //no
     place_delays[$location[the haunted gallery]] = 5; //FIXME this is a guess, spade
     place_delays[$location[the haunted bathroom]] = 5;
     place_delays[$location[the haunted ballroom]] = 5; //FIXME rumored
@@ -1176,4 +1179,56 @@ int ka_dropped(monster m)
 boolean is_underwater_familiar(familiar f)
 {
     return $familiars[Barrrnacle,Emo Squid,Cuddlefish,Imitation Crab,Magic Dragonfish,Midget Clownfish,Rock Lobster,Urchin Urchin,Grouper Groupie,Squamous Gibberer,Dancing Frog,Adorable Space Buddy] contains f;
+}
+
+float calculateCurrentNinjaAssassinMaxDamage()
+{
+    
+	//float assassin_ml = 155.0 + monster_level_adjustment();
+    float assassin_ml = $monster[ninja snowman assassin].base_attack + 5.0;
+	float damage_absorption = raw_damage_absorption();
+	float damage_reduction = damage_reduction();
+	float moxie = my_buffedstat($stat[moxie]);
+	float cold_resistance = numeric_modifier("cold resistance");
+	float v = 0.0;
+	
+	//spaded by yojimboS_LAW
+	//also by soirana
+    
+	float myst_class_extra_cold_resistance = 0.0;
+	if (my_class() == $class[pastamancer] || my_class() == $class[sauceror] || my_class() == $class[avatar of jarlsberg])
+		myst_class_extra_cold_resistance = 0.05;
+	//Direct from the spreadsheet:
+	if (cold_resistance < 9)
+		v = ((((MAX((assassin_ml - moxie), 0.0) - damage_reduction) + 120.0) * MAX(0.1, MIN((1.1 - sqrt((damage_absorption/1000.0))), 1.0))) * ((1.0 - myst_class_extra_cold_resistance) - ((0.1) * MAX((cold_resistance - 5.0), 0.0))));
+	else
+		v = ((((MAX((assassin_ml - moxie), 0.0) - damage_reduction) + 120.0) * MAX(0.1, MIN((1.1 - sqrt((damage_absorption/1000.0))), 1.0))) * (0.1 - myst_class_extra_cold_resistance + (0.5 * (powf((5.0/6.0), (cold_resistance - 9.0))))));
+	
+    
+    
+	return v;
+}
+
+float calculateCurrentNinjaAssassinMaxEnvironmentalDamage()
+{
+    float v = 0.0;
+    int ml_level = monster_level_adjustment_ignoring_plants();
+    if (ml_level >= 25)
+    {
+        float expected_assassin_damage = 0.0;
+        
+        expected_assassin_damage = ((150 + ml_level) * (ml_level - 25)).to_float() / 500.0;
+        
+        expected_assassin_damage = expected_assassin_damage + ceiling(expected_assassin_damage / 11.0); //upper limit
+        
+        //FIXME add in resists later
+        //Resists don't work properly. They have an effect, but it's different. I don't know how much exactly, so for now, ignore this:
+        //I think they're probably just -5 like above
+        //expected_assassin_damage = damageTakenByElement(expected_assassin_damage, $element[cold]);
+        
+        expected_assassin_damage = ceil(expected_assassin_damage);
+        
+        v += expected_assassin_damage;
+    }
+    return v;
 }

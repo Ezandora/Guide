@@ -172,7 +172,7 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
     if (bounty_item_name == "burned-out arcanodiode")
     {
         if (monster_level_adjustment() < 20)
-            subentry.entries.listAppend(HTMLGenerateSpanFont("Run +20 ML to find more MechaMechs.", "red", ""));
+            subentry.entries.listAppend(HTMLGenerateSpanFont("Run +20 ML to find more MechaMechs.", "red"));
     }
     
     return subentry;

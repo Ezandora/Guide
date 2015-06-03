@@ -143,7 +143,7 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
             
             if (delay_for_semirare)
             {
-                task = HTMLGenerateSpanFont("Avoid fighting Ed the Undying, semi-rare coming up ", "red", "");
+                task = HTMLGenerateSpanFont("Avoid fighting Ed the Undying, semi-rare coming up ", "red");
             }
             else
             {
@@ -214,7 +214,7 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
             
             int extra_spin_sources_needed = clampi(total_spins_needed - amount, 0, 11);
             if (extra_spin_sources_needed > 0)
-                subentry.entries.listAppend("Need " + HTMLGenerateSpanFont(int_to_wordy(extra_spin_sources_needed), "red", "") + " more ratchet/wheel" + ((extra_spin_sources_needed > 1) ? "s" : "") + ".");
+                subentry.entries.listAppend("Need " + HTMLGenerateSpanFont(int_to_wordy(extra_spin_sources_needed), "red") + " more ratchet/wheel" + ((extra_spin_sources_needed > 1) ? "s" : "") + ".");
             else
                 subentry.entries.listAppend("Have enough wheels.");
             /*if (amount > 0)

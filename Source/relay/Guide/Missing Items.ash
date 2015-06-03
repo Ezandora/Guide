@@ -69,6 +69,10 @@ void generateMissingItems(Checklist [int] checklists)
                 if (__misc_state["fax equivalent accessible"] && in_hardcore()) //not suggesting this in SC
                     options.listAppend("Fax/copy a ghost");
                 options.listAppend("8-bit realm (olfact blooper, slow)");
+                
+                int total_white_pixels = $item[white pixel].available_amount() + $item[white pixel].creatable_amount();
+                if (total_white_pixels > 0)
+                    options.listAppend(total_white_pixels + "/30 white pixels found.");
             }
             //FIXME URL?
 			items_needed_entries.listAppend(ChecklistEntryMake("__item digital key", "", ChecklistSubentryMake("Digital key", "", options)));

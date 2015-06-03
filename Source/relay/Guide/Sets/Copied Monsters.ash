@@ -1,54 +1,4 @@
-float calculateCurrentNinjaAssassinMaxDamage()
-{
-    
-	//float assassin_ml = 155.0 + monster_level_adjustment();
-    float assassin_ml = $monster[ninja snowman assassin].base_attack + 5.0;
-	float damage_absorption = raw_damage_absorption();
-	float damage_reduction = damage_reduction();
-	float moxie = my_buffedstat($stat[moxie]);
-	float cold_resistance = numeric_modifier("cold resistance");
-	float v = 0.0;
-	
-	//spaded by yojimboS_LAW
-	//also by soirana
-    
-	float myst_class_extra_cold_resistance = 0.0;
-	if (my_class() == $class[pastamancer] || my_class() == $class[sauceror] || my_class() == $class[avatar of jarlsberg])
-		myst_class_extra_cold_resistance = 0.05;
-	//Direct from the spreadsheet:
-	if (cold_resistance < 9)
-		v = ((((MAX((assassin_ml - moxie), 0.0) - damage_reduction) + 120.0) * MAX(0.1, MIN((1.1 - sqrt((damage_absorption/1000.0))), 1.0))) * ((1.0 - myst_class_extra_cold_resistance) - ((0.1) * MAX((cold_resistance - 5.0), 0.0))));
-	else
-		v = ((((MAX((assassin_ml - moxie), 0.0) - damage_reduction) + 120.0) * MAX(0.1, MIN((1.1 - sqrt((damage_absorption/1000.0))), 1.0))) * (0.1 - myst_class_extra_cold_resistance + (0.5 * (powf((5.0/6.0), (cold_resistance - 9.0))))));
-	
-    
-    
-	return v;
-}
 
-float calculateCurrentNinjaAssassinMaxEnvironmentalDamage()
-{
-    float v = 0.0;
-    int ml_level = monster_level_adjustment_ignoring_plants();
-    if (ml_level >= 25)
-    {
-        float expected_assassin_damage = 0.0;
-        
-        expected_assassin_damage = ((150 + ml_level) * (ml_level - 25)).to_float() / 500.0;
-        
-        expected_assassin_damage = expected_assassin_damage + ceiling(expected_assassin_damage / 11.0); //upper limit
-        
-        //FIXME add in resists later
-        //Resists don't work properly. They have an effect, but it's different. I don't know how much exactly, so for now, ignore this:
-        //I think they're probably just -5 like above
-        //expected_assassin_damage = damageTakenByElement(expected_assassin_damage, $element[cold]);
-        
-        expected_assassin_damage = ceil(expected_assassin_damage);
-        
-        v += expected_assassin_damage;
-    }
-    return v;
-}
 
 
 string generateNinjaSafetyGuide(boolean show_color)
@@ -95,7 +45,7 @@ string generateNinjaSafetyGuide(boolean show_color)
     }
 	
 	if (!can_survive && show_color)
-		result = HTMLGenerateSpanFont(result, "red", "");
+		result = HTMLGenerateSpanFont(result, "red");
 	return result;
 }
 
@@ -109,7 +59,7 @@ void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [in
         {
             string line = "Make sure to copy with angel, not the reanimator.";
             if (my_familiar() == $familiar[reanimated reanimator])
-                line = HTMLGenerateSpanFont(line, "red", "");
+                line = HTMLGenerateSpanFont(line, "red");
             description.listAppend(line);
         }
 	}
@@ -126,7 +76,7 @@ void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [in
 		}
 		line += "+150% item for large box";
 		if (show_details && !requirements_met)
-			line = HTMLGenerateSpanFont(line, "red", "");
+			line = HTMLGenerateSpanFont(line, "red");
 		description.listAppend(line);
 	}
     else if ($strings[bricko bat,bricko cathedral,bricko elephant,bricko gargantuchicken,bricko octopus,bricko ooze,bricko oyster,bricko python,bricko turtle,bricko vacuum cleaner] contains monster_name)
@@ -147,7 +97,7 @@ void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [in
         string attack_text = lfm_attack + " attack.";
         
 		if (my_buffedstat($stat[moxie]) < lfm_attack)
-			attack_text = HTMLGenerateSpanFont(attack_text, "red", "");
+			attack_text = HTMLGenerateSpanFont(attack_text, "red");
         
         line += attack_text;
         description.listAppend(line);
@@ -164,7 +114,7 @@ void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [in
     else if (monster_name == "Writing Desk")
     {
         if (lookupItem("telegram from Lady Spookyraven").available_amount() > 0)
-            description.listAppend(HTMLGenerateSpanFont("Read the telegram from Lady Spookyraven first.", "red", ""));
+            description.listAppend(HTMLGenerateSpanFont("Read the telegram from Lady Spookyraven first.", "red"));
         int desks_remaining = clampi(5 - get_property_int("writingDesksDefeated"), 0, 5);
         if (desks_remaining > 0 && get_property_int("lastSecondFloorUnlock") != my_ascensions() && $item[Lady Spookyraven's necklace].available_amount() == 0 && get_property("questM20Necklace") != "finished" && mafiaIsPastRevision(15244))
             description.listAppend(pluralizeWordy(desks_remaining, "desk", "desks").capitalizeFirstLetter() + " remaining.");
@@ -174,8 +124,11 @@ void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [in
     {
         description.listAppend("Have " + pluralize($item[star]) + " and " + pluralize($item[line]) + ".");
 		if (item_drop_modifier_ignoring_plants() < 234.0)
-			description.listAppend(HTMLGenerateSpanFont("Need +234% item.", "red", ""));
+			description.listAppend(HTMLGenerateSpanFont("Need +234% item.", "red"));
     }
+    
+    if (__misc_state["monsters can be nearly impossible to kill"] && monster_level_adjustment() > 0)
+        description.listAppend(HTMLGenerateSpanFont("Possibly remove +ML to survive. (at +" + monster_level_adjustment() + " ML)", "red"));
 }
 
 void generateCopiedMonstersEntry(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, boolean from_task) //if from_task is false, assumed to be from resources
@@ -352,7 +305,7 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] available_resources_en
         description.listPrepend("50% success rate");
 		available_resources_entries.listAppend(ChecklistEntryMake("__item crappy camera", "", ChecklistSubentryMake("Crappy camera copy available", "", description)));
     }
-    if (get_property_boolean("chateauAvailable") && !get_property_boolean("_chateauMonsterFought") && mafiaIsPastRevision(15115))
+    if (__misc_state["Chateau Mantegna available"] && !get_property_boolean("_chateauMonsterFought") && mafiaIsPastRevision(15115))
     {
         string url = "place.php?whichplace=chateau";
         string header = "Chateau painting copy";
@@ -413,7 +366,7 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] available_resources_en
 	if (!get_property_boolean("_iceSculptureUsed"))
 		SCopiedMonstersGenerateResourceForCopyType(available_resources_entries, lookupItem("ice sculpture"), "ice sculpture", "iceSculptureMonster");
         
-	//if (get_property_boolean("chateauAvailable") && !get_property_boolean("_chateauMonsterFought") && mafiaIsPastRevision(15115))
+	//if (__misc_state["Chateau Mantegna available"] && !get_property_boolean("_chateauMonsterFought") && mafiaIsPastRevision(15115))
 		//SCopiedMonstersGenerateResourceForCopyType(available_resources_entries, $item[none], "chateau painting", "chateauMonster");
     
     SCopiedMonstersGenerateResourceForCopyType(available_resources_entries, $item[wax bugbear], "wax bugbear", "waxMonster");

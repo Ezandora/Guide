@@ -26,7 +26,7 @@ void SCouncilGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     description.listAppend("Start the " + reasons.listJoinComponents(", ", "and") + ".");
     
     if (!have_outfit_components("War Hippy Fatigues") && !have_outfit_components("Frat Warrior Fatigues") && !have_outfit_components("Filthy Hippy Disguise") && __quest_state["Level 12"].startable && !__quest_state["Level 12"].in_progress && !__quest_state["Level 12"].finished)
-        description.listAppend(HTMLGenerateSpanFont("May want to wait", "red", "") + " until you've acquired a filthy hippy disguise for acquiring a war outfit?");
+        description.listAppend(HTMLGenerateSpanFont("May want to wait", "red") + " until you've acquired a filthy hippy disguise for acquiring a war outfit?");
 	
 	task_entries.listAppend(ChecklistEntryMake("council", "place.php?whichplace=town", ChecklistSubentryMake("Visit the Council of Loathing", "", description)));
 }
