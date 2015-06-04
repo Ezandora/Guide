@@ -8,9 +8,6 @@ void QNemesisInit()
 	//questG04Nemesis
 	QuestState state;
     
-    //boolean should_quest_load = false;
-    //if ($items[distilled seal blood,turtle chain,high-octane olive oil,peppercorns of power,vial of mojo,golden reeds,hammer of smiting,chelonian morningstar,greek pasta of peril,17-alarm saucepan,shagadelic disco banjo,squeezebox of the ages,Sledgehammer of the V&aelig;lkyr,Flail of the Seven Aspects,Wrath of the Capsaician Pastalords,Windsor Pan of the Source,Seeger's Unstoppable Banjo,The Trickster's Trikitixa].available_amount() > 0 || $location[the "fun" house].turnsAttemptedInLocation() > 0) //they've done something with regard to the quest, let's quest load
-        //should_quest_load = true;
 	
 	QuestStateParseMafiaQuestProperty(state, "questG04Nemesis");
 	
@@ -28,7 +25,7 @@ void QNemesisInit()
         item [class] class_epic_weapons;
         class_epic_weapons[$class[seal clubber]] = $item[bjorn's hammer];
         class_epic_weapons[$class[turtle tamer]] = $item[mace of the tortoise];
-        class_epic_weapons[$class[pastamancer]] = $item[pasta of peril];
+        class_epic_weapons[$class[pastamancer]] = lookupItem("pasta spoon of peril");
         class_epic_weapons[$class[sauceror]] = $item[5-alarm saucepan];
         class_epic_weapons[$class[disco bandit]] = $item[disco banjo];
         class_epic_weapons[$class[accordion thief]] = $item[rock and roll legend];
@@ -40,7 +37,7 @@ void QNemesisInit()
         if (state.mafia_internal_step < 4 && $items[distilled seal blood,turtle chain,high-octane olive oil,Peppercorns of Power,vial of mojo,golden reeds].available_amount() > 0)
             state.mafia_internal_step = 4;
             
-        if (state.mafia_internal_step < 5 && $items[hammer of smiting,chelonian morningstar,greek pasta of peril,17-alarm saucepan,shagadelic disco banjo,squeezebox of the ages].available_amount() > 0)
+        if (state.mafia_internal_step < 5 && lookupItems("hammer of smiting,chelonian morningstar,greek pasta spoon of peril,17-alarm saucepan,shagadelic disco banjo,squeezebox of the ages").available_amount() > 0)
             state.mafia_internal_step = 5;
             
         if (state.mafia_internal_step < 6 && get_property("relayCounters").contains_text("Nemesis Assassin"))
@@ -642,7 +639,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     
     class_epic_weapons[$class[seal clubber]] = $item[bjorn's hammer];
     class_epic_weapons[$class[turtle tamer]] = $item[mace of the tortoise];
-    class_epic_weapons[$class[pastamancer]] = $item[pasta of peril];
+    class_epic_weapons[$class[pastamancer]] = lookupItem("pasta spoon of peril");
     class_epic_weapons[$class[sauceror]] = $item[5-alarm saucepan];
     class_epic_weapons[$class[disco bandit]] = $item[disco banjo];
     class_epic_weapons[$class[accordion thief]] = $item[rock and roll legend];
@@ -651,7 +648,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     
     class_legendary_epic_weapons[$class[seal clubber]] = $item[hammer of smiting];
     class_legendary_epic_weapons[$class[turtle tamer]] = $item[chelonian morningstar];
-    class_legendary_epic_weapons[$class[pastamancer]] = $item[greek pasta of peril];
+    class_legendary_epic_weapons[$class[pastamancer]] = lookupItem("greek pasta spoon of peril");
     class_legendary_epic_weapons[$class[sauceror]] = $item[17-alarm saucepan];
     class_legendary_epic_weapons[$class[disco bandit]] = $item[shagadelic disco banjo];
     class_legendary_epic_weapons[$class[accordion thief]] = $item[squeezebox of the ages];
@@ -684,7 +681,12 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     first_boss_name[$class[Disco Bandit]] = "The Spirit of New Wave";
     first_boss_name[$class[Accordion Thief]] = "Somerset Lopez, Dread Mariachi";
     
-    if (base_quest_state.mafia_internal_step <= 1)
+    if (!base_quest_state.started)
+    {
+        subentry.entries.listAppend("Speak to your guild to start the quest.|Then adventure in the Unquiet Garves until you unlock the tomb of the unknown, and solve the puzzle.");
+        url = "guild.php";
+    }
+    else if (base_quest_state.mafia_internal_step <= 1)
     {
         //1	One of your guild leaders has tasked you to recover a mysterious and unnamed artifact stolen by your Nemesis. Your first step is to smith an Epic Weapon
         if (have_epic_weapon)

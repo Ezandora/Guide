@@ -78,7 +78,12 @@ void generateMisc(Checklist [int] checklists)
         }
         if (adventures_lost > 0)
         {
-            description.listAppend("You'll miss out on " + pluralizeWordy(adventures_lost, "adventure", "adventures") + ". Alas.|Could work out in the gym, craft, or play arcade games.");
+            string [int] leisure_activities;
+            leisure_activities.listAppend("work out in the gym");
+            leisure_activities.listAppend("craft");
+            if ($item[game grid ticket].is_unrestricted())
+                leisure_activities.listAppend("play arcade games");
+            description.listAppend("You'll miss out on " + pluralizeWordy(adventures_lost, "adventure", "adventures") + ". Alas.|Could " + leisure_activities.listJoinComponents(", ", "or") + ".");
         }
         
         //this could be better (i.e. checking against current shirt and looking in inventory, etc.)

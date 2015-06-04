@@ -6,7 +6,7 @@ buffer generateLocationBar(boolean displaying_navbar)
     if (!playerIsLoggedIn())
         return bar;
     location l = __last_adventure_location;
-    if (!__setting_location_bar_uses_last_location)
+    if (!__setting_location_bar_uses_last_location && !get_property_boolean("_relay_guide_setting_ignore_next_adventure_for_location_bar")) //setting exists for ascension scripts that alter my_location() to a null value/noob cave whenever they're not adventuring somewhere specific, to avoid environment-based effects on modifiers.
         l = get_property_location("nextAdventure");
     //l = my_location();
     

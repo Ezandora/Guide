@@ -25,10 +25,14 @@ string generateRandomMessage()
             random_messages.listAppend("you are ascending at a reasonable pace, could do better");
         else
             random_messages.listAppend("you are ascending too slowly, ascend faster!");
+        
+        string what_does_the_spreadsheet_say = "saves a turn";
+        if (my_path_id() == PATH_ONE_CRAZY_RANDOM_SUMMER)
+            what_does_the_spreadsheet_say = "gives +fun";
         if ($item[optimal spreadsheet].equipped_amount() > 0)
-            random_messages.listAppend("every spreadsheet you wear saves a turn"); //sure, why not?
+            random_messages.listAppend("every spreadsheet you wear " + what_does_the_spreadsheet_say); //sure, why not?
         else
-            random_messages.listAppend("every spreadsheet you make saves a turn");
+            random_messages.listAppend("every spreadsheet you make " + what_does_the_spreadsheet_say);
     }
     
     string [string] holiday_messages;
