@@ -1,7 +1,7 @@
 //This script and its support scripts are in the public domain.
 
 //These settings are for development. Don't worry about editing them.
-string __version = "1.2.1";
+string __version = "1.2.2";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -12816,7 +12816,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 {
                     float base_stat = MAX(1.0, my_basestat(stat_type));
                     
-                    boolean [item] blacklist = $items[R&uuml;mpelstiltz,gummi snake,banana smoothie,banana supersucker,ennui-flavored potato chips,moonds,handful of laughing willow bark,ultrasoldier serum,kumquat supersucker,dennis's blessing of minerva,smart watch,mer-kin smartjuice,lump of saccharine maple sap,burt's blessing of bacchus,augmented-reality shades,mer-kin cooljuice,lobos mints,mariachi toothpaste,disco horoscope (virgo),pressurized potion of pulchritude,pressurized potion of perspicacity,pressurized potion of puissance,handful of crotchety pine needles,bruno's blessing of mars,fitness wristband,gummi salamander,bottle of fire,mer-kin strongjuice]; //limited/expensive content
+                    boolean [item] blacklist = $items[R&uuml;mpelstiltz,gummi snake,banana smoothie,banana supersucker,ennui-flavored potato chips,moonds,handful of laughing willow bark,ultrasoldier serum,kumquat supersucker,dennis's blessing of minerva,smart watch,mer-kin smartjuice,lump of saccharine maple sap,burt's blessing of bacchus,augmented-reality shades,mer-kin cooljuice,lobos mints,mariachi toothpaste,disco horoscope (virgo),pressurized potion of pulchritude,pressurized potion of perspicacity,pressurized potion of puissance,handful of crotchety pine needles,bruno's blessing of mars,fitness wristband,gummi salamander,bottle of fire,mer-kin strongjuice,snake,M-242,sparkler]; //limited/expensive/unusable content
                     item [int] relevant_potions = ItemFilterGetPotionsCouldPullToAddToNumericModifier(stat_type, 50, blacklist);
                     item [int] relevant_potions_source_2 = ItemFilterGetPotionsCouldPullToAddToNumericModifier(stat_type + " percent", 50.0 / base_stat * 100.0, blacklist);
                     
@@ -14534,9 +14534,6 @@ void QNemesisInit()
 	//questG04Nemesis
 	QuestState state;
     
-    //boolean should_quest_load = false;
-    //if ($items[distilled seal blood,turtle chain,high-octane olive oil,peppercorns of power,vial of mojo,golden reeds,hammer of smiting,chelonian morningstar,greek pasta of peril,17-alarm saucepan,shagadelic disco banjo,squeezebox of the ages,Sledgehammer of the V&aelig;lkyr,Flail of the Seven Aspects,Wrath of the Capsaician Pastalords,Windsor Pan of the Source,Seeger's Unstoppable Banjo,The Trickster's Trikitixa].available_amount() > 0 || $location[the "fun" house].turnsAttemptedInLocation() > 0) //they've done something with regard to the quest, let's quest load
-        //should_quest_load = true;
 	
 	QuestStateParseMafiaQuestProperty(state, "questG04Nemesis");
 	
@@ -14554,7 +14551,7 @@ void QNemesisInit()
         item [class] class_epic_weapons;
         class_epic_weapons[$class[seal clubber]] = $item[bjorn's hammer];
         class_epic_weapons[$class[turtle tamer]] = $item[mace of the tortoise];
-        class_epic_weapons[$class[pastamancer]] = $item[pasta of peril];
+        class_epic_weapons[$class[pastamancer]] = lookupItem("pasta spoon of peril");
         class_epic_weapons[$class[sauceror]] = $item[5-alarm saucepan];
         class_epic_weapons[$class[disco bandit]] = $item[disco banjo];
         class_epic_weapons[$class[accordion thief]] = $item[rock and roll legend];
@@ -14566,7 +14563,7 @@ void QNemesisInit()
         if (state.mafia_internal_step < 4 && $items[distilled seal blood,turtle chain,high-octane olive oil,Peppercorns of Power,vial of mojo,golden reeds].available_amount() > 0)
             state.mafia_internal_step = 4;
             
-        if (state.mafia_internal_step < 5 && $items[hammer of smiting,chelonian morningstar,greek pasta of peril,17-alarm saucepan,shagadelic disco banjo,squeezebox of the ages].available_amount() > 0)
+        if (state.mafia_internal_step < 5 && lookupItems("hammer of smiting,chelonian morningstar,greek pasta spoon of peril,17-alarm saucepan,shagadelic disco banjo,squeezebox of the ages").available_amount() > 0)
             state.mafia_internal_step = 5;
             
         if (state.mafia_internal_step < 6 && get_property("relayCounters").contains_text("Nemesis Assassin"))
@@ -15168,7 +15165,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     
     class_epic_weapons[$class[seal clubber]] = $item[bjorn's hammer];
     class_epic_weapons[$class[turtle tamer]] = $item[mace of the tortoise];
-    class_epic_weapons[$class[pastamancer]] = $item[pasta of peril];
+    class_epic_weapons[$class[pastamancer]] = lookupItem("pasta spoon of peril");
     class_epic_weapons[$class[sauceror]] = $item[5-alarm saucepan];
     class_epic_weapons[$class[disco bandit]] = $item[disco banjo];
     class_epic_weapons[$class[accordion thief]] = $item[rock and roll legend];
@@ -15177,7 +15174,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     
     class_legendary_epic_weapons[$class[seal clubber]] = $item[hammer of smiting];
     class_legendary_epic_weapons[$class[turtle tamer]] = $item[chelonian morningstar];
-    class_legendary_epic_weapons[$class[pastamancer]] = $item[greek pasta of peril];
+    class_legendary_epic_weapons[$class[pastamancer]] = lookupItem("greek pasta spoon of peril");
     class_legendary_epic_weapons[$class[sauceror]] = $item[17-alarm saucepan];
     class_legendary_epic_weapons[$class[disco bandit]] = $item[shagadelic disco banjo];
     class_legendary_epic_weapons[$class[accordion thief]] = $item[squeezebox of the ages];
@@ -15210,7 +15207,12 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     first_boss_name[$class[Disco Bandit]] = "The Spirit of New Wave";
     first_boss_name[$class[Accordion Thief]] = "Somerset Lopez, Dread Mariachi";
     
-    if (base_quest_state.mafia_internal_step <= 1)
+    if (!base_quest_state.started)
+    {
+        subentry.entries.listAppend("Speak to your guild to start the quest.|Then adventure in the Unquiet Garves until you unlock the tomb of the unknown, and solve the puzzle.");
+        url = "guild.php";
+    }
+    else if (base_quest_state.mafia_internal_step <= 1)
     {
         //1	One of your guild leaders has tasked you to recover a mysterious and unnamed artifact stolen by your Nemesis. Your first step is to smith an Epic Weapon
         if (have_epic_weapon)
@@ -31310,10 +31312,14 @@ string generateRandomMessage()
             random_messages.listAppend("you are ascending at a reasonable pace, could do better");
         else
             random_messages.listAppend("you are ascending too slowly, ascend faster!");
+        
+        string what_does_the_spreadsheet_say = "saves a turn";
+        if (my_path_id() == PATH_ONE_CRAZY_RANDOM_SUMMER)
+            what_does_the_spreadsheet_say = "gives +fun";
         if ($item[optimal spreadsheet].equipped_amount() > 0)
-            random_messages.listAppend("every spreadsheet you wear saves a turn"); //sure, why not?
+            random_messages.listAppend("every spreadsheet you wear " + what_does_the_spreadsheet_say); //sure, why not?
         else
-            random_messages.listAppend("every spreadsheet you make saves a turn");
+            random_messages.listAppend("every spreadsheet you make " + what_does_the_spreadsheet_say);
     }
     
     string [string] holiday_messages;
@@ -32277,7 +32283,12 @@ void generateMisc(Checklist [int] checklists)
         }
         if (adventures_lost > 0)
         {
-            description.listAppend("You'll miss out on " + pluralizeWordy(adventures_lost, "adventure", "adventures") + ". Alas.|Could work out in the gym, craft, or play arcade games.");
+            string [int] leisure_activities;
+            leisure_activities.listAppend("work out in the gym");
+            leisure_activities.listAppend("craft");
+            if ($item[game grid ticket].is_unrestricted())
+                leisure_activities.listAppend("play arcade games");
+            description.listAppend("You'll miss out on " + pluralizeWordy(adventures_lost, "adventure", "adventures") + ". Alas.|Could " + leisure_activities.listJoinComponents(", ", "or") + ".");
         }
         
         //this could be better (i.e. checking against current shirt and looking in inventory, etc.)
@@ -33362,7 +33373,7 @@ buffer generateLocationPopup(float bottom_coordinates)
 {
     buffer buf;
     location l = __last_adventure_location;
-    if (!__setting_location_bar_uses_last_location)
+    if (!__setting_location_bar_uses_last_location && !get_property_boolean("_relay_guide_setting_ignore_next_adventure_for_location_bar"))
         l = get_property_location("nextAdventure");
     if (!__setting_location_bar_uses_last_location)
         l = my_location();
@@ -34019,7 +34030,7 @@ buffer generateLocationBar(boolean displaying_navbar)
     if (!playerIsLoggedIn())
         return bar;
     location l = __last_adventure_location;
-    if (!__setting_location_bar_uses_last_location)
+    if (!__setting_location_bar_uses_last_location && !get_property_boolean("_relay_guide_setting_ignore_next_adventure_for_location_bar")) //setting exists for ascension scripts that alter my_location() to a null value/noob cave whenever they're not adventuring somewhere specific, to avoid environment-based effects on modifiers.
         l = get_property_location("nextAdventure");
     //l = my_location();
     
@@ -34662,7 +34673,7 @@ string [string] generateAPIResponse()
     else if (true)
     {
         //Checking every item is slow. But certain items won't trigger a reload, but need to. So:
-        boolean [item] relevant_items = $items[photocopied monster,4-d camera,pagoda plans,Elf Farm Raffle ticket,skeleton key,heavy metal thunderrr guitarrr,heavy metal sonata,Hey Deze nuts,rave whistle,damp old boot,map to Professor Jacking's laboratory,world's most unappetizing beverage,squirmy violent party snack,White Citadel Satisfaction Satchel,rusty screwdriver,giant pinky ring,The Lost Pill Bottle,GameInformPowerDailyPro magazine,dungeoneering kit,Knob Goblin encryption key,dinghy plans,Sneaky Pete's key,Jarlsberg's key,Boris's key,fat loot token,bridge,chrome ore,asbestos ore,linoleum ore,csa fire-starting kit,tropical orchid,stick of dynamite,barbed-wire fence,psychoanalytic jar,digital key,Richard's star key,star hat,star crossbow,star staff,star sword,Wand of Nagamar,Azazel's tutu,Azazel's unicorn,Azazel's lollipop,smut orc keepsake box,blessed large box,massive sitar,hammer of smiting,chelonian morningstar,greek pasta of peril,17-alarm saucepan,shagadelic disco banjo,squeezebox of the ages,E.M.U. helmet,E.M.U. harness,E.M.U. joystick,E.M.U. rocket thrusters,E.M.U. unit,wriggling flytrap pellet,Mer-kin trailmap,Mer-kin stashbox,Makeshift yakuza mask,Novelty tattoo sleeves,strange goggles,zaibatsu level 2 card,zaibatsu level 3 card,flickering pixel,jar of oil,bowl of scorpions,molybdenum magnet,steel lasagna,steel margarita,steel-scented air freshener,Grandma's Map,mer-kin healscroll,scented massage oil,soggy used band-aid,extra-strength red potion,red pixel potion,red potion,filthy poultice,gauze garter,green pixel potion,cartoon heart,red plastic oyster egg,Manual of Dexterity,Manual of Labor,Manual of Transmission,wet stunt nut stew,bjorn's hammer,mace of the tortoise,pasta of peril,5-alarm saucepan,disco banjo,rock and roll legend,lost key,resolution: be more adventurous,sugar sheet,sack lunch,glob of Blank-Out,gaudy key,plus sign,Newbiesport&trade; tent,Frobozz Real-Estate Company Instant House (TM),dry cleaning receipt,book of matches,rock band flyers,jam band flyers,disassembled clover,continuum transfunctioner,UV-resistant compass,eyepatch,carton of astral energy drinks,astral hot dog dinner,astral six-pack,gym membership card,tattered scrap of paper,bowling ball, snow boards,reassembled blackbird,reconstituted crow,louder than bomb,odd silver coin,grimstone mask,empty rain-doh can,Lord Spookyraven's spectacles,lump of Brituminous coal,bone rattle,mer-kin knucklebone,spooky glove,steam-powered model rocketship,crappy camera,shaking crappy camera,hedge maze puzzle,ghost of a necklace,telegram from Lady Spookyraven,Lady Spookyraven's finest gown,recipe: mortar-dissolving solution,disposable instant camera,unstable fulminate,thunder thigh,aquaconda brain,lightning milk,White Citadel Satisfaction Satchel,handful of smithereens,Loathing Legion jackhammer,lynyrd skin,red zeppelin ticket,lynyrd snare,glark cable,Fernswarthy's key,bottle of G&uuml;-Gone,BURT,handful of juicy garbage,Jeff Goldblum larva,imbued seal-blubber candle,claw of the infernal seal];
+        boolean [item] relevant_items = $items[photocopied monster,4-d camera,pagoda plans,Elf Farm Raffle ticket,skeleton key,heavy metal thunderrr guitarrr,heavy metal sonata,Hey Deze nuts,rave whistle,damp old boot,map to Professor Jacking's laboratory,world's most unappetizing beverage,squirmy violent party snack,White Citadel Satisfaction Satchel,rusty screwdriver,giant pinky ring,The Lost Pill Bottle,GameInformPowerDailyPro magazine,dungeoneering kit,Knob Goblin encryption key,dinghy plans,Sneaky Pete's key,Jarlsberg's key,Boris's key,fat loot token,bridge,chrome ore,asbestos ore,linoleum ore,csa fire-starting kit,tropical orchid,stick of dynamite,barbed-wire fence,psychoanalytic jar,digital key,Richard's star key,star hat,star crossbow,star staff,star sword,Wand of Nagamar,Azazel's tutu,Azazel's unicorn,Azazel's lollipop,smut orc keepsake box,blessed large box,massive sitar,hammer of smiting,chelonian morningstar,17-alarm saucepan,shagadelic disco banjo,squeezebox of the ages,E.M.U. helmet,E.M.U. harness,E.M.U. joystick,E.M.U. rocket thrusters,E.M.U. unit,wriggling flytrap pellet,Mer-kin trailmap,Mer-kin stashbox,Makeshift yakuza mask,Novelty tattoo sleeves,strange goggles,zaibatsu level 2 card,zaibatsu level 3 card,flickering pixel,jar of oil,bowl of scorpions,molybdenum magnet,steel lasagna,steel margarita,steel-scented air freshener,Grandma's Map,mer-kin healscroll,scented massage oil,soggy used band-aid,extra-strength red potion,red pixel potion,red potion,filthy poultice,gauze garter,green pixel potion,cartoon heart,red plastic oyster egg,Manual of Dexterity,Manual of Labor,Manual of Transmission,wet stunt nut stew,lost key,resolution: be more adventurous,sugar sheet,sack lunch,glob of Blank-Out,gaudy key,plus sign,Newbiesport&trade; tent,Frobozz Real-Estate Company Instant House (TM),dry cleaning receipt,book of matches,rock band flyers,jam band flyers,disassembled clover,continuum transfunctioner,UV-resistant compass,eyepatch,carton of astral energy drinks,astral hot dog dinner,astral six-pack,gym membership card,tattered scrap of paper,bowling ball, snow boards,reassembled blackbird,reconstituted crow,louder than bomb,odd silver coin,grimstone mask,empty rain-doh can,Lord Spookyraven's spectacles,lump of Brituminous coal,bone rattle,mer-kin knucklebone,spooky glove,steam-powered model rocketship,crappy camera,shaking crappy camera,hedge maze puzzle,ghost of a necklace,telegram from Lady Spookyraven,Lady Spookyraven's finest gown,recipe: mortar-dissolving solution,disposable instant camera,unstable fulminate,thunder thigh,aquaconda brain,lightning milk,White Citadel Satisfaction Satchel,handful of smithereens,Loathing Legion jackhammer,lynyrd skin,red zeppelin ticket,lynyrd snare,glark cable,Fernswarthy's key,bottle of G&uuml;-Gone,BURT,handful of juicy garbage,Jeff Goldblum larva,imbued seal-blubber candle,claw of the infernal seal];
         
         
         int [int] output;
@@ -34673,7 +34684,7 @@ string [string] generateAPIResponse()
                 output[it.to_int()] = it.available_amount();
         }
         
-        boolean [item] relevant_items_strings = lookupItemsArray($strings[poppy,opium grenade,talisman o' nam,toxic globule,yellow pixel]);
+        boolean [item] relevant_items_strings = lookupItemsArray($strings[poppy,opium grenade,talisman o' nam,toxic globule,yellow pixel,greek spoon pasta of peril]);
         foreach it in relevant_items_strings
         {
             if (it.available_amount() > 0)
