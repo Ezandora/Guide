@@ -34,6 +34,7 @@ void QuestsInit()
     QMartyInit();
     QMeatsmithInit();
     QGalaktikInit();
+    QOldLandfillInit();
     
     //has to happen after level 13 init... or not?
 	QManorInit();
@@ -77,6 +78,7 @@ void QuestsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     QMartyGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     QMeatsmithGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     QGalaktikGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+    QOldLandfillGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 }
 
 void QuestsGenerateResources(ChecklistEntry [int] available_resources_entries)

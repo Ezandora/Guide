@@ -929,7 +929,7 @@ void QStenchAirportWillWorkForFoodGenerateTasks(ChecklistEntry [int] task_entrie
     {
         subentry.entries.listAppend("Adventure in Barf Mountain, use complimentary Dinsey refreshments on garbage/angry tourists.");
         subentry.entries.listAppend(pluralizeWordy(tourists_to_feed, "more remains", "more remain").capitalizeFirstLetter() + ".");
-        subentry.modifiers.listAppend("olfact garbage tourists");
+        subentry.modifiers.listAppend("olfact angry/garbage tourists");
         
     }
     else
@@ -1009,6 +1009,79 @@ void QStenchAirportGarbageGenerateTasks(ChecklistEntry [int] task_entries)
     }
 }
 
+void QStenchAirportWartDinseyGenerateTasks(ChecklistEntry [int] task_entries)
+{
+    if (get_property_int("lastWartDinseyDefeated") == my_ascensions())
+        return;
+        
+    item dinsey_item;
+    if (my_class() == $class[seal clubber])
+        dinsey_item = lookupItem("Dinsey's oculus");
+    else if (my_class() == $class[turtle tamer])
+        dinsey_item = lookupItem("Dinsey's radar dish");
+    else if (my_class() == $class[pastamancer])
+        dinsey_item = lookupItem("Dinsey's pizza cutter");
+    else if (my_class() == $class[sauceror])
+        dinsey_item = lookupItem("Dinsey's brain");
+    else if (my_class() == $class[disco bandit])
+        dinsey_item = lookupItem("Dinsey's pants");
+    else if (my_class() == $class[accordion thief])
+        dinsey_item = lookupItem("Dinsey's glove");
+    if (!($classes[seal clubber,turtle tamer,pastamancer,sauceror,disco bandit,accordion thief] contains my_class())) //class-specific items only drop when you're class-specific
+        return;
+        
+    if (last_monster() != lookupMonster("Wart Dinsey"))
+    {
+        if (dinsey_item == $item[none] || haveAtLeastXOfItemEverywhere(dinsey_item, 1))
+            return;
+    }
+    boolean [item] keycards = lookupItems("keycard &alpha;,keycard &beta;,keycard &gamma;,keycard &delta;");
+    
+    item [int] missing_keycards;
+    foreach it in keycards
+    {
+        if (it.available_amount() == 0)
+        {
+            missing_keycards.listAppend(it);
+        }
+    }
+    if (missing_keycards.count() > 0)
+        return;
+        
+        
+	string url = "place.php?whichplace=airport_stench&action=airport3_tunnels";
+    string [int] description;
+    string [int] modifiers;
+    modifiers.listAppend("+" + MAX(250, lookupMonster("Wart Dinsey").base_initiative) + "% init");
+    modifiers.listAppend("+lots all resistance");
+    
+    item mercenary_pistol = lookupItem("mercenary pistol");
+    description.listAppend("Run +resistance, deal many sources of non-stench damage to him. (100 damage cap)");
+    if (mercenary_pistol.available_amount() > 0)
+    {
+        string [int] tasks;
+        if (mercenary_pistol.equipped_amount() == 0)
+            tasks.listAppend("equip a mercenary pistol");
+        item clip = lookupItem("special clip: boneburners");
+        if (clip.item_amount() == 0 && lookupItem("special clip: splatterers").item_amount() > 0)
+            clip = lookupItem("special clip: splatterers");
+        if (clip.item_amount() == 0)
+        {
+            tasks.listAppend("acquire a few clips of " + clip);
+        }
+        tasks.listAppend("throw " + clip + " in combat");
+        
+        description.listAppend(tasks.listJoinComponents(", ").capitalizeFirstLetter() + ".");
+    }
+    else
+    {
+        description.listAppend("The mercenary pistol is useful for this, if you can acquire one.");
+    }
+    description.listAppend("Will acquire a " + dinsey_item + ".");
+    
+	task_entries.listAppend(ChecklistEntryMake("__item " + dinsey_item, url, ChecklistSubentryMake("Defeat Wart Dinsey", modifiers, description)));
+}
+
 void QStenchAirportGenerateTasks(ChecklistEntry [int] task_entries)
 {
     if (!__misc_state["stench airport available"])
@@ -1024,6 +1097,7 @@ void QStenchAirportGenerateTasks(ChecklistEntry [int] task_entries)
     QStenchAirportGarbageGenerateTasks(task_entries);
     QStenchAirportGiveMeFuelGenerateTasks(task_entries);
     QStenchAirportWillWorkForFoodGenerateTasks(task_entries);
+    QStenchAirportWartDinseyGenerateTasks(task_entries);
 }
 
 void QAirportGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)

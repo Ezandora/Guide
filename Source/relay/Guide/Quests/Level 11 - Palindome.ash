@@ -46,7 +46,13 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
         subentry.entries.listAppend("Find the palindome. The pirates will know the way.");
         
         if (!is_wearing_outfit("Swashbuckling Getup") && $item[pirate fledges].equipped_amount() == 0)
+        {
+            if ($item[pirate fledges].available_amount() > 0 && $item[pirate fledges].can_equip())
+                subentry.entries.listAppend("Equip the pirate fledges first.");
+            else
+                subentry.entries.listAppend("Equip the Swashbuckling Getup first.");
             url = "inventory.php?which=2";
+        }
             
         if ($location[the poop deck].noncombat_queue.contains_text("It's Always Swordfish") || $location[belowdecks].turnsAttemptedInLocation() > 0)
         {

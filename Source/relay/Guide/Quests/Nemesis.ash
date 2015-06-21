@@ -16,73 +16,8 @@ void QNemesisInit()
 	
 	if (my_basestat(my_primestat()) >= 12)
 		state.startable = true;
-    
-    if (!state.finished && !mafiaIsPastRevision(14330))
-    {
-        //FIXME temporary code
-        //Internal checking:
-        
-        item [class] class_epic_weapons;
-        class_epic_weapons[$class[seal clubber]] = $item[bjorn's hammer];
-        class_epic_weapons[$class[turtle tamer]] = $item[mace of the tortoise];
-        class_epic_weapons[$class[pastamancer]] = lookupItem("pasta spoon of peril");
-        class_epic_weapons[$class[sauceror]] = $item[5-alarm saucepan];
-        class_epic_weapons[$class[disco bandit]] = $item[disco banjo];
-        class_epic_weapons[$class[accordion thief]] = $item[rock and roll legend];
-        item epic_weapon = class_epic_weapons[my_class()];
-        if (state.mafia_internal_step < 2 && epic_weapon.available_amount_ignoring_storage() > 0)
-            state.mafia_internal_step = 2;
-        
-        
-        if (state.mafia_internal_step < 4 && $items[distilled seal blood,turtle chain,high-octane olive oil,Peppercorns of Power,vial of mojo,golden reeds].available_amount() > 0)
-            state.mafia_internal_step = 4;
-            
-        if (state.mafia_internal_step < 5 && lookupItems("hammer of smiting,chelonian morningstar,greek pasta spoon of peril,17-alarm saucepan,shagadelic disco banjo,squeezebox of the ages").available_amount() > 0)
-            state.mafia_internal_step = 5;
-            
-        if (state.mafia_internal_step < 6 && get_property("relayCounters").contains_text("Nemesis Assassin"))
-            state.mafia_internal_step = 6;
-        
-        if (state.mafia_internal_step < 6 && get_property("questG05Dark") == "finished")
-            state.mafia_internal_step = 6;
-            
-        
-        if (state.mafia_internal_step < 15 && $item[secret tropical island volcano lair map].available_amount() > 0)
-            state.mafia_internal_step = 15;
-        
-        if (state.mafia_internal_step < 18 && $items[Sledgehammer of the V&aelig;lkyr,Flail of the Seven Aspects,Wrath of the Capsaician Pastalords,Windsor Pan of the Source,Seeger's Unstoppable Banjo,The Trickster's Trikitixa].available_amount() > 0)
-            state.mafia_internal_step = 18;
-            
-        if (state.mafia_internal_step < 17 && get_property("volcanoMaze1").length() > 0)
-            state.mafia_internal_step = 17;
-        
-        //Location-based:
-        if (state.mafia_internal_step == 15)
-        {
-            location [class] testing_location;
-            testing_location[$class[seal clubber]] = $location[the broodling grounds];
-            testing_location[$class[turtle tamer]] = $location[the outer compound];
-            testing_location[$class[pastamancer]] = $location[the temple portico];
-            testing_location[$class[sauceror]] = $location[convention hall lobby];
-            testing_location[$class[disco bandit]] = $location[outside the club];
-            testing_location[$class[accordion thief]] = $location[the island barracks];
-            
-            if (testing_location[my_class()].turnsAttemptedInLocation() > 0)
-                state.mafia_internal_step = 16;
-            if (state.mafia_internal_step < 16 && $location[The Nemesis' Lair].turnsAttemptedInLocation() > 0)
-                state.mafia_internal_step = 16;
-        }
-        if (state.mafia_internal_step < 16 && $skill[Gothy Handwave].skill_is_usable())
-            state.mafia_internal_step = 16;
-        if (state.mafia_internal_step < 16 && $items[Fouet de tortue-dressage,encoded cult documents,cult memo,spaghetti cult robe,hacienda key,bottle of G&uuml;-Gone].available_amount() > 0)
-            state.mafia_internal_step = 16;
-            
-        if (!state.in_progress && state.mafia_internal_step > 0)
-        {
-            //force start:
-            QuestStateParseMafiaQuestPropertyValue(state, "step" + (state.mafia_internal_step - 1));
-        }
-    }
+    if (!mafiaIsPastRevision(15935) && state.mafia_internal_step > 1)
+        state.mafia_internal_step += 4; //hack to support old versions, probably won't work
 	
 	__quest_state["Nemesis"] = state;
 }
@@ -686,9 +621,15 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         subentry.entries.listAppend("Speak to your guild to start the quest.|Then adventure in the Unquiet Garves until you unlock the tomb of the unknown, and solve the puzzle.");
         url = "guild.php";
     }
-    else if (base_quest_state.mafia_internal_step <= 1)
+    else if (base_quest_state.mafia_internal_step <= 4)
     {
         //1	One of your guild leaders has tasked you to recover a mysterious and unnamed artifact stolen by your Nemesis. Your first step is to smith an Epic Weapon
+        
+        //1 can be when Tomb of the Unknown Your Class Here is unlocked (think there's a missing quest step here?)
+        //2 can be fighting ghost
+        //4 can be nearing end
+        //5 -> return it
+        //6 -> returning
         if (have_epic_weapon)
         {
             subentry.entries.listAppend("Speak to your guild.");
@@ -701,13 +642,18 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             url = "place.php?whichplace=cemetery";
         }
     }
-    else if (base_quest_state.mafia_internal_step <= 2)
+    else if (base_quest_state.mafia_internal_step == 5)
+    {
+        subentry.entries.listAppend("Speak to your guild.");
+        url = "guild.php";
+    }
+    else if (base_quest_state.mafia_internal_step <= 2 + 4)
     {
         //2	To unlock the full power of the Legendary Epic Weapon, you must defeat Beelzebozo, the Clown Prince of Darkness,
         QNemesisGenerateClownTasks(subentry);
         url = "place.php?whichplace=plains";
     }
-    else if (base_quest_state.mafia_internal_step == 3 || base_quest_state.mafia_internal_step == 4)
+    else if (base_quest_state.mafia_internal_step == 3 + 4 || base_quest_state.mafia_internal_step == 4 + 4)
     {
         //3	You've finally killed the clownlord Beelzebozo
         //4	You've successfully defeated Beelzebozo and claimed the last piece of the Legendary Epic Weapon
@@ -721,13 +667,13 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             subentry.entries.listAppend("Make " + legendary_epic_weapon + ".");
         }
     }
-    else if (base_quest_state.mafia_internal_step == 5)
+    else if (base_quest_state.mafia_internal_step == 5 + 4)
     {
         //5	discovered where your Nemesis is hiding. It took long enough, jeez! Anyway, turns out it's a Dark and
         url = "cave.php";
         QNemesisGenerateCaveTasks(subentry,legendary_epic_weapon);
     }
-    else if (base_quest_state.mafia_internal_step >= 6 && base_quest_state.mafia_internal_step < 15)
+    else if (base_quest_state.mafia_internal_step >= 6 + 4 && base_quest_state.mafia_internal_step < 15 + 4)
     {
         //6	You have successfully shown your Nemesis what for, and claimed an ancient hat of power. It's pretty sweet
         //7	You showed the Epic Hat to the class leader back at your guild, but they didn't seem much impressed. I guess all this Nemesis nonsense isn't quite finished yet, but at least with your Nemesis in hiding again you won't have to worry about it for a while.
@@ -744,17 +690,17 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         
         if (mafiaIsPastRevision(14330))
         {
-            if (base_quest_state.mafia_internal_step < 9)
+            if (base_quest_state.mafia_internal_step < 9 + 4)
             {
                 assassin_up_next = "menacing thug";
                 assassins_left = 4;
             }
-            else if (base_quest_state.mafia_internal_step < 11)
+            else if (base_quest_state.mafia_internal_step < 11 + 4)
             {
                 assassin_up_next = "Mob Penguin hitman";
                 assassins_left = 3;
             }
-            else if (base_quest_state.mafia_internal_step < 13)
+            else if (base_quest_state.mafia_internal_step < 13 + 4)
             {
                 if (my_class() == $class[seal clubber])
                     assassin_up_next = "hunting seal";
@@ -841,7 +787,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         url = "inventory.php?which=3";
         subentry.entries.listAppend("Use the secret tropical island volcano lair map.");
     }
-    else if (base_quest_state.mafia_internal_step == 16 || base_quest_state.mafia_internal_step == 15) //mafia bug - doesn't advance properly
+    else if (base_quest_state.mafia_internal_step == 16 + 4 || base_quest_state.mafia_internal_step == 15 + 4) //mafia bug - doesn't advance properly
     {
         //16	You've arrived at the secret tropical island volcano lair, and it's time to finally put a stop to this Nemesis nonsense once and for all. As soon as you can find where they're hiding. Maybe you can find someone to ask
         if ($location[The Nemesis' Lair].turnsAttemptedInLocation() > 0)
@@ -855,10 +801,10 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             QNemesisGenerateIslandTasks(subentry);
         url = "volcanoisland.php";
     }
-    else if (base_quest_state.mafia_internal_step >= 17 && base_quest_state.mafia_internal_step <= 19)
+    else if (base_quest_state.mafia_internal_step >= 17 + 4 && base_quest_state.mafia_internal_step <= 19 + 4)
     {
         //17	Congratulations on solving the lava maze, which is probably the biggest pain-in-the-ass puzzle in the entire game! Hooray! (Unless you cheated, in which case
-        if (base_quest_state.mafia_internal_step == 17)
+        if (base_quest_state.mafia_internal_step == 17 + 4)
             subentry.entries.listAppend("Solve the volcano maze, then fight your nemesis.");
         else
             subentry.entries.listAppend("Fight your nemesis.");
@@ -884,6 +830,10 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             {
                 subentry.entries.listAppend("Acquire saucespheres: " + missing_saucespheres.listJoinComponents(", ", "and") + ".");
             }
+        }
+        if (my_class() == $class[pastamancer])
+        {
+            subentry.entries.listAppend("Run a potato familiar, and alternate casting entangling noodles twice/some sort of attack to keep the demon blocked.");
         }
     }
 	

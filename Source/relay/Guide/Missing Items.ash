@@ -69,6 +69,8 @@ void generateMissingItems(Checklist [int] checklists)
                 if (__misc_state["fax equivalent accessible"] && in_hardcore()) //not suggesting this in SC
                     options.listAppend("Fax/copy a ghost");
                 options.listAppend("8-bit realm (olfact blooper, slow)");
+                if (my_path_id() == PATH_ONE_CRAZY_RANDOM_SUMMER)
+                    options.listAppend("Wait for pixellated monsters");
                 
                 int total_white_pixels = $item[white pixel].available_amount() + $item[white pixel].creatable_amount();
                 if (total_white_pixels > 0)

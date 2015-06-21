@@ -1,5 +1,5 @@
 //These settings are for development. Don't worry about editing them.
-string __version = "1.2.2";
+string __version = "1.2.3.4.5"; //that's amazing, I have the same combination on my luggage
 
 //Debugging:
 boolean __setting_debug_mode = false;

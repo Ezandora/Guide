@@ -152,13 +152,27 @@ void generateTasks(Checklist [int] checklists)
         }
 		else if (trips_needed > 0)
 		{
-			string line_string = "Shore, " + (3 * trips_needed) + " adventures";
-			int meat_needed = trips_needed * 500;
+            int trip_adventure_cost = 3;
+            int trip_meat_cost = 500;
+            if (my_path_id() == PATH_WAY_OF_THE_SURPRISING_FIST)
+            {
+                trip_adventure_cost = 5;
+                trip_meat_cost = 5;
+            }
+			string line_string = "Shore, " + (trip_adventure_cost * trips_needed) + " adventures";
+			int meat_needed = trip_meat_cost * trips_needed;
 			if (my_meat() < meat_needed)
-				line_string += "|Need " + meat_needed + " meat for vacations, have " + my_meat() + "."; //FIXME what about way of the surprising fist?
+				line_string += "|Need " + meat_needed + " meat for vacations, have " + my_meat() + ".";
 			subentry.entries.listAppend(line_string);
             if ($item[skeleton].available_amount() > 0)
                 subentry.entries.listAppend("Skeletal skiff?");
+            
+            //Think this is slower, so don't suggest:
+            /*line_string = "Or try the hippy quest in the woods";
+            if (my_basestat(my_primesubstat()) < 25)
+                line_string += ", once your mainstat reaches 25";
+            line_string += ". (probably slower?)";
+            subentry.entries.listAppend(line_string);*/
 		}
 		else
 		{
@@ -311,6 +325,11 @@ void generateTasks(Checklist [int] checklists)
 			else
 				potential_targets.listAppend("A bat. (sonar-in-a-biscuit)");
 		}
+        
+        if (__misc_state["stench airport available"] && lookupItem("filthy child leash").available_amount() == 0 && !__misc_state["familiars temporarily blocked"] && $items[ittah bittah hookah,astral pet sweater,snow suit,lead necklace].available_amount() == 0 && !can_interact() && my_path_id() != PATH_HEAVY_RAINS)
+        {
+            potential_targets.listAppend("Horrible tourist family (barf mountain) - +5 familiar weight leash.");
+        }
 		
 		
 		if (item_drop_modifier_ignoring_plants() < 234.0 && !__misc_state["In aftercore"])
@@ -356,10 +375,10 @@ void generateTasks(Checklist [int] checklists)
 		string [int] description;
 		string [int] modifiers;
 		description.listAppend("Missing " + missing_pieces.listJoinComponents(", ", "and") + ".");
-		description.listAppend("Yellow-ray a hippy if you can.");
+		description.listAppend("Yellow-ray a hippy in the hippy camp if you can.");
 		if (my_level() >= 9)
 		{
-			description.listAppend("Otherwise, run -combat.");
+			description.listAppend("Otherwise, run -combat there.");
 			modifiers.listAppend("-combat");
 		}
 		else

@@ -498,7 +498,7 @@ string generateRandomMessage()
 	{
 		random_messages.listClear();
         monster last_monster = get_property_monster("lastEncounter");
-        if (last_monster == $monster[storm cow] && last_monster != $monster[none])
+        if (last_monster == $monster[storm cow])
             random_messages.listAppend("<pre>^__^            <br>(oo)\\_______    <br>(__)\\       )\\/\\<br>    ||----w |   <br>    ||     ||   </pre>");
         else
             random_messages.listAppend("ow");

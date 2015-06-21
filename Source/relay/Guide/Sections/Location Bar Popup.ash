@@ -900,8 +900,6 @@ buffer generateLocationPopup(float bottom_coordinates)
     location l = __last_adventure_location;
     if (!__setting_location_bar_uses_last_location && !get_property_boolean("_relay_guide_setting_ignore_next_adventure_for_location_bar"))
         l = get_property_location("nextAdventure");
-    if (!__setting_location_bar_uses_last_location)
-        l = my_location();
     if (!__setting_enable_location_popup_box)
         return buf;
     
@@ -1374,8 +1372,8 @@ buffer generateLocationPopup(float bottom_coordinates)
                         stats_l1.listAppend(average_meat.round() + " meat");
                 }
             }
-            //if (m.raw_attack > 0 && false) //is this really useful?
-                //stats_l2.listAppend(m.raw_attack + " ML");
+            if (m.raw_attack > 0) //is this really useful?
+                stats_l2.listAppend(m.raw_attack + " ML");
             //if (m.raw_defense > 0)
                 //stats_l2.listAppend(m.raw_defense + " def");
             

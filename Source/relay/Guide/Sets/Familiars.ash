@@ -80,6 +80,119 @@ void SFamiliarsGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [
     }
 }
 
+void SFamiliarsPuckGenerateResource(ChecklistEntry [int] available_resources_entries)
+{
+    if (!__misc_state["in run"])
+        return;
+    ChecklistSubentry [int] puck_subentries;
+    item yellow_pixel = lookupItem("yellow pixel");
+    string url = "";
+    familiar relevant_familiar = lookupFamiliar("Ms. Puck Man");
+    if (!relevant_familiar.familiar_is_usable() && lookupFamiliar("Puck Man").familiar_is_usable())
+        relevant_familiar = lookupFamiliar("Puck Man");
+    if (lookupItem("power pill").available_amount() > 0)
+    {
+        puck_subentries.listAppend(ChecklistSubentryMake(lookupItem("power pill").pluralize().capitalizeFirstLetter(), "", "Use in combat to instakill without costing a turn."));
+    }
+    if (mafiaIsPastRevision(15961) && (lookupFamiliar("Ms. Puck Man").familiar_is_usable() || lookupFamiliar("Puck Man").familiar_is_usable()))
+    {
+        int power_pills_remaining = MAX(0, MIN(11, my_daycount() + 1) - get_property_int("_powerPillDrops"));
+        if (power_pills_remaining > 0)
+        {
+            string [int] description;
+            
+            string line = "Saves a turn each.";
+            if (my_familiar() != lookupFamiliar("Ms. Puck Man") && my_familiar() != lookupFamiliar("Puck Man") && url.length() == 0)
+            {
+                url = "familiar.php";
+                line += " Drops from " + relevant_familiar + ".";
+            }
+            description.listAppend(line);
+            
+            puck_subentries.listAppend(ChecklistSubentryMake(pluralize(power_pills_remaining, "power pill", "power pills") + " obtainable", "", description));
+        }
+    }
+    if (yellow_pixel != $item[none] && yellow_pixel.available_amount() > 0)
+    {
+        string title = pluralize(yellow_pixel);
+        string [int] description;
+        url = "shop.php?whichshop=mystic"; //"place.php?whichplace=forestvillage&action=fv_mystic";
+        //Pixel coin - 10 yellow pixels - 2k autosell (marginal)
+        //minature power pill - 15 yellow pixels - +100% all stats, 30 turns
+        //pixel star - 15 yellow pixels, 2 black pixels - 30 turns of +100% HP/MP/spell damage/weapon damage
+        //pixel banana - 10 yellow pixels, 1 black pixel - 2-size awesome food, 10 turns of +30% item
+        //pixel beer - 10 yellow pixels, 5 white pixels - 2-size awesome drunk, 10 turns of +3 stats/fight (15 mainstat)
+        boolean [item] items_to_always_show;
+        items_to_always_show[lookupItem("yellow pixel potion")] = true;
+        if (!__misc_state["mysterious island available"])
+            items_to_always_show[lookupItem("yellow submarine")] = true;
+        
+        item [int] evalulation_order;
+        evalulation_order.listAppend(lookupItem("yellow pixel potion"));
+        evalulation_order.listAppend(lookupItem("pixel coin")); //before potions
+        
+        string [item] reasons;
+        reasons[lookupItem("pixel coin")] = "Autosells for 2000 meat.";
+        reasons[lookupItem("pixel star")] = "+100% HP/MP/spell/weapon damage. (30 turns)";
+        reasons[lookupItem("miniature power pill")] = "+100% stats. (30 turns)";
+        reasons[lookupItem("yellow pixel potion")] = "+20ML. (20 turns)";
+        if (!__misc_state["mysterious island available"])
+            reasons[lookupItem("yellow submarine")] = "island unlock";
+        //these (should) show up in mafia's consumption manager, so disabled
+        /*if (__misc_state["can eat just about anything"])
+            reasons[lookupItem("pixel banana")] = "2-size awesome food, 10 turns of +30% item.";
+        if (__misc_state["can drink just about anything"])
+            reasons[lookupItem("pixel beer")] = "2-size awesome drunk, 10 turns of +3 stats/fight.";*/
+        
+        boolean [item] evaluated;
+        foreach key, it in evalulation_order
+            evaluated[it] = true;
+        foreach it in reasons
+        {
+            if (!(evaluated contains it))
+            {
+                evaluated[it] = true;
+                evalulation_order.listAppend(it);
+            }
+        }
+        
+        foreach key, it in evalulation_order
+        {
+            string reason = reasons[it];
+            if (reason.length() == 0)
+                continue;
+            if (it == $item[none])
+                continue;
+            if (it.creatable_amount() == 0 && !items_to_always_show[it])
+                continue;
+            string line;
+            line = it.capitalizeFirstLetter() + ": " + reason;
+            if (it.creatable_amount() == 0)
+                line = HTMLGenerateSpanFont(line, "grey");
+            description.listAppend(line);
+        }
+        string [int] consumables;
+        if (__misc_state["can eat just about anything"])
+            consumables.listAppend("food");
+        if (__misc_state["can drink just about anything"])
+            consumables.listAppend("drink");
+        if (consumables.count() > 0)
+        {
+            string line = consumables.listJoinComponents(", ").capitalizeFirstLetter() + ".";
+            if (lookupItem("yellow pixel").available_amount() < 10)
+                line = HTMLGenerateSpanFont(line, "grey");
+            description.listAppend(line);
+        }
+        int importance = 9;
+        puck_subentries.listAppend(ChecklistSubentryMake(title, "", description));
+    }
+    if (puck_subentries.count() > 0)
+    {
+        available_resources_entries.listAppend(ChecklistEntryMake("__familiar " + relevant_familiar, url, puck_subentries, 9));
+    }
+
+}
+
 void SFamiliarsGenerateResource(ChecklistEntry [int] available_resources_entries)
 {
 	if (__misc_state["free runs usable"] && ($familiar[pair of stomping boots].familiar_is_usable() || ($skill[the ode to booze].skill_is_usable() && $familiar[Frumious Bandersnatch].familiar_is_usable())))
@@ -303,68 +416,8 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] available_resources_entries
         available_resources_entries.listAppend(ChecklistEntryMake("__familiar grim brother", url, ChecklistSubentryMake(title, "", description), importance));
     }
     
-    item yellow_pixel = lookupItem("yellow pixel");
-    if (yellow_pixel != $item[none] && yellow_pixel.available_amount() > 0 && __misc_state["in run"])
-    {
-        string title = pluralize(yellow_pixel);
-        string [int] description;
-        string url = "place.php?whichplace=forestvillage&action=fv_mystic"; //"shop.php?whichshop=mystic";
-        //Pixel coin - 10 yellow pixels - 2k autosell (marginal)
-        //power pill - 25 yellow pixels - instakill
-        //pixel star - 15 yellow pixels, 2 black pixels - 30 turns of +100% HP/MP/spell damage/weapon damage
-        //pixel banana - 10 yellow pixels, 1 black pixel - 2-size awesome food, 10 turns of +30% item
-        //pixel beer - 10 yellow pixels, 5 white pixels - 2-size awesome drunk, 10 turns of +3 stats/fight (15 mainstat)
-        boolean [item] items_to_always_show;
-        items_to_always_show[lookupItem("power pill")] = true;
-        
-        item [int] evalulation_order;
-        evalulation_order.listAppend(lookupItem("power pill"));
-        
-        string [item] reasons;
-        if (my_meat() < 20000)
-            reasons[lookupItem("pixel coin")] = "Autosells 2000 meat. (marginal)";
-        reasons[lookupItem("power pill")] = "Zero-turn instakill.";
-        reasons[lookupItem("pixel star")] = "+100% HP/MP/spell/weapon damage. (30 turns)";
-        //these (should) show up in mafia's consumption manager and they are fairly marginal, so disabled
-        /*if (__misc_state["can eat just about anything"])
-            reasons[lookupItem("pixel banana")] = "2-size awesome food, 10 turns of +30% item.";
-        if (__misc_state["can drink just about anything"])
-            reasons[lookupItem("pixel beer")] = "2-size awesome drunk, 10 turns of +3 stats/fight.";*/
-        
-        boolean [item] evaluated;
-        foreach key, it in evalulation_order
-            evaluated[it] = true;
-        foreach it in reasons
-        {
-            if (!(evaluated contains it))
-            {
-                evaluated[it] = true;
-                evalulation_order.listAppend(it);
-            }
-        }
-        
-        foreach key, it in evalulation_order
-        {
-            string reason = reasons[it];
-            if (reason.length() == 0)
-                continue;
-            if (it == $item[none])
-                continue;
-            if (it.creatable_amount() == 0 && !items_to_always_show[it])
-                continue;
-            string line;
-            line = it.capitalizeFirstLetter() + ": " + reason;
-            if (it.creatable_amount() == 0)
-                line = HTMLGenerateSpanFont(line, "grey");
-            description.listAppend(line);
-        }
-        int importance = 9;
-        available_resources_entries.listAppend(ChecklistEntryMake("__familiar ms. puck man", url, ChecklistSubentryMake(title, "", description), importance));
-    }
-    if (lookupItem("power pill").available_amount() > 0 && __misc_state["in run"])
-    {
-        available_resources_entries.listAppend(ChecklistEntryMake("__item power pill", "", ChecklistSubentryMake(lookupItem("power pill").pluralize().capitalizeFirstLetter(), "", "Use in combat to instakill without costing a turn."), 9));
-    }
+    
+    SFamiliarsPuckGenerateResource(available_resources_entries);
     
     //FIXME small medium, organ grinder, charged boots
 	SFamiliarsGenerateEntry(available_resources_entries, available_resources_entries, false);

@@ -372,7 +372,7 @@ boolean CounterWanderingMonsterMayHitInXTurns(int turns)
         if (CounterLookup(s).CounterExists() && CounterLookup(s).CounterMayHitInXTurns(turns))
             return true;
     }
-    if (get_property_int("_romanticFightsLeft") > 0 && !CounterLookup("Romantic Monster").CounterExists()) //mafia will clear the romantic monster window if it goes out of bounds
+    if (get_property_int("_romanticFightsLeft") > 0 && !CounterLookup("Romantic Monster").CounterExists() && my_path_id() != PATH_ONE_CRAZY_RANDOM_SUMMER) //mafia will clear the romantic monster window if it goes out of bounds
         return true;
     return false;
 }
@@ -394,7 +394,7 @@ boolean CounterWanderingMonsterMayHitNextTurn()
         if (c.CounterExists() && c.CounterMayHitNextTurn())
             return true;
     }
-    if (get_property_int("_romanticFightsLeft") > 0 && !CounterLookup("Romantic Monster").CounterExists()) //mafia will clear the romantic monster window if it goes out of bounds
+    if (get_property_int("_romanticFightsLeft") > 0 && !CounterLookup("Romantic Monster").CounterExists() && my_path_id() != PATH_ONE_CRAZY_RANDOM_SUMMER) //mafia will clear the romantic monster window if it goes out of bounds
         return true;
     
     return false;

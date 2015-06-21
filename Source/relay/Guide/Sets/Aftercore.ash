@@ -153,6 +153,47 @@ void SAftercoreThingsToDoGenerateTasks(ChecklistEntry [int] task_entries, Checkl
         if (description_items.count() > 0)
             options.listAppend(AftercoreOptionMake("mer-kin temple in the sea", "", listMake("can find " + description_items.listJoinComponents(", ", "or"))));
     }
+    if (__misc_state["stench airport available"] && get_property_int("lastWartDinseyDefeated") != my_ascensions())
+    {
+        item dinsey_item;
+        if (my_class() == $class[seal clubber])
+            dinsey_item = lookupItem("Dinsey's oculus");
+        else if (my_class() == $class[turtle tamer])
+            dinsey_item = lookupItem("Dinsey's radar dish");
+        else if (my_class() == $class[pastamancer])
+            dinsey_item = lookupItem("Dinsey's pizza cutter");
+        else if (my_class() == $class[sauceror])
+            dinsey_item = lookupItem("Dinsey's brain");
+        else if (my_class() == $class[disco bandit])
+            dinsey_item = lookupItem("Dinsey's pants");
+        else if (my_class() == $class[accordion thief])
+            dinsey_item = lookupItem("Dinsey's glove");
+        
+        if (dinsey_item != $item[none] && !haveAtLeastXOfItemEverywhere(dinsey_item, 1))
+        {
+            location [item] keycards;
+            
+            keycards[lookupItem("keycard &alpha;")] = lookupLocation("Barf Mountain");
+            keycards[lookupItem("keycard &beta;")] = lookupLocation("Pirates of the Garbage Barges");
+            keycards[lookupItem("keycard &gamma;")] = lookupLocation("The Toxic Teacups");
+            keycards[lookupItem("keycard &delta;")] = lookupLocation("Uncle Gator's Country Fun-Time Liquid Waste Sluice");
+            location [int] missing_locations;
+            item [int] missing_keycards;
+            foreach it, l in keycards
+            {
+                if (it.available_amount() == 0)
+                {
+                    missing_keycards.listAppend(it);
+                    missing_locations.listAppend(l);
+                }
+                    
+            }
+            if (missing_keycards.count() > 0)
+            {
+                options.listAppend(AftercoreOptionMake("defeat Wart Dinsey", "", listMake("Find keycards in " + missing_locations.listJoinComponents(", ", "and"))));
+            }
+        }
+    }
     
     if (options.count() > 0)
     {

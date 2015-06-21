@@ -855,8 +855,9 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         
         if (__misc_state_int["pulls available"] > 0 && current_value < 526.0)
         {
+            float delta = 526.0 - current_value;
             boolean [item] blacklist = $items[uncle greenspan's bathroom finance guide,black snowcone,sorority brain,blue grass,salt wages,perl necklace];
-            item [int] relevant_potions = ItemFilterGetPotionsCouldPullToAddToNumericModifier("Meat Drop", 25, blacklist);
+            item [int] relevant_potions = ItemFilterGetPotionsCouldPullToAddToNumericModifier("Meat Drop", MIN(25, delta), blacklist);
             string [int] relevant_potions_output;
             foreach key, it in relevant_potions
             {
@@ -1203,6 +1204,11 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 int times = floor(my_rain().to_float() / 10.0);
                 task_entries.listAppend(ChecklistEntryMake("__effect Rain Dancin'", "skills.php", ChecklistSubentryMake("Cast Rain Dance " + pluralizeWordy(times, "time", "times"), "", "+20% item buff for aftercore.")));
             }
+        }
+        
+        if ($item[Yearbook Club Camera].available_amount() > 0 && $item[Yearbook Club Camera].equipped_amount() == 0)
+        {
+            task_entries.listAppend(ChecklistEntryMake("__item yearbook club camera", "inventory.php?which=2", ChecklistSubentryMake("Equip the yearbook club camera", "", "Before prism break.")));
         }
 		
 	}

@@ -110,6 +110,14 @@ void listAppend(phylum [int] list, phylum entry)
 	list[position] = entry;
 }
 
+void listAppend(buffer [int] list, buffer entry)
+{
+	int position = list.count();
+	while (list contains position)
+		position += 1;
+	list[position] = entry;
+}
+
 
 
 
