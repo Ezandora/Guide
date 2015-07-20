@@ -1,7 +1,7 @@
 //This script and its support scripts are in the public domain.
 
 //These settings are for development. Don't worry about editing them.
-string __version = "1.2.4";
+string __version = "1.2.5";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -30833,7 +30833,7 @@ void setUpState()
         soda_cost = $item[black cherry soda].npc_price();
     else if (dispensary_available())
         soda_cost = $item[knob goblin seltzer].npc_price();
-    else if (can_interact())
+    else if (can_interact()) //can't buy from NPC, so have to use mall price:
         soda_cost = $item[knob goblin seltzer].mall_price();
     
     if (soda_cost > 0.0)
@@ -34109,7 +34109,7 @@ void generateChecklists(Checklist [int] ordered_output_checklists)
 	Checklist [int] checklists;
 	
     
-    if (limit_mode() == "spelunky" && __setting_debug_mode) //not ready yet
+    if (limit_mode() == "spelunky") //not ready yet
     {
         LimitModeSpelunkingGenerateChecklists(checklists);
     }
