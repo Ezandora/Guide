@@ -6,7 +6,7 @@ buffer generateLocationBar(boolean displaying_navbar)
     if (!playerIsLoggedIn())
         return bar;
     location l = __last_adventure_location;
-    if (!__setting_location_bar_uses_last_location && !get_property_boolean("_relay_guide_setting_ignore_next_adventure_for_location_bar")) //setting exists for ascension scripts that alter my_location() to a null value/noob cave whenever they're not adventuring somewhere specific, to avoid environment-based effects on modifiers.
+    if (!__setting_location_bar_uses_last_location && !get_property_boolean("_relay_guide_setting_ignore_next_adventure_for_location_bar") && get_property_location("nextAdventure") != $location[none]) //setting exists for ascension scripts that alter my_location() to a null value/noob cave whenever they're not adventuring somewhere specific, to avoid environment-based effects on modifiers.
         l = get_property_location("nextAdventure");
     //l = my_location();
     
@@ -74,7 +74,7 @@ buffer generateLocationBar(boolean displaying_navbar)
                 string plant_description = plant_name.getPlantDescription();
                 
                 string class_name = "";
-                //Half-saturation of their original color, to fit in with the modifier look:
+                //Half-saturation of their original colour, to fit in with the modifier look:
                 if (plant_description == "spooky attack")
                     class_name = "r_element_spooky_desaturated";
                 else if (plant_description == "hot attack")
@@ -100,7 +100,7 @@ buffer generateLocationBar(boolean displaying_navbar)
             if (l == $location[The Valley of Rof L'm Fao])
                 plant_data.listAppend(l.environment.replace_string("o", "0"));
             else if (!($locations[The Prince's Restroom,The Prince's Dance Floor,The Prince's Kitchen,The Prince's Balcony,The Prince's Lounge,The Prince's Canapes table,the shore\, inc. travel agency] contains l))
-                plant_data.listAppend(l.environment.capitalizeFirstLetter());
+                plant_data.listAppend(l.environment.capitaliseFirstLetter());
         }
     }
     
@@ -197,7 +197,7 @@ buffer generateLocationBar(boolean displaying_navbar)
     {
         if (!__quest_state["Pirate Quest"].finished)
         {
-            custom_location_information = pluralize(__quest_state["Pirate Quest"].state_int["insult count"], "insult", "insults");
+            custom_location_information = pluralise(__quest_state["Pirate Quest"].state_int["insult count"], "insult", "insults");
         }
     }
     else if ($locations[Dreadsylvanian Woods,Dreadsylvanian Village,Dreadsylvanian Castle,The Slime Tube,A Maze of Sewer Tunnels,Hobopolis Town Square,Burnbarrel Blvd.,Exposure Esplanade,The Heap,The Ancient Hobo Burial Ground,The Purple Light District] contains l)
@@ -214,9 +214,9 @@ buffer generateLocationBar(boolean displaying_navbar)
     else if (l == $location[the defiled niche])
         custom_location_information = __quest_state["Level 7"].state_int["niche evilness"] + " evilness";
     else if (l == $location[the battlefield (hippy uniform)])
-        custom_location_information = pluralize(__quest_state["Level 12"].state_int["frat boys left on battlefield"], "frat boy", "frat boys");
+        custom_location_information = pluralise(__quest_state["Level 12"].state_int["frat boys left on battlefield"], "frat boy", "frat boys");
     else if (l == $location[the battlefield (frat uniform)])
-        custom_location_information = pluralize(__quest_state["Level 12"].state_int["hippies left on battlefield"], "hippy", "hippies");
+        custom_location_information = pluralise(__quest_state["Level 12"].state_int["hippies left on battlefield"], "hippy", "hippies");
     else if ($locations[The Briny Deeps,The Brinier Deepers,The Briniest Deepests,An Octopus's Garden,The Wreck of the Edgar Fitzsimmons,Madness Reef,The Mer-Kin Outpost,The Skate Park,The Coral Corral,Mer-kin Colosseum,Mer-kin Library,Mer-kin Gymnasium,Mer-kin Elementary School,The Marinara Trench,Anemone Mine,The Dive Bar,The Caliginous Abyss] contains l)
     {
         Error error;
@@ -234,12 +234,12 @@ buffer generateLocationBar(boolean displaying_navbar)
     {
         int minutes_to_midnight = get_property_int("cinderellaMinutesToMidnight");
         if (minutes_to_midnight > 0)
-            custom_location_information = pluralize(minutes_to_midnight, "minute", "minutes") + " left";
+            custom_location_information = pluralise(minutes_to_midnight, "minute", "minutes") + " left";
     }
     else if ($locations[Ye Olde Medievale Villagee,Portal to Terrible Parents,Rumpelstiltskin's Workshop] contains l)
     {
         int turns_left = clampi(30 - get_property_int("rumpelstiltskinTurnsUsed"), 0, 30);
-        custom_location_information = pluralize(turns_left, "turn", "turns") + " left";
+        custom_location_information = pluralise(turns_left, "turn", "turns") + " left";
     }
     else if (l == $location[fernswarthy's basement])
     {
@@ -323,12 +323,13 @@ buffer generateLocationBar(boolean displaying_navbar)
         
         int turns_spent = l.turns_spent;
         if (area_delay > 0)
-            location_data.listAppend(pluralize(area_delay, "turn", "turns") + "<br>delay");
+            location_data.listAppend(pluralise(area_delay, "turn", "turns") + "<br>delay");
         else if (turns_spent > 0)
-            location_data.listAppend(pluralize(turns_spent, "turn", "turns"));
+            location_data.listAppend(pluralise(turns_spent, "turn", "turns"));
     }
     
     //easy list:
+    //FIXME just use that test instead?
     //ashq foreach l in $locations[] if (l.appearance_rates().count() == 1 && l.appearance_rates()[$monster[none]] == 100.0) print(l);
     boolean [location] nc_blacklist = $locations[Pump Up Muscle,Pump Up Mysticality,Pump Up Moxie,The Shore\, Inc. Travel Agency,Goat Party,Pirate Party,Lemon Party,The Roulette Tables,The Poker Room,Anemone Mine (Mining),The Knob Shaft (Mining),Friar Ceremony Location,Itznotyerzitz Mine (in Disguise),The Prince's Restroom,The Prince's Dance Floor,The Prince's Kitchen,The Prince's Balcony,The Prince's Lounge,The Prince's Canapes table,Portal to Terrible Parents,fernswarthy's basement];
     
@@ -424,14 +425,13 @@ buffer generateLocationBar(boolean displaying_navbar)
     }
     if (monster_data.count() > 0)
     {
-        location_data.listAppend(pluralize(monster_data.count(), "monster", "monsters"));
+        location_data.listAppend(pluralise(monster_data.count(), "monster", "monsters"));
     }
     if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
     {
         float average_coins_gained = 0.0;
         foreach m, rate in monster_appearance_rates
         {
-            //print_html(m + " rate = " + rate);
             if (rate <= 0) continue;
             float coin_from_monster = m.ka_dropped();
             //NC should already be included in appearance rates?

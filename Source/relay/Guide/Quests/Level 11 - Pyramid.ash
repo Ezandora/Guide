@@ -87,7 +87,7 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
                 int turns_spent = $location[the middle chamber].turns_spent;
                 
                 int turns_remaining = MAX(0, 11 - turns_spent);
-                subentry.entries.listAppend("Adventure in the middle chamber for " + pluralizeWordy(turns_remaining, "more turn", "more turns") + " to unlock the control room.");
+                subentry.entries.listAppend("Adventure in the middle chamber for " + pluraliseWordy(turns_remaining, "more turn", "more turns") + " to unlock the control room.");
             
                 subentry.modifiers.listAppend("+400% item");
                 subentry.modifiers.listAppend("olfact tomb rats");
@@ -107,7 +107,7 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
             //unlock middle chamber:
             int turns_spent = $location[the upper chamber].turns_spent;
             int turns_remaining = MAX(0, 6 - turns_spent);
-            subentry.entries.listAppend("Adventure in the upper chamber for " + pluralizeWordy(turns_remaining, "more turn", "more turns") + " to unlock the middle chamber.");
+            subentry.entries.listAppend("Adventure in the upper chamber for " + pluraliseWordy(turns_remaining, "more turn", "more turns") + " to unlock the middle chamber.");
             subentry.modifiers.listAppend("-combat");
             if (__misc_state["have hipster"])
                 subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
@@ -203,7 +203,7 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
             }
             
             if (tasks.count() > 0)
-                subentry.entries.listPrepend(tasks.listJoinComponents(", ", "then").capitalizeFirstLetter() + ".");
+                subentry.entries.listPrepend(tasks.listJoinComponents(", ", "then").capitaliseFirstLetter() + ".");
             else
                 subentry.entries.listAppend("Spin the control room, search the lower chambers! Then fight Ed.");
         }
@@ -218,9 +218,9 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
             else
                 subentry.entries.listAppend("Have enough wheels.");
             /*if (amount > 0)
-                subentry.entries.listAppend(pluralize(amount, "wheel turn", "wheel turns") + " available.");*/
+                subentry.entries.listAppend(pluralise(amount, "wheel turn", "wheel turns") + " available.");*/
             if ($item[tangle of rat tails].available_amount() > 0)
-                subentry.entries.listAppend(pluralize($item[tangle of rat tails]) + " available.");
+                subentry.entries.listAppend(pluralise($item[tangle of rat tails]) + " available.");
         }
         
     }

@@ -112,7 +112,7 @@ void SGrimstoneHareGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
     if (my_basestat($stat[mysticality]) < 400)
         description.listAppend("May want to gain " + (400 - my_basestat($stat[mysticality])) + " more mysticality.");
     
-    description.listAppend(pluralize(time_remaining, "turn", "turns") + " remaining in race.");
+    description.listAppend(pluralise(time_remaining, "turn", "turns") + " remaining in race.");
     
     
     
@@ -135,10 +135,10 @@ void SGrimstoneStepmotherGenerateTasks(ChecklistEntry [int] task_entries, Checkl
     if (minutes_to_midnight > 0)
     {
         string line;
-        line = pluralize(minutes_to_midnight, "minute", "minutes") + " to midnight.";
+        line = pluralise(minutes_to_midnight, "minute", "minutes") + " to midnight.";
         
         if (score > 0)
-            line += " " + pluralize(score, "point", "points") + " earned.";
+            line += " " + pluralise(score, "point", "points") + " earned.";
         
         description.listAppend(line);
     }
@@ -190,7 +190,7 @@ void SGrimstoneStepmotherGenerateTasks(ChecklistEntry [int] task_entries, Checkl
         foreach minute in minute_to_action
         {
             string description = minute_to_action[minute];
-            line = "|" + pluralize(minute, "minute", "minutes") + ":|*" + minute_to_action[minute].listJoinComponents(" > ") + line;
+            line = "|" + pluralise(minute, "minute", "minutes") + ":|*" + minute_to_action[minute].listJoinComponents(" > ") + line;
         }
         description.listAppend(line);
     }

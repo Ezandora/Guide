@@ -11,35 +11,36 @@ void SetsInit()
 }
 
 
-void SetsGenerateResources(ChecklistEntry [int] available_resources_entries)
+void SetsGenerateResources(ChecklistEntry [int] resource_entries)
 {
-	SFamiliarsGenerateResource(available_resources_entries);
-	SSemirareGenerateResource(available_resources_entries);
-	SSkillsGenerateResource(available_resources_entries);
-	SMiscItemsGenerateResource(available_resources_entries);
-	SCopiedMonstersGenerateResource(available_resources_entries);
-    STomesGenerateResource(available_resources_entries);
-    SSmithsnessGenerateResource(available_resources_entries);
-	SSugarGenerateResource(available_resources_entries);
-    SPulverizeGenerateResource(available_resources_entries);
-    SLibramGenerateResource(available_resources_entries);
-    SWOTSFGenerateResource(available_resources_entries);
-    SCountersGenerateResource(available_resources_entries);
-    SGardensGenerateResource(available_resources_entries);
-    SFaxGenerateResource(available_resources_entries);
-    SJarlsbergGenerateResource(available_resources_entries);
-    SCOTGenerateResource(available_resources_entries);
-    SSneakyPeteGenerateResource(available_resources_entries);
-    SDNAGenerateResource(available_resources_entries);
-    SPlasticVampireFangsGenerateResource(available_resources_entries);
-    SSpeakeasyGenerateResource(available_resources_entries);
-    SHeavyRainsGenerateResource(available_resources_entries);
-    SBugbearInvasionGenerateResource(available_resources_entries);
-    SClassesGenerateResource(available_resources_entries);
-    SEquipmentGenerateResource(available_resources_entries);
-    SActuallyEdtheUndyingGenerateResource(available_resources_entries);
-    SMayoClinicGenerateResource(available_resources_entries);
-    S8bitRealmGenerateResource(available_resources_entries);
+	SFamiliarsGenerateResource(resource_entries);
+	SSemirareGenerateResource(resource_entries);
+	SSkillsGenerateResource(resource_entries);
+	SMiscItemsGenerateResource(resource_entries);
+	SCopiedMonstersGenerateResource(resource_entries);
+    STomesGenerateResource(resource_entries);
+    SSmithsnessGenerateResource(resource_entries);
+	SSugarGenerateResource(resource_entries);
+    SPulveriseGenerateResource(resource_entries);
+    SLibramGenerateResource(resource_entries);
+    SWOTSFGenerateResource(resource_entries);
+    SCountersGenerateResource(resource_entries);
+    SGardensGenerateResource(resource_entries);
+    SFaxGenerateResource(resource_entries);
+    SJarlsbergGenerateResource(resource_entries);
+    SCOTGenerateResource(resource_entries);
+    SSneakyPeteGenerateResource(resource_entries);
+    SDNAGenerateResource(resource_entries);
+    SPlasticVampireFangsGenerateResource(resource_entries);
+    SSpeakeasyGenerateResource(resource_entries);
+    SHeavyRainsGenerateResource(resource_entries);
+    SBugbearInvasionGenerateResource(resource_entries);
+    SClassesGenerateResource(resource_entries);
+    SEquipmentGenerateResource(resource_entries);
+    SActuallyEdtheUndyingGenerateResource(resource_entries);
+    SMayoClinicGenerateResource(resource_entries);
+    S8bitRealmGenerateResource(resource_entries);
+    SDeckOfEveryCardGenerateResource(resource_entries);
 }
 
 void SetsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)

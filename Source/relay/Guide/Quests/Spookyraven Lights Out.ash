@@ -126,7 +126,7 @@ void QSpookyravenLightsOutGenerateEntry(ChecklistEntry [int] task_entries, Check
             available_questlines.listAppend("Elizabeth");
         if (available_questlines.count() > 0)
         {
-            optional_task_entries.listAppend(ChecklistEntryMake("__half Lights Out", "", ChecklistSubentryMake("Lights Out in " + pluralize(turns_until_next_lights_out, "adventure", "adventures"), "", available_questlines.listJoinComponents(",", "and") + " quest " + (available_questlines.count() > 1 ? "lines" : "line") + "."), (from_task ? 5 : 8)));
+            optional_task_entries.listAppend(ChecklistEntryMake("__half Lights Out", "", ChecklistSubentryMake("Lights Out in " + pluralise(turns_until_next_lights_out, "adventure", "adventures"), "", available_questlines.listJoinComponents(",", "and") + " quest " + (available_questlines.count() > 1 ? "lines" : "line") + "."), (from_task ? 5 : 8)));
         }
     }
     
@@ -143,7 +143,7 @@ void QSpookyravenLightsOutGenerateTasks(ChecklistEntry [int] task_entries, Check
 	QSpookyravenLightsOutGenerateEntry(task_entries, optional_task_entries, true);
 }
 
-void QSpookyravenLightsOutGenerateResource(ChecklistEntry [int] available_resources_entries)
+void QSpookyravenLightsOutGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	QSpookyravenLightsOutGenerateEntry(available_resources_entries, available_resources_entries, false);
+	QSpookyravenLightsOutGenerateEntry(resource_entries, resource_entries, false);
 }

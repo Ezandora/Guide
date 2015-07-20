@@ -222,7 +222,7 @@ string [int] split_string_alternate(string source, string delimiter)
     return split_string_mutable(source, delimiter);
 }
 
-//Same as my_primestate(), except refers to substat
+//Same as my_primestat(), except refers to substat
 stat my_primesubstat()
 {
 	if (my_primestat() == $stat[muscle])
@@ -260,6 +260,24 @@ string slot_to_string(slot s)
     else if (s == $slot[buddy-bjorn])
         return "buddy bjorn";
     return s;
+}
+
+string slot_to_plural_string(slot s)
+{
+    if (s == $slot[acc1] || s == $slot[acc2] || s == $slot[acc3])
+        return "accessories";
+    else if (s == $slot[hat])
+        return "hats";
+    else if (s == $slot[weapon])
+        return "weapons";
+    else if (s == $slot[off-hand])
+        return "off-hands";
+    else if (s == $slot[shirt])
+        return "shirts";
+    else if (s == $slot[back])
+        return "back items";
+    
+    return s.slot_to_string();
 }
 
 int storage_amount(boolean [item] items)
@@ -481,7 +499,7 @@ boolean stringHasSuffix(string s, string suffix)
 	return false;
 }
 
-string capitalizeFirstLetter(string v)
+string capitaliseFirstLetter(string v)
 {
 	buffer buf = v.to_buffer();
 	if (v.length() <= 0)
@@ -632,7 +650,7 @@ int turnsCompletedInLocation(location place)
     return place.turnsAttemptedInLocation(); //FIXME make this correct
 }
 
-string pluralize(float value, string non_plural, string plural)
+string pluralise(float value, string non_plural, string plural)
 {
 	if (value == 1.0)
 		return value + " " + non_plural;
@@ -640,7 +658,7 @@ string pluralize(float value, string non_plural, string plural)
 		return value + " " + plural;
 }
 
-string pluralize(int value, string non_plural, string plural)
+string pluralise(int value, string non_plural, string plural)
 {
 	if (value == 1)
 		return value + " " + non_plural;
@@ -648,22 +666,22 @@ string pluralize(int value, string non_plural, string plural)
 		return value + " " + plural;
 }
 
-string pluralize(int value, item i)
+string pluralise(int value, item i)
 {
-	return pluralize(value, i.to_string(), i.plural);
+	return pluralise(value, i.to_string(), i.plural);
 }
 
-string pluralize(item i) //whatever we have around
+string pluralise(item i) //whatever we have around
 {
-	return pluralize(i.available_amount(), i);
+	return pluralise(i.available_amount(), i);
 }
 
-string pluralize(effect e)
+string pluralise(effect e)
 {
-    return pluralize(e.have_effect(), "turn", "turns") + " of " + e;
+    return pluralise(e.have_effect(), "turn", "turns") + " of " + e;
 }
 
-string pluralizeWordy(int value, string non_plural, string plural)
+string pluraliseWordy(int value, string non_plural, string plural)
 {
 	if (value == 1)
     {
@@ -677,14 +695,14 @@ string pluralizeWordy(int value, string non_plural, string plural)
 		return value.int_to_wordy() + " " + plural;
 }
 
-string pluralizeWordy(int value, item i)
+string pluraliseWordy(int value, item i)
 {
-	return pluralizeWordy(value, i.to_string(), i.plural);
+	return pluraliseWordy(value, i.to_string(), i.plural);
 }
 
-string pluralizeWordy(item i) //whatever we have around
+string pluraliseWordy(item i) //whatever we have around
 {
-	return pluralizeWordy(i.available_amount(), i);
+	return pluraliseWordy(i.available_amount(), i);
 }
 
 //Backwards compatibility:
@@ -1231,4 +1249,15 @@ float calculateCurrentNinjaAssassinMaxEnvironmentalDamage()
         v += expected_assassin_damage;
     }
     return v;
+}
+
+//mafia describes "merkin" for the "mer-kin" phylum, which "to_phylum()" does not interpret
+//hmm... maybe file a request for to_phylum() to parse that
+phylum getDNASyringePhylum()
+{
+    string phylum_text = get_property("dnaSyringe");
+    if (phylum_text == "merkin")
+        return $phylum[mer-kin];
+    else
+        return phylum_text.to_phylum();
 }

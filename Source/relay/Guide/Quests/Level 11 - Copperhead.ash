@@ -97,7 +97,7 @@ void QLevel11RonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
     else if (base_quest_state.mafia_internal_step <= 2)
     {
         //Fight your way through the mob of zeppelin protesters.
-        subentry.entries.listAppend("Scare away " + pluralizeWordy(base_quest_state.state_int["protestors remaining"], "more protestor", "more protestors") + ".");
+        subentry.entries.listAppend("Scare away " + pluraliseWordy(base_quest_state.state_int["protestors remaining"], "more protestor", "more protestors") + ".");
         subentry.modifiers.listAppend("-combat");
         subentry.modifiers.listAppend("+567% item");
         if (__misc_state["have olfaction equivalent"])
@@ -221,12 +221,15 @@ void QLevel11RonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
                 subentry.entries.listAppend("No ticket.");
         }
             
-        if ($skill[Transcendent Olfaction].skill_is_usable() && !($effect[on the trail].have_effect() > 0 && get_property_monster("olfactedMonster") == $monster[red butler]))
-            subentry.entries.listAppend("Olfact red butlers for glark cables.");
-        
-        if ($item[glark cable].available_amount() > 0)
+        if (get_property_int("_glarkCableUses") < 5)
         {
-            subentry.entries.listAppend(HTMLGenerateSpanFont("Use glark cable in-combat.", "red"));
+            if ($skill[Transcendent Olfaction].skill_is_usable() && !($effect[on the trail].have_effect() > 0 && get_property_monster("olfactedMonster") == $monster[red butler]))
+                subentry.entries.listAppend("Olfact red butlers for glark cables.");
+            
+            if ($item[glark cable].available_amount() > 0)
+            {
+                subentry.entries.listAppend(HTMLGenerateSpanFont("Use glark cable in-combat.", "red"));
+            }
         }
             
         if ($item[priceless diamond].available_amount() > 0 && $item[red zeppelin ticket].available_amount() == 0)

@@ -30,7 +30,7 @@ void SPShadyPastGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         {
             //at least one gold piece from a desperate gold farmer is under 21.89% drop rate
             //needs spading
-            description.listAppend("Adventure in the chinatown tenement, acquire " + pluralize(gold_pieces_needed, "more gold piece", "more gold pieces") + ".");
+            description.listAppend("Adventure in the chinatown tenement, acquire " + pluralise(gold_pieces_needed, "more gold piece", "more gold pieces") + ".");
             modifiers.listAppend("+400%? item");
             
             if (__misc_state["have olfaction equivalent"])
@@ -375,7 +375,7 @@ void SPCrackpotGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     if (bosses_remaining.count() == 1)
         await = " awaits.";
     if (bosses_remaining.count() > 0)
-        description.listAppend(bosses_remaining.listJoinComponents(", ", "and").capitalizeFirstLetter() + await);
+        description.listAppend(bosses_remaining.listJoinComponents(", ", "and").capitaliseFirstLetter() + await);
     else if ($item[flickering pixel].available_amount() == 8)
     {
         url = "inventory.php?which=3";

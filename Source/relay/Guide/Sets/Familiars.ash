@@ -80,7 +80,7 @@ void SFamiliarsGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [
     }
 }
 
-void SFamiliarsPuckGenerateResource(ChecklistEntry [int] available_resources_entries)
+void SFamiliarsPuckGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (!__misc_state["in run"])
         return;
@@ -92,7 +92,7 @@ void SFamiliarsPuckGenerateResource(ChecklistEntry [int] available_resources_ent
         relevant_familiar = lookupFamiliar("Puck Man");
     if (lookupItem("power pill").available_amount() > 0)
     {
-        puck_subentries.listAppend(ChecklistSubentryMake(lookupItem("power pill").pluralize().capitalizeFirstLetter(), "", "Use in combat to instakill without costing a turn."));
+        puck_subentries.listAppend(ChecklistSubentryMake(lookupItem("power pill").pluralise().capitaliseFirstLetter(), "", "Use in combat to instakill without costing a turn."));
     }
     if (mafiaIsPastRevision(15961) && (lookupFamiliar("Ms. Puck Man").familiar_is_usable() || lookupFamiliar("Puck Man").familiar_is_usable()))
     {
@@ -109,12 +109,12 @@ void SFamiliarsPuckGenerateResource(ChecklistEntry [int] available_resources_ent
             }
             description.listAppend(line);
             
-            puck_subentries.listAppend(ChecklistSubentryMake(pluralize(power_pills_remaining, "power pill", "power pills") + " obtainable", "", description));
+            puck_subentries.listAppend(ChecklistSubentryMake(pluralise(power_pills_remaining, "power pill", "power pills") + " obtainable", "", description));
         }
     }
     if (yellow_pixel != $item[none] && yellow_pixel.available_amount() > 0)
     {
-        string title = pluralize(yellow_pixel);
+        string title = pluralise(yellow_pixel);
         string [int] description;
         url = "shop.php?whichshop=mystic"; //"place.php?whichplace=forestvillage&action=fv_mystic";
         //Pixel coin - 10 yellow pixels - 2k autosell (marginal)
@@ -166,7 +166,7 @@ void SFamiliarsPuckGenerateResource(ChecklistEntry [int] available_resources_ent
             if (it.creatable_amount() == 0 && !items_to_always_show[it])
                 continue;
             string line;
-            line = it.capitalizeFirstLetter() + ": " + reason;
+            line = it.capitaliseFirstLetter() + ": " + reason;
             if (it.creatable_amount() == 0)
                 line = HTMLGenerateSpanFont(line, "grey");
             description.listAppend(line);
@@ -178,7 +178,7 @@ void SFamiliarsPuckGenerateResource(ChecklistEntry [int] available_resources_ent
             consumables.listAppend("drink");
         if (consumables.count() > 0)
         {
-            string line = consumables.listJoinComponents(", ").capitalizeFirstLetter() + ".";
+            string line = consumables.listJoinComponents(", ").capitaliseFirstLetter() + ".";
             if (lookupItem("yellow pixel").available_amount() < 10)
                 line = HTMLGenerateSpanFont(line, "grey");
             description.listAppend(line);
@@ -188,12 +188,12 @@ void SFamiliarsPuckGenerateResource(ChecklistEntry [int] available_resources_ent
     }
     if (puck_subentries.count() > 0)
     {
-        available_resources_entries.listAppend(ChecklistEntryMake("__familiar " + relevant_familiar, url, puck_subentries, 9));
+        resource_entries.listAppend(ChecklistEntryMake("__familiar " + relevant_familiar, url, puck_subentries, 9));
     }
 
 }
 
-void SFamiliarsGenerateResource(ChecklistEntry [int] available_resources_entries)
+void SFamiliarsGenerateResource(ChecklistEntry [int] resource_entries)
 {
 	if (__misc_state["free runs usable"] && ($familiar[pair of stomping boots].familiar_is_usable() || ($skill[the ode to booze].skill_is_usable() && $familiar[Frumious Bandersnatch].familiar_is_usable())))
 	{
@@ -229,7 +229,7 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] available_resources_entries
                 description.listAppend("Sugar shield available (+2 runs)");
         }
 			
-		available_resources_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(name, "", description)));
+		resource_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(name, "", description)));
 	}
 	
 	if (true)
@@ -241,7 +241,7 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] available_resources_entries
 			string name = "";
 			string [int] description;
 				
-			name = pluralize(hipster_fights_available, __misc_state_string["hipster name"] + " fight", __misc_state_string["hipster name"] + " fights");
+			name = pluralise(hipster_fights_available, __misc_state_string["hipster name"] + " fight", __misc_state_string["hipster name"] + " fights");
 			
 			int [int] hipster_chances;
 			hipster_chances[7] = 50;
@@ -260,7 +260,7 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] available_resources_entries
 			int importance = 0;
             if (!__misc_state["In run"])
                 importance = 6;
-			available_resources_entries.listAppend(ChecklistEntryMake(__misc_state_string["hipster name"], url, ChecklistSubentryMake(name, "", description), importance));
+			resource_entries.listAppend(ChecklistEntryMake(__misc_state_string["hipster name"], url, ChecklistSubentryMake(name, "", description), importance));
 		}
 	}
 	
@@ -276,7 +276,7 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] available_resources_entries
             url = "familiar.php";
 		
         if (get_property("_nanorhinoBanishedMonster") != "")
-            description_banish.listAppend(get_property("_nanorhinoBanishedMonster").HTMLEscapeString().capitalizeFirstLetter() + " currently banished.");
+            description_banish.listAppend(get_property("_nanorhinoBanishedMonster").HTMLEscapeString().capitaliseFirstLetter() + " currently banished.");
         else
             description_banish.listAppend("All day. Cast muscle combat skill.");
 		if (__misc_state["have muscle class combat skill"])
@@ -291,11 +291,11 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] available_resources_entries
                 subentries.listAppend(ChecklistSubentryMake("Nanorhino Yellow Ray", "", "Cast moxie combat skill."));
         }
 		if (subentries.count() > 0)
-			available_resources_entries.listAppend(ChecklistEntryMake("__familiar nanorhino", url, subentries, 5));
+			resource_entries.listAppend(ChecklistEntryMake("__familiar nanorhino", url, subentries, 5));
 	}
 	if (__misc_state["yellow ray available"] && !__misc_state["In run"])
     {
-        available_resources_entries.listAppend(ChecklistEntryMake(__misc_state_string["yellow ray image name"], "", ChecklistSubentryMake("Yellow ray available", "", "From " + __misc_state_string["yellow ray source"] + "."), 6));
+        resource_entries.listAppend(ChecklistEntryMake(__misc_state_string["yellow ray image name"], "", ChecklistSubentryMake("Yellow ray available", "", "From " + __misc_state_string["yellow ray source"] + "."), 6));
     }
     
     if (my_familiar() == $familiar[happy medium] || $familiar[happy medium].charges > 0 && $familiar[happy medium].familiar_is_usable()) //|| stuff
@@ -318,18 +318,18 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] available_resources_entries
         {
             title = "Orange medium";
             description.listAppend("3.25 turns/drunkenness.");
-            description.listAppend(pluralizeWordy(adventures_to_next_at_most, "turn", "turns").capitalizeFirstLetter() + " (at most) to red.");
+            description.listAppend(pluraliseWordy(adventures_to_next_at_most, "turn", "turns").capitaliseFirstLetter() + " (at most) to red.");
         }
         else if (charges == 1)
         {
             title = "Blue medium";
             description.listAppend("2.25 turns/drunkenness.");
-            description.listAppend(pluralizeWordy(adventures_to_next_at_most, "turn", "turns").capitalizeFirstLetter() + " (at most) to orange.");
+            description.listAppend(pluraliseWordy(adventures_to_next_at_most, "turn", "turns").capitaliseFirstLetter() + " (at most) to orange.");
         }
         else
         {
             title = "Uncharged medium";
-            description.listAppend(pluralizeWordy(adventures_to_next_at_most, "turn", "turns").capitalizeFirstLetter() + " (at most) to blue. ");
+            description.listAppend(pluraliseWordy(adventures_to_next_at_most, "turn", "turns").capitaliseFirstLetter() + " (at most) to blue. ");
         }
         string url;
         if (my_familiar() != $familiar[happy medium])
@@ -338,7 +338,7 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] available_resources_entries
         int importance = 6;
         if (my_familiar() == $familiar[happy medium] || charges > 0)
             importance = 0;
-        available_resources_entries.listAppend(ChecklistEntryMake("__familiar happy medium", url, ChecklistSubentryMake(title, "", description), importance));
+        resource_entries.listAppend(ChecklistEntryMake("__familiar happy medium", url, ChecklistSubentryMake(title, "", description), importance));
     }
     if (my_familiar() == $familiar[steam-powered cheerleader] || $familiar[steam-powered cheerleader].familiar_is_usable() && get_property_int("_cheerleaderSteam") < 200)
     {
@@ -388,7 +388,7 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] available_resources_entries
         title = multiplier + "x fairy steam-powered cheerleader";
         
         if (turns_remaining_at_this_level > 0)
-            description.listAppend(pluralize(turns_remaining_at_this_level, "turn remains", "turns remain") + " until " + next_multiplier_level + "x.");
+            description.listAppend(pluralise(turns_remaining_at_this_level, "turn remains", "turns remain") + " until " + next_multiplier_level + "x.");
         
         int importance = 6;
         if (my_familiar() == $familiar[steam-powered cheerleader])
@@ -400,7 +400,7 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] available_resources_entries
             url = "familiar.php";
         
         
-        available_resources_entries.listAppend(ChecklistEntryMake("__familiar steam-powered cheerleader", url, ChecklistSubentryMake(title, "", description), importance));
+        resource_entries.listAppend(ChecklistEntryMake("__familiar steam-powered cheerleader", url, ChecklistSubentryMake(title, "", description), importance));
     }
     
     if ($familiar[grim brother].familiar_is_usable() && !get_property_boolean("_grimBuff") && __misc_state["In run"]) //in aftercore, let the maximizer handle it?
@@ -413,14 +413,14 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] available_resources_entries
         
         description.listAppend("30 turns of +20% init or +HP/MP or +damage.");
         int importance = 9;
-        available_resources_entries.listAppend(ChecklistEntryMake("__familiar grim brother", url, ChecklistSubentryMake(title, "", description), importance));
+        resource_entries.listAppend(ChecklistEntryMake("__familiar grim brother", url, ChecklistSubentryMake(title, "", description), importance));
     }
     
     
-    SFamiliarsPuckGenerateResource(available_resources_entries);
+    SFamiliarsPuckGenerateResource(resource_entries);
     
     //FIXME small medium, organ grinder, charged boots
-	SFamiliarsGenerateEntry(available_resources_entries, available_resources_entries, false);
+	SFamiliarsGenerateEntry(resource_entries, resource_entries, false);
 }
 
 void SFamiliarsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)

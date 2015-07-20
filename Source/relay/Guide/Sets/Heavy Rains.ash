@@ -116,7 +116,7 @@ void SHeavyRainsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
             if (available_skills_for_item[it] > 0)
             {
                 available_skill_types.listAppend(item_to_typename[it]);
-                items_to_use_description.listAppend(pluralize(available_skills_for_item[it], it));
+                items_to_use_description.listAppend(pluralise(available_skills_for_item[it], it));
                 
                 if (url.length() == 0)
                     url = item_to_url[it];
@@ -150,12 +150,12 @@ void SHeavyRainsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
             if (other_count > 0)
             {
                 if (relevant_descriptions.count() > 0)
-                    relevant_descriptions.listAppend("Or " + pluralizeWordy(other_count, "other skill", "other skills") + ".");
+                    relevant_descriptions.listAppend("Or " + pluraliseWordy(other_count, "other skill", "other skills") + ".");
                 else
-                    relevant_descriptions.listAppend(pluralizeWordy(other_count, "possible skill", "possible skills").capitalizeFirstLetter() + ".");
+                    relevant_descriptions.listAppend(pluraliseWordy(other_count, "possible skill", "possible skills").capitaliseFirstLetter() + ".");
             }
             
-            description.listAppend(HTMLGenerateSpanOfClass(item_to_typename[it].capitalizeFirstLetter() + ":", "r_bold") + HTMLGenerateIndentedText(relevant_descriptions.listJoinComponents("<hr>")));
+            description.listAppend(HTMLGenerateSpanOfClass(item_to_typename[it].capitaliseFirstLetter() + ":", "r_bold") + HTMLGenerateIndentedText(relevant_descriptions.listJoinComponents("<hr>")));
         }
         
         if (available_skill_types.count() > 0)
@@ -163,12 +163,12 @@ void SHeavyRainsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
     }
 }
 
-void SHeavyRainsGenerateResource(ChecklistEntry [int] available_resources_entries)
+void SHeavyRainsGenerateResource(ChecklistEntry [int] resource_entries)
 {
 	if (my_path_id() != PATH_HEAVY_RAINS)
 		return;
     
-    //available_resources_entries.listAppend(ChecklistEntryMake("__item gym membership card", "inventory.php?which=3", ChecklistSubentryMake(pluralize($item[gym membership card]), "", description), importance_level_item));
+    //resource_entries.listAppend(ChecklistEntryMake("__item gym membership card", "inventory.php?which=3", ChecklistSubentryMake(pluralise($item[gym membership card]), "", description), importance_level_item));
     
     
     int fishbone_amount = lookupItem("freshwater fishbone").available_amount();
@@ -218,14 +218,14 @@ void SHeavyRainsGenerateResource(ChecklistEntry [int] available_resources_entrie
                 continue;
             int amount_to_make = MIN(creatable, amount_needed - it.available_amount());
             
-            description.listAppend(pluralize(amount_to_make, it) + ": " + fishbone_item_descriptions[it]);
+            description.listAppend(pluralise(amount_to_make, it) + ": " + fishbone_item_descriptions[it]);
         }
-        available_resources_entries.listAppend(ChecklistEntryMake("__item freshwater fishbone", "shop.php?whichshop=fishbones", ChecklistSubentryMake(pluralize(lookupItem("freshwater fishbone")), "", description), 7));
+        resource_entries.listAppend(ChecklistEntryMake("__item freshwater fishbone", "shop.php?whichshop=fishbones", ChecklistSubentryMake(pluralise(lookupItem("freshwater fishbone")), "", description), 7));
     }
     
     if (lookupItem("catfish whiskers").available_amount() > 0)
     {
         //should we add in area suggestions?
-        available_resources_entries.listAppend(ChecklistEntryMake("__item catfish whiskers", "inventory.php?which=3", ChecklistSubentryMake(pluralize(lookupItem("catfish whiskers")), "", "40 turns of -washaway"), 7));
+        resource_entries.listAppend(ChecklistEntryMake("__item catfish whiskers", "inventory.php?which=3", ChecklistSubentryMake(pluralise(lookupItem("catfish whiskers")), "", "40 turns of -washaway"), 7));
     }
 }

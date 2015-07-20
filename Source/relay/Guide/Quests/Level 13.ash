@@ -519,7 +519,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         else if (keys_to_use.count() < 6)
         {
             subentry.entries.listClear();
-            subentry.entries.listAppend("Use " + pluralizeWordy(keys_to_use.count(), "more key", "more keys") + " on the perplexing door: " + keys_to_use.listJoinComponents(", ", "and") + ".");
+            subentry.entries.listAppend("Use " + pluraliseWordy(keys_to_use.count(), "more key", "more keys") + " on the perplexing door: " + keys_to_use.listJoinComponents(", ", "and") + ".");
             url = "place.php?whichplace=nstower_door";
         }
         else
@@ -683,7 +683,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         }
         if (total_contestants_to_fight > 0)
         {
-            subentries.listAppend(ChecklistSubentryMake("Fight " + pluralizeWordy(total_contestants_to_fight, "more contestant", "more contestants"), "", ""));
+            subentries.listAppend(ChecklistSubentryMake("Fight " + pluraliseWordy(total_contestants_to_fight, "more contestant", "more contestants"), "", ""));
         }
         else if (subentries.count() == 0)
         {
@@ -803,7 +803,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         }
         else
         {
-            subentry.entries.listAppend("Use " + pluralizeWordy(keys_to_use.count(), "more key", "more keys") + " on the perplexing door: " + keys_to_use.listJoinComponents(", ", "and") + ".");
+            subentry.entries.listAppend("Use " + pluraliseWordy(keys_to_use.count(), "more key", "more keys") + " on the perplexing door: " + keys_to_use.listJoinComponents(", ", "and") + ".");
         }
         if (missing_keys.count() > 0)
         {
@@ -909,12 +909,12 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                     things_to_do.listAppend("uneffect " + e);
             }
             if (things_to_do.count() > 0)
-                subentry.entries.listAppend(HTMLGenerateSpanFont(things_to_do.listJoinComponents(", ", "and").capitalizeFirstLetter() + ".", "red"));*/
+                subentry.entries.listAppend(HTMLGenerateSpanFont(things_to_do.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".", "red"));*/
             
-            if (lookupSkill("Garbage Nova").have_skill() && false) //calculations are incorrect
+            if (lookupSkill("Garbage Nova").skill_is_usable() && false) //calculations are incorrect
             {
                 float spell_damage_percent = numeric_modifier("spell damage percent");
-                float spell_damage_multiplier = (1.0 + spell_damage_percent / 100.0);
+                float spell_damage_multiplier = 1.0 + spell_damage_percent / 100.0;
                 string [int] tasks;
                 
                 //Formula:
@@ -942,15 +942,19 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 {
                     tasks.listAppend(HTMLGenerateSpanFont("buff up to " + min_myst_needed + " mysticality", "red"));
                 }
-                tasks.listAppend("cast garbage nova " + pluralizeWordy(casts_needed, "time", "times"));
+                tasks.listAppend("cast garbage nova " + pluraliseWordy(casts_needed, "time", "times"));
                 
                 
                     
-                subentry.entries.listAppend(tasks.listJoinComponents(", ", "then").capitalizeFirstLetter() + ".");
+                subentry.entries.listAppend(tasks.listJoinComponents(", ", "then").capitaliseFirstLetter() + ".");
                 
                 subentry.entries.listAppend(per_round_damage + " damage/round.");
             }
-            else if ($skill[saucegeyser].have_skill())
+            else if (lookupSkill("Garbage Nova").skill_is_usable())
+            {
+                subentry.entries.listAppend("Cast garbage nova four times with enough buffed mysticality. Umm... I don't know what that is. Maybe two hundred.");
+            }
+            else if ($skill[saucegeyser].skill_is_usable())
             {
                 boolean need_modifier_output = true;
                 if (my_familiar() != $familiar[magic dragonfish] && $familiar[magic dragonfish].familiar_is_usable() && !__misc_state["familiars temporarily blocked"])
@@ -1097,12 +1101,12 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         string [int] healing_items_available;
         foreach it in $items[filthy poultice,gauze garter,red pixel potion,Dreadsylvanian seed pod,soggy used band-aid,Mer-kin healscroll,scented massage oil,extra-strength red potion,red potion]
         {
-            if (it.available_amount() == 0)
+            if (it.item_amount() == 0)
                 continue;
-            if (it.available_amount() == 1)
+            if (it.item_amount() == 1)
                 healing_items_available.listAppend(it.to_string());
             else
-                healing_items_available.listAppend(it.pluralize());
+                healing_items_available.listAppend(it.pluralise());
         }
         if (healing_items_available.count() > 0)
             subentry.entries.listAppend("Healing items available: " + healing_items_available.listJoinComponents(", ", "and") + ".");
@@ -1202,7 +1206,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             if ($skill[rain dance].skill_is_usable() && my_rain() >= 10)
             {
                 int times = floor(my_rain().to_float() / 10.0);
-                task_entries.listAppend(ChecklistEntryMake("__effect Rain Dancin'", "skills.php", ChecklistSubentryMake("Cast Rain Dance " + pluralizeWordy(times, "time", "times"), "", "+20% item buff for aftercore.")));
+                task_entries.listAppend(ChecklistEntryMake("__effect Rain Dancin'", "skills.php", ChecklistSubentryMake("Cast Rain Dance " + pluraliseWordy(times, "time", "times"), "", "+20% item buff for aftercore.")));
             }
         }
         
@@ -1273,7 +1277,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 }
                 line.listAppend("cast thunder bird/stun/staggers repeatedly under defense is below zero");
                 line.listAppend("attack");
-                tower_killing_ideas.listAppend(line.listJoinComponents(", ", "then").capitalizeFirstLetter());
+                tower_killing_ideas.listAppend(line.listJoinComponents(", ", "then").capitaliseFirstLetter());
             }
             else if ($skill[curse of weaksauce].skill_is_usable() && $item[crayon shavings].available_amount() >= 2) //currently disabled because while it'll work in theory, I haven't tested it
             {
@@ -1292,7 +1296,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 line.listAppend("stagger/stun until defense is below zero");
                 
                 line.listAppend("attack");
-                tower_killing_ideas.listAppend(line.listJoinComponents(", ", "then").capitalizeFirstLetter());
+                tower_killing_ideas.listAppend(line.listJoinComponents(", ", "then").capitaliseFirstLetter());
             }
             
             //Familiar sources:
@@ -1362,7 +1366,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             {
                 if (it.item_amount() == 0 || !it.is_unrestricted())
                     continue;
-                stun_sources.listAppend(it.pluralizeWordy());
+                stun_sources.listAppend(it.pluraliseWordy());
             }
             if ($item[naughty paper shuriken].available_amount() > 0)
                 stun_sources.listAppend("naughty paper shuriken");
@@ -1421,7 +1425,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             {
                 if (it.item_amount() == 0 || !it.is_unrestricted())
                     continue;
-                stagger_sources.listAppend(it.pluralizeWordy());
+                stagger_sources.listAppend(it.pluraliseWordy());
             }
             if ($item[operation patriot shield].equipped_amount() > 0)
                 stagger_sources.listAppend("throw shield");
@@ -1446,7 +1450,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                     tower_killing_ideas.listAppend("Small golem available. Use early in combat for 3k damage/round.");
             }
             if ($item[slime stack].available_amount() > 0)
-                tower_killing_ideas.listAppend($item[slime stack].pluralize() + " available. (15% damage)");
+                tower_killing_ideas.listAppend($item[slime stack].pluralise() + " available. (15% damage)");
                 
             if ($skill[frigidalmatian].skill_is_usable() && my_maxmp() >= 300 && $effect[Frigidalmatian].have_effect() == 0)
                 tower_killing_ideas.listAppend("Possibly cast Frigidalmatian.");

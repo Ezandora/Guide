@@ -49,7 +49,7 @@ void SEquipmentGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     }
 }
 
-void SEquipmentGenerateResource(ChecklistEntry [int] available_resources_entries)
+void SEquipmentGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if ($item[Xiblaxian holo-wrist-puter].equipped_amount() > 0)
     {
@@ -63,7 +63,7 @@ void SEquipmentGenerateResource(ChecklistEntry [int] available_resources_entries
             string header = turns_left + " combats to Xiblaxian item";
             if (turns_left <= 1)
                 header = "Xiblaxian next turn";
-            available_resources_entries.listAppend(ChecklistEntryMake("__item Xiblaxian holo-wrist-puter", "", ChecklistSubentryMake(header, "", description), 8));
+            resource_entries.listAppend(ChecklistEntryMake("__item Xiblaxian holo-wrist-puter", "", ChecklistSubentryMake(header, "", description), 8));
         }
     }
 }

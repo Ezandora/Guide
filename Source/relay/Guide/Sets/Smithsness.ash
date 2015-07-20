@@ -102,27 +102,27 @@ void smithsnessGenerateSmithereensSuggestions(string [int] smithereen_suggestion
 	
 }
 
-void SSmithsnessGenerateResource(ChecklistEntry [int] available_resources_entries)
+void SSmithsnessGenerateResource(ChecklistEntry [int] resource_entries)
 {
 	if (__misc_state["In run"] && $item[handful of smithereens].available_amount() > 0)
 	{
 		string [int] smithereen_suggestions;
 		smithsnessGenerateSmithereensSuggestions(smithereen_suggestions);
-		available_resources_entries.listAppend(ChecklistEntryMake("__item handful of smithereens", "", ChecklistSubentryMake(pluralize($item[handful of smithereens]), "", smithereen_suggestions.listJoinComponents("<hr>")), 10));
+		resource_entries.listAppend(ChecklistEntryMake("__item handful of smithereens", "", ChecklistSubentryMake(pluralise($item[handful of smithereens]), "", smithereen_suggestions.listJoinComponents("<hr>")), 10));
 	}
 	if (__misc_state["In run"] && $item[lump of Brituminous coal].available_amount() > 0)
 	{
 		string [int] coal_suggestions;
 		smithsnessGenerateCoalSuggestions(coal_suggestions);
-		available_resources_entries.listAppend(ChecklistEntryMake("__item lump of Brituminous coal", "", ChecklistSubentryMake(pluralize($item[lump of Brituminous coal]), "", coal_suggestions.listJoinComponents("<hr>")), 10));
+		resource_entries.listAppend(ChecklistEntryMake("__item lump of Brituminous coal", "", ChecklistSubentryMake(pluralise($item[lump of Brituminous coal]), "", coal_suggestions.listJoinComponents("<hr>")), 10));
 	}
 	if ($item[flaskfull of hollow].available_amount() > 0 && $effect[Merry Smithsness].have_effect() < 25 && __misc_state["In run"])
 	{
 		int turns_left = $effect[Merry Smithsness].have_effect();
 		string [int] details;
-		details.listAppend(pluralize((turns_left + 150 * $item[flaskfull of hollow].available_amount()), "turn", "turns") + " of +25 smithsness");
+		details.listAppend(pluralise((turns_left + 150 * $item[flaskfull of hollow].available_amount()), "turn", "turns") + " of +25 smithsness");
 		if (turns_left > 0)
-			details.listAppend("Effect will run out in " + pluralize(turns_left, "turn", "turns"));
-		available_resources_entries.listAppend(ChecklistEntryMake("__item flaskfull of hollow", "inventory.php?which=3", ChecklistSubentryMake(pluralize($item[flaskfull of hollow]), "", details), 10));
+			details.listAppend("Effect will run out in " + pluralise(turns_left, "turn", "turns"));
+		resource_entries.listAppend(ChecklistEntryMake("__item flaskfull of hollow", "inventory.php?which=3", ChecklistSubentryMake(pluralise($item[flaskfull of hollow]), "", details), 10));
 	}
 }

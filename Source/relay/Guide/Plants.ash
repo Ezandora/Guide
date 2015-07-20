@@ -53,7 +53,7 @@ Plant [string] __plant_properties;
 string [int] __plant_output_order; //MUST contain all plants
 
 
-void finalizeSetUpFloristState()
+void finaliseSetUpFloristState()
 {
 	if (!florist_available())
 		return;
@@ -149,7 +149,7 @@ void finalizeSetUpFloristState()
 	//War Lily - indoor, +ML:
     if (__misc_state["need to level"])
     {
-        if ((my_path_id() != PATH_PICKY || my_primestat() == $stat[moxie]) && $location[The Castle in the Clouds in the Sky (Ground Floor)].turns_spent < 11) //nightmare in picky
+        if ((my_path_id() != PATH_PICKY || my_primestat() == $stat[moxie]) && $location[The Castle in the Clouds in the Sky (Ground Floor)].turnsAttemptedInLocation() < 11) //nightmare in picky
             __plants_suggested_locations.listAppend(PlantSuggestionMake($location[The castle in the clouds in the sky (ground floor)], "War Lily", ""));
         //Haunted bedroom?
     }
@@ -293,7 +293,7 @@ void generateFloristFriar(Checklist [int] checklists)
 	checklists.listAppend(ChecklistMake("Florist Friar", florist_entries));
 }
 
-//Does not return color formatting for elemental damage; will need to add that yourself.
+//Does not return colour formatting for elemental damage; will need to add that yourself.
 string getPlantDescription(string plant_name)
 {
     switch (plant_name)

@@ -2,7 +2,7 @@ buffer generateNavbar(Checklist [int] ordered_output_checklists)
 {
     buffer navbar;
     navbar.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_bottom_outer_container", "style", "bottom:0px;")));
-    navbar.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_bottom_inner_container", "style", "background:" + __setting_navbar_background_color + ";")));
+    navbar.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_bottom_inner_container", "style", "background:" + __setting_navbar_background_colour + ";")));
     
     string [int] titles;
     foreach key in ordered_output_checklists
@@ -67,14 +67,14 @@ buffer generateNavbar(Checklist [int] ordered_output_checklists)
             string text_div = HTMLGenerateDivOfClass(title, "r_navbar_text");
             if (__use_table_based_layouts)
             {
-                //Vertical centering with tables:
+                //Vertical centring with tables:
                 navbar.append("<table style=\"border-spacing:0px;margin-left:auto;margin-right:auto;height:100%;\"><tr><td style=\"vertical-align:middle;\">");
                 navbar.append(text_div);
                 navbar.append("</td></tr></table>");
             }
             else if (true)
             {
-                //Vertical centering with divs:
+                //Vertical centring with divs:
                 //Which is to... tell the browser to act like a table.
                 //Sorry.
                 navbar.append(HTMLGenerateTagPrefix("div", mapMake("style", "padding-left:1px;padding-right:1px;margin-left:auto;margin-right:auto;display:table;height:100%;")));
@@ -85,7 +85,7 @@ buffer generateNavbar(Checklist [int] ordered_output_checklists)
             }
             else
             {
-                //No vertical centering.
+                //No vertical centring.
                 navbar.append(text_div);
             }
             navbar.append("</div>");

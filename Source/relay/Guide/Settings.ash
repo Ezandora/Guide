@@ -1,5 +1,5 @@
 //These settings are for development. Don't worry about editing them.
-string __version = "1.2.3.4.5"; //that's amazing, I have the same combination on my luggage
+string __version = "1.2.4";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -28,12 +28,12 @@ boolean __setting_location_bar_limit_max_width = true;
 float __setting_location_bar_max_width_per_entry = 0.35;
 boolean __setting_small_size_uses_full_width = false; //implemented, but disabled - doesn't look amazing. reduced indention width instead to compensate
 
-string __setting_unavailable_color = "#7F7F7F";
-string __setting_line_color = "#B2B2B2";
-string __setting_dark_color = "#C0C0C0";
-string __setting_modifier_color = "#404040";
-string __setting_navbar_background_color = "#FFFFFF";
-string __setting_page_background_color = "#F7F7F7";
+string __setting_unavailable_colour = "#7F7F7F";
+string __setting_line_colour = "#B2B2B2";
+string __setting_dark_colour = "#C0C0C0";
+string __setting_modifier_colour = "#404040";
+string __setting_navbar_background_colour = "#FFFFFF";
+string __setting_page_background_colour = "#F7F7F7";
 
 string __setting_media_query_large_size = "@media (min-width: 500px)";
 string __setting_media_query_medium_size = "@media (min-width: 350px) and (max-width: 500px)";

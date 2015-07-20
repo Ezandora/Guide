@@ -115,23 +115,23 @@ buffer HTMLGenerateSpanOfStyle(string source, string style)
 	return HTMLGenerateTagWrap("span", source, mapMake("style", style));
 }
 
-buffer HTMLGenerateSpanFont(string source, string font_color, string font_size)
+buffer HTMLGenerateSpanFont(string source, string font_colour, string font_size)
 {
-	if (font_color == "" && font_size == "")
+	if (font_colour == "" && font_size == "")
 		return source.to_buffer();
 		
 	string style = "";
 	
-	if (font_color != "")
-		style += "color:" + font_color +";";
+	if (font_colour != "")
+		style += "color:" + font_colour +";";
 	if (font_size != "")
 		style += "font-size:" + font_size +";";
 	return HTMLGenerateSpanOfStyle(source, style);
 }
 
-buffer HTMLGenerateSpanFont(string source, string font_color)
+buffer HTMLGenerateSpanFont(string source, string font_colour)
 {
-    return HTMLGenerateSpanFont(source, font_color, "");
+    return HTMLGenerateSpanFont(source, font_colour, "");
 }
 
 string HTMLConvertStringToAnchorID(string id)

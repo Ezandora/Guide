@@ -320,6 +320,14 @@ string generateRandomMessage()
     
     if (get_property_int("cinderellaScore") >= 32)
         random_messages.listAppend("mother knows best");
+
+    if ($location[the shore\, inc. travel agency].turnsAttemptedInLocation() >= 11)
+    {
+        if (hippy_stone_broken())
+            random_messages.listAppend("beware of shorebots");
+        else
+            random_messages.listAppend("under a distant shore you will find your answers");
+    }
     
     string [class] class_messages;
     class_messages[$class[disco bandit]] = "making discos of your castles";
@@ -329,6 +337,21 @@ string generateRandomMessage()
     
     if (class_messages contains my_class())
         random_messages.listAppend(class_messages[my_class()]);
+    
+    
+    if (__misc_state["Chateau Mantegna available"] && get_property_monster("chateauMonster").phylum == $phylum[fish] && !get_property_boolean("_chateauMonsterFought"))
+    {
+        random_messages.listAppend(HTMLGenerateTagWrap("a", "personal aquarium", generateMainLinkMap("place.php?whichplace=chateau"))); //WhiteWizard42:  feeeeesh. feesh in the waaaall
+    }
+    
+    if (__quest_state["Level 13"].state_boolean["king waiting to be freed"])
+    {
+        if (my_path_id() == PATH_ONE_CRAZY_RANDOM_SUMMER)
+        {
+            random_messages.listClear();
+            random_messages.listAppend("roll the dice");
+        }
+    }
         
     if (last_monster().phylum == $phylum[penguin])
     {
@@ -410,14 +433,17 @@ string generateRandomMessage()
     }
     
     string [string] encounter_messages;
+    boolean encounter_override = false;
     encounter_messages["It's Always Swordfish"] = "one two three four five";
     encounter_messages["Meet Frank"] = "don't trust the skull";
     encounter_messages["The Mirror in the Tower has the View that is True"] = "shatter the false reality";
+    encounter_messages["A Tombstone"] = "peperony and chease";
     
     if (encounter_messages contains get_property("lastEncounter"))
     {
 		random_messages.listClear();
         random_messages.listAppend(encounter_messages[get_property("lastEncounter")]);
+        encounter_override = true;
     }
     
     if (__quest_state["Level 12"].in_progress && __quest_state["Level 12"].state_int["hippies left on battlefield"] == 1 && __quest_state["Level 12"].state_int["frat boys left on battlefield"] == 1)
@@ -494,7 +520,7 @@ string generateRandomMessage()
 		random_messages.listClear();
 		random_messages.listAppend("win some, lose some");
     }
-	if ($effect[beaten up].have_effect() > 0)
+	if ($effect[beaten up].have_effect() > 0 && limit_mode().length() == 0)
 	{
 		random_messages.listClear();
         monster last_monster = get_property_monster("lastEncounter");
@@ -508,6 +534,21 @@ string generateRandomMessage()
 		random_messages.listClear();
 		random_messages.listAppend("find yourself<br>starting back");
 	}
+    if (limit_mode() == "Spelunky" && !encounter_override)
+    {
+		random_messages.listClear();
+        
+        if (get_property("lastEncounter") == "Spelunkrifice" && get_property("spelunkyStatus").contains_text("Buddy: "))
+        {
+            if (get_property("spelunkingStatus").contains_text("Resourceful Kid"))
+                random_messages.listAppend("he's only a child!");
+            else
+                random_messages.listAppend("et tu, " + lowercase_player_name + "?");
+        }
+        else
+            random_messages.listAppend("ascend? yes! play? no!");
+    }
+    
     if (format_today_to_string("YYYYMMdd") == "20151021") //october 21st, 2015
     {
 		random_messages.listClear();

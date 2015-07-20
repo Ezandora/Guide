@@ -5,7 +5,7 @@
 
 
 string [phylum] __dna_phylum_to_description;
-string [phylum] __dna_phylum_to_description_colorless;
+string [phylum] __dna_phylum_to_description_colourless;
 item [phylum] __dna_phylum_to_item;
 effect [phylum] __dna_phylum_to_effect;
 phylum [effect] __dna_effect_to_phylum;
@@ -113,25 +113,25 @@ void SDNAInit()
 	__dna_phylum_to_description[$phylum[pirate]] = "+50% gear drops, +50% booze drops";
     
     
-	__dna_phylum_to_description_colorless[$phylum[demon]] = "+20 hot damage / hot spell damage";
-	__dna_phylum_to_description_colorless[$phylum[hobo]] = "+20 stench damage / stench spell damage";
-	__dna_phylum_to_description_colorless[$phylum[plant]] = "+20 cold damage / cold spell damage";
-	__dna_phylum_to_description_colorless[$phylum[slime]] = "+20 sleaze damage / sleaze spell damage";
-	__dna_phylum_to_description_colorless[$phylum[undead]] = "+20 spooky damage / spooky spell damage";
+	__dna_phylum_to_description_colourless[$phylum[demon]] = "+20 hot damage / hot spell damage";
+	__dna_phylum_to_description_colourless[$phylum[hobo]] = "+20 stench damage / stench spell damage";
+	__dna_phylum_to_description_colourless[$phylum[plant]] = "+20 cold damage / cold spell damage";
+	__dna_phylum_to_description_colourless[$phylum[slime]] = "+20 sleaze damage / sleaze spell damage";
+	__dna_phylum_to_description_colourless[$phylum[undead]] = "+20 spooky damage / spooky spell damage";
     
-	__dna_phylum_to_description[$phylum[demon]] = HTMLGenerateSpanOfClass(__dna_phylum_to_description_colorless[$phylum[demon]], "r_element_hot_desaturated");
-	__dna_phylum_to_description[$phylum[hobo]] = HTMLGenerateSpanOfClass(__dna_phylum_to_description_colorless[$phylum[hobo]], "r_element_stench_desaturated");
-	__dna_phylum_to_description[$phylum[plant]] = HTMLGenerateSpanOfClass(__dna_phylum_to_description_colorless[$phylum[plant]], "r_element_cold_desaturated");
-	__dna_phylum_to_description[$phylum[slime]] = HTMLGenerateSpanOfClass(__dna_phylum_to_description_colorless[$phylum[slime]], "r_element_sleaze_desaturated");
-	__dna_phylum_to_description[$phylum[undead]] = HTMLGenerateSpanOfClass(__dna_phylum_to_description_colorless[$phylum[undead]], "r_element_spooky_desaturated");
+	__dna_phylum_to_description[$phylum[demon]] = HTMLGenerateSpanOfClass(__dna_phylum_to_description_colourless[$phylum[demon]], "r_element_hot_desaturated");
+	__dna_phylum_to_description[$phylum[hobo]] = HTMLGenerateSpanOfClass(__dna_phylum_to_description_colourless[$phylum[hobo]], "r_element_stench_desaturated");
+	__dna_phylum_to_description[$phylum[plant]] = HTMLGenerateSpanOfClass(__dna_phylum_to_description_colourless[$phylum[plant]], "r_element_cold_desaturated");
+	__dna_phylum_to_description[$phylum[slime]] = HTMLGenerateSpanOfClass(__dna_phylum_to_description_colourless[$phylum[slime]], "r_element_sleaze_desaturated");
+	__dna_phylum_to_description[$phylum[undead]] = HTMLGenerateSpanOfClass(__dna_phylum_to_description_colourless[$phylum[undead]], "r_element_spooky_desaturated");
     
 	__dna_phylum_to_description[$phylum[weird]] = "+4 stats/fight";
     
     foreach p in __dna_phylum_to_description
     {
-        if (__dna_phylum_to_description_colorless contains p)
+        if (__dna_phylum_to_description_colourless contains p)
             continue;
-        __dna_phylum_to_description_colorless[p] = __dna_phylum_to_description[p];
+        __dna_phylum_to_description_colourless[p] = __dna_phylum_to_description[p];
     }
     
     __dna_phylum_to_item[$phylum[beast]] = lookupItem("Gene Tonic: Beast");
@@ -236,7 +236,7 @@ void SDNAInit()
             reasons.listAppend("a-boo peak");
         
         if (reasons.count() > 0)
-            __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[elemental], "+3 all resistance", reasons.listJoinComponents(", ", "and").capitalizeFirstLetter()));
+            __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[elemental], "+3 all resistance", reasons.listJoinComponents(", ", "and").capitaliseFirstLetter()));
     }
     
     if (__misc_state["In run"])
@@ -310,7 +310,7 @@ void SDNAInit()
     }
 }
 
-void SDNAGenerateResource(ChecklistEntry [int] available_resources_entries)
+void SDNAGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (!mafiaIsPastRevision(13918)) //minimum supported version
         return;
@@ -321,7 +321,7 @@ void SDNAGenerateResource(ChecklistEntry [int] available_resources_entries)
     
     //Player has a genetic engineering lab installed. Let's play with our DNA!
     
-    phylum syringe_phylum = get_property("dnaSyringe").to_phylum();
+    phylum syringe_phylum = getDNASyringePhylum();
     int potions_made = get_property_int("_dnaPotionsMade");
     int potions_left = MAX(0, 3 - potions_made);
     boolean became_a_genetic_monstrosity_today = get_property_boolean("_dnaHybrid");
@@ -359,7 +359,7 @@ void SDNAGenerateResource(ChecklistEntry [int] available_resources_entries)
     boolean syringe_description_output = false;
     if (syringe_phylum != $phylum[none])
     {
-        string line = "Syringe has " + syringe_phylum + "." + " (" + __dna_phylum_to_description_colorless[syringe_phylum] + ")";
+        string line = "Syringe has " + syringe_phylum + "." + " (" + __dna_phylum_to_description_colourless[syringe_phylum] + ")";
         syringe_description = line;
     }
     
@@ -401,7 +401,7 @@ void SDNAGenerateResource(ChecklistEntry [int] available_resources_entries)
                     phylum_descriptions.listAppend(DNABoldPhylumIfCurrentMonster(p));
                     
                     if (suggestion.relevant_effect_description.length() == 0)
-                        output_effect_description.listAppend(__dna_phylum_to_description_colorless[p]);
+                        output_effect_description.listAppend(__dna_phylum_to_description_colourless[p]);
                 }
                 if (suggestion.relevant_effect_description.length() > 0)
                     output_effect_description.listAppend(suggestion.relevant_effect_description);
@@ -419,7 +419,7 @@ void SDNAGenerateResource(ChecklistEntry [int] available_resources_entries)
         //HTMLGenerateSimpleTableLines
         if (potion_suggestion_descriptions.count() > 0)
             description.listAppend("Tonic ideas:|*" + potion_suggestion_descriptions.listJoinComponents("<hr>|*"));
-        subentries.listAppend(ChecklistSubentryMake(pluralize(potions_left, "gene tonic", "gene tonics") + " creatable", "", description));
+        subentries.listAppend(ChecklistSubentryMake(pluralise(potions_left, "gene tonic", "gene tonics") + " creatable", "", description));
     }
     if (!became_a_genetic_monstrosity_today)
     {
@@ -431,7 +431,7 @@ void SDNAGenerateResource(ChecklistEntry [int] available_resources_entries)
         }
         
         if (__current_dna_intrinsic != $effect[none] && (__dna_effect_to_phylum contains __current_dna_intrinsic))
-            description.listAppend("Currently a " + __dna_effect_to_phylum[__current_dna_intrinsic] + ". (" + __dna_phylum_to_description_colorless[__dna_effect_to_phylum[__current_dna_intrinsic]] + ")");
+            description.listAppend("Currently a " + __dna_effect_to_phylum[__current_dna_intrinsic] + ". (" + __dna_phylum_to_description_colourless[__dna_effect_to_phylum[__current_dna_intrinsic]] + ")");
         
         
         if (__current_dna_intrinsic == $effect[none])
@@ -459,13 +459,13 @@ void SDNAGenerateResource(ChecklistEntry [int] available_resources_entries)
                 continue;
             if (subentries.count() == 0)
                 image_name = "__item Gene Tonic: Constellation";
-            subentries.listAppend(ChecklistSubentryMake(it.pluralize(), "", __dna_phylum_to_description_colorless[p]));
+            subentries.listAppend(ChecklistSubentryMake(it.pluralise(), "", __dna_phylum_to_description_colourless[p]));
             
         }
     }
     
     if (subentries.count() > 0)
-        available_resources_entries.listAppend(ChecklistEntryMake(image_name, "campground.php?action=workshed", subentries, importance));
+        resource_entries.listAppend(ChecklistEntryMake(image_name, "campground.php?action=workshed", subentries, importance));
     
     
 }
@@ -478,7 +478,7 @@ void SDNAGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
         return;
     
     //Reminders:
-    phylum syringe_phylum = get_property("dnaSyringe").to_phylum();
+    phylum syringe_phylum = getDNASyringePhylum();
     
     
     if (get_property_int("_dnaPotionsMade") < 3)
@@ -508,7 +508,7 @@ void SDNAGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
             
             if (suggestion_reason.length() > 0)
             {
-                string description = suggestion_reason.capitalizeFirstLetter() + ".";
+                string description = suggestion_reason.capitaliseFirstLetter() + ".";
                 task_entries.listAppend(ChecklistEntryMake("__effect Human-Human Hybrid", "campground.php?action=workshed", ChecklistSubentryMake("Make gene tonic for " + syringe_phylum, "", description), -11));
             }
         }
@@ -543,8 +543,8 @@ void SDNAGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
             {
                 if (relevant_effect_description.length() == 0)
                     relevant_effect_description = __dna_phylum_to_description[p];
-                string description = suggestion_reason.capitalizeFirstLetter() + ".";
-                description += "|" + monster_phylum().to_string().capitalizeFirstLetter() + " (" + relevant_effect_description + ")";
+                string description = suggestion_reason.capitaliseFirstLetter() + ".";
+                description += "|" + monster_phylum().to_string().capitaliseFirstLetter() + " (" + relevant_effect_description + ")";
                 task_entries.listAppend(ChecklistEntryMake("__effect Human-Human Hybrid", "", ChecklistSubentryMake("Extract DNA from " + last_monster().to_string().HTMLEscapeString(), "", description), -11));
             }
         }

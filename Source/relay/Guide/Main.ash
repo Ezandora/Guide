@@ -6,6 +6,7 @@ import "relay/Guide/Support/Math.ash"
 import "relay/Guide/Support/Library.ash"
 import "relay/Guide/Support/List.ash"
 import "relay/Guide/Tasks.ash"
+import "relay/Guide/Limit Mode/Spelunking.ash"
 import "relay/Guide/Daily Resources.ash"
 import "relay/Guide/Strategy.ash"
 import "relay/Guide/Sections/Messages.ash"
@@ -49,8 +50,9 @@ void runMain(string relay_filename)
 	Checklist [int] ordered_output_checklists;
 	generateChecklists(ordered_output_checklists);
 	
+    string guide_title = "Guide";
 	
-	PageSetTitle("Guide");
+	PageSetTitle(guide_title);
 	
     if (__setting_use_kol_css)
         PageWriteHead(HTMLGenerateTagPrefix("link", mapMake("rel", "stylesheet", "type", "text/css", "href", "/images/styles.css")));
@@ -84,7 +86,7 @@ void runMain(string relay_filename)
 
 	int max_width_setting = __setting_horizontal_width;
 	
-	PageWrite(HTMLGenerateTagPrefix("div", mapMake("class", "r_center", "style", "max-width:" + max_width_setting + "px;"))); //center holding container
+	PageWrite(HTMLGenerateTagPrefix("div", mapMake("class", "r_centre", "style", "max-width:" + max_width_setting + "px;"))); //centre holding container
 	
     
     
@@ -146,11 +148,11 @@ void runMain(string relay_filename)
         string style = "";
         style += "max-width:" + max_width_setting + "px;padding-top:5px;padding-bottom:0.25em;";
         if (!__setting_fill_vertical)
-            style += "background-color:" + __setting_page_background_color + ";";
+            style += "background-color:" + __setting_page_background_colour + ";";
         if (!__setting_side_negative_space_is_dark && !__setting_fill_vertical)
         {
             style += "border:1px solid;border-top:0px;border-bottom:1px solid;";
-            style += "border-color:" + __setting_line_color + ";";
+            style += "border-color:" + __setting_line_colour + ";";
         }
         PageWrite(HTMLGenerateTagPrefix("div", mapMake("style", style)));
     }
@@ -197,8 +199,8 @@ void runMain(string relay_filename)
     
     if (__setting_fill_vertical)
     {
-        PageWrite(HTMLGenerateTagWrap("div", "", mapMake("class", "r_vertical_fill", "style", "z-index:-1;background-color:" + __setting_page_background_color + ";max-width:" + __setting_horizontal_width + "px;"))); //Color fill
-        PageWrite(HTMLGenerateTagWrap("div", "", mapMake("class", "r_vertical_fill", "style", "z-index:-11;border-left:1px solid;border-right:1px solid;border-color:" + __setting_line_color + ";width:" + (__setting_horizontal_width) + "px;"))); //Vertical border lines, empty background
+        PageWrite(HTMLGenerateTagWrap("div", "", mapMake("class", "r_vertical_fill", "style", "z-index:-1;background-color:" + __setting_page_background_colour + ";max-width:" + __setting_horizontal_width + "px;"))); //Color fill
+        PageWrite(HTMLGenerateTagWrap("div", "", mapMake("class", "r_vertical_fill", "style", "z-index:-11;border-left:1px solid;border-right:1px solid;border-color:" + __setting_line_colour + ";width:" + (__setting_horizontal_width) + "px;"))); //Vertical border lines, empty background
     }
     PageWriteHead("<script type=\"text/javascript\" src=\"relay_Guide.js\"></script>");
     

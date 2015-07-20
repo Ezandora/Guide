@@ -89,7 +89,7 @@ int CHECKLIST_DEFAULT_IMPORTANCE = 0;
 record ChecklistEntry
 {
 	string image_lookup_name;
-	string target_location;
+	string url;
 	ChecklistSubentry [int] subentries;
 	boolean should_indent_after_first_subentry;
     
@@ -99,11 +99,11 @@ record ChecklistEntry
 };
 
 
-ChecklistEntry ChecklistEntryMake(string image_lookup_name, string target_location, ChecklistSubentry [int] subentries, int importance, boolean should_highlight)
+ChecklistEntry ChecklistEntryMake(string image_lookup_name, string url, ChecklistSubentry [int] subentries, int importance, boolean should_highlight)
 {
 	ChecklistEntry result;
 	result.image_lookup_name = image_lookup_name;
-	result.target_location = target_location;
+	result.url = url;
 	result.subentries = subentries;
 	result.importance_level = importance;
     result.should_highlight = should_highlight;
@@ -236,10 +236,10 @@ string ChecklistGenerateModifierSpan(string modifier)
 void ChecklistInit()
 {
 	PageAddCSSClass("a", "r_cl_internal_anchor", "");
-	//PageAddCSSClass("", "r_cl_modifier_inline", "font-size:0.80em; color:" + __setting_modifier_color + ";");
-	//PageAddCSSClass("", "r_cl_modifier", "font-size:0.80em; color:" + __setting_modifier_color + "; display:block;");
-    PageAddCSSClass("", "r_cl_modifier_inline", "font-size:0.85em; color:" + __setting_modifier_color + ";");
-    PageAddCSSClass("", "r_cl_modifier", "font-size:0.85em; color:" + __setting_modifier_color + "; display:block;");
+	//PageAddCSSClass("", "r_cl_modifier_inline", "font-size:0.80em; color:" + __setting_modifier_colour + ";");
+	//PageAddCSSClass("", "r_cl_modifier", "font-size:0.80em; color:" + __setting_modifier_colour + "; display:block;");
+    PageAddCSSClass("", "r_cl_modifier_inline", "font-size:0.85em; color:" + __setting_modifier_colour + ";");
+    PageAddCSSClass("", "r_cl_modifier", "font-size:0.85em; color:" + __setting_modifier_colour + "; display:block;");
 	
 	PageAddCSSClass("", "r_cl_header", "text-align:center; font-size:1.15em; font-weight:bold;");
 	PageAddCSSClass("", "r_cl_subheader", "font-size:1.07em; font-weight:bold;");
@@ -266,7 +266,7 @@ void ChecklistInit()
 	if (true)
 	{
 		string div_style = "";
-		div_style = "margin:0px; border:1px; border-style: solid; border-color:" + __setting_line_color + ";";
+		div_style = "margin:0px; border:1px; border-style: solid; border-color:" + __setting_line_colour + ";";
         div_style += "border-left:0px; border-right:0px;";
         div_style += "background-color:#FFFFFF; width:100%; padding-top:5px;";
 		PageAddCSSClass("div", "r_cl_checklist_container", div_style);
@@ -462,9 +462,9 @@ buffer ChecklistGenerate(Checklist cl, boolean output_borders)
 		boolean outputting_anchor = false;
         buffer anchor_prefix_html;
         buffer anchor_suffix_html;
-		if (entry.target_location != "")
+		if (entry.url != "")
 		{
-            anchor_prefix_html = HTMLGenerateTagPrefix("a", mapMake("target", "mainpane", "href", entry.target_location, "class", "r_a_undecorated"));
+            anchor_prefix_html = HTMLGenerateTagPrefix("a", mapMake("target", "mainpane", "href", entry.url, "class", "r_a_undecorated"));
 			anchor_suffix_html.append("</a>");
 			outputting_anchor = true;
 		}

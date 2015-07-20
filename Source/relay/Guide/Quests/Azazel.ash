@@ -75,7 +75,7 @@ void QAzazelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
     
         
 	ChecklistEntry entry;
-	entry.target_location = "pandamonium.php";
+	entry.url = "pandamonium.php";
 	entry.image_lookup_name = base_quest_state.image_name;
 	entry.should_indent_after_first_subentry = true;
     entry.should_highlight = $locations[the laugh floor, infernal rackets backstage] contains __last_adventure_location;
@@ -115,7 +115,7 @@ void QAzazelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             if (imp_air_needed > 0)
             {
                 string line;
-                line = "Need " + pluralize(imp_air_needed, $item[imp air]) + ", from the laugh floor.";
+                line = "Need " + pluralise(imp_air_needed, $item[imp air]) + ", from the laugh floor.";
                 if (!in_ronin())
                     line += " Or the mall.";
                 subentry.entries.listAppend(line);
@@ -124,7 +124,7 @@ void QAzazelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             if (bus_passes_needed > 0)
             {
                 string line;
-                line = "Need " + pluralize(bus_passes_needed, $item[bus pass]) + ", from backstage.";
+                line = "Need " + pluralise(bus_passes_needed, $item[bus pass]) + ", from backstage.";
                 if (!in_ronin())
                     line += " Or the mall.";
                 subentry.entries.listAppend(line);

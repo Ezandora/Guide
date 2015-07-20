@@ -83,7 +83,7 @@ void generateMisc(Checklist [int] checklists)
             leisure_activities.listAppend("craft");
             if ($item[game grid ticket].is_unrestricted())
                 leisure_activities.listAppend("play arcade games");
-            description.listAppend("You'll miss out on " + pluralizeWordy(adventures_lost, "adventure", "adventures") + ". Alas.|Could " + leisure_activities.listJoinComponents(", ", "or") + ".");
+            description.listAppend("You'll miss out on " + pluraliseWordy(adventures_lost, "adventure", "adventures") + ". Alas.|Could " + leisure_activities.listJoinComponents(", ", "or") + ".");
         }
         
         //this could be better (i.e. checking against current shirt and looking in inventory, etc.)
@@ -100,7 +100,7 @@ void generateMisc(Checklist [int] checklists)
         }
         if (in_ronin() && pulls_remaining() > 0)
         {
-            description.listAppend("Don't forget your " + pluralizeWordy(pulls_remaining(), "pull", "pulls") + ".");
+            description.listAppend("Don't forget your " + pluraliseWordy(pulls_remaining(), "pull", "pulls") + ".");
         }
         //FIXME resolution be more adventurous goes here
         
@@ -110,7 +110,7 @@ void generateMisc(Checklist [int] checklists)
             string url = "shop.php?whichshop=still";
             if ($item[soda water].available_amount() == 0)
                 url = "shop.php?whichshop=generalstore";
-            task_entries.entries.listAppend(ChecklistEntryMake("__item tonic water", url, ChecklistSubentryMake("Make " + pluralize(stills_available(), $item[tonic water]), "", listMake("Tonic water is a ~40MP restore, improved from soda water.", "Or improve drinks.")), -11));
+            task_entries.entries.listAppend(ChecklistEntryMake("__item tonic water", url, ChecklistSubentryMake("Make " + pluralise(stills_available(), $item[tonic water]), "", listMake("Tonic water is a ~40MP restore, improved from soda water.", "Or improve drinks.")), -11));
         }
 	}
 }
@@ -124,12 +124,16 @@ void generateChecklists(Checklist [int] ordered_output_checklists)
 	if (__misc_state["Example mode"])
 		setUpExampleState();
 	
-	finalizeSetUpState();
+	finaliseSetUpState();
 	
 	Checklist [int] checklists;
 	
     
-    if (!playerIsLoggedIn())
+    if (limit_mode() == "spelunky" && __setting_debug_mode) //not ready yet
+    {
+        LimitModeSpelunkingGenerateChecklists(checklists);
+    }
+    else if (!playerIsLoggedIn())
     {
         //Hmm. I think emptying everything is the way to go, because if we're not online, we'll be inaccurate. Best to give no advice than some.
         //But, it might break in the future if our playerIsLoggedIn() detection is inaccurate?
@@ -211,7 +215,7 @@ void generateChecklists(Checklist [int] ordered_output_checklists)
 void outputChecklists(Checklist [int] ordered_output_checklists)
 {
     if (__misc_state["In run"] && playerIsLoggedIn())
-        PageWrite(HTMLGenerateDivOfClass("Day " + my_daycount() + ". " + pluralize(my_turncount(), "turn", "turns") + " played.", "r_bold"));
+        PageWrite(HTMLGenerateDivOfClass("Day " + my_daycount() + ". " + pluralise(my_turncount(), "turn", "turns") + " played.", "r_bold"));
 	if (my_path() != "" && my_path() != "None" && playerIsLoggedIn())
 	{
 		PageWrite(HTMLGenerateDivOfClass(my_path(), "r_bold"));
@@ -262,7 +266,7 @@ void outputChecklists(Checklist [int] ordered_output_checklists)
     {
         extra_important_tasks.title = "Tasks";
         extra_important_tasks.disable_generating_id = true;
-        PageWrite(HTMLGenerateTagPrefix("div", mapMake("id", "importance_bar", "style", "z-index:3;position:fixed; top:0;width:100%;max-width:" + __setting_horizontal_width + "px;border-bottom:1px solid;border-color:" + __setting_line_color + ";visibility:hidden;")));
+        PageWrite(HTMLGenerateTagPrefix("div", mapMake("id", "importance_bar", "style", "z-index:3;position:fixed; top:0;width:100%;max-width:" + __setting_horizontal_width + "px;border-bottom:1px solid;border-color:" + __setting_line_colour + ";visibility:hidden;")));
 		PageWrite(ChecklistGenerate(extra_important_tasks, false));
         PageWrite(HTMLGenerateTagSuffix("div"));
         

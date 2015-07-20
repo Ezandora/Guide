@@ -201,10 +201,10 @@ void SAftercoreThingsToDoGenerateTasks(ChecklistEntry [int] task_entries, Checkl
         string url = "";
         foreach key, option in options
         {
-            option.header = option.header.capitalizeFirstLetter();
+            option.header = option.header.capitaliseFirstLetter();
             foreach key in option.description
             {
-                option.description[key] = option.description[key].capitalizeFirstLetter() + ".";
+                option.description[key] = option.description[key].capitaliseFirstLetter() + ".";
             }
             if (url.length() == 0)
                 url = option.url;
@@ -251,7 +251,7 @@ void SAftercoreGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
                 if (things_to_buy.count() > 0)
                     things_to_do.listAppend("buy " + things_to_buy.listJoinComponents(", ", "and") + " in mall, ");
                 things_to_do.listAppend("use hey deze map");
-				details.listAppend(things_to_do.listJoinComponents("", "then").capitalizeFirstLetter() + ".");
+				details.listAppend(things_to_do.listJoinComponents("", "then").capitaliseFirstLetter() + ".");
             }
         }
         if ($item[pagoda plans].item_amount() == 0)

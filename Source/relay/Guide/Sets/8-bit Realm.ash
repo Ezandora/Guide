@@ -20,7 +20,7 @@ void S8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
 
         subentry.header = "Bring along the angry jung man";
     
-        subentry.entries.listAppend(pluralize(jung_mans_charge_turns_remaining, "turn", "turns") + " until jar drops. (skip 8-bit realm)");
+        subentry.entries.listAppend(pluralise(jung_mans_charge_turns_remaining, "turn", "turns") + " until jar drops. (skip 8-bit realm)");
         if (my_path_id() == PATH_ONE_CRAZY_RANDOM_SUMMER)
             subentry.entries.listAppend("Or wait for pixellated monsters.");
     
@@ -106,7 +106,7 @@ void S8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     }
 }
 
-void S8bitRealmGenerateResource(ChecklistEntry [int] available_resources_entries)
+void S8bitRealmGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (!(__quest_state["Level 13"].state_boolean["digital key used"] || $item[digital key].available_amount() > 0))
         return;
@@ -123,11 +123,15 @@ void S8bitRealmGenerateResource(ChecklistEntry [int] available_resources_entries
     int [item] max_craftables_wanted;
     craftables[$item[blue pixel potion]] = "~65 MP restore";
     craftables[$item[monster bait]] = "+5% combat";
+    max_craftables_wanted[$item[monster bait]] = 1;
     //pixel sword?
     if (__quest_state["Level 13"].state_boolean["shadow will need to be defeated"])
         craftables[$item[red pixel potion]] = "~110 HP restore for shadow";
     if ($locations[dreadsylvanian castle,the spooky forest,The Haunted Sorority House,The Daily Dungeon] contains __last_adventure_location) //known vampire locations. it's perfectly reasonable to test against the sorority house, here in 2015
+    {
         craftables[$item[pixel whip]] = "vampire killer";
+        max_craftables_wanted[$item[pixel whip]] = 1;
+    }
     
     max_craftables_wanted[$item[blue pixel potion]] = 11;
     max_craftables_wanted[$item[red pixel potion]] = 4; //4 minimum to out-shadow
@@ -138,7 +142,11 @@ void S8bitRealmGenerateResource(ChecklistEntry [int] available_resources_entries
     {
         if (it.available_amount() >= MAX(1, max_craftables_wanted[it]))
             continue;
-        string line = it + ": " + reason;
+        string line = it;
+        
+        if (max_craftables_wanted[it] != 1 && it.creatable_amount() > 0)
+            line = pluralise(it.creatable_amount(), it);
+        line += ": " + reason;
         if (it.creatable_amount() == 0)
         {
             line = HTMLGenerateSpanFont(line, "grey");
@@ -152,6 +160,6 @@ void S8bitRealmGenerateResource(ChecklistEntry [int] available_resources_entries
         string [int] crafting_list = crafting_list_have;
         crafting_list.listAppendList(crafting_list_cannot);
         string pixels_have = "Pixel crafting";
-        available_resources_entries.listAppend(ChecklistEntryMake("__item white pixel", "place.php?whichplace=forestvillage&action=fv_mystic", ChecklistSubentryMake(pixels_have,  "", crafting_list), 10));
+        resource_entries.listAppend(ChecklistEntryMake("__item white pixel", "place.php?whichplace=forestvillage&action=fv_mystic", ChecklistSubentryMake(pixels_have,  "", crafting_list), 10));
     }
 }

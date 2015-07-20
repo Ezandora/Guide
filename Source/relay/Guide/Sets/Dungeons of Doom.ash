@@ -59,7 +59,7 @@ void SDungeonsOfDoomGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
             description.listAppend("Run -combat in the enormous greater-than sign.");
             
         }
-        description.listAppend(tasks.listJoinComponents(", ", "then").capitalizeFirstLetter() + ".");
+        description.listAppend(tasks.listJoinComponents(", ", "then").capitaliseFirstLetter() + ".");
     }
     
     if (should_output)

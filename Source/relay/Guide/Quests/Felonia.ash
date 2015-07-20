@@ -122,7 +122,7 @@ void QFeloniaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 }
                 tasks.listAppend("defeat Felonia");
                 
-                subentry.entries.listAppend(tasks.listJoinComponents(", ", "and").capitalizeFirstLetter() + " in the Spooky Gravy Burrow.");
+                subentry.entries.listAppend(tasks.listJoinComponents(", ", "and").capitaliseFirstLetter() + " in the Spooky Gravy Burrow.");
                 need_minus_combat = true;
             }
             else

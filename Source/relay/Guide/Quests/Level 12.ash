@@ -214,7 +214,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 		
 		//FIXME consider looking into tracking how long until the semi-rare item runs out, for turn calculation
 		if (turn_range.x == turn_range.y)
-			details.listAppend(pluralize(turn_range.x, "turn", "turns") + " remaining");
+			details.listAppend(pluralise(turn_range.x, "turn", "turns") + " remaining");
 		else
 			details.listAppend("[" + turn_range.x + " to " + turn_range.y + "] turns remaining");
         
@@ -449,7 +449,7 @@ void QLevel12GenerateBattlefieldDescription(ChecklistSubentry subentry, string s
     string line;
     if (enemies_remaining > 0)
     {
-        line = pluralize(enemies_remaining, enemy_name, enemy_name_plural) + " left.";
+        line = pluralise(enemies_remaining, enemy_name, enemy_name_plural) + " left.";
     }
     else
         line += "Fight " + boss_name + "!";
@@ -469,8 +469,8 @@ void QLevel12GenerateBattlefieldDescription(ChecklistSubentry subentry, string s
     int turns_remaining = ceiling(enemies_remaining.to_float() / enemies_defeated_per_combat.to_float());
     if (turns_remaining > 0)
     {
-        line += "|*" + pluralize(turns_remaining, "turn", "turns") + " remaining.";
-        line += " " + pluralize(enemies_defeated_per_combat, enemy_name, enemy_name_plural) + " defeated per combat.";
+        line += "|*" + pluralise(turns_remaining, "turn", "turns") + " remaining.";
+        line += " " + pluralise(enemies_defeated_per_combat, enemy_name, enemy_name_plural) + " defeated per combat.";
     }
     int enemies_to_defeat_for_unlock = -1;
     string area_to_unlock = "";
@@ -517,7 +517,7 @@ void QLevel12GenerateBattlefieldDescription(ChecklistSubentry subentry, string s
     if (enemies_to_defeat_for_unlock != -1)
     {
         int turns_to_reach = ceiling(enemies_to_defeat_for_unlock.to_float() / enemies_defeated_per_combat.to_float());
-        line += "|*" + pluralize(turns_to_reach, "turn", "turns") + " (" + pluralize(enemies_to_defeat_for_unlock, enemy_name, enemy_name_plural) + ") to unlock " + area_to_unlock + ".";
+        line += "|*" + pluralise(turns_to_reach, "turn", "turns") + " (" + pluralise(enemies_to_defeat_for_unlock, enemy_name, enemy_name_plural) + ") to unlock " + area_to_unlock + ".";
     }
     
     if (areas_unlocked_but_not_completed.count() > 0)

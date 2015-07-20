@@ -17,7 +17,7 @@ void SJarlsbergGenerateStaff(ChecklistEntry entry, item staff, string property_n
             else
                 title += " uses";
         }
-            //description = pluralizeWordy(uses_remaining, "use remains", "uses remain").capitalizeFirstLetter() + ".|" + description;
+            //description = pluraliseWordy(uses_remaining, "use remains", "uses remain").capitaliseFirstLetter() + ".|" + description;
         entry.subentries.listAppend(ChecklistSubentryMake(title, "", description));
         if (entry.image_lookup_name == "")
             entry.image_lookup_name = "__item " + staff;
@@ -25,13 +25,13 @@ void SJarlsbergGenerateStaff(ChecklistEntry entry, item staff, string property_n
 }
 
 
-void SJarlsbergGenerateResource(ChecklistEntry [int] available_resources_entries)
+void SJarlsbergGenerateResource(ChecklistEntry [int] resource_entries)
 {
 	if (my_path_id() != PATH_AVATAR_OF_JARLSBERG)
 		return;
     
 	ChecklistEntry entry;
-	entry.target_location = "";
+	entry.url = "";
 	entry.image_lookup_name = "";
     
     
@@ -70,5 +70,5 @@ void SJarlsbergGenerateResource(ChecklistEntry [int] available_resources_entries
     SJarlsbergGenerateStaff(entry, $item[Staff of the Staff of Life], "_jiggleLife", "Restores all HP.", false);
     
     if (entry.subentries.count() > 0)
-        available_resources_entries.listAppend(entry);
+        resource_entries.listAppend(entry);
 }

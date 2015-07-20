@@ -66,7 +66,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
             else
                 url = "inventory.php?which=3";
             if ($item[gaudy key].available_amount() > 0)
-                subentry.entries.listAppend("Use " + $item[gaudy key].pluralize() + ".");
+                subentry.entries.listAppend("Use " + $item[gaudy key].pluralise() + ".");
         }
         else
         {
@@ -134,7 +134,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                 tasks.listAppend("equip the Mega Gem");
             
             tasks.listAppend("fight Dr. Awkward in his office");
-            subentry.entries.listAppend(tasks.listJoinComponents(", ", "then").capitalizeFirstLetter() + ".");
+            subentry.entries.listAppend(tasks.listJoinComponents(", ", "then").capitaliseFirstLetter() + ".");
         }
         else if (base_quest_state.mafia_internal_step == 3 && 7270.to_item().available_amount() > 0 && mafiaIsPastRevision(14644) && false)
         {
@@ -228,7 +228,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
             else
                 tasks.listAppend("talk to Mr. Alarm to unlock Whitey's Grove");
                 
-            subentry.entries.listAppend(tasks.listJoinComponents(", ", "and").capitalizeFirstLetter() + ".");
+            subentry.entries.listAppend(tasks.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".");
             if (lookupItem("talisman o' nam").equipped_amount() == 0)
                 subentry.entries.listAppend("Equip the Talisman o' Nam.");
         }
@@ -266,7 +266,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                         monsters_in_zone = 5;
                     
                     if (!in_hardcore() && (get_property("questM21Dance") == "finished" || $location[the haunted ballroom].turnsAttemptedInLocation() > 0 || lookupItem("Lady Spookyraven's finest gown").available_amount() > 0))
-                        single_entry_mode += "|Or pull for it. (saves " + pluralizeWordy(monsters_in_zone, "turn", "turns") + ")";
+                        single_entry_mode += "|Or pull for it. (saves " + pluraliseWordy(monsters_in_zone, "turn", "turns") + ")";
                     need_palindome_location = false;
                 }
                 else
@@ -334,7 +334,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                 }
                 else
                 {
-                    subentry.entries.listAppend("Defeat " + pluralizeWordy(dudes_left, "more dude", "more dudes") + " in the palindome.");
+                    subentry.entries.listAppend("Defeat " + pluraliseWordy(dudes_left, "more dude", "more dudes") + " in the palindome.");
                 }
                 need_to_adventure_in_palindome = true;
             }

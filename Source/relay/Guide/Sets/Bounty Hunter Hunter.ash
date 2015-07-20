@@ -103,7 +103,7 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
                     target_locations.listAppend(l);
                     
                     min_turns_remaining = turns_remaining;
-                    turns_remaining_string = " ~" + pluralize(round(turns_remaining), "turn remains", "turns remain") + ".";
+                    turns_remaining_string = " ~" + pluralise(round(turns_remaining), "turn remains", "turns remain") + ".";
                 }
             }
             if (noncombats_wanted && appearance_rates[$monster[none]] != 0.0)
@@ -134,7 +134,7 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
     else
     {
         int amount_remaining = amount_needed - amount_found;
-        subentry.entries.listAppend(amount_remaining.int_to_wordy().capitalizeFirstLetter() + " left." + turns_remaining_string);
+        subentry.entries.listAppend(amount_remaining.int_to_wordy().capitaliseFirstLetter() + " left." + turns_remaining_string);
         //subentry.entries.listAppend(amount_found + " out of " + amount_needed + " found." + turns_remaining_string);
     }
     

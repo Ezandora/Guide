@@ -12,22 +12,22 @@ string [int] SSkillsPotentialCraftingOptions()
     return potential_options;
 }
 
-void SSkillsGenerateResource(ChecklistEntry [int] available_resources_entries)
+void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
 {
     string url;
 	if (skill_is_usable($skill[inigo's incantation of inspiration]))
 	{
 		int inigos_casts_remaining = 5 - get_property_int("_inigosCasts");
-		string description = SSkillsPotentialCraftingOptions().listJoinComponents(", ").capitalizeFirstLetter();
+		string description = SSkillsPotentialCraftingOptions().listJoinComponents(", ").capitaliseFirstLetter();
 		if (inigos_casts_remaining > 0)
-			available_resources_entries.listAppend(ChecklistEntryMake("__effect Inigo's Incantation of Inspiration", "skills.php", ChecklistSubentryMake(pluralize(inigos_casts_remaining, "Inigo's cast", "Inigo's casts") + " remaining", "", description), 4));
+			resource_entries.listAppend(ChecklistEntryMake("__effect Inigo's Incantation of Inspiration", "skills.php", ChecklistSubentryMake(pluralise(inigos_casts_remaining, "Inigo's cast", "Inigo's casts") + " remaining", "", description), 4));
 	}
     if (lookupSkill("rapid prototyping").skill_is_usable())
     {
         int casts_remaining = clampi(5 - get_property_int("_rapidPrototypingUsed"), 0, 5);
-		string description = SSkillsPotentialCraftingOptions().listJoinComponents(", ").capitalizeFirstLetter();
+		string description = SSkillsPotentialCraftingOptions().listJoinComponents(", ").capitaliseFirstLetter();
 		if (casts_remaining > 0)
-			available_resources_entries.listAppend(ChecklistEntryMake("__item tenderizing hammer", "", ChecklistSubentryMake(pluralize(casts_remaining, "free craft", "free crafts") + " remaining", "", description), 4));
+			resource_entries.listAppend(ChecklistEntryMake("__item tenderizing hammer", "", ChecklistSubentryMake(pluralise(casts_remaining, "free craft", "free crafts") + " remaining", "", description), 4));
         
     }
 	ChecklistSubentry [int] subentries;
@@ -173,6 +173,6 @@ void SSkillsGenerateResource(ChecklistEntry [int] available_resources_entries)
 		subentries.listPrepend(ChecklistSubentryMake("Skill summons:"));
 		ChecklistEntry entry = ChecklistEntryMake("__item Knob Goblin love potion", url, subentries, importance);
 		entry.should_indent_after_first_subentry = true;
-		available_resources_entries.listAppend(entry);
+		resource_entries.listAppend(entry);
 	}
 }

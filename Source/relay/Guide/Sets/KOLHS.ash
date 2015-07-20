@@ -20,7 +20,7 @@ void SKOLHSGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         subentry.entries.listAppend(adventures_remaining + " adventures left in school.");
     }
     else if (ring_ring_ring_ring_left > 0)
-        subentry.entries.listAppend(pluralize(ring_ring_ring_ring_left, "bell ring", "bell rings") + " left.");
+        subentry.entries.listAppend(pluralise(ring_ring_ring_ring_left, "bell ring", "bell rings") + " left.");
     
     
     if (subentry.entries.count() > 0)

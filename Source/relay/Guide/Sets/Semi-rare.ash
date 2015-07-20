@@ -218,7 +218,7 @@ void SSemirareGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
 				title = "Semi-rare now";
 			}
 			else
-				title = pluralize(turns_until, "turn", "turns") + " until semi-rare";
+				title = pluralise(turns_until, "turn", "turns") + " until semi-rare";
 				
 			min_turns_until = turns_until;
         }
@@ -273,9 +273,9 @@ void SSemirareGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
 	}
 }
 
-void SSemirareGenerateResource(ChecklistEntry [int] available_resources_entries)
+void SSemirareGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	SSemirareGenerateEntry(available_resources_entries, available_resources_entries, false);
+	SSemirareGenerateEntry(resource_entries, resource_entries, false);
 }
 
 void SSemirareGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)

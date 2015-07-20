@@ -61,7 +61,7 @@ void QLegendaryBeatGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
             if ($item[can-you-dig-it?].equipped_amount() == 0)
                 tasks.listAppend("equip can-you-dig-it?");
             tasks.listAppend("adventure in Small-O-Fier, find non-combat, dig your way to safety");
-            subentry.entries.listAppend(tasks.listJoinComponents(", ", "then").capitalizeFirstLetter() + ".");
+            subentry.entries.listAppend(tasks.listJoinComponents(", ", "then").capitaliseFirstLetter() + ".");
         }
         else if ($item[can-you-dig-it?].available_amount() > 0 && $effect[smooth legs].have_effect() > 0)
         {
@@ -109,7 +109,7 @@ void QLegendaryBeatGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
                 else if (!waiting)
                     tasks.listAppend("eat a squirmy violent party snack");
             }
-            subentry.entries.listAppend(tasks.listJoinComponents(", ", "and").capitalizeFirstLetter() + ".");
+            subentry.entries.listAppend(tasks.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".");
         }
         else
         {

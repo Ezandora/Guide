@@ -128,8 +128,8 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             
             if (turns_delay != -1 && !need_minus_combat)
             {
-                //subentry.entries.listAppend(pluralizeWordy(turns_delay, "turn", "turns").capitalizeFirstLetter() + " delay until -combat relevant.");
-                string line = "After " + pluralizeWordy(turns_delay, "turn", "turns") + " delay, ";
+                //subentry.entries.listAppend(pluraliseWordy(turns_delay, "turn", "turns").capitaliseFirstLetter() + " delay until -combat relevant.");
+                string line = "After " + pluraliseWordy(turns_delay, "turn", "turns") + " delay, ";
                 if (immaterias_missing.count() == 0)
                     subentry.entries.listAppend(line + "find Cid.");
                 else
@@ -152,7 +152,7 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             if (turns_spent == -1)
                 subentry.entries.listAppend("25 total turns of delay.");
             else if (turns_spent < 25)
-                subentry.entries.listAppend(pluralize(25 - turns_spent, "turn", "turns") + " total delay remaining.");
+                subentry.entries.listAppend(pluralise(25 - turns_spent, "turn", "turns") + " total delay remaining.");
             if ($skill[Transcendent Olfaction].skill_is_usable() && !($effect[on the trail].have_effect() > 0 && get_property("olfactedMonster") == "Quiet Healer"))
                 subentry.entries.listAppend("Potentially olfact quiet healer for SGEEAs");
             
@@ -246,7 +246,7 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             if (turns_spent != -1)
             {
                 turns_remaining = 11 - turns_spent;
-                subentry.entries.listAppend("Ground floor. Spend " + pluralizeWordy(turns_remaining, "more turn", "more turns") + " here to unlock top floor.");
+                subentry.entries.listAppend("Ground floor. Spend " + pluraliseWordy(turns_remaining, "more turn", "more turns") + " here to unlock top floor.");
             }
             else
                 subentry.entries.listAppend("Ground floor. Spend eleven turns here to unlock top floor.");

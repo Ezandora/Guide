@@ -81,7 +81,7 @@ void generateMissingItems(Checklist [int] checklists)
 		}
 		string from_daily_dungeon_string = "From daily dungeon";
 		if ($item[fat loot token].available_amount() > 0)
-			from_daily_dungeon_string += "|" + pluralize($item[fat loot token]) + " available";
+			from_daily_dungeon_string += "|" + pluralise($item[fat loot token]) + " available";
 		if ($item[sneaky pete's key].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["Sneaky Pete's key used"])
 		{
 			string [int] options;
@@ -185,7 +185,7 @@ void generateMissingItems(Checklist [int] checklists)
             subentry.modifiers.listAppend(HTMLGenerateSpanOfClass("+" + type + " spell damage", type_class));
             sources.listAppend(type);
         }
-        subentry.header = sources.listJoinComponents(", ", "and").capitalizeFirstLetter() + " sources";
+        subentry.header = sources.listJoinComponents(", ", "and").capitaliseFirstLetter() + " sources";
         if (subentry.modifiers.count() > 0)
             items_needed_entries.listAppend(ChecklistEntryMake("__item vial of patchouli oil", "", subentry));
     }

@@ -1,4 +1,4 @@
-void SPlasticVampireFangsGenerateResource(ChecklistEntry [int] available_resources_entries)
+void SPlasticVampireFangsGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (!$item[plastic vampire fangs].is_unrestricted())
         return;
@@ -49,7 +49,7 @@ void SPlasticVampireFangsGenerateResource(ChecklistEntry [int] available_resourc
             description.listAppend("Visit Isabella's" + separator + "Redirect Your Desire" + separator + "Go to the Bar.");
         
         
-        available_resources_entries.listAppend(ChecklistEntryMake("__item " + fang_source, url, ChecklistSubentryMake("Vampire stats", "", description), 5));
+        resource_entries.listAppend(ChecklistEntryMake("__item " + fang_source, url, ChecklistSubentryMake("Vampire stats", "", description), 5));
         
     }
 
@@ -136,8 +136,8 @@ void SPlasticVampireFangsGenerateResource(ChecklistEntry [int] available_resourc
         
         if (vamp_outs_remaining > 0)
         {
-            //available_resources_entries.listAppend(ChecklistEntryMake("__item " + fang_source, url, ChecklistSubentryMake(pluralize(vamp_outs_remaining, "vamp out", "vamp outs"), "", description), 8));
-            available_resources_entries.listAppend(ChecklistEntryMake("__item " + fang_source, url, ChecklistSubentryMake("Vampire masquerade", "", description), 8));
+            //resource_entries.listAppend(ChecklistEntryMake("__item " + fang_source, url, ChecklistSubentryMake(pluralise(vamp_outs_remaining, "vamp out", "vamp outs"), "", description), 8));
+            resource_entries.listAppend(ChecklistEntryMake("__item " + fang_source, url, ChecklistSubentryMake("Vampire masquerade", "", description), 8));
         }
     }
 }

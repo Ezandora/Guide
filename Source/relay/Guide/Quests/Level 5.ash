@@ -58,7 +58,7 @@ void QLevel5GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
                 if (delay_turns_remaining == 0)
                     subentry.entries.listAppend("Map appears next turn in cobb's knob.");
                 else
-                    subentry.entries.listAppend("Delay for " + pluralizeWordy(delay_turns_remaining, "more turn", "more turns") + " in cobb's knob to unlock area.");
+                    subentry.entries.listAppend("Delay for " + pluraliseWordy(delay_turns_remaining, "more turn", "more turns") + " in cobb's knob to unlock area.");
             }
             else
                 subentry.entries.listAppend("Delay for ten turns in cobb's knob to unlock area.");
@@ -129,7 +129,7 @@ void QLevel5GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 					}
 				}
 				things_to_do_before_fighting_king.listAppend(fight_king_string);
-				harem_lines.listAppend(things_to_do_before_fighting_king.listJoinComponents(", ", "then").capitalizeFirstLetter() + ".");
+				harem_lines.listAppend(things_to_do_before_fighting_king.listJoinComponents(", ", "then").capitaliseFirstLetter() + ".");
 			}
 			subentry.entries.listAppend("Harem route:|*" + ChecklistGenerateModifierSpan(harem_modifiers) + harem_lines.listJoinComponents("|*"));
 		}
@@ -206,7 +206,7 @@ void QLevel5GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 					things_to_do_before_fighting_king.listAppend(cook_cake_line);
 				}
 				things_to_do_before_fighting_king.listAppend(fight_king_string);
-				kge_lines.listAppend(things_to_do_before_fighting_king.listJoinComponents(", then ", "").capitalizeFirstLetter() + ".");
+				kge_lines.listAppend(things_to_do_before_fighting_king.listJoinComponents(", then ", "").capitaliseFirstLetter() + ".");
 			}
 			subentry.entries.listAppend("Guard route:|*" + ChecklistGenerateModifierSpan(kge_modifiers) + kge_lines.listJoinComponents("|*"));
 		}

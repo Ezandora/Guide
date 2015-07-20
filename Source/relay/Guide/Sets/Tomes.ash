@@ -1,4 +1,4 @@
-void STomesGenerateResource(ChecklistEntry [int] available_resources_entries)
+void STomesGenerateResource(ChecklistEntry [int] resource_entries)
 {
 	if (true)
 	{
@@ -38,7 +38,7 @@ void STomesGenerateResource(ChecklistEntry [int] available_resources_entries)
         if (!can_interact())
         {
             int summons_remaining = 3 - get_property_int("tomeSummons");
-            subentries.listAppend(ChecklistSubentryMake(pluralize(summons_remaining, "tome summon", "tome summons") + " remaining", "", ""));
+            subentries.listAppend(ChecklistSubentryMake(pluralise(summons_remaining, "tome summon", "tome summons") + " remaining", "", ""));
         }
         
         
@@ -78,7 +78,7 @@ void STomesGenerateResource(ChecklistEntry [int] available_resources_entries)
 			
 			string name = "The Smith's Tome";
 			if (!in_ronin())
-				name = pluralize(summons_available[$skill[Summon Smithsness]], name + " summon", name + " summons");
+				name = pluralise(summons_available[$skill[Summon Smithsness]], name + " summon", name + " summons");
 			subentries.listAppend(ChecklistSubentryMake(name, "", description));
 			
 		}
@@ -135,7 +135,7 @@ void STomesGenerateResource(ChecklistEntry [int] available_resources_entries)
 			
 			string name = "Tome of Clip Art";
 			if (!in_ronin())
-				name = pluralize(summons_available[$skill[Summon Clip Art]], name + " summon", name + " summons");
+				name = pluralise(summons_available[$skill[Summon Clip Art]], name + " summon", name + " summons");
 			subentries.listAppend(ChecklistSubentryMake(name, "", description));
 		}
 		if (summons_available[$skill[Summon Sugar Sheets]] > 0)
@@ -146,7 +146,7 @@ void STomesGenerateResource(ChecklistEntry [int] available_resources_entries)
 				
 			string name = "Tome of Sugar Shummoning";
 			if (!in_ronin())
-				name = pluralize(summons_available[$skill[Summon Sugar Sheets]], name + " summon", name + " summons");
+				name = pluralise(summons_available[$skill[Summon Sugar Sheets]], name + " summon", name + " summons");
 			subentries.listAppend(ChecklistSubentryMake(name, "", description));
 		}
 		if (summons_available[$skill[Summon Snowcones]] > 0)
@@ -156,7 +156,7 @@ void STomesGenerateResource(ChecklistEntry [int] available_resources_entries)
 			
 			string name = "Tome of Snowcone Summoning";
 			if (!in_ronin())
-				name = pluralize(summons_available[$skill[Summon Snowcones]], name + " summon", name + " summons");
+				name = pluralise(summons_available[$skill[Summon Snowcones]], name + " summon", name + " summons");
 			subentries.listAppend(ChecklistSubentryMake(name, "", description));
 		}
 		if (summons_available[$skill[Summon Stickers]] > 0)
@@ -166,7 +166,7 @@ void STomesGenerateResource(ChecklistEntry [int] available_resources_entries)
 			
 			string name = "Scratch 'n' Sniff Sticker Tome";
 			if (!in_ronin())
-				name = pluralize(summons_available[$skill[Summon Stickers]], name + " summon", name + " summons");
+				name = pluralise(summons_available[$skill[Summon Stickers]], name + " summon", name + " summons");
 			subentries.listAppend(ChecklistSubentryMake(name, "", description));
 		}
 		if (summons_available[$skill[Summon Rad Libs]] > 0)
@@ -177,7 +177,7 @@ void STomesGenerateResource(ChecklistEntry [int] available_resources_entries)
 			
 			string name = "Tome of Rad Libs";
 			if (!in_ronin())
-				name = pluralize(summons_available[$skill[Summon Rad Libs]], name + " summon", name + " summons");
+				name = pluralise(summons_available[$skill[Summon Rad Libs]], name + " summon", name + " summons");
 			subentries.listAppend(ChecklistSubentryMake(name, "", description));
 		}
 		
@@ -185,6 +185,6 @@ void STomesGenerateResource(ChecklistEntry [int] available_resources_entries)
         ChecklistEntry entry = ChecklistEntryMake("__item tome of clip art", "campground.php?action=bookshelf", subentries);
         if (!can_interact())
             entry.should_indent_after_first_subentry = true;
-        available_resources_entries.listAppend(entry);
+        resource_entries.listAppend(entry);
 	}
 }

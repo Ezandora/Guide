@@ -18,7 +18,7 @@ void SActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, Check
     {
         string image_name = "__skill wisdom of thoth";
         string [int] description;
-        description.listAppend("At least " + pluralizeWordy(skills_available - skills_have, "skill", "skills") + " available.");
+        description.listAppend("At least " + pluraliseWordy(skills_available - skills_have, "skill", "skills") + " available.");
         optional_task_entries.listAppend(ChecklistEntryMake(image_name, "place.php?whichplace=edbase&action=edbase_book", ChecklistSubentryMake("Buy Undying skills", "", description), 11));
     }
     
@@ -66,14 +66,14 @@ void SActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, Check
             foreach it in lookupItems("warehouse inventory page,warehouse map page")
             {
                 if (it.available_amount() > 0)
-                    items_available.listAppend(pluralizeWordy(it));
+                    items_available.listAppend(pluraliseWordy(it));
             }
             if (items_available.count() > 0)
             {
-                description.listAppend(items_available.listJoinComponents(", ", "and").capitalizeFirstLetter() + " available.");
+                description.listAppend(items_available.listJoinComponents(", ", "and").capitaliseFirstLetter() + " available.");
             }
             
-            string line;// = pluralizeWordy(progress_remaining, "remaining aisle", "remaining aisles").capitalizeFirstLetter() + ".";
+            string line;// = pluraliseWordy(progress_remaining, "remaining aisle", "remaining aisles").capitaliseFirstLetter() + ".";
             if (progress_remaining <= 0)
                 line += "MacGuffin next turn";
             else
@@ -99,7 +99,7 @@ void SActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, Check
                             bring_me_the_red_pages.listAppend(it);
                             continue;
                         }
-                        bring_me_the_red_pages.listAppend(pluralizeWordy(pages_remaining, it));
+                        bring_me_the_red_pages.listAppend(pluraliseWordy(pages_remaining, it));
                     }
                 }
                 
@@ -109,7 +109,7 @@ void SActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, Check
                     line += bring_me_the_red_pages.listJoinComponents(", ", "and");*/
                     
                 line += " or collect ";
-                line += pluralizeWordy(page_pairs_remaining, "more page pair", "more page pairs");
+                line += pluraliseWordy(page_pairs_remaining, "more page pair", "more page pairs");
             }
             line += ".";
             description.listAppend(line);
@@ -119,7 +119,7 @@ void SActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, Check
     }
 }
 
-void SActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] available_resources_entries)
+void SActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING) return;
     item ka = lookupItem("Ka coin");
@@ -136,7 +136,7 @@ void SActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] available_resour
             //15 ka coin
             string name;
             if (haunches_want > 1)
-                name = pluralize(haunches_want, lookupItem("mummified beef haunch"));
+                name = pluralise(haunches_want, lookupItem("mummified beef haunch"));
             else
                 name = "mummified beef haunch";
             ka_table.listAppend(listMake(name, 15, "best spleen consumable"));
@@ -242,7 +242,7 @@ void SActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] available_resour
         if (places_to_farm_ka.count() > 0)
             description.listAppend("Could farm ka in the " + places_to_farm_ka.listJoinComponents(", ", "or") + ".");
         
-        available_resources_entries.listAppend(ChecklistEntryMake("__item ka coin", url, ChecklistSubentryMake(ka.pluralize(), "", description), 6));
+        resource_entries.listAppend(ChecklistEntryMake("__item ka coin", url, ChecklistSubentryMake(ka.pluralise(), "", description), 6));
     }
     
     if (true)
@@ -266,13 +266,13 @@ void SActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] available_resour
         {
             if (it.available_amount() > 0)
             {
-                subentries.listAppend(ChecklistSubentryMake(pluralize(it), "", reason.capitalizeFirstLetter() + "."));
+                subentries.listAppend(ChecklistSubentryMake(pluralise(it), "", reason.capitaliseFirstLetter() + "."));
                 if (image_name.length() == 0)
                     image_name = "__item " + it;
             }
         }
         if (subentries.count() > 0)
-            available_resources_entries.listAppend(ChecklistEntryMake(image_name, "", subentries, 6));
+            resource_entries.listAppend(ChecklistEntryMake(image_name, "", subentries, 6));
     }
     
     if (lookupSkill("Lash of the cobra").have_skill() && mafiaIsPastRevision(15553) || true)
@@ -303,7 +303,7 @@ void SActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] available_resour
             else
                 description.listAppend("Steals a random item.");
                 
-            available_resources_entries.listAppend(ChecklistEntryMake("__item cool whip", "", ChecklistSubentryMake(pluralize(lashes_remaining, "lash", "lashes") + " of the cobra left", "", description), 6));
+            resource_entries.listAppend(ChecklistEntryMake("__item cool whip", "", ChecklistSubentryMake(pluralise(lashes_remaining, "lash", "lashes") + " of the cobra left", "", description), 6));
         }
     }
 }

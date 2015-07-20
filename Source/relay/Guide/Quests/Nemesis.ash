@@ -101,7 +101,7 @@ void QNemesisGenerateIslandTasks(ChecklistSubentry subentry)
         {
             subentry.modifiers.listAppend("-combat");
             int keys_needed = MAX(0, 5 - $item[hacienda key].available_amount());
-            subentry.entries.listAppend(pluralizeWordy(keys_needed, "key", "keys").capitalizeFirstLetter() + " to go.");
+            subentry.entries.listAppend(pluraliseWordy(keys_needed, "key", "keys").capitaliseFirstLetter() + " to go.");
             subentry.entries.listAppend("Four are from the non-combat; one is from pick-pocketing a mariachi.");
         }
     }
@@ -128,7 +128,7 @@ void QNemesisGenerateIslandTasks(ChecklistSubentry subentry)
             }
             tasks.listAppend("defeat a cult member");
             
-            subentry.entries.listAppend(tasks.listJoinComponents(", ", "then").capitalizeFirstLetter() + ".");
+            subentry.entries.listAppend(tasks.listJoinComponents(", ", "then").capitaliseFirstLetter() + ".");
         }
         else if ($skill[Bind Spaghetti Elemental].skill_is_usable())
         {
@@ -148,7 +148,7 @@ void QNemesisGenerateIslandTasks(ChecklistSubentry subentry)
                 int missing_cult_memos = MAX(0, 5 - $item[cult memo].available_amount());
                 if (missing_cult_memos > 0)
                 {
-                    subentry.entries.listAppend("Acquire " + pluralize(missing_cult_memos, $item[cult memo]) + " more from middle-managers.");
+                    subentry.entries.listAppend("Acquire " + pluralise(missing_cult_memos, $item[cult memo]) + " more from middle-managers.");
                 }
                 else if ($item[encoded cult documents].available_amount() > 0)
                 {
@@ -259,7 +259,7 @@ void QNemesisGenerateIslandTasks(ChecklistSubentry subentry)
             {
                 subentry.entries.listAppend("Buy lunging thrust-smack from your guild.");
             }
-            subentry.entries.listAppend(pluralizeWordy(seal_screeches, "seal " + screech_name, "seal " + screech_name + "es").capitalizeFirstLetter() + ".");
+            subentry.entries.listAppend(pluraliseWordy(seal_screeches, "seal " + screech_name, "seal " + screech_name + "es").capitaliseFirstLetter() + ".");
             
             
             int sinew_need = clampi(6 - $item[hellseal sinew].available_amount(), 0, 6);
@@ -273,7 +273,7 @@ void QNemesisGenerateIslandTasks(ChecklistSubentry subentry)
                 if (remaining == 0) continue;
                 string name_short = it.to_string().replace_string("hellseal ", "");
                 string name_short_plural = it.plural.to_string().replace_string("hellseal ", "");
-                items_needed_list.listAppend(pluralizeWordy(remaining, "more " + name_short, "more " + name_short_plural));
+                items_needed_list.listAppend(pluraliseWordy(remaining, "more " + name_short, "more " + name_short_plural));
             }
             if (items_needed_list.count() == 0)
             {
@@ -508,7 +508,7 @@ void QNemesisGenerateCaveTasks(ChecklistSubentry subentry, item legendary_epic_w
                 average_turns = strips_needed / average_turns;
             else
                 average_turns = -1.0;
-            subentry.entries.listAppend("Find " + pluralizeWordy(strips_needed, "paper strip", "paper strips") + ". ~" + average_turns.roundForOutput(1) + " turns left.");
+            subentry.entries.listAppend("Find " + pluraliseWordy(strips_needed, "paper strip", "paper strips") + ". ~" + average_turns.roundForOutput(1) + " turns left.");
         }
     }
     else if (state.mafia_internal_step == 6)
@@ -638,7 +638,12 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         else
         {
             subentry.entries.listAppend("Acquire " + epic_weapon + ".");
-            subentry.entries.listAppend("Adventure in the Unquiet Garves until you unlock the tomb of the unknown, then solve the three puzzles.");
+            if (lookupLocation("The Unquiet Garves").noncombat_queue.contains_text("Tomb of the Unknown Your Class Here"))
+            {
+                subentry.entries.listAppend("Solve the three puzzles at the unknown tomb.");
+            }
+            else
+                subentry.entries.listAppend("Adventure in the Unquiet Garves until you unlock the tomb of the unknown, then solve the three puzzles.");
             url = "place.php?whichplace=cemetery";
         }
     }
@@ -737,7 +742,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         
         if (assassins_left != -1)
         {
-            string line = "Wait for " + pluralizeWordy(assassins_left, "more assassin", "more assassins");
+            string line = "Wait for " + pluraliseWordy(assassins_left, "more assassin", "more assassins");
             
             //int min_turns_left = 0;
             //int max_turns_left = 0;
@@ -769,7 +774,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             
             
         if (assassin_up_next.length() > 0)
-            subentry.entries.listAppend(assassin_up_next.capitalizeFirstLetter() + " up next.");
+            subentry.entries.listAppend(assassin_up_next.capitaliseFirstLetter() + " up next.");
             
         if (my_basestat(my_primestat()) < 90)
             subentry.entries.listAppend("Level to 90 " + my_primestat().to_lower_case() + ".");

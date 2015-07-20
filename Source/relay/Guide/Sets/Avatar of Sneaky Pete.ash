@@ -1,13 +1,13 @@
 
 
-void SSneakyPeteGenerateResource(ChecklistEntry [int] available_resources_entries)
+void SSneakyPeteGenerateResource(ChecklistEntry [int] resource_entries)
 {
 	if (my_path_id() != PATH_AVATAR_OF_SNEAKY_PETE || !mafiaIsPastRevision(13785))
 		return;
     
     
 	ChecklistEntry entry;
-	entry.target_location = "";
+	entry.url = "";
 	entry.image_lookup_name = "";
     entry.importance_level = 1;
     
@@ -32,7 +32,7 @@ void SSneakyPeteGenerateResource(ChecklistEntry [int] available_resources_entrie
             if (entry.image_lookup_name.length() == 0)
                 entry.image_lookup_name = "__skill Easy Riding";
         
-            entry.subentries.listAppend(ChecklistSubentryMake(pluralize(free_peel_outs_available, "peel out", "peel outs"), "10 MP/cast", description));
+            entry.subentries.listAppend(ChecklistSubentryMake(pluralise(free_peel_outs_available, "peel out", "peel outs"), "10 MP/cast", description));
         }
     }
     
@@ -73,7 +73,7 @@ void SSneakyPeteGenerateResource(ChecklistEntry [int] available_resources_entrie
         if (targets.count() > 0)
             description.listAppend("Potential targets:|*" + targets.listJoinComponents("<hr>|*"));
         
-        entry.subentries.listAppend(ChecklistSubentryMake(pluralize(uses_remaining, "jukebox fix", "jukebox fixes"), "25 MP", description));
+        entry.subentries.listAppend(ChecklistSubentryMake(pluralise(uses_remaining, "jukebox fix", "jukebox fixes"), "25 MP", description));
     }
     
     if ($skill[Jump Shark].skill_is_usable() && get_property_int("_peteJumpedShark") < 3)
@@ -86,12 +86,12 @@ void SSneakyPeteGenerateResource(ChecklistEntry [int] available_resources_entrie
         
         if (entry.image_lookup_name.length() == 0)
             entry.image_lookup_name = "__skill jump shark";
-        entry.subentries.listAppend(ChecklistSubentryMake(pluralize(uses_remaining, "shark jump", "shark jumps"), "25 MP", description));
+        entry.subentries.listAppend(ChecklistSubentryMake(pluralise(uses_remaining, "shark jump", "shark jumps"), "25 MP", description));
     }
     
     
     if (entry.subentries.count() > 0)
-        available_resources_entries.listAppend(entry);
+        resource_entries.listAppend(entry);
 }
 
 void SSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -117,7 +117,7 @@ void SSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         if (motorcycle_upgrades_have < motorcycle_upgrades_available)
         {
             string [int] description;
-            description.listAppend(pluralize(motorcycle_upgrades_available - motorcycle_upgrades_have, "upgrade", "upgrades") + " available.");
+            description.listAppend(pluralise(motorcycle_upgrades_available - motorcycle_upgrades_have, "upgrade", "upgrades") + " available.");
             
             string [int] upgrades;
             foreach key in parts_not_upgraded
@@ -209,7 +209,7 @@ void SSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
                 
                 if (name.length() > 0)
                 {
-                    upgrades.listAppend(HTMLGenerateSpanOfClass(name, "r_bold") + " - " + options.listJoinComponents(", ", "or").capitalizeFirstLetter() + ".");
+                    upgrades.listAppend(HTMLGenerateSpanOfClass(name, "r_bold") + " - " + options.listJoinComponents(", ", "or").capitaliseFirstLetter() + ".");
                     //upgrades.listAppend(HTMLGenerateSpanOfClass(name, "r_bold") + "|*" + options.listJoinComponents("|*"));
                 }
             }
@@ -281,7 +281,7 @@ void SSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
     if (skills_available > skills_have)
     {
         string [int] description;
-        description.listAppend("At least " + pluralizeWordy(skills_available - skills_have, "skill", "skills") + " available.");
+        description.listAppend("At least " + pluraliseWordy(skills_available - skills_have, "skill", "skills") + " available.");
         optional_task_entries.listAppend(ChecklistEntryMake("__skill Natural Dancer", "da.php?place=gate3", ChecklistSubentryMake("Buy Sneaky Pete skills", "", description), 11));
     }
 }

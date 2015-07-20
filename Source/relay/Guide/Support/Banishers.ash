@@ -87,7 +87,6 @@ Banish [int] BanishesActive()
         result.listAppend(b);
         
     }
-    //print("BanishesActive() = " + result.to_json(), "purple");
     return result;
 }
 

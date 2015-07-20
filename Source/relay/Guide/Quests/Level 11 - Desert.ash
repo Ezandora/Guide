@@ -66,7 +66,7 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
     //FIXME deal with ultra-hydrated
     int combats_remaining = exploration_remaining;
     combats_remaining = ceil(to_float(exploration_remaining) / exploration_per_turn);
-    subentry.entries.listAppend(exploration_remaining + "% exploration remaining. (" + pluralize(combats_remaining, "combat", "combats") + ")");
+    subentry.entries.listAppend(exploration_remaining + "% exploration remaining. (" + pluralise(combats_remaining, "combat", "combats") + ")");
     if ($effect[ultrahydrated].have_effect() == 0)
     {
         if (__last_adventure_location == $location[the arid, extra-dry desert])
@@ -86,7 +86,7 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         if (exploration_per_turn != 0.0)
             turns_until_gnasir_found = ceil(to_float(10 - exploration) / exploration_per_turn);
         
-        subentry.entries.listAppend("Find Gnasir after " + pluralize(turns_until_gnasir_found, "turn", "turns") + ".");
+        subentry.entries.listAppend("Find Gnasir after " + pluralise(turns_until_gnasir_found, "turn", "turns") + ".");
     }
     else if (get_property_int("gnasirProgress") == 0 && exploration <= 14 && $location[the arid, extra-dry desert].noncombatTurnsAttemptedInLocation() == 0)
     {
@@ -117,7 +117,7 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
                     {
                         hipster_text = " (use " + __misc_state_string["hipster name"] + ")";
                     }
-                    line += "|Delay for " + pluralize(delayRemainingInLocation($location[the oasis]), "turn", "turns") + hipster_text + ".";
+                    line += "|Delay for " + pluralise(delayRemainingInLocation($location[the oasis]), "turn", "turns") + hipster_text + ".";
                 }
                 subentry.entries.listAppend(line);
             }
@@ -130,7 +130,7 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
             {
                 int remaining = 15 - $item[worm-riding manual page].available_amount();
                 
-                subentry.entries.listAppend("Find " + pluralize(remaining, "more worm-riding manual page", "more worm-riding manual pages") + ".");
+                subentry.entries.listAppend("Find " + pluralise(remaining, "more worm-riding manual page", "more worm-riding manual pages") + ".");
                 need_pages = true;
             }
             
@@ -163,7 +163,7 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         {
             subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
             
-            string line = __misc_state_string["hipster name"].capitalizeFirstLetter() + " for free combats";
+            string line = __misc_state_string["hipster name"].capitaliseFirstLetter() + " for free combats";
             if (need_pages)
                 line += " and manual pages";
             line += ".";

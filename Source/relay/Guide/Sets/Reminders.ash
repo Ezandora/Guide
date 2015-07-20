@@ -80,7 +80,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             else*/
             if (true)
             {
-                url = "galaktik.php";
+                url = "shop.php?whichshop=doc";
                 methods.listAppend("Use Doc Galaktik's anti-anti-antidote.");
                 if ($item[anti-anti-antidote].available_amount() > 0)
                     url = "inventory.php?which=1";
@@ -162,8 +162,8 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     {
         ChecklistEntry stat_items;
         stat_items.image_lookup_name = "";
-        stat_items.target_location = "inventory.php?which=3";
-        stat_items.importance_level = -11;
+        stat_items.url = "inventory.php?which=3";
+        stat_items.importance_level = 0;
         
         effect [item] item_effects;
         string [item] item_descriptions;
@@ -264,7 +264,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             stat_items.subentries.listAppend(subentry);
         if (stat_items.subentries.count() > 0)
         {
-            task_entries.listAppend(stat_items);
+            optional_task_entries.listAppend(stat_items);
         }
     }
     
@@ -313,7 +313,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             string [int] description;
             description.listAppend("Gives ~" + __misc_state_float["dance card average stats"].round() + " mainstat in four turns.");
             if ($item[dance card].available_amount() > 1)
-                description.listAppend("Have " + $item[dance card].pluralizeWordy() + ".");
+                description.listAppend("Have " + $item[dance card].pluraliseWordy() + ".");
             task_entries.listAppend(ChecklistEntryMake("__item " + $item[dance card], "inventory.php?which=3", ChecklistSubentryMake("Use " + $item[dance card], "", description), -11));
         }
     }
@@ -366,7 +366,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         //can we reasonably discover the secret?
         string [int] description;
         int upcoming_in = semirare_counter.range_start_turn;
-        description.listAppend("Window starts after " + pluralizeWordy(upcoming_in, "turn", "turns") + ".");
+        description.listAppend("Window starts after " + pluraliseWordy(upcoming_in, "turn", "turns") + ".");
         
         string [int] options;
         if (__misc_state["can eat just about anything"])
@@ -378,7 +378,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             options.listAppend("drink a lucky lindy");
         }
         
-        description.listAppend(options.listJoinComponents(", ", "or").capitalizeFirstLetter() + ".");
+        description.listAppend(options.listJoinComponents(", ", "or").capitaliseFirstLetter() + ".");
         
         if (options.count() > 0)
             task_entries.listAppend(ChecklistEntryMake("__item fortune cookie", "", ChecklistSubentryMake(HTMLGenerateSpanFont("Learn semi-rare number", "red"), "", description), -11));

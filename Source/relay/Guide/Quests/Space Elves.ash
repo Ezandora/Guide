@@ -58,7 +58,7 @@ void QSpaceElvesGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
             {
                 if (subentry.modifiers.count() == 0)
                     subentry.modifiers.listAppend("+item");
-				line.listAppend("Acquire " + pluralize(maps_needed, $item[map to safety shelter ronald prime]));
+				line.listAppend("Acquire " + pluralise(maps_needed, $item[map to safety shelter ronald prime]));
             }
 			
             line.listAppendList(ronald_map_entries);
@@ -75,7 +75,7 @@ void QSpaceElvesGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
             {
                 if (subentry.modifiers.count() == 0)
                     subentry.modifiers.listAppend("+item");
-				line.listAppend("Acquire " + pluralize(maps_needed, $item[map to safety shelter grimace prime]));
+				line.listAppend("Acquire " + pluralise(maps_needed, $item[map to safety shelter grimace prime]));
             }
 				
             line.listAppendList(grimace_map_entries);

@@ -1,4 +1,4 @@
-void SLibramGenerateResource(ChecklistEntry [int] available_resources_entries)
+void SLibramGenerateResource(ChecklistEntry [int] resource_entries)
 {
 	if (__misc_state["bookshelf accessible"])
 	{
@@ -33,7 +33,7 @@ void SLibramGenerateResource(ChecklistEntry [int] available_resources_entries)
 			}
 			
 			subentry.entries.listAppend(readable_list.listJoinComponents(", ", "and") + ".");
-			available_resources_entries.listAppend(ChecklistEntryMake("__item libram of divine favors", "campground.php?action=bookshelf", subentry, 7));
+			resource_entries.listAppend(ChecklistEntryMake("__item libram of divine favors", "campground.php?action=bookshelf", subentry, 7));
 		}
 		
 		
@@ -44,7 +44,7 @@ void SLibramGenerateResource(ChecklistEntry [int] available_resources_entries)
 				ChecklistSubentry subentry;
 				subentry.header =  (3 - get_property_int("_brickoEyeSummons")) + " BRICKO&trade; eye bricks obtainable";
 				subentry.entries.listAppend("Cast Summon BRICKOs libram. (" + libram_mp_cost + " mp)");
-				available_resources_entries.listAppend(ChecklistEntryMake("__item bricko eye brick", "campground.php?action=bookshelf", subentry, 9));
+				resource_entries.listAppend(ChecklistEntryMake("__item bricko eye brick", "campground.php?action=bookshelf", subentry, 9));
 				
 			}
 		}
@@ -63,7 +63,7 @@ void SLibramGenerateResource(ChecklistEntry [int] available_resources_entries)
 		if (bricko_potential_fights_available > 0)
 		{
 			ChecklistSubentry subentry;
-			subentry.header = pluralize(bricko_potential_fights_available, "BRICKO&trade; fight", "BRICKO&trade; fights") + " ready";
+			subentry.header = pluralise(bricko_potential_fights_available, "BRICKO&trade; fight", "BRICKO&trade; fights") + " ready";
 			
 			
 			foreach fight in all_possible_bricko_fights
@@ -71,7 +71,7 @@ void SLibramGenerateResource(ChecklistEntry [int] available_resources_entries)
 				int number_available = fight.available_amount();
 				if (number_available > 0)
                 {
-                    string line = pluralize(number_available, fight);
+                    string line = pluralise(number_available, fight);
                     
                     if ($items[rock band flyers,jam band flyers].available_amount() > 0 && !__quest_state["Level 12"].state_boolean["Arena Finished"] && __quest_state["Level 12"].in_progress && get_property_int("flyeredML") < 10000)
                     {
@@ -93,14 +93,14 @@ void SLibramGenerateResource(ChecklistEntry [int] available_resources_entries)
 				if (number_available > 0)
 				{
 					craftable_fights.listAppend(fight);
-					creatable.listAppend(pluralize(number_available, fight) + " (" + bricks_needed + " bricks, " + monster_level + "ML)");
+					creatable.listAppend(pluralise(number_available, fight) + " (" + bricks_needed + " bricks, " + monster_level + "ML)");
 				}
 			}
 			
 			if (creatable.count() > 0)
 				subentry.entries.listAppend("Creatable: (" + $item[bricko brick].available_amount() + " bricks available)" + HTMLGenerateIndentedText(creatable));
 				
-			available_resources_entries.listAppend(ChecklistEntryMake("__item bricko brick", "inventory.php?which=3", subentry, 7));
+			resource_entries.listAppend(ChecklistEntryMake("__item bricko brick", "inventory.php?which=3", subentry, 7));
 		}
 	}
 }

@@ -116,9 +116,9 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     
     //if (lookupItem("7301").available_amount() == 0 || lookupItem("7302").available_amount() == 0) //first floor can be skipped via faxing
         //second_floor_probably_open = false;
-    if (get_property_int("lastSecondFloorUnlock") == my_ascensions()) //updates properly now.
+    if (get_property_int("lastSecondFloorUnlock") == my_ascensions()) //updates properly now
         second_floor_probably_open = true;
-    if (get_property("questM20Necklace") == "finished") //mafia will erroneously set questM20Necklace to finished in certain (unknown) cases. could be an error in QuestDatabase.java's reset(), but I am uncertain what caused the bug locally (it also set lastSecondFloorUnlock to current, though it is not unlocked)
+    if (get_property("questM20Necklace") == "finished") //mafia will erroneously set questM20Necklace to finished in certain (unknown) cases. could be an error in QuestDatabase.java's reset(), but I am uncertain what caused the bug locally (it also set lastSecondFloorUnlock to current, though it is not unlocked) note - still in effect.
         second_floor_probably_open = true;
     
     if ($item[Lady Spookyraven's necklace].available_amount() > 0) //mostly
@@ -171,7 +171,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
                             
                         if (delayRemainingInLocation($location[the haunted gallery]) > 0)
                         {
-                            string line = "Delay(?) for " + pluralize(delayRemainingInLocation($location[the haunted gallery]), "turn", "turns") + ".";
+                            string line = "Delay(?) for " + pluralise(delayRemainingInLocation($location[the haunted gallery]), "turn", "turns") + ".";
                             if (__misc_state["have hipster"])
                             {
                                 modifiers.listAppend(__misc_state_string["hipster name"]+"?");
@@ -206,7 +206,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
                             image_name = "__item bottle of Monsieur Bubble";
                         if (delayRemainingInLocation($location[the haunted bathroom]) > 0)
                         {
-                            string line = "Delay for " + pluralize(delayRemainingInLocation($location[the haunted bathroom]), "turn", "turns") + ".";
+                            string line = "Delay for " + pluralise(delayRemainingInLocation($location[the haunted bathroom]), "turn", "turns") + ".";
                             if (__misc_state["have hipster"])
                             {
                                 modifiers.listAppend(__misc_state_string["hipster name"]+"?");
@@ -252,7 +252,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
                             
                         if (delayRemainingInLocation($location[the haunted bedroom]) > 0)
                         {
-                            string line = "Delay for " + pluralize(delayRemainingInLocation($location[the haunted bedroom]), "turn", "turns") + ".";
+                            string line = "Delay for " + pluralise(delayRemainingInLocation($location[the haunted bedroom]), "turn", "turns") + ".";
                             if (__misc_state["have hipster"])
                             {
                                 line += " (use " + __misc_state_string["hipster name"] + ")";
@@ -300,7 +300,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
                     if (__misc_state["free runs available"])
                         modifiers2.listAppend("free runs");
                         
-                    subentries2.listAppend(ChecklistSubentryMake("Burn " + pluralize($location[the haunted ballroom].delayRemainingInLocation(), "turn(?)", "turns(?)") + " delay in haunted ballroom", modifiers2, ""));
+                    subentries2.listAppend(ChecklistSubentryMake("Burn " + pluralise($location[the haunted ballroom].delayRemainingInLocation(), "turn(?)", "turns(?)") + " delay in haunted ballroom", modifiers2, ""));
                     ChecklistEntry entry2 = ChecklistEntryMake("__half Haunted Ballroom", $location[the haunted ballroom].getClickableURLForLocation(), subentries2, $locations[the haunted ballroom]);
                     entry2.importance_level = 5;
                     optional_task_entries.listAppend(entry2);
@@ -340,7 +340,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         
         if (get_property("romanticTarget").to_monster() == $monster[writing desk] && get_property_int("_romanticFightsLeft") > 0 || get_property_int("writingDesksDefeated") > 0)
         {
-            subentry.entries.listAppend(HTMLGenerateSpanFont("Avoid adventuring here,", "red") + " as you seem to be using the writing desk trick?|Need to fight " + pluralizeWordy(clampi(5 - get_property_int("writingDesksDefeated"), 0, 5), "more writing desk.", "more writing desks."));
+            subentry.entries.listAppend(HTMLGenerateSpanFont("Avoid adventuring here,", "red") + " as you seem to be using the writing desk trick?|Need to fight " + pluraliseWordy(clampi(5 - get_property_int("writingDesksDefeated"), 0, 5), "more writing desk.", "more writing desks."));
         }
         
         float drawers_per_turn = 0.0;
@@ -368,7 +368,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         
         if (needed_resists.count() > 0 && total_turns > 1)
             subentry.entries.listAppend("Run " + needed_resists.listJoinComponents(", ", "and") + " to search faster.");
-        subentry.entries.listAppend(drawers_per_turn.roundForOutput(1) + " drawers searched per turn.|~" + pluralize(total_turns, "turn", "turns") + " remaining.");
+        subentry.entries.listAppend(drawers_per_turn.roundForOutput(1) + " drawers searched per turn.|~" + pluralise(total_turns, "turn", "turns") + " remaining.");
         
 		if (__misc_state["have hipster"])
 			subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
@@ -395,8 +395,8 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         subentry.entries.listAppend("To unlock the Haunted Library.");
         
         int estimated_pool_skill = get_property_int("poolSkill");
-        //FIXME numeric_modifier("pool skill") exists, so change to use that (once we can make sure everything works properly with it)
-        if ($effect[chalky hand].have_effect() > 0)
+        
+        /*if ($effect[chalky hand].have_effect() > 0)
             estimated_pool_skill += 3;
             
         if ($item[staff of fats].equipped_amount() > 0)
@@ -410,7 +410,8 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         if ($effect[video... games?].have_effect() > 0)
             estimated_pool_skill += 5;
         if ($effect[swimming with sharks].have_effect() > 0)
-            estimated_pool_skill += 3;
+            estimated_pool_skill += 3;*/
+        estimated_pool_skill += numeric_modifier("pool skill");
         
         int theoretical_hidden_pool_skill = 0;
         if (my_inebriety() <= 10)
@@ -492,7 +493,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         
         int desks_remaining = clampi(5 - get_property_int("writingDesksDefeated"), 0, 5);
         subentry.entries.listAppend("To unlock the second floor.");
-        subentry.entries.listAppend("Defeat " + pluralizeWordy(desks_remaining, "more writing desk", "more writing desks") + " to acquire a necklace.");
+        subentry.entries.listAppend("Defeat " + pluraliseWordy(desks_remaining, "more writing desk", "more writing desks") + " to acquire a necklace.");
         
         boolean need_killing_jar = false;
         if ($item[killing jar].available_amount() == 0 && !__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && !__quest_state["Level 11 Desert"].state_boolean["Killing Jar Given"])

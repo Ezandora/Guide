@@ -35,7 +35,7 @@ void listAppend(SealSummon [int] list, SealSummon entry)
 	list[position] = entry;
 }
 
-void SSealClubberInfernalSealsGenerateResource(ChecklistEntry [int] available_resources_entries)
+void SSealClubberInfernalSealsGenerateResource(ChecklistEntry [int] resource_entries)
 {
     string [int] description;
     int seal_summon_limit = 5;
@@ -154,15 +154,15 @@ void SSealClubberInfernalSealsGenerateResource(ChecklistEntry [int] available_re
     }
     description.listPrepend(HTMLGenerateSimpleTableLines(options));
         
-    available_resources_entries.listAppend(ChecklistEntryMake("__item figurine of an ancient seal", url, ChecklistSubentryMake(pluralize(summons_remaining, "seal summon", "seal summons"), "", description), 10));
+    resource_entries.listAppend(ChecklistEntryMake("__item figurine of an ancient seal", url, ChecklistSubentryMake(pluralise(summons_remaining, "seal summon", "seal summons"), "", description), 10));
 }
 
-void SSealClubberGenerateResource(ChecklistEntry [int] available_resources_entries)
+void SSealClubberGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (my_class() != $class[seal clubber])
         return;
 
-    SSealClubberInfernalSealsGenerateResource(available_resources_entries);
+    SSealClubberInfernalSealsGenerateResource(resource_entries);
 }
 
 void STurtleTamerGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -176,7 +176,7 @@ void STurtleTamerGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     }
 }
 
-void SDiscoBanditGenerateResource(ChecklistEntry [int] available_resources_entries)
+void SDiscoBanditGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (my_class() != $class[disco bandit])
         return;
@@ -194,9 +194,9 @@ void SDiscoBanditGenerateResource(ChecklistEntry [int] available_resources_entri
             if (rave_combo_number_5.length() > 0)
             {
                 string [int] skill_order = rave_combo_number_5.split_string(",");
-                description.listAppend(skill_order.listJoinComponents(__html_right_arrow_character).capitalizeFirstLetter() + ".");
+                description.listAppend(skill_order.listJoinComponents(__html_right_arrow_character).capitaliseFirstLetter() + ".");
             }
-            available_resources_entries.listAppend(ChecklistEntryMake("__skill Disco Dance 3: Back in the Habit", "", ChecklistSubentryMake(pluralize(steals_remaining, "Rave Steal", "Rave Steals"), "", description), 8));
+            resource_entries.listAppend(ChecklistEntryMake("__skill Disco Dance 3: Back in the Habit", "", ChecklistSubentryMake(pluralise(steals_remaining, "Rave Steal", "Rave Steals"), "", description), 8));
         }
     }
 }
@@ -206,8 +206,8 @@ void SClassesGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     STurtleTamerGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 }
 
-void SClassesGenerateResource(ChecklistEntry [int] available_resources_entries)
+void SClassesGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    SSealClubberGenerateResource(available_resources_entries);
-    SDiscoBanditGenerateResource(available_resources_entries);
+    SSealClubberGenerateResource(resource_entries);
+    SDiscoBanditGenerateResource(resource_entries);
 }

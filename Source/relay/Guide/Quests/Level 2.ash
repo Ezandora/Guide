@@ -60,7 +60,7 @@ void QLevel2GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
                 hipster_text = " (use " + __misc_state_string["hipster name"] + ")";
                 modifiers.listAppend(__misc_state_string["hipster name"]);
             }
-			string line = "Delay for " + pluralize(delayRemainingInLocation($location[the spooky forest]), "turn", "turns") + hipster_text + ".";
+			string line = "Delay for " + pluralise(delayRemainingInLocation($location[the spooky forest]), "turn", "turns") + hipster_text + ".";
             subentry.entries.listAppend(line);
 			subentry.entries.listAppend("Run -combat after that.");
 		}

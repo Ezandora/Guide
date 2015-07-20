@@ -91,7 +91,7 @@ void generatePullList(Checklist [int] checklists)
 	if (pulls_available <= 0)
 		return;
 	if (pulls_available > 0)
-		pulls_entries.listAppend(ChecklistEntryMake("special subheader", "", ChecklistSubentryMake(pluralize(pulls_available, "pull", "pulls") + " remaining")));
+		pulls_entries.listAppend(ChecklistEntryMake("special subheader", "", ChecklistSubentryMake(pluralise(pulls_available, "pull", "pulls") + " remaining")));
 	
 	item [int] pullable_list_item;
 	int [int] pullable_list_max_wanted;
@@ -370,7 +370,7 @@ void generatePullList(Checklist [int] checklists)
         item [int] missing_ninja_components = items_missing($items[ninja carabiner, ninja crampons, ninja rope]);
         if (missing_ninja_components.count() > 0)
         {
-            string description = missing_ninja_components.listJoinComponents(", ", "and").capitalizeFirstLetter() + ".";
+            string description = missing_ninja_components.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".";
             
             if (numeric_modifier("cold resistance") < 5.0)
                 description += "|Will require five " + HTMLGenerateSpanOfClass("cold", "r_element_cold") + " resist to use properly.";
@@ -382,7 +382,7 @@ void generatePullList(Checklist [int] checklists)
         item [int] missing_outfit_components = missing_outfit_components("Swashbuckling Getup");
         if (missing_outfit_components.count() > 0)
         {
-            string entry = missing_outfit_components.listJoinComponents(", ", "and").capitalizeFirstLetter() + ".";
+            string entry = missing_outfit_components.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".";
             if ($item[eyepatch].available_amount() == 0)
                 entry += "|Or NPZR head/clockwork pirate skull to untinker for eyepatch/clockwork maid.";
             pullable_item_list.listAppend(GPItemMake("Swashbuckling Getup", "__item " + missing_outfit_components[0], entry));
@@ -423,7 +423,7 @@ void generatePullList(Checklist [int] checklists)
 	}
 	if (scrip_needed > 0)
 	{
-		pullable_item_list.listAppend(GPItemMake($item[Shore Inc. Ship Trip Scrip], "Saves three turns each|" + scrip_reasons.listJoinComponents(", ", "and").capitalizeFirstLetter() + ".", scrip_needed));
+		pullable_item_list.listAppend(GPItemMake($item[Shore Inc. Ship Trip Scrip], "Saves three turns each|" + scrip_reasons.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".", scrip_needed));
 	}
     
     if (__misc_state["Need to level"] && __misc_state["Chateau Mantegna available"] && __misc_state_int["free rests remaining"] > 0 && false)
@@ -507,7 +507,7 @@ void generatePullList(Checklist [int] checklists)
 				if (max_wanted == 1)
 					pulls_entries.listAppend(ChecklistEntryMake(it, url, ChecklistSubentryMake(it, "", reason_list)));
 				else
-					pulls_entries.listAppend(ChecklistEntryMake(it, url, ChecklistSubentryMake(pluralize(actual_amount, it), "", reason_list)));
+					pulls_entries.listAppend(ChecklistEntryMake(it, url, ChecklistSubentryMake(pluralise(actual_amount, it), "", reason_list)));
 				break;
 			}
 		}

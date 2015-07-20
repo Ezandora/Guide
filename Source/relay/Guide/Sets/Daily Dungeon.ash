@@ -145,7 +145,7 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 			string l;
             
             if (__misc_state_int["fat loot tokens needed"] > 0)
-                l = pluralize(__misc_state_int["fat loot tokens needed"], "token", "tokens") + " needed.";
+                l = pluralise(__misc_state_int["fat loot tokens needed"], "token", "tokens") + " needed.";
 			
 			if (daily_dungeon_aftercore_items_wanted.count() > 0)
             {
@@ -205,7 +205,7 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
             
 			
             if (rooms_left < 15)
-                description.listAppend(pluralizeWordy(rooms_left, "room", "rooms").capitalizeFirstLetter() + " left.");
+                description.listAppend(pluraliseWordy(rooms_left, "room", "rooms").capitaliseFirstLetter() + " left.");
             
             if (avoid_using_skeleton_key && $item[skeleton key].available_amount() > 0)
                 description.listAppend(HTMLGenerateSpanOfClass("Avoid using your skeleton key, you don't have many left.", "r_bold"));

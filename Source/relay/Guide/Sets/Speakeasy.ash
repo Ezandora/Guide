@@ -1,5 +1,5 @@
 
-void SSpeakeasyGenerateResource(ChecklistEntry [int] available_resources_entries)
+void SSpeakeasyGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (!__misc_state["VIP available"])
         return;
@@ -60,7 +60,7 @@ void SSpeakeasyGenerateResource(ChecklistEntry [int] available_resources_entries
         reasons_to_sockdollager.listAppend("fighting rain king");
     
     if (reasons_to_sockdollager.count() > 0)
-        options.listAppend(listMake("Sockdollager", "2", reasons_to_sockdollager.listJoinComponents(", ", "and").capitalizeFirstLetter()));
+        options.listAppend(listMake("Sockdollager", "2", reasons_to_sockdollager.listJoinComponents(", ", "and").capitaliseFirstLetter()));
     
     if (__misc_state["In run"] && my_meat() >= 20000)
         options.listAppend(listMake("Flivver", "2", "Epic-level drunkenness."));
@@ -102,6 +102,6 @@ void SSpeakeasyGenerateResource(ChecklistEntry [int] available_resources_entries
         description.listAppend(HTMLGenerateSimpleTableLines(options));
     
     if (__misc_state["In run"] || drinks_remaining > 0)
-        available_resources_entries.listAppend(ChecklistEntryMake("__item observational glasses", "clan_viplounge.php?action=speakeasy", ChecklistSubentryMake(pluralize(drinks_remaining, "speakeasy drink", "speakeasy drinks"), "", description), 8)); //the eyes of T.J. Eckleburg
+        resource_entries.listAppend(ChecklistEntryMake("__item observational glasses", "clan_viplounge.php?action=speakeasy", ChecklistSubentryMake(pluralise(drinks_remaining, "speakeasy drink", "speakeasy drinks"), "", description), 8)); //the eyes of T.J. Eckleburg
     
 }

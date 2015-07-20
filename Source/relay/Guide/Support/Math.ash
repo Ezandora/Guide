@@ -261,7 +261,6 @@ string floorForOutput(float v, int additional_fractional_digits)
 
 float TriangularDistributionCalculateCDF(float x, float min, float max, float centre)
 {
-    //print("TriangularDistributionCalculateCDF(" + x + ", " + min + ", " + max + ", " + centre + ")");
     //piecewise function:
     if (x < min) return 0.0;
     else if (x > max) return 1.0;

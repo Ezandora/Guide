@@ -105,7 +105,7 @@ string [int] SCountersGenerateDescriptionForRainMonster()
             terrain_monsters.listAppend(line);
         }
         
-        line = terrain.capitalizeFirstLetter() + ": ";
+        line = terrain.capitaliseFirstLetter() + ": ";
         if (!have_usable_last_terrain || last_terrain == terrain)
             line = HTMLGenerateSpanOfClass(line, "r_bold");
         line += terrain_monsters.listJoinComponents(", ", "or");
@@ -224,7 +224,7 @@ void SCountersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [i
             }
             else
             {
-                optional_task_entries.listAppend(ChecklistEntryMake("__item dance card", "", ChecklistSubentryMake("Dance card up after " + pluralize(turns_until_dance_card, "adventure", "adventures") + ".", "", "Haunted ballroom. " + stats)));
+                optional_task_entries.listAppend(ChecklistEntryMake("__item dance card", "", ChecklistSubentryMake("Dance card up after " + pluralise(turns_until_dance_card, "adventure", "adventures") + ".", "", "Haunted ballroom. " + stats)));
             }
         }
     }
@@ -232,7 +232,7 @@ void SCountersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [i
 	SCountersGenerateEntry(task_entries, optional_task_entries, true);
 }
 
-void SCountersGenerateResource(ChecklistEntry [int] available_resources_entries)
+void SCountersGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	SCountersGenerateEntry(available_resources_entries, available_resources_entries, false);
+	SCountersGenerateEntry(resource_entries, resource_entries, false);
 }

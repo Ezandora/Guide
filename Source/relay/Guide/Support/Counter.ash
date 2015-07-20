@@ -14,7 +14,7 @@ Record Counter
     boolean found_start_turn_range;
     boolean found_end_turn_range;
     
-    boolean initialized;
+    boolean initialised;
 };
 
 Counter CounterMake()
@@ -22,7 +22,7 @@ Counter CounterMake()
     Counter c;
     c.range_start_turn = -1;
     c.range_end_turn = -1;
-    c.initialized = true;
+    c.initialised = true;
     
     return c;
 }
@@ -30,7 +30,7 @@ Counter CounterMake()
 //If false, use exact_turns. If true, range_start_turn/range_end_turn. (this isn't ideal, sorry)
 boolean CounterIsRange(Counter c)
 {
-    if (!c.initialized)
+    if (!c.initialised)
         return false;
     //if (c.range_start_turn < 0 && c.range_end_turn < 0) //seems to be an errornous test when we go past our window
         //return false;
@@ -41,7 +41,7 @@ boolean CounterIsRange(Counter c)
 
 int CounterGetNextExactTurn(Counter c)
 {
-    if (!c.initialized)
+    if (!c.initialised)
         return -1;
     if (c.CounterIsRange())
         return -1;
@@ -54,7 +54,7 @@ int CounterGetNextExactTurn(Counter c)
 boolean CounterMayHitNextTurn(Counter c)
 {
     //FIXME use CounterMayHitInXTurns to implement this once we're sure it works
-    if (!c.initialized)
+    if (!c.initialised)
         return false;
     if (c.exact_turns.count() > 0)
     {
@@ -84,7 +84,7 @@ boolean CounterMayHitNextTurn(Counter c)
 
 boolean CounterMayHitInXTurns(Counter c, int turns_limit)
 {
-    if (!c.initialized)
+    if (!c.initialised)
         return false;
     if (c.exact_turns.count() > 0)
     {
@@ -122,7 +122,7 @@ Vec2i CounterGetWindowRange(Counter c) //x is min, y is max
 //DOES NOT HANDLE COUNTER RANGES:
 boolean CounterWillHitExactlyInTurnRange(Counter c, int start_turn_range, int end_turn_range)
 {
-    if (!c.initialized)
+    if (!c.initialised)
         return false;
     
     Vec2i turn_range = Vec2iMake(start_turn_range, end_turn_range);
@@ -138,7 +138,7 @@ boolean CounterWillHitExactlyInTurnRange(Counter c, int start_turn_range, int en
 
 boolean CounterExists(Counter c)
 {
-    if (!c.initialized)
+    if (!c.initialised)
         return false;
     if (c.CounterIsRange())
         return true;
@@ -149,8 +149,8 @@ boolean CounterExists(Counter c)
 
 buffer CounterDescription(Counter c)
 {
-    if (!c.initialized)
-        return "Uninitialized".to_buffer();
+    if (!c.initialised)
+        return "Uninitialised".to_buffer();
     buffer description;
     description.append(c.name);
     if (!c.CounterExists())

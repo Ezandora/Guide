@@ -96,14 +96,14 @@ void SEventsCrimbo2014GenerateTasks(ChecklistEntry [int] task_entries, Checklist
             url = lookupLocation("The Crimbonium Mine").getClickableURLForLocation();
             if (my_hp() == 0)
             {
-                url = "galaktik.php";
+                url = "shop.php?whichshop=doc";
                 subentry.entries.listAppend("Restore HP at Doc Galaktik. (1 HP)");
             }
             else
             {
                 if (!is_wearing_outfit("High-Radiation Mining Gear"))
                     url = "inventory.php?which=2";
-                subentry.entries.listAppend("Mine in the mine for " + pluralizeWordy(oily_legs_effect.have_effect(), "more turn", "more turns") + ".");
+                subentry.entries.listAppend("Mine in the mine for " + pluraliseWordy(oily_legs_effect.have_effect(), "more turn", "more turns") + ".");
                 if (crimbonar_effect.have_effect() > 0 || $effect[object detection].have_effect() > 0)
                     subentry.entries.listAppend("Try to look for a large group of flashing spots. All the crimbonium is packed together.");
                 if (!is_wearing_outfit("High-Radiation Mining Gear"))
@@ -111,7 +111,7 @@ void SEventsCrimbo2014GenerateTasks(ChecklistEntry [int] task_entries, Checklist
                 if (crimbonium_seen >= 6)
                     subentry.entries.listAppend("Find a new cavern.");
                 else if (crimbonium_seen >= 0)
-                    subentry.entries.listAppend(pluralizeWordy(6 - crimbonium_seen, "more nugget", "more nuggets").capitalizeFirstLetter() + " of crimbonium in mine.");
+                    subentry.entries.listAppend(pluraliseWordy(6 - crimbonium_seen, "more nugget", "more nuggets").capitaliseFirstLetter() + " of crimbonium in mine.");
             }
             
         }
@@ -140,7 +140,7 @@ void SEventsCrimbo2014GenerateTasks(ChecklistEntry [int] task_entries, Checklist
             if (loose_joints_effect.have_effect() >= 200)
                 line += " for a few hundred turns";
             else if (loose_joints_effect.have_effect() > 0)
-                line += " for possibly " + pluralizeWordy(loose_joints_effect.have_effect(), "more turn", "more turns");
+                line += " for possibly " + pluraliseWordy(loose_joints_effect.have_effect(), "more turn", "more turns");
             line += ".|Cylindrical molds stop dropping after around two hundred adventures in the area, per day.";
             subentry.entries.listPrepend(line);
             if (is_wearing_outfit("High-Radiation Mining Gear"))

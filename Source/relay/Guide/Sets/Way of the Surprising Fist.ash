@@ -6,14 +6,14 @@ void SWOTSFGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 		return;
 }
 
-void SWOTSFGenerateResource(ChecklistEntry [int] available_resources_entries)
+void SWOTSFGenerateResource(ChecklistEntry [int] resource_entries)
 {
 	if (my_path_id() != PATH_WAY_OF_THE_SURPRISING_FIST)
 		return;
 	//Meat:
 	if (have_outfit_components("Knob Goblin Harem Girl Disguise") && !get_property_boolean("_treasuryHaremMeatCollected") && locationAvailable($location[Cobb's Knob Barracks]))
 	{
-		available_resources_entries.listAppend(ChecklistEntryMake("meat", "cobbsknob.php", ChecklistSubentryMake("Cobb's Knob treasury meat", "", "Wear harem girl disguise, adventure once for 500 meat."), 5));
+		resource_entries.listAppend(ChecklistEntryMake("meat", "cobbsknob.php", ChecklistSubentryMake("Cobb's Knob treasury meat", "", "Wear harem girl disguise, adventure once for 500 meat."), 5));
 	}
 	//Skills:
 	string [int] fist_teaching_properties = split_string_alternate("fistTeachingsBarroomBrawl,fistTeachingsBatHole,fistTeachingsConservatory,fistTeachingsFratHouse,fistTeachingsFunHouse,fistTeachingsHaikuDungeon,fistTeachingsMenagerie,fistTeachingsNinjaSnowmen,fistTeachingsPokerRoom,fistTeachingsRoad,fistTeachingsSlums", ",");
@@ -41,6 +41,6 @@ void SWOTSFGenerateResource(ChecklistEntry [int] available_resources_entries)
 		}
 	}
 	if (missing_areas.count() > 0)
-		available_resources_entries.listAppend(ChecklistEntryMake("__item Teachings of the Fist", "", ChecklistSubentryMake("Teachings of the Fist", "", "Found in " + missing_areas.listJoinComponents(", ", "and") + "."), 5));
+		resource_entries.listAppend(ChecklistEntryMake("__item Teachings of the Fist", "", ChecklistSubentryMake("Teachings of the Fist", "", "Found in " + missing_areas.listJoinComponents(", ", "and") + "."), 5));
 		
 }

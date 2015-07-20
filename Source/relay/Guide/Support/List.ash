@@ -24,6 +24,18 @@ void listAppendList(string [int] list, string [int] entries)
 		list.listAppend(entries[key]);
 }
 
+void listAppendList(boolean [item] destination, boolean [item] source)
+{
+    foreach it, value in source
+        destination[it] = value;
+}
+
+void listAppendList(boolean [string] destination, boolean [string] source)
+{
+    foreach it, value in source
+        destination[it] = value;
+}
+
 void listAppend(item [int] list, item entry)
 {
 	int position = list.count();
@@ -117,6 +129,15 @@ void listAppend(buffer [int] list, buffer entry)
 		position += 1;
 	list[position] = entry;
 }
+
+void listAppend(slot [int] list, slot entry)
+{
+	int position = list.count();
+	while (list contains position)
+		position += 1;
+	list[position] = entry;
+}
+
 
 
 

@@ -9,7 +9,7 @@ void SugarGenerateSuggestions(string [int] suggestions)
         suggestions.listAppend("Sugar chapeau: +50% spell damage (tower killing)");
 }
 
-void SSugarGenerateResource(ChecklistEntry [int] available_resources_entries)
+void SSugarGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (!$item[sugar sheet].is_unrestricted())
         return;
@@ -26,7 +26,7 @@ void SSugarGenerateResource(ChecklistEntry [int] available_resources_entries)
     {
         string [int] suggestions;
         SugarGenerateSuggestions(suggestions);
-        subentries.listAppend(ChecklistSubentryMake(pluralize($item[sugar sheet]), "", suggestions));
+        subentries.listAppend(ChecklistSubentryMake(pluralise($item[sugar sheet]), "", suggestions));
         
         image_name = "sugar sheet";
     }
@@ -37,12 +37,12 @@ void SSugarGenerateResource(ChecklistEntry [int] available_resources_entries)
             continue;
         int counter = get_property_int("sugarCounter" + it.to_int());
         int combats_left = 31 - counter;
-        subentries.listAppend(ChecklistSubentryMake(pluralize(it), "", pluralize(combats_left, "combat", "combats") + " left."));
+        subentries.listAppend(ChecklistSubentryMake(pluralise(it), "", pluralise(combats_left, "combat", "combats") + " left."));
         if (image_name.length() == 0)
             image_name = it;
     }
     if (subentries.count() > 0)
     {
-        available_resources_entries.listAppend(ChecklistEntryMake(image_name, "", subentries, 10));
+        resource_entries.listAppend(ChecklistEntryMake(image_name, "", subentries, 10));
     }
 }

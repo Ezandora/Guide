@@ -74,7 +74,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	QuestState base_quest_state = __quest_state["Level 7"];
 	
 	ChecklistEntry entry;
-	entry.target_location = "crypt.php";
+	entry.url = "crypt.php";
 	entry.image_lookup_name = base_quest_state.image_name;
 	entry.should_indent_after_first_subentry = true;
 	entry.subentries.listAppend(ChecklistSubentryMake(base_quest_state.quest_name));
@@ -230,7 +230,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 			int zmobies_needed = ceil((evilness.to_float() - 26.0) / 5.0);
 			float zmobie_chance = min(100.0, 15.0 + initiative_modifier_for_location($location[the defiled alcove]) / 10.0);
 			
-			subentry.entries.listAppend(pluralize(zmobies_needed, "modern zmobie", "modern zmobies") + " needed (" + roundForOutput(zmobie_chance, 0) + "% chance of appearing)");
+			subentry.entries.listAppend(pluralise(zmobies_needed, "modern zmobie", "modern zmobies") + " needed (" + roundForOutput(zmobie_chance, 0) + "% chance of appearing)");
             
             //float combat_rate = clampNormalf(0.85 + combat_rate_modifier() / 100.0);
             //float nc_rate = 1.0 - combat_rate;
@@ -250,7 +250,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	if (base_quest_state.mafia_internal_step == 2)
 	{
 		entry.subentries[0].entries.listAppend("Go talk to the council to finish the quest.");
-        entry.target_location = "place.php?whichplace=town";
+        entry.url = "place.php?whichplace=town";
 	}
 	else if (base_quest_state.state_boolean["alcove finished"] && base_quest_state.state_boolean["cranny finished"] && base_quest_state.state_boolean["niche finished"] && base_quest_state.state_boolean["nook finished"])
 	{

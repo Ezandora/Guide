@@ -1,7 +1,7 @@
 
 
 
-string generateNinjaSafetyGuide(boolean show_color)
+string generateNinjaSafetyGuide(boolean show_colour)
 {
 	boolean can_survive = false;
 	float init_needed = $monster[ninja snowman assassin].monster_initiative();
@@ -44,7 +44,7 @@ string generateNinjaSafetyGuide(boolean show_color)
         can_survive = false;
     }
 	
-	if (!can_survive && show_color)
+	if (!can_survive && show_colour)
 		result = HTMLGenerateSpanFont(result, "red");
 	return result;
 }
@@ -90,7 +90,7 @@ void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [in
         if (!__quest_state["Level 12"].state_boolean["Lighthouse Finished"] && $item[barrel of gunpowder].available_amount() < 5)
         {
             int number_to_fight = clampi(5 - $item[barrel of gunpowder].available_amount(), 0, 5);
-            line += number_to_fight.int_to_wordy().capitalizeFirstLetter() + " more to defeat. ";
+            line += number_to_fight.int_to_wordy().capitaliseFirstLetter() + " more to defeat. ";
         }
         
         int lfm_attack = $monster[lobsterfrogman].base_attack + 5.0;
@@ -117,12 +117,12 @@ void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [in
             description.listAppend(HTMLGenerateSpanFont("Read the telegram from Lady Spookyraven first.", "red"));
         int desks_remaining = clampi(5 - get_property_int("writingDesksDefeated"), 0, 5);
         if (desks_remaining > 0 && get_property_int("lastSecondFloorUnlock") != my_ascensions() && $item[Lady Spookyraven's necklace].available_amount() == 0 && get_property("questM20Necklace") != "finished" && mafiaIsPastRevision(15244))
-            description.listAppend(pluralizeWordy(desks_remaining, "desk", "desks").capitalizeFirstLetter() + " remaining.");
+            description.listAppend(pluraliseWordy(desks_remaining, "desk", "desks").capitaliseFirstLetter() + " remaining.");
 
     }
     else if (monster_name == "Skinflute" || monster_name == "Camel's Toe")
     {
-        description.listAppend("Have " + pluralize($item[star]) + " and " + pluralize($item[line]) + ".");
+        description.listAppend("Have " + pluralise($item[star]) + " and " + pluralise($item[line]) + ".");
 		if (item_drop_modifier_ignoring_plants() < 234.0)
 			description.listAppend(HTMLGenerateSpanFont("Need +234% item.", "red"));
     }
@@ -200,7 +200,7 @@ void generateCopiedMonstersEntry(ChecklistEntry [int] task_entries, ChecklistEnt
 	}
 }
 
-void SCopiedMonstersGenerateResourceForCopyType(ChecklistEntry [int] available_resources_entries, item shaking_object, string shaking_shorthand_name, string monster_name_property_name)
+void SCopiedMonstersGenerateResourceForCopyType(ChecklistEntry [int] resource_entries, item shaking_object, string shaking_shorthand_name, string monster_name_property_name)
 {
 	if (shaking_object.available_amount() == 0 && shaking_object != $item[none])
 		return;
@@ -217,8 +217,8 @@ void SCopiedMonstersGenerateResourceForCopyType(ChecklistEntry [int] available_r
         monster_description.listAppend("Auto attack is on, disable it?");
     }
 	
-	//string line = monster_name.capitalizeFirstLetter() + HTMLGenerateIndentedText(monster_description);
-    string line = HTMLGenerateSpanOfClass(monster_name.capitalizeFirstLetter(), "r_bold");
+	//string line = monster_name.capitaliseFirstLetter() + HTMLGenerateIndentedText(monster_description);
+    string line = HTMLGenerateSpanOfClass(monster_name.capitaliseFirstLetter(), "r_bold");
     
     if (monster_description.count() > 0)
         line += "<hr>" + monster_description.listJoinComponents("|");
@@ -230,10 +230,10 @@ void SCopiedMonstersGenerateResourceForCopyType(ChecklistEntry [int] available_r
         url = "place.php?whichplace=chateau";
     }
 	
-	available_resources_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(shaking_shorthand_name.capitalizeFirstLetter() + " monster trapped!", "", line)));
+	resource_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(shaking_shorthand_name.capitaliseFirstLetter() + " monster trapped!", "", line)));
 }
 
-void SCopiedMonstersGenerateResource(ChecklistEntry [int] available_resources_entries)
+void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
 {
     //Sources:
     
@@ -281,29 +281,29 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] available_resources_en
 		string copy_sources = copy_source_list.listJoinComponents("/");
 		string name = "";
 		//FIXME make this possibly say which one in the case of 6 (does that matter? how does that mechanic work?)
-		name = pluralize(copies_left, copy_sources + " copy", copy_sources + " copies") + " left";
+		name = pluralise(copies_left, copy_sources + " copy", copy_sources + " copies") + " left";
 		string [int] description = potential_copies;
         
-		available_resources_entries.listAppend(ChecklistEntryMake(copy_source_list[0], "", ChecklistSubentryMake(name, "", description)));
+		resource_entries.listAppend(ChecklistEntryMake(copy_source_list[0], "", ChecklistSubentryMake(name, "", description)));
 	}
     
     if (!get_property_boolean("_cameraUsed") && $item[4-d camera].available_amount() > 0)
     {
-		available_resources_entries.listAppend(ChecklistEntryMake("__item 4-d camera", "", ChecklistSubentryMake("4-d camera copy available", "", potential_copies)));
+		resource_entries.listAppend(ChecklistEntryMake("__item 4-d camera", "", ChecklistSubentryMake("4-d camera copy available", "", potential_copies)));
     }
     if (!get_property_boolean("_iceSculptureUsed") && lookupItem("unfinished ice sculpture").available_amount() > 0)
     {
-		available_resources_entries.listAppend(ChecklistEntryMake("__item unfinished ice sculpture", "", ChecklistSubentryMake("Ice sculpture copy available", "", potential_copies)));
+		resource_entries.listAppend(ChecklistEntryMake("__item unfinished ice sculpture", "", ChecklistSubentryMake("Ice sculpture copy available", "", potential_copies)));
     }
     if ($item[sticky clay homunculus].available_amount() > 0)
     {
-		available_resources_entries.listAppend(ChecklistEntryMake("__item sticky clay homunculus", "", ChecklistSubentryMake(pluralize($item[sticky clay homunculus].available_amount(), "sticky clay copy", "sticky clay copies") + " available", "", "Unlimited/day.")));
+		resource_entries.listAppend(ChecklistEntryMake("__item sticky clay homunculus", "", ChecklistSubentryMake(pluralise($item[sticky clay homunculus].available_amount(), "sticky clay copy", "sticky clay copies") + " available", "", "Unlimited/day.")));
     }
     if (!get_property_boolean("_crappyCameraUsed") && $item[crappy camera].available_amount() > 0)
     {
         string [int] description = listCopy(potential_copies);
         description.listPrepend("50% success rate");
-		available_resources_entries.listAppend(ChecklistEntryMake("__item crappy camera", "", ChecklistSubentryMake("Crappy camera copy available", "", description)));
+		resource_entries.listAppend(ChecklistEntryMake("__item crappy camera", "", ChecklistSubentryMake("Crappy camera copy available", "", description)));
     }
     if (__misc_state["Chateau Mantegna available"] && !get_property_boolean("_chateauMonsterFought") && mafiaIsPastRevision(15115))
     {
@@ -346,31 +346,31 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] available_resources_en
                 line += "|*" + monster_description.listJoinComponents("|*");
             description.listPrepend(line);
         }
-		available_resources_entries.listAppend(ChecklistEntryMake("__item fancy oil painting", url, ChecklistSubentryMake(header, "", description)));
+		resource_entries.listAppend(ChecklistEntryMake("__item fancy oil painting", url, ChecklistSubentryMake(header, "", description)));
     }
     
     //Copies made:
 
 
-	generateCopiedMonstersEntry(available_resources_entries, available_resources_entries, false);
-	SCopiedMonstersGenerateResourceForCopyType(available_resources_entries, $item[Rain-Doh box full of monster], "rain doh", "rainDohMonster");
-	SCopiedMonstersGenerateResourceForCopyType(available_resources_entries, $item[spooky putty monster], "spooky putty", "spookyPuttyMonster");
+	generateCopiedMonstersEntry(resource_entries, resource_entries, false);
+	SCopiedMonstersGenerateResourceForCopyType(resource_entries, $item[Rain-Doh box full of monster], "rain doh", "rainDohMonster");
+	SCopiedMonstersGenerateResourceForCopyType(resource_entries, $item[spooky putty monster], "spooky putty", "spookyPuttyMonster");
     if (!get_property_boolean("_cameraUsed"))
-        SCopiedMonstersGenerateResourceForCopyType(available_resources_entries, $item[shaking 4-d camera], "shaking 4-d camera", "cameraMonster");
+        SCopiedMonstersGenerateResourceForCopyType(resource_entries, $item[shaking 4-d camera], "shaking 4-d camera", "cameraMonster");
     if (!get_property_boolean("_crappyCameraUsed"))
-        SCopiedMonstersGenerateResourceForCopyType(available_resources_entries, $item[shaking crappy camera], "shaking crappy camera", "crappyCameraMonster");
+        SCopiedMonstersGenerateResourceForCopyType(resource_entries, $item[shaking crappy camera], "shaking crappy camera", "crappyCameraMonster");
 	if (!get_property_boolean("_photocopyUsed"))
-		SCopiedMonstersGenerateResourceForCopyType(available_resources_entries, $item[photocopied monster], "photocopied", "photocopyMonster");
+		SCopiedMonstersGenerateResourceForCopyType(resource_entries, $item[photocopied monster], "photocopied", "photocopyMonster");
 	if (!get_property_boolean("_envyfishEggUsed"))
-		SCopiedMonstersGenerateResourceForCopyType(available_resources_entries, $item[envyfish egg], "envyfish egg", "envyfishMonster");
+		SCopiedMonstersGenerateResourceForCopyType(resource_entries, $item[envyfish egg], "envyfish egg", "envyfishMonster");
 	if (!get_property_boolean("_iceSculptureUsed"))
-		SCopiedMonstersGenerateResourceForCopyType(available_resources_entries, lookupItem("ice sculpture"), "ice sculpture", "iceSculptureMonster");
+		SCopiedMonstersGenerateResourceForCopyType(resource_entries, lookupItem("ice sculpture"), "ice sculpture", "iceSculptureMonster");
         
 	//if (__misc_state["Chateau Mantegna available"] && !get_property_boolean("_chateauMonsterFought") && mafiaIsPastRevision(15115))
-		//SCopiedMonstersGenerateResourceForCopyType(available_resources_entries, $item[none], "chateau painting", "chateauMonster");
+		//SCopiedMonstersGenerateResourceForCopyType(resource_entries, $item[none], "chateau painting", "chateauMonster");
     
-    SCopiedMonstersGenerateResourceForCopyType(available_resources_entries, $item[wax bugbear], "wax bugbear", "waxMonster");
-    SCopiedMonstersGenerateResourceForCopyType(available_resources_entries, $item[crude monster sculpture], "crude sculpture", "crudeMonster");
+    SCopiedMonstersGenerateResourceForCopyType(resource_entries, $item[wax bugbear], "wax bugbear", "waxMonster");
+    SCopiedMonstersGenerateResourceForCopyType(resource_entries, $item[crude monster sculpture], "crude sculpture", "crudeMonster");
 }
 
 void SCopiedMonstersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)

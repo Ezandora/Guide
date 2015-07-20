@@ -114,7 +114,7 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
                     things_to_do.listAppend("uneffect " + e);
             }
             if (things_to_do.count() > 0)
-                description.listAppend(HTMLGenerateSpanFont(things_to_do.listJoinComponents(", ", "and").capitalizeFirstLetter() + ".", "red"));
+                description.listAppend(HTMLGenerateSpanFont(things_to_do.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".", "red"));
             
             if ($item[dark porquoise ring].equipped_amount() == 0)
             {
@@ -253,7 +253,7 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
                     
                     if (library_clues_known < 3)
                     {
-                        unknown_clues.listAppend((3 - library_clues_known).int_to_wordy().capitalizeFirstLetter() + " non-combats in the library. (vocabulary)");
+                        unknown_clues.listAppend((3 - library_clues_known).int_to_wordy().capitaliseFirstLetter() + " non-combats in the library. (vocabulary)");
                         need_to_learn_vocabulary = true;
                     }
                     if (get_property_int("dreadScroll5") == 0)
@@ -294,7 +294,7 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
                         if (vocabulary < 100)
                         {
                             int word_quizzes_needed = clampi(10 - vocabulary / 10, 1, 10);
-                            description.listAppend("At " + (vocabulary) + "% Mer-Kin vocabulary. (use " + pluralize(word_quizzes_needed, $item[mer-kin wordquiz]) + " with a mer-kin cheatsheet)");
+                            description.listAppend("At " + (vocabulary) + "% Mer-Kin vocabulary. (use " + pluralise(word_quizzes_needed, $item[mer-kin wordquiz]) + " with a mer-kin cheatsheet)");
                         }
                         else
                             description.listAppend("Mer-Kin vocabulary mastered.");
@@ -412,7 +412,7 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 			if (get_property("lassoTraining") != "expertly")
 			{
 				string line = "";
-				if ($item[sea lasso].available_amount() == 0)
+				if ($item[sea lasso].item_amount() == 0)
 					line += HTMLGenerateSpanFont("Buy and use a sea lasso in each combat.", "red");
 				else
 					line += "Use a sea lasso in each combat.";
@@ -426,13 +426,13 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
             {
                 professional_roper = true;
 				string line = "";
-				if ($item[sea lasso].available_amount() == 0)
+				if ($item[sea lasso].item_amount() == 0)
 					line += "Buy a sea lasso.";
-				if ($item[sea cowbell].available_amount() <3 )
+				if ($item[sea cowbell].item_amount() <3 )
                 {
-                    int needed_amount = MAX(3 - $item[sea cowbell].available_amount(), 0);
+                    int needed_amount = MAX(3 - $item[sea cowbell].item_amount(), 0);
                     if (line.length() > 0) line += " ";
-					line += "Buy " + pluralizeWordy(needed_amount, "sea cowbell", "sea cowbells") + ".";
+					line += "Buy " + pluraliseWordy(needed_amount, "sea cowbell", "sea cowbells") + ".";
                 }
                 if (line.length() > 0)
                     subentry.entries.listAppend(line);
@@ -542,7 +542,7 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
             {
                 //Find grandpa in one of the three zones.
                 need_minus_combat_modifier = true;
-                subentry.entries.listAppend("Find grandpa sea monkee in " + class_grandpa_location + ".|" + pluralizeWordy(grandpa_ncs_remaining, "non-combat remains", "non-combats remain").capitalizeFirstLetter() + ".");
+                subentry.entries.listAppend("Find grandpa sea monkee in " + class_grandpa_location + ".|" + pluraliseWordy(grandpa_ncs_remaining, "non-combat remains", "non-combats remain").capitaliseFirstLetter() + ".");
             }
             else if (monkees_quest_state.mafia_internal_step == 4)
             {

@@ -35,7 +35,7 @@ locationCompatibilityInit(); //not sure if calling functions like this is intend
 boolean [location] __la_location_is_available;
 
 boolean __la_commons_were_inited = false;
-int __la_turncount_initialized_on = -1;
+int __la_turncount_initialised_on = -1;
 
 
 //Takes into account banishes and olfactions.
@@ -499,7 +499,7 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
 
 void locationAvailablePrivateInit()
 {
-	if (__la_commons_were_inited && __la_turncount_initialized_on == my_turncount())
+	if (__la_commons_were_inited && __la_turncount_initialised_on == my_turncount())
 		return;
         
     if (__la_location_is_available.count() > 0)
@@ -608,7 +608,7 @@ void locationAvailablePrivateInit()
 		
 		
 	__la_commons_were_inited = true;
-    __la_turncount_initialized_on = my_turncount();
+    __la_turncount_initialised_on = my_turncount();
 }
 
 boolean locationAvailable(location loc, Error able_to_find)
@@ -994,6 +994,8 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
             lookup_map[s] = "place.php?whichplace=airport_spooky";
         foreach s in $strings[Pirates of the Garbage Barges,Barf Mountain,The Toxic Teacups,Uncle Gator's Country Fun-Time Liquid Waste Sluice]
             lookup_map[s] = "place.php?whichplace=airport_stench";
+        foreach s in $strings[The Mines,The Jungle,The Ice Caves,The Temple Ruins,Hell,The Snake Pit,The Spider Hole,The Ancient Burial Ground,The Beehive,the crashed u. f. o.,The City of Goooold,LOLmec's Lair,Yomama's Throne]
+            lookup_map[s] = "place.php?whichplace=spelunky";
         
         foreach s in $strings[Medbay,Waste Processing,Sonar,Science Lab,Morgue,Special Ops,Engineering,Navigation,Galley]
             lookup_map[s] = "place.php?whichplace=bugbearship";

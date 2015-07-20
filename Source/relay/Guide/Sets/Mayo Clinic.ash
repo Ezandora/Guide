@@ -1,4 +1,4 @@
-void SMayoClinicGenerateResource(ChecklistEntry [int] available_resources_entries)
+void SMayoClinicGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (!mafiaIsPastRevision(15790)) //minimum supported version
         return;
@@ -39,6 +39,6 @@ void SMayoClinicGenerateResource(ChecklistEntry [int] available_resources_entrie
             benefits.listAppend("HP restore");
         benefits.listAppend("+2 all resistance");
         description.listAppend("Gives " + benefits.listJoinComponents(", ", "and") + ".");
-        available_resources_entries.listAppend(ChecklistEntryMake("__item bubblin' chemistry solution", "campground.php?action=workshed", ChecklistSubentryMake("Mayo Tank Soak", "", description), 8));
+        resource_entries.listAppend(ChecklistEntryMake("__item bubblin' chemistry solution", "campground.php?action=workshed", ChecklistSubentryMake("Mayo Tank Soak", "", description), 8));
     }
 }

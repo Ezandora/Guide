@@ -286,7 +286,7 @@ void SBugbearInvasionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistE
         if (description.count() > 0)
         {
             if ($item[crayon shavings].available_amount() > 0)
-                description.listPrepend($item[crayon shavings].available_amount().int_to_wordy().capitalizeFirstLetter() + " crayon shavings available for copying bugbears.");
+                description.listPrepend($item[crayon shavings].available_amount().int_to_wordy().capitaliseFirstLetter() + " crayon shavings available for copying bugbears.");
             if ($item[bugbear detector].available_amount() > 0 && $item[bugbear detector].equipped_amount() == 0)
                 description.listPrepend(HTMLGenerateSpanFont("Equip bugbear detector first.", "red"));
             task_entries.listAppend(ChecklistEntryMake("__item software glitch", url, ChecklistSubentryMake("Collect biodata", "", description), relevant_locations));
@@ -297,7 +297,7 @@ void SBugbearInvasionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistE
     if (true)
     {
         ChecklistEntry entry;
-        entry.target_location = "place.php?whichplace=bugbearship";
+        entry.url = "place.php?whichplace=bugbearship";
         entry.image_lookup_name = "bugbear";
         foreach key, l in location_evaluation_order
         {
@@ -356,7 +356,7 @@ void SBugbearInvasionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistE
                 modifiers.listAppend("+item");
                 description.listAppend("Collect quantum nanopolymer spider webs from spiderbugbears, use them on the poor innocent scientists.");
                 if ($item[quantum nanopolymer spider web].available_amount() > 0)
-                    description.listAppend(pluralizeWordy($item[quantum nanopolymer spider web]).capitalizeFirstLetter() + " available.");
+                    description.listAppend(pluraliseWordy($item[quantum nanopolymer spider web]).capitaliseFirstLetter() + " available.");
             }
             else if (l == $location[morgue])
             {
@@ -402,7 +402,7 @@ void SBugbearInvasionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistE
                 }
                 description.listAppend("Collect drone self-destruct chips from drones, use them on liquid metal bugbears.");
                 if ($item[drone self-destruct chip].available_amount() > 0)
-                    description.listAppend(pluralizeWordy($item[drone self-destruct chip]).capitalizeFirstLetter() + " available.");
+                    description.listAppend(pluraliseWordy($item[drone self-destruct chip]).capitaliseFirstLetter() + " available.");
             }
             else if (l == $location[Navigation])
             {
@@ -479,7 +479,7 @@ void SBugbearInvasionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistE
     }
 }
 
-void SBugbearInvasionGenerateResource(ChecklistEntry [int] available_resources_entries)
+void SBugbearInvasionGenerateResource(ChecklistEntry [int] resource_entries)
 {
 	if (my_path_id() != PATH_BUGBEAR_INVASION)
 		return;
@@ -487,7 +487,7 @@ void SBugbearInvasionGenerateResource(ChecklistEntry [int] available_resources_e
         return;
     if ($item[crayon shavings].available_amount() > 0)
     {
-		available_resources_entries.listAppend(ChecklistEntryMake("__item crayon shavings", "", ChecklistSubentryMake(pluralize($item[crayon shavings].available_amount(), "crayon shaving copy", "crayon shaving copies") + " available", "", "Bugbears only.")));
+		resource_entries.listAppend(ChecklistEntryMake("__item crayon shavings", "", ChecklistSubentryMake(pluralise($item[crayon shavings].available_amount(), "crayon shaving copy", "crayon shaving copies") + " available", "", "Bugbears only.")));
     }
     if ($item[BURT].available_amount() > 0)
     {
@@ -524,6 +524,6 @@ void SBugbearInvasionGenerateResource(ChecklistEntry [int] available_resources_e
                 line = HTMLGenerateSpanFont(line, "grey");
             description.listAppend(line);
         }
-		available_resources_entries.listAppend(ChecklistEntryMake("__item BURT", "inv_use.php?pwd=" + my_hash() + "&whichitem=5683", ChecklistSubentryMake(pluralize($item[BURT]) + " available", "", description), 8));
+		resource_entries.listAppend(ChecklistEntryMake("__item BURT", "inv_use.php?pwd=" + my_hash() + "&whichitem=5683", ChecklistSubentryMake(pluralise($item[BURT]) + " available", "", description), 8));
     }
 }

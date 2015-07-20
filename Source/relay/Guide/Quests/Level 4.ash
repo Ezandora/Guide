@@ -60,7 +60,7 @@ void QLevel4GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         subentry.modifiers.listAppend("+meat");
 		if (delayRemainingInLocation($location[the boss bat's lair]) > 0)
 		{
-			string line = "Delay for " + pluralize(delayRemainingInLocation($location[the boss bat's lair]), "turn", "turns") + " before boss bat shows up.";
+			string line = "Delay for " + pluralise(delayRemainingInLocation($location[the boss bat's lair]), "turn", "turns") + " before boss bat shows up.";
             subentry.entries.listAppend(line);
 		}
     }
@@ -73,9 +73,9 @@ void QLevel4GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         
         if (true)
         {
-            string line = pluralizeWordy(areas_locked, "area", "areas").capitalizeFirstLetter() + " to unlock";
+            string line = pluraliseWordy(areas_locked, "area", "areas").capitaliseFirstLetter() + " to unlock";
             /*if ($item[sonar-in-a-biscuit].available_amount() > 0)
-                line += ", " + pluralize($item[sonar-in-a-biscuit]);*/
+                line += ", " + pluralise($item[sonar-in-a-biscuit]);*/
             line += ".";
             subentry.entries.listAppend(line);
         }
@@ -83,7 +83,7 @@ void QLevel4GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         if ($item[sonar-in-a-biscuit].available_amount() > 0 && areas_locked > 0)
         {
             int amount = MIN(areas_locked, $item[sonar-in-a-biscuit].available_amount());
-            subentry.entries.listAppend("Use " + pluralize(amount, $item[sonar-in-a-biscuit]));
+            subentry.entries.listAppend("Use " + pluralise(amount, $item[sonar-in-a-biscuit]));
             url = "inventory.php?which=3";
         }
         
@@ -128,7 +128,7 @@ void QLevel4GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             subentry.entries.listAppend("Screambat next turn.");
         }
         else
-            subentry.entries.listAppend("Screambat after " + pluralizeWordy(turns_until_next_screambat, "turn", "turns") + ".");
+            subentry.entries.listAppend("Screambat after " + pluraliseWordy(turns_until_next_screambat, "turn", "turns") + ".");
         
         if (!screambat_up_now)
         {

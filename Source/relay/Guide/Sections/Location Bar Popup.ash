@@ -898,7 +898,7 @@ buffer generateLocationPopup(float bottom_coordinates)
 {
     buffer buf;
     location l = __last_adventure_location;
-    if (!__setting_location_bar_uses_last_location && !get_property_boolean("_relay_guide_setting_ignore_next_adventure_for_location_bar"))
+    if (!__setting_location_bar_uses_last_location && !get_property_boolean("_relay_guide_setting_ignore_next_adventure_for_location_bar") && get_property_location("nextAdventure") != $location[none])
         l = get_property_location("nextAdventure");
     if (!__setting_enable_location_popup_box)
         return buf;
@@ -906,7 +906,7 @@ buffer generateLocationPopup(float bottom_coordinates)
     buf.append(HTMLGenerateTagWrap("div", "", mapMake("id", "r_location_popup_blackout", "style", "position:fixed;z-index:4;width:100%;height:100%;background:rgba(0,0,0,0.5);display:none;")));
     
     
-    buf.append(HTMLGenerateTagPrefix("div", mapMake("id", "r_location_popup_box", "style", "bottom:" + bottom_coordinates + "em;display:none;height:auto;" /*+ "border-top:3px solid;border-color:" + __setting_line_color + ";"*/, "class", "r_bottom_outer_container")));
+    buf.append(HTMLGenerateTagPrefix("div", mapMake("id", "r_location_popup_box", "style", "bottom:" + bottom_coordinates + "em;display:none;height:auto;" /*+ "border-top:3px solid;border-color:" + __setting_line_colour + ";"*/, "class", "r_bottom_outer_container")));
     buf.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_bottom_inner_container", "style", "background:white;height:auto;")));
     
     float [monster] appearance_rates_adjusted = l.appearance_rates_adjusted();
@@ -1241,7 +1241,7 @@ buffer generateLocationPopup(float bottom_coordinates)
                 style = "font-size:1.2em;";
             style += "text-align:left;padding-top:2px;";
             
-            fl_entries.listAppend(m.capitalizeFirstLetter());
+            fl_entries.listAppend(m.capitaliseFirstLetter());
             fl_entry_classes[fl_entries.count() - 1] = "r_bold r_location_bar_ellipsis_entry";
             fl_entry_styles[fl_entries.count() - 1] = style;
             fl_entry_width_weight[fl_entries.count() - 1] = width_weight;
@@ -1271,7 +1271,7 @@ buffer generateLocationPopup(float bottom_coordinates)
             {
                 int turns_left = banish_information.BanishTurnsLeft();
                 rate_buffer.append(" for ");
-                rate_buffer.append(pluralize(turns_left, "more turn", "more turns"));
+                rate_buffer.append(pluralise(turns_left, "more turn", "more turns"));
             }
             rate_buffer.append(" ");
             avoid_outputting_conditional = true;
@@ -1336,7 +1336,7 @@ buffer generateLocationPopup(float bottom_coordinates)
         int item_count_displaying = m.item_drops_array().count();
         if (item_count_displaying > 0 && try_for_minimal_display && !monster_cannot_be_encountered)
         {
-            fl_entries.listAppend(pluralize(item_count_displaying, "item", "items"));
+            fl_entries.listAppend(pluralise(item_count_displaying, "item", "items"));
         }
         
         
@@ -1465,13 +1465,13 @@ buffer generateLocationPopup(float bottom_coordinates)
         if (l.parentdesc.length() > 0 && l.parentdesc != "No Category")
             lines.listAppend(l.parentdesc);
         if (!__misc_state["In run"] && l.turns_spent > 0)
-            lines_offscreen.listAppend(pluralize(l.turns_spent, "turn spent", "turns spent"));
+            lines_offscreen.listAppend(pluralise(l.turns_spent, "turn spent", "turns spent"));
         
         if (lines.count() + lines_offscreen.count() > 0)
         {
             if (entries_displayed >= 1)
                 buf.append(HTMLGenerateTagPrefix("hr", mapMake("style", "margin:0px;")));
-            buf.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_cl_modifier_inline r_center", "style", "height:1.1em;")));
+            buf.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_cl_modifier_inline r_centre", "style", "height:1.1em;")));
             buf.append(lines.listJoinComponents(" - "));
             buf.append("</div>");
             if (lines_offscreen.count() > 0)
@@ -1505,7 +1505,7 @@ buffer generateLocationPopup(float bottom_coordinates)
         }*/
         
         if (!__misc_state["In run"] && l.turns_spent > 0)
-            fl_entries.listAppend(pluralize(l.turns_spent, "turn spent", "turns spent"));
+            fl_entries.listAppend(pluralise(l.turns_spent, "turn spent", "turns spent"));
             
         
         if (fl_entries.count() == 1)

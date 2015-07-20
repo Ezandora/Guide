@@ -32,7 +32,7 @@ void QGalaktikGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [i
     {
         if (it.available_amount() >= 3)
             continue;
-        missing_item_descriptions.listAppend(pluralizeWordy(3 - it.available_amount(), "more " + it, "more " + it.plural));
+        missing_item_descriptions.listAppend(pluraliseWordy(3 - it.available_amount(), "more " + it, "more " + it.plural));
     }
     
     if (missing_item_descriptions.count() > 0)

@@ -269,7 +269,7 @@ void PageSetBodyAttribute(string attribute, string value)
 void PageInit()
 {
 	PageAddCSSClass("a", "r_a_undecorated", "text-decoration:none;color:inherit;");
-	PageAddCSSClass("div", "r_center", "margin-left:auto; margin-right:auto;text-align:center;");
+	PageAddCSSClass("div", "r_centre", "margin-left:auto; margin-right:auto;text-align:center;");
 	PageAddCSSClass("", "r_bold", "font-weight:bold;");
 	PageAddCSSClass("", "r_end_floating_elements", "clear:both;");
 	

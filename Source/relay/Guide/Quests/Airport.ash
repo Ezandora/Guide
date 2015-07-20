@@ -82,7 +82,7 @@ ChecklistEntry QSleazeAirportGenerateQuestFramework(ChecklistEntry [int] task_en
                     line += "s";
                 line += " ";
                 line += remaining_quests_after_this.listJoinComponents(", ", "and") + " will be available next.";*/
-                string line = pluralizeWordy(remaining_quests_after_this.count(), "quest", "quests").capitalizeFirstLetter() + " will be available after this.";
+                string line = pluraliseWordy(remaining_quests_after_this.count(), "quest", "quests").capitaliseFirstLetter() + " will be available after this.";
                 subentry.entries.listAppend(line);
             }
         }
@@ -266,7 +266,7 @@ void QSleazeAirportGenerateTasks(ChecklistEntry [int] task_entries)
     }
 }
 
-void QSleazeAirportGenerateResource(ChecklistEntry [int] available_resources_entries)
+void QSleazeAirportGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (!__misc_state["sleaze airport available"])
         return;
@@ -305,7 +305,7 @@ void QSleazeAirportGenerateResource(ChecklistEntry [int] available_resources_ent
             if ($effect[fishy].have_effect() == 0)
                 description.listAppend("Possibly acquire fishy effect first.");
             
-            available_resources_entries.listAppend(ChecklistEntryMake("__item ultimate mind destroyer", $location[The Sunken Party Yacht].getClickableURLForLocation(), ChecklistSubentryMake("Ultimate Mind Destroyer collectable", "free runs", description), $locations[The Sunken Party Yacht]));
+            resource_entries.listAppend(ChecklistEntryMake("__item ultimate mind destroyer", $location[The Sunken Party Yacht].getClickableURLForLocation(), ChecklistSubentryMake("Ultimate Mind Destroyer collectable", "free runs", description), $locations[The Sunken Party Yacht]));
         }
     }
 }
@@ -349,10 +349,13 @@ void QSpookyAirportJunglePunGenerateTasks(ChecklistEntry [int] task_entries)
             url = "inventory.php?which=2";
         }
         
-        subentry.entries.listAppend(pluralizeWordy(puns_remaining, "pun", "puns").capitalizeFirstLetter() + " remaining.");
+        subentry.entries.listAppend(pluraliseWordy(puns_remaining, "pun", "puns").capitaliseFirstLetter() + " remaining.");
     }
     else
+    {
+        url = "place.php?whichplace=airport_spooky&action=airport2_radio";
         subentry.entries.listAppend("Return to the radio and reply.");
+    }
     
 	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, lookupLocations("The Deep Dark Jungle")));
 }
@@ -406,7 +409,10 @@ void QSpookyAirportFakeMediumGenerateTasks(ChecklistEntry [int] task_entries)
         }
     }
     else
+    {
+        url = "place.php?whichplace=airport_spooky&action=airport2_radio";
         subentry.entries.listAppend("Return to the radio and reply.");
+    }
     
 	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, lookupLocations("The Secret Government Laboratory")));
 }
@@ -439,10 +445,13 @@ void QSpookyAirportClipperGenerateTasks(ChecklistEntry [int] task_entries)
         
         int turns_remaining = ceil(fingernails_remaining.to_float() / 3.0);
         
-        subentry.entries.listAppend(fingernails_remaining + " fingernails / " + pluralize(turns_remaining, "turn", "turns") + " remaining.");
+        subentry.entries.listAppend(fingernails_remaining + " fingernails / " + pluralise(turns_remaining, "turn", "turns") + " remaining.");
     }
     else
+    {
+        url = "place.php?whichplace=airport_spooky&action=airport2_radio";
         subentry.entries.listAppend("Return to the radio and reply.");
+    }
     
 	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, lookupLocations("The Mansion of Dr. Weirdeaux")));
 }
@@ -482,7 +491,10 @@ void QSpookyAirportEveGenerateTasks(ChecklistEntry [int] task_entries)
         }
     }
     else
+    {
+        url = "place.php?whichplace=airport_spooky&action=airport2_radio";
         subentry.entries.listAppend("Return to the radio and reply.");
+    }
 	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, lookupLocations("The Secret Government Laboratory")));
 }
 
@@ -512,11 +524,14 @@ void QSpookyAirportSmokesGenerateTasks(ChecklistEntry [int] task_entries)
         
         if (smokes != $item[none])
         {
-            subentry.entries.listAppend(pluralizeWordy(clampi(10 - smokes.available_amount(), 0, 10), "more pack of smokes", "more packs of smokes").capitalizeFirstLetter() + " remaining.");
+            subentry.entries.listAppend(pluraliseWordy(clampi(10 - smokes.available_amount(), 0, 10), "more pack of smokes", "more packs of smokes").capitaliseFirstLetter() + " remaining.");
         }
     }
     else
+    {
+        url = "place.php?whichplace=airport_spooky&action=airport2_radio";
         subentry.entries.listAppend("Return to the radio and reply.");
+    }
 	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, lookupLocations("The Deep Dark Jungle")));
 }
 
@@ -560,10 +575,13 @@ void QSpookyAirportGoreGenerateTasks(ChecklistEntry [int] task_entries)
             subentry.entries.listAppend(HTMLGenerateSpanFont("Equip the " + items_to_equip.listJoinComponents(", ", "and") + ".", "red"));
             url = "inventory.php?which=2";
         }
-        subentry.entries.listAppend(pluralize(gore_remaining, "pound", "pounds") + " remaining.");
+        subentry.entries.listAppend(pluralise(gore_remaining, "pound", "pounds") + " remaining.");
     }
     else
+    {
+        url = "place.php?whichplace=airport_spooky&action=airport2_radio";
         subentry.entries.listAppend("Return to the radio and reply.");
+    }
 	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, lookupLocations("The Secret Government Laboratory")));
 }
 
@@ -606,7 +624,10 @@ void QSpookyAirportOutOfOrderGenerateTasks(ChecklistEntry [int] task_entries)
             subentry.entries.listAppend("Adventure in The Deep Dark Jungle.");
     }
     else
+    {
+        url = "place.php?whichplace=airport_spooky&action=airport2_radio";
         subentry.entries.listAppend("Return to the radio and reply.");
+    }
     
 	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, lookupLocations("The Deep Dark Jungle")));
 }
@@ -621,7 +642,7 @@ void QSpookyAirportSerumGenerateTasks(ChecklistEntry [int] task_entries)
     
     if (!state.in_progress)
         return;
-    item serum = lookupItem("experimental serum P-00");
+    item serum = $item[experimental serum P-00];
     
     if (serum == $item[none])
         return;
@@ -632,16 +653,133 @@ void QSpookyAirportSerumGenerateTasks(ChecklistEntry [int] task_entries)
 	string url = "place.php?whichplace=airport_spooky";
     
     
-    if (state.mafia_internal_step <= 2 && serum.available_amount() < 5)
+    if (state.mafia_internal_step <= 2 && serum.item_amount() < 5)
     {
-        subentry.modifiers.listAppend("+item");
-        
-        subentry.entries.listAppend("Adventure in The Mansion of Dr. Weirdeaux, collect " + int_to_wordy(5 - serum.available_amount()) + " more " + serum.plural + ".");
+        if (serum.available_amount() >= 5)
+        {
+            subentry.entries.listAppend("Pull " + pluralise(5 - serum.item_amount(), serum) + ".");
+        }
+        else
+        {
+            subentry.modifiers.listAppend("+item");
+            
+            subentry.entries.listAppend("Adventure in The Mansion of Dr. Weirdeaux, collect " + int_to_wordy(5 - serum.available_amount()) + " more " + serum.plural + ".");
+        }
     }
     else
+    {
+        url = "place.php?whichplace=airport_spooky&action=airport2_radio";
         subentry.entries.listAppend("Return to the radio and reply.");
+    }
     
 	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, lookupLocations("The Mansion of Dr. Weirdeaux")));
+}
+
+void QSpookyAirportWeirdeauxGenerateTasks(ChecklistEntry [int] task_entries)
+{
+    if (__last_adventure_location != $location[The Mansion of Dr. Weirdeaux] || my_level() >= 256)
+        return;
+    if (!can_interact())
+        return;
+    if (QuestState("questESpClipper").in_progress)
+        return;
+    
+    string url = "place.php?whichplace=airport_spooky";
+    string [int] description;
+    string [int] modifiers;
+    if (!$skill[curse of marinara].have_skill())
+    {
+        if (my_class() == $class[sauceror])
+        {
+            description.listAppend("Buy curse of marinara from the guild trainer.");
+            url = "guild.php?place=trainer";
+        }
+        else if ($classes[disco bandit,disco bandit,seal clubber,turtle tamer,disco bandit,pastamancer,accordion thief,disco bandit] contains my_class())
+        {
+            description.listAppend("Ascend sauceror to buy curse of marinara.");
+            url = "ascend.php";
+        }
+        else
+            description.listAppend("Become a sauceror at the end of this ascension, to buy curse of marinara.");
+    }
+    else
+    {
+        if ($skill[utensil twist].have_skill() && lookupItem("dinsey's pizza cutter").available_amount() > 0)
+        {
+            string [int] tasks;
+            if (lookupItem("dinsey's pizza cutter").equipped_amount() == 0)
+                tasks.listAppend("equip Dinsey's Pizza Cutter");
+            tasks.listAppend("cast curse of marinara");
+            tasks.listAppend("keep monster stunned");
+            tasks.listAppend("cast utensil twist repeatedly in combat");
+            
+            description.listAppend(tasks.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".");
+        }
+        else
+        {
+            if ($skill[utensil twist].have_skill())
+            {
+                description.listAppend("Possibly acquire Dinsey's pizza cutter by fighting Wart Dinsey as a Pastamancer.");
+            }
+            else if (lookupItem("dinsey's pizza cutter").available_amount() > 0)
+            {
+                description.listAppend("Possibly acquire the pastamancer skill Utensil Twist.");
+            }
+            else
+            {
+                description.listAppend("Possibly acquire the pastamancer skill Utensil Twist and Dinsey's pizza cutter by fighting Wart Dinsey as a Pastamancer.");
+            }
+            //Drunkula's bell - 15% to 20% of your buffed myst as damage?
+            //right bear arm - Grizzly Scene, once/fight, 50% HP damage
+            //Staff of the Headmaster's Victuals - chefstaff (requires skill), jiggle does 30% of monster HP
+            //Great Wolf's lice - reduces monster attack/def by 30%. ???
+            //great wolf's right paw, great wolf's left paw - gives Great Slash ability, which deals 1/3rd buffed muscle damage per paw equipped
+            description.listAppend("Cast curse of marinara at the start of combat, and keep monster stunned.");
+            string [item] other_relevant_items;
+            other_relevant_items[$item[drunkula's bell]] = "throw in combat to deal damage";
+            other_relevant_items[$item[right bear arm]] = "grizzly scene deals 50% HP damage";
+            if ($skill[Spirit of Rigatoni].skill_is_usable())
+                other_relevant_items[$item[Staff of the Headmaster's Victuals]] = "jiggle for 30% HP damage";
+            other_relevant_items[$item[Great Wolf's lice]] = "throw in combat to deal damage";
+            other_relevant_items[$item[great wolf's left paw]] = "great slash skill deals damage";
+            other_relevant_items[$item[great wolf's right paw]] = "great slash skill deals damage";
+            
+            string [int] possibilities;
+            foreach it, desc in other_relevant_items
+            {
+                if (it.available_amount() == 0)
+                    continue;
+                string line = it.capitaliseFirstLetter() + " - " + desc + ".";
+                if (it.to_slot() != $slot[none] && it.equipped_amount() == 0)
+                    line += " (equip)";
+                possibilities.listAppend(line);
+            }
+            description.listAppend("Try:|*" + possibilities.listJoinComponents("|*").capitaliseFirstLetter());
+        }
+        
+        modifiers.listAppend("+spooky resistance");
+        
+        string [int] blocking_sources;
+        if (!__misc_state["familiars temporarily blocked"])
+            blocking_sources.listAppend("a potato familiar");
+        foreach it in $items[Drunkula's ring of haze,Mesmereyes&trade; contact lenses,attorney's badge,ancient stone head,navel ring of navel gazing]
+        {
+            if (it.available_amount() == 0)
+                continue;
+            if (it.equipped_amount() > 0)
+                continue;
+            string line = it;
+            if (it.equipped_amount() == 0)
+                line += " (equip)";
+            blocking_sources.listAppend(line);
+        }
+        if (my_class() == $class[pastamancer])
+            blocking_sources.listAppend("spaghetti elemental thrall");
+        if (blocking_sources.count() > 0)
+            description.listAppend("Use sources of blocking, like " + blocking_sources.listJoinComponents(", ", "and") + ".");
+    }
+    
+	task_entries.listAppend(ChecklistEntryMake("__effect Incredibly Hulking", url, ChecklistSubentryMake("Gain " + pluralise(clampi(256 - my_level(), 0, 256), "level", "levels"), modifiers, description), lookupLocations("The Mansion of Dr. Weirdeaux")));
 }
 
 void QSpookyAirportGenerateTasks(ChecklistEntry [int] task_entries)
@@ -659,6 +797,7 @@ void QSpookyAirportGenerateTasks(ChecklistEntry [int] task_entries)
     QSpookyAirportFakeMediumGenerateTasks(task_entries);
     QSpookyAirportGoreGenerateTasks(task_entries);
     QSpookyAirportJunglePunGenerateTasks(task_entries);
+    QSpookyAirportWeirdeauxGenerateTasks(task_entries);
 }
 
 void QStenchAirportFishTrashGenerateTasks(ChecklistEntry [int] task_entries)
@@ -696,7 +835,7 @@ void QStenchAirportFishTrashGenerateTasks(ChecklistEntry [int] task_entries)
         else
         {
             int turns_remaining = clampi(get_property_int("dinseyFilthLevel") / 5, 0, 20);
-            subentry.entries.listAppend("Adventure in Pirates of the Garbage Barges for " + pluralizeWordy(turns_remaining, "more turn", "more turns") + ".");
+            subentry.entries.listAppend("Adventure in Pirates of the Garbage Barges for " + pluraliseWordy(turns_remaining, "more turn", "more turns") + ".");
         }
     }
     else
@@ -728,7 +867,7 @@ void QStenchAirportNastyBearsGenerateTasks(ChecklistEntry [int] task_entries)
     int bears_left = 8 - get_property_int("dinseyNastyBearsDefeated");
     if (state.mafia_internal_step < 3 && bears_left > 0)
     {
-        subentry.entries.listAppend("Adventure in Gator's Country Fun-Time Liquid Waste Sluice, defeat " + pluralizeWordy(bears_left, "more nasty bear", "more nasty bears") + ".");
+        subentry.entries.listAppend("Adventure in Gator's Country Fun-Time Liquid Waste Sluice, defeat " + pluraliseWordy(bears_left, "more nasty bear", "more nasty bears") + ".");
         
         if (__misc_state["have olfaction equivalent"])
             subentry.modifiers.listAppend("olfact nasty bears?");
@@ -762,7 +901,7 @@ void QStenchAirportSocialJusticeIGenerateTasks(ChecklistEntry [int] task_entries
     int adventures_left = 15 - get_property_int("dinseySocialJusticeIProgress");
     if (state.mafia_internal_step < 2 && adventures_left > 0)
     {
-        subentry.entries.listAppend("Adventure in Pirates of the Garbage Barges " + pluralizeWordy(adventures_left, "more time", "more times") + ".");
+        subentry.entries.listAppend("Adventure in Pirates of the Garbage Barges " + pluraliseWordy(adventures_left, "more time", "more times") + ".");
     }
     else
     {
@@ -792,8 +931,8 @@ void QStenchAirportSocialJusticeIIGenerateTasks(ChecklistEntry [int] task_entrie
     
     if (state.mafia_internal_step < 2)
     {
-        int adventures_left = 15 - get_property_int("dinseySocialJusticeIIProgress");
-        subentry.entries.listAppend("Adventure in Uncle Gator's Country Fun-Time Liquid Waste Sluice " + pluralizeWordy(adventures_left, "more time", "more times") + ".");
+        int adventures_left = clampi(15 - get_property_int("dinseySocialJusticeIIProgress"), 0, 15);
+        subentry.entries.listAppend("Adventure in Uncle Gator's Country Fun-Time Liquid Waste Sluice " + pluraliseWordy(adventures_left, "more time", "more times") + ".");
     }
     else
     {
@@ -891,7 +1030,7 @@ void QStenchAirportZippityDooDahGenerateTasks(ChecklistEntry [int] task_entries)
         }
         else
         {
-            subentry.entries.listAppend("Adventure in the Toxic Teacups for " + pluralizeWordy(turns_remaining, "more turn", "more turns") + ".");
+            subentry.entries.listAppend("Adventure in the Toxic Teacups for " + pluraliseWordy(turns_remaining, "more turn", "more turns") + ".");
         }
     }
     else
@@ -928,7 +1067,7 @@ void QStenchAirportWillWorkForFoodGenerateTasks(ChecklistEntry [int] task_entrie
     if (state.mafia_internal_step == 1)
     {
         subentry.entries.listAppend("Adventure in Barf Mountain, use complimentary Dinsey refreshments on garbage/angry tourists.");
-        subentry.entries.listAppend(pluralizeWordy(tourists_to_feed, "more remains", "more remain").capitalizeFirstLetter() + ".");
+        subentry.entries.listAppend(pluraliseWordy(tourists_to_feed, "more remains", "more remain").capitaliseFirstLetter() + ".");
         subentry.modifiers.listAppend("olfact angry/garbage tourists");
         
     }
@@ -962,13 +1101,13 @@ void QStenchAirportGiveMeFuelGenerateTasks(ChecklistEntry [int] task_entries)
         int globules_needed = clampi(20 - lookupItem("toxic globule").available_amount(), 0, 20);
         if (can_interact())
         {
-            subentry.entries.listAppend("Buy " + pluralize(globules_needed, "more toxic globule", "more toxic globules") + " in the mall.");
+            subentry.entries.listAppend("Buy " + pluralise(globules_needed, "more toxic globule", "more toxic globules") + " in the mall.");
             url = "mall.php";
         }
         else
         {
             subentry.modifiers.listAppend("+unknown");
-            subentry.entries.listAppend("Adventure in the Toxic Teacups and collect " + pluralize(globules_needed, "more toxic globule", "more toxic globules") + ".");
+            subentry.entries.listAppend("Adventure in the Toxic Teacups and collect " + pluralise(globules_needed, "more toxic globule", "more toxic globules") + ".");
         }
     }
     else
@@ -976,7 +1115,7 @@ void QStenchAirportGiveMeFuelGenerateTasks(ChecklistEntry [int] task_entries)
         if (lookupItem("toxic globule").item_amount() < 20)
         {
             int globules_needed = clampi(20 - lookupItem("toxic globule").item_amount(), 0, 20);
-            subentry.entries.listAppend("Pull " + pluralize(globules_needed, "more toxic globule", "more toxic globules") + ".");
+            subentry.entries.listAppend("Pull " + pluralise(globules_needed, "more toxic globule", "more toxic globules") + ".");
         }
         else
         {
@@ -1071,7 +1210,7 @@ void QStenchAirportWartDinseyGenerateTasks(ChecklistEntry [int] task_entries)
         }
         tasks.listAppend("throw " + clip + " in combat");
         
-        description.listAppend(tasks.listJoinComponents(", ").capitalizeFirstLetter() + ".");
+        description.listAppend(tasks.listJoinComponents(", ").capitaliseFirstLetter() + ".");
     }
     else
     {
@@ -1111,7 +1250,7 @@ void QAirportGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     QStenchAirportGenerateTasks(chosen_entries);
 }
 
-void QAirportGenerateResource(ChecklistEntry [int] available_resources_entries)
+void QAirportGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    QSleazeAirportGenerateResource(available_resources_entries);
+    QSleazeAirportGenerateResource(resource_entries);
 }

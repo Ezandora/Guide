@@ -1,4 +1,4 @@
-void generateGardenEntry(ChecklistEntry [int] available_resources_entries, boolean [item] garden_source_items, boolean [item] garden_creatable_items)
+void generateGardenEntry(ChecklistEntry [int] resource_entries, boolean [item] garden_source_items, boolean [item] garden_creatable_items)
 {
     ChecklistSubentry [int] subentries;
     string image_name = "";
@@ -7,7 +7,7 @@ void generateGardenEntry(ChecklistEntry [int] available_resources_entries, boole
         if (it.available_amount() == 0) continue;
         if (image_name.length() == 0)
             image_name = "__item " + it;
-        subentries.listAppend(ChecklistSubentryMake(pluralize(it), "", ""));
+        subentries.listAppend(ChecklistSubentryMake(pluralise(it), "", ""));
     }
     if (subentries.count() > 0)
     {
@@ -22,19 +22,19 @@ void generateGardenEntry(ChecklistEntry [int] available_resources_entries, boole
             
             if (it.to_slot() != $slot[none] && it.available_amount() > 0) //already have one
                 continue;
-            output_list.listAppend(pluralize(amount, it));
+            output_list.listAppend(pluralise(amount, it));
         }
         if (output_list.count() > 0)
         {
             subentry.entries.listAppend("Can create " + output_list.listJoinComponents(", ", "or") + ".");
         }
-        available_resources_entries.listAppend(ChecklistEntryMake(image_name, "", subentries, 8));
+        resource_entries.listAppend(ChecklistEntryMake(image_name, "", subentries, 8));
     }
 }
 
 
 
-void SGardensGenerateResource(ChecklistEntry [int] available_resources_entries)
+void SGardensGenerateResource(ChecklistEntry [int] resource_entries)
 {
 	if (!__misc_state["In run"])
         return;
@@ -51,7 +51,7 @@ void SGardensGenerateResource(ChecklistEntry [int] available_resources_entries)
         if (__misc_state_string["yellow ray source"] == 4766.to_item().to_string())
             garden_creatable_items[4766.to_item()] = true;
         
-        generateGardenEntry(available_resources_entries, $items[pumpkin], garden_creatable_items);
+        generateGardenEntry(resource_entries, $items[pumpkin], garden_creatable_items);
     }
     if (true)
     {
@@ -63,7 +63,7 @@ void SGardensGenerateResource(ChecklistEntry [int] available_resources_entries)
         if (__misc_state["free runs usable"])
             garden_creatable_items[$item[peppermint parasol]] = true;
         garden_creatable_items[$item[peppermint crook]] = true;
-        generateGardenEntry(available_resources_entries, $items[peppermint sprout], garden_creatable_items);
+        generateGardenEntry(resource_entries, $items[peppermint sprout], garden_creatable_items);
     }
     if (true)
     {
@@ -76,11 +76,11 @@ void SGardensGenerateResource(ChecklistEntry [int] available_resources_entries)
             garden_creatable_items[$item[skeletal skiff]] = true;
         if (hippy_stone_broken())
             garden_creatable_items[$item[auxiliary backbone]] = true;
-        generateGardenEntry(available_resources_entries, $items[skeleton], garden_creatable_items);
+        generateGardenEntry(resource_entries, $items[skeleton], garden_creatable_items);
     }
     if (true)
     {
-        generateGardenEntry(available_resources_entries, $items[handful of barley,cluster of hops,fancy beer bottle,fancy beer label], $items[can of Br&uuml;talbr&auml;u,can of Drooling Monk,can of Impetuous Scofflaw,bottle of old pugilist,bottle of professor beer,bottle of rapier witbier,artisanal homebrew gift package]);
+        generateGardenEntry(resource_entries, $items[handful of barley,cluster of hops,fancy beer bottle,fancy beer label], $items[can of Br&uuml;talbr&auml;u,can of Drooling Monk,can of Impetuous Scofflaw,bottle of old pugilist,bottle of professor beer,bottle of rapier witbier,artisanal homebrew gift package]);
     }
     if (true)
     {
@@ -103,6 +103,6 @@ void SGardensGenerateResource(ChecklistEntry [int] available_resources_entries)
             garden_creatable_items[lookupItem("ice nine")] = true;
         
         
-        generateGardenEntry(available_resources_entries, lookupItems("snow berries, ice harvest"), garden_creatable_items);
+        generateGardenEntry(resource_entries, lookupItems("snow berries, ice harvest"), garden_creatable_items);
     }
 }

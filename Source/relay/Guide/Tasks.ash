@@ -35,14 +35,14 @@ void generateTasks(Checklist [int] checklists)
         {
             single_mode_only = true;
 			PlantSuggestion suggestion = area_relevant_suggestions[0];
-			string plant_name = suggestion.plant_name.capitalizeFirstLetter();
+			string plant_name = suggestion.plant_name.capitaliseFirstLetter();
         
             subentry.header = "Plant " + plant_name + " in " + __last_adventure_location;
         }
 		
 		foreach key, suggestion in area_relevant_suggestions
 		{
-			string plant_name = suggestion.plant_name.capitalizeFirstLetter();
+			string plant_name = suggestion.plant_name.capitaliseFirstLetter();
 			Plant plant = __plant_properties[plant_name];
 			
 			string line;
@@ -110,7 +110,8 @@ void generateTasks(Checklist [int] checklists)
 			}
 			subentry.entries.listAppend(meatcar_line);
 			
-			subentry.entries.listAppend("Or buy a desert bus pass. (5000 meat)");
+            if (my_path_id() != PATH_WAY_OF_THE_SURPRISING_FIST)
+                subentry.entries.listAppend("Or buy a desert bus pass. (5000 meat)");
 			if ($item[pumpkin].available_amount() > 0)
 				subentry.entries.listAppend("Or build a pumpkin carriage.");
             if ($items[can of Br&uuml;talbr&auml;u,can of Drooling Monk,can of Impetuous Scofflaw,fancy tin beer can].available_amount() > 0)
@@ -195,7 +196,7 @@ void generateTasks(Checklist [int] checklists)
 		
 		subentry.header = "Level to " + (my_level() + 1);
 		
-		subentry.entries.listAppend("Gain " + pluralize(substats_remaining, "substat", "substats") + ".");
+		subentry.entries.listAppend("Gain " + pluralise(substats_remaining, "substat", "substats") + ".");
         
         string url = "";
         

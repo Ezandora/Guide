@@ -159,7 +159,7 @@ void SCOTGenerateSuggestions(string [int] description)
             reanimator_reasons.listAppend("hot wings");
         
         if (reanimator_reasons.count() > 0)
-            suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake(reanimator_reasons.listJoinComponents(", ").capitalizeFirstLetter(), $familiar[reanimated reanimator])));
+            suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake(reanimator_reasons.listJoinComponents(", ").capitaliseFirstLetter(), $familiar[reanimated reanimator])));
     }
     if (__misc_state["in run"])
         suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("50% block", $familiar[Mariachi Chihuahua])));
@@ -194,7 +194,7 @@ void SCOTGenerateSuggestions(string [int] description)
     if (get_property_int("_grimstoneMaskDropsCrown") == 0)
         suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("Grimstone mask", $familiar[Grimstone Golem])));
     if (get_property_int("_grimFairyTaleDropsCrown") < 2 && !(__misc_state["in run"] && spleen_limit() == 0))
-        suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake(pluralizeWordy(clampi(2 - get_property_int("_grimFairyTaleDropsCrown"), 0, 2), "spleen item", "spleen items").capitalizeFirstLetter(), $familiar[grim Brother])));
+        suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake(pluraliseWordy(clampi(2 - get_property_int("_grimFairyTaleDropsCrown"), 0, 2), "spleen item", "spleen items").capitaliseFirstLetter(), $familiar[grim Brother])));
     
     if ($item[blackberry].available_amount() < 3 && $item[blackberry galoshes].available_amount() == 0 && __quest_state["Level 11"].mafia_internal_step < 2)
         suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("Blackberries for galoshes", $familiars[reassembled blackbird,reconstituted crow])));
@@ -247,7 +247,7 @@ void SCOTGenerateSuggestions(string [int] description)
         description.listAppend(HTMLGenerateSimpleTableLines(familiar_options));
 }
 
-void SCOTGenerateResource(ChecklistEntry [int] available_resources_entries)
+void SCOTGenerateResource(ChecklistEntry [int] resource_entries)
 {
 	if ($item[crown of thrones].available_amount() == 0 && lookupItem("Buddy Bjorn").available_amount() == 0)
 		return;
@@ -292,5 +292,5 @@ void SCOTGenerateResource(ChecklistEntry [int] available_resources_entries)
         header = available_sources.listJoinComponents(", ", "and");
         
     if (description.count() > 0)
-        available_resources_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(header, "", description), 8));
+        resource_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(header, "", description), 8));
 }

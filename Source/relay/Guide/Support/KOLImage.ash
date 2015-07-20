@@ -9,7 +9,7 @@ boolean __setting_show_alignment_guides = false;
 //There's a list of pre-set images in KOLImagesInit. Otherwise, it tries to look up the string as an item, then as a familiar, and then as an effect. If any matches are found, that image is output. (uses KoLmafia's internal database)
 //Also "__item item name", "__familiar familiar name", and "__effect effect name" explicitly request those images.
 //"__half lookup name" will reduce the image to half-size.
-//NOTE: To use KOLImageGenerateImageHTML with should_center set to true, the page must have the class "r_center" set as "margin-left:auto; margin-right:auto;text-align:center;"
+//NOTE: To use KOLImageGenerateImageHTML with should_centre set to true, the page must have the class "r_centre" set as "margin-left:auto; margin-right:auto;text-align:center;"
 
 Record ServerImageStats
 {
@@ -260,7 +260,6 @@ void KOLImagesInit()
 	
 	__kol_images["sword guy"] = KOLImageMake("images/otherimages/leftswordguy.gif", Vec2iMake(80,100));
 	__kol_images["Jick"] = KOLImageMake("images/otherimages/customavatars/1.gif", Vec2iMake(30,50));
-	__kol_images["Pulverize"] = KOLImageMake("images/itemimages/blackhammer.gif", Vec2iMake(30,30));
 	__kol_images["Superhuman Cocktailcrafting"] = KOLImageMake("images/itemimages/fruitym.gif", Vec2iMake(30,30));
     
 	__kol_images["inexplicable door"] = KOLImageMake("images/otherimages/woods/8bitdoor.gif", Vec2iMake(100,100), RectMake(15, 43, 85, 99));
@@ -400,7 +399,7 @@ KOLImage KOLImageLookup(string lookup_name)
 }
 
 Vec2i __kol_image_generate_image_html_return_final_size;
-buffer KOLImageGenerateImageHTML(string lookup_name, boolean should_center, Vec2i max_image_dimensions, string container_additional_class)
+buffer KOLImageGenerateImageHTML(string lookup_name, boolean should_centre, Vec2i max_image_dimensions, string container_additional_class)
 {
     KOLImagesInit();
 	lookup_name = to_lower_case(lookup_name);
@@ -527,8 +526,8 @@ buffer KOLImageGenerateImageHTML(string lookup_name, boolean should_center, Vec2
         string [int] classes;
         classes.listAppend("r_image_container");
         
-        if (should_center)
-            classes.listAppend("r_center");
+        if (should_centre)
+            classes.listAppend("r_centre");
         if (container_additional_class.length() > 0)
             classes.listAppend(container_additional_class);
         result.append(HTMLGenerateTagPrefix("div", mapMake("class", classes.listJoinComponents(" "), "style", style)));
@@ -629,14 +628,14 @@ buffer KOLImageGenerateImageHTML(string lookup_name, boolean should_center, Vec2
 	return result;
 }
 
-buffer KOLImageGenerateImageHTML(string lookup_name, boolean should_center, Vec2i max_image_dimensions)
+buffer KOLImageGenerateImageHTML(string lookup_name, boolean should_centre, Vec2i max_image_dimensions)
 {
-    return KOLImageGenerateImageHTML(lookup_name, should_center, max_image_dimensions, "");
+    return KOLImageGenerateImageHTML(lookup_name, should_centre, max_image_dimensions, "");
 }
 
-buffer KOLImageGenerateImageHTML(string lookup_name, boolean should_center)
+buffer KOLImageGenerateImageHTML(string lookup_name, boolean should_centre)
 {
-	return KOLImageGenerateImageHTML(lookup_name, should_center, Vec2iMake(65535, 65535));
+	return KOLImageGenerateImageHTML(lookup_name, should_centre, Vec2iMake(65535, 65535));
 }
 
 static

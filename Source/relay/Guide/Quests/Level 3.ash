@@ -120,7 +120,7 @@ void QLevel3GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         
         if ($item[tangle of rat tails].available_amount() > 0 && need_to_complete_pyramid)
         {
-            subentry.entries.listAppend(pluralize($item[tangle of rat tails]) + " found.");
+            subentry.entries.listAppend(pluralise($item[tangle of rat tails]) + " found.");
         }
     }
     if (need_to_complete_pyramid)

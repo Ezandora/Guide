@@ -172,7 +172,7 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 				if (!is_wearing_outfit("Frat Boy Ensemble"))
 					todo.listAppend("wear frat boy ensemble");
 				todo.listAppend("attempt a frontal assault");
-				method = todo.listJoinComponents(", ", "then").capitalizeFirstLetter() + ".";
+				method = todo.listJoinComponents(", ", "then").capitaliseFirstLetter() + ".";
 			}
 			else if ($item[mullet wig].available_amount() > 0 && $item[briefcase].available_amount() > 0)
 			{
@@ -180,7 +180,7 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 				if ($item[mullet wig].equipped_amount() == 0)
 					todo.listAppend("wear mullet wig");
 				todo.listAppend("go in through the side door");
-				method = todo.listJoinComponents(", ", "then").capitalizeFirstLetter() + ".";
+				method = todo.listJoinComponents(", ", "then").capitaliseFirstLetter() + ".";
 			}
 			else if (knoll_available() || $item[frilly skirt].available_amount() > 0)
 			{
@@ -188,11 +188,11 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
                 if (insult_count < 6)
                     todo.listAppend("acquire at least six insults");
 				if ($item[hot wing].available_amount() <3 )
-					todo.listAppend("acquire " + pluralize((3 - $item[hot wing].available_amount()), "more hot wing", "more hot wings"));
+					todo.listAppend("acquire " + pluralise((3 - $item[hot wing].available_amount()), "more hot wing", "more hot wings"));
 				if ($item[frilly skirt].equipped_amount() == 0)
 					todo.listAppend("wear frilly skirt");
 				todo.listAppend("catburgle");
-                string line2 = todo.listJoinComponents(", ", "then").capitalizeFirstLetter() + ".";
+                string line2 = todo.listJoinComponents(", ", "then").capitaliseFirstLetter() + ".";
 				method = line2;
 			}
 			else
@@ -294,7 +294,7 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		
 	if (should_output_insult_data)
 	{
-		string line = "At " + pluralize(insult_count, "insult", "insults") + ". " + roundForOutput(insult_success_likelyhood[insult_count] * 100, 1) + "% chance of beer pong success.";
+		string line = "At " + pluralise(insult_count, "insult", "insults") + ". " + roundForOutput(insult_success_likelyhood[insult_count] * 100, 1) + "% chance of beer pong success.";
 		if (insult_count < 8)
 			line += "|Insult every pirate with the big book of pirate insults.";
 		subentry.entries.listAppend(line);

@@ -46,7 +46,7 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
             image_name = "Haunted Ballroom";
             if (delayRemainingInLocation($location[the haunted ballroom]) > 0)
             {
-                string line = "Delay for " + pluralize(delayRemainingInLocation($location[the haunted ballroom]), "turn", "turns") + ".";
+                string line = "Delay for " + pluralise(delayRemainingInLocation($location[the haunted ballroom]), "turn", "turns") + ".";
                 if (__misc_state["have hipster"])
                 {
                     subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
@@ -65,7 +65,7 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                 subentry.entries.listAppend("Acquire Lord Spookyraven's spectacles from the haunted bedroom.");
                 image_name = "__item Lord Spookyraven's spectacles";
             }
-            else if (lookupItem("recipe: mortar-dissolving solution").available_amount() == 0 && !__setting_debug_mode && !recipe_was_autoread)
+            else if ($item[recipe: mortar-dissolving solution].available_amount() == 0 && !__setting_debug_mode && !recipe_was_autoread)
             {
                 if (recipe_will_be_autoread)
                 {
@@ -115,7 +115,7 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                         tasks.listAppend("adventure in the haunted boiler room with +" + ml_needed + " ML");
                         subentry.modifiers.listAppend("+" + ml_needed + " ML");
                         
-                        subentry.entries.listAppend(tasks.listJoinComponents(", ", "then").capitalizeFirstLetter() + ".");
+                        subentry.entries.listAppend(tasks.listJoinComponents(", ", "then").capitaliseFirstLetter() + ".");
                         
                         int current_ml = lookupLocation("The Haunted Boiler Room").monster_level_adjustment_for_location();
                         
@@ -213,7 +213,7 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                         foreach l in missing_searchables
                         {
                             item it = searchables[l];
-                            places.listAppend(it.capitalizeFirstLetter() + " in " + l + ".");
+                            places.listAppend(it.capitaliseFirstLetter() + " in " + l + ".");
                         }
                         subentry.entries.listAppend("Scavenger hunt! Go search for:|*" + places.listJoinComponents("<hr>|*"));
                         subentry.entries.listAppend("Read the recipe if you haven't.");

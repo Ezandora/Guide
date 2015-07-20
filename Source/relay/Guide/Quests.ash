@@ -81,8 +81,8 @@ void QuestsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     QOldLandfillGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 }
 
-void QuestsGenerateResources(ChecklistEntry [int] available_resources_entries)
+void QuestsGenerateResources(ChecklistEntry [int] resource_entries)
 {
-    QSpookyravenLightsOutGenerateResource(available_resources_entries);
-    QAirportGenerateResource(available_resources_entries);
+    QSpookyravenLightsOutGenerateResource(resource_entries);
+    QAirportGenerateResource(resource_entries);
 }

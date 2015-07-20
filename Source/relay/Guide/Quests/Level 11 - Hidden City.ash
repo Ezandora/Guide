@@ -73,7 +73,7 @@ void generateHiddenAreaUnlockForShrine(string [int] description, location shrine
         description.listAppend("Unlock by visiting " + shrine + ".");
     if (liana_remaining > 0 && shrine.noncombatTurnsAttemptedInLocation() == 0)
     {
-        string line = liana_remaining.int_to_wordy().capitalizeFirstLetter() + " dense liana remain.";
+        string line = liana_remaining.int_to_wordy().capitaliseFirstLetter() + " dense liana remain.";
         
         if (__misc_state["can equip just about any weapon"])
         {
@@ -99,7 +99,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         
     QuestState base_quest_state = __quest_state["Level 11 Hidden City"];
     ChecklistEntry entry;
-    entry.target_location = "place.php?whichplace=hiddencity";
+    entry.url = "place.php?whichplace=hiddencity";
     entry.image_lookup_name = base_quest_state.image_name;
     entry.should_indent_after_first_subentry = true;
     entry.should_highlight = $locations[the hidden temple, the hidden apartment building, the hidden hospital, the hidden office building, the hidden bowling alley, the hidden park, a massive ziggurat,an overgrown shrine (northwest),an overgrown shrine (southwest),an overgrown shrine (northeast),an overgrown shrine (southeast)] contains __last_adventure_location;
@@ -111,7 +111,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
     else if (!locationAvailable($location[the hidden park]))
     {
         entry.image_lookup_name = "Hidden Temple";
-        entry.target_location = "place.php?whichplace=woods";
+        entry.url = "place.php?whichplace=woods";
         ChecklistSubentry subentry;
         subentry.header = base_quest_state.quest_name;
         subentry.entries.listAppend("Unlock the hidden city via the hidden temple.");
@@ -120,8 +120,8 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         if ($item[stone wool].available_amount() > 0)
         {
             if ($effect[Stone-Faced].have_effect() == 0)
-                entry.target_location = "inventory.php?which=3";
-            subentry.entries.listAppend(pluralize($item[stone wool]) + " available.");
+                entry.url = "inventory.php?which=3";
+            subentry.entries.listAppend(pluralise($item[stone wool]) + " available.");
         }
         entry.subentries.listAppend(subentry);
     }
@@ -253,7 +253,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                     if (turns_until_next_nc == 0)
                         subentry.entries.listAppend("Non-combat appears next turn.");
                     else
-                        subentry.entries.listAppend("Non-combat appears after " + pluralizeWordy(turns_until_next_nc, "turn", "turns") + ".");
+                        subentry.entries.listAppend("Non-combat appears after " + pluraliseWordy(turns_until_next_nc, "turn", "turns") + ".");
                 }
                 
                 string [int] curse_sources;
@@ -322,7 +322,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                     if (files_not_found > 0)
                     {
                         subentry.entries.listAppend("Olfact accountant.");
-                        subentry.entries.listAppend("Need " + pluralize(files_not_found, "more McClusky file", "more McClusky files") + ". Found from pygmy witch accountants.");
+                        subentry.entries.listAppend("Need " + pluralise(files_not_found, "more McClusky file", "more McClusky files") + ". Found from pygmy witch accountants.");
                         //if (!$monster[pygmy witch lawyer].is_banished())
                             //subentry.entries.listAppend("Potentially banish lawyers.");
                     }
@@ -348,7 +348,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                     if (turns_until_next_nc == 0)
                         subentry.entries.listAppend("Non-combat appears next turn.");
                     else
-                        subentry.entries.listAppend("Non-combat appears after " + pluralizeWordy(turns_until_next_nc, "turn", "turns") + ".");
+                        subentry.entries.listAppend("Non-combat appears after " + pluraliseWordy(turns_until_next_nc, "turn", "turns") + ".");
                         
                     if (turns_until_next_nc == 0 && $item[McClusky file (complete)].available_amount() == 0 && $item[Boring binder clip].available_amount() > 0)
                     {
@@ -452,7 +452,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 }
                 
                 string line;
-                line = int_to_wordy(rolls_needed).capitalizeFirstLetter();
+                line = int_to_wordy(rolls_needed).capitaliseFirstLetter();
                 if (rolls_needed > 1)
                     line += " more rolls";
                 else
@@ -460,14 +460,14 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 line += " until protector spirit fight.";
                 
                 if ($item[bowling ball].item_amount() > 0)
-                    line += "|Have " + pluralizeWordy($item[bowling ball].item_amount(), $item[bowling ball]) + ".";
+                    line += "|Have " + pluraliseWordy($item[bowling ball].item_amount(), $item[bowling ball]) + ".";
                 if ($item[bowling ball].item_amount() < rolls_needed)
                 {
                     if ($item[bowling ball].closet_amount() > 0 && $item[bowling ball].item_amount() > 0)
                         line += " (" + ($item[bowling ball].item_amount() + $item[bowling ball].closet_amount()).int_to_wordy() + " total with closet)";
                     else if ($item[bowling ball].closet_amount() > 0)
                     {
-                        line += "|Have " + pluralizeWordy($item[bowling ball].closet_amount(), $item[bowling ball]) + " in closet.";
+                        line += "|Have " + pluraliseWordy($item[bowling ball].closet_amount(), $item[bowling ball]) + " in closet.";
                         if ($item[bowling ball].closet_amount() >= rolls_needed)
                             line += " (take them out!)";
                     }

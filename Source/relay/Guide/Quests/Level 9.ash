@@ -109,7 +109,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
             if (clues_remaining > 0)
                 tasks.listAppend("collect " + clues_remaining.int_to_wordy() + " a-boo clues");
             tasks.listAppend("use/survive each clue to finish quest.|May want to consider delaying until end of the run");
-            details.listAppend(tasks.listJoinComponents(", ", "then").capitalizeFirstLetter() + ".");
+            details.listAppend(tasks.listJoinComponents(", ", "then").capitaliseFirstLetter() + ".");
         }
         
 		modifiers.listAppend("+567% item");
@@ -119,7 +119,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
         
         if (true)
         {
-            string line = "Have " + pluralize($item[a-boo clue]) + ".";
+            string line = "Have " + pluralise($item[a-boo clue]) + ".";
             
             float clue_drop_rate = item_drop_multiplier * 0.15;
             line += " " + clue_drop_rate.roundForOutput(2) + " clues/adventure at +" + ((item_drop_multiplier - 1) * 100.0).roundForOutput(1) + "% item.";
@@ -268,7 +268,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
             {
                 string line = "investigate room 37";
                 if (options_left.count() == 0)
-                    line = line.capitalizeFirstLetter(); //have to pre-capitalize because of possible HTML later
+                    line = line.capitaliseFirstLetter(); //have to pre-capitalise because of possible HTML later
                 if (!can_complete_stench)
                     line = HTMLGenerateSpanFont(line, "gray");
                 options_left.listAppend(line);
@@ -277,7 +277,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
             {
                 string line = "search the pantry";
                 if (options_left.count() == 0)
-                    line = line.capitalizeFirstLetter();
+                    line = line.capitaliseFirstLetter();
                 if (!can_complete_item)
                     line = HTMLGenerateSpanFont(line, "gray");
                 options_left.listAppend(line);
@@ -286,7 +286,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
             {
                 string line = "follow the faint sound of music";
                 if (options_left.count() == 0)
-                    line = line.capitalizeFirstLetter();
+                    line = line.capitaliseFirstLetter();
                 if (!can_complete_jar)
                     line = HTMLGenerateSpanFont(line, "gray");
                 options_left.listAppend(line);
@@ -295,7 +295,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
             {
                 string line = "you";
                 if (options_left.count() == 0)
-                    line = line.capitalizeFirstLetter();
+                    line = line.capitaliseFirstLetter();
                 if (!can_complete_init)
                     line = HTMLGenerateSpanFont(line, "gray");
                 options_left.listAppend(line);
@@ -322,7 +322,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
 				
             if (!item_completed && !can_complete_item)
             {
-                details.listAppend("+50% non-familiar item required.");
+                details.listAppend("+50% non-familiar item required. (+food works)");
             }
 			
 			if ($item[jar of oil].available_amount() == 0 && !jar_completed)
@@ -350,9 +350,9 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
 			if ($item[rusty hedge trimmers].available_amount() > 0)
             {
                 if (!have_at_least_one_usable_option)
-                    details.listAppend("Have " + $item[rusty hedge trimmers].pluralizeWordy() + ".");
+                    details.listAppend("Have " + $item[rusty hedge trimmers].pluraliseWordy() + ".");
                 else if ($item[rusty hedge trimmers].available_amount() > 1)
-                    details.listAppend("Use " + $item[rusty hedge trimmers].pluralizeWordy() + ".");
+                    details.listAppend("Use " + $item[rusty hedge trimmers].pluraliseWordy() + ".");
                 else
                     details.listAppend("Use rusty hedge trimmers.");
             }
@@ -428,7 +428,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
             if (fabs(pressure_reduced_per_turn) > 0.01)
                 turns_remaining_at_current_ml = ceil(base_quest_state.state_float["oil peak pressure"] / pressure_reduced_per_turn);
             
-            string line2 = pluralize(turns_remaining_at_current_ml, "turn", "turns") + " remaining at " + oil_ml + " ML.";
+            string line2 = pluralise(turns_remaining_at_current_ml, "turn", "turns") + " remaining at " + oil_ml + " ML.";
             if (base_quest_state.state_boolean["oil peak pressure bug in effect"])
                 line2 = "At most " + line2 + " (unable to track, sorry)";
             details.listAppend(line2);
@@ -479,9 +479,9 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
             if ($item[bubblin' crude].available_amount() < 12)
             {
                 details.listAppend("Run +item to acquire 12 bubblin' crude. (" + item_drop_string + ")|" + crude_string);
-                details.listAppend("Need " + pluralize(MAX(0, 12 - $item[bubblin' crude].available_amount()), "more bubblin' crude", "more bubblin' crudes") + ".");
+                details.listAppend("Need " + pluralise(MAX(0, 12 - $item[bubblin' crude].available_amount()), "more bubblin' crude", "more bubblin' crudes") + ".");
                 if ($item[duskwalker syringe].available_amount() > 0)
-                    details.listAppend("Use " + $item[duskwalker syringe].pluralize() + " in-combat for more crude.");
+                    details.listAppend("Use " + $item[duskwalker syringe].pluralise() + " in-combat for more crude.");
             }
 		}
 		
@@ -569,7 +569,7 @@ void QLevel9GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             subentry.entries.listAppend("Build a bridge!");
         }
 		if ($item[smut orc keepsake box].available_amount() > 0)
-			subentry.entries.listAppend("Open " + pluralize($item[smut orc keepsake box]) + ".");
+			subentry.entries.listAppend("Open " + pluralise($item[smut orc keepsake box]) + ".");
 		if (line.count() > 0)
 			subentry.entries.listAppend("Need " + line.listJoinComponents(" ", "and") + ".");
 	}

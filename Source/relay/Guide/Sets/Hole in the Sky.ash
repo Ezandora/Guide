@@ -158,14 +158,14 @@ void QHitsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] 
 		
 		string [int] required_components;
 		if (star_charts_remaining > 0)
-			required_components.listAppend(pluralize(star_charts_remaining, $item[star chart]));
+			required_components.listAppend(pluralise(star_charts_remaining, $item[star chart]));
 		foreach key in stars_remaining
 		{
 			string [int] line;
 			if (stars_remaining[key] > 0)
-				line.listAppend(pluralize(stars_remaining[key], $item[star]));
+				line.listAppend(pluralise(stars_remaining[key], $item[star]));
 			if (lines_remaining[key] > 0)
-				line.listAppend(pluralize(lines_remaining[key], $item[line]));
+				line.listAppend(pluralise(lines_remaining[key], $item[line]));
 			string route = "";
 			if (remaining_options_names contains key)
 			{

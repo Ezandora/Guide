@@ -251,7 +251,7 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
                     }
                     if (stew_source_monsters.count() > 0)
                     {
-                        string description = stew_source_monsters.listJoinComponents("/").capitalizeFirstLetter() + " - run +300% item/food drops for wet stunt nut stew components. (marginal?)";
+                        string description = stew_source_monsters.listJoinComponents("/").capitaliseFirstLetter() + " - run +300% item/food drops for wet stunt nut stew components. (marginal?)";
                         
                         potential_faxes.listAppend(description);
                     }
@@ -327,9 +327,9 @@ void SFaxGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
     }
 }
 
-void SFaxGenerateResource(ChecklistEntry [int] available_resources_entries)
+void SFaxGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	SFaxGenerateEntry(available_resources_entries, available_resources_entries, false);
+	SFaxGenerateEntry(resource_entries, resource_entries, false);
 }
 
 

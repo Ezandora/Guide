@@ -762,7 +762,7 @@ void setUpQuestStateViaMafia()
 }
 
 
-void finalizeSetUpState()
+void finaliseSetUpState()
 {
 	//done after quest parsing
 	
@@ -783,7 +783,7 @@ void finalizeSetUpState()
 	}
     computeFatLootTokens();
 	
-	finalizeSetUpFloristState();
+	finaliseSetUpFloristState();
 }
 
 void setUpQuestState()

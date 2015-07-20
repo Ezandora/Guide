@@ -68,7 +68,7 @@ void QLevel8GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 			
 				
 			if ($skill[Advanced Saucecrafting].skill_is_usable() && fullness_limit() > 0 && __misc_state["can eat just about anything"] && my_path_id() != PATH_SLOW_AND_STEADY)
-				cheese_lines.listAppend("Have " + pluralize($item[glass of goat's milk]) + " for magnesium (20% drop)");
+				cheese_lines.listAppend("Have " + pluralise($item[glass of goat's milk]) + " for magnesium (20% drop)");
 		}
 		
 		subentry.entries.listAppend(cheese_header + HTMLGenerateIndentedText(cheese_lines));
@@ -147,7 +147,7 @@ void QLevel8GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             if (items_needed.count() == 0)
             {
                 if (cold_resistance < 5.0)
-                    ninja_path.listAppend(need_cold_res_string.capitalizeFirstLetter() + ".");
+                    ninja_path.listAppend(need_cold_res_string.capitaliseFirstLetter() + ".");
                     
                 ninja_path.listAppend("Climb the peak.");
                 ninja_finishes_quest = true;
@@ -217,7 +217,7 @@ void QLevel8GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
                     extreme_modifiers.listAppend("-combat");
                 }
                 things_to_do.listAppend("jump onto the mountain top");
-                extreme_path.listAppend(things_to_do.listJoinComponents(", ", "and").capitalizeFirstLetter() + ".");
+                extreme_path.listAppend(things_to_do.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".");
             }
             else
             {
@@ -261,12 +261,12 @@ void QLevel8GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             line += " (attack: " + groar_attack.round() + ")";
             
 		todo.listAppend(line);
-		subentry.entries.listAppend(todo.listJoinComponents(", ", "then").capitalizeFirstLetter() + ".");
+		subentry.entries.listAppend(todo.listJoinComponents(", ", "then").capitaliseFirstLetter() + ".");
 		
         if (turns_remaining > 1)
         {
             subentry.modifiers.listAppend("+meat");
-            subentry.entries.listAppend("Optionally run +meat for " + pluralizeWordy((turns_remaining - 1), "turn", "turns") + ". (200 base meat drop)");
+            subentry.entries.listAppend("Optionally run +meat for " + pluraliseWordy((turns_remaining - 1), "turn", "turns") + ". (200 base meat drop)");
         }
         
         image_name = "Yeti";
