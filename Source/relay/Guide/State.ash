@@ -719,7 +719,7 @@ void setUpState()
         soda_cost = $item[black cherry soda].npc_price();
     else if (dispensary_available())
         soda_cost = $item[knob goblin seltzer].npc_price();
-    else if (can_interact())
+    else if (can_interact()) //can't buy from NPC, so have to use mall price:
         soda_cost = $item[knob goblin seltzer].mall_price();
     
     if (soda_cost > 0.0)

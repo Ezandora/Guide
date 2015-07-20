@@ -129,7 +129,7 @@ void generateChecklists(Checklist [int] ordered_output_checklists)
 	Checklist [int] checklists;
 	
     
-    if (limit_mode() == "spelunky" && __setting_debug_mode) //not ready yet
+    if (limit_mode() == "spelunky") //not ready yet
     {
         LimitModeSpelunkingGenerateChecklists(checklists);
     }
