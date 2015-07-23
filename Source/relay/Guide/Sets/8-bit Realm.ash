@@ -160,6 +160,6 @@ void S8bitRealmGenerateResource(ChecklistEntry [int] resource_entries)
         string [int] crafting_list = crafting_list_have;
         crafting_list.listAppendList(crafting_list_cannot);
         string pixels_have = "Pixel crafting";
-        resource_entries.listAppend(ChecklistEntryMake("__item white pixel", "place.php?whichplace=forestvillage&action=fv_mystic", ChecklistSubentryMake(pixels_have,  "", crafting_list), 10));
+        resource_entries.listAppend(ChecklistEntryMake("__item white pixel", "shop.php?whichshop=mystic", ChecklistSubentryMake(pixels_have,  "", crafting_list), 10));
     }
 }

@@ -116,6 +116,13 @@ void SDeckOfEveryCardGenerateResource(ChecklistEntry [int] resource_entries)
         summons.listAppend(DOECSummonMake(card_name, "+" + (500 * (1.0 + numeric_modifier(my_primestat().to_string() + " Experience Percent") / 100.0)).floor() + " mainstat."));
     }
     
+    if (in_run && !__quest_state["Level 8"].state_boolean["Past mine"])
+    {
+        int missing_ore = MAX(0, 3 - __quest_state["Level 8"].state_string["ore needed"].to_item().available_amount());
+        if (missing_ore > 0)
+            summons.listAppend(DOECSummonMake("Mine", "One of every ore."));
+    }
+    
     if (!in_run && lookupItem("knife").available_amount() == 0)
         summons.listAppend(DOECSummonMake("Knife", "+50% meat farming weapon."));
     
@@ -188,10 +195,14 @@ void SDeckOfEveryCardGenerateResource(ChecklistEntry [int] resource_entries)
     
     if (in_run)
     {
-        int wool_needed = 1;
-        if ($item[the nostril of the serpent].available_amount() == 0)
+        int wool_needed = 0;
+        if (!$location[the hidden park].locationAvailable())
+        {
             wool_needed += 1;
-		if ($item[stone wool].available_amount() < wool_needed && !$location[the hidden park].locationAvailable())
+            if ($item[the nostril of the serpent].available_amount() == 0)
+                wool_needed += 1;
+        }
+		if ($item[stone wool].available_amount() < wool_needed)
         {
             summons.listAppend(DOECSummonMake("Sheep", "3 stone wool."));
         }

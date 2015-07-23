@@ -258,7 +258,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
 			taffy_lines.listAppend(ChecklistSubentryMake(pluralise(it), "",  description));
 		}
 		if (taffy_lines.count() > 0)
-			resource_entries.listAppend(ChecklistEntryMake(image_name, "", taffy_lines, importance_level_item));
+			resource_entries.listAppend(ChecklistEntryMake(image_name, "inventory.php?which=3", taffy_lines, importance_level_item));
 			
 	}
 	
@@ -732,6 +732,21 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
             description.listAppend("Currently on the path of " + get_property("grimstoneMaskPath") + ".");
         
         resource_entries.listAppend(ChecklistEntryMake("__item " + grimstone_mask, "inventory.php?which=3", ChecklistSubentryMake(grimstone_mask.pluralise(), "", description), importance_level_item));
+    }
+    
+    if (get_campground()[$item[spinning wheel]] > 0 && !get_property_boolean("_spinningWheel"))
+    {
+        string [int] description;
+        int meat_gained = powi(MIN(30, my_level()), 3);
+        description.listAppend("Will gain " + meat_gained + " meat.");
+        if (availableDrunkenness() >= 0)
+        {
+            if (my_level() < 8)
+                description.listAppend("Wait until you've leveled up more.");
+            else if (my_level() < 13)
+                description.listAppend("Possibly wait until you've leveled up more?");
+        }
+        resource_entries.listAppend(ChecklistEntryMake("__item spinning wheel", "campground.php?action=workshed", ChecklistSubentryMake("Spinning wheel meat", "", description), importance_level_unimportant_item));
     }
     
     if ($item[very overdue library book].available_amount() > 0 && in_run && __misc_state["Need to level"])

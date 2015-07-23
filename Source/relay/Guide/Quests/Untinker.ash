@@ -1,7 +1,6 @@
 
 void QUntinkerInit()
 {
-	//questM01Untinker
 	QuestState state;
 	
 	QuestStateParseMafiaQuestProperty(state, "questM01Untinker");

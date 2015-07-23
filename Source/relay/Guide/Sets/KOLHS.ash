@@ -24,7 +24,7 @@ void SKOLHSGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     
     
     if (subentry.entries.count() > 0)
-        task_entries.listAppend(ChecklistEntryMake("high school", "", subentry, $locations[the hallowed halls, shop class, chemistry class, art class]));
+        task_entries.listAppend(ChecklistEntryMake("high school", "place.php?whichplace=KOLHS", subentry, $locations[the hallowed halls, shop class, chemistry class, art class]));
     
     
     foreach it in $items[can of the cheapest beer,bottle of fruity &quot;wine&quot;,single swig of vodka]

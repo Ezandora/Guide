@@ -1,7 +1,6 @@
 
 void QArtistInit()
 {
-	//questM02Artist
 	QuestState state;
 	
 	QuestStateParseMafiaQuestProperty(state, "questM02Artist");

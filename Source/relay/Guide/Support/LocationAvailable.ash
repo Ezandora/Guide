@@ -980,7 +980,8 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         lookup_map["The Crimbonium Mine"] = "mining.php?mine=5";
         lookup_map["The Secret Council Warehouse"] = "tutorial.php";
         lookup_map["The Skeleton Store"] = "place.php?whichplace=town_market";
-
+        foreach s in $strings[The Hallowed Halls,Shop Class,Chemistry Class,Art Class]
+            lookup_map[s] = "place.php?whichplace=KOLHS";
         foreach s in $strings[The Edge of the Swamp,The Dark and Spooky Swamp,The Corpse Bog,The Ruined Wizard Tower,The Wildlife Sanctuarrrrrgh,Swamp Beaver Territory,The Weird Swamp Village]
             lookup_map[s] = "place.php?whichplace=marais";
         foreach s in $strings[Ye Olde Medievale Villagee,Portal to Terrible Parents,Rumpelstiltskin's Workshop]

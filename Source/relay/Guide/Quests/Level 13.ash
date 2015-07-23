@@ -911,42 +911,60 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             if (things_to_do.count() > 0)
                 subentry.entries.listAppend(HTMLGenerateSpanFont(things_to_do.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".", "red"));*/
             
-            if (lookupSkill("Garbage Nova").skill_is_usable() && false) //calculations are incorrect
+            if (lookupSkill("Garbage Nova").skill_is_usable() && false) //calculations need in-game verification
             {
+                //Special note on calculations:
+                //Spell damage percent is multiplied before the group size multiplier, then floored.
+                //I believe this means against a size 100 monster, garbage nova will always deal damage in multiples of 50
+                //It also means estimation can be wildly off without taking that into account.
+                //Also, stench spell damage counts double, maybe?
+                float buffed_myst = my_buffedstat($stat[mysticality]);
+                float spell_damage = numeric_modifier("spell damage");
+                float stench_spell_damage = numeric_modifier("stench spell damage");
                 float spell_damage_percent = numeric_modifier("spell damage percent");
+                float monster_level = monster_level_adjustment_ignoring_plants();
                 float spell_damage_multiplier = 1.0 + spell_damage_percent / 100.0;
-                string [int] tasks;
+                float monster_damage_multiplier = (1.0 - min(50.0, monster_level * 0.4)) / 100.0;
                 
-                //Formula:
-                //damage = 50 * (1 + spell_damage_percent / 100.0) * (45 + floor(0.4 * myst))
+                
+                //Current damage formulas:
+                //min = floor((45.0 + floor(0.4 * buffed_myst) + spell_damage + stench_spell_damage * 2.0) * (1.0 + spell_damage_percent / 100.0)) * ceil(group_size * 0.5)
+                //max = floor((50.0 + floor(0.4 * buffed_myst) + spell_damage + stench_spell_damage * 2.0) * (1.0 + spell_damage_percent / 100.0)) * ceil(group_size * 0.5)
+                //group_size = 100
+                //then apply damage resistance: damage_out = floor(damage_in * (1.0 - min(50.0, ml * 0.4)) / 100.0));
                 //damage must be >= 5k
                 
-                //FIXME this is not correct
-                //predicted minimum value: 59495
-                //actual: 56948
-                int min_myst_needed = 138;
+                string [int] tasks;
                 
-                if (spell_damage_multiplier != 0)
-                    min_myst_needed = MAX(ceil((20000.0 / 4.0 / 50.0 / spell_damage_multiplier - 45.0) / 0.4), 0);
-                    
+                int min_myst_needed = 1000;
+                //5000 = floor(floor((45.0 + floor(0.4 * buffed_myst) + spell_damage + stench_spell_damage * 2.0) * spell_damage_multiplier) * 50.0 * monster_damage_multiplier)
+                //approximation:
+                //buffed_myst = 2.5 * (5000 / monster_damage_multiplier / 50.0 / spell_damage_multiplier - spell_damage - stench_spell_damage * 2.0 - 45.0)
+                //hmm... 138 to 388 myst without anything else? yes
+                //though -100 myst with 50 stench spell damage is also enough
                 
-                int per_round_damage = 50 * spell_damage_multiplier * (45 + floor(0.4 * my_buffedstat($stat[mysticality])));
+                float divisor = monster_damage_multiplier * 50.0 * spell_damage_multiplier;
+                if (divisor == 0.0)
+                    divisor = 0.001;
+                min_myst_needed = ceil(2.5 * (5000 / divisor - spell_damage - stench_spell_damage * 2.0 - 45.0));
+                
+                int per_round_damage = floor(floor((45.0 + floor(0.4 * buffed_myst) + spell_damage + stench_spell_damage * 2.0) * spell_damage_multiplier) * 50.0 * monster_damage_multiplier);
+                
+                
                 int casts_needed = 4;
                 if (per_round_damage != 0)
-                    casts_needed = clampi(20000.0 / to_float(per_round_damage), 1, 4);
+                    casts_needed = clampi(ceil(20000.0 / to_float(per_round_damage)), 1, 4);
                 
-                int mp_needed = casts_needed * 50;
-                if (my_mp() < mp_needed)
-                    tasks.listAppend(HTMLGenerateSpanFont("Acquire " + mp_needed + " MP", "red"));
                 if (my_buffedstat($stat[mysticality]) < min_myst_needed)
                 {
                     tasks.listAppend(HTMLGenerateSpanFont("buff up to " + min_myst_needed + " mysticality", "red"));
+                    if (monster_level > 0)
+                        tasks.listAppend("possibly reduce ML");
                 }
                 tasks.listAppend("cast garbage nova " + pluraliseWordy(casts_needed, "time", "times"));
                 
-                
-                    
-                subentry.entries.listAppend(tasks.listJoinComponents(", ", "then").capitaliseFirstLetter() + ".");
+                if (tasks.count() > 0)
+                    subentry.entries.listAppend(tasks.listJoinComponents(", ", "then").capitaliseFirstLetter() + ".");
                 
                 subentry.entries.listAppend(per_round_damage + " damage/round.");
             }
