@@ -1,7 +1,7 @@
 //This script and its support scripts are in the public domain.
 
 //These settings are for development. Don't worry about editing them.
-string __version = "1.2.5";
+string __version = "1.2.6";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -5971,7 +5971,8 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         lookup_map["The Crimbonium Mine"] = "mining.php?mine=5";
         lookup_map["The Secret Council Warehouse"] = "tutorial.php";
         lookup_map["The Skeleton Store"] = "place.php?whichplace=town_market";
-
+        foreach s in $strings[The Hallowed Halls,Shop Class,Chemistry Class,Art Class]
+            lookup_map[s] = "place.php?whichplace=KOLHS";
         foreach s in $strings[The Edge of the Swamp,The Dark and Spooky Swamp,The Corpse Bog,The Ruined Wizard Tower,The Wildlife Sanctuarrrrrgh,Swamp Beaver Territory,The Weird Swamp Village]
             lookup_map[s] = "place.php?whichplace=marais";
         foreach s in $strings[Ye Olde Medievale Villagee,Portal to Terrible Parents,Rumpelstiltskin's Workshop]
@@ -7571,6 +7572,8 @@ void QLevel8GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 				potential_ore_sources.listAppend("Earthen Fist will allow mining." + have_skill_text);
 				need_outfit = false;
 			}
+            if (lookupItem("Deck of every card").available_amount() > 0 && lookupItem("Deck of every card").is_unrestricted())
+                potential_ore_sources.listAppend("Deck of Every Card - Mine card");
 			ore_lines.listAppend("Potential sources of ore:" + HTMLGenerateIndentedText(potential_ore_sources));
 			if (skill_is_usable($skill[unaccompanied miner]))
 				ore_lines.listAppend("You can free mine. Consider splitting mining over several days for zero-adventure cost.");
@@ -13192,42 +13195,60 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             if (things_to_do.count() > 0)
                 subentry.entries.listAppend(HTMLGenerateSpanFont(things_to_do.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".", "red"));*/
             
-            if (lookupSkill("Garbage Nova").skill_is_usable() && false) //calculations are incorrect
+            if (lookupSkill("Garbage Nova").skill_is_usable() && false) //calculations need in-game verification
             {
+                //Special note on calculations:
+                //Spell damage percent is multiplied before the group size multiplier, then floored.
+                //I believe this means against a size 100 monster, garbage nova will always deal damage in multiples of 50
+                //It also means estimation can be wildly off without taking that into account.
+                //Also, stench spell damage counts double, maybe?
+                float buffed_myst = my_buffedstat($stat[mysticality]);
+                float spell_damage = numeric_modifier("spell damage");
+                float stench_spell_damage = numeric_modifier("stench spell damage");
                 float spell_damage_percent = numeric_modifier("spell damage percent");
+                float monster_level = monster_level_adjustment_ignoring_plants();
                 float spell_damage_multiplier = 1.0 + spell_damage_percent / 100.0;
-                string [int] tasks;
+                float monster_damage_multiplier = (1.0 - min(50.0, monster_level * 0.4)) / 100.0;
                 
-                //Formula:
-                //damage = 50 * (1 + spell_damage_percent / 100.0) * (45 + floor(0.4 * myst))
+                
+                //Current damage formulas:
+                //min = floor((45.0 + floor(0.4 * buffed_myst) + spell_damage + stench_spell_damage * 2.0) * (1.0 + spell_damage_percent / 100.0)) * ceil(group_size * 0.5)
+                //max = floor((50.0 + floor(0.4 * buffed_myst) + spell_damage + stench_spell_damage * 2.0) * (1.0 + spell_damage_percent / 100.0)) * ceil(group_size * 0.5)
+                //group_size = 100
+                //then apply damage resistance: damage_out = floor(damage_in * (1.0 - min(50.0, ml * 0.4)) / 100.0));
                 //damage must be >= 5k
                 
-                //FIXME this is not correct
-                //predicted minimum value: 59495
-                //actual: 56948
-                int min_myst_needed = 138;
+                string [int] tasks;
                 
-                if (spell_damage_multiplier != 0)
-                    min_myst_needed = MAX(ceil((20000.0 / 4.0 / 50.0 / spell_damage_multiplier - 45.0) / 0.4), 0);
-                    
+                int min_myst_needed = 1000;
+                //5000 = floor(floor((45.0 + floor(0.4 * buffed_myst) + spell_damage + stench_spell_damage * 2.0) * spell_damage_multiplier) * 50.0 * monster_damage_multiplier)
+                //approximation:
+                //buffed_myst = 2.5 * (5000 / monster_damage_multiplier / 50.0 / spell_damage_multiplier - spell_damage - stench_spell_damage * 2.0 - 45.0)
+                //hmm... 138 to 388 myst without anything else? yes
+                //though -100 myst with 50 stench spell damage is also enough
                 
-                int per_round_damage = 50 * spell_damage_multiplier * (45 + floor(0.4 * my_buffedstat($stat[mysticality])));
+                float divisor = monster_damage_multiplier * 50.0 * spell_damage_multiplier;
+                if (divisor == 0.0)
+                    divisor = 0.001;
+                min_myst_needed = ceil(2.5 * (5000 / divisor - spell_damage - stench_spell_damage * 2.0 - 45.0));
+                
+                int per_round_damage = floor(floor((45.0 + floor(0.4 * buffed_myst) + spell_damage + stench_spell_damage * 2.0) * spell_damage_multiplier) * 50.0 * monster_damage_multiplier);
+                
+                
                 int casts_needed = 4;
                 if (per_round_damage != 0)
-                    casts_needed = clampi(20000.0 / to_float(per_round_damage), 1, 4);
+                    casts_needed = clampi(ceil(20000.0 / to_float(per_round_damage)), 1, 4);
                 
-                int mp_needed = casts_needed * 50;
-                if (my_mp() < mp_needed)
-                    tasks.listAppend(HTMLGenerateSpanFont("Acquire " + mp_needed + " MP", "red"));
                 if (my_buffedstat($stat[mysticality]) < min_myst_needed)
                 {
                     tasks.listAppend(HTMLGenerateSpanFont("buff up to " + min_myst_needed + " mysticality", "red"));
+                    if (monster_level > 0)
+                        tasks.listAppend("possibly reduce ML");
                 }
                 tasks.listAppend("cast garbage nova " + pluraliseWordy(casts_needed, "time", "times"));
                 
-                
-                    
-                subentry.entries.listAppend(tasks.listJoinComponents(", ", "then").capitaliseFirstLetter() + ".");
+                if (tasks.count() > 0)
+                    subentry.entries.listAppend(tasks.listJoinComponents(", ", "then").capitaliseFirstLetter() + ".");
                 
                 subentry.entries.listAppend(per_round_damage + " damage/round.");
             }
@@ -16471,7 +16492,6 @@ void QAzazelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 
 void QUntinkerInit()
 {
-	//questM01Untinker
 	QuestState state;
 	
 	QuestStateParseMafiaQuestProperty(state, "questM01Untinker");
@@ -16530,7 +16550,6 @@ void QUntinkerGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [i
 
 void QArtistInit()
 {
-	//questM02Artist
 	QuestState state;
 	
 	QuestStateParseMafiaQuestProperty(state, "questM02Artist");
@@ -19403,6 +19422,50 @@ void QOldLandfillGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     
 	optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, active_url, subentry, $locations[the old landfill]));
 }
+//questM25Armorer
+void QMadnessBakeryInit()
+{
+	QuestState state;
+	
+	QuestStateParseMafiaQuestProperty(state, "questM25Armorer");
+	
+	state.quest_name = "Lending a Hand (and a Foot)";
+	state.image_name = "__item unlit birthday cake";
+    
+	
+	__quest_state["Madness Bakery"] = state;
+}
+
+
+void QMadnessBakeryGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+	QuestState base_quest_state = __quest_state["Madness Bakery"];
+	if (!base_quest_state.in_progress)
+		return;
+    
+	ChecklistSubentry subentry;
+	
+	subentry.header = base_quest_state.quest_name;
+	
+	string url = "place.php?whichplace=town_right";
+    
+    if (lookupItem("no-handed pie").available_amount() > 0 || base_quest_state.mafia_internal_step >= 5)
+    {
+        subentry.entries.listAppend("Talk to the leggerer.");
+        url = "place.php?whichplace=town_market";
+    }
+    else
+    {
+        //step1 seems to exist, but no information on office visits left
+        //step2 - cake lord
+        //step3 - in the progress of talking to madeline
+        //step4 - acquire cake
+        //step5 - melon lord?
+        subentry.entries.listAppend("Adventure in the Madness Bakery|Choose the first option in the non-combat repeatedly.");
+    }
+		
+	optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, lookupLocations("Madness Bakery")));
+}
 
 
 void QuestsInit()
@@ -19437,6 +19500,7 @@ void QuestsInit()
     QMeatsmithInit();
     QGalaktikInit();
     QOldLandfillInit();
+    QMadnessBakeryInit();
     
     //has to happen after level 13 init... or not?
 	QManorInit();
@@ -19481,6 +19545,7 @@ void QuestsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     QMeatsmithGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     QGalaktikGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     QOldLandfillGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+    QMadnessBakeryGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 }
 
 void QuestsGenerateResources(ChecklistEntry [int] resource_entries)
@@ -21104,7 +21169,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
 			taffy_lines.listAppend(ChecklistSubentryMake(pluralise(it), "",  description));
 		}
 		if (taffy_lines.count() > 0)
-			resource_entries.listAppend(ChecklistEntryMake(image_name, "", taffy_lines, importance_level_item));
+			resource_entries.listAppend(ChecklistEntryMake(image_name, "inventory.php?which=3", taffy_lines, importance_level_item));
 			
 	}
 	
@@ -21578,6 +21643,21 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
             description.listAppend("Currently on the path of " + get_property("grimstoneMaskPath") + ".");
         
         resource_entries.listAppend(ChecklistEntryMake("__item " + grimstone_mask, "inventory.php?which=3", ChecklistSubentryMake(grimstone_mask.pluralise(), "", description), importance_level_item));
+    }
+    
+    if (get_campground()[$item[spinning wheel]] > 0 && !get_property_boolean("_spinningWheel"))
+    {
+        string [int] description;
+        int meat_gained = powi(MIN(30, my_level()), 3);
+        description.listAppend("Will gain " + meat_gained + " meat.");
+        if (availableDrunkenness() >= 0)
+        {
+            if (my_level() < 8)
+                description.listAppend("Wait until you've leveled up more.");
+            else if (my_level() < 13)
+                description.listAppend("Possibly wait until you've leveled up more?");
+        }
+        resource_entries.listAppend(ChecklistEntryMake("__item spinning wheel", "campground.php?action=workshed", ChecklistSubentryMake("Spinning wheel meat", "", description), importance_level_unimportant_item));
     }
     
     if ($item[very overdue library book].available_amount() > 0 && in_run && __misc_state["Need to level"])
@@ -22957,7 +23037,7 @@ void S8bitRealmGenerateResource(ChecklistEntry [int] resource_entries)
         string [int] crafting_list = crafting_list_have;
         crafting_list.listAppendList(crafting_list_cannot);
         string pixels_have = "Pixel crafting";
-        resource_entries.listAppend(ChecklistEntryMake("__item white pixel", "place.php?whichplace=forestvillage&action=fv_mystic", ChecklistSubentryMake(pixels_have,  "", crafting_list), 10));
+        resource_entries.listAppend(ChecklistEntryMake("__item white pixel", "shop.php?whichshop=mystic", ChecklistSubentryMake(pixels_have,  "", crafting_list), 10));
     }
 }
 void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -23903,7 +23983,7 @@ void SKOLHSGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     
     
     if (subentry.entries.count() > 0)
-        task_entries.listAppend(ChecklistEntryMake("high school", "", subentry, $locations[the hallowed halls, shop class, chemistry class, art class]));
+        task_entries.listAppend(ChecklistEntryMake("high school", "place.php?whichplace=KOLHS", subentry, $locations[the hallowed halls, shop class, chemistry class, art class]));
     
     
     foreach it in $items[can of the cheapest beer,bottle of fruity &quot;wine&quot;,single swig of vodka]
@@ -28949,6 +29029,13 @@ void SDeckOfEveryCardGenerateResource(ChecklistEntry [int] resource_entries)
         summons.listAppend(DOECSummonMake(card_name, "+" + (500 * (1.0 + numeric_modifier(my_primestat().to_string() + " Experience Percent") / 100.0)).floor() + " mainstat."));
     }
     
+    if (in_run && !__quest_state["Level 8"].state_boolean["Past mine"])
+    {
+        int missing_ore = MAX(0, 3 - __quest_state["Level 8"].state_string["ore needed"].to_item().available_amount());
+        if (missing_ore > 0)
+            summons.listAppend(DOECSummonMake("Mine", "One of every ore."));
+    }
+    
     if (!in_run && lookupItem("knife").available_amount() == 0)
         summons.listAppend(DOECSummonMake("Knife", "+50% meat farming weapon."));
     
@@ -29021,10 +29108,14 @@ void SDeckOfEveryCardGenerateResource(ChecklistEntry [int] resource_entries)
     
     if (in_run)
     {
-        int wool_needed = 1;
-        if ($item[the nostril of the serpent].available_amount() == 0)
+        int wool_needed = 0;
+        if (!$location[the hidden park].locationAvailable())
+        {
             wool_needed += 1;
-		if ($item[stone wool].available_amount() < wool_needed && !$location[the hidden park].locationAvailable())
+            if ($item[the nostril of the serpent].available_amount() == 0)
+                wool_needed += 1;
+        }
+		if ($item[stone wool].available_amount() < wool_needed)
         {
             summons.listAppend(DOECSummonMake("Sheep", "3 stone wool."));
         }
@@ -34109,7 +34200,7 @@ void generateChecklists(Checklist [int] ordered_output_checklists)
 	Checklist [int] checklists;
 	
     
-    if (limit_mode() == "spelunky") //not ready yet
+    if (limit_mode() == "spelunky")
     {
         LimitModeSpelunkingGenerateChecklists(checklists);
     }
@@ -36474,7 +36565,7 @@ string [string] generateAPIResponse()
     
     if (true)
     {
-        boolean [string] relevant_mafia_properties = $strings[merkinQuestPath,questF01Primordial,questF02Hyboria,questF03Future,questF04Elves,questF05Clancy,questG01Meatcar,questG02Whitecastle,questG03Ego,questG04Nemesis,questG05Dark,questG06Delivery,questI01Scapegoat,questI02Beat,questL02Larva,questL03Rat,questL04Bat,questL05Goblin,questL06Friar,questL07Cyrptic,questL08Trapper,questL09Topping,questL10Garbage,questL11MacGuffin,questL11Manor,questL11Palindome,questL11Pyramid,questL11Worship,questL12War,questL13Final,questM01Untinker,questM02Artist,questM03Bugbear,questM04Galaktic,questM05Toot,questM06Gourd,questM07Hammer,questM08Baker,questM09Rocks,questM10Azazel,questM11Postal,questM12Pirate,questM13Escape,questM14Bounty,questM15Lol,questS01OldGuy,questS02Monkees,sidequestArenaCompleted,sidequestFarmCompleted,sidequestJunkyardCompleted,sidequestLighthouseCompleted,sidequestNunsCompleted,sidequestOrchardCompleted,cyrptAlcoveEvilness,cyrptCrannyEvilness,cyrptNicheEvilness,cyrptNookEvilness,desertExploration,gnasirProgress,relayCounters,timesRested,currentEasyBountyItem,currentHardBountyItem,currentSpecialBountyItem,volcanoMaze1,_lastDailyDungeonRoom,seahorseName,chasmBridgeProgress,_aprilShower,lastAdventure,lastEncounter,_floristPlantsUsed,_fireStartingKitUsed,_psychoJarUsed,hiddenHospitalProgress,hiddenBowlingAlleyProgress,hiddenApartmentProgress,hiddenOfficeProgress,pyramidPosition,parasolUsed,_discoKnife,lastPlusSignUnlock,olfactedMonster,photocopyMonster,lastTempleUnlock,volcanoMaze1,blankOutUsed,peteMotorbikeCowling,peteMotorbikeGasTank,peteMotorbikeHeadlight,peteMotorbikeMuffler,peteMotorbikeSeat,peteMotorbikeTires,_petePeeledOut,_navelRunaways,_peteRiotIncited,_petePartyThrown,hiddenTavernUnlock,_dnaPotionsMade,_psychokineticHugUsed,dnaSyringe,_warbearGyrocopterUsed,questM20Necklace,questM21Dance,grimstoneMaskPath,cinderellaMinutesToMidnight,merkinVocabularyMastery,_pirateBellowUsed,questM21Dance,_defectiveTokenChecked,questG07Myst,questG08Moxie,questESpClipper,questESpGore,questESpJunglePun,questESpFakeMedium,questESlMushStash,questESlAudit,questESlBacteria,questESlCheeseburger,questESlCocktail,questESlSprinkles,questESlSalt,questESlFish,questESlDebt,_pickyTweezersUsed,_bittycar,questESpSerum,questESpOutOfOrder,_shrubDecorated,questESpEVE,questESpSmokes,questG09Muscle,_rapidPrototypingUsed,nsTowerDoorKeysUsed,_chateauDeskHarvested,lastGoofballBuy,nsChallenge1,nsChallenge2,nsContestants1,nsContestants2,nsContestants3,lastDesertUnlock,questM18Swamp,edPiece,warehouseProgress,questEStFishTrash,questEStNastyBears,questEStSocialJusticeI,questEStSocialJusticeII,questEStSuperLuber,questEStZippityDooDah,_summonAnnoyanceUsed,questEStWorkWithFood,questM24Doc,questEStGiveMeFuel,_mayoTankSoaked,_feastUsed,spelunkyNextNoncombat,spelunkySacrifices,spelunkyStatus,spelunkyUpgrades,spelunkyWinCount,_deckCardsDrawn,_glarkCableUses,_banderRunaways];
+        boolean [string] relevant_mafia_properties = $strings[merkinQuestPath,questF01Primordial,questF02Hyboria,questF03Future,questF04Elves,questF05Clancy,questG01Meatcar,questG02Whitecastle,questG03Ego,questG04Nemesis,questG05Dark,questG06Delivery,questI01Scapegoat,questI02Beat,questL02Larva,questL03Rat,questL04Bat,questL05Goblin,questL06Friar,questL07Cyrptic,questL08Trapper,questL09Topping,questL10Garbage,questL11MacGuffin,questL11Manor,questL11Palindome,questL11Pyramid,questL11Worship,questL12War,questL13Final,questM01Untinker,questM02Artist,questM03Bugbear,questM04Galaktic,questM05Toot,questM06Gourd,questM07Hammer,questM08Baker,questM09Rocks,questM10Azazel,questM11Postal,questM12Pirate,questM13Escape,questM14Bounty,questM15Lol,questS01OldGuy,questS02Monkees,sidequestArenaCompleted,sidequestFarmCompleted,sidequestJunkyardCompleted,sidequestLighthouseCompleted,sidequestNunsCompleted,sidequestOrchardCompleted,cyrptAlcoveEvilness,cyrptCrannyEvilness,cyrptNicheEvilness,cyrptNookEvilness,desertExploration,gnasirProgress,relayCounters,timesRested,currentEasyBountyItem,currentHardBountyItem,currentSpecialBountyItem,volcanoMaze1,_lastDailyDungeonRoom,seahorseName,chasmBridgeProgress,_aprilShower,lastAdventure,lastEncounter,_floristPlantsUsed,_fireStartingKitUsed,_psychoJarUsed,hiddenHospitalProgress,hiddenBowlingAlleyProgress,hiddenApartmentProgress,hiddenOfficeProgress,pyramidPosition,parasolUsed,_discoKnife,lastPlusSignUnlock,olfactedMonster,photocopyMonster,lastTempleUnlock,volcanoMaze1,blankOutUsed,peteMotorbikeCowling,peteMotorbikeGasTank,peteMotorbikeHeadlight,peteMotorbikeMuffler,peteMotorbikeSeat,peteMotorbikeTires,_petePeeledOut,_navelRunaways,_peteRiotIncited,_petePartyThrown,hiddenTavernUnlock,_dnaPotionsMade,_psychokineticHugUsed,dnaSyringe,_warbearGyrocopterUsed,questM20Necklace,questM21Dance,grimstoneMaskPath,cinderellaMinutesToMidnight,merkinVocabularyMastery,_pirateBellowUsed,questM21Dance,_defectiveTokenChecked,questG07Myst,questG08Moxie,questESpClipper,questESpGore,questESpJunglePun,questESpFakeMedium,questESlMushStash,questESlAudit,questESlBacteria,questESlCheeseburger,questESlCocktail,questESlSprinkles,questESlSalt,questESlFish,questESlDebt,_pickyTweezersUsed,_bittycar,questESpSerum,questESpOutOfOrder,_shrubDecorated,questESpEVE,questESpSmokes,questG09Muscle,_rapidPrototypingUsed,nsTowerDoorKeysUsed,_chateauDeskHarvested,lastGoofballBuy,nsChallenge1,nsChallenge2,nsContestants1,nsContestants2,nsContestants3,lastDesertUnlock,questM18Swamp,edPiece,warehouseProgress,questEStFishTrash,questEStNastyBears,questEStSocialJusticeI,questEStSocialJusticeII,questEStSuperLuber,questEStZippityDooDah,_summonAnnoyanceUsed,questEStWorkWithFood,questM24Doc,questEStGiveMeFuel,_mayoTankSoaked,_feastUsed,spelunkyNextNoncombat,spelunkySacrifices,spelunkyStatus,spelunkyUpgrades,spelunkyWinCount,_deckCardsDrawn,_glarkCableUses,_banderRunaways,questM25Armorer];
         
         if (false)
         {
