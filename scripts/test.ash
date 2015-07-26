@@ -1,7 +1,7 @@
-string version = "NaN";
+string version = "1.0";
 
 //svn checkout https://github.com/Ezandora/Guide/branches/SVNTest/
 void main()
 {
-	print(version);
+	print("Version " + version);
 }
