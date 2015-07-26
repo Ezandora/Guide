@@ -1,4 +1,4 @@
-string version = "1.0";
+string version = "Food build";
 
 //svn checkout https://github.com/Ezandora/Guide/branches/SVNTest/
 void main()
