@@ -1,4 +1,4 @@
-string version = "3.12.2";
+string version = "3.12.3";
 
 //svn checkout https://github.com/Ezandora/Guide/branches/SVNTest/
 void main()
