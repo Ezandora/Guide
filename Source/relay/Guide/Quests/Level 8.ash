@@ -108,7 +108,7 @@ void QLevel8GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 				potential_ore_sources.listAppend("Earthen Fist will allow mining." + have_skill_text);
 				need_outfit = false;
 			}
-            if (lookupItem("Deck of every card").available_amount() > 0 && lookupItem("Deck of every card").is_unrestricted())
+            if ($item[Deck of every card].available_amount() > 0 && $item[Deck of every card].is_unrestricted())
                 potential_ore_sources.listAppend("Deck of Every Card - Mine card");
 			ore_lines.listAppend("Potential sources of ore:" + HTMLGenerateIndentedText(potential_ore_sources));
 			if (skill_is_usable($skill[unaccompanied miner]))

@@ -192,7 +192,7 @@ void setUpState()
 		yellow_ray_image_name = "__item " + source.to_string();
     }
     
-    if (lookupFamiliar("Crimbo Shrub").familiar_is_usable() && get_property("shrubGifts") == "yellow" && !(my_daycount() == 1 && get_property("_shrubDecorated") == "false"))
+    if ($familiar[Crimbo Shrub].familiar_is_usable() && get_property("shrubGifts") == "yellow" && !(my_daycount() == 1 && get_property("_shrubDecorated") == "false"))
     {
         yellow_ray_available = true;
         yellow_ray_source = "Crimbo Shrub";
@@ -205,13 +205,13 @@ void setUpState()
 		yellow_ray_image_name = "nanorhino";
 		
 	}
-    if (lookupSkill("Ball Lightning").skill_is_usable() && my_path_id() == PATH_HEAVY_RAINS && my_lightning() >= 5)
+    if ($skill[Ball Lightning].skill_is_usable() && my_path_id() == PATH_HEAVY_RAINS && my_lightning() >= 5)
     {
         yellow_ray_available = true;
         yellow_ray_source = "Ball Lightning";
         yellow_ray_image_name = "__skill Ball Lightning";
     }
-    if (lookupSkill("wrath of ra").skill_is_usable() && my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
+    if ($skill[wrath of ra].skill_is_usable() && my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
     {
         yellow_ray_available = true;
         yellow_ray_source = "Wrath of Ra";
@@ -257,7 +257,7 @@ void setUpState()
     if (campground_items[$item[bartender-in-the-box]] > 0 || campground_items[$item[clockwork bartender-in-the-box]] > 0 || $effect[Inigo's Incantation of Inspiration].have_effect() >= 5)
         __misc_state["can bartend for free"] = true;
     
-    if (lookupSkill("Rapid Prototyping").skill_is_usable() && get_property_int("_rapidPrototypingUsed") < 5)
+    if ($skill[Rapid Prototyping].skill_is_usable() && get_property_int("_rapidPrototypingUsed") < 5)
     {
         __misc_state["can cook for free"] = true;
         __misc_state["can bartend for free"] = true;
@@ -302,7 +302,7 @@ void setUpState()
         if (free_peel_outs_available > 0)
             free_runs_available = true;
     }
-    if (my_path_id() == PATH_HEAVY_RAINS && lookupSkill("Lightning Strike").skill_is_usable())
+    if (my_path_id() == PATH_HEAVY_RAINS && $skill[Lightning Strike].skill_is_usable())
         free_runs_available = true;
 	if (!free_runs_usable)
 		free_runs_available = false;
@@ -591,8 +591,8 @@ void setUpState()
         //No silent beret, because mohawk wig:
         boolean [item] minus_combat_items = $items[ring of conflict,red shoe,bram's choker,space trip safety headphones,fuzzy slippers of hatred,quiets-your-steps,over-the-shoulder folder holder].makeConstantItemArrayMutable();
         
-        minus_combat_items[lookupItem("duonoculars")] = true;
-        minus_combat_items[lookupItem("Xiblaxian stealth vest")] = true;
+        minus_combat_items[$item[duonoculars]] = true;
+        minus_combat_items[$item[Xiblaxian stealth vest]] = true;
         //ignore Xiblaxian stealth cowl, Xiblaxian stealth trousers, and silent hat, because they take up valuable slots
         foreach it in minus_combat_items
         {
@@ -642,7 +642,7 @@ void setUpState()
         }
         if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
         {
-            if (lookupSkill("Shelter of Shed").have_skill())
+            if ($skill[Shelter of Shed].have_skill())
                 minus_combat_source_count += 4;
         }
         if (minus_combat_source_count >= 5)
@@ -709,7 +709,7 @@ void setUpState()
     if (my_path_id() == PATH_ONE_CRAZY_RANDOM_SUMMER)
         __misc_state["monsters can be nearly impossible to kill"] = true;
     
-    int tonic_price = lookupItem("Doc Galaktik's Invigorating Tonic").npc_price();
+    int tonic_price = $item[Doc Galaktik's Invigorating Tonic].npc_price();
     if (tonic_price == 0)
         tonic_price = 90; //wrong, but w/e
     __misc_state_float["meat per MP"] = tonic_price.to_float() / 10.0;

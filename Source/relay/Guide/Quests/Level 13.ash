@@ -159,7 +159,7 @@ boolean generateTowerFamiliarWeightMethod(string [int] how, string [int] immedia
     {
         if (get_property_int("_speakeasyDrinksDrunk") <3 && availableDrunkenness() >= 3)
         {
-            boolean have_effect = lookupEffect("Hip to the Jive").have_effect() > 0;
+            boolean have_effect = $effect[Hip to the Jive].have_effect() > 0;
             weight_modifiers.listAppend(TFWMInternalModifierMake("Speakeasy hot socks", have_effect, true, true, 10.0));
         }
         
@@ -197,9 +197,7 @@ boolean generateTowerFamiliarWeightMethod(string [int] how, string [int] immedia
         weight_modifiers.listAppend(TFWMInternalModifierMake("resolution: be kinder (summon)", false, false, true, 5.0));
     }
     //green candy heart
-    skill candy_hearts = lookupSkill("Summon Candy Hearts");
-    if (candy_hearts == $skill[none])
-        candy_hearts = lookupSkill("Summon Candy Heart");
+    skill candy_hearts = $skill[Summon Candy Heart];
     if ($item[green candy heart].available_amount() > 0 || $effect[Heart of Green].have_effect() > 0)
     {
         boolean have_effect = $effect[Heart of Green].have_effect() > 0;
@@ -472,11 +470,11 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         //early support:
         string [int] race_types;
         race_types.listAppend("init");
-        if (base_quest_state.state_string["Stat race type"].length() > 0)
+        if (base_quest_state.state_string["Stat race type"] != "")
             race_types.listAppend(base_quest_state.state_string["Stat race type"]);
         else
             race_types.listAppend("? stat");
-        if (base_quest_state.state_string["Elemental damage race type"].length() > 0)
+        if (base_quest_state.state_string["Elemental damage race type"] != "")
             race_types.listAppend(base_quest_state.state_string["Elemental damage race type"] + " damage/spell damage");
         else
             race_types.listAppend("? element damage and element spell damage");
@@ -814,7 +812,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     {
         //wall of skin
         subentry.header = "Defeat the Wall of Skin";
-        if (lookupItem("beehive").available_amount() > 0)
+        if ($item[beehive].available_amount() > 0)
         {
             subentry.entries.listAppend("Use the beehive against it.");
         }
@@ -879,7 +877,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     {
         subentry.header = "Defeat the Wall of Bones";
         //wall of bones
-        if (lookupItem("electric boning knife").available_amount() > 0)
+        if ($item[electric boning knife].available_amount() > 0)
         {
             subentry.entries.listAppend("Use the electric boning knife against it.");
         }
@@ -911,7 +909,11 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             if (things_to_do.count() > 0)
                 subentry.entries.listAppend(HTMLGenerateSpanFont(things_to_do.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".", "red"));*/
             
-            if (lookupSkill("Garbage Nova").skill_is_usable() && false) //calculations need in-game verification
+            //FIXME Firegate
+            //Firegate is 100% myst, +30-40 damage, but unaffected by spell damage % (and possibly spell damage?)
+            //Garbage nova is 40% myst, etc, but affected by spell damage %/spell damage.
+            //So, we have to calculate which one is better and suggest that. (garbage nova may be better, in fact)
+            if ($skill[Garbage Nova].skill_is_usable() && false) //calculations need in-game verification
             {
                 //Special note on calculations:
                 //Spell damage percent is multiplied before the group size multiplier, then floored.
@@ -968,7 +970,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 
                 subentry.entries.listAppend(per_round_damage + " damage/round.");
             }
-            else if (lookupSkill("Garbage Nova").skill_is_usable())
+            else if ($skill[Garbage Nova].skill_is_usable())
             {
                 subentry.entries.listAppend("Cast garbage nova four times with enough buffed mysticality. Umm... I don't know what that is. Maybe two hundred.");
             }
@@ -979,7 +981,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                     subentry.entries.listAppend("Potentially switch to the magic dragonfish.");
                     
                 //Calculate saucegeyser damage:
-                float expected_saucegeyser_damage = skillExpectedDamageRange(lookupMonster("wall of bones"), $skill[saucegeyser]).x;
+                float expected_saucegeyser_damage = skillExpectedDamageRange($monster[wall of bones], $skill[saucegeyser]).x;
                 
                 subentry.entries.listAppend("Expected saucegeyser minimum damage: " + expected_saucegeyser_damage.roundForOutput(0));
                 if (expected_saucegeyser_damage >= 5000.0)
@@ -997,13 +999,13 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                     airport_skill_per_turn_damage_multiplier[$skill[grease up]] = 5.0;
                     airport_skill_base_damage[$skill[grease up]] = 30.0;
                     
-                    airport_skill_per_turn_damage_multiplier[lookupSkill("Intimidating Mien")] = 2.0;
-                    airport_skill_base_damage[lookupSkill("Intimidating Mien")] = 15.0;
+                    airport_skill_per_turn_damage_multiplier[$skill[Intimidating Mien]] = 2.0;
+                    airport_skill_base_damage[$skill[Intimidating Mien]] = 15.0;
                     
                     string [skill] airport_skill_name_of_combat_skill;
                     
                     airport_skill_name_of_combat_skill[$skill[grease up]] = "Unleash the Greash";
-                    airport_skill_name_of_combat_skill[lookupSkill("Intimidating Mien")] = "Thousand-Yard Stare";
+                    airport_skill_name_of_combat_skill[$skill[Intimidating Mien]] = "Thousand-Yard Stare";
                     
                     
                     float ml_damage_multiplier = MLDamageMultiplier();
@@ -1166,12 +1168,12 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             subentry.entries.listAppend(potato_suggestion);
         }*/
         
-        if (lookupItem("The Lot's engagement ring").equipped_amount() > 0)
+        if ($item[The Lot's engagement ring].equipped_amount() > 0)
         {
             subentry.entries.listAppend("You and her? Good luck!");
         }
         
-        /*if (lookupItem("The Lot's engagement ring").available_amount() > 0 && lookupItem("The Lot's engagement ring").equipped_amount() == 0)
+        /*if ($item[The Lot's engagement ring].available_amount() > 0 && $item[The Lot's engagement ring].equipped_amount() == 0)
         {
             subentry.entries.listAppend("Potentially equip the lot's engagement ring for an alternate ending.|<small>(sigh... if only)<small>");
         }*/
@@ -1190,7 +1192,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             if ($skill[frigidalmatian].skill_is_usable() && my_maxmp() >= 300 && $effect[Frigidalmatian].have_effect() == 0)
                 subentry.entries.listAppend("Try casting Frigidalmatian.");
         }
-        if (my_hp() < my_maxhp() && !get_property("lastEncounter").contains_text("The Naughty Sorceress") && __last_adventure_location != lookupLocation("The Naughty Sorceress' Chamber") && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING)
+        if (my_hp() < my_maxhp() && !get_property("lastEncounter").contains_text("The Naughty Sorceress") && __last_adventure_location != $location[The Naughty Sorceress' Chamber] && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING)
         {
             subentry.entries.listAppend(HTMLGenerateSpanFont("Restore your HP first.", "red"));
         }

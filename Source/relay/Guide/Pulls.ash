@@ -161,7 +161,7 @@ void generatePullList(Checklist [int] checklists)
     if (!__misc_state["familiars temporarily blocked"])
     {
         if ($item[Buddy Bjorn].storage_amount() > 0)
-            pullable_item_list.listAppend(GPItemMake(lookupItem("Buddy Bjorn"), "+10ML/+lots MP hat|or +item/+init/+meat/etc", 1));
+            pullable_item_list.listAppend(GPItemMake($item[Buddy Bjorn], "+10ML/+lots MP hat|or +item/+init/+meat/etc", 1));
         else if ($item[buddy bjorn].available_amount() == 0)
             pullable_item_list.listAppend(GPItemMake($item[crown of thrones], "+10ML/+lots MP hat|or +item/+init/+meat/etc", 1));
     }
@@ -170,7 +170,7 @@ void generatePullList(Checklist [int] checklists)
     {
         pullable_item_list.listAppend(GPItemMake($item[plastic vampire fangs], "Large stat gain, once/day.", 1));
         pullable_item_list.listAppend(GPItemMake($item[operation patriot shield], "+america", 1));
-        pullable_item_list.listAppend(GPItemMake(lookupItem("the crown of ed the undying"), "Various in-run modifiers. (init, HP, ML/item/meat/etc)", 1));
+        pullable_item_list.listAppend(GPItemMake($item[the crown of ed the undying], "Various in-run modifiers. (init, HP, ML/item/meat/etc)", 1));
     }
     pullable_item_list.listAppend(GPItemMake($item[v for vivala mask], "?", 1));
 	
@@ -195,20 +195,20 @@ void generatePullList(Checklist [int] checklists)
     if (__misc_state["Torso aware"])
     {
         pullable_item_list.listAppend(GPItemMake($item[flaming pink shirt], "+15% items on shirt. (marginal)" + (__misc_state["familiars temporarily blocked"] ? "" : "|Or extra experience on familiar. (very marginal)"), 1));
-        if (__misc_state["Need to level"] && lookupItem("Sneaky Pete's leather jacket (collar popped)").available_amount() == 0 && lookupItem("Sneaky Pete's leather jacket").available_amount() == 0)
+        if (__misc_state["Need to level"] && $item[Sneaky Pete's leather jacket (collar popped)].available_amount() == 0 && $item[Sneaky Pete's leather jacket].available_amount() == 0)
         {
             
-            if (lookupItem("Sneaky Pete's leather jacket (collar popped)").storage_amount() + lookupItem("Sneaky Pete's leather jacket").storage_amount() > 0)
+            if ($item[Sneaky Pete's leather jacket (collar popped)].storage_amount() + $item[Sneaky Pete's leather jacket].storage_amount() > 0)
             {
                 if (my_path_id() != PATH_AVATAR_OF_SNEAKY_PETE)
-                    pullable_item_list.listAppend(GPItemMake(lookupItem("Sneaky Pete's leather jacket"), "+30ML/+meat/+adv/+init/+moxie shirt", 1));
+                    pullable_item_list.listAppend(GPItemMake($item[Sneaky Pete's leather jacket], "+30ML/+meat/+adv/+init/+moxie shirt", 1));
             }
             else
                 pullable_item_list.listAppend(GPItemMake($item[cane-mail shirt], "+20ML shirt", 1));
         }
     }
     
-    if (__misc_state["spooky airport available"] && __misc_state["Need to level"] && __misc_state["can drink just about anything"] && lookupEffect("jungle juiced").have_effect() == 0)
+    if (__misc_state["spooky airport available"] && __misc_state["Need to level"] && __misc_state["can drink just about anything"] && $effect[jungle juiced].have_effect() == 0)
     {
         pullable_item_list.listAppend(GPItemMake($item[jungle juice], "Drink that doubles stat-gain in the deep dark jungle.", 1));
     }
@@ -270,7 +270,7 @@ void generatePullList(Checklist [int] checklists)
                     else if (my_primestat() == $stat[muscle])
                         hi_mein_types = "cold/hot";
                 }
-                if (hi_mein_types.length() > 0)
+                if (hi_mein_types != "")
                     food_selections.listAppend(hi_mein_types + " hi meins");
                 else
                     food_selections.listAppend("hi meins");
@@ -354,7 +354,7 @@ void generatePullList(Checklist [int] checklists)
         pullable_item_list.listAppend(GPItemMake($item[blackberry galoshes], "speed up black forest by 2-3? turns", 1));
         
     if (my_path_id() == PATH_HEAVY_RAINS)
-        pullable_item_list.listAppend(GPItemMake(lookupItem("fishbone catcher's mitt"), "offhand, less items washing away", 1));
+        pullable_item_list.listAppend(GPItemMake($item[fishbone catcher's mitt], "offhand, less items washing away", 1));
     
         
     //OUTFITS: √Pirate outfit, √War outfit, √Ninja "outfit"
@@ -377,7 +377,7 @@ void generatePullList(Checklist [int] checklists)
             pullable_item_list.listAppend(GPItemMake("Ninja peak climbing", "__item " + missing_ninja_components[0], description));
         }
     }
-    if (lookupItem("talisman o' nam").available_amount() == 0 && !have_outfit_components("Swashbuckling Getup") && $item[pirate fledges].available_amount() == 0 && !__quest_state["Pirate Quest"].finished)
+    if ($item[talisman o' namsilat].available_amount() == 0 && !have_outfit_components("Swashbuckling Getup") && $item[pirate fledges].available_amount() == 0 && !__quest_state["Pirate Quest"].finished)
     {
         item [int] missing_outfit_components = missing_outfit_components("Swashbuckling Getup");
         if (missing_outfit_components.count() > 0)
@@ -396,7 +396,7 @@ void generatePullList(Checklist [int] checklists)
     
     if (!__misc_state["can reasonably reach -25% combat"])
     {
-        pullable_item_list.listAppend(GPItemMake(lookupItem("duonoculars"), "-combat, +5 ML"));
+        pullable_item_list.listAppend(GPItemMake($item[duonoculars], "-combat, +5 ML"));
         pullable_item_list.listAppend(GPItemMake($item[ring of conflict], "-combat"));
         if ($item[red shoe].can_equip())
             pullable_item_list.listAppend(GPItemMake($item[red shoe], "-combat"));
@@ -416,7 +416,7 @@ void generatePullList(Checklist [int] checklists)
 		scrip_needed += 3;
 		scrip_reasons.listAppend("mysterious island");
 	}
-	if ($item[uv-resistant compass].available_amount() == 0 && lookupItem("ornate dowsing rod").available_amount() == 0 && __misc_state["can equip just about any weapon"] && !__quest_state["Level 11 Desert"].state_boolean["Desert Explored"])
+	if ($item[uv-resistant compass].available_amount() == 0 && $item[ornate dowsing rod].available_amount() == 0 && __misc_state["can equip just about any weapon"] && !__quest_state["Level 11 Desert"].state_boolean["Desert Explored"])
 	{
 		scrip_needed += 1;
 		scrip_reasons.listAppend($item[uv-resistant compass].to_string());

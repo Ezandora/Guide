@@ -57,7 +57,7 @@ void smithsnessGenerateCoalSuggestions(string [int] coal_suggestions)
 	}
 	
 	if ($skill[pulverize].skill_is_usable())
-		coal_suggestions.listAppend("Smash smithed weapon for more smithereens");
+		coal_suggestions.listAppend("Smash smithed equipment for more smithereens");
 	foreach it in coal_item_suggestions
 	{
 		int number_wanted_max = 1;

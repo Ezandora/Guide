@@ -31,7 +31,7 @@ void QLevel11DesertInit()
         have_uv_compass_equipped = true;
     if ($item[UV-resistant compass].equipped_amount() > 0)
         have_uv_compass_equipped = true;
-    if (lookupItem("ornate dowsing rod").equipped_amount() > 0)
+    if ($item[ornate dowsing rod].equipped_amount() > 0)
         have_uv_compass_equipped = true;
     
     state.state_boolean["Have UV-Compass eqipped"] = have_uv_compass_equipped;
@@ -55,7 +55,7 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
     int exploration = base_quest_state.state_int["Desert Exploration"];
     int exploration_remaining = 100 - exploration;
     float exploration_per_turn = 1.0;
-    if (lookupItem("ornate dowsing rod").available_amount() > 0)
+    if ($item[ornate dowsing rod].available_amount() > 0)
         exploration_per_turn += 2.0; //FIXME make completely accurate for first turn? not enough information available
     else if ($item[uv-resistant compass].available_amount() > 0)
         exploration_per_turn += 1.0;
@@ -187,7 +187,7 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         boolean should_output_compass_in_red = true;
         string line = "";
         string line_extra = "";
-        if (lookupItem("ornate dowsing rod").available_amount() > 0)
+        if ($item[ornate dowsing rod].available_amount() > 0)
         {
             line = "Equip the ornate dowsing rod.";
             url = "inventory.php?which=2";
@@ -207,7 +207,7 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
                 if ($item[Shore Inc. Ship Trip Scrip].available_amount() > 0)
                     url = "shop.php?whichshop=shore";
               
-                if (lookupItem("odd silver coin").available_amount() > 0 || lookupItem("grimstone mask").available_amount() > 0 || get_property("grimstoneMaskPath").length() > 0) //FIXME check for the correct grimstoneMaskPath
+                if ($item[odd silver coin].available_amount() > 0 || $item[grimstone mask].available_amount() > 0 || get_property("grimstoneMaskPath") != "") //FIXME check for the correct grimstoneMaskPath
                 {
                     line_extra += "|Or acquire ornate dowsing rod from Paul's Boutique? (5 odd silver coins)";
                 }
@@ -219,7 +219,7 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
                 url = "inventory.php?which=2";
             }
         }
-        if (line.length() > 0)
+        if (line != "")
         {
             if (should_output_compass_in_red)
                 line = HTMLGenerateSpanFont(line, "red");

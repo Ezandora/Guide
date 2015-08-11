@@ -20,9 +20,9 @@ void QWizardOfEgoInit()
         {
             state.mafia_internal_step = 7;
         }
-        if (state.mafia_internal_step < 1 && lookupLocation("The Unquiet Garves").noncombat_queue.contains_text("A Grave Mistake") || lookupLocation("The VERY Unquiet Garves").noncombat_queue.contains_text("A Grave Mistake"))
+        if (state.mafia_internal_step < 1 && $location[The Unquiet Garves].noncombat_queue.contains_text("A Grave Mistake") || $location[The VERY Unquiet Garves].noncombat_queue.contains_text("A Grave Mistake"))
             state.mafia_internal_step = 1;
-        if (state.mafia_internal_step < 2 && lookupLocation("The Unquiet Garves").noncombat_queue.contains_text("A Grave Situation") || lookupLocation("The VERY Unquiet Garves").noncombat_queue.contains_text("A Grave Situation"))
+        if (state.mafia_internal_step < 2 && $location[The Unquiet Garves].noncombat_queue.contains_text("A Grave Situation") || $location[The VERY Unquiet Garves].noncombat_queue.contains_text("A Grave Situation"))
             state.mafia_internal_step = 2;
         
         if (state.mafia_internal_step < 2 && $item[Fernswarthy's key].available_amount() > 0)
@@ -121,8 +121,8 @@ void QWizardOfEgoGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     }
     
     boolean [location] relevant_locations;
-    relevant_locations[lookupLocation("The Unquiet Garves")] = true;
-    relevant_locations[lookupLocation("The VERY Unquiet Garves")] = true;
+    relevant_locations[$location[The Unquiet Garves]] = true;
+    relevant_locations[$location[The VERY Unquiet Garves]] = true;
     
 	optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, relevant_locations));
 }

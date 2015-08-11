@@ -1,10 +1,12 @@
 import "relay/Guide/Settings.ash"
+import "relay/Guide/Support/Library.ash"
+import "relay/Guide/Support/List.ash"
+import "relay/Guide/Sections/Globals.ash"
+import "relay/Guide/Sections/Data.ash"
 import "relay/Guide/Support/Counter.ash"
 import "relay/Guide/State.ash"
 import "relay/Guide/Missing Items.ash"
 import "relay/Guide/Support/Math.ash"
-import "relay/Guide/Support/Library.ash"
-import "relay/Guide/Support/List.ash"
 import "relay/Guide/Tasks.ash"
 import "relay/Guide/Limit Mode/Spelunking.ash"
 import "relay/Guide/Daily Resources.ash"
@@ -23,14 +25,14 @@ void runMain(string relay_filename)
     __relay_filename = relay_filename;
 
 	string [string] form_fields = form_fields();
-	if (form_fields["API status"].length() > 0)
+	if (form_fields["API status"] != "")
 	{
         write(generateAPIResponse().to_json());
         return;
 	}
     
 	boolean output_body_tag_only = false;
-	if (form_fields["body tag only"].length() > 0)
+	if (form_fields["body tag only"] != "")
 	{
 		output_body_tag_only = true;
 	}
@@ -103,7 +105,7 @@ void runMain(string relay_filename)
         base_image_map["class"] = "r_button";
         
         string [string] image_map = mapCopy(base_image_map);
-        image_map["src"] = __close_image;
+        image_map["src"] = __close_image_data;
         image_map["onclick"] = "buttonCloseClicked(event)";
         image_map["style"] = "left:5px;top:5px;";
         image_map["id"] = "button_close_box";
@@ -113,7 +115,7 @@ void runMain(string relay_filename)
         
         
         image_map = mapCopy(base_image_map);
-        image_map["src"] = __new_window_image;
+        image_map["src"] = __new_window_image_data;
         image_map["id"] = "button_new_window";
         image_map["onclick"] = "buttonNewWindowClicked(event)";
         image_map["style"] = "right:5px;top:5px;";
@@ -122,7 +124,7 @@ void runMain(string relay_filename)
         PageWrite(HTMLGenerateTagPrefix("img", image_map));
         
         image_map = mapCopy(base_image_map);
-        image_map["src"] = __left_arrow_image;
+        image_map["src"] = __left_arrow_image_data;
         image_map["id"] = "button_arrow_right_left";
         image_map["onclick"] = "buttonRightLeftClicked(event)";
         image_map["style"] = "right:5px;top:30px;";
@@ -131,7 +133,7 @@ void runMain(string relay_filename)
         PageWrite(HTMLGenerateTagPrefix("img", image_map));
         
         image_map = mapCopy(base_image_map);
-        image_map["src"] = __right_arrow_image;
+        image_map["src"] = __right_arrow_image_data;
         image_map["id"] = "button_arrow_right_right";
         image_map["onclick"] = "buttonRightRightClicked(event)";
         image_map["style"] = "right:5px;top:30px;";
@@ -180,7 +182,7 @@ void runMain(string relay_filename)
             image_map["width"] = "12";
             image_map["height"] = "12";
             image_map["class"] = "r_button";
-            image_map["src"] = __refresh_image;
+            image_map["src"] = __refresh_image_data;
             image_map["id"] = "button_refresh";
             image_map["onclick"] = "document.location.reload(true)";
             image_map["style"] = "position:relative;top:-12px;right:3px;";

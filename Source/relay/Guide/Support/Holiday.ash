@@ -71,7 +71,7 @@ boolean [string] getHolidaysForDate(string realworld_date, int game_day)
 boolean [string] getHolidaysToday()
 {
     boolean [string] holidays = getHolidaysForDate(format_today_to_string("MMdd"), gameday_to_int()); //FIXME Y10K error
-    if (holiday().length() > 0)
+    if (holiday() != "")
         holidays[holiday()] = true;
     return holidays;
 }

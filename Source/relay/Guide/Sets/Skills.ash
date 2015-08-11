@@ -22,7 +22,7 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
 		if (inigos_casts_remaining > 0)
 			resource_entries.listAppend(ChecklistEntryMake("__effect Inigo's Incantation of Inspiration", "skills.php", ChecklistSubentryMake(pluralise(inigos_casts_remaining, "Inigo's cast", "Inigo's casts") + " remaining", "", description), 4));
 	}
-    if (lookupSkill("rapid prototyping").skill_is_usable())
+    if ($skill[rapid prototyping].skill_is_usable())
     {
         int casts_remaining = clampi(5 - get_property_int("_rapidPrototypingUsed"), 0, 5);
 		string description = SSkillsPotentialCraftingOptions().listJoinComponents(", ").capitaliseFirstLetter();
@@ -47,9 +47,9 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
 	property_summons_to_skills["_discoKnife"] = listMake($skill[that's not a knife]);
 	property_summons_to_skills["_lunchBreak"] = listMake($skill[lunch break]);
 	property_summons_to_skills["_psychokineticHugUsed"] = listMake($skill[Psychokinetic Hug]);
-	property_summons_to_skills["_pirateBellowUsed"] = listMake(lookupSkill("Pirate Bellow"));
-	property_summons_to_skills["_holidayFunUsed"] = listMake(lookupSkill("Summon Holiday Fun!"));
-	property_summons_to_skills["_summonCarrotUsed"] = listMake(lookupSkill("Summon Carrot"));
+	property_summons_to_skills["_pirateBellowUsed"] = listMake($skill[Pirate Bellow]);
+	property_summons_to_skills["_holidayFunUsed"] = listMake($skill[Summon Holiday Fun!]);
+	property_summons_to_skills["_summonCarrotUsed"] = listMake($skill[Summon Carrot]);
 	property_summons_to_skills["_summonAnnoyanceUsed"] = listMake($skill[summon annoyance]);
     skills_to_title_notes[$skill[summon annoyance]] = get_property_int("summonAnnoyanceCost") + " swagger";
     
@@ -59,8 +59,8 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
     
     if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE)
     {
-		property_summons_to_skills["_petePartyThrown"] = listMake(lookupSkill("Throw Party"));
-		property_summons_to_skills["_peteRiotIncited"] = listMake(lookupSkill("Incite Riot"));
+		property_summons_to_skills["_petePartyThrown"] = listMake($skill[Throw Party]);
+		property_summons_to_skills["_peteRiotIncited"] = listMake($skill[Incite Riot]);
         
         int audience_max = 30;
         int hate_useful_max = 25; //ashes and soda max out early; more audience hatred only gives crates and grenades, not of absolute importance
@@ -70,9 +70,15 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
             hate_useful_max = 41;
         }
             
+        if (my_audience() < audience_max)
+            skills_to_details[$skill[Throw Party]] = "Ideally have " + audience_max + " audience love before casting.";
+        else
+            skills_to_details[$skill[Throw Party]] = "Gain party supplies.";
         
-        skills_to_details[lookupSkill("Throw Party")] = "Ideally have " + audience_max + " audience love before casting.";
-        skills_to_details[lookupSkill("Incite Riot")] = "Ideally have " + hate_useful_max + " audience hate before casting.";
+        if (my_audience() > -hate_useful_max)
+            skills_to_details[$skill[Incite Riot]] = "Ideally have " + hate_useful_max + " audience hate before casting.";
+        else
+            skills_to_details[$skill[Incite Riot]] = "This fire is out of control";
     }
 	//Jarlsberg:
 	if (my_path_id() == PATH_AVATAR_OF_JARLSBERG)
@@ -101,30 +107,32 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
     if (mafiaIsPastRevision(14300))
     {
         property_summons_to_skills["_grimoireConfiscatorSummons"] = listMake($skill[Summon Confiscated Things]);
-        skills_to_urls[lookupSkill("Summon Confiscated Things")] = "campground.php?action=bookshelf";
+        skills_to_urls[$skill[Summon Confiscated Things]] = "campground.php?action=bookshelf";
     }
     property_summons_to_skills["_candySummons"] = listMake($skill[Summon Crimbo Candy]);
-    property_summons_to_skills["_summonResortPassUsed"] = listMake(lookupSkill("Summon Kokomo Resort Pass"));
+    property_summons_to_skills["_summonResortPassUsed"] = listMake($skill[Summon Kokomo Resort Pass]);
     
     foreach s in $skills[Summon Hilarious Objects,Summon Tasteful Items,Summon Alice's Army Cards,Summon Geeky Gifts]
         skills_to_urls[s] = "campground.php?action=bookshelf";
     
 	
 	
+    int muscle_basestat = my_basestat($stat[muscle]);
 	item summoned_knife = $item[none];
-	if (my_level() < 4)
+	if (muscle_basestat < 10)
 		summoned_knife = $item[boot knife];
-	else if (my_level() < 6)
+	else if (muscle_basestat < 20)
 		summoned_knife = $item[broken beer bottle];
-	else if (my_level() < 8)
+	else if (muscle_basestat < 40)
 		summoned_knife = $item[sharpened spoon];
-	else if (my_level() < 11)
+	else if (muscle_basestat < 60)
 		summoned_knife = $item[candy knife];
 	else
 		summoned_knife = $item[soap knife];
 	if (summoned_knife.available_amount() > 0 && summoned_knife != $item[none])
     {
         //already have the knife, don't annoy them:
+        //(or ask them to closet the knife?)
         remove property_summons_to_skills["_discoKnife"];
 		//skills_to_details[$skill[that's not a knife]] = "Closet " + summoned_knife + " first.";
     }

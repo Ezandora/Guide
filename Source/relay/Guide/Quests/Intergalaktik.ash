@@ -38,10 +38,10 @@ void QGalaktikGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [i
     if (missing_item_descriptions.count() > 0)
     {
         subentry.entries.listAppend("Collect " + missing_item_descriptions.listJoinComponents(", ", "and") + " in the overgrown lot.");
-        if (lookupItem("brown paper bag mask").available_amount() > 0 && lookupItem("brown paper bag mask").equipped_amount() == 0)
+        if ($item[brown paper bag mask].available_amount() > 0 && $item[brown paper bag mask].equipped_amount() == 0)
             subentry.entries.listAppend("Could equip the brown paper bag mask to meet the Lot's wife, if you haven't already.");
         
-        if (__misc_state["In run"] && __last_adventure_location != lookupLocation("the overgrown lot") && !in_bad_moon())
+        if (__misc_state["In run"] && __last_adventure_location != $location[the overgrown lot] && !in_bad_moon())
             return;
     }
     else
@@ -52,5 +52,5 @@ void QGalaktikGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [i
         //image_name = "__familiar o.a.f.";
     }
 	
-	optional_task_entries.listAppend(ChecklistEntryMake(image_name, active_url, subentry, lookupLocations("the overgrown lot")));
+	optional_task_entries.listAppend(ChecklistEntryMake(image_name, active_url, subentry, $locations[the overgrown lot]));
 }

@@ -679,3 +679,55 @@ buffer ChecklistGenerate(Checklist cl)
 {
     return ChecklistGenerate(cl, true);
 }
+
+
+Record ChecklistCollection
+{
+    Checklist [string] checklists;
+};
+
+//NOTE: WILL DESTRUCTIVELY EDIT CHECKLISTS GIVEN TO IT
+//mostly because there's no easy way to copy an object in ASH
+//without manually writing a copy function and insuring it is synched
+Checklist [int] ChecklistCollectionMergeWithLinearList(ChecklistCollection collection, Checklist [int] other_checklists)
+{
+    Checklist [int] result;
+    
+    boolean [string] seen_titles;
+    foreach key, checklist in other_checklists
+    {
+        seen_titles[checklist.title] = true;
+        result.listAppend(checklist);
+    }
+    foreach key, checklist in collection.checklists
+    {
+        if (seen_titles contains checklist.title)
+        {
+            foreach key, checklist2 in result
+            {
+                if (checklist2.title == checklist.title)
+                {
+                    checklist2.entries.listAppendList(checklist.entries);
+                    break;
+                }
+            }
+        }
+        else
+        {
+            result.listAppend(checklist);
+        }
+    }
+    
+    return result;
+}
+
+Checklist lookup(ChecklistCollection collection, string name)
+{
+    if (collection.checklists contains name)
+        return collection.checklists[name];
+    
+    Checklist c = ChecklistMake();
+    c.title = name;
+    collection.checklists[c.title] = c;
+    return c;
+}

@@ -38,7 +38,7 @@ buffer CSSBlockGenerate(CSSBlock block)
     
     if (block.defined_css_classes.count() > 0)
     {
-        boolean output_identifier = (block.identifier.length() > 0);
+        boolean output_identifier = (block.identifier != "");
         if (output_identifier)
         {
             result.append("\t\t\t");

@@ -107,13 +107,13 @@ void QMartyGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     }
 	
     boolean [location] relevant_locations;
-    relevant_locations[lookupLocation("the edge of the swamp")] = true;
-    relevant_locations[lookupLocation("The Dark and Spooky Swamp")] = true;
-    relevant_locations[lookupLocation("The Corpse Bog")] = true;
-    relevant_locations[lookupLocation("The Ruined Wizard Tower")] = true;
-    relevant_locations[lookupLocation("The Wildlife Sanctuarrrrrgh")] = true;
-    relevant_locations[lookupLocation("Swamp Beaver Territory")] = true;
-    relevant_locations[lookupLocation("The Weird Swamp Village")] = true;
+    relevant_locations[$location[the edge of the swamp]] = true;
+    relevant_locations[$location[The Dark and Spooky Swamp]] = true;
+    relevant_locations[$location[The Corpse Bog]] = true;
+    relevant_locations[$location[The Ruined Wizard Tower]] = true;
+    relevant_locations[$location[The Wildlife Sanctuarrrrrgh]] = true;
+    relevant_locations[$location[Swamp Beaver Territory]] = true;
+    relevant_locations[$location[The Weird Swamp Village]] = true;
 	
 	optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, relevant_locations));
     

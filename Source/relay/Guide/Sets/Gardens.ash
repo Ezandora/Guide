@@ -86,23 +86,23 @@ void SGardensGenerateResource(ChecklistEntry [int] resource_entries)
     {
         boolean [item] garden_creatable_items;
         
-        foreach it in lookupItems("snow cleats,snow crab,unfinished ice sculpture,snow mobile,ice bucket,bod-ice,snow belt,ice house,ice nine")
+        foreach it in $items[snow cleats,snow crab,unfinished ice sculpture,snow mobile,ice bucket,bod-ice,snow belt,ice house,ice nine]
             garden_creatable_items[it] = true;
         
         if (!__quest_state["Level 9"].state_boolean["bridge complete"])
-            garden_creatable_items[lookupItem("snow boards")] = true;
+            garden_creatable_items[$item[snow boards]] = true;
         
         if (!__quest_state["Level 4"].finished)
-            garden_creatable_items[lookupItem("snow shovel")] = true;
+            garden_creatable_items[$item[snow shovel]] = true;
         
         if (__misc_state["can eat just about anything"])
-            garden_creatable_items[lookupItem("snow crab")] = true;
+            garden_creatable_items[$item[snow crab]] = true;
         if (__misc_state["can drink just about anything"])
-            garden_creatable_items[lookupItem("Ice Island Long Tea")] = true;
+            garden_creatable_items[$item[Ice Island Long Tea]] = true;
         if (hippy_stone_broken())
-            garden_creatable_items[lookupItem("ice nine")] = true;
+            garden_creatable_items[$item[ice nine]] = true;
         
         
-        generateGardenEntry(resource_entries, lookupItems("snow berries, ice harvest"), garden_creatable_items);
+        generateGardenEntry(resource_entries, $items[snow berries, ice harvest], garden_creatable_items);
     }
 }

@@ -12,9 +12,9 @@ buffer HTMLGenerateTagPrefix(string tag, string [string] attributes)
 	buffer result;
 	result.append("<");
 	result.append(tag);
-	foreach attribute_name in attributes
+	foreach attribute_name, attribute_value in attributes
 	{
-		string attribute_value = attributes[attribute_name];
+		//string attribute_value = attributes[attribute_name];
 		result.append(" ");
 		result.append(attribute_name);
 		if (attribute_value != "")
@@ -33,6 +33,7 @@ buffer HTMLGenerateTagPrefix(string tag, string [string] attributes)
 	
 	return result;
 }
+
 buffer HTMLGenerateTagPrefix(string tag)
 {
     buffer result;
@@ -120,13 +121,23 @@ buffer HTMLGenerateSpanFont(string source, string font_colour, string font_size)
 	if (font_colour == "" && font_size == "")
 		return source.to_buffer();
 		
-	string style = "";
+	buffer style;
 	
 	if (font_colour != "")
-		style += "color:" + font_colour +";";
+    {
+		//style += "color:" + font_colour + ";";
+        style.append("color:");
+        style.append(font_colour);
+        style.append(";");
+    }
 	if (font_size != "")
-		style += "font-size:" + font_size +";";
-	return HTMLGenerateSpanOfStyle(source, style);
+    {
+		//style += "font-size:" + font_size + ";";
+        style.append("font-size:");
+        style.append(font_size);
+        style.append(";");
+    }
+	return HTMLGenerateSpanOfStyle(source, style.to_string());
 }
 
 buffer HTMLGenerateSpanFont(string source, string font_colour)

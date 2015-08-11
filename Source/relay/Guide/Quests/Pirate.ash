@@ -39,7 +39,7 @@ void QPirateInit()
         QuestStateParseMafiaQuestPropertyValue(state, "step2");
     
 	//Certain characters are in weird states, I think?
-    if ($item[pirate fledges].available_amount() > 0 || lookupItem("talisman o' nam").available_amount() > 0)
+    if ($item[pirate fledges].available_amount() > 0 || $item[talisman o' namsilat].available_amount() > 0)
         QuestStateParseMafiaQuestPropertyValue(state, "finished");
 	__quest_state["Pirate Quest"] = state;
 }
@@ -258,10 +258,10 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
                                 monsters_left_string.listAppend(m);
                         }
                         string line2 = "Use";
-                        if (lookupItem("Talisman of Renenutet").available_amount() == 0)
+                        if ($item[Talisman of Renenutet].available_amount() == 0)
                             line2 = "Acquire and use";
                         line2 += " the Talisman of Renenutet on " + monsters_left_string.listJoinComponents(", ", "and") + ".";
-                        if (lookupItem("Talisman of Renenutet").available_amount() == 0)
+                        if ($item[Talisman of Renenutet].available_amount() == 0)
                             line2 = HTMLGenerateSpanFont(line2, "red");
                         subentry.entries.listAppend(line2);
                     }

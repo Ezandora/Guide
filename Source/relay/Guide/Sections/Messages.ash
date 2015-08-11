@@ -1,6 +1,9 @@
 string generateRandomMessage()
 {
 	string [int] random_messages;
+	int current_hour = now_to_string("HH").to_int_silent();
+	int current_minute = now_to_string("mm").to_int_silent();
+	int minute_of_day = current_hour * 60 + current_minute;
     
     if (!playerIsLoggedIn())
         return "the kingdom awaits";
@@ -66,9 +69,9 @@ string generateRandomMessage()
     location_messages[$location[The Arrrboretum]] = "save the planet";
     location_messages[$location[the red queen's garden]] = "curiouser and curiouser";
     location_messages[$location[A Massive Ziggurat]] = "1.21 ziggurats";
-    location_messages[lookupLocation("McMillicancuddy's Barn")] = "dooks";
-    location_messages[lookupLocation("The Roman Forum")] = "they go the house";
-    location_messages[lookupLocation("the battlefield (hippy uniform)")] = "love and war";
+    location_messages[$location[McMillicancuddy's Barn]] = "dooks";
+    location_messages[$location[The Roman Forum]] = "they go the house";
+    location_messages[$location[the battlefield (hippy uniform)]] = "love and war";
     location_messages[$location[the middle chamber]] = "pyramid laundry machine";
     location_messages[$location[the arid, extra-dry desert]] = "can't remember your name";
     location_messages[$location[outside the club]] = "around the world around the world around the world around the world";
@@ -300,12 +303,12 @@ string generateRandomMessage()
     familiar_messages[$familiar[Gluttonous Green Ghost]] = "I think he can hear you, " + lowercase_player_name;
     familiar_messages[$familiar[hand turkey]] = "a rare bird";
     familiar_messages[$familiar[reanimated reanimator]] = "weird science";
-    familiar_messages[lookupFamiliar("Twitching Space Critter")] = "right right right right down right agh";
+    familiar_messages[$familiar[Twitching Space Critter]] = "right right right right down right agh";
     familiar_messages[$familiar[slimeling]] = "lost mother";
     if (format_today_to_string("MM") == "07")
-        familiar_messages[lookupFamiliar("Crimbo Shrub")] = "crimbo in july";
-    familiar_messages[lookupFamiliar("Ms. Puck Man")] = "&#5607; &bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;";
-    familiar_messages[lookupFamiliar("Puck Man")] = familiar_messages[lookupFamiliar("Ms. Puck Man")];
+        familiar_messages[$familiar[Crimbo Shrub]] = "crimbo in july";
+    familiar_messages[$familiar[Ms. Puck Man]] = "&#5607; &bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;";
+    familiar_messages[$familiar[Puck Man]] = familiar_messages[$familiar[Ms. Puck Man]];
     
     if (familiar_messages contains my_familiar() && !__misc_state["familiars temporarily blocked"])
         random_messages.listAppend(familiar_messages[my_familiar()]);
@@ -328,6 +331,13 @@ string generateRandomMessage()
         else
             random_messages.listAppend("under a distant shore you will find your answers");
     }
+    
+    if (current_hour >= 2 && current_hour <= 3)
+        random_messages.listAppend("up late?");
+    else if (current_hour >= 4 && current_hour <= 5)
+        random_messages.listAppend("zzz...");
+    else if (current_hour == 6)
+        random_messages.listAppend("the dawn is your enemy");
     
     string [class] class_messages;
     class_messages[$class[disco bandit]] = "making discos of your castles";
@@ -360,6 +370,7 @@ string generateRandomMessage()
     }
     
     string [monster] monster_messages;
+    string [monster] beaten_up_monster_messages;
     //TODO add a message for the procrastination giant
     foreach m in $monsters[The Temporal Bandit,crazy bastard,Knott Slanding,hockey elemental,Hypnotist of Hey Deze,infinite meat bug,QuickBASIC elemental,The Master Of Thieves,Baiowulf,Count Bakula,the nuge] //Pooltergeist (Ultra-Rare)?
         monster_messages[m] = "an ultra rare! congratulations!";
@@ -412,14 +423,40 @@ string generateRandomMessage()
     monster_messages[$monster[urge to stare at your hands]] = ".&#x20dd;.&#x20dd;"; //.⃝.⃝
     if (my_path_id() == PATH_HEAVY_RAINS)
         monster_messages[$monster[pygmy bowler]] = "right into the gutter"; //come back!
-    monster_messages[lookupMonster("extremely annoyed witch")] = "am I blue?"; //you dare to strike... quit it!
-    monster_messages[lookupMonster("surprised and annoyed witch")] = "these tears in my eyes, telling you";
+    monster_messages[$monster[extremely annoyed witch]] = "am I blue?"; //you dare to strike... quit it!
+    monster_messages[$monster[surprised and annoyed witch]] = "these tears in my eyes, telling you";
     monster_messages[$monster[Ron "The Weasel" Copperhead]] = "RONALD WEASLEY! HOW DARE YOU STEAL THAT ZEPPELIN<br>" + ChecklistGenerateModifierSpan("your father's now facing an inquiry at work and it's entirely YOUR FAULT");
-    monster_messages[lookupMonster("Mr. Loathing")] = HTMLGenerateTagWrap("a", "ruuun! go! get to the towah!", generateMainLinkMap("place.php?whichplace=nstower"));
+    monster_messages[$monster[Mr. Loathing]] = HTMLGenerateTagWrap("a", "ruuun! go! get to the towah!", generateMainLinkMap("place.php?whichplace=nstower"));
     if (my_hp() < my_maxhp())
-        monster_messages[lookupMonster("smooth criminal")] = "you've been hit by<br>you've been struck by<br><i>a smooth criminal</i>";
+        monster_messages[$monster[smooth criminal]] = "you've been hit by<br>you've been struck by<br><i>a smooth criminal</i>";
     monster_messages[$monster[demonic icebox]] = "zuul";
-    if (monster_messages contains last_monster() && last_monster() != $monster[none])
+    beaten_up_monster_messages[$monster[storm cow]] = "<pre>^__^            <br>(oo)\\_______    <br>(__)\\       )\\/\\<br>    ||----w |   <br>    ||     ||   </pre>";
+    beaten_up_monster_messages[lookupMonster("Lavalos")] = "but... the future refused to change";
+    //beaten_up_monster_messages[lookupMonster("Lavalos")] = HTMLGenerateTagWrap("span", "but... the future refused to change", mapMake("onclick", "var l = new Audio('" + __lavalos_sound_data + "'); l.play();", "class", "r_clickable")); //copyright, etc
+    if (current_hour >= 5 && current_hour <= 11)
+        monster_messages[lookupMonster("Lavalos")] = "good morning, " + lowercase_player_name + "!";
+    else
+        monster_messages[lookupMonster("Lavalos")] = "all life begins with nu and ends with nu";
+    
+    string day_cycle;
+    if (current_hour >= 5 && current_hour <= 11)
+        day_cycle = "morning";
+    else if (current_hour >= 12 && current_hour <= 16)
+        day_cycle = "afternoon";
+    else if (current_hour >= 17 && current_hour <= 20)
+        day_cycle = "evening";
+    else
+        day_cycle = "night";
+    monster_messages[lookupMonster("Travoltron")] = now_to_string("EEEE").to_lower_case() + " " + day_cycle + " fever";
+    
+    boolean already_output_relevant_beaten_up_effect = false;
+    if ($effect[beaten up].have_effect() > 0 && beaten_up_monster_messages contains last_monster() && last_monster() != $monster[none])
+    {
+		random_messages.listClear();
+        random_messages.listAppend(beaten_up_monster_messages[last_monster()]);
+        already_output_relevant_beaten_up_effect = true;
+    }
+    else if (monster_messages contains last_monster() && last_monster() != $monster[none])
     {
 		random_messages.listClear();
         random_messages.listAppend(monster_messages[last_monster()]);
@@ -452,7 +489,7 @@ string generateRandomMessage()
         random_messages.listAppend("wossname is waiting");
     }
     
-    if (my_familiar() == lookupFamiliar("Helix Fossil"))
+    if (my_familiar() == $familiar[Helix Fossil])
     {
         buffer generated;
         
@@ -499,7 +536,7 @@ string generateRandomMessage()
         random_messages.listClear();
         
         string message = commands.listJoinComponents(" ");
-        message = HTMLGenerateTagWrap("span", message, mapMake("onclick", "updatePageAndFireTimer()", "style", "cursor:pointer;cursor:hand;"));
+        message = HTMLGenerateTagWrap("span", message, mapMake("onclick", "updatePageAndFireTimer()", "class", "r_clickable"));
         
         random_messages.listAppend(message);
     }
@@ -520,14 +557,10 @@ string generateRandomMessage()
 		random_messages.listClear();
 		random_messages.listAppend("win some, lose some");
     }
-	if ($effect[beaten up].have_effect() > 0 && limit_mode().length() == 0)
+	if ($effect[beaten up].have_effect() > 0 && limit_mode().length() == 0 && !already_output_relevant_beaten_up_effect)
 	{
 		random_messages.listClear();
-        monster last_monster = get_property_monster("lastEncounter");
-        if (last_monster == $monster[storm cow])
-            random_messages.listAppend("<pre>^__^            <br>(oo)\\_______    <br>(__)\\       )\\/\\<br>    ||----w |   <br>    ||     ||   </pre>");
-        else
-            random_messages.listAppend("ow");
+        random_messages.listAppend("ow");
 	}
 	if (my_turncount() <= 0)
 	{
@@ -564,9 +597,6 @@ string generateRandomMessage()
         return "lack of cleverness";
 	string chosen_message = "";
 	//Base message off of the minute, so it doesn't cycle when the page reloads often:
-	int current_hour = now_to_string("HH").to_int_silent();
-	int current_minute = now_to_string("mm").to_int_silent();
-	int minute_of_day = current_hour * 60 + current_minute;
 	chosen_message = random_messages[minute_of_day % random_messages.count()];
     
     return chosen_message;

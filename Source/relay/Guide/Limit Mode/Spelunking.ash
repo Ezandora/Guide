@@ -306,11 +306,11 @@ void SpelunkingGenerateNCInformation(SpelunkingStatus spelunking_status, Checkli
                         line += " (equip jetpack first)";
                     description.listAppend(line);
                 }
-                else if (lookupItems("spring boots,yellow cape").items_missing().count() == 0)
+                else if ($items[spring boots,yellow cape].items_missing().count() == 0)
                 {
                     string line = "+250 gold.";
                     string [int] items_to_equip;
-                    foreach it in lookupItems("spring boots,yellow cape")
+                    foreach it in $items[spring boots,yellow cape]
                     {
                         if (it.equipped_amount() == 0)
                             items_to_equip.listAppend(it);
@@ -400,7 +400,7 @@ void SpelunkingGenerateNCInformation(SpelunkingStatus spelunking_status, Checkli
         possible_inventory.listAppend("bombs");
         possible_inventory.listAppend("ropes");
         possible_inventory.listAppend("a key");
-        foreach it in lookupItems("spelunking fedora,boomerang,sturdy machete,heavy pickaxe,spiked boots,spring boots,mining helmet,X-ray goggles,yellow cape,shotgun,jetpack")
+        foreach it in $items[spelunking fedora,boomerang,sturdy machete,heavy pickaxe,spiked boots,spring boots,mining helmet,X-ray goggles,yellow cape,shotgun,jetpack]
         {
             if (it.available_amount() == 0)
                 possible_inventory.listAppend(it);
@@ -413,7 +413,7 @@ void SpelunkingGenerateNCInformation(SpelunkingStatus spelunking_status, Checkli
         string [int] drops;
         drops.listAppend("3 ropes");
         drops.listAppend("3 bombs");
-        foreach it in lookupItems("heavy pickaxe,jetpack,sturdy machete,spring boots")
+        foreach it in $items[heavy pickaxe,jetpack,sturdy machete,spring boots]
         {
             //seen crate give duplicate spring boots before
             drops.listAppend(it);
@@ -465,7 +465,7 @@ string [item] SpelunkingGenerateEquipmentDescriptions(SpelunkingStatus spelunkin
     equipment_descriptions[$item[plasma rifle]] = "9-18 damage, +20 ranged damage.";
     
     equipment_descriptions[$item[Bananubis's Staff]] = "3-6 damage, -6 gold drops, raises a skeleton buddy";
-    if (spelunking_status.buddy.length() > 0)
+    if (spelunking_status.buddy != "")
         equipment_descriptions[$item[Bananubis's Staff]] += " later";
     equipment_descriptions[$item[Bananubis's Staff]] += ".";
     if (spelunking_status.buddy.length() == 0)
@@ -491,7 +491,7 @@ string [item] SpelunkingGenerateEquipmentDescriptions(SpelunkingStatus spelunkin
     
     //Note: Both the yellow cape and jetpack affect both boots. How to?
     item [int] boots_available;
-    foreach it in lookupItems("spring boots,spiked boots")
+    foreach it in $items[spring boots,spiked boots]
     {
         if (it.available_amount() > 0)
             boots_available.listAppend(it);
@@ -543,7 +543,7 @@ void SpelunkingGenerateEquipmentEntries(Checklist [int] checklists, SpelunkingSt
     
     item [slot][int] equipment_per_slot;
     
-    foreach it in lookupItems("trusty whip,sturdy machete,shotgun,boomerang,plasma rifle,Bananubis's Staff,crumbling skull,rock,pot,heavy pickaxe,torch,The Joke Book of the Dead,cursed coffee cup,spelunking fedora,mining helmet,X-ray goggles,The Clown Crown,yellow cape,jetpack,spring boots,spiked boots")
+    foreach it in $items[trusty whip,sturdy machete,shotgun,boomerang,plasma rifle,Bananubis's Staff,crumbling skull,rock,pot,heavy pickaxe,torch,The Joke Book of the Dead,cursed coffee cup,spelunking fedora,mining helmet,X-ray goggles,The Clown Crown,yellow cape,jetpack,spring boots,spiked boots]
     {
         if (it.available_amount() == 0)
             continue;
@@ -613,6 +613,8 @@ void SpelunkingGenerateEquipmentEntries(Checklist [int] checklists, SpelunkingSt
                 //I mean, you should never feel safe around guide. save yourself!
                 //But, it seems useful enough to be worth doing...
                 entry.url = "inv_equip.php?pwd=" + my_hash() + "&which=2&action=equip&whichitem=" + it.to_int();
+                //KoLmafia/sideCommand?cmd=uneffect+effect&pwd=hash
+                //entry.url = "KoLmafia/sideCommand?pwd=" + my_hash() + "&cmd=equip+" + it.replace_string(" ", "+");
                 //entry.url = "inventory.php?which=2";
             }
             checklist_entries.listAppend(entry);
@@ -716,7 +718,7 @@ void LimitModeSpelunkingGenerateChecklists(Checklist [int] checklists)
             future_task_entries.listAppend(ChecklistEntryMake("__item heavy pickaxe", "", ChecklistSubentryMake("Spelunk " + pluraliseWordy(after_this_remaining, "more time", "more times") + " after this", "", "Unlock all the starting bonuses.")));
     }
     
-    if (spelunking_status.altar_unlocked && spelunking_status.buddy.length() > 0)
+    if (spelunking_status.altar_unlocked && spelunking_status.buddy != "")
     {
         string [int] description;
         //spelunking_status.sacrifices
@@ -863,7 +865,7 @@ void LimitModeSpelunkingGenerateChecklists(Checklist [int] checklists)
     if (!spelunking_status.areas_unlocked[$location[the temple ruins]])
     {
     }
-    else if (!spelunking_status.areas_unlocked[$location[Hell]] && lookupItems("Bananubis's Staff,The Joke Book of the Dead,The Clown Crown").items_missing().count() == 0)
+    else if (!spelunking_status.areas_unlocked[$location[Hell]] && $items[Bananubis's Staff,The Joke Book of the Dead,The Clown Crown].items_missing().count() == 0)
     {
         if (spelunking_status.keys == 0)
         {
@@ -876,7 +878,7 @@ void LimitModeSpelunkingGenerateChecklists(Checklist [int] checklists)
             string url;
             url = spelunking_url;
             
-            foreach it in lookupItems("Bananubis's Staff,The Joke Book of the Dead,The Clown Crown")
+            foreach it in $items[Bananubis's Staff,The Joke Book of the Dead,The Clown Crown]
             {
                 if (it.equipped_amount() == 0)
                 {

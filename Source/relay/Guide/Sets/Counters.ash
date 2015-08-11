@@ -13,10 +13,10 @@ string [int] SCountersGenerateDescriptionForRainMonster()
     
     string [int] waterbending_skills_can_cast;
     
-    if (lookupEffect("Personal Thundercloud").have_effect() == 0 && lookupSkill("Thundercloud").skill_is_usable())
+    if ($effect[Personal Thundercloud].have_effect() == 0 && $skill[Thundercloud].skill_is_usable())
         waterbending_skills_can_cast.listAppend("Thundercloud");
     
-    if (lookupEffect("The Rain In Loathing").have_effect() == 0 && lookupSkill("Rainy Day").skill_is_usable())
+    if ($effect[The Rain In Loathing].have_effect() == 0 && $skill[Rainy Day].skill_is_usable())
         waterbending_skills_can_cast.listAppend("Rainy Day");
     
     int water_level_modifier = numeric_modifier("water level");
@@ -54,7 +54,7 @@ string [int] SCountersGenerateDescriptionForRainMonster()
     monster_descriptions["aquaconda"] = "rain skill";
     monster_descriptions["storm cow"] = "lightning skill";
     
-    if (get_campground()[lookupItem("Little Geneticist DNA-Splicing Lab")] > 0 && mafiaIsPastRevision(13918) && !get_property_boolean("_dnaHybrid") && lookupEffect("Human-Fish Hybrid").have_effect() == 0 && !__misc_state["familiars temporarily blocked"])
+    if (get_campground()[$item[Little Geneticist DNA-Splicing Lab]] > 0 && mafiaIsPastRevision(13918) && !get_property_boolean("_dnaHybrid") && $effect[Human-Fish Hybrid].have_effect() == 0 && !__misc_state["familiars temporarily blocked"])
     {
         //FIXME all once spaded
         //NOT giant isopod

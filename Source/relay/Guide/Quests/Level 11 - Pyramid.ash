@@ -27,7 +27,7 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
     if (2286.to_item().available_amount() > 0 && 2268.to_item().available_amount() > 0 && 2180.to_item().available_amount() > 0)
         definitely_have_staff_of_ed = true;
     
-    if (lookupItem("2325").available_amount() + lookupItem("2325").creatable_amount() + lookupItem("7961").available_amount() + lookupItem("7961").creatable_amount() == 0 && !definitely_have_staff_of_ed)
+    if ($item[2325].available_amount() + $item[2325].creatable_amount() + $item[7961].available_amount() + $item[7961].creatable_amount() == 0 && !definitely_have_staff_of_ed)
     {
         //Staff of ed.
         //subentry.entries.listAppend("Find the Staff of Ed.");
@@ -99,7 +99,7 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
             }
             if ($item[tangle of rat tails].available_amount() > 0)
                 subentry.entries.listAppend("Use tangle of rat tails against tomb rats for more tomb ratchets.");
-            if (my_path_id() == PATH_HEAVY_RAINS && lookupItem("catfish whiskers").available_amount() > 0 && lookupEffect("Fishy Whiskers").have_effect() == 0 && $item[tangle of rat tails].available_amount() > 0)
+            if (my_path_id() == PATH_HEAVY_RAINS && $item[catfish whiskers].available_amount() > 0 && $effect[Fishy Whiskers].have_effect() == 0 && $item[tangle of rat tails].available_amount() > 0)
                 subentry.entries.listAppend("Possibly use catfish whiskers to find more tomb ratchets.");
         }
         else
@@ -184,7 +184,7 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
                     tasks.listAppend("spin the pyramid One More Time");
                 else
                     tasks.listAppend("spin the pyramid " + spins_needed.int_to_wordy() + " times");
-                if ($item[tomb ratchet].available_amount() + lookupItem("crumbling wooden wheel").available_amount() > 0)
+                if ($item[tomb ratchet].available_amount() + $item[crumbling wooden wheel].available_amount() > 0)
                     url = "place.php?whichplace=pyramid&action=pyramid_control";
             }
             tasks.listAppend(task);
@@ -210,7 +210,7 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
         
         if (!done_with_wheel_turning)
         {
-            int amount = $item[tomb ratchet].available_amount() + lookupItem("crumbling wooden wheel").available_amount();
+            int amount = $item[tomb ratchet].available_amount() + $item[crumbling wooden wheel].available_amount();
             
             int extra_spin_sources_needed = clampi(total_spins_needed - amount, 0, 11);
             if (extra_spin_sources_needed > 0)

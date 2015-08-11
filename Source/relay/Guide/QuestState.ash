@@ -27,24 +27,6 @@ string [string] __misc_state_string;
 int [string] __misc_state_int;
 float [string] __misc_state_float;
 
-boolean safeToLoadQuestLog()
-{
-    return false;
-}
-
-string shrinkKOLPage(string html)
-{
-    int body_position = html.index_of("<body>");
-    if (body_position != -1)
-        return html.substring(body_position);
-    return html;
-}
-
-boolean __loaded_quest_log = false;
-void requestQuestLogLoad(string property_name)
-{
-}
-
 int QuestStateConvertQuestPropertyValueToNumber(string property_value)
 {
 	int result = 0;
@@ -75,7 +57,6 @@ int QuestStateConvertQuestPropertyValueToNumber(string property_value)
 	}
 	return result;
 }
-
 
 boolean questPropertyPastInternalStepNumber(string quest_property, int number)
 {
@@ -132,11 +113,6 @@ void QuestStateParseMafiaQuestProperty(QuestState state, string property_name, b
 void QuestStateParseMafiaQuestProperty(QuestState state, string property_name)
 {
     QuestStateParseMafiaQuestProperty(state, property_name, true);
-}
-
-boolean needTowerMonsterItem(string in_item_name)
-{
-    return false;
 }
 
 QuestState QuestState(string property_name)

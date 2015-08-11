@@ -179,8 +179,8 @@ boolean in_ronin()
 boolean [item] makeConstantItemArrayMutable(boolean [item] array)
 {
     boolean [item] result;
-    foreach l in array
-        result[l] = array[l];
+    foreach k in array
+        result[k] = array[k];
     
     return result;
 }
@@ -188,8 +188,8 @@ boolean [item] makeConstantItemArrayMutable(boolean [item] array)
 boolean [location] makeConstantLocationArrayMutable(boolean [location] locations)
 {
     boolean [location] result;
-    foreach l in locations
-        result[l] = locations[l];
+    foreach k in locations
+        result[k] = locations[k];
     
     return result;
 }
@@ -197,8 +197,17 @@ boolean [location] makeConstantLocationArrayMutable(boolean [location] locations
 boolean [skill] makeConstantSkillArrayMutable(boolean [skill] array)
 {
     boolean [skill] result;
-    foreach l in array
-        result[l] = array[l];
+    foreach k in array
+        result[k] = array[k];
+    
+    return result;
+}
+
+boolean [effect] makeConstantEffectArrayMutable(boolean [effect] array)
+{
+    boolean [effect] result;
+    foreach k in array
+        result[k] = array[k];
     
     return result;
 }
@@ -299,6 +308,16 @@ int available_amount(boolean [item] items)
     foreach it in items
     {
         count += it.available_amount();
+    }
+    return count;
+}
+
+int item_amount(boolean [item] items)
+{
+    int count = 0;
+    foreach it in items
+    {
+        count += it.item_amount();
     }
     return count;
 }
@@ -561,7 +580,7 @@ int getMillisecondsOfToday()
 int combatTurnsAttemptedInLocation(location place)
 {
     int count = 0;
-    if (place.combat_queue.length() > 0)
+    if (place.combat_queue != "")
         count += place.combat_queue.split_string_alternate("; ").count();
     return count;
 }
@@ -569,7 +588,7 @@ int combatTurnsAttemptedInLocation(location place)
 int noncombatTurnsAttemptedInLocation(location place)
 {
     int count = 0;
-    if (place.noncombat_queue.length() > 0)
+    if (place.noncombat_queue != "")
         count += place.noncombat_queue.split_string_alternate("; ").count();
     return count;
 }
@@ -599,14 +618,14 @@ string [int] locationSeenCombats(location place)
 
 string lastNoncombatInLocation(location place)
 {
-    if (place.noncombat_queue.length() > 0)
+    if (place.noncombat_queue != "")
         return place.locationSeenNoncombats().listLastObject();
     return "";
 }
 
 string lastCombatInLocation(location place)
 {
-    if (place.noncombat_queue.length() > 0)
+    if (place.noncombat_queue != "")
         return place.locationSeenCombats().listLastObject();
     return "";
 }
@@ -875,7 +894,7 @@ buffer generateTurnsToSeeNoncombat(int combat_rate, int noncombats_in_zone, stri
             result.append(" turns");
     }
     
-    if (task.length() > 0)
+    if (task != "")
     {
         result.append(" to ");
         result.append(task);
@@ -1260,4 +1279,12 @@ phylum getDNASyringePhylum()
         return $phylum[mer-kin];
     else
         return phylum_text.to_phylum();
+}
+
+int nextLibramSummonMPCost()
+{
+    int libram_summoned = get_property_int("libramSummons");
+    int next_libram_summoned = libram_summoned + 1;
+    int libram_mp_cost = MAX(1 + (next_libram_summoned * (next_libram_summoned - 1)/2) + mana_cost_modifier(), 1);
+    return libram_mp_cost;
 }

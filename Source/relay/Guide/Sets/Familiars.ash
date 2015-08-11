@@ -47,7 +47,7 @@ void SFamiliarsGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [
 	}
     
     
-    if (lookupFamiliar("Crimbo Shrub").familiar_is_usable())
+    if ($familiar[Crimbo Shrub].familiar_is_usable())
     {
         boolean should_output = false;
         if (__misc_state["In run"])
@@ -67,7 +67,7 @@ void SFamiliarsGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [
             if (!from_task)
                 title = "Big Red Present openable in combat";
             string description = "Gives 2.5k meat.";
-            if (my_familiar() != lookupFamiliar("Crimbo Shrub"))
+            if (my_familiar() != $familiar[Crimbo Shrub])
             {
                 url = "familiar.php";
                 if (from_task)
@@ -85,16 +85,16 @@ void SFamiliarsPuckGenerateResource(ChecklistEntry [int] resource_entries)
     if (!__misc_state["in run"])
         return;
     ChecklistSubentry [int] puck_subentries;
-    item yellow_pixel = lookupItem("yellow pixel");
+    item yellow_pixel = $item[yellow pixel];
     string url = "";
-    familiar relevant_familiar = lookupFamiliar("Ms. Puck Man");
-    if (!relevant_familiar.familiar_is_usable() && lookupFamiliar("Puck Man").familiar_is_usable())
-        relevant_familiar = lookupFamiliar("Puck Man");
-    if (lookupItem("power pill").available_amount() > 0)
+    familiar relevant_familiar = $familiar[Ms. Puck Man];
+    if (!relevant_familiar.familiar_is_usable() && $familiar[Puck Man].familiar_is_usable())
+        relevant_familiar = $familiar[Puck Man];
+    if ($item[power pill].available_amount() > 0)
     {
-        puck_subentries.listAppend(ChecklistSubentryMake(lookupItem("power pill").pluralise().capitaliseFirstLetter(), "", "Use in combat to instakill without costing a turn."));
+        puck_subentries.listAppend(ChecklistSubentryMake($item[power pill].pluralise().capitaliseFirstLetter(), "", "Use in combat to instakill without costing a turn."));
     }
-    if (mafiaIsPastRevision(15961) && (lookupFamiliar("Ms. Puck Man").familiar_is_usable() || lookupFamiliar("Puck Man").familiar_is_usable()))
+    if (mafiaIsPastRevision(15961) && ($familiar[Ms. Puck Man].familiar_is_usable() || $familiar[Puck Man].familiar_is_usable()))
     {
         int power_pills_remaining = MAX(0, MIN(11, my_daycount() + 1) - get_property_int("_powerPillDrops"));
         if (power_pills_remaining > 0)
@@ -102,7 +102,7 @@ void SFamiliarsPuckGenerateResource(ChecklistEntry [int] resource_entries)
             string [int] description;
             
             string line = "Saves a turn each.";
-            if (my_familiar() != lookupFamiliar("Ms. Puck Man") && my_familiar() != lookupFamiliar("Puck Man") && url.length() == 0)
+            if (my_familiar() != $familiar[Ms. Puck Man] && my_familiar() != $familiar[Puck Man] && url.length() == 0)
             {
                 url = "familiar.php";
                 line += " Drops from " + relevant_familiar + ".";
@@ -123,26 +123,26 @@ void SFamiliarsPuckGenerateResource(ChecklistEntry [int] resource_entries)
         //pixel banana - 10 yellow pixels, 1 black pixel - 2-size awesome food, 10 turns of +30% item
         //pixel beer - 10 yellow pixels, 5 white pixels - 2-size awesome drunk, 10 turns of +3 stats/fight (15 mainstat)
         boolean [item] items_to_always_show;
-        items_to_always_show[lookupItem("yellow pixel potion")] = true;
+        items_to_always_show[$item[yellow pixel potion]] = true;
         if (!__misc_state["mysterious island available"])
-            items_to_always_show[lookupItem("yellow submarine")] = true;
+            items_to_always_show[$item[yellow submarine]] = true;
         
         item [int] evalulation_order;
-        evalulation_order.listAppend(lookupItem("yellow pixel potion"));
-        evalulation_order.listAppend(lookupItem("pixel coin")); //before potions
+        evalulation_order.listAppend($item[yellow pixel potion]);
+        evalulation_order.listAppend($item[pixel coin]); //before potions
         
         string [item] reasons;
-        reasons[lookupItem("pixel coin")] = "Autosells for 2000 meat.";
-        reasons[lookupItem("pixel star")] = "+100% HP/MP/spell/weapon damage. (30 turns)";
-        reasons[lookupItem("miniature power pill")] = "+100% stats. (30 turns)";
-        reasons[lookupItem("yellow pixel potion")] = "+20ML. (20 turns)";
+        reasons[$item[pixel coin]] = "Autosells for 2000 meat.";
+        reasons[$item[pixel star]] = "+100% HP/MP/spell/weapon damage. (30 turns)";
+        reasons[$item[miniature power pill]] = "+100% stats. (30 turns)";
+        reasons[$item[yellow pixel potion]] = "+20ML. (20 turns)";
         if (!__misc_state["mysterious island available"])
-            reasons[lookupItem("yellow submarine")] = "island unlock";
+            reasons[$item[yellow submarine]] = "island unlock";
         //these (should) show up in mafia's consumption manager, so disabled
         /*if (__misc_state["can eat just about anything"])
-            reasons[lookupItem("pixel banana")] = "2-size awesome food, 10 turns of +30% item.";
+            reasons[$item[pixel banana]] = "2-size awesome food, 10 turns of +30% item.";
         if (__misc_state["can drink just about anything"])
-            reasons[lookupItem("pixel beer")] = "2-size awesome drunk, 10 turns of +3 stats/fight.";*/
+            reasons[$item[pixel beer]] = "2-size awesome drunk, 10 turns of +3 stats/fight.";*/
         
         boolean [item] evaluated;
         foreach key, it in evalulation_order
@@ -179,7 +179,7 @@ void SFamiliarsPuckGenerateResource(ChecklistEntry [int] resource_entries)
         if (consumables.count() > 0)
         {
             string line = consumables.listJoinComponents(", ").capitaliseFirstLetter() + ".";
-            if (lookupItem("yellow pixel").available_amount() < 10)
+            if ($item[yellow pixel].available_amount() < 10)
                 line = HTMLGenerateSpanFont(line, "grey");
             description.listAppend(line);
         }
@@ -431,12 +431,12 @@ void SFamiliarsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
 		optional_task_entries.listAppend(ChecklistEntryMake(image_name, "familiar.php", ChecklistSubentryMake("Bring along a familiar", "", "")));
 	}
     
-    if (lookupFamiliar("Crimbo Shrub").familiar_is_usable())
+    if ($familiar[Crimbo Shrub].familiar_is_usable())
     {
-        boolean configured = get_property("shrubGarland").length() > 0 || get_property("shrubGifts").length() > 0 || get_property("shrubLights").length() > 0 || get_property("shrubTopper").length() > 0;
+        boolean configured = get_property("shrubGarland") != "" || get_property("shrubGifts") != "" || get_property("shrubLights") != "" || get_property("shrubTopper") != "";
         if (my_daycount() == 1 && get_property("_shrubDecorated") == "false") //default configuration exists, but
             configured = false;
-        if (!configured && (__misc_state["In run"] || my_familiar() == lookupFamiliar("Crimbo Shrub")) && get_property("_shrubDecorated") == "false")
+        if (!configured && (__misc_state["In run"] || my_familiar() == $familiar[Crimbo Shrub]) && get_property("_shrubDecorated") == "false")
         {
             string [int] description;
             
@@ -464,7 +464,7 @@ void SFamiliarsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             
             string url = "familiar.php";
             
-            if (lookupItem("box of old Crimbo decorations").available_amount() > 0)
+            if ($item[box of old Crimbo decorations].available_amount() > 0)
                 url = "inv_use.php?pwd=" + my_hash() + "&whichitem=7958";
             
             optional_task_entries.listAppend(ChecklistEntryMake("__item box of old Crimbo decorations", url, ChecklistSubentryMake("Configure your Crimbo Shrub", "", description), 6));

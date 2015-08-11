@@ -59,7 +59,7 @@ void SJarlsbergGenerateResource(ChecklistEntry [int] resource_entries)
         string [int] banished_monsters = split_string_alternate(get_property("_jiggleCheesedMonsters"), "\\|");
         boolean always_output = false;
         string cheese_line = "Banish monsters.";
-        if (get_property("_jiggleCheesedMonsters").length() > 0)
+        if (get_property("_jiggleCheesedMonsters") != "")
         {
             cheese_line += "|Monsters banished: " + banished_monsters.listJoinComponents(", ", "and").HTMLEscapeString() + ".";
             always_output = true;

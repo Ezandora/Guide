@@ -157,26 +157,26 @@ void SAftercoreThingsToDoGenerateTasks(ChecklistEntry [int] task_entries, Checkl
     {
         item dinsey_item;
         if (my_class() == $class[seal clubber])
-            dinsey_item = lookupItem("Dinsey's oculus");
+            dinsey_item = $item[Dinsey's oculus];
         else if (my_class() == $class[turtle tamer])
-            dinsey_item = lookupItem("Dinsey's radar dish");
+            dinsey_item = $item[Dinsey's radar dish];
         else if (my_class() == $class[pastamancer])
-            dinsey_item = lookupItem("Dinsey's pizza cutter");
+            dinsey_item = $item[Dinsey's pizza cutter];
         else if (my_class() == $class[sauceror])
-            dinsey_item = lookupItem("Dinsey's brain");
+            dinsey_item = $item[Dinsey's brain];
         else if (my_class() == $class[disco bandit])
-            dinsey_item = lookupItem("Dinsey's pants");
+            dinsey_item = $item[Dinsey's pants];
         else if (my_class() == $class[accordion thief])
-            dinsey_item = lookupItem("Dinsey's glove");
+            dinsey_item = $item[Dinsey's glove];
         
         if (dinsey_item != $item[none] && !haveAtLeastXOfItemEverywhere(dinsey_item, 1))
         {
             location [item] keycards;
             
-            keycards[lookupItem("keycard &alpha;")] = lookupLocation("Barf Mountain");
-            keycards[lookupItem("keycard &beta;")] = lookupLocation("Pirates of the Garbage Barges");
-            keycards[lookupItem("keycard &gamma;")] = lookupLocation("The Toxic Teacups");
-            keycards[lookupItem("keycard &delta;")] = lookupLocation("Uncle Gator's Country Fun-Time Liquid Waste Sluice");
+            keycards[$item[keycard &alpha;]] = $location[Barf Mountain];
+            keycards[$item[keycard &beta;]] = $location[Pirates of the Garbage Barges];
+            keycards[$item[keycard &gamma;]] = $location[The Toxic Teacups];
+            keycards[$item[keycard &delta;]] = $location[Uncle Gator's Country Fun-Time Liquid Waste Sluice];
             location [int] missing_locations;
             item [int] missing_keycards;
             foreach it, l in keycards

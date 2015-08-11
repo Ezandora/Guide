@@ -251,7 +251,7 @@ void QLevel11RonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
     
     ChecklistEntry entry = ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[A Mob of Zeppelin Protesters,The Red Zeppelin]);
     
-    if (!__misc_state["In run"] || lookupItem("talisman o' nam").available_amount() > 0)
+    if (!__misc_state["In run"] || $item[talisman o' namsilat].available_amount() > 0)
         optional_task_entries.listAppend(entry);
     else
         task_entries.listAppend(entry);
@@ -295,7 +295,7 @@ void QLevel11ShenGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     if (base_quest_state.mafia_internal_step <= 1)
     {
         subentry.entries.listAppend("Adventure in the Copperhead Club and meet Shen.");
-        subentry.entries.listAppend("This will give you unremovable -20 stat poison.");
+        subentry.entries.listAppend("This will give you unremovable -5 stat poison.");
     }
     else if (base_quest_state.mafia_internal_step == 2)
     {
@@ -368,7 +368,7 @@ void QLevel11ShenGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     
 	ChecklistEntry entry = ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the copperhead club]);
     
-    if (!__misc_state["In run"] || lookupItem("talisman o' nam").available_amount() > 0)
+    if (!__misc_state["In run"] || $item[talisman o' namsilat].available_amount() > 0)
         optional_task_entries.listAppend(entry);
     else
         task_entries.listAppend(entry);

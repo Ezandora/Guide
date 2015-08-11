@@ -49,7 +49,7 @@ void generateMisc(Checklist [int] checklists)
             description.listAppend("Or equip your wineglass.");
         }
         
-        if (__misc_state["In run"])
+        if (!can_interact()) //after that, clan furniture affects it, so we can't give accurate readings
         {
             int adventures_after_rollover = my_adventures() + 40;
             if (my_path_id() != PATH_SLOW_AND_STEADY)
@@ -64,11 +64,11 @@ void generateMisc(Checklist [int] checklists)
         }
         
         int rollover_adventures_from_equipment = 0;
-        foreach s in $slots[]
-            rollover_adventures_from_equipment += s.equipped_item().numeric_modifier("adventures").to_int();
+        foreach s in $slots[hat,weapon,off-hand,back,shirt,pants,acc1,acc2,acc3,familiar]
+            rollover_adventures_from_equipment += s.equipped_item().numeric_modifier("adventures").to_int_silent();
         
         //detect if they're going to lose some turns, be nice:
-        int rollover_adventures_gained = numeric_modifier("adventures").to_int() + 40;
+        int rollover_adventures_gained = numeric_modifier("adventures").to_int_silent() + 40;
         if (get_property_boolean("_borrowedTimeUsed"))
             rollover_adventures_gained -= 20;
         int adventures_lost = (my_adventures() + rollover_adventures_gained) - 200;
@@ -84,6 +84,17 @@ void generateMisc(Checklist [int] checklists)
             if ($item[game grid ticket].is_unrestricted())
                 leisure_activities.listAppend("play arcade games");
             description.listAppend("You'll miss out on " + pluraliseWordy(adventures_lost, "adventure", "adventures") + ". Alas.|Could " + leisure_activities.listJoinComponents(", ", "or") + ".");
+        }
+        
+        if (hippy_stone_broken())
+        {
+            int pvp_fights_gained = numeric_modifier("pvp fights").to_int_silent() + 10;
+            int pvp_fights_after_rollover = pvp_attacks_left() + pvp_fights_gained;
+            int pvp_fights_lost = MAX(0, pvp_fights_after_rollover - 100);
+            if (pvp_fights_lost > 0 && pvp_attacks_left() > 0)
+            {
+                description.listAppend("Fight " + pluralise(MIN(pvp_attacks_left(), pvp_fights_lost), "time", "times") + " to avoid losing fights to rollover.");
+            }
         }
         
         //this could be better (i.e. checking against current shirt and looking in inventory, etc.)
@@ -127,7 +138,8 @@ void generateChecklists(Checklist [int] ordered_output_checklists)
 	finaliseSetUpState();
 	
 	Checklist [int] checklists;
-	
+    
+    ChecklistCollection checklist_collection;
     
     if (limit_mode() == "spelunky")
     {
@@ -169,7 +181,14 @@ void generateChecklists(Checklist [int] ordered_output_checklists)
         
         generateMisc(checklists);
         generateStrategy(checklists);
+        
+        foreach key, checklist_generation_function_name in __checklist_generation_function_names
+        {
+            call checklist_generation_function_name(checklist_collection);
+        }
     }
+    //Convert checklist_collection to checklists:
+    checklists = ChecklistCollectionMergeWithLinearList(checklist_collection, checklists);
 	
 	//Remove checklists that have no entries:
 	int [int] keys_to_remove;
@@ -223,7 +242,7 @@ void outputChecklists(Checklist [int] ordered_output_checklists)
     
     
     string chosen_message = generateRandomMessage();
-    if (chosen_message.length() > 0)
+    if (chosen_message != "")
         PageWrite(HTMLGenerateDivOfStyle(chosen_message, "padding-left:20px;padding-right:20px;"));
     PageWrite(HTMLGenerateTagWrap("div", "", mapMake("id", "extra_words_at_top")));
 	

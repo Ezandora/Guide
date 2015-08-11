@@ -105,7 +105,11 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 				if (can_make_skeleton_key)
 					delay_daily_dungeon_reason = "Make a skeleton key first. (you have the ingredients)";
 				else
-					delay_daily_dungeon_reason = "Acquire a skeleton key first. (from defiled nook)|Unless you can't reach that by the end of today.";
+                {
+					delay_daily_dungeon_reason = "Acquire a skeleton key first. (from defiled nook)";
+                    if (!in_bad_moon() && my_path_id() != PATH_OXYGENARIAN) //FIXME state track this elsewhere
+                        delay_daily_dungeon_reason += "|Unless you can't reach that by the end of today.";
+                }
 					
 					
 				if (can_make_skeleton_key)
@@ -149,7 +153,7 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 			
 			if (daily_dungeon_aftercore_items_wanted.count() > 0)
             {
-                if (l.length() > 0)
+                if (l != "")
                     l += "|";
                 l += "Missing " + daily_dungeon_aftercore_items_wanted.listJoinComponents(", ", "and") + ". Possibly buy ";
                 if (daily_dungeon_aftercore_items_wanted.count() > 1)
@@ -158,7 +162,7 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                     l += "it";
                 l += " in the mall?";
             }
-            if (l.length() > 0)
+            if (l != "")
                 description.listAppend(l);
 			if (!__misc_state["In Aftercore"])
 			{
@@ -167,7 +171,7 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 					submessage = "";
 				if (__misc_state["zap wand available"] && __misc_state_int["DD Tokens and keys available"] > 0)
 					submessage = "Or zap for it";
-				if (submessage.length() > 0)
+				if (submessage != "")
 					description.listAppend(submessage);
 			}
 			

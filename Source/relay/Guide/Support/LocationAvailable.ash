@@ -295,7 +295,7 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
 		case $location[The Haunted Conservatory]:
             return true; //FIXME exact detection
 		case $location[The Haunted Billiards Room]:
-            if (lookupItem("7301").available_amount() > 0)
+            if ($item[7301].available_amount() > 0)
                 return true;
             else
                 return false;
@@ -321,9 +321,9 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
             return questPropertyPastInternalStepNumber("questL04Bat", 2);
         case $location[the beanbat chamber]:
             return questPropertyPastInternalStepNumber("questL04Bat", 3);
-        case lookupLocation("The Unquiet Garves"):
+        case $location[The Unquiet Garves]:
             return true;
-        case lookupLocation("The VERY Unquiet Garves"):
+        case $location[The VERY Unquiet Garves]:
             return get_property("questL07Cyrptic") == "finished";
         case $location[the boss bat's lair]:
             if ($location[the boss bat's lair].combatTurnsAttemptedInLocation() > 0)
@@ -394,13 +394,13 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
         case $location[sloppy seconds diner]:
         case $location[the sunken party yacht]:
             return (get_property_boolean("_sleazeAirportToday") || get_property_boolean("sleazeAirportAlways"));
-        case lookupLocation("Pirates of the Garbage Barges"):
-        case lookupLocation("Barf Mountain"):
-        case lookupLocation("The Toxic Teacups"):
-        case lookupLocation("Uncle Gator's Country Fun-Time Liquid Waste Sluice"):
+        case $location[Pirates of the Garbage Barges]:
+        case $location[Barf Mountain]:
+        case $location[The Toxic Teacups]:
+        case $location[Uncle Gator's Country Fun-Time Liquid Waste Sluice]:
             return (get_property_boolean("_stenchAirportToday") || get_property_boolean("stenchAirportAlways"));
-        case lookupLocation("Kokomo Resort"):
-            return lookupEffect("Tropical Contact High").have_effect() > 0;
+        case $location[Kokomo Resort]:
+            return $effect[Tropical Contact High].have_effect() > 0;
         case $location[Dreadsylvanian Woods]:
         case $location[Dreadsylvanian Village]:
         case $location[Dreadsylvanian Castle]:
@@ -444,9 +444,9 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
             return knoll_available() && get_property("questM03Bugbear") == "finished";
         case $location[the thinknerd warehouse]:
             return questPropertyPastInternalStepNumber("questM22Shirt", 1);
-        case lookupLocation("The Overgrown Lot"):
+        case $location[The Overgrown Lot]:
             return questPropertyPastInternalStepNumber("questM24Doc", 1);
-        case lookupLocation("The Skeleton Store"):
+        case $location[The Skeleton Store]:
             if (questPropertyPastInternalStepNumber("questM23Meatsmith", 1))
                 return true;
             //otherwise, don't know
@@ -555,7 +555,7 @@ void locationAvailablePrivateInit()
 	
 	string [int] zones_never_accessible = split_string_alternate(zones_never_accessible_string, ",");
 	
-	boolean [string] zone_accessibility_status = zones_never_accessible.listGeneratePresenceMap();
+	boolean [string] zone_accessibility_status = zones_never_accessible.listInvert();
     foreach s in zone_accessibility_status //invert
     {
         zone_accessibility_status[s] = false;
@@ -794,8 +794,8 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         lookup_map["The Degrassi Knoll Gym"] = "place.php?whichplace=knoll_hostile";
         lookup_map["The Degrassi Knoll Garage"] = "place.php?whichplace=knoll_hostile";
         lookup_map["The \"Fun\" House"] = "place.php?whichplace=plains";
-        lookup_map["The Unquiet Garves"] = "place.php?whichplace=plains";
-        lookup_map["The VERY Unquiet Garves"] = "place.php?whichplace=plains";
+        lookup_map["The Unquiet Garves"] = "place.php?whichplace=cemetery";
+        lookup_map["The VERY Unquiet Garves"] = "place.php?whichplace=cemetery";
         lookup_map["Tower Ruins"] = "fernruin.php";
         lookup_map["Fernswarthy's Basement"] = "basement.php";
         lookup_map["Cobb's Knob Barracks"] = "cobbsknob.php";
@@ -912,16 +912,16 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         lookup_map["Elf Alley"] = "";
         lookup_map["CRIMBCO cubicles"] = "";
         lookup_map["CRIMBCO WC"] = "";
-        lookup_map["Crimbo Town Toy Factory"] = "";
+        lookup_map["Crimbo Town Toy Factory (2005)"] = "";
         lookup_map["The Don's Crimbo Compound"] = "";
         lookup_map["Atomic Crimbo Toy Factory"] = "";
-        lookup_map["Old Crimbo Town Toy Factory"] = "";
+        lookup_map["Old Crimbo Town Toy Factory (2007)"] = "";
         lookup_map["Sinister Dodecahedron"] = "";
-        lookup_map["Crimbo Town Toy Factory"] = "";
+        lookup_map["Crimbo Town Toy Factory (2009)"] = "";
         lookup_map["Simple Tool-Making Cave"] = "";
         lookup_map["Spooky Fright Factory"] = "";
         lookup_map["Crimborg Collective Factory"] = "";
-        lookup_map["Crimbo Town Toy Factory"] = "";
+        lookup_map["Crimbo Town Toy Factory (2012)"] = "";
         lookup_map["Future Market Square"] = "";
         lookup_map["Mall of the Future"] = "";
         lookup_map["Future Wrong Side of the Tracks"] = "";
@@ -980,6 +980,7 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         lookup_map["The Crimbonium Mine"] = "mining.php?mine=5";
         lookup_map["The Secret Council Warehouse"] = "tutorial.php";
         lookup_map["The Skeleton Store"] = "place.php?whichplace=town_market";
+        lookup_map["Madness Bakery"] = "place.php?whichplace=town_right";
         foreach s in $strings[The Hallowed Halls,Shop Class,Chemistry Class,Art Class]
             lookup_map[s] = "place.php?whichplace=KOLHS";
         foreach s in $strings[The Edge of the Swamp,The Dark and Spooky Swamp,The Corpse Bog,The Ruined Wizard Tower,The Wildlife Sanctuarrrrrgh,Swamp Beaver Territory,The Weird Swamp Village]
@@ -995,6 +996,8 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
             lookup_map[s] = "place.php?whichplace=airport_spooky";
         foreach s in $strings[Pirates of the Garbage Barges,Barf Mountain,The Toxic Teacups,Uncle Gator's Country Fun-Time Liquid Waste Sluice]
             lookup_map[s] = "place.php?whichplace=airport_stench";
+        foreach s in $strings[The SMOOCH Army HQ,The Velvet / Gold Mine,LavaCo&trade; Lamp Factory,The Bubblin' Caldera]
+            lookup_map[s] = "place.php?whichplace=airport_hot";
         foreach s in $strings[The Mines,The Jungle,The Ice Caves,The Temple Ruins,Hell,The Snake Pit,The Spider Hole,The Ancient Burial Ground,The Beehive,the crashed u. f. o.,The City of Goooold,LOLmec's Lair,Yomama's Throne]
             lookup_map[s] = "place.php?whichplace=spelunky";
         
@@ -1018,7 +1021,7 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         else
             lookup_map["Post-Quest Bugbear Pens"] =  "place.php?whichplace=knoll_hostile";
             
-        if (lookupItem("talisman o' nam").equipped_amount() > 0)
+        if ($item[talisman o' namsilat].equipped_amount() > 0)
             lookup_map["Palindome"] = "place.php?whichplace=palindome";
         else
             lookup_map["Palindome"] = "inventory.php?which=2";

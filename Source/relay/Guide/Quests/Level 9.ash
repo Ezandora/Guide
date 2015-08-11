@@ -25,8 +25,8 @@ void QLevel9Init()
 	else
 	{
 		int bridge_progress = get_property_int("chasmBridgeProgress");
-		int fasteners_have = bridge_progress + $item[thick caulk].available_amount() + $item[long hard screw].available_amount() + $item[messy butt joint].available_amount() + 5 * $item[smut orc keepsake box].available_amount() + 5 * lookupItem("snow boards").available_amount();
-		int lumber_have = bridge_progress + $item[morningwood plank].available_amount() + $item[raging hardwood plank].available_amount() + $item[weirdwood plank].available_amount() + 5 * $item[smut orc keepsake box].available_amount() + 5 * lookupItem("snow boards").available_amount();
+		int fasteners_have = bridge_progress + $item[thick caulk].available_amount() + $item[long hard screw].available_amount() + $item[messy butt joint].available_amount() + 5 * $item[smut orc keepsake box].available_amount() + 5 * $item[snow boards].available_amount();
+		int lumber_have = bridge_progress + $item[morningwood plank].available_amount() + $item[raging hardwood plank].available_amount() + $item[weirdwood plank].available_amount() + 5 * $item[smut orc keepsake box].available_amount() + 5 * $item[snow boards].available_amount();
 		
 		int fasteners_needed = MAX(0, 30 - fasteners_have);
 		int lumber_needed = MAX(0, 30 - lumber_have);
@@ -47,6 +47,8 @@ void QLevel9Init()
 	state.state_float["oil peak pressure"] = get_property_float("oilPeakProgress");
 	state.state_int["twin peak progress"] = get_property_int("twinPeakProgress");
 	state.state_int["a-boo peak hauntedness"] = get_property_int("booPeakProgress");
+    if ($location[a-boo peak].noncombat_queue.contains_text("Come On Ghosty, Light My Pyre"))
+        state.state_int["a-boo peak hauntedness"] = 0;
     
 	
 	if (!state.state_boolean["bridge complete"]) //haven't gotten over there yet. not sure what mafia says at this point, so set some defaults:
@@ -341,7 +343,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
                     line = "+40% init will be required later.";
                 if ($familiar[oily woim].familiar_is_usable() && !($familiars[oily woim,happy medium] contains my_familiar()))
                 {
-                    if (!(my_familiar() == lookupFamiliar("Xiblaxian Holo-Companion") && my_familiar() != $familiar[none]))
+                    if (!(my_familiar() == $familiar[Xiblaxian Holo-Companion] && my_familiar() != $familiar[none]))
                         line += "|Run " + $familiar[oily woim] + " for +init.";
                 }
 				details.listAppend(line);
@@ -350,9 +352,9 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
 			if ($item[rusty hedge trimmers].available_amount() > 0)
             {
                 if (!have_at_least_one_usable_option)
-                    details.listAppend("Have " + $item[rusty hedge trimmers].pluraliseWordy() + ".");
+                    details.listAppend("Have " + pluraliseWordy(MIN(4, $item[rusty hedge trimmers].available_amount()), $item[rusty hedge trimmers]) + ".");
                 else if ($item[rusty hedge trimmers].available_amount() > 1)
-                    details.listAppend("Use " + $item[rusty hedge trimmers].pluraliseWordy() + ".");
+                    details.listAppend("Use " + pluraliseWordy(MIN(4, $item[rusty hedge trimmers].available_amount()), $item[rusty hedge trimmers]) + ".");
                 else
                     details.listAppend("Use rusty hedge trimmers.");
             }
@@ -478,8 +480,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
             
             if ($item[bubblin' crude].available_amount() < 12)
             {
-                details.listAppend("Run +item to acquire 12 bubblin' crude. (" + item_drop_string + ")|" + crude_string);
-                details.listAppend("Need " + pluralise(MAX(0, 12 - $item[bubblin' crude].available_amount()), "more bubblin' crude", "more bubblin' crudes") + ".");
+                details.listAppend("Run +item to acquire " + pluralise(MAX(0, 12 - $item[bubblin' crude].available_amount()), "more bubblin' crude", "more bubblin' crudes") + ". (" + item_drop_string + ")|" + crude_string);
                 if ($item[duskwalker syringe].available_amount() > 0)
                     details.listAppend("Use " + $item[duskwalker syringe].pluralise() + " in-combat for more crude.");
             }
@@ -549,7 +550,7 @@ void QLevel9GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             }
 		}
 		
-        if ((lookupItem("snow berries").available_amount() > 0 || lookupItem("ice harvest").available_amount() > 0) && lookupItem("snow boards").available_amount() < 4)
+        if (($item[snow berries].available_amount() > 0 || $item[ice harvest].available_amount() > 0) && $item[snow boards].available_amount() < 4)
 			subentry.entries.listAppend("Possibly make snow boards.");
         if (__misc_state["can use clovers"])
 			subentry.entries.listAppend("Possibly clover for 3 lumber and 3 fasteners.");

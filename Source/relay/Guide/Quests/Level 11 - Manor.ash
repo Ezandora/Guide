@@ -92,15 +92,15 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                 boolean output_final_fight_info = false;
                 if (use_fast_route)
                 {
-                    if (lookupItem("wine bomb").available_amount() > 0 || base_quest_state.mafia_internal_step >= 4)
+                    if ($item[wine bomb].available_amount() > 0 || base_quest_state.mafia_internal_step >= 4)
                     {
                         output_final_fight_info = true;
                         image_name = "Demon Summon";
                     }
-                    else if (lookupItem("unstable fulminate").available_amount() > 0)
+                    else if ($item[unstable fulminate].available_amount() > 0)
                     {
                         string [int] tasks;
-                        if (lookupItem("unstable fulminate").equipped_amount() == 0)
+                        if ($item[unstable fulminate].equipped_amount() == 0)
                         {
                             url = "inventory.php?which=2";
                             tasks.listAppend(HTMLGenerateSpanFont("Equip unstable fulminate", "red"));
@@ -117,7 +117,7 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                         
                         subentry.entries.listAppend(tasks.listJoinComponents(", ", "then").capitaliseFirstLetter() + ".");
                         
-                        int current_ml = lookupLocation("The Haunted Boiler Room").monster_level_adjustment_for_location();
+                        int current_ml = $location[The Haunted Boiler Room].monster_level_adjustment_for_location();
                         
                         if (current_ml < ml_needed)
                         {
@@ -126,9 +126,9 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                         else
                         {
                             string [int] banish_targets;
-                            if (!lookupMonster("coaltergeist").is_banished())
+                            if (!$monster[coaltergeist].is_banished())
                                 banish_targets.listAppend("coaltergeist");
-                            if (!lookupMonster("steam elemental").is_banished())
+                            if (!$monster[steam elemental].is_banished())
                                 banish_targets.listAppend("steam elemental");
                             if (banish_targets.count() > 0)
                                 subentry.modifiers.listAppend("banish " + banish_targets.listJoinComponents(", "));
@@ -138,8 +138,8 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                         
                         int boilers_needed = clampi(ceil(50.1 / degrees_per_fight.to_float()), 1, 6);
                         
-                        monster boiler_monster = lookupMonster("monstrous boiler");
-                        float [monster] appearance_rates = lookupLocation("The Haunted Boiler Room").appearance_rates_adjusted();
+                        monster boiler_monster = $monster[monstrous boiler];
+                        float [monster] appearance_rates = $location[The Haunted Boiler Room].appearance_rates_adjusted();
                         
                         
                         float boiler_per_adventure = appearance_rates[boiler_monster] / 100.0;
@@ -158,7 +158,7 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                     {
                         //FIXME implement this differently?
                         boolean need_item_modifier = false;
-                        if (lookupItem("bottle of Chateau de Vinegar").available_amount() == 0)
+                        if ($item[bottle of Chateau de Vinegar].available_amount() == 0)
                         {
                             //+booze? +food seemingly doesn't work on this one
                             subentry.entries.listAppend("Find bottle of Chateau de Vinegar from possessed wine rack in the haunted wine cellar.");
@@ -166,7 +166,7 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                             need_item_modifier = true;
                             image_name = "possessed wine rack";
                         }
-                        if (lookupItem("blasting soda").available_amount() == 0)
+                        if ($item[blasting soda].available_amount() == 0)
                         {
                             subentry.entries.listAppend("Find blasting soda from the cabinet in the haunted laundry room.");
                             subentry.modifiers.listAppend("olfact cabinet");
@@ -178,7 +178,7 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                         if (need_item_modifier)
                             subentry.modifiers.listPrepend("+item"); //Probably +item. Possibly an increasing drop.
                             
-                        if (lookupItem("bottle of Chateau de Vinegar").available_amount() > 0 && lookupItem("blasting soda").available_amount() > 0)
+                        if ($item[bottle of Chateau de Vinegar].available_amount() > 0 && $item[blasting soda].available_amount() > 0)
                         {
                             url = "craft.php?mode=cook";
                             string line = "Cook unstable fulminate.";
@@ -192,12 +192,12 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                 else
                 {
                     item [location] searchables;
-                    searchables[$location[the haunted kitchen]] = lookupItem("loosening powder");
-                    searchables[$location[the haunted conservatory]] = lookupItem("powdered castoreum");
-                    searchables[$location[the haunted bathroom]] = lookupItem("drain dissolver");
-                    searchables[$location[the haunted gallery]] = lookupItem("triple-distilled turpentine");
-                    searchables[lookupLocation("the haunted laboratory")] = lookupItem("detartrated anhydrous sublicalc");
-                    searchables[lookupLocation("the haunted storage room")] = lookupItem("triatomaceous dust");
+                    searchables[$location[the haunted kitchen]] = $item[loosening powder];
+                    searchables[$location[the haunted conservatory]] = $item[powdered castoreum];
+                    searchables[$location[the haunted bathroom]] = $item[drain dissolver];
+                    searchables[$location[the haunted gallery]] = $item[triple-distilled turpentine];
+                    searchables[$location[the haunted laboratory]] = $item[detartrated anhydrous sublicalc];
+                    searchables[$location[the haunted storage room]] = $item[triatomaceous dust];
                     
                     item [location] missing_searchables;
                     foreach l in searchables
@@ -252,7 +252,7 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                 }
                 if (use_fast_route)
                 {
-                    if (lookupItem("unstable fulminate").available_amount() == 0 && !output_final_fight_info && lookupItem("bottle of Chateau de Vinegar").available_amount() == 0 && lookupItem("bottle of Chateau de Vinegar").available_amount() == 0 && !recipe_will_be_autoread)
+                    if ($item[unstable fulminate].available_amount() == 0 && !output_final_fight_info && $item[bottle of Chateau de Vinegar].available_amount() == 0 && $item[bottle of Chateau de Vinegar].available_amount() == 0 && !recipe_will_be_autoread)
                         subentry.entries.listAppend("Remember to wear Spookyraven's spectacles/read the recipe if you haven't.");
                 }
                 else
@@ -265,8 +265,8 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
     relevant_locations[$location[the haunted ballroom]] = true;
     relevant_locations[$location[summoning chamber]] = true;
     relevant_locations[__location_the_haunted_wine_cellar] = true;
-    relevant_locations[lookupLocation("The Haunted Boiler Room")] = true;
-    relevant_locations[lookupLocation("The Haunted Laundry Room")] = true;
+    relevant_locations[$location[The Haunted Boiler Room]] = true;
+    relevant_locations[$location[The Haunted Laundry Room]] = true;
     
 
     task_entries.listAppend(ChecklistEntryMake(image_name, url, subentry, relevant_locations));

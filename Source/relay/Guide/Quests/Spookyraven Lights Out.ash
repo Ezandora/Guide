@@ -38,12 +38,12 @@ void QSpookyravenLightsOutGenerateEntry(ChecklistEntry [int] task_entries, Check
         {
             string [location][int] stephen_area_descriptions;
             stephen_area_descriptions[$location[The Haunted Bedroom]] = listMake("Search for a light", "Search a nearby nightstand", "Check a nightstand on your left");
-            stephen_area_descriptions[lookupLocation("The Haunted Nursery")] = listMake("Search for a lamp", "Search over by the (gaaah) stuffed animals", "Examine the Dresser", "Open the bear and put your hand inside", "Unlock the box");
+            stephen_area_descriptions[$location[The Haunted Nursery]] = listMake("Search for a lamp", "Search over by the (gaaah) stuffed animals", "Examine the Dresser", "Open the bear and put your hand inside", "Unlock the box");
             stephen_area_descriptions[$location[The Haunted Conservatory]] = listMake("Make a torch", "Examine the graves", "Examine the grave marked \"Crumbles\"");
             stephen_area_descriptions[$location[The Haunted Billiards Room]] = listMake("Search for a light", "What the heck, let's explore a bit", "Examine the taxidermy heads");
-            stephen_area_descriptions[lookupLocation("The Haunted Wine Cellar")] = listMake("Try to find a light", "Keep your cool", "Investigate the wine racks", "Examine the Pinot Noir rack");
-            stephen_area_descriptions[lookupLocation("The Haunted Boiler Room")] = listMake("Look for a light", "Search the barrel", "No, but I will anyway");
-            stephen_area_descriptions[lookupLocation("The Haunted Laboratory")] = listMake("Search for a light", "Check it out", "Examine the weird machines", "Enter 23-47-99 and turn on the machine", "Oh god");
+            stephen_area_descriptions[$location[The Haunted Wine Cellar]] = listMake("Try to find a light", "Keep your cool", "Investigate the wine racks", "Examine the Pinot Noir rack");
+            stephen_area_descriptions[$location[The Haunted Boiler Room]] = listMake("Look for a light", "Search the barrel", "No, but I will anyway");
+            stephen_area_descriptions[$location[The Haunted Laboratory]] = listMake("Search for a light", "Check it out", "Examine the weird machines", "Enter 23-47-99 and turn on the machine", "Oh god");
         
             string [int] description;
             
@@ -55,16 +55,16 @@ void QSpookyravenLightsOutGenerateEntry(ChecklistEntry [int] task_entries, Check
                 else
                     first_line += "Situationally useful (+familiar weight) in-run. ";
             }
-            if (next_stephen_location == lookupLocation("The Haunted Laboratory"))
+            if (next_stephen_location == $location[The Haunted Laboratory])
                 first_line += HTMLGenerateSpanFont("Will take a turn.", "red");
             else
                 first_line += "Will not take a turn.";
             
-            if (first_line.length() > 0)
+            if (first_line != "")
                 description.listAppend(first_line);
             
             string line = "Adventure in " + next_stephen_room;
-            if (next_stephen_location == lookupLocation("The Haunted Laboratory"))
+            if (next_stephen_location == $location[The Haunted Laboratory])
                 line += " to fight Stephen Spookyraven";
             line += ".";
             if (stephen_area_descriptions contains next_stephen_location)
@@ -80,8 +80,8 @@ void QSpookyravenLightsOutGenerateEntry(ChecklistEntry [int] task_entries, Check
         if (next_elizabeth_location != $location[none])
         {
             string [location][int] elizabeth_area_descriptions;
-            elizabeth_area_descriptions[lookupLocation("The Haunted Storage Room")] = listMake("Look out the Window");
-            elizabeth_area_descriptions[lookupLocation("The Haunted Laundry Room")] = listMake("Check a Pile of Stained Sheets");
+            elizabeth_area_descriptions[$location[The Haunted Storage Room]] = listMake("Look out the Window");
+            elizabeth_area_descriptions[$location[The Haunted Laundry Room]] = listMake("Check a Pile of Stained Sheets");
             elizabeth_area_descriptions[$location[The Haunted Bathroom]] = listMake("Inspect the Bathtub");
             elizabeth_area_descriptions[$location[The Haunted Kitchen]] = listMake("Make a Snack");
             elizabeth_area_descriptions[$location[The Haunted Library]] = listMake("Go to the Childrens' Section");
@@ -97,7 +97,7 @@ void QSpookyravenLightsOutGenerateEntry(ChecklistEntry [int] task_entries, Check
             else
                 first_line += "Will not take a turn.";
             
-            if (first_line.length() > 0)
+            if (first_line != "")
                 description.listAppend(first_line);
             
             string line = "Adventure in " + next_elizabeth_room;

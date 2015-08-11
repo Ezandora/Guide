@@ -17,17 +17,86 @@ void generateMissingItems(Checklist [int] checklists)
 		
 		subentries.listAppend(ChecklistSubentryMake("Wand of Nagamar", "", ""));
 		
-		if (__misc_state_int["ruby w needed"] > 0)
-			subentries.listAppend(ChecklistSubentryMake("ruby W", "Clover or +234% item", listMake("Clover the castle basement", "W Imp - Dark Neck of the Woods/Pandamonium Slums - 30% drop")));
+        Record WandComponentSource
+        {
+            item component;
+            int drop_rate;
+            monster monster_dropped_from;
+            location location_dropped_from;
+        };
+        void listAppend(WandComponentSource [int] list, WandComponentSource entry)
+        {
+            int position = list.count();
+            while (list contains position)
+                position += 1;
+            list[position] = entry;
+        }
+        
+        WandComponentSource [int] component_sources;
+        
+        if (__misc_state_int["ruby w needed"] > 0)
+        {
+            WandComponentSource source;
+            source.component = $item[ruby w];
+            source.drop_rate = 30;
+            source.monster_dropped_from = $monster[w imp];
+            if (__quest_state["Level 6"].finished)
+                source.location_dropped_from = $location[Pandamonium Slums];
+            else
+                source.location_dropped_from = $location[the dark neck of the woods];
+            component_sources.listAppend(source);
+        }
+        
 		if (__misc_state_int["metallic a needed"] > 0)
-			subentries.listAppend(ChecklistSubentryMake("metallic A", "Clover or +234% item", listMake("Clover the castle basement", "MagiMechTech MechaMech - Penultimate Fantasy Airship - 30% drop")));
-		if (__misc_state_int["lowercase n needed"] > 0 && __misc_state_int["lowercase n available"] == 0)
-		{
-			string name = "lowercase N";
-			subentries.listAppend(ChecklistSubentryMake(name, "Clover or +234% item", listMake("Clover the castle basement", "XXX pr0n - Valley of Rof L'm Fao - 30% drop")));
-		}
+        {
+            WandComponentSource source;
+            source.component = $item[metallic a];
+            source.drop_rate = 30;
+            source.monster_dropped_from = $monster[MagiMechTech MechaMech];
+            source.location_dropped_from = $location[The Penultimate Fantasy Airship];
+            component_sources.listAppend(source);
+        }
+        
+        if (__misc_state_int["lowercase n needed"] > 0 && __misc_state_int["lowercase n available"] == 0)
+        {
+            WandComponentSource source;
+            source.component = $item[lowercase n];
+            source.drop_rate = 30;
+            source.monster_dropped_from = $monster[XXX pr0n];
+            source.location_dropped_from = $location[The Valley of Rof L'm Fao];
+            component_sources.listAppend(source);
+        }
+        
 		if (__misc_state_int["heavy d needed"] > 0)
-			subentries.listAppend(ChecklistSubentryMake("heavy D", "Clover or +150% item", listMake("Clover the castle basement", "Alphabet Giant - Castle Basement - 40% drop")));
+        {
+            WandComponentSource source;
+            source.component = $item[heavy d];
+            source.drop_rate = 40;
+            source.monster_dropped_from = $monster[Alphabet Giant];
+            source.location_dropped_from = $location[The Castle in the Clouds in the Sky (Basement)];
+            component_sources.listAppend(source);
+        }
+        
+        foreach key, source in component_sources
+        {
+            if (source.component.available_amount() > 0)
+                continue;
+            string modifier_text = "";
+            if (!in_bad_moon())
+                modifier_text = "Clover or ";
+            if (source.drop_rate > 0 && source.drop_rate < 100)
+            {
+                int drop_rate_inverse = ceil(100.0 / source.drop_rate.to_float() * 100.0 - 100.0);
+                modifier_text += "+" + drop_rate_inverse + "% item";
+            }
+            
+            string [int] description;
+            if (!in_bad_moon())
+                description.listAppend("Clover the castle basement.");
+            description.listAppend(source.monster_dropped_from + " - " + source.location_dropped_from + " - " + source.drop_rate + "% drop");
+			subentries.listAppend(ChecklistSubentryMake(source.component, modifier_text, description));
+        }
+        
         if (subentries.count() == 1)
             subentries[0].entries.listAppend("Can create it.");
 			
@@ -135,17 +204,17 @@ void generateMissingItems(Checklist [int] checklists)
         }
     }
     
-    if (lookupItem("electric boning knife").available_amount() == 0 && __quest_state["Level 13"].state_boolean["wall of bones will need to be defeated"])
+    if ($item[electric boning knife].available_amount() == 0 && __quest_state["Level 13"].state_boolean["wall of bones will need to be defeated"])
     {
         string [int] description;
         description.listAppend("Found from an NC on the ground floor of the castle in the clouds in the sky.");
-        if (lookupSkill("garbage nova").skill_is_usable())
+        if ($skill[garbage nova].skill_is_usable())
             description.listAppend("Ignore this, you can towerkill with Garbage Nova.");
         else
             description.listAppend("Or towerkill.");
         items_needed_entries.listAppend(ChecklistEntryMake("__item electric boning knife", $location[the castle in the clouds in the sky (ground floor)].getClickableURLForLocation(), ChecklistSubentryMake("Electric boning knife", "-combat", description)));
     }
-    if (lookupItem("beehive").available_amount() == 0 && __quest_state["Level 13"].state_boolean["wall of skin will need to be defeated"])
+    if ($item[beehive].available_amount() == 0 && __quest_state["Level 13"].state_boolean["wall of skin will need to be defeated"])
     {
         string [int] description;
         
@@ -170,13 +239,13 @@ void generateMissingItems(Checklist [int] checklists)
             sources.listAppend("init");
             //subentries.listAppend(ChecklistSubentryMake("+init sources", "+init", "For the lair races."));
         }
-        if (!__quest_state["Level 13"].state_boolean["Stat race completed"] && __quest_state["Level 13"].state_string["Stat race type"].length() > 0)
+        if (!__quest_state["Level 13"].state_boolean["Stat race completed"] && __quest_state["Level 13"].state_string["Stat race type"] != "")
         {
             //
             subentry.modifiers.listAppend("+" + __quest_state["Level 13"].state_string["Stat race type"]);
             sources.listAppend(__quest_state["Level 13"].state_string["Stat race type"]);
         }
-        if (!__quest_state["Level 13"].state_boolean["Elemental damage race completed"] && __quest_state["Level 13"].state_string["Elemental damage race type"].length() > 0)
+        if (!__quest_state["Level 13"].state_boolean["Elemental damage race completed"] && __quest_state["Level 13"].state_string["Elemental damage race type"] != "")
         {
             //
             string type = __quest_state["Level 13"].state_string["Elemental damage race type"];

@@ -78,7 +78,7 @@ void SCOTGenerateSuggestions(string [int] description)
     COTSuggestionSet [int] suggestion_sets;
     
     boolean have_two_available = false;
-    if ($item[crown of thrones].available_amount() > 0 && lookupItem("Buddy Bjorn").available_amount() > 0)
+    if ($item[crown of thrones].available_amount() > 0 && $item[Buddy Bjorn].available_amount() > 0)
         have_two_available = true;
 
     //Relevant:
@@ -185,7 +185,7 @@ void SCOTGenerateSuggestions(string [int] description)
         suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+2 all res", $familiars[Bulky Buddy Box,Exotic Parrot,Holiday Log,Pet Rock,Toothsome Rock])));
         
     //if (__misc_state["in run"] && availableSpleen() >= 4)
-        //suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("Spleen items", lookupFamiliar("Grim Brother"))));
+        //suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("Spleen items", $familiar[Grim Brother])));
     
     //slightly powerful:
     suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+combat", $familiar[Grim Brother])));
@@ -249,21 +249,21 @@ void SCOTGenerateSuggestions(string [int] description)
 
 void SCOTGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if ($item[crown of thrones].available_amount() == 0 && lookupItem("Buddy Bjorn").available_amount() == 0)
+	if ($item[crown of thrones].available_amount() == 0 && $item[Buddy Bjorn].available_amount() == 0)
 		return;
     if (__misc_state["familiars temporarily blocked"]) //avatar paths
         return;
 	string [int] description;
     
     item crown_item = $item[crown of thrones];
-    if (crown_item.equipped_amount() == 0 && lookupItem("Buddy Bjorn").available_amount() > 0)
-        crown_item = lookupItem("Buddy Bjorn");
+    if (crown_item.equipped_amount() == 0 && $item[Buddy Bjorn].available_amount() > 0)
+        crown_item = $item[Buddy Bjorn];
     
     string image_name = "__item " + crown_item;
     familiar enthroned_familiar = my_enthroned_familiar();
     familiar bjorned_familiar = my_bjorned_familiar();
     
-    if (($item[crown of thrones].equipped_amount() > 0 || lookupItem("Buddy Bjorn").equipped_amount() > 0) || __misc_state["in run"])
+    if (($item[crown of thrones].equipped_amount() > 0 || $item[Buddy Bjorn].equipped_amount() > 0) || __misc_state["in run"])
     {
         SCOTGenerateSuggestions(description);
     }
@@ -278,14 +278,14 @@ void SCOTGenerateResource(ChecklistEntry [int] resource_entries)
     //FIXME my_bjorned_familiar() when 16.3
     
     string url = "familiar.php";
-    if ($item[crown of thrones].equipped_amount() == 0 && lookupItem("Buddy Bjorn").equipped_amount() == 0)
+    if ($item[crown of thrones].equipped_amount() == 0 && $item[Buddy Bjorn].equipped_amount() == 0)
         url = "inventory.php?which=2";
         
     string header = crown_item;
     item [int] available_sources;
     
-    if (lookupItem("Buddy Bjorn").available_amount() > 0)
-        available_sources.listAppend(lookupItem("Buddy Bjorn"));
+    if ($item[Buddy Bjorn].available_amount() > 0)
+        available_sources.listAppend($item[Buddy Bjorn]);
     if ($item[crown of thrones].available_amount() > 0)
         available_sources.listAppend($item[crown of thrones]);
     if (available_sources.count() > 0)

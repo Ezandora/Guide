@@ -25,7 +25,7 @@ void QMadnessBakeryGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 	
 	string url = "place.php?whichplace=town_right";
     
-    if (lookupItem("no-handed pie").available_amount() > 0 || base_quest_state.mafia_internal_step >= 5)
+    if ($item[no-handed pie].available_amount() > 0 || base_quest_state.mafia_internal_step >= 5)
     {
         subentry.entries.listAppend("Talk to the leggerer.");
         url = "place.php?whichplace=town_market";
@@ -40,5 +40,5 @@ void QMadnessBakeryGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         subentry.entries.listAppend("Adventure in the Madness Bakery|Choose the first option in the non-combat repeatedly.");
     }
 		
-	optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, lookupLocations("Madness Bakery")));
+	optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[Madness Bakery]));
 }

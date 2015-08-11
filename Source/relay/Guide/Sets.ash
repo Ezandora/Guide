@@ -41,6 +41,7 @@ void SetsGenerateResources(ChecklistEntry [int] resource_entries)
     SMayoClinicGenerateResource(resource_entries);
     S8bitRealmGenerateResource(resource_entries);
     SDeckOfEveryCardGenerateResource(resource_entries);
+    SBadMoonGenerateResource(resource_entries);
 }
 
 void SetsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -75,6 +76,7 @@ void SetsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 	SEquipmentGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SActuallyEdtheUndyingGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SMiscItemsGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+	SBadMoonGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     
 }
 

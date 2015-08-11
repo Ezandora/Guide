@@ -74,7 +74,7 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
                 return subentry;
             }
             string clickable_url = getClickableURLForLocation(l);
-            if (clickable_url.length() > 0 && (url.s.length() == 0 || url.s == "place.php?whichplace=forestvillage")) //if it's that URL, then it's back to the BHH - we'd rather override that with a bounty
+            if (clickable_url != "" && (url.s.length() == 0 || url.s == "place.php?whichplace=forestvillage")) //if it's that URL, then it's back to the BHH - we'd rather override that with a bounty
                 url.s = clickable_url;
             
             float bounty_appearance_rate = appearance_rates[target_monster] / 100.0;
@@ -239,7 +239,7 @@ void SBountyHunterHunterGenerateTasks(ChecklistEntry [int] task_entries, Checkli
         
     }
     
-    boolean [location] highlight_locations = listGeneratePresenceMap(relevant_locations);
+    boolean [location] highlight_locations = listInvert(relevant_locations);
     if (subentries.count() > 0)
     {
         optional_task_entries.listAppend(ChecklistEntryMake("__item bounty-hunting helmet", url_handle.s, subentries, highlight_locations));

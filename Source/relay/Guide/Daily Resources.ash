@@ -187,7 +187,7 @@ void generateDailyResources(Checklist [int] checklists)
     
     if ((get_property("sidequestOrchardCompleted") == "hippy" || get_property("sidequestOrchardCompleted") == "fratboy") && !get_property_boolean("_hippyMeatCollected"))
     {
-		resource_entries.listAppend(ChecklistEntryMake("__item herbs", "", ChecklistSubentryMake("Meat from the hippy store", "", "~4500 free meat."), 5));
+		resource_entries.listAppend(ChecklistEntryMake("__item herbs", "island.php", ChecklistSubentryMake("Meat from the hippy store", "", "~4500 free meat."), 5)); //FIXME consider shop.php?whichshop=hippy
     }
     if ((get_property("sidequestArenaCompleted") == "hippy" || get_property("sidequestArenaCompleted") == "fratboy") && !get_property_boolean("concertVisited"))
     {
@@ -213,7 +213,7 @@ void generateDailyResources(Checklist [int] checklists)
     }
     
     //Not sure how I feel about this. It's kind of extraneous?
-    if (get_property_int("telescopeUpgrades") > 0 && !get_property_boolean("telescopeLookedHigh") && __misc_state["In run"] && availableDrunkenness() < 0 && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING)
+    if (get_property_int("telescopeUpgrades") > 0 && !get_property_boolean("telescopeLookedHigh") && __misc_state["In run"] && availableDrunkenness() < 0 && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING && !in_bad_moon())
     {
         string [int] description;
         int percentage = 5 * get_property_int("telescopeUpgrades");
@@ -224,7 +224,6 @@ void generateDailyResources(Checklist [int] checklists)
     
     if (__misc_state_int["free rests remaining"] > 0)
     {
-        
         string [int] description;
         
         if (__misc_state["recommend resting at campsite"])
@@ -294,15 +293,6 @@ void generateDailyResources(Checklist [int] checklists)
         }
         
 		resource_entries.listAppend(ChecklistEntryMake("__effect sleepy", __misc_state_string["resting url"], ChecklistSubentryMake(pluraliseWordy(__misc_state_int["free rests remaining"], "free rest", "free rests").capitaliseFirstLetter(), "", description), 10));
-    }
-    
-    if (in_bad_moon() && !get_property_boolean("styxPixieVisited"))
-    {
-        string [int] description;
-        description.listAppend("+40% meat, +20% items, +25% moxie.");
-        description.listAppend("Or +25% mysticality, +10-15 mp regen.");
-        description.listAppend("Or +25% muscle, +5 DR.");
-		resource_entries.listAppend(ChecklistEntryMake("__effect Hella Smooth", "", ChecklistSubentryMake("Styx pixie buff", "", description), 10));
     }
     
     //FIXME skate park?
@@ -402,9 +392,7 @@ void generateDailyResources(Checklist [int] checklists)
     
     if (__misc_state["Chateau Mantegna available"] && !get_property_boolean("_chateauDeskHarvested") && mafiaIsPastRevision(15191))
     {
-        string image_name = "__item disintegrating quill pen";
-        if (lookupItem("fancy calligraphy pen").image.length() > 0)
-            image_name = "__item fancy calligraphy pen";
+        string image_name = "__item fancy calligraphy pen";
         resource_entries.listAppend(ChecklistEntryMake(image_name, "place.php?whichplace=chateau", ChecklistSubentryMake("Chateau desk openable", "", "Daily collectable."), 8));
     }
 	

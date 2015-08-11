@@ -1,16 +1,28 @@
+static
+{
+    skill [int] __libram_skills;
+    void initialiseLibramSkills()
+    {
+		foreach s in $skills[]
+        {
+			if (s.libram)
+				__libram_skills.listAppend(s);
+        }
+    }
+    initialiseLibramSkills();
+}
+
 void SLibramGenerateResource(ChecklistEntry [int] resource_entries)
 {
 	if (__misc_state["bookshelf accessible"])
 	{
-		int libram_summoned = get_property_int("libramSummons");
-        int next_libram_summoned = libram_summoned + 1;
-		int libram_mp_cost = MAX(1 + (next_libram_summoned * (next_libram_summoned - 1)/2) + mana_cost_modifier(), 1);
+		int libram_mp_cost = nextLibramSummonMPCost();
 		
 		
 		string [int] librams_usable;
-		foreach s in $skills[]
+		foreach key, s in __libram_skills
         {
-			if (s.libram && s.skill_is_usable())
+			if (s.skill_is_usable())
 				librams_usable.listAppend(s.to_string());
         }
 		if (libram_mp_cost <= my_maxmp() && librams_usable.count() > 0)
@@ -33,6 +45,14 @@ void SLibramGenerateResource(ChecklistEntry [int] resource_entries)
 			}
 			
 			subentry.entries.listAppend(readable_list.listJoinComponents(", ", "and") + ".");
+            
+            if ($skill[summon taffy].skill_is_usable() && get_property_int("_taffyYellowSummons") == 0)
+            {
+                float chance = powf(0.5, MAX(0, get_property_int("_taffyRareSummons") + 1));
+                subentry.entries.listAppend("Could try to summon a yellow taffy. (" + (chance * 100.0).roundForOutput(1) + "% chance)");
+                //_taffyYellowSummons
+            }
+            
 			resource_entries.listAppend(ChecklistEntryMake("__item libram of divine favors", "campground.php?action=bookshelf", subentry, 7));
 		}
 		

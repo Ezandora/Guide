@@ -107,7 +107,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     boolean ballroom_probably_open = false;
     if ($location[the haunted ballroom].turnsAttemptedInLocation() > 0)
         ballroom_probably_open = true;
-    if (__misc_state_string["ballroom song"].length() > 0) //FALSE if they haven't ascended since the revamp, I guess
+    if (__misc_state_string["ballroom song"] != "") //FALSE if they haven't ascended since the revamp, I guess
         ballroom_probably_open = true;
     if (get_property("questM21Dance") == "finished")
         ballroom_probably_open = true;
@@ -118,7 +118,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         //second_floor_probably_open = false;
     if (get_property_int("lastSecondFloorUnlock") == my_ascensions()) //updates properly now
         second_floor_probably_open = true;
-    if (get_property("questM20Necklace") == "finished") //mafia will erroneously set questM20Necklace to finished in certain (unknown) cases. could be an error in QuestDatabase.java's reset(), but I am uncertain what caused the bug locally (it also set lastSecondFloorUnlock to current, though it is not unlocked) note - still in effect.
+    if (get_property("questM20Necklace") == "finished") //mafia will erroneously set questM20Necklace to finished in certain (unknown) cases. could be an error in QuestDatabase.java's reset(), but I am uncertain what caused the bug locally (it also set lastSecondFloorUnlock to current, though it is not unlocked) note - still in effect. additional information: south of the border?
         second_floor_probably_open = true;
     
     if ($item[Lady Spookyraven's necklace].available_amount() > 0) //mostly
@@ -508,7 +508,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         }
         
     }
-	if (subentry.header.length() > 0)
+	if (subentry.header != "")
     {
         if (image_name.length() == 0)
             image_name = base_quest_state.image_name;

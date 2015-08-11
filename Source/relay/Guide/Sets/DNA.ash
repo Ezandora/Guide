@@ -134,51 +134,51 @@ void SDNAInit()
         __dna_phylum_to_description_colourless[p] = __dna_phylum_to_description[p];
     }
     
-    __dna_phylum_to_item[$phylum[beast]] = lookupItem("Gene Tonic: Beast");
-    __dna_phylum_to_item[$phylum[bug]] = lookupItem("Gene Tonic: Insect");
-    __dna_phylum_to_item[$phylum[constellation]] = lookupItem("Gene Tonic: Constellation");
-    __dna_phylum_to_item[$phylum[construct]] = lookupItem("Gene Tonic: Construct");
-    __dna_phylum_to_item[$phylum[demon]] = lookupItem("Gene Tonic: Demon");
-    __dna_phylum_to_item[$phylum[dude]] = lookupItem("Gene Tonic: Dude");
-    __dna_phylum_to_item[$phylum[elemental]] = lookupItem("Gene Tonic: Elemental");
-    __dna_phylum_to_item[$phylum[elf]] = lookupItem("Gene Tonic: Elf");
-    __dna_phylum_to_item[$phylum[fish]] = lookupItem("Gene Tonic: Fish");
-    __dna_phylum_to_item[$phylum[goblin]] = lookupItem("Gene Tonic: Goblin");
-    __dna_phylum_to_item[$phylum[hippy]] = lookupItem("Gene Tonic: Hippy");
-    __dna_phylum_to_item[$phylum[hobo]] = lookupItem("Gene Tonic: Hobo");
-    __dna_phylum_to_item[$phylum[horror]] = lookupItem("Gene Tonic: Horror");
-    __dna_phylum_to_item[$phylum[humanoid]] = lookupItem("Gene Tonic: Humanoid");
-    __dna_phylum_to_item[$phylum[mer-kin]] = lookupItem("Gene Tonic: Mer-kin");
-    __dna_phylum_to_item[$phylum[orc]] = lookupItem("Gene Tonic: Orc");
-    __dna_phylum_to_item[$phylum[penguin]] = lookupItem("Gene Tonic: Penguin");
-    __dna_phylum_to_item[$phylum[pirate]] = lookupItem("Gene Tonic: Pirate");
-    __dna_phylum_to_item[$phylum[plant]] = lookupItem("Gene Tonic: Plant");
-    __dna_phylum_to_item[$phylum[slime]] = lookupItem("Gene Tonic: Slime");
-    __dna_phylum_to_item[$phylum[undead]] = lookupItem("Gene Tonic: Undead");
-    __dna_phylum_to_item[$phylum[weird]] = lookupItem("Gene Tonic: Weird");
+    __dna_phylum_to_item[$phylum[beast]] = $item[Gene Tonic: Beast];
+    __dna_phylum_to_item[$phylum[bug]] = $item[Gene Tonic: Insect];
+    __dna_phylum_to_item[$phylum[constellation]] = $item[Gene Tonic: Constellation];
+    __dna_phylum_to_item[$phylum[construct]] = $item[Gene Tonic: Construct];
+    __dna_phylum_to_item[$phylum[demon]] = $item[Gene Tonic: Demon];
+    __dna_phylum_to_item[$phylum[dude]] = $item[Gene Tonic: Dude];
+    __dna_phylum_to_item[$phylum[elemental]] = $item[Gene Tonic: Elemental];
+    __dna_phylum_to_item[$phylum[elf]] = $item[Gene Tonic: Elf];
+    __dna_phylum_to_item[$phylum[fish]] = $item[Gene Tonic: Fish];
+    __dna_phylum_to_item[$phylum[goblin]] = $item[Gene Tonic: Goblin];
+    __dna_phylum_to_item[$phylum[hippy]] = $item[Gene Tonic: Hippy];
+    __dna_phylum_to_item[$phylum[hobo]] = $item[Gene Tonic: Hobo];
+    __dna_phylum_to_item[$phylum[horror]] = $item[Gene Tonic: Horror];
+    __dna_phylum_to_item[$phylum[humanoid]] = $item[Gene Tonic: Humanoid];
+    __dna_phylum_to_item[$phylum[mer-kin]] = $item[Gene Tonic: Mer-kin];
+    __dna_phylum_to_item[$phylum[orc]] = $item[Gene Tonic: Orc];
+    __dna_phylum_to_item[$phylum[penguin]] = $item[Gene Tonic: Penguin];
+    __dna_phylum_to_item[$phylum[pirate]] = $item[Gene Tonic: Pirate];
+    __dna_phylum_to_item[$phylum[plant]] = $item[Gene Tonic: Plant];
+    __dna_phylum_to_item[$phylum[slime]] = $item[Gene Tonic: Slime];
+    __dna_phylum_to_item[$phylum[undead]] = $item[Gene Tonic: Undead];
+    __dna_phylum_to_item[$phylum[weird]] = $item[Gene Tonic: Weird];
     
-    __dna_phylum_to_effect[$phylum[beast]] = lookupEffect("Human-Beast Hybrid");
-    __dna_phylum_to_effect[$phylum[bug]] = lookupEffect("Human-Insect Hybrid");
-    __dna_phylum_to_effect[$phylum[constellation]] = lookupEffect("Human-Constellation Hybrid");
-    __dna_phylum_to_effect[$phylum[construct]] = lookupEffect("Human-Machine Hybrid");
-    __dna_phylum_to_effect[$phylum[demon]] = lookupEffect("Human-Demon Hybrid");
-    __dna_phylum_to_effect[$phylum[dude]] = lookupEffect("Human-Human Hybrid");
-    __dna_phylum_to_effect[$phylum[elemental]] = lookupEffect("Human-Elemental Hybrid");
-    __dna_phylum_to_effect[$phylum[elf]] = lookupEffect("Human-Elf Hybrid");
-    __dna_phylum_to_effect[$phylum[fish]] = lookupEffect("Human-Fish Hybrid");
-    __dna_phylum_to_effect[$phylum[goblin]] = lookupEffect("Human-Goblin Hybrid");
-    __dna_phylum_to_effect[$phylum[hippy]] = lookupEffect("Human-Hippy Hybrid");
-    __dna_phylum_to_effect[$phylum[hobo]] = lookupEffect("Human-Hobo Hybrid");
-    __dna_phylum_to_effect[$phylum[horror]] = lookupEffect("Human-Horror Hybrid");
-    __dna_phylum_to_effect[$phylum[humanoid]] = lookupEffect("Human-Humanoid Hybrid");
-    __dna_phylum_to_effect[$phylum[mer-kin]] = lookupEffect("Human-Mer-kin Hybrid");
-    __dna_phylum_to_effect[$phylum[orc]] = lookupEffect("Human-Orc Hybrid");
-    __dna_phylum_to_effect[$phylum[penguin]] = lookupEffect("Human-Penguin Hybrid");
-    __dna_phylum_to_effect[$phylum[pirate]] = lookupEffect("Human-Pirate Hybrid");
-    __dna_phylum_to_effect[$phylum[plant]] = lookupEffect("Human-Plant Hybrid");
-    __dna_phylum_to_effect[$phylum[slime]] = lookupEffect("Human-Slime Hybrid");
-    __dna_phylum_to_effect[$phylum[undead]] = lookupEffect("Human-Undead Hybrid");
-    __dna_phylum_to_effect[$phylum[weird]] = lookupEffect("Human-Weird Thing Hybrid");
+    __dna_phylum_to_effect[$phylum[beast]] = $effect[Human-Beast Hybrid];
+    __dna_phylum_to_effect[$phylum[bug]] = $effect[Human-Insect Hybrid];
+    __dna_phylum_to_effect[$phylum[constellation]] = $effect[Human-Constellation Hybrid];
+    __dna_phylum_to_effect[$phylum[construct]] = $effect[Human-Machine Hybrid];
+    __dna_phylum_to_effect[$phylum[demon]] = $effect[Human-Demon Hybrid];
+    __dna_phylum_to_effect[$phylum[dude]] = $effect[Human-Human Hybrid];
+    __dna_phylum_to_effect[$phylum[elemental]] = $effect[Human-Elemental Hybrid];
+    __dna_phylum_to_effect[$phylum[elf]] = $effect[Human-Elf Hybrid];
+    __dna_phylum_to_effect[$phylum[fish]] = $effect[Human-Fish Hybrid];
+    __dna_phylum_to_effect[$phylum[goblin]] = $effect[Human-Goblin Hybrid];
+    __dna_phylum_to_effect[$phylum[hippy]] = $effect[Human-Hippy Hybrid];
+    __dna_phylum_to_effect[$phylum[hobo]] = $effect[Human-Hobo Hybrid];
+    __dna_phylum_to_effect[$phylum[horror]] = $effect[Human-Horror Hybrid];
+    __dna_phylum_to_effect[$phylum[humanoid]] = $effect[Human-Humanoid Hybrid];
+    __dna_phylum_to_effect[$phylum[mer-kin]] = $effect[Human-Mer-kin Hybrid];
+    __dna_phylum_to_effect[$phylum[orc]] = $effect[Human-Orc Hybrid];
+    __dna_phylum_to_effect[$phylum[penguin]] = $effect[Human-Penguin Hybrid];
+    __dna_phylum_to_effect[$phylum[pirate]] = $effect[Human-Pirate Hybrid];
+    __dna_phylum_to_effect[$phylum[plant]] = $effect[Human-Plant Hybrid];
+    __dna_phylum_to_effect[$phylum[slime]] = $effect[Human-Slime Hybrid];
+    __dna_phylum_to_effect[$phylum[undead]] = $effect[Human-Undead Hybrid];
+    __dna_phylum_to_effect[$phylum[weird]] = $effect[Human-Weird Thing Hybrid];
     
     foreach p in __dna_phylum_to_effect
     {
@@ -262,7 +262,7 @@ void SDNAInit()
                 element_suggestion = DNASuggestionMake($phylum[undead], suggestion_effect, suggestion_description, true);
             else if (element_needed == "stench")
                 element_suggestion = DNASuggestionMake($phylum[hobo], suggestion_effect, suggestion_description, true);
-            if (element_suggestion.phylums.count() > 0 && element_needed.length() > 0)
+            if (element_suggestion.phylums.count() > 0 && element_needed != "")
             {
                 __phylum_potion_suggestions.listAppend(element_suggestion);
                 __phylum_potion_reminder_suggestions.listAppend(element_suggestion);
@@ -316,7 +316,7 @@ void SDNAGenerateResource(ChecklistEntry [int] resource_entries)
         return;
     if (__misc_state["campground unavailable"])
         return;
-    if (get_campground()[lookupItem("Little Geneticist DNA-Splicing Lab")] == 0)
+    if (get_campground()[$item[Little Geneticist DNA-Splicing Lab]] == 0)
         return;
     
     //Player has a genetic engineering lab installed. Let's play with our DNA!
@@ -367,7 +367,7 @@ void SDNAGenerateResource(ChecklistEntry [int] resource_entries)
     {
         string [int] description;
         
-        if (syringe_description.length() > 0 && !syringe_description_output)
+        if (syringe_description != "" && !syringe_description_output)
         {
             description.listAppend(syringe_description);
             syringe_description_output = true;
@@ -403,14 +403,14 @@ void SDNAGenerateResource(ChecklistEntry [int] resource_entries)
                     if (suggestion.relevant_effect_description.length() == 0)
                         output_effect_description.listAppend(__dna_phylum_to_description_colourless[p]);
                 }
-                if (suggestion.relevant_effect_description.length() > 0)
+                if (suggestion.relevant_effect_description != "")
                     output_effect_description.listAppend(suggestion.relevant_effect_description);
                 
                 string line;
                 
                 line = phylum_descriptions.listJoinComponents("/");
                 line += ": " + output_effect_description.listJoinComponents("/");
-                if (suggestion.reason.length() > 0)
+                if (suggestion.reason != "")
                     line += " - " + suggestion.reason;
                 
                 potion_suggestion_descriptions.listAppend(line);
@@ -424,7 +424,7 @@ void SDNAGenerateResource(ChecklistEntry [int] resource_entries)
     if (!became_a_genetic_monstrosity_today)
     {
         string [int] description;
-        if (syringe_description.length() > 0 && !syringe_description_output)
+        if (syringe_description != "" && !syringe_description_output)
         {
             description.listAppend(syringe_description);
             syringe_description_output = true;
@@ -474,7 +474,7 @@ void SDNAGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 {
     if (__misc_state["campground unavailable"])
         return;
-    if (!(mafiaIsPastRevision(13918) && get_campground()[lookupItem("Little Geneticist DNA-Splicing Lab")] > 0))
+    if (!(mafiaIsPastRevision(13918) && get_campground()[$item[Little Geneticist DNA-Splicing Lab]] > 0))
         return;
     
     //Reminders:
@@ -506,7 +506,7 @@ void SDNAGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
             }
             
             
-            if (suggestion_reason.length() > 0)
+            if (suggestion_reason != "")
             {
                 string description = suggestion_reason.capitaliseFirstLetter() + ".";
                 task_entries.listAppend(ChecklistEntryMake("__effect Human-Human Hybrid", "campground.php?action=workshed", ChecklistSubentryMake("Make gene tonic for " + syringe_phylum, "", description), -11));
@@ -539,7 +539,7 @@ void SDNAGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
                 }
             }
             
-            if (suggestion_reason.length() > 0)
+            if (suggestion_reason != "")
             {
                 if (relevant_effect_description.length() == 0)
                     relevant_effect_description = __dna_phylum_to_description[p];

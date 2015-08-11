@@ -1,8 +1,6 @@
 
 void QWhiteCitadelInit()
 {
-    if (!__misc_state["In aftercore"]) //not yet
-        return;
     QuestState state;
     QuestStateParseMafiaQuestProperty(state, "questG02Whitecastle");
     
@@ -14,7 +12,7 @@ void QWhiteCitadelInit()
     
     if ($item[White Citadel Satisfaction Satchel].available_amount() > 0 && state.mafia_internal_step < 11)
         QuestStateParseMafiaQuestPropertyValue(state, "step10");
-    if (lookupEffect("SOME PIGS").have_effect() == 2147483647 && state.mafia_internal_step < 7)
+    if ($effect[SOME PIGS].have_effect() == 2147483647 && state.mafia_internal_step < 7)
         QuestStateParseMafiaQuestPropertyValue(state, "step6");
     
     __quest_state["White Citadel"] = state;
@@ -24,6 +22,8 @@ void QWhiteCitadelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 {
     if (!mafiaIsPastRevision(14794))
         return;
+    if (!__misc_state["In aftercore"]) //not yet
+        return;
     if (!__misc_state["guild open"]) //bugged
         return;
 	QuestState base_quest_state = __quest_state["White Citadel"];
@@ -32,7 +32,7 @@ void QWhiteCitadelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
     
     boolean using_black_cat_equivalent = ($familiars[O.A.F.,black cat] contains my_familiar());
     
-    if (__misc_state["In run"] && lookupLocation("The Road to the White Citadel").turnsAttemptedInLocation() == 0 && !using_black_cat_equivalent) //not until they're sure
+    if (__misc_state["In run"] && $location[The Road to the White Citadel].turnsAttemptedInLocation() == 0 && !using_black_cat_equivalent) //not until they're sure
         return;
     
     boolean add_as_future_task = false;
@@ -64,12 +64,9 @@ void QWhiteCitadelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
         
         subentry.entries.listAppend("Adventure on the Road to White Citadel, defeat " + int_to_wordy(burnouts_remaining) + " more burn-outs.");
         
-        item opium_grenade = lookupItem("opium grenade");
+        item opium_grenade = $item[opium grenade];
         
-        if (opium_grenade == $item[none])
-        {
-        }
-        else if (opium_grenade.storage_amount() > 1 && pulls_remaining() == -1)
+        if (opium_grenade.storage_amount() > 1 && pulls_remaining() == -1)
             subentry.entries.listAppend("Pull some opium grenades from hagnk's.");
         else if (opium_grenade.storage_amount() > 0 && pulls_remaining() == -1)
             subentry.entries.listAppend("Pull an opium grenade from hagnk's.");
@@ -78,7 +75,7 @@ void QWhiteCitadelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
         else if (opium_grenade.available_amount() > 1)
             subentry.entries.listAppend("Throw opium grenades at burnouts.");
         
-        if (lookupItem("poppy").available_amount() >= 2)
+        if ($item[poppy].available_amount() >= 2)
         {
             string line = "Make opium grenade. (meatpaste poppy + poppy)";
             if (opium_grenade.available_amount() == 0)
@@ -87,10 +84,10 @@ void QWhiteCitadelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
         }
         
         //turn estimation why not?
-        float grenades_have_now = opium_grenade.available_amount().to_float() + lookupItem("poppy").available_amount().to_float() * 0.5;
+        float grenades_have_now = opium_grenade.available_amount().to_float() + $item[poppy].available_amount().to_float() * 0.5;
         
-        float poppy_one_drop_rate = clampNormalf(0.3 * (1.0 + lookupLocation("the road to the white citadel").item_drop_modifier_for_location() / 100.0));
-        float poppy_two_drop_rate = clampNormalf(0.1 * (1.0 + lookupLocation("the road to the white citadel").item_drop_modifier_for_location() / 100.0));
+        float poppy_one_drop_rate = clampNormalf(0.3 * (1.0 + $location[the road to the white citadel].item_drop_modifier_for_location() / 100.0));
+        float poppy_two_drop_rate = clampNormalf(0.1 * (1.0 + $location[the road to the white citadel].item_drop_modifier_for_location() / 100.0));
         if (using_black_cat_equivalent)
         {
             //strangely, there's no public listing of the batting away rates of these familiars
@@ -102,7 +99,7 @@ void QWhiteCitadelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
         
         if (my_path_id() == PATH_HEAVY_RAINS)
         {
-            float washaway_rate = lookupLocation("The Road to the White Citadel").washaway_rate_of_location();
+            float washaway_rate = $location[The Road to the White Citadel].washaway_rate_of_location();
             
             poppy_one_drop_rate *= (1.0 - washaway_rate);
             poppy_two_drop_rate *= (1.0 - washaway_rate);
@@ -192,7 +189,7 @@ void QWhiteCitadelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
     
     boolean [location] relevant_locations;
     relevant_locations[$location[whitey's grove]] = true;
-    relevant_locations[lookupLocation("the road to the white citadel")] = true;
+    relevant_locations[$location[the road to the white citadel]] = true;
     
     string image_name = base_quest_state.image_name;
     if (my_familiar() == $familiar[black cat])

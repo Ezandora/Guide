@@ -225,9 +225,9 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
             details.listAppend("Potentially use stone wool and visit the hidden temple to extend Sinuses for Miles for 3 turns.");
         
         
-        if (my_path_id() == PATH_HEAVY_RAINS && lookupSkill("Make it Rain").skill_is_usable() && turn_range.y > 1)
+        if (my_path_id() == PATH_HEAVY_RAINS && $skill[Make it Rain].skill_is_usable() && turn_range.y > 1)
             details.listAppend("Cast Make it Rain each fight. (+300%? meat)");
-        if (lookupItem("Sneaky Pete's leather jacket (collar popped)").equipped_amount() > 0 && turn_range.y > 1)
+        if ($item[Sneaky Pete's leather jacket (collar popped)].equipped_amount() > 0 && turn_range.y > 1)
             details.listAppend("Could unpop your collar. (+20% meat)");
 	
         if (__misc_state_int["pulls available"] > 0 && meat_drop_modifier() < 1000.0)
@@ -460,7 +460,7 @@ void QLevel12GenerateBattlefieldDescription(ChecklistSubentry subentry, string s
     if (side == "frat boy")
         outfit_name = "Frat Warrior Fatigues";
     
-    if (outfit_name.length() > 0)
+    if (outfit_name != "")
     {
         item [int] missing_outfit_components = missing_outfit_components(outfit_name);
         if (missing_outfit_components.count() > 0)
@@ -588,7 +588,7 @@ void QLevel12GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             //need 70 moxie, 70 myst
             
         }
-        if (lookupItem("talisman o' nam").available_amount() == 0 && !__quest_state["Level 11 Palindome"].finished)
+        if ($item[talisman o' namsilat].available_amount() == 0 && !__quest_state["Level 11 Palindome"].finished)
         {
             subentry.entries.listAppend("May want to " + HTMLGenerateSpanFont("acquire the Talisman o' Nam", "red") + " first.");
         }

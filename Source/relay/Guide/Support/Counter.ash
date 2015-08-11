@@ -155,7 +155,7 @@ buffer CounterDescription(Counter c)
     description.append(c.name);
     if (!c.CounterExists())
         description.append(" (invalid)");
-    if (c.location_id.length() > 0)
+    if (c.location_id != "")
     {
         description.append(" (location ");
         description.append(c.location_id);

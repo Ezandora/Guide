@@ -124,17 +124,17 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
                 line += "equip a dark porquoise ring to use less crayon shavings.";
                 description.listAppend(line);
             }
-            if (lookupEffect("Ruthlessly Efficient").have_effect() == 0)
+            if ($effect[Ruthlessly Efficient].have_effect() == 0)
             {
-                if (lookupSkill("Ruthless Efficiency").have_skill())
+                if ($skill[Ruthless Efficiency].have_skill())
                 {
                     description.listAppend("Possibly cast Ruthless Efficiency to delevel faster.");
                 }
-                else if (lookupItem("Crimbot ROM: Ruthless Efficiency (dirty)").available_amount() > 0)
+                else if ($item[Crimbot ROM: Ruthless Efficiency (dirty)].available_amount() > 0)
                 {
                     description.listAppend("Possibly use Crimbot ROM: Ruthless Efficiency (dirty) and cast it to delevel faster.");
                 }
-                else if (lookupItem("Crimbot ROM: Ruthless Efficiency").available_amount() > 0)
+                else if ($item[Crimbot ROM: Ruthless Efficiency].available_amount() > 0)
                 {
                     description.listAppend("Possibly use Crimbot ROM: Ruthless Efficiency and cast it to delevel faster.");
                 }
@@ -154,7 +154,7 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
                 string shrap_suggestion = "Shrap is nice for this.";
                 if (!$skill[shrap].skill_is_usable())
                 {
-                    if (lookupItem("warbear metalworking primer (used)").available_amount() > 0)
+                    if ($item[warbear metalworking primer (used)].available_amount() > 0)
                     {
                         shrap_suggestion += " (use your used copy of warbear metalworking primer)";
                     }
@@ -431,10 +431,10 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 				if ($item[sea cowbell].item_amount() <3 )
                 {
                     int needed_amount = MAX(3 - $item[sea cowbell].item_amount(), 0);
-                    if (line.length() > 0) line += " ";
+                    if (line != "") line += " ";
 					line += "Buy " + pluraliseWordy(needed_amount, "sea cowbell", "sea cowbells") + ".";
                 }
-                if (line.length() > 0)
+                if (line != "")
                     subentry.entries.listAppend(line);
             }
             location class_grandpa_location;

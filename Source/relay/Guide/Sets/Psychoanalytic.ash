@@ -350,7 +350,7 @@ void SPCrackpotGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             description.listAppend("Need 100 total MP to pass first test.");
         if (my_mp() < 1000 && need_byte_sword)
             description.listAppend("Need 1000 total MP for the first flickering pixel.");
-        int total_elemental_damage = numeric_modifier("cold damage") + numeric_modifier("hot damage") + numeric_modifier("sleaze damage") + numeric_modifier("spooky damage") + numeric_modifier("stench damage");
+        //int total_elemental_damage = numeric_modifier("cold damage") + numeric_modifier("hot damage") + numeric_modifier("sleaze damage") + numeric_modifier("spooky damage") + numeric_modifier("stench damage");
         
         //FIXME I am not sure if this is correct. How exactly does this test work?
         string [int] missing_second_test;
@@ -361,8 +361,8 @@ void SPCrackpotGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             int damage = numeric_modifier(e + " damage").floor();
             if (damage < 50)
                 missing_second_test.listAppend(HTMLGenerateSpanOfClass((50 - damage) + " more " + e, element_html_id));
-            if (damage < 100)
-                missing_second_pixel_test.listAppend(HTMLGenerateSpanOfClass((100 - damage) + " more " + e, element_html_id));
+            if (damage < 60)
+                missing_second_pixel_test.listAppend(HTMLGenerateSpanOfClass((60 - damage) + " more " + e, element_html_id));
             
         }
         if (missing_second_test.count() > 0)
@@ -384,7 +384,6 @@ void SPCrackpotGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     
     if (__misc_state["In run"])
         description.listAppend("(this isn't ascension relevant after you've gotten a digital key)");
-    
         
 	optional_task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake("The Crackpot Mystic's Psychoses", modifiers, description),$locations[anger man's level, fear man's level, doubt man's level, regret man's level]));
 }

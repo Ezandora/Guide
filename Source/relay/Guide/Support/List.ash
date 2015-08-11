@@ -24,6 +24,16 @@ void listAppendList(string [int] list, string [int] entries)
 		list.listAppend(entries[key]);
 }
 
+string [int] listUnion(string [int] list, string [int] list2)
+{
+    string [int] result;
+    foreach key, s in list
+        result.listAppend(s);
+    foreach key, s in list2
+        result.listAppend(s);
+    return result;
+}
+
 void listAppendList(boolean [item] destination, boolean [item] source)
 {
     foreach it, value in source
@@ -468,24 +478,24 @@ string listJoinComponents(string [int] list, string joining_string, string and_s
 	buffer result;
 	boolean first = true;
 	int number_seen = 0;
-	foreach i in list
+	foreach i, value in list
 	{
 		if (first)
 		{
-			result.append(list[i]);
+			result.append(value);
 			first = false;
 		}
 		else
 		{
-			if (!(list.count() == 2 && and_string.length() > 0))
+			if (!(list.count() == 2 && and_string != ""))
 				result.append(joining_string);
-			if (and_string.length() > 0 && number_seen == list.count() - 1)
+			if (and_string != "" && number_seen == list.count() - 1)
 			{
 				result.append(" ");
 				result.append(and_string);
 				result.append(" ");
 			}
-			result.append(list[i]);
+			result.append(value);
 		}
 		number_seen = number_seen + 1;
 	}
@@ -652,6 +662,14 @@ skill [int] listCopy(skill [int] l)
     return result;
 }
 
+boolean [monster] listCopy(boolean [monster] l)
+{
+    boolean [monster] result;
+    foreach key in l
+        result[key] = l[key];
+    return result;
+}
+
 //Strict, in this case, means the keys start at 0, and go up by one per entry. This allows easy consistent access
 boolean listKeysMeetStrictRequirements(string [int] list)
 {
@@ -719,7 +737,7 @@ string [string] mapCopy(string [string] map)
     return result;
 }
 
-boolean [string] listGeneratePresenceMap(string [int] list)
+boolean [string] listInvert(string [int] list)
 {
 	boolean [string] result;
 	foreach key in list
@@ -729,9 +747,19 @@ boolean [string] listGeneratePresenceMap(string [int] list)
 	return result;
 }
 
-boolean [location] listGeneratePresenceMap(location [int] list)
+boolean [location] listInvert(location [int] list)
 {
 	boolean [location] result;
+	foreach key in list
+	{
+		result[list[key]] = true;
+	}
+	return result;
+}
+
+boolean [item] listInvert(item [int] list)
+{
+	boolean [item] result;
 	foreach key in list
 	{
 		result[list[key]] = true;

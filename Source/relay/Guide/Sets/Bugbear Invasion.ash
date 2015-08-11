@@ -118,12 +118,12 @@ void SBugbearInvasionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistE
             boolean [location] unavailable_locations_to_show = $locations[The Sleazy Back Alley,The Spooky Forest,cobb's knob Laboratory,The Defiled Nook,Lair of the Ninja Snowmen,The Penultimate Fantasy Airship,The Haunted Gallery,The Battlefield (Frat Uniform)];
             
             boolean [location] relevant_locations = $locations[The Sleazy Back Alley,The Spooky Forest,The Bat Hole Entrance,The Batrat and Ratbat Burrow,Guano Junction,The Beanbat Chamber,cobb's knob Laboratory,Lair of the Ninja Snowmen,The Penultimate Fantasy Airship,The Haunted Gallery,The Battlefield (Frat Uniform),The Orcish Frat House (Bombed Back to the Stone Age),The Hippy Camp (Bombed Back to the Stone Age)].makeConstantLocationArrayMutable();  //FIXME the battlefield (hippy uniform)?
-            relevant_locations[lookupLocation("the very unquiet garves")] = true;
+            relevant_locations[$location[the very unquiet garves]] = true;
             
             if (defiled_nook_open)
                 relevant_locations[$location[the defiled nook]] = true;
             else
-                relevant_locations[lookupLocation("The VERY Unquiet Garves")] = true;
+                relevant_locations[$location[The VERY Unquiet Garves]] = true;
             
             //FIXME always URL in areas we have olfacted...?
             foreach l in relevant_locations
@@ -213,7 +213,7 @@ void SBugbearInvasionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistE
         if (defiled_nook_open)
             locations_relevant_to_acquire_biodata[$location[Morgue]].listAppend($location[the defiled nook]);
         else
-            locations_relevant_to_acquire_biodata[$location[Morgue]].listAppend(lookupLocation("The VERY Unquiet Garves"));
+            locations_relevant_to_acquire_biodata[$location[Morgue]].listAppend($location[The VERY Unquiet Garves]);
         
         string url = "";
         boolean do_not_override_url = false;
@@ -238,7 +238,7 @@ void SBugbearInvasionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistE
                 relevant_locations[l2] = true;
                 
                 string this_url = l2.getClickableURLForLocation();
-                if (this_url.length() > 0 && !do_not_override_url && l2.locationAvailable())
+                if (this_url != "" && !do_not_override_url && l2.locationAvailable())
                     url = this_url;
                 if ($effect[on the trail].have_effect() > 0 && get_property_monster("olfactedMonster") == bugbears_to_hunt_for_location[l])
                 {
@@ -307,7 +307,7 @@ void SBugbearInvasionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistE
                 
             if (mothership_progress < minimum_mothership_progress_for_area[l])
                 continue;
-            if (entry.image_lookup_name == "bugbear" && image_name_for_location[l].length() > 0)
+            if (entry.image_lookup_name == "bugbear" && image_name_for_location[l] != "")
                 entry.image_lookup_name = image_name_for_location[l];
                 
             string [int] modifiers;
@@ -419,7 +419,7 @@ void SBugbearInvasionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistE
                     else if ($item[soft green echo eyedrop antidote].available_amount() > 0)
                         method_to_remove = "soft green echo eyedrop antidote. (probably not worth it)";
                     
-                    if (method_to_remove.length() > 0)
+                    if (method_to_remove != "")
                         description.listAppend("Remove N-Spatial vision with " + method_to_remove);
                     else
                         description.listAppend("Avoid adventuring here until N-Spatial vision is gone.");

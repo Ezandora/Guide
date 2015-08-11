@@ -1,6 +1,6 @@
 void SMiscItemsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-    if (lookupItem("the crown of ed the undying").equipped_amount() > 0 && mafiaIsPastRevision(15561) && get_property("edPiece").length() == 0)
+    if ($item[the crown of ed the undying].equipped_amount() > 0 && mafiaIsPastRevision(15561) && get_property("edPiece").length() == 0)
     {
         string [int] description;
         
@@ -17,6 +17,78 @@ void SMiscItemsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         description.listAppend("Mouse - +10% item, +20% meat");
         description.listAppend("Weasel - survive first hit, regenerate HP");
         optional_task_entries.listAppend(ChecklistEntryMake("__item the crown of ed the undying", "inventory.php?action=activateedhat", ChecklistSubentryMake("Configure the Crown of Ed the Undying", "", description), 5));
+    }
+    
+    if (__misc_state["In run"])
+    {
+        //Suggest acquiring a stasis source:
+        //If you're not in ronin, you should acquire a source from hangk's.
+        //If you are: suckerpunch as DB -> dictionary -> facsimile dictionary -> seal tooth
+        
+        boolean currently_have_source = false;
+        if (my_class() == $class[disco bandit])
+            currently_have_source = true;
+        else if ($items[dictionary,facsimile dictionary,seal tooth].item_amount() > 0)
+            currently_have_source = true;
+        
+        boolean have_reason = false;
+        //Try not to annoy anyone that doesn't currently have a reason to stasis:
+        if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING) //to always trigger the underworld
+            have_reason = true;
+        if ($effect[everything looks yellow].have_effect() == 0 && $familiar[he-boulder].familiar_is_usable()) //to reach the correct eye
+            have_reason = true;
+        if ($familiars[stocking mimic,cocoabo,star starfish,Animated Macaroni Duck,Midget Clownfish,Rock Lobster,Snow Angel,Twitching Space Critter,slimeling] contains my_familiar()) //MP delaying. grill intentionally left off, because it doesn't act as often in later rounds(?)
+            have_reason = true;
+        if (__quest_state["Level 12"].state_boolean["War started"] && __quest_state["Level 12"].in_progress && !__quest_state["Level 12"].state_boolean["Junkyard Finished"])
+            have_reason = true;
+        
+        if (!currently_have_source && have_reason)
+        {
+            boolean try_for_seal_tooth = false;
+            if (!can_interact())
+            {
+                item pull_item = $item[none];
+                foreach it in $items[dictionary,facsimile dictionary,seal tooth]
+                {
+                    if (it.available_amount() > 0)
+                    {
+                        pull_item = it;
+                        break;
+                    }
+                }
+                if (pull_item != $item[none])
+                {
+                    string [int] description;
+                    description.listAppend("Useful for delaying in-fight.");
+                    optional_task_entries.listAppend(ChecklistEntryMake("__item " + pull_item, "storage.php?which=3", ChecklistSubentryMake("Pull a " + pull_item, "", description), 5));
+                }
+                else
+                    try_for_seal_tooth = true;
+            }
+            else
+            {
+                try_for_seal_tooth = true;
+            }
+            
+            if (try_for_seal_tooth)
+            {
+                string url = "";
+                string [int] description;
+                if ($items[worthless trinket,worthless gewgaw,worthless knick-knack].available_amount() == 0)
+                {
+                    url = "shop.php?whichshop=generalstore";
+                    description.listAppend("Use chewing gum on a string.");
+                }
+                else
+                {
+                    url = "hermit.php";
+                    description.listAppend("From the hermit.");
+                }
+                
+                description.listAppend("Useful for delaying in-fight.");
+                optional_task_entries.listAppend(ChecklistEntryMake("__item seal tooth", url, ChecklistSubentryMake("Acquire a seal tooth", "", description), 5));
+            }
+        }
     }
 }
 
@@ -350,7 +422,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
 		boolean have_all_gum = $item[pack of chewing gum].available_amount() > 0 || ($item[jaba&ntilde;ero-flavored chewing gum].available_amount() > 0 && $item[lime-and-chile-flavored chewing gum].available_amount() > 0 && $item[pickle-flavored chewing gum].available_amount() > 0 && $item[tamarind-flavored chewing gum].available_amount() > 0);
 		if (__quest_state["Level 4"].state_int["areas unlocked"] + $item[sonar-in-a-biscuit].available_amount() < 2)
 			subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("2 sonar-in-a-biscuit (Guano Junction)", $location[guano junction]));
-		if (!__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && !(get_property_boolean("lovebugsUnlocked") && lookupItem("bottle of lovebug pheromones").is_unrestricted())) //taking a gamble here - I'm assuming you'd never clover for ultrahydrated if you have lovebugs. even if you run out of ultrahydrated, you'll likely get it again in a hurry
+		if (!__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && !(get_property_boolean("lovebugsUnlocked") && $item[bottle of lovebug pheromones].is_unrestricted())) //taking a gamble here - I'm assuming you'd never clover for ultrahydrated if you have lovebugs. even if you run out of ultrahydrated, you'll likely get it again in a hurry
         {
 			subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Ultrahydrated (Oasis)", $location[the oasis]));
         }
@@ -402,9 +474,9 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
 			quest_needed = 0;
 		
 		if (quest_needed > 0)
-			description.listAppend(quest_needed + " to unlock hidden city");
+			description.listAppend(quest_needed + " to unlock hidden city.");
 		if (__misc_state["need to level"])
-			description.listAppend("Cave bar");
+			description.listAppend("Cave bar.");
 		if (get_property_int("lastTempleAdventures") != my_ascensions() && my_path_id() != PATH_SLOW_AND_STEADY)
         {
             string line = "+3 adventures, +3 duration to ten effects. (once/ascension)";
@@ -462,7 +534,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
     {
         resource_entries.listAppend(ChecklistEntryMake("__item jackass plumber home game", "place.php?whichplace=arcade", ChecklistSubentryMake("Broken arcade game", "", "May find a defective game grid token."), importance_level_item));
     }
-    if (lookupItem("picky tweezers").available_amount() > 0 && !get_property_boolean("_pickyTweezersUsed"))
+    if ($item[picky tweezers].available_amount() > 0 && !get_property_boolean("_pickyTweezersUsed"))
     {
         resource_entries.listAppend(ChecklistEntryMake("__item picky tweezers", "inventory.php?which=3", ChecklistSubentryMake("Picky tweezers", "", "Acquire a single atom."), importance_level_unimportant_item));
     }
@@ -652,8 +724,8 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         string image_name = "";
         string [int] autosell_list;
         boolean [item] autosellable_items = $items[meat stack, dense meat stack, really dense meat stack, solid gold bowling ball, fancy seashell necklace, commemorative war stein,huge gold coin].makeConstantItemArrayMutable();
-        if (lookupItem("pixel coin") != $item[none])
-            autosellable_items[lookupItem("pixel coin")] = true;
+        if ($item[pixel coin] != $item[none])
+            autosellable_items[$item[pixel coin]] = true;
         foreach it in autosellable_items
         {
             if (it.available_amount() == 0)
@@ -726,9 +798,9 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         description.listAppend("Wear to take you places.");
         description.listAppend("The prince's ball (stepmother) lets you find odd silver coins.|Up to six, one adventure each.");
         //description.listAppend("Rumpelstiltskin's for towerkilling with small golem.|Small golem is a 5k/round combat item.|Involves the semi-rare in village. Don't know the details, sorry."); //only somewhat relevant in obscure edge cases
-        if (lookupEffect("Human-Fish Hybrid").have_effect() == 0 && get_campground()[$item[Little Geneticist DNA-Splicing Lab]] > 0 && !__misc_state["familiars temporarily blocked"])
+        if ($effect[Human-Fish Hybrid].have_effect() == 0 && get_campground()[$item[Little Geneticist DNA-Splicing Lab]] > 0 && !__misc_state["familiars temporarily blocked"])
             description.listAppend("Candy witch for human-fish hybrid. (+10 familiar weight)");
-        if (get_property("grimstoneMaskPath").length() > 0)
+        if (get_property("grimstoneMaskPath") != "")
             description.listAppend("Currently on the path of " + get_property("grimstoneMaskPath") + ".");
         
         resource_entries.listAppend(ChecklistEntryMake("__item " + grimstone_mask, "inventory.php?which=3", ChecklistSubentryMake(grimstone_mask.pluralise(), "", description), importance_level_item));

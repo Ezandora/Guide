@@ -4,7 +4,7 @@ void SMayoClinicGenerateResource(ChecklistEntry [int] resource_entries)
         return;
     if (__misc_state["campground unavailable"])
         return;
-    if (get_campground()[lookupItem("portable Mayo Clinic")] == 0)
+    if (get_campground()[$item[portable Mayo Clinic]] == 0)
         return;
     
     //mayoLevel

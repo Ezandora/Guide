@@ -29,7 +29,7 @@ void SSpeakeasyGenerateResource(ChecklistEntry [int] resource_entries)
     //FIXME every drink
     //FIXME gray out drinks we can't drink at the moment (drunkenness, meat)
     
-    if (lookupEffect("Hip to the Jive").have_effect() == 0 && !__misc_state["familiars temporarily blocked"] && __misc_state["In run"])
+    if ($effect[Hip to the Jive].have_effect() == 0 && !__misc_state["familiars temporarily blocked"] && __misc_state["In run"])
     {
         string [int] description;
         description.listAppend("+10 familiar weight");
@@ -38,7 +38,7 @@ void SSpeakeasyGenerateResource(ChecklistEntry [int] resource_entries)
         options.listAppend(listMake("Hot Socks", "3", description.listJoinComponents("|")));
     }
     
-    if (!__misc_state["In run"] && !lookupSkill("Hollow Leg").skill_is_usable())
+    if (!__misc_state["In run"] && !$skill[Hollow Leg].skill_is_usable())
         options.listAppend(listMake("Sloppy Jalopy", "5", "+1 liver capacity skill|Very expensive"));
     
     
@@ -81,7 +81,7 @@ void SSpeakeasyGenerateResource(ChecklistEntry [int] resource_entries)
         {
             drink_name = "Thermos of \"whiskey\"";
         }
-        if (drink_name.length() > 0)
+        if (drink_name != "")
         {
             float mainstat_gain = 87.5 * (1.0 + numeric_modifier(my_primestat().to_string() + " Experience Percent") / 100.0);
             string description = mainstat_gain.roundForOutput(0) + " mainstat";

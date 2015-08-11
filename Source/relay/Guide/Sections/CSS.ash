@@ -26,6 +26,7 @@ void setUpCSSStyles()
     PageAddCSSClass("body", "", "font-size:12px;", -11, __setting_media_query_tiny_size);
     
     
+	PageAddCSSClass("", "r_clickable", "cursor:pointer;cursor:hand;");
 	PageAddCSSClass("", "r_future_option", "color:" + __setting_unavailable_colour + ";");
 	
     PageAddCSSClass("a", "r_cl_internal_anchor", "position:absolute;z-index:2;padding-top:" + __setting_navbar_height + ";display:inline-block;");

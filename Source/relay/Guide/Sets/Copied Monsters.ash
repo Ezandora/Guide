@@ -113,7 +113,7 @@ void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [in
     }
     else if (monster_name == "Writing Desk")
     {
-        if (lookupItem("telegram from Lady Spookyraven").available_amount() > 0)
+        if ($item[telegram from Lady Spookyraven].available_amount() > 0)
             description.listAppend(HTMLGenerateSpanFont("Read the telegram from Lady Spookyraven first.", "red"));
         int desks_remaining = clampi(5 - get_property_int("writingDesksDefeated"), 0, 5);
         if (desks_remaining > 0 && get_property_int("lastSecondFloorUnlock") != my_ascensions() && $item[Lady Spookyraven's necklace].available_amount() == 0 && get_property("questM20Necklace") != "finished" && mafiaIsPastRevision(15244))
@@ -255,7 +255,7 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
             potential_copies.listAppend("Modern zmobies.");
         if (!__quest_state["Level 8"].state_boolean["Mountain climbed"] && $items[ninja rope,ninja carabiner,ninja crampons].available_amount() == 0 && !have_outfit_components("eXtreme Cold-Weather Gear"))
             potential_copies.listAppend("Ninja assassin.");
-        if (!__quest_state["Level 11"].finished && !__quest_state["Level 11 Palindome"].finished && lookupItem("talisman o' nam").available_amount() == 0 && $items[gaudy key,snakehead charrrm].available_amount() < 2)
+        if (!__quest_state["Level 11"].finished && !__quest_state["Level 11 Palindome"].finished && $item[talisman o' namsilat].available_amount() == 0 && $items[gaudy key,snakehead charrrm].available_amount() < 2)
             potential_copies.listAppend("Gaudy pirate - copy once for extra key.");
         //√baa'baa. astronomer? √nuns trick brigand
         //FIXME astronomer when we can calculate that
@@ -291,7 +291,7 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
     {
 		resource_entries.listAppend(ChecklistEntryMake("__item 4-d camera", "", ChecklistSubentryMake("4-d camera copy available", "", potential_copies)));
     }
-    if (!get_property_boolean("_iceSculptureUsed") && lookupItem("unfinished ice sculpture").available_amount() > 0)
+    if (!get_property_boolean("_iceSculptureUsed") && $item[unfinished ice sculpture].available_amount() > 0)
     {
 		resource_entries.listAppend(ChecklistEntryMake("__item unfinished ice sculpture", "", ChecklistSubentryMake("Ice sculpture copy available", "", potential_copies)));
     }
@@ -325,7 +325,7 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
             else
                 line += "Other options:";
             
-            if (lookupItem("alpine watercolor set").available_amount() == 0)
+            if ($item[alpine watercolor set].available_amount() == 0)
             {
                 //url = "shop.php?whichshop=chateau";
                 line += " (buy alpine watercolor set first)";
@@ -364,7 +364,7 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
 	if (!get_property_boolean("_envyfishEggUsed"))
 		SCopiedMonstersGenerateResourceForCopyType(resource_entries, $item[envyfish egg], "envyfish egg", "envyfishMonster");
 	if (!get_property_boolean("_iceSculptureUsed"))
-		SCopiedMonstersGenerateResourceForCopyType(resource_entries, lookupItem("ice sculpture"), "ice sculpture", "iceSculptureMonster");
+		SCopiedMonstersGenerateResourceForCopyType(resource_entries, $item[ice sculpture], "ice sculpture", "iceSculptureMonster");
         
 	//if (__misc_state["Chateau Mantegna available"] && !get_property_boolean("_chateauMonsterFought") && mafiaIsPastRevision(15115))
 		//SCopiedMonstersGenerateResourceForCopyType(resource_entries, $item[none], "chateau painting", "chateauMonster");

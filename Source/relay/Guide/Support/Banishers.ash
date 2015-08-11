@@ -53,12 +53,21 @@ static
     __banish_source_length["curse of vacation"] = -1;
 }
 
+Banish [int] __banishes_active_cache;
+string __banishes_active_cache_cached_monsters_string;
+
 Banish [int] BanishesActive()
 {
     //banishedMonsters(user, now 'a.m.c. gremlin:ice house:2890', default )
-    Banish [int] result;
     
     string banished_monsters_string = get_property("banishedMonsters");
+    
+    if (banished_monsters_string == __banishes_active_cache_cached_monsters_string && __banishes_active_cache_cached_monsters_string != "")
+        return __banishes_active_cache;
+    
+    __banishes_active_cache_cached_monsters_string = ""; //invalidate the cache
+    
+    Banish [int] result;
     
     string [int] banished_monsters_string_split = banished_monsters_string.split_string(":");
 
@@ -85,8 +94,11 @@ Banish [int] BanishesActive()
         if (b.banish_source == "batter up!" || b.banish_source == "deathchucks" || b.banish_source == "dirty stinkbomb" || b.banish_source == "nanorhino" || b.banish_source == "spooky music box mechanism")
             b.custom_reset_conditions = "rollover";
         result.listAppend(b);
-        
     }
+    
+    __banishes_active_cache_cached_monsters_string = banished_monsters_string;
+    __banishes_active_cache = result;
+    
     return result;
 }
 

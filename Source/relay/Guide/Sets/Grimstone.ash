@@ -6,7 +6,7 @@ void SGrimstoneHareGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
     modifiers.listAppend("mysticality");
     modifiers.listAppend("spell damage percent");
     modifiers.listAppend("spell critical percent");
-    int time_remaining = lookupEffect("hare-brained").have_effect();
+    int time_remaining = $effect[hare-brained].have_effect();
     
     //FIXME deal with coldform / hotform / etc
     
@@ -25,7 +25,7 @@ void SGrimstoneHareGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
     elemental_descriptions["sleaze"] = HTMLGenerateSpanOfClass("sleaze", "r_element_sleaze");
     
     
-    boolean have_shrap = lookupSkill("shrap").skill_is_usable();
+    boolean have_shrap = $skill[shrap].skill_is_usable();
     
     if (have_shrap && $effect[hotform].have_effect() > 0)
         elemental_descriptions["hot"] = "Shrap (" + elemental_descriptions["hot"] + ")";
@@ -69,15 +69,15 @@ void SGrimstoneHareGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
     
     
     string [int][int] vehicle_descriptions;
-    if (!lookupMonster("Fire truck").is_banished())
+    if (!$monster[Fire truck].is_banished())
         vehicle_descriptions.listAppend(listMake("Fire truck", elemental_descriptions["hot"]));
-    if (!lookupMonster("ice cream truck").is_banished())
+    if (!$monster[ice cream truck].is_banished())
         vehicle_descriptions.listAppend(listMake("ice cream truck", elemental_descriptions["cold"]));
-    if (!lookupMonster("monster hearse").is_banished())
+    if (!$monster[monster hearse].is_banished())
         vehicle_descriptions.listAppend(listMake("monster hearse", elemental_descriptions["spooky"]));
-    if (!lookupMonster("sewer tanker").is_banished())
+    if (!$monster[sewer tanker].is_banished())
         vehicle_descriptions.listAppend(listMake("sewer tanker", elemental_descriptions["stench"]));
-    if (!lookupMonster("sketchy van").is_banished())
+    if (!$monster[sketchy van].is_banished())
         vehicle_descriptions.listAppend(listMake("sketchy van", elemental_descriptions["sleaze"]));
     
     monster last_encounter = get_property_monster("lastEncounter");
@@ -117,7 +117,7 @@ void SGrimstoneHareGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
     
     
     
-    //lookupLocation("A Deserted Stretch of I-911")
+    //$location[A Deserted Stretch of I-911]
 	optional_task_entries.listAppend(ChecklistEntryMake("__effect hare-brained", "place.php?whichplace=ioty2014_hare", ChecklistSubentryMake("Hare Race", modifiers, description)));
 }
 
@@ -270,7 +270,7 @@ void SGrimstoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     
     string mask_path = get_property("grimstoneMaskPath");
     
-    if (lookupEffect("hare-brained").have_effect() > 0)
+    if ($effect[hare-brained].have_effect() > 0)
         SGrimstoneHareGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     if (mask_path == "stepmother")
         SGrimstoneStepmotherGenerateTasks(task_entries, optional_task_entries, future_task_entries);

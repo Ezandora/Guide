@@ -86,10 +86,10 @@ buffer generateLocationBar(boolean displaying_navbar)
                 else if (plant_description == "cold attack")
                     class_name = "r_element_cold_desaturated";
                 
-                if (class_name.length() > 0)
+                if (class_name != "")
                     plant_description = HTMLGenerateSpanOfClass(plant_description, class_name);
                 
-                if (plant_description.length() > 0)
+                if (plant_description != "")
                     plant_data.listAppend(plant_description);
                 else
                     plant_data.listAppend("Unknown");
@@ -370,10 +370,10 @@ buffer generateLocationBar(boolean displaying_navbar)
     }
     if (nc_rate > 0.0 && !(nc_blacklist contains l))
         location_data.listAppend(nc_rate + "% NCs");
-    if (custom_location_information.length() > 0)
+    if (custom_location_information != "")
     {
         location_data.listAppend(custom_location_information);
-        if (custom_location_url.length() > 0)
+        if (custom_location_url != "")
             location_urls[location_data.count() - 1] = custom_location_url;
     }
     
@@ -488,9 +488,9 @@ buffer generateLocationBar(boolean displaying_navbar)
         bar.append(HTMLGenerateTagPrefix("div", outer_containiner_map));
         
         string [string] inner_containiner_map = mapMake("class", "r_bottom_inner_container", "style", "background:white;");
-        if (onmouseenter_code.length() > 0)
+        if (onmouseenter_code != "")
             inner_containiner_map["onmouseenter"] = onmouseenter_code;
-        if (onmouseleave_code.length() > 0)
+        if (onmouseleave_code != "")
             inner_containiner_map["onmouseleave"] = onmouseleave_code;
         bar.append(HTMLGenerateTagPrefix("div", inner_containiner_map));
     }

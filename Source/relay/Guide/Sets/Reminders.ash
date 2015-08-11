@@ -39,7 +39,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         }
         
         boolean [location] ignoring_locations;
-        ignoring_locations[lookupLocation("The Crimbonium Mine")] = true;
+        ignoring_locations[$location[The Crimbonium Mine]] = true;
         
         if (methods.count() > 0 && $effect[thrice-cursed].have_effect() == 0 && !((ignoring_locations contains __last_adventure_location) && __last_adventure_location != $location[none]))
             task_entries.listAppend(ChecklistEntryMake("__effect beaten up", url, ChecklistSubentryMake("Remove beaten up", "", methods), -11));
@@ -142,17 +142,17 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     
     boolean [monster] awkwards;
     awkwards[$monster[dr. awkward]] = true;
-    if (lookupMonster("Dr. Aquard") != $monster[none])
-        awkwards[lookupMonster("Dr. Aquard")] = true;
+    if ($monster[Dr. Aquard] != $monster[none])
+        awkwards[$monster[Dr. Aquard]] = true;
 
-    if ((awkwards contains get_property_monster("lastEncounter")) && $item[mega gem].equipped_amount() > 0 && ($items[staff of fats, Staff of Ed\, almost].available_amount() > 0 || lookupItem("2325").available_amount() > 0))
+    if ((awkwards contains get_property_monster("lastEncounter")) && $item[mega gem].equipped_amount() > 0 && ($items[staff of fats, Staff of Ed\, almost].available_amount() > 0 || $item[2325].available_amount() > 0))
     {
         //Just defeated Dr. Awkward.
         //This will disappear once they adventure somewhere else.
         string [int] description;
         
         description.listAppend("It's not useful now, wear a better accessory?");
-        if (lookupItem("talisman o' nam").equipped_amount() > 0)
+        if ($item[talisman o' namsilat].equipped_amount() > 0)
             description.listAppend("Possibly the talisman as well.");
     
 		task_entries.listAppend(ChecklistEntryMake("__item mega gem", "inventory.php?which=2", ChecklistSubentryMake("Possibly unequip the Mega Gem", "", description), -11));
@@ -191,7 +191,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             if (!can_interact())
             {
                 item_descriptions[$item[old bronzer]] = "+2 moxie stats/fight (25 turns)";
-                item_effects[$item[old bronzer]] = lookupEffect("Sepia Tan");
+                item_effects[$item[old bronzer]] = $effect[Sepia Tan];
             }
         }
 
@@ -208,7 +208,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             if (!can_interact())
             {
                 item_descriptions[$item[old eyebrow pencil]] = "+2 muscle stats/fight (25 turns)";
-                item_effects[$item[old eyebrow pencil]] = lookupEffect("Browbeaten");
+                item_effects[$item[old eyebrow pencil]] = $effect[Browbeaten];
             }
         }
         if (__misc_state["need to level mysticality"])
@@ -224,7 +224,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             if (!can_interact())
             {
                 item_descriptions[$item[old rosewater cream]] = "+2 mysticality stats/fight (25 turns)";
-                item_effects[$item[old rosewater cream]] = lookupEffect("Rosewater Mark");
+                item_effects[$item[old rosewater cream]] = $effect[Rosewater Mark];
             }
         }
         
@@ -260,7 +260,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         }
         
         
-        if (subentry.header.length() > 0)
+        if (subentry.header != "")
             stat_items.subentries.listAppend(subentry);
         if (stat_items.subentries.count() > 0)
         {
@@ -333,7 +333,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             url = "skills.php";
         }
         
-        if (curse_removal_method.length() > 0)
+        if (curse_removal_method != "")
         {
             task_entries.listAppend(ChecklistEntryMake("__effect thrice-cursed", url, ChecklistSubentryMake("Remove Thrice-Cursed", "", curse_removal_method), -11));
         }
@@ -350,7 +350,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             string url = "familiar.php";
             string [int] description;
             description.listAppend("Otherwise it'll (probably) be blocked.");
-            if (lookupItem("miniature life preserver").available_amount() == 0)
+            if ($item[miniature life preserver].available_amount() == 0)
             {
                 description.listAppend("Buy from the general store.");
                 url = "shop.php?whichshop=generalstore";

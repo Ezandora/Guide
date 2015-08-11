@@ -24,7 +24,7 @@ void SActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, Check
     
     if (my_level() >= 13 && QuestState("questL13Final").finished)
     {
-        if (lookupItem("7965").available_amount() > 0 || lookupItem("2334").available_amount() > 0) //holy macguffins
+        if ($item[7965].available_amount() > 0 || $item[2334].available_amount() > 0) //holy macguffins
         {
             string [int] description;
             description.listAppend("Finishes the path.");
@@ -39,13 +39,13 @@ void SActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, Check
             string [int] description;
             string url = "tutorial.php";
             
-            if (!lookupMonster("warehouse janitor").is_banished())
+            if (!$monster[warehouse janitor].is_banished())
                 modifiers.listAppend("banish janitor");
             
             description.listAppend("Adventure in the Secret Government Warehouse, use the items you find.");
             
             int progress_remaining = clampi(40 - get_property_int("warehouseProgress"), 0, 40);
-            if (lookupItem("warehouse inventory page").available_amount() > 0 && lookupItem("warehouse map page").available_amount() > 0)
+            if ($item[warehouse inventory page].available_amount() > 0 && $item[warehouse map page].available_amount() > 0)
             {
                 description.listClear();
                 description.listAppend("Use warehouse inventory page.");
@@ -53,7 +53,7 @@ void SActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, Check
             }
             else if (progress_remaining > 0)
             {
-                if (lookupSkill("Lash of the Cobra").have_skill())
+                if ($skill[Lash of the Cobra].have_skill())
                 {
                     description.listAppend("Use lash of the cobra on the clerk and guard.");
                 }
@@ -63,7 +63,7 @@ void SActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, Check
                 }
             }
             string [int] items_available;
-            foreach it in lookupItems("warehouse inventory page,warehouse map page")
+            foreach it in $items[warehouse inventory page,warehouse map page]
             {
                 if (it.available_amount() > 0)
                     items_available.listAppend(pluraliseWordy(it));
@@ -86,7 +86,7 @@ void SActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, Check
                 
                 int first_value = -1;
                 boolean identical_twins = false;
-                foreach it in lookupItems("warehouse inventory page,warehouse map page")
+                foreach it in $items[warehouse inventory page,warehouse map page]
                 {
                     int pages_remaining = page_pairs_remaining - it.available_amount();
                     if (pages_remaining > 0)
@@ -114,7 +114,7 @@ void SActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, Check
             line += ".";
             description.listAppend(line);
             
-            task_entries.listAppend(ChecklistEntryMake("__item holy macguffin", url, ChecklistSubentryMake("Retrieve the Holy MacGuffin", modifiers, description), lookupLocations("The Secret Council Warehouse")));
+            task_entries.listAppend(ChecklistEntryMake("__item holy macguffin", url, ChecklistSubentryMake("Retrieve the Holy MacGuffin", modifiers, description), $locations[The Secret Council Warehouse]));
         }
     }
 }
@@ -122,7 +122,7 @@ void SActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, Check
 void SActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING) return;
-    item ka = lookupItem("Ka coin");
+    item ka = $item[Ka coin];
     if (ka.available_amount() > 0)
     {
         string [int] description;
@@ -130,18 +130,18 @@ void SActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] resource_entries
         string [int][int] ka_table;
         
         int haunches_edible = clampi(availableSpleen() / 5, 0, 7);
-        if (haunches_edible > lookupItem("mummified beef haunch").available_amount())
+        if (haunches_edible > $item[mummified beef haunch].available_amount())
         {
-            int haunches_want = haunches_edible - lookupItem("mummified beef haunch").available_amount();
+            int haunches_want = haunches_edible - $item[mummified beef haunch].available_amount();
             //15 ka coin
             string name;
             if (haunches_want > 1)
-                name = pluralise(haunches_want, lookupItem("mummified beef haunch"));
+                name = pluralise(haunches_want, $item[mummified beef haunch]);
             else
                 name = "mummified beef haunch";
             ka_table.listAppend(listMake(name, 15, "best spleen consumable"));
         }
-        if (lookupItem("linen bandages").available_amount() == 0 && lookupItem("cotton bandages").available_amount() == 0 && lookupItem("silk bandages").available_amount() == 0)
+        if ($item[linen bandages].available_amount() == 0 && $item[cotton bandages].available_amount() == 0 && $item[silk bandages].available_amount() == 0)
         {
             //linen bandages, 1 ka coin
             ka_table.listAppend(listMake("linen bandages", 1, "when beaten up outside a fight"));
@@ -154,11 +154,11 @@ void SActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] resource_entries
             talismen_of_horus_wanted += 2;
         if (!__quest_state["Level 12"].state_boolean["Lighthouse Finished"] && $item[barrel of gunpowder].available_amount() < 5)
             talismen_of_horus_wanted += 2;
-        if ($item[pirate fledges].available_amount() == 0 && lookupItem("talisman o' nam").available_amount() == 0)
+        if ($item[pirate fledges].available_amount() == 0 && $item[talisman o' namsilat].available_amount() == 0)
             talismen_of_horus_wanted += 2;
         if (talismen_of_horus_wanted == 0) //where else do you need +combat? pirate's cove?
             talismen_of_horus_wanted = 1;
-        if (lookupItem("talisman of Horus").available_amount() < talismen_of_horus_wanted)
+        if ($item[talisman of Horus].available_amount() < talismen_of_horus_wanted)
         {
             ka_table.listAppend(listMake("talisman of Horus", 5, "+combat potion"));
         }
@@ -233,6 +233,11 @@ void SActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] resource_entries
             places_to_farm_ka.listAppend("laboratory on conspiracy island");
             if (url.length() == 0) url = $location[the secret government laboratory].getClickableURLForLocation();
         }
+        if (__misc_state["hot airport available"])
+        {
+            places_to_farm_ka.listAppend("smooch army HQ");
+            if (url.length() == 0) url = lookupLocation("The SMOOCH Army HQ").getClickableURLForLocation();
+        }
         if (__misc_state["mysterious island available"] && !__quest_state["Level 12"].in_progress && my_level() < 9) //we test if we're under level 9 and the level 12 quest isn't in progress. maybe they ate a lot of hot dogs. it could happen!
         {
             places_to_farm_ka.listAppend("hippy camp");
@@ -251,9 +256,9 @@ void SActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] resource_entries
         string image_name = "";
         string [item] path_relevant_items;
         
-        path_relevant_items[lookupItem("talisman of Renenutet")] = "+lots% item in a single combat";
-        path_relevant_items[lookupItem("talisman of Horus")] = "+lots% combat potion";
-        path_relevant_items[lookupItem("ancient cure-all")] = "SGEEA-equivalent?";
+        path_relevant_items[$item[talisman of Renenutet]] = "+lots% item in a single combat";
+        path_relevant_items[$item[talisman of Horus]] = "+lots% combat potion";
+        path_relevant_items[$item[ancient cure-all]] = "SGEEA-equivalent?";
         foreach s in $strings[linen bandages,cotton bandages,silk bandages]
         {
             if (lookupItem(s).available_amount() > 0)
@@ -275,7 +280,7 @@ void SActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] resource_entries
             resource_entries.listAppend(ChecklistEntryMake(image_name, "", subentries, 6));
     }
     
-    if (lookupSkill("Lash of the cobra").have_skill() && mafiaIsPastRevision(15553) || true)
+    if ($skill[Lash of the cobra].have_skill() && mafiaIsPastRevision(15553) || true)
     {
         int lashes_remaining = 30 - get_property_int("_edLashCount");
         if (lashes_remaining > 0)

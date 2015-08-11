@@ -125,7 +125,7 @@ Vec2f skillExpectedDamageRange(monster m, skill s)
     
     int monster_group_size = 1;
     //FIXME add a bunch of these, or feature request to mafia:
-    if (m == lookupMonster("wall of bones"))
+    if (m == $monster[wall of bones])
         monster_group_size = 100; //FIXME spade
     
     element [int] active_lanterns;
@@ -136,7 +136,7 @@ Vec2f skillExpectedDamageRange(monster m, skill s)
         active_lanterns.listAppend($element[cold]);
     
     element [int] pastamancer_active_lanterns = active_lanterns.listCopy();
-    if (lookupItem("porcelain porkpie").equipped_amount() > 0) //ONLY for pastamancer spells
+    if ($item[porcelain porkpie].equipped_amount() > 0) //ONLY for pastamancer spells
         pastamancer_active_lanterns.listAppend($element[sleaze]);
     
     

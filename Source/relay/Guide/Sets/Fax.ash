@@ -72,7 +72,7 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
             string fax = "";			
             fax += ChecklistGenerateModifierSpan("+150% item or more");
             fax += "Mining ores. Try to copy a few times.";
-            if (__misc_state_string["obtuse angel name"].length() > 0)
+            if (__misc_state_string["obtuse angel name"] != "")
             {
                 string arrow_text = " (arrow?)";
                 if (get_property_int("_badlyRomanticArrows") > 0)
@@ -131,7 +131,7 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
             }
         }
         
-        if (lookupItem("7301").available_amount() == 0 && get_property("questM20Necklace") != "finished" && lookupItem("Lady Spookyraven's necklace").available_amount() == 0)
+        if (lookupItem("7301").available_amount() == 0 && get_property("questM20Necklace") != "finished" && $item[Lady Spookyraven's necklace].available_amount() == 0)
         {
             int effective_writing_desks_encountering = get_property_int("writingDesksDefeated");
             if (get_property_monster("romanticTarget") == $monster[writing desk])
@@ -140,7 +140,7 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
             {
                 string line = "Writing desk - <strong>only if you can copy it four times</strong>. Skips the manor's first floor if you fight five total.";
                 
-                if (lookupItem("telegram from Lady Spookyraven").available_amount() > 0)
+                if ($item[telegram from Lady Spookyraven].available_amount() > 0)
                     line += HTMLGenerateSpanFont("<br>Read the telegram from Lady Spookyraven first.", "red");
                 potential_faxes.listAppend(line);
             }
@@ -186,7 +186,7 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
                 potential_faxes.listAppend(line);
             }
             //gaudy pirate (use for insults!)
-            if (!__quest_state["Level 11 Palindome"].finished && lookupItem("talisman o' nam").available_amount() == 0 && $items[snakehead charrrm,gaudy key].available_amount() < 2 && $items[Copperhead Charm,Copperhead Charm (rampant)].available_amount() < 2)
+            if (!__quest_state["Level 11 Palindome"].finished && $item[talisman o' namsilat].available_amount() == 0 && $items[snakehead charrrm,gaudy key].available_amount() < 2 && $items[Copperhead Charm,Copperhead Charm (rampant)].available_amount() < 2)
             {
                 string description = "Gaudy pirate - two fights for talisman o' nam. (copy once)";
                 if ($items[snakehead charrrm,gaudy key].available_amount() == 1)
@@ -227,10 +227,10 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
                 potential_faxes.listAppend(description);
             }
             //monstrous boiler
-            if (__quest_state["Level 11 Manor"].mafia_internal_step < 4 && lookupItem("wine bomb").available_amount() == 0)
+            if (__quest_state["Level 11 Manor"].mafia_internal_step < 4 && $item[wine bomb].available_amount() == 0)
             {
                 string description = "Monstrous boiler - charge up unstable fulminate.";
-                if (lookupItem("unstable fulminate").available_amount() == 0)
+                if ($item[unstable fulminate].available_amount() == 0)
                     description = HTMLGenerateSpanFont(description, "gray");
                 potential_faxes.listAppend(description);
             }
@@ -313,7 +313,7 @@ void SFaxGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
     
 	if (__misc_state["fax available"] && $item[photocopied monster].available_amount() == 0)
         optional_task_entries.listAppend(ChecklistEntryMake("fax machine", url, ChecklistSubentryMake("Fax", "", listJoinComponents(SFaxGeneratePotentialFaxes(true), "<hr>"))));
-    if (lookupSkill("Rain Man").skill_is_usable() && my_rain() >= 50)
+    if ($skill[Rain Man].skill_is_usable() && my_rain() >= 50)
     {
         ChecklistEntry entry = ChecklistEntryMake("__skill rain man", "skills.php", ChecklistSubentryMake("Rain man copy", "50 rain drops", listJoinComponents(SFaxGeneratePotentialFaxes(true), "<hr>")));
         

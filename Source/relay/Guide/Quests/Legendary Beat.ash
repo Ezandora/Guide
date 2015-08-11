@@ -9,7 +9,6 @@ void QLegendaryBeatInit()
     
     if (!state.started)
     {
-        requestQuestLogLoad("questI02Beat");
         QuestStateParseMafiaQuestPropertyValue(state, "started");
     }
 	

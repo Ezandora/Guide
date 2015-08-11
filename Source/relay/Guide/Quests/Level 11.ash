@@ -144,7 +144,7 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
                 line += " Parts needed: " + missing_components.listJoinComponents(", ", "and");
             subentry.entries.listAppend(line);
         }
-        if (get_property_int("blackForestProgress") >= 1 && __quest_state["Level 13"].state_boolean["wall of skin will need to be defeated"] && lookupItem("beehive").available_amount() == 0)
+        if (get_property_int("blackForestProgress") >= 1 && __quest_state["Level 13"].state_boolean["wall of skin will need to be defeated"] && $item[beehive].available_amount() == 0)
         {
             subentry.entries.listAppend("Find a beehive for the tower, from the non-combat.|*" + listMake("Head toward the blackberry patch", "Head toward the buzzing sound", "Keep going", "Almost... there...").listJoinComponents(__html_right_arrow_character) + "|*Costs two extra turns. Skip if you're towerkilling.");
         }

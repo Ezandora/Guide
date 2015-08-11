@@ -256,7 +256,7 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             if (__misc_state["Need to level"])
                 subentry.entries.listAppend("Possibly acquire the very overdue library book from a non-combat. (stats)");
             
-            if (lookupItem("electric boning knife").available_amount() == 0 && __quest_state["Level 13"].state_boolean["wall of bones will need to be defeated"] && !lookupSkill("garbage nova").skill_is_usable())
+            if ($item[electric boning knife].available_amount() == 0 && __quest_state["Level 13"].state_boolean["wall of bones will need to be defeated"] && !$skill[garbage nova].skill_is_usable())
             {
                 subentry.modifiers.listAppend("-combat");
                 subentry.entries.listAppend("Try to acquire the electric boning knife if you see it. (foodie NC)");

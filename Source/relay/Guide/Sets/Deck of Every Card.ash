@@ -29,7 +29,7 @@ void listAppend(DOECSummon [int] list, DOECSummon entry)
 
 void SDeckOfEveryCardGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (lookupItem("Deck of Every Card").available_amount() == 0 || !lookupItem("Deck of Every Card").is_unrestricted())
+    if ($item[Deck of Every Card].available_amount() == 0 || !$item[Deck of Every Card].is_unrestricted())
         return;
     
     if (!mafiaIsPastRevision(16018))
@@ -87,7 +87,7 @@ void SDeckOfEveryCardGenerateResource(ChecklistEntry [int] resource_entries)
     
     if (my_path_id() != PATH_SLOW_AND_STEADY)
     {
-        if (lookupSkill("ancestral recall").skill_is_usable())
+        if ($skill[ancestral recall].skill_is_usable())
         {
             summons.listAppend(DOECSummonMake(listMake("Ancestral Recall", "Island"), "+3 adventures via ancestral recall."));
         }
@@ -123,10 +123,10 @@ void SDeckOfEveryCardGenerateResource(ChecklistEntry [int] resource_entries)
             summons.listAppend(DOECSummonMake("Mine", "One of every ore."));
     }
     
-    if (!in_run && lookupItem("knife").available_amount() == 0)
+    if (!in_run && $item[knife].available_amount() == 0)
         summons.listAppend(DOECSummonMake("Knife", "+50% meat farming weapon."));
     
-    if (in_run && lookupItems("lead pipe,rope,wrench,candlestick,knife,revolver").items_missing().count() == 6)
+    if (in_run && $items[lead pipe,rope,wrench,candlestick,knife,revolver].items_missing().count() == 6)
     {
         /*
         Important point on the +stat equipment - there's another card that gives 500 mainstat. So, if that's all you're using the weapon for, you'd need to use it for over 250 fights in a day to be worthwhile.
@@ -215,7 +215,7 @@ void SDeckOfEveryCardGenerateResource(ChecklistEntry [int] resource_entries)
     if (!in_run)
     {
         int missing_emperor_pieces = missing_outfit_components("The Emperor's New Clothes").count();
-        if (missing_emperor_pieces > lookupItem("The Emperor's dry cleaning").available_amount())
+        if (missing_emperor_pieces > $item[The Emperor's dry cleaning].available_amount())
             summons.listAppend(DOECSummonMake("IV - The Emperor", "The Emperor's New Clothes outfit."));
     
         summons.listAppend(DOECSummonMake("Gift card", "Sell to the needy."));
@@ -252,7 +252,7 @@ void SDeckOfEveryCardGenerateResource(ChecklistEntry [int] resource_entries)
         summons.listAppend(DOECSummonMake(title, "Past factoids."));
     }
     
-    if (in_run && !__quest_state["Level 13"].state_boolean["Stat race completed"] && __quest_state["Level 13"].state_string["Stat race type"].length() > 0)
+    if (in_run && !__quest_state["Level 13"].state_boolean["Stat race completed"] && __quest_state["Level 13"].state_string["Stat race type"] != "")
     {
         stat stat_race_type = __quest_state["Level 13"].state_string["Stat race type"].to_stat();
         string card_name = "Joker";
@@ -278,7 +278,7 @@ void SDeckOfEveryCardGenerateResource(ChecklistEntry [int] resource_entries)
     
     if (!in_run)
     {
-        if (!haveAtLeastXOfItemEverywhere(lookupItem("talking spade"), 1))
+        if (!haveAtLeastXOfItemEverywhere($item[talking spade], 1))
             summons.listAppend(DOECSummonMake("X of Spades", "Solve spade puzzle."));
         if (card_summons_left >= 5)
             summons.listAppend(DOECSummonMake("Random card", pluralise(card_summons_left, "luck of the draw", "lucks of the draw") + "."));

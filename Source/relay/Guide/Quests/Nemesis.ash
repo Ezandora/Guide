@@ -574,7 +574,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     
     class_epic_weapons[$class[seal clubber]] = $item[bjorn's hammer];
     class_epic_weapons[$class[turtle tamer]] = $item[mace of the tortoise];
-    class_epic_weapons[$class[pastamancer]] = lookupItem("pasta spoon of peril");
+    class_epic_weapons[$class[pastamancer]] = $item[pasta spoon of peril];
     class_epic_weapons[$class[sauceror]] = $item[5-alarm saucepan];
     class_epic_weapons[$class[disco bandit]] = $item[disco banjo];
     class_epic_weapons[$class[accordion thief]] = $item[rock and roll legend];
@@ -583,7 +583,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     
     class_legendary_epic_weapons[$class[seal clubber]] = $item[hammer of smiting];
     class_legendary_epic_weapons[$class[turtle tamer]] = $item[chelonian morningstar];
-    class_legendary_epic_weapons[$class[pastamancer]] = lookupItem("greek pasta spoon of peril");
+    class_legendary_epic_weapons[$class[pastamancer]] = $item[greek pasta spoon of peril];
     class_legendary_epic_weapons[$class[sauceror]] = $item[17-alarm saucepan];
     class_legendary_epic_weapons[$class[disco bandit]] = $item[shagadelic disco banjo];
     class_legendary_epic_weapons[$class[accordion thief]] = $item[squeezebox of the ages];
@@ -638,7 +638,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         else
         {
             subentry.entries.listAppend("Acquire " + epic_weapon + ".");
-            if (lookupLocation("The Unquiet Garves").noncombat_queue.contains_text("Tomb of the Unknown Your Class Here"))
+            if ($location[The Unquiet Garves].noncombat_queue.contains_text("Tomb of the Unknown Your Class Here"))
             {
                 subentry.entries.listAppend("Solve the three puzzles at the unknown tomb.");
             }
@@ -773,7 +773,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             subentry.entries.listAppend("Wait for assassins.");
             
             
-        if (assassin_up_next.length() > 0)
+        if (assassin_up_next != "")
             subentry.entries.listAppend(assassin_up_next.capitaliseFirstLetter() + " up next.");
             
         if (my_basestat(my_primestat()) < 90)

@@ -35,7 +35,7 @@ static
         style += "font-size:0;";
         if (want_item_minimal_display)
             item_font_size = "0.8rem;";
-        if (style.length() > 0)
+        if (style != "")
             buf.append(HTMLGenerateTagPrefix("div", mapMake("style", style)));
         else
             buf.append(HTMLGenerateTagPrefix("div"));
@@ -153,7 +153,7 @@ static
         string image_url = "images/itemimages/" + it.smallimage;
         if (it.smallimage.contains_text("/"))
             image_url = "images/" + it.smallimage;
-        if (it.image.length() > 0 && !try_for_minimal_display)
+        if (it.image != "" && !try_for_minimal_display)
         {
             if (use_tables_here)
             {
@@ -337,9 +337,9 @@ buffer createItemInformationTableMethod2(int columns, LBPItemInformation [int] i
 
     string [string] table_map;
     table_map = mapMake("style", "display:table;");
-    if (table_style.length() > 0)
+    if (table_style != "")
         table_map["style"] += table_style;
-    if (table_class.length() > 0)
+    if (table_class != "")
         table_map["class"] = table_class;
     output_buffer.append(HTMLGenerateTagPrefix("div", table_map));
     
@@ -856,7 +856,7 @@ buffer generateLocationBarTable(string [int] table_entries, string [int] table_e
         
         string [string] map;
         
-        if (entry_url.length() > 0)
+        if (entry_url != "")
             map = generateMainLinkMap(entry_url);
         map["class"] += " r_location_bar_table_entry";
         if (table_entry_classes contains key)
@@ -914,7 +914,7 @@ buffer generateLocationPopup(float bottom_coordinates)
     //should we take into account the combat queue, etc?
     
     string [monster] monsters_that_we_cannot_encounter;
-    if (lookupEffect("Ancient Annoying Serpent Poison").have_effect() == 0)
+    if ($effect[Ancient Annoying Serpent Poison].have_effect() == 0)
     {
         foreach m in $monsters[the frattlesnake,Batsnake,Frozen Solid Snake,Burning Snake of Fire,The Snake With Like Ten Heads,Snakeleton]
         {
@@ -1169,7 +1169,7 @@ buffer generateLocationPopup(float bottom_coordinates)
                 style += "min-height:100px;";
             buf.append(HTMLGenerateTagPrefix("div", mapMake("style", style)));
         }
-        if (!monster_image_url.contains_text("nopic.gif") && monster_image_url.length() > 0)
+        if (!monster_image_url.contains_text("nopic.gif") && monster_image_url != "")
         {
             //FIXME centre image if it's small? maybe a table? more tables!
             boolean from_bottom_instead = false;
@@ -1255,12 +1255,12 @@ buffer generateLocationPopup(float bottom_coordinates)
         {
             rate_buffer.append("banished");
             Banish banish_information = m.BanishForMonster();
-            if (banish_information.banish_source.length() > 0)
+            if (banish_information.banish_source != "")
             {
                 rate_buffer.append(" by ");
                 rate_buffer.append(banish_information.banish_source);
             }
-            if (banish_information.custom_reset_conditions.length() > 0)
+            if (banish_information.custom_reset_conditions != "")
             {
                 rate_buffer.append(" until ");
                 rate_buffer.append(banish_information.custom_reset_conditions);
@@ -1462,7 +1462,7 @@ buffer generateLocationPopup(float bottom_coordinates)
     {
         string [int] lines;
         string [int] lines_offscreen;
-        if (l.parentdesc.length() > 0 && l.parentdesc != "No Category")
+        if (l.parentdesc != "" && l.parentdesc != "No Category")
             lines.listAppend(l.parentdesc);
         if (!__misc_state["In run"] && l.turns_spent > 0)
             lines_offscreen.listAppend(pluralise(l.turns_spent, "turn spent", "turns spent"));
@@ -1492,7 +1492,7 @@ buffer generateLocationPopup(float bottom_coordinates)
         float [int] fl_entry_width_weight;
         float [int] fl_entry_fixed_width_percentage;
         
-        if (l.parentdesc.length() > 0 && l.parentdesc != "No Category")
+        if (l.parentdesc != "" && l.parentdesc != "No Category")
             fl_entries.listAppend(l.parentdesc);
         else
             fl_entries.listAppend("");
@@ -1514,7 +1514,7 @@ buffer generateLocationPopup(float bottom_coordinates)
         boolean all_entries_blank = true;
         foreach key, entry in fl_entries
         {
-            if (entry.length() > 0)
+            if (entry != "")
                 all_entries_blank = false;
         }
         if (fl_entries.count() > 0 && !all_entries_blank)

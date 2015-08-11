@@ -6,7 +6,7 @@ void QLevel11PalindomeInit()
     state.image_name = "Palindome";
     
     state.state_boolean["Need instant camera"] = false;
-    if (lookupItem("photograph of a dog").available_amount() + lookupItem("disposable instant camera").available_amount() == 0 && state.mafia_internal_step < 3 && mafiaIsPastRevision(13870))
+    if ($item[photograph of a dog].available_amount() + $item[disposable instant camera].available_amount() == 0 && state.mafia_internal_step < 3 && mafiaIsPastRevision(13870))
         state.state_boolean["Need instant camera"] = true;
     if (7270.to_item().available_amount() > 0)
         state.state_boolean["Need instant camera"] = false;
@@ -31,7 +31,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
         return;
     if (__quest_state["Level 11"].mafia_internal_step <3 )
         return;
-    if (($item[Staff of Ed\, almost].available_amount() > 0 || lookupItem("2325").available_amount() > 0 || lookupItem("2268").available_amount() > 0) && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING)
+    if (($item[Staff of Ed\, almost].available_amount() > 0 || $item[2325].available_amount() > 0 || $item[2268].available_amount() > 0) && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING)
         return;
     
     QuestState base_quest_state = __quest_state["Level 11 Palindome"];
@@ -39,7 +39,12 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
     subentry.header = base_quest_state.quest_name;
     string url;
     
-    if (base_quest_state.mafia_internal_step < 2 && lookupItem("talisman o' nam").available_amount() == 0)
+    if (base_quest_state.mafia_internal_step < 2 && $item[talisman o' namsilat].available_amount() == 0 && $items[Copperhead Charm,Copperhead Charm (rampant)].items_missing().count() == 0)
+    {
+        url = "craft.php?mode=combine";
+        subentry.entries.listAppend("Paste the two copperhead charms together to acquire the talisman o' nam.");
+    }
+    else if (base_quest_state.mafia_internal_step < 2 && $item[talisman o' namsilat].available_amount() == 0)
     {
         //1 -> find palindome
         url = "place.php?whichplace=cove";
@@ -89,7 +94,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                         coordinates = "(3, 35)";
                     else if (my_primestat() == $stat[moxie])
                         coordinates = "(5, 39)";
-                    if (coordinates.length() > 0)
+                    if (coordinates != "")
                         subentry.entries.listAppend("If you encounter the wheel/O Cap'm adventure, take the helm, and sail to " + coordinates + ".");
                 }
             }
@@ -99,7 +104,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
     else
     {
         url = "place.php?whichplace=palindome";
-        if (lookupItem("talisman o' nam").equipped_amount() == 0)
+        if ($item[talisman o' namsilat].equipped_amount() == 0)
             url = "inventory.php?which=2";
         
         
@@ -128,7 +133,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
         {
             //5 -> fight dr. awkward
             string [int] tasks;
-            if (lookupItem("talisman o' nam").equipped_amount() == 0)
+            if ($item[talisman o' namsilat].equipped_amount() == 0)
                 tasks.listAppend("equip the Talisman o' Nam");
             if ($item[mega gem].equipped_amount() == 0)
                 tasks.listAppend("equip the Mega Gem");
@@ -186,7 +191,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                             line += " (hound dog is useful for this)";
                         subentry.entries.listAppend(line);
                       
-                        if (lookupItem("white page").available_amount() > 0)
+                        if ($item[white page].available_amount() > 0)
                             subentry.entries.listAppend("Can use your white pages to dial them up.");
                       
                         subentry.modifiers.listAppend("+combat");
@@ -208,7 +213,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
             else
             {
                 subentry.entries.listAppend("Talk to Mr. Alarm.");
-                if (lookupItem("talisman o' nam").equipped_amount() == 0)
+                if ($item[talisman o' namsilat].equipped_amount() == 0)
                     subentry.entries.listAppend("Equip the Talisman o' Nam.");
             }
             //if (7270.to_item() != $item[none] && 7270.to_item().available_amount() > 0)
@@ -229,7 +234,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                 tasks.listAppend("talk to Mr. Alarm to unlock Whitey's Grove");
                 
             subentry.entries.listAppend(tasks.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".");
-            if (lookupItem("talisman o' nam").equipped_amount() == 0)
+            if ($item[talisman o' namsilat].equipped_amount() == 0)
                 subentry.entries.listAppend("Equip the Talisman o' Nam.");
         }
         else
@@ -248,9 +253,9 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
             //√photograph of god
             subentry.entries.listAppend("Adventure in the palindome.");
             
-            if (lookupItem("photograph of a dog").available_amount() == 0)
+            if ($item[photograph of a dog].available_amount() == 0)
             {
-                if (lookupItem("disposable instant camera").available_amount() == 0)
+                if ($item[disposable instant camera].available_amount() == 0)
                 {
                     subentry.modifiers.listClear();
                     url = $location[the haunted bedroom].getClickableURLForLocation();
@@ -265,7 +270,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                     if (monsters_in_zone == 0)
                         monsters_in_zone = 5;
                     
-                    if (!in_hardcore() && (get_property("questM21Dance") == "finished" || $location[the haunted ballroom].turnsAttemptedInLocation() > 0 || lookupItem("Lady Spookyraven's finest gown").available_amount() > 0))
+                    if (!in_hardcore() && (get_property("questM21Dance") == "finished" || $location[the haunted ballroom].turnsAttemptedInLocation() > 0 || $item[Lady Spookyraven's finest gown].available_amount() > 0))
                         single_entry_mode += "|Or pull for it. (saves " + pluraliseWordy(monsters_in_zone, "turn", "turns") + ")";
                     need_palindome_location = false;
                 }
@@ -285,11 +290,11 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
             
             
             string [int] missing_ncs;
-            if (lookupItem("photograph of a red nugget").available_amount() == 0)
+            if ($item[photograph of a red nugget].available_amount() == 0)
             {
                 missing_ncs.listAppend("photograph of a red nugget");
             }
-            if (lookupItem("photograph of an ostrich egg").available_amount() == 0)
+            if ($item[photograph of an ostrich egg].available_amount() == 0)
             {
                 missing_ncs.listAppend("photograph of an ostrich egg");
             }
@@ -363,12 +368,12 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                 single_entry_mode = "Place items on shelves in Dr. Awkward's office.|Order is god, red nugget, dog, and ostrich egg.";
             }
                 
-            if (single_entry_mode.length() > 0)
+            if (single_entry_mode != "")
             {
                 subentry.entries.listClear();
                 subentry.entries.listAppend(single_entry_mode);
             }
-            if (need_palindome_location && lookupItem("talisman o' nam").equipped_amount() == 0)
+            if (need_palindome_location && $item[talisman o' namsilat].equipped_amount() == 0)
                 subentry.entries.listAppend("Equip the Talisman o' Nam.");
         }
     }

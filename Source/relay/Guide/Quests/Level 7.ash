@@ -237,8 +237,8 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             
             if ($familiar[oily woim].familiar_is_usable() && !(($familiars[oily woim,happy medium] contains my_familiar())))
             {
-                if (!(my_familiar() == lookupFamiliar("Xiblaxian Holo-Companion") && my_familiar() != $familiar[none]))
-                    subentry.entries.listAppend("Run " + $familiar[oily woim] + ($familiar[happy medium].familiar_is_usable() ? "/medium" : "") + (lookupFamiliar("Xiblaxian Holo-Companion").familiar_is_usable() ? "/holo-companion" : "") + " for +init.");
+                if (!(my_familiar() == $familiar[Xiblaxian Holo-Companion] && my_familiar() != $familiar[none]))
+                    subentry.entries.listAppend("Run " + $familiar[oily woim] + ($familiar[happy medium].familiar_is_usable() ? "/medium" : "") + ($familiar[Xiblaxian Holo-Companion].familiar_is_usable() ? "/holo-companion" : "") + " for +init.");
             }
 			
             

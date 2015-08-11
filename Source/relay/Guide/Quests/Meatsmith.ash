@@ -19,7 +19,7 @@ void QMeatsmithGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
 {
 	QuestState base_quest_state = __quest_state["Meatsmith"];
     
-    if (__last_adventure_location != lookupLocation("the skeleton store") || __last_adventure_location == $location[none])
+    if (__last_adventure_location != $location[the skeleton store] || __last_adventure_location == $location[none])
         return;
 		
 	ChecklistSubentry subentry;
@@ -38,7 +38,7 @@ void QMeatsmithGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     else if (base_quest_state.mafia_internal_step == 1)
     {
         have_reason_to_add = true;
-        if (lookupItem("skeleton store office key").available_amount() == 0)
+        if ($item[skeleton store office key].available_amount() == 0)
         {
             subentry.entries.listAppend("Check out the cash register at the NC.");
         }
@@ -52,7 +52,7 @@ void QMeatsmithGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         have_reason_to_add = true;
     }
     
-    if (lookupItem("ring of telling skeletons what to do").item_amount() == 0)
+    if ($item[ring of telling skeletons what to do].item_amount() == 0)
     {
         if (!have_reason_to_add)
             subentry.header = "The Skeleton Store";
@@ -68,7 +68,7 @@ void QMeatsmithGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     subentry.entries.listAppend("Non-combat appears every fourth adventure."); //except the first time for some reason? needs spading
     
     boolean [location] relevant_locations;
-    relevant_locations[lookupLocation("the skeleton store")] = true;
+    relevant_locations[$location[the skeleton store]] = true;
     
     if (have_reason_to_add)
         optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, active_url, subentry, relevant_locations));

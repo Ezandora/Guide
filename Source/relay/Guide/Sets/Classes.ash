@@ -191,7 +191,7 @@ void SDiscoBanditGenerateResource(ChecklistEntry [int] resource_entries)
             //raveCombo5 is rave steal
             //FIXME list combo order
             string rave_combo_number_5 = get_property("raveCombo5");
-            if (rave_combo_number_5.length() > 0)
+            if (rave_combo_number_5 != "")
             {
                 string [int] skill_order = rave_combo_number_5.split_string(",");
                 description.listAppend(skill_order.listJoinComponents(__html_right_arrow_character).capitaliseFirstLetter() + ".");

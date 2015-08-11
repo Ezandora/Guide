@@ -100,13 +100,32 @@ void generateTasks(Checklist [int] checklists)
 		if (!knoll_available())
 		{
 			string meatcar_line = "Build a bitchin' meatcar.";
-			if (creatable_amount($item[bitchin' meatcar]) > 0)
+			if ($item[bitchin' meatcar].creatable_amount() > 0)
 				meatcar_line += "|*You have all the parts, build it!";
 			else
 			{
 				item [int] missing_parts_list = missingComponentsToMakeItem($item[bitchin' meatcar]);
+                boolean [item] missing_parts = missing_parts_list.listInvert();
+                
+                //Tires - 100% drop - Gnollish Tirejuggler in The Degrassi Knoll Garage
+                //empty meat tank, cog, spring, sprocket - Gnollish toolbox - Gnollish Gearhead in The Degrassi Knoll Garage
+                //
+                string [int] meatcar_modifiers;
+                if (missing_parts[$item[empty meat tank]] || missing_parts[$item[cog]] || missing_parts[$item[spring]] || missing_parts[$item[sprocket]])
+                {
+                    meatcar_modifiers.listAppend("+34% item");
+                    meatcar_modifiers.listAppend("olfact gnollish gearhead");
+                }
+                
+                    
+                meatcar_modifiers.listAppend("banish guard bugbear");
+                    
+                if (meatcar_modifiers.count() > 0)
+                    meatcar_line += "|*" + ChecklistGenerateModifierSpan(meatcar_modifiers);
 				
-				meatcar_line += "|*Parts needed: " + missing_parts_list.listJoinComponents(", ", "and");
+				meatcar_line += "|*Parts needed: " + missing_parts_list.listJoinComponents(", ", "and") + ".";
+                if (missing_parts[$item[tires]] || missing_parts[$item[empty meat tank]] || missing_parts[$item[cog]] || missing_parts[$item[spring]] || missing_parts[$item[sprocket]])
+                    meatcar_line += " (found in the degrassi knoll garage?)";
 			}
 			subentry.entries.listAppend(meatcar_line);
 			
@@ -248,7 +267,7 @@ void generateTasks(Checklist [int] checklists)
                     url = "da.php?place=gate3";
             }
                 
-            if (statue_name.length() > 0)
+            if (statue_name != "")
             {
                 buffer line = "Possibly donate ".to_buffer();
                 if (cost_to_donate_for_level == min_cost_to_donate_for_level)
@@ -309,7 +328,7 @@ void generateTasks(Checklist [int] checklists)
 		if (!have_outfit_components("War Hippy Fatigues") && !have_outfit_components("Frat Warrior Fatigues"))
 			potential_targets.listAppend("Hippy/frat war outfit?");
 		//fax targets?
-		if (__misc_state["fax available"] || lookupSkill("Rain Man").skill_is_usable())
+		if (__misc_state["fax available"] || $skill[Rain Man].skill_is_usable())
 		{
 			potential_targets.listAppend("Anything on the fax list.");
 		}
@@ -327,7 +346,7 @@ void generateTasks(Checklist [int] checklists)
 				potential_targets.listAppend("A bat. (sonar-in-a-biscuit)");
 		}
         
-        if (__misc_state["stench airport available"] && lookupItem("filthy child leash").available_amount() == 0 && !__misc_state["familiars temporarily blocked"] && $items[ittah bittah hookah,astral pet sweater,snow suit,lead necklace].available_amount() == 0 && !can_interact() && my_path_id() != PATH_HEAVY_RAINS)
+        if (__misc_state["stench airport available"] && $item[filthy child leash].available_amount() == 0 && !__misc_state["familiars temporarily blocked"] && $items[ittah bittah hookah,astral pet sweater,snow suit,lead necklace].available_amount() == 0 && !can_interact() && my_path_id() != PATH_HEAVY_RAINS)
         {
             potential_targets.listAppend("Horrible tourist family (barf mountain) - +5 familiar weight leash.");
         }
@@ -363,7 +382,7 @@ void generateTasks(Checklist [int] checklists)
                 url = "shop.php?whichshop=gnoll";
         }
         //FIXME URLs for the other ones
-		if (current_mcd() < mcd_max_limit && have_mcd && monster_level_adjustment() < 150)
+		if (current_mcd() < mcd_max_limit && have_mcd && monster_level_adjustment() < 150 && !in_bad_moon())
 		{
 			optional_task_entries.listAppend(ChecklistEntryMake("__item detuned radio", url, ChecklistSubentryMake("Set monster control device to " + mcd_max_limit, "", roundForOutput(mcd_max_limit * __misc_state_float["ML to mainstat multiplier"], 2) + " mainstats/turn")));
 		}

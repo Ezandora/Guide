@@ -35,11 +35,17 @@ float clampNormali(int v)
 }
 
 //random() will halt the script if range is <= 1, which can happen when picking a random object out of a variable-sized list.
+//There's also a hidden bug where values above 2147483647 will be treated as zero.
 int random_safe(int range)
 {
-	if (range < 2)
+	if (range < 2 || range > 2147483647)
 		return 0;
 	return random(range);
+}
+
+float randomf()
+{
+    return random_safe(2147483647).to_float() / 2147483647.0;
 }
 
 //to_int will print a warning, but not halt, if you give it a non-int value.

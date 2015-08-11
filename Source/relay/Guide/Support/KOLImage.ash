@@ -380,11 +380,11 @@ KOLImage KOLImageLookup(string lookup_name)
         {
             __kol_images[lookup_name] = KOLImageMake(e.image, Vec2iMake(30,30));
         }
-        else if (m != $monster[none] && m.image.length() > 0 && m.to_string().to_lower_case() == secondary_lookup_name)
+        else if (m != $monster[none] && m.image != "" && m.to_string().to_lower_case() == secondary_lookup_name)
         {
             __kol_images[lookup_name] = KOLImageMake("images/adventureimages/" + m.image, Vec2iMake(100, 100));
         }
-        else if (s != $skill[none] && s.image.length() > 0 && s.to_string().to_lower_case() == secondary_lookup_name)
+        else if (s != $skill[none] && s.image != "" && s.to_string().to_lower_case() == secondary_lookup_name)
         {
 			__kol_images[lookup_name] = KOLImageMake("images/itemimages/" + s.image, Vec2iMake(30,30));
         }
@@ -489,7 +489,7 @@ buffer KOLImageGenerateImageHTML(string lookup_name, boolean should_centre, Vec2
 	boolean outputting_erase_zones = false;
 	Vec2i div_dimensions;
     
-    if (container_additional_class.length() > 0)
+    if (container_additional_class != "")
         outputting_div = true;
 	if (have_size)
 	{
@@ -528,7 +528,7 @@ buffer KOLImageGenerateImageHTML(string lookup_name, boolean should_centre, Vec2
         
         if (should_centre)
             classes.listAppend("r_centre");
-        if (container_additional_class.length() > 0)
+        if (container_additional_class != "")
             classes.listAppend(container_additional_class);
         result.append(HTMLGenerateTagPrefix("div", mapMake("class", classes.listJoinComponents(" "), "style", style)));
 	}
@@ -547,7 +547,7 @@ buffer KOLImageGenerateImageHTML(string lookup_name, boolean should_centre, Vec2
     //Needs to be optimized to use buffers first.
     /*string unadorned_name = lookup_name;
     int breakout = 50;
-    while (unadorned_name.length() > 0 && unadorned_name.stringHasPrefix("__") && breakout > 0)
+    while (unadorned_name != "" && unadorned_name.stringHasPrefix("__") && breakout > 0)
     {
         int space_index = unadorned_name.index_of(" ") + 1;
         if (space_index < 0 || space_index > unadorned_name.length())
@@ -611,13 +611,22 @@ buffer KOLImageGenerateImageHTML(string lookup_name, boolean should_centre, Vec2
 			top += zone.min_coordinate.y;
 			left += zone.min_coordinate.x;
 			//Output a white div over this area:
-			string style = "width:" + dimensions.x + "px;height:" + dimensions.y + "px;";
+            buffer style;
+            style.append("width:");
+            style.append(dimensions.x);
+            style.append("px;height:");
+            style.append(dimensions.y);
+            style.append("px;");
 			if (__setting_show_alignment_guides)
-				style += "background:pink;";
+				style.append("background:pink;");
 			else
-				style += "background:#FFFFFF;";
+				style.append("background:#FFFFFF;");
 			
-			style += "z-index:2;position:absolute;top:" + top + "px;left:" + left + "px;";
+            style.append("z-index:2;position:absolute;top:");
+            style.append(top);
+            style.append("px;left:");
+            style.append(left);
+            style.append("px;");
 			
 			result.append(HTMLGenerateDivOfStyle("", style));
 		}

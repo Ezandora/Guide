@@ -168,8 +168,8 @@ void QFeloniaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     }
     
     boolean [location] relevant_locations;
-    relevant_locations[lookupLocation("the bugbear pen")] = true;
-    relevant_locations[lookupLocation("the spooky gravy burrow")] = true;
+    relevant_locations[$location[the bugbear pen]] = true;
+    relevant_locations[$location[the spooky gravy burrow]] = true;
 	
 	optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, relevant_locations));
 }

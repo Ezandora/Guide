@@ -55,7 +55,7 @@ void SemirareGenerateDescription(string [int] description)
                 line += ".";
             
         }
-        if (line.length() > 0)
+        if (line != "")
             description.listAppend(line);
 	}
 	location last_location = $location[none];
