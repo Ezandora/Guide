@@ -155,7 +155,7 @@ buffer generateLocationBar(boolean displaying_navbar)
             custom_location_information = round(clampNormalf(pressure_remaining) * 100.0) + "% pressure";
         }
     }
-    else if (l == __location_palindome)
+    else if (l == $location[Inside the Palindome])
     {
         if (!__quest_state["Level 11 Palindome"].state_boolean["dr. awkward's office unlocked"])
         {

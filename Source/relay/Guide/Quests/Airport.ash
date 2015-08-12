@@ -1259,12 +1259,15 @@ void QHotAirportGenerateResource(ChecklistEntry [int] resource_entries)
         int potential_disco_style_level = 0;
         int current_disco_style_level = 0;
         item [int] items_to_equip_for_additional_style;
-        //velvet-bra,velvet-pocket square,velvet-socks,velvet-hat,velvet-shirt,velvet-hanky
-        //smooth velvet bra exists, but is not relevant?
-        /*foreach it in lookupItems("")
+        foreach it in lookupItems("smooth velvet pocket square,smooth velvet socks,smooth velvet hat,smooth velvet shirt,smooth velvet hanky,smooth velvet pants")
         {
-                
-        }*/
+            if (it.equipped_amount() > 0)
+                current_disco_style_level += 1;
+            else if (it.available_amount() > 0)
+                potential_disco_style_level += 1;
+        }
+        potential_disco_style_level += current_disco_style_level;
+        
         string [int] description;
         string url = "place.php?whichplace=airport_hot&action=airport4_zone1";
         /*

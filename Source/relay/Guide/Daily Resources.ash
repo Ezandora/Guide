@@ -390,7 +390,7 @@ void generateDailyResources(Checklist [int] checklists)
         }
     }
     
-    if (__misc_state["Chateau Mantegna available"] && !get_property_boolean("_chateauDeskHarvested") && mafiaIsPastRevision(15191))
+    if (__misc_state["Chateau Mantegna available"] && !get_property_boolean("_chateauDeskHarvested"))
     {
         string image_name = "__item fancy calligraphy pen";
         resource_entries.listAppend(ChecklistEntryMake(image_name, "place.php?whichplace=chateau", ChecklistSubentryMake("Chateau desk openable", "", "Daily collectable."), 8));

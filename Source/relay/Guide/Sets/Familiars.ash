@@ -94,7 +94,7 @@ void SFamiliarsPuckGenerateResource(ChecklistEntry [int] resource_entries)
     {
         puck_subentries.listAppend(ChecklistSubentryMake($item[power pill].pluralise().capitaliseFirstLetter(), "", "Use in combat to instakill without costing a turn."));
     }
-    if (mafiaIsPastRevision(15961) && ($familiar[Ms. Puck Man].familiar_is_usable() || $familiar[Puck Man].familiar_is_usable()))
+    if ($familiar[Ms. Puck Man].familiar_is_usable() || $familiar[Puck Man].familiar_is_usable())
     {
         int power_pills_remaining = MAX(0, MIN(11, my_daycount() + 1) - get_property_int("_powerPillDrops"));
         if (power_pills_remaining > 0)

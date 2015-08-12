@@ -60,10 +60,7 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
             if (get_property_boolean("controlRoomUnlock") || $location[the middle chamber].noncombat_queue.contains_text("Under Control"))
             {
                 //control room unlocked:
-                if (mafiaIsPastRevision(14319))
-                    should_generate_control_room_information = true;
-                else
-                    subentry.entries.listAppend("Spin the control room, search the lower chambers! Then fight Ed.");
+                should_generate_control_room_information = true;
                 //FIXME implement this
                 //FIXME suggest the better route
                 subentry.modifiers.listAppend("+400% item OR -combat");
@@ -124,7 +121,7 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
         
         //Uncertain:
         //if (get_property_int("lastPyramidReset") == my_ascensions())
-        if (pyramid_position > 0 && mafiaIsPastRevision(14319)) //does this work?
+        if (pyramid_position > 0) //does this work?
             have_pyramid_position = true;
         
         //I think there are... five positions?

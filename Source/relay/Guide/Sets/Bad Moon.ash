@@ -98,13 +98,11 @@ void SBadMoonGenerateChecklists(ChecklistCollection checklist_collection)
     
     
     BadMoonAdventure [int] meat_locations;
-    
     meat_locations.listAppend(BadMoonAdventureMake(38, $location[the spooky forest], "1000 meat", "", false));
     meat_locations.listAppend(BadMoonAdventureMake(39, $location[the degrassi knoll garage], "2000 meat, -myst debuff", "finish meatcar guild quest", !QuestState("questG01Meatcar").finished));
     meat_locations.listAppend(BadMoonAdventureMake(40, $location[the bat hole entrance], "3000 meat, -moxie debuff", "open boss bat's lair", __quest_state["Level 4"].state_int["areas unlocked"] < 3));
     meat_locations.listAppend(BadMoonAdventureMake(41, $location[south of the border], "4000 meat, beaten up", "", false));
-    meat_locations.listAppend(BadMoonAdventureMake(42, $location[whitey's grove], "5000 meat, -20% stats debuff", "opening the road to white citadel", __quest_state["White Citadel"].mafia_internal_step >= 2));
-    
+    meat_locations.listAppend(BadMoonAdventureMake(42, $location[whitey's grove], "5000 meat, -20% stats debuff" + (__quest_state["Level 11 Palindome"].mafia_internal_step < 4 ? " (wait until farming wet stew components)" : ""), "open the road to white citadel" + (__quest_state["White Citadel"].started ? "" : " and start white citadel quest"), !(__quest_state["White Citadel"].mafia_internal_step >= 2)));
     string [int] description_active;
     string [int] description_inactive;
     string url;

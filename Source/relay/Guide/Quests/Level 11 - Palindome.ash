@@ -6,7 +6,7 @@ void QLevel11PalindomeInit()
     state.image_name = "Palindome";
     
     state.state_boolean["Need instant camera"] = false;
-    if ($item[photograph of a dog].available_amount() + $item[disposable instant camera].available_amount() == 0 && state.mafia_internal_step < 3 && mafiaIsPastRevision(13870))
+    if ($item[photograph of a dog].available_amount() + $item[disposable instant camera].available_amount() == 0 && state.mafia_internal_step < 3)
         state.state_boolean["Need instant camera"] = true;
     if (7270.to_item().available_amount() > 0)
         state.state_boolean["Need instant camera"] = false;
@@ -141,7 +141,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
             tasks.listAppend("fight Dr. Awkward in his office");
             subentry.entries.listAppend(tasks.listJoinComponents(", ", "then").capitaliseFirstLetter() + ".");
         }
-        else if (base_quest_state.mafia_internal_step == 3 && 7270.to_item().available_amount() > 0 && mafiaIsPastRevision(14644) && false)
+        else if (base_quest_state.mafia_internal_step == 3 && 7270.to_item().available_amount() > 0 && false)
         {
             //doesn't seem to work?
             subentry.entries.listAppend("Use 2 Love Me, Vol. 2, then talk to Mr. Alarm in his office.");
@@ -153,7 +153,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
             //step3 not supported yet, so we have this instead:
             if (base_quest_state.mafia_internal_step == 3)
             {
-                if (!(7270.to_item().available_amount() > 0 && mafiaIsPastRevision(14644) && false))
+                if (!(7270.to_item().available_amount() > 0 && false))
                     subentry.entries.listAppend("Use 2 Love Me, Vol. 2, then talk to Mr. Alarm in his office. Then:");
             }
             
@@ -315,32 +315,14 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
             //This must be after all other need_to_adventure_in_palindome checks:
             if (7262.to_item().available_amount() == 0 && !dr_awkwards_office_unlocked) //I love me, Vol. I
             {
-                int dudes_left = 5;
-                boolean dudes_tracked = false;
-                if (mafiaIsPastRevision(15549))
-                {
-                    dudes_left = clampi(5 - get_property_int("palindomeDudesDefeated"), 0, 5);
-                    dudes_tracked = true;
-                }
+                int dudes_left = clampi(5 - get_property_int("palindomeDudesDefeated"), 0, 5);
                     
                 if (__misc_state["have olfaction equivalent"] && __misc_state_string["olfaction equivalent monster"] != "Racecar Bob" && __misc_state_string["olfaction equivalent monster"] != "Bob Racecar" && __misc_state_string["olfaction equivalent monster"] != "Drab Bard" && dudes_left > 1)
                 {
                     subentry.modifiers.listAppend("olfact racecar");
                     subentry.entries.listAppend("Olfact Bob Racecar or Racecar Bob.");
                 }
-                if (!dudes_tracked)
-                {
-                    string line = "Find I Love Me, Vol. I in-combat. Fifth dude-type monster.";
-                    if (!need_to_adventure_in_palindome) //counts stunt nuts and photographs
-                        line += "|Well, unless you have already. If so, place the photographs in Dr. Awkward's Office.";
-                    else
-                        line += "|Well, unless you have already.";
-                    subentry.entries.listAppend(line);
-                }
-                else
-                {
-                    subentry.entries.listAppend("Defeat " + pluraliseWordy(dudes_left, "more dude", "more dudes") + " in the palindome.");
-                }
+                subentry.entries.listAppend("Defeat " + pluraliseWordy(dudes_left, "more dude", "more dudes") + " in the palindome.");
                 need_to_adventure_in_palindome = true;
             }
             else if (7262.to_item().available_amount() > 0)
@@ -379,7 +361,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
     }
     
     boolean [location] relevant_locations = makeConstantLocationArrayMutable($locations[the poop deck, belowdecks,cobb's knob laboratory,whitey's grove]);
-    relevant_locations[__location_palindome] = true;
+    relevant_locations[$location[Inside the Palindome]] = true;
 
     task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, relevant_locations));
 }

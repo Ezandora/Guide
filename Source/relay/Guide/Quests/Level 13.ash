@@ -379,9 +379,9 @@ void QLevel13Init()
     
     state.state_boolean["past races"] = state.mafia_internal_step >= 4;
     
-    state.state_boolean["Init race completed"] = get_property_int("nsContestants1") != -1 && mafiaIsPastRevision(15408);
-    state.state_boolean["Stat race completed"] = get_property_int("nsContestants2") != -1 && mafiaIsPastRevision(15408);
-    state.state_boolean["Elemental damage race completed"] = get_property_int("nsContestants3") != -1 && mafiaIsPastRevision(15408);
+    state.state_boolean["Init race completed"] = get_property_int("nsContestants1") != -1;
+    state.state_boolean["Stat race completed"] = get_property_int("nsContestants2") != -1;
+    state.state_boolean["Elemental damage race completed"] = get_property_int("nsContestants3") != -1;
     if (state.finished || state.state_boolean["past races"])
     {
         state.state_boolean["Init race completed"] = true;
@@ -413,7 +413,7 @@ void QLevel13Init()
         state.state_boolean[key_name + " used"] = state.state_boolean["past keys"];
     }
     
-    if (mafiaIsPastRevision(15177) && !state.state_boolean["past keys"])
+    if (!state.state_boolean["past keys"])
     {
         //nsTowerDoorKeysUsed
         //nsTowerDoorKeysUsed(user, now 'Boris's key,Jarlsberg's key,Sneaky Pete's key,Richard's star key,digital key,skeleton key', default )

@@ -394,20 +394,34 @@ void generateTasks(Checklist [int] checklists)
         
 		string [int] description;
 		string [int] modifiers;
+        boolean should_be_future_task = false;
+        
 		description.listAppend("Missing " + missing_pieces.listJoinComponents(", ", "and") + ".");
-		description.listAppend("Yellow-ray a hippy in the hippy camp if you can.");
+        string next_line_intro = "";
+        if (!__misc_state["yellow ray almost certainly impossible"])
+        {
+            description.listAppend("Yellow-ray a hippy in the hippy camp if you can.");
+            next_line_intro = "Otherwise, ";
+        }
+        else
+            should_be_future_task = true;
 		if (my_level() >= 9)
 		{
-			description.listAppend("Otherwise, run -combat there.");
+			description.listAppend((next_line_intro + "run -combat there.").capitaliseFirstLetter());
 			modifiers.listAppend("-combat");
 		}
 		else
 		{
-			description.listAppend("Otherwise, wait for level 9.");
+			description.listAppend((next_line_intro + "wait for level 9.").capitaliseFirstLetter());
 		}
         if ($familiar[slimeling].familiar_is_usable())
             modifiers.listAppend("slimeling?");
-		optional_task_entries.listAppend(ChecklistEntryMake("__item filthy knitted dread sack", "island.php", ChecklistSubentryMake("Acquire a filthy hippy disguise", modifiers, description), $locations[hippy camp]));
+            
+        ChecklistEntry entry = ChecklistEntryMake("__item filthy knitted dread sack", "island.php", ChecklistSubentryMake("Acquire a filthy hippy disguise", modifiers, description), $locations[hippy camp]);
+        if (should_be_future_task)
+            future_task_entries.listAppend(entry);
+        else
+            optional_task_entries.listAppend(entry);
 	}
     
     if (__misc_state["In run"] && (inebriety_limit() == 0 || my_path_id() == PATH_SLOW_AND_STEADY))

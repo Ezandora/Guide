@@ -33,7 +33,7 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
     if (true)
     {
         boolean use_fast_route = base_quest_state.state_boolean["Can use fast route"];
-        boolean recipe_will_be_autoread = (mafiaIsPastRevision(14187) && ($item[lord spookyraven's spectacles].available_amount() > 0) && use_fast_route) && get_property_boolean("autoCraft");
+        boolean recipe_will_be_autoread = (($item[lord spookyraven's spectacles].available_amount() > 0) && use_fast_route) && get_property_boolean("autoCraft");
         boolean recipe_was_autoread = (get_property("spookyravenRecipeUsed") == "with_glasses");
         //FIXME spectacles first?
         if (!$location[the haunted ballroom].locationAvailable())
@@ -264,7 +264,7 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
     boolean [location] relevant_locations;
     relevant_locations[$location[the haunted ballroom]] = true;
     relevant_locations[$location[summoning chamber]] = true;
-    relevant_locations[__location_the_haunted_wine_cellar] = true;
+    relevant_locations[$location[the haunted wine cellar]] = true;
     relevant_locations[$location[The Haunted Boiler Room]] = true;
     relevant_locations[$location[The Haunted Laundry Room]] = true;
     

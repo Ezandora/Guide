@@ -180,18 +180,21 @@ void setUpState()
 	string yellow_ray_image_name = "__effect everything looks yellow";
 	boolean yellow_ray_potentially_available = false;
     
-    string [int] item_sources = split_string_alternate("4766,5229,6673,7013", ",");
-    
-    foreach key in item_sources
+    foreach source in $items[4766,5229,6673,7013]
     {
-        item source = item_sources[key].to_int().to_item();
-        if (!(source.available_amount() > 0 || (source == 4766.to_item() && 4761.to_item().available_amount() > 0)))
+        if (!(source.available_amount() > 0 || (source == $item[4766] && $item[4761].available_amount() > 0)))
             continue;
 		yellow_ray_available = true;
 		yellow_ray_source = source.to_string();
 		yellow_ray_image_name = "__item " + source.to_string();
     }
     
+    if ($item[mayo lance].available_amount() > 0 && get_property_int("mayoLevel") > 0)
+    {
+        yellow_ray_available = true;
+        yellow_ray_source = "Mayo Lance";
+        yellow_ray_image_name = "__item mayo lance";
+    }
     if ($familiar[Crimbo Shrub].familiar_is_usable() && get_property("shrubGifts") == "yellow" && !(my_daycount() == 1 && get_property("_shrubDecorated") == "false"))
     {
         yellow_ray_available = true;
@@ -247,6 +250,11 @@ void setUpState()
 	__misc_state["yellow ray potentially available"] = yellow_ray_potentially_available;
     
     
+    if (in_bad_moon() && !__misc_state["yellow ray potentially available"] && !__misc_state["yellow ray available"])
+    {
+        __misc_state["yellow ray almost certainly impossible"] = true;
+    }
+    
     int [item] campground_items = get_campground();
     __misc_state["can cook for free"] = false;
     if (campground_items[$item[chef-in-the-box]] > 0 || campground_items[$item[clockwork chef-in-the-box]] > 0 || $effect[Inigo's Incantation of Inspiration].have_effect() >= 5)
@@ -292,7 +300,7 @@ void setUpState()
 		if ($item[bottle of Blank-Out].available_amount() > 0 || get_property_int("blankOutUsed") > 0)
 			free_runs_available = true;
 	}
-    if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE && mafiaIsPastRevision(13783) && $skill[Peel Out].skill_is_usable())
+    if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE && $skill[Peel Out].skill_is_usable())
     {
         
         int total_free_peel_outs_available = 10;
@@ -489,7 +497,7 @@ void setUpState()
     
     if (get_property("peteMotorbikeGasTank") == "Extra-Buoyant Tank")
         mysterious_island_unlocked = true;
-    if (get_property_int("lastIslandUnlock") == my_ascensions() && mafiaIsPastRevision(13812))
+    if (get_property_int("lastIslandUnlock") == my_ascensions())
         mysterious_island_unlocked = true;
             
     
@@ -501,7 +509,7 @@ void setUpState()
 	__misc_state["desert beach available"] = false;
     if (get_property("peteMotorbikeGasTank") == "Large Capacity Tank")
         __misc_state["desert beach available"] = true;
-    if (get_property_int("lastDesertUnlock") == my_ascensions() && mafiaIsPastRevision(13812))
+    if (get_property_int("lastDesertUnlock") == my_ascensions())
         __misc_state["desert beach available"] = true;
 	if ($location[south of the border].locationAvailable())
 		__misc_state["desert beach available"] = true;
@@ -637,7 +645,7 @@ void setUpState()
         {
             if ($skill[Brood].skill_is_usable())
                 minus_combat_source_count += 2;
-            if (mafiaIsPastRevision(13785) && get_property("peteMotorbikeMuffler") == "Extra-Quiet Muffler" && $skill[Rev Engine].skill_is_usable())
+            if (get_property("peteMotorbikeMuffler") == "Extra-Quiet Muffler" && $skill[Rev Engine].skill_is_usable())
                 minus_combat_source_count += 3;
         }
         if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)

@@ -57,9 +57,6 @@ void QGuildGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     
     if (__misc_state["In run"] && my_path_id() != PATH_PICKY && !in_bad_moon())
     {
-        if ($classes[seal clubber,turtle tamer] contains my_class() && !mafiaIsPastRevision(14934)) //you always go here in ascension
-            return;
-        
         if ($classes[pastamancer,sauceror] contains my_class() && $location[the haunted pantry].turnsAttemptedInLocation() == 0)
             return;
         if ($classes[disco bandit,accordion thief] contains my_class() && $location[the sleazy back alley].turnsAttemptedInLocation() == 0)

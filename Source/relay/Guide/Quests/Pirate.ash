@@ -271,7 +271,7 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 			subentry.entries.listAppend(line);
 			if (additional_line != "")
 				subentry.entries.listAppend(additional_line);
-            if (!$monster[clingy pirate].is_banished() && $item[cocktail napkin].available_amount() > 0 && !have_all_fcle_items)
+            if (!(lookupMonster("clingy pirate (female)").is_banished() || lookupMonster("clingy pirate (male)").is_banished()) && $item[cocktail napkin].available_amount() > 0 && !have_all_fcle_items)
             {
                 subentry.entries.listAppend("Use cocktail napkin on clingy pirate to " + (__misc_state["free runs usable"] ? "free run/" : "") + "banish.");
             }

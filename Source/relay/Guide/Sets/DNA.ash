@@ -88,8 +88,6 @@ effect __current_dna_intrinsic = $effect[none];
 
 void SDNAInit()
 {
-    if (!mafiaIsPastRevision(13918)) //minimum supported version
-        return;
     if (get_campground()[$item[Little Geneticist DNA-Splicing Lab]] == 0)
         return;
 
@@ -312,8 +310,6 @@ void SDNAInit()
 
 void SDNAGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (!mafiaIsPastRevision(13918)) //minimum supported version
-        return;
     if (__misc_state["campground unavailable"])
         return;
     if (get_campground()[$item[Little Geneticist DNA-Splicing Lab]] == 0)
@@ -474,7 +470,7 @@ void SDNAGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 {
     if (__misc_state["campground unavailable"])
         return;
-    if (!(mafiaIsPastRevision(13918) && get_campground()[$item[Little Geneticist DNA-Splicing Lab]] > 0))
+    if (get_campground()[$item[Little Geneticist DNA-Splicing Lab]] == 0)
         return;
     
     //Reminders:

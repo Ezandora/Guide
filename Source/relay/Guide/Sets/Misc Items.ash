@@ -1,6 +1,6 @@
 void SMiscItemsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-    if ($item[the crown of ed the undying].equipped_amount() > 0 && mafiaIsPastRevision(15561) && get_property("edPiece").length() == 0)
+    if ($item[the crown of ed the undying].equipped_amount() > 0 && get_property("edPiece").length() == 0)
     {
         string [int] description;
         
@@ -354,7 +354,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
             //if (!__quest_state["Level 13"].state_boolean["past tower monsters"] && (!$item[munchies pill].is_unrestricted() || !__misc_state["can eat just about anything"]))
                 //details.listAppend("The lost comb is turn on the TV, take a nap, pick up the comb. (towerkilling)");
             if ($classes[pastamancer,sauceror] contains my_class() && $skill[Transcendental Noodlecraft].skill_is_usable() && $skill[The Way of Sauce].skill_is_usable() && $skill[pulverize].skill_is_usable())
-                details.listAppend("The lost glasses is mini-fridge, TV, glasses.|Smash for elemental nuggets for hi meins.");
+                details.listAppend("The lost glasses is mini-fridge, TV, glasses.");
 			resource_entries.listAppend(ChecklistEntryMake("__item lost key", "inventory.php?which=3", ChecklistSubentryMake(pluralise($item[lost key]), "", details), importance_level_item));
         }
 			
@@ -1000,7 +1000,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         
     }
     
-    if (!in_run && get_property("_bittycar").length() == 0 && $items[BittyCar HotCar, BittyCar MeatCar,BittyCar SoulCar].available_amount() > 0 && mafiaIsPastRevision(15028))
+    if (!in_run && get_property("_bittycar").length() == 0 && $items[BittyCar HotCar, BittyCar MeatCar,BittyCar SoulCar].available_amount() > 0)
     {
         string [int] available_items;
         string [int] available_descriptions;

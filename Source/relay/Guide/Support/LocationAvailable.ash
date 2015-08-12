@@ -9,8 +9,6 @@ import "relay/Guide/QuestState.ash"
 
 
 //Version compatibility locations:
-location __location_palindome;
-location __location_the_haunted_wine_cellar;
 
 boolean __location_compatibility_inited = false;
 //Should probably be called manually, as a backup:
@@ -23,11 +21,6 @@ void locationCompatibilityInit()
         return;
     __location_compatibility_inited = true;
     
-    __location_palindome = "Inside the Palindome".to_location();
-    if (__location_palindome == $location[none])
-        __location_palindome = "The Palindome".to_location();
-    if (mafiaIsPastRevision(13971)) //FIXME look up exact revision
-        __location_the_haunted_wine_cellar = "The Haunted Wine Cellar".to_location();
 }
 
 locationCompatibilityInit(); //not sure if calling functions like this is intended. may break in the future?
@@ -203,7 +196,7 @@ float [monster] appearance_rates_adjusted(location l)
     
     
     //Convert source_altered to source.
-    if (l == __location_palindome)
+    if (l == $location[Inside the Palindome])
     {
         if (!questPropertyPastInternalStepNumber("questL11Palindome", 3))
             source_altered[$monster[none]] = 0.0;
@@ -487,6 +480,8 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
         case $location[A Kitchen Drawer]:
         case $location[A Grocery Bag]:
             return get_campground()[$item[jar of psychoses (The Pretentious Artist)]] > 0;
+        case $location[whitey's grove]:
+            return questPropertyPastInternalStepNumber("questG02Whitecastle", 1) || questPropertyPastInternalStepNumber("questL11Palindome", 4); //FIXME what step for questL11Palindome?
 		default:
 			break;
 	}
@@ -677,19 +672,30 @@ string HTMLGenerateFutureTextByLocationAvailability(location place)
 
 
 
-string [location] __clickable_urls_map;
-string getClickableURLForLocation(location l, Error unable_to_find_url)
+string [location] LAConvertLocationLookupToLocations(string [string] lookup_map)
 {
-    if (l == $location[none])
-        return "";
-        
-    if (__clickable_urls_map.count() == 0)
+    string [location] result;
+    foreach location_name in lookup_map
     {
-        //Initialize:
-        //We use to_location() lookups here because $location[] will halt the script if the location name changes.
-        //Probably could coalese these into foreach s in $strings[] loops, or move this to an external data file.
-        //Also static, but some of these use my_hash()...
+        location l = location_name.to_location();
+        if (l == $location[none])
+        {
+            if (__setting_debug_mode)
+                print_html("Location \"" + location_name + "\" does not appear to exist anymore.");
+            continue;
+        }
+        result[l] = lookup_map[location_name];
+    }
+    
+    return result;
+}
+static
+{
+    string [location] __constant_clickable_urls;
+    void initialiseConstantClickableURLs()
+    {
         string [string] lookup_map;
+        
         lookup_map["Pump Up Muscle"] = "place.php?whichplace=knoll_friendly&action=dk_gym";
         lookup_map["Richard's Hobo Mysticality"] = "clan_hobopolis.php?place=3";
         lookup_map["Richard's Hobo Moxie"] = "clan_hobopolis.php?place=3";
@@ -756,7 +762,7 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         lookup_map["The Haunted Ballroom"] = "place.php?whichplace=manor2";
         lookup_map["The Haunted Boiler Room"] = "place.php?whichplace=manor4";
         lookup_map["The Haunted Laundry Room"] = "place.php?whichplace=manor4";
-        lookup_map[__location_the_haunted_wine_cellar.to_string()] = "place.php?whichplace=manor4";
+        lookup_map["The Haunted Wine Cellar"] = "place.php?whichplace=manor4";
         lookup_map["The Haunted Laboratory"] = "place.php?whichplace=manor3";
         lookup_map["The Haunted Nursery"] = "place.php?whichplace=manor3";
         lookup_map["The Haunted Storage Room"] = "place.php?whichplace=manor3";
@@ -908,24 +914,23 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         lookup_map["WarBear Fortress (First Level)"] = "";
         lookup_map["WarBear Fortress (Second Level)"] = "";
         lookup_map["WarBear Fortress (Third Level)"] = "";
-        lookup_map["Crimbokutown Toy Factory"] = "";
         lookup_map["Elf Alley"] = "";
         lookup_map["CRIMBCO cubicles"] = "";
         lookup_map["CRIMBCO WC"] = "";
         lookup_map["Crimbo Town Toy Factory (2005)"] = "";
         lookup_map["The Don's Crimbo Compound"] = "";
         lookup_map["Atomic Crimbo Toy Factory"] = "";
-        lookup_map["Old Crimbo Town Toy Factory (2007)"] = "";
+        lookup_map["Crimbo Town Toy Factory (2007)"] = "";
         lookup_map["Sinister Dodecahedron"] = "";
         lookup_map["Crimbo Town Toy Factory (2009)"] = "";
         lookup_map["Simple Tool-Making Cave"] = "";
         lookup_map["Spooky Fright Factory"] = "";
         lookup_map["Crimborg Collective Factory"] = "";
         lookup_map["Crimbo Town Toy Factory (2012)"] = "";
-        lookup_map["Future Market Square"] = "";
-        lookup_map["Mall of the Future"] = "";
-        lookup_map["Future Wrong Side of the Tracks"] = "";
-        lookup_map["Icy Peak of the Past"] = "";
+        lookup_map["Market Square, 28 Days Later"] = "";
+        lookup_map["The Mall of Loathing, 28 Days Later"] = "";
+        lookup_map["Wrong Side of the Tracks, 28 Days Later"] = "";
+        lookup_map["The Icy Peak in The Recent Past"] = "";
         lookup_map["Shivering Timbers"] = "";
         lookup_map["A Skeleton Invasion!"] = "";
         lookup_map["The Cannon Museum"] = "";
@@ -1010,7 +1015,29 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
             lookup_map[s] = "place.php?whichplace=nstower";
             
         lookup_map["Trick-or-treating"] = "place.php?whichplace=town&action=town_trickortreat";
-        //Conditionals:
+        
+        __constant_clickable_urls = LAConvertLocationLookupToLocations(lookup_map);
+    }
+    initialiseConstantClickableURLs();
+    
+}
+
+string [location] __variable_clickable_urls;
+string getClickableURLForLocation(location l, Error unable_to_find_url)
+{
+    if (l == $location[none])
+        return "";
+    if (__constant_clickable_urls contains l)
+        return __constant_clickable_urls[l];
+        
+    if (__variable_clickable_urls.count() == 0)
+    {
+        //Initialize:
+        //We use to_location() lookups here because $location[] will halt the script if the location name changes.
+        //Probably could move this to an external data file.
+        string [string] lookup_map;
+            
+        //Conditionals only:
         if ($location[cobb's knob barracks].locationAvailable())
             lookup_map["The Outskirts of Cobb's Knob"] = "cobbsknob.php";
         else
@@ -1025,28 +1052,16 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
             lookup_map["Palindome"] = "place.php?whichplace=palindome";
         else
             lookup_map["Palindome"] = "inventory.php?which=2";
-            
-        
         //antique maps are weird:
         lookup_map["The Electric Lemonade Acid Parade"] = "inv_use.php?pwd=" + my_hash() + "&whichitem=4613";
         foreach s in $strings[Professor Jacking's Small-O-Fier,Professor Jacking's Huge-A-Ma-tron]
             lookup_map[s] = "inv_use.php?pwd=" + my_hash() + "&whichitem=4560";
             
         //Parse into locations:
-        foreach location_name in lookup_map
-        {
-            location l = location_name.to_location();
-            if (l == $location[none])
-            {
-                if (__setting_debug_mode)
-                    print("Location \"" + location_name + "\" does not appear to exist anymore.");
-                continue;
-            }
-            __clickable_urls_map[l] = lookup_map[location_name];
-        }
+        __variable_clickable_urls = LAConvertLocationLookupToLocations(lookup_map);
     }
-    if (__clickable_urls_map contains l)
-        return __clickable_urls_map[l];
+    if (__variable_clickable_urls contains l)
+        return __variable_clickable_urls[l];
 
     ErrorSet(unable_to_find_url);
     return "";

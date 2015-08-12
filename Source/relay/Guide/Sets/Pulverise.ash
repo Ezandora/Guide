@@ -185,10 +185,10 @@ void SPulveriseGenerateResource(ChecklistEntry [int] resource_entries)
         pulveriseAppendOutputListForProducts(details, "spleen wads", $items[cold wad,hot wad,sleaze wad,spooky wad,stench wad], blacklist);
     }
     
-    if (__misc_state["mysticality guild store available"] && $skill[Transcendental Noodlecraft].skill_is_usable() && $skill[The Way of Sauce].skill_is_usable()) //can make hi mein?
+    /*if (__misc_state["mysticality guild store available"] && $skill[Transcendental Noodlecraft].skill_is_usable() && $skill[The Way of Sauce].skill_is_usable()) //can make hi mein?
     {
         pulveriseAppendOutputListForProducts(details, "hi mein elemental nuggets", $items[cold nuggets,hot nuggets,sleaze nuggets,spooky nuggets,stench nuggets], blacklist);
-    }
+    }*/
     
     
     pulveriseAppendOutputListForProducts(details, "handful of smithereens", $items[handful of smithereens], blacklist);
