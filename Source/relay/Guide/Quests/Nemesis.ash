@@ -385,139 +385,11 @@ void QNemesisGenerateCaveTasks(ChecklistSubentry subentry, item legendary_epic_w
 	
 	QuestStateParseMafiaQuestProperty(state, "questG05Dark", true);
     
-    subentry.entries.listAppend("Visit the sinister cave.");
-    int paper_strips_found = 0;
+    //place.php?whichplace=mountains&action=mts_caveblocked leads to an non-leaving NC (skippable)
+    //place.php?whichplace=nemesiscave
     
-    if (state.mafia_internal_step == 0)
-        state.mafia_internal_step = 1;
-    foreach it in $items[a torn paper strip,a rumpled paper strip,a creased paper strip,a folded paper strip,a crinkled paper strip,a crumpled paper strip,a ragged paper strip,a ripped paper strip]
-    {
-        if (it.available_amount() > 0)
-            paper_strips_found += 1;
-    }
-    if (true)
-    {
-        //FIXME temporary code
-        if (state.mafia_internal_step < 4 && paper_strips_found > 0)
-            state.mafia_internal_step = 4;
-        if (state.mafia_internal_step < 4 && $location[nemesis cave].turnsAttemptedInLocation() > 0)
-            state.mafia_internal_step = 4;
-    }
-        
-        
-    if (state.mafia_internal_step == 1 || state.mafia_internal_step == 2 || state.mafia_internal_step == 3)
-    {
-        //1	Finally it's time to meet this Nemesis you've been hearing so much about! The guy at your guild has marked your map with the location of a cave in the Big Mountains, where your Nemesis is supposedly hiding.
-        //2	Having opened the first door in your Nemesis' cave, you are now faced with a second one. Go figure
-        //3	Having opened the second door in your Nemesis' cave, you are now
-        //First door:
-        string [int] door_unlockers;
-        
-        //First door:
-        if (state.mafia_internal_step <= 1)
-        {
-            if (my_primestat() == $stat[muscle])
-                door_unlockers.listAppend("viking helmet");
-            else if (my_primestat() == $stat[mysticality])
-                door_unlockers.listAppend("stalk of asparagus");
-            else if (my_primestat() == $stat[moxie])
-                door_unlockers.listAppend("dirty hobo gloves");
-        }
-        
-        //Second door:
-        if (state.mafia_internal_step <= 2)
-        {
-            if (my_primestat() == $stat[muscle])
-                door_unlockers.listAppend("insanely spicy bean burrito");
-            else if (my_primestat() == $stat[mysticality])
-                door_unlockers.listAppend("insanely spicy enchanted bean burrito");
-            else if (my_primestat() == $stat[moxie])
-                door_unlockers.listAppend("insanely spicy jumping bean burrito");
-        }
-            
-        //Third door:
-        
-        if (state.mafia_internal_step <= 3)
-        {
-            if (my_class() == $class[seal clubber])
-                door_unlockers.listAppend("clown whip");
-            else if (my_class() == $class[turtle tamer])
-                door_unlockers.listAppend("clownskin buckler");
-            else if (my_class() == $class[pastamancer])
-                door_unlockers.listAppend("boring spaghetti");
-            else if (my_class() == $class[sauceror])
-                door_unlockers.listAppend("tomato juice of powerful power");
-            else if (my_class() == $class[disco bandit])
-            {
-                //suggest:
-                
-                string suggested_drink = "pink pony";
-                int suggested_drink_amount = 0;
-                
-                foreach it in $items[a little sump'm sump'm,bungle in the jungle,calle de miel,ducha de oro,fuzzbump,horizontal tango,ocean motion,perpendicular hula,pink pony,rockin' wagon,roll in the hay,slap and tickle,slip 'n' slide] //NOT tropical swill
-                {
-                    if (it.available_amount() > suggested_drink_amount)
-                    {
-                        suggested_drink_amount = it.available_amount();
-                        suggested_drink = it;
-                    }
-                    if (suggested_drink_amount == 0 && it.creatable_amount() > 0)
-                    {
-                        suggested_drink = it + " (make first)";
-                    }
-                }
-                door_unlockers.listAppend(suggested_drink);
-            }
-            else if (my_class() == $class[accordion thief])
-                door_unlockers.listAppend("polka of plenty buffed on you");
-        }
-        
-        foreach key, v in door_unlockers
-        {
-            item it = v.to_item();
-            if (it == $item[none]) continue;
-            if (it.to_string().to_lower_case() != v.to_lower_case())
-                continue;
-            if (it.item_amount() == 0)
-                door_unlockers[key] = HTMLGenerateSpanFont(door_unlockers[key], "grey");
-        }
-        
-        subentry.entries.listAppend("Open doors via " + door_unlockers.listJoinComponents(", then ") + ".");
-    }
-    else if (state.mafia_internal_step == 4 || state.mafia_internal_step == 5)
-    {
-        //4	Woo! You're past the doors and it's time to stab some bastards
-        //5	The door to your Nemesis' inner sanctum didn't seem to care for the password you tried earlier
-        
-        if (paper_strips_found >= 8)
-        {
-            string line = "Speak the password, then fight your nemesis.";
-            if (!mafiaIsPastRevision(14330))
-                line += "|Then wait for assassins.";
-            subentry.entries.listAppend(line);
-            if (legendary_epic_weapon.equipped_amount() == 0)
-                subentry.entries.listAppend("Equip " + legendary_epic_weapon + ".");
-        }
-        else
-        {
-            subentry.modifiers.listAppend("+234% item");
-            subentry.entries.listAppend("Run +234% item in the large chamber.");
-            int strips_needed = MAX(8 - paper_strips_found, 0);
-            float average_turns = clampNormalf(0.3 * (1.0 + $location[nemesis cave].item_drop_modifier_for_location() / 100.0));
-            if (average_turns != 0.0)
-                average_turns = strips_needed / average_turns;
-            else
-                average_turns = -1.0;
-            subentry.entries.listAppend("Find " + pluraliseWordy(strips_needed, "paper strip", "paper strips") + ". ~" + average_turns.roundForOutput(1) + " turns left.");
-        }
-    }
-    else if (state.mafia_internal_step == 6)
-    {
-        //6	Hear how the background music got all exciting? It's because you opened the door to your Nemesis' inner sanctum
-        subentry.entries.listAppend("Fight your nemesis.");
-        if (legendary_epic_weapon.equipped_amount() == 0)
-            subentry.entries.listAppend("Equip " + legendary_epic_weapon + ".");
-    }
+    subentry.entries.listAppend("Visit the sinister cave, solve the new quest.");
+    subentry.modifiers.listAppend("+item");
 }
 
 void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -858,5 +730,5 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         }
     }
 	
-	optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the "fun" house, nemesis cave, the nemesis' lair, the broodling grounds, the outer compound, the temple portico, convention hall lobby, outside the club, the island barracks, the poop deck]));
+	optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the "fun" house, the nemesis' lair, the broodling grounds, the outer compound, the temple portico, convention hall lobby, outside the club, the island barracks, the poop deck]));
 }

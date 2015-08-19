@@ -93,31 +93,6 @@ float [monster] appearance_rates_adjusted(location l)
         if (lawyers_relocated && (source_altered contains $monster[pygmy witch lawyer]))
             remove source_altered[$monster[pygmy witch lawyer]];
     }
-    
-    if (l == $location[nemesis cave])
-    {
-        boolean [monster] all_monsters_to_remove = $monsters[infernal seal larva,infernal seal spawn,vengeful turtle spectre,haunted soup tureen,evil spaghetti cultist,evil spaghetti cult priest,pernicious puddle of pesto,slithering hollandaise glob,psychedelic fur,talking head,evil trumpet-playing mariachi,evil vihuela-playing mariachi];
-        
-        boolean [monster] monsters_not_to_remove;
-        if (my_class() == $class[seal clubber])
-            monsters_not_to_remove = $monsters[infernal seal larva,infernal seal spawn];
-        else if (my_class() == $class[turtle tamer])
-            monsters_not_to_remove = $monsters[vengeful turtle spectre,haunted soup tureen];
-        else if (my_class() == $class[pastamancer])
-            monsters_not_to_remove = $monsters[evil spaghetti cultist,evil spaghetti cult priest];
-        else if (my_class() == $class[sauceror])
-            monsters_not_to_remove = $monsters[pernicious puddle of pesto,slithering hollandaise glob];
-        else if (my_class() == $class[disco bandit])
-            monsters_not_to_remove = $monsters[psychedelic fur,talking head];
-        else if (my_class() == $class[accordion thief])
-            monsters_not_to_remove = $monsters[evil trumpet-playing mariachi,evil vihuela-playing mariachi];
-        foreach m in all_monsters_to_remove
-        {
-            if (monsters_not_to_remove contains m)
-                continue;
-            remove source_altered[m];
-        }
-    }
     if (l == $location[The Nemesis' Lair])
     {
         boolean [monster] all_monsters_to_remove = $monsters[hellseal guardian,Gorgolok\, the Infernal Seal (Inner Sanctum),warehouse worker,Stella\, the Turtle Poacher (Inner Sanctum),evil spaghetti cult zealot,Spaghetti Elemental (Inner Sanctum),security slime,Lumpy\, the Sinister Sauceblob (Inner Sanctum),daft punk,Spirit of New Wave (Inner Sanctum),mariachi bruiser,Somerset Lopez\, Dread Mariachi (Inner Sanctum)];
@@ -1005,6 +980,7 @@ static
         lookup_map["The Secret Council Warehouse"] = "tutorial.php";
         lookup_map["The Skeleton Store"] = "place.php?whichplace=town_market";
         lookup_map["Madness Bakery"] = "place.php?whichplace=town_right";
+        lookup_map["The Fungal Nethers"] = "place.php?whichplace=nemesiscave";
         foreach s in $strings[The Hallowed Halls,Shop Class,Chemistry Class,Art Class]
             lookup_map[s] = "place.php?whichplace=KOLHS";
         foreach s in $strings[The Edge of the Swamp,The Dark and Spooky Swamp,The Corpse Bog,The Ruined Wizard Tower,The Wildlife Sanctuarrrrrgh,Swamp Beaver Territory,The Weird Swamp Village]

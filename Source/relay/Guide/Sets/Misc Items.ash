@@ -663,6 +663,8 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
 		{
 			string [int] description;
 			description.listAppend(($item[tattered scrap of paper].available_amount() / 2.0).roundForOutput(1) + " free runs.");
+            if (in_bad_moon())
+                description.listAppend("Or save for demon summoning.");
 			resource_entries.listAppend(ChecklistEntryMake("__item tattered scrap of paper", "", ChecklistSubentryMake(pluralise($item[tattered scrap of paper]), "", description), importance_level_unimportant_item));
 		}
 		if (2371.to_item().available_amount() > 0 && __misc_state["free runs usable"])
