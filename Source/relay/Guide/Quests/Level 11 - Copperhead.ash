@@ -60,7 +60,7 @@ boolean QLevel11ShouldOutputCopperheadRoute(string which_route)
     if (which_route == "shen" && $location[the copperhead club].turns_spent > 0)
         return true;
     
-    if (__misc_state["In run"] && ($location[a mob of zeppelin protesters].turns_spent + $location[the red zeppelin].turns_spent + $location[the copperhead club].turns_spent) > 0)
+    if (__misc_state["in run"] && ($location[a mob of zeppelin protesters].turns_spent + $location[the red zeppelin].turns_spent + $location[the copperhead club].turns_spent) > 0)
         return true;
     
     return false;
@@ -251,7 +251,7 @@ void QLevel11RonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
     
     ChecklistEntry entry = ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[A Mob of Zeppelin Protesters,The Red Zeppelin]);
     
-    if (!__misc_state["In run"] || $item[talisman o' namsilat].available_amount() > 0)
+    if (!__misc_state["in run"] || $item[talisman o' namsilat].available_amount() > 0)
         optional_task_entries.listAppend(entry);
     else
         task_entries.listAppend(entry);
@@ -368,7 +368,7 @@ void QLevel11ShenGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     
 	ChecklistEntry entry = ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the copperhead club]);
     
-    if (!__misc_state["In run"] || $item[talisman o' namsilat].available_amount() > 0)
+    if (!__misc_state["in run"] || $item[talisman o' namsilat].available_amount() > 0)
         optional_task_entries.listAppend(entry);
     else
         task_entries.listAppend(entry);

@@ -116,7 +116,7 @@ void generateMisc(Checklist [int] checklists)
         //FIXME resolution be more adventurous goes here
         
 		task_entries.entries.listAppend(ChecklistEntryMake("__item counterclockwise watch", url, ChecklistSubentryMake("Wait for rollover", "", description), -11));
-        if (stills_available() > 0 && __misc_state["In Run"])
+        if (stills_available() > 0 && __misc_state["in run"])
         {
             string url = "shop.php?whichshop=still";
             if ($item[soda water].available_amount() == 0)
@@ -167,7 +167,7 @@ void generateChecklists(Checklist [int] ordered_output_checklists)
         generateDailyResources(checklists);
         
         generateTasks(checklists);
-        if (__misc_state["Example mode"] || !__misc_state["In aftercore"])
+        if (__misc_state["Example mode"] || !__misc_state["in aftercore"])
         {
             generateMissingItems(checklists);
             generatePullList(checklists);
@@ -233,7 +233,7 @@ void generateChecklists(Checklist [int] ordered_output_checklists)
 
 void outputChecklists(Checklist [int] ordered_output_checklists)
 {
-    if (__misc_state["In run"] && playerIsLoggedIn())
+    if (__misc_state["in run"] && playerIsLoggedIn())
         PageWrite(HTMLGenerateDivOfClass("Day " + my_daycount() + ". " + pluralise(my_turncount(), "turn", "turns") + " played.", "r_bold"));
 	if (my_path() != "" && my_path() != "None" && playerIsLoggedIn())
 	{

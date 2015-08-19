@@ -29,6 +29,8 @@ void QLevel5GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 {
 	if (!__quest_state["Level 5"].in_progress)
 		return;
+    if (my_path_id() == PATH_COMMUNITY_SERVICE || __misc_state["in aftercore"])
+        return;
     string url = "place.php?whichplace=plains";
 	//if the quest isn't started and we have unlocked the barracks, wait until it's started:
 	if (get_property("questL05Goblin") == "unstarted" && $item[knob goblin encryption key].available_amount() > 0) //have key already, waiting for quest to start, nothing more to do here

@@ -2,7 +2,7 @@ void generateStrategy(Checklist [int] checklists)
 {
 	ChecklistEntry [int] entries;
     
-    if (!__misc_state["In run"])
+    if (!__misc_state["in run"])
         return;
     
     

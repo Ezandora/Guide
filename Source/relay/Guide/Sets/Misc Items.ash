@@ -19,7 +19,7 @@ void SMiscItemsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         optional_task_entries.listAppend(ChecklistEntryMake("__item the crown of ed the undying", "inventory.php?action=activateedhat", ChecklistSubentryMake("Configure the Crown of Ed the Undying", "", description), 5));
     }
     
-    if (__misc_state["In run"])
+    if (__misc_state["in run"])
     {
         //Suggest acquiring a stasis source:
         //If you're not in ronin, you should acquire a source from hangk's.
@@ -97,7 +97,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
 	int importance_level_item = 7;
 	int importance_level_unimportant_item = 8;
     
-    boolean in_run = __misc_state["In run"];
+    boolean in_run = __misc_state["in run"];
     
 	int navel_percent_chance_of_runaway = 20;
 	if (true)
@@ -402,9 +402,13 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
                 resource_entries.listAppend(ChecklistEntryMake(image_name, "inventory.php?which=3", subentries, importance_level_item));
         }
 	}
-	if ($item[smut orc keepsake box].available_amount() > 0 && !__quest_state["Level 9"].state_boolean["bridge complete"] && __misc_state["In run"])
+	if ($item[smut orc keepsake box].available_amount() > 0 && !__quest_state["Level 9"].state_boolean["bridge complete"] && __misc_state["in run"])
 		resource_entries.listAppend(ChecklistEntryMake("__item smut orc keepsake box", "inventory.php?which=3", ChecklistSubentryMake(pluralise($item[smut orc keepsake box]), "", "Open for bridge building."), 0));
 		
+    if ($item[wand of pigification].available_amount() > 0 && in_bad_moon())
+    {
+		resource_entries.listAppend(ChecklistEntryMake("__item wand of pigification", "", ChecklistSubentryMake("Wand of pigification", "", "Use twice(?) a day on monsters for good-level food."), 6));
+    }
 		
 	int clovers_available = $items[disassembled clover,ten-leaf clover].available_amount();
 	if (clovers_available > 0 && in_run)
@@ -466,7 +470,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
 	if ($item[stone wool].available_amount() > 0)
 	{
 		string [int] description;
-		
+		string url = "inventory.php?which=3";
 		int quest_needed = 2;
 		if ($item[the nostril of the serpent].available_amount() > 0)
 			quest_needed -= 1;
@@ -484,8 +488,10 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
                 line += "|Can use to extend effects at nuns.";
 			description.listAppend(line);
         }
+        if (!__misc_state["in run"] && $effect[stone-faced].have_effect() > 0)
+            url = $location[the hidden temple].getClickableURLForLocation();
 		if (description.count() > 0)
-			resource_entries.listAppend(ChecklistEntryMake("__item stone wool", "inventory.php?which=3", ChecklistSubentryMake(pluralise($item[stone wool]), "", description), importance_level_unimportant_item));
+			resource_entries.listAppend(ChecklistEntryMake("__item stone wool", url, ChecklistSubentryMake(pluralise($item[stone wool]), "", description), importance_level_unimportant_item));
 	}
     if ($item[the legendary beat].available_amount() > 0 && !get_property_boolean("_legendaryBeat"))
     {
@@ -709,7 +715,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
     if ($item[map to safety shelter grimace prime].available_amount() > 0)
     {
         string line = "Use for synthetic dog hair or distention pill.";
-        if (__misc_state["In aftercore"])
+        if (__misc_state["in aftercore"])
             line += "|Will disappear when you ascend.";
         resource_entries.listAppend(ChecklistEntryMake("__item " + $item[map to safety shelter grimace prime], "inventory.php?which=3", ChecklistSubentryMake(pluralise($item[map to safety shelter grimace prime]), "", line), importance_level_unimportant_item));
     }

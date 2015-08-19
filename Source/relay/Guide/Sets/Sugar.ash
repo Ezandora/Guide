@@ -1,7 +1,7 @@
 
 void SugarGenerateSuggestions(string [int] suggestions)
 {
-    if (!__misc_state["In run"])
+    if (!__misc_state["in run"])
         return;
     if ($item[sugar shield].available_amount() == 0 && $item[snow suit].available_amount() == 0)
         suggestions.listAppend("Sugar shield: +10 familiar weight equip");
@@ -22,7 +22,7 @@ void SSugarGenerateResource(ChecklistEntry [int] resource_entries)
     
     string image_name = "";
     
-    if ($item[sugar sheet].available_amount() > 0 && __misc_state["In run"] )
+    if ($item[sugar sheet].available_amount() > 0 && __misc_state["in run"] )
     {
         string [int] suggestions;
         SugarGenerateSuggestions(suggestions);

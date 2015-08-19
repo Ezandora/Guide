@@ -66,7 +66,7 @@ void STomesGenerateResource(ChecklistEntry [int] resource_entries)
 			}
 			
             
-            if (__misc_state["In run"])
+            if (__misc_state["in run"])
             {
                 description.listAppend("1 Flaskfull of Hollow" + HTMLGenerateIndentedText(flask_suggestions.listJoinComponents("<hr>")));
                 description.listAppend("1 Lump of Brituminous coal" + HTMLGenerateIndentedText(coal_suggestions.listJoinComponents("<hr>")));
@@ -114,7 +114,7 @@ void STomesGenerateResource(ChecklistEntry [int] resource_entries)
                 if (true)
                 {
                     string line = "Crystal skull: banish in high monster count zones";
-                    if ($skill[Summon Smithsness].skill_is_usable() && !__misc_state["In aftercore"])
+                    if ($skill[Summon Smithsness].skill_is_usable() && !__misc_state["in aftercore"])
                         line += "|*Smith's Tome has a better one";
                     description.listAppend(line);
                 }

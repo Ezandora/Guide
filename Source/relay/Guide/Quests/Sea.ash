@@ -2,7 +2,7 @@
 
 void QSeaInit()
 {
-	if (!__misc_state["In aftercore"])
+	if (!__misc_state["in aftercore"])
 		return;
     
     //Have they adventured anywhere underwater?
@@ -379,7 +379,7 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 	QuestState temple_quest_state = __quest_state["Sea Temple"];
 	QuestState monkees_quest_state = __quest_state["Sea Monkees"];
 	
-	if (!__misc_state["In aftercore"])
+	if (!__misc_state["in aftercore"])
 		return;
     
 	boolean have_something_to_do_in_sea = false;

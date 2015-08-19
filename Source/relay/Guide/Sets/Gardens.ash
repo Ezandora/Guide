@@ -36,7 +36,7 @@ void generateGardenEntry(ChecklistEntry [int] resource_entries, boolean [item] g
 
 void SGardensGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (!__misc_state["In run"])
+	if (!__misc_state["in run"])
         return;
 
     //Garden items:

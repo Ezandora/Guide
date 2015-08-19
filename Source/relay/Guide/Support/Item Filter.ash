@@ -6,7 +6,7 @@ static
     
     void ItemFilterInitialise()
     {
-        boolean [string] modifier_names = $strings[Meat Drop,Initiative,Muscle,Mysticality,Moxie,Muscle Percent,Mysticality Percent,Moxie Percent];
+        /*boolean [string] modifier_names = $strings[Meat Drop,Initiative,Muscle,Mysticality,Moxie,Muscle Percent,Mysticality Percent,Moxie Percent];
         
         foreach modifier in modifier_names
         {
@@ -24,13 +24,31 @@ static
                     __if_potions_with_numeric_modifiers[modifier].listAppend(it);
                 }
             }
-        }
+        }*/
     }
     
     
     ItemFilterInitialise();
 }
 
+
+void ItemFilterInitialisePotionsForModifier(string modifier)
+{
+    if (__if_potions_with_numeric_modifiers contains modifier)
+        return;
+    __if_potions_with_numeric_modifiers[modifier] = listMakeBlankItem();
+
+    foreach it in $items[]
+    {
+        if (it.inebriety > 0 || it.fullness > 0 || it.spleen > 0) continue;
+        effect e = it.to_effect();
+        if (e == $effect[none]) continue;
+        if (e.numeric_modifier(modifier) != 0.0)
+        {
+            __if_potions_with_numeric_modifiers[modifier].listAppend(it);
+        }
+    }
+}
 
 
 item [int] ItemFilterGetPotionsWithNumericModifiers(string [int] modifiers)
@@ -40,19 +58,11 @@ item [int] ItemFilterGetPotionsWithNumericModifiers(string [int] modifiers)
     foreach key, modifier in modifiers
     {
         item [int] first_layer_list;
-        if (__if_potions_with_numeric_modifiers contains modifier)
-            first_layer_list = __if_potions_with_numeric_modifiers[modifier];
-        else
-        {
-            foreach it in $items[]
-            {
-                if (it.inebriety > 0 || it.fullness > 0 || it.spleen > 0) continue;
-                effect e = it.to_effect();
-                if (e == $effect[none]) continue;
-                if (e.numeric_modifier(modifier) > 0.0)
-                    first_layer_list.listAppend(it);
-            }
-        }
+        if (!(__if_potions_with_numeric_modifiers contains modifier))
+            ItemFilterInitialisePotionsForModifier(modifier);
+        
+        first_layer_list = __if_potions_with_numeric_modifiers[modifier];
+        
         
         foreach key, it in first_layer_list
         {
@@ -82,7 +92,7 @@ item [int] ItemFilterGetPotionsCouldPullToAddToNumericModifier(string [int] modi
         float v = 0;
         foreach key, modifier in modifiers
             v += e.numeric_modifier(modifier);
-        if (v > 0.0 && v >= minimum_modifier && !(blacklist contains it))
+        if (v != 0.0 && v >= minimum_modifier && !(blacklist contains it))
         {
             relevant_potions.listAppend(it);
         }

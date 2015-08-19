@@ -3,7 +3,7 @@ boolean HITSStillRelevant()
 {
 	if (__misc_state["Example mode"])
 		return true;
-	if (!__misc_state["In run"])
+	if (!__misc_state["in run"])
 		return false;
 	if (__quest_state["Level 13"].state_boolean["Richard's star key used"])
 		return false;
@@ -216,7 +216,7 @@ void QHitsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] 
 
 void QHitsGenerateMissingItems(ChecklistEntry [int] items_needed_entries)
 {
-	if (!__misc_state["In run"] && !__misc_state["Example mode"])
+	if (!__misc_state["in run"] && !__misc_state["Example mode"])
 		return;
 	if (__quest_state["Level 13"].state_boolean["Richard's star key used"])
 		return;

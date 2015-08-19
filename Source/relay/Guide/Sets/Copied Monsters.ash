@@ -317,7 +317,7 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
         else
             header += " fightable";
         
-        if (__misc_state["In run"])
+        if (__misc_state["in run"])
         {
             string line;
             if (current_monster == $monster[none])

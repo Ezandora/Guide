@@ -70,7 +70,7 @@ void SLibramGenerateResource(ChecklistEntry [int] resource_entries)
 		}
 	}
 	
-	if (__misc_state["In run"])
+	if (__misc_state["in run"])
 	{
 		boolean [item] all_possible_bricko_fights = $items[bricko eye brick,bricko airship,bricko bat,bricko cathedral,bricko elephant,bricko gargantuchicken,bricko octopus,bricko ooze,bricko oyster,bricko python,bricko turtle,bricko vacuum cleaner];
 		

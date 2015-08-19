@@ -188,7 +188,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             item_descriptions[$item[resolution: be sexier]] = "+2 moxie stats/fight (20 turns)";
             item_effects[$item[resolution: be sexier]] = $effect[Irresistible Resolve];
             
-            if (!can_interact())
+            if (!can_interact() && !in_bad_moon())
             {
                 item_descriptions[$item[old bronzer]] = "+2 moxie stats/fight (25 turns)";
                 item_effects[$item[old bronzer]] = $effect[Sepia Tan];
@@ -205,7 +205,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             item_effects[$item[resolution: be stronger]] = $effect[Strong Resolve];
             
             
-            if (!can_interact())
+            if (!can_interact() && !in_bad_moon())
             {
                 item_descriptions[$item[old eyebrow pencil]] = "+2 muscle stats/fight (25 turns)";
                 item_effects[$item[old eyebrow pencil]] = $effect[Browbeaten];
@@ -221,7 +221,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             item_effects[$item[resolution: be smarter]] = $effect[Brilliant Resolve];
             
             
-            if (!can_interact())
+            if (!can_interact() && !in_bad_moon())
             {
                 item_descriptions[$item[old rosewater cream]] = "+2 mysticality stats/fight (25 turns)";
                 item_effects[$item[old rosewater cream]] = $effect[Rosewater Mark];
@@ -279,7 +279,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     }
     
     boolean have_blacklight_bulb = (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE && get_property("peteMotorbikeHeadlight") == "Blacklight Bulb");
-    if (__last_adventure_location == $location[the arid\, extra-dry desert] && !__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && __misc_state["In run"] && !have_blacklight_bulb && __quest_state["Level 11 Desert"].state_int["Desert Exploration"] < 99)
+    if (__last_adventure_location == $location[the arid\, extra-dry desert] && !__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && __misc_state["in run"] && !have_blacklight_bulb && __quest_state["Level 11 Desert"].state_int["Desert Exploration"] < 99)
     {
         boolean have_uv_compass_equipped = __quest_state["Level 11 Desert"].state_boolean["Have UV-Compass eqipped"];
         
@@ -297,7 +297,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         }
         
     }
-    if ($item[bottle of blank-out].available_amount() > 0 && $item[glob of blank-out].available_amount() == 0 && __misc_state["In run"] && __misc_state["free runs usable"] && !get_property_boolean("_blankOutUsed") && in_ronin())
+    if ($item[bottle of blank-out].available_amount() > 0 && $item[glob of blank-out].available_amount() == 0 && __misc_state["in run"] && __misc_state["free runs usable"] && !get_property_boolean("_blankOutUsed") && in_ronin())
     {
         task_entries.listAppend(ChecklistEntryMake("__item " + $item[bottle of blank-out], "inventory.php?which=3", ChecklistSubentryMake("Use " + $item[bottle of blank-out], "", "Acquire glob to run away with."), -11));
     

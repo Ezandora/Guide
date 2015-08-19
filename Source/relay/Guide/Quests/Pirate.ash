@@ -8,7 +8,7 @@ void QPirateInit()
 	state.quest_name = "Pirate Quest";
 	state.image_name = "pirate quest";
 	
-	if (__misc_state["mysterious island available"])
+	if (__misc_state["mysterious island available"] && !(my_path_id() == PATH_COMMUNITY_SERVICE || __misc_state["in aftercore"]))
 	{
 		state.startable = true;
 		if (!state.in_progress && !state.finished)
@@ -49,10 +49,12 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 {
 	if (!__quest_state["Pirate Quest"].in_progress)
 		return;
+        
 	QuestState base_quest_state = __quest_state["Pirate Quest"];
 	ChecklistSubentry subentry;
 	subentry.header = base_quest_state.quest_name;
     string url = "";
+    
     
 	boolean have_outfit = have_outfit_components("Swashbuckling Getup");
 	if ($item[pirate fledges].available_amount() > 0)

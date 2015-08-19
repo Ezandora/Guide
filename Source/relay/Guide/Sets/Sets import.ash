@@ -43,3 +43,4 @@ import "relay/Guide/Sets/Actually Ed the Undying.ash";
 import "relay/Guide/Sets/Mayo Clinic.ash";
 import "relay/Guide/Sets/Deck of Every Card.ash";
 import "relay/Guide/Sets/Bad Moon.ash";
+import "relay/Guide/Sets/Community Service.ash";

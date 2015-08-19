@@ -225,7 +225,7 @@ void QSleazeAirportGenerateTasks(ChecklistEntry [int] task_entries)
     questESlFish - Taco Dan, Sunken Yacht, tacoDanFishMeat
     questESlDebt - (?)Broden, Sunken Yacht
     */
-    if (__misc_state["In run"] && !($locations[the sunken party yacht,sloppy seconds diner,the fun-guy mansion] contains __last_adventure_location)) //too many
+    if (__misc_state["in run"] && !($locations[the sunken party yacht,sloppy seconds diner,the fun-guy mansion] contains __last_adventure_location)) //too many
         return;
     ChecklistEntry [int] subtask_entries;
     QSleazeAirportMushStashGenerateTasks(subtask_entries); //√
@@ -270,7 +270,7 @@ void QSleazeAirportGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (!__misc_state["sleaze airport available"])
         return;
-    if (get_property("umdLastObtained") != "" && !__misc_state["In run"])
+    if (get_property("umdLastObtained") != "" && !__misc_state["in run"])
     {
         string umd_date_obtained = get_property("umdLastObtained");
         
@@ -789,7 +789,7 @@ void QSpookyAirportGenerateTasks(ChecklistEntry [int] task_entries)
 {
     if (!__misc_state["spooky airport available"])
         return;
-    if (__misc_state["In run"] && !($locations[the mansion of dr. weirdeaux,the secret government laboratory,the deep dark jungle] contains __last_adventure_location)) //a common strategy is to accept an island quest in-run, then finish it upon prism break to do two quests in a day. so, don't clutter their interface unless they're adventuring there? hmm...
+    if (__misc_state["in run"] && !($locations[the mansion of dr. weirdeaux,the secret government laboratory,the deep dark jungle] contains __last_adventure_location)) //a common strategy is to accept an island quest in-run, then finish it upon prism break to do two quests in a day. so, don't clutter their interface unless they're adventuring there? hmm...
         return;
     
     QSpookyAirportClipperGenerateTasks(task_entries);
@@ -1228,7 +1228,7 @@ void QStenchAirportGenerateTasks(ChecklistEntry [int] task_entries)
 {
     if (!__misc_state["stench airport available"])
         return;
-    if (__misc_state["In run"] && !($locations[Pirates of the Garbage Barges,Barf Mountain,The Toxic Teacups,Uncle Gator's Country Fun-Time Liquid Waste Sluice] contains __last_adventure_location))
+    if (__misc_state["in run"] && !($locations[Pirates of the Garbage Barges,Barf Mountain,The Toxic Teacups,Uncle Gator's Country Fun-Time Liquid Waste Sluice] contains __last_adventure_location))
         return;
     QStenchAirportFishTrashGenerateTasks(task_entries);
     QStenchAirportNastyBearsGenerateTasks(task_entries);
@@ -1242,10 +1242,175 @@ void QStenchAirportGenerateTasks(ChecklistEntry [int] task_entries)
     QStenchAirportWartDinseyGenerateTasks(task_entries);
 }
 
+void QHotAirportLavaCoLampGenerateTasks(ChecklistEntry [int] task_entries)
+{
+    if (!can_interact())
+        return;
+        
+    if (__last_adventure_location != lookupLocation("LavaCo&trade; Lamp Factory")) //dave's not here, man
+        return;
+    
+    item [int] missing_lamps = lookupItems("Red LavaCo Lamp&trade;,Green LavaCo Lamp&trade;,Blue LavaCo Lamp&trade;").items_missing();
+    
+    if (missing_lamps.count() == 0)
+        return;
+        
+    string url = "place.php?whichplace=airport_hot";
+    string [int] modifiers;
+    string [int] description;
+    
+    
+    description.listAppend("+5 adventures/+sleepstatgain offhand, useful in ascension.");
+    
+    //One at a time:
+    
+    item targeting_lamp = missing_lamps[0];
+    string [int] colours_missing;
+    foreach key, it in missing_lamps
+        colours_missing.listAppend(it.to_string().replace_string(" LavaCo Lamp&trade;", ""));
+        
+    string colour = colours_missing[0];
+    
+    item capped_item = lookupItem("capped " + colour + " lava bottle");
+    item uncapped_item = lookupItem("uncapped " + colour + " lava bottle");
+    item lava_glob_item = lookupItem(colour + " lava globs");
+    
+        
+    if (capped_item.available_amount() == 0)
+    {
+        boolean have_all_items = true;
+        if (lookupItem("SMOOCH bottlecap").available_amount() == 0)
+        {
+            have_all_items = false;
+            string line;
+            line = "Acquire a SMOOCH bottlecap by eating SMOOCH soda";
+            if (availableFullness() == 0)
+                line += " later";
+            line += ".";
+            
+            description.listAppend(line);
+        }
+        //uncapped red lava bottle
+        if (uncapped_item.available_amount() == 0)
+        {
+            have_all_items = false;
+            string [int] subdescription;
+            if (lava_glob_item.available_amount() == 0)
+            {
+                subdescription.listAppend("Acquire " + lava_glob_item + " in LavaCo NC: Use the glob dyer" + __html_right_arrow_character + "Dye them " + colour + ".");
+            }
+            if (lookupItem("full lava bottle").available_amount() > 0)
+            {
+                if (lava_glob_item.available_amount() > 0)
+                {
+                    subdescription.listAppend("Use " + lava_glob_item + ".");
+                    url = "inventory.php?which=3";
+                }
+            }
+            else
+            {
+                if (lookupItem("empty lava bottle").item_amount() > 0)
+                {
+                    subdescription.listAppend("Adventure in the LavaCo&trade; Lamp Factory, use the squirter.");
+                }
+                else if (lookupItem("empty lava bottle").available_amount() > 0)
+                {
+                    subdescription.listAppend("Acquire an empty lava bottle. (From hagnk's?)");
+                }
+                else
+                {
+                    if (lookupItem("New Age healing crystal").item_amount() > 0)
+                    {
+                        subdescription.listAppend("Adventure in the LavaCo&trade; Lamp Factory, use the klin.");
+                    }
+                    else
+                        subdescription.listAppend("Acquire New Age healing crystal from the mall or the mine.");
+                }
+            }
+            
+            description.listAppend("Acquire an " + uncapped_item + ".|*" + subdescription.listJoinComponents("|*"));
+        }
+        if (have_all_items) //capped_item.creatable_amount() > 0) //BUG: capped_item.creatable_amount() > 0 when only having cap
+        {
+            description.listAppend("Make " + capped_item + " (" + uncapped_item + " + SMOOCH bottlecap)");
+            url = "craft.php?mode=combine";
+        }
+    }
+    else if (lookupItem("LavaCo&trade; Lamp housing").available_amount() > 0)
+    {
+        description.listAppend("Combine " + capped_item + " and LavaCo&trade; Lamp housing.");
+        url = "craft.php?mode=combine";
+    }
+    
+    if (lookupItem("LavaCo&trade; Lamp housing").available_amount() == 0)
+    {
+        boolean have_all_items = true;
+        if (lookupItem("crystalline light bulb").item_amount() == 0)
+        {
+            have_all_items = false;
+            
+            if (lookupItem("glowing New Age crystal").item_amount() > 0)
+            {
+                description.listAppend("Adventure in the LavaCo&trade; Lamp Factory, use the bulber.");
+            }
+            else
+            {
+                description.listAppend("Acquire glowing New Age crystal. (mall, or healing crystal golem in the mine))");
+            }
+        }
+        if (lookupItem("heat-resistant sheet metal").item_amount() == 0)
+        {
+            have_all_items = false;
+            description.listAppend("Buy heat-resistant sheet metal from the mall.");
+        }
+        if (lookupItem("insulated gold wire").item_amount() == 0)
+        {
+            have_all_items = false;
+            
+            
+            if (lookupItem("insulated gold wire").available_amount() > 0)
+            {
+                description.listAppend("Acquire insulated gold wire. (in hagnk's?)");
+            }
+            else if (lookupItem("insulated gold wire").creatable_amount() > 0)
+            {
+                description.listAppend("Make insulated gold wire. (thin gold wire + unsmoothed velvet");
+                url = "craft.php?mode=combine";
+            }
+            else
+            {
+                if (lookupItem("thin gold wire").available_amount() == 0)
+                {
+                    if (lookupItem("1,970 carat gold").item_amount() == 0)
+                    {
+                        description.listAppend("Acquire 1,970 carat gold by mining in the mine.");
+                    }
+                    else
+                    {
+                        description.listAppend("Adventure in the LavaCo&trade; Lamp Factory, use the wire puller.");
+                    }
+                }
+                if (lookupItem("unsmoothed velvet").available_amount() == 0)
+                    description.listAppend("Buy unsmoothed velvet in the mall.");
+            }
+        }
+        
+        if (have_all_items)
+        {
+            description.listAppend("At the LavaCo&trade; NC, use the chassis assembler.");
+        }
+    }
+    
+    
+	task_entries.listAppend(ChecklistEntryMake("__item " + missing_lamps[0], url, ChecklistSubentryMake("Make a " + colours_missing.listJoinComponents(", ", "and") + " LavaCo Lamp&trade;", modifiers, description), lookupLocations("LavaCo&trade; Lamp Factory")));
+}
+
 void QHotAirportGenerateTasks(ChecklistEntry [int] task_entries)
 {
     if (!__misc_state["hot airport available"])
         return;
+    
+    QHotAirportLavaCoLampGenerateTasks(task_entries);
 }
 
 void QHotAirportGenerateResource(ChecklistEntry [int] resource_entries)
@@ -1349,7 +1514,7 @@ void QHotAirportGenerateResource(ChecklistEntry [int] resource_entries)
 void QAirportGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     ChecklistEntry [int] chosen_entries = optional_task_entries;
-    if (__misc_state["In run"])
+    if (__misc_state["in run"])
         chosen_entries = future_task_entries;
     
     QSleazeAirportGenerateTasks(chosen_entries);

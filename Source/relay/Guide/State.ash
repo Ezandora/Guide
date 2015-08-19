@@ -6,7 +6,7 @@ import "relay/Guide/Plants.ash"
 
 void setUpExampleState()
 {
-	__misc_state["In run"] = true;
+	__misc_state["in run"] = true;
     
 	//Do a default reset of each quest:
 	
@@ -88,12 +88,12 @@ void setUpState()
         }
     }
     
-	__misc_state["In aftercore"] = get_property_boolean("kingLiberated");
+	__misc_state["in aftercore"] = get_property_boolean("kingLiberated");
     //if (get_property_int("lastKingLiberation") == my_ascensions() && my_ascensions() != 0)
-        //__misc_state["In aftercore"] = true;
-	__misc_state["In run"] = !__misc_state["In aftercore"];
+        //__misc_state["in aftercore"] = true;
+	__misc_state["in run"] = !__misc_state["in aftercore"];
     if (__misc_state["Example mode"])
-        __misc_state["In run"] = true;
+        __misc_state["in run"] = true;
     __misc_state["In valhalla"] = (my_class().to_string() == "Astral Spirit");
     
     
@@ -410,7 +410,7 @@ void setUpState()
 	
     //stats:
     
-	if (my_level() < 13 && !__misc_state["In aftercore"])
+	if (my_level() < 13 && !__misc_state["in aftercore"])
 	{
 		__misc_state["need to level"] = true;
 	}
@@ -418,7 +418,7 @@ void setUpState()
     __misc_state["need to level mysticality"] = false;
     __misc_state["need to level moxie"] = false;
     
-    if (__misc_state["In run"])
+    if (__misc_state["in run"])
     {
         //62 muscle for antique machete/hidden hospital
         //70 moxie, 70 mysticality for war outfits
@@ -440,7 +440,7 @@ void setUpState()
 	//wand
 	
 	boolean wand_of_nagamar_needed = true;
-	if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_BUGBEAR_INVASION || my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_KOLHS || my_path_id() == PATH_HEAVY_RAINS || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
+	if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_BUGBEAR_INVASION || my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_KOLHS || my_path_id() == PATH_HEAVY_RAINS || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_COMMUNITY_SERVICE)
 		wand_of_nagamar_needed = false;
 		
 	int ruby_w_needed = 1;
@@ -672,7 +672,7 @@ void setUpState()
     __misc_state_string["resting url"] = "campground.php";
     __misc_state_string["resting description"] = "your campsite";
     __misc_state["recommend resting at campsite"] = true;
-    if (__misc_state["Chateau Mantegna available"] && (__misc_state["need to level"] || $item[pantsgiving].available_amount() == 0))
+    if (__misc_state["Chateau Mantegna available"] && (my_level() < 13 || __misc_state["need to level"] || $item[pantsgiving].available_amount() == 0))
     {
         __misc_state_string["resting url"] = "place.php?whichplace=chateau";
         __misc_state_string["resting description"] = "Chateau Mantegna";

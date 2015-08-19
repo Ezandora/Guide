@@ -21,7 +21,7 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 	
 	string [int] daily_dungeon_aftercore_items_wanted; 
 	
-	if (__misc_state["In aftercore"])
+	if (__misc_state["in aftercore"])
 	{
 		int tokens_needed = 0;
 		if (!__misc_state["familiars temporarily missing"])
@@ -164,7 +164,7 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
             }
             if (l != "")
                 description.listAppend(l);
-			if (!__misc_state["In Aftercore"])
+			if (!__misc_state["in aftercore"])
 			{
 				string submessage = "";
 				if (familiar_is_usable($familiar[gelatinous cubeling]))

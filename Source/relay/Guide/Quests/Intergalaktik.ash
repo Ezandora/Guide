@@ -41,7 +41,7 @@ void QGalaktikGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [i
         if ($item[brown paper bag mask].available_amount() > 0 && $item[brown paper bag mask].equipped_amount() == 0)
             subentry.entries.listAppend("Could equip the brown paper bag mask to meet the Lot's wife, if you haven't already.");
         
-        if (__misc_state["In run"] && __last_adventure_location != $location[the overgrown lot] && !in_bad_moon())
+        if (__misc_state["in run"] && __last_adventure_location != $location[the overgrown lot] && !in_bad_moon())
             return;
     }
     else

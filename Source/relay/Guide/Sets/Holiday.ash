@@ -7,7 +7,7 @@ void SHolidayGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     
     if (todays_holidays["Halloween"])
     {
-        if (__misc_state["In run"])
+        if (__misc_state["in run"])
         {
             string [int] description;
             description.listAppend("Free stats/items from monsters on the first block.");
@@ -27,7 +27,7 @@ void SHolidayGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             optional_task_entries.listAppend(ChecklistEntryMake("__item plastic pumpkin bucket", "place.php?whichplace=town&action=town_trickortreat", ChecklistSubentryMake("Trick or treat", "", description), $locations[trick-or-treating]));
         }
     }
-    if (all_tomorrows_parties["Halloween"] && !__misc_state["In run"])
+    if (all_tomorrows_parties["Halloween"] && !__misc_state["in run"])
         optional_task_entries.listAppend(ChecklistEntryMake("__item plastic pumpkin bucket", "", ChecklistSubentryMake("Save turns for Halloween tomorrow", "", ""), 8));
     
     if (todays_holidays["Arrrbor Day"])

@@ -2,7 +2,7 @@ void SBugbearInvasionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistE
 {
 	if (my_path_id() != PATH_BUGBEAR_INVASION)
 		return;
-    if (!__misc_state["In run"])
+    if (!__misc_state["in run"])
         return;
     
     
@@ -483,7 +483,7 @@ void SBugbearInvasionGenerateResource(ChecklistEntry [int] resource_entries)
 {
 	if (my_path_id() != PATH_BUGBEAR_INVASION)
 		return;
-    if (!__misc_state["In run"])
+    if (!__misc_state["in run"])
         return;
     if ($item[crayon shavings].available_amount() > 0)
     {

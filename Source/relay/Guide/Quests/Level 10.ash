@@ -19,9 +19,9 @@ void QLevel10Init()
     if (state.mafia_internal_step > 1)
         beanstalk_grown = true;
     
-    state.state_boolean["Beanstalk grown"] = beanstalk_grown;
+    state.state_boolean["beanstalk grown"] = beanstalk_grown;
     if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
-        state.state_boolean["Beanstalk grown"] = true;
+        state.state_boolean["beanstalk grown"] = true;
 	
 	if (my_level() >= 10)
 		state.startable = true;
@@ -46,7 +46,7 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 	{
         //FIXME delay if ballroom song not set
         image_name = "penultimate fantasy airship";
-        if (!base_quest_state.state_boolean["Beanstalk grown"])
+        if (!base_quest_state.state_boolean["beanstalk grown"])
         {
             if ($item[enchanted bean].available_amount() == 0)
             {

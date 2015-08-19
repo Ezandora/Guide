@@ -92,11 +92,18 @@ void generateTasks(Checklist [int] checklists)
 	
 	QuestsGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	
-	if (!__misc_state["desert beach available"] && __misc_state["In run"])
+	if (!__misc_state["desert beach available"] && __misc_state["in run"])
 	{
         string url;
 		ChecklistSubentry subentry;
+        boolean optional = false;
 		subentry.header = "Unlock desert beach";
+        if (my_path_id() == PATH_COMMUNITY_SERVICE)
+        {
+            subentry.header = "Optionally unlock desert beach";
+            subentry.entries.listAppend("Not needed to finish path.");
+            optional = true;
+        }
 		if (!knoll_available())
 		{
 			string meatcar_line = "Build a bitchin' meatcar.";
@@ -144,9 +151,13 @@ void generateTasks(Checklist [int] checklists)
 			subentry.entries.listAppend("Build a bitchin' meatcar. (" + meatcar_price + " meat)");
 		}
 		
-		task_entries.listAppend(ChecklistEntryMake("__item bitchin' meatcar", url, subentry));
+        ChecklistEntry entry = ChecklistEntryMake("__item bitchin' meatcar", url, subentry);
+        if (optional)
+            optional_task_entries.listAppend(entry);
+        else
+            task_entries.listAppend(entry);
 	}
-	else if (!__misc_state["mysterious island available"] && __misc_state["In run"])
+	else if (!__misc_state["mysterious island available"] && __misc_state["in run"])
 	{
 		ChecklistSubentry subentry;
 		subentry.header = "Unlock mysterious island";
@@ -206,7 +217,7 @@ void generateTasks(Checklist [int] checklists)
 	}
 	
 	
-	if (__misc_state["need to level"])
+	if (__misc_state["need to level"] && my_path_id() != PATH_COMMUNITY_SERVICE)
 	{
 		ChecklistSubentry subentry;
 		
@@ -319,7 +330,7 @@ void generateTasks(Checklist [int] checklists)
 
 	
 
-	if (__misc_state["yellow ray available"] && __misc_state["In run"])
+	if (__misc_state["yellow ray available"] && __misc_state["in run"])
 	{
 		string [int] potential_targets;
 		
@@ -352,12 +363,12 @@ void generateTasks(Checklist [int] checklists)
         }
 		
 		
-		if (item_drop_modifier_ignoring_plants() < 234.0 && !__misc_state["In aftercore"])
+		if (item_drop_modifier_ignoring_plants() < 234.0 && !__misc_state["in aftercore"])
 			potential_targets.listAppend("Anything with 30% drop if you can't 234%. (dwarf foreman, bob racecar, drum machines, etc)");
 		
 		optional_task_entries.listAppend(ChecklistEntryMake(__misc_state_string["yellow ray image name"], "", ChecklistSubentryMake("Fire yellow ray", "", potential_targets), 5));
 	}
-    if (__misc_state["In run"] && !have_mushroom_plot() && knoll_available() && __misc_state["can eat just about anything"] && fullness_limit() >= 4 && $item[spooky mushroom].available_amount() == 0 && my_path_id() != PATH_WAY_OF_THE_SURPRISING_FIST && my_meat() >= 5000 && my_path_id() != PATH_SLOW_AND_STEADY && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING)
+    if (__misc_state["in run"] && !have_mushroom_plot() && knoll_available() && __misc_state["can eat just about anything"] && fullness_limit() >= 4 && $item[spooky mushroom].available_amount() == 0 && my_path_id() != PATH_WAY_OF_THE_SURPRISING_FIST && my_meat() >= 5000 && my_path_id() != PATH_SLOW_AND_STEADY && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING)
     {
         string [int] description;
         description.listAppend("For spooky mushrooms, to cook a grue egg omelette. (epic food)|Will " + ((my_meat() < 5000) ? "need" : "cost") + " 5k meat. Plant a spooky spore.");
@@ -388,7 +399,7 @@ void generateTasks(Checklist [int] checklists)
 		}
 	}
 	
-	if (!have_outfit_components("Filthy Hippy Disguise") && __misc_state["mysterious island available"] && __misc_state["In run"] && !__quest_state["Level 12"].finished && !__quest_state["Level 12"].state_boolean["War started"])
+	if (!have_outfit_components("Filthy Hippy Disguise") && __misc_state["mysterious island available"] && __misc_state["in run"] && !__quest_state["Level 12"].finished && !__quest_state["Level 12"].state_boolean["War started"])
 	{
 		item [int] missing_pieces = missing_outfit_components("Filthy Hippy Disguise");
         
@@ -403,11 +414,12 @@ void generateTasks(Checklist [int] checklists)
             description.listAppend("Yellow-ray a hippy in the hippy camp if you can.");
             next_line_intro = "Otherwise, ";
         }
-        else
+        else if (my_level() < 9)
             should_be_future_task = true;
+        
 		if (my_level() >= 9)
 		{
-			description.listAppend((next_line_intro + "run -combat there.").capitaliseFirstLetter());
+			description.listAppend((next_line_intro + "run -combat " + (next_line_intro == "" ? " in the hippy camp" : "there") + ".").capitaliseFirstLetter());
 			modifiers.listAppend("-combat");
 		}
 		else
@@ -424,7 +436,7 @@ void generateTasks(Checklist [int] checklists)
             optional_task_entries.listAppend(entry);
 	}
     
-    if (__misc_state["In run"] && (inebriety_limit() == 0 || my_path_id() == PATH_SLOW_AND_STEADY))
+    if (__misc_state["in run"] && (inebriety_limit() == 0 || my_path_id() == PATH_SLOW_AND_STEADY))
     {
         //may be removed in the future?
         //FIXME does this burn delay?
@@ -437,7 +449,7 @@ void generateTasks(Checklist [int] checklists)
     }
     
     //I'm not sure if you ever need a frat boy ensemble in-run, even if you're doing the hippy side on the war? If you need war hippy fatigues, the faster (?) way is acquire hippy outfit -> frat warrior fatigues -> start the war / use desert adventure for hippy fatigues. But if they're sure...
-	if (!have_outfit_components("Frat boy ensemble") && __misc_state["mysterious island available"] && __misc_state["In run"] && !__quest_state["Level 12"].finished && !__quest_state["Level 12"].started && $location[frat house].turnsAttemptedInLocation() >= 3 && ($location[frat house].combatTurnsAttemptedInLocation() > 0 || $location[frat house].noncombat_queue.contains_text("Sing This Explosion to Me") || $location[frat house].noncombat_queue.contains_text("Sing This Explosion to Me") || $location[frat house].noncombat_queue.contains_text("Murder by Death") || $location[frat house].noncombat_queue.contains_text("I Just Wanna Fly") || $location[frat house].noncombat_queue.contains_text("From Stoked to Smoked") || $location[frat house].noncombat_queue.contains_text("Purple Hazers")))
+	if (!have_outfit_components("Frat boy ensemble") && __misc_state["mysterious island available"] && __misc_state["in run"] && !__quest_state["Level 12"].finished && !__quest_state["Level 12"].started && $location[frat house].turnsAttemptedInLocation() >= 3 && ($location[frat house].combatTurnsAttemptedInLocation() > 0 || $location[frat house].noncombat_queue.contains_text("Sing This Explosion to Me") || $location[frat house].noncombat_queue.contains_text("Sing This Explosion to Me") || $location[frat house].noncombat_queue.contains_text("Murder by Death") || $location[frat house].noncombat_queue.contains_text("I Just Wanna Fly") || $location[frat house].noncombat_queue.contains_text("From Stoked to Smoked") || $location[frat house].noncombat_queue.contains_text("Purple Hazers")))
     {
         //they don't have a frat boy ensemble, but they adventured in the pre-war frat house
         //I'm assuming this means they want the outfit, for whatever reason. So, suggest it, until the level 12 starts:
@@ -451,7 +463,7 @@ void generateTasks(Checklist [int] checklists)
 		optional_task_entries.listAppend(ChecklistEntryMake("__item homoerotic frat-paddle", "island.php", ChecklistSubentryMake("Acquire a frat boy ensemble?", modifiers, description), $locations[frat house]));
     }
 		
-	if ($item[strange leaflet].available_amount() > 0 && __misc_state["In run"])
+	if ($item[strange leaflet].available_amount() > 0 && __misc_state["in run"])
 	{
         boolean leaflet_quest_probably_finished = false;
         
@@ -470,7 +482,7 @@ void generateTasks(Checklist [int] checklists)
 
     
     boolean have_spaghetti_breakfast = (($skill[spaghetti breakfast].skill_is_usable() && !get_property_boolean("_spaghettiBreakfast")) || $item[spaghetti breakfast].available_amount() > 0);
-    if (__misc_state["In run"] && __misc_state["can eat just about anything"] && !get_property_boolean("_spaghettiBreakfastEaten") && my_fullness() == 0 && have_spaghetti_breakfast && my_path_id() != PATH_SLOW_AND_STEADY)
+    if (__misc_state["in run"] && __misc_state["can eat just about anything"] && !get_property_boolean("_spaghettiBreakfastEaten") && my_fullness() == 0 && have_spaghetti_breakfast && my_path_id() != PATH_SLOW_AND_STEADY)
     {
     
         string [int] adventure_gain;
@@ -502,7 +514,7 @@ void generateTasks(Checklist [int] checklists)
         optional_task_entries.listAppend(ChecklistEntryMake("__item spaghetti breakfast", url, ChecklistSubentryMake("Eat " + $item[spaghetti breakfast] + " first", "", description), 8));
     }
     
-    if (__misc_state["In run"])
+    if (__misc_state["in run"])
     {
         item dwelling = get_dwelling();
         item upgraded_dwelling = $item[none];
@@ -528,7 +540,7 @@ void generateTasks(Checklist [int] checklists)
         }
     }
     
-    if (__misc_state["In run"] && $item[dry cleaning receipt].available_amount() > 0)
+    if (__misc_state["in run"] && $item[dry cleaning receipt].available_amount() > 0)
     {
         item receipt_item = $item[none];
         if (my_primestat() == $stat[muscle])

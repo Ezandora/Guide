@@ -32,6 +32,7 @@ void QLevel11Init()
         
 		if (my_level() >= 11)
 			state.startable = true;
+        
 		__quest_state["Level 11"] = state;
 		__quest_state["MacGuffin"] = state;
 	}
@@ -202,9 +203,11 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
 
 void QLevel11GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
+    if (my_path_id() == PATH_COMMUNITY_SERVICE)
+        return;
     QLevel11RonGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     QLevel11ShenGenerateTasks(task_entries, optional_task_entries, future_task_entries);
-    if (!__misc_state["In run"])
+    if (!__misc_state["in run"])
         return;
     //Such a complicated quest.
     QLevel11BaseGenerateTasks(task_entries, optional_task_entries, future_task_entries);

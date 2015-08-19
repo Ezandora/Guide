@@ -216,7 +216,7 @@ void SAftercoreThingsToDoGenerateTasks(ChecklistEntry [int] task_entries, Checkl
 
 void SAftercoreGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-    if (!__misc_state["In aftercore"])
+    if (!__misc_state["in aftercore"])
         return;
     //Campground items:
     int [item] campground_items = get_campground();
@@ -225,7 +225,7 @@ void SAftercoreGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     {
         optional_task_entries.listAppend(ChecklistEntryMake("__item sprocket", "", ChecklistSubentryMake("Install a clockwork maid", "", listMake("+8 adventures/day.", "Buy from mall."))));
     }
-    if (campground_items[$item[pagoda plans]] == 0)
+    if (campground_items[$item[pagoda plans]] == 0 && $location[Pandamonium Slums].locationAvailable())
     {
         string url;
         string [int] details;

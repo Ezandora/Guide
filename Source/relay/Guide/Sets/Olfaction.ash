@@ -15,7 +15,7 @@ void SOlfactionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     
     monster [location] location_wanted_monster;
     
-    if (__misc_state["In run"])
+    if (__misc_state["in run"])
     {
         if ($item[talisman o' namsilat].available_amount() == 0 && !__quest_state["Level 11 Palindome"].finished)
             location_wanted_monster[$location[belowdecks]] = $monster[gaudy pirate];

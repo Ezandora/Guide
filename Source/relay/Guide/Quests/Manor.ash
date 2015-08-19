@@ -87,7 +87,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 {
 	if (!__quest_state["Manor Unlock"].in_progress)
 		return;
-    if (!__misc_state["In run"])
+    if (!__misc_state["in run"])
         return;
     
     boolean should_output_optionally = false;
@@ -333,6 +333,8 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     }
     else if (lookupItem("7301").available_amount() == 0) //Spookyraven billiards room key
     {
+        if (my_path_id() == PATH_COMMUNITY_SERVICE && __last_adventure_location != $location[the haunted kitchen])
+            return;
         subentry.header = "Adventure in the Haunted Kitchen";
         url = $location[the haunted kitchen].getClickableURLForLocation();
         image_name = "__item tiny knife and fork";

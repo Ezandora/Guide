@@ -69,7 +69,7 @@ void SemirareGenerateDescription(string [int] description)
 	
     Semirare [int] semirares;
 	//Generate things to do:
-	if (__misc_state["In run"])
+	if (__misc_state["in run"])
 	{
 		if (__misc_state["can equip just about any weapon"])
 		{
@@ -132,6 +132,8 @@ void SemirareGenerateDescription(string [int] description)
             if (!can_create_golem)
                 semirares.listAppend(SemirareMake($location[Ye Olde Medievale Villagee], "Small golem (towerkilling)", 0));
         }*/
+        if (in_bad_moon() && __quest_state["Level 13"].state_boolean["shadow will need to be defeated"] && $item[scented massage oil].available_amount() == 0)
+            semirares.listAppend(SemirareMake($location[Cobb's Knob Harem], "|*Scented massage oil for shadow.", 0)); //theoretically, we could ignore this for DBs that aren't in a black cat run
 	}
 		
 	//aftercore? sea quest, sand dollars, giant pearl

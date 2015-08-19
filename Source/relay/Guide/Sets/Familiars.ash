@@ -2,9 +2,9 @@ void SFamiliarsGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [
 {
 	if (get_property_int("_badlyRomanticArrows") == 0 && (familiar_is_usable($familiar[obtuse angel]) || familiar_is_usable($familiar[reanimated reanimator])))
 	{
-        if (!__misc_state["In aftercore"] && !from_task)
+        if (!__misc_state["in aftercore"] && !from_task)
             return;
-        if (__misc_state["In aftercore"] && from_task)
+        if (__misc_state["in aftercore"] && from_task)
             return;
 		string familiar_image = __misc_state_string["obtuse angel name"];
         string [int] description;
@@ -37,7 +37,7 @@ void SFamiliarsGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [
         if (!familiar_is_usable($familiar[angry jung man]) && in_hardcore() && !__quest_state["Level 13"].state_boolean["digital key used"] && ($item[digital key].available_amount() + creatable_amount($item[digital key])) == 0 && __misc_state["fax equivalent accessible"])
             potential_targets.listAppend("ghost");
         
-        if (__misc_state["In run"] && ($items[bricko eye brick,bricko airship,bricko bat,bricko cathedral,bricko elephant,bricko gargantuchicken,bricko octopus,bricko ooze,bricko oyster,bricko python,bricko turtle,bricko vacuum cleaner].available_amount() > 0 || $skill[summon brickos].skill_is_usable()))
+        if (__misc_state["in run"] && ($items[bricko eye brick,bricko airship,bricko bat,bricko cathedral,bricko elephant,bricko gargantuchicken,bricko octopus,bricko ooze,bricko oyster,bricko python,bricko turtle,bricko vacuum cleaner].available_amount() > 0 || $skill[summon brickos].skill_is_usable()))
             potential_targets.listAppend("BRICKO monster");
         
         if (potential_targets.count() > 0)
@@ -50,7 +50,7 @@ void SFamiliarsGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [
     if ($familiar[Crimbo Shrub].familiar_is_usable())
     {
         boolean should_output = false;
-        if (__misc_state["In run"])
+        if (__misc_state["in run"])
         {
             if (from_task)
                 should_output = true;
@@ -92,7 +92,16 @@ void SFamiliarsPuckGenerateResource(ChecklistEntry [int] resource_entries)
         relevant_familiar = $familiar[Puck Man];
     if ($item[power pill].available_amount() > 0)
     {
-        puck_subentries.listAppend(ChecklistSubentryMake($item[power pill].pluralise().capitaliseFirstLetter(), "", "Use in combat to instakill without costing a turn."));
+        string header = $item[power pill].pluralise().capitaliseFirstLetter();
+        int power_pill_uses_left = clampi(20 - get_property_int("_powerPillUses"), 0, 20);
+        if (power_pill_uses_left < $item[power pill].available_amount())
+        {
+            if (power_pill_uses_left == 0)
+                header += " (not usable today)";
+            else
+                header += " (" + power_pill_uses_left + " usable today)";
+        }
+        puck_subentries.listAppend(ChecklistSubentryMake(header, "", "Use in combat to instakill without costing a turn."));
     }
     if ($familiar[Ms. Puck Man].familiar_is_usable() || $familiar[Puck Man].familiar_is_usable())
     {
@@ -258,7 +267,7 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] resource_entries)
 			
 			description.listAppend(hipster_chances[hipster_fights_available] + "% chance of appearing.");
 			int importance = 0;
-            if (!__misc_state["In run"])
+            if (!__misc_state["in run"])
                 importance = 6;
 			resource_entries.listAppend(ChecklistEntryMake(__misc_state_string["hipster name"], url, ChecklistSubentryMake(name, "", description), importance));
 		}
@@ -283,7 +292,7 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] resource_entries)
 			subentries.listAppend(ChecklistSubentryMake("Nanorhino Banish", "", description_banish));
 		if (__misc_state["need to level"] && __misc_state["have mysticality class combat skill"])
 			subentries.listAppend(ChecklistSubentryMake("Nanorhino Gray Goo", "", "130? mainstat, fire against non-item monster with >90 attack. Cast mysticality combat skill."));
-		if (!$familiar[he-boulder].familiar_is_usable() && __misc_state["have moxie class combat skill"] && __misc_state["In run"])
+		if (!$familiar[he-boulder].familiar_is_usable() && __misc_state["have moxie class combat skill"] && __misc_state["in run"])
         {
             if ($effect[everything looks yellow].have_effect() > 0)
                 subentries.listAppend(ChecklistSubentryMake(HTMLGenerateSpanFont("Nanorhino Yellow Ray", "gray"), "", HTMLGenerateSpanFont("Cast moxie combat skill once everything looks yellow is gone.", "gray")));
@@ -293,7 +302,7 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] resource_entries)
 		if (subentries.count() > 0)
 			resource_entries.listAppend(ChecklistEntryMake("__familiar nanorhino", url, subentries, 5));
 	}
-	if (__misc_state["yellow ray available"] && !__misc_state["In run"])
+	if (__misc_state["yellow ray available"] && !__misc_state["in run"])
     {
         resource_entries.listAppend(ChecklistEntryMake(__misc_state_string["yellow ray image name"], "", ChecklistSubentryMake("Yellow ray available", "", "From " + __misc_state_string["yellow ray source"] + "."), 6));
     }
@@ -403,7 +412,7 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__familiar steam-powered cheerleader", url, ChecklistSubentryMake(title, "", description), importance));
     }
     
-    if ($familiar[grim brother].familiar_is_usable() && !get_property_boolean("_grimBuff") && __misc_state["In run"]) //in aftercore, let the maximizer handle it?
+    if ($familiar[grim brother].familiar_is_usable() && !get_property_boolean("_grimBuff") && __misc_state["in run"]) //in aftercore, let the maximizer handle it?
     {
         string title;
         string [int] description;
@@ -436,7 +445,7 @@ void SFamiliarsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         boolean configured = get_property("shrubGarland") != "" || get_property("shrubGifts") != "" || get_property("shrubLights") != "" || get_property("shrubTopper") != "";
         if (my_daycount() == 1 && get_property("_shrubDecorated") == "false") //default configuration exists, but
             configured = false;
-        if (!configured && (__misc_state["In run"] || my_familiar() == $familiar[Crimbo Shrub]) && get_property("_shrubDecorated") == "false")
+        if (!configured && (__misc_state["in run"] || my_familiar() == $familiar[Crimbo Shrub]) && get_property("_shrubDecorated") == "false")
         {
             string [int] description;
             

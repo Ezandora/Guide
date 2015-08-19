@@ -77,6 +77,7 @@ void SetsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 	SActuallyEdtheUndyingGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SMiscItemsGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SBadMoonGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+	SCommunityServiceGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     
 }
 

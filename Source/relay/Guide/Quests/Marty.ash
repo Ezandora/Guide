@@ -20,7 +20,7 @@ void QMartyGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 		return;
     if (!canadia_available())
         return;
-    if (__misc_state["In run"] && $location[the bugbear pen].turnsAttemptedInLocation() == 0)
+    if (__misc_state["in run"] && $location[the bugbear pen].turnsAttemptedInLocation() == 0)
         return;
         
 	string url = "place.php?whichplace=marais";
@@ -88,7 +88,7 @@ void QMartyGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
             if ($item[bouquet of swamp roses].available_amount() == 0)
             {
                 subentry.entries.listAppend("Adventure in the Weird Swamp Village to defeat a swamp skunk.");
-                subentry.entries.listAppend("+item?");
+                subentry.modifiers.listAppend("+item?");
             }
             if ($item[shrunken navigator head].available_amount() > 0 && $item[branch from the Great Tree].available_amount() == 0)
             {

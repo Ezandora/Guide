@@ -6,8 +6,10 @@ void generateMissingItems(Checklist [int] checklists)
 {
 	ChecklistEntry [int] items_needed_entries;
 	
-	if (!__misc_state["In run"])
+	if (!__misc_state["in run"])
 		return;
+    if (my_path_id() == PATH_COMMUNITY_SERVICE)
+        return;
 	
     //thought about using getClickableURLForLocationIfAvailable for these, but our location detection is very poor, and there are corner cases regardless
 	
@@ -180,7 +182,7 @@ void generateMissingItems(Checklist [int] checklists)
 	if ($item[lord spookyraven's spectacles].available_amount() == 0 && __quest_state["Level 11 Manor"].state_boolean["Can use fast route"] && !__quest_state["Level 11 Manor"].finished)
 		items_needed_entries.listAppend(ChecklistEntryMake("__item lord spookyraven's spectacles", $location[the haunted bedroom].getClickableURLForLocation(), ChecklistSubentryMake("lord spookyraven's spectacles", "", "Found in Haunted Bedroom")));
     
-    if ($item[enchanted bean].available_amount() == 0 && !__quest_state["Level 10"].state_boolean["Beanstalk grown"])
+    if ($item[enchanted bean].available_amount() == 0 && !__quest_state["Level 10"].state_boolean["beanstalk grown"])
     {
 		items_needed_entries.listAppend(ChecklistEntryMake("__item enchanted bean", $location[The Beanbat Chamber].getClickableURLForLocation(), ChecklistSubentryMake("Enchanted bean", "", "Found in the beanbat chamber.")));
     }
@@ -210,7 +212,7 @@ void generateMissingItems(Checklist [int] checklists)
         description.listAppend("Found from an NC on the ground floor of the castle in the clouds in the sky.");
         if ($skill[garbage nova].skill_is_usable())
             description.listAppend("Ignore this, you can towerkill with Garbage Nova.");
-        else
+        else if (!in_bad_moon())
             description.listAppend("Or towerkill.");
         items_needed_entries.listAppend(ChecklistEntryMake("__item electric boning knife", $location[the castle in the clouds in the sky (ground floor)].getClickableURLForLocation(), ChecklistSubentryMake("Electric boning knife", "-combat", description)));
     }
@@ -224,7 +226,8 @@ void generateMissingItems(Checklist [int] checklists)
             description.listAppend(listMake("Head toward the blackberry patch", "Head toward the buzzing sound", "Keep going", "Almost... there...").listJoinComponents(__html_right_arrow_character));
         else
             description.listAppend("Not available yet.");
-        description.listAppend("Or towerkill.");
+        if (!in_bad_moon())
+            description.listAppend("Or towerkill.");
         
         items_needed_entries.listAppend(ChecklistEntryMake("__item beehive", $location[the black forest].getClickableURLForLocation(), ChecklistSubentryMake("Beehive", "-combat", description)));
     }

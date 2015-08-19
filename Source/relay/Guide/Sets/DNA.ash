@@ -237,7 +237,7 @@ void SDNAInit()
             __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[elemental], "+3 all resistance", reasons.listJoinComponents(", ", "and").capitaliseFirstLetter()));
     }
     
-    if (__misc_state["In run"])
+    if (__misc_state["in run"])
     {
         if (__current_dna_intrinsic != __dna_phylum_to_effect[$phylum[construct]] && !__misc_state["familiars temporarily blocked"])
             __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[construct], "+5 familiar weight, DR/DA", "", true));
@@ -279,7 +279,7 @@ void SDNAInit()
     {
         if (!__misc_state["familiars temporarily blocked"])
         {
-            if (!__misc_state["In run"] || my_path_id() == PATH_HEAVY_RAINS)
+            if (!__misc_state["in run"] || my_path_id() == PATH_HEAVY_RAINS)
                 __dna_intrinsic_ideas.listAppend(DNABoldPhylumIfCurrentMonster($phylum[fish]) + " (+10 familiar weight)");
             else if ($item[grimstone mask].available_amount() > 0)
             {
@@ -446,7 +446,7 @@ void SDNAGenerateResource(ChecklistEntry [int] resource_entries)
     
     string image_name = "__effect Human-Human Hybrid";
     
-    if (__misc_state["In run"])
+    if (__misc_state["in run"])
     {
         foreach p in __dna_phylum_to_item
         {

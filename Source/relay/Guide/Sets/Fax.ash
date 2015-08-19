@@ -12,7 +12,7 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
         potential_faxes.listAppend("Auto attack is on, disable it?");
     }
     
-    if (__misc_state["In run"])
+    if (__misc_state["in run"])
     {
         //sleepy mariachi
         if (familiar_is_usable($familiar[fancypants scarecrow]) || familiar_is_usable($familiar[mad hatrack]))
@@ -300,9 +300,9 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
 
 void SFaxGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, boolean from_task)
 {
-    if (!__misc_state["In aftercore"] && !from_task)
+    if (!__misc_state["in aftercore"] && !from_task)
         return;
-    if (__misc_state["In aftercore"] && from_task)
+    if (__misc_state["in aftercore"] && from_task)
         return;
     string url = "clan_viplounge.php?action=faxmachine";
     

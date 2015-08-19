@@ -261,9 +261,9 @@ void generatePullList(Checklist [int] checklists)
             else if ($item[moon pie].is_unrestricted())
                 food_selections.listAppend("moon pies");
             
-            food_selections.listAppend("fleetwood mac 'n' cheese");
+            food_selections.listAppend("fleetwood mac 'n' cheese" + (my_level() < 8 ? " (level 8)" : ""));
             if ($item[karma shawarma].is_unrestricted())
-                food_selections.listAppend("karma shawarma? (expensive)");
+                food_selections.listAppend("karma shawarma? (expensive" + (my_level() < 7 ? ", level 7" : "") + ")");
             //FIXME maybe the new pasta?
         }
         

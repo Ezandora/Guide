@@ -21,7 +21,7 @@ void SPlasticVampireFangsGenerateResource(ChecklistEntry [int] resource_entries)
         }
     }
     
-    if (!get_property_boolean("_interviewIsabella") && __misc_state["In run"] && __misc_state["need to level"])
+    if (!get_property_boolean("_interviewIsabella") && __misc_state["in run"] && __misc_state["need to level"])
     {
         string [int] description;
         int stats_gained = MIN(500, 4 * my_basestat(my_primestat())) * (1.0 + numeric_modifier(my_primestat().to_string() + " Experience Percent") / 100.0);
@@ -53,7 +53,7 @@ void SPlasticVampireFangsGenerateResource(ChecklistEntry [int] resource_entries)
         
     }
 
-    if (!__misc_state["In run"])
+    if (!__misc_state["in run"])
     {
         string [int] description;
         if ($item[plastic vampire fangs].available_amount() == 0)

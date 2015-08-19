@@ -24,7 +24,7 @@ void QFeloniaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         return;
     if (__misc_state["familiars temporarily blocked"]) //cannot complete
         return;
-    if (__misc_state["In run"] && $location[the bugbear pen].turnsAttemptedInLocation() == 0)
+    if (__misc_state["in run"] && $location[the bugbear pen].turnsAttemptedInLocation() == 0)
         return;
 		
 	ChecklistSubentry subentry;

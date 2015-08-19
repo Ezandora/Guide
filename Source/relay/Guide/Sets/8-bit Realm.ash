@@ -110,7 +110,7 @@ void S8bitRealmGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (!(__quest_state["Level 13"].state_boolean["digital key used"] || $item[digital key].available_amount() > 0))
         return;
-    if (!__misc_state["In run"])
+    if (!__misc_state["in run"])
         return;
     //This is mainly for one crazy random summer, where you have many pixels.
     //Blue pixel potion - [50,80] MP restore

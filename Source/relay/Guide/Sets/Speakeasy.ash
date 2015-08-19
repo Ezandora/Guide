@@ -29,7 +29,7 @@ void SSpeakeasyGenerateResource(ChecklistEntry [int] resource_entries)
     //FIXME every drink
     //FIXME gray out drinks we can't drink at the moment (drunkenness, meat)
     
-    if ($effect[Hip to the Jive].have_effect() == 0 && !__misc_state["familiars temporarily blocked"] && __misc_state["In run"])
+    if ($effect[Hip to the Jive].have_effect() == 0 && !__misc_state["familiars temporarily blocked"] && __misc_state["in run"])
     {
         string [int] description;
         description.listAppend("+10 familiar weight");
@@ -38,7 +38,7 @@ void SSpeakeasyGenerateResource(ChecklistEntry [int] resource_entries)
         options.listAppend(listMake("Hot Socks", "3", description.listJoinComponents("|")));
     }
     
-    if (!__misc_state["In run"] && !$skill[Hollow Leg].skill_is_usable())
+    if (!__misc_state["in run"] && !$skill[Hollow Leg].skill_is_usable())
         options.listAppend(listMake("Sloppy Jalopy", "5", "+1 liver capacity skill|Very expensive"));
     
     
@@ -62,7 +62,7 @@ void SSpeakeasyGenerateResource(ChecklistEntry [int] resource_entries)
     if (reasons_to_sockdollager.count() > 0)
         options.listAppend(listMake("Sockdollager", "2", reasons_to_sockdollager.listJoinComponents(", ", "and").capitaliseFirstLetter()));
     
-    if (__misc_state["In run"] && my_meat() >= 20000)
+    if (__misc_state["in run"] && my_meat() >= 20000)
         options.listAppend(listMake("Flivver", "2", "Epic-level drunkenness."));
     
     if (__misc_state["need to level"])
@@ -101,7 +101,7 @@ void SSpeakeasyGenerateResource(ChecklistEntry [int] resource_entries)
     if (options.count() > 1)
         description.listAppend(HTMLGenerateSimpleTableLines(options));
     
-    if (__misc_state["In run"] || drinks_remaining > 0)
+    if (__misc_state["in run"] || drinks_remaining > 0)
         resource_entries.listAppend(ChecklistEntryMake("__item observational glasses", "clan_viplounge.php?action=speakeasy", ChecklistSubentryMake(pluralise(drinks_remaining, "speakeasy drink", "speakeasy drinks"), "", description), 8)); //the eyes of T.J. Eckleburg
     
 }

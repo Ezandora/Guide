@@ -243,7 +243,7 @@ void generateFloristFriar(Checklist [int] checklists)
 {
 	if (!florist_available())
 		return;
-    if (!__misc_state["In run"]) //currently, these suggestions are in-run only
+    if (!__misc_state["in run"]) //currently, these suggestions are in-run only
         return;
 	ChecklistEntry [int] florist_entries;
 	

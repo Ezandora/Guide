@@ -163,6 +163,7 @@ void PageSetTitle(Page page_in, string title)
 
 void PageAddCSSClass(Page page_in, string tag, string class_name, string definition, int importance, string block_identifier)
 {
+    //print_html("Adding block_identifier \"" + block_identifier + "\"");
     if (!(page_in.defined_css_blocks contains block_identifier))
         page_in.defined_css_blocks[block_identifier] = CSSBlockMake(block_identifier);
     page_in.defined_css_blocks[block_identifier].defined_css_classes.listAppend(CSSEntryMake(tag, class_name, definition, importance));
@@ -417,4 +418,25 @@ string HTMLGenerateSimpleTableLines(string [int][int] lines)
         result.append("</div>");
 	}
 	return result.to_string();
+}
+
+string HTMLGenerateElementSpan(element e, string additional_text, boolean desaturated)
+{
+    string line = e;
+    if (additional_text != "")
+        line += " " + additional_text;
+    return HTMLGenerateSpanOfClass(line, "r_element_" + e + (desaturated ? "_desaturated" : ""));
+}
+
+string HTMLGenerateElementSpan(element e, string additional_text)
+{
+    return HTMLGenerateElementSpan(e, additional_text, false);
+}
+string HTMLGenerateElementSpanDesaturated(element e, string additional_text)
+{
+    return HTMLGenerateElementSpan(e, additional_text, true);
+}
+string HTMLGenerateElementSpanDesaturated(element e)
+{
+    return HTMLGenerateElementSpanDesaturated(e, "");
 }

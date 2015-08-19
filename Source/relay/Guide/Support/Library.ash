@@ -67,6 +67,7 @@ int PATH_PICKY = 23;
 int PATH_STANDARD = 24;
 int PATH_ACTUALLY_ED_THE_UNDYING = 25;
 int PATH_ONE_CRAZY_RANDOM_SUMMER = 26;
+int PATH_COMMUNITY_SERVICE = 27;
 
 int __my_path_id_cached = -11;
 int my_path_id()
@@ -119,6 +120,8 @@ int my_path_id()
         __my_path_id_cached = PATH_ACTUALLY_ED_THE_UNDYING;
     else if (path_name == "One Crazy Random Summer")
         __my_path_id_cached = PATH_ONE_CRAZY_RANDOM_SUMMER;
+    else if (path_name == "Community Service" || path_name == "25")
+        __my_path_id_cached = PATH_COMMUNITY_SERVICE;
     else
         __my_path_id_cached = PATH_UNKNOWN;
     return __my_path_id_cached;
@@ -808,6 +811,10 @@ familiar lookupFamiliar(string name)
 location lookupLocation(string name)
 {
     return name.to_location();
+    /*l = name.to_location();
+    if (__setting_debug_mode && l == $location[none])
+        print_html("Unable to find location \"" + name + "\"");
+    return l;*/
 }
 
 boolean [location] lookupLocations(string names_string)
@@ -1287,4 +1294,22 @@ int nextLibramSummonMPCost()
     int next_libram_summoned = libram_summoned + 1;
     int libram_mp_cost = MAX(1 + (next_libram_summoned * (next_libram_summoned - 1)/2) + mana_cost_modifier(), 1);
     return libram_mp_cost;
+}
+
+int equippable_amount(item it)
+{
+    if (!it.can_equip()) return 0;
+    if (it.available_amount() == 0) return 0;
+    if ($slots[acc1, acc2, acc3] contains it.to_slot() && it.available_amount() > 1 && !it.boolean_modifier("Single equip"))
+        return MIN(3, it.available_amount());
+    if (it.to_slot() == $slot[weapon] && it.weapon_hands() == 1)
+    {
+        int weapon_maximum = 1;
+        if ($skill[double-fisted skull smashing].skill_is_usable())
+            weapon_maximum += 1;
+        if (my_familiar() == $familiar[disembodied hand])
+            weapon_maximum += 1;
+        return MIN(weapon_maximum, it.available_amount());
+    }
+    return 1;
 }

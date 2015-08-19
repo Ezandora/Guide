@@ -34,7 +34,7 @@ void generateDailyResources(Checklist [int] checklists)
         string [int][int] options;
 		options.listAppend(generateHotDogLine("Optimal Dog", "Semi-rare next adventure.", 1));
         
-        if (__misc_state["In run"])
+        if (__misc_state["in run"])
         {
             options.listAppend(generateHotDogLine("Ghost Dog", "-combat, 30 turns.", 3));
             options.listAppend(generateHotDogLine("Video Game Hot Dog", "+25% item, +25% meat, pixels, 50 turns.", 3));
@@ -107,7 +107,7 @@ void generateDailyResources(Checklist [int] checklists)
             description.listAppend("+30% food drop.");
         description.listAppend("Or +30% booze drop.");
         boolean should_output = true;
-        if (!__misc_state["In run"])
+        if (!__misc_state["in run"])
         {
             should_output = false;
         }
@@ -130,7 +130,7 @@ void generateDailyResources(Checklist [int] checklists)
 	{
         string [int] description;
         string line = "Various effects.";
-        if (__misc_state["In run"] && my_path_id() != PATH_ZOMBIE_SLAYER && $item[pail].available_amount() > 0)
+        if (__misc_state["in run"] && my_path_id() != PATH_ZOMBIE_SLAYER && $item[pail].available_amount() > 0)
         {
             line = "+20ML";
             line += "|Or various effects.";
@@ -213,7 +213,7 @@ void generateDailyResources(Checklist [int] checklists)
     }
     
     //Not sure how I feel about this. It's kind of extraneous?
-    if (get_property_int("telescopeUpgrades") > 0 && !get_property_boolean("telescopeLookedHigh") && __misc_state["In run"] && availableDrunkenness() < 0 && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING && !in_bad_moon())
+    if (get_property_int("telescopeUpgrades") > 0 && !get_property_boolean("telescopeLookedHigh") && __misc_state["in run"] && availableDrunkenness() < 0 && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING && !in_bad_moon())
     {
         string [int] description;
         int percentage = 5 * get_property_int("telescopeUpgrades");
@@ -290,6 +290,40 @@ void generateDailyResources(Checklist [int] checklists)
             description.listAppend("HP/MP/stats.");
             if (my_level() < 9)
                 description.listAppend("May want to wait until level 9(?) for more stats from resting.");
+            boolean [item] experience_percent_modifiers;
+            int [item] chateau = get_chateau();
+            string numeric_modifier_string;
+            if (chateau[$item[electric muscle stimulator]] > 0)
+            {
+                experience_percent_modifiers = $items[trench lighter,fake washboard];
+                numeric_modifier_string = "Muscle";
+            }
+            else if (chateau[$item[foreign language tapes]] > 0)
+            {
+                experience_percent_modifiers = lookupItems("trench lighter,basaltamander buckler");
+                numeric_modifier_string = "Mysticality";
+            }
+            else if (chateau[$item[bowl of potpourri]] > 0)
+            {
+                experience_percent_modifiers = $items[trench lighter,backwoods banjo];
+                numeric_modifier_string = "Moxie";
+            }
+            item [slot] item_slots;
+            if (numeric_modifier_string != "")
+                numeric_modifier_string += " Experience Percent";
+
+            foreach it in experience_percent_modifiers
+            {
+                if (it.available_amount() > 0 && it.can_equip() && it.equipped_amount() == 0 && item_slots[it.to_slot()].numeric_modifier(numeric_modifier_string) < it.numeric_modifier(numeric_modifier_string))
+                {
+                    item_slots[it.to_slot()] = it;
+                }
+            }
+            item [int] items_equipping;
+            foreach s, it in item_slots
+                items_equipping.listAppend(it);
+            if (items_equipping.count() > 0)
+                description.listAppend("Could equip " + items_equipping.listJoinComponents(", ", "or") + " for more stats.");
         }
         
 		resource_entries.listAppend(ChecklistEntryMake("__effect sleepy", __misc_state_string["resting url"], ChecklistSubentryMake(pluraliseWordy(__misc_state_int["free rests remaining"], "free rest", "free rests").capitaliseFirstLetter(), "", description), 10));
@@ -297,7 +331,7 @@ void generateDailyResources(Checklist [int] checklists)
     
     //FIXME skate park?
     
-    if (my_path_id() != PATH_BEES_HATE_YOU && !get_property_boolean("guyMadeOfBeesDefeated") && get_property_int("guyMadeOfBeesCount") > 0 && (__misc_state["In aftercore"] || !__quest_state["Level 12"].state_boolean["Arena Finished"]))
+    if (my_path_id() != PATH_BEES_HATE_YOU && !get_property_boolean("guyMadeOfBeesDefeated") && get_property_int("guyMadeOfBeesCount") > 0 && (__misc_state["in aftercore"] || !__quest_state["Level 12"].state_boolean["Arena Finished"]))
     {
         //Not really worthwhile? But I suppose we can track it if they've started it, and are either in aftercore or haven't flyered yet.
         //For flyering, it's 20 turns at -25%, 25 turns at -15%. 33 turns at -5%. Not worthwhile?
@@ -352,7 +386,7 @@ void generateDailyResources(Checklist [int] checklists)
         //_deluxeKlawSummons?
         //_crimboTree?
         int soaks_remaining = __misc_state_int["hot tub soaks remaining"];
-        if (__misc_state["In run"] && soaks_remaining > 0 && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING)
+        if (__misc_state["in run"] && soaks_remaining > 0 && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING)
         {
             string description = "Restore all HP, removes most bad effects.";
             resource_entries.listAppend(ChecklistEntryMake("__effect blessing of squirtlcthulli", "clan_viplounge.php", ChecklistSubentryMake(pluralise(soaks_remaining, "hot tub soak", "hot tub soaks"), "", description), 8));
@@ -366,7 +400,7 @@ void generateDailyResources(Checklist [int] checklists)
     
     //soul sauce tracking?
     
-    if ($item[can of rain-doh].available_amount() > 0 && $item[empty rain-doh can].available_amount() == 0 && __misc_state["In run"])
+    if ($item[can of rain-doh].available_amount() > 0 && $item[empty rain-doh can].available_amount() == 0 && __misc_state["in run"])
     {
         resource_entries.listAppend(ChecklistEntryMake("__item can of rain-doh", "inventory.php?which=3", ChecklistSubentryMake("Can of Rain-Doh", "", "Open it!"), 0));
     }

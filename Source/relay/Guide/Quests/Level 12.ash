@@ -23,6 +23,7 @@ void QLevel12Init()
 	state.state_boolean["Nuns Finished"] = (get_property("sidequestNunsCompleted") != "none");
 	state.state_boolean["Orchard Finished"] = (get_property("sidequestOrchardCompleted") != "none");
     state.state_boolean["War started"] = (state.mafia_internal_step >= 2);
+    state.state_boolean["War in progress"] = state.state_boolean["War started"] && !state.finished;
     
     state.state_int["hippies left on battlefield"] = 1000 - get_property_int("hippiesDefeated");
     state.state_int["frat boys left on battlefield"] = 1000 - get_property_int("fratboysDefeated");

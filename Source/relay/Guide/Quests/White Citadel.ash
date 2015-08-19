@@ -20,19 +20,17 @@ void QWhiteCitadelInit()
 
 void QWhiteCitadelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-    if (!mafiaIsPastRevision(14794))
-        return;
-    if (!__misc_state["In aftercore"]) //not yet
+    if (!__misc_state["in aftercore"] && !in_bad_moon()) //not yet
         return;
     if (!__misc_state["guild open"]) //bugged
         return;
 	QuestState base_quest_state = __quest_state["White Citadel"];
-	if (!base_quest_state.in_progress)
+	if (!base_quest_state.in_progress && !(in_bad_moon() && !base_quest_state.started))
 		return;
     
     boolean using_black_cat_equivalent = ($familiars[O.A.F.,black cat] contains my_familiar());
     
-    if (__misc_state["In run"] && $location[The Road to the White Citadel].turnsAttemptedInLocation() == 0 && !using_black_cat_equivalent) //not until they're sure
+    if (__misc_state["in run"] && $location[The Road to the White Citadel].turnsAttemptedInLocation() == 0 && !in_bad_moon()) //not until they're sure
         return;
     
     boolean add_as_future_task = false;
@@ -43,8 +41,15 @@ void QWhiteCitadelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 	
 	string active_url = "place.php?whichplace=woods";
     
+    if (in_bad_moon())
+        subentry.entries.listAppend("Relevant in Bad Moon for duonoculars and food from the wand of pigification.");
     
-    if (base_quest_state.mafia_internal_step == 1)
+    if (!base_quest_state.started)
+    {
+        subentry.entries.listAppend("Visit your friend at the guild to start the quest.");
+        active_url = "guild.php";
+    }
+    else if (base_quest_state.mafia_internal_step == 1)
     {
         //1	Find the road to the White Citadel, somewhere in Whitey's Grove.
         //Unlock the road to white citadel:

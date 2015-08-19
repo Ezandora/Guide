@@ -35,6 +35,9 @@ void QLevel2GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	QuestState base_quest_state = __quest_state["Level 2"];
 	if (!base_quest_state.in_progress)
 		return;
+    
+    if (my_path_id() == PATH_COMMUNITY_SERVICE || __misc_state["in aftercore"])
+        return;
 		
 	ChecklistSubentry subentry;
     string url = "place.php?whichplace=woods";

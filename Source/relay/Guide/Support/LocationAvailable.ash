@@ -26,6 +26,7 @@ void locationCompatibilityInit()
 locationCompatibilityInit(); //not sure if calling functions like this is intended. may break in the future?
 
 boolean [location] __la_location_is_available;
+boolean [string] __la_zone_is_unlocked;
 
 boolean __la_commons_were_inited = false;
 int __la_turncount_initialised_on = -1;
@@ -277,6 +278,8 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
 			return true;
 		return false;
 	}
+    if (zone == "Woods" && !__la_zone_is_unlocked["Woods"])
+        return false;
 	
 	switch (loc)
 	{
@@ -351,7 +354,7 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
         case $location[the hidden temple]:
             return (get_property_int("lastTempleUnlock") == my_ascensions());
 		case $location[the spooky forest]:
-			return questPropertyPastInternalStepNumber("questL02Larva", 1);
+			return __la_zone_is_unlocked["Woods"];
 		case $location[The Smut Orc Logging Camp]:
 			return questPropertyPastInternalStepNumber("questL09Topping", 1);
 		case $location[the black forest]:
@@ -404,7 +407,7 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
         case $location[The Laugh Floor]:
         case $location[Pandamonium Slums]:
         case $location[Infernal Rackets Backstage]:
-            return questPropertyPastInternalStepNumber("questM10Azazel", 1);
+            return get_property("questL06Friar") == "finished";
         case $location[The Degrassi Knoll Restroom]:
         case $location[The Degrassi Knoll Bakery]:
         case $location[The Degrassi Knoll Gym]:
@@ -482,6 +485,12 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
             return get_campground()[$item[jar of psychoses (The Pretentious Artist)]] > 0;
         case $location[whitey's grove]:
             return questPropertyPastInternalStepNumber("questG02Whitecastle", 1) || questPropertyPastInternalStepNumber("questL11Palindome", 4); //FIXME what step for questL11Palindome?
+        case $location[the Obligatory pirate's cove]:
+            return get_property_int("lastIslandUnlock") == my_ascensions() && !(QuestState("questL12War").mafia_internal_step >= 2 && !QuestState("questL12War").finished);
+        case $location[Inside the Palindome]:
+            return $item[talisman o' namsilat].equipped_amount() > 0; //technically
+        case $location[The Valley of Rof L'm Fao]:
+            return QuestState("questL09Topping").finished;
 		default:
 			break;
 	}
@@ -504,14 +513,24 @@ void locationAvailablePrivateInit()
             remove __la_location_is_available[key];
         }
     }
+    if (__la_zone_is_unlocked.count() > 0)
+    {
+        foreach key in __la_zone_is_unlocked
+        {
+            remove __la_zone_is_unlocked[key];
+        }
+    }
 	
-	boolean [location] locations_always_available = $locations[the haunted pantry,the sleazy back alley,the outskirts of cobb's knob,the limerick dungeon,The Haiku Dungeon,The Daily Dungeon];
+	boolean [location] locations_always_available = $locations[the haunted pantry,the sleazy back alley,the outskirts of cobb's knob,the limerick dungeon,The Haiku Dungeon,The Daily Dungeon,noob cave,the dire warren];
 	foreach loc in locations_always_available
 	{
 		if (loc == $location[none])
 			continue;
 		__la_location_is_available[loc] = true;
 	}
+    
+    if (questPropertyPastInternalStepNumber("questL02Larva", 1) || questPropertyPastInternalStepNumber("questG02Whitecastle", 1))
+        __la_zone_is_unlocked["Woods"] = true;
 		
 	string zones_never_accessible_string = "Gyms,Crimbo06,Crimbo07,Crimbo08,Crimbo09,Crimbo10,The Candy Diorama,Crimbo12,WhiteWed";
 	
@@ -1003,6 +1022,7 @@ static
             lookup_map[s] = "place.php?whichplace=airport_stench";
         foreach s in $strings[The SMOOCH Army HQ,The Velvet / Gold Mine,LavaCo&trade; Lamp Factory,The Bubblin' Caldera]
             lookup_map[s] = "place.php?whichplace=airport_hot";
+        lookup_map["The Velvet / Gold Mine (Mining)"] = "mining.php?mine=6";
         foreach s in $strings[The Mines,The Jungle,The Ice Caves,The Temple Ruins,Hell,The Snake Pit,The Spider Hole,The Ancient Burial Ground,The Beehive,the crashed u. f. o.,The City of Goooold,LOLmec's Lair,Yomama's Throne]
             lookup_map[s] = "place.php?whichplace=spelunky";
         

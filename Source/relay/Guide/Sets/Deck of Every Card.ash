@@ -275,7 +275,6 @@ void SDeckOfEveryCardGenerateResource(ChecklistEntry [int] resource_entries)
         if (relevant_effect.have_effect() == 0)
             summons.listAppend(DOECSummonMake(card_name, "+200% " + stat_race_type.to_lower_case() + " for lair races. (marginal)"));
     }
-    
     if (!in_run)
     {
         if (!haveAtLeastXOfItemEverywhere($item[talking spade], 1))

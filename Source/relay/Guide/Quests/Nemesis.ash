@@ -604,7 +604,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     if (legendary_epic_weapon.available_amount_ignoring_storage() > 0)
         have_legendary_epic_weapon = true;
         
-	if (!__misc_state["In aftercore"] && !have_legendary_epic_weapon && $location[the "fun" house].turns_spent == 0)
+	if (!__misc_state["in aftercore"] && !have_legendary_epic_weapon && $location[the "fun" house].turns_spent == 0)
 		return;
         
         
@@ -637,8 +637,24 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         }
         else
         {
-            subentry.entries.listAppend("Acquire " + epic_weapon + ".");
-            if ($location[The Unquiet Garves].noncombat_queue.contains_text("Tomb of the Unknown Your Class Here"))
+            item starter_item_needed;
+            if (my_class() == $class[seal clubber])
+                starter_item_needed = $item[seal-clubbing club];
+            else if (my_class() == $class[turtle tamer])
+                starter_item_needed = $item[helmet turtle];
+            else if (my_class() == $class[pastamancer])
+                starter_item_needed = $item[pasta spoon];
+            else if (my_class() == $class[sauceror])
+                starter_item_needed = $item[saucepan];
+            else if (my_class() == $class[disco bandit])
+                starter_item_needed = $item[disco mask];
+            else if (my_class() == $class[accordion thief])
+                starter_item_needed = $item[stolen accordion];
+                
+            //subentry.entries.listAppend("Acquire " + epic_weapon + ".");
+            if (starter_item_needed.item_amount() == 0)
+                subentry.entries.listAppend("Acquire a " + starter_item_needed + ".");
+            else if ($location[The Unquiet Garves].noncombat_queue.contains_text("Tomb of the Unknown Your Class Here"))
             {
                 subentry.entries.listAppend("Solve the three puzzles at the unknown tomb.");
             }

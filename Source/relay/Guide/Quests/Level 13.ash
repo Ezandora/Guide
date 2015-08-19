@@ -114,7 +114,7 @@ boolean generateTowerFamiliarWeightMethod(string [int] how, string [int] immedia
     missing_weight.f = 0.0;
     if (__quest_state["Level 13"].finished) //no need
         return true;
-    if (!__misc_state["In run"])
+    if (!__misc_state["in run"])
         return true;
     if (__misc_state["familiars temporarily blocked"])
         return true;
@@ -309,7 +309,7 @@ void QLevel13Init()
     
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL13Final");
-    if (my_path_id() == PATH_BUGBEAR_INVASION || __misc_state["In aftercore"] || (!state.in_progress && my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)) //FIXME mafia may track the ed L13 quest under this variable
+    if (my_path_id() == PATH_BUGBEAR_INVASION || __misc_state["in aftercore"] || (!state.in_progress && my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING) || my_path_id() == PATH_COMMUNITY_SERVICE) //FIXME mafia may track the ed L13 quest under this variable
         QuestStateParseMafiaQuestPropertyValue(state, "finished"); //never will start
 	if (__misc_state["Example mode"])
         QuestStateParseMafiaQuestPropertyValue(state, "step6");
@@ -465,69 +465,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 	string image_name = base_quest_state.image_name;
     
 	boolean should_output_main_entry = true;
-    if (!mafiaIsPastRevision(15408))
-    {
-        //early support:
-        string [int] race_types;
-        race_types.listAppend("init");
-        if (base_quest_state.state_string["Stat race type"] != "")
-            race_types.listAppend(base_quest_state.state_string["Stat race type"]);
-        else
-            race_types.listAppend("? stat");
-        if (base_quest_state.state_string["Elemental damage race type"] != "")
-            race_types.listAppend(base_quest_state.state_string["Elemental damage race type"] + " damage/spell damage");
-        else
-            race_types.listAppend("? element damage and element spell damage");
-        
-        subentry.entries.listAppend("Compete in three races. (" + race_types.listJoinComponents(", ", "and") + ")");
-        
-        string elemental_resistance_to_run_string = "+elemental resistance";
-        
-        string [int] resists_needed_for_hedge_maze = base_quest_state.state_string["Hedge maze elements needed"].split_string_alternate("\\|");
-        if (resists_needed_for_hedge_maze.count() > 0)
-        {
-            elemental_resistance_to_run_string = "";
-            foreach key, e in resists_needed_for_hedge_maze
-            {
-                if (elemental_resistance_to_run_string.length() != 0)
-                    elemental_resistance_to_run_string += ", ";
-                elemental_resistance_to_run_string += HTMLGenerateSpanOfClass("+" + e + " resistance", "r_element_" + e);
-            }
-        }
-        
-        subentry.entries.listAppend("Then make it through the hedge maze. Run " + elemental_resistance_to_run_string + " and ignore the skull's directions for the fastest route.|Or take his advice to acquire a unique item.");
-        
-        string [int] keys_to_use;
-        
-        boolean [string] known_key_names = $strings[Boris's key,Jarlsberg's key,Sneaky Pete's key,Richard's star key,skeleton key,digital key];
-        foreach key_name in known_key_names
-        {
-            if (!base_quest_state.state_boolean[key_name + " used"])
-            {
-                keys_to_use.listAppend(key_name.replace_string(" key", ""));
-            }
-        }
-        
-        //subentry.entries.listAppend("Then use six keys on the perplexing door: Boris's, Jarlsberg's, Sneaky Pete's, star, skeleton, and digital.");
-        
-        if (keys_to_use.count() == 0)
-        {
-            subentry.entries.listClear();
-        }
-        else if (keys_to_use.count() < 6)
-        {
-            subentry.entries.listClear();
-            subentry.entries.listAppend("Use " + pluraliseWordy(keys_to_use.count(), "more key", "more keys") + " on the perplexing door: " + keys_to_use.listJoinComponents(", ", "and") + ".");
-            url = "place.php?whichplace=nstower_door";
-        }
-        else
-            subentry.entries.listAppend("Then use six keys on the perplexing door: " + keys_to_use.listJoinComponents(", ", "and") + " .");
-        subentry.entries.listAppend("Then make it through the tower. Use a beehive against the first monster, +meat against the second, and the electric boning knife against the third.|Smash the mirror to save a turn, if you can handle a more difficult naughty sorceress. (?)|Then fight your shadow.");
-        subentry.entries.listAppend("Then fight the naughty sorceress. Run a potato familiar and +moxie.");
-        if (__misc_state["wand of nagamar needed"])
-            subentry.entries.listAppend("Make sure to acquire a wand of nagamar.");
-    }
-    else if (!base_quest_state.state_boolean["past races"] && (base_quest_state.state_string["Stat race type"].length() == 0 || base_quest_state.state_string["Elemental damage race type"].length() == 0))
+    if (!base_quest_state.state_boolean["past races"] && (base_quest_state.state_string["Stat race type"].length() == 0 || base_quest_state.state_string["Elemental damage race type"].length() == 0))
     {
         subentry.header = "Visit the registration desk";
         subentry.entries.listAppend("Find out what the races are, first.");
@@ -909,11 +847,12 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             if (things_to_do.count() > 0)
                 subentry.entries.listAppend(HTMLGenerateSpanFont(things_to_do.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".", "red"));*/
             
-            //FIXME Firegate
+            //FIXME Firegate - spade, etc
+            
             //Firegate is 100% myst, +30-40 damage, but unaffected by spell damage % (and possibly spell damage?)
             //Garbage nova is 40% myst, etc, but affected by spell damage %/spell damage.
             //So, we have to calculate which one is better and suggest that. (garbage nova may be better, in fact)
-            if ($skill[Garbage Nova].skill_is_usable() && false) //calculations need in-game verification
+            if ($skill[Garbage Nova].skill_is_usable())
             {
                 //Special note on calculations:
                 //Spell damage percent is multiplied before the group size multiplier, then floored.
@@ -926,8 +865,10 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 float spell_damage_percent = numeric_modifier("spell damage percent");
                 float monster_level = monster_level_adjustment_ignoring_plants();
                 float spell_damage_multiplier = 1.0 + spell_damage_percent / 100.0;
-                float monster_damage_multiplier = (1.0 - min(50.0, monster_level * 0.4)) / 100.0;
+                float monster_damage_multiplier = 1.0 - min(50.0, monster_level * 0.4) / 100.0;
                 
+                //Estimate: 62894
+                //Actual: 63263
                 
                 //Current damage formulas:
                 //min = floor((45.0 + floor(0.4 * buffed_myst) + spell_damage + stench_spell_damage * 2.0) * (1.0 + spell_damage_percent / 100.0)) * ceil(group_size * 0.5)

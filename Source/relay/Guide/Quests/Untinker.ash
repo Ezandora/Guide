@@ -8,7 +8,7 @@ void QUntinkerInit()
 	state.quest_name = "Untinker's Quest";
 	state.image_name = "rusty screwdriver";
 	
-	state.startable = locationAvailable($location[the spooky forest]);
+	state.startable = $location[the spooky forest].locationAvailable();
 	
 	__quest_state["Untinker"] = state;
 }
@@ -29,7 +29,7 @@ void QUntinkerGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [i
 	if ($item[rusty screwdriver].available_amount() > 0 || base_quest_state.mafia_internal_step == 0)
 	{
 		subentry.entries.listAppend("Speak to the Untinker.");
-		url = "place.php?whichplace=forestvillage";
+		url = "place.php?whichplace=forestvillage&action=fv_untinker_quest";
 	}
 	else
 	{

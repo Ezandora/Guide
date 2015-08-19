@@ -48,7 +48,7 @@ void QSpookyravenLightsOutGenerateEntry(ChecklistEntry [int] task_entries, Check
             string [int] description;
             
             string first_line = "";
-            if (__misc_state["In run"])
+            if (__misc_state["in run"])
             {
                 if (__misc_state["familiars temporarily blocked"])
                     first_line += "Not useful this run. ";
@@ -90,7 +90,7 @@ void QSpookyravenLightsOutGenerateEntry(ChecklistEntry [int] task_entries, Check
         
             string [int] description;
             string first_line = "";
-            if (__misc_state["In run"])
+            if (__misc_state["in run"])
                 first_line += "Not useful in-run. ";
             if (next_elizabeth_location == $location[The Haunted Gallery])
                 first_line += HTMLGenerateSpanFont("Will take a turn.", "red");

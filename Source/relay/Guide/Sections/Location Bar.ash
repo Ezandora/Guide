@@ -1,4 +1,5 @@
 import "relay/Guide/Sections/Location Bar Popup.ash";
+import "relay/Guide/Sets/Bad Moon.ash";
 
 buffer generateLocationBar(boolean displaying_navbar)
 {
@@ -316,8 +317,9 @@ buffer generateLocationBar(boolean displaying_navbar)
     
     string [int] location_data;
     string [int] location_urls;
+    float [int] location_fixed_widths;
     
-    if (__misc_state["In run"])
+    if (__misc_state["in run"])
     {
         int area_delay = l.delayRemainingInLocation();
         
@@ -333,7 +335,7 @@ buffer generateLocationBar(boolean displaying_navbar)
     //ashq foreach l in $locations[] if (l.appearance_rates().count() == 1 && l.appearance_rates()[$monster[none]] == 100.0) print(l);
     boolean [location] nc_blacklist = $locations[Pump Up Muscle,Pump Up Mysticality,Pump Up Moxie,The Shore\, Inc. Travel Agency,Goat Party,Pirate Party,Lemon Party,The Roulette Tables,The Poker Room,Anemone Mine (Mining),The Knob Shaft (Mining),Friar Ceremony Location,Itznotyerzitz Mine (in Disguise),The Prince's Restroom,The Prince's Dance Floor,The Prince's Kitchen,The Prince's Balcony,The Prince's Lounge,The Prince's Canapes table,Portal to Terrible Parents,fernswarthy's basement];
     
-    if ((my_buffedstat($stat[moxie]) < average_ml || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE) && sample_count > 0 && __misc_state["In run"] && monster_level_adjustment() < 100)
+    if ((my_buffedstat($stat[moxie]) < average_ml || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE) && sample_count > 0 && __misc_state["in run"] && monster_level_adjustment() < 100)
     {
         //Init:
         //We only show this if the monsters out-moxie the player in-run. It feels as though it can easily be information overload otherwise.
@@ -445,12 +447,42 @@ buffer generateLocationBar(boolean displaying_navbar)
     
     boolean [location] powerleveling_locations = $locations[hamburglaris shield generator,video game level 1,video game level 2,video game level 3];
     
-    if (sample_count > 0 && (__misc_state["In run"] || powerleveling_locations contains l || average_ml > my_buffedstat($stat[moxie])))
+    if (sample_count > 0 && (__misc_state["in run"] || powerleveling_locations contains l || average_ml > my_buffedstat($stat[moxie])))
     {
         if (false)
             location_data.listAppend(average_ml.round() + " ML<br>" + (average_ml * __misc_state_float["ML to mainstat multiplier"]).round() + " " + my_primestat().to_lower_case() + "/fight");
         else
             location_data.listAppend(average_ml.round() + " ML");
+    }
+    
+    if (in_bad_moon())
+    {
+        boolean bad_moon_adventure_possible_now = false;
+        boolean bad_moon_adventure_possible = false;
+        
+        BadMoonAdventure [int] bad_moon_adventures = BadMoonAdventuresForLocation(l);
+        
+        if (bad_moon_adventures.count() > 0)
+        {
+            foreach key, adventure in bad_moon_adventures
+            {
+                boolean possible = !get_property_boolean("badMoonEncounter" + adventure.encounter_id);
+                if (possible)
+                    bad_moon_adventure_possible = possible;
+                if (!bad_moon_adventure_possible_now)
+                    bad_moon_adventure_possible_now = !adventure.has_additional_requirements_not_yet_met;
+            }
+        }
+        
+        if (bad_moon_adventure_possible)
+        {
+            string style = "margin-top:1px;";
+            if (!bad_moon_adventure_possible_now)
+                style += "opacity:0.25;";
+            string image_html = HTMLGenerateTagPrefix("img", mapMake("src", __bad_moon_small_image_data, "style", style)); //"images/itemimages/badmoon.gif"
+            location_data.listAppend(image_html);
+            location_fixed_widths[location_data.count() - 1] = 0.15; //won't display otherwise
+        }
     }
     
     if (plant_data.count() > 0)
@@ -531,6 +563,10 @@ buffer generateLocationBar(boolean displaying_navbar)
     foreach key in location_urls
     {
         table_entry_urls[key + 1] = location_urls[key];
+    }
+    foreach key in location_fixed_widths
+    {
+        table_entry_fixed_width_percentage[key + 1] = location_fixed_widths[key];
     }
     foreach key in location_data
     {

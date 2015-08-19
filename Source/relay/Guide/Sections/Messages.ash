@@ -11,7 +11,7 @@ string generateRandomMessage()
     if (__misc_state["In valhalla"])
         return "rebirth";
     
-	if (__misc_state["In run"])
+	if (__misc_state["in run"])
     {
         if (my_turncount() > 1000)
             random_messages.listAppend("so many turns");
@@ -54,7 +54,7 @@ string generateRandomMessage()
         }
     }
     
-	if (__misc_state["In run"])
+	if (__misc_state["in run"])
     {
         random_messages.listAppend("optimal power, make up!");
         random_messages.listAppend("the faster your runs, the longer they take");
@@ -83,7 +83,7 @@ string generateRandomMessage()
     string conspiracy = "they know where you live, " + get_property("System.user.name").to_lower_case();
     foreach s in $strings[The Mansion of Dr. Weirdeaux,The Deep Dark Jungle,The Secret Government Laboratory]
         location_messages[lookupLocation(s)] = conspiracy;
-    foreach s in $strings[anemone mine (mining),itznotyerzitz mine (in disguise),the knob shaft (mining),The Crimbonium Mine]
+    foreach s in $strings[anemone mine (mining),itznotyerzitz mine (in disguise),the knob shaft (mining),The Crimbonium Mine,The Velvet / Gold Mine (Mining)]
         location_messages[lookupLocation(s)] = "street sneaky pete don't you call me cause I can't go";
     location_messages[$location[sonar]] = "one ping only";
     location_messages[$location[galley]] = "hungry?";
@@ -137,7 +137,7 @@ string generateRandomMessage()
     else if (my_ascensions() == 1)
         random_messages.listAppend("run, while you still have the chance!");
         
-    if (__misc_state["In run"])
+    if (__misc_state["in run"])
         random_messages.listAppend("perfect runs are overrated");
     random_messages.listAppend("math is your helpful friend");
     
@@ -202,6 +202,7 @@ string generateRandomMessage()
     paths[PATH_STANDARD] = "no past no path";
     paths[PATH_ACTUALLY_ED_THE_UNDYING] = "UNDYING!";
     paths[PATH_ONE_CRAZY_RANDOM_SUMMER] = "dance the mersenne twist";
+    paths[PATH_COMMUNITY_SERVICE] = "make the world a better place";
     //paths[PATH_CLASS_ACT_3] = "buttons for the people";
     //paths[PATH_AVATAR_OF_THE_NAUGHTY_SORCERESS] = "go forth to your lair! have some tea";
     
@@ -214,7 +215,7 @@ string generateRandomMessage()
         
     random_messages.listAppend(HTMLGenerateTagWrap("a", "check the wiki", mapMake("class", "r_a_undecorated", "href", "http://kol.coldfront.net/thekolwiki/index.php/Main_Page", "target", "_blank")));
     random_messages.listAppend("the RNG is only trying to help");
-    if (__misc_state["In run"])
+    if (__misc_state["in run"])
         random_messages.listAppend("speed ascension is all I have left, " + lowercase_player_name);
     if (item_drop_modifier() <= -100.0)
         random_messages.listAppend("let go of your material posessions");
@@ -353,15 +354,6 @@ string generateRandomMessage()
     {
         random_messages.listAppend(HTMLGenerateTagWrap("a", "personal aquarium", generateMainLinkMap("place.php?whichplace=chateau"))); //WhiteWizard42:  feeeeesh. feesh in the waaaall
     }
-    
-    if (__quest_state["Level 13"].state_boolean["king waiting to be freed"])
-    {
-        if (my_path_id() == PATH_ONE_CRAZY_RANDOM_SUMMER)
-        {
-            random_messages.listClear();
-            random_messages.listAppend("roll the dice");
-        }
-    }
         
     if (last_monster().phylum == $phylum[penguin])
     {
@@ -462,6 +454,15 @@ string generateRandomMessage()
         random_messages.listAppend(monster_messages[last_monster()]);
     }
     
+    
+    if (__quest_state["Level 13"].state_boolean["king waiting to be freed"])
+    {
+        if (my_path_id() == PATH_ONE_CRAZY_RANDOM_SUMMER)
+        {
+            random_messages.listClear();
+            random_messages.listAppend(HTMLGenerateTagWrap("a", "roll the dice", generateMainLinkMap("place.php?whichplace=nstower")));
+        }
+    }
     
     if (__misc_state_int["Basement Floor"] == 500)
     {

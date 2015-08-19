@@ -86,7 +86,8 @@ void QLevel8GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		{
 			string [int] potential_ore_sources;
 			potential_ore_sources.listAppend("Mining");
-			potential_ore_sources.listAppend("Clovering itznotyerzitzmine (one of each ore, consider if zap available?)");
+            if (!in_bad_moon())
+                potential_ore_sources.listAppend("Clovering itznotyerzitzmine (one of each ore, consider if zap available?)");
 			
 			
 			

@@ -95,7 +95,6 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                     if ($item[wine bomb].available_amount() > 0 || base_quest_state.mafia_internal_step >= 4)
                     {
                         output_final_fight_info = true;
-                        image_name = "Demon Summon";
                     }
                     else if ($item[unstable fulminate].available_amount() > 0)
                     {
@@ -189,7 +188,7 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                         }
                     }
                 }
-                else
+                if (true)
                 {
                     item [location] searchables;
                     searchables[$location[the haunted kitchen]] = $item[loosening powder];
@@ -215,7 +214,11 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                             item it = searchables[l];
                             places.listAppend(it.capitaliseFirstLetter() + " in " + l + ".");
                         }
-                        subentry.entries.listAppend("Scavenger hunt! Go search for:|*" + places.listJoinComponents("<hr>|*"));
+                        string line = "Scavenger hunt! ";
+                        if (!use_fast_route || in_bad_moon())
+                            line = "Alternatively, scavenger hunt! (probably slower)|";
+                        line += "Go search for:|*" + places.listJoinComponents("<hr>|*");
+                        subentry.entries.listAppend(line);
                         subentry.entries.listAppend("Read the recipe if you haven't.");
                         
                         //are these scheduled, or regular NCs?
@@ -230,11 +233,16 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                         }
                     }
                     else
+                    {
+                        subentry.entries.listClear();
+                        subentry.modifiers.listClear();
                         output_final_fight_info = true;
+                    }
                     
                 }
                 if (output_final_fight_info)
                 {
+                    image_name = "Demon Summon";
                     if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
                     {
                         subentry.entries.listAppend("Talk to Lord Spookyraven.");

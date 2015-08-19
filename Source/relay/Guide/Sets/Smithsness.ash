@@ -1,6 +1,6 @@
 void smithsnessGenerateCoalSuggestions(string [int] coal_suggestions)
 {
-    if (!__misc_state["In run"])
+    if (!__misc_state["in run"])
         return;
 	string [item] coal_item_suggestions;
 	
@@ -97,26 +97,26 @@ void smithsnessGenerateSmithereensSuggestions(string [int] smithereen_suggestion
 		smithereen_suggestions.listAppend(line);
     }
     
-    if (__misc_state["In run"])
+    if (__misc_state["in run"])
         smithereen_suggestions.listAppend("Handsome Devil: single-turn +100% item");
 	
 }
 
 void SSmithsnessGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (__misc_state["In run"] && $item[handful of smithereens].available_amount() > 0)
+	if (__misc_state["in run"] && $item[handful of smithereens].available_amount() > 0)
 	{
 		string [int] smithereen_suggestions;
 		smithsnessGenerateSmithereensSuggestions(smithereen_suggestions);
 		resource_entries.listAppend(ChecklistEntryMake("__item handful of smithereens", "", ChecklistSubentryMake(pluralise($item[handful of smithereens]), "", smithereen_suggestions.listJoinComponents("<hr>")), 10));
 	}
-	if (__misc_state["In run"] && $item[lump of Brituminous coal].available_amount() > 0)
+	if (__misc_state["in run"] && $item[lump of Brituminous coal].available_amount() > 0)
 	{
 		string [int] coal_suggestions;
 		smithsnessGenerateCoalSuggestions(coal_suggestions);
 		resource_entries.listAppend(ChecklistEntryMake("__item lump of Brituminous coal", "", ChecklistSubentryMake(pluralise($item[lump of Brituminous coal]), "", coal_suggestions.listJoinComponents("<hr>")), 10));
 	}
-	if ($item[flaskfull of hollow].available_amount() > 0 && $effect[Merry Smithsness].have_effect() < 25 && __misc_state["In run"])
+	if ($item[flaskfull of hollow].available_amount() > 0 && $effect[Merry Smithsness].have_effect() < 25 && __misc_state["in run"])
 	{
 		int turns_left = $effect[Merry Smithsness].have_effect();
 		string [int] details;
