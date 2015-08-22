@@ -219,7 +219,7 @@ string generateRandomMessage()
         random_messages.listAppend("speed ascension is all I have left, " + lowercase_player_name);
     if (item_drop_modifier() <= -100.0)
         random_messages.listAppend("let go of your material posessions");
-    if ($item[puppet strings].item_amount() > 0)
+    if ($item[puppet strings].item_amount() > 0 && my_id() != 1557284)
     {
         //full puppet string support:
         string chosen_message;

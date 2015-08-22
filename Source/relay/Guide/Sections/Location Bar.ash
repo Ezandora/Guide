@@ -466,7 +466,7 @@ buffer generateLocationBar(boolean displaying_navbar)
         {
             foreach key, adventure in bad_moon_adventures
             {
-                boolean possible = !get_property_boolean("badMoonEncounter" + adventure.encounter_id);
+                boolean possible = !haveSeenBadMoonEncounter(adventure.encounter_id);
                 if (possible)
                     bad_moon_adventure_possible = possible;
                 if (!bad_moon_adventure_possible_now)

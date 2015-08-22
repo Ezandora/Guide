@@ -501,7 +501,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         //2 can be fighting ghost
         //4 can be nearing end
         //5 -> return it
-        //6 -> returning
+        //6 -> returning (?
         if (have_epic_weapon)
         {
             subentry.entries.listAppend("Speak to your guild.");
@@ -540,16 +540,14 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         subentry.entries.listAppend("Speak to your guild.");
         url = "guild.php";
     }
-    else if (base_quest_state.mafia_internal_step <= 2 + 4)
+    else if (base_quest_state.mafia_internal_step <= 6)
     {
-        //2	To unlock the full power of the Legendary Epic Weapon, you must defeat Beelzebozo, the Clown Prince of Darkness,
+        //6	To unlock the full power of the Legendary Epic Weapon, you must defeat Beelzebozo, the Clown Prince of Darkness,
         QNemesisGenerateClownTasks(subentry);
         url = "place.php?whichplace=plains";
     }
-    else if (base_quest_state.mafia_internal_step == 3 + 4 || base_quest_state.mafia_internal_step == 4 + 4)
+    else if (base_quest_state.mafia_internal_step >= 7 && base_quest_state.mafia_internal_step <= 9)
     {
-        //3	You've finally killed the clownlord Beelzebozo
-        //4	You've successfully defeated Beelzebozo and claimed the last piece of the Legendary Epic Weapon
         if (have_legendary_epic_weapon)
         {
             subentry.entries.listAppend("Speak to your guild.");
@@ -560,40 +558,98 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             subentry.entries.listAppend("Make " + legendary_epic_weapon + ".");
         }
     }
-    else if (base_quest_state.mafia_internal_step == 5 + 4)
+    else if (base_quest_state.mafia_internal_step == 10)
     {
-        //5	discovered where your Nemesis is hiding. It took long enough, jeez! Anyway, turns out it's a Dark and
-        url = "cave.php";
-        QNemesisGenerateCaveTasks(subentry,legendary_epic_weapon);
+        //???
+        subentry.entries.listAppend("???");
     }
-    else if (base_quest_state.mafia_internal_step >= 6 + 4 && base_quest_state.mafia_internal_step < 15 + 4)
+    else if (base_quest_state.mafia_internal_step >= 11 && base_quest_state.mafia_internal_step <= 16)
     {
-        //6	You have successfully shown your Nemesis what for, and claimed an ancient hat of power. It's pretty sweet
-        //7	You showed the Epic Hat to the class leader back at your guild, but they didn't seem much impressed. I guess all this Nemesis nonsense isn't quite finished yet, but at least with your Nemesis in hiding again you won't have to worry about it for a while.
-        //8	It appears as though some nefarious ne'er-do-well has put a contract on your head
-        //9	You handily dispatched some thugs who were trying to collect on your bounty, but something tells you they won't be the last ones to try
+        //QNemesisGenerateCaveTasks(subentry, legendary_epic_weapon);
+        if (base_quest_state.mafia_internal_step == 11 || base_quest_state.mafia_internal_step == 12)
+        {
+            url = "place.php?whichplace=mountains";
+            //The hunt for your Nemesis is on! Better check out that cave they sent you to.
+            //Figure out how to get into your Nemesis' cave. If you're stumped, maybe your guild can help?
+            
+            skill skill_needed;
+            string skill_choice_name;
+            
+            if (my_class() == $class[seal clubber])
+            {
+                skill_needed = $skill[wrath of the wolverine];
+                skill_choice_name = "wolverine";
+            }
+            else if (my_class() == $class[disco bandit])
+            {
+                skill_needed = $skill[disco state of mind];
+                skill_choice_name = "disco state of mind";
+            }
+            //Stream of sauce?
+            //entangling noodles?
+            if (skill_needed != $skill[none] && skill_needed.have_skill())
+            {
+                subentry.entries.listAppend("Learn " + skill_needed + " from guild trainer.");
+                url = "guild.php?place=trainer";
+            }
+            else if (skill_needed != $skill[none])
+            {
+                subentry.entries.listAppend("Click on the nemesis cave, choose " + skill_choice_name + ".");
+            }
+            else
+                subentry.entries.listAppend("Solve the cave entrance puzzle.");
+        }
+        else if (base_quest_state.mafia_internal_step >= 13 && base_quest_state.mafia_internal_step <= 15)
+        {
+            url = "place.php?whichplace=nemesiscave";
+            //The cavern is full of weird mushrooms, but where's your Nemesis?
+            //more fizzing spore pods to blow up the blockade in your Nemesis' cave.
+            //Take those fizzing spore pods to the rubble!
+            subentry.modifiers.listAppend("+item");
+            
+            monster monster_to_olfact;
+            if (my_class() == $class[seal clubber])
+                monster_to_olfact = lookupMonster("angry mushroom guy");
+            if (monster_to_olfact != $monster[none])
+                subentry.modifiers.listAppend("olfact " + monster_to_olfact);
+            subentry.entries.listAppend("Adventure in the fungal nethers, collect spore pods, make rubble go boom!");
+        }
+        else if (base_quest_state.mafia_internal_step == 16)
+        {
+            url = "place.php?whichplace=nemesiscave";
+            //Boom! Time to bring the fight to your stinking Nemesis in that stinking cave!
+            subentry.entries.listAppend("Fight your nemesis in the nemesis cave.");
+            subentry.entries.listAppend("Do nemesis caves just get rented out on a time-share nemesis basis?|For the month of june, you'll be rueing the day! What? I paid how much?");
+        }
+    }
+    else if (base_quest_state.mafia_internal_step >= 17 && base_quest_state.mafia_internal_step < 26)
+    {
+        //	You have successfully shown your Nemesis what for, and claimed an ancient hat of power. It's pretty sweet
+        //	You showed the Epic Hat to the class leader back at your guild, but they didn't seem much impressed. I guess all this Nemesis nonsense isn't quite finished yet, but at least with your Nemesis in hiding again you won't have to worry about it for a while.
+        //	It appears as though some nefarious ne'er-do-well has put a contract on your head
+        //	You handily dispatched some thugs who were trying to collect on your bounty, but something tells you they won't be the last ones to try
         
-        //10	Whoever put this hit out on you (like you haven't guessed already) has sent Mob Penguins to do their dirty work. Do you know any polar bears you could hire as bodyguards
-        //11	So much for those mob penguins that were after your head! If whoever put this hit out on you wants you killed (which, presumably, they do) they'll have to find some much more competent thugs
-        //12	have been confirmed: your Nemesis has put the order out for you to be hunted down and killed, and now they're sending their own guys instead of contracting out
-        //13	Bam! So much for your Nemesis' assassins! If that's the best they've got, you have nothing at all to worry about
-        //14	You had a run-in with some crazy mercenary or assassin or... thing that your Nemesis sent to do you in once and for all. A run-in followed by a run-out, evidently,
+        //	Whoever put this hit out on you (like you haven't guessed already) has sent Mob Penguins to do their dirty work. Do you know any polar bears you could hire as bodyguards
+        //	So much for those mob penguins that were after your head! If whoever put this hit out on you wants you killed (which, presumably, they do) they'll have to find some much more competent thugs
+        //	have been confirmed: your Nemesis has put the order out for you to be hunted down and killed, and now they're sending their own guys instead of contracting out
+        //	Bam! So much for your Nemesis' assassins! If that's the best they've got, you have nothing at all to worry about
+        //	You had a run-in with some crazy mercenary or assassin or... thing that your Nemesis sent to do you in once and for all. A run-in followed by a run-out, evidently,
         string assassin_up_next = "";
         int assassins_left = -1;
         
         if (mafiaIsPastRevision(14330))
         {
-            if (base_quest_state.mafia_internal_step < 9 + 4)
+            if (base_quest_state.mafia_internal_step < 20)
             {
                 assassin_up_next = "menacing thug";
                 assassins_left = 4;
             }
-            else if (base_quest_state.mafia_internal_step < 11 + 4)
+            else if (base_quest_state.mafia_internal_step < 22)
             {
                 assassin_up_next = "Mob Penguin hitman";
                 assassins_left = 3;
             }
-            else if (base_quest_state.mafia_internal_step < 13 + 4)
+            else if (base_quest_state.mafia_internal_step < 24)
             {
                 if (my_class() == $class[seal clubber])
                     assassin_up_next = "hunting seal";
@@ -675,14 +731,14 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     }
     else if (base_quest_state.mafia_internal_step == 15 && false)
     {
-        //15	Now that you've dealt with your Nemesis' assassins and found a map to the secret tropical island volcano lair, it's time to take the fight to your foe. Booyah
+        //	Now that you've dealt with your Nemesis' assassins and found a map to the secret tropical island volcano lair, it's time to take the fight to your foe. Booyah
         //find island
         url = "inventory.php?which=3";
         subentry.entries.listAppend("Use the secret tropical island volcano lair map.");
     }
-    else if (base_quest_state.mafia_internal_step == 16 + 4 || base_quest_state.mafia_internal_step == 15 + 4) //mafia bug - doesn't advance properly
+    else if (base_quest_state.mafia_internal_step == 27 || base_quest_state.mafia_internal_step == 26) //mafia bug(?) - doesn't advance properly
     {
-        //16	You've arrived at the secret tropical island volcano lair, and it's time to finally put a stop to this Nemesis nonsense once and for all. As soon as you can find where they're hiding. Maybe you can find someone to ask
+        //	You've arrived at the secret tropical island volcano lair, and it's time to finally put a stop to this Nemesis nonsense once and for all. As soon as you can find where they're hiding. Maybe you can find someone to ask
         if ($location[The Nemesis' Lair].turnsAttemptedInLocation() > 0)
         {
             if (my_class() == $class[disco bandit])
@@ -694,10 +750,10 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             QNemesisGenerateIslandTasks(subentry);
         url = "volcanoisland.php";
     }
-    else if (base_quest_state.mafia_internal_step >= 17 + 4 && base_quest_state.mafia_internal_step <= 19 + 4)
+    else if (base_quest_state.mafia_internal_step >= 28 && base_quest_state.mafia_internal_step <= 30)
     {
-        //17	Congratulations on solving the lava maze, which is probably the biggest pain-in-the-ass puzzle in the entire game! Hooray! (Unless you cheated, in which case
-        if (base_quest_state.mafia_internal_step == 17 + 4)
+        //	Congratulations on solving the lava maze, which is probably the biggest pain-in-the-ass puzzle in the entire game! Hooray! (Unless you cheated, in which case
+        if (base_quest_state.mafia_internal_step == 21)
             subentry.entries.listAppend("Solve the volcano maze, then fight your nemesis.");
         else
             subentry.entries.listAppend("Fight your nemesis.");

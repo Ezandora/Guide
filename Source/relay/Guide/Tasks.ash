@@ -98,6 +98,7 @@ void generateTasks(Checklist [int] checklists)
 		ChecklistSubentry subentry;
         boolean optional = false;
 		subentry.header = "Unlock desert beach";
+        boolean [location] relevant_locations;
         if (my_path_id() == PATH_COMMUNITY_SERVICE)
         {
             subentry.header = "Optionally unlock desert beach";
@@ -106,6 +107,7 @@ void generateTasks(Checklist [int] checklists)
         }
 		if (!knoll_available())
 		{
+            relevant_locations[$location[the degrassi knoll garage]] = true;
 			string meatcar_line = "Build a bitchin' meatcar.";
 			if ($item[bitchin' meatcar].creatable_amount() > 0)
 				meatcar_line += "|*You have all the parts, build it!";
@@ -151,7 +153,7 @@ void generateTasks(Checklist [int] checklists)
 			subentry.entries.listAppend("Build a bitchin' meatcar. (" + meatcar_price + " meat)");
 		}
 		
-        ChecklistEntry entry = ChecklistEntryMake("__item bitchin' meatcar", url, subentry);
+        ChecklistEntry entry = ChecklistEntryMake("__item bitchin' meatcar", url, subentry, relevant_locations);
         if (optional)
             optional_task_entries.listAppend(entry);
         else

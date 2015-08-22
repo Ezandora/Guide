@@ -225,7 +225,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         }
 		else if (evilness > 26)
 		{
-            subentry.modifiers.listAppend("+init");
+            subentry.modifiers.listAppend("+850% init");
             subentry.modifiers.listAppend("-combat");
 			int zmobies_needed = ceil((evilness.to_float() - 26.0) / 5.0);
 			float zmobie_chance = min(100.0, 15.0 + initiative_modifier_for_location($location[the defiled alcove]) / 10.0);

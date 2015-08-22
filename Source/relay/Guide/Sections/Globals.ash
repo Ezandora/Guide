@@ -1,5 +1,4 @@
 //Runtime variables:
-string __relay_filename;
 location __last_adventure_location;
 
 

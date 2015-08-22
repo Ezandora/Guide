@@ -42,12 +42,30 @@ void QWhiteCitadelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 	string active_url = "place.php?whichplace=woods";
     
     if (in_bad_moon())
-        subentry.entries.listAppend("Relevant in Bad Moon for duonoculars and food from the wand of pigification.");
-    
+    {
+        string [int] reasons;
+        if (base_quest_state.mafia_internal_step < 6)
+            reasons.listAppend("duonoculars");
+        if (base_quest_state.mafia_internal_step < 8)
+            reasons.listAppend("food from the wand of pigification");
+        if (base_quest_state.mafia_internal_step < 11)
+            reasons.listAppend("an epic drink");
+        
+        if (reasons.count() > 0)
+            subentry.entries.listAppend("Relevant in Bad Moon for " + reasons.listJoinComponents(", ", "and") + ".");
+    }
     if (!base_quest_state.started)
     {
-        subentry.entries.listAppend("Visit your friend at the guild to start the quest.");
-        active_url = "guild.php";
+        if (QuestState("questG01Meatcar").finished || $item[bitchin' meatcar].available_amount() > 0)
+        {
+            subentry.entries.listAppend("Visit your friend at the guild to start the quest.");
+            active_url = "guild.php";
+        }
+        else
+        {
+            subentry.entries.listAppend("Build a meatcar first.");
+            active_url = "";
+        }
     }
     else if (base_quest_state.mafia_internal_step == 1)
     {
@@ -67,18 +85,21 @@ void QWhiteCitadelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
         
         subentry.modifiers.listAppend("+item");
         
-        subentry.entries.listAppend("Adventure on the Road to White Citadel, defeat " + int_to_wordy(burnouts_remaining) + " more burn-outs.");
+        subentry.entries.listAppend("Adventure on the Road to White Citadel, defeat " + pluraliseWordy(burnouts_remaining, "more set of burn-outs", "more burn-outs") + ".");
         
         item opium_grenade = $item[opium grenade];
         
-        if (opium_grenade.storage_amount() > 1 && pulls_remaining() == -1)
-            subentry.entries.listAppend("Pull some opium grenades from hagnk's.");
-        else if (opium_grenade.storage_amount() > 0 && pulls_remaining() == -1)
-            subentry.entries.listAppend("Pull an opium grenade from hagnk's.");
-        else if (opium_grenade.available_amount() == 1)
-            subentry.entries.listAppend("Throw an opium grenade at burnouts.");
-        else if (opium_grenade.available_amount() > 1)
-            subentry.entries.listAppend("Throw opium grenades at burnouts.");
+        if (burnouts_remaining > 1)
+        {
+            if (opium_grenade.storage_amount() > 1 && pulls_remaining() == -1)
+                subentry.entries.listAppend("Pull some opium grenades from hagnk's.");
+            else if (opium_grenade.storage_amount() > 0 && pulls_remaining() == -1)
+                subentry.entries.listAppend("Pull an opium grenade from hagnk's.");
+            else if (opium_grenade.available_amount() == 1)
+                subentry.entries.listAppend("Throw an opium grenade at burnouts.");
+            else if (opium_grenade.available_amount() > 1)
+                subentry.entries.listAppend("Throw opium grenades at burnouts.");
+        }
         
         if ($item[poppy].available_amount() >= 2)
         {
@@ -126,7 +147,10 @@ void QWhiteCitadelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
             turns_remaining += operating_burnouts_remaining / burnouts_defeated_per_turn;
         }
         turns_remaining = clampf(turns_remaining, 1.0, 30.0);
-        subentry.entries.listAppend("~" + turns_remaining.roundForOutput(1) + " turns remaining.");
+        if (burnouts_remaining == 1)
+            subentry.entries.listAppend("One More Turn remaining.");
+        else
+            subentry.entries.listAppend("~" + turns_remaining.roundForOutput(1) + " turns remaining.");
         
     }
     else if (base_quest_state.mafia_internal_step == 5)

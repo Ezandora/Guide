@@ -22,8 +22,6 @@ import "relay/Guide/Sections/CSS.ash"
 
 void runMain(string relay_filename)
 {
-    __relay_filename = relay_filename;
-
 	string [string] form_fields = form_fields();
 	if (form_fields["API status"] != "")
 	{
@@ -62,10 +60,10 @@ void runMain(string relay_filename)
     PageWriteHead(HTMLGenerateTagPrefix("meta", mapMake("name", "viewport", "content", "width=device-width")));
 	
 	
-    if (__relay_filename == "relay_Guide.ash")
+    if (relay_filename.to_lower_case() == "relay_guide.ash")
         PageSetBodyAttribute("onload", "GuideInit('relay_Guide.ash'," + __setting_horizontal_width + ");");
-    //We don't give the javascript __relay_filename, because it's unsafe without escaping, and writing escape functions yourself is a bad plan.
-    //So if they rename the file, automatic refreshing and opening in a new window is disabled.
+    else
+        PageSetBodyAttribute("onload", "GuideInit('" + relay_filename + "'," + __setting_horizontal_width + ");"); //not escaped
     
     boolean displaying_navbar = false;
 	if (__setting_show_navbar)

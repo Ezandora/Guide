@@ -83,7 +83,6 @@ static
         __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(35, lookupLocation("The VERY Unquiet Garves"), "MEAT_DROP", "+200% meat, -50% item", "", false));
         __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(38, lookupLocation("the spooky forest"), "meat", "1000 meat", "", false));
         __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(41, lookupLocation("south of the border"), "meat", "4000 meat, beaten up", "", false));
-        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(42, $location[whitey's grove], "meat", "5000 meat, -20% stats debuff", "", false));
         __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(43, lookupLocation("Noob Cave"), "Familiar Hatchlings", "Black cat hatchling, 14 drunkenness", "", false));
         __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(46, lookupLocation("A Barroom Brawl"), "Familiar Hatchlings", "Leprechaun hatchling, one drunkenness", "", false));
         __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(47, lookupLocation("The Hidden Temple"), "ITEMS", "Loaded dice", "", false));
@@ -129,9 +128,11 @@ BadMoonAdventure [int] AllBadMoonAdventures()
     adventures.listAppend(BadMoonAdventureMake(31, lookupLocation("The Haunted Wine Cellar"), "RESIST2", "+2 all res, -20% stats", "defeat Lord Spookyraven", !__quest_state["Level 11 Manor"].finished));
     adventures.listAppend(BadMoonAdventureMake(36, lookupLocation("8-bit realm"), "DAMAGE_REDUCTION", "+4 DR, -8 damage", "acquire digital key", $item[digital key].available_amount() == 0));
     adventures.listAppend(BadMoonAdventureMake(37, lookupLocation("The Penultimate Fantasy Airship"), "DAMAGE_REDUCTION", "+8 DR, -8 damage", "unlock castle", $item[s.o.c.k.].available_amount() == 0));
+    QuestState white_citadel_quest = QuestState("questG02Whitecastle");
+    adventures.listAppend(BadMoonAdventureMake(42, $location[whitey's grove], "meat", "5000 meat, -20% stats debuff", "finish white citadel quest? (this needs spading)", !(!white_citadel_quest.started || white_citadel_quest.finished)));
     //adventures.listAppend(BadMoonAdventureMake(45, lookupLocation("The Arid, Extra-Dry Desert"), "ITEMS", "anticheese", "need to not have ultrahydrated", $effect[ultrahydrated].have_effect() == 0)); //is this still here?
     
-    adventures.listAppend(BadMoonAdventureMake(39, $location[the spooky forest], "SKILLS", "torso awaregness, -50% muscle debuff", "unlock hidden temple", get_property_int("lastTempleUnlock") != my_ascensions()));
+    adventures.listAppend(BadMoonAdventureMake(44, $location[the spooky forest], "SKILLS", "torso awaregness, -50% muscle debuff", "unlock hidden temple", get_property_int("lastTempleUnlock") != my_ascensions()));
     
     __all_bad_moon_adventures_cache = adventures;
     __all_bad_moon_adventures_cache_on_turn = my_turncount();
@@ -174,7 +175,7 @@ void SBadMoonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 {
     if (!in_bad_moon())
         return;
-    if (my_turncount() == 0 && !get_property_boolean("badMoonEncounter43") && $item[black kitten].available_amount() == 0 && !$familiar[black cat].have_familiar())
+    if (my_turncount() == 0 && !haveSeenBadMoonEncounter(43) && $item[black kitten].available_amount() == 0 && !$familiar[black cat].have_familiar())
     {
         string [int] description;
         description.listAppend("For a black cat run. So cute!");
@@ -259,19 +260,13 @@ void SBadMoonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 description.listAppend("Use a leprechaun hatchling.");
                 url = "inventory.php?which=3";
             }
-            else if (!get_property_boolean("badMoonEncounter46"))
+            else if (!haveSeenBadMoonEncounter(46) && $location[a barroom brawl].locationAvailable())
             {
-                if ($location[a barroom brawl].locationAvailable())
-                {
-                    description.listAppend("Find in a barroom brawl.");
-                    url = $location[a barroom brawl].getClickableURLForLocation();
-                }
-                else
-                {
-                    description.listAppend("Find in a barroom brawl in the tavern, later.");
-                }
+                description.listAppend("Find in a barroom brawl.");
+                url = $location[a barroom brawl].getClickableURLForLocation();
             }
-            optional_task_entries.listAppend(ChecklistEntryMake("__familiar Leprechaun", url, ChecklistSubentryMake("Adopt a leprechaun", "", description), $locations[a barroom brawl]));
+            if (description.count() > 0)
+                optional_task_entries.listAppend(ChecklistEntryMake("__familiar Leprechaun", url, ChecklistSubentryMake("Adopt a leprechaun", "", description), $locations[a barroom brawl]));
         }
         if (!$familiar[baby gravy fairy].have_familiar())
         {
@@ -295,7 +290,7 @@ void SBadMoonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 if ($item[fairy gravy boat].available_amount() == 0)
                 {
                     need_minus_combat = true;
-                    description.listAppend("Adventure in the Haiku Dungeon for a fairy gravy boat.|Second choice in the NC");
+                    description.listAppend("Adventure in the Haiku Dungeon for a fairy gravy boat.|Second choice in the NC.");
                     url = $location[the haiku dungeon].getClickableURLForLocation();
                 }
                 if ($item[Knob mushroom].available_amount() == 0)
@@ -358,7 +353,7 @@ void SBadMoonGenerateCategoryChecklistEntry(BadMoonAdventure [string][int] adven
     {
         foreach key2, adventure in adventures_by_category[category]
         {
-            if (get_property_boolean("badMoonEncounter" + adventure.encounter_id))
+            if (haveSeenBadMoonEncounter(adventure.encounter_id))
                 continue;
                 
             string [int] line;
@@ -428,8 +423,11 @@ void SBadMoonGenerateCategoryChecklistEntry(BadMoonAdventure [string][int] adven
     {
         description_active.listAppend(description_inactive[key]);
     }
-    description.listAppend(HTMLGenerateSimpleTableLines(description_active));
-    bad_moon_adventures_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(header, "", description), relevant_locations));
+    if (description_active.count() + description.count() > 0)
+    {
+        description.listAppend(HTMLGenerateSimpleTableLines(description_active));
+        bad_moon_adventures_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(header, "", description), relevant_locations));
+    }
 }
 
 void SBadMoonGenerateCategoryChecklistEntry(BadMoonAdventure [string][int] adventures_by_category, ChecklistEntry [int] bad_moon_adventures_entries, string [int] categories, string image_name, string header)
@@ -487,7 +485,7 @@ void SBadMoonGenerateChecklists(ChecklistCollection checklist_collection)
     SBadMoonGenerateCategoryChecklistEntry(adventures_by_category, bad_moon_adventures_entries, listMake("STAT2", "STAT1", "STAT3"), "__effect Phorcefullness", "Stat buffs");
     SBadMoonGenerateCategoryChecklistEntry(adventures_by_category, bad_moon_adventures_entries, elemental_damage_ordering, "__item oversized snowflake", "Elemental damage buffs", listMake("For defeating ghosts."));
     
-    if (!$skill[torso awaregness].have_skill() && !get_property_boolean("badMoonEncounter44") && $location[the hidden temple].locationAvailable())
+    if (!$skill[torso awaregness].have_skill() && !haveSeenBadMoonEncounter(44) && $location[the hidden temple].locationAvailable())
     {
         string [int] description;
         description.listAppend("Spooky forest.");

@@ -101,6 +101,8 @@ void generateMissingItems(Checklist [int] checklists)
         
         if (subentries.count() == 1)
             subentries[0].entries.listAppend("Can create it.");
+        else if (!__misc_state["can use clovers"])
+            subentries[0].entries.listAppend("Either meatpaste together, or find after losing to the naughty sorceress. (usually slower)");
 			
 		ChecklistEntry entry = ChecklistEntryMake("__item wand of nagamar", $location[the castle in the clouds in the sky (basement)].getClickableURLForLocation(), subentries);
 		entry.should_indent_after_first_subentry = true;
@@ -210,10 +212,16 @@ void generateMissingItems(Checklist [int] checklists)
     {
         string [int] description;
         description.listAppend("Found from an NC on the ground floor of the castle in the clouds in the sky.");
+        boolean can_towerkill = false;
         if ($skill[garbage nova].skill_is_usable())
+        {
             description.listAppend("Ignore this, you can towerkill with Garbage Nova.");
+            can_towerkill = true;
+        }
         else if (!in_bad_moon())
             description.listAppend("Or towerkill.");
+        if (!can_towerkill && !__quest_state["Level 13"].state_boolean["past tower level 2"] && $location[the castle in the clouds in the sky (top floor)].locationAvailable())
+            description.listAppend("Chances of finding go up if you wait until you're at the wall of meat.");
         items_needed_entries.listAppend(ChecklistEntryMake("__item electric boning knife", $location[the castle in the clouds in the sky (ground floor)].getClickableURLForLocation(), ChecklistSubentryMake("Electric boning knife", "-combat", description)));
     }
     if ($item[beehive].available_amount() == 0 && __quest_state["Level 13"].state_boolean["wall of skin will need to be defeated"])

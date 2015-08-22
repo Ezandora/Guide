@@ -1178,7 +1178,7 @@ buffer generateLocationPopup(float bottom_coordinates)
         {
             foreach key, adventure in bad_moon_adventures
             {
-                if (get_property_boolean("badMoonEncounter" + adventure.encounter_id))
+                if (haveSeenBadMoonEncounter(adventure.encounter_id))
                     continue;
                     
                 string [int] fl_entries;

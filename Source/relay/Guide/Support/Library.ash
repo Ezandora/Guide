@@ -1313,3 +1313,10 @@ int equippable_amount(item it)
     }
     return 1;
 }
+
+boolean haveSeenBadMoonEncounter(int encounter_id)
+{
+    if (get_property_int("lastBadMoonReset") != my_ascensions()) //badMoonEncounter values are not reset when you ascend
+        return false;
+    return get_property_boolean("badMoonEncounter" + encounter_id);
+}
