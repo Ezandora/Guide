@@ -2,7 +2,7 @@
 
 since 17.1; //the earliest main release that is usable in modern KOL (unequip bug)
 //These settings are for development. Don't worry about editing them.
-string __version = "1.2.10";
+string __version = "1.2.11";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -2567,8 +2567,14 @@ int equippable_amount(item it)
     return 1;
 }
 
+boolean haveSeenBadMoonEncounter(int encounter_id)
+{
+    if (get_property_int("lastBadMoonReset") != my_ascensions()) //badMoonEncounter values are not reset when you ascend
+        return false;
+    return get_property_boolean("badMoonEncounter" + encounter_id);
+}
+
 //Runtime variables:
-string __relay_filename;
 location __last_adventure_location;
 
 
@@ -7262,7 +7268,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         }
 		else if (evilness > 26)
 		{
-            subentry.modifiers.listAppend("+init");
+            subentry.modifiers.listAppend("+850% init");
             subentry.modifiers.listAppend("-combat");
 			int zmobies_needed = ceil((evilness.to_float() - 26.0) / 5.0);
 			float zmobie_chance = min(100.0, 15.0 + initiative_modifier_for_location($location[the defiled alcove]) / 10.0);
@@ -15311,7 +15317,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         //2 can be fighting ghost
         //4 can be nearing end
         //5 -> return it
-        //6 -> returning
+        //6 -> returning (?
         if (have_epic_weapon)
         {
             subentry.entries.listAppend("Speak to your guild.");
@@ -15350,16 +15356,14 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         subentry.entries.listAppend("Speak to your guild.");
         url = "guild.php";
     }
-    else if (base_quest_state.mafia_internal_step <= 2 + 4)
+    else if (base_quest_state.mafia_internal_step <= 6)
     {
-        //2	To unlock the full power of the Legendary Epic Weapon, you must defeat Beelzebozo, the Clown Prince of Darkness,
+        //6	To unlock the full power of the Legendary Epic Weapon, you must defeat Beelzebozo, the Clown Prince of Darkness,
         QNemesisGenerateClownTasks(subentry);
         url = "place.php?whichplace=plains";
     }
-    else if (base_quest_state.mafia_internal_step == 3 + 4 || base_quest_state.mafia_internal_step == 4 + 4)
+    else if (base_quest_state.mafia_internal_step >= 7 && base_quest_state.mafia_internal_step <= 9)
     {
-        //3	You've finally killed the clownlord Beelzebozo
-        //4	You've successfully defeated Beelzebozo and claimed the last piece of the Legendary Epic Weapon
         if (have_legendary_epic_weapon)
         {
             subentry.entries.listAppend("Speak to your guild.");
@@ -15370,40 +15374,98 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             subentry.entries.listAppend("Make " + legendary_epic_weapon + ".");
         }
     }
-    else if (base_quest_state.mafia_internal_step == 5 + 4)
+    else if (base_quest_state.mafia_internal_step == 10)
     {
-        //5	discovered where your Nemesis is hiding. It took long enough, jeez! Anyway, turns out it's a Dark and
-        url = "cave.php";
-        QNemesisGenerateCaveTasks(subentry,legendary_epic_weapon);
+        //???
+        subentry.entries.listAppend("???");
     }
-    else if (base_quest_state.mafia_internal_step >= 6 + 4 && base_quest_state.mafia_internal_step < 15 + 4)
+    else if (base_quest_state.mafia_internal_step >= 11 && base_quest_state.mafia_internal_step <= 16)
     {
-        //6	You have successfully shown your Nemesis what for, and claimed an ancient hat of power. It's pretty sweet
-        //7	You showed the Epic Hat to the class leader back at your guild, but they didn't seem much impressed. I guess all this Nemesis nonsense isn't quite finished yet, but at least with your Nemesis in hiding again you won't have to worry about it for a while.
-        //8	It appears as though some nefarious ne'er-do-well has put a contract on your head
-        //9	You handily dispatched some thugs who were trying to collect on your bounty, but something tells you they won't be the last ones to try
+        //QNemesisGenerateCaveTasks(subentry, legendary_epic_weapon);
+        if (base_quest_state.mafia_internal_step == 11 || base_quest_state.mafia_internal_step == 12)
+        {
+            url = "place.php?whichplace=mountains";
+            //The hunt for your Nemesis is on! Better check out that cave they sent you to.
+            //Figure out how to get into your Nemesis' cave. If you're stumped, maybe your guild can help?
+            
+            skill skill_needed;
+            string skill_choice_name;
+            
+            if (my_class() == $class[seal clubber])
+            {
+                skill_needed = $skill[wrath of the wolverine];
+                skill_choice_name = "wolverine";
+            }
+            else if (my_class() == $class[disco bandit])
+            {
+                skill_needed = $skill[disco state of mind];
+                skill_choice_name = "disco state of mind";
+            }
+            //Stream of sauce?
+            //entangling noodles?
+            if (skill_needed != $skill[none] && skill_needed.have_skill())
+            {
+                subentry.entries.listAppend("Learn " + skill_needed + " from guild trainer.");
+                url = "guild.php?place=trainer";
+            }
+            else if (skill_needed != $skill[none])
+            {
+                subentry.entries.listAppend("Click on the nemesis cave, choose " + skill_choice_name + ".");
+            }
+            else
+                subentry.entries.listAppend("Solve the cave entrance puzzle.");
+        }
+        else if (base_quest_state.mafia_internal_step >= 13 && base_quest_state.mafia_internal_step <= 15)
+        {
+            url = "place.php?whichplace=nemesiscave";
+            //The cavern is full of weird mushrooms, but where's your Nemesis?
+            //more fizzing spore pods to blow up the blockade in your Nemesis' cave.
+            //Take those fizzing spore pods to the rubble!
+            subentry.modifiers.listAppend("+item");
+            
+            monster monster_to_olfact;
+            if (my_class() == $class[seal clubber])
+                monster_to_olfact = lookupMonster("angry mushroom guy");
+            if (monster_to_olfact != $monster[none])
+                subentry.modifiers.listAppend("olfact " + monster_to_olfact);
+            subentry.entries.listAppend("Adventure in the fungal nethers, collect spore pods, make rubble go boom!");
+        }
+        else if (base_quest_state.mafia_internal_step == 16)
+        {
+            url = "place.php?whichplace=nemesiscave";
+            //Boom! Time to bring the fight to your stinking Nemesis in that stinking cave!
+            subentry.entries.listAppend("Fight your nemesis in the nemesis cave.");
+            subentry.entries.listAppend("Do nemesis caves just get rented out on a time-share nemesis basis?|For the month of june, you'll be rueing the day! What? I paid how much?");
+        }
+    }
+    else if (base_quest_state.mafia_internal_step >= 17 && base_quest_state.mafia_internal_step < 26)
+    {
+        //	You have successfully shown your Nemesis what for, and claimed an ancient hat of power. It's pretty sweet
+        //	You showed the Epic Hat to the class leader back at your guild, but they didn't seem much impressed. I guess all this Nemesis nonsense isn't quite finished yet, but at least with your Nemesis in hiding again you won't have to worry about it for a while.
+        //	It appears as though some nefarious ne'er-do-well has put a contract on your head
+        //	You handily dispatched some thugs who were trying to collect on your bounty, but something tells you they won't be the last ones to try
         
-        //10	Whoever put this hit out on you (like you haven't guessed already) has sent Mob Penguins to do their dirty work. Do you know any polar bears you could hire as bodyguards
-        //11	So much for those mob penguins that were after your head! If whoever put this hit out on you wants you killed (which, presumably, they do) they'll have to find some much more competent thugs
-        //12	have been confirmed: your Nemesis has put the order out for you to be hunted down and killed, and now they're sending their own guys instead of contracting out
-        //13	Bam! So much for your Nemesis' assassins! If that's the best they've got, you have nothing at all to worry about
-        //14	You had a run-in with some crazy mercenary or assassin or... thing that your Nemesis sent to do you in once and for all. A run-in followed by a run-out, evidently,
+        //	Whoever put this hit out on you (like you haven't guessed already) has sent Mob Penguins to do their dirty work. Do you know any polar bears you could hire as bodyguards
+        //	So much for those mob penguins that were after your head! If whoever put this hit out on you wants you killed (which, presumably, they do) they'll have to find some much more competent thugs
+        //	have been confirmed: your Nemesis has put the order out for you to be hunted down and killed, and now they're sending their own guys instead of contracting out
+        //	Bam! So much for your Nemesis' assassins! If that's the best they've got, you have nothing at all to worry about
+        //	You had a run-in with some crazy mercenary or assassin or... thing that your Nemesis sent to do you in once and for all. A run-in followed by a run-out, evidently,
         string assassin_up_next = "";
         int assassins_left = -1;
         
         if (mafiaIsPastRevision(14330))
         {
-            if (base_quest_state.mafia_internal_step < 9 + 4)
+            if (base_quest_state.mafia_internal_step < 20)
             {
                 assassin_up_next = "menacing thug";
                 assassins_left = 4;
             }
-            else if (base_quest_state.mafia_internal_step < 11 + 4)
+            else if (base_quest_state.mafia_internal_step < 22)
             {
                 assassin_up_next = "Mob Penguin hitman";
                 assassins_left = 3;
             }
-            else if (base_quest_state.mafia_internal_step < 13 + 4)
+            else if (base_quest_state.mafia_internal_step < 24)
             {
                 if (my_class() == $class[seal clubber])
                     assassin_up_next = "hunting seal";
@@ -15485,14 +15547,14 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     }
     else if (base_quest_state.mafia_internal_step == 15 && false)
     {
-        //15	Now that you've dealt with your Nemesis' assassins and found a map to the secret tropical island volcano lair, it's time to take the fight to your foe. Booyah
+        //	Now that you've dealt with your Nemesis' assassins and found a map to the secret tropical island volcano lair, it's time to take the fight to your foe. Booyah
         //find island
         url = "inventory.php?which=3";
         subentry.entries.listAppend("Use the secret tropical island volcano lair map.");
     }
-    else if (base_quest_state.mafia_internal_step == 16 + 4 || base_quest_state.mafia_internal_step == 15 + 4) //mafia bug - doesn't advance properly
+    else if (base_quest_state.mafia_internal_step == 27 || base_quest_state.mafia_internal_step == 26) //mafia bug(?) - doesn't advance properly
     {
-        //16	You've arrived at the secret tropical island volcano lair, and it's time to finally put a stop to this Nemesis nonsense once and for all. As soon as you can find where they're hiding. Maybe you can find someone to ask
+        //	You've arrived at the secret tropical island volcano lair, and it's time to finally put a stop to this Nemesis nonsense once and for all. As soon as you can find where they're hiding. Maybe you can find someone to ask
         if ($location[The Nemesis' Lair].turnsAttemptedInLocation() > 0)
         {
             if (my_class() == $class[disco bandit])
@@ -15504,10 +15566,10 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             QNemesisGenerateIslandTasks(subentry);
         url = "volcanoisland.php";
     }
-    else if (base_quest_state.mafia_internal_step >= 17 + 4 && base_quest_state.mafia_internal_step <= 19 + 4)
+    else if (base_quest_state.mafia_internal_step >= 28 && base_quest_state.mafia_internal_step <= 30)
     {
-        //17	Congratulations on solving the lava maze, which is probably the biggest pain-in-the-ass puzzle in the entire game! Hooray! (Unless you cheated, in which case
-        if (base_quest_state.mafia_internal_step == 17 + 4)
+        //	Congratulations on solving the lava maze, which is probably the biggest pain-in-the-ass puzzle in the entire game! Hooray! (Unless you cheated, in which case
+        if (base_quest_state.mafia_internal_step == 21)
             subentry.entries.listAppend("Solve the volcano maze, then fight your nemesis.");
         else
             subentry.entries.listAppend("Fight your nemesis.");
@@ -17040,12 +17102,30 @@ void QWhiteCitadelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 	string active_url = "place.php?whichplace=woods";
     
     if (in_bad_moon())
-        subentry.entries.listAppend("Relevant in Bad Moon for duonoculars and food from the wand of pigification.");
-    
+    {
+        string [int] reasons;
+        if (base_quest_state.mafia_internal_step < 6)
+            reasons.listAppend("duonoculars");
+        if (base_quest_state.mafia_internal_step < 8)
+            reasons.listAppend("food from the wand of pigification");
+        if (base_quest_state.mafia_internal_step < 11)
+            reasons.listAppend("an epic drink");
+        
+        if (reasons.count() > 0)
+            subentry.entries.listAppend("Relevant in Bad Moon for " + reasons.listJoinComponents(", ", "and") + ".");
+    }
     if (!base_quest_state.started)
     {
-        subentry.entries.listAppend("Visit your friend at the guild to start the quest.");
-        active_url = "guild.php";
+        if (QuestState("questG01Meatcar").finished || $item[bitchin' meatcar].available_amount() > 0)
+        {
+            subentry.entries.listAppend("Visit your friend at the guild to start the quest.");
+            active_url = "guild.php";
+        }
+        else
+        {
+            subentry.entries.listAppend("Build a meatcar first.");
+            active_url = "";
+        }
     }
     else if (base_quest_state.mafia_internal_step == 1)
     {
@@ -17065,18 +17145,21 @@ void QWhiteCitadelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
         
         subentry.modifiers.listAppend("+item");
         
-        subentry.entries.listAppend("Adventure on the Road to White Citadel, defeat " + int_to_wordy(burnouts_remaining) + " more burn-outs.");
+        subentry.entries.listAppend("Adventure on the Road to White Citadel, defeat " + pluraliseWordy(burnouts_remaining, "more set of burn-outs", "more burn-outs") + ".");
         
         item opium_grenade = $item[opium grenade];
         
-        if (opium_grenade.storage_amount() > 1 && pulls_remaining() == -1)
-            subentry.entries.listAppend("Pull some opium grenades from hagnk's.");
-        else if (opium_grenade.storage_amount() > 0 && pulls_remaining() == -1)
-            subentry.entries.listAppend("Pull an opium grenade from hagnk's.");
-        else if (opium_grenade.available_amount() == 1)
-            subentry.entries.listAppend("Throw an opium grenade at burnouts.");
-        else if (opium_grenade.available_amount() > 1)
-            subentry.entries.listAppend("Throw opium grenades at burnouts.");
+        if (burnouts_remaining > 1)
+        {
+            if (opium_grenade.storage_amount() > 1 && pulls_remaining() == -1)
+                subentry.entries.listAppend("Pull some opium grenades from hagnk's.");
+            else if (opium_grenade.storage_amount() > 0 && pulls_remaining() == -1)
+                subentry.entries.listAppend("Pull an opium grenade from hagnk's.");
+            else if (opium_grenade.available_amount() == 1)
+                subentry.entries.listAppend("Throw an opium grenade at burnouts.");
+            else if (opium_grenade.available_amount() > 1)
+                subentry.entries.listAppend("Throw opium grenades at burnouts.");
+        }
         
         if ($item[poppy].available_amount() >= 2)
         {
@@ -17124,7 +17207,10 @@ void QWhiteCitadelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
             turns_remaining += operating_burnouts_remaining / burnouts_defeated_per_turn;
         }
         turns_remaining = clampf(turns_remaining, 1.0, 30.0);
-        subentry.entries.listAppend("~" + turns_remaining.roundForOutput(1) + " turns remaining.");
+        if (burnouts_remaining == 1)
+            subentry.entries.listAppend("One More Turn remaining.");
+        else
+            subentry.entries.listAppend("~" + turns_remaining.roundForOutput(1) + " turns remaining.");
         
     }
     else if (base_quest_state.mafia_internal_step == 5)
@@ -21006,7 +21092,7 @@ void SFamiliarsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             else
                 configuration_idea.listAppend("Popcorn Strands");
             
-            if (!__misc_state["yellow ray potentially available"])
+            if (!__misc_state["yellow ray potentially available"] && my_path_id() != PATH_WAY_OF_THE_SURPRISING_FIST) //you really want the meat one in WOTSF (this works!)
                 configuration_idea.listAppend("Big Yellow-Wrapped Presents");
             else
                 configuration_idea.listAppend("Big Red-Wrapped Presents");
@@ -21669,7 +21755,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
 	if ($item[smut orc keepsake box].available_amount() > 0 && !__quest_state["Level 9"].state_boolean["bridge complete"] && __misc_state["in run"])
 		resource_entries.listAppend(ChecklistEntryMake("__item smut orc keepsake box", "inventory.php?which=3", ChecklistSubentryMake(pluralise($item[smut orc keepsake box]), "", "Open for bridge building."), 0));
 		
-    if ($item[wand of pigification].available_amount() > 0 && in_bad_moon())
+    if ($item[wand of pigification].available_amount() > 0 && in_bad_moon() && __misc_state["in run"])
     {
 		resource_entries.listAppend(ChecklistEntryMake("__item wand of pigification", "", ChecklistSubentryMake("Wand of pigification", "", "Use twice(?) a day on monsters for good-level food."), 6));
     }
@@ -29635,7 +29721,6 @@ static
         __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(35, lookupLocation("The VERY Unquiet Garves"), "MEAT_DROP", "+200% meat, -50% item", "", false));
         __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(38, lookupLocation("the spooky forest"), "meat", "1000 meat", "", false));
         __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(41, lookupLocation("south of the border"), "meat", "4000 meat, beaten up", "", false));
-        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(42, $location[whitey's grove], "meat", "5000 meat, -20% stats debuff", "", false));
         __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(43, lookupLocation("Noob Cave"), "Familiar Hatchlings", "Black cat hatchling, 14 drunkenness", "", false));
         __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(46, lookupLocation("A Barroom Brawl"), "Familiar Hatchlings", "Leprechaun hatchling, one drunkenness", "", false));
         __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(47, lookupLocation("The Hidden Temple"), "ITEMS", "Loaded dice", "", false));
@@ -29681,9 +29766,11 @@ BadMoonAdventure [int] AllBadMoonAdventures()
     adventures.listAppend(BadMoonAdventureMake(31, lookupLocation("The Haunted Wine Cellar"), "RESIST2", "+2 all res, -20% stats", "defeat Lord Spookyraven", !__quest_state["Level 11 Manor"].finished));
     adventures.listAppend(BadMoonAdventureMake(36, lookupLocation("8-bit realm"), "DAMAGE_REDUCTION", "+4 DR, -8 damage", "acquire digital key", $item[digital key].available_amount() == 0));
     adventures.listAppend(BadMoonAdventureMake(37, lookupLocation("The Penultimate Fantasy Airship"), "DAMAGE_REDUCTION", "+8 DR, -8 damage", "unlock castle", $item[s.o.c.k.].available_amount() == 0));
+    QuestState white_citadel_quest = QuestState("questG02Whitecastle");
+    adventures.listAppend(BadMoonAdventureMake(42, $location[whitey's grove], "meat", "5000 meat, -20% stats debuff", "finish white citadel quest? (this needs spading)", !(!white_citadel_quest.started || white_citadel_quest.finished)));
     //adventures.listAppend(BadMoonAdventureMake(45, lookupLocation("The Arid, Extra-Dry Desert"), "ITEMS", "anticheese", "need to not have ultrahydrated", $effect[ultrahydrated].have_effect() == 0)); //is this still here?
     
-    adventures.listAppend(BadMoonAdventureMake(39, $location[the spooky forest], "SKILLS", "torso awaregness, -50% muscle debuff", "unlock hidden temple", get_property_int("lastTempleUnlock") != my_ascensions()));
+    adventures.listAppend(BadMoonAdventureMake(44, $location[the spooky forest], "SKILLS", "torso awaregness, -50% muscle debuff", "unlock hidden temple", get_property_int("lastTempleUnlock") != my_ascensions()));
     
     __all_bad_moon_adventures_cache = adventures;
     __all_bad_moon_adventures_cache_on_turn = my_turncount();
@@ -29726,7 +29813,7 @@ void SBadMoonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 {
     if (!in_bad_moon())
         return;
-    if (my_turncount() == 0 && !get_property_boolean("badMoonEncounter43") && $item[black kitten].available_amount() == 0 && !$familiar[black cat].have_familiar())
+    if (my_turncount() == 0 && !haveSeenBadMoonEncounter(43) && $item[black kitten].available_amount() == 0 && !$familiar[black cat].have_familiar())
     {
         string [int] description;
         description.listAppend("For a black cat run. So cute!");
@@ -29811,19 +29898,13 @@ void SBadMoonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 description.listAppend("Use a leprechaun hatchling.");
                 url = "inventory.php?which=3";
             }
-            else if (!get_property_boolean("badMoonEncounter46"))
+            else if (!haveSeenBadMoonEncounter(46) && $location[a barroom brawl].locationAvailable())
             {
-                if ($location[a barroom brawl].locationAvailable())
-                {
-                    description.listAppend("Find in a barroom brawl.");
-                    url = $location[a barroom brawl].getClickableURLForLocation();
-                }
-                else
-                {
-                    description.listAppend("Find in a barroom brawl in the tavern, later.");
-                }
+                description.listAppend("Find in a barroom brawl.");
+                url = $location[a barroom brawl].getClickableURLForLocation();
             }
-            optional_task_entries.listAppend(ChecklistEntryMake("__familiar Leprechaun", url, ChecklistSubentryMake("Adopt a leprechaun", "", description), $locations[a barroom brawl]));
+            if (description.count() > 0)
+                optional_task_entries.listAppend(ChecklistEntryMake("__familiar Leprechaun", url, ChecklistSubentryMake("Adopt a leprechaun", "", description), $locations[a barroom brawl]));
         }
         if (!$familiar[baby gravy fairy].have_familiar())
         {
@@ -29847,7 +29928,7 @@ void SBadMoonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 if ($item[fairy gravy boat].available_amount() == 0)
                 {
                     need_minus_combat = true;
-                    description.listAppend("Adventure in the Haiku Dungeon for a fairy gravy boat.|Second choice in the NC");
+                    description.listAppend("Adventure in the Haiku Dungeon for a fairy gravy boat.|Second choice in the NC.");
                     url = $location[the haiku dungeon].getClickableURLForLocation();
                 }
                 if ($item[Knob mushroom].available_amount() == 0)
@@ -29910,7 +29991,7 @@ void SBadMoonGenerateCategoryChecklistEntry(BadMoonAdventure [string][int] adven
     {
         foreach key2, adventure in adventures_by_category[category]
         {
-            if (get_property_boolean("badMoonEncounter" + adventure.encounter_id))
+            if (haveSeenBadMoonEncounter(adventure.encounter_id))
                 continue;
                 
             string [int] line;
@@ -29980,8 +30061,11 @@ void SBadMoonGenerateCategoryChecklistEntry(BadMoonAdventure [string][int] adven
     {
         description_active.listAppend(description_inactive[key]);
     }
-    description.listAppend(HTMLGenerateSimpleTableLines(description_active));
-    bad_moon_adventures_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(header, "", description), relevant_locations));
+    if (description_active.count() + description.count() > 0)
+    {
+        description.listAppend(HTMLGenerateSimpleTableLines(description_active));
+        bad_moon_adventures_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(header, "", description), relevant_locations));
+    }
 }
 
 void SBadMoonGenerateCategoryChecklistEntry(BadMoonAdventure [string][int] adventures_by_category, ChecklistEntry [int] bad_moon_adventures_entries, string [int] categories, string image_name, string header)
@@ -30039,7 +30123,7 @@ void SBadMoonGenerateChecklists(ChecklistCollection checklist_collection)
     SBadMoonGenerateCategoryChecklistEntry(adventures_by_category, bad_moon_adventures_entries, listMake("STAT2", "STAT1", "STAT3"), "__effect Phorcefullness", "Stat buffs");
     SBadMoonGenerateCategoryChecklistEntry(adventures_by_category, bad_moon_adventures_entries, elemental_damage_ordering, "__item oversized snowflake", "Elemental damage buffs", listMake("For defeating ghosts."));
     
-    if (!$skill[torso awaregness].have_skill() && !get_property_boolean("badMoonEncounter44") && $location[the hidden temple].locationAvailable())
+    if (!$skill[torso awaregness].have_skill() && !haveSeenBadMoonEncounter(44) && $location[the hidden temple].locationAvailable())
     {
         string [int] description;
         description.listAppend("Spooky forest.");
@@ -32010,6 +32094,8 @@ void generateMissingItems(Checklist [int] checklists)
         
         if (subentries.count() == 1)
             subentries[0].entries.listAppend("Can create it.");
+        else if (!__misc_state["can use clovers"])
+            subentries[0].entries.listAppend("Either meatpaste together, or find after losing to the naughty sorceress. (usually slower)");
 			
 		ChecklistEntry entry = ChecklistEntryMake("__item wand of nagamar", $location[the castle in the clouds in the sky (basement)].getClickableURLForLocation(), subentries);
 		entry.should_indent_after_first_subentry = true;
@@ -32119,10 +32205,16 @@ void generateMissingItems(Checklist [int] checklists)
     {
         string [int] description;
         description.listAppend("Found from an NC on the ground floor of the castle in the clouds in the sky.");
+        boolean can_towerkill = false;
         if ($skill[garbage nova].skill_is_usable())
+        {
             description.listAppend("Ignore this, you can towerkill with Garbage Nova.");
+            can_towerkill = true;
+        }
         else if (!in_bad_moon())
             description.listAppend("Or towerkill.");
+        if (!can_towerkill && !__quest_state["Level 13"].state_boolean["past tower level 2"] && $location[the castle in the clouds in the sky (top floor)].locationAvailable())
+            description.listAppend("Chances of finding go up if you wait until you're at the wall of meat.");
         items_needed_entries.listAppend(ChecklistEntryMake("__item electric boning knife", $location[the castle in the clouds in the sky (ground floor)].getClickableURLForLocation(), ChecklistSubentryMake("Electric boning knife", "-combat", description)));
     }
     if ($item[beehive].available_amount() == 0 && __quest_state["Level 13"].state_boolean["wall of skin will need to be defeated"])
@@ -32276,6 +32368,7 @@ void generateTasks(Checklist [int] checklists)
 		ChecklistSubentry subentry;
         boolean optional = false;
 		subentry.header = "Unlock desert beach";
+        boolean [location] relevant_locations;
         if (my_path_id() == PATH_COMMUNITY_SERVICE)
         {
             subentry.header = "Optionally unlock desert beach";
@@ -32284,6 +32377,7 @@ void generateTasks(Checklist [int] checklists)
         }
 		if (!knoll_available())
 		{
+            relevant_locations[$location[the degrassi knoll garage]] = true;
 			string meatcar_line = "Build a bitchin' meatcar.";
 			if ($item[bitchin' meatcar].creatable_amount() > 0)
 				meatcar_line += "|*You have all the parts, build it!";
@@ -32329,7 +32423,7 @@ void generateTasks(Checklist [int] checklists)
 			subentry.entries.listAppend("Build a bitchin' meatcar. (" + meatcar_price + " meat)");
 		}
 		
-        ChecklistEntry entry = ChecklistEntryMake("__item bitchin' meatcar", url, subentry);
+        ChecklistEntry entry = ChecklistEntryMake("__item bitchin' meatcar", url, subentry, relevant_locations);
         if (optional)
             optional_task_entries.listAppend(entry);
         else
@@ -34381,7 +34475,7 @@ string generateRandomMessage()
         random_messages.listAppend("speed ascension is all I have left, " + lowercase_player_name);
     if (item_drop_modifier() <= -100.0)
         random_messages.listAppend("let go of your material posessions");
-    if ($item[puppet strings].item_amount() > 0)
+    if ($item[puppet strings].item_amount() > 0 && my_id() != 1557284)
     {
         //full puppet string support:
         string chosen_message;
@@ -36634,7 +36728,7 @@ buffer generateLocationPopup(float bottom_coordinates)
         {
             foreach key, adventure in bad_moon_adventures
             {
-                if (get_property_boolean("badMoonEncounter" + adventure.encounter_id))
+                if (haveSeenBadMoonEncounter(adventure.encounter_id))
                     continue;
                     
                 string [int] fl_entries;
@@ -37219,7 +37313,7 @@ buffer generateLocationBar(boolean displaying_navbar)
         {
             foreach key, adventure in bad_moon_adventures
             {
-                boolean possible = !get_property_boolean("badMoonEncounter" + adventure.encounter_id);
+                boolean possible = !haveSeenBadMoonEncounter(adventure.encounter_id);
                 if (possible)
                     bad_moon_adventure_possible = possible;
                 if (!bad_moon_adventure_possible_now)
@@ -37743,8 +37837,6 @@ void setUpCSSStyles()
 
 void runMain(string relay_filename)
 {
-    __relay_filename = relay_filename;
-
 	string [string] form_fields = form_fields();
 	if (form_fields["API status"] != "")
 	{
@@ -37783,10 +37875,10 @@ void runMain(string relay_filename)
     PageWriteHead(HTMLGenerateTagPrefix("meta", mapMake("name", "viewport", "content", "width=device-width")));
 	
 	
-    if (__relay_filename == "relay_Guide.ash")
+    if (relay_filename.to_lower_case() == "relay_guide.ash")
         PageSetBodyAttribute("onload", "GuideInit('relay_Guide.ash'," + __setting_horizontal_width + ");");
-    //We don't give the javascript __relay_filename, because it's unsafe without escaping, and writing escape functions yourself is a bad plan.
-    //So if they rename the file, automatic refreshing and opening in a new window is disabled.
+    else
+        PageSetBodyAttribute("onload", "GuideInit('" + relay_filename + "'," + __setting_horizontal_width + ");"); //not escaped
     
     boolean displaying_navbar = false;
 	if (__setting_show_navbar)
