@@ -253,13 +253,21 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             
 			image_name = "castle stairs up";
             
-            if (__misc_state["Need to level"])
+            if (__misc_state["need to level"])
                 subentry.entries.listAppend("Possibly acquire the very overdue library book from a non-combat. (stats)");
             
+            boolean request_minus_combat = false;
             if ($item[electric boning knife].available_amount() == 0 && __quest_state["Level 13"].state_boolean["wall of bones will need to be defeated"] && !$skill[garbage nova].skill_is_usable())
             {
+                request_minus_combat = true;
                 subentry.modifiers.listAppend("-combat");
                 subentry.entries.listAppend("Try to acquire the electric boning knife if you see it. (foodie NC)");
+            }
+            if (!request_minus_combat && CounterWanderingMonsterMayHitNextTurn())
+            {
+                request_minus_combat = true;
+                subentry.modifiers.listAppend("-combat");
+                subentry.entries.listAppend("If you seek out and skip NCs here, they can tell you if your wandering monster is up next turn.|Then you can adventure somewhere else for a turn, and burn more delay here.");
             }
             
             if (true)

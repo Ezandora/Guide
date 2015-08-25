@@ -87,14 +87,16 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 {
 	if (!__quest_state["Manor Unlock"].in_progress)
 		return;
-    if (!__misc_state["in run"])
-        return;
     
     boolean should_output_optionally = false;
 	QuestState base_quest_state = __quest_state["Manor Unlock"];
     
     boolean [location] relevant_locations = $locations[the haunted kitchen, the haunted library, the haunted billiards room, the haunted bedroom, the haunted ballroom, the haunted gallery, the haunted bathroom];
     //$locations[the haunted kitchen, the haunted library, the haunted billiards room, the haunted bedroom, the haunted ballroom];
+    
+    
+    if (!__misc_state["in run"] && !(relevant_locations contains __last_adventure_location))
+        return;
 	ChecklistSubentry subentry;
 	//subentry.header = "Unlock Spookyraven Manor";
     
@@ -463,13 +465,13 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         if (inebriety_limit() > 0)
         {
             int desired_drunkenness = MIN(inebriety_limit(), 10);
-            if (missing_pool_skill > 0)
+            if (my_inebriety() < desired_drunkenness)
             {
                 int more_drunkenness = MIN(missing_pool_skill, desired_drunkenness - my_inebriety());
                 if (more_drunkenness > 0)
                     subentry.entries.listAppend("Consider drinking " + more_drunkenness + " more drunkenness.");
             }
-            else if (my_inebriety() > desired_drunkenness)
+            else if (missing_pool_skill > 0)
                 subentry.entries.listAppend(HTMLGenerateSpanFont("Consider waiting for rollover for better pool skill.", "red") + " (you're over " + desired_drunkenness + " drunkenness.)");
         }
         if (my_inebriety() > 0 && false)

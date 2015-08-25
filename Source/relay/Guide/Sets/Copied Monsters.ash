@@ -138,6 +138,9 @@ void generateCopiedMonstersEntry(ChecklistEntry [int] task_entries, ChecklistEnt
 	int show_up_in_tasks_turn_cutoff = 10;
 	string title = "";
 	int min_turns_until = -1;
+    string url = "";
+    if (get_property_boolean("dailyDungeonDone"))
+        url = $location[the daily dungeon].getClickableURLForLocation();
     Counter romantic_arrow_counter = CounterLookup("Romantic Monster");
 	if (romantic_arrow_counter.CounterIsRange() || get_property_int("_romanticFightsLeft") > 0)
 	{
@@ -191,7 +194,7 @@ void generateCopiedMonstersEntry(ChecklistEntry [int] task_entries, ChecklistEnt
 		int importance = 4;
 		if (very_important)
 			importance = -11;
-		ChecklistEntry entry = ChecklistEntryMake(__misc_state_string["obtuse angel name"], "", ChecklistSubentryMake(title, "", description), importance);
+		ChecklistEntry entry = ChecklistEntryMake(__misc_state_string["obtuse angel name"], url, ChecklistSubentryMake(title, "", description), importance);
 		if (very_important)
 			task_entries.listAppend(entry);
 		else

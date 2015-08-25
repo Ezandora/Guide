@@ -48,7 +48,7 @@ void SOlfactionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         }
         location_wanted_monster[$location[cobb's knob harem]] = $monster[knob goblin harem girl];
         location_wanted_monster[$location[The Dark Neck of the Woods]] = $monster[Hellion];
-        if ($skill[summon smithsness].skill_is_usable() && $item[dirty hobo gloves].available_amount() == 0 && $item[hand in glove].available_amount() == 0 && __misc_state["Need to level"])
+        if ($skill[summon smithsness].skill_is_usable() && $item[dirty hobo gloves].available_amount() == 0 && $item[hand in glove].available_amount() == 0 && __misc_state["need to level"])
         {
             location_wanted_monster[$location[The Sleazy Back Alley]] = $monster[drunken half-orc hobo];
             location_wanted_monster[$location[The Haunted Pantry]] = $monster[drunken half-orc hobo];

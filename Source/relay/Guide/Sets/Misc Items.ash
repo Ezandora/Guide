@@ -474,7 +474,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
 		int quest_needed = 2;
 		if ($item[the nostril of the serpent].available_amount() > 0)
 			quest_needed -= 1;
-		if (locationAvailable($location[the hidden park]))
+		if (locationAvailable($location[the hidden park]) || !in_run)
 			quest_needed = 0;
 		
 		if (quest_needed > 0)
@@ -721,7 +721,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
             line += "|Will disappear when you ascend.";
         resource_entries.listAppend(ChecklistEntryMake("__item " + $item[map to safety shelter grimace prime], "inventory.php?which=3", ChecklistSubentryMake(pluralise($item[map to safety shelter grimace prime]), "", line), importance_level_unimportant_item));
     }
-    if ($item[rusty hedge trimmers].available_amount() > 0 && __quest_state["Level 9"].state_int["twin peak progress"] != 15)
+    if ($item[rusty hedge trimmers].available_amount() > 0 && __quest_state["Level 9"].state_int["twin peak progress"] != 15 && in_run)
     {
         string line = "Use to visit the Twin Peak non-combat.";
         resource_entries.listAppend(ChecklistEntryMake("__item " + $item[rusty hedge trimmers], "inventory.php?which=3", ChecklistSubentryMake(pluralise($item[rusty hedge trimmers]), "", line), importance_level_unimportant_item));
@@ -829,7 +829,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__item spinning wheel", "campground.php?action=workshed", ChecklistSubentryMake("Spinning wheel meat", "", description), importance_level_unimportant_item));
     }
     
-    if ($item[very overdue library book].available_amount() > 0 && in_run && __misc_state["Need to level"])
+    if ($item[very overdue library book].available_amount() > 0 && in_run && __misc_state["need to level"])
     {
         resource_entries.listAppend(ChecklistEntryMake("__item very overdue library book", "inventory.php?which=3", ChecklistSubentryMake("Very overdue library book", "", "Open for 63 moxie/mysticality/muscle."), importance_level_unimportant_item));
     }

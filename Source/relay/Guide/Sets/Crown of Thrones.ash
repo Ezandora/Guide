@@ -93,7 +93,7 @@ void SCOTGenerateSuggestions(string [int] description)
         suggestion_sets.listAppend(COTSuggestionSetMake(suggestions));
     }
     //+2 moxie/muscle/mysticality stats/fight
-    if (__misc_state["Need to level"])
+    if (__misc_state["need to level"])
     {
         if (my_primestat() == $stat[moxie])
         {
@@ -129,12 +129,12 @@ void SCOTGenerateSuggestions(string [int] description)
             //Either scaling monster levelling, or the NS
             suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+15% moxie", $familiars[Ninja Snowflake,Nosy Nose,Clockwork Grapefruit,Sabre-Toothed Lime])));
         }
-        if (my_primestat() == $stat[mysticality] && __misc_state["Need to level"])
+        if (my_primestat() == $stat[mysticality] && __misc_state["need to level"])
         {
             //Scaling monster levelling
             suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+15% mysticality", $familiars[Ragamuffin Imp,Inflatable Dodecapede,Scary Death Orb,Snowy Owl,grue])));
         }
-        else if (my_primestat() == $stat[muscle] && __misc_state["Need to level"])
+        else if (my_primestat() == $stat[muscle] && __misc_state["need to level"])
         {
             //Scaling monster levelling
             suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+15% muscle", $familiars[MagiMechTech MicroMechaMech,Angry Goat,Wereturtle,Stab Bat,Wind-up Chattering Teeth,Imitation Crab])));

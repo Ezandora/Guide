@@ -228,9 +228,9 @@ void QHitsGenerateMissingItems(ChecklistEntry [int] items_needed_entries)
 	if ($item[richard's star key].available_amount() == 0)
 	{
 		string [int] oh_my_stars_and_gauze_garters;
-		oh_my_stars_and_gauze_garters.listAppend($item[star chart].available_amount() + "/1 star chart");
-		oh_my_stars_and_gauze_garters.listAppend($item[star].available_amount() + "/8 stars");
-		oh_my_stars_and_gauze_garters.listAppend($item[line].available_amount() + "/7 lines");
+		oh_my_stars_and_gauze_garters.listAppend(MIN(1, $item[star chart].available_amount()) + "/1 star chart");
+		oh_my_stars_and_gauze_garters.listAppend(MIN(8, $item[star].available_amount()) + "/8 stars");
+		oh_my_stars_and_gauze_garters.listAppend(MIN(7, $item[line].available_amount()) + "/7 lines");
 		items_needed_entries.listAppend(ChecklistEntryMake("__item richard's star key", url, ChecklistSubentryMake("Richard's star key", "", oh_my_stars_and_gauze_garters.listJoinComponents(", ", "and"))));
 	}
 }

@@ -185,7 +185,7 @@ void generatePullList(Checklist [int] checklists)
 	pullable_item_list.listAppend(GPItemMake($item[bottle-rocket crossbow], "?", 1));
 	pullable_item_list.listAppend(GPItemMake($item[jekyllin hide belt], "+variable% item", 3));
     
-    if (__misc_state["Need to level"])
+    if (__misc_state["need to level"])
     {
         pullable_item_list.listAppend(GPItemMake($item[hockey stick of furious angry rage], "+30ML accessory.", 1));
     }
@@ -195,7 +195,7 @@ void generatePullList(Checklist [int] checklists)
     if (__misc_state["Torso aware"])
     {
         pullable_item_list.listAppend(GPItemMake($item[flaming pink shirt], "+15% items on shirt. (marginal)" + (__misc_state["familiars temporarily blocked"] ? "" : "|Or extra experience on familiar. (very marginal)"), 1));
-        if (__misc_state["Need to level"] && $item[Sneaky Pete's leather jacket (collar popped)].available_amount() == 0 && $item[Sneaky Pete's leather jacket].available_amount() == 0)
+        if (__misc_state["need to level"] && $item[Sneaky Pete's leather jacket (collar popped)].available_amount() == 0 && $item[Sneaky Pete's leather jacket].available_amount() == 0)
         {
             
             if ($item[Sneaky Pete's leather jacket (collar popped)].storage_amount() + $item[Sneaky Pete's leather jacket].storage_amount() > 0)
@@ -208,7 +208,7 @@ void generatePullList(Checklist [int] checklists)
         }
     }
     
-    if (__misc_state["spooky airport available"] && __misc_state["Need to level"] && __misc_state["can drink just about anything"] && $effect[jungle juiced].have_effect() == 0)
+    if (__misc_state["spooky airport available"] && __misc_state["need to level"] && __misc_state["can drink just about anything"] && $effect[jungle juiced].have_effect() == 0)
     {
         pullable_item_list.listAppend(GPItemMake($item[jungle juice], "Drink that doubles stat-gain in the deep dark jungle.", 1));
     }
@@ -395,6 +395,15 @@ void generatePullList(Checklist [int] checklists)
     //Ideas: Goat cheese, keepsake box, √spooky-gro fertilizer, harem outfit, perfume, rusty hedge trimmers, bowling ball, surgeon gear, tomb ratchets or tangles, all the other pies
     //FIXME suggest ore when we don't have access to free mining
     
+    if (!have_outfit_components("Knob Goblin Elite Guard Uniform") && !__quest_state["Level 5"].finished)
+    {
+        item [int] missing_outfit_components = missing_outfit_components("Knob Goblin Harem Girl Disguise");
+        
+        string entry = missing_outfit_components.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".";
+        entry += " Level 5 quest.";
+        if (missing_outfit_components.count() > 0)
+            pullable_item_list.listAppend(GPItemMake("Knob Goblin Harem Girl Disguise", "__item " + missing_outfit_components[0], entry));
+    }
     if (!__misc_state["can reasonably reach -25% combat"])
     {
         pullable_item_list.listAppend(GPItemMake($item[duonoculars], "-combat, +5 ML"));
@@ -427,7 +436,7 @@ void generatePullList(Checklist [int] checklists)
     if (lookupItem("Mr. Cheeng's spectacles") != $item[none])
         pullable_item_list.listAppend(GPItemMake(lookupItem("Mr. Cheeng's spectacles"), "+15% item, +30% spell damage, acquire random potions in-combat."));
     
-    if (__misc_state["Need to level"] && __misc_state["Chateau Mantegna available"] && __misc_state_int["free rests remaining"] > 0 && false)
+    if (__misc_state["need to level"] && __misc_state["Chateau Mantegna available"] && __misc_state_int["free rests remaining"] > 0 && false)
     {
         //This is not currently suggested because I'm not sure if it's worth it for anyone but unrestricted or the very high end speed ascension.
         //It seems to give about as much stats as a good clover, which you can also pull, and are much cheaper.
@@ -445,7 +454,7 @@ void generatePullList(Checklist [int] checklists)
         
     }
     
-    if (__misc_state["Need to level"])
+    if (__misc_state["need to level"])
     {
         if (my_primestat() == $stat[muscle])
         {

@@ -442,7 +442,7 @@ string generateRandomMessage()
     monster_messages[lookupMonster("Travoltron")] = now_to_string("EEEE").to_lower_case() + " " + day_cycle + " fever";
     
     boolean already_output_relevant_beaten_up_effect = false;
-    if ($effect[beaten up].have_effect() > 0 && beaten_up_monster_messages contains last_monster() && last_monster() != $monster[none])
+    if ((my_hp() == 0 || $effect[beaten up].have_effect() > 0) && beaten_up_monster_messages contains last_monster() && last_monster() != $monster[none])
     {
 		random_messages.listClear();
         random_messages.listAppend(beaten_up_monster_messages[last_monster()]);

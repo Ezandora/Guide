@@ -188,7 +188,7 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                         }
                     }
                 }
-                if (true)
+                if (!output_final_fight_info)
                 {
                     item [location] searchables;
                     searchables[$location[the haunted kitchen]] = $item[loosening powder];
@@ -212,12 +212,14 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                         foreach l in missing_searchables
                         {
                             item it = searchables[l];
-                            places.listAppend(it.capitaliseFirstLetter() + " in " + l + ".");
+                            //places.listAppend(it.capitaliseFirstLetter() + " in " + l + ".");
+                            places.listAppend(l.to_string().replace_string("The Haunted ", ""));
                         }
                         string line = "Scavenger hunt! ";
-                        if (!use_fast_route || in_bad_moon())
-                            line = "Alternatively, scavenger hunt! (probably slower)|";
-                        line += "Go search for:|*" + places.listJoinComponents("<hr>|*");
+                        if (use_fast_route || !in_bad_moon())
+                            line = "Alternatively, scavenger hunt! (likely much slower)|*";
+                        //line += "Go search for:|*" + places.listJoinComponents("<hr>|*");
+                        line += "Go search in the Haunted " + places.listJoinComponents(", ", "and");
                         subentry.entries.listAppend(line);
                         subentry.entries.listAppend("Read the recipe if you haven't.");
                         
