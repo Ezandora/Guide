@@ -84,6 +84,13 @@ void listPrepend(ChecklistSubentry [int] list, ChecklistSubentry entry)
 	list[position] = entry;
 }
 
+ChecklistSubentry [int] listMake(ChecklistSubentry e1)
+{
+	ChecklistSubentry [int] result;
+	result.listAppend(e1);
+	return result;
+}
+
 
 int CHECKLIST_DEFAULT_IMPORTANCE = 0;
 record ChecklistEntry

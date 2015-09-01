@@ -169,7 +169,6 @@ void QLevel8GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
                     ninja_modifiers.listAppend("+combat");
                     ninja_path.listAppend("Run +combat in Lair of the Ninja Snowmen, fight assassins.");
                     CopiedMonstersGenerateDescriptionForMonster("ninja snowman assassin", assassin_description, true, false);
-                    ninja_path.listAppend(assassin_description.listJoinComponents("<br>"));
                     if (combat_rate_modifier() <= 0.0)
                         ninja_path.listAppend("Need more +combat, assassins won't appear at " + combat_rate_modifier().floor() + "% combat.");
                     else

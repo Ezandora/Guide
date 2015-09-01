@@ -255,6 +255,7 @@ static
         building_images["Nemesis Pastamancer"] = KOLImageMake("images/adventureimages/3_1.gif", Vec2iMake(100,100));
         building_images["Nemesis Sauceror"] = KOLImageMake("images/adventureimages/4_1.gif", Vec2iMake(100,100));
         building_images["Nemesis Accordion Thief"] = KOLImageMake("images/adventureimages/6_1.gif", Vec2iMake(100,100));
+        building_images["Nemesis Actually Ed the Undying"] = KOLImageMake("images/itemimages/blackcheck.gif", Vec2iMake(30,30)); //being old, his true enemy is his ever-decreasing pension
         
         building_images["sword guy"] = KOLImageMake("images/otherimages/leftswordguy.gif", Vec2iMake(80,100));
         building_images["Jick"] = KOLImageMake("images/otherimages/customavatars/1.gif", Vec2iMake(60,100));

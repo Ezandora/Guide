@@ -227,7 +227,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         
 		if ($item[glob of blank-out].available_amount() == 0)
             description.listAppend("Use blank-out for glob.");
-        if (get_property_boolean("_blankOutUsed"))
+        if (get_property_boolean("_blankoutUsed"))
             description.listAppend("Will have to wait until tomorrow to open.");
         
 		resource_entries.listAppend(ChecklistEntryMake("__item Bottle of Blank-Out", "inventory.php?which=3", ChecklistSubentryMake(name, "", description)));
@@ -407,7 +407,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
 		
     if ($item[wand of pigification].available_amount() > 0 && in_bad_moon() && __misc_state["in run"])
     {
-		resource_entries.listAppend(ChecklistEntryMake("__item wand of pigification", "", ChecklistSubentryMake("Wand of pigification", "", "Use twice(?) a day on monsters for good-level food."), 6));
+		resource_entries.listAppend(ChecklistEntryMake("__item wand of pigification", "", ChecklistSubentryMake("Wand of pigification", "", "Use twice a day on monsters for good-level food."), 6));
     }
 		
 	int clovers_available = $items[disassembled clover,ten-leaf clover].available_amount();

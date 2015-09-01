@@ -312,7 +312,7 @@ void SBadMoonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             string url;
             if ($item[cocoa egg].available_amount() == 0)
             {
-                description.listAppend("Cook two cocoa eggshell fragments together twice, then cook two large cocoa eggshell fragments together.|Then use the cocoa egg");
+                description.listAppend("Cook two cocoa eggshell fragments together twice, then cook two large cocoa eggshell fragments together.|Then use the cocoa egg.");
                 url = "craft.php?mode=cook";
             }
             else

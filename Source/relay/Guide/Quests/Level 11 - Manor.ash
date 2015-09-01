@@ -34,7 +34,8 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
     {
         boolean use_fast_route = base_quest_state.state_boolean["Can use fast route"];
         boolean recipe_will_be_autoread = (($item[lord spookyraven's spectacles].available_amount() > 0) && use_fast_route) && get_property_boolean("autoCraft");
-        boolean recipe_was_autoread = (get_property("spookyravenRecipeUsed") == "with_glasses");
+        boolean recipe_was_autoread_with_glasses = (get_property("spookyravenRecipeUsed") == "with_glasses");
+        boolean recipe_was_autoread = recipe_was_autoread_with_glasses || (get_property("spookyravenRecipeUsed") == "no_glasses");
         //FIXME spectacles first?
         if (!$location[the haunted ballroom].locationAvailable())
             return;
@@ -62,7 +63,7 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
             if (use_fast_route && $item[lord spookyraven's spectacles].available_amount() == 0 && !recipe_was_autoread)
             {
                 url = $location[the haunted bedroom].getClickableURLForLocation();
-                subentry.entries.listAppend("Acquire Lord Spookyraven's spectacles from the haunted bedroom.");
+                subentry.entries.listAppend("Acquire Lord Spookyraven's spectacles from the haunted bedroom.|Unless you're using the slow route, in which case ignore this.");
                 image_name = "__item Lord Spookyraven's spectacles";
             }
             else if ($item[recipe: mortar-dissolving solution].available_amount() == 0 && !__setting_debug_mode && !recipe_was_autoread)
@@ -153,6 +154,10 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                             subentry.entries.listAppend("Seemingly unable to find boilers. They miss you. They look up to you.");
                         }
                     }
+                    else if (!recipe_was_autoread_with_glasses)
+                    {
+                        subentry.entries.listAppend("Need to " + ($item[lord spookyraven's spectacles].available_amount() == 0 ? "acquire and " : "") + "equip Lord Spookyraven's spectacles and read the recipe before you can use the quick route.");
+                    }
                     else
                     {
                         //FIXME implement this differently?
@@ -197,6 +202,7 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                     searchables[$location[the haunted gallery]] = $item[triple-distilled turpentine];
                     searchables[$location[the haunted laboratory]] = $item[detartrated anhydrous sublicalc];
                     searchables[$location[the haunted storage room]] = $item[triatomaceous dust];
+                    
                     
                     item [location] missing_searchables;
                     foreach l in searchables
@@ -277,6 +283,8 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
     relevant_locations[$location[the haunted wine cellar]] = true;
     relevant_locations[$location[The Haunted Boiler Room]] = true;
     relevant_locations[$location[The Haunted Laundry Room]] = true;
+    foreach l in $locations[the haunted kitchen,the haunted conservatory,the haunted bathroom,the haunted gallery,the haunted laboratory,the haunted storage room]
+        relevant_locations[l] = true;
     
 
     task_entries.listAppend(ChecklistEntryMake(image_name, url, subentry, relevant_locations));

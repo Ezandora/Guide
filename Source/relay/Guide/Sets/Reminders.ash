@@ -297,7 +297,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         }
         
     }
-    if ($item[bottle of blank-out].available_amount() > 0 && $item[glob of blank-out].available_amount() == 0 && __misc_state["in run"] && __misc_state["free runs usable"] && !get_property_boolean("_blankOutUsed") && in_ronin())
+    if ($item[bottle of blank-out].available_amount() > 0 && $item[glob of blank-out].available_amount() == 0 && __misc_state["in run"] && __misc_state["free runs usable"] && !get_property_boolean("_blankoutUsed") && in_ronin())
     {
         task_entries.listAppend(ChecklistEntryMake("__item " + $item[bottle of blank-out], "inventory.php?which=3", ChecklistSubentryMake("Use " + $item[bottle of blank-out], "", "Acquire glob to run away with."), -11));
     

@@ -1086,8 +1086,8 @@ buffer generateLocationPopup(float bottom_coordinates)
                         stats_l1.listAppend(average_meat.round() + " meat");
                 }
             }
-            if (m.raw_attack > 0) //is this really useful?
-                stats_l2.listAppend(m.raw_attack + " ML");
+            if (m.base_attack > 0)
+                stats_l2.listAppend(m.base_attack + " ML");
             //if (m.raw_defense > 0)
                 //stats_l2.listAppend(m.raw_defense + " def");
             

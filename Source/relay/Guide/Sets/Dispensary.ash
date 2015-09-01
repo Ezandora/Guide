@@ -26,7 +26,7 @@ void SDispensaryGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
 	dispensary_advantages.listAppend("+1 mainstat/fight");
 	
 	if (dispensary_advantages.count() > 0)
-		subentry.entries.listAppend("Access to " + dispensary_advantages.listJoinComponents(", ", "and") + " buff items");
+		subentry.entries.listAppend("Access to " + dispensary_advantages.listJoinComponents(", ", "and") + " buff items.");
 		
 	if ($item[Cobb's Knob lab key].available_amount() == 0)
 		subentry.entries.listAppend("Find the cobb's knob lab key either laying around, or defeat the goblin king.");

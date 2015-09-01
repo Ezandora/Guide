@@ -495,7 +495,7 @@ buffer generateLocationBar(boolean displaying_navbar)
         if (__setting_location_bar_fixed_layout)
             line = HTMLGenerateDivOfClass(line, "r_location_bar_ellipsis_entry");
         location_data.listAppend(line);
-        if (l == __last_adventure_location)
+        if (l == __last_adventure_location || true)
             location_urls[location_data.count() - 1] = "place.php?whichplace=forestvillage&amp;action=fv_friar";
     }
     if (true)

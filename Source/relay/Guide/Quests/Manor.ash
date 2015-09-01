@@ -6,8 +6,8 @@ void QManorInit()
     
     state.state_boolean["need ballroom song set"] = false;
     
-    if (true)
-        state.state_boolean["need ballroom song set"] = true;
+    if (false)
+        state.state_boolean["need ballroom song set"] = true; //this is too confusing; don't bother suggesting
     
     //Trace every quest where it's worth setting the song:
     //Let's see...

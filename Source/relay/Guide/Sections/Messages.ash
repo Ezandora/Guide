@@ -13,7 +13,7 @@ string generateRandomMessage()
     
 	if (__misc_state["in run"])
     {
-        if (my_turncount() > 1000)
+        if (my_turncount() > 1000 && !in_bad_moon())
             random_messages.listAppend("so many turns");
         
         if (false)
@@ -422,6 +422,7 @@ string generateRandomMessage()
     if (my_hp() < my_maxhp())
         monster_messages[$monster[smooth criminal]] = "you've been hit by<br>you've been struck by<br><i>a smooth criminal</i>";
     monster_messages[$monster[demonic icebox]] = "zuul";
+    monster_messages[lookupMonster("angry mushroom guy")] = "touch fizzy, get dizzy";
     beaten_up_monster_messages[$monster[storm cow]] = "<pre>^__^            <br>(oo)\\_______    <br>(__)\\       )\\/\\<br>    ||----w |   <br>    ||     ||   </pre>";
     beaten_up_monster_messages[lookupMonster("Lavalos")] = "but... the future refused to change";
     //beaten_up_monster_messages[lookupMonster("Lavalos")] = HTMLGenerateTagWrap("span", "but... the future refused to change", mapMake("onclick", "var l = new Audio('" + __lavalos_sound_data + "'); l.play();", "class", "r_clickable")); //copyright, etc

@@ -290,7 +290,7 @@ void generatePullList(Checklist [int] checklists)
     //pullable_item_list.listAppend(GPItemMake($item[slimy alveolus], "40 turns of +50ML (" + floor(40 * 50 * __misc_state_float["ML to mainstat multiplier"]) +" mainstat total, cave bar levelling)|1 spleen", 3)); //marginal now. low-skill oil peak/cyrpt?
 	
 	
-    if (!get_property_boolean("_blankOutUsed") && __misc_state["free runs usable"])
+    if (!get_property_boolean("_blankoutUsed") && __misc_state["free runs usable"])
         pullable_item_list.listAppend(GPItemMake($item[bottle of blank-out], "run away from your problems", 1));
 	
 	
@@ -419,7 +419,7 @@ void generatePullList(Checklist [int] checklists)
 	
 	string [int] scrip_reasons;
 	int scrip_needed = 0;
-	if (!__misc_state["mysterious island available"])
+	if (!__misc_state["mysterious island available"] && $item[dinghy plans].available_amount() == 0)
 	{
 		scrip_needed += 3;
 		scrip_reasons.listAppend("mysterious island");

@@ -561,7 +561,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     else if (base_quest_state.mafia_internal_step == 10)
     {
         //???
-        subentry.entries.listAppend("???");
+        subentry.entries.listAppend("Speak to your guild?");
     }
     else if (base_quest_state.mafia_internal_step >= 11 && base_quest_state.mafia_internal_step <= 16)
     {
@@ -582,12 +582,33 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             }
             else if (my_class() == $class[disco bandit])
             {
+                //Focus on your disco state of mind
                 skill_needed = $skill[disco state of mind];
                 skill_choice_name = "disco state of mind";
             }
+            else if (my_class() == $class[sauceror])
+            {
+                skill_needed = $skill[stream of sauce];
+                skill_choice_name = "stream of sauce";
+            }
+            else if (my_class() == $class[turtle tamer])
+            {
+                skill_needed = $skill[amphibian sympathy];
+                skill_choice_name = "sympathize with an amphibian";
+            }
+            else if (my_class() == $class[pastamancer])
+            {
+                skill_needed = $skill[entangling noodles];
+                skill_choice_name = "entangle the wall with noodles";
+            }
+            else if (my_class() == $class[accordion thief])
+            {
+                skill_needed = $skill[accordion bash];
+                skill_choice_name = "bash the wall with your accordion";
+            }
             //Stream of sauce?
             //entangling noodles?
-            if (skill_needed != $skill[none] && skill_needed.have_skill())
+            if (skill_needed != $skill[none] && !skill_needed.have_skill())
             {
                 subentry.entries.listAppend("Learn " + skill_needed + " from guild trainer.");
                 url = "guild.php?place=trainer";
@@ -607,12 +628,17 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             //Take those fizzing spore pods to the rubble!
             subentry.modifiers.listAppend("+item");
             
-            monster monster_to_olfact;
-            if (my_class() == $class[seal clubber])
-                monster_to_olfact = lookupMonster("angry mushroom guy");
-            if (monster_to_olfact != $monster[none])
-                subentry.modifiers.listAppend("olfact " + monster_to_olfact);
-            subentry.entries.listAppend("Adventure in the fungal nethers, collect spore pods, make rubble go boom!");
+            item needed_item = lookupItem("fizzing spore pod");
+            
+            if (needed_item.item_amount() < 6)
+            {
+                subentry.modifiers.listAppend("olfact angry mushroom guy");
+                subentry.entries.listAppend("Adventure in the fungal nethers, collect " + pluraliseWordy(clampi(6 - needed_item.item_amount(), 0, 6), needed_item) + ", make rubble go boom!");
+            }
+            else
+            {
+                subentry.entries.listAppend("Make rubble go boom!");
+            }
         }
         else if (base_quest_state.mafia_internal_step == 16)
         {
@@ -715,7 +741,9 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         }
         else
             subentry.entries.listAppend("Wait for assassins.");
-            
+        
+        //if (base_quest_state.mafia_internal_step < 20)
+            //subentry.entries.listAppend("Umm... you may need to talk to your guild(?)|Something about this step is weird.");
             
         if (assassin_up_next != "")
             subentry.entries.listAppend(assassin_up_next.capitaliseFirstLetter() + " up next.");
@@ -786,5 +814,5 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         }
     }
 	
-	optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the "fun" house, the nemesis' lair, the broodling grounds, the outer compound, the temple portico, convention hall lobby, outside the club, the island barracks, the poop deck]));
+	optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the unquiet garves,the "fun" house, the nemesis' lair, the broodling grounds, the outer compound, the temple portico, convention hall lobby, outside the club, the island barracks, the poop deck]));
 }
