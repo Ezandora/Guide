@@ -1,5 +1,5 @@
 //These settings are for development. Don't worry about editing them.
-string __version = "1.2.13";
+string __version = "1.2.14";
 
 //Debugging:
 boolean __setting_debug_mode = false;

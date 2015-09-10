@@ -290,38 +290,17 @@ void generateDailyResources(Checklist [int] checklists)
             description.listAppend("HP/MP/stats.");
             if (my_level() < 9)
                 description.listAppend("May want to wait until level 9(?) for more stats from resting.");
-            boolean [item] experience_percent_modifiers;
+            
+            stat desired_stat = $stat[none];
             int [item] chateau = get_chateau();
-            string numeric_modifier_string;
+            
             if (chateau[$item[electric muscle stimulator]] > 0)
-            {
-                experience_percent_modifiers = $items[trench lighter,fake washboard];
-                numeric_modifier_string = "Muscle";
-            }
+                desired_stat = $stat[muscle];
             else if (chateau[$item[foreign language tapes]] > 0)
-            {
-                experience_percent_modifiers = lookupItems("trench lighter,basaltamander buckler");
-                numeric_modifier_string = "Mysticality";
-            }
+                desired_stat = $stat[mysticality];
             else if (chateau[$item[bowl of potpourri]] > 0)
-            {
-                experience_percent_modifiers = $items[trench lighter,backwoods banjo];
-                numeric_modifier_string = "Moxie";
-            }
-            item [slot] item_slots;
-            if (numeric_modifier_string != "")
-                numeric_modifier_string += " Experience Percent";
-
-            foreach it in experience_percent_modifiers
-            {
-                if (it.available_amount() > 0 && it.can_equip() && it.equipped_amount() == 0 && item_slots[it.to_slot()].numeric_modifier(numeric_modifier_string) < it.numeric_modifier(numeric_modifier_string))
-                {
-                    item_slots[it.to_slot()] = it;
-                }
-            }
-            item [int] items_equipping;
-            foreach s, it in item_slots
-                items_equipping.listAppend(it);
+                desired_stat = $stat[moxie];
+            item [int] items_equipping = generateEquipmentToEquipForExtraExperienceOnStat(desired_stat);
             if (items_equipping.count() > 0)
                 description.listAppend("Could equip " + items_equipping.listJoinComponents(", ", "or") + " for more stats.");
         }

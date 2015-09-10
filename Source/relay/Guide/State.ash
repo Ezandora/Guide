@@ -391,6 +391,8 @@ void setUpState()
 	
 	int pulls_available = 0;
 	pulls_available = pulls_remaining();
+    if (__setting_debug_mode)
+        pulls_available = MAX(pulls_available, 4);
 	__misc_state_int["pulls available"] = pulls_available;
 	
     //Calculate free rests available:
@@ -543,7 +545,7 @@ void setUpState()
 	if (hipster_fights_used < 0) hipster_fights_used = 0;
 	if (hipster_fights_used > 7) hipster_fights_used = 7;
 	
-	if (familiar_is_usable($familiar[artistic goth kid])) //goth kid is better now with the stat revamps?
+	if (familiar_is_usable($familiar[artistic goth kid])) //goth kid has crayon shavings, which help survivability, though it has that weirdness with early runaways (have to defeat a monster first)
 	{
 		__misc_state_string["hipster name"] = "goth kid";
 		__misc_state_int["hipster fights available"] = 7 - hipster_fights_used;

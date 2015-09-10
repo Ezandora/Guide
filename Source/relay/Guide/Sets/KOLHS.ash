@@ -17,9 +17,31 @@ void SKOLHSGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     relevant_intrinsic["Shop Class"] = $effect[Jamming with the Jocks];
     items_wanted_in_classes["Shop Class"].listAppend($item[miniature suspension bridge]);
     items_wanted_in_classes["Shop Class"].listAppend($item[world's most dangerous birdhouse]);
+    items_wanted_in_classes["Shop Class"].listAppend($item[deathchucks]);
+    if ($skill[Spirit of Rigatoni].have_skill() && my_primestat() == $stat[mysticality])
+        items_wanted_in_classes["Shop Class"].listAppend($item[Staff of the Lunch Lady]);
+    
+    items_wanted_in_classes["Chemistry Class"] = listMakeBlankItem();
+    items_wanted_in_classes["Chemistry Class"].listAppend($item[grains of salt]);
+    items_wanted_in_classes["Chemistry Class"].listAppend($item[Dirty stinkbomb]);
+    items_wanted_in_classes["Chemistry Class"].listAppend($item[Sodium pentasomething]);
+    items_wanted_in_classes["Chemistry Class"].listAppend($item[superwater]);
+    items_wanted_in_classes["Chemistry Class"].listAppend($item[Yellowcake bomb]);
     
     string [item] class_item_description;
     class_item_description[$item[giant eraser]] = "free runaway";
+    class_item_description[$item[grains of salt]] = "+3 adventures from a food";
+    class_item_description[$item[Dirty stinkbomb]] = "banisher";
+    class_item_description[$item[Sodium pentasomething]] = "+20 ML for 20 turns potion";
+    class_item_description[$item[superwater]] = "50 turns of ultrahydrated";
+    class_item_description[$item[Yellowcake bomb]] = "75-turn yellow-ray";
+    class_item_description[$item[quasireligious sculpture]] = "-4.5 evil in cyrpt";
+    class_item_description[$item[Sticky clay homunculus]] = "monster copier without daily limit";
+    class_item_description[$item[Modeling claymore]] = "clears battlefield a bit";
+    class_item_description[$item[miniature suspension bridge]] = "10 planks for the chasm bridge";
+    class_item_description[$item[world's most dangerous birdhouse]] = "instakill";
+    class_item_description[$item[deathchucks]] = "free banisher";
+    class_item_description[$item[Staff of the Lunch Lady]] = "chefstaff";
         
     ChecklistSubentry subentry;
     subentry.header = "Kingdom of Loathing High School";
@@ -109,7 +131,7 @@ void SKOLHSGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     {
         if ($item[Yearbook Club Camera].available_amount() > 0 && !get_property_boolean("yearbookCameraPending") && get_property("yearbookCameraTarget") != "")
         {
-            string line = "Could take a picture of a " + get_property_monster("yearbookCameraTarget") + ".";
+            string line = "Could take a picture of a " + get_property("yearbookCameraTarget") + "."; //"mine worker" is a seen value
             if ($item[Yearbook Club Camera].equipped_amount() == 0)
                 line += "|Equip the yearbook club camera first.";
             subentry.entries.listAppend(line);
@@ -124,7 +146,15 @@ void SKOLHSGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     {
         if (it.available_amount() > 0 && my_inebriety() < 8) //is this eight or nine or
         {
-            task_entries.listAppend(ChecklistEntryMake("__item " + it, "", ChecklistSubentryMake("Drink " + it, "", "Next one won't show up until you do."), -11));
+            int importance = -11;
+            string [int] description;
+            description.listAppend("Next one won't show up until you do.");
+            if (get_campground()[$item[portable mayo clinic]] > 0)
+            {
+                importance = -10;
+                description.listAppend("Or drink via the mayo clinic.");
+            }
+            task_entries.listAppend(ChecklistEntryMake("__item " + it, "", ChecklistSubentryMake("Drink " + it, "", description), importance));
             break;
         }
     }

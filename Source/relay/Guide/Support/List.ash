@@ -767,6 +767,16 @@ boolean [item] listInvert(item [int] list)
 	return result;
 }
 
+boolean [monster] listInvert(monster [int] list)
+{
+	boolean [monster] result;
+	foreach key in list
+	{
+		result[list[key]] = true;
+	}
+	return result;
+}
+
 int [int] listConvertToInt(string [int] list)
 {
 	int [int] result;

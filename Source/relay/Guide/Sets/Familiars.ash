@@ -249,8 +249,16 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] resource_entries)
 		{
 			string name = "";
 			string [int] description;
-				
-			name = pluralise(hipster_fights_available, __misc_state_string["hipster name"] + " fight", __misc_state_string["hipster name"] + " fights");
+            string hipster_image = __misc_state_string["hipster name"];
+
+            string hipster_name = __misc_state_string["hipster name"];
+            if ($familiar[artistic goth kid].familiar_is_usable() && $familiar[Mini-Hipster].familiar_is_usable())
+            {
+                hipster_name = "goth kid / mini-hipster";
+                hipster_image = "__familiar Mini-hipster";
+            }
+                
+			name = pluralise(hipster_fights_available, __misc_state_string["hipster name"] + " fight", hipster_name + " fights");
 			
 			int [int] hipster_chances;
 			hipster_chances[7] = 50;
@@ -269,7 +277,7 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] resource_entries)
 			int importance = 0;
             if (!__misc_state["in run"])
                 importance = 6;
-			resource_entries.listAppend(ChecklistEntryMake(__misc_state_string["hipster name"], url, ChecklistSubentryMake(name, "", description), importance));
+			resource_entries.listAppend(ChecklistEntryMake(hipster_image, url, ChecklistSubentryMake(name, "", description), importance));
 		}
 	}
 	

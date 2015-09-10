@@ -37,7 +37,7 @@ void SMiscItemsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             have_reason = true;
         if ($effect[everything looks yellow].have_effect() == 0 && $familiar[he-boulder].familiar_is_usable()) //to reach the correct eye
             have_reason = true;
-        if ($familiars[stocking mimic,cocoabo,star starfish,Animated Macaroni Duck,Midget Clownfish,Rock Lobster,Snow Angel,Twitching Space Critter,slimeling] contains my_familiar()) //MP delaying. grill intentionally left off, because it doesn't act as often in later rounds(?)
+        if ($familiars[stocking mimic,cocoabo,star starfish,Animated Macaroni Duck,Midget Clownfish,Rock Lobster,Snow Angel,Twitching Space Critter,slimeling,mini-hipster] contains my_familiar()) //MP delaying. grill intentionally left off, because it doesn't act as often in later rounds(?)
             have_reason = true;
         if (__quest_state["Level 12"].state_boolean["War started"] && __quest_state["Level 12"].in_progress && !__quest_state["Level 12"].state_boolean["Junkyard Finished"])
             have_reason = true;
@@ -723,8 +723,10 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
     }
     if ($item[rusty hedge trimmers].available_amount() > 0 && __quest_state["Level 9"].state_int["twin peak progress"] != 15 && in_run)
     {
-        string line = "Use to visit the Twin Peak non-combat.";
-        resource_entries.listAppend(ChecklistEntryMake("__item " + $item[rusty hedge trimmers], "inventory.php?which=3", ChecklistSubentryMake(pluralise($item[rusty hedge trimmers]), "", line), importance_level_unimportant_item));
+        string [int] description;
+        description.listAppend("Use to visit the Twin Peak non-combat.");
+        description.listAppend("Can be used to burn delay - adventure somewhere with delay, then use the trimmers.");
+        resource_entries.listAppend(ChecklistEntryMake("__item " + $item[rusty hedge trimmers], "inventory.php?which=3", ChecklistSubentryMake(pluralise($item[rusty hedge trimmers]), "", description), importance_level_unimportant_item));
     }
     
     if (in_run && my_path_id() != PATH_WAY_OF_THE_SURPRISING_FIST)

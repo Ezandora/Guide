@@ -475,7 +475,49 @@ void generateTasks(Checklist [int] checklists)
             leaflet_quest_probably_finished = true;
         
         if (!leaflet_quest_probably_finished)
-            optional_task_entries.listAppend(ChecklistEntryMake("__item strange leaflet", "", ChecklistSubentryMake("Strange leaflet quest", "", "Quests Menu" + __html_right_arrow_character + "Leaflet (With Stats)")));
+        {
+            string [int] description;
+            boolean future_task = false;
+            description.listAppend("Quests Menu" + __html_right_arrow_character + "Leaflet (With Stats)");
+            
+            if (__misc_state["need to level"])
+            {
+                item relevant_lamp;
+                effect relevant_lamp_effect;
+                if (my_primestat() == $stat[muscle])
+                {
+                    relevant_lamp = lookupItem("red LavaCo Lamp&trade;");
+                    relevant_lamp_effect = lookupEffect("Red Menace");
+                }
+                else if (my_primestat() == $stat[mysticality])
+                {
+                    relevant_lamp = lookupItem("blue LavaCo Lamp&trade;");
+                    relevant_lamp_effect = lookupEffect("Blue Eyed Devil");
+                }
+                else if (my_primestat() == $stat[moxie])
+                {
+                    relevant_lamp = lookupItem("green LavaCo Lamp&trade;");
+                    relevant_lamp_effect = lookupEffect("Green Peace");
+                }
+                if (relevant_lamp != $item[none] && relevant_lamp_effect != $effect[none] && relevant_lamp.available_amount() > 0 && relevant_lamp_effect.have_effect() == 0)
+                {
+                    future_task = true;
+                    description.listAppend("Possibly wait until tomorrow. The " + relevant_lamp + " bonus will give extra stats.");
+                }
+                else if (relevant_lamp_effect.have_effect() > 0)
+                    description.listAppend("Soon, before the lava lamp effect runs out.");
+                
+                item [int] items_equipping = generateEquipmentToEquipForExtraExperienceOnStat(my_primestat());
+                if (items_equipping.count() > 0)
+                    description.listAppend("Could equip " + items_equipping.listJoinComponents(", ", "or") + " for more stats.");
+            }
+            
+            ChecklistEntry entry = ChecklistEntryMake("__item strange leaflet", "", ChecklistSubentryMake("Strange leaflet quest", "", description));
+            if (future_task)
+                future_task_entries.listAppend(entry);
+            else
+                optional_task_entries.listAppend(entry);
+        }
 	}
 	
 

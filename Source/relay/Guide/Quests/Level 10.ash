@@ -119,7 +119,12 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             string [int] things_we_want_item_for;
             
             if ($skill[Transcendent Olfaction].skill_is_usable())
-                things_we_want_item_for.listAppend("SGEEA");
+            {
+                string line = "SGEEA";
+                if ($item[soft green echo eyedrop antidote].available_amount() > 0)
+                    line += " (have " + $item[soft green echo eyedrop antidote].available_amount() + ")";
+                things_we_want_item_for.listAppend(line);
+            }
             
             
             //immateria:

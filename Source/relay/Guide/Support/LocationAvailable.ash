@@ -863,7 +863,6 @@ static
         lookup_map["The Valley of Rof L'm Fao"] = "place.php?whichplace=mountains";
         lookup_map["Mt. Molehill"] = "place.php?whichplace=mountains";
         lookup_map["The Barrel Full of Barrels"] = "barrel.php";
-        lookup_map["Nemesis Cave"] = "cave.php";
         lookup_map["The Smut Orc Logging Camp"] = "place.php?whichplace=orc_chasm";
         lookup_map["The Thinknerd Warehouse"] = "place.php?whichplace=mountains";
         lookup_map["A Mob of Zeppelin Protesters"] = "place.php?whichplace=zeppelin";

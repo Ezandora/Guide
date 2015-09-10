@@ -37,9 +37,6 @@ void SDeckOfEveryCardGenerateResource(ChecklistEntry [int] resource_entries)
     
     int card_summons_left = clampi(15 - get_property_int("_deckCardsDrawn"), 0, 15);
     
-    if (availableDrunkenness() < 0) //can't card shark drunk. can you cheat drunk? I mean, some people do, but can adventurers?
-        return;
-    
     /*
     In-run:
     √Sheep - 3 stone wool

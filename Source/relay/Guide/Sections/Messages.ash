@@ -75,6 +75,7 @@ string generateRandomMessage()
     location_messages[$location[the middle chamber]] = "pyramid laundry machine";
     location_messages[$location[the arid, extra-dry desert]] = "can't remember your name";
     location_messages[$location[outside the club]] = "around the world around the world around the world around the world";
+    location_messages[$location[the hidden temple]] = "beware of temple guards";
     if (my_class() == $class[disco bandit])
     {
         foreach l in $locations[The castle in the clouds in the sky (ground floor),The castle in the clouds in the sky (basement),The castle in the clouds in the sky (top floor)]
@@ -120,6 +121,7 @@ string generateRandomMessage()
     equipment_messages[$item[liar's pants]] = "never tell the same lie twice";
     equipment_messages[$item[detective skull]] = HTMLGenerateSpanFont("too slow ascend faster", "#ACA200"); //speakeasy password
     equipment_messages[$item[gasmask]] = "are you my mummy?";
+    equipment_messages[$item[spanish fly trap]] = "around the world around the world around the world around the world";
     foreach it in $items[twisted-up wet towel,sommelier's towel,time bandit time towel]
         equipment_messages[it] = "don't panic";
     
@@ -160,8 +162,8 @@ string generateRandomMessage()
     effect_messages[$effect[Form of...Bird!]] = "fiddle fiddle fiddle";
     effect_messages[$effect[superstar]] = "&#9733;";
     effect_messages[$effect[hopped up on goofballs]] = "a massive drug deficiency";
-    
-    
+    foreach s in $strings[Warlock\, Warstock\, and Warbarrel,Barrel of Laughs,Barrel Chested,Pork Barrel,Double-Barreled,Beer Barrel Polka]
+        effect_messages[s.to_effect()] = "just let me throw a barrel at it";
     foreach e in effect_messages
     {
         if (e.have_effect() > 0 && e != $effect[none])
@@ -425,6 +427,7 @@ string generateRandomMessage()
     monster_messages[lookupMonster("angry mushroom guy")] = "touch fizzy, get dizzy";
     beaten_up_monster_messages[$monster[storm cow]] = "<pre>^__^            <br>(oo)\\_______    <br>(__)\\       )\\/\\<br>    ||----w |   <br>    ||     ||   </pre>";
     beaten_up_monster_messages[lookupMonster("Lavalos")] = "but... the future refused to change";
+    monster_messages[lookupMonster("Barrelmech of Diogenes")] = "just let me throw a barrel at it";
     //beaten_up_monster_messages[lookupMonster("Lavalos")] = HTMLGenerateTagWrap("span", "but... the future refused to change", mapMake("onclick", "var l = new Audio('" + __lavalos_sound_data + "'); l.play();", "class", "r_clickable")); //copyright, etc
     if (current_hour >= 5 && current_hour <= 11)
         monster_messages[lookupMonster("Lavalos")] = "good morning, " + lowercase_player_name + "!";

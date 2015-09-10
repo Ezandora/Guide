@@ -626,12 +626,12 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             //The cavern is full of weird mushrooms, but where's your Nemesis?
             //more fizzing spore pods to blow up the blockade in your Nemesis' cave.
             //Take those fizzing spore pods to the rubble!
-            subentry.modifiers.listAppend("+item");
             
             item needed_item = lookupItem("fizzing spore pod");
             
             if (needed_item.item_amount() < 6)
             {
+                subentry.modifiers.listAppend("+item");
                 subentry.modifiers.listAppend("olfact angry mushroom guy");
                 subentry.entries.listAppend("Adventure in the fungal nethers, collect " + pluraliseWordy(clampi(6 - needed_item.item_amount(), 0, 6), needed_item) + ", make rubble go boom!");
             }
@@ -813,6 +813,10 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             subentry.entries.listAppend("Run a potato familiar, and alternate casting entangling noodles twice/some sort of attack to keep the demon blocked.");
         }
     }
-	
-	optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the unquiet garves,the "fun" house, the nemesis' lair, the broodling grounds, the outer compound, the temple portico, convention hall lobby, outside the club, the island barracks, the poop deck]));
+    
+    boolean [location] relevant_locations;
+    foreach l in $locations[the unquiet garves,the "fun" house, the nemesis' lair, the broodling grounds, the outer compound, the temple portico, convention hall lobby, outside the club, the island barracks, the poop deck]
+        relevant_locations[l] = true;
+    relevant_locations[lookupLocation("the fungal nethers")] = true;
+	optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, relevant_locations));
 }
