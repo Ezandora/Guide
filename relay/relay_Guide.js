@@ -683,10 +683,9 @@ function navbarClick(event, checklist_div_id)
 
 function alterLocationPopupBarVisibility(event, visibility)
 {
-    //console.log("alterLocationPopupBarVisibility(" + event + ", " + visibility + "), currentTarget = " + event.currentTarget);
     var popup_box = document.getElementById('r_location_popup_box');
     var blackout_box = document.getElementById('r_location_popup_blackout');
-    if (document.getElementById('location_bar_inner_container') != event.currentTarget) //I... think what is happening here is that we're receiving mouseleave events for the last innerHTML, and that causes a re-pop-up, so only listen to events from current inner containers
+    if (document.getElementById('location_bar_inner_container') != event.target && event.target != undefined) //I... think what is happening here is that we're receiving mouseleave events for the last innerHTML, and that causes a re-pop-up, so only listen to events from current inner containers
         return;
     
     if (popup_box == undefined)

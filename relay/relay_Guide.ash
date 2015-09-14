@@ -38471,7 +38471,7 @@ void runMain(string relay_filename)
             image_map["src"] = __refresh_image_data;
             image_map["id"] = "button_refresh";
             image_map["onclick"] = "document.location.reload(true)";
-            image_map["style"] = "position:relative;top:-12px;right:3px;";
+            image_map["style"] = "position:relative;top:-12px;right:3px;visibility:visible;";
             image_map["alt"] = "Refresh";
             image_map["title"] = image_map["alt"];
             PageWrite(HTMLGenerateDivOfStyle(HTMLGenerateTagPrefix("img", image_map), "max-height:0px;width:100%;text-align:right;"));
