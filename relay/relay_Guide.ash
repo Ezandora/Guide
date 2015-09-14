@@ -2,7 +2,7 @@
 
 since 17.1; //the earliest main release that is usable in modern KOL (unequip bug)
 //These settings are for development. Don't worry about editing them.
-string __version = "1.3a1";
+string __version = "1.3";
 
 //Debugging:
 boolean __setting_debug_mode = false;
