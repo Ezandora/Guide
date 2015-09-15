@@ -31,7 +31,7 @@ void setUpCSSStyles()
 	
     PageAddCSSClass("a", "r_cl_internal_anchor", "position:absolute;z-index:2;padding-top:" + __setting_navbar_height + ";display:inline-block;");
 	
-    PageAddCSSClass("", "r_button", "visibility:hidden;background:" + __setting_page_background_colour + ";cursor:pointer;color:#7F7F7F;font-size:1.5em;z-index:3;position:absolute;");
+    PageAddCSSClass("", "r_button", "visibility:hidden;cursor:pointer;color:#7F7F7F;font-size:1.5em;z-index:3;position:absolute;"); //background:" + __setting_page_background_colour + ";
 	
     PageAddCSSClass("div", "r_word_wrap_group", "display:inline-block;");
 	
@@ -118,6 +118,8 @@ void setUpCSSStyles()
     PageAddCSSClass("", "r_tooltip_inner_class", "background:white;border-style:solid;border-color:" + __setting_line_colour + ";border-width:1px;padding-left:1em;padding-right:1em;padding-bottom:0.25em;padding-top:0.25em;position:absolute;opacity:0;transition:visibility 0s linear 0.25s, opacity 0.25s linear;visibility:hidden;margin-top:1.5em;");
     PageAddCSSClass("", "r_tooltip_outer_class:hover .r_tooltip_inner_class", "opacity:1;visibility:visible;transition-delay:0s;");
     //PageAddCSSClass("", "r_tooltip_inner_class_weve_had_one_yes_but_what_about_second_inner_class", "background:white;border-style:solid;border-color:black;border-width:1px;padding:1em;top:1.5em;");
+    
+    PageAddCSSClass("", "r_no_css_transition", "-webkit-transition:none !important;-moz-transition:none !important;-o-transition:none !important;-ms-transition:none !important;transition:none !important;");
     
     PageAddCSSClass("img", "", "border:0px;");
 }

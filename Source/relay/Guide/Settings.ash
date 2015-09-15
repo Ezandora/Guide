@@ -1,5 +1,5 @@
 //These settings are for development. Don't worry about editing them.
-string __version = "1.2.14";
+string __version = "1.3";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -8,7 +8,7 @@ boolean __setting_debug_show_all_internal_states = false; //displays usable imag
 
 //Display settings:
 boolean __setting_entire_area_clickable = false;
-boolean __setting_side_negative_space_is_dark = false;
+boolean __setting_side_negative_space_is_dark = true;
 boolean __setting_fill_vertical = true;
 int __setting_image_width_large = 100;
 int __setting_image_width_medium = 70;

@@ -306,20 +306,43 @@ function installFrameDefault(event)
         installFrame(3);
 }
 
-function recalculateImportanceBarVisibility(test_position, relevant_container)
+function recalculateImportanceBarVisibility(test_position, relevant_container, initial)
 {
     var scroll_position = window.pageYOffset || document.body.scrollTop || document.documentElement.scrollTop;
     var desired_visibility = false;
-    if (scroll_position >= test_position)
+    if (scroll_position > test_position)
         desired_visibility = true;
     if (__guide_importance_bar_visible != desired_visibility)
     {
         if (relevant_container == undefined)
             return;
+        
+        var gradient_container = document.getElementById("importance_bar_gradient");
+        var saved_class_name;
+        if (initial && gradient_container != undefined)
+        {
+            saved_class_name = gradient_container.className;
+            gradient_container.className += "r_no_css_transition"; //don't fade in if we have already
+        }
         if (!desired_visibility)
+        {
             relevant_container.style.visibility = "hidden";
+            //relevant_container.style.pointerEvents = "none";
+            if (gradient_container != undefined)
+                gradient_container.style.opacity = "0.0";
+        }
         else
+        {
             relevant_container.style.visibility = "visible";
+            //relevant_container.style.pointerEvents = "auto";
+            if (gradient_container != undefined)
+                gradient_container.style.opacity = "0.75";
+        }
+        if (initial && gradient_container != undefined)
+        {
+            gradient_container.offsetHeight; //browser hack to make no_css_transition apply
+            gradient_container.className = saved_class_name;
+        }
         __guide_importance_bar_visible = desired_visibility;
     }
 }
@@ -407,9 +430,9 @@ function writePageExtras()
         __guide_importance_bar_visible = false;
         var tasks_position = elementGetGlobalOffsetTop(document.getElementById("Tasks_checklist_container")) + 1;
         
-        recalculateImportanceBarVisibility(tasks_position, importance_container)
+        recalculateImportanceBarVisibility(tasks_position, importance_container, true)
         
-        window.onscroll = function (event) { recalculateImportanceBarVisibility(tasks_position, importance_container); };
+        window.onscroll = function (event) { recalculateImportanceBarVisibility(tasks_position, importance_container, false); };
     }
     else
         window.onscroll = undefined;
@@ -423,18 +446,20 @@ function updatePageHTML(body_response_string)
     
     //Save display style for two tags:
     //r_location_popup_blackout r_location_popup_box
-    var elements_to_save_visibility_of = ["r_location_popup_blackout", "r_location_popup_box"];
-    var saved_visibility_of_element = [];
+    var elements_to_save_properties_of = ["r_location_popup_blackout", "r_location_popup_box"];
+    var saved_opacity_of_element = [];
+    var saved_bottom_of_element = [];
     
-    for (var i = 0; i < elements_to_save_visibility_of.length; i++)
+    for (var i = 0; i < elements_to_save_properties_of.length; i++)
     {
-        var element_id = elements_to_save_visibility_of[i];
+        var element_id = elements_to_save_properties_of[i];
         var element = document.getElementById(element_id);
         if (element == undefined)
             continue;
         if (element.style == undefined)
             continue;
-        saved_visibility_of_element[element_id] = element.style.display;
+        saved_opacity_of_element[element_id] = element.style.opacity;
+        saved_bottom_of_element[element_id] = element.style.bottom;
     }
     
     window.onscroll = undefined;
@@ -443,20 +468,35 @@ function updatePageHTML(body_response_string)
     
     
     //Restore style tag:
-    for (var element_id in saved_visibility_of_element)
+    for (var element_id in saved_opacity_of_element)
     {
-        if (!saved_visibility_of_element.hasOwnProperty(element_id))
+        if (!saved_opacity_of_element.hasOwnProperty(element_id))
             continue;
         
-        var visibility = saved_visibility_of_element[element_id];
-        if (visibility == null)
+        var opacity = saved_opacity_of_element[element_id];
+        var bottom = saved_bottom_of_element[element_id];
+        
+        if (opacity == undefined || bottom == undefined)
             continue;
         var element = document.getElementById(element_id);
         if (element == undefined)
             continue;
         if (element.style == undefined)
             continue;
-        element.style.display = visibility;
+        
+        var saved_transition = element.style.transition;
+        element.style.transition = "";
+        
+        element.style.opacity = opacity;
+        if (element_id === "r_location_popup_box" && !(bottom === "4.59em"))
+        {
+            element.style.bottom = "-" + element.clientHeight + "px";
+        }
+        else
+            element.style.bottom = bottom;
+        
+        element.offsetHeight; //force movement
+        element.style.transition = saved_transition;
     }
     writePageExtras();
 }
@@ -551,7 +591,7 @@ function parseAPIResponseAndFireTimer(response_string)
             }
         }
     }
-    //should_update = true; //temporary constant refresh
+    //should_update = true; //continually refresh for testing
 	if (should_update)
 	{
         if (should_save)
@@ -639,4 +679,58 @@ function navbarClick(event, checklist_div_id)
     {
     }
     return false; //cancel regular click
+}
+
+var __tested_pointer_events = false;
+var __browser_probably_supports_pointer_events = false;
+function browserProbablySupportsPointerEvents()
+{
+    if (!__tested_pointer_events)
+    {
+        var testing_element = document.createElement("pointerEventsTest");
+        testing_element.style.cssText='pointer-events:auto';
+        __browser_probably_supports_pointer_events = (testing_element.style.pointerEvents === 'auto');
+        __tested_pointer_events = true;
+    }
+    return __browser_probably_supports_pointer_events;
+}
+
+function alterLocationPopupBarVisibility(event, visibility)
+{
+    var popup_box = document.getElementById('r_location_popup_box');
+    var blackout_box = document.getElementById('r_location_popup_blackout');
+    if (document.getElementById('location_bar_inner_container') != event.target && event.target != undefined) //I... think what is happening here is that we're receiving mouseleave events for the last innerHTML, and that causes a re-pop-up, so only listen to events from current inner containers
+        return;
+    
+    if (popup_box == undefined)
+        return;
+    
+    if (visibility)
+    {
+        blackout_box.style.visibility = "visible";
+        blackout_box.style.transition = "opacity 1.0s";
+        
+        popup_box.style.opacity = 1.0;
+        blackout_box.style.opacity = 1.0;
+        
+        //scroll up from proper position:
+        if (!(popup_box.style.bottom === "4.59em"))
+        {
+            var saved_transition = popup_box.style.transition;
+            popup_box.style.transition = "";
+            popup_box.style.bottom = "-" + popup_box.clientHeight + "px";
+            popup_box.offsetHeight; //force movement
+            popup_box.style.transition = saved_transition;
+            
+            popup_box.style.bottom = "4.59em"; //supposed to be 4.6em, but temporarily renders one pixel off in chromium otherwise
+        }
+    }
+    else
+    {
+        if (!browserProbablySupportsPointerEvents()) //disable animation, but allow clicks
+            blackout_box.style.visibility = "hidden";
+        blackout_box.style.transition = "opacity 0.25s";
+        blackout_box.style.opacity = 0.0;
+        popup_box.style.bottom = "-" + popup_box.clientHeight + "px";
+    }
 }

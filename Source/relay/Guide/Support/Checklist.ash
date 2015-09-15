@@ -97,12 +97,15 @@ record ChecklistEntry
 {
 	string image_lookup_name;
 	string url;
+    string [string] container_div_attributes;
 	ChecklistSubentry [int] subentries;
 	boolean should_indent_after_first_subentry;
     
     boolean should_highlight;
 	
 	int importance_level; //Entries will be resorted by importance level before output, ascending order. Default importance is 0. Convention is to vary it from [-11, 11] for reasons that are clear and well supported in the narrative.
+    boolean only_show_as_extra_important_pop_up; //only valid if -11 importance or lower - only shows up as a pop-up, meant to inform the user they can scroll up to see something else (semi-rares)
+    ChecklistSubentry [int] subentries_on_mouse_over; //replaces subentries
 };
 
 
@@ -354,6 +357,145 @@ Checklist lookupChecklist(Checklist [int] checklists, string title)
 	return cl;
 }
 
+void ChecklistFormatSubentry(ChecklistSubentry subentry)
+{
+    foreach i in subentry.entries
+    {
+        string [int] line_split = split_string_alternate(subentry.entries[i], "\\|");
+        foreach l in line_split
+        {
+            if (stringHasPrefix(line_split[l], "*"))
+            {
+                //remove prefix:
+                //indent:
+                line_split[l] = HTMLGenerateIndentedText(substring(line_split[l], 1));
+            }
+        }
+        //Recombine:
+        buffer building_line;
+        boolean first = true;
+        boolean last_was_indention = false;
+        foreach key in line_split
+        {
+            string line = line_split[key];
+            if (!contains_text(line, "class=\"r_indention\"") && !first && !last_was_indention) //hack way of testing for indention
+            {
+                building_line.append("<br>");
+            }
+            last_was_indention = contains_text(line, "class=\"r_indention\"");
+            building_line.append(line);
+            first = false;
+        }
+        subentry.entries[i] = to_string(building_line);
+    }
+}
+
+buffer ChecklistGenerateEntryHTML(ChecklistEntry entry, ChecklistSubentry [int] subentries, boolean outputting_anchor, buffer anchor_prefix_html, buffer anchor_suffix_html, boolean setting_use_holding_containers_per_subentry)
+{
+    Vec2i max_image_dimensions_large = Vec2iMake(__setting_image_width_large, 75);
+    Vec2i max_image_dimensions_medium = Vec2iMake(__setting_image_width_medium, 50);
+    Vec2i max_image_dimensions_small = Vec2iMake(__setting_image_width_small, 50);
+    if (__setting_small_size_uses_full_width)
+        max_image_dimensions_small = Vec2iMake(__setting_image_width_small,__setting_image_width_small);
+    buffer result;
+    if (true)
+    {
+        
+        buffer image_container;
+        
+        if (outputting_anchor && !__setting_entire_area_clickable)
+            image_container.append(anchor_prefix_html);
+        
+        image_container.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_large, "r_cl_image_container_large"));
+        image_container.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_medium, "r_cl_image_container_medium"));
+        if (!__setting_small_size_uses_full_width)
+            image_container.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_small, "r_cl_image_container_small"));
+        
+        if (outputting_anchor && !__setting_entire_area_clickable)
+            image_container.append(anchor_suffix_html);
+        
+        result.append(HTMLGenerateDivOfClass(image_container, "r_cl_l_left"));
+        
+    }
+    else
+        result.append(HTMLGenerateDivOfClass(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_large), "r_cl_l_left"));
+    
+    
+    result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_cl_l_right_container")));
+    
+    if (outputting_anchor && !__setting_entire_area_clickable)
+        result.append(anchor_prefix_html);
+    result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_cl_l_right_content")));
+    
+    if (__setting_small_size_uses_full_width)
+    {
+        result.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_small, "r_cl_image_container_small"));
+        
+        result.append(HTMLGenerateTagWrap("div", "", mapMake("class", "r_small_float_indention", "style", "height: " + __kol_image_generate_image_html_return_final_size.y + "px;")));
+        //result.append(HTMLGenerateDivOfClass("", "r_small_float_indention")); //&nbsp; to have it display. hack
+    }
+    
+    boolean first = true;
+    foreach j in subentries
+    {
+        ChecklistSubentry subentry = subentries[j];
+        if (subentry.header == "")
+            continue;
+        string subheader = subentry.header;
+        
+        boolean indent_this_entry = false;
+        if (first)
+        {
+            first = false;
+        }
+        else if (entry.should_indent_after_first_subentry)
+        {
+            indent_this_entry = true;
+        }
+        
+        if (indent_this_entry)
+            result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_indention")));
+        
+        result.append(HTMLGenerateSpanOfClass(subheader, "r_cl_subheader"));
+        if (__setting_small_size_uses_full_width)
+            result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_indention_not_small")));
+        else
+            result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_indention")));
+        if (subentry.modifiers.count() > 0)
+            result.append(ChecklistGenerateModifierSpan(listJoinComponents(subentry.modifiers, ", ")));
+        if (subentry.entries.count() > 0)
+        {
+            int intra_k = 0;
+            if (setting_use_holding_containers_per_subentry)
+                result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_cl_holding_container"))); //HRs
+            while (intra_k < subentry.entries.count())
+            { 
+                if (intra_k > 0)
+                    result.append("<hr>");
+                string line = subentry.entries[listKeyForIndex(subentry.entries, intra_k)];
+                
+                //if (line.contains_text("<hr"))
+                line = HTMLGenerateDivOfClass(line, "r_cl_holding_container"); //For nested HRs, sizes them down a bit
+                
+                result.append(line);
+                
+                intra_k += 1;
+            }
+            if (setting_use_holding_containers_per_subentry)
+                result.append("</div>");
+        }
+        result.append("</div>");
+        if (indent_this_entry)
+            result.append("</div>");
+    }
+    result.append("</div>");
+    if (outputting_anchor && !__setting_entire_area_clickable)
+        result.append(anchor_suffix_html);
+    result.append("</div>");
+    result.append(HTMLGenerateDivOfClass("", "r_end_floating_elements")); //stop floating
+    return result;
+}
+
 buffer ChecklistGenerate(Checklist cl, boolean output_borders)
 {
 	ChecklistEntry [int] entries = cl.entries;
@@ -370,36 +512,11 @@ buffer ChecklistGenerate(Checklist cl, boolean output_borders)
 			ChecklistEntry entry = entries[i];
 			foreach j in entry.subentries
 			{
-				ChecklistSubentry subentry = entry.subentries[j];
-				foreach k in subentry.entries
-				{
-					string [int] line_split = split_string_alternate(subentry.entries[k], "\\|");
-					foreach l in line_split
-					{
-						if (stringHasPrefix(line_split[l], "*"))
-						{
-							//remove prefix:
-							//indent:
-							line_split[l] = HTMLGenerateIndentedText(substring(line_split[l], 1));
-						}
-					}
-					//Recombine:
-					buffer building_line;
-					boolean first = true;
-                    boolean last_was_indention = false;
-					foreach key in line_split
-					{
-						string line = line_split[key];
-						if (!contains_text(line, "class=\"r_indention\"") && !first && !last_was_indention) //hack way of testing for indention
-						{
-							building_line.append("<br>");
-						}
-                        last_was_indention = contains_text(line, "class=\"r_indention\"");
-						building_line.append(line);
-						first = false;
-					}
-					subentry.entries[k] = to_string(building_line);
-				}
+                ChecklistFormatSubentry(entry.subentries[j]);
+			}
+			foreach j in entry.subentries_on_mouse_over
+			{
+                ChecklistFormatSubentry(entry.subentries_on_mouse_over[j]);
 			}
 		}
 	}
@@ -446,6 +563,7 @@ buffer ChecklistGenerate(Checklist cl, boolean output_borders)
 	int intra_i = 0;
 	int entries_output = 0;
     boolean last_was_highlighted = false;
+    int current_mouse_over_id = 1;
 	foreach i in entries
 	{
 		if (intra_i < starting_intra_i)
@@ -480,9 +598,9 @@ buffer ChecklistGenerate(Checklist cl, boolean output_borders)
 		
 		boolean setting_use_holding_containers_per_subentry = true;
 			
-		Vec2i max_image_dimensions_large = Vec2iMake(__setting_image_width_large,75);
-		Vec2i max_image_dimensions_medium = Vec2iMake(__setting_image_width_medium,50);
-		Vec2i max_image_dimensions_small = Vec2iMake(__setting_image_width_small,50);
+		Vec2i max_image_dimensions_large = Vec2iMake(__setting_image_width_large, 75);
+		Vec2i max_image_dimensions_medium = Vec2iMake(__setting_image_width_medium, 50);
+		Vec2i max_image_dimensions_small = Vec2iMake(__setting_image_width_small, 50);
         if (__setting_small_size_uses_full_width)
             max_image_dimensions_small = Vec2iMake(__setting_image_width_small,__setting_image_width_small);
         
@@ -490,7 +608,30 @@ buffer ChecklistGenerate(Checklist cl, boolean output_borders)
         if (entry.should_highlight)
             container_class = "r_cl_l_container_highlighted";
         last_was_highlighted = entry.should_highlight;
-        result.append(HTMLGenerateTagPrefix("div", mapMake("class", container_class)));
+        
+        buffer generated_subentry_html = ChecklistGenerateEntryHTML(entry, entry.subentries, outputting_anchor, anchor_prefix_html, anchor_suffix_html, setting_use_holding_containers_per_subentry);
+        if (entry.subentries_on_mouse_over.count() > 0)
+        {
+            buffer generated_mouseover_subentry_html = ChecklistGenerateEntryHTML(entry, entry.subentries_on_mouse_over, outputting_anchor, anchor_prefix_html, anchor_suffix_html, setting_use_holding_containers_per_subentry);
+            
+            //Can't properly escape, so generate two no-show divs and replace them as needed:
+            //We could just have a div that shows up when we mouse over...
+            //This is currently very buggy.
+            entry.container_div_attributes["onmouseenter"] = "event.currentTarget.innerHTML = document.getElementById('r_temp_o" + current_mouse_over_id + "').innerHTML";
+            entry.container_div_attributes["onmouseleave"] = "event.currentTarget.innerHTML = document.getElementById('r_temp_l" + current_mouse_over_id + "').innerHTML";
+            
+            result.append(HTMLGenerateTagPrefix("div", mapMake("id", "r_temp_o" + current_mouse_over_id, "style", "display:none")));
+            result.append(generated_mouseover_subentry_html);
+            result.append(HTMLGenerateTagSuffix("div"));
+            result.append(HTMLGenerateTagPrefix("div", mapMake("id", "r_temp_l" + current_mouse_over_id, "style", "display:none")));
+            result.append(generated_subentry_html);
+            result.append(HTMLGenerateTagSuffix("div"));
+            
+            current_mouse_over_id += 1;
+        }
+        
+        entry.container_div_attributes["class"] += (entry.container_div_attributes contains "class" ? " " : "") + container_class;
+        result.append(HTMLGenerateTagPrefix("div", entry.container_div_attributes));
         
 		if (__use_table_based_layouts)
 		{
@@ -567,102 +708,8 @@ buffer ChecklistGenerate(Checklist cl, boolean output_borders)
 		else
 		{
 			//div-based layout:
-            
-            if (true)
-            {
-                
-                buffer image_container;
-                
-                if (outputting_anchor && !__setting_entire_area_clickable)
-                    image_container.append(anchor_prefix_html);
-                
-                image_container.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_large, "r_cl_image_container_large"));
-                image_container.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_medium, "r_cl_image_container_medium"));
-                if (!__setting_small_size_uses_full_width)
-                    image_container.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_small, "r_cl_image_container_small"));
-                
-                if (outputting_anchor && !__setting_entire_area_clickable)
-                    image_container.append(anchor_suffix_html);
-                
-                result.append(HTMLGenerateDivOfClass(image_container, "r_cl_l_left"));
-                
-            }
-            else
-                result.append(HTMLGenerateDivOfClass(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_large), "r_cl_l_left"));
-            
-            
-			result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_cl_l_right_container")));
-            
-            if (outputting_anchor && !__setting_entire_area_clickable)
-                result.append(anchor_prefix_html);
-			result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_cl_l_right_content")));
-            
-            if (__setting_small_size_uses_full_width)
-            {
-                result.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_small, "r_cl_image_container_small"));
-                
-                result.append(HTMLGenerateTagWrap("div", "", mapMake("class", "r_small_float_indention", "style", "height: " + __kol_image_generate_image_html_return_final_size.y + "px;")));
-                //result.append(HTMLGenerateDivOfClass("", "r_small_float_indention")); //&nbsp; to have it display. hack
-            }
-			
-			boolean first = true;
-			foreach j in entry.subentries
-			{
-				ChecklistSubentry subentry = entry.subentries[j];
-				if (subentry.header == "")
-					continue;
-				string subheader = subentry.header;
-				
-				boolean indent_this_entry = false;
-				if (first)
-				{
-					first = false;
-				}
-				else if (entry.should_indent_after_first_subentry)
-				{
-					indent_this_entry = true;
-				}
-				
-				if (indent_this_entry)
-					result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_indention")));
-				
-				result.append(HTMLGenerateSpanOfClass(subheader, "r_cl_subheader"));
-                if (__setting_small_size_uses_full_width)
-                    result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_indention_not_small")));
-                else
-                    result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_indention")));
-				if (subentry.modifiers.count() > 0)
-					result.append(ChecklistGenerateModifierSpan(listJoinComponents(subentry.modifiers, ", ")));
-				if (subentry.entries.count() > 0)
-				{
-					int intra_k = 0;
-					if (setting_use_holding_containers_per_subentry)
-						result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_cl_holding_container"))); //HRs
-					while (intra_k < subentry.entries.count())
-					{ 
-						if (intra_k > 0)
-							result.append("<hr>");
-						string line = subentry.entries[listKeyForIndex(subentry.entries, intra_k)];
-						
-						//if (line.contains_text("<hr"))
-						line = HTMLGenerateDivOfClass(line, "r_cl_holding_container"); //For nested HRs, sizes them down a bit
-						
-						result.append(line);
-						
-						intra_k += 1;
-					}
-					if (setting_use_holding_containers_per_subentry)
-						result.append("</div>");
-				}
-				result.append("</div>");
-				if (indent_this_entry)
-					result.append("</div>");
-			}
-			result.append("</div>");
-                if (outputting_anchor && !__setting_entire_area_clickable)
-                    result.append(anchor_suffix_html);
-			result.append("</div>");
-			result.append(HTMLGenerateDivOfClass("", "r_end_floating_elements")); //stop floating
+            //result.append(ChecklistGenerateEntryHTML(entry, entry.subentries, outputting_anchor, anchor_prefix_html, anchor_suffix_html, setting_use_holding_containers_per_subentry));
+            result.append(generated_subentry_html);
 		}
         result.append("</div>");
 

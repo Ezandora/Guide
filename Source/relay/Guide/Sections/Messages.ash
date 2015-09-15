@@ -312,6 +312,7 @@ string generateRandomMessage()
         familiar_messages[$familiar[Crimbo Shrub]] = "crimbo in july";
     familiar_messages[$familiar[Ms. Puck Man]] = "&#5607; &bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;";
     familiar_messages[$familiar[Puck Man]] = familiar_messages[$familiar[Ms. Puck Man]];
+    familiar_messages[lookupFamiliar("Lil' Barrel Mimic")] = ":D";
     
     if (familiar_messages contains my_familiar() && !__misc_state["familiars temporarily blocked"])
         random_messages.listAppend(familiar_messages[my_familiar()]);
@@ -433,6 +434,7 @@ string generateRandomMessage()
         monster_messages[lookupMonster("Lavalos")] = "good morning, " + lowercase_player_name + "!";
     else
         monster_messages[lookupMonster("Lavalos")] = "all life begins with nu and ends with nu";
+    monster_messages[$monster[sk8 gnome]] = "he was a sk8 gnome she said see u l8 gnome";
     
     string day_cycle;
     if (current_hour >= 5 && current_hour <= 11)

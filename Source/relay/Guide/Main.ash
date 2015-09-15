@@ -105,7 +105,7 @@ void runMain(string relay_filename)
         string [string] image_map = mapCopy(base_image_map);
         image_map["src"] = __close_image_data;
         image_map["onclick"] = "buttonCloseClicked(event)";
-        image_map["style"] = "left:5px;top:5px;";
+        image_map["style"] = "left:5px;top:5px;position:fixed;z-index:4;";
         image_map["id"] = "button_close_box";
         image_map["alt"] = "Close";
         image_map["title"] = image_map["alt"];
@@ -183,7 +183,7 @@ void runMain(string relay_filename)
             image_map["src"] = __refresh_image_data;
             image_map["id"] = "button_refresh";
             image_map["onclick"] = "document.location.reload(true)";
-            image_map["style"] = "position:relative;top:-12px;right:3px;";
+            image_map["style"] = "position:relative;top:-12px;right:3px;visibility:visible;";
             image_map["alt"] = "Refresh";
             image_map["title"] = image_map["alt"];
             PageWrite(HTMLGenerateDivOfStyle(HTMLGenerateTagPrefix("img", image_map), "max-height:0px;width:100%;text-align:right;"));

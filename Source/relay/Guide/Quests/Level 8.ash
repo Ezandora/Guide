@@ -40,6 +40,7 @@ void QLevel8GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
     string image_name = base_quest_state.image_name;
 	ChecklistSubentry subentry;
 	subentry.header = base_quest_state.quest_name;
+    string url = "place.php?whichplace=mclargehuge";
 	string talk_to_trapper_string = "Go talk to the trapper.";
     
     float cold_resistance = numeric_modifier("cold resistance");
@@ -121,6 +122,10 @@ void QLevel8GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
                     subentry.modifiers.listAppend("slimeling?");
 				ore_lines.listAppend("Mining outfit not available. Consider acquiring one via -combat in mine or the semi-rare (30% drop)");
 			}
+            if (is_wearing_outfit("Mining Gear"))
+            {
+                url = "mining.php?mine=1";
+            }
 		
 		}
 		subentry.entries.listAppend(ore_header + HTMLGenerateIndentedText(ore_lines));
@@ -280,5 +285,5 @@ void QLevel8GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	
 	
 	
-	task_entries.listAppend(ChecklistEntryMake(image_name, "place.php?whichplace=mclargehuge", subentry, $locations[itznotyerzitz mine,the goatlet, lair of the ninja snowmen, the extreme slope,mist-shrouded peak, itznotyerzitz mine (in disguise)]));
+	task_entries.listAppend(ChecklistEntryMake(image_name, url, subentry, $locations[itznotyerzitz mine,the goatlet, lair of the ninja snowmen, the extreme slope,mist-shrouded peak, itznotyerzitz mine (in disguise)]));
 }

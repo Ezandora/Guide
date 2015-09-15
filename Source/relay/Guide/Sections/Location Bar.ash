@@ -512,14 +512,14 @@ buffer generateLocationBar(boolean displaying_navbar)
         
         if (__setting_enable_location_popup_box)
         {
-            onmouseenter_code = "if (document.getElementById('r_location_popup_box') != undefined) { document.getElementById('r_location_popup_box').style.display = 'inline'; document.getElementById('r_location_popup_blackout').style.display = 'inline'; }";
-            onmouseleave_code = "document.getElementById('r_location_popup_box').style.display = 'none'; document.getElementById('r_location_popup_blackout').style.display = 'none';";
+            onmouseenter_code = "alterLocationPopupBarVisibility(event, true);";
+            onmouseleave_code = "alterLocationPopupBarVisibility(event, false);";
         }
             
         string [string] outer_containiner_map = mapMake("class", "r_bottom_outer_container", "style", style);
         bar.append(HTMLGenerateTagPrefix("div", outer_containiner_map));
         
-        string [string] inner_containiner_map = mapMake("class", "r_bottom_inner_container", "style", "background:white;");
+        string [string] inner_containiner_map = mapMake("id", "location_bar_inner_container", "class", "r_bottom_inner_container", "style", "background:white;");
         if (onmouseenter_code != "")
             inner_containiner_map["onmouseenter"] = onmouseenter_code;
         if (onmouseleave_code != "")

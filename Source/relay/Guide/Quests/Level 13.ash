@@ -1173,7 +1173,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         
         if ($item[Yearbook Club Camera].available_amount() > 0 && $item[Yearbook Club Camera].equipped_amount() == 0)
         {
-            task_entries.listAppend(ChecklistEntryMake("__item yearbook club camera", "inventory.php?which=2", ChecklistSubentryMake("Equip the yearbook club camera", "", "Before prism break.")));
+            task_entries.listAppend(ChecklistEntryMake("__item yearbook club camera", "inventory.php?which=2", ChecklistSubentryMake("Equip the yearbook club camera", "", "Before prism break. Otherwise, it'll disappear.")));
         }
 		
 	}

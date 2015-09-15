@@ -4,15 +4,17 @@ void SBarrelGodGenerateResource(ChecklistEntry [int] resource_entries)
         return;
     
     
-    if (!get_property_boolean("barrelShrineWorshipped") && __setting_debug_mode) //not yet supported in mafia
+    if (!get_property_boolean("_barrelPrayer") && mafiaIsPastRevision(16316))
     {
         string [int] description;
         string [int][int] gear;
-        //FIXME tracking properties for equipment
-        if (__misc_state["can equip just about any weapon"])
+        
+        if (__misc_state["can equip just about any weapon"] && !get_property_boolean("prayedForProtection"))
             gear.listAppend(listMake("Protection", "+50 ML, +100 HP, +25% muscle offhand"));
-        gear.listAppend(listMake("Glamour", "+50% item, ~8 MP regen, +25% myst accessory"));
-        gear.listAppend(listMake("Vigor", "+50% init, ~15 HP regen, +25% moxie pants"));
+        if (!get_property_boolean("prayedForGlamour"))
+            gear.listAppend(listMake("Glamour", "+50% item, ~8 MP regen, +25% myst accessory"));
+        if (!get_property_boolean("prayedForVigor"))
+            gear.listAppend(listMake("Vigor", "+50% init, ~15 HP regen, +25% moxie pants"));
         
         if (gear.count() > 0)
             description.listAppend("Once/ascension gear:|*" + HTMLGenerateSimpleTableLines(gear));
@@ -59,13 +61,14 @@ void SBarrelGodGenerateResource(ChecklistEntry [int] resource_entries)
 
 void SBarrelGodGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-    if (lookupItem("map to the Biggest Barrel").available_amount() > 0 && !lookupItem("chest barrel").haveAtLeastXOfItemEverywhere(1))
+    if (lookupItem("map to the Biggest Barrel").available_amount() > 0 && (!lookupItem("chest barrel").haveAtLeastXOfItemEverywhere(1) || !lookupItem("barrelhead").haveAtLeastXOfItemEverywhere(1) || !lookupItem("bottoms of the barrel").haveAtLeastXOfItemEverywhere(1)))
     {
-        //spaded by fractalnavel
         string [int] description;
         description.listAppend("Use map to the Biggest Barrel.");
-        description.listAppend("To defeat him, use multiple independent sources of damage. These sources should not go over (30?) damage each. Otherwise, he'll heal his HP.|You'll also want healing items.");
-        description.listAppend("Can only be fought once a day.");
+        description.listAppend("To defeat him, deal up to, but not over, 150 HP/round. Otherwise, he'll heal his HP.|You'll also want healing items.");
+        if ($skill[belch the rainbow].have_skill())
+            description.listAppend("Could run -250 ML and cast belch the rainbow over and over, if you've upgraded that.");
+        description.listAppend("Can only be fought once a day, until defeated.");
         optional_task_entries.listAppend(ChecklistEntryMake("barrel god", "inventory.php?which=3", ChecklistSubentryMake("Defeat the Barrelmech", "", description), 8));
     }
 }

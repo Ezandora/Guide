@@ -260,15 +260,40 @@ void SSemirareGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
 	}
     if (very_important && __misc_state["monsters can be nearly impossible to kill"] && monster_level_adjustment() > 0)
         description.listAppend(HTMLGenerateSpanFont("Possibly remove +ML to survive. (at +" + monster_level_adjustment() + " ML)", "red"));
-	
+	boolean very_important_reduces_size = description.count() > 2;
+    
 	if (title != "")
 	{
 		int importance = 4;
 		if (very_important)
-			importance = -11;
+        {
+            if (very_important_reduces_size)
+                importance = -10;
+            else
+                importance = -11;
+        }
 		ChecklistEntry entry = ChecklistEntryMake("__item fortune cookie", "", ChecklistSubentryMake(title, "", description), importance);
 		if (very_important)
+        {
 			task_entries.listAppend(entry);
+            
+            if (very_important_reduces_size)
+            {
+                boolean setting_use_mouse_over_technique = false;
+                string secondary_description = "[...]";
+                if (!setting_use_mouse_over_technique)
+                    secondary_description = "Scroll up for full description.";
+                ChecklistEntry pop_up_reminder_entry = ChecklistEntryMake("__item fortune cookie", "", ChecklistSubentryMake(title, "", secondary_description), -11);
+                pop_up_reminder_entry.only_show_as_extra_important_pop_up = true;
+                pop_up_reminder_entry.container_div_attributes["onclick"] = "navbarClick(0, 'Tasks_checklist_container')";
+                pop_up_reminder_entry.container_div_attributes["class"] = "r_clickable";
+                
+                //this feature is very, very buggy, so disable it:
+                if (setting_use_mouse_over_technique)
+                    pop_up_reminder_entry.subentries_on_mouse_over = entry.subentries;
+                task_entries.listAppend(pop_up_reminder_entry);
+            }
+        }
 		else
 			optional_task_entries.listAppend(entry);
 			

@@ -252,13 +252,7 @@ void outputChecklists(Checklist [int] ordered_output_checklists)
 		PageWrite("<br>");
 		PageWrite(HTMLGenerateDivOfStyle("Example ascension", "text-align:center; font-weight:bold;"));
 	}
-		
-	if (my_path_id() == PATH_TRENDY) //trendy is unsupported
-    {
-        PageWrite("<br>");
-		PageWrite(HTMLGenerateDiv("Trendy warning - advice may be dangerously out of style"));
-    }
-
+    
     Checklist extra_important_tasks;
     
 	//And output:
@@ -274,6 +268,8 @@ void outputChecklists(Checklist [int] ordered_output_checklists)
                 if (entry.importance_level <= -11)
                 {
                     extra_important_tasks.entries.listAppend(entry);
+                    if (entry.only_show_as_extra_important_pop_up)
+                        remove cl.entries[key];
                 }
                     
             }
@@ -285,8 +281,13 @@ void outputChecklists(Checklist [int] ordered_output_checklists)
     {
         extra_important_tasks.title = "Tasks";
         extra_important_tasks.disable_generating_id = true;
-        PageWrite(HTMLGenerateTagPrefix("div", mapMake("id", "importance_bar", "style", "z-index:3;position:fixed; top:0;width:100%;max-width:" + __setting_horizontal_width + "px;border-bottom:1px solid;border-color:" + __setting_line_colour + ";visibility:hidden;")));
+        PageWrite(HTMLGenerateTagPrefix("div", mapMake("id", "importance_bar", "style", "z-index:3;position:fixed; top:0;width:100%;max-width:" + __setting_horizontal_width + "px;visibility:hidden;")));
 		PageWrite(ChecklistGenerate(extra_important_tasks, false));
+        
+        //string background = "background: -moz-linear-gradient(top, rgba(100,100,100,1) 0%, rgba(255,255,255,0) 100%);background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(100,100,100,1)), color-stop(100%,rgba(255,255,255,0)));background: -webkit-linear-gradient(top, rgba(100,100,100,1) 0%,rgba(255,255,255,0) 100%);background: -o-linear-gradient(top, rgba(100,100,100,1) 0%,rgba(255,255,255,0) 100%);background: -ms-linear-gradient(top, rgba(100,100,100,1) 0%,rgba(255,255,255,0) 100%);background: linear-gradient(to bottom, rgba(100,100,100,1) 0%,rgba(255,255,255,0) 100%);filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#646464', endColorstr='#00ffffff',GradientType=0 );"; //this looks correct in safari, but not others
+        string background = "background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAUCAYAAABMDlehAAAAb0lEQVR42gFkAJv/AFFRUf8AVlZW+ABcXFzvAGRjY+QAa2xr2AB1dHXLAH5+fr0AiIiIrgCTk5KfAJ2dnZAAqKiofwCzs7JwAL69vmAAyMjIUQDS0tJBANzb3DMA5eXlJwDt7e0bAPT09BAA+vr6B861MNMaArkVAAAAAElFTkSuQmCC);background-repeat:repeat-x;"; //use this gradient image, because alpha gradients are not consistent across browsers (compare black to white, 100% to zero opacity, on safari versus firefox)
+
+        PageWrite(HTMLGenerateTagWrap("div", "", mapMake("id", "importance_bar_gradient", "style", "height:20px;transition:opacity 0.25s;opacity:0;" + background)));
         PageWrite(HTMLGenerateTagSuffix("div"));
         
     }

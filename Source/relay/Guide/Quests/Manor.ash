@@ -471,8 +471,9 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
                 if (more_drunkenness > 0)
                     subentry.entries.listAppend("Consider drinking " + more_drunkenness + " more drunkenness.");
             }
-            else if (missing_pool_skill > 0)
-                subentry.entries.listAppend(HTMLGenerateSpanFont("Consider waiting for rollover for better pool skill.", "red") + " (you're over " + desired_drunkenness + " drunkenness.)");
+            
+            if (missing_pool_skill > 0 && my_inebriety() > 10)
+                subentry.entries.listAppend(HTMLGenerateSpanFont("Consider waiting for rollover for better pool skill.", "red") + " (you're over 10 drunkenness.)");
         }
         if (my_inebriety() > 0 && false)
         {

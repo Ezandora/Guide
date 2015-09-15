@@ -42,6 +42,12 @@ buffer to_buffer(string str)
 	return result;
 }
 
+buffer copyBuffer(buffer buf)
+{
+    buffer result;
+    result.append(buf);
+    return result;
+}
 
 int PATH_UNKNOWN = -1;
 int PATH_NONE = 0;

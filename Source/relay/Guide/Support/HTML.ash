@@ -30,7 +30,6 @@ buffer HTMLGenerateTagPrefix(string tag, string [string] attributes)
 		}
 	}
 	result.append(">");
-	
 	return result;
 }
 
