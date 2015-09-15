@@ -681,6 +681,20 @@ function navbarClick(event, checklist_div_id)
     return false; //cancel regular click
 }
 
+var __tested_pointer_events = false;
+var __browser_probably_supports_pointer_events = false;
+function browserProbablySupportsPointerEvents()
+{
+    if (!__tested_pointer_events)
+    {
+        var testing_element = document.createElement("pointerEventsTest");
+        testing_element.style.cssText='pointer-events:auto';
+        __browser_probably_supports_pointer_events = (testing_element.style.pointerEvents === 'auto');
+        __tested_pointer_events = true;
+    }
+    return __browser_probably_supports_pointer_events;
+}
+
 function alterLocationPopupBarVisibility(event, visibility)
 {
     var popup_box = document.getElementById('r_location_popup_box');
@@ -693,6 +707,7 @@ function alterLocationPopupBarVisibility(event, visibility)
     
     if (visibility)
     {
+        blackout_box.style.visibility = "visible";
         blackout_box.style.transition = "opacity 1.0s";
         
         popup_box.style.opacity = 1.0;
@@ -712,6 +727,8 @@ function alterLocationPopupBarVisibility(event, visibility)
     }
     else
     {
+        if (!browserProbablySupportsPointerEvents()) //disable animation, but allow clicks
+            blackout_box.style.visibility = "hidden";
         blackout_box.style.transition = "opacity 0.25s";
         blackout_box.style.opacity = 0.0;
         popup_box.style.bottom = "-" + popup_box.clientHeight + "px";

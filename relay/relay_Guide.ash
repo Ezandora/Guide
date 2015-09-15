@@ -14587,8 +14587,9 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
                 if (more_drunkenness > 0)
                     subentry.entries.listAppend("Consider drinking " + more_drunkenness + " more drunkenness.");
             }
-            else if (missing_pool_skill > 0)
-                subentry.entries.listAppend(HTMLGenerateSpanFont("Consider waiting for rollover for better pool skill.", "red") + " (you're over " + desired_drunkenness + " drunkenness.)");
+            
+            if (missing_pool_skill > 0 && my_inebriety() > 10)
+                subentry.entries.listAppend(HTMLGenerateSpanFont("Consider waiting for rollover for better pool skill.", "red") + " (you're over 10 drunkenness.)");
         }
         if (my_inebriety() > 0 && false)
         {
@@ -36636,7 +36637,7 @@ buffer generateLocationPopup(float bottom_coordinates)
         return buf;
     
     string transition_time = "0.5s";
-    buf.append(HTMLGenerateTagWrap("div", "", mapMake("id", "r_location_popup_blackout", "style", "position:fixed;z-index:5;width:100%;height:100%;background:rgba(0,0,0,0.5);opacity:0;pointer-events:none;")));
+    buf.append(HTMLGenerateTagWrap("div", "", mapMake("id", "r_location_popup_blackout", "style", "position:fixed;z-index:5;width:100%;height:100%;background:rgba(0,0,0,0.5);opacity:0;pointer-events:none;visibility:hidden;")));
     
     
     buf.append(HTMLGenerateTagPrefix("div", mapMake("id", "r_location_popup_box", "style", "height:auto;transition:bottom " + transition_time + ";z-index:5;opacity:0;pointer-events:none;bottom:-10000px", "class", "r_bottom_outer_container")));
