@@ -2,7 +2,7 @@
 
 since 17.1; //the earliest main release that is usable in modern KOL (unequip bug)
 //These settings are for development. Don't worry about editing them.
-string __version = "1.3";
+string __version = "1.3.1";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -26253,7 +26253,8 @@ void SOlfactionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             location_wanted_monster[$location[the hidden bowling alley]] = $monster[pygmy bowler];
         }
         location_wanted_monster[$location[cobb's knob harem]] = $monster[knob goblin harem girl];
-        location_wanted_monster[$location[The Dark Neck of the Woods]] = $monster[Hellion];
+        if (in_hardcore())
+            location_wanted_monster[$location[The Dark Neck of the Woods]] = $monster[Hellion];
         if ($skill[summon smithsness].skill_is_usable() && $item[dirty hobo gloves].available_amount() == 0 && $item[hand in glove].available_amount() == 0 && __misc_state["need to level"])
         {
             location_wanted_monster[$location[The Sleazy Back Alley]] = $monster[drunken half-orc hobo];
