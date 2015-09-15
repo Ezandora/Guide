@@ -449,6 +449,7 @@ function updatePageHTML(body_response_string)
     var elements_to_save_properties_of = ["r_location_popup_blackout", "r_location_popup_box"];
     var saved_opacity_of_element = [];
     var saved_bottom_of_element = [];
+    var saved_visibility_of_element = [];
     
     for (var i = 0; i < elements_to_save_properties_of.length; i++)
     {
@@ -460,6 +461,7 @@ function updatePageHTML(body_response_string)
             continue;
         saved_opacity_of_element[element_id] = element.style.opacity;
         saved_bottom_of_element[element_id] = element.style.bottom;
+        saved_visibility_of_element[element_id] = element.style.visibility;
     }
     
     window.onscroll = undefined;
@@ -488,6 +490,7 @@ function updatePageHTML(body_response_string)
         element.style.transition = "";
         
         element.style.opacity = opacity;
+        element.style.visibility = saved_visibility_of_element[element_id];
         if (element_id === "r_location_popup_box" && !(bottom === "4.59em"))
         {
             element.style.bottom = "-" + element.clientHeight + "px";
