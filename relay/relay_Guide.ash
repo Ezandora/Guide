@@ -38680,7 +38680,6 @@ void setUpCSSStyles()
     if (__setting_ios_appearance)
         body_style += "font-family:'Helvetica Neue',Arial, Helvetica, sans-serif;font-weight:lighter;";
     
-    body_style += "filter:invert(75%);";
     PageAddCSSClass("body", "", body_style, -11);
     
     PageAddCSSClass("body", "", "font-size:13px;", -11, __setting_media_query_medium_size);
