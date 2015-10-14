@@ -129,7 +129,7 @@ void SKOLHSGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     
     if (adventures_remaining <= 0)
     {
-        if ($item[Yearbook Club Camera].available_amount() > 0 && !get_property_boolean("yearbookCameraPending") && get_property("yearbookCameraTarget") != "")
+        if ($item[Yearbook Club Camera].available_amount() > 0 && !get_property_boolean("yearbookCameraPending") && get_property("yearbookCameraTarget") != "" && get_property_int("yearbookCameraUpgrades") < 21)
         {
             string line = "Could take a picture of a " + get_property("yearbookCameraTarget") + "."; //"mine worker" is a seen value
             if ($item[Yearbook Club Camera].equipped_amount() == 0)

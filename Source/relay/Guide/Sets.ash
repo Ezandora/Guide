@@ -43,6 +43,9 @@ void SetsGenerateResources(ChecklistEntry [int] resource_entries)
     SDeckOfEveryCardGenerateResource(resource_entries);
     SBadMoonGenerateResource(resource_entries);
     SBarrelGodGenerateResource(resource_entries);
+    STeaTreeGenerateResource(resource_entries);
+    SHauntedDoghouseGenerateResource(resource_entries);
+    SCalculateUniverseGenerateResource(resource_entries);
 }
 
 void SetsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -80,7 +83,6 @@ void SetsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 	SBadMoonGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SCommunityServiceGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     SBarrelGodGenerateTasks(task_entries, optional_task_entries, future_task_entries);
-    
 }
 
 

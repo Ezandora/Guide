@@ -113,8 +113,10 @@ void SpelunkingGenerateNCInformation(SpelunkingStatus spelunking_status, Checkli
     entry.should_indent_after_first_subentry = true;
     
     string first_entry_title = "";
+    boolean very_important = false;
     if (spelunking_status.noncombat_due_next_adventure)
     {
+        very_important = true;
         first_entry_title = "Non-combat next adventure";
         entry.url = "place.php?whichplace=spelunky";
     }
@@ -448,8 +450,17 @@ void SpelunkingGenerateNCInformation(SpelunkingStatus spelunking_status, Checkli
     }
     
     
-    if (spelunking_status.noncombat_due_next_adventure)
+    if (very_important)
+    {
         task_entries.listAppend(entry);
+        string secondary_description = "Scroll up for full description.";
+        ChecklistEntry pop_up_reminder_entry = ChecklistEntryMake(entry.image_lookup_name, "", ChecklistSubentryMake(entry.subentries[0].header, "", secondary_description), -11);
+        pop_up_reminder_entry.only_show_as_extra_important_pop_up = true;
+        pop_up_reminder_entry.container_div_attributes["onclick"] = "navbarClick(0, 'Tasks_checklist_container')";
+        pop_up_reminder_entry.container_div_attributes["class"] = "r_clickable";
+        
+        task_entries.listAppend(pop_up_reminder_entry);
+    }
     else
         future_task_entries.listAppend(entry);
 }

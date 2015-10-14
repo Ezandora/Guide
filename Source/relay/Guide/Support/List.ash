@@ -176,6 +176,13 @@ void listAppend(familiar [int][int] list, familiar [int] entry)
 	list[position] = entry;
 }
 
+void listAppend(int [int][int] list, int [int] entry)
+{
+	int position = list.count();
+	while (list contains position)
+		position += 1;
+	list[position] = entry;
+}
 
 void listAppend(skill [int] list, boolean [skill] entry)
 {

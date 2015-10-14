@@ -68,6 +68,13 @@ void SBarrelGodGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         description.listAppend("To defeat him, deal up to, but not over, 150 HP/round. Otherwise, he'll heal his HP.|You'll also want healing items.");
         if ($skill[belch the rainbow].have_skill())
             description.listAppend("Could run -250 ML and cast belch the rainbow over and over, if you've upgraded that.");
+        if (!in_ronin())
+        {
+            string line = "Could throw chipotle wasabi cilantro aioli repeatedly.";
+            if ($item[chipotle wasabi cilantro aioli].item_amount() < 22)
+                line += "|Acquire 22 of them first, though.";
+            description.listAppend(line);
+        }
         description.listAppend("Can only be fought once a day, until defeated.");
         optional_task_entries.listAppend(ChecklistEntryMake("barrel god", "inventory.php?which=3", ChecklistSubentryMake("Defeat the Barrelmech", "", description), 8));
     }

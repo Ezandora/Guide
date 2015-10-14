@@ -98,6 +98,25 @@ void generatePullList(Checklist [int] checklists)
 	string [int] pullable_list_reason;
 	
 	GPItem [int] pullable_item_list;
+    
+    if (__misc_state["need to level"])
+    {
+        if (my_primestat() == $stat[muscle])
+        {
+            pullable_item_list.listAppend(GPItemMake($item[fake washboard], "+25% to mainstat gain, offhand."));
+            pullable_item_list.listAppend(GPItemMake(lookupItem("red LavaCo Lamp&trade;"), "+5 adventures, 50 turns of +50% mainstat gain after rollover."));
+        }
+        else if (my_primestat() == $stat[mysticality])
+        {
+            pullable_item_list.listAppend(GPItemMake(lookupItem("basaltamander buckler"), "+25% to mainstat gain, offhand."));
+            pullable_item_list.listAppend(GPItemMake(lookupItem("blue LavaCo Lamp&trade;"), "+5 adventures, 50 turns of +50% mainstat gain after rollover."));
+        }
+        else if (my_primestat() == $stat[moxie])
+        {
+            pullable_item_list.listAppend(GPItemMake($item[backwoods banjo], "+25% to mainstat gain, 2h weapon."));
+            pullable_item_list.listAppend(GPItemMake(lookupItem("green LavaCo Lamp&trade;"), "+5 adventures, 50 turns of +50% mainstat gain after rollover."));
+        }
+    }
 	
 	//IOTMs:
 	if ($item[empty rain-doh can].available_amount() == 0 && $item[can of rain-doh].available_amount() == 0)
@@ -407,6 +426,8 @@ void generatePullList(Checklist [int] checklists)
     }
     if (!__misc_state["can reasonably reach -25% combat"])
     {
+        if (my_primestat() == $stat[moxie] || my_basestat($stat[moxie]) >= 35)
+            pullable_item_list.listAppend(GPItemMake($item[iFlail], "-combat, +11 ML, +5 familiar weight"));
         pullable_item_list.listAppend(GPItemMake($item[duonoculars], "-combat, +5 ML"));
         pullable_item_list.listAppend(GPItemMake($item[ring of conflict], "-combat"));
         if ($item[red shoe].can_equip())
@@ -459,25 +480,6 @@ void generatePullList(Checklist [int] checklists)
         if (dis_item != $item[none] && dis_item.to_effect().have_effect() == 0)
             pullable_item_list.listAppend(GPItemMake(dis_item, "+20% mainstat gain.|Use with Chateau resting; at the end of the day, rest with this potion active to gain extra stats.<br>Then rest again after rollover.<br>Worth up to " + ideal_extra_stats_worth + " " + my_primestat() + ".", 1));
         
-    }
-    
-    if (__misc_state["need to level"])
-    {
-        if (my_primestat() == $stat[muscle])
-        {
-            pullable_item_list.listAppend(GPItemMake($item[fake washboard], "+25% to mainstat gain, offhand."));
-            pullable_item_list.listAppend(GPItemMake(lookupItem("red LavaCo Lamp&trade;"), "+5 adventures, 50 turns of +50% mainstat gain after rollover."));
-        }
-        else if (my_primestat() == $stat[mysticality])
-        {
-            pullable_item_list.listAppend(GPItemMake(lookupItem("basaltamander buckler"), "+25% to mainstat gain, offhand."));
-            pullable_item_list.listAppend(GPItemMake(lookupItem("blue LavaCo Lamp&trade;"), "+5 adventures, 50 turns of +50% mainstat gain after rollover."));
-        }
-        else if (my_primestat() == $stat[moxie])
-        {
-            pullable_item_list.listAppend(GPItemMake($item[backwoods banjo], "+25% to mainstat gain, 2h weapon."));
-            pullable_item_list.listAppend(GPItemMake(lookupItem("green LavaCo Lamp&trade;"), "+5 adventures, 50 turns of +50% mainstat gain after rollover."));
-        }
     }
     if (lookupItem("Mr. Cheeng's spectacles") != $item[none])
         pullable_item_list.listAppend(GPItemMake(lookupItem("Mr. Cheeng's spectacles"), "+15% item, +30% spell damage, acquire random potions in-combat.|Not particularly optimal, but fun."));

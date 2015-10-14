@@ -319,7 +319,7 @@ buffer generateLocationBar(boolean displaying_navbar)
     string [int] location_urls;
     float [int] location_fixed_widths;
     
-    if (__misc_state["in run"])
+    if (true) //__misc_state["in run"]) //useful even in aftercore
     {
         int area_delay = l.delayRemainingInLocation();
         
@@ -590,6 +590,6 @@ buffer generateLocationBar(boolean displaying_navbar)
     float bottom_coordinates = __setting_navbar_height_in_em;
     if (displaying_navbar)
         bottom_coordinates = __setting_navbar_height_in_em * 2.0;
-    bar.append(generateLocationPopup(bottom_coordinates));
+    bar.append(generateLocationPopup(bottom_coordinates, (table_entries.count() == 1)));
     return bar;
 }

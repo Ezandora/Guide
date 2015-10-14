@@ -296,3 +296,8 @@ float TriangularDistributionCalculateCDF(float x, float min, float max)
 {
     return TriangularDistributionCalculateCDF(x, min, max, (min + max) * 0.5);
 }
+
+float averagef(float a, float b)
+{
+    return (a + b) * 0.5;
+}

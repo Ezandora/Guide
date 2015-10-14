@@ -217,7 +217,12 @@ void SCountersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [i
         
         if (turns_until_dance_card >= 0)
         {
-            string stats = "Gives ~" + __misc_state_float["dance card average stats"].round() + " mainstats.";
+            string stats = "Gives ~" + __misc_state_float["dance card average stats"].round() + " ";
+            if (my_primestat() == $stat[moxie])
+                stats += "mainstat";
+            else
+                stats += "moxie";
+            stats += ".";
             if (turns_until_dance_card == 0)
             {
                 task_entries.listAppend(ChecklistEntryMake("__item dance card", $location[the haunted ballroom].getClickableURLForLocation(), ChecklistSubentryMake("Dance card up now.", "", "Adventure in haunted ballroom. " + stats), -11));

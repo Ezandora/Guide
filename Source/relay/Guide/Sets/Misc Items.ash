@@ -119,9 +119,10 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
 		if (navel_ring_runaway_chance contains navel_runaway_progress)
             navel_percent_chance_of_runaway = navel_ring_runaway_chance[navel_runaway_progress];
 	}
-	
-	if ($item[navel ring of navel gazing].available_amount() > 0)
+	boolean have_navel_type_equipment = false;
+	if ($item[navel ring of navel gazing].available_amount() > 0 && $item[navel ring of navel gazing].is_unrestricted())
 	{
+        have_navel_type_equipment = true;
 		string name = "Navel Ring runaways";
         
         string url = "";
@@ -132,9 +133,9 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
 		description.listAppend(navel_percent_chance_of_runaway + "% chance of free runaway.");
 		resource_entries.listAppend(ChecklistEntryMake("__item navel ring of navel gazing", url, ChecklistSubentryMake(name, "", description)));
 	}
-	
-	if ($item[greatest american pants].available_amount() > 0)
+	if ($item[greatest american pants].available_amount() > 0 && $item[greatest american pants].is_unrestricted())
 	{
+        have_navel_type_equipment = true;
 		string name = "Greatest American Pants";
 		
         string url = "";
@@ -149,7 +150,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
             description.listAppend(pluralise(buffs_remaining, "buff", "buffs") + " remaining.");
 		resource_entries.listAppend(ChecklistEntryMake("__item greatest american pants", url, ChecklistSubentryMake(name, "", description)));
 	}
-	if ($item[peppermint parasol].available_amount() > 0 && in_run) //don't think we want to use the parasol in aftercore, it's expensive
+    if ($item[peppermint parasol].available_amount() > 0 && in_run && !have_navel_type_equipment)
 	{
 		int parasol_progress = get_property_int("parasolUsed");
 		string name = "";

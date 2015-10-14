@@ -45,3 +45,6 @@ import "relay/Guide/Sets/Deck of Every Card.ash";
 import "relay/Guide/Sets/Bad Moon.ash";
 import "relay/Guide/Sets/Community Service.ash";
 import "relay/Guide/Sets/Barrel God.ash";
+import "relay/Guide/Sets/Tea Tree.ash";
+import "relay/Guide/Sets/Haunted Doghouse.ash";
+import "relay/Guide/Sets/Calculate Universe.ash";

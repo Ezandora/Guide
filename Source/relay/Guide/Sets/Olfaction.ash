@@ -99,8 +99,9 @@ void SOlfactionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             line += "To olfact " + m.HTMLEscapeString() + " instead of " + olfacted_monster.HTMLEscapeString() + ".|";
         else
             line += "To olfact in " + l + ".|";
-        
-        line += $item[soft green echo eyedrop antidote].pluralise() + " available.";
+            
+        if (!can_interact())
+            line += $item[soft green echo eyedrop antidote].pluralise() + " available.";
         
         description.listAppend(line);
         

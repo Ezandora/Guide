@@ -216,7 +216,7 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
                 subentry.entries.listAppend("Have enough wheels.");
             /*if (amount > 0)
                 subentry.entries.listAppend(pluralise(amount, "wheel turn", "wheel turns") + " available.");*/
-            if ($item[tangle of rat tails].available_amount() > 0)
+            if ($item[tangle of rat tails].available_amount() > 0 && extra_spin_sources_needed > 0)
                 subentry.entries.listAppend(pluralise($item[tangle of rat tails]) + " available.");
         }
         

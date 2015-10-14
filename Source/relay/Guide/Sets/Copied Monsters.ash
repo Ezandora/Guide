@@ -52,7 +52,8 @@ string generateNinjaSafetyGuide(boolean show_colour)
 
 void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [int] description, boolean show_details, boolean from_copy)
 {
-	if (monster_name == "Ninja snowman assassin")
+    monster_name = monster_name.to_lower_case();
+	if (monster_name == "ninja snowman assassin")
 	{
 		description.listAppend(generateNinjaSafetyGuide(show_details));
         if (from_copy && $familiar[obtuse angel].familiar_is_usable() && $familiar[reanimated reanimator].familiar_is_usable())
@@ -63,7 +64,7 @@ void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [in
             description.listAppend(line);
         }
 	}
-	else if (monster_name == "Quantum Mechanic")
+	else if (monster_name == "quantum mechanic")
 	{
 		string line;
 		boolean requirements_met = false;
@@ -83,7 +84,7 @@ void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [in
     {
         description.listAppend("Zero adventure cost, use to burn delay.");
     }
-    else if (monster_name == "Lobsterfrogman" && show_details)
+    else if (monster_name == "lobsterfrogman" && show_details)
     {
         string line;
     
@@ -102,7 +103,7 @@ void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [in
         line += attack_text;
         description.listAppend(line);
     }
-    else if (monster_name == "Big swarm of ghuol whelps" || monster_name == "Swarm of ghuol whelps" || monster_name == "Giant swarm of ghuol whelps")
+    else if (monster_name == "big swarm of ghuol whelps" || monster_name == "swarm of ghuol whelps" || monster_name == "giant swarm of ghuol whelps")
     {
         float monster_level = monster_level_adjustment_ignoring_plants();
     
@@ -111,7 +112,7 @@ void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [in
         float cranny_beep_beep_beep = MAX(3.0,sqrt(monster_level));
         description.listAppend("~" + cranny_beep_beep_beep.roundForOutput(1) + " cranny beeps.");
     }
-    else if (monster_name == "Writing Desk")
+    else if (monster_name == "writing desk")
     {
         if ($item[telegram from Lady Spookyraven].available_amount() > 0)
             description.listAppend(HTMLGenerateSpanFont("Read the telegram from Lady Spookyraven first.", "red"));
@@ -120,7 +121,7 @@ void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [in
             description.listAppend(pluraliseWordy(desks_remaining, "desk", "desks").capitaliseFirstLetter() + " remaining.");
 
     }
-    else if (monster_name == "Skinflute" || monster_name == "Camel's Toe")
+    else if (monster_name == "skinflute" || monster_name == "camel's toe")
     {
         description.listAppend("Have " + pluralise($item[star]) + " and " + pluralise($item[line]) + ".");
 		if (item_drop_modifier_ignoring_plants() < 234.0)
@@ -273,6 +274,8 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
         //if (__misc_state["bookshelf accessible"] && $skill[summon brickos].skill_is_usable())
             //potential_copies.listAppend("Bricko bats...?");
     }
+    ChecklistEntry copy_source_entry;
+    
 	if (copies_left > 0)
 	{
 		string [int] copy_source_list;
@@ -285,28 +288,49 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
 		string name = "";
 		//FIXME make this possibly say which one in the case of 6 (does that matter? how does that mechanic work?)
 		name = pluralise(copies_left, copy_sources + " copy", copy_sources + " copies") + " left";
-		string [int] description = potential_copies;
+		string [int] description;// = potential_copies;
         
-		resource_entries.listAppend(ChecklistEntryMake(copy_source_list[0], "", ChecklistSubentryMake(name, "", description)));
+		//resource_entries.listAppend(ChecklistEntryMake(copy_source_list[0], "", ChecklistSubentryMake(name, "", description)));
+        
+        copy_source_entry.subentries.listAppend(ChecklistSubentryMake(name, "", description));
+        if (copy_source_entry.image_lookup_name == "")
+            copy_source_entry.image_lookup_name = copy_source_list[0];
 	}
     
     if (!get_property_boolean("_cameraUsed") && $item[4-d camera].available_amount() > 0)
     {
-		resource_entries.listAppend(ChecklistEntryMake("__item 4-d camera", "", ChecklistSubentryMake("4-d camera copy available", "", potential_copies)));
+		//resource_entries.listAppend(ChecklistEntryMake("__item 4-d camera", "", ChecklistSubentryMake("4-d camera copy available", "", potential_copies)));
+        
+        copy_source_entry.subentries.listAppend(ChecklistSubentryMake("4-d camera copy available", "", ""));
+        if (copy_source_entry.image_lookup_name == "")
+            copy_source_entry.image_lookup_name = "__item 4-d camera";
     }
     if (!get_property_boolean("_iceSculptureUsed") && $item[unfinished ice sculpture].available_amount() > 0)
     {
-		resource_entries.listAppend(ChecklistEntryMake("__item unfinished ice sculpture", "", ChecklistSubentryMake("Ice sculpture copy available", "", potential_copies)));
+		//resource_entries.listAppend(ChecklistEntryMake("__item unfinished ice sculpture", "", ChecklistSubentryMake("Ice sculpture copy available", "", potential_copies)));
+        
+        copy_source_entry.subentries.listAppend(ChecklistSubentryMake("Ice sculpture copy available", "", ""));
+        if (copy_source_entry.image_lookup_name == "")
+            copy_source_entry.image_lookup_name = "__item unfinished ice sculpture";
     }
     if ($item[sticky clay homunculus].available_amount() > 0)
     {
-		resource_entries.listAppend(ChecklistEntryMake("__item sticky clay homunculus", "", ChecklistSubentryMake(pluralise($item[sticky clay homunculus].available_amount(), "sticky clay copy", "sticky clay copies") + " available", "", "Unlimited/day.")));
+		//resource_entries.listAppend(ChecklistEntryMake("__item sticky clay homunculus", "", ChecklistSubentryMake(pluralise($item[sticky clay homunculus].available_amount(), "sticky clay copy", "sticky clay copies") + " available", "", "Unlimited/day.")));
+        
+        copy_source_entry.subentries.listAppend(ChecklistSubentryMake(pluralise($item[sticky clay homunculus].available_amount(), "sticky clay copy", "sticky clay copies") + " available", "", "Unlimited/day."));
+        if (copy_source_entry.image_lookup_name == "")
+            copy_source_entry.image_lookup_name = "__item sticky clay homunculus";
     }
     if (!get_property_boolean("_crappyCameraUsed") && $item[crappy camera].available_amount() > 0)
     {
-        string [int] description = listCopy(potential_copies);
+        string [int] description;// = listCopy(potential_copies);
         description.listPrepend("50% success rate");
-		resource_entries.listAppend(ChecklistEntryMake("__item crappy camera", "", ChecklistSubentryMake("Crappy camera copy available", "", description)));
+		//resource_entries.listAppend(ChecklistEntryMake("__item crappy camera", "", ChecklistSubentryMake("Crappy camera copy available", "", description)));
+        
+        
+        copy_source_entry.subentries.listAppend(ChecklistSubentryMake("Crappy camera copy available", "", description));
+        if (copy_source_entry.image_lookup_name == "")
+            copy_source_entry.image_lookup_name = "__item crappy camera";
     }
     if (__misc_state["Chateau Mantegna available"] && !get_property_boolean("_chateauMonsterFought") && mafiaIsPastRevision(15115))
     {
@@ -322,7 +346,11 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
         
         if (__misc_state["in run"])
         {
-            string line;
+            if ($item[alpine watercolor set].available_amount() == 0)
+                description.listAppend("Acquire an alpine watercolor set to copy something else.");
+            else
+                description.listAppend("Copy something else with alpine watercolor set.");
+            /*string line;
             if (current_monster == $monster[none])
                 line += "Options:";
             else
@@ -337,7 +365,7 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
                 line += " (copy with alpine watercolor set)";
         
             line += "|*" + potential_copies.listJoinComponents("|*");
-            description.listAppend(line);
+            description.listAppend(line);*/
         }
         
         if (current_monster != $monster[none])
@@ -349,7 +377,23 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
                 line += "|*" + monster_description.listJoinComponents("|*");
             description.listPrepend(line);
         }
-		resource_entries.listAppend(ChecklistEntryMake("__item fancy oil painting", url, ChecklistSubentryMake(header, "", description)));
+		//resource_entries.listAppend(ChecklistEntryMake("__item fancy oil painting", url, ChecklistSubentryMake(header, "", description)));
+        
+        
+        copy_source_entry.subentries.listAppend(ChecklistSubentryMake(header, "", description));
+        if (copy_source_entry.image_lookup_name == "")
+            copy_source_entry.image_lookup_name = "__item fancy oil painting";
+    }
+    if (copy_source_entry.subentries.count() > 0)
+    {
+        ChecklistSubentry last_subentry = copy_source_entry.subentries[copy_source_entry.subentries.count() - 1];
+        if (last_subentry.entries.count() > 0 && potential_copies.count() > 0)
+        {
+            copy_source_entry.subentries.listAppend(ChecklistSubentryMake("Potential targets:", "", potential_copies));
+        }
+        else
+            last_subentry.entries.listAppendList(potential_copies);
+        resource_entries.listAppend(copy_source_entry);
     }
     
     //Copies made:

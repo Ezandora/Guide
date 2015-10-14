@@ -102,7 +102,7 @@ void generateMissingItems(Checklist [int] checklists)
         if (subentries.count() == 1)
             subentries[0].entries.listAppend("Can create it.");
         else if (!__misc_state["can use clovers"])
-            subentries[0].entries.listAppend("Either meatpaste together, or find after losing to the naughty sorceress. (usually slower)");
+            subentries[0].entries.listAppend("Either meatpaste together, or find after losing to the naughty sorceress. (" + (in_bad_moon() ? "probably faster" : "usually slower") + ")");
 			
 		ChecklistEntry entry = ChecklistEntryMake("__item wand of nagamar", $location[the castle in the clouds in the sky (basement)].getClickableURLForLocation(), subentries);
 		entry.should_indent_after_first_subentry = true;

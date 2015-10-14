@@ -65,6 +65,11 @@ void runMain(string relay_filename)
     else
         PageSetBodyAttribute("onload", "GuideInit('" + relay_filename + "'," + __setting_horizontal_width + ");"); //not escaped
     
+    boolean drunk = $item[beer goggles].equipped_amount() > 0;
+    
+    if (drunk)
+        PageWrite(HTMLGenerateTagPrefix("div", mapMake("style", "-webkit-filter:blur(4.0px) brightness(1.01);"))); //FIXME make this animated
+    
     boolean displaying_navbar = false;
 	if (__setting_show_navbar)
 	{
@@ -94,7 +99,7 @@ void runMain(string relay_filename)
     if (true)
     {
         //Buttons.
-        //position:absolute holding container, so we can absolutely position these:
+        //position:absolute holding container, so we can absolutely position these, absolutely:
         PageWrite(HTMLGenerateTagPrefix("div", mapMake("style", "position:absolute;" + "width:100%;max-width:" + max_width_setting + "px;")));
         
         string [string] base_image_map;
@@ -204,6 +209,9 @@ void runMain(string relay_filename)
     }
     PageWriteHead("<script type=\"text/javascript\" src=\"relay_Guide.js\"></script>");
     
+    
+    if (drunk)
+        PageWrite("</div>");
     
     if (output_body_tag_only)
     	write(__global_page.body_contents);

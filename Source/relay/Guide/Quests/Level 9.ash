@@ -352,9 +352,9 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
 			if ($item[rusty hedge trimmers].available_amount() > 0)
             {
                 if (!have_at_least_one_usable_option)
-                    details.listAppend("Have " + pluraliseWordy(MIN(4, $item[rusty hedge trimmers].available_amount()), $item[rusty hedge trimmers]) + ".");
+                    details.listAppend("Have " + pluraliseWordy(MIN(options_left.count(), $item[rusty hedge trimmers].available_amount()), $item[rusty hedge trimmers]) + ".");
                 else if ($item[rusty hedge trimmers].available_amount() > 1)
-                    details.listAppend("Use " + pluraliseWordy(MIN(4, $item[rusty hedge trimmers].available_amount()), $item[rusty hedge trimmers]) + ".");
+                    details.listAppend("Use " + pluraliseWordy(MIN(options_left.count(), $item[rusty hedge trimmers].available_amount()), $item[rusty hedge trimmers]) + ".");
                 else
                     details.listAppend("Use rusty hedge trimmers.");
             }

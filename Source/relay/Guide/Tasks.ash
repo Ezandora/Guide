@@ -233,9 +233,12 @@ void generateTasks(Checklist [int] checklists)
         string url = "";
         
         boolean spooky_airport_unlocked = __misc_state["spooky airport available"];
+        boolean stench_airport_unlocked = __misc_state["stench airport available"];
         
         if (__misc_state["Chateau Mantegna available"] && __misc_state_int["free rests remaining"] > 0)
             url = "place.php?whichplace=chateau";
+        else if (stench_airport_unlocked && monster_level_adjustment() >= 150)
+            url = $location[Uncle Gator's Country Fun-Time Liquid Waste Sluice].getClickableURLForLocation();
         else if (spooky_airport_unlocked && ($effect[jungle juiced].have_effect() > 0 || ($item[jungle juice].available_amount() > 0 && availableDrunkenness() > 0 && __misc_state["can drink just about anything"])))
             url = $location[the deep dark jungle].getClickableURLForLocation();
         else if (__misc_state["Chateau Mantegna available"])
@@ -280,7 +283,7 @@ void generateTasks(Checklist [int] checklists)
                     url = "da.php?place=gate3";
             }
                 
-            if (statue_name != "")
+            if (statue_name != "" && !(can_interact() && cost_to_donate_for_level > 20000))
             {
                 buffer line = "Possibly donate ".to_buffer();
                 if (cost_to_donate_for_level == min_cost_to_donate_for_level)
@@ -438,7 +441,7 @@ void generateTasks(Checklist [int] checklists)
             optional_task_entries.listAppend(entry);
 	}
     
-    if (__misc_state["in run"] && (inebriety_limit() == 0 || my_path_id() == PATH_SLOW_AND_STEADY))
+    if (__misc_state["in run"] && (inebriety_limit() == 0 || my_path_id() == PATH_SLOW_AND_STEADY) && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING)
     {
         //may be removed in the future?
         //FIXME does this burn delay?

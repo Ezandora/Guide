@@ -606,7 +606,7 @@ buffer generateLocationBarTable(string [int] table_entries, string [int] table_e
 
 
 
-buffer generateLocationPopup(float bottom_coordinates)
+buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_location_name_is_centre_aligned)
 {
     buffer buf;
     location l = __last_adventure_location;
@@ -791,6 +791,7 @@ buffer generateLocationPopup(float bottom_coordinates)
     int monsters_displayed = 0;
     
     boolean can_display_as_2x = true;
+    boolean spelunking = limit_mode() == "spelunky";
     
     /*if (false) //trying with it off - it feels better to use layout more effectively, rather than try to line up everything. example area: domed city of grimacia
     {
@@ -1099,7 +1100,7 @@ buffer generateLocationPopup(float bottom_coordinates)
                     stats_l1.listAppend(ka_dropped + " ka");
             }
             
-            if (m.expected_damage() > 1 && (m.expected_damage() > my_hp().to_float() * 0.75 || ($monsters[spider gremlin,batwinged gremlin,erudite gremlin,vegetable gremlin] contains m)))
+            if (m.expected_damage() > 1 && (m.expected_damage() > my_hp().to_float() * 0.75 || ($monsters[spider gremlin,batwinged gremlin,erudite gremlin,vegetable gremlin] contains m)) || spelunking)
             {
                 string damage_text = m.expected_damage() + " dmg";
                 if (m.expected_damage() >= 0.75 * my_hp())
@@ -1207,22 +1208,29 @@ buffer generateLocationPopup(float bottom_coordinates)
             }
         }
     }
-    boolean output_hr_override = false;
+    
     
     if (false)
     {
         string [int] lines;
         string [int] lines_offscreen;
-        if (l.parentdesc != "" && l.parentdesc != "No Category")
+        if (false && l.parentdesc != "" && l.parentdesc != "No Category" && l.parentdesc.to_lower_case() != l.to_lower_case())
             lines.listAppend(l.parentdesc);
         if (!__misc_state["in run"] && l.turns_spent > 0)
-            lines_offscreen.listAppend(pluralise(l.turns_spent, "turn spent", "turns spent"));
-        
+        {
+            lines.listAppend(pluralise(l.turns_spent, "turn spent", "turns spent")); //lines_offscreen
+        }
         if (lines.count() + lines_offscreen.count() > 0)
         {
             if (entries_displayed >= 1)
                 buf.append(HTMLGenerateTagPrefix("hr", mapMake("style", "margin:0px;")));
-            buf.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_cl_modifier_inline r_centre", "style", "height:1.1em;")));
+            string div_class = "r_cl_modifier_inline";
+            string div_style = "height:1.1em;padding-top:1px;padding-bottom:1px;";
+            if (location_bar_location_name_is_centre_aligned)
+                div_class += " r_centre";
+            else
+                div_style += "padding-left:" + __setting_indention_width + ";";
+            buf.append(HTMLGenerateTagPrefix("div", mapMake("class", div_class, "style", div_style)));
             buf.append(lines.listJoinComponents(" - "));
             buf.append("</div>");
             if (lines_offscreen.count() > 0)
@@ -1243,10 +1251,8 @@ buffer generateLocationPopup(float bottom_coordinates)
         float [int] fl_entry_width_weight;
         float [int] fl_entry_fixed_width_percentage;
         
-        if (l.parentdesc != "" && l.parentdesc != "No Category")
+        if (false && l.parentdesc != "" && l.parentdesc != "No Category" && l.parentdesc.to_lower_case() != l.to_lower_case())
             fl_entries.listAppend(l.parentdesc);
-        else
-            fl_entries.listAppend("");
         
         /*Error err;
         if (!l.locationAvailable(err))
@@ -1257,10 +1263,6 @@ buffer generateLocationPopup(float bottom_coordinates)
         
         if (!__misc_state["in run"] && l.turns_spent > 0)
             fl_entries.listAppend(pluralise(l.turns_spent, "turn spent", "turns spent"));
-            
-        
-        if (fl_entries.count() == 1)
-            fl_entries.listAppend("");
         
         boolean all_entries_blank = true;
         foreach key, entry in fl_entries
@@ -1276,10 +1278,16 @@ buffer generateLocationPopup(float bottom_coordinates)
             {
                 fl_entry_styles[1] += "text-align:right;";
             }*/
-            fl_entry_styles[0] += "text-align:left;";
-            fl_entry_styles[0] += "padding-left:" + __setting_indention_width + ";";
             foreach key in fl_entries
                 fl_entry_styles[key] += "height:1.25em;";
+                
+            fl_entry_styles[0] += "text-align:left;";
+            fl_entry_styles[0] += "padding-left:" + __setting_indention_width + ";";
+            if (fl_entries.count() > 1)
+            {
+                fl_entry_styles[fl_entries.count() - 1] += "text-align:right;";
+                fl_entry_styles[fl_entries.count() - 1] += "padding-right:" + __setting_indention_width + ";";
+            }
             buf.append(generateLocationBarTable(fl_entries, fl_entry_urls, fl_entry_styles, fl_entry_classes, fl_entry_width_weight, fl_entry_fixed_width_percentage, ""));
             entries_displayed += 1;
             
@@ -1287,6 +1295,8 @@ buffer generateLocationPopup(float bottom_coordinates)
         }
         
     }
+    
+    //boolean output_hr_override = false;
     
     if (entries_displayed == 0)
         return "".to_buffer();

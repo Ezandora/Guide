@@ -49,7 +49,7 @@ void QLevel3GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         need_to_complete_pyramid = false;
     if (__quest_state["Level 11"].finished)
         need_to_complete_pyramid = false;
-    if (need_to_complete_pyramid)
+    if (need_to_complete_pyramid && $item[tangle of rat tails].available_amount() < 6)
     {
         float rat_king_chance = clampNormalf(monster_level_adjustment_for_location($location[the typical tavern cellar]) / 300.0);
         float average_tangles_found = (clampNormalf(rat_king_chance * combat_rate) * 8.5);

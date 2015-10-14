@@ -30,6 +30,7 @@ void computeFatLootTokens()
 {
     int dd_tokens_and_keys_available = 0;
     int tokens_needed = 0;
+    int keys_missing = 0;
     boolean need_boris_key = true;
     boolean need_jarlsberg_key = true;
     boolean need_sneaky_pete_key = true;
@@ -54,7 +55,8 @@ void computeFatLootTokens()
         tokens_needed += 1;
     if (need_sneaky_pete_key)
         tokens_needed += 1;
-        
+    
+    keys_missing = tokens_needed;
     tokens_needed -= $item[fat loot token].available_amount();
     tokens_needed = MAX(0, tokens_needed);
     
@@ -64,6 +66,7 @@ void computeFatLootTokens()
     dd_tokens_and_keys_available += $item[sneaky pete's key].available_amount();
 
     __misc_state_int["fat loot tokens needed"] = MAX(0, tokens_needed);
+    __misc_state_int["hero keys missing"] = keys_missing;
     
     __misc_state_int["DD Tokens and keys available"] = dd_tokens_and_keys_available;
 }
@@ -391,7 +394,7 @@ void setUpState()
 	
 	int pulls_available = 0;
 	pulls_available = pulls_remaining();
-    if (__setting_debug_mode)
+    if (__setting_debug_mode && !can_interact())
         pulls_available = MAX(pulls_available, 4);
 	__misc_state_int["pulls available"] = pulls_available;
 	

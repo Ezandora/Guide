@@ -54,6 +54,14 @@ string generateRandomMessage()
         }
     }
     
+    if (lookupItem("The One Mood Ring").equipped_amount() > 0 || $item[mood ring].equipped_amount() > 0)
+    {
+        string [int] moods = split_string("grateful,awake,accomplished,disappointed,enraged,tired,exhausted,amused,crushed,peaceful,energetic,listless,hyper,jubilant,hungry,sad,bewildered,alone,quixotic,recumbent,bored,excited,relaxed,lonely,curious,guilty,jealous,cheerful,depressed,stressed,infuriated,pleased,crappy,aggravated,okay,rejuvenated,apathetic,bittersweet,optimistic,exanimate,complacent,devious,rejected,blissful,discontent,sympathetic,mellow,refreshed,ecstatic,lazy,morose,dark,mischievous,bouncy,thankful,melancholy,content,drained,numb,uncomfortable,indifferent,groggy,calm,irate,determined,giggly,good,confused,anxious,relieved,mad,accepted,happy,angry,lethargic,shocked,indescribable,satisfied,gloomy,irritated,pessimistic,rushed,frustrated,surprised,annoyed,sleepy,touched,enthralled,cynical,envious,hopeful,ashamed,chipper,loved,giddy,restless", ",");
+        string mood_today = moods[gameday_to_int()];
+        if (mood_today != "")
+            random_messages.listAppend(mood_today);
+    }
+    
 	if (__misc_state["in run"])
     {
         random_messages.listAppend("optimal power, make up!");
@@ -122,6 +130,8 @@ string generateRandomMessage()
     equipment_messages[$item[detective skull]] = HTMLGenerateSpanFont("too slow ascend faster", "#ACA200"); //speakeasy password
     equipment_messages[$item[gasmask]] = "are you my mummy?";
     equipment_messages[$item[spanish fly trap]] = "around the world around the world around the world around the world";
+    if (in_bad_moon() && my_primestat() != $stat[moxie])
+        equipment_messages[$item[sneaky pete's breath spray]] = "every class a moxie class";
     foreach it in $items[twisted-up wet towel,sommelier's towel,time bandit time towel]
         equipment_messages[it] = "don't panic";
     
@@ -218,7 +228,21 @@ string generateRandomMessage()
     random_messages.listAppend(HTMLGenerateTagWrap("a", "check the wiki", mapMake("class", "r_a_undecorated", "href", "http://kol.coldfront.net/thekolwiki/index.php/Main_Page", "target", "_blank")));
     random_messages.listAppend("the RNG is only trying to help");
     if (__misc_state["in run"])
-        random_messages.listAppend("speed ascension is all I have left, " + lowercase_player_name);
+    {
+        int choice = gameday_to_int() & 3;
+        
+        if (choice == 0)
+            random_messages.listAppend("speed ascension is all I have left, " + lowercase_player_name);
+        else if (choice == 1)
+            random_messages.listAppend("let the turns go");
+        else if (choice == 2)
+            random_messages.listAppend("mostly made up");
+        else if (choice == 3)
+            random_messages.listAppend("kingdom of self loathing");
+        if (my_ascensions() >= 1000)
+            random_messages.listAppend("dedicated");
+    }
+    
     if (item_drop_modifier() <= -100.0)
         random_messages.listAppend("let go of your material posessions");
     if ($item[puppet strings].item_amount() > 0 && my_id() != 1557284)
@@ -252,10 +276,9 @@ string generateRandomMessage()
 	if (florist_available())
         random_messages.listAppend(HTMLGenerateTagWrap("a", "the forgotten friar cries himself to sleep", generateMainLinkMap("place.php?whichplace=forestvillage&amp;action=fv_friar")));
     
-	if (!__misc_state["skills temporarily missing"])
+	if (!__misc_state["skills temporarily missing"] && !$skill[Transcendent Olfaction].skill_is_usable())
 	{
-		if (!$skill[Transcendent Olfaction].skill_is_usable())
-            random_messages.listAppend(HTMLGenerateTagWrap("a", "visit the bounty hunter hunter sometime", generateMainLinkMap("bounty.php")));
+        random_messages.listAppend(HTMLGenerateTagWrap("a", "visit the bounty hunter hunter sometime", generateMainLinkMap("bounty.php")));
 	}
     if (__misc_state["in aftercore"])
         random_messages.listAppend(HTMLGenerateTagWrap("a", "ascension is waiting for you", generateMainLinkMap("lair6.php")));
@@ -265,6 +288,13 @@ string generateRandomMessage()
         
     if (__quest_state["Level 11"].in_progress)
         random_messages.listAppend("try not to lose your sanity");
+    if (__quest_state["Level 13"].in_progress)
+    {
+        if (my_daycount() == 1)
+            random_messages.listAppend("all the world's work in a day");
+        else
+            random_messages.listAppend("it'll be all over soon");
+    }
         
     if (!CounterLookup("Semi-rare").CounterIsRange() && CounterLookup("Semi-rare").CounterExists() && CounterLookup("Semi-rare").exact_turns.count() > 1)
         random_messages.listAppend("superpositioned semi-rare");
@@ -427,9 +457,9 @@ string generateRandomMessage()
     monster_messages[$monster[demonic icebox]] = "zuul";
     monster_messages[lookupMonster("angry mushroom guy")] = "touch fizzy, get dizzy";
     beaten_up_monster_messages[$monster[storm cow]] = "<pre>^__^            <br>(oo)\\_______    <br>(__)\\       )\\/\\<br>    ||----w |   <br>    ||     ||   </pre>";
-    beaten_up_monster_messages[lookupMonster("Lavalos")] = "but... the future refused to change";
     monster_messages[lookupMonster("Barrelmech of Diogenes")] = "just let me throw a barrel at it";
     //beaten_up_monster_messages[lookupMonster("Lavalos")] = HTMLGenerateTagWrap("span", "but... the future refused to change", mapMake("onclick", "var l = new Audio('" + __lavalos_sound_data + "'); l.play();", "class", "r_clickable")); //copyright, etc
+    beaten_up_monster_messages[lookupMonster("Lavalos")] = "but... the future refused to change";
     if (current_hour >= 5 && current_hour <= 11)
         monster_messages[lookupMonster("Lavalos")] = "good morning, " + lowercase_player_name + "!";
     else

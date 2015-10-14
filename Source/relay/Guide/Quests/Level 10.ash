@@ -116,9 +116,13 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                     subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
             }
             
+            boolean have_more_than_enough_sgeeas = false;
+            if ($item[soft green echo eyedrop antidote].available_amount() >= 30 || can_interact())
+                have_more_than_enough_sgeeas = true;
+            
             string [int] things_we_want_item_for;
             
-            if ($skill[Transcendent Olfaction].skill_is_usable())
+            if ($skill[Transcendent Olfaction].skill_is_usable() && !have_more_than_enough_sgeeas)
             {
                 string line = "SGEEA";
                 if ($item[soft green echo eyedrop antidote].available_amount() > 0)
@@ -152,13 +156,12 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 }
             }
             
-            
             //FIXME it would be nice to track this
             if (turns_spent == -1)
                 subentry.entries.listAppend("25 total turns of delay.");
             else if (turns_spent < 25)
                 subentry.entries.listAppend(pluralise(25 - turns_spent, "turn", "turns") + " total delay remaining.");
-            if ($skill[Transcendent Olfaction].skill_is_usable() && !($effect[on the trail].have_effect() > 0 && get_property("olfactedMonster") == "Quiet Healer"))
+            if ($skill[Transcendent Olfaction].skill_is_usable() && !($effect[on the trail].have_effect() > 0 && get_property("olfactedMonster") == "Quiet Healer") && !have_more_than_enough_sgeeas)
                 subentry.entries.listAppend("Potentially olfact quiet healer for SGEEAs");
             
             if ($items[amulet of extreme plot significance,mohawk wig].items_missing().count() > 0 && $familiar[slimeling].familiar_is_usable())
