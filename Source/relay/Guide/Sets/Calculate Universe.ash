@@ -131,22 +131,23 @@ void SCalculateUniverseGenerateResource(ChecklistEntry [int] resource_entries)
     {
         for digit from 0 to 99
         {
-            if (!($ints[24,39,42,46,52,53,54,55,56,61,62,64,73,76,81,82,86,94,95] contains digit)) //Try Again FIXME all
+            if (!($ints[24,25,26,28,29,31,32,39,41,42,46,52,53,54,55,56,59,60,61,62,64,65,67,72,73,74,76,79,80,81,82,84,85,86,91,92,94,95,96] contains digit)) //Try Again FIXME all
                 useful_digits_and_their_reasons[digit] = "";
         }
     }
     //Set up useful digits:
     
     if (my_path_id() != PATH_SLOW_AND_STEADY)
-        useful_digits_and_their_reasons[36] = "+2 adventures";
+        useful_digits_and_their_reasons[69] = "+3 adventures";
     if (hippy_stone_broken())
-        useful_digits_and_their_reasons[21] = "+1 fight";
+        useful_digits_and_their_reasons[37] = "+3 fights";
     if (__misc_state["in run"])
     {
         if (!have_outfit_components("War Hippy Fatigues") && !have_outfit_components("Frat Warrior Fatigues") && !__quest_state["Level 12"].finished)
             useful_digits_and_their_reasons[51] = "War frat orc to YR";
     }
     
+    //useful_digits_and_their_reasons[44] = "is very bad to steal jobu's rum";
     
     //Run complicated calculation code:
     boolean [int] desired_digits;

@@ -290,7 +290,7 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
     else
     {
         //aftercore:
-        potential_faxes.listAppend("Adventurer Echo - event chroner");
+        //potential_faxes.listAppend("Adventurer Echo - event chroner");
         potential_faxes.listAppend("Clod Hopper (YR/+item) - floaty sand");
         potential_faxes.listAppend("Swarm of fudgewasps - fudge");
     }
