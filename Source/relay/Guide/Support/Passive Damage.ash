@@ -99,7 +99,7 @@ static
             __known_sources.listExactLastObject().PassiveDamageSourceAddDamage(1);
             __known_sources.listExactLastObject().source_equipment = it;
         }
-        foreach e in $effects[Skeletal Warrior,Skeletal Cleric,Skeletal Wizard,Bone Homie,Burning\, Man,Biologically Shocked,EVISCERATE!,Fangs and Pangs,Permanent Halloween,Curse of the Black Pearl Onion,Long Live GORF,Apoplectic with Rage,Dizzy with Rage,Quivering with Rage,Jaba&ntilde;ero Saucesphere,Psalm of Pointiness,Drenched With Filth,Stuck-Up Hair,It's Electric!,Smokin',Jalape&ntilde;o Saucesphere,Scarysauce,spiky shell]
+        foreach e in $effects[Skeletal Warrior,Skeletal Cleric,Skeletal Wizard,Bone Homie,Burning\, Man,Biologically Shocked,EVISCERATE!,Fangs and Pangs,Permanent Halloween,Curse of the Black Pearl Onion,Long Live GORF,Apoplectic with Rage,Dizzy with Rage,Quivering with Rage,Jaba&ntilde;ero Saucesphere,Psalm of Pointiness,Drenched With Filth,Stuck-Up Hair,It's Electric!,Smokin',Jalape&ntilde;o Saucesphere,Scarysauce,spiky shell,Boner Battalion]
         {
             __known_sources.listAppend(PassiveDamageSourceMake(PDS_DAMAGE_TYPE_ACTIVE, PDS_SOURCE_TYPE_EFFECT));
             __known_sources.listExactLastObject().PassiveDamageSourceAddDamage(1);
