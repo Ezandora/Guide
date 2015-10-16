@@ -2,7 +2,7 @@
 
 since 17.1; //the earliest main release that is usable in modern KOL (unequip bug)
 //These settings are for development. Don't worry about editing them.
-string __version = "1.3.3";
+string __version = "1.3.4";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -12566,7 +12566,7 @@ static
             __known_sources.listExactLastObject().PassiveDamageSourceAddDamage(1);
             __known_sources.listExactLastObject().source_equipment = it;
         }
-        foreach e in $effects[Skeletal Warrior,Skeletal Cleric,Skeletal Wizard,Bone Homie,Burning\, Man,Biologically Shocked,EVISCERATE!,Fangs and Pangs,Permanent Halloween,Curse of the Black Pearl Onion,Long Live GORF,Apoplectic with Rage,Dizzy with Rage,Quivering with Rage,Jaba&ntilde;ero Saucesphere,Psalm of Pointiness,Drenched With Filth,Stuck-Up Hair,It's Electric!,Smokin',Jalape&ntilde;o Saucesphere,Scarysauce,spiky shell]
+        foreach e in $effects[Skeletal Warrior,Skeletal Cleric,Skeletal Wizard,Bone Homie,Burning\, Man,Biologically Shocked,EVISCERATE!,Fangs and Pangs,Permanent Halloween,Curse of the Black Pearl Onion,Long Live GORF,Apoplectic with Rage,Dizzy with Rage,Quivering with Rage,Jaba&ntilde;ero Saucesphere,Psalm of Pointiness,Drenched With Filth,Stuck-Up Hair,It's Electric!,Smokin',Jalape&ntilde;o Saucesphere,Scarysauce,spiky shell,Boner Battalion]
         {
             __known_sources.listAppend(PassiveDamageSourceMake(PDS_DAMAGE_TYPE_ACTIVE, PDS_SOURCE_TYPE_EFFECT));
             __known_sources.listExactLastObject().PassiveDamageSourceAddDamage(1);
@@ -30822,16 +30822,17 @@ static
 	int [string] __moon_sign_id_lookup;
 	void initialiseMoonSignIDLookup()
 	{
-		__moon_sign_id_lookup["Mongoose"] = 0;
-		__moon_sign_id_lookup["Wallaby"] = 1;
-		__moon_sign_id_lookup["Vole"] = 2;
-		__moon_sign_id_lookup["Platypus"] = 3;
-		__moon_sign_id_lookup["Opossum"] = 4;
-		__moon_sign_id_lookup["Marmot"] = 5;
-		__moon_sign_id_lookup["Wombat"] = 6;
-		__moon_sign_id_lookup["Blender"] = 7;
-		__moon_sign_id_lookup["Packrat"] = 8;
-		__moon_sign_id_lookup["Bad Moon"] = 9; //?????
+        __moon_sign_id_lookup[""] = 0; //???
+		__moon_sign_id_lookup["Mongoose"] = 1;
+		__moon_sign_id_lookup["Wallaby"] = 2;
+		__moon_sign_id_lookup["Vole"] = 3;
+		__moon_sign_id_lookup["Platypus"] = 4;
+		__moon_sign_id_lookup["Opossum"] = 5;
+		__moon_sign_id_lookup["Marmot"] = 6;
+		__moon_sign_id_lookup["Wombat"] = 7;
+		__moon_sign_id_lookup["Blender"] = 8;
+		__moon_sign_id_lookup["Packrat"] = 9;
+		__moon_sign_id_lookup["Bad Moon"] = 10; //?????
 	}
 	initialiseMoonSignIDLookup();
 }
@@ -30859,6 +30860,9 @@ static
 
 void calculateNumberologyInputValuesForOutputs(boolean [int] desired_digits_in, int [int] digit_inputs_to_outputs_out, int [int] digit_inputs_to_deltas_out)
 {
+    if (!(__moon_sign_id_lookup contains my_sign())) //not computable
+        return;
+    
 	boolean [int] desired_digits_left;
 	foreach digit in desired_digits_in
 	{
@@ -30867,9 +30871,8 @@ void calculateNumberologyInputValuesForOutputs(boolean [int] desired_digits_in, 
 	}
 	int mood_sign_id = __moon_sign_id_lookup[my_sign()];
 	
-	int lifetimes = my_ascensions() + 1;
 	int b = my_spleen_use() + my_level();
-	int c = ((my_ascensions() + 1) + mood_sign_id) * b + my_adventures();
+	int c = (my_ascensions() + mood_sign_id) * b + my_adventures();
 	
 	if (__numberology_cache.b == b && __numberology_cache.c == c)
 	{
@@ -30911,8 +30914,14 @@ void calculateNumberologyInputValuesForOutputs(boolean [int] desired_digits_in, 
 		foreach digit in desired_digits_left
 		{
 			int delta = digit - last_two_digits;
-			if (delta < 0)
+			if (delta <= 0)
 				digit_inputs_to_deltas_out[digit] = min(digit_inputs_to_deltas_out[digit], -delta);
+			else
+			{
+				delta = digit - (last_two_digits + 100);
+				if (delta <= 0)
+                    digit_inputs_to_deltas_out[digit] = min(digit_inputs_to_deltas_out[digit], -delta);
+			}
 		}
 	}
     
@@ -30934,8 +30943,6 @@ void calculateNumberologyInputValuesForOutputs(boolean [int] desired_digits_in, 
 	foreach input, delta in digit_inputs_to_deltas_out
 		__numberology_cache.input_deltas[input] = delta;
 }
-
-
 void SCalculateUniverseGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (!lookupSkill("Calculate the Universe").have_skill())
