@@ -49,7 +49,7 @@ void generateMisc(Checklist [int] checklists)
             description.listAppend("Or equip your wineglass.");
         }
         
-        if (!can_interact()) //after that, clan furniture affects it, so we can't give accurate readings
+        if (in_ronin()) //after that, clan furniture affects it, so we can't give accurate readings
         {
             int adventures_after_rollover = my_adventures() + 40;
             if (my_path_id() != PATH_SLOW_AND_STEADY)
@@ -104,7 +104,7 @@ void generateMisc(Checklist [int] checklists)
                 description.listAppend("Could unpop your collar. (+4 adventures)");
             if ($item[Sneaky Pete's leather jacket].equipped_amount() > 0 && hippy_stone_broken())
                 description.listAppend("Could pop your collar. (+4 fights)");
-            if (!can_interact() && $item[resolution: be more adventurous].available_amount() > 0 && get_property_int("_resolutionAdv") < 5)
+            if (in_ronin() && $item[resolution: be more adventurous].available_amount() > 0 && get_property_int("_resolutionAdv") < 5)
             {
                 description.listAppend("Use resolution: be more adventurous.");
             }

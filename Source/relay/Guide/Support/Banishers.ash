@@ -50,7 +50,9 @@ static
     __banish_source_length["thunder clap"] = 40;
     __banish_source_length["v for vivala mask"] = 10;
     __banish_source_length["walk away from explosion"] = 30;
+    __banish_source_length["tennis ball"] = 30;
     __banish_source_length["curse of vacation"] = -1;
+    __banish_source_length["ice hotel bell"] = -1; //think?
 }
 
 Banish [int] __banishes_active_cache;

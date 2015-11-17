@@ -305,7 +305,9 @@ void QSleazeAirportGenerateResource(ChecklistEntry [int] resource_entries)
             if ($effect[fishy].have_effect() == 0)
                 description.listAppend("Possibly acquire fishy effect first.");
             
-            resource_entries.listAppend(ChecklistEntryMake("__item ultimate mind destroyer", $location[The Sunken Party Yacht].getClickableURLForLocation(), ChecklistSubentryMake("Ultimate Mind Destroyer collectable", "free runs", description), $locations[The Sunken Party Yacht]));
+            ChecklistEntry entry = ChecklistEntryMake("__item ultimate mind destroyer", $location[The Sunken Party Yacht].getClickableURLForLocation(), ChecklistSubentryMake("Ultimate Mind Destroyer collectable", "free runs", description), $locations[The Sunken Party Yacht]);
+            entry.importance_level = 8;
+            resource_entries.listAppend(entry);
         }
     }
 }
@@ -679,7 +681,7 @@ void QSpookyAirportWeirdeauxGenerateTasks(ChecklistEntry [int] task_entries)
 {
     if (__last_adventure_location != $location[The Mansion of Dr. Weirdeaux] || my_level() >= 256)
         return;
-    if (!can_interact())
+    if (in_ronin())
         return;
     if (QuestState("questESpClipper").in_progress)
         return;
@@ -1102,7 +1104,7 @@ void QStenchAirportGiveMeFuelGenerateTasks(ChecklistEntry [int] task_entries)
     if ($item[toxic globule].available_amount() < 20)
     {
         int globules_needed = clampi(20 - $item[toxic globule].available_amount(), 0, 20);
-        if (can_interact())
+        if (!in_ronin())
         {
             subentry.entries.listAppend("Buy " + pluralise(globules_needed, "more toxic globule", "more toxic globules") + " in the mall.");
             url = "mall.php";
@@ -1145,7 +1147,7 @@ void QStenchAirportGarbageGenerateTasks(ChecklistEntry [int] task_entries)
     else if ($item[bag of park garbage].available_amount() > 0)
     {
     }
-    else if (can_interact())
+    else if (!in_ronin())
     {
         
     }
@@ -1244,7 +1246,7 @@ void QStenchAirportGenerateTasks(ChecklistEntry [int] task_entries)
 
 void QHotAirportLavaCoLampGenerateTasks(ChecklistEntry [int] task_entries)
 {
-    if (!can_interact())
+    if (in_ronin())
         return;
         
     if (__last_adventure_location != lookupLocation("LavaCo&trade; Lamp Factory")) //dave's not here, man
@@ -1511,6 +1513,122 @@ void QHotAirportGenerateResource(ChecklistEntry [int] resource_entries)
     }
 }
 
+void QColdAirportGenerateTasks(ChecklistEntry [int] task_entries)
+{
+    if (!__misc_state["cold airport available"])
+        return;
+    if (lookupItem("Walford's bucket").available_amount() > 0 && QuestState("questECoBucket").in_progress) //need quest tracking as well, you keep the bucket
+    {
+        string title = "";
+        string [int] modifiers;
+        string [int] description;
+        string url = lookupLocation("The Ice Hotel").getClickableURLForLocation();
+        int progress = get_property_int("walfordBucketProgress");
+        if (progress >= 100)
+        {
+            url = "place.php?whichplace=airport_cold&action=glac_walrus";
+            title = "Talk to Walford";
+            description.listAppend("Turn in the quest.");
+        }
+        else
+        {
+            string desired_item = get_property("walfordBucketItem").to_lower_case();
+            title = "Walford's quest";
+            
+            modifiers.listAppend("-combat");
+            string [int] options;
+            
+            options.listAppend("The Ice Hole" + ($effect[fishy].have_effect() == 0 ? " with fishy" : "") + ". (5% per turn)");
+            
+            string [int] tasks;
+            string hotel_string = "The Ice Hotel.";
+            boolean nc_helps_in_hotel = true;
+            if (desired_item == "milk" || desired_item == "rain")
+                nc_helps_in_hotel = false;
+            if (nc_helps_in_hotel)
+            {
+                if (lookupItem("bellhop's hat").equipped_amount() == 0 && desired_item != "moonbeams")
+                    tasks.listAppend("equip bellhop's hat");
+                tasks.listAppend("run -combat");
+            }
+            if (desired_item == "moonbeams" && $slot[hat].equipped_item() != $item[none])
+            {
+                tasks.listAppend("unequip your hat");
+            }
+            if (desired_item == "blood")
+                tasks.listAppend("use tin snips every fight");
+            if (desired_item == "chicken" && numeric_modifier("food drop") < 50.0)
+            {
+                modifiers.listAppend("+50% food drop");
+                tasks.listAppend("run +50% food drop");
+            }
+            if (desired_item == "milk" && numeric_modifier("booze drop") < 50.0)
+            {
+                modifiers.listAppend("+50% booze drop");
+                tasks.listAppend("run +50% booze drop");
+            }
+            if (desired_item == "rain")
+                tasks.listAppend("cast hot spells");
+            //FIXME verify all (ice?)
+            
+            if (!get_property_boolean("_iceHotelRoomsRaided"))
+                tasks.listAppend("collect once/day certificates");
+            if (tasks.count() > 0)
+                hotel_string += " " + tasks.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".";
+            
+            options.listAppend(hotel_string);
+            
+            tasks.listClear();
+            string vkyea_string = "VYKEA.";
+            boolean nc_helps_in_vykea = true;
+            if (desired_item == "blood")
+                nc_helps_in_vykea = false;
+            if (nc_helps_in_vykea)
+            {
+                tasks.listAppend("run -combat");
+            }
+            if (desired_item == "moonbeams" && $slot[hat].equipped_item() != $item[none])
+            {
+                tasks.listAppend("unequip your hat");
+            }
+            if (desired_item == "blood")
+                tasks.listAppend("use tin snips every fight");
+            if (desired_item == "bolts" && lookupItem("VYKEA hex key").equipped_amount() == 0)
+                tasks.listAppend("equip VYKEA hex key");
+            if (desired_item == "chum" && meat_drop_modifier() < 250.0)
+            {
+                modifiers.listAppend("+250% meat");
+                tasks.listAppend("run +250% meat");
+            }
+            if (desired_item == "balls" && item_drop_modifier() < 50)
+            {
+                modifiers.listAppend("+50% item");
+                tasks.listAppend("run +50% item");
+            }
+            if (!get_property_boolean("_VYKEALoungeRaided"))
+                tasks.listAppend("collect once/day certificates");
+            
+            if (tasks.count() > 0)
+                vkyea_string += " " + tasks.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".";
+            
+            options.listAppend(vkyea_string);
+            
+            tasks.listClear();
+            if (lookupItem("Walford's bucket").equipped_amount() == 0)
+            {
+                url = "inventory.php?which=2";
+                tasks.listAppend("equip walford's bucket");
+            }
+            tasks.listAppend("adventure on the glacier");
+            description.listAppend(tasks.listJoinComponents(", ", "then").capitaliseFirstLetter() + ":|*" + options.listJoinComponents("<hr>|*"));
+            
+            
+            description.listAppend(progress + "% done collecting " + desired_item + ".");
+        }
+        task_entries.listAppend(ChecklistEntryMake("__item Walford's bucket", url, ChecklistSubentryMake(title, modifiers, description), lookupLocations("The Ice Hotel,VYKEA,The Ice Hole")));
+    }
+}
+
 void QAirportGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     ChecklistEntry [int] chosen_entries = optional_task_entries;
@@ -1521,6 +1639,7 @@ void QAirportGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     QSpookyAirportGenerateTasks(chosen_entries);
     QStenchAirportGenerateTasks(chosen_entries);
     QHotAirportGenerateTasks(chosen_entries);
+    QColdAirportGenerateTasks(chosen_entries);
 }
 
 void QAirportGenerateResource(ChecklistEntry [int] resource_entries)

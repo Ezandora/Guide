@@ -997,6 +997,8 @@ static
             lookup_map[s] = "place.php?whichplace=airport_stench";
         foreach s in $strings[The SMOOCH Army HQ,The Velvet / Gold Mine,LavaCo&trade; Lamp Factory,The Bubblin' Caldera]
             lookup_map[s] = "place.php?whichplace=airport_hot";
+        foreach s in $strings[The Ice Hotel,VYKEA,The Ice Hole]
+            lookup_map[s] = "place.php?whichplace=airport_cold";
         lookup_map["The Velvet / Gold Mine (Mining)"] = "mining.php?mine=6";
         foreach s in $strings[The Mines,The Jungle,The Ice Caves,The Temple Ruins,Hell,The Snake Pit,The Spider Hole,The Ancient Burial Ground,The Beehive,the crashed u. f. o.,The City of Goooold,LOLmec's Lair,Yomama's Throne]
             lookup_map[s] = "place.php?whichplace=spelunky";

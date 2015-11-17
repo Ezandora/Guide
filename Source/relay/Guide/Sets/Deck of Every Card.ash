@@ -78,7 +78,7 @@ void SDeckOfEveryCardGenerateResource(ChecklistEntry [int] resource_entries)
     
     DOECSummon [int] summons;
     
-    if (in_run && (__misc_state_int["fat loot tokens needed"] > 0 || (can_interact() && __misc_state_int["hero keys missing"] > 0)))
+    if (in_run && (__misc_state_int["fat loot tokens needed"] > 0 || (!in_ronin() && __misc_state_int["hero keys missing"] > 0)))
         summons.listAppend(DOECSummonMake("XVI - The Tower", "Daily Dungeon key."));
     
     

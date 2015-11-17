@@ -35,7 +35,7 @@ void STomesGenerateResource(ChecklistEntry [int] resource_entries)
         if (tome_count == 0)
             return;
 		
-        if (!can_interact())
+        if (in_ronin())
         {
             int summons_remaining = 3 - get_property_int("tomeSummons");
             subentries.listAppend(ChecklistSubentryMake(pluralise(summons_remaining, "tome summon", "tome summons") + " remaining", "", ""));
@@ -183,7 +183,7 @@ void STomesGenerateResource(ChecklistEntry [int] resource_entries)
 		
         
         ChecklistEntry entry = ChecklistEntryMake("__item tome of clip art", "campground.php?action=bookshelf", subentries);
-        if (!can_interact())
+        if (in_ronin())
             entry.should_indent_after_first_subentry = true;
         resource_entries.listAppend(entry);
 	}

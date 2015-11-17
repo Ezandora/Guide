@@ -36,6 +36,8 @@ void SSugarGenerateResource(ChecklistEntry [int] resource_entries)
         if (it.available_amount() == 0)
             continue;
         int counter = get_property_int("sugarCounter" + it.to_int());
+        if (counter == 0 && !__misc_state["in run"]) //in aftercore, probably not as relevant
+            continue;
         int combats_left = 31 - counter;
         subentries.listAppend(ChecklistSubentryMake(pluralise(it), "", pluralise(combats_left, "combat", "combats") + " left."));
         if (image_name.length() == 0)

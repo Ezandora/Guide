@@ -174,7 +174,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             item_effects[$item[orange snowcone]] = $effect[Orange Tongue];
         }
         
-        if (!can_interact())
+        if (in_ronin())
         {
             item_descriptions[$item[Effermint&trade; tablets]] = "+1.5 mainstat/fight (10 turns)";
         }
@@ -188,7 +188,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             item_descriptions[$item[resolution: be sexier]] = "+2 moxie stats/fight (20 turns)";
             item_effects[$item[resolution: be sexier]] = $effect[Irresistible Resolve];
             
-            if (!can_interact() && !in_bad_moon())
+            if (in_ronin() && !in_bad_moon())
             {
                 item_descriptions[$item[old bronzer]] = "+2 moxie stats/fight (25 turns)";
                 item_effects[$item[old bronzer]] = $effect[Sepia Tan];
@@ -205,7 +205,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             item_effects[$item[resolution: be stronger]] = $effect[Strong Resolve];
             
             
-            if (!can_interact() && !in_bad_moon())
+            if (in_ronin() && !in_bad_moon())
             {
                 item_descriptions[$item[old eyebrow pencil]] = "+2 muscle stats/fight (25 turns)";
                 item_effects[$item[old eyebrow pencil]] = $effect[Browbeaten];
@@ -221,7 +221,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             item_effects[$item[resolution: be smarter]] = $effect[Brilliant Resolve];
             
             
-            if (!can_interact() && !in_bad_moon())
+            if (in_ronin() && !in_bad_moon())
             {
                 item_descriptions[$item[old rosewater cream]] = "+2 mysticality stats/fight (25 turns)";
                 item_effects[$item[old rosewater cream]] = $effect[Rosewater Mark];

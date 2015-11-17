@@ -394,7 +394,7 @@ void setUpState()
 	
 	int pulls_available = 0;
 	pulls_available = pulls_remaining();
-    if (__setting_debug_mode && !can_interact())
+    if (__setting_debug_mode && in_ronin())
         pulls_available = MAX(pulls_available, 4);
 	__misc_state_int["pulls available"] = pulls_available;
 	
@@ -732,7 +732,7 @@ void setUpState()
         soda_cost = $item[black cherry soda].npc_price();
     else if (dispensary_available())
         soda_cost = $item[knob goblin seltzer].npc_price();
-    else if (can_interact()) //can't buy from NPC, so have to use mall price:
+    else if (!in_ronin()) //can't buy from NPC, so have to use mall price:
         soda_cost = $item[knob goblin seltzer].mall_price();
     
     if (soda_cost > 0.0)

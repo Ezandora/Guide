@@ -343,7 +343,7 @@ int available_amount(item [int] items)
 
 int available_amount_ignoring_storage(item it)
 {
-    if (can_interact())
+    if (!in_ronin())
         return it.available_amount() - it.storage_amount();
     else
         return it.available_amount();

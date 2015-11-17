@@ -13,12 +13,11 @@ void SCalculateUniverseGenerateResource(ChecklistEntry [int] resource_entries)
     {
         for digit from 0 to 99
         {
-            if (!($ints[24,25,26,28,29,31,32,39,41,42,46,52,53,54,55,56,59,60,61,62,64,65,67,72,73,74,76,79,80,81,82,84,85,86,91,92,94,95,96] contains digit)) //Try Again FIXME all
+            if (!($ints[24,25,26,28,29,31,32,39,41,42,46,52,53,54,55,56,59,60,61,62,64,65,67,72,73,74,76,79,80,81,82,84,85,86,91,92,94,95,96] contains digit)) //Try Again
                 useful_digits_and_their_reasons[digit] = "";
         }
     }
     //Set up useful digits:
-    
     if (my_path_id() != PATH_SLOW_AND_STEADY)
         useful_digits_and_their_reasons[69] = "+3 adventures";
     if (hippy_stone_broken())
@@ -27,6 +26,22 @@ void SCalculateUniverseGenerateResource(ChecklistEntry [int] resource_entries)
     {
         if (!have_outfit_components("War Hippy Fatigues") && !have_outfit_components("Frat Warrior Fatigues") && !__quest_state["Level 12"].finished)
             useful_digits_and_their_reasons[51] = "War frat orc to YR";
+        useful_digits_and_their_reasons[14] = "1400 meat (autosell 14 moxie weeds)";
+        
+        int ice_cubes_needing_creation = lookupItem("perfect ice cube").available_amount();
+        if (lookupSkill("Perfect Freeze").skill_is_usable() && !get_property_boolean("_perfectFreezeUsed"))
+            ice_cubes_needing_creation += 1;
+        if (ice_cubes_needing_creation > 0 && $items[bottle of rum,bottle of vodka,boxed wine,bottle of gin,bottle of whiskey,bottle of tequila].available_amount() < ice_cubes_needing_creation)
+        {
+            //FIXME 18, 44, 75, and 99 are all valid for this - pick whichever we can summon now?
+            useful_digits_and_their_reasons[99] = "base booze for perfect ice cube";
+        }
+    }
+    if (my_level() < 13)
+    {
+        //making a guess here - 89 is 89 mainstat with bonus experience percent (seems logical with the limited data we have)
+        float mainstat_gained = 89.0 * (1.0 + numeric_modifier(my_primestat() + " experience percent") / 100.0);
+        useful_digits_and_their_reasons[89] = roundForOutput(mainstat_gained, 0) + " mainstats";
     }
     
     //useful_digits_and_their_reasons[44] = "is very bad to steal jobu's rum";
@@ -91,5 +106,5 @@ void SCalculateUniverseGenerateResource(ChecklistEntry [int] resource_entries)
         description.listAppend("Cast skill, enter the right number: (this changes, and is still being spaded)|*" + HTMLGenerateSimpleTableLines(table));
     else
         description.listAppend("Cast skill, enter the right number.");
-    resource_entries.listAppend(ChecklistEntryMake("__skill Calculate the Universe", "skillz.php", ChecklistSubentryMake("Calculate the Universe", "", description), 8));
+    resource_entries.listAppend(ChecklistEntryMake("__skill Calculate the Universe", "skillz.php", ChecklistSubentryMake("Calculate the Universe", "", description), 0));
 }

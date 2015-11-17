@@ -48,3 +48,4 @@ import "relay/Guide/Sets/Barrel God.ash";
 import "relay/Guide/Sets/Tea Tree.ash";
 import "relay/Guide/Sets/Haunted Doghouse.ash";
 import "relay/Guide/Sets/Calculate Universe.ash";
+import "relay/Guide/Sets/PVP.ash";

@@ -13,7 +13,7 @@ static
 		__moon_sign_id_lookup["Wombat"] = 7;
 		__moon_sign_id_lookup["Blender"] = 8;
 		__moon_sign_id_lookup["Packrat"] = 9;
-		__moon_sign_id_lookup["Bad Moon"] = 10; //?????
+		__moon_sign_id_lookup["Bad Moon"] = 10; //confirmed
 	}
 	initialiseMoonSignIDLookup();
 }
@@ -105,14 +105,6 @@ void calculateNumberologyInputValuesForOutputs(boolean [int] desired_digits_in, 
 			}
 		}
 	}
-    
-    /*
-    //Covered by loop above, I think
-    foreach digit in digit_inputs_to_outputs_out
-    {
-        if (digit_inputs_to_deltas_out contains digit)
-            remove digit_inputs_to_deltas_out[digit];
-    }*/
 	
 	//Save cache:
 	if (__numberology_cache.b != b || __numberology_cache.c != c)

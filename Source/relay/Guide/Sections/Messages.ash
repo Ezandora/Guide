@@ -130,6 +130,7 @@ string generateRandomMessage()
     equipment_messages[$item[detective skull]] = HTMLGenerateSpanFont("too slow ascend faster", "#ACA200"); //speakeasy password
     equipment_messages[$item[gasmask]] = "are you my mummy?";
     equipment_messages[$item[spanish fly trap]] = "around the world around the world around the world around the world";
+    equipment_messages[$item[wand of nagamar]] = "levi OH sa";
     if (in_bad_moon() && my_primestat() != $stat[moxie])
         equipment_messages[$item[sneaky pete's breath spray]] = "every class a moxie class";
     foreach it in $items[twisted-up wet towel,sommelier's towel,time bandit time towel]
@@ -621,11 +622,12 @@ string generateRandomMessage()
     
     if (format_today_to_string("YYYYMMdd") == "20151021") //october 21st, 2015
     {
+        //kept active for any time travelers
 		random_messages.listClear();
         if (get_property("System.user.country.format") == "US")
-            random_messages.listAppend("88 MPH");
+            random_messages.listAppend("88 MPH<br>hey, you did it!");
         else
-            random_messages.listAppend("142 KPH");
+            random_messages.listAppend("142 km/h<br>hey, you did it!");
     }
     
     

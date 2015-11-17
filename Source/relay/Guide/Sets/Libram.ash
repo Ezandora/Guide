@@ -57,7 +57,7 @@ void SLibramGenerateResource(ChecklistEntry [int] resource_entries)
 		}
 		
 		
-		if ($skill[summon brickos].skill_is_usable())
+		if ($skill[summon brickos].skill_is_usable() && __misc_state["in run"])
 		{
 			if (get_property_int("_brickoEyeSummons") <3)
 			{

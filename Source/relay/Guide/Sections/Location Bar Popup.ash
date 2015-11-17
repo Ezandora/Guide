@@ -194,6 +194,7 @@ buffer generateItemInformationMethod2(location l, monster m, boolean try_for_min
         boolean item_is_pickpockable_only = r.type.contains_text("p");
         boolean item_cannot_be_pickpocketed = r.type.contains_text("n"); //FIXME use this for anything?
         boolean item_rate_is_fixed = r.type.contains_text("f");
+        boolean item_is_avatar_potion = r.drop.to_effect().string_modifier("Avatar") != "";
         boolean grey_out_item = false;
         if (item_is_stealable_accordion && my_class() != $class[accordion thief])
         {
@@ -352,6 +353,8 @@ buffer generateItemInformationMethod2(location l, monster m, boolean try_for_min
             info.tags.listAppend("pickpocket");
         if (item_rate_is_fixed)
             info.tags.listAppend("unaffected by +item");
+        if (item_is_avatar_potion)
+            info.tags.listAppend("avatar");
         info.greyed_out = grey_out_item;
         
         items_presenting.listAppend(info);

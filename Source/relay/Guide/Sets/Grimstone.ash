@@ -127,6 +127,9 @@ void SGrimstoneStepmotherGenerateTasks(ChecklistEntry [int] task_entries, Checkl
     if (minutes_to_midnight <= 0)
         return;
     
+    if (__misc_state["in run"] && !($locations[the prince's kitchen,the prince's balcony,the prince's lounge,the prince's canapes table,the prince's restroom,the prince's dance floor] contains __last_adventure_location) && minutes_to_midnight < 30)
+        return;
+    
     int score = get_property_int("cinderellaScore");
     string [int] description;
     string [int] modifiers;
@@ -242,7 +245,6 @@ void SGrimstoneStepmotherGenerateTasks(ChecklistEntry [int] task_entries, Checkl
         description.listAppend("Though, this is a fun puzzle to solve on your own.");
     }
     
-    
     //FIXME add suggestions for other two trophies (partners in crime, ending party early)
 	optional_task_entries.listAppend(ChecklistEntryMake("__item long-stemmed rose", "place.php?whichplace=ioty2014_cindy", ChecklistSubentryMake("The Prince's Ball", modifiers, description)));
 }
@@ -268,7 +270,7 @@ void SGrimstoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     //rumpelstiltskinTurnsUsed gives number of turns used getting materials. rumpelstiltskinKidsRescued gives the number of children rescued. It is likely that there are more messages than are documented on the wiki, so if some are missing and aren't parsed correctly, please put a note in the forum.
     //cinderellaMinutesToMidnight gives number of turns remaining. cinderellaScore gives the current score. Also added grimstoneMaskPath which gives the current grimstone content available, "stepmother", "wolf", "witch", "gnome" or "hare".
     
-    string mask_path = get_property("grimstoneMaskPath");
+    string mask_path = get_property("grimstoneMaskPath").to_lower_case();
     
     if ($effect[hare-brained].have_effect() > 0)
         SGrimstoneHareGenerateTasks(task_entries, optional_task_entries, future_task_entries);

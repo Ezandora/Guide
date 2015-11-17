@@ -117,7 +117,7 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             }
             
             boolean have_more_than_enough_sgeeas = false;
-            if ($item[soft green echo eyedrop antidote].available_amount() >= 30 || can_interact())
+            if ($item[soft green echo eyedrop antidote].available_amount() >= 30 || !in_ronin())
                 have_more_than_enough_sgeeas = true;
             
             string [int] things_we_want_item_for;

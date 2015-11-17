@@ -7,11 +7,11 @@ __flavour_lookup[$element[stench]] = $effect[Spirit of Garlic];
 __flavour_lookup[$element[spooky]] = $effect[Spirit of Wormwood];
 __flavour_lookup[$element[sleaze]] = $effect[Spirit of Bacon Grease];
 
-float damageForElementAgainstElement(float base_damage, element attacking_element, element defense_element)
+float damageForElementAgainstElement(float base_damage, element attacking_element, element defence_element)
 {
-    if (defense_element == $element[none])
+    if (defence_element == $element[none])
         return base_damage;
-    if (attacking_element == defense_element)
+    if (attacking_element == defence_element)
         return 1;
     
     boolean [element] relevant_elements = $elements[sleaze,stench,hot,spooky,cold];
@@ -42,7 +42,7 @@ float damageForElementAgainstElement(float base_damage, element attacking_elemen
     attack_versus_element[$element[cold]][$element[stench]] = 2.0;
     
     
-    return MAX(1, base_damage * attack_versus_element[attacking_element][defense_element]);
+    return MAX(1, base_damage * attack_versus_element[attacking_element][defence_element]);
 }
 
 element currentFlavourElement()

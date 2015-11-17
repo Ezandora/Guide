@@ -70,6 +70,14 @@ void listAppend(int [int] list, int entry)
 	list[position] = entry;
 }
 
+void listAppend(float [int] list, float entry)
+{
+	int position = list.count();
+	while (list contains position)
+		position += 1;
+	list[position] = entry;
+}
+
 void listAppend(location [int] list, location entry)
 {
 	int position = list.count();
@@ -228,6 +236,14 @@ void listClear(string [int] list)
 }
 
 void listClear(int [int] list)
+{
+	foreach i in list
+	{
+		remove list[i];
+	}
+}
+
+void listClear(item [int] list)
 {
 	foreach i in list
 	{
@@ -844,6 +860,30 @@ int listKeyForIndex(familiar [int] list, int index)
 	return -1;
 }
 
+int listKeyForIndex(item [int] list, int index)
+{
+	int i = 0;
+	foreach key in list
+	{
+		if (i == index)
+			return key;
+		i += 1;
+	}
+	return -1;
+}
+
+int listKeyForIndex(monster [int] list, int index)
+{
+	int i = 0;
+	foreach key in list
+	{
+		if (i == index)
+			return key;
+		i += 1;
+	}
+	return -1;
+}
+
 int llistKeyForIndex(string [int][int] list, int index)
 {
 	int i = 0;
@@ -865,6 +905,15 @@ string listGetRandomObject(string [int] list)
     return list[listKeyForIndex(list, random(list.count()))];
 }
 
+item listGetRandomObject(item [int] list)
+{
+    if (list.count() == 0)
+        return $item[none];
+    if (list.count() == 1)
+    	return list[listKeyForIndex(list, 0)];
+    return list[listKeyForIndex(list, random(list.count()))];
+}
+
 location listGetRandomObject(location [int] list)
 {
     if (list.count() == 0)
@@ -878,6 +927,15 @@ familiar listGetRandomObject(familiar [int] list)
 {
     if (list.count() == 0)
         return $familiar[none];
+    if (list.count() == 1)
+    	return list[listKeyForIndex(list, 0)];
+    return list[listKeyForIndex(list, random(list.count()))];
+}
+
+monster listGetRandomObject(monster [int] list)
+{
+    if (list.count() == 0)
+        return $monster[none];
     if (list.count() == 1)
     	return list[listKeyForIndex(list, 0)];
     return list[listKeyForIndex(list, random(list.count()))];

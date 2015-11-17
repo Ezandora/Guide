@@ -61,6 +61,7 @@ void SBarrelGodGenerateResource(ChecklistEntry [int] resource_entries)
 
 void SBarrelGodGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
+    //we could suggest they defeat the barrelmech if they have the map anyways... hmm
     if (lookupItem("map to the Biggest Barrel").available_amount() > 0 && (!lookupItem("chest barrel").haveAtLeastXOfItemEverywhere(1) || !lookupItem("barrelhead").haveAtLeastXOfItemEverywhere(1) || !lookupItem("bottoms of the barrel").haveAtLeastXOfItemEverywhere(1)))
     {
         string [int] description;

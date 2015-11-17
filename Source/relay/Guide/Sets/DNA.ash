@@ -194,6 +194,19 @@ void SDNAInit()
     }
     
     
+    if (my_path_id() == PATH_COMMUNITY_SERVICE)
+    {
+        __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[fish], "", "+10 familiar weight for statgain, parrot"));
+        __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[elemental], "", "saves three turns on resistance test"));
+        __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[pirate], "", "~3.3 turns saved on item test"));
+        __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[construct], "", "+5 familiar weight"));
+        __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[elf], "", "spell damage test"));
+        __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[beast], "", "marginal?"));
+        __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[dude], "", "marginal?"));
+        
+        return;
+    }
+    
     if (__quest_state["Level 7"].state_boolean["alcove needs speed tricks"])
     {
         __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[bug], "", "speed up defiled alcove"));

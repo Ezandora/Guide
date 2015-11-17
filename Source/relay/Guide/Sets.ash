@@ -83,6 +83,7 @@ void SetsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 	SBadMoonGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SCommunityServiceGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     SBarrelGodGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+    SPVPGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 }
 
 

@@ -43,7 +43,7 @@ void QFeloniaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         subentry.header = "Tame the Bugbears";
         if ($item[annoying pitchfork].available_amount() == 0)
         {
-            if (can_interact())
+            if (!in_ronin())
             {
                 subentry.entries.listAppend("Acquire annoying pitchfork in the mall.");
                 url = "mall.php";

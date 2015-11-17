@@ -83,7 +83,7 @@ void STeaTreeGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__item potted tea tree", "campground.php?action=teatree", ChecklistSubentryMake("Tea Tree Tea", "", options), 4));
     }
     
-    if (__misc_state["in run"] && !can_interact())
+    if (__misc_state["in run"] && in_ronin())
     {
         string image_name = "";
         string url = "";

@@ -340,6 +340,30 @@ void SBadMoonGenerateResource(ChecklistEntry [int] resource_entries)
         description.listAppend("Colonge: +20% items, +25% moxie, +40% meat.");
 		resource_entries.listAppend(ChecklistEntryMake("__effect Hella Smooth", "heydeze.php?place=styx", ChecklistSubentryMake("Styx pixie buff", "", description), 10));
     }
+    
+    if ($item[ghost key].available_amount() > 0 && __misc_state["in run"])
+    {
+        string url = "";
+        if ($location[the haunted bedroom].locationAvailable())
+            url = $location[the haunted bedroom].getClickableURLForLocation();
+        
+        string [int] description;
+        
+        if (__misc_state["need to level"])
+        {
+            string target_nightstand = "";
+            if (my_primestat() == $stat[muscle])
+                target_nightstand = "simple";
+            else if (my_primestat() == $stat[mysticality])
+                target_nightstand = "ornate";
+            else if (my_primestat() == $stat[moxie])
+                target_nightstand = "rustic";
+            description.listAppend("? mainstat from a " + target_nightstand + " nightstand."); //wiki says 200, but I saw 87 at level nine in bad moon
+        }
+        description.listAppend("1000 meat from a mahogany nightstand.");
+		resource_entries.listAppend(ChecklistEntryMake("__item ghost key", url, ChecklistSubentryMake(pluralise($item[ghost key]), "", description), 10));
+        
+    }
 }
 
 void SBadMoonGenerateCategoryChecklistEntry(BadMoonAdventure [string][int] adventures_by_category, ChecklistEntry [int] bad_moon_adventures_entries, string [int] categories, string image_name, string header, string [int] initial_d_escription)

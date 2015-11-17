@@ -479,7 +479,6 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         {
             //shortly after rollover during the revamp, drunkenness affected listed pool skill in the quest log
             //exact values were 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 8, 6, 4, 2, 0, -2, -4, -6, -8
-            //uncertain whether those are still in effect, but invisible
             
             string pool_skill_string;
             if (theoretical_hidden_pool_skill >= 0)

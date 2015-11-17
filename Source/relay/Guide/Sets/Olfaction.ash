@@ -100,7 +100,7 @@ void SOlfactionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         else
             line += "To olfact in " + l + ".|";
             
-        if (!can_interact())
+        if (in_ronin())
             line += $item[soft green echo eyedrop antidote].pluralise() + " available.";
         
         description.listAppend(line);

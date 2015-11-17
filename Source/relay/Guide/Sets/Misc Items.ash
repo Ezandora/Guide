@@ -45,7 +45,7 @@ void SMiscItemsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         if (!currently_have_source && have_reason)
         {
             boolean try_for_seal_tooth = false;
-            if (!can_interact())
+            if (in_ronin())
             {
                 item pull_item = $item[none];
                 foreach it in $items[dictionary,facsimile dictionary,seal tooth]
@@ -1038,7 +1038,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__item bottle of goofballs", "tavern.php?place=susguy", ChecklistSubentryMake("Bottle of goofballs obtainable", "", "For the lair stat test.|Costs nothing, but be careful..."), importance_level_unimportant_item));
     }
     
-    if ($item[tonic djinn].available_amount() > 0 && !can_interact() && in_run)
+    if ($item[tonic djinn].available_amount() > 0 && in_ronin() && in_run && !get_property_boolean("_tonicDjinn"))
     {
         string [int] possibilities;
         possibilities.listAppend("~450 meat (Wealth!)");
@@ -1157,5 +1157,88 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         description.listAppend(HTMLGenerateSimpleTableLines(table));
         resource_entries.listAppend(ChecklistEntryMake("__item cosmic calorie", "inventory.php?which=3", ChecklistSubentryMake(pluralise($item[cosmic calorie]), "", description), importance_level_item));
         
+    }
+    
+    if ($item[portable cassette player].available_amount() > 0 && (__misc_state["in run"] || $item[portable cassette player].equipped_amount() > 0))
+    {
+        string [int] description;
+        string url = "";
+        int modulus = total_turns_played() % 40;
+        
+        string [effect] buff_descriptions;
+        buff_descriptions[$effect[Dark Orchestral Song]] = "+5 moxie";
+        buff_descriptions[$effect[Pet Shop Song]] = "+10% init";
+        buff_descriptions[$effect[Dangerous Zone Song]] = "+25% meat";
+        buff_descriptions[$effect[Flashy Dance Song]] = "+10% item";
+        
+        effect [int] buffs_activate_at; //NOT a linear list
+        buffs_activate_at[0] = $effect[Dark Orchestral Song];
+        buffs_activate_at[10] = $effect[Pet Shop Song];
+        buffs_activate_at[20] = $effect[Dangerous Zone Song];
+        buffs_activate_at[30] = $effect[Flashy Dance Song];
+        
+        boolean [effect] buffs_to_display_for_future = $effects[Dangerous Zone Song,Flashy Dance Song];
+        
+        boolean [effect] buffs_to_not_bother_display_current_for = $effects[Dark Orchestral Song,Pet Shop Song]; //+10% init is like +1% chance of extra modern zmobies, which saves an extremely small fraction of a turn. ignore, because cognitive load + you might run better accessories instead, like +ML
+        string [int] future_buffs;
+        foreach mod_value, buff in buffs_activate_at
+        {
+            string buff_description = buff_descriptions[buff];
+            if (modulus >= mod_value && modulus < mod_value + 10)
+            {
+                if (buffs_to_not_bother_display_current_for contains buff)
+                {
+                    continue;
+                }
+                int turns_remaining = 10 - modulus % 10;
+                string line = buff_description;
+                if (buff.have_effect() == 0)
+                    line += " obtainable";
+                else
+                {
+                    if (turns_remaining < buff.have_effect())
+                    {
+                        turns_remaining = buff.have_effect();
+                        line += " active";
+                    }
+                }
+                line += " for " + pluralise(turns_remaining, " more turn", " more turns");
+                boolean have_other_song_active = false;
+                effect other_song = $effect[none];
+                foreach e in $effects[Dark Orchestral Song,Pet Shop Song,Dangerous Zone Song,Flashy Dance Song]
+                {
+                    if (e != buff && e.have_effect() > 0)
+                    {
+                        other_song = e;
+                        have_other_song_active = true;
+                    }
+                }
+                if (have_other_song_active)
+                {
+                    line += " after losing current";
+                    if (!(buffs_to_not_bother_display_current_for contains other_song))
+                        line += " " + buff_descriptions[other_song];
+                    line += " song. (unequip cassette for a turn)";
+                }
+                else
+                    line += ".";
+                if (buff.have_effect() == 0 && !have_other_song_active && $item[portable cassette player].equipped_amount() == 0)
+                    line += " (equip player)";
+                description.listAppend(line);
+                continue;
+            }
+            if (buffs_to_display_for_future contains buff)
+            {
+                int turns_until = mod_value - modulus;
+                if (turns_until < 0)
+                    turns_until += 40;
+                future_buffs.listAppend(pluralise(turns_until, "more turn", "more turns") + " until " + buff_description);
+            }
+        }
+        if (future_buffs.count() > 0)
+            description.listAppend(future_buffs.listJoinComponents(", ").capitaliseFirstLetter() + ".");
+        
+        //description.listAppend("Modulus " + modulus + ".");
+        resource_entries.listAppend(ChecklistEntryMake("__item portable cassette player", url, ChecklistSubentryMake("Portable cassette player buffs", "", description), 10));
     }
 }

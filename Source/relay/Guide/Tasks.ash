@@ -283,7 +283,7 @@ void generateTasks(Checklist [int] checklists)
                     url = "da.php?place=gate3";
             }
                 
-            if (statue_name != "" && !(can_interact() && cost_to_donate_for_level > 20000))
+            if (statue_name != "" && !(!in_ronin() && cost_to_donate_for_level > 20000))
             {
                 buffer line = "Possibly donate ".to_buffer();
                 if (cost_to_donate_for_level == min_cost_to_donate_for_level)
@@ -362,7 +362,7 @@ void generateTasks(Checklist [int] checklists)
 				potential_targets.listAppend("A bat. (sonar-in-a-biscuit)");
 		}
         
-        if (__misc_state["stench airport available"] && $item[filthy child leash].available_amount() == 0 && !__misc_state["familiars temporarily blocked"] && $items[ittah bittah hookah,astral pet sweater,snow suit,lead necklace].available_amount() == 0 && !can_interact() && my_path_id() != PATH_HEAVY_RAINS)
+        if (__misc_state["stench airport available"] && $item[filthy child leash].available_amount() == 0 && !__misc_state["familiars temporarily blocked"] && $items[ittah bittah hookah,astral pet sweater,snow suit,lead necklace].available_amount() == 0 && in_ronin() && my_path_id() != PATH_HEAVY_RAINS)
         {
             potential_targets.listAppend("Horrible tourist family (barf mountain) - +5 familiar weight leash.");
         }
@@ -404,7 +404,7 @@ void generateTasks(Checklist [int] checklists)
 		}
 	}
 	
-	if (!have_outfit_components("Filthy Hippy Disguise") && __misc_state["mysterious island available"] && __misc_state["in run"] && !__quest_state["Level 12"].finished && !__quest_state["Level 12"].state_boolean["War started"])
+	if (!have_outfit_components("Filthy Hippy Disguise") && __misc_state["mysterious island available"] && __misc_state["in run"] && !__quest_state["Level 12"].finished && !__quest_state["Level 12"].state_boolean["War started"] && !have_outfit_components("Frat Warrior Fatigues"))
 	{
 		item [int] missing_pieces = missing_outfit_components("Filthy Hippy Disguise");
         
@@ -429,7 +429,7 @@ void generateTasks(Checklist [int] checklists)
 		}
 		else
 		{
-			description.listAppend((next_line_intro + "wait for level 9.").capitaliseFirstLetter());
+			description.listAppend((next_line_intro + "wait for level 9 for the non-combats.").capitaliseFirstLetter());
 		}
         if ($familiar[slimeling].familiar_is_usable())
             modifiers.listAppend("slimeling?");

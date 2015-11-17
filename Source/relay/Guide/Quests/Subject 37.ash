@@ -60,7 +60,7 @@ step8	You've done a good turn, and helped Subject 37 make his escape from the Co
         if (need_to_return_goto && $item[goto].available_amount() == 0)
         {
             //234% item from BASIC elemental
-            if (can_interact())
+            if (!in_ronin())
             {
                 items_to_buy_in_mall.listAppend($item[goto]);
             }
@@ -73,7 +73,7 @@ step8	You've done a good turn, and helped Subject 37 make his escape from the Co
         if (need_to_return_weremoose && $item[weremoose spit].available_amount() == 0)
         {
             //+item? from weremoose
-            if (can_interact())
+            if (!in_ronin())
             {
                 items_to_buy_in_mall.listAppend($item[weremoose spit]);
             }
@@ -87,7 +87,7 @@ step8	You've done a good turn, and helped Subject 37 make his escape from the Co
         if (need_to_return_blubber && $item[abominable blubber].available_amount() == 0)
         {
             //234% item from Portly Abomination
-            if (can_interact())
+            if (!in_ronin())
             {
                 items_to_buy_in_mall.listAppend($item[abominable blubber]);
             }
