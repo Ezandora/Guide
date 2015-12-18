@@ -2,7 +2,7 @@
 
 since 17.1; //the earliest main release that is usable in modern KOL (unequip bug)
 //These settings are for development. Don't worry about editing them.
-string __version = "1.3.5";
+string __version = "1.3.6";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -1335,6 +1335,48 @@ boolean listContainsValue(monster [int] list, monster vo)
     return false;
 }
 
+monster [int] listInvert(boolean [monster] monsters)
+{
+    monster [int] out;
+    foreach m, value in monsters
+    {
+        if (value)
+            out.listAppend(m);
+    }
+    return out;
+}
+
+location [int] listInvert(boolean [location] list)
+{
+    location [int] out;
+    foreach k, value in list
+    {
+        if (value)
+            out.listAppend(k);
+    }
+    return out;
+}
+
+skill [int] listConvertStringsToSkills(string [int] list)
+{
+    skill [int] out;
+    foreach key, s in list
+    {
+        out.listAppend(s.to_skill());
+    }
+    return out;
+}
+
+monster [int] listConvertStringsToMonsters(string [int] list)
+{
+    monster [int] out;
+    foreach key, s in list
+    {
+        out.listAppend(s.to_monster());
+    }
+    return out;
+}
+
 boolean mafiaIsPastRevision(int revision_number)
 {
     if (get_revision() <= 0) //get_revision reports zero in certain cases; assume they're on a recent version
@@ -1651,6 +1693,19 @@ int available_amount(boolean [item] items)
     foreach it in items
     {
         count += it.available_amount();
+    }
+    return count;
+}
+
+int creatable_amount(boolean [item] items)
+{
+    //Usage:
+    //$items[disco ball, corrupted stardust].available_amount()
+    //Returns the total number of all items.
+    int count = 0;
+    foreach it in items
+    {
+        count += it.creatable_amount();
     }
     return count;
 }
@@ -2715,17 +2770,110 @@ item [int] generateEquipmentToEquipForExtraExperienceOnStat(stat desired_stat)
     return items_equipping;
 }
 
+
+
+float averageAdventuresForConsumable(item it, boolean assume_monday)
+{
+	float adventures = 0.0;
+	string [int] adventures_string = it.adventures.split_string("-");
+	foreach key, v in adventures_string
+	{
+		float a = v.to_float();
+		if (a < 0)
+			continue;
+		adventures += a * (1.0 / to_float(adventures_string.count()));
+	}
+	
+	if ($skill[saucemaven].have_skill() && $items[hot hi mein,cold hi mein,sleazy hi mein,spooky hi mein,stinky hi mein,Hell ramen,fettucini Inconnu,gnocchetti di Nietzsche,spaghetti with Skullheads,spaghetti con calaveras] contains it)
+	{
+		if ($classes[sauceror,pastamancer] contains my_class())
+			adventures += 5;
+		else
+			adventures += 3;
+	}
+	
+	if ($skill[pizza lover].have_skill() && it.to_lower_case().contains_text("pizza"))
+	{
+		adventures += it.fullness;
+	}
+	if (it.to_lower_case().contains_text("lasagna") && !assume_monday)
+		adventures += 5;
+	//FIXME lasagna properly
+	return adventures;
+}
+float averageAdventuresForConsumable(item it)
+{
+    return averageAdventuresForConsumable(it, false);
+}
+
 //Runtime variables:
 location __last_adventure_location;
 
 
 //Runtime call functions:
+
+//Init functions happen after state and quest initialisation, so they can be referred to safely.
+string [int] __init_functions;
+
+void RegisterInitFunction(string function_name)
+{
+    __init_functions.listAppend(function_name);
+}
+
 string [int] __checklist_generation_function_names;
 
 //Call function registration:
 void RegisterChecklistGenerationFunction(string function_name)
 {
     __checklist_generation_function_names.listAppend(function_name);
+}
+
+
+string [string][int] __specific_checklist_1_generation_function_names;
+void RegisterSpecificChecklistGenerationFunction1(string function_name, string checklist_name_1)
+{
+    if (!(__specific_checklist_1_generation_function_names contains checklist_name_1))
+    {
+        __specific_checklist_1_generation_function_names[checklist_name_1] = listMakeBlankString();
+    }
+    __specific_checklist_1_generation_function_names[checklist_name_1].listAppend(function_name);
+}
+
+Record ChecklistGenerationFunctionRequest
+{
+    string function_name;
+    string [int] checklist_names;
+};
+
+void listAppend(ChecklistGenerationFunctionRequest [int] list, ChecklistGenerationFunctionRequest entry)
+{
+	int position = list.count();
+	while (list contains position)
+		position += 1;
+	list[position] = entry;
+}
+
+ChecklistGenerationFunctionRequest [int] __specific_checklist_generation_requests;
+
+void RegisterSpecificChecklistGenerationFunction3(string function_name, string checklist_name_1, string checklist_name_2, string checklist_name_3)
+{
+    ChecklistGenerationFunctionRequest request;
+    request.function_name = function_name;
+    //Hardcoded to match call structure:
+    request.checklist_names[0] = checklist_name_1;
+    request.checklist_names[1] = checklist_name_2;
+    request.checklist_names[2] = checklist_name_3;
+    __specific_checklist_generation_requests.listAppend(request);
+}
+
+void RegisterResourceGenerationFunction(string function_name)
+{
+    RegisterSpecificChecklistGenerationFunction1(function_name, "Resources");
+}
+
+void RegisterTaskGenerationFunction(string function_name)
+{
+    RegisterSpecificChecklistGenerationFunction3(function_name, "Tasks", "Optional Tasks", "Future Tasks");
 }
 string __close_image_data = "data:image/gif;base64,R0lGODlhgACAANUiAODg4IqKitra2o2NjYGBgdXV1YCAgOPj49vb24eHh4iIiIODg+fn5+Tk5NnZ2YmJidbW1ouLi9zc3M/Pz4WFhdTU1MDAwMfHx8HBwcrKysbGxtjY2Lu7u8XFxfj4+IKCgsTExH9/f/f39wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAACIALAAAAACAAIAAAAb/QJFwmBEMj8ikcslsOp/QaBOgcSIMBKN0y+16v0fAIlRgCgKhUOAAbrvfXcYgnagoL4Z0OuCA+/+AAHN6IRZIV4RpBn2AjY5bYolpZUJnkmkPbI+bnEhylyF1Ihl5oCEPG52qj4KmaSASBK4hi6u2cJGuBmUIEbOZt8Fen64JlCINvq4PjMLOTq3FAEgCsrrNz9lhY7oQSpbLmtraxKYKx0kHaMvY48HR5tNN1bO17u/cpgbeT+CmwPdWlQN1Toq6X+0CNoJHUJ4UetcUssoHap8Xf6AASvQz8FLBLwfZbcQ1KJ4biPoSjoRE8ZLFNxgvaVy5paOkj3BC/lNJkwlD/48O/aCsqKUntJaSXjaKKWmm0SQ2E+F0pDMjT6M/bwZ9NNRl0adCcunjp4ppIqc9oxKaqqqqzKsKs0rduqpr0q8jxVYkK8wsIbQB1ephK8xtU7jP5K6l68xuIgN4x+l1yXecXz2AnQlOQ3ic4bOIVSkezNidY0KQtU1OWlniZUzigm0O0VniZ0J8hI3mXHojAmumstxa/bh1z9dqYm+aXbtng3WmcnPaTbu30d+zhE+sZxxsJeig1jhijs57kuezpPuhrsC6eRHYXWl/Qxx19/dHkIt3Qx4/FPSuqOcFe+75N0R8wUUWRX16KGVgP+Bdsl9NJRFU3oNOABhdaGFUCP8UhlwgCMp8R3EHYhf6KadEfyd2oWF4cBHY4hciXkLiNibO+EWKUHl404U6bvGihF/JGGQbNUqiHYOK3HfkQxFKsgZ7QD7pYpRSAdeQlX4kOUtxXP6BnDlVhvnFkF9WZ2YjXo61piNjclbmm200oMCXFBRI54AffJnanoH4GJ6CgA6IlHyEFirFbBKqqOiCgqYZQKKPLsHklzdWysRsFJQSnaOadjhLAgDoR2mll+4iRJt6ZBrqbMbkhyVuoCpKHannzarHpKGGdShqVbKahqt7wjonArruUauZtxaIZiK8FprqnEcIGwKxVhq7BbLpLatjs1emd+qJ09KopY3jPqj/LRjcBuitgeC68Sxu6ZpXLhzWYovful0mm1yL8QIy7671rnSvI/kWLBG/j7T7qX8BczLwHgpL9muD1P6RsHcMr+JweO9KFqkeuDozsRoVD3exIhlvsvFIHTvzcaMbRazNydHec/A9L48TszszSxnyJjYrhHPKuKxMS8vZ9HzLz775O+EqRdN0tC07g+X0I1BfJ/XQA45Mh54rXe1I1v5t/UbX7wUNLdhPVP2g2W6gfaLaXLCNodu0giH3jMmIa2g9TGMYS3YV661jL91K8beVgQeYrt1rHo6oE4pzybi7PokdCtlcRh6dgpQXanmCnngea68HKvNwWKqDTqfog4pQT3qlHohw+ogCXDBq4YpuboohBdx5ScmsM0E7IRRMMAQELgGv6e56OH8EBomsnvwTwqfBgRLFj729FJE3zwT0qo4vxeHWM9GB9OojgEESQQAAOw==";
 string __new_window_image_data = "data:image/gif;base64,R0lGODlhgACAANU7AImJiZiYmKCgoKenp/Dw8MjIyKGhoYyMjKioqLW1tZmZmYiIiISEhICAgIWFhfPz8+7u7ry8vIeHh6Ojo4aGhunp6dTU1JeXl+Tk5JycnLGxsaSkpI6Ojpubm4qKisXFxYKCgvb29u/v75+fn7S0tK6urqWlpb29vaKiotbW1q2trdPT08fHx9DQ0K+vr+3t7Y2NjZGRkaamptHR0bq6ure3t8bGxtfX16mpqbKysn9/f/f39wAAAAAAAAAAAAAAACH5BAEAADsALAAAAACAAIAAAAb/wJ1wSCwaj8ikcslsOp/QqHRKrVqv2Kx2y+16v+CweExGYjSZS2DNbrvf8Lh8Tq+/L5kcZrxq6P6AgYKDhIWGh4iJiQ0WYS8AipGSk5SUABBgNJWbnJ2TEWATnqOkpRtgI6Wqq5MCYAKssbKEBq+zt7O1X7C4vaq6XryDFALFxsfIycrLzM3OzQ6FwF3Cggpl2DsB0raE19lk27Tdg9/gYuKD01zVgebnYOmC61vtgO/wXvKB9Fr2f/jycdkHqF+WfzoCCtRC8I9BLAgVLsTSUMfDKxEn6uO2q5BEjVUqXrSSEeQWkeSsmTzJMZjHlQxbUnsJk6JMdjRrWkHZ0ZvO/ys8Xfr8GfJmvZxEpQSdOTSpUqP+kDp9shRn06lUoR6UipUJzwoRTEwYQLas2bNoz3ootCCt27dw45KVgQIHiwc2x1nw46tvJQ4VgEqrIMGvYUodBNNScbixpBs7pcFwTBlRjci0olXePKgEZnVrOYv+Q+LzvAOjRycwzQ91as6ri9JyPQgEgNu4c+verZsBgwW8gwsfTvw230GxqYikLQhBVyiQCCWfsryQ8+dOoiNnXZB5oOvYmWgXNP3pbOvhm4wPVD5KdULg0ydZD6g9lPeD4ss/Qv+P/aznwbefEv3p8J8T+DU34HyFHNhEgt8tiESBDnoljXeA6CehEBRy5/8Qhn9ouGGHsqkDog4iSkiicheit2ERK1LXooAvEhGjeSa6WCOHDXpo0YkpLnijezPmt+MQQ95XpIJH7pAkgDnSeOSTCC4ZYZNUPmhlhk062WOJp+m4Y5YWBmgkll+yaCaTU6Yp45pXtimdjwYA2SWZS0DIJZpzgtmamDXiqYSeId7pJo5hSjnmoUTCuaec2/nZHaAvCpoEoSga2qeaUZ4JqSAxyAVXYY4WyqdhdVI6YmOpKlrjAqza2aRmhgkg65EMNLbBrTvCetgJvAZ6GAUEBFvpYR/sYOyqhDBQ3LML/DZBCkIsqyKjWlgrJLZZaDugpVJ4ux+4UYgrH7lQmJvJHrpPqBseu064ix28Tcj7HL1M2NsVvkvoixW/Svg7FcBJCOwUwUgYnBTCRyhMFMNGOPwTxEVIrBPFRFhcE8ZDaAwTx9Wqeu2mXXi8EsjKirwtyVycGEABMMcs88w012zzzTjnjDOt5IFx4mt+VVjFz0D7IjQVRBeNy9FTkKp0YxqAQcHTjrkARgdUN5bsFy1kbdgCmIAxgNd92SDGAxFwQLYsDSgwAzYPiEDA3HTXbffdeOet99589303BCF0KfjghBdu+OGIgxMEADs=";
@@ -2910,6 +3058,89 @@ string HTMLStripTags(string html)
 string [string] generateMainLinkMap(string url)
 {
     return mapMake("class", "r_a_undecorated", "href", url, "target", "mainpane");
+}
+boolean [string] getHolidaysForDate(string realworld_date, int game_day)
+{
+    boolean [string] holidays;
+    
+    if (realworld_date == "0202")
+        holidays["Groundhog Day"] = true;
+    //april fools
+    else if (realworld_date == "0401")
+        holidays["April Fool's Day"] = true;
+    //Talk Like a Pirate Day - september 19th
+    else if (realworld_date == "0919")
+        holidays["Talk Like a Pirate Day"] = true;
+    else if (realworld_date == "1031")
+        holidays["Halloween"] = true;
+    else if (realworld_date == "0214")
+        holidays["Valentine's Day"] = true;
+    else if (realworld_date == "0525")
+        holidays["Towel Day"] = true;
+    
+    //Crimbo
+    if (now_to_string("M").to_int_silent() == 12)
+        holidays["Crimbo"] = true;
+        
+    //Friday the 13th
+    if (format_today_to_string("EEE d") == "Fri 13")
+        holidays["Friday the 13th"] = true;
+    
+    
+    
+    //Festival of Jarlsberg - acquire the party hat? - Jarlsuary 1
+    if (game_day == 0)
+        holidays["Festival of Jarlsberg"] = true;
+    //Valentine's Day! - Frankuary 4
+    else if (game_day == 11)
+        holidays["Valentine's Day"] = true;
+    //St. Sneaky Pete's Day - Starch 3
+    else if (game_day == 18)
+        holidays["St. Sneaky Pete's Day"] = true;
+    //Oyster Egg Day - April 2
+    else if (game_day == 25)
+        holidays["Oyster Egg Day"] = true;
+    //El Dia de Los Muertos Borrachos? just wandering monsters... - Martinus 2
+    else if (game_day == 33)
+        holidays["El Dia de Los Muertos Borrachos"] = true;
+    //Generic Summer Holiday - Bill 3
+    else if (game_day == 42)
+        holidays["Generic Summer Holiday"] = true;
+    //Dependence Day - Bor 4
+    else if (game_day == 51)
+        holidays["Dependence Day"] = true;
+    //Arrrbor Day - Petember 4
+    else if (game_day == 59)
+        holidays["Arrrbor Day"] = true;
+    //Labór Day - Carlvember 6
+    else if (game_day == 69)
+        holidays["Labór Day"] = true;
+    //Halloween / halloween tomorrow, save adventures? - Porktober 8
+    else if (game_day == 79)
+        holidays["Halloween"] = true;
+    //feast of boris...? - Boozember 7
+    else if (game_day == 86)
+        holidays["Feast of Boris"] = true;
+    //Yuletide? - Dougtember 4
+    else if (game_day == 91)
+        holidays["Yuletide"] = true;
+        
+    
+    return holidays;
+}
+
+boolean [string] getHolidaysToday()
+{
+    boolean [string] holidays = getHolidaysForDate(format_today_to_string("MMdd"), gameday_to_int()); //FIXME Y10K error
+    if (holiday() != "")
+        holidays[holiday()] = true;
+    return holidays;
+}
+
+boolean [string] getHolidaysTomorrow()
+{
+    //FIXME support next real-world day
+    return getHolidaysForDate("", ((gameday_to_int() + 1) % 96));
 }
 
 Record Counter
@@ -3290,26 +3521,64 @@ boolean CounterWanderingMonsterMayHitNextTurn()
 {
     monster last_monster = get_property_monster("lastEncounter");
     
-    if ($monsters[Black Crayon Beast,Black Crayon Beetle,Black Crayon Constellation,Black Crayon Golem,Black Crayon Demon,Black Crayon Man,Black Crayon Elemental,Black Crayon Crimbo Elf,Black Crayon Fish,Black Crayon Goblin,Black Crayon Hippy,Black Crayon Hobo,Black Crayon Shambling Monstrosity,Black Crayon Manloid,Black Crayon Mer-kin,Black Crayon Frat Orc,Black Crayon Penguin,Black Crayon Pirate,Black Crayon Flower,Black Crayon Slime,Black Crayon Undead Thing,Black Crayon Spiraling Shape,angry bassist,blue-haired girl,evil ex-girlfriend,peeved roommate,random scenester] contains last_monster) //bit of a hack - if they just fought a hipster monster (hopefully not faxing it), then the wandering monster isn't up this turn. though... __last_turn_definitely_visited_adventure_php should handle that...
+    if (__last_turn_definitely_visited_adventure_php == -1 && $monsters[Black Crayon Beast,Black Crayon Beetle,Black Crayon Constellation,Black Crayon Golem,Black Crayon Demon,Black Crayon Man,Black Crayon Elemental,Black Crayon Crimbo Elf,Black Crayon Fish,Black Crayon Goblin,Black Crayon Hippy,Black Crayon Hobo,Black Crayon Shambling Monstrosity,Black Crayon Manloid,Black Crayon Mer-kin,Black Crayon Frat Orc,Black Crayon Penguin,Black Crayon Pirate,Black Crayon Flower,Black Crayon Slime,Black Crayon Undead Thing,Black Crayon Spiraling Shape,angry bassist,blue-haired girl,evil ex-girlfriend,peeved roommate,random scenester] contains last_monster) //bit of a hack - if they just fought a hipster monster (hopefully not faxing it), then the wandering monster isn't up this turn. though... __last_turn_definitely_visited_adventure_php should handle that...
     {
         return false;
     }
-    if (my_turncount() == __last_turn_definitely_visited_adventure_php && __last_turn_definitely_visited_adventure_php != -1 && !get_property("lastEncounter").contains_text("Lights Out")) //that adventure didn't advance the counter; no wandering monsters. also, does lights out override wanderers?
+    if (my_turncount() == __last_turn_definitely_visited_adventure_php && __last_turn_definitely_visited_adventure_php != -1 && !get_property("lastEncounter").contains_text("Lights Out")) //that adventure didn't advance the counter; no wandering monsters. also, does lights out override wanderers? but, what if there are TWO wandering monsters? the plot thickens
+    {
         return false;
+    }
     //FIXME use CounterWanderingMonsterMayHitInXTurns to implement this once we're sure it works
     foreach s in __wandering_monster_counter_names
     {
+        if (s == "Romantic Monster" && get_property_int("_romanticFightsLeft") == 0) //If mafia's tracking doesn't recognise the monster, then we can override by decrementing the romantic fights left. Added because of the machine elf tunnels.
+            continue;
         Counter c = CounterLookup(s);
         if (c.CounterExists() && c.CounterMayHitNextTurn())
+        {
             return true;
+        }
     }
     if (get_property_int("_romanticFightsLeft") > 0 && !CounterLookup("Romantic Monster").CounterExists() && my_path_id() != PATH_ONE_CRAZY_RANDOM_SUMMER) //mafia will clear the romantic monster window if it goes out of bounds
         return true;
     
+    //Disabled for now, because this is hard to predict:
+    /*boolean [string] holidays = getHolidaysToday();
+    foreach s in $strings[Feast of Boris,El Dia de Los Muertos Borrachos]
+    {
+        if (!holidays[s]) continue;
+        if (!CounterLookup("Holiday Monster").CounterExists())
+        {
+            return true;
+        }
+    }*/
     return false;
 }
 
+Counter [int] CounterWanderingMonsterWindowsActiveNextTurn()
+{
+    Counter [int] result;
+    if (!CounterWanderingMonsterMayHitNextTurn())
+        return result;
+    foreach s in __wandering_monster_counter_names
+    {
+        Counter c = CounterLookup(s);
+        if (c.CounterExists() && c.CounterMayHitNextTurn())
+            result[result.count()] = c;
+    }
+    return result;
+    
+}
+
 CountersInit();
+//Library for checking if any given location is unlocked.
+//Similar to canadv.ash, except there's no code for using items and no URLs are (currently) visited. This limits our accuracy.
+//Currently, most locations are missing, sorry.
+
+
+
+
 
 
 //Quest status stores all/most of our quest information in an internal format that's easier to understand.
@@ -3433,6 +3702,1083 @@ QuestState QuestState(string property_name)
     QuestStateParseMafiaQuestProperty(state, property_name);
     return state;
 }
+
+
+//Version compatibility locations:
+
+boolean __location_compatibility_inited = false;
+//Should probably be called manually, as a backup:
+void locationCompatibilityInit()
+{
+    //Different versions refer to locations by different names.
+    //For instance, pre-13878 versions refer to the palindome as "The Palindome". Versions after that refer it to "Inside the Palindome".
+    //This method provides correct lookups for both versions, without warnings.
+    if (__location_compatibility_inited)
+        return;
+    __location_compatibility_inited = true;
+    
+}
+
+locationCompatibilityInit(); //not sure if calling functions like this is intended. may break in the future?
+
+boolean [location] __la_location_is_available;
+boolean [string] __la_zone_is_unlocked;
+
+boolean __la_commons_were_inited = false;
+int __la_turncount_initialised_on = -1;
+
+
+//Takes into account banishes and olfactions.
+//Probably will be inaccurate in many corner cases, sorry.
+//There's an appearance_rates() function that takes into account queue effects, which we may consider using in the future?
+float [monster] appearance_rates_adjusted(location l)
+{
+    boolean appearance_rates_has_changed = mafiaIsPastRevision(14740); //not sure on the revision, but after a certain revision, appearance_rates() takes into account olfaction
+    //FIXME domed city of ronald/grimacia doesn't take into account alien appearance rate
+    float [monster] source = l.appearance_rates();
+    
+    if (l == $location[the sleazy back alley])
+        source[$monster[none]] = MIN(MAX(0, 20 - combat_rate_modifier()), 100);
+    
+    float minimum_monster_appearance = 1000000000.0;
+    foreach m in source
+    {
+        if (m == $monster[none])
+            continue;
+        float v = source[m];
+        if (v > 0.0)
+        {
+            if (v < minimum_monster_appearance)
+                minimum_monster_appearance = v;
+        }
+    }
+    
+    float [monster] source_altered;
+    foreach m in source
+    {
+        float v = source[m];
+        if (m == $monster[none])
+        {
+            if (v < 0.0)
+                source_altered[m] = 0.0;
+            else
+                source_altered[m] = v;
+        }
+        else
+            source_altered[m] = v / minimum_monster_appearance;
+    }
+    
+    //FIXME appearance_rates now seems to (?) take into account janitors moving. does it take into account laywers moving?
+    boolean lawyers_relocated = (get_property_int("relocatePygmyLawyer") == my_ascensions());
+    boolean janitors_relocated = (get_property_int("relocatePygmyJanitor") == my_ascensions());
+    if (l == $location[the hidden park])
+    {
+        if (janitors_relocated)
+            source_altered[$monster[pygmy janitor]] = 1.0;
+        else if (source_altered contains $monster[pygmy janitor])
+            remove source_altered[$monster[pygmy janitor]];
+        if (lawyers_relocated)
+            source_altered[$monster[pygmy witch lawyer]] = 1.0;
+        else if (source_altered contains $monster[pygmy witch lawyer])
+            remove source_altered[$monster[pygmy witch lawyer]];
+    }
+    if (($locations[The Hidden Apartment Building,The Hidden Bowling Alley,The Hidden Hospital,The Hidden Office Building] contains l))
+    {
+        if (janitors_relocated && (source_altered contains $monster[pygmy janitor]))
+            remove source_altered[$monster[pygmy janitor]];
+        if (lawyers_relocated && (source_altered contains $monster[pygmy witch lawyer]))
+            remove source_altered[$monster[pygmy witch lawyer]];
+    }
+    if (l == $location[The Nemesis' Lair])
+    {
+        boolean [monster] all_monsters_to_remove = $monsters[hellseal guardian,Gorgolok\, the Infernal Seal (Inner Sanctum),warehouse worker,Stella\, the Turtle Poacher (Inner Sanctum),evil spaghetti cult zealot,Spaghetti Elemental (Inner Sanctum),security slime,Lumpy\, the Sinister Sauceblob (Inner Sanctum),daft punk,Spirit of New Wave (Inner Sanctum),mariachi bruiser,Somerset Lopez\, Dread Mariachi (Inner Sanctum)];
+        
+        boolean [monster] monsters_not_to_remove;
+        if (my_class() == $class[seal clubber])
+            monsters_not_to_remove = $monsters[hellseal guardian,Gorgolok\, the Infernal Seal (Inner Sanctum)];
+        else if (my_class() == $class[turtle tamer])
+            monsters_not_to_remove = $monsters[warehouse worker,Stella\, the Turtle Poacher (Inner Sanctum)];
+        else if (my_class() == $class[pastamancer])
+            monsters_not_to_remove = $monsters[evil spaghetti cult zealot,Spaghetti Elemental (Inner Sanctum)];
+        else if (my_class() == $class[sauceror])
+            monsters_not_to_remove = $monsters[security slime,Lumpy\, the Sinister Sauceblob (Inner Sanctum)];
+        else if (my_class() == $class[disco bandit])
+            monsters_not_to_remove = $monsters[daft punk,Spirit of New Wave (Inner Sanctum)];
+        else if (my_class() == $class[accordion thief])
+            monsters_not_to_remove = $monsters[mariachi bruiser,Somerset Lopez\, Dread Mariachi (Inner Sanctum)];
+        foreach m in all_monsters_to_remove
+        {
+            if (monsters_not_to_remove contains m)
+                continue;
+            remove source_altered[m];
+        }
+    }
+    
+    boolean banishes_are_possible = true;
+    if ($locations[the secret government laboratory,sloppy seconds diner] contains l)
+        banishes_are_possible = false;
+    if (banishes_are_possible)
+    {
+        foreach m in source_altered
+        {
+            if (m.is_banished())
+                source_altered[m] = 0.0;
+        }
+    }
+    
+    //umm... I'm not sure if appearance_rates() takes into account olfact all the time or not
+    //in the palindome, it didn't for some reason? but in another area I think it did. can't remember
+    /*
+    > get olfactedMonster
+    bob racecar
+    > ash $effect[on the trail].have_effect()
+    Returned: 35
+    > ash $location[inside the palindome].appearance_rates()
+    Returned: aggregate float [monster]
+    Bob Racecar => 9.0
+    Dr. Awkward => 0.0
+    Drab Bard => 9.0
+    Evil Olive => -3.0
+    Flock of Stab-Bats => 9.0
+    none => 55.0
+    Racecar Bob => 9.0
+    Taco Cat => 9.0
+    Tan Gnat => -3.0
+    */
+    //so, if appearance_rate() doesn't seem to be taking into account olfaction, force it?
+    if ($effect[on the trail].have_effect() > 0 && get_property("olfactedMonster").to_monster() != $monster[none])
+    {
+        monster olfacted_monster = get_property("olfactedMonster").to_monster();
+        if (source_altered contains olfacted_monster)
+        {
+            if (fabs(source_altered[olfacted_monster] - 1.0) < 0.01)
+                appearance_rates_has_changed = false;
+        }
+    }
+    
+    if ($effect[on the trail].have_effect() > 0 && !appearance_rates_has_changed)
+    {
+        monster olfacted_monster = get_property("olfactedMonster").to_monster();
+        if (olfacted_monster != $monster[none])
+        {
+            if (source_altered contains olfacted_monster)
+                source_altered[olfacted_monster] += 3.0; //FIXME is this correct?
+        }
+    }
+    
+    
+    //Convert source_altered to source.
+    if (l == $location[Inside the Palindome])
+    {
+        if (!questPropertyPastInternalStepNumber("questL11Palindome", 3))
+            source_altered[$monster[none]] = 0.0;
+    }
+    
+    float total = 0.0;
+    float nc_rate = clampf(source_altered[$monster[none]], 0.0, 100.0);
+    float combat_rate = clampf(100.0 - nc_rate, 0.0, 100.0);
+    foreach m in source_altered
+    {
+        float v = source_altered[m];
+        if (m == $monster[none])
+            continue;
+        if (v > 0)
+            total += v;
+    }
+    if ($locations[Guano Junction,the Batrat and Ratbat Burrow,the Beanbat Chamber] contains l)
+    {
+        //hacky, probably wrong:
+        float v = total / 8.0;
+        source_altered[$monster[screambat]] = v;
+        total += v;
+    }
+    //oil peak goes here?
+    if (total > 0.0)
+    {
+        foreach m in source_altered
+        {
+            if (m == $monster[none])
+                continue;
+            float v = source_altered[m];
+            source_altered[m] = v / total * combat_rate;
+        }
+    }
+    
+    return source_altered;
+}
+
+
+float [monster] appearance_rates_adjusted_cancel_nc(location l)
+{
+    float [monster] base_rates = appearance_rates_adjusted(l);
+    float nc_rate = base_rates[$monster[none]] / 100.0;
+    float nc_inverse_multiplier = 1.0;
+    if (nc_rate != 1.0)
+        nc_inverse_multiplier = 1.0 / (1.0 - nc_rate);
+    foreach m in base_rates
+    {
+        if (m == $monster[none])
+            base_rates[m] = 0.0;
+        else
+            base_rates[m] *= nc_inverse_multiplier;
+    }
+    return base_rates;
+}
+
+
+//Do not call - internal implementation detail.
+boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
+{
+	string zone = loc.zone;
+	
+	if (zone == "KOL High School")
+	{
+		if (my_path_id() == PATH_KOLHS)
+			return true;
+		return false;
+	}
+	if (zone == "Mothership")
+	{
+		if (my_path_id() == PATH_BUGBEAR_INVASION)
+			return true;
+		return false;
+	}
+	if (zone == "BadMoon")
+	{
+		if (in_bad_moon())
+			return true;
+		return false;
+	}
+    if (zone == "Woods" && !__la_zone_is_unlocked["Woods"])
+        return false;
+	
+	switch (loc)
+	{
+		case $location[The Castle in the Clouds in the Sky (Ground floor)]:
+			return get_property_int("lastCastleGroundUnlock") == my_ascensions();
+		case $location[The Castle in the Clouds in the Sky (Top floor)]:
+			return get_property_int("lastCastleTopUnlock") == my_ascensions();
+		case $location[The Haunted Kitchen]:
+		case $location[The Haunted Conservatory]:
+            return true; //FIXME exact detection
+		case $location[The Haunted Billiards Room]:
+            if ($item[7301].available_amount() > 0)
+                return true;
+            else
+                return false;
+			//return get_property_int("lastManorUnlock") == my_ascensions();
+		case $location[The Haunted Bedroom]:
+		case $location[The Haunted Bathroom]:
+        case $location[the haunted gallery]:
+            //FIXME detect this
+			return get_property_int("lastSecondFloorUnlock") == my_ascensions(); //FIXME test against questM21Dance
+        case $location[the haunted ballroom]:
+            return questPropertyPastInternalStepNumber("questM21Dance", 4);
+        case $location[The Haunted Laboratory]:
+        case $location[The Haunted Nursery]:
+        case $location[The Haunted Storage Room]:
+            return questPropertyPastInternalStepNumber("questM17Babies", 1);
+        case $location[The Haunted Boiler Room]:
+        case $location[The Haunted Laundry Room]:
+        case $location[The Haunted Wine Cellar]:
+            return questPropertyPastInternalStepNumber("questL11Manor", 2);
+        case $location[summoning chamber]:
+            return get_property("questL11Manor") == "finished";
+        case $location[the batrat and ratbat burrow]:
+            return questPropertyPastInternalStepNumber("questL04Bat", 2);
+        case $location[the beanbat chamber]:
+            return questPropertyPastInternalStepNumber("questL04Bat", 3);
+        case $location[The Unquiet Garves]:
+            return true;
+        case $location[The VERY Unquiet Garves]:
+            return get_property("questL07Cyrptic") == "finished";
+        case $location[the boss bat's lair]:
+            if ($location[the boss bat's lair].combatTurnsAttemptedInLocation() > 0)
+                return true;
+            return questPropertyPastInternalStepNumber("questL04Bat", 4);
+		case $location[cobb's knob barracks]:
+		case $location[cobb's knob kitchens]:
+		case $location[cobb's knob harem]:
+		case $location[cobb's knob treasury]:
+			string quest_value = get_property("questL05Goblin");
+			if (quest_value == "finished")
+				return true;
+			else if (questPropertyPastInternalStepNumber("questL05Goblin", 1))
+			{
+				//Inference - quest is started. If map is missing, area must be unlocked
+				if ($item[cobb's knob map].available_amount() > 0)
+					return false;
+				else //no map, must be available
+					return true;
+			}
+			//unstarted, impossible
+            return false;
+		case $location[Vanya's Castle Chapel]:
+			if ($item[map to Vanya's Castle].available_amount() > 0)
+				return true;
+			return false;
+		case $location[lair of the ninja snowmen]:
+		case $location[the extreme slope]:
+			return questPropertyPastInternalStepNumber("questL08Trapper", 3);
+		case $location[the hidden park]:
+			return questPropertyPastInternalStepNumber("questL11Worship", 4);
+        case $location[the hidden temple]:
+            return (get_property_int("lastTempleUnlock") == my_ascensions());
+		case $location[the spooky forest]:
+			return __la_zone_is_unlocked["Woods"];
+		case $location[The Smut Orc Logging Camp]:
+			return questPropertyPastInternalStepNumber("questL09Topping", 1);
+		case $location[the black forest]:
+			return questPropertyPastInternalStepNumber("questL11MacGuffin", 1);
+		case $location[guano junction]:
+		case $location[the bat hole entrance]:
+			return questPropertyPastInternalStepNumber("questL04Bat", 1);
+		case $location[itznotyerzitz mine]:
+			return questPropertyPastInternalStepNumber("questL08Trapper", 2);
+        case $location[the arid, extra-dry desert]:
+			return (questPropertyPastInternalStepNumber("questL11MacGuffin", 3) || $item[your father's MacGuffin diary].available_amount() > 0);
+        case $location[the oasis]:
+			return (get_property_int("desertExploration") > 0) && (questPropertyPastInternalStepNumber("questL11MacGuffin", 3) || $item[your father's MacGuffin diary].available_amount() > 0);
+        case $location[the defiled alcove]:
+			return questPropertyPastInternalStepNumber("questL07Cyrptic", 1) && get_property_int("cyrptAlcoveEvilness") > 0;
+        case $location[the defiled cranny]:
+			return questPropertyPastInternalStepNumber("questL07Cyrptic", 1) && get_property_int("cyrptCrannyEvilness") > 0;
+        case $location[the defiled niche]:
+			return questPropertyPastInternalStepNumber("questL07Cyrptic", 1) && get_property_int("cyrptNicheEvilness") > 0;
+        case $location[the defiled nook]:
+			return questPropertyPastInternalStepNumber("questL07Cyrptic", 1) && get_property_int("cyrptNookEvilness") > 0;
+		case $location[south of the border]:
+			return $items[pumpkin carriage,desert bus pass, bitchin' meatcar, tin lizzie].available_amount() > 0;
+        case $location[Portal to Terrible Parents]:
+        case $location[Rumpelstiltskin's Workshop]:
+        case $location[Ye Olde Medievale Villagee]:
+            return (get_property("grimstoneMaskPath") == "gnome");
+        case $location[the mansion of dr. weirdeaux]:
+        case $location[the secret government laboratory]:
+        case $location[the deep dark jungle]:
+            return (get_property_boolean("_spookyAirportToday") || get_property_boolean("spookyAirportAlways"));
+        case $location[the fun-guy mansion]:
+        case $location[sloppy seconds diner]:
+        case $location[the sunken party yacht]:
+            return (get_property_boolean("_sleazeAirportToday") || get_property_boolean("sleazeAirportAlways"));
+        case $location[Pirates of the Garbage Barges]:
+        case $location[Barf Mountain]:
+        case $location[The Toxic Teacups]:
+        case $location[Uncle Gator's Country Fun-Time Liquid Waste Sluice]:
+            return (get_property_boolean("_stenchAirportToday") || get_property_boolean("stenchAirportAlways"));
+        case $location[Kokomo Resort]:
+            return $effect[Tropical Contact High].have_effect() > 0;
+        case $location[Dreadsylvanian Woods]:
+        case $location[Dreadsylvanian Village]:
+        case $location[Dreadsylvanian Castle]:
+            //FIXME not correct - does not take account whether the dungeon is open and the areas are unlocked
+            return get_clan_id() > 0 && my_level() >= 15;
+        case $location[A Barroom Brawl]:
+            return questPropertyPastInternalStepNumber("questL03Rat", 1);
+        case $location[The Laugh Floor]:
+        case $location[Pandamonium Slums]:
+        case $location[Infernal Rackets Backstage]:
+            return get_property("questL06Friar") == "finished";
+        case $location[The Degrassi Knoll Restroom]:
+        case $location[The Degrassi Knoll Bakery]:
+        case $location[The Degrassi Knoll Gym]:
+        case $location[The Degrassi Knoll Garage]:
+            return !knoll_available();
+        case $location[Thugnderdome]:
+            return gnomads_available() && my_basestat(my_primestat()) >= 25;
+        case $location[outskirts of camp logging camp]:
+        case $location[camp logging camp]:
+            return canadia_available();
+        ///FIXME test grimstone masks against their progress?
+        case $location[Sweet-Ade Lake]:
+        case $location[Eager Rice Burrows]:
+        case $location[Gumdrop Forest]:
+            return get_property("grimstoneMaskPath") == "witch";
+        case $location[The Inner Wolf Gym]:
+        case $location[Unleash Your Inner Wolf]:
+            return get_property("grimstoneMaskPath") == "wolf";
+        case $location[A Deserted Stretch of I-911]:
+            return get_property("grimstoneMaskPath") == "hare";
+        case $location[A-Boo Peak]:
+        case $location[Twin Peak]:
+        case $location[Oil Peak]:
+            return questPropertyPastInternalStepNumber("questL09Topping", 2);
+        case $location[The Icy Peak]:
+            return get_property("questL08Trapper") == "finished"; //FIXME is it finished, or after defeating groar?
+        case $location[the bugbear pen]:
+            return knoll_available() && questPropertyPastInternalStepNumber("questM03Bugbear", 1) && get_property("questM03Bugbear") != "finished";
+        case $location[post-quest bugbear pens]:
+            return knoll_available() && get_property("questM03Bugbear") == "finished";
+        case $location[the thinknerd warehouse]:
+            return questPropertyPastInternalStepNumber("questM22Shirt", 1);
+        case $location[The Overgrown Lot]:
+            return questPropertyPastInternalStepNumber("questM24Doc", 1);
+        case $location[The Skeleton Store]:
+            if (questPropertyPastInternalStepNumber("questM23Meatsmith", 1))
+                return true;
+            //otherwise, don't know
+            break;
+        case $location[the old landfill]:
+            return questPropertyPastInternalStepNumber("questM19Hippy", 1);
+        case $location[The Hidden Apartment Building]:
+            return get_property_int("hiddenApartmentProgress") >= 1;
+        case $location[The Hidden Bowling Alley]:
+            return get_property_int("hiddenBowlingAlleyProgress") >= 1;
+        case $location[The Hidden Hospital]:
+            return get_property_int("hiddenHospitalProgress") >= 1;
+        case $location[The Hidden Office Building]:
+            return get_property_int("hiddenOfficeProgress") >= 1;
+        case $location[The Enormous Greater-Than Sign]:
+            return my_basestat(my_primestat()) >= 45 && get_property_int("lastPlusSignUnlock") != my_ascensions();
+        case $location[The dungeons of doom]:
+            return my_basestat(my_primestat()) >= 45 && get_property_int("lastPlusSignUnlock") == my_ascensions();
+        case $location[The "Fun" House]:
+            return questPropertyPastInternalStepNumber("questG04Nemesis", 2); //FIXME is 2 correct?
+        case $location[The Dark Neck of the Woods]:
+        case $location[The Dark Heart of the Woods]:
+        case $location[The Dark Elbow of the Woods]:
+            return QuestState("questL06Friar").in_progress;
+        case $location[The Goatlet]:
+            return questPropertyPastInternalStepNumber("questL08Trapper", 1);
+        case $location[The Penultimate Fantasy Airship]:
+            return questPropertyPastInternalStepNumber("questL10Garbage", 2);
+        case $location[anger man's level]:
+        case $location[fear man's level]:
+        case $location[doubt man's level]:
+        case $location[regret man's level]:
+            return get_campground()[$item[jar of psychoses (The Crackpot Mystic)]] > 0;
+        case $location[the gourd!]:
+            return get_campground()[$item[jar of psychoses (The Captain of the Gourd)]] > 0;
+        case $location[The Nightmare Meatrealm]:
+            return get_campground()[$item[jar of psychoses (The Meatsmith)]] > 0;
+        case $location[A Kitchen Drawer]:
+        case $location[A Grocery Bag]:
+            return get_campground()[$item[jar of psychoses (The Pretentious Artist)]] > 0;
+        case $location[whitey's grove]:
+            return questPropertyPastInternalStepNumber("questG02Whitecastle", 1) || questPropertyPastInternalStepNumber("questL11Palindome", 4); //FIXME what step for questL11Palindome?
+        case $location[the Obligatory pirate's cove]:
+            return get_property_int("lastIslandUnlock") == my_ascensions() && !(QuestState("questL12War").mafia_internal_step >= 2 && !QuestState("questL12War").finished);
+        case $location[Inside the Palindome]:
+            return $item[talisman o' namsilat].equipped_amount() > 0; //technically
+        case $location[The Valley of Rof L'm Fao]:
+            return QuestState("questL09Topping").finished;
+		default:
+			break;
+	}
+    //if (loc.turnsAttemptedInLocation() > 0) //FIXME make this finer-grained, this is hacky
+        //return true;
+	
+	ErrorSet(able_to_find, "");
+	return false;
+}
+
+void locationAvailablePrivateInit()
+{
+	if (__la_commons_were_inited && __la_turncount_initialised_on == my_turncount())
+		return;
+        
+    if (__la_location_is_available.count() > 0)
+    {
+        foreach key in __la_location_is_available
+        {
+            remove __la_location_is_available[key];
+        }
+    }
+    if (__la_zone_is_unlocked.count() > 0)
+    {
+        foreach key in __la_zone_is_unlocked
+        {
+            remove __la_zone_is_unlocked[key];
+        }
+    }
+	
+	boolean [location] locations_always_available = $locations[the haunted pantry,the sleazy back alley,the outskirts of cobb's knob,the limerick dungeon,The Haiku Dungeon,The Daily Dungeon,noob cave,the dire warren];
+	foreach loc in locations_always_available
+	{
+		if (loc == $location[none])
+			continue;
+		__la_location_is_available[loc] = true;
+	}
+    
+    if (questPropertyPastInternalStepNumber("questL02Larva", 1) || questPropertyPastInternalStepNumber("questG02Whitecastle", 1))
+        __la_zone_is_unlocked["Woods"] = true;
+		
+	string zones_never_accessible_string = "Gyms,Crimbo06,Crimbo07,Crimbo08,Crimbo09,Crimbo10,The Candy Diorama,Crimbo12,WhiteWed";
+	
+	item [location] locations_unlocked_by_item;
+	effect [location] locations_unlocked_by_effect;
+	
+	item [string] zones_unlocked_by_item;
+	effect [string] zones_unlocked_by_effect;
+	
+	locations_unlocked_by_item[$location[Cobb's Knob Laboratory]] = $item[Cobb's Knob lab key];
+	locations_unlocked_by_item[$location[Cobb's Knob Menagerie\, Level 1]] = $item[Cobb's Knob Menagerie key];
+	locations_unlocked_by_item[$location[Cobb's Knob Menagerie\, Level 2]] = $item[Cobb's Knob Menagerie key];
+	locations_unlocked_by_item[$location[Cobb's Knob Menagerie\, Level 3]] = $item[Cobb's Knob Menagerie key];
+	
+	//locations_unlocked_by_item[$location[the haunted ballroom]] = $item[spookyraven ballroom key];
+	locations_unlocked_by_item[$location[The Haunted Library]] = $item[spookyraven library key];
+	//locations_unlocked_by_item[$location[The Haunted Gallery]] = $item[spookyraven gallery key];
+	locations_unlocked_by_item[$location[The Castle in the Clouds in the Sky (Basement)]] = $item[S.O.C.K.];
+	locations_unlocked_by_item[$location[the hole in the sky]] = $item[steam-powered model rocketship];
+	
+	locations_unlocked_by_item[$location[Vanya's Castle Foyer]] = $item[map to Vanya's Castle];
+	
+	
+	zones_unlocked_by_item["Magic Commune"] = $item[map to the Magic Commune];
+	zones_unlocked_by_item["Landscaper"] = $item[Map to The Landscaper's Lair];
+	zones_unlocked_by_item["Kegger"] = $item[map to the Kegger in the Woods];
+	zones_unlocked_by_item["Ellsbury's Claim"] = $item[Map to Ellsbury's Claim];
+	zones_unlocked_by_item["Memories"] = $item[empty agua de vida bottle];
+	zones_unlocked_by_item["Casino"] = $item[casino pass];
+	
+	zones_unlocked_by_effect["Astral"] = $effect[Half-Astral];
+	zones_unlocked_by_effect["Spaaace"] = $effect[Transpondent];
+	zones_unlocked_by_effect["RabbitHole"] = $effect[Down the Rabbit Hole];
+	zones_unlocked_by_effect["Wormwood"] = $effect[Absinthe-Minded];	
+	zones_unlocked_by_effect["Suburbs"] = $effect[Dis Abled];
+	
+	string [int] zones_never_accessible = split_string_alternate(zones_never_accessible_string, ",");
+	
+	boolean [string] zone_accessibility_status = zones_never_accessible.listInvert();
+    foreach s in zone_accessibility_status //invert
+    {
+        zone_accessibility_status[s] = false;
+    }
+	
+	
+	foreach loc in $locations[Shivering Timbers,A Skeleton Invasion!,The Cannon Museum,A Swarm of Yeti-Mounted Skeletons,The Bonewall,A Massive Flying Battleship,A Supply Train,The Bone Star,Grim Grimacite Site,A Pile of Old Servers,The Haunted Sorority House,Fightin' Fire,Super-Intense Mega-Grassfire,Fierce Flying Flames,Lord Flameface's Castle Entryway,Lord Flameface's Castle Belfry,Lord Flameface's Throne Room,A Stinking Abyssal Portal,A Scorching Abyssal Portal,A Terrifying Abyssal Portal,A Freezing Abyssal Portal,An Unsettling Abyssal Portal,A Yawning Abyssal Portal,The Space Odyssey Discotheque,The Spirit World,The Crimbonium Mining Camp,WarBear Fortress (First Level),WarBear Fortress (Second Level),WarBear Fortress (Third Level)]
+	{
+		__la_location_is_available[loc] = false;
+	}
+	
+	foreach loc in locations_unlocked_by_item
+	{
+		if (locations_unlocked_by_item[loc].available_amount() > 0)
+			__la_location_is_available[loc] = true;
+		else
+			__la_location_is_available[loc] = false;
+	}
+	foreach loc in locations_unlocked_by_effect
+	{
+		if (locations_unlocked_by_effect[loc].have_effect() > 0)
+			__la_location_is_available[loc] = true;
+		else
+			__la_location_is_available[loc] = false;
+	}
+	
+	foreach zone in zones_unlocked_by_item
+	{
+		if (zones_unlocked_by_item[zone].available_amount() > 0)
+			zone_accessibility_status[zone] = true;
+		else
+			zone_accessibility_status[zone] = false;
+	}
+	foreach zone in zones_unlocked_by_effect
+	{
+		if (zones_unlocked_by_effect[zone].have_effect() > 0)
+			zone_accessibility_status[zone] = true;
+		else
+			zone_accessibility_status[zone] = false;
+	}
+	
+	
+	
+	
+	foreach loc in $locations[]
+	{
+		if (zone_accessibility_status contains (loc.zone))
+			__la_location_is_available[loc] = zone_accessibility_status[loc.zone];
+	}
+		
+		
+	__la_commons_were_inited = true;
+    __la_turncount_initialised_on = my_turncount();
+}
+
+boolean locationAvailable(location loc, Error able_to_find)
+{
+    locationAvailablePrivateInit();
+	if ((__la_location_is_available contains loc))
+		return __la_location_is_available[loc];
+	
+	boolean [int] could_find;
+	boolean is_available = locationAvailablePrivateCheck(loc, able_to_find);
+	if (able_to_find.was_error)
+		return false;
+	__la_location_is_available[loc] = is_available;
+	
+	return is_available;
+}
+
+boolean locationAvailable(location loc)
+{
+	return locationAvailable(loc, ErrorMake());
+}
+
+
+void locationAvailableRunDiagnostics()
+{
+	location [string][int] unknown_locations_by_zone;
+	
+	foreach loc in $locations[]
+	{
+		Error able_to_find;
+		locationAvailable(loc, able_to_find);
+		if (!able_to_find.was_error)
+			continue;
+		if (!(unknown_locations_by_zone contains (loc.zone)))
+			unknown_locations_by_zone[loc.zone] = listMakeBlankLocation();
+		unknown_locations_by_zone[loc.zone].listAppend(loc);
+	}
+	if (unknown_locations_by_zone.count() > 0)
+	{
+		print("Unknown locations in location availability tester:");
+		foreach zone in unknown_locations_by_zone
+		{
+			print(zone + ":");
+			foreach key in unknown_locations_by_zone[zone]
+			{
+				location loc = unknown_locations_by_zone[zone][key];
+				print("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + loc);
+			}
+		}
+	}
+}
+
+
+string [location] LAConvertLocationLookupToLocations(string [string] lookup_map)
+{
+    string [location] result;
+    foreach location_name in lookup_map
+    {
+        location l = location_name.to_location();
+        if (l == $location[none])
+        {
+            if (__setting_debug_mode)
+                print_html("Location \"" + location_name + "\" does not appear to exist anymore.");
+            continue;
+        }
+        result[l] = lookup_map[location_name];
+    }
+    
+    return result;
+}
+static
+{
+    string [location] __constant_clickable_urls;
+    void initialiseConstantClickableURLs()
+    {
+        string [string] lookup_map;
+        
+        lookup_map["Pump Up Muscle"] = "place.php?whichplace=knoll_friendly&action=dk_gym";
+        lookup_map["Richard's Hobo Mysticality"] = "clan_hobopolis.php?place=3";
+        lookup_map["Richard's Hobo Moxie"] = "clan_hobopolis.php?place=3";
+        lookup_map["Richard's Hobo Muscle"] = "clan_hobopolis.php?place=3";
+        lookup_map["South of the Border"] = "place.php?whichplace=desertbeach";
+        lookup_map["The Oasis"] = "place.php?whichplace=desertbeach";
+        lookup_map["The Arid, Extra-Dry Desert"] = "place.php?whichplace=desertbeach";
+        lookup_map["The Shore, Inc. Travel Agency"] = "place.php?whichplace=desertbeach";
+        lookup_map["The Upper Chamber"] = "pyramid.php";
+        lookup_map["The Middle Chamber"] = "pyramid.php";
+        lookup_map["The Lower Chambers"] = "pyramid.php";
+        lookup_map["Goat Party"] = "casino.php";
+        lookup_map["Pirate Party"] = "casino.php";
+        lookup_map["Lemon Party"] = "casino.php";
+        lookup_map["The Roulette Tables"] = "casino.php";
+        lookup_map["The Poker Room"] = "casino.php";
+        lookup_map["The Haiku Dungeon"] = "da.php";
+        lookup_map["The Limerick Dungeon"] = "da.php";
+        lookup_map["The Enormous Greater-Than Sign"] = "da.php";
+        lookup_map["The Dungeons of Doom"] = "da.php";
+        lookup_map["The Daily Dungeon"] = "da.php";
+        lookup_map["Video Game Level 1"] = "place.php?whichplace=faqdungeon";
+        lookup_map["Video Game Level 2"] = "place.php?whichplace=faqdungeon";
+        lookup_map["Video Game Level 3"] = "place.php?whichplace=faqdungeon";
+        lookup_map["A Maze of Sewer Tunnels"] = "clan_hobopolis.php";
+        lookup_map["Hobopolis Town Square"] = "clan_hobopolis.php?place=2";
+        lookup_map["Burnbarrel Blvd."] = "clan_hobopolis.php?place=4";
+        lookup_map["Exposure Esplanade"] = "clan_hobopolis.php?place=5";
+        lookup_map["The Heap"] = "clan_hobopolis.php?place=6";
+        lookup_map["The Ancient Hobo Burial Ground"] = "clan_hobopolis.php?place=7";
+        lookup_map["The Purple Light District"] = "clan_hobopolis.php?place=8";
+        lookup_map["The Slime Tube"] = "clan_slimetube.php";
+        lookup_map["Dreadsylvanian Woods"] = "clan_dreadsylvania.php";
+        lookup_map["Dreadsylvanian Village"] = "clan_dreadsylvania.php";
+        lookup_map["Dreadsylvanian Castle"] = "clan_dreadsylvania.php";
+        lookup_map["The Briny Deeps"] = "place.php?whichplace=thesea";
+        lookup_map["The Brinier Deepers"] = "place.php?whichplace=thesea";
+        lookup_map["The Briniest Deepests"] = "place.php?whichplace=thesea";
+        lookup_map["An Octopus's Garden"] = "seafloor.php";
+        lookup_map["The Wreck of the Edgar Fitzsimmons"] = "seafloor.php";
+        lookup_map["Madness Reef"] = "seafloor.php";
+        lookup_map["The Mer-Kin Outpost"] = "seafloor.php";
+        lookup_map["The Skate Park"] = "seafloor.php";
+        lookup_map["The Marinara Trench"] = "seafloor.php";
+        lookup_map["Anemone Mine"] = "seafloor.php";
+        lookup_map["The Dive Bar"] = "seafloor.php";
+        lookup_map["The Coral Corral"] = "seafloor.php";
+        lookup_map["Mer-kin Elementary School"] = "sea_merkin.php?seahorse=1";
+        lookup_map["Mer-kin Library"] = "sea_merkin.php?seahorse=1";
+        lookup_map["Mer-kin Gymnasium"] = "sea_merkin.php?seahorse=1";
+        lookup_map["Mer-kin Colosseum"] = "sea_merkin.php?seahorse=1";
+        lookup_map["The Caliginous Abyss"] = "seafloor.php";
+        lookup_map["Anemone Mine (Mining)"] = "seafloor.php";
+        lookup_map["The Sleazy Back Alley"] = "place.php?whichplace=town_wrong";
+        lookup_map["The Copperhead Club"] = "place.php?whichplace=town_wrong";
+        lookup_map["The Haunted Kitchen"] = "place.php?whichplace=manor1";
+        lookup_map["The Haunted Conservatory"] = "place.php?whichplace=manor1";
+        lookup_map["The Haunted Library"] = "place.php?whichplace=manor1";
+        lookup_map["The Haunted Billiards Room"] = "place.php?whichplace=manor1";
+        lookup_map["The Haunted Pantry"] = "place.php?whichplace=manor1";
+        lookup_map["The Haunted Gallery"] = "place.php?whichplace=manor2";
+        lookup_map["The Haunted Bathroom"] = "place.php?whichplace=manor2";
+        lookup_map["The Haunted Bedroom"] = "place.php?whichplace=manor2";
+        lookup_map["The Haunted Ballroom"] = "place.php?whichplace=manor2";
+        lookup_map["The Haunted Boiler Room"] = "place.php?whichplace=manor4";
+        lookup_map["The Haunted Laundry Room"] = "place.php?whichplace=manor4";
+        lookup_map["The Haunted Wine Cellar"] = "place.php?whichplace=manor4";
+        lookup_map["The Haunted Laboratory"] = "place.php?whichplace=manor3";
+        lookup_map["The Haunted Nursery"] = "place.php?whichplace=manor3";
+        lookup_map["The Haunted Storage Room"] = "place.php?whichplace=manor3";
+        lookup_map["Summoning Chamber"] = "place.php?whichplace=manor4";
+        lookup_map["The Hidden Apartment Building"] = "place.php?whichplace=hiddencity";
+        lookup_map["The Hidden Hospital"] = "place.php?whichplace=hiddencity";
+        lookup_map["The Hidden Office Building"] = "place.php?whichplace=hiddencity";
+        lookup_map["The Hidden Bowling Alley"] = "place.php?whichplace=hiddencity";
+        lookup_map["The Hidden Park"] = "place.php?whichplace=hiddencity";
+        lookup_map["An Overgrown Shrine (Northwest)"] = "place.php?whichplace=hiddencity";
+        lookup_map["An Overgrown Shrine (Southwest)"] = "place.php?whichplace=hiddencity";
+        lookup_map["An Overgrown Shrine (Northeast)"] = "place.php?whichplace=hiddencity";
+        lookup_map["An Overgrown Shrine (Southeast)"] = "place.php?whichplace=hiddencity";
+        lookup_map["A Massive Ziggurat"] = "place.php?whichplace=hiddencity";
+        lookup_map["The Typical Tavern Cellar"] = "cellar.php";
+        lookup_map["The Spooky Forest"] = "place.php?whichplace=woods";
+        lookup_map["The Hidden Temple"] = "place.php?whichplace=woods";
+        lookup_map["A Barroom Brawl"] = "tavern.php";
+        lookup_map["8-Bit Realm"] = "place.php?whichplace=woods";
+        lookup_map["Whitey's Grove"] = "place.php?whichplace=woods";
+        lookup_map["The Road to the White Citadel"] = "place.php?whichplace=woods";
+        lookup_map["The Black Forest"] = "place.php?whichplace=woods";
+        lookup_map["The Old Landfill"] = "place.php?whichplace=woods";
+        lookup_map["The Bat Hole Entrance"] = "place.php?whichplace=bathole";
+        lookup_map["Guano Junction"] = "place.php?whichplace=bathole";
+        lookup_map["The Batrat and Ratbat Burrow"] = "place.php?whichplace=bathole";
+        lookup_map["The Beanbat Chamber"] = "place.php?whichplace=bathole";
+        lookup_map["The Boss Bat's Lair"] = "place.php?whichplace=bathole";
+        lookup_map["The Red Queen's Garden"] = "place.php?whichplace=rabbithole";
+        lookup_map["The Clumsiness Grove"] = "suburbandis.php";
+        lookup_map["The Maelstrom of Lovers"] = "suburbandis.php";
+        lookup_map["The Glacier of Jerks"] = "suburbandis.php";
+        lookup_map["The Degrassi Knoll Restroom"] = "place.php?whichplace=knoll_hostile";
+        lookup_map["The Degrassi Knoll Bakery"] = "place.php?whichplace=knoll_hostile";
+        lookup_map["The Degrassi Knoll Gym"] = "place.php?whichplace=knoll_hostile";
+        lookup_map["The Degrassi Knoll Garage"] = "place.php?whichplace=knoll_hostile";
+        lookup_map["The \"Fun\" House"] = "place.php?whichplace=plains";
+        lookup_map["The Unquiet Garves"] = "place.php?whichplace=cemetery";
+        lookup_map["The VERY Unquiet Garves"] = "place.php?whichplace=cemetery";
+        lookup_map["Tower Ruins"] = "fernruin.php";
+        lookup_map["Fernswarthy's Basement"] = "basement.php";
+        lookup_map["Cobb's Knob Barracks"] = "cobbsknob.php";
+        lookup_map["Cobb's Knob Kitchens"] = "cobbsknob.php";
+        lookup_map["Cobb's Knob Harem"] = "cobbsknob.php";
+        lookup_map["Cobb's Knob Treasury"] = "cobbsknob.php";
+        lookup_map["Throne Room"] = "cobbsknob.php";
+        lookup_map["Cobb's Knob Laboratory"] = "cobbsknob.php?action=tolabs";
+        lookup_map["The Knob Shaft"] = "cobbsknob.php?action=tolabs";
+        lookup_map["The Knob Shaft (Mining)"] = "cobbsknob.php?action=tolabs";
+        lookup_map["Cobb's Knob Menagerie, Level 1"] = "cobbsknob.php?action=tomenagerie";
+        lookup_map["Cobb's Knob Menagerie, Level 2"] = "cobbsknob.php?action=tomenagerie";
+        lookup_map["Cobb's Knob Menagerie, Level 3"] = "cobbsknob.php?action=tomenagerie";
+        lookup_map["The Dark Neck of the Woods"] = "friars.php";
+        lookup_map["The Dark Heart of the Woods"] = "friars.php";
+        lookup_map["The Dark Elbow of the Woods"] = "friars.php";
+        lookup_map["Friar Ceremony Location"] = "friars.php";
+        lookup_map["Pandamonium Slums"] = "pandamonium.php";
+        lookup_map["The Laugh Floor"] = "pandamonium.php?action=beli";
+        lookup_map["Infernal Rackets Backstage"] = "pandamonium.php?action=infe";
+        lookup_map["The Defiled Nook"] = "crypt.php";
+        lookup_map["The Defiled Cranny"] = "crypt.php";
+        lookup_map["The Defiled Alcove"] = "crypt.php";
+        lookup_map["The Defiled Niche"] = "crypt.php";
+        lookup_map["Haert of the Cyrpt"] = "crypt.php";
+        lookup_map["Frat House"] = "island.php";
+        lookup_map["Frat House In Disguise"] = "island.php";
+        lookup_map["The Frat House (Bombed Back to the Stone Age)"] = "island.php";
+        lookup_map["Hippy Camp"] = "island.php";
+        lookup_map["Hippy Camp In Disguise"] = "island.php";
+        lookup_map["The Hippy Camp (Bombed Back to the Stone Age)"] = "island.php";
+        lookup_map["The Obligatory Pirate's Cove"] = "island.php";
+        lookup_map["Barrrney's Barrr"] = "place.php?whichplace=cove";
+        lookup_map["The F'c'le"] = "place.php?whichplace=cove";
+        lookup_map["The Poop Deck"] = "place.php?whichplace=cove";
+        lookup_map["Belowdecks"] = "place.php?whichplace=cove";
+        lookup_map["Post-War Junkyard"] = "island.php";
+        lookup_map["McMillicancuddy's Farm"] = "island.php";
+        lookup_map["The Battlefield (Frat Uniform)"] = "bigisland.php";
+        lookup_map["The Battlefield (Hippy Uniform)"] = "bigisland.php";
+        lookup_map["Wartime Frat House"] = "island.php";
+        lookup_map["Wartime Frat House (Hippy Disguise)"] = "island.php";
+        lookup_map["Wartime Hippy Camp"] = "island.php";
+        lookup_map["Wartime Hippy Camp (Frat Disguise)"] = "island.php";
+        lookup_map["Next to that Barrel with Something Burning in it"] = "bigisland.php?place=junkyard";
+        lookup_map["Near an Abandoned Refrigerator"] = "bigisland.php?place=junkyard";
+        lookup_map["Over Where the Old Tires Are"] = "bigisland.php?place=junkyard";
+        lookup_map["Out by that Rusted-Out Car"] = "bigisland.php?place=junkyard";
+        lookup_map["Sonofa Beach"] = "bigisland.php?place=lighthouse";
+        lookup_map["The Themthar Hills"] = "bigisland.php?place=nunnery";
+        lookup_map["McMillicancuddy's Barn"] = "bigisland.php?place=farm";
+        lookup_map["McMillicancuddy's Pond"] = "bigisland.php?place=farm";
+        lookup_map["McMillicancuddy's Back 40"] = "bigisland.php?place=farm";
+        lookup_map["McMillicancuddy's Other Back 40"] = "bigisland.php?place=farm";
+        lookup_map["McMillicancuddy's Granary"] = "bigisland.php?place=farm";
+        lookup_map["McMillicancuddy's Bog"] = "bigisland.php?place=farm";
+        lookup_map["McMillicancuddy's Family Plot"] = "bigisland.php?place=farm";
+        lookup_map["McMillicancuddy's Shady Thicket"] = "bigisland.php?place=farm";
+        lookup_map["The Hatching Chamber"] = "bigisland.php?place=orchard";
+        lookup_map["The Feeding Chamber"] = "bigisland.php?place=orchard";
+        lookup_map["The Royal Guard Chamber"] = "bigisland.php?place=orchard";
+        lookup_map["The Filthworm Queen's Chamber"] = "bigisland.php?place=orchard";
+        lookup_map["Noob Cave"] = "tutorial.php";
+        lookup_map["The Dire Warren"] = "tutorial.php";
+        lookup_map["The Valley of Rof L'm Fao"] = "place.php?whichplace=mountains";
+        lookup_map["Mt. Molehill"] = "place.php?whichplace=mountains";
+        lookup_map["The Barrel Full of Barrels"] = "barrel.php";
+        lookup_map["The Smut Orc Logging Camp"] = "place.php?whichplace=orc_chasm";
+        lookup_map["The Thinknerd Warehouse"] = "place.php?whichplace=mountains";
+        lookup_map["A Mob of Zeppelin Protesters"] = "place.php?whichplace=zeppelin";
+        lookup_map["The Red Zeppelin"] = "place.php?whichplace=zeppelin";
+        lookup_map["A-Boo Peak"] = "place.php?whichplace=highlands";
+        lookup_map["Twin Peak"] = "place.php?whichplace=highlands";
+        lookup_map["Oil Peak"] = "place.php?whichplace=highlands";
+        lookup_map["Itznotyerzitz Mine"] = "place.php?whichplace=mclargehuge";
+        lookup_map["The Goatlet"] = "place.php?whichplace=mclargehuge";
+        lookup_map["Lair of the Ninja Snowmen"] = "place.php?whichplace=mclargehuge";
+        lookup_map["The eXtreme Slope"] = "place.php?whichplace=mclargehuge";
+        lookup_map["Mist-Shrouded Peak"] = "place.php?whichplace=mclargehuge";
+        lookup_map["The Icy Peak"] = "place.php?whichplace=mclargehuge";
+        lookup_map["Itznotyerzitz Mine (in Disguise)"] = "place.php?whichplace=mclargehuge";
+        lookup_map["The Penultimate Fantasy Airship"] = "place.php?whichplace=beanstalk";
+        lookup_map["The Castle in the Clouds in the Sky (Basement)"] = "place.php?whichplace=giantcastle";
+        lookup_map["The Castle in the Clouds in the Sky (Ground Floor)"] = "place.php?whichplace=giantcastle";
+        lookup_map["The Castle in the Clouds in the Sky (Top Floor)"] = "place.php?whichplace=giantcastle";
+        lookup_map["The Hole in the Sky"] = "place.php?whichplace=beanstalk";
+        lookup_map["The Broodling Grounds"] = "volcanoisland.php";
+        lookup_map["The Outer Compound"] = "volcanoisland.php";
+        lookup_map["The Temple Portico"] = "volcanoisland.php";
+        lookup_map["Convention Hall Lobby"] = "volcanoisland.php";
+        lookup_map["Outside the Club"] = "volcanoisland.php";
+        lookup_map["The Island Barracks"] = "volcanoisland.php";
+        lookup_map["The Nemesis' Lair"] = "volcanoisland.php";
+        lookup_map["The Bugbear Pen"] = "place.php?whichplace=knoll_friendly";
+        lookup_map["The Spooky Gravy Burrow"] = "place.php?whichplace=knoll_friendly";
+        lookup_map["The Stately Pleasure Dome"] = "place.php?whichplace=wormwood";
+        lookup_map["The Mouldering Mansion"] = "place.php?whichplace=wormwood";
+        lookup_map["The Rogue Windmill"] = "place.php?whichplace=wormwood";
+        lookup_map["The Primordial Soup"] = "place.php?whichplace=memories";
+        lookup_map["The Jungles of Ancient Loathing"] = "place.php?whichplace=memories";
+        lookup_map["Seaside Megalopolis"] = "place.php?whichplace=memories";
+        lookup_map["Domed City of Ronaldus"] = "place.php?whichplace=spaaace";
+        lookup_map["Domed City of Grimacia"] = "place.php?whichplace=spaaace";
+        lookup_map["Hamburglaris Shield Generator"] = "place.php?whichplace=spaaace";
+        lookup_map["The Arrrboretum"] = "place.php?whichplace=woods";
+        lookup_map["Spectral Pickle Factory"] = "place.php?whichplace=plains";
+        lookup_map["Lollipop Forest"] = "";
+        lookup_map["Fudge Mountain"] = "";
+        lookup_map["WarBear Fortress (First Level)"] = "";
+        lookup_map["WarBear Fortress (Second Level)"] = "";
+        lookup_map["WarBear Fortress (Third Level)"] = "";
+        lookup_map["Elf Alley"] = "";
+        lookup_map["CRIMBCO cubicles"] = "";
+        lookup_map["CRIMBCO WC"] = "";
+        lookup_map["Crimbo Town Toy Factory (2005)"] = "";
+        lookup_map["The Don's Crimbo Compound"] = "";
+        lookup_map["Atomic Crimbo Toy Factory"] = "";
+        lookup_map["Crimbo Town Toy Factory (2007)"] = "";
+        lookup_map["Sinister Dodecahedron"] = "";
+        lookup_map["Crimbo Town Toy Factory (2009)"] = "";
+        lookup_map["Simple Tool-Making Cave"] = "";
+        lookup_map["Spooky Fright Factory"] = "";
+        lookup_map["Crimborg Collective Factory"] = "";
+        lookup_map["Crimbo Town Toy Factory (2012)"] = "";
+        lookup_map["Market Square, 28 Days Later"] = "";
+        lookup_map["The Mall of Loathing, 28 Days Later"] = "";
+        lookup_map["Wrong Side of the Tracks, 28 Days Later"] = "";
+        lookup_map["The Icy Peak in The Recent Past"] = "";
+        lookup_map["Shivering Timbers"] = "";
+        lookup_map["A Skeleton Invasion!"] = "";
+        lookup_map["The Cannon Museum"] = "";
+        lookup_map["A Swarm of Yeti-Mounted Skeletons"] = "";
+        lookup_map["The Bonewall"] = "";
+        lookup_map["A Massive Flying Battleship"] = "";
+        lookup_map["A Supply Train"] = "";
+        lookup_map["The Bone Star"] = "";
+        lookup_map["Grim Grimacite Site"] = "";
+        lookup_map["A Pile of Old Servers"] = "";
+        lookup_map["The Haunted Sorority House"] = "";
+        lookup_map["Fightin' Fire"] = "";
+        lookup_map["Super-Intense Mega-Grassfire"] = "";
+        lookup_map["Fierce Flying Flames"] = "";
+        lookup_map["Lord Flameface's Castle Entryway"] = "";
+        lookup_map["Lord Flameface's Castle Belfry"] = "";
+        lookup_map["Lord Flameface's Throne Room"] = "";
+        lookup_map["A Stinking Abyssal Portal"] = "";
+        lookup_map["A Scorching Abyssal Portal"] = "";
+        lookup_map["A Terrifying Abyssal Portal"] = "";
+        lookup_map["A Freezing Abyssal Portal"] = "";
+        lookup_map["An Unsettling Abyssal Portal"] = "";
+        lookup_map["A Yawning Abyssal Portal"] = "";
+        lookup_map["The Space Odyssey Discotheque"] = "";
+        lookup_map["The Spirit World"] = "";
+        lookup_map["Some Scattered Smoking Debris"] = "place.php?whichplace=crashsite";
+        lookup_map["Anger Man's Level"] = "place.php?whichplace=junggate_3";
+        lookup_map["Fear Man's Level"] = "place.php?whichplace=junggate_3";
+        lookup_map["Doubt Man's Level"] = "place.php?whichplace=junggate_3";
+        lookup_map["Regret Man's Level"] = "place.php?whichplace=junggate_3";
+        lookup_map["The Nightmare Meatrealm"] = "place.php?whichplace=junggate_6";
+        lookup_map["A Kitchen Drawer"] = "place.php?whichplace=junggate_5";
+        lookup_map["A Grocery Bag"] = "place.php?whichplace=junggate_5";
+        lookup_map["Chinatown Shops"] = "place.php?whichplace=junggate_1";
+        lookup_map["Triad Factory"] = "place.php?whichplace=junggate_1";
+        lookup_map["1st Floor, Shiawase-Mitsuhama Building"] = "place.php?whichplace=junggate_1";
+        lookup_map["2nd Floor, Shiawase-Mitsuhama Building"] = "place.php?whichplace=junggate_1";
+        lookup_map["3rd Floor, Shiawase-Mitsuhama Building"] = "place.php?whichplace=junggate_1";
+        lookup_map["Chinatown Tenement"] = "place.php?whichplace=junggate_1";
+        lookup_map["The Gourd!"] = "place.php?whichplace=junggate_2";
+        lookup_map["A Deserted Stretch of I-911"] = "place.php?whichplace=ioty2014_hare";
+        lookup_map["The Prince's Restroom"] = "place.php?whichplace=ioty2014_cindy";
+        lookup_map["The Prince's Dance Floor"] = "place.php?whichplace=ioty2014_cindy";
+        lookup_map["The Prince's Kitchen"] = "place.php?whichplace=ioty2014_cindy";
+        lookup_map["The Prince's Balcony"] = "place.php?whichplace=ioty2014_cindy";
+        lookup_map["The Prince's Lounge"] = "place.php?whichplace=ioty2014_cindy";
+        lookup_map["The Prince's Canapes table"] = "place.php?whichplace=ioty2014_cindy";
+        lookup_map["The Inner Wolf Gym"] = "place.php?whichplace=ioty2014_wolf";
+        lookup_map["Unleash Your Inner Wolf"] = "place.php?whichplace=ioty2014_wolf";
+        lookup_map["The Crimbonium Mining Camp"] = "place.php?whichplace=desertbeach";
+        lookup_map["Kokomo Resort"] = "place.php?whichplace=desertbeach";
+        lookup_map["The Crimbonium Mine"] = "mining.php?mine=5";
+        lookup_map["The Secret Council Warehouse"] = "tutorial.php";
+        lookup_map["The Skeleton Store"] = "place.php?whichplace=town_market";
+        lookup_map["Madness Bakery"] = "place.php?whichplace=town_right";
+        lookup_map["The Fungal Nethers"] = "place.php?whichplace=nemesiscave";
+        foreach s in $strings[The Hallowed Halls,Shop Class,Chemistry Class,Art Class]
+            lookup_map[s] = "place.php?whichplace=KOLHS";
+        foreach s in $strings[The Edge of the Swamp,The Dark and Spooky Swamp,The Corpse Bog,The Ruined Wizard Tower,The Wildlife Sanctuarrrrrgh,Swamp Beaver Territory,The Weird Swamp Village]
+            lookup_map[s] = "place.php?whichplace=marais";
+        foreach s in $strings[Ye Olde Medievale Villagee,Portal to Terrible Parents,Rumpelstiltskin's Workshop]
+            lookup_map[s] = "place.php?whichplace=ioty2014_rumple";
+            
+        foreach s in $strings[The Cave Before Time,An Illicit Bohemian Party,Moonshiners' Woods,The Roman Forum,The Post-Mall,The Rowdy Saloon,The Spooky Old Abandoned Mine,Globe Theatre Main Stage,Globe Theatre Backstage]
+            lookup_map[s] = "place.php?whichplace=twitch";
+        foreach s in $strings[The Fun-Guy Mansion,Sloppy Seconds Diner,The Sunken Party Yacht]
+            lookup_map[s] = "place.php?whichplace=airport_sleaze";
+        foreach s in $strings[The Mansion of Dr. Weirdeaux,The Deep Dark Jungle,The Secret Government Laboratory]
+            lookup_map[s] = "place.php?whichplace=airport_spooky";
+        foreach s in $strings[Pirates of the Garbage Barges,Barf Mountain,The Toxic Teacups,Uncle Gator's Country Fun-Time Liquid Waste Sluice]
+            lookup_map[s] = "place.php?whichplace=airport_stench";
+        foreach s in $strings[The SMOOCH Army HQ,The Velvet / Gold Mine,LavaCo&trade; Lamp Factory,The Bubblin' Caldera]
+            lookup_map[s] = "place.php?whichplace=airport_hot";
+        foreach s in $strings[The Ice Hotel,VYKEA,The Ice Hole]
+            lookup_map[s] = "place.php?whichplace=airport_cold";
+        lookup_map["The Velvet / Gold Mine (Mining)"] = "mining.php?mine=6";
+        foreach s in $strings[The Mines,The Jungle,The Ice Caves,The Temple Ruins,Hell,The Snake Pit,The Spider Hole,The Ancient Burial Ground,The Beehive,the crashed u. f. o.,The City of Goooold,LOLmec's Lair,Yomama's Throne]
+            lookup_map[s] = "place.php?whichplace=spelunky";
+        
+        foreach s in $strings[Medbay,Waste Processing,Sonar,Science Lab,Morgue,Special Ops,Engineering,Navigation,Galley]
+            lookup_map[s] = "place.php?whichplace=bugbearship";
+        foreach s in $strings[Sweet-Ade Lake,Eager Rice Burrows,Gumdrop Forest]
+            lookup_map[s] = "place.php?whichplace=ioty2014_candy";
+            
+        foreach s in $strings[Fastest Adventurer Contest,Strongest Adventurer Contest,Smartest Adventurer Contest,Smoothest Adventurer Contest,A Crowd of (Stat) Adventurers,Hottest Adventurer Contest,Coldest Adventurer Contest,Spookiest Adventurer Contest,Stinkiest Adventurer Contest,Sleaziest Adventurer Contest,A Crowd of (Element) Adventurers,The Hedge Maze,Tower Level 1,Tower Level 2,Tower Level 3,Tower Level 4,Tower Level 5,The Naughty Sorceress' Chamber]
+            lookup_map[s] = "place.php?whichplace=nstower";
+            
+        lookup_map["Trick-or-treating"] = "place.php?whichplace=town&action=town_trickortreat";
+        lookup_map["The Deep Machine Tunnels"] = "place.php?whichplace=dmt";
+        
+        lookup_map["The Ruins of the Fully Automated Crimbo Factory"] = "place.php?whichplace=crimbo2015";
+        
+        __constant_clickable_urls = LAConvertLocationLookupToLocations(lookup_map);
+    }
+    initialiseConstantClickableURLs();
+    
+}
+
+string [location] __variable_clickable_urls;
+string getClickableURLForLocation(location l, Error unable_to_find_url)
+{
+    if (l == $location[none])
+        return "";
+    if (__constant_clickable_urls contains l)
+        return __constant_clickable_urls[l];
+        
+    if (__variable_clickable_urls.count() == 0)
+    {
+        //Initialize:
+        //We use to_location() lookups here because $location[] will halt the script if the location name changes.
+        //Probably could move this to an external data file.
+        string [string] lookup_map;
+            
+        //Conditionals only:
+        if ($location[cobb's knob barracks].locationAvailable())
+            lookup_map["The Outskirts of Cobb's Knob"] = "cobbsknob.php";
+        else
+            lookup_map["The Outskirts of Cobb's Knob"] = "place.php?whichplace=plains";
+            
+        if (knoll_available())
+            lookup_map["Post-Quest Bugbear Pens"] = "place.php?whichplace=knoll_friendly";
+        else
+            lookup_map["Post-Quest Bugbear Pens"] =  "place.php?whichplace=knoll_hostile";
+            
+        if ($item[talisman o' namsilat].equipped_amount() > 0)
+            lookup_map["Palindome"] = "place.php?whichplace=palindome";
+        else
+            lookup_map["Palindome"] = "inventory.php?which=2";
+        //antique maps are weird:
+        lookup_map["The Electric Lemonade Acid Parade"] = "inv_use.php?pwd=" + my_hash() + "&whichitem=4613";
+        foreach s in $strings[Professor Jacking's Small-O-Fier,Professor Jacking's Huge-A-Ma-tron]
+            lookup_map[s] = "inv_use.php?pwd=" + my_hash() + "&whichitem=4560";
+            
+        //Parse into locations:
+        __variable_clickable_urls = LAConvertLocationLookupToLocations(lookup_map);
+    }
+    if (__variable_clickable_urls contains l)
+        return __variable_clickable_urls[l];
+
+    ErrorSet(unable_to_find_url);
+    return "";
+}
+
+string getClickableURLForLocation(location l)
+{
+    return l.getClickableURLForLocation(ErrorMake());
+}
+
+string getClickableURLForLocationIfAvailable(location l)
+{
+    Error able_to_find;
+    boolean found = l.locationAvailable(able_to_find);
+    if (able_to_find.was_error) //assume it's available, since we don't know
+        found = true;
+    if (found)
+        return l.getClickableURLForLocation();
+    else
+        return "";
+}
+
+string HTMLGenerateFutureTextByLocationAvailability(string base_text, location place)
+{
+    if (!place.locationAvailable() && place != $location[none])
+    {
+        base_text = HTMLGenerateSpanOfClass(base_text, "r_future_option");
+    }
+    return base_text;
+}
+
+string HTMLGenerateFutureTextByLocationAvailability(location place)
+{
+	return HTMLGenerateFutureTextByLocationAvailability(place.to_string(), place);
+}
+
 
 
 
@@ -4569,7 +5915,13 @@ static
         ServerImageStats [string] ism;
         int [string] ysm;
         
-ism["borgelf1.gif"] = im(11, 74);ism["borgelf4.gif"] = im(19, 82);ism["borgelf2.gif"] = im(25, 87);ism["borgelf3.gif"] = im(14, 78);ism["handymanjay.gif"] = im(5, 92);ism["1335.gif"] = im(7, 93);ism["miner.gif"] = im(1, 95);ism["foreman.gif"] = im(2, 94);ism["gremlinamc.gif"] = im(12, 78);ism["abcrusher.gif"] = im(12, 89);ism["adv_smart1.gif"] = im(0, 97);ism["lower_b.gif"] = im(16, 74);ism["electriceel.gif"] = im(1, 98);ism["1boy2cups.gif"] = im(2, 91);ism["advecho.gif"] = im(0, 99);ism["whitebat.gif"] = im(33, 70);ism["mar_alert.gif"] = im(0, 99);ism["alielf.gif"] = im(4, 95);ism["spelunkalien.gif"] = im(17, 81);ism["muthamster.gif"] = im(5, 95);ism["spelunkalienq.gif"] = im(150, 150, 17, 141);ism["spelunkufo.gif"] = im(21, 78);ism["steve.gif"] = im(0, 98);ism["catfish.gif"] = im(41, 91);ism["giant_alphabet.gif"] = im(1, 97);ism["elf_amateur.gif"] = im(10, 83);ism["ninja.gif"] = im(13, 85);ism["pirate2.gif"] = im(6, 93);ism["crimbominer3.gif"] = im(2, 97);ism["amokputty.gif"] = im(5, 84);ism["srpainting2.gif"] = im(20, 82);ism["regret3.gif"] = im(27, 79);ism["oldguardstatue.gif"] = im(0, 97);ism["pebbleman.gif"] = im(2, 89);ism["mariner.gif"] = im(5, 93);ism["protspirit.gif"] = im(7, 86);ism["guardstatue.gif"] = im(0, 98);ism["bb_horror.gif"] = im(125, 100, 5, 89);ism["anemone.gif"] = im(0, 97);ism["bb_doctor.gif"] = im(7, 83);ism["angel.gif"] = im(6, 87);ism["angerman.gif"] = im(200, 250, 15, 242);ism["anglerbush.gif"] = im(0, 97);ism["mh_bassist.gif"] = im(2, 97);ism["angbugbear.gif"] = im(6, 91);ism["bb_caveman.gif"] = im(4, 92);ism["mush_angry.gif"] = im(8, 89);ism["pinata.gif"] = im(0, 97);ism["madpoet.gif"] = im(7, 93);ism["raccoon.gif"] = im(6, 93);ism["hunter7.gif"] = im(0, 98);ism["stenchtourist.gif"] = im(0, 93);ism["nightstand2.gif"] = im(13, 91);ism["darkstand.gif"] = im(1, 98);ism["nightstand.gif"] = im(2, 96);ism["nightstand4.gif"] = im(1, 99);ism["fear2.gif"] = im(1, 95);ism["nightstand3.gif"] = im(7, 95);ism["spittoon.gif"] = im(3, 99);ism["smiley.gif"] = im(30, 67);ism["annoyfairy.gif"] = im(15, 76);ism["spiderserver.gif"] = im(7, 94);ism["lizardman.gif"] = im(4, 94);ism["aquabat.gif"] = im(150, 100, 15, 79);ism["aquaconda.gif"] = im(5, 91);ism["aquagoblin.gif"] = im(0, 99);ism["2headseal.gif"] = im(9, 81);ism["mush_armor.gif"] = im(7, 91);ism["adv_spooky4.gif"] = im(4, 96);ism["adv_stench3.gif"] = im(5, 95);ism["astronomer.gif"] = im(6, 93);ism["aquadargon.gif"] = im(200, 200, 6, 190);ism["elf_auteur.gif"] = im(15, 78);ism["disco_awkward.gif"] = im(4, 95);ism["axehandle.gif"] = im(9, 89);ism["axewound.gif"] = im(9, 87);ism["saucezombie.gif"] = im(0, 97);ism["stone_serpent.gif"] = im(0, 98);ism["stone_sheep.gif"] = im(21, 81);ism["baconsnake.gif"] = im(4, 96);ism["badascii.gif"] = im(35, 61);ism["pa_potatoes.gif"] = im(8, 95);ism["baglady.gif"] = im(0, 99);ism["warhipmo.gif"] = im(44, 98);ism["baiowulf.gif"] = im(8, 94);ism["spelunkbanana.gif"] = im(150, 150, 0, 149);ism["bangyomama.gif"] = im(2, 89);ism["banjowizard.gif"] = im(0, 99);ism["banshee.gif"] = im(6, 98);ism["bar.gif"] = im(13, 88);ism["ratsworth.gif"] = im(0, 96);ism["basaltamander.gif"] = im(0, 99);ism["ballbat.gif"] = im(7, 60);ism["reindeer.gif"] = im(0, 99);ism["basicgolem.gif"] = im(6, 89);ism["spelunkbat.gif"] = im(15, 77);ism["bb_bat.gif"] = im(27, 81);ism["adv_spooky3.gif"] = im(1, 93);ism["batrat.gif"] = im(25, 75);ism["snakeboss5.gif"] = im(150, 150, 13, 141);ism["bb_mech.gif"] = im(1, 98);ism["aboo_wars.gif"] = im(3, 98);ism["gremlinbat.gif"] = im(11, 83);ism["bazookafish.gif"] = im(25, 68);ism["beanbat.gif"] = im(28, 63);ism["topi2.gif"] = im(9, 93);ism["earbeast.gif"] = im(14, 80);ism["eyebeast.gif"] = im(17, 99);ism["beaver.gif"] = im(13, 77);ism["spelunkbee.gif"] = im(3, 86);ism["beeswarm.gif"] = im(3, 97);ism["beethoven.gif"] = im(5, 94);ism["beebeegunner.gif"] = im(16, 70);ism["beebeeking.gif"] = im(16, 79);ism["beebeequeue.gif"] = im(4, 97);ism["beefybat.gif"] = im(18, 58);ism["beelephant.gif"] = im(0, 89);ism["batter.gif"] = im(0, 99);ism["warfratbg.gif"] = im(0, 95);ism["straw_stench.gif"] = im(15, 93);ism["bellhop.gif"] = im(17, 89);ism["carpet.gif"] = im(33, 75);ism["novelist.gif"] = im(2, 92);ism["wraith2.gif"] = im(15, 89);ism["biclops.gif"] = im(4, 92);ism["spider1.gif"] = im(15, 78);ism["bigmeat.gif"] = im(0, 94);ism["whelps2.gif"] = im(1, 98);ism["twins_bigwheel.gif"] = im(200, 100, 5, 95);ism["aquaniewski.gif"] = im(0, 97);ism["bigface.gif"] = im(14, 92);ism["vib2.gif"] = im(3, 97);ism["blimp.gif"] = im(8, 94);ism["blackadder.gif"] = im(12, 79);ism["blackcat.gif"] = im(4, 90);ism["cray_beast.gif"] = im(200, 200, 41, 171);ism["cray_bug.gif"] = im(200, 200, 43, 152);ism["cray_const.gif"] = im(200, 200, 15, 193);ism["cray_elf.gif"] = im(200, 200, 22, 181);ism["cray_demon.gif"] = im(200, 200, 32, 178);ism["cray_elemental.gif"] = im(200, 200, 8, 191);ism["cray_fish.gif"] = im(200, 200, 30, 145);ism["cray_plant.gif"] = im(200, 200, 9, 184);ism["cray_orc.gif"] = im(200, 200, 32, 169);ism["cray_goblin.gif"] = im(200, 200, 32, 167);ism["cray_construct.gif"] = im(200, 200, 23, 183);ism["cray_hippy.gif"] = im(200, 200, 19, 163);ism["cray_hobo.gif"] = im(200, 200, 1, 198);ism["cray_dude.gif"] = im(200, 200, 7, 182);ism["cray_humanoid.gif"] = im(200, 200, 12, 188);ism["cray_merkin.gif"] = im(200, 200, 17, 172);ism["cray_penguin.gif"] = im(200, 200, 31, 185);ism["cray_pirate.gif"] = im(200, 200, 18, 179);ism["cray_horror.gif"] = im(200, 200, 1, 197);ism["cray_slime.gif"] = im(200, 200, 61, 166);ism["cray_weird.gif"] = im(200, 200, 27, 186);ism["cray_undead.gif"] = im(200, 200, 22, 162);ism["blackfriar.gif"] = im(5, 97);ism["blknight.gif"] = im(4, 90);ism["witchywoman.gif"] = im(1, 99);ism["bb_ninja.gif"] = im(5, 91);ism["panther.gif"] = im(11, 93);ism["blpudding.gif"] = im(47, 98);ism["blackwidow.gif"] = im(0, 99);ism["pengblackop.gif"] = im(3, 98);ism["blackbush.gif"] = im(15, 98);ism["sawblade.gif"] = im(0, 98);ism["firebat.gif"] = im(1, 97);ism["squid.gif"] = im(3, 95);ism["bluecultist.gif"] = im(0, 99);ism["mh_bluehair.gif"] = im(1, 98);ism["blur.gif"] = im(4, 97);ism["boaraffe.gif"] = im(0, 99);ism["naskar2.gif"] = im(5, 95);ism["bogleech.gif"] = im(10, 91);ism["bogskeleton.gif"] = im(1, 95);ism["bogart.gif"] = im(11, 91);ism["elf_boltcutters.gif"] = im(5, 78);ism["foss_wyrm.gif"] = im(200, 200, 0, 196);ism["bookbat.gif"] = im(22, 65);ism["boothslime.gif"] = im(2, 97);ism["bootycrab.gif"] = im(20, 85);ism["boozegiant.gif"] = im(5, 92);ism["borgabeeping.gif"] = im(0, 96);ism["bossbat.gif"] = im(26, 73);ism["deadbossbat.gif"] = im(7, 94);ism["crimonster3.gif"] = im(4, 96);ism["cricket.gif"] = im(5, 97);ism["box.gif"] = im(9, 87);ism["pa_muffin.gif"] = im(13, 87);ism["mystwander5.gif"] = im(5, 99);ism["broombrain.gif"] = im(6, 95);ism["bram.gif"] = im(8, 92);ism["breadgolem.gif"] = im(6, 90);ism["breakdancer.gif"] = im(0, 97);ism["brick_sleaze.gif"] = im(24, 96);ism["brick_cold.gif"] = im(1, 95);ism["brick_hot.gif"] = im(0, 99);ism["brick_spooky.gif"] = im(4, 95);ism["kok_tender.gif"] = im(21, 97);ism["brick_stench.gif"] = im(4, 94);ism["brickoairship.gif"] = im(300, 300, 6, 295);ism["brickobat.gif"] = im(3, 68);ism["brickocathedral.gif"] = im(500, 450, 17, 443);ism["brickoelephant.gif"] = im(150, 150, 34, 132);ism["brickogchicken.gif"] = im(600, 450, 15, 444);ism["brickoctopus.gif"] = im(150, 150, 9, 143);ism["brickoblob.gif"] = im(57, 94);ism["brickooyster.gif"] = im(16, 91);ism["brickopython.gif"] = im(450, 100, 11, 87);ism["brickoturtle.gif"] = im(22, 77);ism["brickovacuum.gif"] = im(200, 200, 17, 182);ism["casebat.gif"] = im(40, 63);ism["bath_bubble.gif"] = im(17, 76);ism["iceguy5.gif"] = im(0, 97);ism["broctopus.gif"] = im(0, 99);ism["bronzechef.gif"] = im(0, 99);ism["babyseal.gif"] = im(6, 84);ism["togafrat.gif"] = im(2, 96);ism["twins_bubble.gif"] = im(13, 94);ism["bb_ghost.gif"] = im(5, 89);ism["bb_captain.gif"] = im(150, 150, 3, 143);ism["bb_drone.gif"] = im(2, 97);ism["bb_mortician.gif"] = im(9, 91);ism["robosurgeon.gif"] = im(14, 88);ism["bb_science.gif"] = im(6, 88);ism["binbox.gif"] = im(4, 91);ism["bugbugbear.gif"] = im(6, 91);ism["bulletbill.gif"] = im(15, 83);ism["bullseal.gif"] = im(9, 95);ism["ratbunch.gif"] = im(1, 92);ism["pa_meat.gif"] = im(5, 96);ism["bunsen.gif"] = im(9, 87);ism["sidekick.gif"] = im(5, 97);ism["adv_hot3.gif"] = im(18, 95);ism["snakeboss4.gif"] = im(150, 150, 19, 133);ism["bishop.gif"] = im(54, 94);ism["bush.gif"] = im(8, 93);ism["bushippy.gif"] = im(8, 94);ism["hedgerow.gif"] = im(25, 79);ism["pa_knife.gif"] = im(1, 87);ism["buzzerker.gif"] = im(11, 84);ism["buzzy.gif"] = im(0, 97);ism["chum1.gif"] = im(7, 91);ism["chumchief.gif"] = im(7, 94);ism["carnivore.gif"] = im(6, 96);ism["animbear.gif"] = im(0, 99);ism["laundrycabinet.gif"] = im(1, 98);ism["cactuary.gif"] = im(0, 97);ism["cakelord.gif"] = im(0, 98);ism["cameltoe.gif"] = im(5, 97);ism["cancan.gif"] = im(4, 97);ism["pecantree.gif"] = im(1, 98);ism["yamgolem.gif"] = im(0, 97);ism["gourd_cangoblin.gif"] = im(9, 88);ism["carbuncletop.gif"] = im(1, 92);ism["cargocrab.gif"] = im(7, 94);ism["dillplant.gif"] = im(2, 99);ism["carniv.gif"] = im(5, 94);ism["pa_eggs.gif"] = im(22, 86);ism["thecastle.gif"] = im(21, 78);ism["catalien.gif"] = im(21, 89);ism["spelunkcaveman.gif"] = im(7, 91);ism["cavedan.gif"] = im(0, 97);ism["cavefrat.gif"] = im(2, 95);ism["cavehippy.gif"] = im(0, 97);ism["cavesorority.gif"] = im(0, 95);ism["cavewomyn.gif"] = im(0, 94);ism["butt.gif"] = im(16, 81);ism["pengcement.gif"] = im(2, 97);ism["centurion.gif"] = im(7, 80);ism["adv_hot2.gif"] = im(2, 96);ism["chimp.gif"] = im(6, 90);ism["chalkdust.gif"] = im(6, 98);ism["hunter10.gif"] = im(1, 97);ism["c10chatty.gif"] = im(0, 96);ism["strix.gif"] = im(4, 93);ism["adv_stench2.gif"] = im(1, 97);ism["adv_fast1.gif"] = im(4, 93);ism["chefboy.gif"] = im(0, 98);ism["chester.gif"] = im(1, 97);ism["robotceo.gif"] = im(5, 92);ism["chocohare.gif"] = im(23, 93);ism["ccprairie.gif"] = im(1, 97);ism["soupgolem.gif"] = im(3, 93);ism["ciggirl.gif"] = im(0, 99);ism["animelf3.gif"] = im(19, 80);ism["cavebars.gif"] = im(0, 98);ism["clancy.gif"] = im(9, 94);ism["bathtub.gif"] = im(50, 97);ism["claygolem.gif"] = im(1, 98);ism["aboo_wiz.gif"] = im(3, 96);ism["cleanroomdemon.gif"] = im(5, 95);ism["cleanpirate.gif"] = im(3, 94);ism["girlpirate.gif"] = im(7, 91);ism["colaoff1.gif"] = im(4, 94);ism["colasol1.gif"] = im(6, 96);ism["rock_hopper.gif"] = im(0, 99);ism["whiskers.gif"] = im(8, 84);ism["clubfish.gif"] = im(1, 90);ism["prim_bact.gif"] = im(0, 98);ism["coaltergeist.gif"] = im(5, 91);ism["kg_oven.gif"] = im(8, 97);ism["spelunkcobra.gif"] = im(14, 77);ism["cocktailshrimp.gif"] = im(0, 99);ism["dvcoldbear1.gif"] = im(3, 97);ism["coldcutter.gif"] = im(2, 94);ism["dvcoldghost1.gif"] = im(0, 96);ism["coldhobo1.gif"] = im(5, 89);ism["wood_cold.gif"] = im(13, 96);ism["dvcoldskel1.gif"] = im(1, 95);ism["dvcoldvamp1.gif"] = im(3, 94);ism["dvcoldwolf1.gif"] = im(1, 98);ism["dvcoldzom1.gif"] = im(5, 98);ism["minegolem.gif"] = im(4, 89);ism["spider2.gif"] = im(20, 83);ism["pianist.gif"] = im(0, 98);ism["lilgoth.gif"] = im(19, 96);ism["2zombies.gif"] = im(6, 92);ism["conhippy.gif"] = im(2, 94);ism["regret1.gif"] = im(2, 90);ism["pa_cutter.gif"] = im(21, 76);ism["crimonster2.gif"] = im(0, 99);ism["coolerwino.gif"] = im(0, 97);ism["coppertender.gif"] = im(6, 91);ism["fatzombie.gif"] = im(9, 93);ism["prim_alga.gif"] = im(0, 98);ism["makeupwraith.gif"] = im(11, 81);ism["bakula.gif"] = im(7, 90);ism["drunkula.gif"] = im(100, 175, 5, 166);ism["drunkula_hm.gif"] = im(300, 175, 2, 159);ism["courtesan.gif"] = im(5, 95);ism["cowskeleton.gif"] = im(1, 97);ism["creep.gif"] = im(13, 91);ism["craggybart.gif"] = im(3, 91);ism["crate.gif"] = im(10, 89);ism["stone_raven.gif"] = im(21, 85);ism["bastard.gif"] = im(3, 94);ism["adv_smooth2.gif"] = im(3, 94);ism["clown.gif"] = im(3, 97);ism["creepydoll.gif"] = im(4, 96);ism["dianoga.gif"] = im(11, 87);ism["twins_ginger.gif"] = im(1, 98);ism["creepygirl.gif"] = im(32, 97);ism["pa_torch.gif"] = im(3, 92);ism["crimbomega.gif"] = im(400, 550, 7, 545);ism["spelunkcroc.gif"] = im(6, 89);ism["croqueteer.gif"] = im(1, 90);ism["dustmote.gif"] = im(20, 86);ism["hippy3.gif"] = im(8, 94);ism["crustpirate.gif"] = im(1, 95);ism["crys_rock.gif"] = im(200, 150, 2, 137);ism["cubistbull.gif"] = im(0, 99);ism["spelunkhawk.gif"] = im(3, 95);ism["curmpirate.gif"] = im(6, 93);ism["cybercop.gif"] = im(2, 97);ism["prim_cyru.gif"] = im(0, 98);ism["dad_machine.gif"] = im(400, 300, 6, 294);ism["daftpunk.gif"] = im(3, 97);ism["biggoat.gif"] = im(2, 98);ism["ooze.gif"] = im(45, 93);ism["dirtyape.gif"] = im(0, 99);ism["mush_dancing.gif"] = im(11, 91);ism["chad.gif"] = im(3, 93);ism["rorshach.gif"] = im(8, 79);ism["bath_showerhead.gif"] = im(2, 97);ism["venomtrout.gif"] = im(47, 99);ism["vice.gif"] = im(20, 85);ism["shiv_dead.gif"] = im(3, 94);ism["deathray.gif"] = im(4, 98);ism["lumberjack.gif"] = im(5, 92);ism["whiteshark.gif"] = im(15, 71);ism["5_4a.gif"] = im(200, 200, 0, 197);ism["demfridge.gif"] = im(1, 99);ism["jigsaw.gif"] = im(12, 83);ism["demoninja.gif"] = im(17, 89);ism["liana.gif"] = im(13, 90);ism["wanderacc1.gif"] = im(1, 97);ism["hunter8.gif"] = im(0, 97);ism["goldfarmer.gif"] = im(9, 91);ism["smoochboss4.gif"] = im(100, 200, 11, 191);ism["spelunkdevil.gif"] = im(0, 99);ism["digitalug.gif"] = im(17, 87);ism["dinnertroll.gif"] = im(13, 87);ism["direpigeon.gif"] = im(0, 98);ism["hippy2.gif"] = im(8, 93);ism["dirtyoldlihc.gif"] = im(6, 99);ism["bandit.gif"] = im(1, 95);ism["dinbox.gif"] = im(16, 91);ism["c10files.gif"] = im(7, 98);ism["divingbelle.gif"] = im(0, 99);ism["js_oh.gif"] = im(5, 91);ism["pede.gif"] = im(20, 81);ism["dogalien.gif"] = im(3, 92);ism["catdog.gif"] = im(17, 85);ism["iceguy2.gif"] = im(8, 97);ism["doncrimbo.gif"] = im(0, 99);ism["donerbagon.gif"] = im(200, 200, 1, 189);ism["dwarf_dopey.gif"] = im(0, 99);ism["doubtman.gif"] = im(200, 200, 2, 193);ism["doughbat.gif"] = im(41, 63);ism["aquard.gif"] = im(0, 99);ism["drawkward.gif"] = im(4, 95);ism["braddarb.gif"] = im(5, 96);ism["droll.gif"] = im(18, 87);ism["dropbase.gif"] = im(12, 80);ism["drownedsailor.gif"] = im(1, 97);ism["drownedbeat.gif"] = im(0, 95);ism["ducknicedrunk.gif"] = im(1, 94);ism["drunkgoat.gif"] = im(2, 98);ism["pyg_drunk.gif"] = im(9, 99);ism["drunkminer.gif"] = im(0, 98);ism["hobo.gif"] = im(5, 91);ism["rat.gif"] = im(33, 67);ism["ratking.gif"] = im(200, 200, 7, 185);ism["kok_drunk.gif"] = im(0, 93);ism["zomhobo.gif"] = im(5, 91);ism["aboo_dipshit.gif"] = im(1, 97);ism["straw_spooky.gif"] = im(39, 91);ism["dwarfgnome.gif"] = im(17, 84);ism["dweebie.gif"] = im(5, 94);ism["colaoff2.gif"] = im(4, 94);ism["colasol2.gif"] = im(6, 96);ism["eve.gif"] = im(0, 93);ism["eagle.gif"] = im(0, 98);ism["ed.gif"] = im(1, 98);ism["ed2.gif"] = im(1, 98);ism["ed3.gif"] = im(1, 98);ism["ed4.gif"] = im(1, 98);ism["ed5.gif"] = im(1, 98);ism["ed6.gif"] = im(22, 98);ism["ed7.gif"] = im(46, 98);ism["edwing.gif"] = im(24, 83);ism["eldiablo.gif"] = im(0, 99);ism["elders.gif"] = im(11, 85);ism["submarine.gif"] = im(8, 86);ism["nightstand5.gif"] = im(22, 82);ism["topi3.gif"] = im(7, 90);ism["elfhobo1.gif"] = im(28, 97);ism["warfratbg2.gif"] = im(0, 95);ism["elp_and_cros.gif"] = im(300, 150, 5, 146);ism["skinyeti.gif"] = im(4, 90);ism["armor.gif"] = im(0, 98);ism["inflatiger.gif"] = im(7, 98);ism["c10confcall.gif"] = im(2, 94);ism["grayblob3.gif"] = im(150, 200, 21, 178);ism["cow.gif"] = im(0, 99);ism["adv_strong3.gif"] = im(9, 91);ism["gremlinglasses.gif"] = im(7, 94);ism["stairmaster.gif"] = im(12, 94);ism["mc_respect3.gif"] = im(4, 94);ism["mc_soy3.gif"] = im(0, 97);ism["mc_tofu3.gif"] = im(1, 98);ism["cultist.gif"] = im(3, 98);ism["mh_evilex.gif"] = im(0, 99);ism["oliveevil.gif"] = im(13, 85);ism["spagcult2.gif"] = im(1, 95);ism["spagcult3.gif"] = im(0, 99);ism["spagcult1.gif"] = im(0, 98);ism["spagcult2k.gif"] = im(1, 95);ism["spagcult4.gif"] = im(0, 99);ism["spagcult1k.gif"] = im(0, 98);ism["trumpetmariachi.gif"] = im(2, 97);ism["vihuelamariachi.gif"] = im(2, 96);ism["crimbominer1.gif"] = im(0, 99);ism["skihippy.gif"] = im(3, 94);ism["fratboard.gif"] = im(3, 91);ism["wcorcs.gif"] = im(0, 97);ism["witchy2.gif"] = im(0, 99);ism["darkeye.gif"] = im(5, 91);ism["guai.gif"] = im(11, 85);ism["facworker4.gif"] = im(3, 95);ism["facworker3.gif"] = im(1, 97);ism["facworker1.gif"] = im(3, 97);ism["facworker2.gif"] = im(1, 93);ism["badskel1.gif"] = im(20, 84);ism["archfiend.gif"] = im(10, 84);ism["fallsfromsky.gif"] = im(100, 150, 2, 143);ism["fallsfromsky_hm.gif"] = im(200, 300, 7, 285);ism["jewels.gif"] = im(8, 82);ism["kobolds.gif"] = im(0, 97);ism["fandancer.gif"] = im(6, 91);ism["fanslime.gif"] = im(2, 94);ism["bathslug.gif"] = im(1, 98);ism["hunter5.gif"] = im(1, 98);ism["hunter9.gif"] = im(1, 93);ism["fearman.gif"] = im(200, 200, 12, 185);ism["bath_octopus.gif"] = im(0, 98);ism["wacken.gif"] = im(200, 200, 23, 186);ism["manyeyes.gif"] = im(4, 81);ism["felonia.gif"] = im(0, 98);ism["haiku2.gif"] = im(6, 91);ism["bath_pelican.gif"] = im(1, 97);ism["ferrelf.gif"] = im(5, 90);ism["finger.gif"] = im(2, 96);ism["asparagus.gif"] = im(9, 89);ism["mush_flaming.gif"] = im(0, 99);ism["duckskate.gif"] = im(2, 98);ism["filthworm2.gif"] = im(24, 75);ism["filthworm3.gif"] = im(19, 70);ism["hippy1.gif"] = im(8, 89);ism["stinkpirate1.gif"] = im(3, 97);ism["adv_hot1.gif"] = im(1, 97);ism["firetruck.gif"] = im(300, 150, 7, 145);ism["duckfirebreath.gif"] = im(7, 91);ism["fisherfish.gif"] = im(3, 97);ism["stinkpirate3.gif"] = im(1, 93);ism["giant_fitness.gif"] = im(9, 97);ism["bigskeleton5.gif"] = im(250, 100, 0, 99);ism["meatblob.gif"] = im(10, 79);ism["samurai.gif"] = im(0, 99);ism["flametroll.gif"] = im(1, 96);ism["flange.gif"] = im(12, 78);ism["flashypirate.gif"] = im(4, 94);ism["cvfleaman.gif"] = im(5, 90);ism["woodsman.gif"] = im(9, 96);ism["disco_flexible.gif"] = im(3, 97);ism["caveelf3.gif"] = im(25, 85);ism["horstray.gif"] = im(19, 89);ism["seagulls.gif"] = im(3, 91);ism["stabbats.gif"] = im(0, 97);ism["bunny.gif"] = im(49, 94);ism["gourd_fnord.gif"] = im(200, 200, 23, 171);ism["giant_foodie.gif"] = im(4, 97);ism["forspirit.gif"] = im(21, 74);ism["bigskeleton4.gif"] = im(200, 100, 0, 99);ism["mime.gif"] = im(0, 97);ism["artteacher.gif"] = im(4, 95);ism["accboss.gif"] = im(0, 98);ism["warfrata.gif"] = im(1, 96);ism["mush_freaked.gif"] = im(9, 91);ism["frenchturtle.gif"] = im(19, 72);ism["bonefish.gif"] = im(40, 97);ism["frog.gif"] = im(53, 99);ism["frosty.gif"] = im(0, 99);ism["straw_cold.gif"] = im(12, 91);ism["mystwander3.gif"] = im(8, 94);ism["duckfrozen.gif"] = im(2, 96);ism["snakeboss1.gif"] = im(150, 150, 21, 133);ism["fruitgolem.gif"] = im(8, 97);ism["anger3.gif"] = im(0, 99);ism["fudgemonkey2.gif"] = im(0, 99);ism["fudgeoyster.gif"] = im(0, 99);ism["fudgepoodle.gif"] = im(2, 96);ism["fudgevulture.gif"] = im(0, 99);ism["fudgeweasel.gif"] = im(11, 86);ism["bigmirror.gif"] = im(0, 99);ism["fun-gal1.gif"] = im(0, 99);ism["funkparticle.gif"] = im(8, 94);ism["solebrother.gif"] = im(19, 76);ism["stinkpirate2.gif"] = im(3, 96);ism["shiv_fur.gif"] = im(1, 94);ism["giant_furry.gif"] = im(0, 98);ism["gimp.gif"] = im(15, 90);ism["gamblinman.gif"] = im(1, 95);ism["muggers.gif"] = im(2, 98);ism["ganger.gif"] = im(16, 88);ism["garbagetourist.gif"] = im(3, 94);ism["gargantulihc.gif"] = im(1, 93);ism["ghuol_skinny.gif"] = im(16, 90);ism["gelcube.gif"] = im(12, 97);ism["generalseal.gif"] = im(150, 100, 2, 97);ism["duckgeneric.gif"] = im(4, 94);ism["merkinballer2.gif"] = im(1, 99);ism["smoochboss1.gif"] = im(100, 200, 8, 189);ism["phantom.gif"] = im(1, 95);ism["cvghost.gif"] = im(4, 92);ism["spelunkghost.gif"] = im(11, 91);ism["ghostminer.gif"] = im(1, 98);ism["elizabeth.gif"] = im(10, 86);ism["fernghost.gif"] = im(1, 92);ism["worker.gif"] = im(2, 94);ism["adv_spooky1.gif"] = im(8, 91);ism["ghuol_reg.gif"] = im(11, 85);ism["giantbee.gif"] = im(2, 84);ism["pterodactyl.gif"] = im(6, 91);ism["globe.gif"] = im(0, 95);ism["friedegg.gif"] = im(2, 82);ism["centipede.gif"] = im(21, 81);ism["moth.gif"] = im(5, 95);ism["isopod.gif"] = im(35, 95);ism["python.gif"] = im(4, 93);ism["bath_whale.gif"] = im(14, 82);ism["manyspiders.gif"] = im(1, 94);ism["watertentacle.gif"] = im(6, 93);ism["tweezers.gif"] = im(6, 93);ism["headpumpkin.gif"] = im(5, 96);ism["rubberspider.gif"] = im(15, 84);ism["sandworm.gif"] = im(2, 99);ism["giantskel.gif"] = im(0, 99);ism["tarantula.gif"] = im(1, 97);ism["giantsquid.gif"] = im(0, 98);ism["whelps3.gif"] = im(0, 99);ism["tardigrade.gif"] = im(4, 91);ism["zomfish.gif"] = im(2, 86);ism["crimonster5.gif"] = im(0, 92);ism["gingerbreadman.gif"] = im(0, 99);ism["gladiator.gif"] = im(1, 96);ism["juiceglass.gif"] = im(12, 87);ism["wood_hot.gif"] = im(3, 95);ism["ghuol_fat.gif"] = im(13, 87);ism["gnarlgnome.gif"] = im(9, 79);ism["gnasgnome.gif"] = im(6, 77);ism["gnefgnome.gif"] = im(12, 83);ism["dk_builder.gif"] = im(9, 97);ism["dk_cross.gif"] = im(3, 94);ism["dk_swatter.gif"] = im(3, 95);ism["dk_gearhead.gif"] = im(1, 97);ism["dk_piechef.gif"] = im(0, 99);ism["dk_plunger.gif"] = im(3, 93);ism["gnollmage.gif"] = im(3, 95);ism["dk_juggler.gif"] = im(1, 97);ism["dk_warchef.gif"] = im(0, 98);ism["gnomester.gif"] = im(5, 91);ism["gnugnome.gif"] = im(10, 84);ism["gourd_goblin.gif"] = im(7, 92);ism["goldenring.gif"] = im(17, 86);ism["goomba.gif"] = im(9, 89);ism["goosealaying.gif"] = im(0, 99);ism["1_4a.gif"] = im(200, 200, 2, 198);ism["1_1.gif"] = im(18, 93);ism["1_2.gif"] = im(10, 92);ism["1_3.gif"] = im(10, 93);ism["giant_goth.gif"] = im(3, 96);ism["gourami.gif"] = im(51, 93);ism["gov_agent.gif"] = im(11, 94);ism["scientist.gif"] = im(3, 95);ism["adv_stench1.gif"] = im(6, 97);ism["grasselemental.gif"] = im(0, 99);ism["grasspirate.gif"] = im(0, 95);ism["rober.gif"] = im(8, 91);ism["zomshovel.gif"] = im(4, 94);ism["adv_sleaze1.gif"] = im(3, 90);ism["duckgreasy.gif"] = im(0, 91);ism["wolfoftheair.gif"] = im(200, 150, 8, 136);ism["wolfoftheair_hm.gif"] = im(200, 150, 7, 135);ism["warhipgr.gif"] = im(5, 93);ism["porkbun.gif"] = im(14, 79);ism["gritpirate.gif"] = im(1, 97);ism["surv_grizzled.gif"] = im(3, 91);ism["wingedyeti.gif"] = im(200, 100, 0, 99);ism["groast.gif"] = im(5, 94);ism["grouchewie.gif"] = im(7, 90);ism["cultistgroup.gif"] = im(4, 96);ism["groupie.gif"] = im(16, 85);ism["dwarf_grumpy.gif"] = im(0, 99);ism["grungypirate.gif"] = im(11, 95);ism["guardturtle1.gif"] = im(29, 89);ism["plesio.gif"] = im(1, 98);ism["gurgle.gif"] = im(150, 100, 0, 99);ism["animturtle.gif"] = im(100, 120, 4, 118);ism["beeguy.gif"] = im(0, 96);ism["gothic.gif"] = im(4, 96);ism["adv_sleaze2.gif"] = im(6, 89);ism["drunkyam.gif"] = im(0, 99);ism["hamsterpus.gif"] = im(2, 88);ism["mariachi1.gif"] = im(2, 97);ism["shiv_hangman.gif"] = im(3, 93);ism["hunter12.gif"] = im(3, 97);ism["skullabra.gif"] = im(1, 91);ism["tureen.gif"] = im(6, 87);ism["crystalgolem.gif"] = im(1, 92);ism["heatseal.gif"] = im(0, 99);ism["warfratar2.gif"] = im(10, 88);ism["nachogolem.gif"] = im(0, 98);ism["hellion.gif"] = im(3, 95);ism["sealguard.gif"] = im(13, 95);ism["sealpup.gif"] = im(29, 81);ism["hepcat.gif"] = im(1, 98);ism["hunter6.gif"] = im(3, 96);ism["hermeticseal.gif"] = im(5, 88);ism["c10slideshow.gif"] = im(10, 89);ism["highpriest.gif"] = im(0, 99);ism["warbear31.gif"] = im(0, 99);ism["snakes.gif"] = im(2, 83);ism["hockeyelem.gif"] = im(6, 90);ism["hodgman.gif"] = im(1, 96);ism["holoarmy.gif"] = im(2, 92);ism["honeypot.gif"] = im(5, 92);ism["hooded.gif"] = im(4, 96);ism["stenchfamily.gif"] = im(4, 96);ism["prim_amoe.gif"] = im(0, 98);ism["dvhotbear1.gif"] = im(5, 94);ism["dvhotghost1.gif"] = im(4, 93);ism["hothobo1.gif"] = im(3, 92);ism["dvhotskel1.gif"] = im(13, 99);ism["dvhotvamp1.gif"] = im(0, 98);ism["dvhotwolf1.gif"] = im(12, 98);ism["dvhotzom1.gif"] = im(1, 98);ism["mimic4.gif"] = im(1, 97);ism["ghuol_huge.gif"] = im(5, 95);ism["giantmosquito.gif"] = im(0, 98);ism["iceguy1.gif"] = im(1, 98);ism["bridgetroll.gif"] = im(2, 97);ism["vib6.gif"] = im(7, 98);ism["caveelf2.gif"] = im(18, 73);ism["huntingseal.gif"] = im(9, 85);ism["poolghost.gif"] = im(0, 99);ism["hypnotist.gif"] = im(0, 97);ism["medicus.gif"] = im(3, 92);ism["bb_vamp.gif"] = im(3, 93);ism["adv_cold2.gif"] = im(0, 98);ism["icecreamtruck.gif"] = im(400, 150, 9, 142);ism["icecube.gif"] = im(12, 94);ism["iceskate.gif"] = im(4, 96);ism["adv_cold3.gif"] = im(8, 93);ism["mummycat.gif"] = im(1, 96);ism["illegal_alien.gif"] = im(24, 96);ism["vib3.gif"] = im(0, 99);ism["drunktofurkey.gif"] = im(0, 99);ism["seal_larva.gif"] = im(63, 93);ism["seal_baby.gif"] = im(47, 93);ism["meatbug.gif"] = im(7, 89);ism["inkubus.gif"] = im(7, 97);ism["mariachi2.gif"] = im(2, 91);ism["adv_strong2.gif"] = im(5, 92);ism["encount.gif"] = im(3, 93);ism["jacobsadder.gif"] = im(0, 99);ism["orquette1.gif"] = im(13, 86);ism["jamfish.gif"] = im(0, 98);ism["pilot.gif"] = im(3, 97);ism["jetski.gif"] = im(15, 94);ism["jockohomo.gif"] = im(0, 98);ism["merkindragger2.gif"] = im(1, 99);ism["doubt3.gif"] = im(0, 99);ism["orangutan.gif"] = im(8, 97);ism["scabie_jungle.gif"] = im(2, 92);ism["thejunk.gif"] = im(19, 86);ism["js_bender.gif"] = im(5, 91);ism["js_melter.gif"] = im(11, 95);ism["js_sharpener.gif"] = im(7, 90);ism["orquette2.gif"] = im(13, 86);ism["keese.gif"] = im(25, 66);ism["tooold.gif"] = im(1, 97);ism["clownfish.gif"] = im(22, 82);ism["killingbird.gif"] = im(0, 98);ism["adv_smart3.gif"] = im(15, 94);ism["snaknight.gif"] = im(0, 97);ism["wolfknight.gif"] = im(3, 97);ism["knight.gif"] = im(7, 91);ism["kg_accountant.gif"] = im(12, 98);ism["kg_alchemist.gif"] = im(15, 94);ism["kg_asstchef.gif"] = im(0, 99);ism["kg_bbqteam.gif"] = im(1, 99);ism["kg_beancounter.gif"] = im(12, 97);ism["kg_guard.gif"] = im(10, 94);ism["kg_guardcaptain.gif"] = im(10, 94);ism["zomelite.gif"] = im(6, 90);ism["kg_embezzler.gif"] = im(12, 97);ism["kg_haremgirl.gif"] = im(15, 89);ism["kg_haremguard.gif"] = im(14, 94);ism["kg_king.gif"] = im(0, 98);ism["kg_madsci.gif"] = im(11, 91);ism["kg_madam.gif"] = im(16, 97);ism["kg_masterchef.gif"] = im(0, 99);ism["kg_mba.gif"] = im(16, 98);ism["kg_mutant.gif"] = im(13, 97);ism["kg_poseur.gif"] = im(28, 94);ism["kg_souschef.gif"] = im(0, 98);ism["kg_verymadsci.gif"] = im(15, 92);ism["slanding.gif"] = im(5, 91);ism["yeti.gif"] = im(1, 95);ism["koopa.gif"] = im(5, 93);ism["kublakhan.gif"] = im(5, 92);ism["adv_fast3.gif"] = im(4, 92);ism["limp.gif"] = im(8, 94);ism["labmonkey.gif"] = im(16, 91);ism["n00b.gif"] = im(6, 91);ism["lower_k.gif"] = im(7, 81);ism["headwolf.gif"] = im(0, 98);ism["grayblob2.gif"] = im(9, 93);ism["larrysignfield.gif"] = im(9, 95);ism["filthworm1.gif"] = im(49, 83);ism["laser.gif"] = im(9, 97);ism["lavagolem.gif"] = im(5, 89);ism["lavalamprey.gif"] = im(3, 95);ism["lavalos.gif"] = im(200, 300, 7, 290);ism["lavatory.gif"] = im(0, 98);ism["statbike.gif"] = im(2, 96);ism["linbox.gif"] = im(17, 91);ism["lemonfish.gif"] = im(17, 74);ism["adv_sleaze4.gif"] = im(3, 97);ism["lfruitgol.gif"] = im(33, 84);ism["licosnake.gif"] = im(5, 94);ism["lich.gif"] = im(3, 98);ism["bb_liquidmetal.gif"] = im(7, 92);ism["liquidmetal.gif"] = im(1, 97);ism["grayblob1.gif"] = im(40, 88);ism["canoeman.gif"] = im(13, 66);ism["wanderacc2.gif"] = im(1, 98);ism["pa_bread.gif"] = im(7, 95);ism["lobsterman.gif"] = im(1, 98);ism["lollicat.gif"] = im(12, 91);ism["lolligator.gif"] = im(18, 85);ism["lollipede.gif"] = im(11, 77);ism["lolliphaunt.gif"] = im(12, 91);ism["spelunklolm.gif"] = im(250, 300, 3, 269);ism["lollirus2.gif"] = im(9, 91);ism["vib5.gif"] = im(1, 97);ism["coalition.gif"] = im(2, 89);ism["soggyraven.gif"] = im(0, 99);ism["lordspooky.gif"] = im(7, 97);ism["lotswife.gif"] = im(1, 97);ism["lizardfish.gif"] = im(31, 61);ism["regret2.gif"] = im(1, 95);ism["kok_lovers.gif"] = im(5, 97);ism["lower_h.gif"] = im(13, 87);ism["catstatue.gif"] = im(15, 84);ism["lumbersup.gif"] = im(5, 92);ism["lumberjill.gif"] = im(5, 92);ism["lumberjuan.gif"] = im(0, 92);ism["4_4a.gif"] = im(200, 200, 13, 168);ism["4_1.gif"] = im(21, 70);ism["4_2.gif"] = im(19, 92);ism["4_3.gif"] = im(3, 97);ism["lynyrd.gif"] = im(9, 91);ism["skinner.gif"] = im(2, 96);ism["adv_strong1.gif"] = im(5, 94);ism["madbugbear.gif"] = im(6, 95);ism["prim_flag.gif"] = im(0, 98);ism["madwino.gif"] = im(6, 94);ism["madiator.gif"] = im(2, 96);ism["dragonfish.gif"] = im(0, 99);ism["mech.gif"] = im(1, 98);ism["spelunkmagma.gif"] = im(7, 84);ism["cropcircle.gif"] = im(2, 93);ism["hairclog.gif"] = im(0, 94);ism["magfield.gif"] = im(1, 93);ism["tofurkey.gif"] = im(2, 92);ism["maltliquorgolem.gif"] = im(0, 99);ism["mammon.gif"] = im(200, 200, 11, 193);ism["redbuttons.gif"] = im(1, 93);ism["audrey.gif"] = im(0, 98);ism["wraith5.gif"] = im(10, 90);ism["bandolero.gif"] = im(0, 99);ism["mar_bruiser.gif"] = im(4, 93);ism["mariachi3.gif"] = im(1, 96);ism["wraith3.gif"] = im(9, 88);ism["promoter.gif"] = im(2, 93);ism["wasp.gif"] = im(13, 96);ism["mayorghost.gif"] = im(200, 150, 3, 146);ism["mayorghost_hm.gif"] = im(200, 150, 5, 147);ism["beggar.gif"] = im(0, 98);ism["duckmeandrunk.gif"] = im(3, 96);ism["med_dung.gif"] = im(5, 94);ism["med_mugman.gif"] = im(3, 92);ism["med_muggirl.gif"] = im(5, 89);ism["med_potter.gif"] = im(3, 91);ism["med_strawman.gif"] = im(0, 97);ism["med_stucco.gif"] = im(12, 96);ism["mimic3.gif"] = im(11, 89);ism["cvmedusa.gif"] = im(4, 91);ism["megafrog.gif"] = im(15, 89);ism["vib1.gif"] = im(0, 98);ism["lawngnome1.gif"] = im(14, 80);ism["nemesisthug.gif"] = im(7, 90);ism["merkinalphabet.gif"] = im(6, 93);ism["merkinballer.gif"] = im(4, 98);ism["merkinswitcher.gif"] = im(4, 98);ism["merkinburglar.gif"] = im(1, 95);ism["merkindiver.gif"] = im(1, 95);ism["merkindrifter.gif"] = im(4, 98);ism["merkinhealer.gif"] = im(3, 95);ism["merkinjuicer.gif"] = im(4, 98);ism["merkinminer.gif"] = im(1, 95);ism["merkinmonitor.gif"] = im(6, 93);ism["merkindragger.gif"] = im(4, 98);ism["merkinposeur.gif"] = im(1, 95);ism["merkinpunisher.gif"] = im(1, 95);ism["merkinraider.gif"] = im(3, 95);ism["merkinresearcher.gif"] = im(6, 93);ism["merkinspear.gif"] = im(1, 95);ism["merkinscav.gif"] = im(1, 95);ism["merkinghost.gif"] = im(13, 85);ism["merkinteacher.gif"] = im(2, 99);ism["merkintippler.gif"] = im(1, 99);ism["merkintrainer.gif"] = im(4, 98);ism["mercenary.gif"] = im(6, 95);ism["pengmesmer.gif"] = im(3, 99);ism["adv_smart2.gif"] = im(6, 98);ism["adv_fast2.gif"] = im(1, 96);ism["lowerm.gif"] = im(9, 90);ism["minecrab.gif"] = im(0, 99);ism["mineboss2.gif"] = im(1, 96);ism["mineboss1.gif"] = im(2, 97);ism["mineworker1.gif"] = im(3, 92);ism["mineworker2.gif"] = im(3, 92);ism["twins_mism.gif"] = im(100, 200, 17, 198);ism["badportrait.gif"] = im(0, 98);ism["pengarson.gif"] = im(2, 97);ism["mobcapo.gif"] = im(8, 95);ism["pengcapo.gif"] = im(3, 98);ism["pengdemo.gif"] = im(2, 98);ism["pengthug.gif"] = im(2, 98);ism["peng_ent.gif"] = im(3, 98);ism["pengbook.gif"] = im(2, 98);ism["penggoon.gif"] = im(2, 98);ism["penggun.gif"] = im(3, 98);ism["pengchef.gif"] = im(3, 98);ism["pengpsycho.gif"] = im(3, 98);ism["pengracket.gif"] = im(3, 99);ism["pengsmasher.gif"] = im(0, 98);ism["hazmatpeng.gif"] = im(0, 98);ism["pengprano.gif"] = im(0, 99);ism["pengphone.gif"] = im(0, 98);ism["warhipar2.gif"] = im(6, 89);ism["modelskeleton.gif"] = im(1, 99);ism["modernzombie.gif"] = im(8, 91);ism["moyster.gif"] = im(7, 93);ism["moneybee.gif"] = im(11, 75);ism["elf_wrench.gif"] = im(17, 87);ism["monsterhearse.gif"] = im(250, 200, 22, 186);ism["boiler.gif"] = im(4, 95);ism["monty.gif"] = im(4, 95);ism["moonshriner.gif"] = im(0, 99);ism["fear1.gif"] = im(0, 99);ism["wraith1.gif"] = im(8, 83);ism["motherseal.gif"] = im(9, 91);ism["otherimages/slimetube/stboss.gif"] = im(30, 30, 29, 30);ism["motorhead.gif"] = im(2, 95);ism["mountainman.gif"] = im(3, 97);ism["lawngnome3.gif"] = im(1, 99);ism["lawngnome2.gif"] = im(26, 98);ism["mrcheeng.gif"] = im(0, 97);ism["mrchoch.gif"] = im(0, 98);ism["adv_strong4.gif"] = im(17, 91);ism["adv_cold4.gif"] = im(0, 99);ism["chemteacher.gif"] = im(0, 98);ism["swampturtle.gif"] = im(0, 99);ism["muff.gif"] = im(10, 78);ism["mumblebee.gif"] = im(27, 74);ism["spelunkmumm.gif"] = im(3, 92);ism["mush_beefy.gif"] = im(6, 89);ism["antlerelf.gif"] = im(12, 97);ism["elfblob.gif"] = im(5, 98);ism["elflimbs.gif"] = im(17, 97);ism["elfclaw.gif"] = im(25, 96);ism["mutantgila.gif"] = im(3, 96);ism["mutantsnake.gif"] = im(19, 95);ism["mutantcactus.gif"] = im(0, 96);ism["elfhulk.gif"] = im(3, 97);ism["alielephant.gif"] = im(10, 97);ism["mutantalielf.gif"] = im(1, 97);ism["bb_vassist.gif"] = im(3, 95);ism["nastybear.gif"] = im(1, 97);ism["fear3.gif"] = im(1, 99);ism["sorcform1.gif"] = im(0, 99);ism["sorcblob.gif"] = im(200, 200, 28, 197);ism["bigsaus.gif"] = im(39, 59);ism["warfratmd2.gif"] = im(2, 96);ism["navyseal.gif"] = im(0, 98);ism["giant_neckbeard.gif"] = im(3, 95);ism["neil.gif"] = im(6, 95);ism["flytrap.gif"] = im(0, 96);ism["mc_respect2.gif"] = im(0, 97);ism["mc_respect1.gif"] = im(0, 97);ism["snakenest.gif"] = im(8, 88);ism["newt.gif"] = im(43, 97);ism["emofrat.gif"] = im(0, 97);ism["ninjawaiter.gif"] = im(5, 95);ism["ninjarice.gif"] = im(7, 95);ism["snowman.gif"] = im(7, 95);ism["ninja_ass.gif"] = im(3, 91);ism["ninjamop.gif"] = im(10, 98);ism["ninjacloud.gif"] = im(3, 97);ism["nhobo1.gif"] = im(7, 94);ism["hunter2.gif"] = im(0, 99);ism["tropicalskel.gif"] = im(0, 98);ism["novia.gif"] = im(5, 99);ism["novio.gif"] = im(11, 97);ism["nurseshark.gif"] = im(15, 71);ism["whirlwind.gif"] = im(8, 91);ism["tourist.gif"] = im(9, 92);ism["octopus.gif"] = im(0, 96);ism["octorok.gif"] = im(10, 93);ism["headghost.gif"] = im(4, 94);ism["adv_stench4.gif"] = im(0, 97);ism["kg_offdutyguard.gif"] = im(13, 95);ism["officialseal.gif"] = im(17, 91);ism["oilbaron.gif"] = im(0, 99);ism["oilcartel2.gif"] = im(200, 100, 5, 97);ism["oilslick.gif"] = im(29, 61);ism["oiltycoon.gif"] = im(1, 99);ism["straw_sleaze.gif"] = im(37, 93);ism["olscratch.gif"] = im(2, 97);ism["noart.gif"] = im(7, 91);ism["dk_oneeye.gif"] = im(2, 95);ism["oneeyed.gif"] = im(4, 91);ism["fratboy.gif"] = im(2, 91);ism["fratskirt.gif"] = im(2, 91);ism["fratbong.gif"] = im(2, 91);ism["lilfratboy.gif"] = im(7, 86);ism["oscus.gif"] = im(5, 97);ism["bandsaw.gif"] = im(11, 87);ism["tableoutlaw.gif"] = im(8, 93);ism["outlawboss.gif"] = im(0, 97);ism["surv_overarmed.gif"] = im(0, 98);ism["pimp.gif"] = im(17, 90);ism["elpriest.gif"] = im(1, 97);ism["stonebros.gif"] = im(2, 96);ism["warfratpr.gif"] = im(19, 85);ism["ptowels.gif"] = im(0, 99);ism["hunter3.gif"] = im(1, 99);ism["peanut.gif"] = im(0, 98);ism["mh_roommate.gif"] = im(2, 97);ism["pencil.gif"] = im(5, 93);ism["smoochboss3.gif"] = im(100, 200, 17, 191);ism["defense_sphere.gif"] = im(3, 97);ism["pestopuddle.gif"] = im(46, 91);ism["perpbat.gif"] = im(5, 88);ism["bystander.gif"] = im(1, 96);ism["somepig.gif"] = im(3, 88);ism["pinebat.gif"] = im(33, 69);ism["piranhadon.gif"] = im(29, 97);ism["wood_stench.gif"] = im(3, 90);ism["adv_spooky2.gif"] = im(4, 95);ism["plaidghost.gif"] = im(7, 95);ism["plaque.gif"] = im(0, 99);ism["drunkcrancan.gif"] = im(1, 99);ism["drunkfrat.gif"] = im(1, 96);ism["animelf2.gif"] = im(20, 81);ism["poolter.gif"] = im(1, 97);ism["poolter2.gif"] = im(2, 98);ism["popnlocker.gif"] = im(0, 98);ism["porkbutterfly.gif"] = im(9, 88);ism["porksword.gif"] = im(17, 87);ism["adv_sleaze3.gif"] = im(8, 90);ism["abom.gif"] = im(6, 95);ism["crancan.gif"] = im(21, 95);ism["mystwander2.gif"] = im(9, 95);ism["mystwander1.gif"] = im(8, 95);ism["tomatosoup.gif"] = im(6, 89);ism["eyewash.gif"] = im(11, 91);ism["mystwander4.gif"] = im(1, 97);ism["mangler.gif"] = im(5, 95);ism["organ.gif"] = im(1, 99);ism["silverware.gif"] = im(0, 99);ism["toybox.gif"] = im(7, 89);ism["winerack.gif"] = im(4, 98);ism["question.gif"] = im(0, 86);ism["pouooze.gif"] = im(33, 88);ism["primp.gif"] = im(7, 90);ism["fly.gif"] = im(4, 92);ism["surv_primitive.gif"] = im(2, 91);ism["chalmers.gif"] = im(1, 98);ism["bigskeleton.gif"] = im(0, 98);ism["giant_procrast.gif"] = im(5, 98);ism["profjacking.gif"] = im(2, 96);ism["elf_propaganda.gif"] = im(11, 84);ism["protag.gif"] = im(6, 95);ism["protspect.gif"] = im(0, 99);ism["spurt.gif"] = im(0, 99);ism["elf_provocateur.gif"] = im(10, 83);ism["pterodact.gif"] = im(250, 150, 14, 136);ism["pufferfish.gif"] = im(0, 98);ism["pumpedbass.gif"] = im(17, 69);ism["shiv_pumpkin.gif"] = im(6, 97);ism["giant_punk.gif"] = im(0, 98);ism["pyg_squad.gif"] = im(0, 99);ism["pyg_blowgunner.gif"] = im(31, 99);ism["pyg_bowler.gif"] = im(29, 98);ism["pyg_headhunter.gif"] = im(28, 99);ism["pyg_janitor.gif"] = im(41, 99);ism["pyg_orderlies.gif"] = im(18, 98);ism["pyg_shaman.gif"] = im(24, 97);ism["pyg_acct.gif"] = im(33, 99);ism["pyg_lawyer.gif"] = im(27, 98);ism["pyg_nurse.gif"] = im(20, 98);ism["pyg_surgeon.gif"] = im(21, 99);ism["wood_spooky.gif"] = im(28, 90);ism["animelf4.gif"] = im(19, 78);ism["upper_q.gif"] = im(8, 88);ism["beequeen.gif"] = im(13, 87);ism["spelunkbeeq.gif"] = im(200, 150, 5, 149);ism["filthworm4.gif"] = im(0, 97);ism["qbasicele.gif"] = im(0, 97);ism["healer.gif"] = im(9, 93);ism["wanderacc3.gif"] = im(0, 99);ism["mmoaddict.gif"] = im(12, 94);ism["naskar1.gif"] = im(5, 95);ism["weightrack.gif"] = im(27, 95);ism["elf_raconteur.gif"] = im(7, 80);ism["radiator.gif"] = im(0, 99);ism["hunter13.gif"] = im(7, 93);ism["anger1.gif"] = im(0, 99);ism["ragingbull.gif"] = im(2, 94);ism["adding.gif"] = im(2, 89);ism["mh_scenester.gif"] = im(1, 96);ism["ratbat.gif"] = im(19, 67);ism["duckrattle.gif"] = im(2, 96);ism["smoochboss2.gif"] = im(100, 200, 13, 191);ism["raven.gif"] = im(18, 93);ism["giant_raver.gif"] = im(0, 99);ism["wallpaper.gif"] = im(17, 83);ism["foss_baboon.gif"] = im(1, 97);ism["foss_bat.gif"] = im(38, 69);ism["foss_demon.gif"] = im(150, 150, 2, 130);ism["foss_spider.gif"] = im(150, 150, 32, 130);ism["foss_serpent.gif"] = im(1, 96);ism["redbutler.gif"] = im(4, 95);ism["redfox.gif"] = im(5, 94);ism["redherring.gif"] = im(7, 94);ism["redskeleton.gif"] = im(5, 97);ism["redsnapper.gif"] = im(6, 90);ism["regretman.gif"] = im(200, 200, 9, 180);ism["regbat.gif"] = im(35, 66);ism["headlessskel.gif"] = im(15, 89);ism["mistress.gif"] = im(2, 99);ism["giant_renfair.gif"] = im(1, 97);ism["reneccorman.gif"] = im(1, 97);ism["doubt2.gif"] = im(6, 92);ism["kok_waiter.gif"] = im(2, 95);ism["revbugbear.gif"] = im(1, 98);ism["merkinswitcher2.gif"] = im(1, 99);ism["duckgolem.gif"] = im(2, 92);ism["rock_guy.gif"] = im(31, 96);ism["popweasel.gif"] = im(0, 99);ism["scorpion.gif"] = im(8, 91);ism["rock_snake.gif"] = im(1, 97);ism["caveelf1.gif"] = im(21, 78);ism["rock_fish.gif"] = im(24, 77);ism["rollerskate.gif"] = im(2, 92);ism["muse.gif"] = im(2, 96);ism["rollingstone.gif"] = im(4, 90);ism["roncopper.gif"] = im(3, 96);ism["realdolphin.gif"] = im(14, 92);ism["duckfat.gif"] = im(0, 99);ism["rudolfus.gif"] = im(3, 97);ism["rulergolem.gif"] = im(0, 99);ism["runningman.gif"] = im(2, 94);ism["bum.gif"] = im(8, 95);ism["elf_saboteur.gif"] = im(22, 79);ism["ferret.gif"] = im(2, 90);ism["toothgoat.gif"] = im(0, 95);ism["stkiwi.gif"] = im(8, 85);ism["lime.gif"] = im(15, 77);ism["sadiator.gif"] = im(3, 92);ism["safarijack.gif"] = im(1, 97);ism["salamander.gif"] = im(51, 97);ism["salaminder.gif"] = im(26, 88);ism["salaryninja.gif"] = im(4, 96);ism["pirate1.gif"] = im(6, 93);ism["adv_smooth1.gif"] = im(5, 92);ism["zompirate.gif"] = im(7, 93);ism["bb_scav.gif"] = im(7, 93);ism["gummifish.gif"] = im(0, 99);ism["schoolofmany.gif"] = im(3, 94);ism["wizardfish.gif"] = im(1, 99);ism["scimitarfish.gif"] = im(16, 73);ism["duckscorch.gif"] = im(0, 98);ism["spelunkscorp.gif"] = im(3, 89);ism["hunter4.gif"] = im(2, 92);ism["scoutseal.gif"] = im(12, 86);ism["screambat.gif"] = im(24, 79);ism["screwgolem.gif"] = im(3, 98);ism["seacow.gif"] = im(17, 73);ism["seacowboy.gif"] = im(0, 98);ism["adv_smooth4.gif"] = im(2, 95);ism["secrobot.gif"] = im(11, 87);ism["securityslime.gif"] = im(4, 96);ism["crimbominer2.gif"] = im(9, 81);ism["sadpoet.gif"] = im(5, 93);ism["atm.gif"] = im(7, 94);ism["serialbus.gif"] = im(1, 94);ism["grodseal.gif"] = im(3, 93);ism["fireservant1.gif"] = im(0, 99);ism["sewergator.gif"] = im(11, 78);ism["sewersnake.gif"] = im(5, 91);ism["sewertruck.gif"] = im(400, 150, 6, 143);ism["sororghost1.gif"] = im(1, 97);ism["sororeton1.gif"] = im(3, 89);ism["sororpire1.gif"] = im(7, 97);ism["sororwolf1.gif"] = im(6, 97);ism["sororbie1.gif"] = im(5, 95);ism["shadowseal.gif"] = im(8, 91);ism["sheetghost.gif"] = im(5, 95);ism["shopkeep.gif"] = im(7, 91);ism["shub-jigguwatt.gif"] = im(300, 300, 20, 283);ism["tacoelf_sign.gif"] = im(27, 94);ism["caveelf4.gif"] = im(14, 77);ism["sk8gnome.gif"] = im(23, 77);ism["boardskate.gif"] = im(3, 91);ism["animrat.gif"] = im(1, 93);ism["catskel.gif"] = im(20, 84);ism["hamskel.gif"] = im(73, 95);ism["monkeyskel.gif"] = im(17, 77);ism["crimonster6.gif"] = im(3, 95);ism["steward.gif"] = im(3, 97);ism["spelunkskel.gif"] = im(10, 91);ism["mopskeleton.gif"] = im(6, 96);ism["buttleton.gif"] = im(3, 97);ism["sketchyvan.gif"] = im(200, 100, 0, 99);ism["skinflute.gif"] = im(27, 76);ism["skeleton.gif"] = im(6, 93);ism["skullbat.gif"] = im(31, 66);ism["skulldozer.gif"] = im(450, 300, 12, 278);ism["skullery.gif"] = im(0, 97);ism["dvsleazebear1.gif"] = im(5, 89);ism["dvsleazeghost1.gif"] = im(11, 88);ism["slhobo1.gif"] = im(1, 97);ism["dvsleazeskel1.gif"] = im(9, 92);ism["dvsleazevamp1.gif"] = im(3, 96);ism["dvsleazewolf1.gif"] = im(2, 97);ism["dvsleazezom1.gif"] = im(4, 93);ism["kg_sleepingguard.gif"] = im(0, 98);ism["dwarf_sleepy.gif"] = im(37, 95);ism["mar_sleepy.gif"] = im(0, 99);ism["slime1_1.gif"] = im(0, 98);ism["slime2_1.gif"] = im(0, 96);ism["slime3_1.gif"] = im(2, 97);ism["slime4_1.gif"] = im(3, 95);ism["slime5_1.gif"] = im(0, 98);ism["wood_sleaze.gif"] = im(16, 79);ism["holglob.gif"] = im(34, 89);ism["slithering.gif"] = im(15, 81);ism["ssd_burger.gif"] = im(0, 99);ism["ssd_cocktail.gif"] = im(0, 98);ism["ssd_sundae.gif"] = im(1, 98);ism["eliot.gif"] = im(5, 97);ism["mimic2.gif"] = im(23, 87);ism["smartskel.gif"] = im(4, 94);ism["smellothewisp.gif"] = im(4, 98);ism["smokemonster.gif"] = im(5, 96);ism["smoochman3.gif"] = im(100, 150, 16, 127);ism["smoochman1.gif"] = im(7, 93);ism["smoochman2.gif"] = im(1, 97);ism["adv_smooth3.gif"] = im(3, 97);ism["scabie_jazz.gif"] = im(2, 89);ism["smutorc_jacker.gif"] = im(6, 95);ism["smutorc_nailer.gif"] = im(8, 96);ism["smutorc_pervert.gif"] = im(7, 93);ism["smutorc_layer.gif"] = im(5, 97);ism["smutorc_screwer.gif"] = im(9, 97);ism["spelunksnake.gif"] = im(20, 83);ism["firesnake.gif"] = im(0, 99);ism["snakeboss6.gif"] = im(150, 150, 26, 131);ism["snapdragon.gif"] = im(1, 98);ism["snowqueen.gif"] = im(0, 98);ism["adv_cold1.gif"] = im(9, 93);ism["sodium.gif"] = im(3, 92);ism["6_4a.gif"] = im(200, 200, 11, 189);ism["6_1.gif"] = im(10, 91);ism["6_2.gif"] = im(3, 96);ism["6_3.gif"] = im(2, 98);ism["sonofsailor.gif"] = im(1, 99);ism["warfratmd.gif"] = im(4, 96);ism["warfratcm.gif"] = im(1, 96);ism["tree_hickory.gif"] = im(0, 98);ism["drunkstuffing.gif"] = im(0, 99);ism["spacebeast1.gif"] = im(8, 83);ism["spacebeast3.gif"] = im(14, 91);ism["spacemarine.gif"] = im(1, 95);ism["aboo_trek.gif"] = im(1, 97);ism["3_4a.gif"] = im(200, 200, 3, 193);ism["3_1.gif"] = im(2, 95);ism["3_2.gif"] = im(4, 97);ism["3_3.gif"] = im(0, 93);ism["spamwitch.gif"] = im(3, 95);ism["pa_spatula.gif"] = im(7, 98);ism["wretchedseal.gif"] = im(54, 94);ism["hunter11.gif"] = im(3, 95);ism["jellyfish.gif"] = im(6, 96);ism["spelastronaut.gif"] = im(2, 96);ism["spelunkspider.gif"] = im(21, 88);ism["topi1.gif"] = im(3, 93);ism["gourd_spider.gif"] = im(10, 83);ism["gremlinspider.gif"] = im(7, 88);ism["spelunkspiderq.gif"] = im(150, 100, 1, 96);ism["gourd_spidergob.gif"] = im(1, 97);ism["spiderhut.gif"] = im(200, 150, 9, 140);ism["bb_spider.gif"] = im(125, 100, 3, 86);ism["spikeskel.gif"] = im(7, 92);ism["spiritalclock.gif"] = im(0, 99);ism["spiritbug.gif"] = im(10, 92);ism["spiritfaucet.gif"] = im(5, 93);ism["5_1.gif"] = im(3, 99);ism["5_2.gif"] = im(0, 99);ism["5_3.gif"] = im(0, 99);ism["spiritpea.gif"] = im(18, 78);ism["sponge.gif"] = im(0, 98);ism["dvspookybear1.gif"] = im(1, 95);ism["dvspookyghost1.gif"] = im(4, 94);ism["sgguard.gif"] = im(16, 77);ism["sgninja.gif"] = im(22, 80);ism["sgwarlock.gif"] = im(8, 83);ism["spookyhobo1.gif"] = im(3, 89);ism["mummy.gif"] = im(6, 89);ism["musicbox.gif"] = im(2, 90);ism["dvspookyskel1.gif"] = im(13, 97);ism["vampire.gif"] = im(10, 91);ism["dvspookyvamp1.gif"] = im(35, 65);ism["dvspookywolf1.gif"] = im(8, 94);ism["dvspookyzom1.gif"] = im(39, 93);ism["manor.gif"] = im(12, 89);ism["sporto.gif"] = im(1, 99);ism["princess.gif"] = im(8, 95);ism["steamelemental.gif"] = im(3, 94);ism["straw_hot.gif"] = im(5, 91);ism["giant_steampunk.gif"] = im(0, 99);ism["2_4a.gif"] = im(200, 200, 11, 189);ism["2_1.gif"] = im(10, 90);ism["2_2.gif"] = im(12, 96);ism["2_3.gif"] = im(16, 93);ism["dvstenchbear1.gif"] = im(1, 99);ism["dvstenchghost1.gif"] = im(0, 97);ism["stenchhobo1.gif"] = im(12, 97);ism["dvstenchskel1.gif"] = im(2, 99);ism["dvstenchvamp1.gif"] = im(0, 98);ism["dvstenchwolf1.gif"] = im(1, 99);ism["dvstenchzom1.gif"] = im(0, 98);ism["steven.gif"] = im(5, 91);ism["stickymummy.gif"] = im(3, 94);ism["disco_stiff.gif"] = im(2, 91);ism["crimonster4.gif"] = im(3, 94);ism["stomper.gif"] = im(0, 99);ism["stone_pirate.gif"] = im(3, 93);ism["stormcow.gif"] = im(0, 99);ism["strangler.gif"] = im(1, 98);ism["algae.gif"] = im(1, 97);ism["crimboelf.gif"] = im(27, 96);ism["moosehead.gif"] = im(7, 93);ism["stuffgolem.gif"] = im(3, 91);ism["paulblart.gif"] = im(2, 99);ism["suckubus.gif"] = im(6, 92);ism["tree_juniper.gif"] = im(0, 99);ism["colasoldier.gif"] = im(1, 95);ism["supervirus.gif"] = im(9, 95);ism["witchy1.gif"] = im(0, 99);ism["mar_surprised.gif"] = im(0, 99);ism["mc_soy2.gif"] = im(0, 94);ism["mc_soy1.gif"] = im(0, 98);ism["beav_jack.gif"] = im(9, 92);ism["beav_shaman.gif"] = im(0, 97);ism["beav_warrior.gif"] = im(7, 90);ism["duckstinky.gif"] = im(0, 98);ism["swampentity.gif"] = im(5, 95);ism["swampgator.gif"] = im(19, 81);ism["swamphag.gif"] = im(0, 97);ism["swampowl.gif"] = im(0, 99);ism["swampskunk.gif"] = im(3, 95);ism["swarmers.gif"] = im(1, 95);ism["ralphbat.gif"] = im(2, 84);ism["ants.gif"] = im(1, 97);ism["fudgewasps.gif"] = im(0, 98);ism["whelps1.gif"] = im(10, 85);ism["aswarm.gif"] = im(7, 93);ism["kg_lice.gif"] = im(3, 93);ism["mutantants.gif"] = im(9, 87);ism["beatles.gif"] = im(5, 94);ism["skullswarm.gif"] = im(50, 93);ism["swisshen.gif"] = im(0, 98);ism["t9000.gif"] = im(3, 99);ism["cacotap.gif"] = im(21, 80);ism["tacofish.gif"] = im(17, 82);ism["tacoelf_taco.gif"] = im(12, 86);ism["tacoelf_cart.gif"] = im(9, 82);ism["kasemhead.gif"] = im(2, 96);ism["biggnat.gif"] = im(21, 70);ism["hatskel.gif"] = im(0, 99);ism["adv_fast4.gif"] = im(11, 86);ism["c10spreadsheet.gif"] = im(8, 98);ism["tektite.gif"] = im(21, 77);ism["skel10.gif"] = im(300, 100, 0, 98);ism["terrorbot.gif"] = im(5, 88);ism["tetched.gif"] = im(1, 98);ism["madpirate.gif"] = im(6, 93);ism["fudgeman.gif"] = im(200, 200, 19, 186);ism["theaquaman.gif"] = im(0, 99);ism["boris.gif"] = im(6, 89);ism["aojarls.gif"] = im(6, 93);ism["sneakypete.gif"] = im(13, 90);ism["batinspats.gif"] = im(200, 100, 6, 96);ism["beefhemoth.gif"] = im(200, 100, 0, 98);ism["c10bge.gif"] = im(11, 86);ism["thisdude.gif"] = im(0, 93);ism["c10faces.gif"] = im(0, 99);ism["beelzebozo.gif"] = im(0, 98);ism["colollilossus.gif"] = im(270, 270, 3, 264);ism["bath_craykin.gif"] = im(0, 99);ism["darkness.gif"] = im(0, 98);ism["theemperor.gif"] = im(5, 93);ism["skelmanager.gif"] = im(5, 97);ism["snakeboss2.gif"] = im(5, 94);ism["hunter15.gif"] = im(0, 92);ism["fudgewizard.gif"] = im(0, 99);ism["bunionghost.gif"] = im(4, 92);ism["thegunk.gif"] = im(3, 95);ism["hermit.gif"] = im(30, 30, 29, 30);ism["landscaper.gif"] = im(0, 99);ism["snitch.gif"] = im(150, 300, 13, 275);ism["adv_hot4.gif"] = im(10, 97);ism["theluter.gif"] = im(11, 93);ism["theman.gif"] = im(0, 94);ism["darkmariachi.gif"] = im(2, 97);ism["masterat.gif"] = im(40, 97);ism["adv_smart4.gif"] = im(13, 97);ism["thenuge.gif"] = im(4, 94);ism["rainking.gif"] = im(250, 300, 10, 287);ism["sagittarian.gif"] = im(3, 95);ism["theserver.gif"] = im(0, 97);ism["sierpinski.gif"] = im(0, 89);ism["snakeboss3.gif"] = im(150, 150, 5, 136);ism["timebandit.gif"] = im(9, 88);ism["thepinch.gif"] = im(100, 150, 4, 147);ism["thething.gif"] = im(250, 200, 3, 195);ism["thethorax.gif"] = im(200, 100, 4, 92);ism["c10tropes.gif"] = im(0, 99);ism["ukskeleton.gif"] = im(200, 200, 15, 187);ism["ukskeleton_hm.gif"] = im(200, 200, 2, 195);ism["unknownghost.gif"] = im(0, 99);ism["c10cooler.gif"] = im(0, 98);ism["wholekingdom.gif"] = im(200, 200, 2, 195);ism["they.gif"] = im(0, 99);ism["tnbot1.gif"] = im(1, 95);ism["bigskeleton3.gif"] = im(150, 100, 0, 99);ism["thug1thug2.gif"] = im(200, 100, 1, 93);ism["anger2.gif"] = im(0, 99);ism["tigerlily.gif"] = im(1, 96);ism["spelunktiki.gif"] = im(1, 93);ism["mc_tofu2.gif"] = im(2, 97);ism["mc_tofu1.gif"] = im(2, 95);ism["gourd_can.gif"] = im(14, 90);ism["gourd_canspider.gif"] = im(150, 100, 9, 87);ism["mimic1.gif"] = im(17, 83);ism["animelf1.gif"] = im(19, 79);ism["tipsypirate.gif"] = im(0, 98);ism["tpgeist.gif"] = im(0, 97);ism["shiv_tp.gif"] = im(6, 94);ism["tombasp.gif"] = im(0, 99);ism["mummybat.gif"] = im(34, 60);ism["tombrat.gif"] = im(33, 78);ism["tombratking.gif"] = im(200, 200, 17, 176);ism["tombguy.gif"] = im(0, 98);ism["mastiff.gif"] = im(34, 95);ism["toothpirate.gif"] = im(2, 96);ism["toothskel.gif"] = im(5, 90);ism["topiarychi.gif"] = im(2, 95);ism["topiaryduck.gif"] = im(10, 89);ism["topiary.gif"] = im(0, 98);ism["topiarygopher.gif"] = im(7, 93);ism["topiarykiwi.gif"] = im(17, 92);ism["tree_baobab.gif"] = im(3, 96);ism["c10tmz.gif"] = im(0, 99);ism["orquette3.gif"] = im(6, 92);ism["vib4.gif"] = im(2, 96);ism["toxbeast1.gif"] = im(2, 98);ism["animelf5.gif"] = im(18, 76);ism["crimonster1.gif"] = im(1, 98);ism["travoltron.gif"] = im(200, 200, 4, 197);ism["treadmill.gif"] = im(9, 91);ism["bb_chef.gif"] = im(5, 92);ism["triadwizard.gif"] = im(1, 96);ism["tribalgoblin.gif"] = im(11, 89);ism["trixiepixie.gif"] = im(6, 99);ism["triffid.gif"] = im(2, 96);ism["tarkinhead.gif"] = im(0, 98);ism["monahead.gif"] = im(0, 99);ism["twins_troll.gif"] = im(0, 98);ism["trollipop.gif"] = im(100, 150, 5, 145);ism["trophyfish.gif"] = im(0, 98);ism["tsnake.gif"] = im(5, 94);ism["tumbleweed.gif"] = im(4, 93);ism["turtlemech.gif"] = im(14, 89);ism["turtletrapper.gif"] = im(1, 95);ism["twigberry.gif"] = im(3, 89);ism["bigskeleton2.gif"] = im(0, 99);ism["tex.gif"] = im(0, 98);ism["unclehobo.gif"] = im(10, 92);ism["macaroni.gif"] = im(4, 84);ism["pengundercover.gif"] = im(2, 98);ism["shiv_underworld.gif"] = im(200, 200, 17, 170);ism["ellsburyboss.gif"] = im(150, 150, 15, 124);ism["lensgoblin.gif"] = im(3, 94);ism["surv_unhinged.gif"] = im(6, 95);ism["unholydiver.gif"] = im(0, 99);ism["surv_unlikely.gif"] = im(7, 89);ism["c10database.gif"] = im(2, 95);ism["unstill.gif"] = im(8, 92);ism["ram.gif"] = im(13, 85);ism["urchin.gif"] = im(10, 90);ism["eyesdown.gif"] = im(45, 62);ism["usher.gif"] = im(11, 88);ism["spelunkvampire.gif"] = im(13, 85);ism["vampclam.gif"] = im(11, 91);ism["duckvampire.gif"] = im(3, 95);ism["vandalkid.gif"] = im(9, 91);ism["cvcreature.gif"] = im(100, 200, 4, 196);ism["gremlinveg.gif"] = im(5, 93);ism["velvetug.gif"] = im(19, 91);ism["vendorslime.gif"] = im(0, 95);ism["turtleghost.gif"] = im(23, 84);ism["mantrap.gif"] = im(4, 97);ism["easel.gif"] = im(5, 95);ism["gnauga.gif"] = im(14, 92);ism["victor.gif"] = im(15, 88);ism["qmark.gif"] = im(4, 93);ism["gar.gif"] = im(6, 93);ism["prim_fung.gif"] = im(0, 98);ism["music.gif"] = im(2, 95);ism["iceguy4.gif"] = im(7, 98);ism["smallartist.gif"] = im(40, 97);ism["wimp.gif"] = im(15, 90);ism["wackypirate.gif"] = im(1, 97);ism["iceguy3.gif"] = im(1, 98);ism["mush_shrieking.gif"] = im(1, 93);ism["waiterninja.gif"] = im(5, 95);ism["wallofbones.gif"] = im(250, 150, 3, 138);ism["wallofskin.gif"] = im(250, 125, 1, 115);ism["warfratc.gif"] = im(1, 95);ism["warfrata2.gif"] = im(1, 96);ism["warfratb.gif"] = im(0, 95);ism["warfratc2.gif"] = im(1, 95);ism["warfratb2.gif"] = im(0, 95);ism["warfratsp2.gif"] = im(0, 97);ism["warfratgr.gif"] = im(5, 96);ism["warfratar.gif"] = im(5, 89);ism["warfratmo.gif"] = im(24, 89);ism["warfratgr2.gif"] = im(2, 91);ism["streaker.gif"] = im(3, 95);ism["warfratsp.gif"] = im(3, 98);ism["warhipb.gif"] = im(6, 96);ism["warhipac2.gif"] = im(1, 96);ism["warhipar.gif"] = im(0, 99);ism["warhipds.gif"] = im(8, 93);ism["warhipsh2.gif"] = im(0, 98);ism["warhipfs2.gif"] = im(3, 95);ism["warhipc2.gif"] = im(5, 94);ism["warhipa2.gif"] = im(0, 98);ism["warhipfs.gif"] = im(2, 94);ism["warhipb2.gif"] = im(6, 96);ism["warhipmd.gif"] = im(0, 90);ism["warhipa.gif"] = im(0, 98);ism["warhipmd2.gif"] = im(0, 91);ism["warhipc.gif"] = im(5, 92);ism["warhipsh.gif"] = im(1, 97);ism["warhipac.gif"] = im(5, 96);ism["hippyspy.gif"] = im(8, 89);ism["warhipcm.gif"] = im(2, 94);ism["warbear11.gif"] = im(2, 97);ism["warbear21.gif"] = im(0, 99);ism["nightstand1.gif"] = im(4, 96);ism["warehouseclerk.gif"] = im(2, 95);ism["warehouseguard.gif"] = im(0, 98);ism["warehousejanitor.gif"] = im(3, 92);ism["warehouseguy.gif"] = im(3, 94);ism["wartdinsey.gif"] = im(150, 150, 0, 148);ism["wartpirate.gif"] = im(2, 92);ism["werewolf.gif"] = im(4, 98);ism["wigwasp.gif"] = im(8, 93);ism["wastoid.gif"] = im(8, 93);ism["waterspider.gif"] = im(23, 80);ism["waterseal.gif"] = im(0, 99);ism["richpirate.gif"] = im(3, 93);ism["weatherug.gif"] = im(3, 91);ism["weremoose.gif"] = im(2, 90);ism["weretaco.gif"] = im(29, 82);ism["hunter14.gif"] = im(4, 95);ism["wetseal.gif"] = im(6, 80);ism["aboo_who.gif"] = im(2, 97);ism["tree_willow.gif"] = im(2, 95);ism["surv_whiny.gif"] = im(3, 91);ism["pa_whisk.gif"] = im(4, 91);ism["whitebonedemon.gif"] = im(200, 100, 12, 98);ism["chocgolem.gif"] = im(9, 92);ism["whiteelephant.gif"] = im(11, 88);ism["lion.gif"] = im(6, 93);ism["zombie2.gif"] = im(5, 94);ism["whitesnake.gif"] = im(10, 87);ism["wildgirl.gif"] = im(0, 97);ism["seahorse.gif"] = im(4, 96);ism["wiresculpture.gif"] = im(0, 97);ism["elf_wires.gif"] = im(12, 89);ism["mush_wizard.gif"] = im(0, 99);ism["tree_magnolia.gif"] = im(1, 99);ism["wraith4.gif"] = im(14, 81);ism["doubt1.gif"] = im(0, 98);ism["ravendesk.gif"] = im(0, 94);ism["susguy.gif"] = im(1, 96);ism["wumpus.gif"] = im(0, 99);ism["beergolem.gif"] = im(4, 97);ism["stonegolem.gif"] = im(3, 97);ism["dimhorror.gif"] = im(2, 96);ism["shopteacher.gif"] = im(1, 98);ism["hydra.gif"] = im(6, 99);ism["polprisoner.gif"] = im(9, 89);ism["pr0n.gif"] = im(11, 87);ism["yakisoba.gif"] = im(0, 97);ism["yakcourier.gif"] = im(3, 96);ism["yakguard.gif"] = im(3, 96);ism["yeastbeast.gif"] = im(4, 93);ism["spelunkyeti.gif"] = im(1, 97);ism["yog-urt.gif"] = im(300, 300, 107, 290);ism["yomama.gif"] = im(300, 300, 3, 289);ism["c10inbox.gif"] = im(9, 94);ism["otherimages/shadows/20.gif"] = im(30, 30, 29, 30);ism["zrex.gif"] = im(150, 100, 0, 99);ism["zimmerman.gif"] = im(4, 98);ism["zombie.gif"] = im(3, 84);ism["zol.gif"] = im(11, 90);ism["zomlizard.gif"] = im(4, 94);ism["zmobaby.gif"] = im(2, 86);ism["zombiechef.gif"] = im(1, 97);ism["zomclown.gif"] = im(3, 97);ism["duckzombie.gif"] = im(1, 96);ism["zomsnow.gif"] = im(7, 91);ism["zomfrat.gif"] = im(12, 84);ism["zomknoll.gif"] = im(10, 87);ism["zomgoth.gif"] = im(0, 94);ism["zomhippy.gif"] = im(4, 92);ism["zombiehoa.gif"] = im(150, 150, 1, 148);ism["zombiehoa_hm.gif"] = im(200, 200, 0, 199);ism["zomchef.gif"] = im(1, 92);ism["zomnoob.gif"] = im(4, 93);ism["zomhealer.gif"] = im(1, 93);ism["zomwaltz.gif"] = im(0, 97);ism["zomyeast.gif"] = im(9, 98);ism["hunter1.gif"] = im(3, 96);ism["zombo.gif"] = im(0, 98);
+ism["borgelf1.gif"] = im(11, 74);ism["borgelf4.gif"] = im(19, 82);ism["borgelf2.gif"] = im(25, 87);ism["borgelf3.gif"] = im(14, 78);ism["handymanjay.gif"] = im(5, 92);ism["1335.gif"] = im(7, 93);ism["miner.gif"] = im(1, 95);ism["foreman.gif"] = im(2, 94);ism["gremlinamc.gif"] = im(12, 78);ism["abcrusher.gif"] = im(12, 89);ism["adv_smart1.gif"] = im(0, 97);ism["lower_b.gif"] = im(16, 74);ism["electriceel.gif"] = im(1, 98);ism["1boy2cups.gif"] = im(2, 91);ism["advecho.gif"] = im(0, 99);ism["whitebat.gif"] = im(33, 70);ism["mar_alert.gif"] = im(0, 99);ism["alielf.gif"] = im(4, 95);ism["spelunkalien.gif"] = im(17, 81);ism["muthamster.gif"] = im(5, 95);ism["spelunkalienq.gif"] = im(150, 150, 17, 141);ism["spelunkufo.gif"] = im(21, 78);ism["steve.gif"] = im(0, 98);ism["catfish.gif"] = im(41, 91);ism["giant_alphabet.gif"] = im(1, 97);ism["elf_amateur.gif"] = im(10, 83);ism["ninja.gif"] = im(13, 85);ism["pirate2.gif"] = im(6, 93);ism["crimbominer3.gif"] = im(2, 97);ism["amokputty.gif"] = im(5, 84);ism["srpainting2.gif"] = im(20, 82);ism["regret3.gif"] = im(27, 79);ism["oldguardstatue.gif"] = im(0, 97);ism["pebbleman.gif"] = im(2, 89);ism["mariner.gif"] = im(5, 93);ism["protspirit.gif"] = im(7, 86);ism["guardstatue.gif"] = im(0, 98);ism["bb_horror.gif"] = im(125, 100, 5, 89);ism["anemone.gif"] = im(0, 97);ism["bb_doctor.gif"] = im(7, 83);ism["angel.gif"] = im(6, 87);ism["angerman.gif"] = im(200, 250, 15, 242);ism["anglerbush.gif"] = im(0, 97);ism["mh_bassist.gif"] = im(2, 97);ism["angbugbear.gif"] = im(6, 91);ism["bb_caveman.gif"] = im(4, 92);ism["mush_angry.gif"] = im(8, 89);ism["pinata.gif"] = im(0, 97);ism["madpoet.gif"] = im(7, 93);ism["raccoon.gif"] = im(6, 93);ism["hunter7.gif"] = im(0, 98);ism["stenchtourist.gif"] = im(0, 93);ism["nightstand2.gif"] = im(13, 91);ism["darkstand.gif"] = im(1, 98);ism["nightstand.gif"] = im(2, 96);ism["nightstand4.gif"] = im(1, 99);ism["fear2.gif"] = im(1, 95);ism["nightstand3.gif"] = im(7, 95);ism["spittoon.gif"] = im(3, 99);ism["smiley.gif"] = im(30, 67);ism["annoyfairy.gif"] = im(15, 76);ism["spiderserver.gif"] = im(7, 94);ism["lizardman.gif"] = im(4, 94);ism["aquabat.gif"] = im(150, 100, 15, 79);ism["aquaconda.gif"] = im(5, 91);ism["aquagoblin.gif"] = im(0, 99);ism["2headseal.gif"] = im(9, 81);ism["mush_armor.gif"] = im(7, 91);ism["adv_spooky4.gif"] = im(4, 96);ism["adv_stench3.gif"] = im(5, 95);ism["astronomer.gif"] = im(6, 93);ism["aquadargon.gif"] = im(200, 200, 6, 190);ism["elf_auteur.gif"] = im(15, 78);ism["disco_awkward.gif"] = im(4, 95);ism["axehandle.gif"] = im(9, 89);ism["axewound.gif"] = im(9, 87);ism["saucezombie.gif"] = im(0, 97);ism["stone_serpent.gif"] = im(0, 98);ism["stone_sheep.gif"] = im(21, 81);ism["baconsnake.gif"] = im(4, 96);ism["badascii.gif"] = im(35, 61);ism["pa_potatoes.gif"] = im(8, 95);ism["baglady.gif"] = im(0, 99);ism["warhipmo.gif"] = im(44, 98);ism["baiowulf.gif"] = im(8, 94);ism["spelunkbanana.gif"] = im(150, 150, 0, 149);ism["bangyomama.gif"] = im(2, 89);ism["banjowizard.gif"] = im(0, 99);ism["banshee.gif"] = im(6, 98);ism["bar.gif"] = im(13, 88);ism["ratsworth.gif"] = im(0, 96);ism["basaltamander.gif"] = im(0, 99);ism["ballbat.gif"] = im(7, 60);ism["reindeer.gif"] = im(0, 99);ism["basicgolem.gif"] = im(6, 89);ism["spelunkbat.gif"] = im(15, 77);ism["bb_bat.gif"] = im(27, 81);ism["adv_spooky3.gif"] = im(1, 93);ism["batrat.gif"] = im(25, 75);ism["snakeboss5.gif"] = im(150, 150, 13, 141);ism["bb_mech.gif"] = im(1, 98);ism["aboo_wars.gif"] = im(3, 98);ism["gremlinbat.gif"] = im(11, 83);ism["bazookafish.gif"] = im(25, 68);ism["beanbat.gif"] = im(28, 63);ism["topi2.gif"] = im(9, 93);ism["earbeast.gif"] = im(14, 80);ism["eyebeast.gif"] = im(17, 99);ism["beaver.gif"] = im(13, 77);ism["spelunkbee.gif"] = im(3, 86);ism["beeswarm.gif"] = im(3, 97);ism["beethoven.gif"] = im(5, 94);ism["beebeegunner.gif"] = im(16, 70);ism["beebeeking.gif"] = im(16, 79);ism["beebeequeue.gif"] = im(4, 97);ism["beefybat.gif"] = im(18, 58);ism["beelephant.gif"] = im(0, 89);ism["batter.gif"] = im(0, 99);ism["warfratbg.gif"] = im(0, 95);ism["straw_stench.gif"] = im(15, 93);ism["bellhop.gif"] = im(17, 89);ism["carpet.gif"] = im(33, 75);ism["novelist.gif"] = im(2, 92);ism["wraith2.gif"] = im(15, 89);ism["biclops.gif"] = im(4, 92);ism["spider1.gif"] = im(15, 78);ism["bigmeat.gif"] = im(0, 94);ism["whelps2.gif"] = im(1, 98);ism["twins_bigwheel.gif"] = im(200, 100, 5, 95);ism["aquaniewski.gif"] = im(0, 97);ism["bigface.gif"] = im(14, 92);ism["vib2.gif"] = im(3, 97);ism["blimp.gif"] = im(8, 94);ism["blackadder.gif"] = im(12, 79);ism["blackcat.gif"] = im(4, 90);ism["cray_beast.gif"] = im(200, 200, 41, 171);ism["cray_bug.gif"] = im(200, 200, 43, 152);ism["cray_const.gif"] = im(200, 200, 15, 193);ism["cray_elf.gif"] = im(200, 200, 22, 181);ism["cray_demon.gif"] = im(200, 200, 32, 178);ism["cray_elemental.gif"] = im(200, 200, 8, 191);ism["cray_fish.gif"] = im(200, 200, 30, 145);ism["cray_plant.gif"] = im(200, 200, 9, 184);ism["cray_orc.gif"] = im(200, 200, 32, 169);ism["cray_goblin.gif"] = im(200, 200, 32, 167);ism["cray_construct.gif"] = im(200, 200, 23, 183);ism["cray_hippy.gif"] = im(200, 200, 19, 163);ism["cray_hobo.gif"] = im(200, 200, 1, 198);ism["cray_dude.gif"] = im(200, 200, 7, 182);ism["cray_humanoid.gif"] = im(200, 200, 12, 188);ism["cray_merkin.gif"] = im(200, 200, 17, 172);ism["cray_penguin.gif"] = im(200, 200, 31, 185);ism["cray_pirate.gif"] = im(200, 200, 18, 179);ism["cray_horror.gif"] = im(200, 200, 1, 197);ism["cray_slime.gif"] = im(200, 200, 61, 166);ism["cray_weird.gif"] = im(200, 200, 27, 186);ism["cray_undead.gif"] = im(200, 200, 22, 162);ism["blackfriar.gif"] = im(5, 97);ism["blknight.gif"] = im(4, 90);ism["witchywoman.gif"] = im(1, 99);ism["bb_ninja.gif"] = im(5, 91);ism["panther.gif"] = im(11, 93);ism["blpudding.gif"] = im(47, 98);ism["blackwidow.gif"] = im(0, 99);ism["pengblackop.gif"] = im(3, 98);ism["blackbush.gif"] = im(15, 98);ism["sawblade.gif"] = im(0, 98);ism["firebat.gif"] = im(1, 97);ism["squid.gif"] = im(3, 95);ism["bluecultist.gif"] = im(0, 99);ism["mh_bluehair.gif"] = im(1, 98);ism["blur.gif"] = im(4, 97);ism["boaraffe.gif"] = im(0, 99);ism["naskar2.gif"] = im(5, 95);ism["bogleech.gif"] = im(10, 91);ism["bogskeleton.gif"] = im(1, 95);ism["bogart.gif"] = im(11, 91);ism["elf_boltcutters.gif"] = im(5, 78);ism["foss_wyrm.gif"] = im(200, 200, 0, 196);ism["bookbat.gif"] = im(22, 65);ism["boothslime.gif"] = im(2, 97);ism["bootycrab.gif"] = im(20, 85);ism["boozegiant.gif"] = im(5, 92);ism["borgabeeping.gif"] = im(0, 96);ism["bossbat.gif"] = im(26, 73);ism["deadbossbat.gif"] = im(7, 94);ism["crimonster3.gif"] = im(4, 96);ism["cricket.gif"] = im(5, 97);ism["box.gif"] = im(9, 87);ism["pa_muffin.gif"] = im(13, 87);ism["mystwander5.gif"] = im(5, 99);ism["broombrain.gif"] = im(6, 95);ism["bram.gif"] = im(8, 92);ism["breadgolem.gif"] = im(6, 90);ism["breakdancer.gif"] = im(0, 97);ism["brick_sleaze.gif"] = im(24, 96);ism["brick_cold.gif"] = im(1, 95);ism["brick_hot.gif"] = im(0, 99);
+ism["brick_spooky.gif"] = im(4, 95);ism["kok_tender.gif"] = im(21, 97);ism["brick_stench.gif"] = im(4, 94);ism["brickoairship.gif"] = im(300, 300, 6, 295);ism["brickobat.gif"] = im(3, 68);ism["brickocathedral.gif"] = im(500, 450, 17, 443);ism["brickoelephant.gif"] = im(150, 150, 34, 132);ism["brickogchicken.gif"] = im(600, 450, 15, 444);ism["brickoctopus.gif"] = im(150, 150, 9, 143);ism["brickoblob.gif"] = im(57, 94);ism["brickooyster.gif"] = im(16, 91);ism["brickopython.gif"] = im(450, 100, 11, 87);ism["brickoturtle.gif"] = im(22, 77);ism["brickovacuum.gif"] = im(200, 200, 17, 182);ism["casebat.gif"] = im(40, 63);ism["bath_bubble.gif"] = im(17, 76);ism["iceguy5.gif"] = im(0, 97);ism["broctopus.gif"] = im(0, 99);ism["bronzechef.gif"] = im(0, 99);ism["babyseal.gif"] = im(6, 84);ism["togafrat.gif"] = im(2, 96);ism["twins_bubble.gif"] = im(13, 94);ism["bb_ghost.gif"] = im(5, 89);ism["bb_captain.gif"] = im(150, 150, 3, 143);ism["bb_drone.gif"] = im(2, 97);ism["bb_mortician.gif"] = im(9, 91);ism["robosurgeon.gif"] = im(14, 88);ism["bb_science.gif"] = im(6, 88);ism["binbox.gif"] = im(4, 91);ism["bugbugbear.gif"] = im(6, 91);ism["bulletbill.gif"] = im(15, 83);ism["bullseal.gif"] = im(9, 95);ism["ratbunch.gif"] = im(1, 92);ism["pa_meat.gif"] = im(5, 96);ism["bunsen.gif"] = im(9, 87);ism["sidekick.gif"] = im(5, 97);ism["adv_hot3.gif"] = im(18, 95);ism["snakeboss4.gif"] = im(150, 150, 19, 133);ism["bishop.gif"] = im(54, 94);ism["bush.gif"] = im(8, 93);ism["bushippy.gif"] = im(8, 94);ism["hedgerow.gif"] = im(25, 79);ism["pa_knife.gif"] = im(1, 87);ism["buzzerker.gif"] = im(11, 84);ism["buzzy.gif"] = im(0, 97);ism["chum1.gif"] = im(7, 91);ism["chumchief.gif"] = im(7, 94);ism["carnivore.gif"] = im(6, 96);ism["animbear.gif"] = im(0, 99);ism["laundrycabinet.gif"] = im(1, 98);ism["cactuary.gif"] = im(0, 97);ism["cakelord.gif"] = im(0, 98);ism["cameltoe.gif"] = im(5, 97);ism["cancan.gif"] = im(4, 97);ism["pecantree.gif"] = im(1, 98);ism["yamgolem.gif"] = im(0, 97);ism["gourd_cangoblin.gif"] = im(9, 88);ism["carbuncletop.gif"] = im(1, 92);ism["cargocrab.gif"] = im(7, 94);ism["dillplant.gif"] = im(2, 99);ism["carniv.gif"] = im(5, 94);ism["pa_eggs.gif"] = im(22, 86);ism["thecastle.gif"] = im(21, 78);ism["catalien.gif"] = im(21, 89);ism["spelunkcaveman.gif"] = im(7, 91);ism["cavedan.gif"] = im(0, 97);ism["cavefrat.gif"] = im(2, 95);ism["cavehippy.gif"] = im(0, 97);ism["cavesorority.gif"] = im(0, 95);ism["cavewomyn.gif"] = im(0, 94);ism["butt.gif"] = im(16, 81);ism["pengcement.gif"] = im(2, 97);ism["centurion.gif"] = im(7, 80);ism["adv_hot2.gif"] = im(2, 96);ism["chimp.gif"] = im(6, 90);ism["chalkdust.gif"] = im(6, 98);ism["hunter10.gif"] = im(1, 97);ism["c10chatty.gif"] = im(0, 96);ism["strix.gif"] = im(4, 93);ism["adv_stench2.gif"] = im(1, 97);ism["adv_fast1.gif"] = im(4, 93);ism["chefboy.gif"] = im(0, 98);ism["chester.gif"] = im(1, 97);ism["robotceo.gif"] = im(5, 92);ism["chocohare.gif"] = im(23, 93);ism["ccprairie.gif"] = im(1, 97);ism["soupgolem.gif"] = im(3, 93);ism["ciggirl.gif"] = im(0, 99);ism["animelf3.gif"] = im(19, 80);ism["cavebars.gif"] = im(0, 98);ism["clancy.gif"] = im(9, 94);ism["bathtub.gif"] = im(50, 97);ism["claygolem.gif"] = im(1, 98);ism["aboo_wiz.gif"] = im(3, 96);ism["cleanroomdemon.gif"] = im(5, 95);ism["cleanpirate.gif"] = im(3, 94);ism["girlpirate.gif"] = im(7, 91);ism["colaoff1.gif"] = im(4, 94);ism["colasol1.gif"] = im(6, 96);ism["rock_hopper.gif"] = im(0, 99);ism["whiskers.gif"] = im(8, 84);ism["clubfish.gif"] = im(1, 90);ism["prim_bact.gif"] = im(0, 98);ism["coaltergeist.gif"] = im(5, 91);ism["kg_oven.gif"] = im(8, 97);ism["spelunkcobra.gif"] = im(14, 77);ism["cocktailshrimp.gif"] = im(0, 99);ism["dvcoldbear1.gif"] = im(3, 97);ism["coldcutter.gif"] = im(2, 94);ism["dvcoldghost1.gif"] = im(0, 96);ism["coldhobo1.gif"] = im(5, 89);ism["wood_cold.gif"] = im(13, 96);ism["dvcoldskel1.gif"] = im(1, 95);ism["dvcoldvamp1.gif"] = im(3, 94);ism["dvcoldwolf1.gif"] = im(1, 98);ism["dvcoldzom1.gif"] = im(5, 98);ism["minegolem.gif"] = im(4, 89);ism["spider2.gif"] = im(20, 83);ism["pianist.gif"] = im(0, 98);ism["lilgoth.gif"] = im(19, 96);ism["2zombies.gif"] = im(6, 92);ism["conhippy.gif"] = im(2, 94);ism["regret1.gif"] = im(2, 90);ism["pa_cutter.gif"] = im(21, 76);ism["crimonster2.gif"] = im(0, 99);ism["coolerwino.gif"] = im(0, 97);ism["coppertender.gif"] = im(6, 91);ism["fatzombie.gif"] = im(9, 93);ism["prim_alga.gif"] = im(0, 98);ism["makeupwraith.gif"] = im(11, 81);ism["bakula.gif"] = im(7, 90);ism["drunkula.gif"] = im(100, 175, 5, 166);ism["drunkula_hm.gif"] = im(300, 175, 2, 159);ism["courtesan.gif"] = im(5, 95);ism["cowskeleton.gif"] = im(1, 97);ism["creep.gif"] = im(13, 91);ism["craggybart.gif"] = im(3, 91);ism["crate.gif"] = im(10, 89);ism["stone_raven.gif"] = im(21, 85);ism["bastard.gif"] = im(3, 94);ism["adv_smooth2.gif"] = im(3, 94);ism["clown.gif"] = im(3, 97);ism["creepydoll.gif"] = im(4, 96);ism["dianoga.gif"] = im(11, 87);ism["twins_ginger.gif"] = im(1, 98);ism["creepygirl.gif"] = im(32, 97);ism["pa_torch.gif"] = im(3, 92);ism["crimbomega.gif"] = im(400, 550, 7, 545);ism["spelunkcroc.gif"] = im(6, 89);ism["croqueteer.gif"] = im(1, 90);ism["dustmote.gif"] = im(20, 86);ism["hippy3.gif"] = im(8, 94);ism["crustpirate.gif"] = im(1, 95);ism["crys_rock.gif"] = im(200, 150, 2, 137);ism["cubistbull.gif"] = im(0, 99);ism["spelunkhawk.gif"] = im(3, 95);ism["curmpirate.gif"] = im(6, 93);ism["cybercop.gif"] = im(2, 97);ism["prim_cyru.gif"] = im(0, 98);ism["dad_machine.gif"] = im(400, 300, 6, 294);ism["daftpunk.gif"] = im(3, 97);ism["biggoat.gif"] = im(2, 98);ism["ooze.gif"] = im(45, 93);ism["dirtyape.gif"] = im(0, 99);ism["mush_dancing.gif"] = im(11, 91);ism["chad.gif"] = im(3, 93);ism["rorshach.gif"] = im(8, 79);ism["bath_showerhead.gif"] = im(2, 97);ism["venomtrout.gif"] = im(47, 99);ism["vice.gif"] = im(20, 85);ism["shiv_dead.gif"] = im(3, 94);ism["deathray.gif"] = im(4, 98);ism["lumberjack.gif"] = im(5, 92);ism["whiteshark.gif"] = im(15, 71);ism["5_4a.gif"] = im(200, 200, 0, 197);ism["demfridge.gif"] = im(1, 99);ism["jigsaw.gif"] = im(12, 83);ism["demoninja.gif"] = im(17, 89);ism["liana.gif"] = im(13, 90);ism["wanderacc1.gif"] = im(1, 97);ism["hunter8.gif"] = im(0, 97);ism["goldfarmer.gif"] = im(9, 91);ism["smoochboss4.gif"] = im(100, 200, 11, 191);ism["spelunkdevil.gif"] = im(0, 99);ism["digitalug.gif"] = im(17, 87);ism["dinnertroll.gif"] = im(13, 87);ism["direpigeon.gif"] = im(0, 98);ism["hippy2.gif"] = im(8, 93);ism["dirtyoldlihc.gif"] = im(6, 99);ism["bandit.gif"] = im(1, 95);ism["dinbox.gif"] = im(16, 91);ism["c10files.gif"] = im(7, 98);ism["divingbelle.gif"] = im(0, 99);ism["js_oh.gif"] = im(5, 91);ism["pede.gif"] = im(20, 81);ism["dogalien.gif"] = im(3, 92);ism["catdog.gif"] = im(17, 85);ism["iceguy2.gif"] = im(8, 97);ism["doncrimbo.gif"] = im(0, 99);ism["donerbagon.gif"] = im(200, 200, 1, 189);ism["dwarf_dopey.gif"] = im(0, 99);ism["doubtman.gif"] = im(200, 200, 2, 193);ism["doughbat.gif"] = im(41, 63);ism["aquard.gif"] = im(0, 99);ism["drawkward.gif"] = im(4, 95);ism["braddarb.gif"] = im(5, 96);ism["droll.gif"] = im(18, 87);ism["dropbase.gif"] = im(12, 80);ism["drownedsailor.gif"] = im(1, 97);ism["drownedbeat.gif"] = im(0, 95);ism["ducknicedrunk.gif"] = im(1, 94);ism["drunkgoat.gif"] = im(2, 98);ism["pyg_drunk.gif"] = im(9, 99);ism["drunkminer.gif"] = im(0, 98);ism["hobo.gif"] = im(5, 91);ism["rat.gif"] = im(33, 67);ism["ratking.gif"] = im(200, 200, 7, 185);ism["kok_drunk.gif"] = im(0, 93);ism["zomhobo.gif"] = im(5, 91);ism["aboo_dipshit.gif"] = im(1, 97);ism["straw_spooky.gif"] = im(39, 91);ism["dwarfgnome.gif"] = im(17, 84);ism["dweebie.gif"] = im(5, 94);ism["colaoff2.gif"] = im(4, 94);ism["colasol2.gif"] = im(6, 96);ism["eve.gif"] = im(0, 93);ism["eagle.gif"] = im(0, 98);ism["ed.gif"] = im(1, 98);ism["ed2.gif"] = im(1, 98);ism["ed3.gif"] = im(1, 98);ism["ed4.gif"] = im(1, 98);ism["ed5.gif"] = im(1, 98);ism["ed6.gif"] = im(22, 98);ism["ed7.gif"] = im(46, 98);ism["edwing.gif"] = im(24, 83);ism["eldiablo.gif"] = im(0, 99);ism["elders.gif"] = im(11, 85);ism["submarine.gif"] = im(8, 86);ism["nightstand5.gif"] = im(22, 82);ism["topi3.gif"] = im(7, 90);ism["elfhobo1.gif"] = im(28, 97);ism["warfratbg2.gif"] = im(0, 95);ism["elp_and_cros.gif"] = im(300, 150, 5, 146);ism["skinyeti.gif"] = im(4, 90);ism["armor.gif"] = im(0, 98);ism["inflatiger.gif"] = im(7, 98);ism["c10confcall.gif"] = im(2, 94);ism["grayblob3.gif"] = im(150, 200, 21, 178);ism["cow.gif"] = im(0, 99);ism["adv_strong3.gif"] = im(9, 91);ism["gremlinglasses.gif"] = im(7, 94);ism["stairmaster.gif"] = im(12, 94);ism["mc_respect3.gif"] = im(4, 94);ism["mc_soy3.gif"] = im(0, 97);ism["mc_tofu3.gif"] = im(1, 98);ism["cultist.gif"] = im(3, 98);ism["mh_evilex.gif"] = im(0, 99);ism["oliveevil.gif"] = im(13, 85);ism["spagcult2.gif"] = im(1, 95);ism["spagcult3.gif"] = im(0, 99);ism["spagcult1.gif"] = im(0, 98);ism["spagcult2k.gif"] = im(1, 95);ism["spagcult4.gif"] = im(0, 99);ism["spagcult1k.gif"] = im(0, 98);ism["trumpetmariachi.gif"] = im(2, 97);ism["vihuelamariachi.gif"] = im(2, 96);ism["crimbominer1.gif"] = im(0, 99);ism["skihippy.gif"] = im(3, 94);ism["fratboard.gif"] = im(3, 91);ism["wcorcs.gif"] = im(0, 97);
+ism["witchy2.gif"] = im(0, 99);ism["darkeye.gif"] = im(5, 91);ism["guai.gif"] = im(11, 85);ism["facworker4.gif"] = im(3, 95);ism["facworker3.gif"] = im(1, 97);ism["facworker1.gif"] = im(3, 97);ism["facworker2.gif"] = im(1, 93);ism["badskel1.gif"] = im(20, 84);ism["archfiend.gif"] = im(10, 84);ism["fallsfromsky.gif"] = im(100, 150, 2, 143);ism["fallsfromsky_hm.gif"] = im(200, 300, 7, 285);ism["jewels.gif"] = im(8, 82);ism["kobolds.gif"] = im(0, 97);ism["fandancer.gif"] = im(6, 91);ism["fanslime.gif"] = im(2, 94);ism["bathslug.gif"] = im(1, 98);ism["hunter5.gif"] = im(1, 98);ism["hunter9.gif"] = im(1, 93);ism["fearman.gif"] = im(200, 200, 12, 185);ism["bath_octopus.gif"] = im(0, 98);ism["wacken.gif"] = im(200, 200, 23, 186);ism["manyeyes.gif"] = im(4, 81);ism["felonia.gif"] = im(0, 98);ism["haiku2.gif"] = im(6, 91);ism["bath_pelican.gif"] = im(1, 97);ism["ferrelf.gif"] = im(5, 90);ism["finger.gif"] = im(2, 96);ism["asparagus.gif"] = im(9, 89);ism["mush_flaming.gif"] = im(0, 99);ism["duckskate.gif"] = im(2, 98);ism["filthworm2.gif"] = im(24, 75);ism["filthworm3.gif"] = im(19, 70);ism["hippy1.gif"] = im(8, 89);ism["stinkpirate1.gif"] = im(3, 97);ism["adv_hot1.gif"] = im(1, 97);ism["firetruck.gif"] = im(300, 150, 7, 145);ism["duckfirebreath.gif"] = im(7, 91);ism["fisherfish.gif"] = im(3, 97);ism["stinkpirate3.gif"] = im(1, 93);ism["giant_fitness.gif"] = im(9, 97);ism["bigskeleton5.gif"] = im(250, 100, 0, 99);ism["meatblob.gif"] = im(10, 79);ism["samurai.gif"] = im(0, 99);ism["flametroll.gif"] = im(1, 96);ism["flange.gif"] = im(12, 78);ism["flashypirate.gif"] = im(4, 94);ism["cvfleaman.gif"] = im(5, 90);ism["woodsman.gif"] = im(9, 96);ism["disco_flexible.gif"] = im(3, 97);ism["caveelf3.gif"] = im(25, 85);ism["horstray.gif"] = im(19, 89);ism["seagulls.gif"] = im(3, 91);ism["stabbats.gif"] = im(0, 97);ism["bunny.gif"] = im(49, 94);ism["gourd_fnord.gif"] = im(200, 200, 23, 171);ism["giant_foodie.gif"] = im(4, 97);ism["forspirit.gif"] = im(21, 74);ism["bigskeleton4.gif"] = im(200, 100, 0, 99);ism["mime.gif"] = im(0, 97);ism["artteacher.gif"] = im(4, 95);ism["accboss.gif"] = im(0, 98);ism["warfrata.gif"] = im(1, 96);ism["mush_freaked.gif"] = im(9, 91);ism["frenchturtle.gif"] = im(19, 72);ism["bonefish.gif"] = im(40, 97);ism["frog.gif"] = im(53, 99);ism["frosty.gif"] = im(0, 99);ism["straw_cold.gif"] = im(12, 91);ism["mystwander3.gif"] = im(8, 94);ism["duckfrozen.gif"] = im(2, 96);ism["snakeboss1.gif"] = im(150, 150, 21, 133);ism["fruitgolem.gif"] = im(8, 97);ism["anger3.gif"] = im(0, 99);ism["fudgemonkey2.gif"] = im(0, 99);ism["fudgeoyster.gif"] = im(0, 99);ism["fudgepoodle.gif"] = im(2, 96);ism["fudgevulture.gif"] = im(0, 99);ism["fudgeweasel.gif"] = im(11, 86);ism["bigmirror.gif"] = im(0, 99);ism["fun-gal1.gif"] = im(0, 99);ism["funkparticle.gif"] = im(8, 94);ism["solebrother.gif"] = im(19, 76);ism["stinkpirate2.gif"] = im(3, 96);ism["shiv_fur.gif"] = im(1, 94);ism["giant_furry.gif"] = im(0, 98);ism["gimp.gif"] = im(15, 90);ism["gamblinman.gif"] = im(1, 95);ism["muggers.gif"] = im(2, 98);ism["ganger.gif"] = im(16, 88);ism["garbagetourist.gif"] = im(3, 94);ism["gargantulihc.gif"] = im(1, 93);ism["ghuol_skinny.gif"] = im(16, 90);ism["gelcube.gif"] = im(12, 97);ism["generalseal.gif"] = im(150, 100, 2, 97);ism["duckgeneric.gif"] = im(4, 94);ism["merkinballer2.gif"] = im(1, 99);ism["smoochboss1.gif"] = im(100, 200, 8, 189);ism["phantom.gif"] = im(1, 95);ism["cvghost.gif"] = im(4, 92);ism["spelunkghost.gif"] = im(11, 91);ism["ghostminer.gif"] = im(1, 98);ism["elizabeth.gif"] = im(10, 86);ism["fernghost.gif"] = im(1, 92);ism["worker.gif"] = im(2, 94);ism["adv_spooky1.gif"] = im(8, 91);ism["ghuol_reg.gif"] = im(11, 85);ism["giantbee.gif"] = im(2, 84);ism["pterodactyl.gif"] = im(6, 91);ism["globe.gif"] = im(0, 95);ism["friedegg.gif"] = im(2, 82);ism["centipede.gif"] = im(21, 81);ism["moth.gif"] = im(5, 95);ism["isopod.gif"] = im(35, 95);ism["python.gif"] = im(4, 93);ism["bath_whale.gif"] = im(14, 82);ism["manyspiders.gif"] = im(1, 94);ism["watertentacle.gif"] = im(6, 93);ism["tweezers.gif"] = im(6, 93);ism["headpumpkin.gif"] = im(5, 96);ism["rubberspider.gif"] = im(15, 84);ism["sandworm.gif"] = im(2, 99);ism["giantskel.gif"] = im(0, 99);ism["tarantula.gif"] = im(1, 97);ism["giantsquid.gif"] = im(0, 98);ism["whelps3.gif"] = im(0, 99);ism["tardigrade.gif"] = im(4, 91);ism["zomfish.gif"] = im(2, 86);ism["crimonster5.gif"] = im(0, 92);ism["gingerbreadman.gif"] = im(0, 99);ism["gladiator.gif"] = im(1, 96);ism["juiceglass.gif"] = im(12, 87);ism["wood_hot.gif"] = im(3, 95);ism["ghuol_fat.gif"] = im(13, 87);ism["gnarlgnome.gif"] = im(9, 79);ism["gnasgnome.gif"] = im(6, 77);ism["gnefgnome.gif"] = im(12, 83);ism["dk_builder.gif"] = im(9, 97);ism["dk_cross.gif"] = im(3, 94);ism["dk_swatter.gif"] = im(3, 95);ism["dk_gearhead.gif"] = im(1, 97);ism["dk_piechef.gif"] = im(0, 99);ism["dk_plunger.gif"] = im(3, 93);ism["gnollmage.gif"] = im(3, 95);ism["dk_juggler.gif"] = im(1, 97);ism["dk_warchef.gif"] = im(0, 98);ism["gnomester.gif"] = im(5, 91);ism["gnugnome.gif"] = im(10, 84);ism["gourd_goblin.gif"] = im(7, 92);ism["goldenring.gif"] = im(17, 86);ism["goomba.gif"] = im(9, 89);ism["goosealaying.gif"] = im(0, 99);ism["1_4a.gif"] = im(200, 200, 2, 198);ism["1_1.gif"] = im(18, 93);ism["1_2.gif"] = im(10, 92);ism["1_3.gif"] = im(10, 93);ism["giant_goth.gif"] = im(3, 96);ism["gourami.gif"] = im(51, 93);ism["gov_agent.gif"] = im(11, 94);ism["scientist.gif"] = im(3, 95);ism["adv_stench1.gif"] = im(6, 97);ism["grasselemental.gif"] = im(0, 99);ism["grasspirate.gif"] = im(0, 95);ism["rober.gif"] = im(8, 91);ism["zomshovel.gif"] = im(4, 94);ism["adv_sleaze1.gif"] = im(3, 90);ism["duckgreasy.gif"] = im(0, 91);ism["wolfoftheair.gif"] = im(200, 150, 8, 136);ism["wolfoftheair_hm.gif"] = im(200, 150, 7, 135);ism["warhipgr.gif"] = im(5, 93);ism["porkbun.gif"] = im(14, 79);ism["gritpirate.gif"] = im(1, 97);ism["surv_grizzled.gif"] = im(3, 91);ism["wingedyeti.gif"] = im(200, 100, 0, 99);ism["groast.gif"] = im(5, 94);ism["grouchewie.gif"] = im(7, 90);ism["cultistgroup.gif"] = im(4, 96);ism["groupie.gif"] = im(16, 85);ism["dwarf_grumpy.gif"] = im(0, 99);ism["grungypirate.gif"] = im(11, 95);ism["guardturtle1.gif"] = im(29, 89);ism["plesio.gif"] = im(1, 98);ism["gurgle.gif"] = im(150, 100, 0, 99);ism["animturtle.gif"] = im(100, 120, 4, 118);ism["beeguy.gif"] = im(0, 96);ism["gothic.gif"] = im(4, 96);ism["adv_sleaze2.gif"] = im(6, 89);ism["drunkyam.gif"] = im(0, 99);ism["hamsterpus.gif"] = im(2, 88);ism["mariachi1.gif"] = im(2, 97);ism["shiv_hangman.gif"] = im(3, 93);ism["hunter12.gif"] = im(3, 97);ism["skullabra.gif"] = im(1, 91);ism["tureen.gif"] = im(6, 87);ism["crystalgolem.gif"] = im(1, 92);ism["heatseal.gif"] = im(0, 99);ism["warfratar2.gif"] = im(10, 88);ism["nachogolem.gif"] = im(0, 98);ism["hellion.gif"] = im(3, 95);ism["sealguard.gif"] = im(13, 95);ism["sealpup.gif"] = im(29, 81);ism["hepcat.gif"] = im(1, 98);ism["hunter6.gif"] = im(3, 96);ism["hermeticseal.gif"] = im(5, 88);ism["c10slideshow.gif"] = im(10, 89);ism["highpriest.gif"] = im(0, 99);ism["warbear31.gif"] = im(0, 99);ism["snakes.gif"] = im(2, 83);ism["hockeyelem.gif"] = im(6, 90);ism["hodgman.gif"] = im(1, 96);ism["holoarmy.gif"] = im(2, 92);ism["honeypot.gif"] = im(5, 92);ism["hooded.gif"] = im(4, 96);ism["stenchfamily.gif"] = im(4, 96);ism["prim_amoe.gif"] = im(0, 98);ism["dvhotbear1.gif"] = im(5, 94);ism["dvhotghost1.gif"] = im(4, 93);ism["hothobo1.gif"] = im(3, 92);ism["dvhotskel1.gif"] = im(13, 99);ism["dvhotvamp1.gif"] = im(0, 98);ism["dvhotwolf1.gif"] = im(12, 98);ism["dvhotzom1.gif"] = im(1, 98);ism["mimic4.gif"] = im(1, 97);ism["ghuol_huge.gif"] = im(5, 95);ism["giantmosquito.gif"] = im(0, 98);ism["iceguy1.gif"] = im(1, 98);ism["bridgetroll.gif"] = im(2, 97);ism["vib6.gif"] = im(7, 98);ism["caveelf2.gif"] = im(18, 73);ism["huntingseal.gif"] = im(9, 85);ism["poolghost.gif"] = im(0, 99);ism["hypnotist.gif"] = im(0, 97);ism["medicus.gif"] = im(3, 92);ism["bb_vamp.gif"] = im(3, 93);ism["adv_cold2.gif"] = im(0, 98);ism["icecreamtruck.gif"] = im(400, 150, 9, 142);ism["icecube.gif"] = im(12, 94);ism["iceskate.gif"] = im(4, 96);ism["adv_cold3.gif"] = im(8, 93);ism["mummycat.gif"] = im(1, 96);ism["illegal_alien.gif"] = im(24, 96);ism["vib3.gif"] = im(0, 99);ism["drunktofurkey.gif"] = im(0, 99);ism["seal_larva.gif"] = im(63, 93);ism["seal_baby.gif"] = im(47, 93);ism["meatbug.gif"] = im(7, 89);ism["inkubus.gif"] = im(7, 97);ism["mariachi2.gif"] = im(2, 91);ism["adv_strong2.gif"] = im(5, 92);ism["encount.gif"] = im(3, 93);ism["jacobsadder.gif"] = im(0, 99);ism["orquette1.gif"] = im(13, 86);ism["jamfish.gif"] = im(0, 98);ism["pilot.gif"] = im(3, 97);ism["jetski.gif"] = im(15, 94);ism["jockohomo.gif"] = im(0, 98);ism["merkindragger2.gif"] = im(1, 99);ism["doubt3.gif"] = im(0, 99);ism["orangutan.gif"] = im(8, 97);ism["scabie_jungle.gif"] = im(2, 92);ism["thejunk.gif"] = im(19, 86);ism["js_bender.gif"] = im(5, 91);ism["js_melter.gif"] = im(11, 95);ism["js_sharpener.gif"] = im(7, 90);ism["orquette2.gif"] = im(13, 86);ism["keese.gif"] = im(25, 66);ism["tooold.gif"] = im(1, 97);ism["clownfish.gif"] = im(22, 82);ism["killingbird.gif"] = im(0, 98);ism["adv_smart3.gif"] = im(15, 94);ism["snaknight.gif"] = im(0, 97);ism["wolfknight.gif"] = im(3, 97);ism["knight.gif"] = im(7, 91);ism["kg_accountant.gif"] = im(12, 98);ism["kg_alchemist.gif"] = im(15, 94);ism["kg_asstchef.gif"] = im(0, 99);ism["kg_bbqteam.gif"] = im(1, 99);ism["kg_beancounter.gif"] = im(12, 97);ism["kg_guard.gif"] = im(10, 94);ism["kg_guardcaptain.gif"] = im(10, 94);ism["zomelite.gif"] = im(6, 90);
+ism["kg_embezzler.gif"] = im(12, 97);ism["kg_haremgirl.gif"] = im(15, 89);ism["kg_haremguard.gif"] = im(14, 94);ism["kg_king.gif"] = im(0, 98);ism["kg_madsci.gif"] = im(11, 91);ism["kg_madam.gif"] = im(16, 97);ism["kg_masterchef.gif"] = im(0, 99);ism["kg_mba.gif"] = im(16, 98);ism["kg_mutant.gif"] = im(13, 97);ism["kg_poseur.gif"] = im(28, 94);ism["kg_souschef.gif"] = im(0, 98);ism["kg_verymadsci.gif"] = im(15, 92);ism["slanding.gif"] = im(5, 91);ism["yeti.gif"] = im(1, 95);ism["koopa.gif"] = im(5, 93);ism["kublakhan.gif"] = im(5, 92);ism["adv_fast3.gif"] = im(4, 92);ism["limp.gif"] = im(8, 94);ism["labmonkey.gif"] = im(16, 91);ism["n00b.gif"] = im(6, 91);ism["lower_k.gif"] = im(7, 81);ism["headwolf.gif"] = im(0, 98);ism["grayblob2.gif"] = im(9, 93);ism["larrysignfield.gif"] = im(9, 95);ism["filthworm1.gif"] = im(49, 83);ism["laser.gif"] = im(9, 97);ism["lavagolem.gif"] = im(5, 89);ism["lavalamprey.gif"] = im(3, 95);ism["lavalos.gif"] = im(200, 300, 7, 290);ism["lavatory.gif"] = im(0, 98);ism["statbike.gif"] = im(2, 96);ism["linbox.gif"] = im(17, 91);ism["lemonfish.gif"] = im(17, 74);ism["adv_sleaze4.gif"] = im(3, 97);ism["lfruitgol.gif"] = im(33, 84);ism["licosnake.gif"] = im(5, 94);ism["lich.gif"] = im(3, 98);ism["bb_liquidmetal.gif"] = im(7, 92);ism["liquidmetal.gif"] = im(1, 97);ism["grayblob1.gif"] = im(40, 88);ism["canoeman.gif"] = im(13, 66);ism["wanderacc2.gif"] = im(1, 98);ism["pa_bread.gif"] = im(7, 95);ism["lobsterman.gif"] = im(1, 98);ism["lollicat.gif"] = im(12, 91);ism["lolligator.gif"] = im(18, 85);ism["lollipede.gif"] = im(11, 77);ism["lolliphaunt.gif"] = im(12, 91);ism["spelunklolm.gif"] = im(250, 300, 3, 269);ism["lollirus2.gif"] = im(9, 91);ism["vib5.gif"] = im(1, 97);ism["coalition.gif"] = im(2, 89);ism["soggyraven.gif"] = im(0, 99);ism["lordspooky.gif"] = im(7, 97);ism["lotswife.gif"] = im(1, 97);ism["lizardfish.gif"] = im(31, 61);ism["regret2.gif"] = im(1, 95);ism["kok_lovers.gif"] = im(5, 97);ism["lower_h.gif"] = im(13, 87);ism["catstatue.gif"] = im(15, 84);ism["lumbersup.gif"] = im(5, 92);ism["lumberjill.gif"] = im(5, 92);ism["lumberjuan.gif"] = im(0, 92);ism["4_4a.gif"] = im(200, 200, 13, 168);ism["4_1.gif"] = im(21, 70);ism["4_2.gif"] = im(19, 92);ism["4_3.gif"] = im(3, 97);ism["lynyrd.gif"] = im(9, 91);ism["skinner.gif"] = im(2, 96);ism["adv_strong1.gif"] = im(5, 94);ism["madbugbear.gif"] = im(6, 95);ism["prim_flag.gif"] = im(0, 98);ism["madwino.gif"] = im(6, 94);ism["madiator.gif"] = im(2, 96);ism["dragonfish.gif"] = im(0, 99);ism["mech.gif"] = im(1, 98);ism["spelunkmagma.gif"] = im(7, 84);ism["cropcircle.gif"] = im(2, 93);ism["hairclog.gif"] = im(0, 94);ism["magfield.gif"] = im(1, 93);ism["tofurkey.gif"] = im(2, 92);ism["maltliquorgolem.gif"] = im(0, 99);ism["mammon.gif"] = im(200, 200, 11, 193);ism["redbuttons.gif"] = im(1, 93);ism["audrey.gif"] = im(0, 98);ism["wraith5.gif"] = im(10, 90);ism["bandolero.gif"] = im(0, 99);ism["mar_bruiser.gif"] = im(4, 93);ism["mariachi3.gif"] = im(1, 96);ism["wraith3.gif"] = im(9, 88);ism["promoter.gif"] = im(2, 93);ism["wasp.gif"] = im(13, 96);ism["mayorghost.gif"] = im(200, 150, 3, 146);ism["mayorghost_hm.gif"] = im(200, 150, 5, 147);ism["beggar.gif"] = im(0, 98);ism["duckmeandrunk.gif"] = im(3, 96);ism["med_dung.gif"] = im(5, 94);ism["med_mugman.gif"] = im(3, 92);ism["med_muggirl.gif"] = im(5, 89);ism["med_potter.gif"] = im(3, 91);ism["med_strawman.gif"] = im(0, 97);ism["med_stucco.gif"] = im(12, 96);ism["mimic3.gif"] = im(11, 89);ism["cvmedusa.gif"] = im(4, 91);ism["megafrog.gif"] = im(15, 89);ism["vib1.gif"] = im(0, 98);ism["lawngnome1.gif"] = im(14, 80);ism["nemesisthug.gif"] = im(7, 90);ism["merkinalphabet.gif"] = im(6, 93);ism["merkinballer.gif"] = im(4, 98);ism["merkinswitcher.gif"] = im(4, 98);ism["merkinburglar.gif"] = im(1, 95);ism["merkindiver.gif"] = im(1, 95);ism["merkindrifter.gif"] = im(4, 98);ism["merkinhealer.gif"] = im(3, 95);ism["merkinjuicer.gif"] = im(4, 98);ism["merkinminer.gif"] = im(1, 95);ism["merkinmonitor.gif"] = im(6, 93);ism["merkindragger.gif"] = im(4, 98);ism["merkinposeur.gif"] = im(1, 95);ism["merkinpunisher.gif"] = im(1, 95);ism["merkinraider.gif"] = im(3, 95);ism["merkinresearcher.gif"] = im(6, 93);ism["merkinspear.gif"] = im(1, 95);ism["merkinscav.gif"] = im(1, 95);ism["merkinghost.gif"] = im(13, 85);ism["merkinteacher.gif"] = im(2, 99);ism["merkintippler.gif"] = im(1, 99);ism["merkintrainer.gif"] = im(4, 98);ism["mercenary.gif"] = im(6, 95);ism["pengmesmer.gif"] = im(3, 99);ism["adv_smart2.gif"] = im(6, 98);ism["adv_fast2.gif"] = im(1, 96);ism["lowerm.gif"] = im(9, 90);ism["minecrab.gif"] = im(0, 99);ism["mineboss2.gif"] = im(1, 96);ism["mineboss1.gif"] = im(2, 97);ism["mineworker1.gif"] = im(3, 92);ism["mineworker2.gif"] = im(3, 92);ism["twins_mism.gif"] = im(100, 200, 17, 198);ism["badportrait.gif"] = im(0, 98);ism["pengarson.gif"] = im(2, 97);ism["mobcapo.gif"] = im(8, 95);ism["pengcapo.gif"] = im(3, 98);ism["pengdemo.gif"] = im(2, 98);ism["pengthug.gif"] = im(2, 98);ism["peng_ent.gif"] = im(3, 98);ism["pengbook.gif"] = im(2, 98);ism["penggoon.gif"] = im(2, 98);ism["penggun.gif"] = im(3, 98);ism["pengchef.gif"] = im(3, 98);ism["pengpsycho.gif"] = im(3, 98);ism["pengracket.gif"] = im(3, 99);ism["pengsmasher.gif"] = im(0, 98);ism["hazmatpeng.gif"] = im(0, 98);ism["pengprano.gif"] = im(0, 99);ism["pengphone.gif"] = im(0, 98);ism["warhipar2.gif"] = im(6, 89);ism["modelskeleton.gif"] = im(1, 99);ism["modernzombie.gif"] = im(8, 91);ism["moyster.gif"] = im(7, 93);ism["moneybee.gif"] = im(11, 75);ism["elf_wrench.gif"] = im(17, 87);ism["monsterhearse.gif"] = im(250, 200, 22, 186);ism["boiler.gif"] = im(4, 95);ism["monty.gif"] = im(4, 95);ism["moonshriner.gif"] = im(0, 99);ism["fear1.gif"] = im(0, 99);ism["wraith1.gif"] = im(8, 83);ism["motherseal.gif"] = im(9, 91);ism["otherimages/slimetube/stboss.gif"] = im(30, 30, 29, 30);ism["motorhead.gif"] = im(2, 95);ism["mountainman.gif"] = im(3, 97);ism["lawngnome3.gif"] = im(1, 99);ism["lawngnome2.gif"] = im(26, 98);ism["mrcheeng.gif"] = im(0, 97);ism["mrchoch.gif"] = im(0, 98);ism["adv_strong4.gif"] = im(17, 91);ism["adv_cold4.gif"] = im(0, 99);ism["chemteacher.gif"] = im(0, 98);ism["swampturtle.gif"] = im(0, 99);ism["muff.gif"] = im(10, 78);ism["mumblebee.gif"] = im(27, 74);ism["spelunkmumm.gif"] = im(3, 92);ism["mush_beefy.gif"] = im(6, 89);ism["antlerelf.gif"] = im(12, 97);ism["elfblob.gif"] = im(5, 98);ism["elflimbs.gif"] = im(17, 97);ism["elfclaw.gif"] = im(25, 96);ism["mutantgila.gif"] = im(3, 96);ism["mutantsnake.gif"] = im(19, 95);ism["mutantcactus.gif"] = im(0, 96);ism["elfhulk.gif"] = im(3, 97);ism["alielephant.gif"] = im(10, 97);ism["mutantalielf.gif"] = im(1, 97);ism["bb_vassist.gif"] = im(3, 95);ism["nastybear.gif"] = im(1, 97);ism["fear3.gif"] = im(1, 99);ism["sorcform1.gif"] = im(0, 99);ism["sorcblob.gif"] = im(200, 200, 28, 197);ism["bigsaus.gif"] = im(39, 59);ism["warfratmd2.gif"] = im(2, 96);ism["navyseal.gif"] = im(0, 98);ism["giant_neckbeard.gif"] = im(3, 95);ism["neil.gif"] = im(6, 95);ism["flytrap.gif"] = im(0, 96);ism["mc_respect2.gif"] = im(0, 97);ism["mc_respect1.gif"] = im(0, 97);ism["snakenest.gif"] = im(8, 88);ism["newt.gif"] = im(43, 97);ism["emofrat.gif"] = im(0, 97);ism["ninjawaiter.gif"] = im(5, 95);ism["ninjarice.gif"] = im(7, 95);ism["snowman.gif"] = im(7, 95);ism["ninja_ass.gif"] = im(3, 91);ism["ninjamop.gif"] = im(10, 98);ism["ninjacloud.gif"] = im(3, 97);ism["nhobo1.gif"] = im(7, 94);ism["hunter2.gif"] = im(0, 99);ism["tropicalskel.gif"] = im(0, 98);ism["novia.gif"] = im(5, 99);ism["novio.gif"] = im(11, 97);ism["nurseshark.gif"] = im(15, 71);ism["whirlwind.gif"] = im(8, 91);ism["tourist.gif"] = im(9, 92);ism["octopus.gif"] = im(0, 96);ism["octorok.gif"] = im(10, 93);ism["headghost.gif"] = im(4, 94);ism["adv_stench4.gif"] = im(0, 97);ism["kg_offdutyguard.gif"] = im(13, 95);ism["officialseal.gif"] = im(17, 91);ism["oilbaron.gif"] = im(0, 99);ism["oilcartel2.gif"] = im(200, 100, 5, 97);ism["oilslick.gif"] = im(29, 61);ism["oiltycoon.gif"] = im(1, 99);ism["straw_sleaze.gif"] = im(37, 93);ism["olscratch.gif"] = im(2, 97);ism["noart.gif"] = im(7, 91);ism["dk_oneeye.gif"] = im(2, 95);ism["oneeyed.gif"] = im(4, 91);ism["fratboy.gif"] = im(2, 91);ism["fratskirt.gif"] = im(2, 91);ism["fratbong.gif"] = im(2, 91);ism["lilfratboy.gif"] = im(7, 86);ism["oscus.gif"] = im(5, 97);ism["bandsaw.gif"] = im(11, 87);ism["tableoutlaw.gif"] = im(8, 93);ism["outlawboss.gif"] = im(0, 97);ism["surv_overarmed.gif"] = im(0, 98);ism["pimp.gif"] = im(17, 90);ism["elpriest.gif"] = im(1, 97);ism["stonebros.gif"] = im(2, 96);ism["warfratpr.gif"] = im(19, 85);ism["ptowels.gif"] = im(0, 99);ism["hunter3.gif"] = im(1, 99);
+ism["peanut.gif"] = im(0, 98);ism["mh_roommate.gif"] = im(2, 97);ism["pencil.gif"] = im(5, 93);ism["smoochboss3.gif"] = im(100, 200, 17, 191);ism["defense_sphere.gif"] = im(3, 97);ism["pestopuddle.gif"] = im(46, 91);ism["perpbat.gif"] = im(5, 88);ism["bystander.gif"] = im(1, 96);ism["somepig.gif"] = im(3, 88);ism["pinebat.gif"] = im(33, 69);ism["piranhadon.gif"] = im(29, 97);ism["wood_stench.gif"] = im(3, 90);ism["adv_spooky2.gif"] = im(4, 95);ism["plaidghost.gif"] = im(7, 95);ism["plaque.gif"] = im(0, 99);ism["drunkcrancan.gif"] = im(1, 99);ism["drunkfrat.gif"] = im(1, 96);ism["animelf2.gif"] = im(20, 81);ism["poolter.gif"] = im(1, 97);ism["poolter2.gif"] = im(2, 98);ism["popnlocker.gif"] = im(0, 98);ism["porkbutterfly.gif"] = im(9, 88);ism["porksword.gif"] = im(17, 87);ism["adv_sleaze3.gif"] = im(8, 90);ism["abom.gif"] = im(6, 95);ism["crancan.gif"] = im(21, 95);ism["mystwander2.gif"] = im(9, 95);ism["mystwander1.gif"] = im(8, 95);ism["tomatosoup.gif"] = im(6, 89);ism["eyewash.gif"] = im(11, 91);ism["mystwander4.gif"] = im(1, 97);ism["mangler.gif"] = im(5, 95);ism["organ.gif"] = im(1, 99);ism["silverware.gif"] = im(0, 99);ism["toybox.gif"] = im(7, 89);ism["winerack.gif"] = im(4, 98);ism["question.gif"] = im(0, 86);ism["pouooze.gif"] = im(33, 88);ism["primp.gif"] = im(7, 90);ism["fly.gif"] = im(4, 92);ism["surv_primitive.gif"] = im(2, 91);ism["chalmers.gif"] = im(1, 98);ism["bigskeleton.gif"] = im(0, 98);ism["giant_procrast.gif"] = im(5, 98);ism["profjacking.gif"] = im(2, 96);ism["elf_propaganda.gif"] = im(11, 84);ism["protag.gif"] = im(6, 95);ism["protspect.gif"] = im(0, 99);ism["spurt.gif"] = im(0, 99);ism["elf_provocateur.gif"] = im(10, 83);ism["pterodact.gif"] = im(250, 150, 14, 136);ism["pufferfish.gif"] = im(0, 98);ism["pumpedbass.gif"] = im(17, 69);ism["shiv_pumpkin.gif"] = im(6, 97);ism["giant_punk.gif"] = im(0, 98);ism["pyg_squad.gif"] = im(0, 99);ism["pyg_blowgunner.gif"] = im(31, 99);ism["pyg_bowler.gif"] = im(29, 98);ism["pyg_headhunter.gif"] = im(28, 99);ism["pyg_janitor.gif"] = im(41, 99);ism["pyg_orderlies.gif"] = im(18, 98);ism["pyg_shaman.gif"] = im(24, 97);ism["pyg_acct.gif"] = im(33, 99);ism["pyg_lawyer.gif"] = im(27, 98);ism["pyg_nurse.gif"] = im(20, 98);ism["pyg_surgeon.gif"] = im(21, 99);ism["wood_spooky.gif"] = im(28, 90);ism["animelf4.gif"] = im(19, 78);ism["upper_q.gif"] = im(8, 88);ism["beequeen.gif"] = im(13, 87);ism["spelunkbeeq.gif"] = im(200, 150, 5, 149);ism["filthworm4.gif"] = im(0, 97);ism["qbasicele.gif"] = im(0, 97);ism["healer.gif"] = im(9, 93);ism["wanderacc3.gif"] = im(0, 99);ism["mmoaddict.gif"] = im(12, 94);ism["naskar1.gif"] = im(5, 95);ism["weightrack.gif"] = im(27, 95);ism["elf_raconteur.gif"] = im(7, 80);ism["radiator.gif"] = im(0, 99);ism["hunter13.gif"] = im(7, 93);ism["anger1.gif"] = im(0, 99);ism["ragingbull.gif"] = im(2, 94);ism["adding.gif"] = im(2, 89);ism["mh_scenester.gif"] = im(1, 96);ism["ratbat.gif"] = im(19, 67);ism["duckrattle.gif"] = im(2, 96);ism["smoochboss2.gif"] = im(100, 200, 13, 191);ism["raven.gif"] = im(18, 93);ism["giant_raver.gif"] = im(0, 99);ism["wallpaper.gif"] = im(17, 83);ism["foss_baboon.gif"] = im(1, 97);ism["foss_bat.gif"] = im(38, 69);ism["foss_demon.gif"] = im(150, 150, 2, 130);ism["foss_spider.gif"] = im(150, 150, 32, 130);ism["foss_serpent.gif"] = im(1, 96);ism["redbutler.gif"] = im(4, 95);ism["redfox.gif"] = im(5, 94);ism["redherring.gif"] = im(7, 94);ism["redskeleton.gif"] = im(5, 97);ism["redsnapper.gif"] = im(6, 90);ism["regretman.gif"] = im(200, 200, 9, 180);ism["regbat.gif"] = im(35, 66);ism["headlessskel.gif"] = im(15, 89);ism["mistress.gif"] = im(2, 99);ism["giant_renfair.gif"] = im(1, 97);ism["reneccorman.gif"] = im(1, 97);ism["doubt2.gif"] = im(6, 92);ism["kok_waiter.gif"] = im(2, 95);ism["revbugbear.gif"] = im(1, 98);ism["merkinswitcher2.gif"] = im(1, 99);ism["duckgolem.gif"] = im(2, 92);ism["rock_guy.gif"] = im(31, 96);ism["popweasel.gif"] = im(0, 99);ism["scorpion.gif"] = im(8, 91);ism["rock_snake.gif"] = im(1, 97);ism["caveelf1.gif"] = im(21, 78);ism["rock_fish.gif"] = im(24, 77);ism["rollerskate.gif"] = im(2, 92);ism["muse.gif"] = im(2, 96);ism["rollingstone.gif"] = im(4, 90);ism["roncopper.gif"] = im(3, 96);ism["realdolphin.gif"] = im(14, 92);ism["duckfat.gif"] = im(0, 99);ism["rudolfus.gif"] = im(3, 97);ism["rulergolem.gif"] = im(0, 99);ism["runningman.gif"] = im(2, 94);ism["bum.gif"] = im(8, 95);ism["elf_saboteur.gif"] = im(22, 79);ism["ferret.gif"] = im(2, 90);ism["toothgoat.gif"] = im(0, 95);ism["stkiwi.gif"] = im(8, 85);ism["lime.gif"] = im(15, 77);ism["sadiator.gif"] = im(3, 92);ism["safarijack.gif"] = im(1, 97);ism["salamander.gif"] = im(51, 97);ism["salaminder.gif"] = im(26, 88);ism["salaryninja.gif"] = im(4, 96);ism["pirate1.gif"] = im(6, 93);ism["adv_smooth1.gif"] = im(5, 92);ism["zompirate.gif"] = im(7, 93);ism["bb_scav.gif"] = im(7, 93);ism["gummifish.gif"] = im(0, 99);ism["schoolofmany.gif"] = im(3, 94);ism["wizardfish.gif"] = im(1, 99);ism["scimitarfish.gif"] = im(16, 73);ism["duckscorch.gif"] = im(0, 98);ism["spelunkscorp.gif"] = im(3, 89);ism["hunter4.gif"] = im(2, 92);ism["scoutseal.gif"] = im(12, 86);ism["screambat.gif"] = im(24, 79);ism["screwgolem.gif"] = im(3, 98);ism["seacow.gif"] = im(17, 73);ism["seacowboy.gif"] = im(0, 98);ism["adv_smooth4.gif"] = im(2, 95);ism["secrobot.gif"] = im(11, 87);ism["securityslime.gif"] = im(4, 96);ism["crimbominer2.gif"] = im(9, 81);ism["sadpoet.gif"] = im(5, 93);ism["atm.gif"] = im(7, 94);ism["serialbus.gif"] = im(1, 94);ism["grodseal.gif"] = im(3, 93);ism["fireservant1.gif"] = im(0, 99);ism["sewergator.gif"] = im(11, 78);ism["sewersnake.gif"] = im(5, 91);ism["sewertruck.gif"] = im(400, 150, 6, 143);ism["sororghost1.gif"] = im(1, 97);ism["sororeton1.gif"] = im(3, 89);ism["sororpire1.gif"] = im(7, 97);ism["sororwolf1.gif"] = im(6, 97);ism["sororbie1.gif"] = im(5, 95);ism["shadowseal.gif"] = im(8, 91);ism["sheetghost.gif"] = im(5, 95);ism["shopkeep.gif"] = im(7, 91);ism["shub-jigguwatt.gif"] = im(300, 300, 20, 283);ism["tacoelf_sign.gif"] = im(27, 94);ism["caveelf4.gif"] = im(14, 77);ism["sk8gnome.gif"] = im(23, 77);ism["boardskate.gif"] = im(3, 91);ism["animrat.gif"] = im(1, 93);ism["catskel.gif"] = im(20, 84);ism["hamskel.gif"] = im(73, 95);ism["monkeyskel.gif"] = im(17, 77);ism["crimonster6.gif"] = im(3, 95);ism["steward.gif"] = im(3, 97);ism["spelunkskel.gif"] = im(10, 91);ism["mopskeleton.gif"] = im(6, 96);ism["buttleton.gif"] = im(3, 97);ism["sketchyvan.gif"] = im(200, 100, 0, 99);ism["skinflute.gif"] = im(27, 76);ism["skeleton.gif"] = im(6, 93);ism["skullbat.gif"] = im(31, 66);ism["skulldozer.gif"] = im(450, 300, 12, 278);ism["skullery.gif"] = im(0, 97);ism["dvsleazebear1.gif"] = im(5, 89);ism["dvsleazeghost1.gif"] = im(11, 88);ism["slhobo1.gif"] = im(1, 97);ism["dvsleazeskel1.gif"] = im(9, 92);ism["dvsleazevamp1.gif"] = im(3, 96);ism["dvsleazewolf1.gif"] = im(2, 97);ism["dvsleazezom1.gif"] = im(4, 93);ism["kg_sleepingguard.gif"] = im(0, 98);ism["dwarf_sleepy.gif"] = im(37, 95);ism["mar_sleepy.gif"] = im(0, 99);ism["slime1_1.gif"] = im(0, 98);ism["slime2_1.gif"] = im(0, 96);ism["slime3_1.gif"] = im(2, 97);ism["slime4_1.gif"] = im(3, 95);ism["slime5_1.gif"] = im(0, 98);ism["wood_sleaze.gif"] = im(16, 79);ism["holglob.gif"] = im(34, 89);ism["slithering.gif"] = im(15, 81);ism["ssd_burger.gif"] = im(0, 99);ism["ssd_cocktail.gif"] = im(0, 98);ism["ssd_sundae.gif"] = im(1, 98);ism["eliot.gif"] = im(5, 97);ism["mimic2.gif"] = im(23, 87);ism["smartskel.gif"] = im(4, 94);ism["smellothewisp.gif"] = im(4, 98);ism["smokemonster.gif"] = im(5, 96);ism["smoochman3.gif"] = im(100, 150, 16, 127);ism["smoochman1.gif"] = im(7, 93);ism["smoochman2.gif"] = im(1, 97);ism["adv_smooth3.gif"] = im(3, 97);ism["scabie_jazz.gif"] = im(2, 89);ism["smutorc_jacker.gif"] = im(6, 95);ism["smutorc_nailer.gif"] = im(8, 96);ism["smutorc_pervert.gif"] = im(7, 93);ism["smutorc_layer.gif"] = im(5, 97);ism["smutorc_screwer.gif"] = im(9, 97);ism["spelunksnake.gif"] = im(20, 83);ism["firesnake.gif"] = im(0, 99);ism["snakeboss6.gif"] = im(150, 150, 26, 131);ism["snapdragon.gif"] = im(1, 98);ism["snowqueen.gif"] = im(0, 98);ism["adv_cold1.gif"] = im(9, 93);ism["sodium.gif"] = im(3, 92);ism["6_4a.gif"] = im(200, 200, 11, 189);ism["6_1.gif"] = im(10, 91);ism["6_2.gif"] = im(3, 96);ism["6_3.gif"] = im(2, 98);ism["sonofsailor.gif"] = im(1, 99);ism["warfratmd.gif"] = im(4, 96);ism["warfratcm.gif"] = im(1, 96);ism["tree_hickory.gif"] = im(0, 98);ism["drunkstuffing.gif"] = im(0, 99);ism["spacebeast1.gif"] = im(8, 83);ism["spacebeast3.gif"] = im(14, 91);ism["spacemarine.gif"] = im(1, 95);ism["aboo_trek.gif"] = im(1, 97);ism["3_4a.gif"] = im(200, 200, 3, 193);ism["3_1.gif"] = im(2, 95);ism["3_2.gif"] = im(4, 97);ism["3_3.gif"] = im(0, 93);ism["spamwitch.gif"] = im(3, 95);ism["pa_spatula.gif"] = im(7, 98);ism["wretchedseal.gif"] = im(54, 94);ism["hunter11.gif"] = im(3, 95);ism["jellyfish.gif"] = im(6, 96);ism["spelastronaut.gif"] = im(2, 96);ism["spelunkspider.gif"] = im(21, 88);ism["topi1.gif"] = im(3, 93);ism["gourd_spider.gif"] = im(10, 83);ism["gremlinspider.gif"] = im(7, 88);ism["spelunkspiderq.gif"] = im(150, 100, 1, 96);ism["gourd_spidergob.gif"] = im(1, 97);ism["spiderhut.gif"] = im(200, 150, 9, 140);ism["bb_spider.gif"] = im(125, 100, 3, 86);ism["spikeskel.gif"] = im(7, 92);ism["spiritalclock.gif"] = im(0, 99);ism["spiritbug.gif"] = im(10, 92);ism["spiritfaucet.gif"] = im(5, 93);ism["5_1.gif"] = im(3, 99);ism["5_2.gif"] = im(0, 99);ism["5_3.gif"] = im(0, 99);ism["spiritpea.gif"] = im(18, 78);ism["sponge.gif"] = im(0, 98);ism["dvspookybear1.gif"] = im(1, 95);ism["dvspookyghost1.gif"] = im(4, 94);ism["sgguard.gif"] = im(16, 77);ism["sgninja.gif"] = im(22, 80);ism["sgwarlock.gif"] = im(8, 83);ism["spookyhobo1.gif"] = im(3, 89);ism["mummy.gif"] = im(6, 89);ism["musicbox.gif"] = im(2, 90);ism["dvspookyskel1.gif"] = im(13, 97);ism["vampire.gif"] = im(10, 91);ism["dvspookyvamp1.gif"] = im(35, 65);ism["dvspookywolf1.gif"] = im(8, 94);ism["dvspookyzom1.gif"] = im(39, 93);ism["manor.gif"] = im(12, 89);ism["sporto.gif"] = im(1, 99);ism["princess.gif"] = im(8, 95);ism["steamelemental.gif"] = im(3, 94);ism["straw_hot.gif"] = im(5, 91);ism["giant_steampunk.gif"] = im(0, 99);ism["2_4a.gif"] = im(200, 200, 11, 189);ism["2_1.gif"] = im(10, 90);ism["2_2.gif"] = im(12, 96);ism["2_3.gif"] = im(16, 93);ism["dvstenchbear1.gif"] = im(1, 99);ism["dvstenchghost1.gif"] = im(0, 97);ism["stenchhobo1.gif"] = im(12, 97);ism["dvstenchskel1.gif"] = im(2, 99);ism["dvstenchvamp1.gif"] = im(0, 98);ism["dvstenchwolf1.gif"] = im(1, 99);ism["dvstenchzom1.gif"] = im(0, 98);ism["steven.gif"] = im(5, 91);
+ism["stickymummy.gif"] = im(3, 94);ism["disco_stiff.gif"] = im(2, 91);ism["crimonster4.gif"] = im(3, 94);ism["stomper.gif"] = im(0, 99);ism["stone_pirate.gif"] = im(3, 93);ism["stormcow.gif"] = im(0, 99);ism["strangler.gif"] = im(1, 98);ism["algae.gif"] = im(1, 97);ism["crimboelf.gif"] = im(27, 96);ism["moosehead.gif"] = im(7, 93);ism["stuffgolem.gif"] = im(3, 91);ism["paulblart.gif"] = im(2, 99);ism["suckubus.gif"] = im(6, 92);ism["tree_juniper.gif"] = im(0, 99);ism["colasoldier.gif"] = im(1, 95);ism["supervirus.gif"] = im(9, 95);ism["witchy1.gif"] = im(0, 99);ism["mar_surprised.gif"] = im(0, 99);ism["mc_soy2.gif"] = im(0, 94);ism["mc_soy1.gif"] = im(0, 98);ism["beav_jack.gif"] = im(9, 92);ism["beav_shaman.gif"] = im(0, 97);ism["beav_warrior.gif"] = im(7, 90);ism["duckstinky.gif"] = im(0, 98);ism["swampentity.gif"] = im(5, 95);ism["swampgator.gif"] = im(19, 81);ism["swamphag.gif"] = im(0, 97);ism["swampowl.gif"] = im(0, 99);ism["swampskunk.gif"] = im(3, 95);ism["swarmers.gif"] = im(1, 95);ism["ralphbat.gif"] = im(2, 84);ism["ants.gif"] = im(1, 97);ism["fudgewasps.gif"] = im(0, 98);ism["whelps1.gif"] = im(10, 85);ism["aswarm.gif"] = im(7, 93);ism["kg_lice.gif"] = im(3, 93);ism["mutantants.gif"] = im(9, 87);ism["beatles.gif"] = im(5, 94);ism["skullswarm.gif"] = im(50, 93);ism["swisshen.gif"] = im(0, 98);ism["t9000.gif"] = im(3, 99);ism["cacotap.gif"] = im(21, 80);ism["tacofish.gif"] = im(17, 82);ism["tacoelf_taco.gif"] = im(12, 86);ism["tacoelf_cart.gif"] = im(9, 82);ism["kasemhead.gif"] = im(2, 96);ism["biggnat.gif"] = im(21, 70);ism["hatskel.gif"] = im(0, 99);ism["adv_fast4.gif"] = im(11, 86);ism["c10spreadsheet.gif"] = im(8, 98);ism["tektite.gif"] = im(21, 77);ism["skel10.gif"] = im(300, 100, 0, 98);ism["terrorbot.gif"] = im(5, 88);ism["tetched.gif"] = im(1, 98);ism["madpirate.gif"] = im(6, 93);ism["fudgeman.gif"] = im(200, 200, 19, 186);ism["theaquaman.gif"] = im(0, 99);ism["boris.gif"] = im(6, 89);ism["aojarls.gif"] = im(6, 93);ism["sneakypete.gif"] = im(13, 90);ism["batinspats.gif"] = im(200, 100, 6, 96);ism["beefhemoth.gif"] = im(200, 100, 0, 98);ism["c10bge.gif"] = im(11, 86);ism["thisdude.gif"] = im(0, 93);ism["c10faces.gif"] = im(0, 99);ism["beelzebozo.gif"] = im(0, 98);ism["colollilossus.gif"] = im(270, 270, 3, 264);ism["bath_craykin.gif"] = im(0, 99);ism["darkness.gif"] = im(0, 98);ism["theemperor.gif"] = im(5, 93);ism["skelmanager.gif"] = im(5, 97);ism["snakeboss2.gif"] = im(5, 94);ism["hunter15.gif"] = im(0, 92);ism["fudgewizard.gif"] = im(0, 99);ism["bunionghost.gif"] = im(4, 92);ism["thegunk.gif"] = im(3, 95);ism["hermit.gif"] = im(30, 30, 29, 30);ism["landscaper.gif"] = im(0, 99);ism["snitch.gif"] = im(150, 300, 13, 275);ism["adv_hot4.gif"] = im(10, 97);ism["theluter.gif"] = im(11, 93);ism["theman.gif"] = im(0, 94);ism["darkmariachi.gif"] = im(2, 97);ism["masterat.gif"] = im(40, 97);ism["adv_smart4.gif"] = im(13, 97);ism["thenuge.gif"] = im(4, 94);ism["rainking.gif"] = im(250, 300, 10, 287);ism["sagittarian.gif"] = im(3, 95);ism["theserver.gif"] = im(0, 97);ism["sierpinski.gif"] = im(0, 89);ism["snakeboss3.gif"] = im(150, 150, 5, 136);ism["timebandit.gif"] = im(9, 88);ism["thepinch.gif"] = im(100, 150, 4, 147);ism["thething.gif"] = im(250, 200, 3, 195);ism["thethorax.gif"] = im(200, 100, 4, 92);ism["c10tropes.gif"] = im(0, 99);ism["ukskeleton.gif"] = im(200, 200, 15, 187);ism["ukskeleton_hm.gif"] = im(200, 200, 2, 195);ism["unknownghost.gif"] = im(0, 99);ism["c10cooler.gif"] = im(0, 98);ism["wholekingdom.gif"] = im(200, 200, 2, 195);ism["they.gif"] = im(0, 99);ism["tnbot1.gif"] = im(1, 95);ism["bigskeleton3.gif"] = im(150, 100, 0, 99);ism["thug1thug2.gif"] = im(200, 100, 1, 93);ism["anger2.gif"] = im(0, 99);ism["tigerlily.gif"] = im(1, 96);ism["spelunktiki.gif"] = im(1, 93);ism["mc_tofu2.gif"] = im(2, 97);ism["mc_tofu1.gif"] = im(2, 95);ism["gourd_can.gif"] = im(14, 90);ism["gourd_canspider.gif"] = im(150, 100, 9, 87);ism["mimic1.gif"] = im(17, 83);ism["animelf1.gif"] = im(19, 79);ism["tipsypirate.gif"] = im(0, 98);ism["tpgeist.gif"] = im(0, 97);ism["shiv_tp.gif"] = im(6, 94);ism["tombasp.gif"] = im(0, 99);ism["mummybat.gif"] = im(34, 60);ism["tombrat.gif"] = im(33, 78);ism["tombratking.gif"] = im(200, 200, 17, 176);ism["tombguy.gif"] = im(0, 98);ism["mastiff.gif"] = im(34, 95);ism["toothpirate.gif"] = im(2, 96);ism["toothskel.gif"] = im(5, 90);ism["topiarychi.gif"] = im(2, 95);ism["topiaryduck.gif"] = im(10, 89);ism["topiary.gif"] = im(0, 98);ism["topiarygopher.gif"] = im(7, 93);ism["topiarykiwi.gif"] = im(17, 92);ism["tree_baobab.gif"] = im(3, 96);ism["c10tmz.gif"] = im(0, 99);ism["orquette3.gif"] = im(6, 92);ism["vib4.gif"] = im(2, 96);ism["toxbeast1.gif"] = im(2, 98);ism["animelf5.gif"] = im(18, 76);ism["crimonster1.gif"] = im(1, 98);ism["travoltron.gif"] = im(200, 200, 4, 197);ism["treadmill.gif"] = im(9, 91);ism["bb_chef.gif"] = im(5, 92);ism["triadwizard.gif"] = im(1, 96);ism["tribalgoblin.gif"] = im(11, 89);ism["trixiepixie.gif"] = im(6, 99);ism["triffid.gif"] = im(2, 96);ism["tarkinhead.gif"] = im(0, 98);ism["monahead.gif"] = im(0, 99);ism["twins_troll.gif"] = im(0, 98);ism["trollipop.gif"] = im(100, 150, 5, 145);ism["trophyfish.gif"] = im(0, 98);ism["tsnake.gif"] = im(5, 94);ism["tumbleweed.gif"] = im(4, 93);ism["turtlemech.gif"] = im(14, 89);ism["turtletrapper.gif"] = im(1, 95);ism["twigberry.gif"] = im(3, 89);ism["bigskeleton2.gif"] = im(0, 99);ism["tex.gif"] = im(0, 98);ism["unclehobo.gif"] = im(10, 92);ism["macaroni.gif"] = im(4, 84);ism["pengundercover.gif"] = im(2, 98);ism["shiv_underworld.gif"] = im(200, 200, 17, 170);ism["ellsburyboss.gif"] = im(150, 150, 15, 124);ism["lensgoblin.gif"] = im(3, 94);ism["surv_unhinged.gif"] = im(6, 95);ism["unholydiver.gif"] = im(0, 99);ism["surv_unlikely.gif"] = im(7, 89);ism["c10database.gif"] = im(2, 95);ism["unstill.gif"] = im(8, 92);ism["ram.gif"] = im(13, 85);ism["urchin.gif"] = im(10, 90);ism["eyesdown.gif"] = im(45, 62);ism["usher.gif"] = im(11, 88);ism["spelunkvampire.gif"] = im(13, 85);ism["vampclam.gif"] = im(11, 91);ism["duckvampire.gif"] = im(3, 95);ism["vandalkid.gif"] = im(9, 91);ism["cvcreature.gif"] = im(100, 200, 4, 196);ism["gremlinveg.gif"] = im(5, 93);ism["velvetug.gif"] = im(19, 91);ism["vendorslime.gif"] = im(0, 95);ism["turtleghost.gif"] = im(23, 84);ism["mantrap.gif"] = im(4, 97);ism["easel.gif"] = im(5, 95);ism["gnauga.gif"] = im(14, 92);ism["victor.gif"] = im(15, 88);ism["qmark.gif"] = im(4, 93);ism["gar.gif"] = im(6, 93);ism["prim_fung.gif"] = im(0, 98);ism["music.gif"] = im(2, 95);ism["iceguy4.gif"] = im(7, 98);ism["smallartist.gif"] = im(40, 97);ism["wimp.gif"] = im(15, 90);ism["wackypirate.gif"] = im(1, 97);ism["iceguy3.gif"] = im(1, 98);ism["mush_shrieking.gif"] = im(1, 93);ism["waiterninja.gif"] = im(5, 95);ism["wallofbones.gif"] = im(250, 150, 3, 138);ism["wallofskin.gif"] = im(250, 125, 1, 115);ism["warfratc.gif"] = im(1, 95);ism["warfrata2.gif"] = im(1, 96);ism["warfratb.gif"] = im(0, 95);ism["warfratc2.gif"] = im(1, 95);ism["warfratb2.gif"] = im(0, 95);ism["warfratsp2.gif"] = im(0, 97);ism["warfratgr.gif"] = im(5, 96);ism["warfratar.gif"] = im(5, 89);ism["warfratmo.gif"] = im(24, 89);ism["warfratgr2.gif"] = im(2, 91);ism["streaker.gif"] = im(3, 95);ism["warfratsp.gif"] = im(3, 98);ism["warhipb.gif"] = im(6, 96);ism["warhipac2.gif"] = im(1, 96);ism["warhipar.gif"] = im(0, 99);ism["warhipds.gif"] = im(8, 93);ism["warhipsh2.gif"] = im(0, 98);ism["warhipfs2.gif"] = im(3, 95);ism["warhipc2.gif"] = im(5, 94);ism["warhipa2.gif"] = im(0, 98);ism["warhipfs.gif"] = im(2, 94);ism["warhipb2.gif"] = im(6, 96);ism["warhipmd.gif"] = im(0, 90);ism["warhipa.gif"] = im(0, 98);ism["warhipmd2.gif"] = im(0, 91);ism["warhipc.gif"] = im(5, 92);ism["warhipsh.gif"] = im(1, 97);ism["warhipac.gif"] = im(5, 96);ism["hippyspy.gif"] = im(8, 89);ism["warhipcm.gif"] = im(2, 94);ism["warbear11.gif"] = im(2, 97);ism["warbear21.gif"] = im(0, 99);ism["nightstand1.gif"] = im(4, 96);ism["warehouseclerk.gif"] = im(2, 95);ism["warehouseguard.gif"] = im(0, 98);ism["warehousejanitor.gif"] = im(3, 92);ism["warehouseguy.gif"] = im(3, 94);ism["wartdinsey.gif"] = im(150, 150, 0, 148);ism["wartpirate.gif"] = im(2, 92);ism["werewolf.gif"] = im(4, 98);ism["wigwasp.gif"] = im(8, 93);ism["wastoid.gif"] = im(8, 93);ism["waterspider.gif"] = im(23, 80);ism["waterseal.gif"] = im(0, 99);ism["richpirate.gif"] = im(3, 93);ism["weatherug.gif"] = im(3, 91);ism["weremoose.gif"] = im(2, 90);ism["weretaco.gif"] = im(29, 82);ism["hunter14.gif"] = im(4, 95);ism["wetseal.gif"] = im(6, 80);
+ism["aboo_who.gif"] = im(2, 97);ism["tree_willow.gif"] = im(2, 95);ism["surv_whiny.gif"] = im(3, 91);ism["pa_whisk.gif"] = im(4, 91);ism["whitebonedemon.gif"] = im(200, 100, 12, 98);ism["chocgolem.gif"] = im(9, 92);ism["whiteelephant.gif"] = im(11, 88);ism["lion.gif"] = im(6, 93);ism["zombie2.gif"] = im(5, 94);ism["whitesnake.gif"] = im(10, 87);ism["wildgirl.gif"] = im(0, 97);ism["seahorse.gif"] = im(4, 96);ism["wiresculpture.gif"] = im(0, 97);ism["elf_wires.gif"] = im(12, 89);ism["mush_wizard.gif"] = im(0, 99);ism["tree_magnolia.gif"] = im(1, 99);ism["wraith4.gif"] = im(14, 81);ism["doubt1.gif"] = im(0, 98);ism["ravendesk.gif"] = im(0, 94);ism["susguy.gif"] = im(1, 96);ism["wumpus.gif"] = im(0, 99);ism["beergolem.gif"] = im(4, 97);ism["stonegolem.gif"] = im(3, 97);ism["dimhorror.gif"] = im(2, 96);ism["shopteacher.gif"] = im(1, 98);ism["hydra.gif"] = im(6, 99);ism["polprisoner.gif"] = im(9, 89);ism["pr0n.gif"] = im(11, 87);ism["yakisoba.gif"] = im(0, 97);ism["yakcourier.gif"] = im(3, 96);ism["yakguard.gif"] = im(3, 96);ism["yeastbeast.gif"] = im(4, 93);ism["spelunkyeti.gif"] = im(1, 97);ism["yog-urt.gif"] = im(300, 300, 107, 290);ism["yomama.gif"] = im(300, 300, 3, 289);ism["c10inbox.gif"] = im(9, 94);ism["otherimages/shadows/20.gif"] = im(30, 30, 29, 30);ism["zrex.gif"] = im(150, 100, 0, 99);ism["zimmerman.gif"] = im(4, 98);ism["zombie.gif"] = im(3, 84);ism["zol.gif"] = im(11, 90);ism["zomlizard.gif"] = im(4, 94);ism["zmobaby.gif"] = im(2, 86);ism["zombiechef.gif"] = im(1, 97);ism["zomclown.gif"] = im(3, 97);ism["duckzombie.gif"] = im(1, 96);ism["zomsnow.gif"] = im(7, 91);ism["zomfrat.gif"] = im(12, 84);ism["zomknoll.gif"] = im(10, 87);ism["zomgoth.gif"] = im(0, 94);ism["zomhippy.gif"] = im(4, 92);ism["zombiehoa.gif"] = im(150, 150, 1, 148);ism["zombiehoa_hm.gif"] = im(200, 200, 0, 199);ism["zomchef.gif"] = im(1, 92);ism["zomnoob.gif"] = im(4, 93);ism["zomhealer.gif"] = im(1, 93);ism["zomwaltz.gif"] = im(0, 97);ism["zomyeast.gif"] = im(9, 98);ism["hunter1.gif"] = im(3, 96);ism["zombo.gif"] = im(0, 98);
 
         
         
@@ -5387,1088 +6739,7 @@ Checklist lookup(ChecklistCollection collection, string name)
     collection.checklists[c.title] = c;
     return c;
 }
-//Library for checking if any given location is unlocked.
-//Similar to canadv.ash, except there's no code for using items and no URLs are (currently) visited. This limits our accuracy.
-//Currently, most locations are missing, sorry.
 
-
-
-
-
-
-
-//Version compatibility locations:
-
-boolean __location_compatibility_inited = false;
-//Should probably be called manually, as a backup:
-void locationCompatibilityInit()
-{
-    //Different versions refer to locations by different names.
-    //For instance, pre-13878 versions refer to the palindome as "The Palindome". Versions after that refer it to "Inside the Palindome".
-    //This method provides correct lookups for both versions, without warnings.
-    if (__location_compatibility_inited)
-        return;
-    __location_compatibility_inited = true;
-    
-}
-
-locationCompatibilityInit(); //not sure if calling functions like this is intended. may break in the future?
-
-boolean [location] __la_location_is_available;
-boolean [string] __la_zone_is_unlocked;
-
-boolean __la_commons_were_inited = false;
-int __la_turncount_initialised_on = -1;
-
-
-//Takes into account banishes and olfactions.
-//Probably will be inaccurate in many corner cases, sorry.
-//There's an appearance_rates() function that takes into account queue effects, which we may consider using in the future?
-float [monster] appearance_rates_adjusted(location l)
-{
-    boolean appearance_rates_has_changed = mafiaIsPastRevision(14740); //not sure on the revision, but after a certain revision, appearance_rates() takes into account olfaction
-    //FIXME domed city of ronald/grimacia doesn't take into account alien appearance rate
-    float [monster] source = l.appearance_rates();
-    
-    if (l == $location[the sleazy back alley])
-        source[$monster[none]] = MIN(MAX(0, 20 - combat_rate_modifier()), 100);
-    
-    float minimum_monster_appearance = 1000000000.0;
-    foreach m in source
-    {
-        if (m == $monster[none])
-            continue;
-        float v = source[m];
-        if (v > 0.0)
-        {
-            if (v < minimum_monster_appearance)
-                minimum_monster_appearance = v;
-        }
-    }
-    
-    float [monster] source_altered;
-    foreach m in source
-    {
-        float v = source[m];
-        if (m == $monster[none])
-        {
-            if (v < 0.0)
-                source_altered[m] = 0.0;
-            else
-                source_altered[m] = v;
-        }
-        else
-            source_altered[m] = v / minimum_monster_appearance;
-    }
-    
-    
-    boolean lawyers_relocated = (get_property_int("relocatePygmyLawyer") == my_ascensions());
-    boolean janitors_relocated = (get_property_int("relocatePygmyJanitor") == my_ascensions());
-    if (l == $location[the hidden park])
-    {
-        if (janitors_relocated)
-            source_altered[$monster[pygmy janitor]] = 1.0;
-        else if (source_altered contains $monster[pygmy janitor])
-            remove source_altered[$monster[pygmy janitor]];
-        if (lawyers_relocated)
-            source_altered[$monster[pygmy witch lawyer]] = 1.0;
-        else if (source_altered contains $monster[pygmy witch lawyer])
-            remove source_altered[$monster[pygmy witch lawyer]];
-    }
-    if (($locations[The Hidden Apartment Building,The Hidden Bowling Alley,The Hidden Hospital,The Hidden Office Building] contains l))
-    {
-        if (janitors_relocated && (source_altered contains $monster[pygmy janitor]))
-            remove source_altered[$monster[pygmy janitor]];
-        if (lawyers_relocated && (source_altered contains $monster[pygmy witch lawyer]))
-            remove source_altered[$monster[pygmy witch lawyer]];
-    }
-    if (l == $location[The Nemesis' Lair])
-    {
-        boolean [monster] all_monsters_to_remove = $monsters[hellseal guardian,Gorgolok\, the Infernal Seal (Inner Sanctum),warehouse worker,Stella\, the Turtle Poacher (Inner Sanctum),evil spaghetti cult zealot,Spaghetti Elemental (Inner Sanctum),security slime,Lumpy\, the Sinister Sauceblob (Inner Sanctum),daft punk,Spirit of New Wave (Inner Sanctum),mariachi bruiser,Somerset Lopez\, Dread Mariachi (Inner Sanctum)];
-        
-        boolean [monster] monsters_not_to_remove;
-        if (my_class() == $class[seal clubber])
-            monsters_not_to_remove = $monsters[hellseal guardian,Gorgolok\, the Infernal Seal (Inner Sanctum)];
-        else if (my_class() == $class[turtle tamer])
-            monsters_not_to_remove = $monsters[warehouse worker,Stella\, the Turtle Poacher (Inner Sanctum)];
-        else if (my_class() == $class[pastamancer])
-            monsters_not_to_remove = $monsters[evil spaghetti cult zealot,Spaghetti Elemental (Inner Sanctum)];
-        else if (my_class() == $class[sauceror])
-            monsters_not_to_remove = $monsters[security slime,Lumpy\, the Sinister Sauceblob (Inner Sanctum)];
-        else if (my_class() == $class[disco bandit])
-            monsters_not_to_remove = $monsters[daft punk,Spirit of New Wave (Inner Sanctum)];
-        else if (my_class() == $class[accordion thief])
-            monsters_not_to_remove = $monsters[mariachi bruiser,Somerset Lopez\, Dread Mariachi (Inner Sanctum)];
-        foreach m in all_monsters_to_remove
-        {
-            if (monsters_not_to_remove contains m)
-                continue;
-            remove source_altered[m];
-        }
-    }
-    
-    boolean banishes_are_possible = true;
-    if ($locations[the secret government laboratory,sloppy seconds diner] contains l)
-        banishes_are_possible = false;
-    if (banishes_are_possible)
-    {
-        foreach m in source_altered
-        {
-            if (m.is_banished())
-                source_altered[m] = 0.0;
-        }
-    }
-    
-    //umm... I'm not sure if appearance_rates() takes into account olfact all the time or not
-    //in the palindome, it didn't for some reason? but in another area I think it did. can't remember
-    /*
-    > get olfactedMonster
-    bob racecar
-    > ash $effect[on the trail].have_effect()
-    Returned: 35
-    > ash $location[inside the palindome].appearance_rates()
-    Returned: aggregate float [monster]
-    Bob Racecar => 9.0
-    Dr. Awkward => 0.0
-    Drab Bard => 9.0
-    Evil Olive => -3.0
-    Flock of Stab-Bats => 9.0
-    none => 55.0
-    Racecar Bob => 9.0
-    Taco Cat => 9.0
-    Tan Gnat => -3.0
-    */
-    //so, if appearance_rate() doesn't seem to be taking into account olfaction, force it?
-    if ($effect[on the trail].have_effect() > 0 && get_property("olfactedMonster").to_monster() != $monster[none])
-    {
-        monster olfacted_monster = get_property("olfactedMonster").to_monster();
-        if (source_altered contains olfacted_monster)
-        {
-            if (fabs(source_altered[olfacted_monster] - 1.0) < 0.01)
-                appearance_rates_has_changed = false;
-        }
-    }
-    
-    if ($effect[on the trail].have_effect() > 0 && !appearance_rates_has_changed)
-    {
-        monster olfacted_monster = get_property("olfactedMonster").to_monster();
-        if (olfacted_monster != $monster[none])
-        {
-            if (source_altered contains olfacted_monster)
-                source_altered[olfacted_monster] += 3.0; //FIXME is this correct?
-        }
-    }
-    
-    
-    //Convert source_altered to source.
-    if (l == $location[Inside the Palindome])
-    {
-        if (!questPropertyPastInternalStepNumber("questL11Palindome", 3))
-            source_altered[$monster[none]] = 0.0;
-    }
-    
-    float total = 0.0;
-    float nc_rate = clampf(source_altered[$monster[none]], 0.0, 100.0);
-    float combat_rate = clampf(100.0 - nc_rate, 0.0, 100.0);
-    foreach m in source_altered
-    {
-        float v = source_altered[m];
-        if (m == $monster[none])
-            continue;
-        if (v > 0)
-            total += v;
-    }
-    if ($locations[Guano Junction,the Batrat and Ratbat Burrow,the Beanbat Chamber] contains l)
-    {
-        //hacky, probably wrong:
-        float v = total / 8.0;
-        source_altered[$monster[screambat]] = v;
-        total += v;
-    }
-    //oil peak goes here?
-    if (total > 0.0)
-    {
-        foreach m in source_altered
-        {
-            if (m == $monster[none])
-                continue;
-            float v = source_altered[m];
-            source_altered[m] = v / total * combat_rate;
-        }
-    }
-    
-    return source_altered;
-}
-
-
-float [monster] appearance_rates_adjusted_cancel_nc(location l)
-{
-    float [monster] base_rates = appearance_rates_adjusted(l);
-    float nc_rate = base_rates[$monster[none]] / 100.0;
-    float nc_inverse_multiplier = 1.0;
-    if (nc_rate != 1.0)
-        nc_inverse_multiplier = 1.0 / (1.0 - nc_rate);
-    foreach m in base_rates
-    {
-        if (m == $monster[none])
-            base_rates[m] = 0.0;
-        else
-            base_rates[m] *= nc_inverse_multiplier;
-    }
-    return base_rates;
-}
-
-
-//Do not call - internal implementation detail.
-boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
-{
-	string zone = loc.zone;
-	
-	if (zone == "KOL High School")
-	{
-		if (my_path_id() == PATH_KOLHS)
-			return true;
-		return false;
-	}
-	if (zone == "Mothership")
-	{
-		if (my_path_id() == PATH_BUGBEAR_INVASION)
-			return true;
-		return false;
-	}
-	if (zone == "BadMoon")
-	{
-		if (in_bad_moon())
-			return true;
-		return false;
-	}
-    if (zone == "Woods" && !__la_zone_is_unlocked["Woods"])
-        return false;
-	
-	switch (loc)
-	{
-		case $location[The Castle in the Clouds in the Sky (Ground floor)]:
-			return get_property_int("lastCastleGroundUnlock") == my_ascensions();
-		case $location[The Castle in the Clouds in the Sky (Top floor)]:
-			return get_property_int("lastCastleTopUnlock") == my_ascensions();
-		case $location[The Haunted Kitchen]:
-		case $location[The Haunted Conservatory]:
-            return true; //FIXME exact detection
-		case $location[The Haunted Billiards Room]:
-            if ($item[7301].available_amount() > 0)
-                return true;
-            else
-                return false;
-			//return get_property_int("lastManorUnlock") == my_ascensions();
-		case $location[The Haunted Bedroom]:
-		case $location[The Haunted Bathroom]:
-        case $location[the haunted gallery]:
-            //FIXME detect this
-			return get_property_int("lastSecondFloorUnlock") == my_ascensions(); //FIXME test against questM21Dance
-        case $location[the haunted ballroom]:
-            return questPropertyPastInternalStepNumber("questM21Dance", 4);
-        case $location[The Haunted Laboratory]:
-        case $location[The Haunted Nursery]:
-        case $location[The Haunted Storage Room]:
-            return questPropertyPastInternalStepNumber("questM17Babies", 1);
-        case $location[The Haunted Boiler Room]:
-        case $location[The Haunted Laundry Room]:
-        case $location[The Haunted Wine Cellar]:
-            return questPropertyPastInternalStepNumber("questL11Manor", 2);
-        case $location[summoning chamber]:
-            return get_property("questL11Manor") == "finished";
-        case $location[the batrat and ratbat burrow]:
-            return questPropertyPastInternalStepNumber("questL04Bat", 2);
-        case $location[the beanbat chamber]:
-            return questPropertyPastInternalStepNumber("questL04Bat", 3);
-        case $location[The Unquiet Garves]:
-            return true;
-        case $location[The VERY Unquiet Garves]:
-            return get_property("questL07Cyrptic") == "finished";
-        case $location[the boss bat's lair]:
-            if ($location[the boss bat's lair].combatTurnsAttemptedInLocation() > 0)
-                return true;
-            return questPropertyPastInternalStepNumber("questL04Bat", 4);
-		case $location[cobb's knob barracks]:
-		case $location[cobb's knob kitchens]:
-		case $location[cobb's knob harem]:
-		case $location[cobb's knob treasury]:
-			string quest_value = get_property("questL05Goblin");
-			if (quest_value == "finished")
-				return true;
-			else if (questPropertyPastInternalStepNumber("questL05Goblin", 1))
-			{
-				//Inference - quest is started. If map is missing, area must be unlocked
-				if ($item[cobb's knob map].available_amount() > 0)
-					return false;
-				else //no map, must be available
-					return true;
-			}
-			//unstarted, impossible
-            return false;
-		case $location[Vanya's Castle Chapel]:
-			if ($item[map to Vanya's Castle].available_amount() > 0)
-				return true;
-			return false;
-		case $location[lair of the ninja snowmen]:
-		case $location[the extreme slope]:
-			return questPropertyPastInternalStepNumber("questL08Trapper", 3);
-		case $location[the hidden park]:
-			return questPropertyPastInternalStepNumber("questL11Worship", 4);
-        case $location[the hidden temple]:
-            return (get_property_int("lastTempleUnlock") == my_ascensions());
-		case $location[the spooky forest]:
-			return __la_zone_is_unlocked["Woods"];
-		case $location[The Smut Orc Logging Camp]:
-			return questPropertyPastInternalStepNumber("questL09Topping", 1);
-		case $location[the black forest]:
-			return questPropertyPastInternalStepNumber("questL11MacGuffin", 1);
-		case $location[guano junction]:
-		case $location[the bat hole entrance]:
-			return questPropertyPastInternalStepNumber("questL04Bat", 1);
-		case $location[itznotyerzitz mine]:
-			return questPropertyPastInternalStepNumber("questL08Trapper", 2);
-        case $location[the arid, extra-dry desert]:
-			return (questPropertyPastInternalStepNumber("questL11MacGuffin", 3) || $item[your father's MacGuffin diary].available_amount() > 0);
-        case $location[the oasis]:
-			return (get_property_int("desertExploration") > 0) && (questPropertyPastInternalStepNumber("questL11MacGuffin", 3) || $item[your father's MacGuffin diary].available_amount() > 0);
-        case $location[the defiled alcove]:
-			return questPropertyPastInternalStepNumber("questL07Cyrptic", 1) && get_property_int("cyrptAlcoveEvilness") > 0;
-        case $location[the defiled cranny]:
-			return questPropertyPastInternalStepNumber("questL07Cyrptic", 1) && get_property_int("cyrptCrannyEvilness") > 0;
-        case $location[the defiled niche]:
-			return questPropertyPastInternalStepNumber("questL07Cyrptic", 1) && get_property_int("cyrptNicheEvilness") > 0;
-        case $location[the defiled nook]:
-			return questPropertyPastInternalStepNumber("questL07Cyrptic", 1) && get_property_int("cyrptNookEvilness") > 0;
-		case $location[south of the border]:
-			return $items[pumpkin carriage,desert bus pass, bitchin' meatcar, tin lizzie].available_amount() > 0;
-        case $location[Portal to Terrible Parents]:
-        case $location[Rumpelstiltskin's Workshop]:
-        case $location[Ye Olde Medievale Villagee]:
-            return (get_property("grimstoneMaskPath") == "gnome");
-        case $location[the mansion of dr. weirdeaux]:
-        case $location[the secret government laboratory]:
-        case $location[the deep dark jungle]:
-            return (get_property_boolean("_spookyAirportToday") || get_property_boolean("spookyAirportAlways"));
-        case $location[the fun-guy mansion]:
-        case $location[sloppy seconds diner]:
-        case $location[the sunken party yacht]:
-            return (get_property_boolean("_sleazeAirportToday") || get_property_boolean("sleazeAirportAlways"));
-        case $location[Pirates of the Garbage Barges]:
-        case $location[Barf Mountain]:
-        case $location[The Toxic Teacups]:
-        case $location[Uncle Gator's Country Fun-Time Liquid Waste Sluice]:
-            return (get_property_boolean("_stenchAirportToday") || get_property_boolean("stenchAirportAlways"));
-        case $location[Kokomo Resort]:
-            return $effect[Tropical Contact High].have_effect() > 0;
-        case $location[Dreadsylvanian Woods]:
-        case $location[Dreadsylvanian Village]:
-        case $location[Dreadsylvanian Castle]:
-            //FIXME not correct - does not take account whether the dungeon is open and the areas are unlocked
-            return get_clan_id() > 0 && my_level() >= 15;
-        case $location[A Barroom Brawl]:
-            return questPropertyPastInternalStepNumber("questL03Rat", 1);
-        case $location[The Laugh Floor]:
-        case $location[Pandamonium Slums]:
-        case $location[Infernal Rackets Backstage]:
-            return get_property("questL06Friar") == "finished";
-        case $location[The Degrassi Knoll Restroom]:
-        case $location[The Degrassi Knoll Bakery]:
-        case $location[The Degrassi Knoll Gym]:
-        case $location[The Degrassi Knoll Garage]:
-            return !knoll_available();
-        case $location[Thugnderdome]:
-            return gnomads_available() && my_basestat(my_primestat()) >= 25;
-        case $location[outskirts of camp logging camp]:
-        case $location[camp logging camp]:
-            return canadia_available();
-        ///FIXME test grimstone masks against their progress?
-        case $location[Sweet-Ade Lake]:
-        case $location[Eager Rice Burrows]:
-        case $location[Gumdrop Forest]:
-            return get_property("grimstoneMaskPath") == "witch";
-        case $location[The Inner Wolf Gym]:
-        case $location[Unleash Your Inner Wolf]:
-            return get_property("grimstoneMaskPath") == "wolf";
-        case $location[A Deserted Stretch of I-911]:
-            return get_property("grimstoneMaskPath") == "hare";
-        case $location[A-Boo Peak]:
-        case $location[Twin Peak]:
-        case $location[Oil Peak]:
-            return questPropertyPastInternalStepNumber("questL09Topping", 2);
-        case $location[The Icy Peak]:
-            return get_property("questL08Trapper") == "finished"; //FIXME is it finished, or after defeating groar?
-        case $location[the bugbear pen]:
-            return knoll_available() && questPropertyPastInternalStepNumber("questM03Bugbear", 1) && get_property("questM03Bugbear") != "finished";
-        case $location[post-quest bugbear pens]:
-            return knoll_available() && get_property("questM03Bugbear") == "finished";
-        case $location[the thinknerd warehouse]:
-            return questPropertyPastInternalStepNumber("questM22Shirt", 1);
-        case $location[The Overgrown Lot]:
-            return questPropertyPastInternalStepNumber("questM24Doc", 1);
-        case $location[The Skeleton Store]:
-            if (questPropertyPastInternalStepNumber("questM23Meatsmith", 1))
-                return true;
-            //otherwise, don't know
-            break;
-        case $location[the old landfill]:
-            return questPropertyPastInternalStepNumber("questM19Hippy", 1);
-        case $location[The Hidden Apartment Building]:
-            return get_property_int("hiddenApartmentProgress") >= 1;
-        case $location[The Hidden Bowling Alley]:
-            return get_property_int("hiddenBowlingAlleyProgress") >= 1;
-        case $location[The Hidden Hospital]:
-            return get_property_int("hiddenHospitalProgress") >= 1;
-        case $location[The Hidden Office Building]:
-            return get_property_int("hiddenOfficeProgress") >= 1;
-        case $location[The Enormous Greater-Than Sign]:
-            return my_basestat(my_primestat()) >= 45 && get_property_int("lastPlusSignUnlock") != my_ascensions();
-        case $location[The dungeons of doom]:
-            return my_basestat(my_primestat()) >= 45 && get_property_int("lastPlusSignUnlock") == my_ascensions();
-        case $location[The "Fun" House]:
-            return questPropertyPastInternalStepNumber("questG04Nemesis", 2); //FIXME is 2 correct?
-        case $location[The Dark Neck of the Woods]:
-        case $location[The Dark Heart of the Woods]:
-        case $location[The Dark Elbow of the Woods]:
-            return QuestState("questL06Friar").in_progress;
-        case $location[The Goatlet]:
-            return questPropertyPastInternalStepNumber("questL08Trapper", 1);
-        case $location[The Penultimate Fantasy Airship]:
-            return questPropertyPastInternalStepNumber("questL10Garbage", 2);
-        case $location[anger man's level]:
-        case $location[fear man's level]:
-        case $location[doubt man's level]:
-        case $location[regret man's level]:
-            return get_campground()[$item[jar of psychoses (The Crackpot Mystic)]] > 0;
-        case $location[the gourd!]:
-            return get_campground()[$item[jar of psychoses (The Captain of the Gourd)]] > 0;
-        case $location[The Nightmare Meatrealm]:
-            return get_campground()[$item[jar of psychoses (The Meatsmith)]] > 0;
-        case $location[A Kitchen Drawer]:
-        case $location[A Grocery Bag]:
-            return get_campground()[$item[jar of psychoses (The Pretentious Artist)]] > 0;
-        case $location[whitey's grove]:
-            return questPropertyPastInternalStepNumber("questG02Whitecastle", 1) || questPropertyPastInternalStepNumber("questL11Palindome", 4); //FIXME what step for questL11Palindome?
-        case $location[the Obligatory pirate's cove]:
-            return get_property_int("lastIslandUnlock") == my_ascensions() && !(QuestState("questL12War").mafia_internal_step >= 2 && !QuestState("questL12War").finished);
-        case $location[Inside the Palindome]:
-            return $item[talisman o' namsilat].equipped_amount() > 0; //technically
-        case $location[The Valley of Rof L'm Fao]:
-            return QuestState("questL09Topping").finished;
-		default:
-			break;
-	}
-    //if (loc.turnsAttemptedInLocation() > 0) //FIXME make this finer-grained, this is hacky
-        //return true;
-	
-	ErrorSet(able_to_find, "");
-	return false;
-}
-
-void locationAvailablePrivateInit()
-{
-	if (__la_commons_were_inited && __la_turncount_initialised_on == my_turncount())
-		return;
-        
-    if (__la_location_is_available.count() > 0)
-    {
-        foreach key in __la_location_is_available
-        {
-            remove __la_location_is_available[key];
-        }
-    }
-    if (__la_zone_is_unlocked.count() > 0)
-    {
-        foreach key in __la_zone_is_unlocked
-        {
-            remove __la_zone_is_unlocked[key];
-        }
-    }
-	
-	boolean [location] locations_always_available = $locations[the haunted pantry,the sleazy back alley,the outskirts of cobb's knob,the limerick dungeon,The Haiku Dungeon,The Daily Dungeon,noob cave,the dire warren];
-	foreach loc in locations_always_available
-	{
-		if (loc == $location[none])
-			continue;
-		__la_location_is_available[loc] = true;
-	}
-    
-    if (questPropertyPastInternalStepNumber("questL02Larva", 1) || questPropertyPastInternalStepNumber("questG02Whitecastle", 1))
-        __la_zone_is_unlocked["Woods"] = true;
-		
-	string zones_never_accessible_string = "Gyms,Crimbo06,Crimbo07,Crimbo08,Crimbo09,Crimbo10,The Candy Diorama,Crimbo12,WhiteWed";
-	
-	item [location] locations_unlocked_by_item;
-	effect [location] locations_unlocked_by_effect;
-	
-	item [string] zones_unlocked_by_item;
-	effect [string] zones_unlocked_by_effect;
-	
-	locations_unlocked_by_item[$location[Cobb's Knob Laboratory]] = $item[Cobb's Knob lab key];
-	locations_unlocked_by_item[$location[Cobb's Knob Menagerie\, Level 1]] = $item[Cobb's Knob Menagerie key];
-	locations_unlocked_by_item[$location[Cobb's Knob Menagerie\, Level 2]] = $item[Cobb's Knob Menagerie key];
-	locations_unlocked_by_item[$location[Cobb's Knob Menagerie\, Level 3]] = $item[Cobb's Knob Menagerie key];
-	
-	//locations_unlocked_by_item[$location[the haunted ballroom]] = $item[spookyraven ballroom key];
-	locations_unlocked_by_item[$location[The Haunted Library]] = $item[spookyraven library key];
-	//locations_unlocked_by_item[$location[The Haunted Gallery]] = $item[spookyraven gallery key];
-	locations_unlocked_by_item[$location[The Castle in the Clouds in the Sky (Basement)]] = $item[S.O.C.K.];
-	locations_unlocked_by_item[$location[the hole in the sky]] = $item[steam-powered model rocketship];
-	
-	locations_unlocked_by_item[$location[Vanya's Castle Foyer]] = $item[map to Vanya's Castle];
-	
-	
-	zones_unlocked_by_item["Magic Commune"] = $item[map to the Magic Commune];
-	zones_unlocked_by_item["Landscaper"] = $item[Map to The Landscaper's Lair];
-	zones_unlocked_by_item["Kegger"] = $item[map to the Kegger in the Woods];
-	zones_unlocked_by_item["Ellsbury's Claim"] = $item[Map to Ellsbury's Claim];
-	zones_unlocked_by_item["Memories"] = $item[empty agua de vida bottle];
-	zones_unlocked_by_item["Casino"] = $item[casino pass];
-	
-	zones_unlocked_by_effect["Astral"] = $effect[Half-Astral];
-	zones_unlocked_by_effect["Spaaace"] = $effect[Transpondent];
-	zones_unlocked_by_effect["RabbitHole"] = $effect[Down the Rabbit Hole];
-	zones_unlocked_by_effect["Wormwood"] = $effect[Absinthe-Minded];	
-	zones_unlocked_by_effect["Suburbs"] = $effect[Dis Abled];
-	
-	string [int] zones_never_accessible = split_string_alternate(zones_never_accessible_string, ",");
-	
-	boolean [string] zone_accessibility_status = zones_never_accessible.listInvert();
-    foreach s in zone_accessibility_status //invert
-    {
-        zone_accessibility_status[s] = false;
-    }
-	
-	
-	foreach loc in $locations[Shivering Timbers,A Skeleton Invasion!,The Cannon Museum,A Swarm of Yeti-Mounted Skeletons,The Bonewall,A Massive Flying Battleship,A Supply Train,The Bone Star,Grim Grimacite Site,A Pile of Old Servers,The Haunted Sorority House,Fightin' Fire,Super-Intense Mega-Grassfire,Fierce Flying Flames,Lord Flameface's Castle Entryway,Lord Flameface's Castle Belfry,Lord Flameface's Throne Room,A Stinking Abyssal Portal,A Scorching Abyssal Portal,A Terrifying Abyssal Portal,A Freezing Abyssal Portal,An Unsettling Abyssal Portal,A Yawning Abyssal Portal,The Space Odyssey Discotheque,The Spirit World,The Crimbonium Mining Camp,WarBear Fortress (First Level),WarBear Fortress (Second Level),WarBear Fortress (Third Level)]
-	{
-		__la_location_is_available[loc] = false;
-	}
-	
-	foreach loc in locations_unlocked_by_item
-	{
-		if (locations_unlocked_by_item[loc].available_amount() > 0)
-			__la_location_is_available[loc] = true;
-		else
-			__la_location_is_available[loc] = false;
-	}
-	foreach loc in locations_unlocked_by_effect
-	{
-		if (locations_unlocked_by_effect[loc].have_effect() > 0)
-			__la_location_is_available[loc] = true;
-		else
-			__la_location_is_available[loc] = false;
-	}
-	
-	foreach zone in zones_unlocked_by_item
-	{
-		if (zones_unlocked_by_item[zone].available_amount() > 0)
-			zone_accessibility_status[zone] = true;
-		else
-			zone_accessibility_status[zone] = false;
-	}
-	foreach zone in zones_unlocked_by_effect
-	{
-		if (zones_unlocked_by_effect[zone].have_effect() > 0)
-			zone_accessibility_status[zone] = true;
-		else
-			zone_accessibility_status[zone] = false;
-	}
-	
-	
-	
-	
-	foreach loc in $locations[]
-	{
-		if (zone_accessibility_status contains (loc.zone))
-			__la_location_is_available[loc] = zone_accessibility_status[loc.zone];
-	}
-		
-		
-	__la_commons_were_inited = true;
-    __la_turncount_initialised_on = my_turncount();
-}
-
-boolean locationAvailable(location loc, Error able_to_find)
-{
-    locationAvailablePrivateInit();
-	if ((__la_location_is_available contains loc))
-		return __la_location_is_available[loc];
-	
-	boolean [int] could_find;
-	boolean is_available = locationAvailablePrivateCheck(loc, able_to_find);
-	if (able_to_find.was_error)
-		return false;
-	__la_location_is_available[loc] = is_available;
-	
-	return is_available;
-}
-
-boolean locationAvailable(location loc)
-{
-	return locationAvailable(loc, ErrorMake());
-}
-
-
-void locationAvailableRunDiagnostics()
-{
-	location [string][int] unknown_locations_by_zone;
-	
-	foreach loc in $locations[]
-	{
-		Error able_to_find;
-		locationAvailable(loc, able_to_find);
-		if (!able_to_find.was_error)
-			continue;
-		if (!(unknown_locations_by_zone contains (loc.zone)))
-			unknown_locations_by_zone[loc.zone] = listMakeBlankLocation();
-		unknown_locations_by_zone[loc.zone].listAppend(loc);
-	}
-	if (unknown_locations_by_zone.count() > 0)
-	{
-		print("Unknown locations in location availability tester:");
-		foreach zone in unknown_locations_by_zone
-		{
-			print(zone + ":");
-			foreach key in unknown_locations_by_zone[zone]
-			{
-				location loc = unknown_locations_by_zone[zone][key];
-				print("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + loc);
-			}
-		}
-	}
-}
-
-string HTMLGenerateFutureTextByLocationAvailability(string base_text, location place)
-{
-    if (!locationAvailable(place) && place != $location[none])
-    {
-        base_text = HTMLGenerateSpanOfClass(base_text, "r_future_option");
-    }
-    return base_text;
-}
-
-string HTMLGenerateFutureTextByLocationAvailability(location place)
-{
-	return HTMLGenerateFutureTextByLocationAvailability(place.to_string(), place);
-}
-
-
-
-string [location] LAConvertLocationLookupToLocations(string [string] lookup_map)
-{
-    string [location] result;
-    foreach location_name in lookup_map
-    {
-        location l = location_name.to_location();
-        if (l == $location[none])
-        {
-            if (__setting_debug_mode)
-                print_html("Location \"" + location_name + "\" does not appear to exist anymore.");
-            continue;
-        }
-        result[l] = lookup_map[location_name];
-    }
-    
-    return result;
-}
-static
-{
-    string [location] __constant_clickable_urls;
-    void initialiseConstantClickableURLs()
-    {
-        string [string] lookup_map;
-        
-        lookup_map["Pump Up Muscle"] = "place.php?whichplace=knoll_friendly&action=dk_gym";
-        lookup_map["Richard's Hobo Mysticality"] = "clan_hobopolis.php?place=3";
-        lookup_map["Richard's Hobo Moxie"] = "clan_hobopolis.php?place=3";
-        lookup_map["Richard's Hobo Muscle"] = "clan_hobopolis.php?place=3";
-        lookup_map["South of the Border"] = "place.php?whichplace=desertbeach";
-        lookup_map["The Oasis"] = "place.php?whichplace=desertbeach";
-        lookup_map["The Arid, Extra-Dry Desert"] = "place.php?whichplace=desertbeach";
-        lookup_map["The Shore, Inc. Travel Agency"] = "place.php?whichplace=desertbeach";
-        lookup_map["The Upper Chamber"] = "pyramid.php";
-        lookup_map["The Middle Chamber"] = "pyramid.php";
-        lookup_map["The Lower Chambers"] = "pyramid.php";
-        lookup_map["Goat Party"] = "casino.php";
-        lookup_map["Pirate Party"] = "casino.php";
-        lookup_map["Lemon Party"] = "casino.php";
-        lookup_map["The Roulette Tables"] = "casino.php";
-        lookup_map["The Poker Room"] = "casino.php";
-        lookup_map["The Haiku Dungeon"] = "da.php";
-        lookup_map["The Limerick Dungeon"] = "da.php";
-        lookup_map["The Enormous Greater-Than Sign"] = "da.php";
-        lookup_map["The Dungeons of Doom"] = "da.php";
-        lookup_map["The Daily Dungeon"] = "da.php";
-        lookup_map["Video Game Level 1"] = "place.php?whichplace=faqdungeon";
-        lookup_map["Video Game Level 2"] = "place.php?whichplace=faqdungeon";
-        lookup_map["Video Game Level 3"] = "place.php?whichplace=faqdungeon";
-        lookup_map["A Maze of Sewer Tunnels"] = "clan_hobopolis.php";
-        lookup_map["Hobopolis Town Square"] = "clan_hobopolis.php?place=2";
-        lookup_map["Burnbarrel Blvd."] = "clan_hobopolis.php?place=4";
-        lookup_map["Exposure Esplanade"] = "clan_hobopolis.php?place=5";
-        lookup_map["The Heap"] = "clan_hobopolis.php?place=6";
-        lookup_map["The Ancient Hobo Burial Ground"] = "clan_hobopolis.php?place=7";
-        lookup_map["The Purple Light District"] = "clan_hobopolis.php?place=8";
-        lookup_map["The Slime Tube"] = "clan_slimetube.php";
-        lookup_map["Dreadsylvanian Woods"] = "clan_dreadsylvania.php";
-        lookup_map["Dreadsylvanian Village"] = "clan_dreadsylvania.php";
-        lookup_map["Dreadsylvanian Castle"] = "clan_dreadsylvania.php";
-        lookup_map["The Briny Deeps"] = "place.php?whichplace=thesea";
-        lookup_map["The Brinier Deepers"] = "place.php?whichplace=thesea";
-        lookup_map["The Briniest Deepests"] = "place.php?whichplace=thesea";
-        lookup_map["An Octopus's Garden"] = "seafloor.php";
-        lookup_map["The Wreck of the Edgar Fitzsimmons"] = "seafloor.php";
-        lookup_map["Madness Reef"] = "seafloor.php";
-        lookup_map["The Mer-Kin Outpost"] = "seafloor.php";
-        lookup_map["The Skate Park"] = "seafloor.php";
-        lookup_map["The Marinara Trench"] = "seafloor.php";
-        lookup_map["Anemone Mine"] = "seafloor.php";
-        lookup_map["The Dive Bar"] = "seafloor.php";
-        lookup_map["The Coral Corral"] = "seafloor.php";
-        lookup_map["Mer-kin Elementary School"] = "sea_merkin.php?seahorse=1";
-        lookup_map["Mer-kin Library"] = "sea_merkin.php?seahorse=1";
-        lookup_map["Mer-kin Gymnasium"] = "sea_merkin.php?seahorse=1";
-        lookup_map["Mer-kin Colosseum"] = "sea_merkin.php?seahorse=1";
-        lookup_map["The Caliginous Abyss"] = "seafloor.php";
-        lookup_map["Anemone Mine (Mining)"] = "seafloor.php";
-        lookup_map["The Sleazy Back Alley"] = "place.php?whichplace=town_wrong";
-        lookup_map["The Copperhead Club"] = "place.php?whichplace=town_wrong";
-        lookup_map["The Haunted Kitchen"] = "place.php?whichplace=manor1";
-        lookup_map["The Haunted Conservatory"] = "place.php?whichplace=manor1";
-        lookup_map["The Haunted Library"] = "place.php?whichplace=manor1";
-        lookup_map["The Haunted Billiards Room"] = "place.php?whichplace=manor1";
-        lookup_map["The Haunted Pantry"] = "place.php?whichplace=manor1";
-        lookup_map["The Haunted Gallery"] = "place.php?whichplace=manor2";
-        lookup_map["The Haunted Bathroom"] = "place.php?whichplace=manor2";
-        lookup_map["The Haunted Bedroom"] = "place.php?whichplace=manor2";
-        lookup_map["The Haunted Ballroom"] = "place.php?whichplace=manor2";
-        lookup_map["The Haunted Boiler Room"] = "place.php?whichplace=manor4";
-        lookup_map["The Haunted Laundry Room"] = "place.php?whichplace=manor4";
-        lookup_map["The Haunted Wine Cellar"] = "place.php?whichplace=manor4";
-        lookup_map["The Haunted Laboratory"] = "place.php?whichplace=manor3";
-        lookup_map["The Haunted Nursery"] = "place.php?whichplace=manor3";
-        lookup_map["The Haunted Storage Room"] = "place.php?whichplace=manor3";
-        lookup_map["Summoning Chamber"] = "place.php?whichplace=manor4";
-        lookup_map["The Hidden Apartment Building"] = "place.php?whichplace=hiddencity";
-        lookup_map["The Hidden Hospital"] = "place.php?whichplace=hiddencity";
-        lookup_map["The Hidden Office Building"] = "place.php?whichplace=hiddencity";
-        lookup_map["The Hidden Bowling Alley"] = "place.php?whichplace=hiddencity";
-        lookup_map["The Hidden Park"] = "place.php?whichplace=hiddencity";
-        lookup_map["An Overgrown Shrine (Northwest)"] = "place.php?whichplace=hiddencity";
-        lookup_map["An Overgrown Shrine (Southwest)"] = "place.php?whichplace=hiddencity";
-        lookup_map["An Overgrown Shrine (Northeast)"] = "place.php?whichplace=hiddencity";
-        lookup_map["An Overgrown Shrine (Southeast)"] = "place.php?whichplace=hiddencity";
-        lookup_map["A Massive Ziggurat"] = "place.php?whichplace=hiddencity";
-        lookup_map["The Typical Tavern Cellar"] = "cellar.php";
-        lookup_map["The Spooky Forest"] = "place.php?whichplace=woods";
-        lookup_map["The Hidden Temple"] = "place.php?whichplace=woods";
-        lookup_map["A Barroom Brawl"] = "tavern.php";
-        lookup_map["8-Bit Realm"] = "place.php?whichplace=woods";
-        lookup_map["Whitey's Grove"] = "place.php?whichplace=woods";
-        lookup_map["The Road to the White Citadel"] = "place.php?whichplace=woods";
-        lookup_map["The Black Forest"] = "place.php?whichplace=woods";
-        lookup_map["The Old Landfill"] = "place.php?whichplace=woods";
-        lookup_map["The Bat Hole Entrance"] = "place.php?whichplace=bathole";
-        lookup_map["Guano Junction"] = "place.php?whichplace=bathole";
-        lookup_map["The Batrat and Ratbat Burrow"] = "place.php?whichplace=bathole";
-        lookup_map["The Beanbat Chamber"] = "place.php?whichplace=bathole";
-        lookup_map["The Boss Bat's Lair"] = "place.php?whichplace=bathole";
-        lookup_map["The Red Queen's Garden"] = "place.php?whichplace=rabbithole";
-        lookup_map["The Clumsiness Grove"] = "suburbandis.php";
-        lookup_map["The Maelstrom of Lovers"] = "suburbandis.php";
-        lookup_map["The Glacier of Jerks"] = "suburbandis.php";
-        lookup_map["The Degrassi Knoll Restroom"] = "place.php?whichplace=knoll_hostile";
-        lookup_map["The Degrassi Knoll Bakery"] = "place.php?whichplace=knoll_hostile";
-        lookup_map["The Degrassi Knoll Gym"] = "place.php?whichplace=knoll_hostile";
-        lookup_map["The Degrassi Knoll Garage"] = "place.php?whichplace=knoll_hostile";
-        lookup_map["The \"Fun\" House"] = "place.php?whichplace=plains";
-        lookup_map["The Unquiet Garves"] = "place.php?whichplace=cemetery";
-        lookup_map["The VERY Unquiet Garves"] = "place.php?whichplace=cemetery";
-        lookup_map["Tower Ruins"] = "fernruin.php";
-        lookup_map["Fernswarthy's Basement"] = "basement.php";
-        lookup_map["Cobb's Knob Barracks"] = "cobbsknob.php";
-        lookup_map["Cobb's Knob Kitchens"] = "cobbsknob.php";
-        lookup_map["Cobb's Knob Harem"] = "cobbsknob.php";
-        lookup_map["Cobb's Knob Treasury"] = "cobbsknob.php";
-        lookup_map["Throne Room"] = "cobbsknob.php";
-        lookup_map["Cobb's Knob Laboratory"] = "cobbsknob.php?action=tolabs";
-        lookup_map["The Knob Shaft"] = "cobbsknob.php?action=tolabs";
-        lookup_map["The Knob Shaft (Mining)"] = "cobbsknob.php?action=tolabs";
-        lookup_map["Cobb's Knob Menagerie, Level 1"] = "cobbsknob.php?action=tomenagerie";
-        lookup_map["Cobb's Knob Menagerie, Level 2"] = "cobbsknob.php?action=tomenagerie";
-        lookup_map["Cobb's Knob Menagerie, Level 3"] = "cobbsknob.php?action=tomenagerie";
-        lookup_map["The Dark Neck of the Woods"] = "friars.php";
-        lookup_map["The Dark Heart of the Woods"] = "friars.php";
-        lookup_map["The Dark Elbow of the Woods"] = "friars.php";
-        lookup_map["Friar Ceremony Location"] = "friars.php";
-        lookup_map["Pandamonium Slums"] = "pandamonium.php";
-        lookup_map["The Laugh Floor"] = "pandamonium.php?action=beli";
-        lookup_map["Infernal Rackets Backstage"] = "pandamonium.php?action=infe";
-        lookup_map["The Defiled Nook"] = "crypt.php";
-        lookup_map["The Defiled Cranny"] = "crypt.php";
-        lookup_map["The Defiled Alcove"] = "crypt.php";
-        lookup_map["The Defiled Niche"] = "crypt.php";
-        lookup_map["Haert of the Cyrpt"] = "crypt.php";
-        lookup_map["Frat House"] = "island.php";
-        lookup_map["Frat House In Disguise"] = "island.php";
-        lookup_map["The Frat House (Bombed Back to the Stone Age)"] = "island.php";
-        lookup_map["Hippy Camp"] = "island.php";
-        lookup_map["Hippy Camp In Disguise"] = "island.php";
-        lookup_map["The Hippy Camp (Bombed Back to the Stone Age)"] = "island.php";
-        lookup_map["The Obligatory Pirate's Cove"] = "island.php";
-        lookup_map["Barrrney's Barrr"] = "place.php?whichplace=cove";
-        lookup_map["The F'c'le"] = "place.php?whichplace=cove";
-        lookup_map["The Poop Deck"] = "place.php?whichplace=cove";
-        lookup_map["Belowdecks"] = "place.php?whichplace=cove";
-        lookup_map["Post-War Junkyard"] = "island.php";
-        lookup_map["McMillicancuddy's Farm"] = "island.php";
-        lookup_map["The Battlefield (Frat Uniform)"] = "bigisland.php";
-        lookup_map["The Battlefield (Hippy Uniform)"] = "bigisland.php";
-        lookup_map["Wartime Frat House"] = "island.php";
-        lookup_map["Wartime Frat House (Hippy Disguise)"] = "island.php";
-        lookup_map["Wartime Hippy Camp"] = "island.php";
-        lookup_map["Wartime Hippy Camp (Frat Disguise)"] = "island.php";
-        lookup_map["Next to that Barrel with Something Burning in it"] = "bigisland.php?place=junkyard";
-        lookup_map["Near an Abandoned Refrigerator"] = "bigisland.php?place=junkyard";
-        lookup_map["Over Where the Old Tires Are"] = "bigisland.php?place=junkyard";
-        lookup_map["Out by that Rusted-Out Car"] = "bigisland.php?place=junkyard";
-        lookup_map["Sonofa Beach"] = "bigisland.php?place=lighthouse";
-        lookup_map["The Themthar Hills"] = "bigisland.php?place=nunnery";
-        lookup_map["McMillicancuddy's Barn"] = "bigisland.php?place=farm";
-        lookup_map["McMillicancuddy's Pond"] = "bigisland.php?place=farm";
-        lookup_map["McMillicancuddy's Back 40"] = "bigisland.php?place=farm";
-        lookup_map["McMillicancuddy's Other Back 40"] = "bigisland.php?place=farm";
-        lookup_map["McMillicancuddy's Granary"] = "bigisland.php?place=farm";
-        lookup_map["McMillicancuddy's Bog"] = "bigisland.php?place=farm";
-        lookup_map["McMillicancuddy's Family Plot"] = "bigisland.php?place=farm";
-        lookup_map["McMillicancuddy's Shady Thicket"] = "bigisland.php?place=farm";
-        lookup_map["The Hatching Chamber"] = "bigisland.php?place=orchard";
-        lookup_map["The Feeding Chamber"] = "bigisland.php?place=orchard";
-        lookup_map["The Royal Guard Chamber"] = "bigisland.php?place=orchard";
-        lookup_map["The Filthworm Queen's Chamber"] = "bigisland.php?place=orchard";
-        lookup_map["Noob Cave"] = "tutorial.php";
-        lookup_map["The Dire Warren"] = "tutorial.php";
-        lookup_map["The Valley of Rof L'm Fao"] = "place.php?whichplace=mountains";
-        lookup_map["Mt. Molehill"] = "place.php?whichplace=mountains";
-        lookup_map["The Barrel Full of Barrels"] = "barrel.php";
-        lookup_map["The Smut Orc Logging Camp"] = "place.php?whichplace=orc_chasm";
-        lookup_map["The Thinknerd Warehouse"] = "place.php?whichplace=mountains";
-        lookup_map["A Mob of Zeppelin Protesters"] = "place.php?whichplace=zeppelin";
-        lookup_map["The Red Zeppelin"] = "place.php?whichplace=zeppelin";
-        lookup_map["A-Boo Peak"] = "place.php?whichplace=highlands";
-        lookup_map["Twin Peak"] = "place.php?whichplace=highlands";
-        lookup_map["Oil Peak"] = "place.php?whichplace=highlands";
-        lookup_map["Itznotyerzitz Mine"] = "place.php?whichplace=mclargehuge";
-        lookup_map["The Goatlet"] = "place.php?whichplace=mclargehuge";
-        lookup_map["Lair of the Ninja Snowmen"] = "place.php?whichplace=mclargehuge";
-        lookup_map["The eXtreme Slope"] = "place.php?whichplace=mclargehuge";
-        lookup_map["Mist-Shrouded Peak"] = "place.php?whichplace=mclargehuge";
-        lookup_map["The Icy Peak"] = "place.php?whichplace=mclargehuge";
-        lookup_map["Itznotyerzitz Mine (in Disguise)"] = "place.php?whichplace=mclargehuge";
-        lookup_map["The Penultimate Fantasy Airship"] = "place.php?whichplace=beanstalk";
-        lookup_map["The Castle in the Clouds in the Sky (Basement)"] = "place.php?whichplace=giantcastle";
-        lookup_map["The Castle in the Clouds in the Sky (Ground Floor)"] = "place.php?whichplace=giantcastle";
-        lookup_map["The Castle in the Clouds in the Sky (Top Floor)"] = "place.php?whichplace=giantcastle";
-        lookup_map["The Hole in the Sky"] = "place.php?whichplace=beanstalk";
-        lookup_map["The Broodling Grounds"] = "volcanoisland.php";
-        lookup_map["The Outer Compound"] = "volcanoisland.php";
-        lookup_map["The Temple Portico"] = "volcanoisland.php";
-        lookup_map["Convention Hall Lobby"] = "volcanoisland.php";
-        lookup_map["Outside the Club"] = "volcanoisland.php";
-        lookup_map["The Island Barracks"] = "volcanoisland.php";
-        lookup_map["The Nemesis' Lair"] = "volcanoisland.php";
-        lookup_map["The Bugbear Pen"] = "place.php?whichplace=knoll_friendly";
-        lookup_map["The Spooky Gravy Burrow"] = "place.php?whichplace=knoll_friendly";
-        lookup_map["The Stately Pleasure Dome"] = "place.php?whichplace=wormwood";
-        lookup_map["The Mouldering Mansion"] = "place.php?whichplace=wormwood";
-        lookup_map["The Rogue Windmill"] = "place.php?whichplace=wormwood";
-        lookup_map["The Primordial Soup"] = "place.php?whichplace=memories";
-        lookup_map["The Jungles of Ancient Loathing"] = "place.php?whichplace=memories";
-        lookup_map["Seaside Megalopolis"] = "place.php?whichplace=memories";
-        lookup_map["Domed City of Ronaldus"] = "place.php?whichplace=spaaace";
-        lookup_map["Domed City of Grimacia"] = "place.php?whichplace=spaaace";
-        lookup_map["Hamburglaris Shield Generator"] = "place.php?whichplace=spaaace";
-        lookup_map["The Arrrboretum"] = "place.php?whichplace=woods";
-        lookup_map["Spectral Pickle Factory"] = "place.php?whichplace=plains";
-        lookup_map["Lollipop Forest"] = "";
-        lookup_map["Fudge Mountain"] = "";
-        lookup_map["WarBear Fortress (First Level)"] = "";
-        lookup_map["WarBear Fortress (Second Level)"] = "";
-        lookup_map["WarBear Fortress (Third Level)"] = "";
-        lookup_map["Elf Alley"] = "";
-        lookup_map["CRIMBCO cubicles"] = "";
-        lookup_map["CRIMBCO WC"] = "";
-        lookup_map["Crimbo Town Toy Factory (2005)"] = "";
-        lookup_map["The Don's Crimbo Compound"] = "";
-        lookup_map["Atomic Crimbo Toy Factory"] = "";
-        lookup_map["Crimbo Town Toy Factory (2007)"] = "";
-        lookup_map["Sinister Dodecahedron"] = "";
-        lookup_map["Crimbo Town Toy Factory (2009)"] = "";
-        lookup_map["Simple Tool-Making Cave"] = "";
-        lookup_map["Spooky Fright Factory"] = "";
-        lookup_map["Crimborg Collective Factory"] = "";
-        lookup_map["Crimbo Town Toy Factory (2012)"] = "";
-        lookup_map["Market Square, 28 Days Later"] = "";
-        lookup_map["The Mall of Loathing, 28 Days Later"] = "";
-        lookup_map["Wrong Side of the Tracks, 28 Days Later"] = "";
-        lookup_map["The Icy Peak in The Recent Past"] = "";
-        lookup_map["Shivering Timbers"] = "";
-        lookup_map["A Skeleton Invasion!"] = "";
-        lookup_map["The Cannon Museum"] = "";
-        lookup_map["A Swarm of Yeti-Mounted Skeletons"] = "";
-        lookup_map["The Bonewall"] = "";
-        lookup_map["A Massive Flying Battleship"] = "";
-        lookup_map["A Supply Train"] = "";
-        lookup_map["The Bone Star"] = "";
-        lookup_map["Grim Grimacite Site"] = "";
-        lookup_map["A Pile of Old Servers"] = "";
-        lookup_map["The Haunted Sorority House"] = "";
-        lookup_map["Fightin' Fire"] = "";
-        lookup_map["Super-Intense Mega-Grassfire"] = "";
-        lookup_map["Fierce Flying Flames"] = "";
-        lookup_map["Lord Flameface's Castle Entryway"] = "";
-        lookup_map["Lord Flameface's Castle Belfry"] = "";
-        lookup_map["Lord Flameface's Throne Room"] = "";
-        lookup_map["A Stinking Abyssal Portal"] = "";
-        lookup_map["A Scorching Abyssal Portal"] = "";
-        lookup_map["A Terrifying Abyssal Portal"] = "";
-        lookup_map["A Freezing Abyssal Portal"] = "";
-        lookup_map["An Unsettling Abyssal Portal"] = "";
-        lookup_map["A Yawning Abyssal Portal"] = "";
-        lookup_map["The Space Odyssey Discotheque"] = "";
-        lookup_map["The Spirit World"] = "";
-        lookup_map["Some Scattered Smoking Debris"] = "place.php?whichplace=crashsite";
-        lookup_map["Anger Man's Level"] = "place.php?whichplace=junggate_3";
-        lookup_map["Fear Man's Level"] = "place.php?whichplace=junggate_3";
-        lookup_map["Doubt Man's Level"] = "place.php?whichplace=junggate_3";
-        lookup_map["Regret Man's Level"] = "place.php?whichplace=junggate_3";
-        lookup_map["The Nightmare Meatrealm"] = "place.php?whichplace=junggate_6";
-        lookup_map["A Kitchen Drawer"] = "place.php?whichplace=junggate_5";
-        lookup_map["A Grocery Bag"] = "place.php?whichplace=junggate_5";
-        lookup_map["Chinatown Shops"] = "place.php?whichplace=junggate_1";
-        lookup_map["Triad Factory"] = "place.php?whichplace=junggate_1";
-        lookup_map["1st Floor, Shiawase-Mitsuhama Building"] = "place.php?whichplace=junggate_1";
-        lookup_map["2nd Floor, Shiawase-Mitsuhama Building"] = "place.php?whichplace=junggate_1";
-        lookup_map["3rd Floor, Shiawase-Mitsuhama Building"] = "place.php?whichplace=junggate_1";
-        lookup_map["Chinatown Tenement"] = "place.php?whichplace=junggate_1";
-        lookup_map["The Gourd!"] = "place.php?whichplace=junggate_2";
-        lookup_map["A Deserted Stretch of I-911"] = "place.php?whichplace=ioty2014_hare";
-        lookup_map["The Prince's Restroom"] = "place.php?whichplace=ioty2014_cindy";
-        lookup_map["The Prince's Dance Floor"] = "place.php?whichplace=ioty2014_cindy";
-        lookup_map["The Prince's Kitchen"] = "place.php?whichplace=ioty2014_cindy";
-        lookup_map["The Prince's Balcony"] = "place.php?whichplace=ioty2014_cindy";
-        lookup_map["The Prince's Lounge"] = "place.php?whichplace=ioty2014_cindy";
-        lookup_map["The Prince's Canapes table"] = "place.php?whichplace=ioty2014_cindy";
-        lookup_map["The Inner Wolf Gym"] = "place.php?whichplace=ioty2014_wolf";
-        lookup_map["Unleash Your Inner Wolf"] = "place.php?whichplace=ioty2014_wolf";
-        lookup_map["The Crimbonium Mining Camp"] = "place.php?whichplace=desertbeach";
-        lookup_map["Kokomo Resort"] = "place.php?whichplace=desertbeach";
-        lookup_map["The Crimbonium Mine"] = "mining.php?mine=5";
-        lookup_map["The Secret Council Warehouse"] = "tutorial.php";
-        lookup_map["The Skeleton Store"] = "place.php?whichplace=town_market";
-        lookup_map["Madness Bakery"] = "place.php?whichplace=town_right";
-        lookup_map["The Fungal Nethers"] = "place.php?whichplace=nemesiscave";
-        foreach s in $strings[The Hallowed Halls,Shop Class,Chemistry Class,Art Class]
-            lookup_map[s] = "place.php?whichplace=KOLHS";
-        foreach s in $strings[The Edge of the Swamp,The Dark and Spooky Swamp,The Corpse Bog,The Ruined Wizard Tower,The Wildlife Sanctuarrrrrgh,Swamp Beaver Territory,The Weird Swamp Village]
-            lookup_map[s] = "place.php?whichplace=marais";
-        foreach s in $strings[Ye Olde Medievale Villagee,Portal to Terrible Parents,Rumpelstiltskin's Workshop]
-            lookup_map[s] = "place.php?whichplace=ioty2014_rumple";
-            
-        foreach s in $strings[The Cave Before Time,An Illicit Bohemian Party,Moonshiners' Woods,The Roman Forum,The Post-Mall,The Rowdy Saloon,The Spooky Old Abandoned Mine,Globe Theatre Main Stage,Globe Theatre Backstage]
-            lookup_map[s] = "place.php?whichplace=twitch";
-        foreach s in $strings[The Fun-Guy Mansion,Sloppy Seconds Diner,The Sunken Party Yacht]
-            lookup_map[s] = "place.php?whichplace=airport_sleaze";
-        foreach s in $strings[The Mansion of Dr. Weirdeaux,The Deep Dark Jungle,The Secret Government Laboratory]
-            lookup_map[s] = "place.php?whichplace=airport_spooky";
-        foreach s in $strings[Pirates of the Garbage Barges,Barf Mountain,The Toxic Teacups,Uncle Gator's Country Fun-Time Liquid Waste Sluice]
-            lookup_map[s] = "place.php?whichplace=airport_stench";
-        foreach s in $strings[The SMOOCH Army HQ,The Velvet / Gold Mine,LavaCo&trade; Lamp Factory,The Bubblin' Caldera]
-            lookup_map[s] = "place.php?whichplace=airport_hot";
-        foreach s in $strings[The Ice Hotel,VYKEA,The Ice Hole]
-            lookup_map[s] = "place.php?whichplace=airport_cold";
-        lookup_map["The Velvet / Gold Mine (Mining)"] = "mining.php?mine=6";
-        foreach s in $strings[The Mines,The Jungle,The Ice Caves,The Temple Ruins,Hell,The Snake Pit,The Spider Hole,The Ancient Burial Ground,The Beehive,the crashed u. f. o.,The City of Goooold,LOLmec's Lair,Yomama's Throne]
-            lookup_map[s] = "place.php?whichplace=spelunky";
-        
-        foreach s in $strings[Medbay,Waste Processing,Sonar,Science Lab,Morgue,Special Ops,Engineering,Navigation,Galley]
-            lookup_map[s] = "place.php?whichplace=bugbearship";
-        foreach s in $strings[Sweet-Ade Lake,Eager Rice Burrows,Gumdrop Forest]
-            lookup_map[s] = "place.php?whichplace=ioty2014_candy";
-            
-        foreach s in $strings[Fastest Adventurer Contest,Strongest Adventurer Contest,Smartest Adventurer Contest,Smoothest Adventurer Contest,A Crowd of (Stat) Adventurers,Hottest Adventurer Contest,Coldest Adventurer Contest,Spookiest Adventurer Contest,Stinkiest Adventurer Contest,Sleaziest Adventurer Contest,A Crowd of (Element) Adventurers,The Hedge Maze,Tower Level 1,Tower Level 2,Tower Level 3,Tower Level 4,Tower Level 5,The Naughty Sorceress' Chamber]
-            lookup_map[s] = "place.php?whichplace=nstower";
-            
-        lookup_map["Trick-or-treating"] = "place.php?whichplace=town&action=town_trickortreat";
-        
-        __constant_clickable_urls = LAConvertLocationLookupToLocations(lookup_map);
-    }
-    initialiseConstantClickableURLs();
-    
-}
-
-string [location] __variable_clickable_urls;
-string getClickableURLForLocation(location l, Error unable_to_find_url)
-{
-    if (l == $location[none])
-        return "";
-    if (__constant_clickable_urls contains l)
-        return __constant_clickable_urls[l];
-        
-    if (__variable_clickable_urls.count() == 0)
-    {
-        //Initialize:
-        //We use to_location() lookups here because $location[] will halt the script if the location name changes.
-        //Probably could move this to an external data file.
-        string [string] lookup_map;
-            
-        //Conditionals only:
-        if ($location[cobb's knob barracks].locationAvailable())
-            lookup_map["The Outskirts of Cobb's Knob"] = "cobbsknob.php";
-        else
-            lookup_map["The Outskirts of Cobb's Knob"] = "place.php?whichplace=plains";
-            
-        if (knoll_available())
-            lookup_map["Post-Quest Bugbear Pens"] = "place.php?whichplace=knoll_friendly";
-        else
-            lookup_map["Post-Quest Bugbear Pens"] =  "place.php?whichplace=knoll_hostile";
-            
-        if ($item[talisman o' namsilat].equipped_amount() > 0)
-            lookup_map["Palindome"] = "place.php?whichplace=palindome";
-        else
-            lookup_map["Palindome"] = "inventory.php?which=2";
-        //antique maps are weird:
-        lookup_map["The Electric Lemonade Acid Parade"] = "inv_use.php?pwd=" + my_hash() + "&whichitem=4613";
-        foreach s in $strings[Professor Jacking's Small-O-Fier,Professor Jacking's Huge-A-Ma-tron]
-            lookup_map[s] = "inv_use.php?pwd=" + my_hash() + "&whichitem=4560";
-            
-        //Parse into locations:
-        __variable_clickable_urls = LAConvertLocationLookupToLocations(lookup_map);
-    }
-    if (__variable_clickable_urls contains l)
-        return __variable_clickable_urls[l];
-
-    ErrorSet(unable_to_find_url);
-    return "";
-}
-
-string getClickableURLForLocation(location l)
-{
-    return l.getClickableURLForLocation(ErrorMake());
-}
-
-string getClickableURLForLocationIfAvailable(location l)
-{
-    Error able_to_find;
-    boolean found = l.locationAvailable(able_to_find);
-    if (able_to_find.was_error) //assume it's available, since we don't know
-        found = true;
-    if (found)
-        return l.getClickableURLForLocation();
-    else
-        return "";
-}
 
 void QLevel2Init()
 {
@@ -6789,6 +7060,8 @@ void QLevel4GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         if (!have_stench_resistance)
         {
             string line = "Need " + HTMLGenerateSpanOfClass("stench resistance", "r_element_stench") + " to adventure in Guano Junction.";
+            string [int] possibilities;
+            //This could be more... unified:
             if ($item[ghost of a necklace].available_amount() > 0)
             {
                 if ($item[ghost of a necklace].equipped_amount() == 0)
@@ -6800,12 +7073,26 @@ void QLevel4GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
                     line += "|*Equip your bum cheek.";
             }
             else if ($item[knob goblin harem veil].available_amount() == 0)
-                line += "|*Possibly acquire a knob goblin harem veil, or finish the first floor of spookyraven manor.";
+            {
+                possibilities.listAppend("acquire a knob goblin harem veil");
+                possibilities.listAppend("finish the first floor of spookyraven manor");
+            }
             else
             {
                 if ($item[knob goblin harem veil].equipped_amount() == 0)
-                    line += "|*Possibly equip your knob goblin harem veil.";
+                {
+                    possibilities.listAppend("equip your knob goblin harem veil");
+                }
             }
+            if ($skill[elemental saucesphere].have_skill())
+            {
+                possibilities.listAppend("cast elemental saucesphere");
+            }
+            else if (my_class() == $class[sauceror])
+                possibilities.listAppend("learn elemental saucesphere at guild trainer");
+            if (possibilities.count() > 0)
+                line += "|*Possibly " + possibilities.listJoinComponents(", ", "or") + ".";
+            
             subentry.entries.listAppend(line);
         }
         
@@ -7786,6 +8073,60 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
     }
     ChecklistEntry copy_source_entry;
     
+    if (__misc_state["Chateau Mantegna available"] && !get_property_boolean("_chateauMonsterFought") && mafiaIsPastRevision(15115))
+    {
+        string url = "place.php?whichplace=chateau";
+        string header = "Chateau painting copy";
+        string [int] description;
+        monster current_monster = get_property_monster("chateauMonster");
+        
+        if (current_monster == $monster[none])
+            header += " available";
+        else
+            header += " fightable";
+        
+        if (__misc_state["in run"])
+        {
+            if ($item[alpine watercolor set].available_amount() == 0)
+                description.listAppend("Acquire an alpine watercolor set to copy something else.");
+            else
+                description.listAppend("Copy something else with alpine watercolor set.");
+            /*string line;
+            if (current_monster == $monster[none])
+                line += "Options:";
+            else
+                line += "Other options:";
+            
+            if ($item[alpine watercolor set].available_amount() == 0)
+            {
+                //url = "shop.php?whichshop=chateau";
+                line += " (buy alpine watercolor set first)";
+            }
+            else
+                line += " (copy with alpine watercolor set)";
+        
+            line += "|*" + potential_copies.listJoinComponents("|*");
+            description.listAppend(line);*/
+        }
+        
+        if (current_monster != $monster[none])
+        {
+            string [int] monster_description;
+            CopiedMonstersGenerateDescriptionForMonster(current_monster, monster_description, true, true);
+            string line = HTMLGenerateSpanOfClass("Currently have " + current_monster.to_string() + ".", "r_bold");
+            if (monster_description.count() > 0)
+                line += "|*" + monster_description.listJoinComponents("|*");
+            description.listPrepend(line);
+        }
+		//resource_entries.listAppend(ChecklistEntryMake("__item fancy oil painting", url, ChecklistSubentryMake(header, "", description)));
+        
+        
+        copy_source_entry.subentries.listAppend(ChecklistSubentryMake(header, "", description));
+        if (copy_source_entry.image_lookup_name == "")
+            copy_source_entry.image_lookup_name = "__item fancy oil painting";
+        if (copy_source_entry.url == "")
+            copy_source_entry.url = "place.php?whichplace=chateau";
+    }
 	if (copies_left > 0)
 	{
 		string [int] copy_source_list;
@@ -7841,58 +8182,6 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
         copy_source_entry.subentries.listAppend(ChecklistSubentryMake("Crappy camera copy available", "", description));
         if (copy_source_entry.image_lookup_name == "")
             copy_source_entry.image_lookup_name = "__item crappy camera";
-    }
-    if (__misc_state["Chateau Mantegna available"] && !get_property_boolean("_chateauMonsterFought") && mafiaIsPastRevision(15115))
-    {
-        string url = "place.php?whichplace=chateau";
-        string header = "Chateau painting copy";
-        string [int] description;
-        monster current_monster = get_property_monster("chateauMonster");
-        
-        if (current_monster == $monster[none])
-            header += " available";
-        else
-            header += " fightable";
-        
-        if (__misc_state["in run"])
-        {
-            if ($item[alpine watercolor set].available_amount() == 0)
-                description.listAppend("Acquire an alpine watercolor set to copy something else.");
-            else
-                description.listAppend("Copy something else with alpine watercolor set.");
-            /*string line;
-            if (current_monster == $monster[none])
-                line += "Options:";
-            else
-                line += "Other options:";
-            
-            if ($item[alpine watercolor set].available_amount() == 0)
-            {
-                //url = "shop.php?whichshop=chateau";
-                line += " (buy alpine watercolor set first)";
-            }
-            else
-                line += " (copy with alpine watercolor set)";
-        
-            line += "|*" + potential_copies.listJoinComponents("|*");
-            description.listAppend(line);*/
-        }
-        
-        if (current_monster != $monster[none])
-        {
-            string [int] monster_description;
-            CopiedMonstersGenerateDescriptionForMonster(current_monster, monster_description, true, true);
-            string line = HTMLGenerateSpanOfClass("Currently have " + current_monster.to_string() + ".", "r_bold");
-            if (monster_description.count() > 0)
-                line += "|*" + monster_description.listJoinComponents("|*");
-            description.listPrepend(line);
-        }
-		//resource_entries.listAppend(ChecklistEntryMake("__item fancy oil painting", url, ChecklistSubentryMake(header, "", description)));
-        
-        
-        copy_source_entry.subentries.listAppend(ChecklistSubentryMake(header, "", description));
-        if (copy_source_entry.image_lookup_name == "")
-            copy_source_entry.image_lookup_name = "__item fancy oil painting";
     }
     if (copy_source_entry.subentries.count() > 0)
     {
@@ -9869,7 +10158,7 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         
         subentry.entries.listAppend("Find Gnasir after " + pluralise(turns_until_gnasir_found, "turn", "turns") + ".");
     }
-    else if (get_property_int("gnasirProgress") == 0 && exploration <= 14 && $location[the arid, extra-dry desert].noncombatTurnsAttemptedInLocation() == 0)
+    else if (get_property_int("gnasirProgress") == 0 && exploration <= 14 && !$location[the arid, extra-dry desert].noncombat_queue.contains_text("A Sietch in Time"))
     {
         subentry.entries.listAppend("Find Gnasir next turn.");
     }
@@ -9890,7 +10179,8 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
                 subentry.entries.listAppend("Give stone rose to Gnasir.");
             else
             {
-                string line = "Potentially adventure in Oasis for stone rose.";
+                string line = "Potentially adventure in Oasis for stone rose";
+                line += ".";
                 if (delayRemainingInLocation($location[the oasis]) > 0)
                 {
                     string hipster_text = "";
@@ -11790,7 +12080,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 			if ($effect[Filthworm Guard Stench].have_effect() == 0)
             {
                 url = "inventory.php?which=3";
-				details.listAppend("Use filthworm royal guard scent gland");
+				details.listAppend("Use filthworm royal guard scent gland.");
             }
 			modifiers.listClear();
             modifiers.listAppend("+meat");
@@ -15571,7 +15861,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     if (legendary_epic_weapon.available_amount_ignoring_storage() > 0)
         have_legendary_epic_weapon = true;
         
-	if (!__misc_state["in aftercore"] && !have_legendary_epic_weapon && $location[the "fun" house].turns_spent == 0)
+	if (!__misc_state["in aftercore"] && !have_legendary_epic_weapon && $location[the unquiet garves].turns_spent == 0)
 		return;
         
         
@@ -15724,7 +16014,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             
             item needed_item = lookupItem("fizzing spore pod");
             
-            if (needed_item.item_amount() < 6)
+            if (needed_item.available_amount() < 6)
             {
                 subentry.modifiers.listAppend("+item");
                 subentry.modifiers.listAppend("olfact angry mushroom guy");
@@ -15732,7 +16022,10 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             }
             else
             {
-                subentry.entries.listAppend("Make rubble go boom!");
+                if (needed_item.item_amount() < 6)
+                    subentry.entries.listAppend("Pull fizzing spore pod from hangk's, make rubble go boom!");
+                else
+                    subentry.entries.listAppend("Make rubble go boom!");
             }
         }
         else if (base_quest_state.mafia_internal_step == 16)
@@ -16738,7 +17031,11 @@ void QAzazelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         ChecklistSubentry subentry;
         
         subentry.header = base_quest_state.quest_name;
-        subentry.entries.listAppend("Consume " + consumable + ".");
+        string line = "Consume " + consumable;
+        if ((consumable == $item[steel lasagna] && availableFullness() < 5) || (consumable == $item[steel-scented air freshener] && availableSpleen() < 5))
+            line += " once you have enough space";
+        line += ".";
+        subentry.entries.listAppend(line);
         optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, "", subentry));
         return;
     }
@@ -16921,6 +17218,11 @@ void QAzazelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         entry.subentries.listAppend(subentry);
     }
     
+    if ((my_path_id() == PATH_TEETOTALER || my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_ZOMBIE_SLAYER) && availableFullness() < 5)
+        entry.subentries.listAppend(ChecklistSubentryMake(HTMLGenerateSpanFont("Won't work, need five fullness to eat lasagna.", "red"), "", ""));
+        
+    if (my_path_id() == PATH_OXYGENARIAN && availableSpleen() < 5)
+        entry.subentries.listAppend(ChecklistSubentryMake(HTMLGenerateSpanFont("Won't work, need five spleen to consume steel-scented air freshener.", "red"), "", ""));
 	
 	optional_task_entries.listAppend(entry);
 }
@@ -20512,7 +20814,8 @@ void SemirareGenerateDescription(string [int] description)
 		//limerick dungeon - +100% item
 		if ($item[cyclops eyedrops].available_amount() == 0 && $effect[One Very Clear Eye].have_effect() == 0)
 			semirares.listAppend(SemirareMake($location[the limerick dungeon], "|*+100% items eyedrops (10 turns), for tomb rats and low drops.", 0));
-	
+        if (in_bad_moon() && $item[bram's choker].available_amount() == 0)
+			semirares.listAppend(SemirareMake($location[The Haunted Boiler Room], "|*-5% combat accessory.", 0));
 		//three turn generation SRs go here
 		if (my_path_id() != PATH_SLOW_AND_STEADY)
 		{
@@ -20540,7 +20843,7 @@ void SemirareGenerateDescription(string [int] description)
             if (!can_create_golem)
                 semirares.listAppend(SemirareMake($location[Ye Olde Medievale Villagee], "Small golem (towerkilling)", 0));
         }*/
-        if (in_bad_moon() && __quest_state["Level 13"].state_boolean["shadow will need to be defeated"] && $item[scented massage oil].available_amount() == 0 && !$skill[Ambidextrous Funkslinging].have_skill())
+        if (in_bad_moon() && __quest_state["Level 13"].state_boolean["shadow will need to be defeated"] && $item[scented massage oil].available_amount() + $item[scented massage oil].closet_amount() == 0 && !$skill[Ambidextrous Funkslinging].have_skill())
             semirares.listAppend(SemirareMake($location[Cobb's Knob Harem], "|*Scented massage oil for shadow.", 0)); //theoretically, we could ignore this for DBs that aren't in a black cat run
 	}
 		
@@ -20716,134 +21019,6 @@ void SSemirareGenerateResource(ChecklistEntry [int] resource_entries)
 void SSemirareGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
 	SSemirareGenerateEntry(task_entries, optional_task_entries, true);
-}
-void smithsnessGenerateCoalSuggestions(string [int] coal_suggestions)
-{
-    if (!__misc_state["in run"])
-        return;
-	string [item] coal_item_suggestions;
-	
-	if (__misc_state["can equip just about any weapon"])
-	{
-        if (!__quest_state["Level 12"].state_boolean["Nuns Finished"])
-            coal_item_suggestions[$item[half a purse]] = "2x smithsness meat for nuns";
-		coal_item_suggestions[$item[A Light that Never Goes Out]] = "2x smithsness +item";
-			
-			
-		if (my_class() == $class[seal clubber])
-			coal_item_suggestions[$item[Meat Tenderizer is Murder]] = "weapon, +2x smithsness muscle %";
-		else if (my_class() == $class[turtle tamer])
-			coal_item_suggestions[$item[Ouija Board, Ouija Board]] = "weapon, +2x smithsness muscle %";
-		else if (my_class() == $class[pastamancer])
-			coal_item_suggestions[$item[Hand that Rocks the Ladle]] = "weapon, +2x smithsness mysticality %";
-		else if (my_class() == $class[sauceror])
-			coal_item_suggestions[$item[Saucepanic]] = "weapon, +myst stats, +2x smithsness mysticality %";
-		else if (my_class() == $class[disco bandit])
-			coal_item_suggestions[$item[Frankly Mr. Shank]] = "weapon, +2x smithsness moxie %";
-		else if (my_class() == $class[accordion thief])
-			coal_item_suggestions[$item[Shakespeare's Sister's Accordion]] = "weapon, +2x smithsness moxie %, useful cadenza";
-		//not sure I like these suggestions based off of mainstat, but...
-		else if (my_primestat() == $stat[mysticality])
-			coal_item_suggestions[$item[Staff of the Headmaster's Victuals]] = "weapon, +smithsnesss spell damage";
-		else if (my_primestat() == $stat[muscle])
-			coal_item_suggestions[$item[Work is a Four Letter Sword]] = "weapon, +2x smithsness weapon damage";
-		else if (my_primestat() == $stat[moxie])
-			coal_item_suggestions[$item[Sheila Take a Crossbow]] = "weapon, +smithsness initiative";
-        
-        string [int] sheila_reasons;
-        if (__quest_state["Level 7"].state_boolean["alcove needs speed tricks"])
-			sheila_reasons.listAppend("modern zmobies");
-        if (!__quest_state["Level 13"].state_boolean["Init race completed"])
-            sheila_reasons.listAppend("lair init race");
-        if (sheila_reasons.count() > 0)
-            coal_item_suggestions[$item[Sheila Take a Crossbow]] = "weapon, +smithsness initiative (useful for " + sheila_reasons.listJoinComponents(", ", "and") + ")";
-			
-			
-	}
-	coal_item_suggestions[$item[Hand in Glove]] = "lots of +ML";
-	if ($item[dirty hobo gloves].available_amount() == 0)
-		coal_item_suggestions[$item[Hand in Glove]] += " (need dirty hobo gloves)";
-	else
-		coal_item_suggestions[$item[Hand in Glove]] += " (have dirty hobo gloves)";
-	if (knoll_available() || $item[maiden wig].available_amount() > 0)
-		coal_item_suggestions[$item[Hairpiece On Fire]] = "+4 adventures, +5 smithness hat, +smithsness MP";
-	if (knoll_available() || $item[frilly skirt].available_amount() > 0)
-	{
-		coal_item_suggestions[$item[Vicar's Tutu]] = "+5 smithsness pants, +smithsness HP";
-		
-		if (hippy_stone_broken())
-			coal_item_suggestions[$item[Vicar's Tutu]] = coal_item_suggestions[$item[Vicar's Tutu]] + ", +3 PVP fights";
-	}
-	
-	if ($skill[pulverize].skill_is_usable())
-		coal_suggestions.listAppend("Smash smithed equipment for more smithereens");
-	foreach it in coal_item_suggestions
-	{
-		int number_wanted_max = 1;
-		if (it.to_slot() == $slot[weapon] && it.weapon_hands() == 1)
-		{
-			if ($skill[double-fisted skull smashing].skill_is_usable() && it.item_type() != "accordion")
-				number_wanted_max += 1;
-			if (familiar_is_usable($familiar[disembodied hand]))
-				number_wanted_max += 1;
-		}
-		
-		if (it.available_amount() >= number_wanted_max)
-			continue;
-		string suggestion = coal_item_suggestions[it];
-		coal_suggestions.listAppend(it + ": " + suggestion);
-	}
-}
-
-void smithsnessGenerateSmithereensSuggestions(string [int] smithereen_suggestions) //suggestereens
-{
-	smithereen_suggestions.listAppend(7014.to_item().to_string() + ": " + (__misc_state["free runs usable"] ? "free run/" : "") + "banish for 20 turns");
-	
-	if (__misc_state["can eat just about anything"] && availableFullness() >= 2 && my_path_id() != PATH_SLOW_AND_STEADY)
-	{
-		smithereen_suggestions.listAppend("Charming Flan: 2 fullness epic food<br>Miserable Pie: 2 fullness awesome food, 50 turns of +10 smithsness");
-	}
-		
-	if (__misc_state["can drink just about anything"] && availableDrunkenness() >= 2 && my_path_id() != PATH_SLOW_AND_STEADY)
-	{
-		smithereen_suggestions.listAppend("Vulgar Pitcher: 2 drunkenness epic drink<br>Bigmouth: 2 drunkenness awesome drink, 50 turns of +10 smithsness");
-	}
-	if (!$familiar[he-boulder].familiar_is_usable())
-    {
-        string line = "Golden Light: Yellow ray";
-        if ($effect[everything looks yellow].have_effect() > 0)
-            line = HTMLGenerateSpanFont(line, "gray");
-		smithereen_suggestions.listAppend(line);
-    }
-    
-    if (__misc_state["in run"])
-        smithereen_suggestions.listAppend("Handsome Devil: single-turn +100% item");
-	
-}
-
-void SSmithsnessGenerateResource(ChecklistEntry [int] resource_entries)
-{
-	if (__misc_state["in run"] && $item[handful of smithereens].available_amount() > 0)
-	{
-		string [int] smithereen_suggestions;
-		smithsnessGenerateSmithereensSuggestions(smithereen_suggestions);
-		resource_entries.listAppend(ChecklistEntryMake("__item handful of smithereens", "", ChecklistSubentryMake(pluralise($item[handful of smithereens]), "", smithereen_suggestions.listJoinComponents("<hr>")), 10));
-	}
-	if (__misc_state["in run"] && $item[lump of Brituminous coal].available_amount() > 0)
-	{
-		string [int] coal_suggestions;
-		smithsnessGenerateCoalSuggestions(coal_suggestions);
-		resource_entries.listAppend(ChecklistEntryMake("__item lump of Brituminous coal", "", ChecklistSubentryMake(pluralise($item[lump of Brituminous coal]), "", coal_suggestions.listJoinComponents("<hr>")), 10));
-	}
-	if ($item[flaskfull of hollow].available_amount() > 0 && $effect[Merry Smithsness].have_effect() < 25 && __misc_state["in run"])
-	{
-		int turns_left = $effect[Merry Smithsness].have_effect();
-		string [int] details;
-		details.listAppend(pluralise((turns_left + 150 * $item[flaskfull of hollow].available_amount()), "turn", "turns") + " of +25 smithsness");
-		if (turns_left > 0)
-			details.listAppend("Effect will run out in " + pluralise(turns_left, "turn", "turns"));
-		resource_entries.listAppend(ChecklistEntryMake("__item flaskfull of hollow", "inventory.php?which=3", ChecklistSubentryMake(pluralise($item[flaskfull of hollow]), "", details), 10));
-	}
 }
 
 boolean HITSStillRelevant()
@@ -21579,8 +21754,6 @@ void SFamiliarsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     
 	SFamiliarsGenerateEntry(task_entries, optional_task_entries, true);
 }
-
-
 void SDispensaryGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
 	//Not sure how I feel about this. The dispensary is very useful, but not necessary to complete an ascension.
@@ -22973,7 +23146,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         
     }
     
-    if ($item[portable cassette player].available_amount() > 0 && (__misc_state["in run"] || $item[portable cassette player].equipped_amount() > 0))
+    if ($item[portable cassette player].available_amount() > 0 && (__misc_state["in run"] || $item[portable cassette player].equipped_amount() > 0) && $item[portable cassette player].is_unrestricted())
     {
         string [int] description;
         string url = "";
@@ -22993,7 +23166,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         
         boolean [effect] buffs_to_display_for_future = $effects[Dangerous Zone Song,Flashy Dance Song];
         
-        boolean [effect] buffs_to_not_bother_display_current_for = $effects[Dark Orchestral Song,Pet Shop Song]; //+10% init is like +1% chance of extra modern zmobies, which saves an extremely small fraction of a turn. ignore, because cognitive load + you might run better accessories instead, like +ML
+        boolean [effect] buffs_to_not_bother_display_current_for = $effects[Dark Orchestral Song,Pet Shop Song]; //+10% init is like +1% chance of extra modern zmobies, which saves an extremely small fraction of a turn. ignore, because cognitive load + you might run better accessories instead, like +ML. plus, you have to use that weird fiddly technique because of +combat
         string [int] future_buffs;
         foreach mod_value, buff in buffs_activate_at
         {
@@ -23091,246 +23264,6 @@ void SCouncilGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 	task_entries.listAppend(ChecklistEntryMake("council", "place.php?whichplace=town", ChecklistSubentryMake("Visit the Council of Loathing", "", description)));
 }
 
-
-void SugarGenerateSuggestions(string [int] suggestions)
-{
-    if (!__misc_state["in run"])
-        return;
-    if ($item[sugar shield].available_amount() == 0 && $item[snow suit].available_amount() == 0)
-        suggestions.listAppend("Sugar shield: +10 familiar weight equip");
-    if ($item[sugar chapeau].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["past tower monsters"])
-        suggestions.listAppend("Sugar chapeau: +50% spell damage (tower killing)");
-}
-
-void SSugarGenerateResource(ChecklistEntry [int] resource_entries)
-{
-    if (!$item[sugar sheet].is_unrestricted())
-        return;
-    item [int] sugar_crafted_items;
-    for i from 4178 to 4183
-    {
-        sugar_crafted_items.listAppend(i.to_item());
-    }
-    ChecklistSubentry [int] subentries;
-    
-    string image_name = "";
-    
-    if ($item[sugar sheet].available_amount() > 0 && __misc_state["in run"] )
-    {
-        string [int] suggestions;
-        SugarGenerateSuggestions(suggestions);
-        subentries.listAppend(ChecklistSubentryMake(pluralise($item[sugar sheet]), "", suggestions));
-        
-        image_name = "sugar sheet";
-    }
-    foreach key in sugar_crafted_items
-    {  
-        item it = sugar_crafted_items[key];
-        if (it.available_amount() == 0)
-            continue;
-        int counter = get_property_int("sugarCounter" + it.to_int());
-        if (counter == 0 && !__misc_state["in run"]) //in aftercore, probably not as relevant
-            continue;
-        int combats_left = 31 - counter;
-        subentries.listAppend(ChecklistSubentryMake(pluralise(it), "", pluralise(combats_left, "combat", "combats") + " left."));
-        if (image_name.length() == 0)
-            image_name = it;
-    }
-    if (subentries.count() > 0)
-    {
-        resource_entries.listAppend(ChecklistEntryMake(image_name, "", subentries, 10));
-    }
-}
-void STomesGenerateResource(ChecklistEntry [int] resource_entries)
-{
-	if (true)
-	{
-		ChecklistSubentry [int] subentries;		
-		
-		int tome_count = 0;
-		
-		string [skill] tome_summons_property_names;
-		tome_summons_property_names[$skill[Summon Smithsness]] = "_smithsnessSummons";
-		tome_summons_property_names[$skill[summon clip art]] = "_clipartSummons";
-		tome_summons_property_names[$skill[Summon Sugar Sheets]] = "_sugarSummons";
-		tome_summons_property_names[$skill[Summon Snowcones]] = "_snowconeSummons";
-		tome_summons_property_names[$skill[Summon Stickers]] = "_stickerSummons";
-		tome_summons_property_names[$skill[Summon Rad Libs]] = "_radlibSummons";
-		
-		int [skill] summons_available;
-		foreach s in tome_summons_property_names
-		{
-			string property_name = tome_summons_property_names[s];
-			int value = 0;
-			if (s.skill_is_usable())
-			{
-				if (in_ronin())
-					value = 3 - get_property_int("tomeSummons");
-				else
-					value = 3 - get_property_int(property_name);
-                if (value > 0)
-                {
-                    tome_count += 1;
-                }
-			}
-			summons_available[s] = value;
-		}
-        if (tome_count == 0)
-            return;
-		
-        if (in_ronin())
-        {
-            int summons_remaining = 3 - get_property_int("tomeSummons");
-            subentries.listAppend(ChecklistSubentryMake(pluralise(summons_remaining, "tome summon", "tome summons") + " remaining", "", ""));
-        }
-        
-        
-		if (summons_available[$skill[Summon Smithsness]] > 0)
-		{
-			string [int] description;
-			
-			string [int] flask_suggestions;
-			
-			string [int] smithereen_suggestions;
-			smithsnessGenerateSmithereensSuggestions(smithereen_suggestions);
-			
-			
-			string [int] coal_suggestions;
-			smithsnessGenerateCoalSuggestions(coal_suggestions);
-			
-			if (true)
-			{
-                int merry_smithsness_currently_available = $item[flaskfull of hollow].available_amount() * 150 + $effect[merry smithsness].have_effect();
-				string building_line = "+25 smithsness (150 turns)";
-				if (merry_smithsness_currently_available > 0)
-					building_line += " (" + merry_smithsness_currently_available + " turns currently available)";
-				flask_suggestions.listAppend(building_line);
-				
-			}
-			
-            
-            if (__misc_state["in run"])
-            {
-                description.listAppend("1 Flaskfull of Hollow" + HTMLGenerateIndentedText(flask_suggestions.listJoinComponents("<hr>")));
-                description.listAppend("1 Lump of Brituminous coal" + HTMLGenerateIndentedText(coal_suggestions.listJoinComponents("<hr>")));
-                description.listAppend("1 Handful of Smithereens" + HTMLGenerateIndentedText(smithereen_suggestions.listJoinComponents("<hr>")));
-            }
-            else
-                description.listAppend("Flaskfull of Hollow, Lump of Brituminous coal, and Handful of Smithereens");
-
-			
-			string name = "The Smith's Tome";
-			if (!in_ronin())
-				name = pluralise(summons_available[$skill[Summon Smithsness]], name + " summon", name + " summons");
-			subentries.listAppend(ChecklistSubentryMake(name, "", description));
-			
-		}
-		if (summons_available[$skill[summon clip art]] > 0)
-		{
-			string [int] description;
-            if (__misc_state["in run"])
-            {
-                if ($item[shining halo].available_amount() == 0 && __misc_state["need to level"])
-                    description.listAppend("Shining halo: +3 stats/fight when unarmed");
-                if ($item[frosty halo].available_amount() == 0 && $item[a light that never goes out].available_amount() == 0)
-                    description.listAppend("Frosty halo: 25% items when unarmed");
-                if ($item[furry halo].available_amount() == 0)
-                {
-                    string line = "Furry halo: +5 familiar weight when unarmed";
-                    if (__misc_state["free runs available"])
-                        line += " (1 free run/day)";
-                    description.listAppend(line);
-                }
-                if ($item[time halo].available_amount() == 0 && my_daycount() <3 )
-                    description.listAppend("Time halo: +5 adventures/day");
-                    
-                if ($item[bucket of wine].available_amount() == 0 && __misc_state["can drink just about anything"])
-                {
-                    if ($skill[the ode to booze].skill_is_usable())
-                        description.listAppend("Bucket of wine: 28 adventures nightcap with ode");
-                    else if (get_property_int("hiddenTavernUnlock") != my_ascensions() && $item[ye olde meade].available_amount() == 0) //just use fog murderers or meade instead, about the same
-                        description.listAppend("Bucket of wine: 18 adventures nightcap");
-                }
-                    
-                if (__misc_state["can eat just about anything"] && __misc_state["need to level"])
-                    description.listAppend("Ultrafondue: 3 fullness awesome food, +15ML for 30 adventures");
-                if (true)
-                {
-                    string line = "Crystal skull: banish in high monster count zones";
-                    if ($skill[Summon Smithsness].skill_is_usable() && !__misc_state["in aftercore"])
-                        line += "|*Smith's Tome has a better one";
-                    description.listAppend(line);
-                }
-                if ($item[borrowed time].available_amount() == 0 && !get_property_boolean("_borrowedTimeUsed") && my_daycount() > 1)
-                    description.listAppend("Borrowed time: 20 adventures on last day");
-                
-                string [int] familiar_suggestions;
-                if (familiar_is_usable($familiar[he-boulder]) && $item[quadroculars].available_amount() == 0)
-                    familiar_suggestions.listAppend("He-Boulder 100-turn YR");
-                if (familiar_is_usable($familiar[obtuse angel]) && !familiar_is_usable($familiar[Reanimated Reanimator]))
-                    familiar_suggestions.listAppend("+1 angel copy");
-                    
-                if (familiar_suggestions.count() > 0)
-                    description.listAppend("Box of familiar jacks: free familiar equipment (" + listJoinComponents(familiar_suggestions, ", ") + ")");
-                else
-                    description.listAppend("Box of familiar jacks: free familiar equipment");
-            }
-			
-			string name = "Tome of Clip Art";
-			if (!in_ronin())
-				name = pluralise(summons_available[$skill[Summon Clip Art]], name + " summon", name + " summons");
-			subentries.listAppend(ChecklistSubentryMake(name, "", description));
-		}
-		if (summons_available[$skill[Summon Sugar Sheets]] > 0)
-		{
-			string [int] description;
-            
-            SugarGenerateSuggestions(description);
-				
-			string name = "Tome of Sugar Shummoning";
-			if (!in_ronin())
-				name = pluralise(summons_available[$skill[Summon Sugar Sheets]], name + " summon", name + " summons");
-			subentries.listAppend(ChecklistSubentryMake(name, "", description));
-		}
-		if (summons_available[$skill[Summon Snowcones]] > 0)
-		{
-			string [int] description;
-			//FIXME check this
-			
-			string name = "Tome of Snowcone Summoning";
-			if (!in_ronin())
-				name = pluralise(summons_available[$skill[Summon Snowcones]], name + " summon", name + " summons");
-			subentries.listAppend(ChecklistSubentryMake(name, "", description));
-		}
-		if (summons_available[$skill[Summon Stickers]] > 0)
-		{
-			string [int] description;
-			//FIXME check this
-			
-			string name = "Scratch 'n' Sniff Sticker Tome";
-			if (!in_ronin())
-				name = pluralise(summons_available[$skill[Summon Stickers]], name + " summon", name + " summons");
-			subentries.listAppend(ChecklistSubentryMake(name, "", description));
-		}
-		if (summons_available[$skill[Summon Rad Libs]] > 0)
-		{
-			string [int] description;
-			
-			//FIXME check this
-			
-			string name = "Tome of Rad Libs";
-			if (!in_ronin())
-				name = pluralise(summons_available[$skill[Summon Rad Libs]], name + " summon", name + " summons");
-			subentries.listAppend(ChecklistSubentryMake(name, "", description));
-		}
-		
-        
-        ChecklistEntry entry = ChecklistEntryMake("__item tome of clip art", "campground.php?action=bookshelf", subentries);
-        if (in_ronin())
-            entry.should_indent_after_first_subentry = true;
-        resource_entries.listAppend(entry);
-	}
-}
 static
 {
     //NOTE: this array does not support non-tradeable, quest, or non-discardable items. It could, but then I'd have to filter those out later, and I'm not sure how fast get_related is.
@@ -23841,132 +23774,6 @@ void SAftercoreGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     
     
     SAftercoreThingsToDoGenerateTasks(task_entries, optional_task_entries, future_task_entries);
-}
-static
-{
-    skill [int] __libram_skills;
-    void initialiseLibramSkills()
-    {
-		foreach s in $skills[]
-        {
-			if (s.libram)
-				__libram_skills.listAppend(s);
-        }
-    }
-    initialiseLibramSkills();
-}
-
-void SLibramGenerateResource(ChecklistEntry [int] resource_entries)
-{
-	if (__misc_state["bookshelf accessible"])
-	{
-		int libram_mp_cost = nextLibramSummonMPCost();
-		
-		
-		string [int] librams_usable;
-		foreach key, s in __libram_skills
-        {
-			if (s.skill_is_usable())
-				librams_usable.listAppend(s.to_string());
-        }
-		if (libram_mp_cost <= my_maxmp() && librams_usable.count() > 0)
-		{
-			ChecklistSubentry subentry;
-			if (librams_usable.count() == 1)
-				subentry.header = "Libram";
-			else
-				subentry.header = "Librams";
-			subentry.header += " summonable";
-			subentry.modifiers.listAppend(libram_mp_cost + "MP cost");
-			
-			string [int] readable_list;
-			foreach key in librams_usable
-			{
-				string libram_name = librams_usable[key];
-				if (libram_name.stringHasPrefix("Summon "))
-					libram_name = libram_name.substring(7);
-				readable_list.listAppend(libram_name);
-			}
-			
-			subentry.entries.listAppend(readable_list.listJoinComponents(", ", "and") + ".");
-            
-            if ($skill[summon taffy].skill_is_usable() && get_property_int("_taffyYellowSummons") == 0)
-            {
-                float chance = powf(0.5, MAX(0, get_property_int("_taffyRareSummons") + 1));
-                subentry.entries.listAppend("Could try to summon a yellow taffy. (" + (chance * 100.0).roundForOutput(1) + "% chance)");
-                //_taffyYellowSummons
-            }
-            
-			resource_entries.listAppend(ChecklistEntryMake("__item libram of divine favors", "campground.php?action=bookshelf", subentry, 7));
-		}
-		
-		
-		if ($skill[summon brickos].skill_is_usable() && __misc_state["in run"])
-		{
-			if (get_property_int("_brickoEyeSummons") <3)
-			{
-				ChecklistSubentry subentry;
-				subentry.header =  (3 - get_property_int("_brickoEyeSummons")) + " BRICKO&trade; eye bricks obtainable";
-				subentry.entries.listAppend("Cast Summon BRICKOs libram. (" + libram_mp_cost + " mp)");
-				resource_entries.listAppend(ChecklistEntryMake("__item bricko eye brick", "campground.php?action=bookshelf", subentry, 9));
-				
-			}
-		}
-	}
-	
-	if (__misc_state["in run"])
-	{
-		boolean [item] all_possible_bricko_fights = $items[bricko eye brick,bricko airship,bricko bat,bricko cathedral,bricko elephant,bricko gargantuchicken,bricko octopus,bricko ooze,bricko oyster,bricko python,bricko turtle,bricko vacuum cleaner];
-		
-		int bricko_potential_fights_available = 0;
-		foreach it in $items[bricko eye brick,bricko airship,bricko bat,bricko cathedral,bricko elephant,bricko gargantuchicken,bricko octopus,bricko ooze,bricko oyster,bricko python,bricko turtle,bricko vacuum cleaner]
-		{
-			bricko_potential_fights_available += it.available_amount();
-		}
-		bricko_potential_fights_available = MIN(10 - get_property_int("_brickoFights"), bricko_potential_fights_available);
-		if (bricko_potential_fights_available > 0)
-		{
-			ChecklistSubentry subentry;
-			subentry.header = pluralise(bricko_potential_fights_available, "BRICKO&trade; fight", "BRICKO&trade; fights") + " ready";
-			
-			
-			foreach fight in all_possible_bricko_fights
-			{
-				int number_available = fight.available_amount();
-				if (number_available > 0)
-                {
-                    string line = pluralise(number_available, fight);
-                    
-                    if ($items[rock band flyers,jam band flyers].available_amount() > 0 && !__quest_state["Level 12"].state_boolean["Arena Finished"] && __quest_state["Level 12"].in_progress && get_property_int("flyeredML") < 10000)
-                    {
-                        monster m = fight.to_string().to_monster(); //is there a better way to look this up?
-                        line += " (" + m.base_initiative + "% init)";
-                    }
-					subentry.entries.listAppend(line);
-                }
-			}
-			
-			item [int] craftable_fights;
-			string [int] creatable;
-			foreach fight in all_possible_bricko_fights
-			{
-                monster m = fight.to_string().to_monster(); //is there a better way to look this up?
-				int bricks_needed = get_ingredients(fight)[$item[bricko brick]];
-				int monster_level = m.raw_attack;
-				int number_available = creatable_amount(fight);
-				if (number_available > 0)
-				{
-					craftable_fights.listAppend(fight);
-					creatable.listAppend(pluralise(number_available, fight) + " (" + bricks_needed + " bricks, " + monster_level + "ML)");
-				}
-			}
-			
-			if (creatable.count() > 0)
-				subentry.entries.listAppend("Creatable: (" + $item[bricko brick].available_amount() + " bricks available)" + HTMLGenerateIndentedText(creatable));
-				
-			resource_entries.listAppend(ChecklistEntryMake("__item bricko brick", "inventory.php?which=3", subentry, 7));
-		}
-	}
 }
 void S8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
@@ -24951,114 +24758,6 @@ void SOldLevel9GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     subentries.listAppend(ChecklistSubentryMake("A Quest, LOL", "", description));
     optional_task_entries.listAppend(ChecklistEntryMake("__item 64735 scroll", url, subentries, 10, $locations[the valley of rof l'm fao]));
 }
-void generateGardenEntry(ChecklistEntry [int] resource_entries, boolean [item] garden_source_items, boolean [item] garden_creatable_items)
-{
-    ChecklistSubentry [int] subentries;
-    string image_name = "";
-    foreach it in garden_source_items
-    {
-        if (it.available_amount() == 0) continue;
-        if (image_name.length() == 0)
-            image_name = "__item " + it;
-        subentries.listAppend(ChecklistSubentryMake(pluralise(it), "", ""));
-    }
-    if (subentries.count() > 0)
-    {
-        ChecklistSubentry subentry = subentries[subentries.count() - 1]; //hacky
-        
-        
-        int [item] creatable_items = garden_creatable_items.creatable_items();
-        string [int] output_list;
-        foreach it in creatable_items
-        {
-            int amount = creatable_items[it];
-            
-            if (it.to_slot() != $slot[none] && it.available_amount() > 0) //already have one
-                continue;
-            output_list.listAppend(pluralise(amount, it));
-        }
-        if (output_list.count() > 0)
-        {
-            subentry.entries.listAppend("Can create " + output_list.listJoinComponents(", ", "or") + ".");
-        }
-        resource_entries.listAppend(ChecklistEntryMake(image_name, "", subentries, 8));
-    }
-}
-
-
-
-void SGardensGenerateResource(ChecklistEntry [int] resource_entries)
-{
-	if (!__misc_state["in run"])
-        return;
-
-    //Garden items:
-    if (true)
-    {
-        boolean [item] garden_creatable_items;
-        garden_creatable_items[$item[pumpkin juice]] = true;
-        if (__misc_state["can eat just about anything"])
-            garden_creatable_items[$item[pumpkin pie]] = true;
-        if (__misc_state["can drink just about anything"])
-            garden_creatable_items[$item[pumpkin beer]] = true;
-        if (__misc_state_string["yellow ray source"] == 4766.to_item().to_string())
-            garden_creatable_items[4766.to_item()] = true;
-        
-        generateGardenEntry(resource_entries, $items[pumpkin], garden_creatable_items);
-    }
-    if (true)
-    {
-        boolean [item] garden_creatable_items;
-        if (__misc_state["can eat just about anything"])
-            garden_creatable_items[$item[peppermint patty]] = true;
-        if (__misc_state["can drink just about anything"])
-            garden_creatable_items[$item[peppermint twist]] = true;
-        if (__misc_state["free runs usable"])
-            garden_creatable_items[$item[peppermint parasol]] = true;
-        garden_creatable_items[$item[peppermint crook]] = true;
-        generateGardenEntry(resource_entries, $items[peppermint sprout], garden_creatable_items);
-    }
-    if (true)
-    {
-        boolean [item] garden_creatable_items;
-        if (__misc_state["can eat just about anything"])
-            garden_creatable_items[$item[skeleton quiche]] = true;
-        if (__misc_state["can drink just about anything"])
-            garden_creatable_items[$item[crystal skeleton vodka]] = true;
-        if (!__misc_state["mysterious island available"])
-            garden_creatable_items[$item[skeletal skiff]] = true;
-        if (hippy_stone_broken())
-            garden_creatable_items[$item[auxiliary backbone]] = true;
-        generateGardenEntry(resource_entries, $items[skeleton], garden_creatable_items);
-    }
-    if (true)
-    {
-        generateGardenEntry(resource_entries, $items[handful of barley,cluster of hops,fancy beer bottle,fancy beer label], $items[can of Br&uuml;talbr&auml;u,can of Drooling Monk,can of Impetuous Scofflaw,bottle of old pugilist,bottle of professor beer,bottle of rapier witbier,artisanal homebrew gift package]);
-    }
-    if (true)
-    {
-        boolean [item] garden_creatable_items;
-        
-        foreach it in $items[snow cleats,snow crab,unfinished ice sculpture,snow mobile,ice bucket,bod-ice,snow belt,ice house,ice nine]
-            garden_creatable_items[it] = true;
-        
-        if (!__quest_state["Level 9"].state_boolean["bridge complete"])
-            garden_creatable_items[$item[snow boards]] = true;
-        
-        if (!__quest_state["Level 4"].finished)
-            garden_creatable_items[$item[snow shovel]] = true;
-        
-        if (__misc_state["can eat just about anything"])
-            garden_creatable_items[$item[snow crab]] = true;
-        if (__misc_state["can drink just about anything"])
-            garden_creatable_items[$item[Ice Island Long Tea]] = true;
-        if (hippy_stone_broken())
-            garden_creatable_items[$item[ice nine]] = true;
-        
-        
-        generateGardenEntry(resource_entries, $items[snow berries, ice harvest], garden_creatable_items);
-    }
-}
 
 void SKOLHSGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
@@ -25701,839 +25400,6 @@ void SJarlsbergGenerateResource(ChecklistEntry [int] resource_entries)
     if (entry.subentries.count() > 0)
         resource_entries.listAppend(entry);
 }
-Record COTSuggestion
-{
-    string reason;
-    familiar [int] familiars;
-};
-
-
-COTSuggestion COTSuggestionMake(string reason, familiar [int] familiars)
-{
-    COTSuggestion suggestion;
-    suggestion.reason = reason;
-    suggestion.familiars = familiars;
-    
-    return suggestion;
-}
-
-COTSuggestion COTSuggestionMake(string reason, familiar f)
-{
-    familiar [int] familiar_list;
-    familiar_list.listAppend(f);
-    return COTSuggestionMake(reason, familiar_list);
-}
-
-COTSuggestion COTSuggestionMake(string reason, boolean [familiar] familiars_in)
-{
-    familiar [int] familiars_out;
-    foreach f in familiars_in
-        familiars_out.listAppend(f);
-    return COTSuggestionMake(reason, familiars_out);
-}
-
-void listAppend(COTSuggestion [int] list, COTSuggestion entry)
-{
-	int position = list.count();
-	while (list contains position)
-		position += 1;
-	list[position] = entry;
-}
-
-
-//Follows in order. If we can't find one in the first set, we check the second, then third, etc.
-//This allows for supporting +25% meat, then falling back on +20%, etc.
-Record COTSuggestionSet
-{
-    COTSuggestion [int] suggestions;
-};
-
-COTSuggestionSet COTSuggestionSetMake(COTSuggestion [int] suggestions)
-{
-    COTSuggestionSet suggestion_set;
-    suggestion_set.suggestions = suggestions;
-    
-    return suggestion_set;
-}
-
-COTSuggestionSet COTSuggestionSetMake(COTSuggestion suggestion)
-{
-    COTSuggestionSet suggestion_set;
-    suggestion_set.suggestions.listAppend(suggestion);
-    
-    return suggestion_set;
-}
-
-void listAppend(COTSuggestionSet [int] list, COTSuggestionSet entry)
-{
-	int position = list.count();
-	while (list contains position)
-		position += 1;
-	list[position] = entry;
-}
-
-
-void SCOTGenerateSuggestions(string [int] description)
-{
-    familiar enthroned_familiar = my_enthroned_familiar();
-    familiar bjorned_familiar = my_bjorned_familiar();
-    //Suggest what it offers:
-    COTSuggestionSet [int] suggestion_sets;
-    
-    boolean have_two_available = false;
-    if ($item[crown of thrones].available_amount() > 0 && $item[Buddy Bjorn].available_amount() > 0)
-        have_two_available = true;
-
-    //Relevant:
-    //+10ML
-    suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+10 ML and +MP regen", $familiar[el vibrato megadrone])));
-    //+15% item drops, or +10%
-    if (true)
-    {
-        COTSuggestion [int] suggestions;
-        suggestions.listAppend(COTSuggestionMake("+15% items", $familiars[li'l xenomorph, feral kobold]));
-        suggestions.listAppend(COTSuggestionMake("+10% items", $familiars[Reassembled Blackbird,Reconstituted Crow,Oily Woim]));
-        suggestion_sets.listAppend(COTSuggestionSetMake(suggestions));
-    }
-    //+2 moxie/muscle/mysticality stats/fight
-    if (__misc_state["need to level"])
-    {
-        if (my_primestat() == $stat[moxie])
-        {
-            suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+2 mainstat/fight", $familiars[blood-faced volleyball,jill-o-lantern, nervous tick,mariachi chihuahua, cymbal-playing monkey,hovering skull])));
-        }
-        else if (my_primestat() == $stat[mysticality])
-        {
-            suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+2 mainstat/fight", $familiars[reanimated reanimator,dramatic hedgehog,cheshire bat,pygmy bugbear shaman,hovering sombrero,sugar fruit fairy, uniclops])));
-        }
-        else if (my_primestat() == $stat[muscle])
-        {
-            suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+2 mainstat/fight", $familiars[hunchbacked minion, killer bee, grinning turtle,chauvinist pig, baby mutant rattlesnake])));
-        }
-    }
-    //+25% / +20% meat from monsters
-    if (true)
-    {
-        COTSuggestion [int] suggestions;
-        suggestions.listAppend(COTSuggestionMake("+25% meat", $familiars[Knob Goblin Organ Grinder,Happy Medium,Hobo Monkey]));
-        suggestions.listAppend(COTSuggestionMake("+20% meat", $familiars[Dancing Frog,Psychedelic Bear,Hippo Ballerina,Attention-Deficit Demon,Piano Cat,Coffee Pixie,Obtuse Angel,Hand Turkey,Leprechaun,Grouper Groupie,Mutant Cactus Bud,Jitterbug,Casagnova Gnome]));
-        suggestion_sets.listAppend(COTSuggestionSetMake(suggestions));
-    }
-    //+5 to familiar weight
-    suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+5 familiar weight", $familiars[Gelatinous Cubeling,Pair of Ragged Claws,Spooky Pirate Skeleton,Autonomous Disco Ball,Ghost Pickle on a Stick,Misshapen Animal Skeleton,Animated Macaroni Duck,Penguin Goodfella,Barrrnacle])));
-    //+20% to combat init
-    if (__misc_state["in run"])
-        suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+20% init", $familiars[Teddy Bear,Emo Squid,Evil Teddy Bear,Syncopated Turtle,Untamed Turtle,Mini-Skulldozer,Cotton Candy Carnie,Origami Towel Crane,Feather Boa Constrictor,Levitating Potato,Temporal Riftlet,Squamous Gibberer,Cuddlefish,Teddy Borg])));
-    //+15% to moxie/muscle/mysticality
-    if (__misc_state["in run"])
-    {
-        if (true)
-        {
-            //Either scaling monster levelling, or the NS
-            suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+15% moxie", $familiars[Ninja Snowflake,Nosy Nose,Clockwork Grapefruit,Sabre-Toothed Lime])));
-        }
-        if (my_primestat() == $stat[mysticality] && __misc_state["need to level"])
-        {
-            //Scaling monster levelling
-            suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+15% mysticality", $familiars[Ragamuffin Imp,Inflatable Dodecapede,Scary Death Orb,Snowy Owl,grue])));
-        }
-        else if (my_primestat() == $stat[muscle] && __misc_state["need to level"])
-        {
-            //Scaling monster levelling
-            suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+15% muscle", $familiars[MagiMechTech MicroMechaMech,Angry Goat,Wereturtle,Stab Bat,Wind-up Chattering Teeth,Imitation Crab])));
-        }
-    }
-    //+20%/+15%/+10% to spell damage
-    //Too marginal?
-    /*if (__misc_state["in run"])
-    {
-        COTSuggestion [int] suggestions;
-        suggestions.listAppend(COTSuggestionMake("+20% spell damage", $familiar[mechanical songbird]));
-        suggestions.listAppend(COTSuggestionMake("+15% spell damage", $familiars[Magic Dragonfish,Pet Cheezling,Rock Lobster]));
-        suggestions.listAppend(COTSuggestionMake("+10% spell damage", $familiars[Midget Clownfish,Star Starfish,Baby Yeti,Snow Angel,Wizard Action Figure,Dataspider,Underworld Bonsai,Whirling Maple Leaf,Rogue Program,Howling Balloon Monkey]));
-        suggestion_sets.listAppend(COTSuggestionSetMake(suggestions));
-    }*/
-    //hot wings from reanimator
-    if (true)
-    {
-        string [int] reanimator_reasons;
-        
-        if (__quest_state["Pirate Quest"].state_boolean["need more hot wings"])
-            reanimator_reasons.listAppend("hot wings");
-        
-        if (reanimator_reasons.count() > 0)
-            suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake(reanimator_reasons.listJoinComponents(", ").capitaliseFirstLetter(), $familiar[reanimated reanimator])));
-    }
-    if (__misc_state["in run"])
-        suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("50% block", $familiar[Mariachi Chihuahua])));
-    
-    //knob mushrooms from badger
-    if (__misc_state["in run"] && __misc_state["can eat just about anything"])
-        suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("Knob mushrooms", $familiar[astral badger])));
-        
-    boolean need_cold_res = false;
-    boolean need_all_res = false;
-    //At a-boo peak, but not finished with it:
-    if (__quest_state["Level 9"].state_int["a-boo peak hauntedness"] > 0 && __quest_state["Level 9"].state_boolean["bridge complete"])
-        need_all_res = true;
-    //Climbing the peak:
-    if (__quest_state["Level 8"].state_boolean["Past mine"] && !__quest_state["Level 8"].state_boolean["Groar defeated"] && numeric_modifier("cold resistance") < 5.0)
-        need_cold_res = true;
-    
-    if (__misc_state["in run"] && need_cold_res)
-        suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+3 cold res", $familiar[Flaming Face])));
-    if (need_cold_res && !$familiar[flaming face].have_familiar_replacement())
-        need_all_res = true;
-    if (__misc_state["in run"] && need_all_res)
-        suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+2 all res", $familiars[Bulky Buddy Box,Exotic Parrot,Holiday Log,Pet Rock,Toothsome Rock])));
-        
-    //if (__misc_state["in run"] && availableSpleen() >= 4)
-        //suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("Spleen items", $familiar[Grim Brother])));
-    
-    //slightly powerful:
-    suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+combat", $familiar[Grim Brother])));
-    suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("-combat", $familiar[Grimstone Golem])));
-    
-    if (get_property_int("_grimstoneMaskDropsCrown") == 0)
-        suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("Grimstone mask", $familiar[Grimstone Golem])));
-    if (get_property_int("_grimFairyTaleDropsCrown") < 2 && !(__misc_state["in run"] && spleen_limit() == 0))
-        suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake(pluraliseWordy(clampi(2 - get_property_int("_grimFairyTaleDropsCrown"), 0, 2), "spleen item", "spleen items").capitaliseFirstLetter(), $familiar[grim Brother])));
-    
-    if ($item[blackberry].available_amount() < 3 && $item[blackberry galoshes].available_amount() == 0 && __quest_state["Level 11"].mafia_internal_step < 2)
-        suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("Blackberries for galoshes", $familiars[reassembled blackbird,reconstituted crow])));
-    string [int][int] familiar_options;
-    foreach key in suggestion_sets
-    {
-        boolean found_relevant = false;
-        COTSuggestionSet suggestion_set = suggestion_sets[key];
-        foreach key2 in suggestion_set.suggestions
-        {
-            //Suggest the familiar with the highest weight, under the assumption they're using it more.
-            COTSuggestion suggestion = suggestion_set.suggestions[key2];
-            familiar best_familiar_by_weight = $familiar[none];
-            familiar second_best_familiar_by_weight = $familiar[none];
-            foreach key3 in suggestion.familiars
-            {
-                familiar f = suggestion.familiars[key3];
-                if (f == $familiar[none]) //didn't find it
-                    continue;
-                if (f.have_familiar_replacement())
-                {
-                    if ((best_familiar_by_weight != enthroned_familiar || enthroned_familiar == $familiar[none]) && (best_familiar_by_weight == $familiar[none] || f.familiar_weight() > best_familiar_by_weight.familiar_weight() || f == enthroned_familiar))
-                    {
-                        second_best_familiar_by_weight = best_familiar_by_weight;
-                        best_familiar_by_weight = f;
-                    }
-                    else if (second_best_familiar_by_weight == $familiar[none] || f.familiar_weight() > second_best_familiar_by_weight.familiar_weight())
-                    {
-                        if (best_familiar_by_weight != f)
-                            second_best_familiar_by_weight = f;
-                    }
-                }
-            }
-            if (best_familiar_by_weight != $familiar[none])
-            {
-                string familiar_string;
-                
-                familiar_string = best_familiar_by_weight;
-                if ((enthroned_familiar == best_familiar_by_weight && enthroned_familiar != $familiar[none]) || (bjorned_familiar == best_familiar_by_weight && bjorned_familiar != $familiar[none]))
-                    familiar_string = HTMLGenerateSpanOfClass(best_familiar_by_weight, "r_bold");
-                    
-                if (second_best_familiar_by_weight != $familiar[none] && have_two_available)
-                    familiar_string += "|" + second_best_familiar_by_weight;
-                familiar_options.listAppend(listMake(suggestion.reason, familiar_string));
-                break;
-            }
-        }
-    }
-    if (familiar_options.count() > 0)
-        description.listAppend(HTMLGenerateSimpleTableLines(familiar_options));
-}
-
-void SCOTGenerateResource(ChecklistEntry [int] resource_entries)
-{
-	if ($item[crown of thrones].available_amount() == 0 && $item[Buddy Bjorn].available_amount() == 0)
-		return;
-    if (__misc_state["familiars temporarily blocked"]) //avatar paths
-        return;
-	string [int] description;
-    
-    item crown_item = $item[crown of thrones];
-    if (crown_item.equipped_amount() == 0 && $item[Buddy Bjorn].available_amount() > 0)
-        crown_item = $item[Buddy Bjorn];
-    
-    string image_name = "__item " + crown_item;
-    familiar enthroned_familiar = my_enthroned_familiar();
-    familiar bjorned_familiar = my_bjorned_familiar();
-    
-    if (($item[crown of thrones].equipped_amount() > 0 || $item[Buddy Bjorn].equipped_amount() > 0) || __misc_state["in run"])
-    {
-        SCOTGenerateSuggestions(description);
-    }
-    
-	if (enthroned_familiar != $familiar[none])
-    {
-		description.listAppend(enthroned_familiar + " enthroned.");
-        //image_name = "__familiar " + enthroned_familiar.to_string();
-    }
-    if (bjorned_familiar != $familiar[none])
-		description.listAppend(bjorned_familiar + " bjorned.");
-    //FIXME my_bjorned_familiar() when 16.3
-    
-    string url = "familiar.php";
-    if ($item[crown of thrones].equipped_amount() == 0 && $item[Buddy Bjorn].equipped_amount() == 0)
-        url = "inventory.php?which=2";
-        
-    string header = crown_item;
-    item [int] available_sources;
-    
-    if ($item[Buddy Bjorn].available_amount() > 0)
-        available_sources.listAppend($item[Buddy Bjorn]);
-    if ($item[crown of thrones].available_amount() > 0)
-        available_sources.listAppend($item[crown of thrones]);
-    if (available_sources.count() > 0)
-        header = available_sources.listJoinComponents(", ", "and");
-        
-    if (description.count() > 0)
-        resource_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(header, "", description), 8));
-}
-
-
-void SPShadyPastGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
-{
-    string [int] description;
-    string [int] modifiers;
-    
-    if ($item[White Dragon Fang].available_amount() == 0)
-    {
-        boolean can_acquire_taijijian = ($item[strange goggles].available_amount() > 0 || $item[toy taijijian].available_amount() > 0 || !in_ronin());
-        if ($item[magical battery].available_amount() > 0 && can_acquire_taijijian)
-        {
-            description.listAppend("To make the White Dragon Fang, meatpaste together the toy taijijian with the magical battery.");
-        }
-    }
-    
-    string last_combat = $location[chinatown tenement].lastCombatInLocation();
-    if ($location[chinatown tenement].combat_queue.contains_text("White Bone Demon") && description.count() == 0) //somewhat limited way of detecting that we are finished
-        return;
-    if ($item[Test site key].available_amount() > 0)
-    {
-        //Last segment:
-        
-        int gold_pieces_needed = MAX(0, 30 - $item[gold piece].available_amount());
-        if (last_combat == "the server")
-        {
-            description.listAppend("Fight the White Bone Demon.");
-        }
-        else if (gold_pieces_needed > 0)
-        {
-            //at least one gold piece from a desperate gold farmer is under 21.89% drop rate
-            //needs spading
-            description.listAppend("Adventure in the chinatown tenement, acquire " + pluralise(gold_pieces_needed, "more gold piece", "more gold pieces") + ".");
-            modifiers.listAppend("+400%? item");
-            
-            if (__misc_state["have olfaction equivalent"])
-                modifiers.listAppend("olfact desperate gold farmer");
-        }
-        else
-        {
-            description.listAppend("Adventure in the chinatown tenement, fight the server.|Once the server's panel falls off, use the strange goggles.");
-        }
-    }
-    else if ($item[CEO office card].available_amount() > 0)
-    {
-        //Use to see wheels within wheels.
-        description.listAppend("Use CEO office card.");
-    }
-    else if ($items[makeshift yakuza mask,Novelty tattoo sleeves].items_missing().count() == 0)
-    {
-        //Visit the first floor.
-        item [int] equip_items;
-        foreach it in $items[makeshift yakuza mask,novelty tattoo sleeves]
-        {
-            if (it.equipped_amount() == 0)
-                equip_items.listAppend(it);
-        }
-        if (equip_items.count() > 0 && $location[1st floor\, shiawase-mitsuhama building].turnsAttemptedInLocation() == 0)
-        {
-            description.listAppend("Equip " + equip_items.listJoinComponents(", ", "and") + ".");
-        }
-        else
-        {
-            description.listAppend("Adventure on the floors of the Shiawase-Mitsuhama building, acquire and use cards.");
-            
-            foreach it in $items[zaibatsu level 2 card, zaibatsu level 3 card]
-            {
-                if (it.available_amount() == 0)
-                    continue;
-                description.listAppend("Use " + it + ".");
-            }
-        }
-    }
-    else if ($item[strange goggles].available_amount() > 0)
-    {
-        //Make yakuza mask.
-        if ($item[makeshift yakuza mask].available_amount() == 0)
-        {
-            string line = "Assemble a makeshift yakuza mask with items from the chinatown shops.";
-            
-            item [int] missing_parts_list = missingComponentsToMakeItem($item[makeshift yakuza mask]);
-            if (missing_parts_list.count() == 0)
-                line = "Assemble a makeshift yakuza mask.|(rhinoceros horn + rhinoceros horn) + (furry pink pillow + bottle of limeade)";
-            else
-                line += "|Missing " + missing_parts_list.listJoinComponents(", ", "and") + ".";
-            
-            description.listAppend(line);
-        }
-        if ($item[Novelty tattoo sleeves].available_amount() == 0)
-        {
-            description.listAppend("Buy novelty tattoo sleeves from the chinatown shops.");
-        }
-    }
-    else if ($item[zaibatsu lobby card].available_amount() > 0)
-    {
-        //Triad factory.
-        description.listAppend("Adventure in the sewer triad factory, defeat the Sierpinski brothers.");
-        description.listAppend("Run +item for a possible magical battery.");
-        modifiers.listAppend("+item");
-    }
-    else
-    {
-        //Start of quest.
-        description.listAppend("Adventure in the Chinatown shops, defeat a yakuza courier.");
-    }
-    
-
-	optional_task_entries.listAppend(ChecklistEntryMake("chinatown", "place.php?whichplace=junggate_1", ChecklistSubentryMake("The Suspicious-Looking Guy's Shady Past", modifiers, description),$locations[chinatown shops, chinatown tenement, triad factory,1st floor\, shiawase-mitsuhama building,2nd floor\, shiawase-mitsuhama building,3rd floor\, shiawase-mitsuhama building]));
-}
-
-void SPOldManGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
-{
-    string [int] description;
-    string [int] modifiers;
-    
-    if ($location[The Old Man's Bathtime Adventures].lastNoncombatInLocation() == "Journey's End") //somewhat limited way of detecting that we are finished
-        return;
-    
-    description.listAppend("Sail the seas. Try to one-hit kill the sea monsters.");
-    
-    if ($item[Bloodbath].available_amount() == 0)
-        description.listAppend("Need to finish the area with 50+ crew to acquire Bloodbath.");
-    else if ($item[ornamental sextant].available_amount() == 0)
-        description.listAppend("Need to finish the area with 37+ crew to acquire ornamental sextant.");
-    else if ($item[miniature deck cannon].available_amount() == 0)
-        description.listAppend("Need to finish the area with [24 to 36] crew to acquire miniature deck cannon.");
-    else if ($item[Foam naval trousers].available_amount() == 0)
-        description.listAppend("Need to finish the area with [24 to 36] crew to acquire Foam naval trousers.");
-    else if ($item[Foam commodore's hat].available_amount() == 0)
-        description.listAppend("Need to finish the area with [24 to 36] crew to acquire Foam commodore's hat.");
-    
-    description.listAppend("Choose +crew non-combat options, add monsters if you can.");
-    
-    
-    monster olfacted_monster = get_property("olfactedMonster").to_monster();
-    if ($effect[on the trail].have_effect() == 0)
-        olfacted_monster = $monster[none];
-    boolean olfacted_relevant_monster = ($monsters[ferocious roc,giant man-eating shark,Bristled Man-O-War,The Cray-Kin,Deadly Hydra] contains olfacted_monster);
-    
-    if (__misc_state["have olfaction equivalent"] && !olfacted_relevant_monster)
-    {
-        description.listAppend("Olfact any monster that is not a fearsome giant squid.");
-        modifiers.listAppend("olfaction");
-    }
-        
-    if (my_basestat($stat[mysticality]) >= 200)
-    {
-        if ($item[Mesmereyes&trade; contact lenses].equipped_amount() == 0)
-        {
-            description.listAppend("Wear " + $item[Mesmereyes&trade; contact lenses] + ".");
-        }
-    }
-    else
-    {
-        if ($item[Attorney's badge].equipped_amount() == 0)
-        {
-            description.listAppend("Wear " + $item[Attorney's badge] + ".");
-        }
-        description.listAppend("Possibly level mysticality to 200 to wear " + $item[Mesmereyes&trade; contact lenses] + ", makes this area much easier.");
-    }
-    
-    if ($item[Young Man's Crew Sequester].available_amount() > 0)
-        description.listAppend("Young Man's Crew Sequester available. (+5 crew)");
-    if ($item[Young Man's Cargo Load].available_amount() > 0)
-        description.listAppend("Young Man's Cargo Load available. (+4 crayons, +16 bubbles)");
-    
-    //very limited potato detection:
-    if (my_familiar() != $familiar[levitating potato] && !(my_familiar() == $familiar[fancypants scarecrow] && ($slot[familiar].equipped_item() == $item[swashbuckling pants] || $slot[familiar].equipped_item() == $item[spangly mariachi pants]))  && !(my_familiar() == $familiar[mad hatrack] && $slot[familiar].equipped_item() == $item[spangly sombrero]))
-        description.listAppend("Run a potato familiar of some kind.");
-    
-    
-	optional_task_entries.listAppend(ChecklistEntryMake("__item inflatable duck", "", ChecklistSubentryMake("The Old Man's Bathtime Adventure", modifiers, description),$locations[The Old Man's Bathtime Adventures]));
-}
-
-void SPMeatGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
-{
-    string [int] description;
-    string [int] modifiers;
-    
-    if ($location[The Nightmare Meatrealm].lastCombatInLocation() == "The Beefhemoth") //somewhat limited way of detecting that we are finished
-        return;
-        
-    modifiers.listAppend("+meat");
-    description.listAppend("Adventure until you find the beefhemoth, defeat him.");
-    if ($items[the sword in the steak, meatcleaver].available_amount() == 0)
-        description.listAppend("The Sword in the Steak is from a 0.1% likelyhood non-combat.|To find it, run away from monsters, preferrably with greatest american pants/navel ring of navel gazing.");
-    if ($item[meatcleaver].available_amount() == 0 && $item[the sword in the steak].available_amount() > 0)
-    {
-        if (my_buffedstat($stat[muscle]) < 1000)
-            description.listAppend("To pull the sword from the steak, buff muscle to 1000.");
-        else
-            description.listAppend("Pull the sword from the steak, adventurer.");
-    }
-        
-        
-	optional_task_entries.listAppend(ChecklistEntryMake("meat", "place.php?whichplace=junggate_6", ChecklistSubentryMake("The Meatsmith's Brainspace", modifiers, description),$locations[The Nightmare Meatrealm]));
-}
-
-void SPGourdGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
-{
-    string [int] description;
-    string [int] modifiers;
-    
-    if ($location[the gourd!].lastCombatInLocation() == "Fnord the Unspeakable") //This should work for termination detection?
-        return;
-        
-    modifiers.listAppend("+item?");
-    description.listAppend("Adventure in the gourd.");
-    if ($item[truthsayer].available_amount() == 0)
-    {
-        string [int] components;
-        boolean [item] items_implicitly_have;
-        if ($item[loose blade].available_amount() > 0)
-        {
-            items_implicitly_have[$item[goblin collarbone]] = true;
-            items_implicitly_have[$item[sharp tin strip]] = true;
-        }
-        if ($item[goblin bone hilt].available_amount() > 0)
-        {
-            items_implicitly_have[$item[goblin collarbone]] = true;
-            items_implicitly_have[$item[wad of spider silk]] = true;
-        }
-        if ($item[sticky sword blade].available_amount() > 0)
-        {
-            items_implicitly_have[$item[sharp tin strip]] = true;
-            items_implicitly_have[$item[wad of spider silk]] = true;
-        }
-        foreach it in $items[sharp tin strip, wad of spider silk, goblin collarbone]
-        {
-            string line = it;
-            if (it.available_amount() == 0 && !(items_implicitly_have contains it))
-                line = HTMLGenerateSpanFont(line, "grey");
-            components.listAppend(line);
-        }
-        description.listAppend("Truthsayer is (" + components.listJoinComponents(" + ") + "), found from gourd monsters.");
-    }
-    
-        
-	optional_task_entries.listAppend(ChecklistEntryMake("__item gourd potion", "place.php?whichplace=junggate_2", ChecklistSubentryMake("The Gourd", modifiers, description),$locations[The gourd!]));
-}
-
-void SPCrackpotGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
-{
-    string [int] description;
-    string [int] modifiers;
-    
-    //Despair, rage, envy. Anger, fear, doubt, regret.
-    string url = "place.php?whichplace=junggate_3";
-    string image_name = "__item red pixel";
-    
-    boolean need_byte_sword = !($item[byte].available_amount() + $item[byte].storage_amount() > 0 || $item[flickering pixel].available_amount() + $item[flickering pixel].storage_amount() >= 8);
-    
-    if ($item[flickering pixel].available_amount() == 8)
-    {
-        description.listAppend("Use eight flickering pixels to acquire the sword, byte.");
-    }
-    
-    string [int] bosses_remaining;
-    
-    if ($location[anger man's level].lastCombatInLocation() != "Anger man")
-        bosses_remaining.listAppend("anger man");
-    if ($location[fear man's level].lastCombatInLocation() != "Fear man")
-        bosses_remaining.listAppend("fear man");
-    if ($location[doubt man's level].lastCombatInLocation() != "Doubt man")
-        bosses_remaining.listAppend("doubt man");
-    if ($location[regret man's level].lastCombatInLocation() != "Regret man")
-        bosses_remaining.listAppend("regret man");
-        
-    if (bosses_remaining.count() == 0 && description.count() == 0)
-        return;
-        
-    if (__last_adventure_location == $location[anger man's level] && $location[anger man's level].lastCombatInLocation() != "Anger man")
-    {
-        description.listAppend("Adventure in anger man's level, defeat the boss.");
-        string [int] stats_needed_to_complete_zone;
-        string [int] stats_needed_for_flickering_pixel;
-        foreach s in $stats[muscle, mysticality, moxie]
-        {
-            if (s.my_buffedstat() < 50)
-            {
-                stats_needed_to_complete_zone.listAppend(s.to_string().to_lower_case());
-            }
-            if (s.my_buffedstat() < 500)
-            {
-                stats_needed_for_flickering_pixel.listAppend(s.to_string().to_lower_case());
-            }
-        }
-        
-        float resistance = numeric_modifier("hot resistance");
-        int resistance_needed = MAX(0, floor(25 - resistance));
-        if (resistance < 25.0 && need_byte_sword)
-            description.listAppend("Need " + resistance_needed + " more hot resistance for the first flickering pixel.");
-        
-        if (stats_needed_to_complete_zone.count() > 0)
-            description.listAppend("Need 50 " + stats_needed_to_complete_zone.listJoinComponents(", ", "and") + " to pass first test.");
-        if (stats_needed_for_flickering_pixel.count() > 0 && need_byte_sword)
-            description.listAppend("Need 500 " + stats_needed_for_flickering_pixel.listJoinComponents(", ", "and") + " for the second flickering pixels.");
-            
-            
-    }
-    else if (__last_adventure_location == $location[fear man's level] && $location[fear man's level].lastCombatInLocation() != "Fear man")
-    {
-        description.listAppend("Adventure in fear man's level, defeat the boss.");
-        
-        //50 moxie to complete
-        //300 moxie for first flickering
-        //25 spooky res for second flickering
-        
-        if (my_buffedstat($stat[moxie]) < 50)
-            description.listAppend("Need 50 total moxie pass first test.");
-            
-        if (my_buffedstat($stat[moxie]) < 300 && need_byte_sword)
-            description.listAppend("Need 300 total moxie for the first flickering pixel.");
-            
-        float resistance = numeric_modifier("spooky resistance");
-        int resistance_needed = MAX(0, floor(25 - resistance));
-        if (resistance < 25.0 && need_byte_sword)
-            description.listAppend("Need " + resistance_needed + " more spooky resistance for the second flickering pixel.");
-    }
-    else if (__last_adventure_location == $location[doubt man's level] && $location[doubt man's level].lastCombatInLocation() != "Doubt man")
-    {
-        description.listAppend("Adventure in doubt man's level, defeat the boss.");
-            
-        //weapon damage >= 100 to complete
-        //HP > 100 to complete
-        //weapon damage >= 276(?) for first flickering
-        //HP >= 1000 for second flickering
-        
-        int weapon_damage = numeric_modifier("weapon damage").floor();
-        if (weapon_damage < 100)
-            description.listAppend("Need " + (100 - weapon_damage) + " more weapon damage to pass first test.");
-        if (weapon_damage < 276 && need_byte_sword)
-            description.listAppend("Need " + (276 - weapon_damage) + "(?) more weapon damage for the first flickering pixel.");
-        
-        if (my_hp() < 100)
-            description.listAppend("Need 100 total HP to pass second test.");
-        if (my_hp() < 1000 && need_byte_sword)
-            description.listAppend("Need 1000 total HP for the second flickering pixel.");
-    }
-    else if (__last_adventure_location == $location[regret man's level] && $location[regret man's level].lastCombatInLocation() != "Regret man")
-    {
-        description.listAppend("Adventure in regret man's level, defeat the boss.");
-        
-        //MP >= 100 to complete
-        //total elemental damage >= 50 to complete
-        //MP >= 1000 for first flickering
-        //total elemental damage >= 100 for second flickering
-        
-        if (my_mp() < 100)
-            description.listAppend("Need 100 total MP to pass first test.");
-        if (my_mp() < 1000 && need_byte_sword)
-            description.listAppend("Need 1000 total MP for the first flickering pixel.");
-        //int total_elemental_damage = numeric_modifier("cold damage") + numeric_modifier("hot damage") + numeric_modifier("sleaze damage") + numeric_modifier("spooky damage") + numeric_modifier("stench damage");
-        
-        //FIXME I am not sure if this is correct. How exactly does this test work?
-        string [int] missing_second_test;
-        string [int] missing_second_pixel_test;
-        foreach e in $strings[cold,hot,sleaze,spooky,stench]
-        {
-            string element_html_id = "r_element_" + e;
-            int damage = numeric_modifier(e + " damage").floor();
-            if (damage < 50)
-                missing_second_test.listAppend(HTMLGenerateSpanOfClass((50 - damage) + " more " + e, element_html_id));
-            if (damage < 60)
-                missing_second_pixel_test.listAppend(HTMLGenerateSpanOfClass((60 - damage) + " more " + e, element_html_id));
-            
-        }
-        if (missing_second_test.count() > 0)
-            description.listAppend("Need " + missing_second_test.listJoinComponents(", ", "and") + " damage to pass the second test.");
-        if (missing_second_pixel_test.count() > 0)
-            description.listAppend("Need " + missing_second_pixel_test.listJoinComponents(", ", "and") + " damage for the second flickering pixel.");
-    }
-    
-    string await = " await.";
-    if (bosses_remaining.count() == 1)
-        await = " awaits.";
-    if (bosses_remaining.count() > 0)
-        description.listAppend(bosses_remaining.listJoinComponents(", ", "and").capitaliseFirstLetter() + await);
-    else if ($item[flickering pixel].available_amount() == 8)
-    {
-        url = "inventory.php?which=3";
-        image_name = "__item flickering pixel";
-    }
-    
-    if (__misc_state["in run"])
-        description.listAppend("(this isn't ascension relevant after you've gotten a digital key)");
-        
-	optional_task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake("The Crackpot Mystic's Psychoses", modifiers, description),$locations[anger man's level, fear man's level, doubt man's level, regret man's level]));
-}
-
-
-
-void SPJickGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
-{
-    string [int] description;
-    string [int] modifiers;
-    
-    if ($item[sword of procedural generation].available_amount() > 0)
-        return;
-        
-    description.listAppend("Fight skeletons.");
-    description.listAppend("Make sure you have a monster manuel first; once this tower is complete, there's no way to get these factoids ever again.");
-    
-    //FIXME be more specific
-        
-	optional_task_entries.listAppend(ChecklistEntryMake("__item skeleton", "", ChecklistSubentryMake("Jick's Obsessions", modifiers, description),$locations[the tower of procedurally-generated skeletons]));
-}
-
-
-
-void SPArtistGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
-{
-    string [int] description;
-    string [int] modifiers;
-    
-    
-    foreach e in $effects[My Breakfast With Andrea,The Champion's Breakfast,Tiffany's Breakfast,Breakfast Clubbed]
-    {
-        if (e.have_effect() > 0)
-            return;
-    }
-    //Let's see.
-    //The way this quest works is, you find utensils in the kitchen drawer. (or the mall)
-    //Then, you adventure in the grocery bag, and use a utensil on the monsters.
-    //The utensil you use on the monster determines breakfast.
-    
-    
-    description.listAppend("Make a breakfast.");
-    description.listAppend("To do this, you find utensils in the kitchen drawer, and use them, in combat, on the five different foods in the grocery bag.|Which utensil you use on which food helps determine your breakfast.");
-    
-    
-    string [int] missing_utensils;
-    foreach it in $items[Artist's Butterknife of Regret,Artist's Cookie Cutter of Loneliness,Artist's Cr&egrave;me Brul&eacute;e Torch of Fury,Artist's Spatula of Despair,Artist's Whisk of Misery]
-    {
-        if (it.available_amount() > 0)
-            continue;
-        string utensil_readable_name = it.to_string().replace_string("Artist's ", "");
-        
-        missing_utensils.listAppend(utensil_readable_name);
-    }
-    
-    if (missing_utensils.count() > 0)
-    {
-        modifiers.listAppend("+300% item");
-        description.listAppend("Find utensils in the kitchen drawer, or buy in the mall.|Utensils missing:|*" + missing_utensils.listJoinComponents(", ", "and") + ".");
-    }
-    
-    string [int] breakfasts;
-    
-    string breakfast_line;
-    //Meat & Knife, Bread & Knife, Batter & Spatula, Eggs & Whisk, Potatoes & Knife
-    breakfast_line += "My Breakfast With Andrea: (+meat)";
-    breakfast_line += "|*Meat" + __html_right_arrow_character + "Butterknife";
-    breakfast_line += "|*Bread" + __html_right_arrow_character + "Butterknife";
-    breakfast_line += "|*Batter" + __html_right_arrow_character + "Spatula";
-    breakfast_line += "|*Eggs" + __html_right_arrow_character + "Whisk";
-    breakfast_line += "|*Potatoes" + __html_right_arrow_character + "Butterknife";
-    breakfasts.listAppend(breakfast_line); breakfast_line = "";
-    
-    //Meat & Cutter, Bread & Torch, Batter & Whisk, Eggs & Torch, Potatoes & Torch
-    breakfast_line += "<hr>";
-    breakfast_line += "The Champion's Breakfast: (+init)";
-    breakfast_line += "|*Meat" + __html_right_arrow_character + "Cookie Cutter";
-    breakfast_line += "|*Bread" + __html_right_arrow_character + "Cr&egrave;me Brul&eacute;e Torch";
-    breakfast_line += "|*Batter" + __html_right_arrow_character + "Whisk";
-    breakfast_line += "|*Eggs" + __html_right_arrow_character + "Cr&egrave;me Brul&eacute;e Torch";
-    breakfast_line += "|*Potatoes" + __html_right_arrow_character + "Cr&egrave;me Brul&eacute;e Torch";
-    breakfasts.listAppend(breakfast_line); breakfast_line = "";
-    
-    //Meat & Spatula, Bread & Cutter, Batter & Cutter, Eggs & Spatula, Potatoes & Whisk
-    breakfast_line += "<hr>";
-    breakfast_line += "Tiffany's Breakfast: (+item)";
-    breakfast_line += "|*Meat" + __html_right_arrow_character + "Spatula";
-    breakfast_line += "|*Bread" + __html_right_arrow_character + "Cookie Cutter";
-    breakfast_line += "|*Batter" + __html_right_arrow_character + "Cookie Cutter";
-    breakfast_line += "|*Eggs" + __html_right_arrow_character + "Spatula";
-    breakfast_line += "|*Potatoes" + __html_right_arrow_character + "Whisk";
-    breakfasts.listAppend(breakfast_line); breakfast_line = "";
-    
-    
-    //It's actually anything, but let's pick one:
-    //Meat & Torch, Bread & Whisk, Batter & Knife, Eggs & Cutter, Potatoes & Spatula
-    breakfast_line += "<hr>";
-    breakfast_line += "Breakfast Clubbed: (+ML)";
-    breakfast_line += "|*Meat" + __html_right_arrow_character + "Cr&egrave;me Brul&eacute;e Torch";
-    breakfast_line += "|*Bread" + __html_right_arrow_character + "Whisk";
-    breakfast_line += "|*Batter" + __html_right_arrow_character + "Butterknife";
-    breakfast_line += "|*Eggs" + __html_right_arrow_character + "Cookie Cutter";
-    breakfast_line += "|*Potatoes" + __html_right_arrow_character + "Spatula";
-    breakfasts.listAppend(breakfast_line); breakfast_line = "";
-    
-    description.listAppend("There are four different breakfasts possible:" + HTMLGenerateIndentedText(breakfasts));
-    
-    if ($item[Ginsu&trade;].available_amount() == 0)
-        description.listAppend("Making all four breakfasts in the same ascension lets you acquire the sword, " + $item[Ginsu&trade;] + ".");
-        
-	optional_task_entries.listAppend(ChecklistEntryMake("__effect My Breakfast With Andrea", "place.php?whichplace=junggate_5", ChecklistSubentryMake("The Pretentious Artist's Obsession", modifiers, description),$locations[a kitchen drawer, a grocery bag]));
-}
-
-void SPsychoanalyticGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
-{
-    if (!get_property_boolean("_psychoJarUsed"))
-        return;
-    //Can't detect which jar was used, so check where they've been:
-    if ($locations[chinatown shops, chinatown tenement, triad factory,1st floor\, shiawase-mitsuhama building,2nd floor\, shiawase-mitsuhama building,3rd floor\, shiawase-mitsuhama building] contains __last_adventure_location)
-    {
-        //√
-        SPShadyPastGenerateTasks(task_entries, optional_task_entries, future_task_entries);
-    }
-    if ($locations[The Old Man's Bathtime Adventures] contains __last_adventure_location)
-    {
-        //√
-        SPOldManGenerateTasks(task_entries, optional_task_entries, future_task_entries);
-    }
-    if ($locations[The Nightmare Meatrealm] contains __last_adventure_location)
-    {
-        SPMeatGenerateTasks(task_entries, optional_task_entries, future_task_entries);
-    }
-    if ($locations[The gourd!] contains __last_adventure_location)
-    {
-        SPGourdGenerateTasks(task_entries, optional_task_entries, future_task_entries);
-    }
-    if ($locations[anger man's level, fear man's level, doubt man's level, regret man's level] contains __last_adventure_location)
-    {
-        //√
-        SPCrackpotGenerateTasks(task_entries, optional_task_entries, future_task_entries);
-    }
-    if ($locations[the tower of procedurally-generated skeletons] contains __last_adventure_location)
-    {
-        SPJickGenerateTasks(task_entries, optional_task_entries, future_task_entries);
-    }
-    if ($locations[a kitchen drawer, a grocery bag] contains __last_adventure_location)
-    {
-        //√
-        SPArtistGenerateTasks(task_entries, optional_task_entries, future_task_entries);
-    }
-}
 void SOlfactionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     if (!$skill[Transcendent Olfaction].skill_is_usable())
@@ -26649,89 +25515,7 @@ void SOlfactionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     }
     
 }
-boolean [string] getHolidaysForDate(string realworld_date, int game_day)
-{
-    boolean [string] holidays;
-    
-    if (realworld_date == "0202")
-        holidays["Groundhog Day"] = true;
-    //april fools
-    else if (realworld_date == "0401")
-        holidays["April Fool's Day"] = true;
-    //Talk Like a Pirate Day - september 19th
-    else if (realworld_date == "0919")
-        holidays["Talk Like a Pirate Day"] = true;
-    else if (realworld_date == "1031")
-        holidays["Halloween"] = true;
-    else if (realworld_date == "0214")
-        holidays["Valentine's Day"] = true;
-    else if (realworld_date == "0525")
-        holidays["Towel Day"] = true;
-    
-    //Crimbo
-    if (now_to_string("M").to_int_silent() == 12)
-        holidays["Crimbo"] = true;
-        
-    //Friday the 13th
-    if (format_today_to_string("EEE d") == "Fri 13")
-        holidays["Friday the 13th"] = true;
-    
-    
-    
-    //Festival of Jarlsberg - acquire the party hat? - Jarlsuary 1
-    if (game_day == 0)
-        holidays["Festival of Jarlsberg"] = true;
-    //Valentine's Day! - Frankuary 4
-    else if (game_day == 11)
-        holidays["Valentine's Day"] = true;
-    //St. Sneaky Pete's Day - Starch 3
-    else if (game_day == 18)
-        holidays["St. Sneaky Pete's Day"] = true;
-    //Oyster Egg Day - April 2
-    else if (game_day == 25)
-        holidays["Oyster Egg Day"] = true;
-    //El Dia de Los Muertos Borrachos? just wandering monsters... - Martinus 2
-    else if (game_day == 33)
-        holidays["El Dia de Los Muertos Borrachos"] = true;
-    //Generic Summer Holiday - Bill 3
-    else if (game_day == 42)
-        holidays["Generic Summer Holiday"] = true;
-    //Dependence Day - Bor 4
-    else if (game_day == 51)
-        holidays["Dependence Day"] = true;
-    //Arrrbor Day - Petember 4
-    else if (game_day == 59)
-        holidays["Arrrbor Day"] = true;
-    //Labór Day - Carlvember 6
-    else if (game_day == 69)
-        holidays["Labór Day"] = true;
-    //Halloween / halloween tomorrow, save adventures? - Porktober 8
-    else if (game_day == 79)
-        holidays["Halloween"] = true;
-    //feast of boris...? - Boozember 7
-    else if (game_day == 86)
-        holidays["Feast of Boris"] = true;
-    //Yuletide? - Dougtember 4
-    else if (game_day == 91)
-        holidays["Yuletide"] = true;
-        
-    
-    return holidays;
-}
 
-boolean [string] getHolidaysToday()
-{
-    boolean [string] holidays = getHolidaysForDate(format_today_to_string("MMdd"), gameday_to_int()); //FIXME Y10K error
-    if (holiday() != "")
-        holidays[holiday()] = true;
-    return holidays;
-}
-
-boolean [string] getHolidaysTomorrow()
-{
-    //FIXME support next real-world day
-    return getHolidaysForDate("", ((gameday_to_int() + 1) % 96));
-}
 
 void SHolidayGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
@@ -27205,293 +25989,6 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     }
     
 }
-void SGrimstoneHareGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
-{
-    string [int] description;
-    string [int] modifiers;
-    
-    modifiers.listAppend("mysticality");
-    modifiers.listAppend("spell damage percent");
-    modifiers.listAppend("spell critical percent");
-    int time_remaining = $effect[hare-brained].have_effect();
-    
-    //FIXME deal with coldform / hotform / etc
-    
-    description.listAppend("Adventure on the deserted stretch of road.|Cast elemental-aligned powerful spells on vehicles.|The more damage, the faster you go.");
-    
-    description.listAppend("The speedy/expensive strategy is to nanorhino/ice house/batter up/pantsgiving/crystal skull/etc. banish everything that isn't an ice cream truck, and olfact ice cream trucks.|Then run coldform, buff spell damage, mysticality, and spell damage critical.|Then cast shrap.");
-    
-    string [string] elemental_descriptions;
-    
-    string [int] missing_hobopolis_spells;
-    
-    elemental_descriptions["hot"] = HTMLGenerateSpanOfClass("hot", "r_element_hot");
-    elemental_descriptions["cold"] = HTMLGenerateSpanOfClass("cold", "r_element_cold");
-    elemental_descriptions["spooky"] = HTMLGenerateSpanOfClass("spooky", "r_element_spooky");
-    elemental_descriptions["stench"] = HTMLGenerateSpanOfClass("stench", "r_element_stench");
-    elemental_descriptions["sleaze"] = HTMLGenerateSpanOfClass("sleaze", "r_element_sleaze");
-    
-    
-    boolean have_shrap = $skill[shrap].skill_is_usable();
-    
-    if (have_shrap && $effect[hotform].have_effect() > 0)
-        elemental_descriptions["hot"] = "Shrap (" + elemental_descriptions["hot"] + ")";
-    else if ($skill[volcanometeor showeruption].skill_is_usable())
-        elemental_descriptions["hot"] = "Volcanometeor Showeruption (" + elemental_descriptions["hot"] + ")";
-    else if ($skill[Awesome Balls of Fire].skill_is_usable())
-        elemental_descriptions["hot"] = "Awesome Balls of Fire (" + elemental_descriptions["hot"] + ")";
-    else
-        missing_hobopolis_spells.listAppend("Awesome Balls of Fire");
-    
-    
-    if (have_shrap && $effect[coldform].have_effect() > 0)
-        elemental_descriptions["cold"] = "Shrap (" + elemental_descriptions["cold"] + ")";
-    else if ($skill[Snowclone].skill_is_usable())
-        elemental_descriptions["cold"] = "Snowclone (" + elemental_descriptions["cold"] + ")";
-    else
-        missing_hobopolis_spells.listAppend("Snowclone");
-    
-    if (have_shrap && $effect[spookyform].have_effect() > 0)
-        elemental_descriptions["spooky"] = "Shrap (" + elemental_descriptions["spooky"] + ")";
-    else if ($skill[Raise Backup Dancer].skill_is_usable())
-        elemental_descriptions["spooky"] = "Raise Backup Dancer (" + elemental_descriptions["spooky"] + ")";
-    else
-        missing_hobopolis_spells.listAppend("Raise Backup Dancer");
-    
-    if (have_shrap && $effect[stenchform].have_effect() > 0)
-        elemental_descriptions["stench"] = "Shrap (" + elemental_descriptions["stench"] + ")";
-    else if ($skill[Eggsplosion].skill_is_usable())
-        elemental_descriptions["stench"] = "Eggsplosion (" + elemental_descriptions["stench"] + ")";
-    else
-        missing_hobopolis_spells.listAppend("Eggsplosion");
-    
-    
-    if (have_shrap && $effect[sleazeform].have_effect() > 0)
-        elemental_descriptions["sleaze"] = "Shrap (" + elemental_descriptions["sleaze"] + ")";
-    else if ($skill[Grease Lightning].skill_is_usable())
-        elemental_descriptions["sleaze"] = "Grease Lightning (" + elemental_descriptions["sleaze"] + ")";
-    else
-        missing_hobopolis_spells.listAppend("Grease Lightning");
-    
-    
-    
-    string [int][int] vehicle_descriptions;
-    if (!$monster[Fire truck].is_banished())
-        vehicle_descriptions.listAppend(listMake("Fire truck", elemental_descriptions["hot"]));
-    if (!$monster[ice cream truck].is_banished())
-        vehicle_descriptions.listAppend(listMake("ice cream truck", elemental_descriptions["cold"]));
-    if (!$monster[monster hearse].is_banished())
-        vehicle_descriptions.listAppend(listMake("monster hearse", elemental_descriptions["spooky"]));
-    if (!$monster[sewer tanker].is_banished())
-        vehicle_descriptions.listAppend(listMake("sewer tanker", elemental_descriptions["stench"]));
-    if (!$monster[sketchy van].is_banished())
-        vehicle_descriptions.listAppend(listMake("sketchy van", elemental_descriptions["sleaze"]));
-    
-    monster last_encounter = get_property_monster("lastEncounter");
-    string [int] vehicles = split_string_alternate("Fire truck,ice cream truck,monster hearse,sewer tanker,sketchy van", ",");
-    
-    foreach key in vehicles
-    {
-        monster vehicle = vehicles[key].to_monster();
-        if (vehicle == $monster[none])
-            continue;
-        
-        if (last_encounter != vehicle)
-            continue;
-        
-        vehicle_descriptions[key][0] = HTMLGenerateSpanOfClass(vehicle_descriptions[key][0], "r_bold");
-        vehicle_descriptions[key][1] = HTMLGenerateSpanOfClass(vehicle_descriptions[key][1], "r_bold");
-    }
-    
-    description.listAppend("Spells to cast: " + HTMLGenerateIndentedText(HTMLGenerateSimpleTableLines(vehicle_descriptions)));
-    
-    if (my_familiar() != $familiar[magic dragonfish])
-        description.listAppend("Run magic dragonfish familiar.");
-    else if ($familiar[magic dragonfish].familiar_weight() < 20)
-        description.listAppend("Gain " + (20 - $familiar[magic dragonfish].familiar_weight()) + " pounds on your magic dragonfish.");
-    
-    if (missing_hobopolis_spells.count() > 0)
-        description.listAppend("Could acquire " + missing_hobopolis_spells.listJoinComponents(", ", "or") + " from the mall.");
-    
-    if ($skill[frigidalmatian].skill_is_usable() && $effect[frigidalmatian].have_effect() == 0)
-        description.listAppend("Could cast frigidalmatian. (expensive)");
-    
-    if (my_basestat($stat[mysticality]) < 400)
-        description.listAppend("May want to gain " + (400 - my_basestat($stat[mysticality])) + " more mysticality.");
-    
-    description.listAppend(pluralise(time_remaining, "turn", "turns") + " remaining in race.");
-    
-    
-    
-    
-    //$location[A Deserted Stretch of I-911]
-	optional_task_entries.listAppend(ChecklistEntryMake("__effect hare-brained", "place.php?whichplace=ioty2014_hare", ChecklistSubentryMake("Hare Race", modifiers, description)));
-}
-
-void SGrimstoneStepmotherGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
-{
-    int minutes_to_midnight = get_property_int("cinderellaMinutesToMidnight");
-    if (minutes_to_midnight <= 0)
-        return;
-    
-    if (__misc_state["in run"] && !($locations[the prince's kitchen,the prince's balcony,the prince's lounge,the prince's canapes table,the prince's restroom,the prince's dance floor] contains __last_adventure_location) && minutes_to_midnight < 30)
-        return;
-    
-    int score = get_property_int("cinderellaScore");
-    string [int] description;
-    string [int] modifiers;
-    
-    
-    if (minutes_to_midnight > 0)
-    {
-        string line;
-        line = pluralise(minutes_to_midnight, "minute", "minutes") + " to midnight.";
-        
-        if (score > 0)
-            line += " " + pluralise(score, "point", "points") + " earned.";
-        
-        description.listAppend(line);
-    }
-    
-    /*
-        The idea behind this solution is you want to put three items into cindy's purse.
-        The first two make her ignore her hankerchief and go to the restroom - where the doctored soap gives her puffy eyes - whereupon she returns and confirms the disease rumor.
-        The third is the mouse, which you confront her about. Then later she'll not have the purse at all and go to the restroom again.
-        
-        There are other solutions, but I don't know them. Find them! It's a fun puzzle.
-    */
-    
-    string [int][int] minute_to_action;
-    minute_to_action[30] = listMake("Lounge", "Take a cigar from the sideboard"); //I say, old chap
-    minute_to_action[29] = listMake("Balcony", "Examine the flowers."); //to give to prince
-    minute_to_action[28] = listMake("Canapés Table", "Give your carnation to the Prince."); //causes sneezing fit at 23, 13, 3
-    minute_to_action[27] = listMake("Canapés Table", "Slip something into Cindy's purse while she's distracted", "The cigar."); //Make her leave when sneezing
-    minute_to_action[26] = listMake("Balcony", "Examine the flowers."); //For doctoring
-    minute_to_action[25] = listMake("Restroom", "Rub the flower on the soap."); //For 23 sneezing.
-    minute_to_action[24] = listMake("Lounge", "Start a rumor about Cinderella", "Cinderella has a terrible disease."); //Points!
-    minute_to_action[23] = listMake("Lounge", "Take the empty cigar box."); //Mouse trap setup. 3 points (from sneezing)
-    minute_to_action[22] = listMake("Kitchen", "Inspect the kitchen pantry."); //Acquire cinnamon, notice mouse hole.
-    minute_to_action[21] = listMake("Canapés Table", "Take a piece of cheese."); //Mouse trap setup.
-    minute_to_action[20] = listMake("Kitchen", "Set a trap for the mouse."); //Set up mouse trap with cigar box and cheese. (if we had room, soap too, but that adds one point and there's no room - used in 31-point solution)
-    minute_to_action[19] = listMake("Canapés Table", "Slip something into Cindy's purse while she's distracted", "The cinnamon."); //For 13 sneezing fit, makes her ignore hankerchief.
-    minute_to_action[18] = listMake("Lounge", "Take the whiskey flask."); //To make cindy drunk. 5 points (prince hears rumor)
-    minute_to_action[17] = listMake("Canapés Table", "Pour some whisky into Cindy's glass."); //Cindy's drunk - used at 16, 6, and extra points from soap.
-    minute_to_action[16] = listMake("Balcony", "Examine the flowers."); //For stealing a hairpin from baronness. 6 points (16 behavior hits, she's drunk)
-    minute_to_action[15] = listMake("Balcony", "Speak with the Baroness."); //First step baronness
-    minute_to_action[14] = listMake("Balcony", "Ask the Baroness what troubles her."); //Makes baronness move to dance floor
-    minute_to_action[13] = listMake("Dance Floor", "Give your carnation to the Baroness and steal one of her hairpins."); //Now we can steal a hairpin. 11 points (sneezing fit with disease rumor)
-    minute_to_action[12] = listMake("Restroom", "Look in the medicine cabinet", "Pick the lock", "Take the bottle of syrup of ipecac."); //Which we use to pick the lock of the medicine cabinet, acquiring ipecac.
-    minute_to_action[11] = listMake("Kitchen", "Dose the tray of cannoli with ipecac."); //Ipecac we use here.
-    minute_to_action[10] = listMake("Restroom", "Take some soap."); //We'll be throwing it later.
-    minute_to_action[9] = listMake("Canapés Table", "Offer Cindy your 'customized' cannoli."); //Makes her throw up in eight turns. (no cinnamon)
-    minute_to_action[8] = listMake("Kitchen", "Take the mouse out of the trap."); //It showed up. Hello mouse.
-    minute_to_action[7] = listMake("Canapés Table", "Slip something into Cindy's purse while she's distracted", "The mouse."); //Third time.
-    minute_to_action[6] = listMake("Canapés Table", "Ask Cindy to loan you her handkerchief."); //Hey, is that a mouse in your purse? 13 points. (one from mouse, one from 6 behavior)
-    minute_to_action[5] = listMake("Dance Floor", "Kick some soap at Cindy."); //She's on the dance floor. Let's make her dance. 15 points. (dance!)
-    minute_to_action[4] = listMake("Restroom", "Take some soap."); //Dancing supplies.
-    minute_to_action[3] = listMake("Dance Floor", "Kick some soap at Cindy."); //Dance. 21 points (sneezing, dance!)
-    minute_to_action[2] = listMake("Restroom", "Take some soap."); //Dancing supplies.
-    minute_to_action[1] = listMake("Dance Floor", "Kick some soap at Cindy."); //She throws up. Dance. 32 points. (she threw up, dance!)
-    
-    if (false)
-    {
-        //output full details for reference:
-        string line;
-        foreach minute in minute_to_action
-        {
-            string description = minute_to_action[minute];
-            line = "|" + pluralise(minute, "minute", "minutes") + ":|*" + minute_to_action[minute].listJoinComponents(" > ") + line;
-        }
-        description.listAppend(line);
-    }
-    //FIXME add the other two trophies?
-    
-    
-    //int [int] needed_points_at_spot_to_be_following_correct_path; //score isn't tracked properly, and anyways there's split score per turn
-    
-    /*
-√30	take cigar
-√29	flower
-√28	give flower to prince
-√27	give cigar to cindy
-√26	flower
-√25	doctor soap
-√24	spread rumour (disease)
-√23	take empty cigar box
-√22	inspect kitchen
-√21	get cheese
-√20	set trap
-√19	plant cinnamon in cindy's purse
-√18	get whiskey
-√17	pour whiskey
-√16	flower
-√15	ask baronness
-√14	ask baronness x2
-√13	steal from baronness
-√12	steal ipecac
-√11	make cannoli (mouse available)
-√10	get soap
-√9	give cindy cannoli
-√8	get mouse
-√7	plant mouse
-√6	ask for hankerchief
-√5	kick soap
-√4	get soap
-√3	kick soap
-√2	get soap
-√1	kick soap
-    */
-    
-    boolean output_next_step = true;
-    //if (needed_points_at_spot_to_be_following_correct_path contains minutes_to_midnight && score != needed_points_at_spot_to_be_following_correct_path[minutes_to_midnight]) //they're doing a different route
-        //output_next_step = false;
-    
-    if (minute_to_action contains minutes_to_midnight && output_next_step)
-    {
-        description.listAppend("Next step for 32 points:|*" + minute_to_action[minutes_to_midnight].listJoinComponents(__html_right_arrow_character));
-        description.listAppend("Though, this is a fun puzzle to solve on your own.");
-    }
-    
-    //FIXME add suggestions for other two trophies (partners in crime, ending party early)
-	optional_task_entries.listAppend(ChecklistEntryMake("__item long-stemmed rose", "place.php?whichplace=ioty2014_cindy", ChecklistSubentryMake("The Prince's Ball", modifiers, description)));
-}
-
-void SGrimstoneWolfGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
-{
-    //FIXME I have no idea
-}
-
-void SGrimstoneWitchGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
-{
-    //FIXME I have no idea
-}
-
-void SGrimstoneGnomeGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
-{
-    //FIXME I have no idea
-}
-
-void SGrimstoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
-{
-    //grimstoneMaskPath
-    //rumpelstiltskinTurnsUsed gives number of turns used getting materials. rumpelstiltskinKidsRescued gives the number of children rescued. It is likely that there are more messages than are documented on the wiki, so if some are missing and aren't parsed correctly, please put a note in the forum.
-    //cinderellaMinutesToMidnight gives number of turns remaining. cinderellaScore gives the current score. Also added grimstoneMaskPath which gives the current grimstone content available, "stepmother", "wolf", "witch", "gnome" or "hare".
-    
-    string mask_path = get_property("grimstoneMaskPath").to_lower_case();
-    
-    if ($effect[hare-brained].have_effect() > 0)
-        SGrimstoneHareGenerateTasks(task_entries, optional_task_entries, future_task_entries);
-    if (mask_path == "stepmother")
-        SGrimstoneStepmotherGenerateTasks(task_entries, optional_task_entries, future_task_entries);
-    if (mask_path == "wolf")
-        SGrimstoneWolfGenerateTasks(task_entries, optional_task_entries, future_task_entries);
-    if (mask_path == "witch")
-        SGrimstoneWitchGenerateTasks(task_entries, optional_task_entries, future_task_entries);
-    if (mask_path == "gnome")
-        SGrimstoneGnomeGenerateTasks(task_entries, optional_task_entries, future_task_entries);
-    if (mask_path == "tuxedo")
-        task_entries.listAppend(ChecklistEntryMake("__item long-stemmed rose", "place.php?whichplace=arcade", ChecklistSubentryMake("Believe in yourself", "", ""), -11));
-}
 
 
 void SSneakyPeteGenerateResource(ChecklistEntry [int] resource_entries)
@@ -27779,825 +26276,6 @@ void SSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         optional_task_entries.listAppend(ChecklistEntryMake("__skill Natural Dancer", "da.php?place=gate3", ChecklistSubentryMake("Buy Sneaky Pete skills", "", description), 11));
     }
 }
-//_dnaPotionsMade - int, count of potions made
-//dnaSyringe - int, current phylum of syringe. seems to track if it's become empty? double check
-//_dnaHybrid - boolean, true if you're become a human abomination today
-//r13912 or higher
-
-
-string [phylum] __dna_phylum_to_description;
-string [phylum] __dna_phylum_to_description_colourless;
-item [phylum] __dna_phylum_to_item;
-effect [phylum] __dna_phylum_to_effect;
-phylum [effect] __dna_effect_to_phylum;
-string [int] __dna_intrinsic_ideas;
-
-record DNASuggestion
-{
-    phylum [int] phylums;
-    string relevant_effect_description;
-    string reason;
-    boolean always_show;
-};
-
-
-DNASuggestion DNASuggestionMake(phylum [int] phylums, string relevant_effect_description, string reason, boolean always_show)
-{
-    DNASuggestion result;
-    result.phylums = phylums;
-    result.relevant_effect_description = relevant_effect_description;
-    result.reason = reason;
-    result.always_show = always_show;
-    return result;
-}
-
-DNASuggestion DNASuggestionMake(phylum p, string relevant_effect_description, string reason)
-{
-    phylum [int] phylums;
-    phylums[0] = p;
-    return DNASuggestionMake(phylums, relevant_effect_description, reason, false);
-}
-
-DNASuggestion DNASuggestionMake(phylum p, string relevant_effect_description, string reason, boolean always_show)
-{
-    phylum [int] phylums;
-    phylums[0] = p;
-    return DNASuggestionMake(phylums, relevant_effect_description, reason, always_show);
-}
-
-
-DNASuggestion DNASuggestionMake(boolean [phylum] phylums_in, string relevant_effect_description, string reason)
-{
-    phylum [int] phylums;
-    foreach p in phylums_in
-    {
-        phylums.listAppend(p);
-    }
-    return DNASuggestionMake(phylums, relevant_effect_description, reason, false);
-}
-
-void listAppend(DNASuggestion [int] list, DNASuggestion entry)
-{
-	int position = list.count();
-	while (list contains position)
-		position += 1;
-	list[position] = entry;
-}
-
-boolean DNAHavePhylum(phylum p)
-{
-    if (__dna_phylum_to_effect[p].have_effect() > 0)
-        return true;
-    
-    if (__dna_phylum_to_item[p].available_amount() > 0)
-        return true;
-    
-    return false;
-}
-
-string DNABoldPhylumIfCurrentMonster(phylum p)
-{
-    if (monster_phylum() == p)
-        return HTMLGenerateSpanOfClass(p.to_string(), "r_bold");
-    else
-        return p.to_string();
-}
-
-DNASuggestion [int] __phylum_potion_suggestions;
-DNASuggestion [int] __phylum_potion_reminder_suggestions;
-effect __current_dna_intrinsic = $effect[none];
-
-void SDNAInit()
-{
-    if (get_campground()[$item[Little Geneticist DNA-Splicing Lab]] == 0)
-        return;
-
-
-    //this is not a particulary good idea:
-    __dna_phylum_to_description[$phylum[beast]] = "+30 weapon damage";
-	__dna_phylum_to_description[$phylum[bug]] = "+25% init";
-	__dna_phylum_to_description[$phylum[constellation]] = "+50% meat";
-	__dna_phylum_to_description[$phylum[construct]] = "+5 familiar weight, +50 DA, +5 DR";
-	__dna_phylum_to_description[$phylum[dude]] = "+10% item, +10 muscle/mysticality/moxie";
-	__dna_phylum_to_description[$phylum[elemental]] = "+3 resistances";
-	__dna_phylum_to_description[$phylum[elf]] = "+100% spell damage, +50% candy drops";
-	__dna_phylum_to_description[$phylum[fish]] = "+10 familiar weight";
-	__dna_phylum_to_description[$phylum[goblin]] = "+20% pickpocket, +50% food drops";
-	__dna_phylum_to_description[$phylum[hippy]] = "+1 stat/fight, +20 max MP";
-	__dna_phylum_to_description[$phylum[humanoid]] = "+20% meat, +10% muscle/mysticality/moxie";
-	__dna_phylum_to_description[$phylum[horror]] = "+10% critical hit, +10% critical spell hit";
-	__dna_phylum_to_description[$phylum[mer-kin]] = "+25 ML";
-	__dna_phylum_to_description[$phylum[orc]] = "+1 stat/fight, +40 max HP";
-	__dna_phylum_to_description[$phylum[penguin]] = "+25% item";
-	__dna_phylum_to_description[$phylum[pirate]] = "+50% gear drops, +50% booze drops";
-    
-    
-	__dna_phylum_to_description_colourless[$phylum[demon]] = "+20 hot damage / hot spell damage";
-	__dna_phylum_to_description_colourless[$phylum[hobo]] = "+20 stench damage / stench spell damage";
-	__dna_phylum_to_description_colourless[$phylum[plant]] = "+20 cold damage / cold spell damage";
-	__dna_phylum_to_description_colourless[$phylum[slime]] = "+20 sleaze damage / sleaze spell damage";
-	__dna_phylum_to_description_colourless[$phylum[undead]] = "+20 spooky damage / spooky spell damage";
-    
-	__dna_phylum_to_description[$phylum[demon]] = HTMLGenerateSpanOfClass(__dna_phylum_to_description_colourless[$phylum[demon]], "r_element_hot_desaturated");
-	__dna_phylum_to_description[$phylum[hobo]] = HTMLGenerateSpanOfClass(__dna_phylum_to_description_colourless[$phylum[hobo]], "r_element_stench_desaturated");
-	__dna_phylum_to_description[$phylum[plant]] = HTMLGenerateSpanOfClass(__dna_phylum_to_description_colourless[$phylum[plant]], "r_element_cold_desaturated");
-	__dna_phylum_to_description[$phylum[slime]] = HTMLGenerateSpanOfClass(__dna_phylum_to_description_colourless[$phylum[slime]], "r_element_sleaze_desaturated");
-	__dna_phylum_to_description[$phylum[undead]] = HTMLGenerateSpanOfClass(__dna_phylum_to_description_colourless[$phylum[undead]], "r_element_spooky_desaturated");
-    
-	__dna_phylum_to_description[$phylum[weird]] = "+4 stats/fight";
-    
-    foreach p in __dna_phylum_to_description
-    {
-        if (__dna_phylum_to_description_colourless contains p)
-            continue;
-        __dna_phylum_to_description_colourless[p] = __dna_phylum_to_description[p];
-    }
-    
-    __dna_phylum_to_item[$phylum[beast]] = $item[Gene Tonic: Beast];
-    __dna_phylum_to_item[$phylum[bug]] = $item[Gene Tonic: Insect];
-    __dna_phylum_to_item[$phylum[constellation]] = $item[Gene Tonic: Constellation];
-    __dna_phylum_to_item[$phylum[construct]] = $item[Gene Tonic: Construct];
-    __dna_phylum_to_item[$phylum[demon]] = $item[Gene Tonic: Demon];
-    __dna_phylum_to_item[$phylum[dude]] = $item[Gene Tonic: Dude];
-    __dna_phylum_to_item[$phylum[elemental]] = $item[Gene Tonic: Elemental];
-    __dna_phylum_to_item[$phylum[elf]] = $item[Gene Tonic: Elf];
-    __dna_phylum_to_item[$phylum[fish]] = $item[Gene Tonic: Fish];
-    __dna_phylum_to_item[$phylum[goblin]] = $item[Gene Tonic: Goblin];
-    __dna_phylum_to_item[$phylum[hippy]] = $item[Gene Tonic: Hippy];
-    __dna_phylum_to_item[$phylum[hobo]] = $item[Gene Tonic: Hobo];
-    __dna_phylum_to_item[$phylum[horror]] = $item[Gene Tonic: Horror];
-    __dna_phylum_to_item[$phylum[humanoid]] = $item[Gene Tonic: Humanoid];
-    __dna_phylum_to_item[$phylum[mer-kin]] = $item[Gene Tonic: Mer-kin];
-    __dna_phylum_to_item[$phylum[orc]] = $item[Gene Tonic: Orc];
-    __dna_phylum_to_item[$phylum[penguin]] = $item[Gene Tonic: Penguin];
-    __dna_phylum_to_item[$phylum[pirate]] = $item[Gene Tonic: Pirate];
-    __dna_phylum_to_item[$phylum[plant]] = $item[Gene Tonic: Plant];
-    __dna_phylum_to_item[$phylum[slime]] = $item[Gene Tonic: Slime];
-    __dna_phylum_to_item[$phylum[undead]] = $item[Gene Tonic: Undead];
-    __dna_phylum_to_item[$phylum[weird]] = $item[Gene Tonic: Weird];
-    
-    __dna_phylum_to_effect[$phylum[beast]] = $effect[Human-Beast Hybrid];
-    __dna_phylum_to_effect[$phylum[bug]] = $effect[Human-Insect Hybrid];
-    __dna_phylum_to_effect[$phylum[constellation]] = $effect[Human-Constellation Hybrid];
-    __dna_phylum_to_effect[$phylum[construct]] = $effect[Human-Machine Hybrid];
-    __dna_phylum_to_effect[$phylum[demon]] = $effect[Human-Demon Hybrid];
-    __dna_phylum_to_effect[$phylum[dude]] = $effect[Human-Human Hybrid];
-    __dna_phylum_to_effect[$phylum[elemental]] = $effect[Human-Elemental Hybrid];
-    __dna_phylum_to_effect[$phylum[elf]] = $effect[Human-Elf Hybrid];
-    __dna_phylum_to_effect[$phylum[fish]] = $effect[Human-Fish Hybrid];
-    __dna_phylum_to_effect[$phylum[goblin]] = $effect[Human-Goblin Hybrid];
-    __dna_phylum_to_effect[$phylum[hippy]] = $effect[Human-Hippy Hybrid];
-    __dna_phylum_to_effect[$phylum[hobo]] = $effect[Human-Hobo Hybrid];
-    __dna_phylum_to_effect[$phylum[horror]] = $effect[Human-Horror Hybrid];
-    __dna_phylum_to_effect[$phylum[humanoid]] = $effect[Human-Humanoid Hybrid];
-    __dna_phylum_to_effect[$phylum[mer-kin]] = $effect[Human-Mer-kin Hybrid];
-    __dna_phylum_to_effect[$phylum[orc]] = $effect[Human-Orc Hybrid];
-    __dna_phylum_to_effect[$phylum[penguin]] = $effect[Human-Penguin Hybrid];
-    __dna_phylum_to_effect[$phylum[pirate]] = $effect[Human-Pirate Hybrid];
-    __dna_phylum_to_effect[$phylum[plant]] = $effect[Human-Plant Hybrid];
-    __dna_phylum_to_effect[$phylum[slime]] = $effect[Human-Slime Hybrid];
-    __dna_phylum_to_effect[$phylum[undead]] = $effect[Human-Undead Hybrid];
-    __dna_phylum_to_effect[$phylum[weird]] = $effect[Human-Weird Thing Hybrid];
-    
-    foreach p in __dna_phylum_to_effect
-    {
-        __dna_effect_to_phylum[__dna_phylum_to_effect[p]] = p;
-    }
-    
-    
-    foreach e in __dna_effect_to_phylum
-    {
-        if (e.have_effect() == 2147483647)
-        {
-            __current_dna_intrinsic = e;
-            break;
-        }
-    }
-    
-    
-    if (my_path_id() == PATH_COMMUNITY_SERVICE)
-    {
-        __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[fish], "", "+10 familiar weight for statgain, parrot"));
-        __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[elemental], "", "saves three turns on resistance test"));
-        __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[pirate], "", "~3.3 turns saved on item test"));
-        __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[construct], "", "+5 familiar weight"));
-        __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[elf], "", "spell damage test"));
-        __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[beast], "", "marginal?"));
-        __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[dude], "", "marginal?"));
-        
-        return;
-    }
-    
-    if (__quest_state["Level 7"].state_boolean["alcove needs speed tricks"])
-    {
-        __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[bug], "", "speed up defiled alcove"));
-        __phylum_potion_reminder_suggestions.listAppend(DNASuggestionMake($phylum[bug], "", "speed up defiled alcove"));
-    }
-    
-    if (!__quest_state["Level 12"].state_boolean["Nuns Finished"])
-    {
-        //FIXME only suggest constellation if they've not finished HITS?
-        __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylums[constellation,humanoid], "+meat", "nuns"));
-        __phylum_potion_reminder_suggestions.listAppend(DNASuggestionMake($phylum[constellation], "+meat", "nuns"));
-        __phylum_potion_reminder_suggestions.listAppend(DNASuggestionMake($phylum[humanoid], "+meat", "nuns"));
-        
-    }
-    if (!__quest_state["Level 3"].finished)
-    {
-        __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylums[demon,hobo,plant,undead], "+elemental damage", "tavern NC skipping"));
-    }
-    if (!__quest_state["Level 12"].finished && (!have_outfit_components("War Hippy Fatigues") && !have_outfit_components("Frat Warrior Fatigues")) && !__misc_state["yellow ray potentially available"])
-    {
-        __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[pirate], "+50% gear drop", "war outfit?"));
-    }
-    if (__quest_state["Level 11 Palindome"].mafia_internal_step < 5 && $item[mega gem].available_amount() == 0 && in_hardcore() && !($skill[Check Hair].skill_is_usable() && $skill[Natural Dancer].skill_is_usable())) //avatar of sneaky pete usually can cap this easily... usually
-    {
-        if ($item[wet stunt nut stew].available_amount() == 0 && !(($item[bird rib].available_amount() > 0 && $item[lion oil].available_amount() > 0 || $item[wet stew].available_amount() > 0)))
-        {
-            __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[goblin], "+50% food drop", "Wet stunt nut stew components"));
-            __phylum_potion_reminder_suggestions.listAppend(DNASuggestionMake($phylum[goblin], "+50% food drop", "Wet stunt nut stew components")); //300% drop, very important
-        }
-    }
-    
-    if (true)
-    {
-        string [int] reasons;
-        if (!__quest_state["Level 8"].finished && numeric_modifier("cold resistance") < 5.0)
-            reasons.listAppend("icy peak");
-        if (__quest_state["Level 9"].state_int["a-boo peak hauntedness"] > 0)
-            reasons.listAppend("a-boo peak");
-        
-        if (reasons.count() > 0)
-            __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[elemental], "+3 all resistance", reasons.listJoinComponents(", ", "and").capitaliseFirstLetter()));
-    }
-    
-    if (__misc_state["in run"])
-    {
-        if (__current_dna_intrinsic != __dna_phylum_to_effect[$phylum[construct]] && !__misc_state["familiars temporarily blocked"])
-            __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[construct], "+5 familiar weight, DR/DA", "", true));
-        if (__current_dna_intrinsic != __dna_phylum_to_effect[$phylum[dude]])
-            __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[dude], "+10% item", "", true));
-        
-        if (!__quest_state["Level 13"].state_boolean["Elemental damage race completed"])
-        {
-            string element_needed = __quest_state["Level 13"].state_string["Elemental damage race type"];
-            DNASuggestion element_suggestion;
-            string suggestion_effect = "+" + HTMLGenerateSpanOfClass(element_needed, "r_element_" + element_needed + "_desaturated") + " damage/spell damage";
-            string suggestion_description = "Lair race";
-            if (element_needed == "hot")
-                element_suggestion = DNASuggestionMake($phylum[demon], suggestion_effect, suggestion_description, true);
-            else if (element_needed == "cold")
-                element_suggestion = DNASuggestionMake($phylum[plant], suggestion_effect, suggestion_description, true);
-            else if (element_needed == "sleaze")
-                element_suggestion = DNASuggestionMake($phylum[slime], suggestion_effect, suggestion_description, true);
-            else if (element_needed == "spooky")
-                element_suggestion = DNASuggestionMake($phylum[undead], suggestion_effect, suggestion_description, true);
-            else if (element_needed == "stench")
-                element_suggestion = DNASuggestionMake($phylum[hobo], suggestion_effect, suggestion_description, true);
-            if (element_suggestion.phylums.count() > 0 && element_needed != "")
-            {
-                __phylum_potion_suggestions.listAppend(element_suggestion);
-                __phylum_potion_reminder_suggestions.listAppend(element_suggestion);
-            }
-        }
-    }
-    else
-    {
-        __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[penguin], "", "", true));
-        __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[fish], "", "", true));
-        __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[constellation], "", "", true));
-    }
-    
-    
-    if (__current_dna_intrinsic == $effect[none])
-    {
-        if (!__misc_state["familiars temporarily blocked"])
-        {
-            if (!__misc_state["in run"] || my_path_id() == PATH_HEAVY_RAINS)
-                __dna_intrinsic_ideas.listAppend(DNABoldPhylumIfCurrentMonster($phylum[fish]) + " (+10 familiar weight)");
-            else if ($item[grimstone mask].available_amount() > 0)
-            {
-                __dna_intrinsic_ideas.listAppend(DNABoldPhylumIfCurrentMonster($phylum[fish]) + " (+10 familiar weight, via grimstone mask candy witch's lake)");
-                __dna_intrinsic_ideas.listAppend(DNABoldPhylumIfCurrentMonster($phylum[construct]) + " (+5 familiar weight)");
-            }
-            else
-                __dna_intrinsic_ideas.listAppend(DNABoldPhylumIfCurrentMonster($phylum[construct]) + " (+5 familiar weight)");
-        }
-        if (__misc_state["need to level"])
-        {
-            if ($familiar[astral badger].familiar_is_usable() || $item[astral mushroom].available_amount() > 0 || $effect[Half-Astral].have_effect() > 0 || __misc_state_int["pulls available"] > 0)
-            {
-                string method = "astral badger";
-                if (!$familiar[astral badger].familiar_is_usable() || $item[astral mushroom].available_amount() > 0)
-                    method = "astral mushroom";
-                __dna_intrinsic_ideas.listAppend(DNABoldPhylumIfCurrentMonster($phylum[weird]) + " (+4 stats/fight, via " + method + ")");
-            }
-            else if (__misc_state["sleaze airport available"])
-            {
-                __dna_intrinsic_ideas.listAppend(DNABoldPhylumIfCurrentMonster($phylum[weird]) + " (+4 stats/fight, via sloppy seconds diner)");
-            }
-        }
-        __dna_intrinsic_ideas.listAppend(DNABoldPhylumIfCurrentMonster($phylum[dude]) + " (+10% item)");
-        
-    }
-}
-
-void SDNAGenerateResource(ChecklistEntry [int] resource_entries)
-{
-    if (__misc_state["campground unavailable"])
-        return;
-    if (get_campground()[$item[Little Geneticist DNA-Splicing Lab]] == 0)
-        return;
-    
-    //Player has a genetic engineering lab installed. Let's play with our DNA!
-    
-    phylum syringe_phylum = getDNASyringePhylum();
-    int potions_made = get_property_int("_dnaPotionsMade");
-    int potions_left = MAX(0, 3 - potions_made);
-    boolean became_a_genetic_monstrosity_today = get_property_boolean("_dnaHybrid");
-    
-    
-    //Some ideas:
-    //Intrinsics:
-    //√constructs - +5 familiar weight - also a potion option
-    //√weird - +4 stats/fight - hard to find without badger
-    //√dudes - +10% items
-    
-    //fish - +10 familiar weight - HCO only? possible with agua de vida, but takes at least two turns? 70% NC base, 2 NCs, need two of an NC. this is versus zero-turn +5 familiar weight...
-    //mer-kin - +25 ML - fax only. even with sea access, requires wreck access
-    //orcs/hippies - +1 stat/fight... ??? marginal?
-    //penguins - +25% item - nowhere to be found in-run before level 11
-    
-    //Potions:
-    //√bug - +25% init - modern zmobies, potion, if we can find bugs
-    //√elemental - +3 all res - icy peak, a-boo, stench for twin/bats
-    //√constellation - +50% meat - nuns, potion
-    //√humanoid - +20% meat - more nuns?
-    //√demon - +20 hot damage - skipping tavern NC
-    //√hobo - +20 stench damage - skipping tavern NCs, but isn't there a better source? (the pool)
-    //√plant - +20 cold damage - tavern skipping, somewhat silly, song of north exists
-    //√undead - +20 spooky damage - tavern skipping...?
-    //pirate - +50% gear drops - not sure. potion? seems like it'd be useful in a handful of places
-    
-    
-    
-    
-    
-    ChecklistSubentry [int] subentries;
-    
-    string syringe_description = "";
-    boolean syringe_description_output = false;
-    if (syringe_phylum != $phylum[none])
-    {
-        string line = "Syringe has " + syringe_phylum + "." + " (" + __dna_phylum_to_description_colourless[syringe_phylum] + ")";
-        syringe_description = line;
-    }
-    
-    if (potions_left > 0)
-    {
-        string [int] description;
-        
-        if (syringe_description != "" && !syringe_description_output)
-        {
-            description.listAppend(syringe_description);
-            syringe_description_output = true;
-        }
-        
-        string [int] potion_suggestion_descriptions;
-        foreach key in __phylum_potion_suggestions
-        {
-            DNASuggestion suggestion = __phylum_potion_suggestions[key];
-            
-            phylum [int] needed_phylums;
-            
-            foreach key2 in suggestion.phylums
-            {
-                phylum p = suggestion.phylums[key2];
-                if (!DNAHavePhylum(p) || suggestion.always_show)
-                {
-                    needed_phylums.listAppend(p);
-                }
-            }
-            
-            if (needed_phylums.count() > 0)
-            {
-                string [int] phylum_descriptions;
-                string [int] output_effect_description;
-                
-                foreach key in needed_phylums
-                {
-                    phylum p = needed_phylums[key];
-                    
-                    phylum_descriptions.listAppend(DNABoldPhylumIfCurrentMonster(p));
-                    
-                    if (suggestion.relevant_effect_description.length() == 0)
-                        output_effect_description.listAppend(__dna_phylum_to_description_colourless[p]);
-                }
-                if (suggestion.relevant_effect_description != "")
-                    output_effect_description.listAppend(suggestion.relevant_effect_description);
-                
-                string line;
-                
-                line = phylum_descriptions.listJoinComponents("/");
-                line += ": " + output_effect_description.listJoinComponents("/");
-                if (suggestion.reason != "")
-                    line += " - " + suggestion.reason;
-                
-                potion_suggestion_descriptions.listAppend(line);
-            }
-        }
-        //HTMLGenerateSimpleTableLines
-        if (potion_suggestion_descriptions.count() > 0)
-            description.listAppend("Tonic ideas:|*" + potion_suggestion_descriptions.listJoinComponents("<hr>|*"));
-        subentries.listAppend(ChecklistSubentryMake(pluralise(potions_left, "gene tonic", "gene tonics") + " creatable", "", description));
-    }
-    if (!became_a_genetic_monstrosity_today)
-    {
-        string [int] description;
-        if (syringe_description != "" && !syringe_description_output)
-        {
-            description.listAppend(syringe_description);
-            syringe_description_output = true;
-        }
-        
-        if (__current_dna_intrinsic != $effect[none] && (__dna_effect_to_phylum contains __current_dna_intrinsic))
-            description.listAppend("Currently a " + __dna_effect_to_phylum[__current_dna_intrinsic] + ". (" + __dna_phylum_to_description_colourless[__dna_effect_to_phylum[__current_dna_intrinsic]] + ")");
-        
-        
-        if (__current_dna_intrinsic == $effect[none])
-        {
-            if (__dna_intrinsic_ideas.count() > 0)
-                description.listAppend("Could try " + __dna_intrinsic_ideas.listJoinComponents(", ", "or") + ".");
-        }
-        
-        subentries.listAppend(ChecklistSubentryMake("Genetic intrinsic available", "", description));
-    }
-    
-    int importance = 5;
-    
-    if (potions_left == 0 && __current_dna_intrinsic != $effect[none]) //no potions, already a hybrid
-        importance = 8;
-    
-    string image_name = "__effect Human-Human Hybrid";
-    
-    if (__misc_state["in run"])
-    {
-        foreach p in __dna_phylum_to_item
-        {
-            item it = __dna_phylum_to_item[p];
-            if (it.available_amount() == 0)
-                continue;
-            if (subentries.count() == 0)
-                image_name = "__item Gene Tonic: Constellation";
-            subentries.listAppend(ChecklistSubentryMake(it.pluralise(), "", __dna_phylum_to_description_colourless[p]));
-            
-        }
-    }
-    
-    if (subentries.count() > 0)
-        resource_entries.listAppend(ChecklistEntryMake(image_name, "campground.php?action=workshed", subentries, importance));
-    
-    
-}
-
-void SDNAGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
-{
-    if (__misc_state["campground unavailable"])
-        return;
-    if (get_campground()[$item[Little Geneticist DNA-Splicing Lab]] == 0)
-        return;
-    
-    //Reminders:
-    phylum syringe_phylum = getDNASyringePhylum();
-    
-    
-    if (get_property_int("_dnaPotionsMade") < 3)
-    {
-        if (syringe_phylum != $phylum[none] && !DNAHavePhylum(syringe_phylum))
-        {
-            //Make the resulting tonic:
-            string suggestion_reason;
-            
-            string relevant_effect_description;
-            
-            
-            foreach key in __phylum_potion_reminder_suggestions
-            {
-                DNASuggestion suggestion = __phylum_potion_reminder_suggestions[key];
-                foreach key2 in suggestion.phylums
-                {
-                    phylum suggestion_phylum = suggestion.phylums[key2];
-                    if (syringe_phylum == suggestion_phylum)
-                    {
-                        suggestion_reason = suggestion.reason;
-                        relevant_effect_description = suggestion.relevant_effect_description;
-                    }
-                }
-            }
-            
-            
-            if (suggestion_reason != "")
-            {
-                string description = suggestion_reason.capitaliseFirstLetter() + ".";
-                task_entries.listAppend(ChecklistEntryMake("__effect Human-Human Hybrid", "campground.php?action=workshed", ChecklistSubentryMake("Make gene tonic for " + syringe_phylum, "", description), -11));
-            }
-        }
-        
-        
-        
-        if (monster_phylum() != $phylum[none] && monster_phylum() != syringe_phylum && !DNAHavePhylum(monster_phylum()))
-        {
-            //Syringe a monster when we find it:
-            phylum p = monster_phylum();
-            
-            string suggestion_reason;
-            
-            string relevant_effect_description;
-            
-            
-            foreach key in __phylum_potion_reminder_suggestions
-            {
-                DNASuggestion suggestion = __phylum_potion_reminder_suggestions[key];
-                foreach key2 in suggestion.phylums
-                {
-                    phylum suggestion_phylum = suggestion.phylums[key2];
-                    if (p == suggestion_phylum)
-                    {
-                        suggestion_reason = suggestion.reason;
-                        relevant_effect_description = suggestion.relevant_effect_description;
-                    }
-                }
-            }
-            
-            if (suggestion_reason != "")
-            {
-                if (relevant_effect_description.length() == 0)
-                    relevant_effect_description = __dna_phylum_to_description[p];
-                string description = suggestion_reason.capitaliseFirstLetter() + ".";
-                description += "|" + monster_phylum().to_string().capitaliseFirstLetter() + " (" + relevant_effect_description + ")";
-                task_entries.listAppend(ChecklistEntryMake("__effect Human-Human Hybrid", "", ChecklistSubentryMake("Extract DNA from " + last_monster().to_string().HTMLEscapeString(), "", description), -11));
-            }
-        }
-    }
-    
-    if (__current_dna_intrinsic == $effect[none] && !get_property_boolean("_dnaHybrid"))
-    {
-        string [int] description;
-        if (__dna_intrinsic_ideas.count() > 0)
-            description.listAppend("Could try " + __dna_intrinsic_ideas.listJoinComponents(", ", "or") + ".");
-        optional_task_entries.listAppend(ChecklistEntryMake("__effect Human-Human Hybrid", "campground.php?action=workshed", ChecklistSubentryMake("Hybridize yourself", "", description), 5));
-    }
-}
-void SPlasticVampireFangsGenerateResource(ChecklistEntry [int] resource_entries)
-{
-    if (!$item[plastic vampire fangs].is_unrestricted())
-        return;
-    if ($items[plastic vampire fangs,Interview With You (a Vampire)].available_amount() == 0)
-        return;
-    item fang_source = $item[plastic vampire fangs];
-    string url = "";
-    string separator = " " + __html_right_arrow_character + " ";
-    if ($item[plastic vampire fangs].available_amount() == 0)
-    {
-        fang_source = $item[Interview With You (a Vampire)];
-            url = "inventory.php?which=3";
-    }
-    else
-    {
-        url = "place.php?whichplace=town";
-        if ($item[plastic vampire fangs].equipped_amount() == 0)
-        {
-            url = "inventory.php?which=2";
-        }
-    }
-    
-    if (!get_property_boolean("_interviewIsabella") && __misc_state["in run"] && __misc_state["need to level"])
-    {
-        string [int] description;
-        int stats_gained = MIN(500, 4 * my_basestat(my_primestat())) * (1.0 + numeric_modifier(my_primestat().to_string() + " Experience Percent") / 100.0);
-        
-        description.listAppend(stats_gained + " " + my_primestat().to_lower_case() + " gained, one adventure cost.");
-        if ($item[plastic vampire fangs].available_amount() == 0)
-        {
-            description.listAppend("Vamp out via Interview With You (a Vampire).");
-        }
-        else
-        {
-            if ($item[plastic vampire fangs].equipped_amount() == 0)
-            {
-                description.listAppend("Equip plastic vampire fangs, then vamp out in Seaside Town.");
-            }
-            else
-                description.listAppend("Vamp out in Seaside Town.");
-        }
-        
-        if (my_primestat() == $stat[muscle])
-            description.listAppend("Visit Isabella's" + separator + "Drain Her.");
-        else if (my_primestat() == $stat[mysticality])
-            description.listAppend("Visit Isabella's" + separator + "Tell Her How You Feel" + separator + "Find Other Prey.");
-        else if (my_primestat() == $stat[moxie])
-            description.listAppend("Visit Isabella's" + separator + "Redirect Your Desire" + separator + "Go to the Bar.");
-        
-        
-        resource_entries.listAppend(ChecklistEntryMake("__item " + fang_source, url, ChecklistSubentryMake("Vampire stats", "", description), 5));
-        
-    }
-
-    if (!__misc_state["in run"])
-    {
-        string [int] description;
-        if ($item[plastic vampire fangs].available_amount() == 0)
-        {
-            description.listAppend("Vamp out via Interview With You (a Vampire).");
-        }
-        else
-        {
-            if ($item[plastic vampire fangs].equipped_amount() == 0)
-            {
-                description.listAppend("Equip plastic vampire fangs, then vamp out in Seaside Town.");
-            }
-            else
-                description.listAppend("Vamp out in Seaside Town.");
-        }
-        
-        int vamp_outs_remaining = 0;
-        
-        //Disabled, unless there's something useful about these to be reminded of in aftercore:
-        /*if (!get_property_boolean("_interviewVlad"))
-        {
-            description.listAppend("Vlad's Boutique - DR or spell damage or weapon damage buff.");
-            vamp_outs_remaining += 1;
-        }
-        if (!get_property_boolean("_interviewIsabella"))
-        {
-            description.listAppend("Isabella's - mainstat gain, meat.");
-            vamp_outs_remaining += 1;
-        }*/
-        if (!get_property_boolean("_interviewMasquerade"))
-        {
-            string [int] masquerade_description;
-            if ($item[Sword of the Brouhaha Prince].available_amount() == 0)
-            {
-                string [int] interview_questions = listMake("Warehouse", "Growl", "The Clash", "Motorcycle", "Lager");
-                string [int] nomination = listMake("Malkovich", "Torremolinos", "Brouhaha", "Ventrilo");
-                string item_name = "Sword of the Brouhaha Prince";
-                masquerade_description.listAppend(item_name + "|*Interview: " + interview_questions.listJoinComponents(separator) + "<hr>|*Nomination order: " + nomination.listJoinComponents(separator));
-            }
-            if ($item[Chalice of the Malkovich Prince].available_amount() == 0)
-            {
-                string [int] interview_questions = listMake("Laugh Factory", "Giggle", "Glass breaking", "Wheelbarrow", "Blood");
-                string [int] nomination = listMake("Torremolinos", "Ventrilo", "Brouhaha", "Malkovich");
-                string item_name = "Chalice of the Malkovich Prince";
-                
-                masquerade_description.listAppend(item_name + "|*Interview: " + interview_questions.listJoinComponents(separator) + "<hr>|*Nomination order: " + nomination.listJoinComponents(separator));
-            }
-            if ($item[Sceptre of the Torremolinos Prince].available_amount() == 0)
-            {
-                string [int] interview_questions = listMake("Loft", "Flirty", "Mozart", "Carriage", "Absinthe");
-                string [int] nomination = listMake("Malkovich", "Ventrilo", "Torremolinos", "Brouhaha");
-                string item_name = "Sceptre of the Torremolinos Prince";
-                masquerade_description.listAppend(item_name + "|*Interview: " + interview_questions.listJoinComponents(separator) + "<hr>|*Nomination order: " + nomination.listJoinComponents(separator));
-            }
-            if ($item[Medallion of the Ventrilo Prince].available_amount() == 0)
-            {
-                string [int] interview_questions = listMake("Penthouse", "Terse", "No time", "Limo", "Espresso");
-                string [int] nomination = listMake("Ventrilo", "Malkovich", "Brouhaha", "Torremolinos");
-                string item_name = "Medallion of the Ventrilo Prince";
-                masquerade_description.listAppend(item_name + "|*Interview: " + interview_questions.listJoinComponents(separator) + "<hr>|*Nomination order: " + nomination.listJoinComponents(separator));
-            }
-            if (true)
-            {
-                string [int] interview_questions = listMake("Warehouse", "Growl", "The Clash", "Motorcycle", "Lager");
-                string [int] nomination = listMake("Ventrilo", "Brouhaha", "Torremolinos", "Malkovich");
-                string item_name = "Your own black heart (restores 100% HP/MP)";
-                masquerade_description.listAppend(item_name + "|*Interview: " + interview_questions.listJoinComponents(separator) + "<hr>|*Nomination order: " + nomination.listJoinComponents(separator));
-            }
-            if ($item[plastic vampire fangs].available_amount() > 0)
-            {
-                string [int] interview_questions = listMake("Warehouse", "Growl", "The Clash", "Motorcycle", "Lager");
-                string [int] nomination = listMake("Ventrilo", "Malkovich", "Torremolinos", "Brouhaha");
-                string item_name = "Interview With You (a Vampire)";
-                masquerade_description.listAppend(item_name + "|*Interview: " + interview_questions.listJoinComponents(separator) + "<hr>|*Nomination order: " + nomination.listJoinComponents(separator));
-            }
-            //description.listAppend("The Masquerade." + HTMLGenerateIndentedText(masquerade_description));
-            description.listAppendList(masquerade_description);
-            vamp_outs_remaining += 1;
-        }
-        
-        if (vamp_outs_remaining > 0)
-        {
-            //resource_entries.listAppend(ChecklistEntryMake("__item " + fang_source, url, ChecklistSubentryMake(pluralise(vamp_outs_remaining, "vamp out", "vamp outs"), "", description), 8));
-            resource_entries.listAppend(ChecklistEntryMake("__item " + fang_source, url, ChecklistSubentryMake("Vampire masquerade", "", description), 8));
-        }
-    }
-}
-
-void SSpeakeasyGenerateResource(ChecklistEntry [int] resource_entries)
-{
-    if (!__misc_state["VIP available"])
-        return;
-
-    if (!(__misc_state["can drink just about anything"] && get_property_int("_speakeasyDrinksDrunk") <3 && mafiaIsPastRevision(14155) && availableDrunkenness() >= 0))
-        return;
-        
-    //speakeasy:
-    /*
-        √Lucky lindy - good 1-potency, gives semi-rare. crucial in zombie slayer
-        Bee's Knees - awesome 2-potency, 25 turns of +100% all stats
-        √Sockdollager - awesome 2-potency, 25 turns of (+20 all elemental damage, +40 all elemental spell damage, +20 ranged/weapon damage, +50% weapon/spell damage, +50 spell damage
-        Flivver - 20,000 meat epic 2-potency, restores mana (not useful in-run)
-        √Hot Socks - awesome 3-potency, 50 turns of (+2 familiar experience, +10 familiar weight, +20 familiar damage)
-        √Sloppy Jalopy - 100,000 meat awesome 5-potency, gives skill Hollow Leg (+1 liver capacity) for aftercore
-        Phonus Balonus - +fights/+adventures
-        Ish Kabibble - +3 all res, +DA/DR
-    */
-    int drinks_remaining = MAX(3 - get_property_int("_speakeasyDrinksDrunk"), 0);
-    
-    string [int][int] options;
-    
-    options.listAppend(listMake("<strong>Drink</strong>", "<strong>Size</strong>", "<strong>Description</strong>"));
-    if (CounterLookup("Semi-rare").CounterIsRange())
-        options.listAppend(listMake("Lucky Lindy", "1", "Semi-rare number"));
-    
-    //FIXME every drink
-    //FIXME gray out drinks we can't drink at the moment (drunkenness, meat)
-    
-    if ($effect[Hip to the Jive].have_effect() == 0 && !__misc_state["familiars temporarily blocked"] && __misc_state["in run"])
-    {
-        string [int] description;
-        description.listAppend("+10 familiar weight");
-        if (familiar_weight(my_familiar()) < 20)
-            description.listAppend("+2 familiar exp/fight");
-        options.listAppend(listMake("Hot Socks", "3", description.listJoinComponents("|")));
-    }
-    
-    if (!__misc_state["in run"] && !$skill[Hollow Leg].skill_is_usable())
-        options.listAppend(listMake("Sloppy Jalopy", "5", "+1 liver capacity skill|Very expensive"));
-    
-    
-    string [int] reasons_to_sockdollager;
-    if (!__quest_state["Level 3"].finished)
-    {
-        boolean can_skip_cold = numeric_modifier("Cold Damage") >= 20.0;
-        boolean can_skip_hot = numeric_modifier("Hot Damage") >= 20.0;
-        boolean can_skip_spooky = numeric_modifier("Spooky Damage") >= 20.0;
-        boolean can_skip_stench = numeric_modifier("Stench Damage") >= 20.0;
-        if (!can_skip_cold || !can_skip_hot || !can_skip_spooky || !can_skip_stench)
-            reasons_to_sockdollager.listAppend("tavern NC skipping");
-    }
-    
-    if (!__quest_state["Level 13"].state_boolean["Elemental damage race completed"])
-        reasons_to_sockdollager.listAppend("Elemental damage race");
-    
-    if (my_path_id() == PATH_HEAVY_RAINS && !__quest_state["Level 13"].finished)
-        reasons_to_sockdollager.listAppend("fighting rain king");
-    
-    if (reasons_to_sockdollager.count() > 0)
-        options.listAppend(listMake("Sockdollager", "2", reasons_to_sockdollager.listJoinComponents(", ", "and").capitaliseFirstLetter()));
-    
-    if (__misc_state["in run"] && my_meat() >= 20000)
-        options.listAppend(listMake("Flivver", "2", "Epic-level drunkenness."));
-    
-    if (__misc_state["need to level"])
-    {
-        string drink_name = "";
-        
-        if (my_primestat() == $stat[muscle])
-        {
-            drink_name = "Glass of \"milk\"";
-        }
-        else if (my_primestat() == $stat[mysticality])
-        {
-            drink_name = "Cup of \"tea\"";
-        }
-        else if (my_primestat() == $stat[moxie])
-        {
-            drink_name = "Thermos of \"whiskey\"";
-        }
-        if (drink_name != "")
-        {
-            float mainstat_gain = 87.5 * (1.0 + numeric_modifier(my_primestat().to_string() + " Experience Percent") / 100.0);
-            string description = mainstat_gain.roundForOutput(0) + " mainstat";
-            //if (my_path_id() != PATH_SLOW_AND_STEADY)
-                //description += "";
-            options.listAppend(listMake(drink_name, "1", description));
-        }
-        
-    }
-    
-    if (hippy_stone_broken())
-    {
-        options.listAppend(listMake("Phonus Balonus", "3", "+fights/+adventures"));
-    }
-    
-    string [int] description;
-    if (options.count() > 1)
-        description.listAppend(HTMLGenerateSimpleTableLines(options));
-    
-    if (__misc_state["in run"] || drinks_remaining > 0)
-        resource_entries.listAppend(ChecklistEntryMake("__item observational glasses", "clan_viplounge.php?action=speakeasy", ChecklistSubentryMake(pluralise(drinks_remaining, "speakeasy drink", "speakeasy drinks"), "", description), 8)); //the eyes of T.J. Eckleburg
-    
-}
 void SHeavyRainsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
 	if (my_path_id() != PATH_HEAVY_RAINS)
@@ -28829,8 +26507,235 @@ void SHeavyRainsGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__item catfish whiskers", "inventory.php?which=3", ChecklistSubentryMake(pluralise($item[catfish whiskers]), "", "40 turns of -washaway"), 7));
     }
 }
+Record Banish
+{
+    monster banished_monster;
+    string banish_source;
+    int turn_banished;
+    int banish_turn_length;
+    string custom_reset_conditions;
+};
+
+void listAppend(Banish [int] list, Banish entry)
+{
+	int position = list.count();
+	while (list contains position)
+		position += 1;
+	list[position] = entry;
+}
+
+int BanishTurnsLeft(Banish b)
+{
+    if (b.banish_turn_length == -1)
+        return 2147483647;
+    return b.turn_banished + b.banish_turn_length - my_turncount();
+}
+
+static
+{
+    int [string] __banish_source_length;
+    //FIXME request this be exposed in ASH?
+    __banish_source_length["banishing shout"] = -1;
+    __banish_source_length["batter up!"] = -1;
+    __banish_source_length["chatterboxing"] = 20;
+    __banish_source_length["classy monkey"] = 20;
+    __banish_source_length["cocktail napkin"] = 20;
+    __banish_source_length["crystal skull"] = 20;
+    __banish_source_length["deathchucks"] = -1;
+    __banish_source_length["dirty stinkbomb"] = -1;
+    __banish_source_length["divine champagne popper"] = 5;
+    __banish_source_length["harold's bell"] = 20;
+    __banish_source_length["howl of the alpha"] = -1;
+    __banish_source_length["ice house"] = -1;
+    __banish_source_length["louder than bomb"] = 20;
+    __banish_source_length["nanorhino"] = -1;
+    __banish_source_length["pantsgiving"] = 30;
+    __banish_source_length["peel out"] = -1;
+    __banish_source_length["pulled indigo taffy"] = 20;
+    __banish_source_length["smoke grenade"] = 20;
+    __banish_source_length["spooky music box mechanism"] = -1;
+    __banish_source_length["staff of the standalone cheese"] = -1;
+    __banish_source_length["stinky cheese eye"] = 10;
+    __banish_source_length["thunder clap"] = 40;
+    __banish_source_length["v for vivala mask"] = 10;
+    __banish_source_length["walk away from explosion"] = 30;
+    __banish_source_length["tennis ball"] = 30;
+    __banish_source_length["curse of vacation"] = -1;
+    __banish_source_length["ice hotel bell"] = -1; //think?
+    __banish_source_length["bundle of &quot;fragrant&quot; herbs"] = -1;
+}
+
+Banish [int] __banishes_active_cache;
+string __banishes_active_cache_cached_monsters_string;
+
+Banish [int] BanishesActive()
+{
+    //banishedMonsters(user, now 'a.m.c. gremlin:ice house:2890', default )
+    
+    string banished_monsters_string = get_property("banishedMonsters");
+    
+    if (banished_monsters_string == __banishes_active_cache_cached_monsters_string && __banishes_active_cache_cached_monsters_string != "")
+        return __banishes_active_cache;
+    
+    __banishes_active_cache_cached_monsters_string = ""; //invalidate the cache
+    
+    Banish [int] result;
+    
+    string [int] banished_monsters_string_split = banished_monsters_string.split_string(":");
+
+    foreach key, s in banished_monsters_string_split
+    {
+        if (s.length() == 0)
+            continue;
+        if (key % 3 != 0)
+            continue;
+        //string [int] entry = s.split_string(":");
+        
+        //if (entry.count() != 3)
+            //continue;
+        if (!(banished_monsters_string_split contains (key + 1)) || !(banished_monsters_string_split contains (key + 2)))
+            continue;
+        
+        Banish b;
+        b.banished_monster = banished_monsters_string_split[key + 0].to_monster();
+        b.banish_source = banished_monsters_string_split[key + 1];
+        b.turn_banished = banished_monsters_string_split[key + 2].to_int();
+        b.banish_turn_length = 0;
+        if (__banish_source_length contains b.banish_source)
+            b.banish_turn_length = __banish_source_length[b.banish_source];
+        if (b.banish_source == "batter up!" || b.banish_source == "deathchucks" || b.banish_source == "dirty stinkbomb" || b.banish_source == "nanorhino" || b.banish_source == "spooky music box mechanism")
+            b.custom_reset_conditions = "rollover";
+        result.listAppend(b);
+    }
+    
+    __banishes_active_cache_cached_monsters_string = banished_monsters_string;
+    __banishes_active_cache = result;
+    
+    return result;
+}
+
+
+Banish [int] BanishesActiveInLocation(location l)
+{
+    boolean [monster] location_monsters;
+    foreach key, m in l.get_monsters()
+        location_monsters[m] = true;
+    Banish [int] banishes_active = BanishesActive();
+    Banish [int] result;
+    foreach key, b in banishes_active
+    {
+        if (location_monsters contains b.banished_monster)
+            result.listAppend(b);
+    }
+    return result;
+}
+
+int BanishShortestBanishForLocation(location l)
+{
+    Banish [int] active_banishes = BanishesActiveInLocation(l);
+    int minimum = 2147483647;
+    foreach key, b in active_banishes
+    {
+        minimum = MIN(minimum, b.BanishTurnsLeft());
+    }
+    return minimum;
+}
+
+Banish BanishForMonster(monster m)
+{
+    foreach key, b in BanishesActive()
+    {
+        if (b.banished_monster == m)
+            return b;
+    }
+    Banish blank;
+    return blank;
+}
+
+string BanishSourceForMonster(monster m)
+{
+    return BanishForMonster(m).banish_source;
+}
+
+boolean [string] activeBanishNamesForLocation(location l)
+{
+    Banish [int] banishes_active = BanishesActive();
+    
+    string [monster] names;
+    foreach key, banish in banishes_active
+    {
+        if (banish.banished_monster.is_banished()) //zuko wrote this code
+        {
+            names[banish.banished_monster] = banish.banish_source;
+        }
+    }
+    
+    boolean [string] banish_names;
+    foreach key, m in l.get_monsters()
+    {
+        if (names contains m)
+            banish_names[names[m]] = true;
+        if (my_path_id() == PATH_ONE_CRAZY_RANDOM_SUMMER)
+        {
+            foreach m2 in names
+            {
+                if (m2.to_string().to_lower_case().contains_text(m.to_string().to_lower_case())) //FIXME complete hack, wrong, substrings, 1337, etc
+                    banish_names[names[m2]] = true;
+            }
+        }
+    }
+    return banish_names;
+}
+
+int BanishLength(string banish_name)
+{
+    int length = __banish_source_length[banish_name];
+    if (length < 0)
+        length = 2147483647;
+    return length;
+}
+
 void SEventsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
+}
+
+void SCrimbo2015GenerateResource(ChecklistEntry [int] resource_entries)
+{
+    string year_and_month = format_today_to_string("YYYYMM");
+    if (year_and_month != "201512")
+        return;
+    if (mafiaIsPastRevision(16544) && !in_ronin())
+    {
+        int herb_uses_left = clampi(10 - get_property_int("_fragrantHerbsUsed"), 0, 10);
+        if (lookupItem("bundle of &quot;fragrant&quot; herbs").available_amount() > 0 && herb_uses_left > 0)
+        {
+            string [int] description;
+            description.listAppend("Free run/banish three monsters at once.");
+            monster [int] banished_monsters;
+            foreach key, b in BanishesActive()
+            {
+                if (b.banish_source == "bundle of &quot;fragrant&quot; herbs")
+                {
+                    banished_monsters.listAppend(b.banished_monster);
+                }
+            }
+            if (banished_monsters.count() > 0)
+                description.listAppend("Have " + banished_monsters.listJoinComponents(", ", "and") + " banished.");
+            resource_entries.listAppend(ChecklistEntryMake("__item bundle of &quot;fragrant&quot; herbs", "", ChecklistSubentryMake(pluralise(herb_uses_left, "fragrant herb banish", "fragrant herb banishes"), "", description), 3));
+        }
+        int stockpile_uses_left = clampi(10 - get_property_int("_nuclearStockpileUsed"), 0, 10);
+        if (lookupItem("nuclear stockpile").available_amount() > 0 && stockpile_uses_left > 0)
+        {
+            string [int] description;
+            description.listAppend("Does not cost a turn.");
+            resource_entries.listAppend(ChecklistEntryMake("__item nuclear stockpile", "", ChecklistSubentryMake(pluralise(stockpile_uses_left, "nuclear stockpile instakill", "nuclear stockpile instakills"), "", description), 3));
+        }
+    }
+}
+
+void SEventsGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    SCrimbo2015GenerateResource(resource_entries);
 }
 void SBugbearInvasionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
@@ -29957,379 +27862,6 @@ void SActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] resource_entries
         }
     }
 }
-void SMayoClinicGenerateResource(ChecklistEntry [int] resource_entries)
-{
-    if (__misc_state["campground unavailable"])
-        return;
-    if (get_campground()[$item[portable Mayo Clinic]] == 0 || in_bad_moon())
-        return;
-    
-    //mayoLevel
-    int mayo_level = get_property_int("mayoLevel");
-    
-    if (availableFullness() > 0)
-    {
-        //stuff:
-        //Mayonex - food adventures -> blood mayo (???)
-        //Mayodiol -> one fullness becomes one drunkenness
-        //Mayostat -> one-fullness same quality restore
-        //Mayozapine -> increased stat gains
-        //Mayoflex -> +1 adventure
-        //Mayo Minder™ -> um... I guess it uses the above things for you. reminds me of buying the autorefueler in EV..
-    }
-    
-    if (!get_property_boolean("_mayoDeviceRented"))
-    {
-        string [int] description;
-        //sphygmayomanometer - +(20 + mayo_level)% stats
-        //tomayohawk-style reflex hammer - reusable combat item. stagger, mayo-level sleaze damage
-        //mayo lance - YR combat item, requires at least one blood mayo
-        //miracle whip - nice day two/three equip. +50% init, +50% item, +100% meat, +100% wait, I only get one of these a run?
-        
-        string line = "Lasts the rest of the day. Can only choose one.";
-        if (my_meat() < 2500)
-            line += "|Need at least 2500 meat first.";
-        description.listAppend(line);
-        
-        string [int][int] choices;
-        
-        choices.listAppend(listMake("Sphygmayomanometer", "+" + (20 + mayo_level) + "% all stats"));
-        choices.listAppend(listMake("Tomayohawk-style reflex hammer", "Reusable combat item.|Staggers and deals mayo-level sleaze damage."));
-        if (!__misc_state["yellow ray available"])
-            choices.listAppend(listMake("Mayo lance", "Yellow ray. " + HTMLGenerateDivOfClass("Uses up blood mayo.", "r_word_wrap_group")));
-        
-        if (!get_property_boolean("mayoWhipRented"))
-        {
-            choices.listAppend(listMake("Miracle whip", "Weapon, usable " + HTMLGenerateSpanFont("once", "red") + " per run.|+50% item, +100% meat, +50% init."));
-        }
-        description.listAppend(HTMLGenerateSimpleTableLines(choices));
-        resource_entries.listAppend(ChecklistEntryMake("__item sphygmayomanometer", "campground.php?action=workshed", ChecklistSubentryMake("Mayo Device Rental", "", description), 8));
-    }
-    if (!get_property_boolean("_mayoTankSoaked") && __misc_state["in run"])
-    {
-        string [int] description;
-        string [int] benefits;
-        if (my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING)
-            benefits.listAppend("HP restore");
-        benefits.listAppend("+2 all resistance");
-        description.listAppend("Gives " + benefits.listJoinComponents(", ", "and") + ".");
-        resource_entries.listAppend(ChecklistEntryMake("__item bubblin' chemistry solution", "campground.php?action=workshed", ChecklistSubentryMake("Mayo Tank Soak", "", description), 8));
-    }
-}
-record DOECSummon
-{
-    string [int] cards;
-    string reason;
-};
-
-DOECSummon DOECSummonMake(string [int] cards, string reason)
-{
-    DOECSummon summon;
-    summon.cards = cards;
-    summon.reason = reason;
-    return summon;
-}
-
-DOECSummon DOECSummonMake(string card, string reason)
-{
-    string [int] cards;
-    cards.listAppend(card);
-    return DOECSummonMake(cards, reason);
-}
-
-void listAppend(DOECSummon [int] list, DOECSummon entry)
-{
-	int position = list.count();
-	while (list contains position)
-		position += 1;
-	list[position] = entry;
-}
-
-void SDeckOfEveryCardGenerateResource(ChecklistEntry [int] resource_entries)
-{
-    if ($item[Deck of Every Card].available_amount() == 0 || !$item[Deck of Every Card].is_unrestricted())
-        return;
-    
-    if (!mafiaIsPastRevision(16018))
-        return;
-    
-    int card_summons_left = clampi(15 - get_property_int("_deckCardsDrawn"), 0, 15);
-    
-    /*
-    In-run:
-    √Sheep - 3 stone wool
-    √X - The Wheel of Fortune - +100% item for 20 turns
-    √[mainstat cards] - gain 500 mainstat
-    √XVI - The Tower - DD key
-    Professor Plum - lets you make ten crimbo pies under the knoll sign. maybe useful if we have fullness over, like, twenty-five?
-    √Spare tire/Extra tank - something meatcar outside of knoll, might not be worth it? just summon the 10k card and buy a bus pass (ignoring... maybe surprising fist?)
-    Fish DNA - acquire a free runaway in... HCO? or any path where that's relevant (not HR)
-    X of Coins - X * 500 meat - if we have low meat and we've already summoned the mantle... maybe
-    √[three +mainstat cards] - stat test in the tower
-    √weapons
-    
-    
-    
-    Aftercore:
-    √random cards - fun!
-    √knife - meat farming
-    Laboratory - five random potions? ???
-    √[monster types] - fight a random monster for factoids
-    √gift card - sell a draw in the mall to the needy
-    √IV - The Emperor - until we have outfit
-    IX - The Hermit - until we have all factoids
-    
-    Both:
-    √ancestral recall / Island - if you have Ancestral Recall, indirectly gives +3 adventures. not useful in S&S
-    √X of Clubs - +3 PVP fights
-    √1952 Mickey Mantle - 10k autosell
-    
-    Unknown:
-    X of Diamonds - X * 100 meat - never? maybe ~550 meat on average? even in run... eh...
-    X of Swords - technically optimal (saw one that gave two SBIPs and an antique machete) but random
-    
-    
-    one card/day/card limit when cheating
-    */
-    
-    boolean in_run = __misc_state["in run"];
-    
-    DOECSummon [int] summons;
-    
-    if (in_run && (__misc_state_int["fat loot tokens needed"] > 0 || (!in_ronin() && __misc_state_int["hero keys missing"] > 0)))
-        summons.listAppend(DOECSummonMake("XVI - The Tower", "Daily Dungeon key."));
-    
-    
-    if (my_path_id() != PATH_SLOW_AND_STEADY)
-    {
-        if ($skill[ancestral recall].skill_is_usable())
-        {
-            summons.listAppend(DOECSummonMake(listMake("Ancestral Recall", "Island"), "+3 adventures via ancestral recall."));
-        }
-        else if (!in_run)
-        {
-            summons.listAppend(DOECSummonMake("Ancestral Recall", "Gives +adventure summoning skill."));
-        }
-    }
-    
-    if (hippy_stone_broken())
-        summons.listAppend(DOECSummonMake("X of Clubs", "+3 PVP fights."));
-    
-    if (in_run)
-        summons.listAppend(DOECSummonMake("X - The Wheel of Fortune", "+100% item for 20 turns."));
-    
-    if (in_run && __misc_state["need to level"])
-    {
-        string card_name = "Cardiff";
-        if (my_primestat() == $stat[muscle])
-            card_name = "XXI - The World";
-        else if (my_primestat() == $stat[mysticality])
-            card_name = "III - The Empress";
-        else if (my_primestat() == $stat[moxie])
-            card_name = "VI - The Lovers";
-        
-        summons.listAppend(DOECSummonMake(card_name, "+" + (500 * (1.0 + numeric_modifier(my_primestat().to_string() + " Experience Percent") / 100.0)).floor() + " mainstat."));
-    }
-    
-    if (in_run && !__quest_state["Level 8"].state_boolean["Past mine"])
-    {
-        int missing_ore = MAX(0, 3 - __quest_state["Level 8"].state_string["ore needed"].to_item().available_amount());
-        if (missing_ore > 0)
-            summons.listAppend(DOECSummonMake("Mine", "One of every ore."));
-    }
-    
-    if (!in_run && $item[knife].available_amount() == 0)
-        summons.listAppend(DOECSummonMake("Knife", "+50% meat farming weapon."));
-    
-    if (in_run && $items[lead pipe,rope,wrench,candlestick,knife,revolver].items_missing().count() == 6)
-    {
-        /*
-        Important point on the +stat equipment - there's another card that gives 500 mainstat. So, if that's all you're using the weapon for, you'd need to use it for over 250 fights in a day to be worthwhile.
-        You can, of course, summon both... but in that situation, there's probably a better summon instead?
-        
-        √lead pipe - 1h club. +100% muscle, +50 HP, vanishes at rollover.
-            Hmm... for muscle classes that don't have familiars? Or seal clubbers?
-            +100% mainstat is a lot...
-        √rope - 1h whip. +2 muscle/fight, +10 familiar weight, vanishes at rollover.
-            Muscle classes. Any class that has a runaway familiar. Maybe just any class that has a familiar?
-         
-        √wrench - 1h utensil. +100% spell damage, +50 MP.
-            For myst classes that don't need stats.
-        √candlestick - 1h wand. +2 myst/fight, +100% myst, vanishes at rollover.
-            For myst classes that need stats.
-        
-        √knife - 1h knife. +50% meat, +100% moxie, vanishes at rollover.
-            For moxie classes. Even then...
-            +100% mainstat is a lot...
-        √revolver -  1h pistol. +50% init, +2 moxie/fight, vanishes at rollover.
-            For moxie classes that need stats? Ehh...
-        */
-        DOECSummon [int] weapon_choices;
-        
-        
-        if (my_primestat() == $stat[muscle])
-        {
-            if (!($skill[summon smithsness].skill_is_usable() && my_class() == $class[seal clubber]))
-                weapon_choices.listAppend(DOECSummonMake("Lead pipe", "+100% muscle, +HP club."));
-            //Rope is mentioned elsewhere
-        }
-        if (my_primestat() == $stat[mysticality] && !$skill[summon smithsness].skill_is_usable())
-        {
-            weapon_choices.listAppend(DOECSummonMake("Wrench", "+100% spell damage weapon.")); //this will do more damage on average than the candlestick, so it's more worthwhile? (compare capped spells versus scaling spells - spell damage affects saucestorm, +myst doesnt')
-            //Is the candlestick worth summoning?
-            if (__misc_state["need to level"])
-                weapon_choices.listAppend(DOECSummonMake("Candlestick", "+100% myst, +2 myst/fight weapon. (wrench may be better)"));
-        }
-        if (my_primestat() == $stat[moxie] && !$skill[summon smithsness].skill_is_usable())
-        {
-            if ($skill[tricky knifework].skill_is_usable())
-                weapon_choices.listAppend(DOECSummonMake("Knife", "+50% meat, +100% moxie knife."));
-            if (__misc_state["need to level"] && !$skill[tricky knifework].skill_is_usable())
-                weapon_choices.listAppend(DOECSummonMake("Revolver", "+50% init, +2 moxie/fight ranged weapon.")); //ignored for DBs, because of the stat issue mentioned above
-        }
-        if (!__misc_state["familiars temporarily blocked"])
-        {
-            //is this worthwhile for non-muscle classes without free runaway familiars?
-            string line;
-            line = "+10 familiar weight";
-            if (my_primestat() == $stat[muscle] && __misc_state["need to level"])
-                line += ", +2 muscle/fight";
-            line += " weapon.";
-            weapon_choices.listAppend(DOECSummonMake("Rope", line));
-        }
-        
-        foreach key, summon in weapon_choices
-        {
-            //FIXME combine?
-            summons.listAppend(summon);
-        }
-    }
-    
-    summons.listAppend(DOECSummonMake("1952 Mickey Mantle", "Autosells for 10k."));
-    
-    
-    if (in_run)
-    {
-        int wool_needed = 0;
-        if (!$location[the hidden park].locationAvailable())
-        {
-            wool_needed += 1;
-            if ($item[the nostril of the serpent].available_amount() == 0)
-                wool_needed += 1;
-        }
-		if ($item[stone wool].available_amount() < wool_needed)
-        {
-            summons.listAppend(DOECSummonMake("Sheep", "3 stone wool."));
-        }
-        else if ($item[stone wool].available_amount() - wool_needed <= 0 && get_property_int("lastTempleAdventures") != my_ascensions() && my_path_id() != PATH_SLOW_AND_STEADY)
-        {
-            summons.listAppend(DOECSummonMake("Sheep", "Stone wool for +3 adventures via temple."));
-        }
-    }
-    
-    if (!in_run)
-    {
-        int missing_emperor_pieces = missing_outfit_components("The Emperor's New Clothes").count();
-        if (missing_emperor_pieces > $item[The Emperor's dry cleaning].available_amount())
-            summons.listAppend(DOECSummonMake("IV - The Emperor", "The Emperor's New Clothes outfit."));
-    
-        summons.listAppend(DOECSummonMake("Gift card", "Sell to the needy."));
-        
-        string [int][int] tooltip_table;
-        tooltip_table.listAppend(listMake("II - The High Priestess", "Hippy"));
-        tooltip_table.listAppend(listMake("V - The Hierophant", "Dude"));
-        tooltip_table.listAppend(listMake("VII - The Chariot", "Construct"));
-        tooltip_table.listAppend(listMake("XII - The Hanged Man", "Orc"));
-        tooltip_table.listAppend(listMake("XIII - Death", "Undead"));
-        tooltip_table.listAppend(listMake("XIV - Temperance", "Hobo"));
-        tooltip_table.listAppend(listMake("XV - The Devil", "Demon"));
-        tooltip_table.listAppend(listMake("XVII - The Star", "Constellation"));
-        tooltip_table.listAppend(listMake("XVIII - The Moon", "Horror"));
-        tooltip_table.listAppend(listMake("The Hive", "Bug"));
-        tooltip_table.listAppend(listMake("Goblin Sapper", "Goblin"));
-        tooltip_table.listAppend(listMake("Fire Elemental", "Elemental"));
-        tooltip_table.listAppend(listMake("Unstable Portal", "Weird"));
-        tooltip_table.listAppend(listMake("Werewolf", "Beast"));
-        tooltip_table.listAppend(listMake("Go Fish", "Fish"));
-        tooltip_table.listAppend(listMake("Plantable Greeting Card", "Plant"));
-        tooltip_table.listAppend(listMake("Pirate Birthday Card", "Pirate"));
-        tooltip_table.listAppend(listMake("Christmas Card", "Elf"));
-        tooltip_table.listAppend(listMake("Suit Warehouse Discount Card", "Penguin"));
-        tooltip_table.listAppend(listMake("Slimer Trading Card", "Slime"));
-        tooltip_table.listAppend(listMake("Aquarius Horoscope", "Mer-Kin"));
-        tooltip_table.listAppend(listMake("Hunky Fireman Card", "Humanoid"));
-
-        buffer tooltip_text;
-        tooltip_text.append(HTMLGenerateTagWrap("div", "Monster Cards", mapMake("class", "r_bold r_centre", "style", "padding-bottom:0.25em;")));
-        tooltip_text.append(HTMLGenerateSimpleTableLines(tooltip_table));
-        
-        string title = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip_text, "r_tooltip_inner_class") + "Monster card", "r_tooltip_outer_class");
-        summons.listAppend(DOECSummonMake(title, "Past factoids."));
-    }
-    
-    if (in_run && !__quest_state["Level 13"].state_boolean["Stat race completed"] && __quest_state["Level 13"].state_string["Stat race type"] != "")
-    {
-        stat stat_race_type = __quest_state["Level 13"].state_string["Stat race type"].to_stat();
-        string card_name = "Joker";
-        effect relevant_effect;
-        if (stat_race_type == $stat[muscle])
-        {
-            card_name = "XI - Strength";
-            relevant_effect = lookupEffect("1912");
-        }
-        else if (stat_race_type == $stat[mysticality])
-        {
-            card_name = "I - The Magician";
-            relevant_effect = lookupEffect("1911");
-        }
-        else if (stat_race_type == $stat[moxie])
-        {
-            card_name = "0 - The Fool";
-            relevant_effect = lookupEffect("1910");
-        }
-        if (relevant_effect.have_effect() == 0)
-            summons.listAppend(DOECSummonMake(card_name, "+200% " + stat_race_type.to_lower_case() + " for lair races. (marginal)"));
-    }
-    if (!in_run)
-    {
-        if (!haveAtLeastXOfItemEverywhere($item[talking spade], 1))
-            summons.listAppend(DOECSummonMake("X of Spades", "Solve spade puzzle."));
-        if (card_summons_left >= 5)
-            summons.listAppend(DOECSummonMake("Random card", pluralise(card_summons_left, "luck of the draw", "lucks of the draw") + "."));
-    }
-    
-    string [int][int] card_table;
-    if (card_summons_left >= 5)
-    {
-        foreach key, summon in summons
-        {
-            card_table.listAppend(listMake(summon.cards.listJoinComponents(" / "), summon.reason));
-        }
-    }
-    
-    if ((card_table.count() > 0 || card_summons_left < 5) && card_summons_left > 0)
-    {
-        string title;
-		string [int] description;
-        
-        if (card_summons_left >= 5)
-        {
-            title = pluralise(card_summons_left / 5, "card drawable", "cards drawable");
-        }
-        else
-        {
-            title = pluralise(card_summons_left, "random card summon", "random card summons");
-            string line = "Luck of the draw.";
-            if (in_run)
-                line += " (may cost turns)";
-            description.listAppend(line);
-        }
-        
-        if (card_table.count() > 0)
-            description.listAppend(HTMLGenerateSimpleTableLines(card_table));
-		resource_entries.listAppend(ChecklistEntryMake("__item deck of every card", "inventory.php?which=3", ChecklistSubentryMake(title, "", description), 1));
-    }
-}
 Record BadMoonAdventure
 {
     int encounter_id;
@@ -30910,217 +28442,6 @@ void SCommunityServiceGenerateTasks(ChecklistEntry [int] task_entries, Checklist
         task_entries.listAppend(ChecklistEntryMake("__item helmet turtle", "council.php", ChecklistSubentryMake("Perform " + s + " service", "", relevant_potions_output.listJoinComponents(", ", "and"))));
     }
 }
-void SBarrelGodGenerateResource(ChecklistEntry [int] resource_entries)
-{
-    if (!get_property_boolean("barrelShrineUnlocked") || in_bad_moon())
-        return;
-    
-    
-    if (!get_property_boolean("_barrelPrayer") && mafiaIsPastRevision(16316))
-    {
-        string [int] description;
-        string [int][int] gear;
-        
-        if (__misc_state["can equip just about any weapon"] && !get_property_boolean("prayedForProtection"))
-            gear.listAppend(listMake("Protection", "+50 ML, +100 HP, +25% muscle offhand"));
-        if (!get_property_boolean("prayedForGlamour"))
-            gear.listAppend(listMake("Glamour", "+50% item, ~8 MP regen, +25% myst accessory"));
-        if (!get_property_boolean("prayedForVigor"))
-            gear.listAppend(listMake("Vigor", "+50% init, ~15 HP regen, +25% moxie pants"));
-        
-        if (gear.count() > 0)
-            description.listAppend("Once/ascension gear:|*" + HTMLGenerateSimpleTableLines(gear));
-        string buff_description;
-        if (my_class() == $class[seal clubber])
-            buff_description = "+150% weapon damage";
-        else if (my_class() == $class[turtle tamer])
-            buff_description = "ode-to-booze type for food";
-        else if (my_class() == $class[pastamancer])
-            buff_description = "+90% item";
-        else if (my_class() == $class[sauceror])
-            buff_description = "+150% spell damage";
-        else if (my_class() == $class[disco bandit])
-            buff_description = "+150% ranged damage";
-        else if (my_class() == $class[accordion thief])
-            buff_description = "ode-to-booze type / +45% booze drops";
-        
-        if (buff_description != "")
-            description.listAppend(buff_description + " buff for 50 turns." + (lookupItem("map to the Biggest Barrel").available_amount() == 0 ? "|Chance of the map to the Biggest Barrel." : ""));
-        
-        resource_entries.listAppend(ChecklistEntryMake("barrel god", "da.php?barrelshrine=1", ChecklistSubentryMake("Barrel worship", "", description), 8));
-    }
-    
-    item [int] barrels_around;
-    foreach it in lookupItems("little firkin,normal barrel,big tun,weathered barrel,dusty barrel,disintegrating barrel,moist barrel,rotting barrel,mouldering barrel,barnacled barrel")
-    {
-        if (it.item_amount() > 0)
-            barrels_around.listAppend(it);
-    }
-    if (barrels_around.count() > 0)
-    {
-        string [int] plurals;
-        foreach key, it in barrels_around
-        {
-            plurals.listAppend(it.pluralise());
-        }
-        string url = "inv_use.php?pwd=" + my_hash() + "&whichitem=" + barrels_around[0].to_int() + "&choice=1";
-        string [int] description;
-        description.listAppend(plurals.listJoinComponents(", ", "and") + ".");
-        resource_entries.listAppend(ChecklistEntryMake("__item " + barrels_around[0], url, ChecklistSubentryMake("Smashable barrels", "", description), 8));
-        
-    }
-}
-
-void SBarrelGodGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
-{
-    //we could suggest they defeat the barrelmech if they have the map anyways... hmm
-    if (lookupItem("map to the Biggest Barrel").available_amount() > 0 && (!lookupItem("chest barrel").haveAtLeastXOfItemEverywhere(1) || !lookupItem("barrelhead").haveAtLeastXOfItemEverywhere(1) || !lookupItem("bottoms of the barrel").haveAtLeastXOfItemEverywhere(1)))
-    {
-        string [int] description;
-        description.listAppend("Use map to the Biggest Barrel.");
-        description.listAppend("To defeat him, deal up to, but not over, 150 HP/round. Otherwise, he'll heal his HP.|You'll also want healing items.");
-        if ($skill[belch the rainbow].have_skill())
-            description.listAppend("Could run -250 ML and cast belch the rainbow over and over, if you've upgraded that.");
-        if (!in_ronin())
-        {
-            string line = "Could throw chipotle wasabi cilantro aioli repeatedly.";
-            if ($item[chipotle wasabi cilantro aioli].item_amount() < 22)
-                line += "|Acquire 22 of them first, though.";
-            description.listAppend(line);
-        }
-        description.listAppend("Can only be fought once a day, until defeated.");
-        optional_task_entries.listAppend(ChecklistEntryMake("barrel god", "inventory.php?which=3", ChecklistSubentryMake("Defeat the Barrelmech", "", description), 8));
-    }
-}
-static
-{
-    string [item] __tea_tree_teas;
-    void initialiseTeaTreeTeas()
-    {
-        __tea_tree_teas[lookupItem("cuppa Activi tea")] = "adventures, stats";
-        __tea_tree_teas[lookupItem("cuppa Alacri tea")] = "+50% init";
-        __tea_tree_teas[lookupItem("cuppa Boo tea")] = "+30 spooky damage";
-        __tea_tree_teas[lookupItem("cuppa Chari tea")] = "+50% meat";
-        __tea_tree_teas[lookupItem("cuppa Craft tea")] = "crafting";
-        __tea_tree_teas[lookupItem("cuppa Cruel tea")] = "+5 fights for spleen";
-        __tea_tree_teas[lookupItem("cuppa Dexteri tea")] = "+50 moxie";
-        __tea_tree_teas[lookupItem("cuppa Feroci tea")] = "+50 muscle";
-        __tea_tree_teas[lookupItem("cuppa Flamibili tea")] = "+30 hot damage";
-        __tea_tree_teas[lookupItem("cuppa Flexibili tea")] = "+3 moxie stats/fight";
-        __tea_tree_teas[lookupItem("cuppa Frost tea")] = "+3 hot res";
-        __tea_tree_teas[lookupItem("cuppa Gill tea")] = "fishy";
-        __tea_tree_teas[lookupItem("cuppa Impregnabili tea")] = "30 DR";
-        __tea_tree_teas[lookupItem("cuppa Improprie tea")] = "+30 sleaze damage";
-        __tea_tree_teas[lookupItem("cuppa Insani tea")] = "+3 OCRS modifiers, teleporting(?)";
-        __tea_tree_teas[lookupItem("cuppa Irritabili tea")] = "+combat";
-        __tea_tree_teas[lookupItem("cuppa Loyal tea")] = "+5 familiar weight";
-        __tea_tree_teas[lookupItem("cuppa Mana tea")] = "+30 max MP, ~4 MP regen";
-        __tea_tree_teas[lookupItem("cuppa Mediocri tea")] = "+30 ML";
-        __tea_tree_teas[lookupItem("cuppa Monstrosi tea")] = "-30 ML";
-        __tea_tree_teas[lookupItem("cuppa Morbidi tea")] = "+3 spooky res";
-        __tea_tree_teas[lookupItem("cuppa Nas tea")] = "+30 stench damage";
-        __tea_tree_teas[lookupItem("cuppa Net tea")] = "+3 stench res";
-        __tea_tree_teas[lookupItem("cuppa Neuroplastici tea")] = "+3 myst stat/fight";
-        __tea_tree_teas[lookupItem("cuppa Obscuri tea")] = "-combat";
-        __tea_tree_teas[lookupItem("cuppa Physicali tea")] = "+3 muscle stats/fight";
-        __tea_tree_teas[lookupItem("cuppa Proprie tea")] = "+3 sleaze res";
-        __tea_tree_teas[lookupItem("cuppa Royal tea")] = "+1 royalty";
-        __tea_tree_teas[lookupItem("cuppa Serendipi Tea")] = "+25% item";
-        __tea_tree_teas[lookupItem("cuppa Sobrie tea")] = "-1 drunkenness";
-        __tea_tree_teas[lookupItem("cuppa Toast tea")] = "+3 cold res";
-        __tea_tree_teas[lookupItem("cuppa Twen tea")] = "+20 various stats";
-        __tea_tree_teas[lookupItem("cuppa Uncertain tea")] = "random effect";
-        __tea_tree_teas[lookupItem("cuppa Vitali tea")] = "+30 max HP, ~4 HP regen";
-        __tea_tree_teas[lookupItem("Cuppa Voraci tea")] = "+1 stomach capacity today";
-        __tea_tree_teas[lookupItem("cuppa Wit tea")] = "+50 myst";
-        __tea_tree_teas[lookupItem("cuppa Yet tea")] = "+30 cold damage";
-    }
-    initialiseTeaTreeTeas();
-}
-
-void STeaTreeGenerateResource(ChecklistEntry [int] resource_entries)
-{
-    if (!get_property_boolean("_pottedTeaTreeUsed") && get_campground()[lookupItem("potted tea tree")] > 0)
-    {
-        string [int] options;
-        //+50% Combat Initiative?
-        
-        string [int][int] tea_options;
-        
-        
-        if (__misc_state["in run"])
-        {
-            tea_options.listAppend(listMake("Irritabili", "+combat (30 turns)"));
-            tea_options.listAppend(listMake("Obscuri", "-combat (30 turns)"));
-            tea_options.listAppend(listMake("Serendipi", "+25% item (30 turns)"));
-            tea_options.listAppend(listMake("Chari", "+50% meat (30 turns)"));
-            tea_options.listAppend(listMake("Mediocri", "+30 ML"));
-            if (!__misc_state["familiars temporarily blocked"])
-                tea_options.listAppend(listMake("Loyal", "+5 familiar weight"));
-            tea_options.listAppend(listMake("Craft", "Free crafts"));
-            if (hippy_stone_broken())
-                tea_options.listAppend(listMake("Cruel", "+5 PVP fights, spleen"));
-        }
-        if (inebriety_limit() > 0)
-            tea_options.listAppend(listMake("Sobrie", "-1 drunkenness"));
-        if (fullness_limit() > 0)
-            tea_options.listAppend(listMake("Voraci", "+1 fullness capacity today"));
-        
-        if (!__misc_state["in run"])
-        {
-            tea_options.listAppend(listMake("Royal", "Mall selling, royal leaderboarding"));
-            tea_options.listAppend(listMake("Gill", "Fishy (30 turns)"));
-        }
-        
-        if (tea_options.count() > 0)
-            options.listAppend(HTMLGenerateSimpleTableLines(tea_options));
-        resource_entries.listAppend(ChecklistEntryMake("__item potted tea tree", "campground.php?action=teatree", ChecklistSubentryMake("Tea Tree Tea", "", options), 4));
-    }
-    
-    if (__misc_state["in run"] && in_ronin())
-    {
-        string image_name = "";
-        string url = "";
-        string [int] teas_found;
-        string [int] reasons_found;
-        boolean one_tea_gives_effect = false;
-        foreach tea, treason in __tea_tree_teas
-        {
-            if (tea.available_amount() == 0)
-                continue;
-            string shortened_tea_name = tea.replace_string("cuppa ", "").replace_string(" tea", "");
-            teas_found.listAppend(pluralise(tea.available_amount(), shortened_tea_name, shortened_tea_name));
-            
-            reasons_found.listAppend(treason);
-            if (image_name == "")
-                image_name = "__item " + tea;
-            if (!one_tea_gives_effect && tea.to_effect() != $effect[none])
-                one_tea_gives_effect = true;
-            if (tea.spleen > 0)
-            {
-                if (url == "")
-                    url = "inventory.php?which=1";
-            }
-            else
-                url = "inventory.php?which=3";
-        }
-        if (teas_found.count() > 0)
-        {
-            resource_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(teas_found.listJoinComponents(", ", "and").capitaliseFirstLetter() + " tea", "", reasons_found.listJoinComponents(", ", "or").capitaliseFirstLetter() + (one_tea_gives_effect ? " (30 turns)" : "")), 8));
-        }
-    }
-}
-
-void SHauntedDoghouseGenerateResource(ChecklistEntry [int] resource_entries)
-{
-    if (!__misc_state["in run"])
-        return;
-    if (lookupItem("tennis ball").available_amount() > 0)
-    {
-        resource_entries.listAppend(ChecklistEntryMake("__item tennis ball", "", ChecklistSubentryMake(pluralise(lookupItem("tennis ball")), "", "Free run/banish."), 6));
-    }
-    //I, um, hmm. I guess there's not much to say. Poor lonely file, nearly empty.
-}
 static
 {
 	int [string] __moon_sign_id_lookup;
@@ -31271,7 +28592,7 @@ void SCalculateUniverseGenerateResource(ChecklistEntry [int] resource_entries)
         int ice_cubes_needing_creation = lookupItem("perfect ice cube").available_amount();
         if (lookupSkill("Perfect Freeze").skill_is_usable() && !get_property_boolean("_perfectFreezeUsed"))
             ice_cubes_needing_creation += 1;
-        if (ice_cubes_needing_creation > 0 && $items[bottle of rum,bottle of vodka,boxed wine,bottle of gin,bottle of whiskey,bottle of tequila].available_amount() < ice_cubes_needing_creation)
+        if (ice_cubes_needing_creation > 0 && $items[bottle of rum,bottle of vodka,boxed wine,bottle of gin,bottle of whiskey,bottle of tequila].available_amount() < ice_cubes_needing_creation && __misc_state["can drink just about anything"])
         {
             //FIXME 18, 44, 75, and 99 are all valid for this - pick whichever we can summon now?
             useful_digits_and_their_reasons[99] = "base booze for perfect ice cube";
@@ -31317,6 +28638,10 @@ void SCalculateUniverseGenerateResource(ChecklistEntry [int] resource_entries)
         if (reason != "")
             table.listAppend(listMake(what_to_do, reason));
     }
+    
+    string table_description;
+    if (table.count() > 0)
+        table_description += "|*" + HTMLGenerateSimpleTableLines(table);
     if (mappings.count() > 0)
     {
         //FIXME full description?
@@ -31339,13 +28664,22 @@ void SCalculateUniverseGenerateResource(ChecklistEntry [int] resource_entries)
         tooltip_text.append(HTMLGenerateSimpleTableLines(mappings_final));
         
         string line = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip_text, "r_tooltip_inner_class") + "Full table", "r_tooltip_outer_class");
+        //we can't do full-width table entries because of colspan and display:table, so mimic it:
         //description.listAppend(line);
-        table.listAppend(listMake(line));
+        //table.listAppend(listMake(line));
+        if (table_description != "")
+            table_description += "<hr>";
+        table_description += line;
     }
-    if (table.count() > 1)
-        description.listAppend("Cast skill, enter the right number: (this changes, and is still being spaded)|*" + HTMLGenerateSimpleTableLines(table));
+    if (table_description != "")
+        description.listAppend("Cast skill, enter the right number: (this changes, and is still being spaded)" + table_description);
     else
         description.listAppend("Cast skill, enter the right number.");
+    
+    /*if (table.count() > 1)
+        description.listAppend("Cast skill, enter the right number: (this changes, and is still being spaded)|*" + HTMLGenerateSimpleTableLines(table));
+    else
+        description.listAppend("Cast skill, enter the right number.");*/
     resource_entries.listAppend(ChecklistEntryMake("__skill Calculate the Universe", "skillz.php", ChecklistSubentryMake("Calculate the Universe", "", description), 0));
 }
 void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -31374,8 +28708,6 @@ void SetsInit()
 {
     SCountersInit();
     QHitsInit();
-    
-    SDNAInit();
 }
 
 
@@ -31386,34 +28718,21 @@ void SetsGenerateResources(ChecklistEntry [int] resource_entries)
 	SSkillsGenerateResource(resource_entries);
 	SMiscItemsGenerateResource(resource_entries);
 	SCopiedMonstersGenerateResource(resource_entries);
-    STomesGenerateResource(resource_entries);
-    SSmithsnessGenerateResource(resource_entries);
-	SSugarGenerateResource(resource_entries);
     SPulveriseGenerateResource(resource_entries);
-    SLibramGenerateResource(resource_entries);
     SWOTSFGenerateResource(resource_entries);
     SCountersGenerateResource(resource_entries);
-    SGardensGenerateResource(resource_entries);
     SFaxGenerateResource(resource_entries);
     SJarlsbergGenerateResource(resource_entries);
-    SCOTGenerateResource(resource_entries);
     SSneakyPeteGenerateResource(resource_entries);
-    SDNAGenerateResource(resource_entries);
-    SPlasticVampireFangsGenerateResource(resource_entries);
-    SSpeakeasyGenerateResource(resource_entries);
     SHeavyRainsGenerateResource(resource_entries);
     SBugbearInvasionGenerateResource(resource_entries);
     SClassesGenerateResource(resource_entries);
     SEquipmentGenerateResource(resource_entries);
     SActuallyEdtheUndyingGenerateResource(resource_entries);
-    SMayoClinicGenerateResource(resource_entries);
     S8bitRealmGenerateResource(resource_entries);
-    SDeckOfEveryCardGenerateResource(resource_entries);
     SBadMoonGenerateResource(resource_entries);
-    SBarrelGodGenerateResource(resource_entries);
-    STeaTreeGenerateResource(resource_entries);
-    SHauntedDoghouseGenerateResource(resource_entries);
     SCalculateUniverseGenerateResource(resource_entries);
+    SEventsGenerateResource(resource_entries);
 }
 
 void SetsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -31434,13 +28753,10 @@ void SetsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 	SOldLevel9GenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SFaxGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SDungeonsOfDoomGenerateTasks(task_entries, optional_task_entries, future_task_entries);
-	SPsychoanalyticGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SOlfactionGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SHolidayGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SRemindersGenerateTasks(task_entries, optional_task_entries, future_task_entries);
-	SGrimstoneGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SSneakyPeteGenerateTasks(task_entries, optional_task_entries, future_task_entries);
-	SDNAGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SHeavyRainsGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SEventsGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SBugbearInvasionGenerateTasks(task_entries, optional_task_entries, future_task_entries);
@@ -31450,7 +28766,6 @@ void SetsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 	SMiscItemsGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SBadMoonGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SCommunityServiceGenerateTasks(task_entries, optional_task_entries, future_task_entries);
-    SBarrelGodGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     SPVPGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 }
 
@@ -33147,16 +30462,11 @@ void setUpState()
 
 void setUpQuestStateViaMafia()
 {
-	//Mafia's internal quest tracking system will sometimes need a quest log load to update.
-	//It seems to work like this:
-	//"unstarted" - quest not started
-	//"started" - quest started, no progress (by log) we can see
-	//"step1" - quest started, first log step completed
-	//"stepX" - quest started, X steps completed
-	//"finished" - quest ended
-	
 	QuestsInit();
 	SetsInit();
+    
+    foreach key, function_name in __init_functions
+        call function_name();
 	
 	//Opening guild quest
 	if (true)
@@ -33382,7 +30692,7 @@ void generateMissingItems(Checklist [int] checklists)
 	}
 	
 	if ($item[lord spookyraven's spectacles].available_amount() == 0 && __quest_state["Level 11 Manor"].state_boolean["Can use fast route"] && !__quest_state["Level 11 Manor"].finished)
-		items_needed_entries.listAppend(ChecklistEntryMake("__item lord spookyraven's spectacles", $location[the haunted bedroom].getClickableURLForLocation(), ChecklistSubentryMake("lord spookyraven's spectacles", "", "Found in Haunted Bedroom")));
+		items_needed_entries.listAppend(ChecklistEntryMake("__item lord spookyraven's spectacles", $location[the haunted bedroom].getClickableURLForLocation(), ChecklistSubentryMake("Lord Spookyraven's spectacles", "", "Found in Haunted Bedroom")));
     
     if ($item[enchanted bean].available_amount() == 0 && !__quest_state["Level 10"].state_boolean["beanstalk grown"])
     {
@@ -36137,192 +33447,7 @@ string generateRandomMessage()
     
     return chosen_message;
 }
-Record Banish
-{
-    monster banished_monster;
-    string banish_source;
-    int turn_banished;
-    int banish_turn_length;
-    string custom_reset_conditions;
-};
 
-void listAppend(Banish [int] list, Banish entry)
-{
-	int position = list.count();
-	while (list contains position)
-		position += 1;
-	list[position] = entry;
-}
-
-int BanishTurnsLeft(Banish b)
-{
-    if (b.banish_turn_length == -1)
-        return 2147483647;
-    return b.turn_banished + b.banish_turn_length - my_turncount();
-}
-
-static
-{
-    int [string] __banish_source_length;
-    //FIXME request this be exposed in ASH?
-    __banish_source_length["banishing shout"] = -1;
-    __banish_source_length["batter up!"] = -1;
-    __banish_source_length["chatterboxing"] = 20;
-    __banish_source_length["classy monkey"] = 20;
-    __banish_source_length["cocktail napkin"] = 20;
-    __banish_source_length["crystal skull"] = 20;
-    __banish_source_length["deathchucks"] = -1;
-    __banish_source_length["dirty stinkbomb"] = -1;
-    __banish_source_length["divine champagne popper"] = 5;
-    __banish_source_length["harold's bell"] = 20;
-    __banish_source_length["howl of the alpha"] = -1;
-    __banish_source_length["ice house"] = -1;
-    __banish_source_length["louder than bomb"] = 20;
-    __banish_source_length["nanorhino"] = -1;
-    __banish_source_length["pantsgiving"] = 30;
-    __banish_source_length["peel out"] = -1;
-    __banish_source_length["pulled indigo taffy"] = 20;
-    __banish_source_length["smoke grenade"] = 20;
-    __banish_source_length["spooky music box mechanism"] = -1;
-    __banish_source_length["staff of the standalone cheese"] = -1;
-    __banish_source_length["stinky cheese eye"] = 10;
-    __banish_source_length["thunder clap"] = 40;
-    __banish_source_length["v for vivala mask"] = 10;
-    __banish_source_length["walk away from explosion"] = 30;
-    __banish_source_length["tennis ball"] = 30;
-    __banish_source_length["curse of vacation"] = -1;
-    __banish_source_length["ice hotel bell"] = -1; //think?
-}
-
-Banish [int] __banishes_active_cache;
-string __banishes_active_cache_cached_monsters_string;
-
-Banish [int] BanishesActive()
-{
-    //banishedMonsters(user, now 'a.m.c. gremlin:ice house:2890', default )
-    
-    string banished_monsters_string = get_property("banishedMonsters");
-    
-    if (banished_monsters_string == __banishes_active_cache_cached_monsters_string && __banishes_active_cache_cached_monsters_string != "")
-        return __banishes_active_cache;
-    
-    __banishes_active_cache_cached_monsters_string = ""; //invalidate the cache
-    
-    Banish [int] result;
-    
-    string [int] banished_monsters_string_split = banished_monsters_string.split_string(":");
-
-    foreach key, s in banished_monsters_string_split
-    {
-        if (s.length() == 0)
-            continue;
-        if (key % 3 != 0)
-            continue;
-        //string [int] entry = s.split_string(":");
-        
-        //if (entry.count() != 3)
-            //continue;
-        if (!(banished_monsters_string_split contains (key + 1)) || !(banished_monsters_string_split contains (key + 2)))
-            continue;
-        
-        Banish b;
-        b.banished_monster = banished_monsters_string_split[key + 0].to_monster();
-        b.banish_source = banished_monsters_string_split[key + 1];
-        b.turn_banished = banished_monsters_string_split[key + 2].to_int();
-        b.banish_turn_length = 0;
-        if (__banish_source_length contains b.banish_source)
-            b.banish_turn_length = __banish_source_length[b.banish_source];
-        if (b.banish_source == "batter up!" || b.banish_source == "deathchucks" || b.banish_source == "dirty stinkbomb" || b.banish_source == "nanorhino" || b.banish_source == "spooky music box mechanism")
-            b.custom_reset_conditions = "rollover";
-        result.listAppend(b);
-    }
-    
-    __banishes_active_cache_cached_monsters_string = banished_monsters_string;
-    __banishes_active_cache = result;
-    
-    return result;
-}
-
-
-Banish [int] BanishesActiveInLocation(location l)
-{
-    boolean [monster] location_monsters;
-    foreach key, m in l.get_monsters()
-        location_monsters[m] = true;
-    Banish [int] banishes_active = BanishesActive();
-    Banish [int] result;
-    foreach key, b in banishes_active
-    {
-        if (location_monsters contains b.banished_monster)
-            result.listAppend(b);
-    }
-    return result;
-}
-
-int BanishShortestBanishForLocation(location l)
-{
-    Banish [int] active_banishes = BanishesActiveInLocation(l);
-    int minimum = 2147483647;
-    foreach key, b in active_banishes
-    {
-        minimum = MIN(minimum, b.BanishTurnsLeft());
-    }
-    return minimum;
-}
-
-Banish BanishForMonster(monster m)
-{
-    foreach key, b in BanishesActive()
-    {
-        if (b.banished_monster == m)
-            return b;
-    }
-    Banish blank;
-    return blank;
-}
-
-string BanishSourceForMonster(monster m)
-{
-    return BanishForMonster(m).banish_source;
-}
-
-boolean [string] activeBanishNamesForLocation(location l)
-{
-    Banish [int] banishes_active = BanishesActive();
-    
-    string [monster] names;
-    foreach key, banish in banishes_active
-    {
-        if (banish.banished_monster.is_banished()) //zuko wrote this code
-        {
-            names[banish.banished_monster] = banish.banish_source;
-        }
-    }
-    
-    boolean [string] banish_names;
-    foreach key, m in l.get_monsters()
-    {
-        if (names contains m)
-            banish_names[names[m]] = true;
-        if (my_path_id() == PATH_ONE_CRAZY_RANDOM_SUMMER)
-        {
-            foreach m2 in names
-            {
-                if (m2.to_string().to_lower_case().contains_text(m.to_string().to_lower_case())) //FIXME complete hack, wrong, substrings, 1337, etc
-                    banish_names[names[m2]] = true;
-            }
-        }
-    }
-    return banish_names;
-}
-
-int BanishLength(string banish_name)
-{
-    int length = __banish_source_length[banish_name];
-    if (length < 0)
-        length = 2147483647;
-    return length;
-}
 
 void generateImageTest(Checklist [int] checklists)
 {
@@ -36723,6 +33848,33 @@ void generateChecklists(Checklist [int] ordered_output_checklists)
         foreach key, checklist_generation_function_name in __checklist_generation_function_names
         {
             call checklist_generation_function_name(checklist_collection);
+        }
+        
+        foreach checklist_name in __specific_checklist_1_generation_function_names
+        {
+            ChecklistEntry [int] checklist_entries = checklist_collection.lookup(checklist_name).entries;
+            foreach key, function_name in __specific_checklist_1_generation_function_names[checklist_name]
+            {
+                call function_name(checklist_entries);
+            }
+        }
+        foreach key, request in __specific_checklist_generation_requests
+        {
+            int argument_count = request.checklist_names.count();
+            string function_name = request.function_name;
+            //"call request.function_name()" will not work
+            if (argument_count == 3)
+            {
+                call function_name(checklist_collection.lookup(request.checklist_names[0]).entries, checklist_collection.lookup(request.checklist_names[1]).entries, checklist_collection.lookup(request.checklist_names[2]).entries);
+            }
+            else if (argument_count == 2)
+            {
+                call function_name(checklist_collection.lookup(request.checklist_names[0]).entries, checklist_collection.lookup(request.checklist_names[1]).entries);
+            }
+            else if (argument_count == 1)
+            {
+                call function_name(checklist_collection.lookup(request.checklist_names[0]).entries);
+            }
         }
     }
     //Convert checklist_collection to checklists:
@@ -37132,7 +34284,7 @@ buffer generateItemInformationMethod2(location l, monster m, boolean try_for_min
                 slimeling_chance *= adjusted_base_drop_rate.to_float() * (1.0 + slimeling_base_drop_rate / 100.0);
                 effective_drop_rate += (100.0 - effective_drop_rate) * (slimeling_chance / 100.0);
             }
-            //not a quest item, not a 100% drop, etc
+            //not a quest item, ???
             //if (my_familiar() == $familiar[black cat])
             
             effective_drop_rate = clampf(floor(effective_drop_rate), 0.0, 100.0);
@@ -37935,7 +35087,7 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
                     stats_l1.listAppend(ka_dropped + " ka");
             }
             
-            if (m.expected_damage() > 1 && (m.expected_damage() > my_hp().to_float() * 0.75 || ($monsters[spider gremlin,batwinged gremlin,erudite gremlin,vegetable gremlin] contains m)) || spelunking)
+            if (m.expected_damage() > 1 && (m.expected_damage() >= my_hp().to_float() * 0.5 || ($monsters[spider gremlin,batwinged gremlin,erudite gremlin,vegetable gremlin] contains m)) || spelunking)
             {
                 string damage_text = m.expected_damage() + " dmg";
                 if (m.expected_damage() >= 0.75 * my_hp())
@@ -38852,7 +36004,7 @@ string [string] generateAPIResponse()
     
     if (true)
     {
-        boolean [string] relevant_mafia_properties = $strings[merkinQuestPath,questF01Primordial,questF02Hyboria,questF03Future,questF04Elves,questF05Clancy,questG01Meatcar,questG02Whitecastle,questG03Ego,questG04Nemesis,questG05Dark,questG06Delivery,questI01Scapegoat,questI02Beat,questL02Larva,questL03Rat,questL04Bat,questL05Goblin,questL06Friar,questL07Cyrptic,questL08Trapper,questL09Topping,questL10Garbage,questL11MacGuffin,questL11Manor,questL11Palindome,questL11Pyramid,questL11Worship,questL12War,questL13Final,questM01Untinker,questM02Artist,questM03Bugbear,questM04Galaktic,questM05Toot,questM06Gourd,questM07Hammer,questM08Baker,questM09Rocks,questM10Azazel,questM11Postal,questM12Pirate,questM13Escape,questM14Bounty,questM15Lol,questS01OldGuy,questS02Monkees,sidequestArenaCompleted,sidequestFarmCompleted,sidequestJunkyardCompleted,sidequestLighthouseCompleted,sidequestNunsCompleted,sidequestOrchardCompleted,cyrptAlcoveEvilness,cyrptCrannyEvilness,cyrptNicheEvilness,cyrptNookEvilness,desertExploration,gnasirProgress,relayCounters,timesRested,currentEasyBountyItem,currentHardBountyItem,currentSpecialBountyItem,volcanoMaze1,_lastDailyDungeonRoom,seahorseName,chasmBridgeProgress,_aprilShower,lastAdventure,lastEncounter,_floristPlantsUsed,_fireStartingKitUsed,_psychoJarUsed,hiddenHospitalProgress,hiddenBowlingAlleyProgress,hiddenApartmentProgress,hiddenOfficeProgress,pyramidPosition,parasolUsed,_discoKnife,lastPlusSignUnlock,olfactedMonster,photocopyMonster,lastTempleUnlock,volcanoMaze1,blankOutUsed,peteMotorbikeCowling,peteMotorbikeGasTank,peteMotorbikeHeadlight,peteMotorbikeMuffler,peteMotorbikeSeat,peteMotorbikeTires,_petePeeledOut,_navelRunaways,_peteRiotIncited,_petePartyThrown,hiddenTavernUnlock,_dnaPotionsMade,_psychokineticHugUsed,dnaSyringe,_warbearGyrocopterUsed,questM20Necklace,questM21Dance,grimstoneMaskPath,cinderellaMinutesToMidnight,merkinVocabularyMastery,_pirateBellowUsed,questM21Dance,_defectiveTokenChecked,questG07Myst,questG08Moxie,questESpClipper,questESpGore,questESpJunglePun,questESpFakeMedium,questESlMushStash,questESlAudit,questESlBacteria,questESlCheeseburger,questESlCocktail,questESlSprinkles,questESlSalt,questESlFish,questESlDebt,_pickyTweezersUsed,_bittycar,questESpSerum,questESpOutOfOrder,_shrubDecorated,questESpEVE,questESpSmokes,questG09Muscle,_rapidPrototypingUsed,nsTowerDoorKeysUsed,_chateauDeskHarvested,lastGoofballBuy,nsChallenge1,nsChallenge2,nsContestants1,nsContestants2,nsContestants3,lastDesertUnlock,questM18Swamp,edPiece,warehouseProgress,questEStFishTrash,questEStNastyBears,questEStSocialJusticeI,questEStSocialJusticeII,questEStSuperLuber,questEStZippityDooDah,_summonAnnoyanceUsed,questEStWorkWithFood,questM24Doc,questEStGiveMeFuel,_mayoTankSoaked,_feastUsed,spelunkyNextNoncombat,spelunkySacrifices,spelunkyStatus,spelunkyUpgrades,spelunkyWinCount,_deckCardsDrawn,_glarkCableUses,_banderRunaways,questM25Armorer,pyramidBombUsed,_powerPillUses,nextAdventure,_barrelPrayer,_universeCalculated,questECoBucket];
+        boolean [string] relevant_mafia_properties = $strings[merkinQuestPath,questF01Primordial,questF02Hyboria,questF03Future,questF04Elves,questF05Clancy,questG01Meatcar,questG02Whitecastle,questG03Ego,questG04Nemesis,questG05Dark,questG06Delivery,questI01Scapegoat,questI02Beat,questL02Larva,questL03Rat,questL04Bat,questL05Goblin,questL06Friar,questL07Cyrptic,questL08Trapper,questL09Topping,questL10Garbage,questL11MacGuffin,questL11Manor,questL11Palindome,questL11Pyramid,questL11Worship,questL12War,questL13Final,questM01Untinker,questM02Artist,questM03Bugbear,questM04Galaktic,questM05Toot,questM06Gourd,questM07Hammer,questM08Baker,questM09Rocks,questM10Azazel,questM11Postal,questM12Pirate,questM13Escape,questM14Bounty,questM15Lol,questS01OldGuy,questS02Monkees,sidequestArenaCompleted,sidequestFarmCompleted,sidequestJunkyardCompleted,sidequestLighthouseCompleted,sidequestNunsCompleted,sidequestOrchardCompleted,cyrptAlcoveEvilness,cyrptCrannyEvilness,cyrptNicheEvilness,cyrptNookEvilness,desertExploration,gnasirProgress,relayCounters,timesRested,currentEasyBountyItem,currentHardBountyItem,currentSpecialBountyItem,volcanoMaze1,_lastDailyDungeonRoom,seahorseName,chasmBridgeProgress,_aprilShower,lastAdventure,lastEncounter,_floristPlantsUsed,_fireStartingKitUsed,_psychoJarUsed,hiddenHospitalProgress,hiddenBowlingAlleyProgress,hiddenApartmentProgress,hiddenOfficeProgress,pyramidPosition,parasolUsed,_discoKnife,lastPlusSignUnlock,olfactedMonster,photocopyMonster,lastTempleUnlock,volcanoMaze1,blankOutUsed,peteMotorbikeCowling,peteMotorbikeGasTank,peteMotorbikeHeadlight,peteMotorbikeMuffler,peteMotorbikeSeat,peteMotorbikeTires,_petePeeledOut,_navelRunaways,_peteRiotIncited,_petePartyThrown,hiddenTavernUnlock,_dnaPotionsMade,_psychokineticHugUsed,dnaSyringe,_warbearGyrocopterUsed,questM20Necklace,questM21Dance,grimstoneMaskPath,cinderellaMinutesToMidnight,merkinVocabularyMastery,_pirateBellowUsed,questM21Dance,_defectiveTokenChecked,questG07Myst,questG08Moxie,questESpClipper,questESpGore,questESpJunglePun,questESpFakeMedium,questESlMushStash,questESlAudit,questESlBacteria,questESlCheeseburger,questESlCocktail,questESlSprinkles,questESlSalt,questESlFish,questESlDebt,_pickyTweezersUsed,_bittycar,questESpSerum,questESpOutOfOrder,_shrubDecorated,questESpEVE,questESpSmokes,questG09Muscle,_rapidPrototypingUsed,nsTowerDoorKeysUsed,_chateauDeskHarvested,lastGoofballBuy,nsChallenge1,nsChallenge2,nsContestants1,nsContestants2,nsContestants3,lastDesertUnlock,questM18Swamp,edPiece,warehouseProgress,questEStFishTrash,questEStNastyBears,questEStSocialJusticeI,questEStSocialJusticeII,questEStSuperLuber,questEStZippityDooDah,_summonAnnoyanceUsed,questEStWorkWithFood,questM24Doc,questEStGiveMeFuel,_mayoTankSoaked,_feastUsed,spelunkyNextNoncombat,spelunkySacrifices,spelunkyStatus,spelunkyUpgrades,spelunkyWinCount,_deckCardsDrawn,_glarkCableUses,_banderRunaways,questM25Armorer,pyramidBombUsed,_powerPillUses,nextAdventure,_barrelPrayer,_universeCalculated,questECoBucket,_nuclearStockpileUsed,_fragrantHerbsUsed]; //FIXME remove _nuclearStockpileUsed,_fragrantHerbsUsed after crimbo.
         
         if (false)
         {
@@ -38868,6 +36020,7 @@ string [string] generateAPIResponse()
         {
             //Give partial description: (equivalent for equivalency testing)
             //65% smaller
+            //FIXME maybe remove ,? might not be needed in almost all cases
             buffer mafia_properties;
             boolean first = true;
             foreach property_name in relevant_mafia_properties
@@ -39130,6 +36283,3191 @@ void setUpCSSStyles()
     PageAddCSSClass("", "r_no_css_transition", "-webkit-transition:none !important;-moz-transition:none !important;-o-transition:none !important;-ms-transition:none !important;transition:none !important;");
     
     PageAddCSSClass("img", "", "border:0px;");
+}
+
+RegisterResourceGenerationFunction("IOTMMachineElfGenerateResource");
+void IOTMMachineElfGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if (!lookupFamiliar("machine elf").familiar_is_usable())
+        return;
+    
+    int free_fights_remaining = clampi(5 - get_property_int("_machineElfFights"), 0, 5);
+    if (false && free_fights_remaining > 0 && mafiaIsPastRevision(10000000000))
+    {
+        string url = "place.php?whichplace=dmt";
+        string [int] description;
+        string [int] modifiers;
+        int importance = 0;
+        if (!__misc_state["in run"] || !__misc_state["need to level"])
+            importance = 6;
+        string [int] tasks;
+        if (my_familiar() != lookupFamiliar("machine elf"))
+        {
+            url = "familiar.php";
+            tasks.listAppend("bring along your machine elf");
+        }
+        tasks.listAppend("adventure in the machine tunnels");
+        description.listAppend(tasks.listJoinComponents(", ", "and").capitaliseFirstLetter() + " to gain stats.");
+        //FIXME suggest abstraction methods.
+        modifiers.listAppend("+" + my_primestat().to_lower_case());
+        resource_entries.listAppend(ChecklistEntryMake("__familiar machine elf", url, ChecklistSubentryMake(pluralise(free_fights_remaining, "free elf fight", "free elf fights"), "", description), importance));
+    }
+}
+
+RegisterResourceGenerationFunction("IOTMBarrelGodGenerateResource");
+void IOTMBarrelGodGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if (!get_property_boolean("barrelShrineUnlocked") || in_bad_moon())
+        return;
+    
+    
+    if (!get_property_boolean("_barrelPrayer") && mafiaIsPastRevision(16316))
+    {
+        string [int] description;
+        string [int][int] gear;
+        
+        if (__misc_state["can equip just about any weapon"] && !get_property_boolean("prayedForProtection"))
+            gear.listAppend(listMake("Protection", "+50 ML, +100 HP, +25% muscle offhand"));
+        if (!get_property_boolean("prayedForGlamour"))
+            gear.listAppend(listMake("Glamour", "+50% item, ~8 MP regen, +25% myst accessory"));
+        if (!get_property_boolean("prayedForVigor"))
+            gear.listAppend(listMake("Vigor", "+50% init, ~15 HP regen, +25% moxie pants"));
+        
+        if (gear.count() > 0)
+            description.listAppend("Once/ascension gear:|*" + HTMLGenerateSimpleTableLines(gear));
+        string buff_description;
+        if (my_class() == $class[seal clubber])
+            buff_description = "+150% weapon damage";
+        else if (my_class() == $class[turtle tamer])
+            buff_description = "ode-to-booze type for food";
+        else if (my_class() == $class[pastamancer])
+            buff_description = "+90% item";
+        else if (my_class() == $class[sauceror])
+            buff_description = "+150% spell damage";
+        else if (my_class() == $class[disco bandit])
+            buff_description = "+150% ranged damage";
+        else if (my_class() == $class[accordion thief])
+            buff_description = "ode-to-booze type / +45% booze drops";
+        
+        if (buff_description != "")
+            description.listAppend(buff_description + " buff for 50 turns." + (lookupItem("map to the Biggest Barrel").available_amount() == 0 ? "|Chance of the map to the Biggest Barrel." : ""));
+        
+        resource_entries.listAppend(ChecklistEntryMake("barrel god", "da.php?barrelshrine=1", ChecklistSubentryMake("Barrel worship", "", description), 8));
+    }
+    
+    item [int] barrels_around;
+    foreach it in lookupItems("little firkin,normal barrel,big tun,weathered barrel,dusty barrel,disintegrating barrel,moist barrel,rotting barrel,mouldering barrel,barnacled barrel")
+    {
+        if (it.item_amount() > 0)
+            barrels_around.listAppend(it);
+    }
+    if (barrels_around.count() > 0)
+    {
+        string [int] plurals;
+        foreach key, it in barrels_around
+        {
+            plurals.listAppend(it.pluralise());
+        }
+        string url = "inv_use.php?pwd=" + my_hash() + "&whichitem=" + barrels_around[0].to_int() + "&choice=1";
+        string [int] description;
+        description.listAppend(plurals.listJoinComponents(", ", "and") + ".");
+        resource_entries.listAppend(ChecklistEntryMake("__item " + barrels_around[0], url, ChecklistSubentryMake("Smashable barrels", "", description), 8));
+        
+    }
+}
+RegisterTaskGenerationFunction("IOTMBarrelGodGenerateTasks");
+void IOTMBarrelGodGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    //we could suggest they defeat the barrelmech if they have the map anyways... hmm
+    if (lookupItem("map to the Biggest Barrel").available_amount() > 0 && (!lookupItem("chest barrel").haveAtLeastXOfItemEverywhere(1) || !lookupItem("barrelhead").haveAtLeastXOfItemEverywhere(1) || !lookupItem("bottoms of the barrel").haveAtLeastXOfItemEverywhere(1)))
+    {
+        string [int] description;
+        description.listAppend("Use map to the Biggest Barrel.");
+        description.listAppend("To defeat him, deal up to, but not over, 150 HP/round. Otherwise, he'll heal his HP.|You'll also want healing items.");
+        if ($skill[belch the rainbow].have_skill())
+            description.listAppend("Could run -250 ML and cast belch the rainbow over and over, if you've upgraded that.");
+        if (!in_ronin())
+        {
+            string line = "Could throw chipotle wasabi cilantro aioli repeatedly.";
+            if ($item[chipotle wasabi cilantro aioli].item_amount() < 22)
+                line += "|Acquire 22 of them first, though.";
+            description.listAppend(line);
+        }
+        description.listAppend("Can only be fought once a day, until defeated.");
+        optional_task_entries.listAppend(ChecklistEntryMake("barrel god", "inventory.php?which=3", ChecklistSubentryMake("Defeat the Barrelmech", "", description), 8));
+    }
+}
+static
+{
+    string [item] __tea_tree_teas;
+    void initialiseTeaTreeTeas()
+    {
+        __tea_tree_teas[lookupItem("cuppa Activi tea")] = "adventures, stats";
+        __tea_tree_teas[lookupItem("cuppa Alacri tea")] = "+50% init";
+        __tea_tree_teas[lookupItem("cuppa Boo tea")] = "+30 spooky damage";
+        __tea_tree_teas[lookupItem("cuppa Chari tea")] = "+50% meat";
+        __tea_tree_teas[lookupItem("cuppa Craft tea")] = "crafting";
+        __tea_tree_teas[lookupItem("cuppa Cruel tea")] = "+5 fights for spleen";
+        __tea_tree_teas[lookupItem("cuppa Dexteri tea")] = "+50 moxie";
+        __tea_tree_teas[lookupItem("cuppa Feroci tea")] = "+50 muscle";
+        __tea_tree_teas[lookupItem("cuppa Flamibili tea")] = "+30 hot damage";
+        __tea_tree_teas[lookupItem("cuppa Flexibili tea")] = "+3 moxie stats/fight";
+        __tea_tree_teas[lookupItem("cuppa Frost tea")] = "+3 hot res";
+        __tea_tree_teas[lookupItem("cuppa Gill tea")] = "fishy";
+        __tea_tree_teas[lookupItem("cuppa Impregnabili tea")] = "30 DR";
+        __tea_tree_teas[lookupItem("cuppa Improprie tea")] = "+30 sleaze damage";
+        __tea_tree_teas[lookupItem("cuppa Insani tea")] = "+3 OCRS modifiers, teleporting(?)";
+        __tea_tree_teas[lookupItem("cuppa Irritabili tea")] = "+combat";
+        __tea_tree_teas[lookupItem("cuppa Loyal tea")] = "+5 familiar weight";
+        __tea_tree_teas[lookupItem("cuppa Mana tea")] = "+30 max MP, ~4 MP regen";
+        __tea_tree_teas[lookupItem("cuppa Mediocri tea")] = "+30 ML";
+        __tea_tree_teas[lookupItem("cuppa Monstrosi tea")] = "-30 ML";
+        __tea_tree_teas[lookupItem("cuppa Morbidi tea")] = "+3 spooky res";
+        __tea_tree_teas[lookupItem("cuppa Nas tea")] = "+30 stench damage";
+        __tea_tree_teas[lookupItem("cuppa Net tea")] = "+3 stench res";
+        __tea_tree_teas[lookupItem("cuppa Neuroplastici tea")] = "+3 myst stat/fight";
+        __tea_tree_teas[lookupItem("cuppa Obscuri tea")] = "-combat";
+        __tea_tree_teas[lookupItem("cuppa Physicali tea")] = "+3 muscle stats/fight";
+        __tea_tree_teas[lookupItem("cuppa Proprie tea")] = "+3 sleaze res";
+        __tea_tree_teas[lookupItem("cuppa Royal tea")] = "+1 royalty";
+        __tea_tree_teas[lookupItem("cuppa Serendipi Tea")] = "+25% item";
+        __tea_tree_teas[lookupItem("cuppa Sobrie tea")] = "-1 drunkenness";
+        __tea_tree_teas[lookupItem("cuppa Toast tea")] = "+3 cold res";
+        __tea_tree_teas[lookupItem("cuppa Twen tea")] = "+20 various stats";
+        __tea_tree_teas[lookupItem("cuppa Uncertain tea")] = "random effect";
+        __tea_tree_teas[lookupItem("cuppa Vitali tea")] = "+30 max HP, ~4 HP regen";
+        __tea_tree_teas[lookupItem("Cuppa Voraci tea")] = "+1 stomach capacity today";
+        __tea_tree_teas[lookupItem("cuppa Wit tea")] = "+50 myst";
+        __tea_tree_teas[lookupItem("cuppa Yet tea")] = "+30 cold damage";
+    }
+    initialiseTeaTreeTeas();
+}
+
+RegisterResourceGenerationFunction("IOTMTeaTreeGenerateResource");
+void IOTMTeaTreeGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if (!get_property_boolean("_pottedTeaTreeUsed") && get_campground()[lookupItem("potted tea tree")] > 0)
+    {
+        string [int] options;
+        //+50% Combat Initiative?
+        
+        string [int][int] tea_options;
+        
+        
+        if (__misc_state["in run"])
+        {
+            tea_options.listAppend(listMake("Irritabili", "+combat (30 turns)"));
+            tea_options.listAppend(listMake("Obscuri", "-combat (30 turns)"));
+            tea_options.listAppend(listMake("Serendipi", "+25% item (30 turns)"));
+            tea_options.listAppend(listMake("Chari", "+50% meat (30 turns)"));
+            tea_options.listAppend(listMake("Mediocri", "+30 ML"));
+            if (!__misc_state["familiars temporarily blocked"])
+                tea_options.listAppend(listMake("Loyal", "+5 familiar weight"));
+            tea_options.listAppend(listMake("Craft", "Free crafts"));
+            if (hippy_stone_broken())
+                tea_options.listAppend(listMake("Cruel", "+5 PVP fights, spleen"));
+        }
+        if (inebriety_limit() > 0)
+            tea_options.listAppend(listMake("Sobrie", "-1 drunkenness"));
+        if (fullness_limit() > 0)
+            tea_options.listAppend(listMake("Voraci", "+1 fullness capacity today"));
+        
+        if (!__misc_state["in run"])
+        {
+            tea_options.listAppend(listMake("Royal", "Mall selling, royal leaderboarding"));
+            tea_options.listAppend(listMake("Gill", "Fishy (30 turns)"));
+        }
+        
+        if (tea_options.count() > 0)
+            options.listAppend(HTMLGenerateSimpleTableLines(tea_options));
+        resource_entries.listAppend(ChecklistEntryMake("__item potted tea tree", "campground.php?action=teatree", ChecklistSubentryMake("Tea Tree Tea", "", options), 4));
+    }
+    
+    if (__misc_state["in run"] && in_ronin())
+    {
+        string image_name = "";
+        string url = "";
+        string [int] teas_found;
+        string [int] reasons_found;
+        boolean one_tea_gives_effect = false;
+        foreach tea, treason in __tea_tree_teas
+        {
+            if (tea.available_amount() == 0)
+                continue;
+            string shortened_tea_name = tea.replace_string("cuppa ", "").replace_string(" tea", "");
+            teas_found.listAppend(pluralise(tea.available_amount(), shortened_tea_name, shortened_tea_name));
+            
+            reasons_found.listAppend(treason);
+            if (image_name == "")
+                image_name = "__item " + tea;
+            if (!one_tea_gives_effect && tea.to_effect() != $effect[none])
+                one_tea_gives_effect = true;
+            if (tea.spleen > 0)
+            {
+                if (url == "")
+                    url = "inventory.php?which=1";
+            }
+            else
+                url = "inventory.php?which=3";
+        }
+        if (teas_found.count() > 0)
+        {
+            resource_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(teas_found.listJoinComponents(", ", "and").capitaliseFirstLetter() + " tea", "", reasons_found.listJoinComponents(", ", "or").capitaliseFirstLetter() + (one_tea_gives_effect ? " (30 turns)" : "")), 8));
+        }
+    }
+}
+
+RegisterResourceGenerationFunction("IOTMSpeakeasyGenerateResource");
+void IOTMSpeakeasyGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if (!__misc_state["VIP available"])
+        return;
+
+    if (!(__misc_state["can drink just about anything"] && get_property_int("_speakeasyDrinksDrunk") <3 && mafiaIsPastRevision(14155) && availableDrunkenness() >= 0))
+        return;
+        
+    //speakeasy:
+    /*
+        √Lucky lindy - good 1-potency, gives semi-rare. crucial in zombie slayer
+        Bee's Knees - awesome 2-potency, 25 turns of +100% all stats
+        √Sockdollager - awesome 2-potency, 25 turns of (+20 all elemental damage, +40 all elemental spell damage, +20 ranged/weapon damage, +50% weapon/spell damage, +50 spell damage
+        Flivver - 20,000 meat epic 2-potency, restores mana (not useful in-run)
+        √Hot Socks - awesome 3-potency, 50 turns of (+2 familiar experience, +10 familiar weight, +20 familiar damage)
+        √Sloppy Jalopy - 100,000 meat awesome 5-potency, gives skill Hollow Leg (+1 liver capacity) for aftercore
+        Phonus Balonus - +fights/+adventures
+        Ish Kabibble - +3 all res, +DA/DR
+    */
+    int drinks_remaining = MAX(3 - get_property_int("_speakeasyDrinksDrunk"), 0);
+    
+    string [int][int] options;
+    
+    options.listAppend(listMake("<strong>Drink</strong>", "<strong>Size</strong>", "<strong>Description</strong>"));
+    if (CounterLookup("Semi-rare").CounterIsRange())
+        options.listAppend(listMake("Lucky Lindy", "1", "Semi-rare number"));
+    
+    //FIXME every drink
+    //FIXME gray out drinks we can't drink at the moment (drunkenness, meat)
+    
+    if ($effect[Hip to the Jive].have_effect() == 0 && !__misc_state["familiars temporarily blocked"] && __misc_state["in run"])
+    {
+        string [int] description;
+        description.listAppend("+10 familiar weight");
+        if (familiar_weight(my_familiar()) < 20)
+            description.listAppend("+2 familiar exp/fight");
+        options.listAppend(listMake("Hot Socks", "3", description.listJoinComponents("|")));
+    }
+    
+    if (!__misc_state["in run"] && !$skill[Hollow Leg].skill_is_usable())
+        options.listAppend(listMake("Sloppy Jalopy", "5", "+1 liver capacity skill|Very expensive"));
+    
+    
+    string [int] reasons_to_sockdollager;
+    if (!__quest_state["Level 3"].finished)
+    {
+        boolean can_skip_cold = numeric_modifier("Cold Damage") >= 20.0;
+        boolean can_skip_hot = numeric_modifier("Hot Damage") >= 20.0;
+        boolean can_skip_spooky = numeric_modifier("Spooky Damage") >= 20.0;
+        boolean can_skip_stench = numeric_modifier("Stench Damage") >= 20.0;
+        if (!can_skip_cold || !can_skip_hot || !can_skip_spooky || !can_skip_stench)
+            reasons_to_sockdollager.listAppend("tavern NC skipping");
+    }
+    
+    if (!__quest_state["Level 13"].state_boolean["Elemental damage race completed"])
+        reasons_to_sockdollager.listAppend("Elemental damage race");
+    
+    if (my_path_id() == PATH_HEAVY_RAINS && !__quest_state["Level 13"].finished)
+        reasons_to_sockdollager.listAppend("fighting rain king");
+    
+    if (reasons_to_sockdollager.count() > 0)
+        options.listAppend(listMake("Sockdollager", "2", reasons_to_sockdollager.listJoinComponents(", ", "and").capitaliseFirstLetter()));
+    
+    if (__misc_state["in run"] && my_meat() >= 20000)
+        options.listAppend(listMake("Flivver", "2", "Epic-level drunkenness."));
+    
+    if (__misc_state["need to level"])
+    {
+        string drink_name = "";
+        
+        if (my_primestat() == $stat[muscle])
+        {
+            drink_name = "Glass of \"milk\"";
+        }
+        else if (my_primestat() == $stat[mysticality])
+        {
+            drink_name = "Cup of \"tea\"";
+        }
+        else if (my_primestat() == $stat[moxie])
+        {
+            drink_name = "Thermos of \"whiskey\"";
+        }
+        if (drink_name != "")
+        {
+            float mainstat_gain = 87.5 * (1.0 + numeric_modifier(my_primestat().to_string() + " Experience Percent") / 100.0);
+            string description = mainstat_gain.roundForOutput(0) + " mainstat";
+            //if (my_path_id() != PATH_SLOW_AND_STEADY)
+                //description += "";
+            options.listAppend(listMake(drink_name, "1", description));
+        }
+        
+    }
+    
+    if (hippy_stone_broken())
+    {
+        options.listAppend(listMake("Phonus Balonus", "3", "+fights/+adventures"));
+    }
+    
+    string [int] description;
+    if (options.count() > 1)
+        description.listAppend(HTMLGenerateSimpleTableLines(options));
+    
+    if (__misc_state["in run"] || drinks_remaining > 0)
+        resource_entries.listAppend(ChecklistEntryMake("__item observational glasses", "clan_viplounge.php?action=speakeasy", ChecklistSubentryMake(pluralise(drinks_remaining, "speakeasy drink", "speakeasy drinks"), "", description), 8)); //the eyes of T.J. Eckleburg
+    
+}
+record DOECSummon
+{
+    string [int] cards;
+    string reason;
+};
+
+DOECSummon DOECSummonMake(string [int] cards, string reason)
+{
+    DOECSummon summon;
+    summon.cards = cards;
+    summon.reason = reason;
+    return summon;
+}
+
+DOECSummon DOECSummonMake(string card, string reason)
+{
+    string [int] cards;
+    cards.listAppend(card);
+    return DOECSummonMake(cards, reason);
+}
+
+void listAppend(DOECSummon [int] list, DOECSummon entry)
+{
+	int position = list.count();
+	while (list contains position)
+		position += 1;
+	list[position] = entry;
+}
+
+RegisterResourceGenerationFunction("IOTMDeckOfEveryCardGenerateResource");
+void IOTMDeckOfEveryCardGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if ($item[Deck of Every Card].available_amount() == 0 || !$item[Deck of Every Card].is_unrestricted())
+        return;
+    
+    if (!mafiaIsPastRevision(16018))
+        return;
+    
+    int card_summons_left = clampi(15 - get_property_int("_deckCardsDrawn"), 0, 15);
+    
+    /*
+    In-run:
+    √Sheep - 3 stone wool
+    √X - The Wheel of Fortune - +100% item for 20 turns
+    √[mainstat cards] - gain 500 mainstat
+    √XVI - The Tower - DD key
+    Professor Plum - lets you make ten crimbo pies under the knoll sign. maybe useful if we have fullness over, like, twenty-five?
+    √Spare tire/Extra tank - something meatcar outside of knoll, might not be worth it? just summon the 10k card and buy a bus pass (ignoring... maybe surprising fist?)
+    Fish DNA - acquire a free runaway in... HCO? or any path where that's relevant (not HR)
+    X of Coins - X * 500 meat - if we have low meat and we've already summoned the mantle... maybe
+    √[three +mainstat cards] - stat test in the tower
+    √weapons
+    
+    
+    
+    Aftercore:
+    √random cards - fun!
+    √knife - meat farming
+    Laboratory - five random potions? ???
+    √[monster types] - fight a random monster for factoids
+    √gift card - sell a draw in the mall to the needy
+    √IV - The Emperor - until we have outfit
+    IX - The Hermit - until we have all factoids
+    
+    Both:
+    √ancestral recall / Island - if you have Ancestral Recall, indirectly gives +3 adventures. not useful in S&S
+    √X of Clubs - +3 PVP fights
+    √1952 Mickey Mantle - 10k autosell
+    
+    Unknown:
+    X of Diamonds - X * 100 meat - never? maybe ~550 meat on average? even in run... eh...
+    X of Swords - technically optimal (saw one that gave two SBIPs and an antique machete) but random
+    
+    
+    one card/day/card limit when cheating
+    */
+    
+    boolean in_run = __misc_state["in run"];
+    
+    DOECSummon [int] summons;
+    
+    if (in_run && (__misc_state_int["fat loot tokens needed"] > 0 || (!in_ronin() && __misc_state_int["hero keys missing"] > 0)))
+        summons.listAppend(DOECSummonMake("XVI - The Tower", "Daily Dungeon key."));
+    
+    
+    if (my_path_id() != PATH_SLOW_AND_STEADY)
+    {
+        if ($skill[ancestral recall].skill_is_usable())
+        {
+            summons.listAppend(DOECSummonMake(listMake("Ancestral Recall", "Island"), "+3 adventures via ancestral recall."));
+        }
+        else if (!in_run)
+        {
+            summons.listAppend(DOECSummonMake("Ancestral Recall", "Gives +adventure summoning skill."));
+        }
+    }
+    
+    if (hippy_stone_broken())
+        summons.listAppend(DOECSummonMake("X of Clubs", "+3 PVP fights."));
+    
+    if (in_run)
+        summons.listAppend(DOECSummonMake("X - The Wheel of Fortune", "+100% item for 20 turns."));
+    
+    if (in_run && __misc_state["need to level"])
+    {
+        string card_name = "Cardiff";
+        if (my_primestat() == $stat[muscle])
+            card_name = "XXI - The World";
+        else if (my_primestat() == $stat[mysticality])
+            card_name = "III - The Empress";
+        else if (my_primestat() == $stat[moxie])
+            card_name = "VI - The Lovers";
+        
+        summons.listAppend(DOECSummonMake(card_name, "+" + (500 * (1.0 + numeric_modifier(my_primestat().to_string() + " Experience Percent") / 100.0)).floor() + " mainstat."));
+    }
+    
+    if (in_run && !__quest_state["Level 8"].state_boolean["Past mine"])
+    {
+        int missing_ore = MAX(0, 3 - __quest_state["Level 8"].state_string["ore needed"].to_item().available_amount());
+        if (missing_ore > 0)
+            summons.listAppend(DOECSummonMake("Mine", "One of every ore."));
+    }
+    
+    if (!in_run && $item[knife].available_amount() == 0)
+        summons.listAppend(DOECSummonMake("Knife", "+50% meat farming weapon."));
+    
+    if (in_run && $items[lead pipe,rope,wrench,candlestick,knife,revolver].items_missing().count() == 6)
+    {
+        /*
+        Important point on the +stat equipment - there's another card that gives 500 mainstat. So, if that's all you're using the weapon for, you'd need to use it for over 250 fights in a day to be worthwhile.
+        You can, of course, summon both... but in that situation, there's probably a better summon instead?
+        
+        √lead pipe - 1h club. +100% muscle, +50 HP, vanishes at rollover.
+            Hmm... for muscle classes that don't have familiars? Or seal clubbers?
+            +100% mainstat is a lot...
+        √rope - 1h whip. +2 muscle/fight, +10 familiar weight, vanishes at rollover.
+            Muscle classes. Any class that has a runaway familiar. Maybe just any class that has a familiar?
+         
+        √wrench - 1h utensil. +100% spell damage, +50 MP.
+            For myst classes that don't need stats.
+        √candlestick - 1h wand. +2 myst/fight, +100% myst, vanishes at rollover.
+            For myst classes that need stats.
+        
+        √knife - 1h knife. +50% meat, +100% moxie, vanishes at rollover.
+            For moxie classes. Even then...
+            +100% mainstat is a lot...
+        √revolver -  1h pistol. +50% init, +2 moxie/fight, vanishes at rollover.
+            For moxie classes that need stats? Ehh...
+        */
+        DOECSummon [int] weapon_choices;
+        
+        
+        if (my_primestat() == $stat[muscle])
+        {
+            if (!($skill[summon smithsness].skill_is_usable() && my_class() == $class[seal clubber]))
+                weapon_choices.listAppend(DOECSummonMake("Lead pipe", "+100% muscle, +HP club."));
+            //Rope is mentioned elsewhere
+        }
+        if (my_primestat() == $stat[mysticality] && !$skill[summon smithsness].skill_is_usable())
+        {
+            weapon_choices.listAppend(DOECSummonMake("Wrench", "+100% spell damage weapon.")); //this will do more damage on average than the candlestick, so it's more worthwhile? (compare capped spells versus scaling spells - spell damage affects saucestorm, +myst doesnt')
+            //Is the candlestick worth summoning?
+            if (__misc_state["need to level"])
+                weapon_choices.listAppend(DOECSummonMake("Candlestick", "+100% myst, +2 myst/fight weapon. (wrench may be better)"));
+        }
+        if (my_primestat() == $stat[moxie] && !$skill[summon smithsness].skill_is_usable())
+        {
+            if ($skill[tricky knifework].skill_is_usable())
+                weapon_choices.listAppend(DOECSummonMake("Knife", "+50% meat, +100% moxie knife."));
+            if (__misc_state["need to level"] && !$skill[tricky knifework].skill_is_usable())
+                weapon_choices.listAppend(DOECSummonMake("Revolver", "+50% init, +2 moxie/fight ranged weapon.")); //ignored for DBs, because of the stat issue mentioned above
+        }
+        if (!__misc_state["familiars temporarily blocked"])
+        {
+            //is this worthwhile for non-muscle classes without free runaway familiars?
+            string line;
+            line = "+10 familiar weight";
+            if (my_primestat() == $stat[muscle] && __misc_state["need to level"])
+                line += ", +2 muscle/fight";
+            line += " weapon.";
+            weapon_choices.listAppend(DOECSummonMake("Rope", line));
+        }
+        
+        foreach key, summon in weapon_choices
+        {
+            //FIXME combine?
+            summons.listAppend(summon);
+        }
+    }
+    
+    summons.listAppend(DOECSummonMake("1952 Mickey Mantle", "Autosells for 10k."));
+    
+    
+    if (in_run)
+    {
+        int wool_needed = 0;
+        if (!$location[the hidden park].locationAvailable())
+        {
+            wool_needed += 1;
+            if ($item[the nostril of the serpent].available_amount() == 0)
+                wool_needed += 1;
+        }
+		if ($item[stone wool].available_amount() < wool_needed)
+        {
+            summons.listAppend(DOECSummonMake("Sheep", "3 stone wool."));
+        }
+        else if ($item[stone wool].available_amount() - wool_needed <= 0 && get_property_int("lastTempleAdventures") != my_ascensions() && my_path_id() != PATH_SLOW_AND_STEADY)
+        {
+            summons.listAppend(DOECSummonMake("Sheep", "Stone wool for +3 adventures via temple."));
+        }
+    }
+    
+    if (!in_run)
+    {
+        int missing_emperor_pieces = missing_outfit_components("The Emperor's New Clothes").count();
+        if (missing_emperor_pieces > $item[The Emperor's dry cleaning].available_amount())
+            summons.listAppend(DOECSummonMake("IV - The Emperor", "The Emperor's New Clothes outfit."));
+    
+        summons.listAppend(DOECSummonMake("Gift card", "Sell to the needy."));
+        
+        string [int][int] tooltip_table;
+        tooltip_table.listAppend(listMake("II - The High Priestess", "Hippy"));
+        tooltip_table.listAppend(listMake("V - The Hierophant", "Dude"));
+        tooltip_table.listAppend(listMake("VII - The Chariot", "Construct"));
+        tooltip_table.listAppend(listMake("XII - The Hanged Man", "Orc"));
+        tooltip_table.listAppend(listMake("XIII - Death", "Undead"));
+        tooltip_table.listAppend(listMake("XIV - Temperance", "Hobo"));
+        tooltip_table.listAppend(listMake("XV - The Devil", "Demon"));
+        tooltip_table.listAppend(listMake("XVII - The Star", "Constellation"));
+        tooltip_table.listAppend(listMake("XVIII - The Moon", "Horror"));
+        tooltip_table.listAppend(listMake("The Hive", "Bug"));
+        tooltip_table.listAppend(listMake("Goblin Sapper", "Goblin"));
+        tooltip_table.listAppend(listMake("Fire Elemental", "Elemental"));
+        tooltip_table.listAppend(listMake("Unstable Portal", "Weird"));
+        tooltip_table.listAppend(listMake("Werewolf", "Beast"));
+        tooltip_table.listAppend(listMake("Go Fish", "Fish"));
+        tooltip_table.listAppend(listMake("Plantable Greeting Card", "Plant"));
+        tooltip_table.listAppend(listMake("Pirate Birthday Card", "Pirate"));
+        tooltip_table.listAppend(listMake("Christmas Card", "Elf"));
+        tooltip_table.listAppend(listMake("Suit Warehouse Discount Card", "Penguin"));
+        tooltip_table.listAppend(listMake("Slimer Trading Card", "Slime"));
+        tooltip_table.listAppend(listMake("Aquarius Horoscope", "Mer-Kin"));
+        tooltip_table.listAppend(listMake("Hunky Fireman Card", "Humanoid"));
+
+        buffer tooltip_text;
+        tooltip_text.append(HTMLGenerateTagWrap("div", "Monster Cards", mapMake("class", "r_bold r_centre", "style", "padding-bottom:0.25em;")));
+        tooltip_text.append(HTMLGenerateSimpleTableLines(tooltip_table));
+        
+        string title = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip_text, "r_tooltip_inner_class") + "Monster card", "r_tooltip_outer_class");
+        summons.listAppend(DOECSummonMake(title, "Past factoids."));
+    }
+    
+    if (in_run && !__quest_state["Level 13"].state_boolean["Stat race completed"] && __quest_state["Level 13"].state_string["Stat race type"] != "")
+    {
+        stat stat_race_type = __quest_state["Level 13"].state_string["Stat race type"].to_stat();
+        string card_name = "Joker";
+        effect relevant_effect;
+        if (stat_race_type == $stat[muscle])
+        {
+            card_name = "XI - Strength";
+            relevant_effect = lookupEffect("1912");
+        }
+        else if (stat_race_type == $stat[mysticality])
+        {
+            card_name = "I - The Magician";
+            relevant_effect = lookupEffect("1911");
+        }
+        else if (stat_race_type == $stat[moxie])
+        {
+            card_name = "0 - The Fool";
+            relevant_effect = lookupEffect("1910");
+        }
+        if (relevant_effect.have_effect() == 0)
+            summons.listAppend(DOECSummonMake(card_name, "+200% " + stat_race_type.to_lower_case() + " for lair races. (marginal)"));
+    }
+    if (!in_run)
+    {
+        if (!haveAtLeastXOfItemEverywhere($item[talking spade], 1))
+            summons.listAppend(DOECSummonMake("X of Spades", "Solve spade puzzle."));
+        if (card_summons_left >= 5)
+            summons.listAppend(DOECSummonMake("Random card", pluralise(card_summons_left, "luck of the draw", "lucks of the draw") + "."));
+    }
+    
+    string [int][int] card_table;
+    if (card_summons_left >= 5)
+    {
+        foreach key, summon in summons
+        {
+            card_table.listAppend(listMake(summon.cards.listJoinComponents(" / "), summon.reason));
+        }
+    }
+    
+    if ((card_table.count() > 0 || card_summons_left < 5) && card_summons_left > 0)
+    {
+        string title;
+		string [int] description;
+        
+        if (card_summons_left >= 5)
+        {
+            title = pluralise(card_summons_left / 5, "card drawable", "cards drawable");
+        }
+        else
+        {
+            title = pluralise(card_summons_left, "random card summon", "random card summons");
+            string line = "Luck of the draw.";
+            if (in_run)
+                line += " (may cost turns)";
+            description.listAppend(line);
+        }
+        
+        if (card_table.count() > 0)
+            description.listAppend(HTMLGenerateSimpleTableLines(card_table));
+		resource_entries.listAppend(ChecklistEntryMake("__item deck of every card", "inventory.php?which=3", ChecklistSubentryMake(title, "", description), 1));
+    }
+}
+RegisterResourceGenerationFunction("IOTMHauntedDoghouseGenerateResource");
+void IOTMHauntedDoghouseGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if (!__misc_state["in run"])
+        return;
+    if (lookupItem("tennis ball").available_amount() > 0)
+    {
+        resource_entries.listAppend(ChecklistEntryMake("__item tennis ball", "", ChecklistSubentryMake(pluralise(lookupItem("tennis ball")), "", "Free run/banish."), 6));
+    }
+    //I, um, hmm. I guess there's not much to say. Poor lonely file, nearly empty.
+}
+RegisterResourceGenerationFunction("IOTMMayoClinicGenerateResource");
+void IOTMMayoClinicGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if (__misc_state["campground unavailable"])
+        return;
+    if (get_campground()[$item[portable Mayo Clinic]] == 0 || in_bad_moon())
+        return;
+    
+    //mayoLevel
+    int mayo_level = get_property_int("mayoLevel");
+    
+    if (availableFullness() > 0)
+    {
+        //stuff:
+        //Mayonex - food adventures -> blood mayo (???)
+        //Mayodiol -> one fullness becomes one drunkenness
+        //Mayostat -> one-fullness same quality restore
+        //Mayozapine -> increased stat gains
+        //Mayoflex -> +1 adventure
+        //Mayo Minder™ -> um... I guess it uses the above things for you. reminds me of buying the autorefueler in EV..
+    }
+    
+    if (!get_property_boolean("_mayoDeviceRented"))
+    {
+        string [int] description;
+        //sphygmayomanometer - +(20 + mayo_level)% stats
+        //tomayohawk-style reflex hammer - reusable combat item. stagger, mayo-level sleaze damage
+        //mayo lance - YR combat item, requires at least one blood mayo
+        //miracle whip - nice day two/three equip. +50% init, +50% item, +100% meat, +100% wait, I only get one of these a run?
+        
+        string line = "Lasts the rest of the day. Can only choose one.";
+        if (my_meat() < 2500)
+            line += "|Need at least 2500 meat first.";
+        description.listAppend(line);
+        
+        string [int][int] choices;
+        
+        choices.listAppend(listMake("Sphygmayomanometer", "+" + (20 + mayo_level) + "% all stats"));
+        choices.listAppend(listMake("Tomayohawk-style reflex hammer", "Reusable combat item.|Staggers and deals mayo-level sleaze damage."));
+        string lance_description = "Yellow ray. ";
+        if (__misc_state["yellow ray available"])
+            lance_description = "Shorter yellow ray. ";
+        lance_description += HTMLGenerateDivOfClass("Uses up blood mayo.", "r_word_wrap_group");
+        choices.listAppend(listMake("Mayo lance", lance_description));
+        
+        if (!get_property_boolean("mayoWhipRented"))
+        {
+            choices.listAppend(listMake("Miracle whip", "Weapon, usable " + HTMLGenerateSpanFont("once", "red") + " per run.|+50% item, +100% meat, +50% init."));
+        }
+        description.listAppend(HTMLGenerateSimpleTableLines(choices));
+        resource_entries.listAppend(ChecklistEntryMake("__item sphygmayomanometer", "campground.php?action=workshed", ChecklistSubentryMake("Mayo Device Rental", "", description), 8));
+    }
+    if (!get_property_boolean("_mayoTankSoaked") && __misc_state["in run"])
+    {
+        string [int] description;
+        string [int] benefits;
+        if (my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING)
+            benefits.listAppend("HP restore");
+        benefits.listAppend("+2 all resistance");
+        description.listAppend("Gives " + benefits.listJoinComponents(", ", "and") + ".");
+        resource_entries.listAppend(ChecklistEntryMake("__item bubblin' chemistry solution", "campground.php?action=workshed", ChecklistSubentryMake("Mayo Tank Soak", "", description), 8));
+    }
+    if ($item[mayo lance].available_amount() > 0)
+    {
+        string [int] description;
+        int turns_yellow_ray_will_be = clampi(150 - get_property_int("mayoLevel") * 5, 0, 150);
+        description.listAppend(pluralise(turns_yellow_ray_will_be, "turn", "turns") + " yellow ray. Affected by mayo level.");
+        resource_entries.listAppend(ChecklistEntryMake("__item mayo lance", "", ChecklistSubentryMake("Mayo lance", "", description), 8));
+        
+    }
+}
+void smithsnessGenerateCoalSuggestions(string [int] coal_suggestions)
+{
+    if (!__misc_state["in run"])
+        return;
+	string [item] coal_item_suggestions;
+	
+	if (__misc_state["can equip just about any weapon"])
+	{
+        if (!__quest_state["Level 12"].state_boolean["Nuns Finished"])
+            coal_item_suggestions[$item[half a purse]] = "2x smithsness meat for nuns";
+		coal_item_suggestions[$item[A Light that Never Goes Out]] = "2x smithsness +item";
+			
+			
+		if (my_class() == $class[seal clubber])
+			coal_item_suggestions[$item[Meat Tenderizer is Murder]] = "weapon, +2x smithsness muscle %";
+		else if (my_class() == $class[turtle tamer])
+			coal_item_suggestions[$item[Ouija Board, Ouija Board]] = "weapon, +2x smithsness muscle %";
+		else if (my_class() == $class[pastamancer])
+			coal_item_suggestions[$item[Hand that Rocks the Ladle]] = "weapon, +2x smithsness mysticality %";
+		else if (my_class() == $class[sauceror])
+			coal_item_suggestions[$item[Saucepanic]] = "weapon, +myst stats, +2x smithsness mysticality %";
+		else if (my_class() == $class[disco bandit])
+			coal_item_suggestions[$item[Frankly Mr. Shank]] = "weapon, +2x smithsness moxie %";
+		else if (my_class() == $class[accordion thief])
+			coal_item_suggestions[$item[Shakespeare's Sister's Accordion]] = "weapon, +2x smithsness moxie %, useful cadenza";
+		//not sure I like these suggestions based off of mainstat, but...
+		else if (my_primestat() == $stat[mysticality])
+			coal_item_suggestions[$item[Staff of the Headmaster's Victuals]] = "weapon, +smithsnesss spell damage";
+		else if (my_primestat() == $stat[muscle])
+			coal_item_suggestions[$item[Work is a Four Letter Sword]] = "weapon, +2x smithsness weapon damage";
+		else if (my_primestat() == $stat[moxie])
+			coal_item_suggestions[$item[Sheila Take a Crossbow]] = "weapon, +smithsness initiative";
+        
+        string [int] sheila_reasons;
+        if (__quest_state["Level 7"].state_boolean["alcove needs speed tricks"])
+			sheila_reasons.listAppend("modern zmobies");
+        if (!__quest_state["Level 13"].state_boolean["Init race completed"])
+            sheila_reasons.listAppend("lair init race");
+        if (sheila_reasons.count() > 0)
+            coal_item_suggestions[$item[Sheila Take a Crossbow]] = "weapon, +smithsness initiative (useful for " + sheila_reasons.listJoinComponents(", ", "and") + ")";
+			
+			
+	}
+	coal_item_suggestions[$item[Hand in Glove]] = "lots of +ML";
+	if ($item[dirty hobo gloves].available_amount() == 0)
+		coal_item_suggestions[$item[Hand in Glove]] += " (need dirty hobo gloves)";
+	else
+		coal_item_suggestions[$item[Hand in Glove]] += " (have dirty hobo gloves)";
+	if (knoll_available() || $item[maiden wig].available_amount() > 0)
+		coal_item_suggestions[$item[Hairpiece On Fire]] = "+4 adventures, +5 smithness hat, +smithsness MP";
+	if (knoll_available() || $item[frilly skirt].available_amount() > 0)
+	{
+		coal_item_suggestions[$item[Vicar's Tutu]] = "+5 smithsness pants, +smithsness HP";
+		
+		if (hippy_stone_broken())
+			coal_item_suggestions[$item[Vicar's Tutu]] = coal_item_suggestions[$item[Vicar's Tutu]] + ", +3 PVP fights";
+	}
+	
+	if ($skill[pulverize].skill_is_usable())
+		coal_suggestions.listAppend("Smash smithed equipment for more smithereens");
+	foreach it in coal_item_suggestions
+	{
+		int number_wanted_max = 1;
+		if (it.to_slot() == $slot[weapon] && it.weapon_hands() == 1)
+		{
+			if ($skill[double-fisted skull smashing].skill_is_usable() && it.item_type() != "accordion")
+				number_wanted_max += 1;
+			if (familiar_is_usable($familiar[disembodied hand]))
+				number_wanted_max += 1;
+		}
+		
+		if (it.available_amount() >= number_wanted_max)
+			continue;
+		string suggestion = coal_item_suggestions[it];
+		coal_suggestions.listAppend(it + ": " + suggestion);
+	}
+}
+
+void smithsnessGenerateSmithereensSuggestions(string [int] smithereen_suggestions) //suggestereens
+{
+	smithereen_suggestions.listAppend(7014.to_item().to_string() + ": " + (__misc_state["free runs usable"] ? "free run/" : "") + "banish for 20 turns");
+	
+	if (__misc_state["can eat just about anything"] && availableFullness() >= 2 && my_path_id() != PATH_SLOW_AND_STEADY)
+	{
+		smithereen_suggestions.listAppend("Charming Flan: 2 fullness epic food<br>Miserable Pie: 2 fullness awesome food, 50 turns of +10 smithsness");
+	}
+		
+	if (__misc_state["can drink just about anything"] && availableDrunkenness() >= 2 && my_path_id() != PATH_SLOW_AND_STEADY)
+	{
+		smithereen_suggestions.listAppend("Vulgar Pitcher: 2 drunkenness epic drink<br>Bigmouth: 2 drunkenness awesome drink, 50 turns of +10 smithsness");
+	}
+	if (!$familiar[he-boulder].familiar_is_usable())
+    {
+        string line = "Golden Light: Yellow ray";
+        if ($effect[everything looks yellow].have_effect() > 0)
+            line = HTMLGenerateSpanFont(line, "gray");
+		smithereen_suggestions.listAppend(line);
+    }
+    
+    if (__misc_state["in run"])
+        smithereen_suggestions.listAppend("Handsome Devil: single-turn +100% item");
+	
+}
+
+RegisterResourceGenerationFunction("IOTMSmithsnessGenerateResource");
+void IOTMSmithsnessGenerateResource(ChecklistEntry [int] resource_entries)
+{
+	if (__misc_state["in run"] && $item[handful of smithereens].available_amount() > 0)
+	{
+		string [int] smithereen_suggestions;
+		smithsnessGenerateSmithereensSuggestions(smithereen_suggestions);
+		resource_entries.listAppend(ChecklistEntryMake("__item handful of smithereens", "", ChecklistSubentryMake(pluralise($item[handful of smithereens]), "", smithereen_suggestions.listJoinComponents("<hr>")), 10));
+	}
+	if (__misc_state["in run"] && $item[lump of Brituminous coal].available_amount() > 0)
+	{
+		string [int] coal_suggestions;
+		smithsnessGenerateCoalSuggestions(coal_suggestions);
+		resource_entries.listAppend(ChecklistEntryMake("__item lump of Brituminous coal", "", ChecklistSubentryMake(pluralise($item[lump of Brituminous coal]), "", coal_suggestions.listJoinComponents("<hr>")), 10));
+	}
+	if ($item[flaskfull of hollow].available_amount() > 0 && $effect[Merry Smithsness].have_effect() < 25 && __misc_state["in run"])
+	{
+		int turns_left = $effect[Merry Smithsness].have_effect();
+		string [int] details;
+		details.listAppend(pluralise((turns_left + 150 * $item[flaskfull of hollow].available_amount()), "turn", "turns") + " of +25 smithsness");
+		if (turns_left > 0)
+			details.listAppend("Effect will run out in " + pluralise(turns_left, "turn", "turns"));
+		resource_entries.listAppend(ChecklistEntryMake("__item flaskfull of hollow", "inventory.php?which=3", ChecklistSubentryMake(pluralise($item[flaskfull of hollow]), "", details), 10));
+	}
+}
+
+
+void SugarGenerateSuggestions(string [int] suggestions)
+{
+    if (!__misc_state["in run"])
+        return;
+    if ($item[sugar shield].available_amount() == 0 && $item[snow suit].available_amount() == 0)
+        suggestions.listAppend("Sugar shield: +10 familiar weight equip");
+    if ($item[sugar chapeau].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["past tower monsters"])
+        suggestions.listAppend("Sugar chapeau: +50% spell damage (tower killing)");
+}
+
+RegisterResourceGenerationFunction("IOTMSugarGenerateResource");
+void IOTMSugarGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if (!$item[sugar sheet].is_unrestricted())
+        return;
+    item [int] sugar_crafted_items;
+    for i from 4178 to 4183
+    {
+        sugar_crafted_items.listAppend(i.to_item());
+    }
+    ChecklistSubentry [int] subentries;
+    
+    string image_name = "";
+    
+    if ($item[sugar sheet].available_amount() > 0 && __misc_state["in run"] )
+    {
+        string [int] suggestions;
+        SugarGenerateSuggestions(suggestions);
+        subentries.listAppend(ChecklistSubentryMake(pluralise($item[sugar sheet]), "", suggestions));
+        
+        image_name = "sugar sheet";
+    }
+    foreach key in sugar_crafted_items
+    {  
+        item it = sugar_crafted_items[key];
+        if (it.available_amount() == 0)
+            continue;
+        int counter = get_property_int("sugarCounter" + it.to_int());
+        if (counter == 0 && !__misc_state["in run"]) //in aftercore, probably not as relevant
+            continue;
+        int combats_left = 31 - counter;
+        subentries.listAppend(ChecklistSubentryMake(pluralise(it), "", pluralise(combats_left, "combat", "combats") + " left."));
+        if (image_name.length() == 0)
+            image_name = it;
+    }
+    if (subentries.count() > 0)
+    {
+        resource_entries.listAppend(ChecklistEntryMake(image_name, "", subentries, 10));
+    }
+}
+
+RegisterResourceGenerationFunction("IOTMTomesGenerateResource");
+void IOTMTomesGenerateResource(ChecklistEntry [int] resource_entries)
+{
+	if (true)
+	{
+		ChecklistSubentry [int] subentries;		
+		
+		int tome_count = 0;
+		
+		string [skill] tome_summons_property_names;
+		tome_summons_property_names[$skill[Summon Smithsness]] = "_smithsnessSummons";
+		tome_summons_property_names[$skill[summon clip art]] = "_clipartSummons";
+		tome_summons_property_names[$skill[Summon Sugar Sheets]] = "_sugarSummons";
+		tome_summons_property_names[$skill[Summon Snowcones]] = "_snowconeSummons";
+		tome_summons_property_names[$skill[Summon Stickers]] = "_stickerSummons";
+		tome_summons_property_names[$skill[Summon Rad Libs]] = "_radlibSummons";
+		
+		int [skill] summons_available;
+		foreach s in tome_summons_property_names
+		{
+			string property_name = tome_summons_property_names[s];
+			int value = 0;
+			if (s.skill_is_usable())
+			{
+				if (in_ronin())
+					value = 3 - get_property_int("tomeSummons");
+				else
+					value = 3 - get_property_int(property_name);
+                if (value > 0)
+                {
+                    tome_count += 1;
+                }
+			}
+			summons_available[s] = value;
+		}
+        if (tome_count == 0)
+            return;
+		
+        if (in_ronin())
+        {
+            int summons_remaining = 3 - get_property_int("tomeSummons");
+            subentries.listAppend(ChecklistSubentryMake(pluralise(summons_remaining, "tome summon", "tome summons") + " remaining", "", ""));
+        }
+        
+        
+		if (summons_available[$skill[Summon Smithsness]] > 0)
+		{
+			string [int] description;
+			
+			string [int] flask_suggestions;
+			
+			string [int] smithereen_suggestions;
+			smithsnessGenerateSmithereensSuggestions(smithereen_suggestions);
+			
+			
+			string [int] coal_suggestions;
+			smithsnessGenerateCoalSuggestions(coal_suggestions);
+			
+			if (true)
+			{
+                int merry_smithsness_currently_available = $item[flaskfull of hollow].available_amount() * 150 + $effect[merry smithsness].have_effect();
+				string building_line = "+25 smithsness (150 turns)";
+				if (merry_smithsness_currently_available > 0)
+					building_line += " (" + merry_smithsness_currently_available + " turns currently available)";
+				flask_suggestions.listAppend(building_line);
+				
+			}
+			
+            
+            if (__misc_state["in run"])
+            {
+                description.listAppend("1 Flaskfull of Hollow" + HTMLGenerateIndentedText(flask_suggestions.listJoinComponents("<hr>")));
+                description.listAppend("1 Lump of Brituminous coal" + HTMLGenerateIndentedText(coal_suggestions.listJoinComponents("<hr>")));
+                description.listAppend("1 Handful of Smithereens" + HTMLGenerateIndentedText(smithereen_suggestions.listJoinComponents("<hr>")));
+            }
+            else
+                description.listAppend("Flaskfull of Hollow, Lump of Brituminous coal, and Handful of Smithereens");
+
+			
+			string name = "The Smith's Tome";
+			if (!in_ronin())
+				name = pluralise(summons_available[$skill[Summon Smithsness]], name + " summon", name + " summons");
+			subentries.listAppend(ChecklistSubentryMake(name, "", description));
+			
+		}
+		if (summons_available[$skill[summon clip art]] > 0)
+		{
+			string [int] description;
+            if (__misc_state["in run"])
+            {
+                if ($item[shining halo].available_amount() == 0 && __misc_state["need to level"])
+                    description.listAppend("Shining halo: +3 stats/fight when unarmed");
+                if ($item[frosty halo].available_amount() == 0 && $item[a light that never goes out].available_amount() == 0)
+                    description.listAppend("Frosty halo: 25% items when unarmed");
+                if ($item[furry halo].available_amount() == 0)
+                {
+                    string line = "Furry halo: +5 familiar weight when unarmed";
+                    if (__misc_state["free runs available"])
+                        line += " (1 free run/day)";
+                    description.listAppend(line);
+                }
+                if ($item[time halo].available_amount() == 0 && my_daycount() <3 )
+                    description.listAppend("Time halo: +5 adventures/day");
+                    
+                if ($item[bucket of wine].available_amount() == 0 && __misc_state["can drink just about anything"])
+                {
+                    if ($skill[the ode to booze].skill_is_usable())
+                        description.listAppend("Bucket of wine: 28 adventures nightcap with ode");
+                    else if (get_property_int("hiddenTavernUnlock") != my_ascensions() && $item[ye olde meade].available_amount() == 0) //just use fog murderers or meade instead, about the same
+                        description.listAppend("Bucket of wine: 18 adventures nightcap");
+                }
+                    
+                if (__misc_state["can eat just about anything"] && __misc_state["need to level"])
+                    description.listAppend("Ultrafondue: 3 fullness awesome food, +15ML for 30 adventures");
+                if (true)
+                {
+                    string line = "Crystal skull: banish in high monster count zones";
+                    if ($skill[Summon Smithsness].skill_is_usable() && !__misc_state["in aftercore"])
+                        line += "|*Smith's Tome has a better one";
+                    description.listAppend(line);
+                }
+                if ($item[borrowed time].available_amount() == 0 && !get_property_boolean("_borrowedTimeUsed") && my_daycount() > 1)
+                    description.listAppend("Borrowed time: 20 adventures on last day");
+                
+                string [int] familiar_suggestions;
+                if (familiar_is_usable($familiar[he-boulder]) && $item[quadroculars].available_amount() == 0)
+                    familiar_suggestions.listAppend("He-Boulder 100-turn YR");
+                if (familiar_is_usable($familiar[obtuse angel]) && !familiar_is_usable($familiar[Reanimated Reanimator]))
+                    familiar_suggestions.listAppend("+1 angel copy");
+                    
+                if (familiar_suggestions.count() > 0)
+                    description.listAppend("Box of familiar jacks: free familiar equipment (" + listJoinComponents(familiar_suggestions, ", ") + ")");
+                else
+                    description.listAppend("Box of familiar jacks: free familiar equipment");
+            }
+			
+			string name = "Tome of Clip Art";
+			if (!in_ronin())
+				name = pluralise(summons_available[$skill[Summon Clip Art]], name + " summon", name + " summons");
+			subentries.listAppend(ChecklistSubentryMake(name, "", description));
+		}
+		if (summons_available[$skill[Summon Sugar Sheets]] > 0)
+		{
+			string [int] description;
+            
+            SugarGenerateSuggestions(description);
+				
+			string name = "Tome of Sugar Shummoning";
+			if (!in_ronin())
+				name = pluralise(summons_available[$skill[Summon Sugar Sheets]], name + " summon", name + " summons");
+			subentries.listAppend(ChecklistSubentryMake(name, "", description));
+		}
+		if (summons_available[$skill[Summon Snowcones]] > 0)
+		{
+			string [int] description;
+			//FIXME check this
+			
+			string name = "Tome of Snowcone Summoning";
+			if (!in_ronin())
+				name = pluralise(summons_available[$skill[Summon Snowcones]], name + " summon", name + " summons");
+			subentries.listAppend(ChecklistSubentryMake(name, "", description));
+		}
+		if (summons_available[$skill[Summon Stickers]] > 0)
+		{
+			string [int] description;
+			//FIXME check this
+			
+			string name = "Scratch 'n' Sniff Sticker Tome";
+			if (!in_ronin())
+				name = pluralise(summons_available[$skill[Summon Stickers]], name + " summon", name + " summons");
+			subentries.listAppend(ChecklistSubentryMake(name, "", description));
+		}
+		if (summons_available[$skill[Summon Rad Libs]] > 0)
+		{
+			string [int] description;
+			
+			//FIXME check this
+			
+			string name = "Tome of Rad Libs";
+			if (!in_ronin())
+				name = pluralise(summons_available[$skill[Summon Rad Libs]], name + " summon", name + " summons");
+			subentries.listAppend(ChecklistSubentryMake(name, "", description));
+		}
+		
+        
+        ChecklistEntry entry = ChecklistEntryMake("__item tome of clip art", "campground.php?action=bookshelf", subentries);
+        if (in_ronin())
+            entry.should_indent_after_first_subentry = true;
+        resource_entries.listAppend(entry);
+	}
+}
+
+Record COTSuggestion
+{
+    string reason;
+    familiar [int] familiars;
+};
+
+
+COTSuggestion COTSuggestionMake(string reason, familiar [int] familiars)
+{
+    COTSuggestion suggestion;
+    suggestion.reason = reason;
+    suggestion.familiars = familiars;
+    
+    return suggestion;
+}
+
+COTSuggestion COTSuggestionMake(string reason, familiar f)
+{
+    familiar [int] familiar_list;
+    familiar_list.listAppend(f);
+    return COTSuggestionMake(reason, familiar_list);
+}
+
+COTSuggestion COTSuggestionMake(string reason, boolean [familiar] familiars_in)
+{
+    familiar [int] familiars_out;
+    foreach f in familiars_in
+        familiars_out.listAppend(f);
+    return COTSuggestionMake(reason, familiars_out);
+}
+
+void listAppend(COTSuggestion [int] list, COTSuggestion entry)
+{
+	int position = list.count();
+	while (list contains position)
+		position += 1;
+	list[position] = entry;
+}
+
+
+//Follows in order. If we can't find one in the first set, we check the second, then third, etc.
+//This allows for supporting +25% meat, then falling back on +20%, etc.
+Record COTSuggestionSet
+{
+    COTSuggestion [int] suggestions;
+};
+
+COTSuggestionSet COTSuggestionSetMake(COTSuggestion [int] suggestions)
+{
+    COTSuggestionSet suggestion_set;
+    suggestion_set.suggestions = suggestions;
+    
+    return suggestion_set;
+}
+
+COTSuggestionSet COTSuggestionSetMake(COTSuggestion suggestion)
+{
+    COTSuggestionSet suggestion_set;
+    suggestion_set.suggestions.listAppend(suggestion);
+    
+    return suggestion_set;
+}
+
+void listAppend(COTSuggestionSet [int] list, COTSuggestionSet entry)
+{
+	int position = list.count();
+	while (list contains position)
+		position += 1;
+	list[position] = entry;
+}
+
+
+void IOTMCOTGenerateSuggestions(string [int] description)
+{
+    familiar enthroned_familiar = my_enthroned_familiar();
+    familiar bjorned_familiar = my_bjorned_familiar();
+    //Suggest what it offers:
+    COTSuggestionSet [int] suggestion_sets;
+    
+    boolean have_two_available = false;
+    if ($item[crown of thrones].available_amount() > 0 && $item[Buddy Bjorn].available_amount() > 0)
+        have_two_available = true;
+
+    //Relevant:
+    //+10ML
+    suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+10 ML and +MP regen", $familiar[el vibrato megadrone])));
+    //+15% item drops, or +10%
+    if (true)
+    {
+        COTSuggestion [int] suggestions;
+        suggestions.listAppend(COTSuggestionMake("+15% items", $familiars[li'l xenomorph, feral kobold]));
+        suggestions.listAppend(COTSuggestionMake("+10% items", $familiars[Reassembled Blackbird,Reconstituted Crow,Oily Woim]));
+        suggestion_sets.listAppend(COTSuggestionSetMake(suggestions));
+    }
+    //+2 moxie/muscle/mysticality stats/fight
+    if (__misc_state["need to level"])
+    {
+        if (my_primestat() == $stat[moxie])
+        {
+            suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+2 mainstat/fight", $familiars[blood-faced volleyball,jill-o-lantern, nervous tick,mariachi chihuahua, cymbal-playing monkey,hovering skull])));
+        }
+        else if (my_primestat() == $stat[mysticality])
+        {
+            suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+2 mainstat/fight", $familiars[reanimated reanimator,dramatic hedgehog,cheshire bat,pygmy bugbear shaman,hovering sombrero,sugar fruit fairy, uniclops])));
+        }
+        else if (my_primestat() == $stat[muscle])
+        {
+            suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+2 mainstat/fight", $familiars[hunchbacked minion, killer bee, grinning turtle,chauvinist pig, baby mutant rattlesnake])));
+        }
+    }
+    //+25% / +20% meat from monsters
+    if (true)
+    {
+        COTSuggestion [int] suggestions;
+        suggestions.listAppend(COTSuggestionMake("+25% meat", $familiars[Knob Goblin Organ Grinder,Happy Medium,Hobo Monkey]));
+        suggestions.listAppend(COTSuggestionMake("+20% meat", $familiars[Dancing Frog,Psychedelic Bear,Hippo Ballerina,Attention-Deficit Demon,Piano Cat,Coffee Pixie,Obtuse Angel,Hand Turkey,Leprechaun,Grouper Groupie,Mutant Cactus Bud,Jitterbug,Casagnova Gnome]));
+        suggestion_sets.listAppend(COTSuggestionSetMake(suggestions));
+    }
+    //+5 to familiar weight
+    suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+5 familiar weight", $familiars[Gelatinous Cubeling,Pair of Ragged Claws,Spooky Pirate Skeleton,Autonomous Disco Ball,Ghost Pickle on a Stick,Misshapen Animal Skeleton,Animated Macaroni Duck,Penguin Goodfella,Barrrnacle])));
+    //+20% to combat init
+    if (__misc_state["in run"])
+        suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+20% init", $familiars[Teddy Bear,Emo Squid,Evil Teddy Bear,Syncopated Turtle,Untamed Turtle,Mini-Skulldozer,Cotton Candy Carnie,Origami Towel Crane,Feather Boa Constrictor,Levitating Potato,Temporal Riftlet,Squamous Gibberer,Cuddlefish,Teddy Borg])));
+    //+15% to moxie/muscle/mysticality
+    if (__misc_state["in run"])
+    {
+        if (true)
+        {
+            //Either scaling monster levelling, or the NS
+            suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+15% moxie", $familiars[Ninja Snowflake,Nosy Nose,Clockwork Grapefruit,Sabre-Toothed Lime])));
+        }
+        if (my_primestat() == $stat[mysticality] && __misc_state["need to level"])
+        {
+            //Scaling monster levelling
+            suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+15% mysticality", $familiars[Ragamuffin Imp,Inflatable Dodecapede,Scary Death Orb,Snowy Owl,grue])));
+        }
+        else if (my_primestat() == $stat[muscle] && __misc_state["need to level"])
+        {
+            //Scaling monster levelling
+            suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+15% muscle", $familiars[MagiMechTech MicroMechaMech,Angry Goat,Wereturtle,Stab Bat,Wind-up Chattering Teeth,Imitation Crab])));
+        }
+    }
+    //+20%/+15%/+10% to spell damage
+    //Too marginal?
+    /*if (__misc_state["in run"])
+    {
+        COTSuggestion [int] suggestions;
+        suggestions.listAppend(COTSuggestionMake("+20% spell damage", $familiar[mechanical songbird]));
+        suggestions.listAppend(COTSuggestionMake("+15% spell damage", $familiars[Magic Dragonfish,Pet Cheezling,Rock Lobster]));
+        suggestions.listAppend(COTSuggestionMake("+10% spell damage", $familiars[Midget Clownfish,Star Starfish,Baby Yeti,Snow Angel,Wizard Action Figure,Dataspider,Underworld Bonsai,Whirling Maple Leaf,Rogue Program,Howling Balloon Monkey]));
+        suggestion_sets.listAppend(COTSuggestionSetMake(suggestions));
+    }*/
+    //hot wings from reanimator
+    if (true)
+    {
+        string [int] reanimator_reasons;
+        
+        if (__quest_state["Pirate Quest"].state_boolean["need more hot wings"])
+            reanimator_reasons.listAppend("hot wings");
+        
+        if (reanimator_reasons.count() > 0)
+            suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake(reanimator_reasons.listJoinComponents(", ").capitaliseFirstLetter(), $familiar[reanimated reanimator])));
+    }
+    if (__misc_state["in run"])
+        suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("50% block", $familiar[Mariachi Chihuahua])));
+    
+    //knob mushrooms from badger
+    if (__misc_state["in run"] && __misc_state["can eat just about anything"])
+        suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("Knob mushrooms", $familiar[astral badger])));
+        
+    boolean need_cold_res = false;
+    boolean need_all_res = false;
+    //At a-boo peak, but not finished with it:
+    if (__quest_state["Level 9"].state_int["a-boo peak hauntedness"] > 0 && __quest_state["Level 9"].state_boolean["bridge complete"])
+        need_all_res = true;
+    //Climbing the peak:
+    if (__quest_state["Level 8"].state_boolean["Past mine"] && !__quest_state["Level 8"].state_boolean["Groar defeated"] && numeric_modifier("cold resistance") < 5.0)
+        need_cold_res = true;
+    
+    if (__misc_state["in run"] && need_cold_res)
+        suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+3 cold res", $familiar[Flaming Face])));
+    if (need_cold_res && !$familiar[flaming face].have_familiar_replacement())
+        need_all_res = true;
+    if (__misc_state["in run"] && need_all_res)
+        suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+2 all res", $familiars[Bulky Buddy Box,Exotic Parrot,Holiday Log,Pet Rock,Toothsome Rock])));
+        
+    //if (__misc_state["in run"] && availableSpleen() >= 4)
+        //suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("Spleen items", $familiar[Grim Brother])));
+    
+    //slightly powerful:
+    suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+combat", $familiar[Grim Brother])));
+    suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("-combat", $familiar[Grimstone Golem])));
+    
+    if (get_property_int("_grimstoneMaskDropsCrown") == 0)
+        suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("Grimstone mask", $familiar[Grimstone Golem])));
+    if (get_property_int("_grimFairyTaleDropsCrown") < 2 && !(__misc_state["in run"] && spleen_limit() == 0))
+        suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake(pluraliseWordy(clampi(2 - get_property_int("_grimFairyTaleDropsCrown"), 0, 2), "spleen item", "spleen items").capitaliseFirstLetter(), $familiar[grim Brother])));
+    
+    if ($item[blackberry].available_amount() < 3 && $item[blackberry galoshes].available_amount() == 0 && __quest_state["Level 11"].mafia_internal_step < 2)
+        suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("Blackberries for galoshes", $familiars[reassembled blackbird,reconstituted crow])));
+    string [int][int] familiar_options;
+    foreach key in suggestion_sets
+    {
+        boolean found_relevant = false;
+        COTSuggestionSet suggestion_set = suggestion_sets[key];
+        foreach key2 in suggestion_set.suggestions
+        {
+            //Suggest the familiar with the highest weight, under the assumption they're using it more.
+            COTSuggestion suggestion = suggestion_set.suggestions[key2];
+            familiar best_familiar_by_weight = $familiar[none];
+            familiar second_best_familiar_by_weight = $familiar[none];
+            foreach key3 in suggestion.familiars
+            {
+                familiar f = suggestion.familiars[key3];
+                if (f == $familiar[none]) //didn't find it
+                    continue;
+                if (f.have_familiar_replacement())
+                {
+                    if ((best_familiar_by_weight != enthroned_familiar || enthroned_familiar == $familiar[none]) && (best_familiar_by_weight == $familiar[none] || f.familiar_weight() > best_familiar_by_weight.familiar_weight() || f == enthroned_familiar))
+                    {
+                        second_best_familiar_by_weight = best_familiar_by_weight;
+                        best_familiar_by_weight = f;
+                    }
+                    else if (second_best_familiar_by_weight == $familiar[none] || f.familiar_weight() > second_best_familiar_by_weight.familiar_weight())
+                    {
+                        if (best_familiar_by_weight != f)
+                            second_best_familiar_by_weight = f;
+                    }
+                }
+            }
+            if (best_familiar_by_weight != $familiar[none])
+            {
+                string familiar_string;
+                
+                familiar_string = best_familiar_by_weight;
+                if ((enthroned_familiar == best_familiar_by_weight && enthroned_familiar != $familiar[none]) || (bjorned_familiar == best_familiar_by_weight && bjorned_familiar != $familiar[none]))
+                    familiar_string = HTMLGenerateSpanOfClass(best_familiar_by_weight, "r_bold");
+                    
+                if (second_best_familiar_by_weight != $familiar[none] && have_two_available)
+                    familiar_string += "|" + second_best_familiar_by_weight;
+                familiar_options.listAppend(listMake(suggestion.reason, familiar_string));
+                break;
+            }
+        }
+    }
+    if (familiar_options.count() > 0)
+        description.listAppend(HTMLGenerateSimpleTableLines(familiar_options));
+}
+
+RegisterResourceGenerationFunction("IOTMCOTGenerateResource");
+void IOTMCOTGenerateResource(ChecklistEntry [int] resource_entries)
+{
+	if ($item[crown of thrones].available_amount() == 0 && $item[Buddy Bjorn].available_amount() == 0)
+		return;
+    if (__misc_state["familiars temporarily blocked"]) //avatar paths
+        return;
+	string [int] description;
+    
+    item crown_item = $item[crown of thrones];
+    if (crown_item.equipped_amount() == 0 && $item[Buddy Bjorn].available_amount() > 0)
+        crown_item = $item[Buddy Bjorn];
+    
+    string image_name = "__item " + crown_item;
+    familiar enthroned_familiar = my_enthroned_familiar();
+    familiar bjorned_familiar = my_bjorned_familiar();
+    
+    if (($item[crown of thrones].equipped_amount() > 0 || $item[Buddy Bjorn].equipped_amount() > 0) || __misc_state["in run"])
+    {
+        IOTMCOTGenerateSuggestions(description);
+    }
+    
+	if (enthroned_familiar != $familiar[none])
+    {
+		description.listAppend(enthroned_familiar + " enthroned.");
+        //image_name = "__familiar " + enthroned_familiar.to_string();
+    }
+    if (bjorned_familiar != $familiar[none])
+		description.listAppend(bjorned_familiar + " bjorned.");
+    //FIXME my_bjorned_familiar() when 16.3
+    
+    string url = "familiar.php";
+    if ($item[crown of thrones].equipped_amount() == 0 && $item[Buddy Bjorn].equipped_amount() == 0)
+        url = "inventory.php?which=2";
+        
+    string header = crown_item;
+    item [int] available_sources;
+    
+    if ($item[Buddy Bjorn].available_amount() > 0)
+        available_sources.listAppend($item[Buddy Bjorn]);
+    if ($item[crown of thrones].available_amount() > 0)
+        available_sources.listAppend($item[crown of thrones]);
+    if (available_sources.count() > 0)
+        header = available_sources.listJoinComponents(", ", "and");
+        
+    if (description.count() > 0)
+        resource_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(header, "", description), 8));
+}
+static
+{
+    skill [int] __libram_skills;
+    void initialiseLibramSkills()
+    {
+		foreach s in $skills[]
+        {
+			if (s.libram)
+				__libram_skills.listAppend(s);
+        }
+    }
+    initialiseLibramSkills();
+}
+
+RegisterResourceGenerationFunction("IOTMLibramGenerateResource");
+void IOTMLibramGenerateResource(ChecklistEntry [int] resource_entries)
+{
+	if (__misc_state["bookshelf accessible"])
+	{
+		int libram_mp_cost = nextLibramSummonMPCost();
+		
+		
+		string [int] librams_usable;
+		foreach key, s in __libram_skills
+        {
+			if (s.skill_is_usable())
+				librams_usable.listAppend(s.to_string());
+        }
+		if (libram_mp_cost <= my_maxmp() && librams_usable.count() > 0)
+		{
+			ChecklistSubentry subentry;
+			if (librams_usable.count() == 1)
+				subentry.header = "Libram";
+			else
+				subentry.header = "Librams";
+			subentry.header += " summonable";
+			subentry.modifiers.listAppend(libram_mp_cost + "MP cost");
+			
+			string [int] readable_list;
+			foreach key in librams_usable
+			{
+				string libram_name = librams_usable[key];
+				if (libram_name.stringHasPrefix("Summon "))
+					libram_name = libram_name.substring(7);
+				readable_list.listAppend(libram_name);
+			}
+			
+			subentry.entries.listAppend(readable_list.listJoinComponents(", ", "and") + ".");
+            
+            if ($skill[summon taffy].skill_is_usable() && get_property_int("_taffyYellowSummons") == 0)
+            {
+                float chance = powf(0.5, MAX(0, get_property_int("_taffyRareSummons") + 1));
+                subentry.entries.listAppend("Could try to summon a yellow taffy. (" + (chance * 100.0).roundForOutput(1) + "% chance)");
+                //_taffyYellowSummons
+            }
+            
+			resource_entries.listAppend(ChecklistEntryMake("__item libram of divine favors", "campground.php?action=bookshelf", subentry, 7));
+		}
+		
+		
+		if ($skill[summon brickos].skill_is_usable() && __misc_state["in run"])
+		{
+			if (get_property_int("_brickoEyeSummons") <3)
+			{
+				ChecklistSubentry subentry;
+				subentry.header =  (3 - get_property_int("_brickoEyeSummons")) + " BRICKO&trade; eye bricks obtainable";
+				subentry.entries.listAppend("Cast Summon BRICKOs libram. (" + libram_mp_cost + " mp)");
+				resource_entries.listAppend(ChecklistEntryMake("__item bricko eye brick", "campground.php?action=bookshelf", subentry, 9));
+				
+			}
+		}
+	}
+	
+	if (__misc_state["in run"])
+	{
+		boolean [item] all_possible_bricko_fights = $items[bricko eye brick,bricko airship,bricko bat,bricko cathedral,bricko elephant,bricko gargantuchicken,bricko octopus,bricko ooze,bricko oyster,bricko python,bricko turtle,bricko vacuum cleaner];
+		
+		int bricko_potential_fights_available = 0;
+		foreach it in $items[bricko eye brick,bricko airship,bricko bat,bricko cathedral,bricko elephant,bricko gargantuchicken,bricko octopus,bricko ooze,bricko oyster,bricko python,bricko turtle,bricko vacuum cleaner]
+		{
+			bricko_potential_fights_available += it.available_amount();
+		}
+		bricko_potential_fights_available = MIN(10 - get_property_int("_brickoFights"), bricko_potential_fights_available);
+		if (bricko_potential_fights_available > 0)
+		{
+			ChecklistSubentry subentry;
+			subentry.header = pluralise(bricko_potential_fights_available, "BRICKO&trade; fight", "BRICKO&trade; fights") + " ready";
+			
+			
+			foreach fight in all_possible_bricko_fights
+			{
+				int number_available = fight.available_amount();
+				if (number_available > 0)
+                {
+                    string line = pluralise(number_available, fight);
+                    
+                    if ($items[rock band flyers,jam band flyers].available_amount() > 0 && !__quest_state["Level 12"].state_boolean["Arena Finished"] && __quest_state["Level 12"].in_progress && get_property_int("flyeredML") < 10000)
+                    {
+                        monster m = fight.to_string().to_monster(); //is there a better way to look this up?
+                        line += " (" + m.base_initiative + "% init)";
+                    }
+					subentry.entries.listAppend(line);
+                }
+			}
+			
+			item [int] craftable_fights;
+			string [int] creatable;
+			foreach fight in all_possible_bricko_fights
+			{
+                monster m = fight.to_string().to_monster(); //is there a better way to look this up?
+				int bricks_needed = get_ingredients(fight)[$item[bricko brick]];
+				int monster_level = m.raw_attack;
+				int number_available = creatable_amount(fight);
+				if (number_available > 0)
+				{
+					craftable_fights.listAppend(fight);
+					creatable.listAppend(pluralise(number_available, fight) + " (" + bricks_needed + " bricks, " + monster_level + "ML)");
+				}
+			}
+			
+			if (creatable.count() > 0)
+				subentry.entries.listAppend("Creatable: (" + $item[bricko brick].available_amount() + " bricks available)" + HTMLGenerateIndentedText(creatable));
+				
+			resource_entries.listAppend(ChecklistEntryMake("__item bricko brick", "inventory.php?which=3", subentry, 7));
+		}
+	}
+}
+void generateGardenEntry(ChecklistEntry [int] resource_entries, boolean [item] garden_source_items, boolean [item] garden_creatable_items)
+{
+    ChecklistSubentry [int] subentries;
+    string image_name = "";
+    foreach it in garden_source_items
+    {
+        if (it.available_amount() == 0) continue;
+        if (image_name.length() == 0)
+            image_name = "__item " + it;
+        subentries.listAppend(ChecklistSubentryMake(pluralise(it), "", ""));
+    }
+    if (subentries.count() > 0)
+    {
+        ChecklistSubentry subentry = subentries[subentries.count() - 1]; //hacky
+        
+        
+        int [item] creatable_items = garden_creatable_items.creatable_items();
+        string [int] output_list;
+        foreach it in creatable_items
+        {
+            int amount = creatable_items[it];
+            
+            if (it.to_slot() != $slot[none] && it.available_amount() > 0) //already have one
+                continue;
+            output_list.listAppend(pluralise(amount, it));
+        }
+        if (output_list.count() > 0)
+        {
+            subentry.entries.listAppend("Can create " + output_list.listJoinComponents(", ", "or") + ".");
+        }
+        resource_entries.listAppend(ChecklistEntryMake(image_name, "", subentries, 8));
+    }
+}
+
+
+RegisterResourceGenerationFunction("IOTMGardensGenerateResource");
+void IOTMGardensGenerateResource(ChecklistEntry [int] resource_entries)
+{
+	if (!__misc_state["in run"])
+        return;
+
+    //Garden items:
+    if (true)
+    {
+        boolean [item] garden_creatable_items;
+        garden_creatable_items[$item[pumpkin juice]] = true;
+        if (__misc_state["can eat just about anything"])
+            garden_creatable_items[$item[pumpkin pie]] = true;
+        if (__misc_state["can drink just about anything"])
+            garden_creatable_items[$item[pumpkin beer]] = true;
+        if (__misc_state_string["yellow ray source"] == 4766.to_item().to_string())
+            garden_creatable_items[4766.to_item()] = true;
+        
+        generateGardenEntry(resource_entries, $items[pumpkin], garden_creatable_items);
+    }
+    if (true)
+    {
+        boolean [item] garden_creatable_items;
+        if (__misc_state["can eat just about anything"])
+            garden_creatable_items[$item[peppermint patty]] = true;
+        if (__misc_state["can drink just about anything"])
+            garden_creatable_items[$item[peppermint twist]] = true;
+        if (__misc_state["free runs usable"])
+            garden_creatable_items[$item[peppermint parasol]] = true;
+        garden_creatable_items[$item[peppermint crook]] = true;
+        generateGardenEntry(resource_entries, $items[peppermint sprout], garden_creatable_items);
+    }
+    if (true)
+    {
+        boolean [item] garden_creatable_items;
+        if (__misc_state["can eat just about anything"])
+            garden_creatable_items[$item[skeleton quiche]] = true;
+        if (__misc_state["can drink just about anything"])
+            garden_creatable_items[$item[crystal skeleton vodka]] = true;
+        if (!__misc_state["mysterious island available"])
+            garden_creatable_items[$item[skeletal skiff]] = true;
+        if (hippy_stone_broken())
+            garden_creatable_items[$item[auxiliary backbone]] = true;
+        generateGardenEntry(resource_entries, $items[skeleton], garden_creatable_items);
+    }
+    if (true)
+    {
+        generateGardenEntry(resource_entries, $items[handful of barley,cluster of hops,fancy beer bottle,fancy beer label], $items[can of Br&uuml;talbr&auml;u,can of Drooling Monk,can of Impetuous Scofflaw,bottle of old pugilist,bottle of professor beer,bottle of rapier witbier,artisanal homebrew gift package]);
+    }
+    if (true)
+    {
+        boolean [item] garden_creatable_items;
+        
+        foreach it in $items[snow cleats,snow crab,unfinished ice sculpture,snow mobile,ice bucket,bod-ice,snow belt,ice house,ice nine]
+            garden_creatable_items[it] = true;
+        
+        if (!__quest_state["Level 9"].state_boolean["bridge complete"])
+            garden_creatable_items[$item[snow boards]] = true;
+        
+        if (!__quest_state["Level 4"].finished)
+            garden_creatable_items[$item[snow shovel]] = true;
+        
+        if (__misc_state["can eat just about anything"])
+            garden_creatable_items[$item[snow crab]] = true;
+        if (__misc_state["can drink just about anything"])
+            garden_creatable_items[$item[Ice Island Long Tea]] = true;
+        if (hippy_stone_broken())
+            garden_creatable_items[$item[ice nine]] = true;
+        
+        
+        generateGardenEntry(resource_entries, $items[snow berries, ice harvest], garden_creatable_items);
+    }
+}
+RegisterResourceGenerationFunction("IOTMPlasticVampireFangsGenerateResource");
+void IOTMPlasticVampireFangsGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if (!$item[plastic vampire fangs].is_unrestricted())
+        return;
+    if ($items[plastic vampire fangs,Interview With You (a Vampire)].available_amount() == 0)
+        return;
+    item fang_source = $item[plastic vampire fangs];
+    string url = "";
+    string separator = " " + __html_right_arrow_character + " ";
+    if ($item[plastic vampire fangs].available_amount() == 0)
+    {
+        fang_source = $item[Interview With You (a Vampire)];
+            url = "inventory.php?which=3";
+    }
+    else
+    {
+        url = "place.php?whichplace=town";
+        if ($item[plastic vampire fangs].equipped_amount() == 0)
+        {
+            url = "inventory.php?which=2";
+        }
+    }
+    
+    if (!get_property_boolean("_interviewIsabella") && __misc_state["in run"] && __misc_state["need to level"])
+    {
+        string [int] description;
+        int stats_gained = MIN(500, 4 * my_basestat(my_primestat())) * (1.0 + numeric_modifier(my_primestat().to_string() + " Experience Percent") / 100.0);
+        
+        description.listAppend(stats_gained + " " + my_primestat().to_lower_case() + " gained, one adventure cost.");
+        if ($item[plastic vampire fangs].available_amount() == 0)
+        {
+            description.listAppend("Vamp out via Interview With You (a Vampire).");
+        }
+        else
+        {
+            if ($item[plastic vampire fangs].equipped_amount() == 0)
+            {
+                description.listAppend("Equip plastic vampire fangs, then vamp out in Seaside Town.");
+            }
+            else
+                description.listAppend("Vamp out in Seaside Town.");
+        }
+        
+        if (my_primestat() == $stat[muscle])
+            description.listAppend("Visit Isabella's" + separator + "Drain Her.");
+        else if (my_primestat() == $stat[mysticality])
+            description.listAppend("Visit Isabella's" + separator + "Tell Her How You Feel" + separator + "Find Other Prey.");
+        else if (my_primestat() == $stat[moxie])
+            description.listAppend("Visit Isabella's" + separator + "Redirect Your Desire" + separator + "Go to the Bar.");
+        
+        
+        resource_entries.listAppend(ChecklistEntryMake("__item " + fang_source, url, ChecklistSubentryMake("Vampire stats", "", description), 5));
+        
+    }
+
+    if (!__misc_state["in run"])
+    {
+        string [int] description;
+        if ($item[plastic vampire fangs].available_amount() == 0)
+        {
+            description.listAppend("Vamp out via Interview With You (a Vampire).");
+        }
+        else
+        {
+            if ($item[plastic vampire fangs].equipped_amount() == 0)
+            {
+                description.listAppend("Equip plastic vampire fangs, then vamp out in Seaside Town.");
+            }
+            else
+                description.listAppend("Vamp out in Seaside Town.");
+        }
+        
+        int vamp_outs_remaining = 0;
+        
+        //Disabled, unless there's something useful about these to be reminded of in aftercore:
+        /*if (!get_property_boolean("_interviewVlad"))
+        {
+            description.listAppend("Vlad's Boutique - DR or spell damage or weapon damage buff.");
+            vamp_outs_remaining += 1;
+        }
+        if (!get_property_boolean("_interviewIsabella"))
+        {
+            description.listAppend("Isabella's - mainstat gain, meat.");
+            vamp_outs_remaining += 1;
+        }*/
+        if (!get_property_boolean("_interviewMasquerade"))
+        {
+            string [int] masquerade_description;
+            if ($item[Sword of the Brouhaha Prince].available_amount() == 0)
+            {
+                string [int] interview_questions = listMake("Warehouse", "Growl", "The Clash", "Motorcycle", "Lager");
+                string [int] nomination = listMake("Malkovich", "Torremolinos", "Brouhaha", "Ventrilo");
+                string item_name = "Sword of the Brouhaha Prince";
+                masquerade_description.listAppend(item_name + "|*Interview: " + interview_questions.listJoinComponents(separator) + "<hr>|*Nomination order: " + nomination.listJoinComponents(separator));
+            }
+            if ($item[Chalice of the Malkovich Prince].available_amount() == 0)
+            {
+                string [int] interview_questions = listMake("Laugh Factory", "Giggle", "Glass breaking", "Wheelbarrow", "Blood");
+                string [int] nomination = listMake("Torremolinos", "Ventrilo", "Brouhaha", "Malkovich");
+                string item_name = "Chalice of the Malkovich Prince";
+                
+                masquerade_description.listAppend(item_name + "|*Interview: " + interview_questions.listJoinComponents(separator) + "<hr>|*Nomination order: " + nomination.listJoinComponents(separator));
+            }
+            if ($item[Sceptre of the Torremolinos Prince].available_amount() == 0)
+            {
+                string [int] interview_questions = listMake("Loft", "Flirty", "Mozart", "Carriage", "Absinthe");
+                string [int] nomination = listMake("Malkovich", "Ventrilo", "Torremolinos", "Brouhaha");
+                string item_name = "Sceptre of the Torremolinos Prince";
+                masquerade_description.listAppend(item_name + "|*Interview: " + interview_questions.listJoinComponents(separator) + "<hr>|*Nomination order: " + nomination.listJoinComponents(separator));
+            }
+            if ($item[Medallion of the Ventrilo Prince].available_amount() == 0)
+            {
+                string [int] interview_questions = listMake("Penthouse", "Terse", "No time", "Limo", "Espresso");
+                string [int] nomination = listMake("Ventrilo", "Malkovich", "Brouhaha", "Torremolinos");
+                string item_name = "Medallion of the Ventrilo Prince";
+                masquerade_description.listAppend(item_name + "|*Interview: " + interview_questions.listJoinComponents(separator) + "<hr>|*Nomination order: " + nomination.listJoinComponents(separator));
+            }
+            if (true)
+            {
+                string [int] interview_questions = listMake("Warehouse", "Growl", "The Clash", "Motorcycle", "Lager");
+                string [int] nomination = listMake("Ventrilo", "Brouhaha", "Torremolinos", "Malkovich");
+                string item_name = "Your own black heart (restores 100% HP/MP)";
+                masquerade_description.listAppend(item_name + "|*Interview: " + interview_questions.listJoinComponents(separator) + "<hr>|*Nomination order: " + nomination.listJoinComponents(separator));
+            }
+            if ($item[plastic vampire fangs].available_amount() > 0)
+            {
+                string [int] interview_questions = listMake("Warehouse", "Growl", "The Clash", "Motorcycle", "Lager");
+                string [int] nomination = listMake("Ventrilo", "Malkovich", "Torremolinos", "Brouhaha");
+                string item_name = "Interview With You (a Vampire)";
+                masquerade_description.listAppend(item_name + "|*Interview: " + interview_questions.listJoinComponents(separator) + "<hr>|*Nomination order: " + nomination.listJoinComponents(separator));
+            }
+            //description.listAppend("The Masquerade." + HTMLGenerateIndentedText(masquerade_description));
+            description.listAppendList(masquerade_description);
+            vamp_outs_remaining += 1;
+        }
+        
+        if (vamp_outs_remaining > 0)
+        {
+            //resource_entries.listAppend(ChecklistEntryMake("__item " + fang_source, url, ChecklistSubentryMake(pluralise(vamp_outs_remaining, "vamp out", "vamp outs"), "", description), 8));
+            resource_entries.listAppend(ChecklistEntryMake("__item " + fang_source, url, ChecklistSubentryMake("Vampire masquerade", "", description), 8));
+        }
+    }
+}
+//_dnaPotionsMade - int, count of potions made
+//dnaSyringe - int, current phylum of syringe. seems to track if it's become empty? double check
+//_dnaHybrid - boolean, true if you're become a human abomination today
+//r13912 or higher
+
+
+string [phylum] __dna_phylum_to_description;
+string [phylum] __dna_phylum_to_description_colourless;
+item [phylum] __dna_phylum_to_item;
+effect [phylum] __dna_phylum_to_effect;
+phylum [effect] __dna_effect_to_phylum;
+string [int] __dna_intrinsic_ideas;
+
+record DNASuggestion
+{
+    phylum [int] phylums;
+    string relevant_effect_description;
+    string reason;
+    boolean always_show;
+};
+
+
+DNASuggestion DNASuggestionMake(phylum [int] phylums, string relevant_effect_description, string reason, boolean always_show)
+{
+    DNASuggestion result;
+    result.phylums = phylums;
+    result.relevant_effect_description = relevant_effect_description;
+    result.reason = reason;
+    result.always_show = always_show;
+    return result;
+}
+
+DNASuggestion DNASuggestionMake(phylum p, string relevant_effect_description, string reason)
+{
+    phylum [int] phylums;
+    phylums[0] = p;
+    return DNASuggestionMake(phylums, relevant_effect_description, reason, false);
+}
+
+DNASuggestion DNASuggestionMake(phylum p, string relevant_effect_description, string reason, boolean always_show)
+{
+    phylum [int] phylums;
+    phylums[0] = p;
+    return DNASuggestionMake(phylums, relevant_effect_description, reason, always_show);
+}
+
+
+DNASuggestion DNASuggestionMake(boolean [phylum] phylums_in, string relevant_effect_description, string reason)
+{
+    phylum [int] phylums;
+    foreach p in phylums_in
+    {
+        phylums.listAppend(p);
+    }
+    return DNASuggestionMake(phylums, relevant_effect_description, reason, false);
+}
+
+void listAppend(DNASuggestion [int] list, DNASuggestion entry)
+{
+	int position = list.count();
+	while (list contains position)
+		position += 1;
+	list[position] = entry;
+}
+
+boolean DNAHavePhylum(phylum p)
+{
+    if (__dna_phylum_to_effect[p].have_effect() > 0)
+        return true;
+    
+    if (__dna_phylum_to_item[p].available_amount() > 0)
+        return true;
+    
+    return false;
+}
+
+string DNABoldPhylumIfCurrentMonster(phylum p)
+{
+    if (monster_phylum() == p)
+        return HTMLGenerateSpanOfClass(p.to_string(), "r_bold");
+    else
+        return p.to_string();
+}
+
+DNASuggestion [int] __phylum_potion_suggestions;
+DNASuggestion [int] __phylum_potion_reminder_suggestions;
+effect __current_dna_intrinsic = $effect[none];
+
+RegisterInitFunction("IOTMDNAInit");
+void IOTMDNAInit()
+{
+    if (get_campground()[$item[Little Geneticist DNA-Splicing Lab]] == 0)
+        return;
+
+
+    //this is not a particulary good idea:
+    __dna_phylum_to_description[$phylum[beast]] = "+30 weapon damage";
+	__dna_phylum_to_description[$phylum[bug]] = "+25% init";
+	__dna_phylum_to_description[$phylum[constellation]] = "+50% meat";
+	__dna_phylum_to_description[$phylum[construct]] = "+5 familiar weight, +50 DA, +5 DR";
+	__dna_phylum_to_description[$phylum[dude]] = "+10% item, +10 muscle/mysticality/moxie";
+	__dna_phylum_to_description[$phylum[elemental]] = "+3 resistances";
+	__dna_phylum_to_description[$phylum[elf]] = "+100% spell damage, +50% candy drops";
+	__dna_phylum_to_description[$phylum[fish]] = "+10 familiar weight";
+	__dna_phylum_to_description[$phylum[goblin]] = "+20% pickpocket, +50% food drops";
+	__dna_phylum_to_description[$phylum[hippy]] = "+1 stat/fight, +20 max MP";
+	__dna_phylum_to_description[$phylum[humanoid]] = "+20% meat, +10% muscle/mysticality/moxie";
+	__dna_phylum_to_description[$phylum[horror]] = "+10% critical hit, +10% critical spell hit";
+	__dna_phylum_to_description[$phylum[mer-kin]] = "+25 ML";
+	__dna_phylum_to_description[$phylum[orc]] = "+1 stat/fight, +40 max HP";
+	__dna_phylum_to_description[$phylum[penguin]] = "+25% item";
+	__dna_phylum_to_description[$phylum[pirate]] = "+50% gear drops, +50% booze drops";
+    
+    
+	__dna_phylum_to_description_colourless[$phylum[demon]] = "+20 hot damage / hot spell damage";
+	__dna_phylum_to_description_colourless[$phylum[hobo]] = "+20 stench damage / stench spell damage";
+	__dna_phylum_to_description_colourless[$phylum[plant]] = "+20 cold damage / cold spell damage";
+	__dna_phylum_to_description_colourless[$phylum[slime]] = "+20 sleaze damage / sleaze spell damage";
+	__dna_phylum_to_description_colourless[$phylum[undead]] = "+20 spooky damage / spooky spell damage";
+    
+	__dna_phylum_to_description[$phylum[demon]] = HTMLGenerateSpanOfClass(__dna_phylum_to_description_colourless[$phylum[demon]], "r_element_hot_desaturated");
+	__dna_phylum_to_description[$phylum[hobo]] = HTMLGenerateSpanOfClass(__dna_phylum_to_description_colourless[$phylum[hobo]], "r_element_stench_desaturated");
+	__dna_phylum_to_description[$phylum[plant]] = HTMLGenerateSpanOfClass(__dna_phylum_to_description_colourless[$phylum[plant]], "r_element_cold_desaturated");
+	__dna_phylum_to_description[$phylum[slime]] = HTMLGenerateSpanOfClass(__dna_phylum_to_description_colourless[$phylum[slime]], "r_element_sleaze_desaturated");
+	__dna_phylum_to_description[$phylum[undead]] = HTMLGenerateSpanOfClass(__dna_phylum_to_description_colourless[$phylum[undead]], "r_element_spooky_desaturated");
+    
+	__dna_phylum_to_description[$phylum[weird]] = "+4 stats/fight";
+    
+    foreach p in __dna_phylum_to_description
+    {
+        if (__dna_phylum_to_description_colourless contains p)
+            continue;
+        __dna_phylum_to_description_colourless[p] = __dna_phylum_to_description[p];
+    }
+    
+    __dna_phylum_to_item[$phylum[beast]] = $item[Gene Tonic: Beast];
+    __dna_phylum_to_item[$phylum[bug]] = $item[Gene Tonic: Insect];
+    __dna_phylum_to_item[$phylum[constellation]] = $item[Gene Tonic: Constellation];
+    __dna_phylum_to_item[$phylum[construct]] = $item[Gene Tonic: Construct];
+    __dna_phylum_to_item[$phylum[demon]] = $item[Gene Tonic: Demon];
+    __dna_phylum_to_item[$phylum[dude]] = $item[Gene Tonic: Dude];
+    __dna_phylum_to_item[$phylum[elemental]] = $item[Gene Tonic: Elemental];
+    __dna_phylum_to_item[$phylum[elf]] = $item[Gene Tonic: Elf];
+    __dna_phylum_to_item[$phylum[fish]] = $item[Gene Tonic: Fish];
+    __dna_phylum_to_item[$phylum[goblin]] = $item[Gene Tonic: Goblin];
+    __dna_phylum_to_item[$phylum[hippy]] = $item[Gene Tonic: Hippy];
+    __dna_phylum_to_item[$phylum[hobo]] = $item[Gene Tonic: Hobo];
+    __dna_phylum_to_item[$phylum[horror]] = $item[Gene Tonic: Horror];
+    __dna_phylum_to_item[$phylum[humanoid]] = $item[Gene Tonic: Humanoid];
+    __dna_phylum_to_item[$phylum[mer-kin]] = $item[Gene Tonic: Mer-kin];
+    __dna_phylum_to_item[$phylum[orc]] = $item[Gene Tonic: Orc];
+    __dna_phylum_to_item[$phylum[penguin]] = $item[Gene Tonic: Penguin];
+    __dna_phylum_to_item[$phylum[pirate]] = $item[Gene Tonic: Pirate];
+    __dna_phylum_to_item[$phylum[plant]] = $item[Gene Tonic: Plant];
+    __dna_phylum_to_item[$phylum[slime]] = $item[Gene Tonic: Slime];
+    __dna_phylum_to_item[$phylum[undead]] = $item[Gene Tonic: Undead];
+    __dna_phylum_to_item[$phylum[weird]] = $item[Gene Tonic: Weird];
+    
+    __dna_phylum_to_effect[$phylum[beast]] = $effect[Human-Beast Hybrid];
+    __dna_phylum_to_effect[$phylum[bug]] = $effect[Human-Insect Hybrid];
+    __dna_phylum_to_effect[$phylum[constellation]] = $effect[Human-Constellation Hybrid];
+    __dna_phylum_to_effect[$phylum[construct]] = $effect[Human-Machine Hybrid];
+    __dna_phylum_to_effect[$phylum[demon]] = $effect[Human-Demon Hybrid];
+    __dna_phylum_to_effect[$phylum[dude]] = $effect[Human-Human Hybrid];
+    __dna_phylum_to_effect[$phylum[elemental]] = $effect[Human-Elemental Hybrid];
+    __dna_phylum_to_effect[$phylum[elf]] = $effect[Human-Elf Hybrid];
+    __dna_phylum_to_effect[$phylum[fish]] = $effect[Human-Fish Hybrid];
+    __dna_phylum_to_effect[$phylum[goblin]] = $effect[Human-Goblin Hybrid];
+    __dna_phylum_to_effect[$phylum[hippy]] = $effect[Human-Hippy Hybrid];
+    __dna_phylum_to_effect[$phylum[hobo]] = $effect[Human-Hobo Hybrid];
+    __dna_phylum_to_effect[$phylum[horror]] = $effect[Human-Horror Hybrid];
+    __dna_phylum_to_effect[$phylum[humanoid]] = $effect[Human-Humanoid Hybrid];
+    __dna_phylum_to_effect[$phylum[mer-kin]] = $effect[Human-Mer-kin Hybrid];
+    __dna_phylum_to_effect[$phylum[orc]] = $effect[Human-Orc Hybrid];
+    __dna_phylum_to_effect[$phylum[penguin]] = $effect[Human-Penguin Hybrid];
+    __dna_phylum_to_effect[$phylum[pirate]] = $effect[Human-Pirate Hybrid];
+    __dna_phylum_to_effect[$phylum[plant]] = $effect[Human-Plant Hybrid];
+    __dna_phylum_to_effect[$phylum[slime]] = $effect[Human-Slime Hybrid];
+    __dna_phylum_to_effect[$phylum[undead]] = $effect[Human-Undead Hybrid];
+    __dna_phylum_to_effect[$phylum[weird]] = $effect[Human-Weird Thing Hybrid];
+    
+    foreach p in __dna_phylum_to_effect
+    {
+        __dna_effect_to_phylum[__dna_phylum_to_effect[p]] = p;
+    }
+    
+    
+    foreach e in __dna_effect_to_phylum
+    {
+        if (e.have_effect() == 2147483647)
+        {
+            __current_dna_intrinsic = e;
+            break;
+        }
+    }
+    
+    
+    if (my_path_id() == PATH_COMMUNITY_SERVICE)
+    {
+        __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[fish], "", "+10 familiar weight for statgain, parrot"));
+        __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[elemental], "", "saves three turns on resistance test"));
+        __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[pirate], "", "~3.3 turns saved on item test"));
+        __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[construct], "", "+5 familiar weight"));
+        __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[elf], "", "spell damage test"));
+        __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[beast], "", "marginal?"));
+        __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[dude], "", "marginal?"));
+        
+        return;
+    }
+    
+    if (__quest_state["Level 7"].state_boolean["alcove needs speed tricks"])
+    {
+        __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[bug], "", "speed up defiled alcove"));
+        __phylum_potion_reminder_suggestions.listAppend(DNASuggestionMake($phylum[bug], "", "speed up defiled alcove"));
+    }
+    
+    if (!__quest_state["Level 12"].state_boolean["Nuns Finished"])
+    {
+        //FIXME only suggest constellation if they've not finished HITS?
+        __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylums[constellation,humanoid], "+meat", "nuns"));
+        __phylum_potion_reminder_suggestions.listAppend(DNASuggestionMake($phylum[constellation], "+meat", "nuns"));
+        __phylum_potion_reminder_suggestions.listAppend(DNASuggestionMake($phylum[humanoid], "+meat", "nuns"));
+        
+    }
+    if (!__quest_state["Level 3"].finished)
+    {
+        __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylums[demon,hobo,plant,undead], "+elemental damage", "tavern NC skipping"));
+    }
+    if (!__quest_state["Level 12"].finished && (!have_outfit_components("War Hippy Fatigues") && !have_outfit_components("Frat Warrior Fatigues")) && !__misc_state["yellow ray potentially available"])
+    {
+        __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[pirate], "+50% gear drop", "war outfit?"));
+    }
+    if (__quest_state["Level 11 Palindome"].mafia_internal_step < 5 && $item[mega gem].available_amount() == 0 && in_hardcore() && !($skill[Check Hair].skill_is_usable() && $skill[Natural Dancer].skill_is_usable())) //avatar of sneaky pete usually can cap this easily... usually
+    {
+        if ($item[wet stunt nut stew].available_amount() == 0 && !(($item[bird rib].available_amount() > 0 && $item[lion oil].available_amount() > 0 || $item[wet stew].available_amount() > 0)))
+        {
+            __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[goblin], "+50% food drop", "Wet stunt nut stew components"));
+            __phylum_potion_reminder_suggestions.listAppend(DNASuggestionMake($phylum[goblin], "+50% food drop", "Wet stunt nut stew components")); //300% drop, very important
+        }
+    }
+    
+    if (true)
+    {
+        string [int] reasons;
+        if (!__quest_state["Level 8"].finished && numeric_modifier("cold resistance") < 5.0)
+            reasons.listAppend("icy peak");
+        if (__quest_state["Level 9"].state_int["a-boo peak hauntedness"] > 0)
+            reasons.listAppend("a-boo peak");
+        
+        if (reasons.count() > 0)
+            __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[elemental], "+3 all resistance", reasons.listJoinComponents(", ", "and").capitaliseFirstLetter()));
+    }
+    
+    if (__misc_state["in run"])
+    {
+        if (__current_dna_intrinsic != __dna_phylum_to_effect[$phylum[construct]] && !__misc_state["familiars temporarily blocked"])
+            __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[construct], "+5 familiar weight, DR/DA", "", true));
+        if (__current_dna_intrinsic != __dna_phylum_to_effect[$phylum[dude]])
+            __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[dude], "+10% item", "", true));
+        
+        if (!__quest_state["Level 13"].state_boolean["Elemental damage race completed"])
+        {
+            string element_needed = __quest_state["Level 13"].state_string["Elemental damage race type"];
+            DNASuggestion element_suggestion;
+            string suggestion_effect = "+" + HTMLGenerateSpanOfClass(element_needed, "r_element_" + element_needed + "_desaturated") + " damage/spell damage";
+            string suggestion_description = "Lair race";
+            if (element_needed == "hot")
+                element_suggestion = DNASuggestionMake($phylum[demon], suggestion_effect, suggestion_description, true);
+            else if (element_needed == "cold")
+                element_suggestion = DNASuggestionMake($phylum[plant], suggestion_effect, suggestion_description, true);
+            else if (element_needed == "sleaze")
+                element_suggestion = DNASuggestionMake($phylum[slime], suggestion_effect, suggestion_description, true);
+            else if (element_needed == "spooky")
+                element_suggestion = DNASuggestionMake($phylum[undead], suggestion_effect, suggestion_description, true);
+            else if (element_needed == "stench")
+                element_suggestion = DNASuggestionMake($phylum[hobo], suggestion_effect, suggestion_description, true);
+            if (element_suggestion.phylums.count() > 0 && element_needed != "")
+            {
+                __phylum_potion_suggestions.listAppend(element_suggestion);
+                __phylum_potion_reminder_suggestions.listAppend(element_suggestion);
+            }
+        }
+    }
+    else
+    {
+        __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[penguin], "", "", true));
+        __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[fish], "", "", true));
+        __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[constellation], "", "", true));
+    }
+    
+    
+    if (__current_dna_intrinsic == $effect[none])
+    {
+        if (!__misc_state["familiars temporarily blocked"])
+        {
+            if (!__misc_state["in run"] || my_path_id() == PATH_HEAVY_RAINS)
+                __dna_intrinsic_ideas.listAppend(DNABoldPhylumIfCurrentMonster($phylum[fish]) + " (+10 familiar weight)");
+            else if ($item[grimstone mask].available_amount() > 0)
+            {
+                __dna_intrinsic_ideas.listAppend(DNABoldPhylumIfCurrentMonster($phylum[fish]) + " (+10 familiar weight, via grimstone mask candy witch's lake)");
+                __dna_intrinsic_ideas.listAppend(DNABoldPhylumIfCurrentMonster($phylum[construct]) + " (+5 familiar weight)");
+            }
+            else
+                __dna_intrinsic_ideas.listAppend(DNABoldPhylumIfCurrentMonster($phylum[construct]) + " (+5 familiar weight)");
+        }
+        if (__misc_state["need to level"])
+        {
+            if ($familiar[astral badger].familiar_is_usable() || $item[astral mushroom].available_amount() > 0 || $effect[Half-Astral].have_effect() > 0 || __misc_state_int["pulls available"] > 0)
+            {
+                string method = "astral badger";
+                if (!$familiar[astral badger].familiar_is_usable() || $item[astral mushroom].available_amount() > 0)
+                    method = "astral mushroom";
+                __dna_intrinsic_ideas.listAppend(DNABoldPhylumIfCurrentMonster($phylum[weird]) + " (+4 stats/fight, via " + method + ")");
+            }
+            else if (__misc_state["sleaze airport available"])
+            {
+                __dna_intrinsic_ideas.listAppend(DNABoldPhylumIfCurrentMonster($phylum[weird]) + " (+4 stats/fight, via sloppy seconds diner)");
+            }
+        }
+        __dna_intrinsic_ideas.listAppend(DNABoldPhylumIfCurrentMonster($phylum[dude]) + " (+10% item)");
+        
+    }
+}
+
+RegisterResourceGenerationFunction("IOTMDNAGenerateResource");
+void IOTMDNAGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if (__misc_state["campground unavailable"])
+        return;
+    if (get_campground()[$item[Little Geneticist DNA-Splicing Lab]] == 0)
+        return;
+    
+    //Player has a genetic engineering lab installed. Let's play with our DNA!
+    
+    phylum syringe_phylum = getDNASyringePhylum();
+    int potions_made = get_property_int("_dnaPotionsMade");
+    int potions_left = MAX(0, 3 - potions_made);
+    boolean became_a_genetic_monstrosity_today = get_property_boolean("_dnaHybrid");
+    
+    
+    //Some ideas:
+    //Intrinsics:
+    //√constructs - +5 familiar weight - also a potion option
+    //√weird - +4 stats/fight - hard to find without badger
+    //√dudes - +10% items
+    
+    //fish - +10 familiar weight - HCO only? possible with agua de vida, but takes at least two turns? 70% NC base, 2 NCs, need two of an NC. this is versus zero-turn +5 familiar weight...
+    //mer-kin - +25 ML - fax only. even with sea access, requires wreck access
+    //orcs/hippies - +1 stat/fight... ??? marginal?
+    //penguins - +25% item - nowhere to be found in-run before level 11
+    
+    //Potions:
+    //√bug - +25% init - modern zmobies, potion, if we can find bugs
+    //√elemental - +3 all res - icy peak, a-boo, stench for twin/bats
+    //√constellation - +50% meat - nuns, potion
+    //√humanoid - +20% meat - more nuns?
+    //√demon - +20 hot damage - skipping tavern NC
+    //√hobo - +20 stench damage - skipping tavern NCs, but isn't there a better source? (the pool)
+    //√plant - +20 cold damage - tavern skipping, somewhat silly, song of north exists
+    //√undead - +20 spooky damage - tavern skipping...?
+    //pirate - +50% gear drops - not sure. potion? seems like it'd be useful in a handful of places
+    
+    
+    
+    
+    
+    ChecklistSubentry [int] subentries;
+    
+    string syringe_description = "";
+    boolean syringe_description_output = false;
+    if (syringe_phylum != $phylum[none])
+    {
+        string line = "Syringe has " + syringe_phylum + "." + " (" + __dna_phylum_to_description_colourless[syringe_phylum] + ")";
+        syringe_description = line;
+    }
+    
+    if (potions_left > 0)
+    {
+        string [int] description;
+        
+        if (syringe_description != "" && !syringe_description_output)
+        {
+            description.listAppend(syringe_description);
+            syringe_description_output = true;
+        }
+        
+        string [int] potion_suggestion_descriptions;
+        foreach key in __phylum_potion_suggestions
+        {
+            DNASuggestion suggestion = __phylum_potion_suggestions[key];
+            
+            phylum [int] needed_phylums;
+            
+            foreach key2 in suggestion.phylums
+            {
+                phylum p = suggestion.phylums[key2];
+                if (!DNAHavePhylum(p) || suggestion.always_show)
+                {
+                    needed_phylums.listAppend(p);
+                }
+            }
+            
+            if (needed_phylums.count() > 0)
+            {
+                string [int] phylum_descriptions;
+                string [int] output_effect_description;
+                
+                foreach key in needed_phylums
+                {
+                    phylum p = needed_phylums[key];
+                    
+                    phylum_descriptions.listAppend(DNABoldPhylumIfCurrentMonster(p));
+                    
+                    if (suggestion.relevant_effect_description.length() == 0)
+                        output_effect_description.listAppend(__dna_phylum_to_description_colourless[p]);
+                }
+                if (suggestion.relevant_effect_description != "")
+                    output_effect_description.listAppend(suggestion.relevant_effect_description);
+                
+                string line;
+                
+                line = phylum_descriptions.listJoinComponents("/");
+                line += ": " + output_effect_description.listJoinComponents("/");
+                if (suggestion.reason != "")
+                    line += " - " + suggestion.reason;
+                
+                potion_suggestion_descriptions.listAppend(line);
+            }
+        }
+        //HTMLGenerateSimpleTableLines
+        if (potion_suggestion_descriptions.count() > 0)
+            description.listAppend("Tonic ideas:|*" + potion_suggestion_descriptions.listJoinComponents("<hr>|*"));
+        subentries.listAppend(ChecklistSubentryMake(pluralise(potions_left, "gene tonic", "gene tonics") + " creatable", "", description));
+    }
+    if (!became_a_genetic_monstrosity_today)
+    {
+        string [int] description;
+        if (syringe_description != "" && !syringe_description_output)
+        {
+            description.listAppend(syringe_description);
+            syringe_description_output = true;
+        }
+        
+        if (__current_dna_intrinsic != $effect[none] && (__dna_effect_to_phylum contains __current_dna_intrinsic))
+            description.listAppend("Currently a " + __dna_effect_to_phylum[__current_dna_intrinsic] + ". (" + __dna_phylum_to_description_colourless[__dna_effect_to_phylum[__current_dna_intrinsic]] + ")");
+        
+        
+        if (__current_dna_intrinsic == $effect[none])
+        {
+            if (__dna_intrinsic_ideas.count() > 0)
+                description.listAppend("Could try " + __dna_intrinsic_ideas.listJoinComponents(", ", "or") + ".");
+        }
+        
+        subentries.listAppend(ChecklistSubentryMake("Genetic intrinsic available", "", description));
+    }
+    
+    int importance = 5;
+    
+    if (potions_left == 0 && __current_dna_intrinsic != $effect[none]) //no potions, already a hybrid
+        importance = 8;
+    
+    string image_name = "__effect Human-Human Hybrid";
+    
+    if (__misc_state["in run"])
+    {
+        foreach p in __dna_phylum_to_item
+        {
+            item it = __dna_phylum_to_item[p];
+            if (it.available_amount() == 0)
+                continue;
+            if (subentries.count() == 0)
+                image_name = "__item Gene Tonic: Constellation";
+            subentries.listAppend(ChecklistSubentryMake(it.pluralise(), "", __dna_phylum_to_description_colourless[p]));
+            
+        }
+    }
+    
+    if (subentries.count() > 0)
+        resource_entries.listAppend(ChecklistEntryMake(image_name, "campground.php?action=workshed", subentries, importance));
+    
+    
+}
+
+RegisterTaskGenerationFunction("IOTMDNAGenerateTasks");
+void IOTMDNAGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    if (__misc_state["campground unavailable"])
+        return;
+    if (get_campground()[$item[Little Geneticist DNA-Splicing Lab]] == 0)
+        return;
+    
+    //Reminders:
+    phylum syringe_phylum = getDNASyringePhylum();
+    
+    
+    if (get_property_int("_dnaPotionsMade") < 3)
+    {
+        if (syringe_phylum != $phylum[none] && !DNAHavePhylum(syringe_phylum))
+        {
+            //Make the resulting tonic:
+            string suggestion_reason;
+            
+            string relevant_effect_description;
+            
+            
+            foreach key in __phylum_potion_reminder_suggestions
+            {
+                DNASuggestion suggestion = __phylum_potion_reminder_suggestions[key];
+                foreach key2 in suggestion.phylums
+                {
+                    phylum suggestion_phylum = suggestion.phylums[key2];
+                    if (syringe_phylum == suggestion_phylum)
+                    {
+                        suggestion_reason = suggestion.reason;
+                        relevant_effect_description = suggestion.relevant_effect_description;
+                    }
+                }
+            }
+            
+            
+            if (suggestion_reason != "")
+            {
+                string description = suggestion_reason.capitaliseFirstLetter() + ".";
+                task_entries.listAppend(ChecklistEntryMake("__effect Human-Human Hybrid", "campground.php?action=workshed", ChecklistSubentryMake("Make gene tonic for " + syringe_phylum, "", description), -11));
+            }
+        }
+        
+        
+        
+        if (monster_phylum() != $phylum[none] && monster_phylum() != syringe_phylum && !DNAHavePhylum(monster_phylum()))
+        {
+            //Syringe a monster when we find it:
+            phylum p = monster_phylum();
+            
+            string suggestion_reason;
+            
+            string relevant_effect_description;
+            
+            
+            foreach key in __phylum_potion_reminder_suggestions
+            {
+                DNASuggestion suggestion = __phylum_potion_reminder_suggestions[key];
+                foreach key2 in suggestion.phylums
+                {
+                    phylum suggestion_phylum = suggestion.phylums[key2];
+                    if (p == suggestion_phylum)
+                    {
+                        suggestion_reason = suggestion.reason;
+                        relevant_effect_description = suggestion.relevant_effect_description;
+                    }
+                }
+            }
+            
+            if (suggestion_reason != "")
+            {
+                if (relevant_effect_description.length() == 0)
+                    relevant_effect_description = __dna_phylum_to_description[p];
+                string description = suggestion_reason.capitaliseFirstLetter() + ".";
+                description += "|" + monster_phylum().to_string().capitaliseFirstLetter() + " (" + relevant_effect_description + ")";
+                task_entries.listAppend(ChecklistEntryMake("__effect Human-Human Hybrid", "", ChecklistSubentryMake("Extract DNA from " + last_monster().to_string().HTMLEscapeString(), "", description), -11));
+            }
+        }
+    }
+    
+    if (__current_dna_intrinsic == $effect[none] && !get_property_boolean("_dnaHybrid"))
+    {
+        string [int] description;
+        if (__dna_intrinsic_ideas.count() > 0)
+            description.listAppend("Could try " + __dna_intrinsic_ideas.listJoinComponents(", ", "or") + ".");
+        optional_task_entries.listAppend(ChecklistEntryMake("__effect Human-Human Hybrid", "campground.php?action=workshed", ChecklistSubentryMake("Hybridize yourself", "", description), 5));
+    }
+}
+
+
+void IOTMPShadyPastGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    string [int] description;
+    string [int] modifiers;
+    
+    if ($item[White Dragon Fang].available_amount() == 0)
+    {
+        boolean can_acquire_taijijian = ($item[strange goggles].available_amount() > 0 || $item[toy taijijian].available_amount() > 0 || !in_ronin());
+        if ($item[magical battery].available_amount() > 0 && can_acquire_taijijian)
+        {
+            description.listAppend("To make the White Dragon Fang, meatpaste together the toy taijijian with the magical battery.");
+        }
+    }
+    
+    string last_combat = $location[chinatown tenement].lastCombatInLocation();
+    if ($location[chinatown tenement].combat_queue.contains_text("White Bone Demon") && description.count() == 0) //somewhat limited way of detecting that we are finished
+        return;
+    if ($item[Test site key].available_amount() > 0)
+    {
+        //Last segment:
+        
+        int gold_pieces_needed = MAX(0, 30 - $item[gold piece].available_amount());
+        if (last_combat == "the server")
+        {
+            description.listAppend("Fight the White Bone Demon.");
+        }
+        else if (gold_pieces_needed > 0)
+        {
+            //at least one gold piece from a desperate gold farmer is under 21.89% drop rate
+            //needs spading
+            description.listAppend("Adventure in the chinatown tenement, acquire " + pluralise(gold_pieces_needed, "more gold piece", "more gold pieces") + ".");
+            modifiers.listAppend("+400%? item");
+            
+            if (__misc_state["have olfaction equivalent"])
+                modifiers.listAppend("olfact desperate gold farmer");
+        }
+        else
+        {
+            description.listAppend("Adventure in the chinatown tenement, fight the server.|Once the server's panel falls off, use the strange goggles.");
+        }
+    }
+    else if ($item[CEO office card].available_amount() > 0)
+    {
+        //Use to see wheels within wheels.
+        description.listAppend("Use CEO office card.");
+    }
+    else if ($items[makeshift yakuza mask,Novelty tattoo sleeves].items_missing().count() == 0)
+    {
+        //Visit the first floor.
+        item [int] equip_items;
+        foreach it in $items[makeshift yakuza mask,novelty tattoo sleeves]
+        {
+            if (it.equipped_amount() == 0)
+                equip_items.listAppend(it);
+        }
+        if (equip_items.count() > 0 && $location[1st floor\, shiawase-mitsuhama building].turnsAttemptedInLocation() == 0)
+        {
+            description.listAppend("Equip " + equip_items.listJoinComponents(", ", "and") + ".");
+        }
+        else
+        {
+            description.listAppend("Adventure on the floors of the Shiawase-Mitsuhama building, acquire and use cards.");
+            
+            foreach it in $items[zaibatsu level 2 card, zaibatsu level 3 card]
+            {
+                if (it.available_amount() == 0)
+                    continue;
+                description.listAppend("Use " + it + ".");
+            }
+        }
+    }
+    else if ($item[strange goggles].available_amount() > 0)
+    {
+        //Make yakuza mask.
+        if ($item[makeshift yakuza mask].available_amount() == 0)
+        {
+            string line = "Assemble a makeshift yakuza mask with items from the chinatown shops.";
+            
+            item [int] missing_parts_list = missingComponentsToMakeItem($item[makeshift yakuza mask]);
+            if (missing_parts_list.count() == 0)
+                line = "Assemble a makeshift yakuza mask.|(rhinoceros horn + rhinoceros horn) + (furry pink pillow + bottle of limeade)";
+            else
+                line += "|Missing " + missing_parts_list.listJoinComponents(", ", "and") + ".";
+            
+            description.listAppend(line);
+        }
+        if ($item[Novelty tattoo sleeves].available_amount() == 0)
+        {
+            description.listAppend("Buy novelty tattoo sleeves from the chinatown shops.");
+        }
+    }
+    else if ($item[zaibatsu lobby card].available_amount() > 0)
+    {
+        //Triad factory.
+        description.listAppend("Adventure in the sewer triad factory, defeat the Sierpinski brothers.");
+        description.listAppend("Run +item for a possible magical battery.");
+        modifiers.listAppend("+item");
+    }
+    else
+    {
+        //Start of quest.
+        description.listAppend("Adventure in the Chinatown shops, defeat a yakuza courier.");
+    }
+    
+
+	optional_task_entries.listAppend(ChecklistEntryMake("chinatown", "place.php?whichplace=junggate_1", ChecklistSubentryMake("The Suspicious-Looking Guy's Shady Past", modifiers, description),$locations[chinatown shops, chinatown tenement, triad factory,1st floor\, shiawase-mitsuhama building,2nd floor\, shiawase-mitsuhama building,3rd floor\, shiawase-mitsuhama building]));
+}
+
+void IOTMPOldManGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    string [int] description;
+    string [int] modifiers;
+    
+    if ($location[The Old Man's Bathtime Adventures].lastNoncombatInLocation() == "Journey's End") //somewhat limited way of detecting that we are finished
+        return;
+    
+    description.listAppend("Sail the seas. Try to one-hit kill the sea monsters.");
+    
+    if ($item[Bloodbath].available_amount() == 0)
+        description.listAppend("Need to finish the area with 50+ crew to acquire Bloodbath.");
+    else if ($item[ornamental sextant].available_amount() == 0)
+        description.listAppend("Need to finish the area with 37+ crew to acquire ornamental sextant.");
+    else if ($item[miniature deck cannon].available_amount() == 0)
+        description.listAppend("Need to finish the area with [24 to 36] crew to acquire miniature deck cannon.");
+    else if ($item[Foam naval trousers].available_amount() == 0)
+        description.listAppend("Need to finish the area with [24 to 36] crew to acquire Foam naval trousers.");
+    else if ($item[Foam commodore's hat].available_amount() == 0)
+        description.listAppend("Need to finish the area with [24 to 36] crew to acquire Foam commodore's hat.");
+    
+    description.listAppend("Choose +crew non-combat options, add monsters if you can.");
+    
+    
+    monster olfacted_monster = get_property("olfactedMonster").to_monster();
+    if ($effect[on the trail].have_effect() == 0)
+        olfacted_monster = $monster[none];
+    boolean olfacted_relevant_monster = ($monsters[ferocious roc,giant man-eating shark,Bristled Man-O-War,The Cray-Kin,Deadly Hydra] contains olfacted_monster);
+    
+    if (__misc_state["have olfaction equivalent"] && !olfacted_relevant_monster)
+    {
+        description.listAppend("Olfact any monster that is not a fearsome giant squid.");
+        modifiers.listAppend("olfaction");
+    }
+        
+    if (my_basestat($stat[mysticality]) >= 200)
+    {
+        if ($item[Mesmereyes&trade; contact lenses].equipped_amount() == 0)
+        {
+            description.listAppend("Wear " + $item[Mesmereyes&trade; contact lenses] + ".");
+        }
+    }
+    else
+    {
+        if ($item[Attorney's badge].equipped_amount() == 0)
+        {
+            description.listAppend("Wear " + $item[Attorney's badge] + ".");
+        }
+        description.listAppend("Possibly level mysticality to 200 to wear " + $item[Mesmereyes&trade; contact lenses] + ", makes this area much easier.");
+    }
+    
+    if ($item[Young Man's Crew Sequester].available_amount() > 0)
+        description.listAppend("Young Man's Crew Sequester available. (+5 crew)");
+    if ($item[Young Man's Cargo Load].available_amount() > 0)
+        description.listAppend("Young Man's Cargo Load available. (+4 crayons, +16 bubbles)");
+    
+    //very limited potato detection:
+    if (my_familiar() != $familiar[levitating potato] && !(my_familiar() == $familiar[fancypants scarecrow] && ($slot[familiar].equipped_item() == $item[swashbuckling pants] || $slot[familiar].equipped_item() == $item[spangly mariachi pants]))  && !(my_familiar() == $familiar[mad hatrack] && $slot[familiar].equipped_item() == $item[spangly sombrero]))
+        description.listAppend("Run a potato familiar of some kind.");
+    
+    
+	optional_task_entries.listAppend(ChecklistEntryMake("__item inflatable duck", "", ChecklistSubentryMake("The Old Man's Bathtime Adventure", modifiers, description),$locations[The Old Man's Bathtime Adventures]));
+}
+
+void IOTMPMeatGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    string [int] description;
+    string [int] modifiers;
+    
+    if ($location[The Nightmare Meatrealm].lastCombatInLocation() == "The Beefhemoth") //somewhat limited way of detecting that we are finished
+        return;
+        
+    modifiers.listAppend("+meat");
+    description.listAppend("Adventure until you find the beefhemoth, defeat him.");
+    if ($items[the sword in the steak, meatcleaver].available_amount() == 0)
+        description.listAppend("The Sword in the Steak is from a 0.1% likelyhood non-combat.|To find it, run away from monsters, preferrably with greatest american pants/navel ring of navel gazing.");
+    if ($item[meatcleaver].available_amount() == 0 && $item[the sword in the steak].available_amount() > 0)
+    {
+        if (my_buffedstat($stat[muscle]) < 1000)
+            description.listAppend("To pull the sword from the steak, buff muscle to 1000.");
+        else
+            description.listAppend("Pull the sword from the steak, adventurer.");
+    }
+        
+        
+	optional_task_entries.listAppend(ChecklistEntryMake("meat", "place.php?whichplace=junggate_6", ChecklistSubentryMake("The Meatsmith's Brainspace", modifiers, description),$locations[The Nightmare Meatrealm]));
+}
+
+void IOTMPGourdGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    string [int] description;
+    string [int] modifiers;
+    
+    if ($location[the gourd!].lastCombatInLocation() == "Fnord the Unspeakable") //This should work for termination detection?
+        return;
+        
+    modifiers.listAppend("+item?");
+    description.listAppend("Adventure in the gourd.");
+    if ($item[truthsayer].available_amount() == 0)
+    {
+        string [int] components;
+        boolean [item] items_implicitly_have;
+        if ($item[loose blade].available_amount() > 0)
+        {
+            items_implicitly_have[$item[goblin collarbone]] = true;
+            items_implicitly_have[$item[sharp tin strip]] = true;
+        }
+        if ($item[goblin bone hilt].available_amount() > 0)
+        {
+            items_implicitly_have[$item[goblin collarbone]] = true;
+            items_implicitly_have[$item[wad of spider silk]] = true;
+        }
+        if ($item[sticky sword blade].available_amount() > 0)
+        {
+            items_implicitly_have[$item[sharp tin strip]] = true;
+            items_implicitly_have[$item[wad of spider silk]] = true;
+        }
+        foreach it in $items[sharp tin strip, wad of spider silk, goblin collarbone]
+        {
+            string line = it;
+            if (it.available_amount() == 0 && !(items_implicitly_have contains it))
+                line = HTMLGenerateSpanFont(line, "grey");
+            components.listAppend(line);
+        }
+        description.listAppend("Truthsayer is (" + components.listJoinComponents(" + ") + "), found from gourd monsters.");
+    }
+    
+        
+	optional_task_entries.listAppend(ChecklistEntryMake("__item gourd potion", "place.php?whichplace=junggate_2", ChecklistSubentryMake("The Gourd", modifiers, description),$locations[The gourd!]));
+}
+
+void IOTMPCrackpotGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    string [int] description;
+    string [int] modifiers;
+    
+    //Despair, rage, envy. Anger, fear, doubt, regret.
+    string url = "place.php?whichplace=junggate_3";
+    string image_name = "__item red pixel";
+    
+    boolean need_byte_sword = !($item[byte].available_amount() + $item[byte].storage_amount() > 0 || $item[flickering pixel].available_amount() + $item[flickering pixel].storage_amount() >= 8);
+    
+    if ($item[flickering pixel].available_amount() == 8)
+    {
+        description.listAppend("Use eight flickering pixels to acquire the sword, byte.");
+    }
+    
+    string [int] bosses_remaining;
+    
+    if ($location[anger man's level].lastCombatInLocation() != "Anger man")
+        bosses_remaining.listAppend("anger man");
+    if ($location[fear man's level].lastCombatInLocation() != "Fear man")
+        bosses_remaining.listAppend("fear man");
+    if ($location[doubt man's level].lastCombatInLocation() != "Doubt man")
+        bosses_remaining.listAppend("doubt man");
+    if ($location[regret man's level].lastCombatInLocation() != "Regret man")
+        bosses_remaining.listAppend("regret man");
+        
+    if (bosses_remaining.count() == 0 && description.count() == 0)
+        return;
+        
+    if (__last_adventure_location == $location[anger man's level] && $location[anger man's level].lastCombatInLocation() != "Anger man")
+    {
+        description.listAppend("Adventure in anger man's level, defeat the boss.");
+        string [int] stats_needed_to_complete_zone;
+        string [int] stats_needed_for_flickering_pixel;
+        foreach s in $stats[muscle, mysticality, moxie]
+        {
+            if (s.my_buffedstat() < 50)
+            {
+                stats_needed_to_complete_zone.listAppend(s.to_string().to_lower_case());
+            }
+            if (s.my_buffedstat() < 500)
+            {
+                stats_needed_for_flickering_pixel.listAppend(s.to_string().to_lower_case());
+            }
+        }
+        
+        float resistance = numeric_modifier("hot resistance");
+        int resistance_needed = MAX(0, floor(25 - resistance));
+        if (resistance < 25.0 && need_byte_sword)
+            description.listAppend("Need " + resistance_needed + " more hot resistance for the first flickering pixel.");
+        
+        if (stats_needed_to_complete_zone.count() > 0)
+            description.listAppend("Need 50 " + stats_needed_to_complete_zone.listJoinComponents(", ", "and") + " to pass first test.");
+        if (stats_needed_for_flickering_pixel.count() > 0 && need_byte_sword)
+            description.listAppend("Need 500 " + stats_needed_for_flickering_pixel.listJoinComponents(", ", "and") + " for the second flickering pixels.");
+            
+            
+    }
+    else if (__last_adventure_location == $location[fear man's level] && $location[fear man's level].lastCombatInLocation() != "Fear man")
+    {
+        description.listAppend("Adventure in fear man's level, defeat the boss.");
+        
+        //50 moxie to complete
+        //300 moxie for first flickering
+        //25 spooky res for second flickering
+        
+        if (my_buffedstat($stat[moxie]) < 50)
+            description.listAppend("Need 50 total moxie pass first test.");
+            
+        if (my_buffedstat($stat[moxie]) < 300 && need_byte_sword)
+            description.listAppend("Need 300 total moxie for the first flickering pixel.");
+            
+        float resistance = numeric_modifier("spooky resistance");
+        int resistance_needed = MAX(0, floor(25 - resistance));
+        if (resistance < 25.0 && need_byte_sword)
+            description.listAppend("Need " + resistance_needed + " more spooky resistance for the second flickering pixel.");
+    }
+    else if (__last_adventure_location == $location[doubt man's level] && $location[doubt man's level].lastCombatInLocation() != "Doubt man")
+    {
+        description.listAppend("Adventure in doubt man's level, defeat the boss.");
+            
+        //weapon damage >= 100 to complete
+        //HP > 100 to complete
+        //weapon damage >= 276(?) for first flickering
+        //HP >= 1000 for second flickering
+        
+        int weapon_damage = numeric_modifier("weapon damage").floor();
+        if (weapon_damage < 100)
+            description.listAppend("Need " + (100 - weapon_damage) + " more weapon damage to pass first test.");
+        if (weapon_damage < 276 && need_byte_sword)
+            description.listAppend("Need " + (276 - weapon_damage) + "(?) more weapon damage for the first flickering pixel.");
+        
+        if (my_hp() < 100)
+            description.listAppend("Need 100 total HP to pass second test.");
+        if (my_hp() < 1000 && need_byte_sword)
+            description.listAppend("Need 1000 total HP for the second flickering pixel.");
+    }
+    else if (__last_adventure_location == $location[regret man's level] && $location[regret man's level].lastCombatInLocation() != "Regret man")
+    {
+        description.listAppend("Adventure in regret man's level, defeat the boss.");
+        
+        //MP >= 100 to complete
+        //total elemental damage >= 50 to complete
+        //MP >= 1000 for first flickering
+        //total elemental damage >= 100 for second flickering
+        
+        if (my_mp() < 100)
+            description.listAppend("Need 100 total MP to pass first test.");
+        if (my_mp() < 1000 && need_byte_sword)
+            description.listAppend("Need 1000 total MP for the first flickering pixel.");
+        //int total_elemental_damage = numeric_modifier("cold damage") + numeric_modifier("hot damage") + numeric_modifier("sleaze damage") + numeric_modifier("spooky damage") + numeric_modifier("stench damage");
+        
+        //FIXME I am not sure if this is correct. How exactly does this test work?
+        string [int] missing_second_test;
+        string [int] missing_second_pixel_test;
+        foreach e in $strings[cold,hot,sleaze,spooky,stench]
+        {
+            string element_html_id = "r_element_" + e;
+            int damage = numeric_modifier(e + " damage").floor();
+            if (damage < 50)
+                missing_second_test.listAppend(HTMLGenerateSpanOfClass((50 - damage) + " more " + e, element_html_id));
+            if (damage < 60)
+                missing_second_pixel_test.listAppend(HTMLGenerateSpanOfClass((60 - damage) + " more " + e, element_html_id));
+            
+        }
+        if (missing_second_test.count() > 0)
+            description.listAppend("Need " + missing_second_test.listJoinComponents(", ", "and") + " damage to pass the second test.");
+        if (missing_second_pixel_test.count() > 0)
+            description.listAppend("Need " + missing_second_pixel_test.listJoinComponents(", ", "and") + " damage for the second flickering pixel.");
+    }
+    
+    string await = " await.";
+    if (bosses_remaining.count() == 1)
+        await = " awaits.";
+    if (bosses_remaining.count() > 0)
+        description.listAppend(bosses_remaining.listJoinComponents(", ", "and").capitaliseFirstLetter() + await);
+    else if ($item[flickering pixel].available_amount() == 8)
+    {
+        url = "inventory.php?which=3";
+        image_name = "__item flickering pixel";
+    }
+    
+    if (__misc_state["in run"])
+        description.listAppend("(this isn't ascension relevant after you've gotten a digital key)");
+        
+	optional_task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake("The Crackpot Mystic's Psychoses", modifiers, description),$locations[anger man's level, fear man's level, doubt man's level, regret man's level]));
+}
+
+
+
+void IOTMPJickGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    string [int] description;
+    string [int] modifiers;
+    
+    if ($item[sword of procedural generation].available_amount() > 0)
+        return;
+        
+    description.listAppend("Fight skeletons.");
+    description.listAppend("Make sure you have a monster manuel first; once this tower is complete, there's no way to get these factoids ever again.");
+    
+    //FIXME be more specific
+        
+	optional_task_entries.listAppend(ChecklistEntryMake("__item skeleton", "", ChecklistSubentryMake("Jick's Obsessions", modifiers, description),$locations[the tower of procedurally-generated skeletons]));
+}
+
+
+
+void IOTMPArtistGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    string [int] description;
+    string [int] modifiers;
+    
+    
+    foreach e in $effects[My Breakfast With Andrea,The Champion's Breakfast,Tiffany's Breakfast,Breakfast Clubbed]
+    {
+        if (e.have_effect() > 0)
+            return;
+    }
+    //Let's see.
+    //The way this quest works is, you find utensils in the kitchen drawer. (or the mall)
+    //Then, you adventure in the grocery bag, and use a utensil on the monsters.
+    //The utensil you use on the monster determines breakfast.
+    
+    
+    description.listAppend("Make a breakfast.");
+    description.listAppend("To do this, you find utensils in the kitchen drawer, and use them, in combat, on the five different foods in the grocery bag.|Which utensil you use on which food helps determine your breakfast.");
+    
+    
+    string [int] missing_utensils;
+    foreach it in $items[Artist's Butterknife of Regret,Artist's Cookie Cutter of Loneliness,Artist's Cr&egrave;me Brul&eacute;e Torch of Fury,Artist's Spatula of Despair,Artist's Whisk of Misery]
+    {
+        if (it.available_amount() > 0)
+            continue;
+        string utensil_readable_name = it.to_string().replace_string("Artist's ", "");
+        
+        missing_utensils.listAppend(utensil_readable_name);
+    }
+    
+    if (missing_utensils.count() > 0)
+    {
+        modifiers.listAppend("+300% item");
+        description.listAppend("Find utensils in the kitchen drawer, or buy in the mall.|Utensils missing:|*" + missing_utensils.listJoinComponents(", ", "and") + ".");
+    }
+    
+    string [int] breakfasts;
+    
+    string breakfast_line;
+    //Meat & Knife, Bread & Knife, Batter & Spatula, Eggs & Whisk, Potatoes & Knife
+    breakfast_line += "My Breakfast With Andrea: (+meat)";
+    breakfast_line += "|*Meat" + __html_right_arrow_character + "Butterknife";
+    breakfast_line += "|*Bread" + __html_right_arrow_character + "Butterknife";
+    breakfast_line += "|*Batter" + __html_right_arrow_character + "Spatula";
+    breakfast_line += "|*Eggs" + __html_right_arrow_character + "Whisk";
+    breakfast_line += "|*Potatoes" + __html_right_arrow_character + "Butterknife";
+    breakfasts.listAppend(breakfast_line); breakfast_line = "";
+    
+    //Meat & Cutter, Bread & Torch, Batter & Whisk, Eggs & Torch, Potatoes & Torch
+    breakfast_line += "<hr>";
+    breakfast_line += "The Champion's Breakfast: (+init)";
+    breakfast_line += "|*Meat" + __html_right_arrow_character + "Cookie Cutter";
+    breakfast_line += "|*Bread" + __html_right_arrow_character + "Cr&egrave;me Brul&eacute;e Torch";
+    breakfast_line += "|*Batter" + __html_right_arrow_character + "Whisk";
+    breakfast_line += "|*Eggs" + __html_right_arrow_character + "Cr&egrave;me Brul&eacute;e Torch";
+    breakfast_line += "|*Potatoes" + __html_right_arrow_character + "Cr&egrave;me Brul&eacute;e Torch";
+    breakfasts.listAppend(breakfast_line); breakfast_line = "";
+    
+    //Meat & Spatula, Bread & Cutter, Batter & Cutter, Eggs & Spatula, Potatoes & Whisk
+    breakfast_line += "<hr>";
+    breakfast_line += "Tiffany's Breakfast: (+item)";
+    breakfast_line += "|*Meat" + __html_right_arrow_character + "Spatula";
+    breakfast_line += "|*Bread" + __html_right_arrow_character + "Cookie Cutter";
+    breakfast_line += "|*Batter" + __html_right_arrow_character + "Cookie Cutter";
+    breakfast_line += "|*Eggs" + __html_right_arrow_character + "Spatula";
+    breakfast_line += "|*Potatoes" + __html_right_arrow_character + "Whisk";
+    breakfasts.listAppend(breakfast_line); breakfast_line = "";
+    
+    
+    //It's actually anything, but let's pick one:
+    //Meat & Torch, Bread & Whisk, Batter & Knife, Eggs & Cutter, Potatoes & Spatula
+    breakfast_line += "<hr>";
+    breakfast_line += "Breakfast Clubbed: (+ML)";
+    breakfast_line += "|*Meat" + __html_right_arrow_character + "Cr&egrave;me Brul&eacute;e Torch";
+    breakfast_line += "|*Bread" + __html_right_arrow_character + "Whisk";
+    breakfast_line += "|*Batter" + __html_right_arrow_character + "Butterknife";
+    breakfast_line += "|*Eggs" + __html_right_arrow_character + "Cookie Cutter";
+    breakfast_line += "|*Potatoes" + __html_right_arrow_character + "Spatula";
+    breakfasts.listAppend(breakfast_line); breakfast_line = "";
+    
+    description.listAppend("There are four different breakfasts possible:" + HTMLGenerateIndentedText(breakfasts));
+    
+    if ($item[Ginsu&trade;].available_amount() == 0)
+        description.listAppend("Making all four breakfasts in the same ascension lets you acquire the sword, " + $item[Ginsu&trade;] + ".");
+        
+	optional_task_entries.listAppend(ChecklistEntryMake("__effect My Breakfast With Andrea", "place.php?whichplace=junggate_5", ChecklistSubentryMake("The Pretentious Artist's Obsession", modifiers, description),$locations[a kitchen drawer, a grocery bag]));
+}
+
+RegisterTaskGenerationFunction("IOTMPsychoanalyticGenerateTasks");
+void IOTMPsychoanalyticGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    if (!get_property_boolean("_psychoJarUsed"))
+        return;
+    //Can't detect which jar was used, so check where they've been:
+    if ($locations[chinatown shops, chinatown tenement, triad factory,1st floor\, shiawase-mitsuhama building,2nd floor\, shiawase-mitsuhama building,3rd floor\, shiawase-mitsuhama building] contains __last_adventure_location)
+    {
+        //√
+        IOTMPShadyPastGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+    }
+    if ($locations[The Old Man's Bathtime Adventures] contains __last_adventure_location)
+    {
+        //√
+        IOTMPOldManGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+    }
+    if ($locations[The Nightmare Meatrealm] contains __last_adventure_location)
+    {
+        IOTMPMeatGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+    }
+    if ($locations[The gourd!] contains __last_adventure_location)
+    {
+        IOTMPGourdGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+    }
+    if ($locations[anger man's level, fear man's level, doubt man's level, regret man's level] contains __last_adventure_location)
+    {
+        //√
+        IOTMPCrackpotGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+    }
+    if ($locations[the tower of procedurally-generated skeletons] contains __last_adventure_location)
+    {
+        IOTMPJickGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+    }
+    if ($locations[a kitchen drawer, a grocery bag] contains __last_adventure_location)
+    {
+        //√
+        IOTMPArtistGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+    }
+}
+void IOTMGrimstoneHareGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    string [int] description;
+    string [int] modifiers;
+    
+    modifiers.listAppend("mysticality");
+    modifiers.listAppend("spell damage percent");
+    modifiers.listAppend("spell critical percent");
+    int time_remaining = $effect[hare-brained].have_effect();
+    
+    //FIXME deal with coldform / hotform / etc
+    
+    description.listAppend("Adventure on the deserted stretch of road.|Cast elemental-aligned powerful spells on vehicles.|The more damage, the faster you go.");
+    
+    description.listAppend("The speedy/expensive strategy is to nanorhino/ice house/batter up/pantsgiving/crystal skull/etc. banish everything that isn't an ice cream truck, and olfact ice cream trucks.|Then run coldform, buff spell damage, mysticality, and spell damage critical.|Then cast shrap.");
+    
+    string [string] elemental_descriptions;
+    
+    string [int] missing_hobopolis_spells;
+    
+    elemental_descriptions["hot"] = HTMLGenerateSpanOfClass("hot", "r_element_hot");
+    elemental_descriptions["cold"] = HTMLGenerateSpanOfClass("cold", "r_element_cold");
+    elemental_descriptions["spooky"] = HTMLGenerateSpanOfClass("spooky", "r_element_spooky");
+    elemental_descriptions["stench"] = HTMLGenerateSpanOfClass("stench", "r_element_stench");
+    elemental_descriptions["sleaze"] = HTMLGenerateSpanOfClass("sleaze", "r_element_sleaze");
+    
+    
+    boolean have_shrap = $skill[shrap].skill_is_usable();
+    
+    if (have_shrap && $effect[hotform].have_effect() > 0)
+        elemental_descriptions["hot"] = "Shrap (" + elemental_descriptions["hot"] + ")";
+    else if ($skill[volcanometeor showeruption].skill_is_usable())
+        elemental_descriptions["hot"] = "Volcanometeor Showeruption (" + elemental_descriptions["hot"] + ")";
+    else if ($skill[Awesome Balls of Fire].skill_is_usable())
+        elemental_descriptions["hot"] = "Awesome Balls of Fire (" + elemental_descriptions["hot"] + ")";
+    else
+        missing_hobopolis_spells.listAppend("Awesome Balls of Fire");
+    
+    
+    if (have_shrap && $effect[coldform].have_effect() > 0)
+        elemental_descriptions["cold"] = "Shrap (" + elemental_descriptions["cold"] + ")";
+    else if ($skill[Snowclone].skill_is_usable())
+        elemental_descriptions["cold"] = "Snowclone (" + elemental_descriptions["cold"] + ")";
+    else
+        missing_hobopolis_spells.listAppend("Snowclone");
+    
+    if (have_shrap && $effect[spookyform].have_effect() > 0)
+        elemental_descriptions["spooky"] = "Shrap (" + elemental_descriptions["spooky"] + ")";
+    else if ($skill[Raise Backup Dancer].skill_is_usable())
+        elemental_descriptions["spooky"] = "Raise Backup Dancer (" + elemental_descriptions["spooky"] + ")";
+    else
+        missing_hobopolis_spells.listAppend("Raise Backup Dancer");
+    
+    if (have_shrap && $effect[stenchform].have_effect() > 0)
+        elemental_descriptions["stench"] = "Shrap (" + elemental_descriptions["stench"] + ")";
+    else if ($skill[Eggsplosion].skill_is_usable())
+        elemental_descriptions["stench"] = "Eggsplosion (" + elemental_descriptions["stench"] + ")";
+    else
+        missing_hobopolis_spells.listAppend("Eggsplosion");
+    
+    
+    if (have_shrap && $effect[sleazeform].have_effect() > 0)
+        elemental_descriptions["sleaze"] = "Shrap (" + elemental_descriptions["sleaze"] + ")";
+    else if ($skill[Grease Lightning].skill_is_usable())
+        elemental_descriptions["sleaze"] = "Grease Lightning (" + elemental_descriptions["sleaze"] + ")";
+    else
+        missing_hobopolis_spells.listAppend("Grease Lightning");
+    
+    
+    
+    string [int][int] vehicle_descriptions;
+    if (!$monster[Fire truck].is_banished())
+        vehicle_descriptions.listAppend(listMake("Fire truck", elemental_descriptions["hot"]));
+    if (!$monster[ice cream truck].is_banished())
+        vehicle_descriptions.listAppend(listMake("ice cream truck", elemental_descriptions["cold"]));
+    if (!$monster[monster hearse].is_banished())
+        vehicle_descriptions.listAppend(listMake("monster hearse", elemental_descriptions["spooky"]));
+    if (!$monster[sewer tanker].is_banished())
+        vehicle_descriptions.listAppend(listMake("sewer tanker", elemental_descriptions["stench"]));
+    if (!$monster[sketchy van].is_banished())
+        vehicle_descriptions.listAppend(listMake("sketchy van", elemental_descriptions["sleaze"]));
+    
+    monster last_encounter = get_property_monster("lastEncounter");
+    string [int] vehicles = split_string_alternate("Fire truck,ice cream truck,monster hearse,sewer tanker,sketchy van", ",");
+    
+    foreach key in vehicles
+    {
+        monster vehicle = vehicles[key].to_monster();
+        if (vehicle == $monster[none])
+            continue;
+        
+        if (last_encounter != vehicle)
+            continue;
+        
+        vehicle_descriptions[key][0] = HTMLGenerateSpanOfClass(vehicle_descriptions[key][0], "r_bold");
+        vehicle_descriptions[key][1] = HTMLGenerateSpanOfClass(vehicle_descriptions[key][1], "r_bold");
+    }
+    
+    description.listAppend("Spells to cast: " + HTMLGenerateIndentedText(HTMLGenerateSimpleTableLines(vehicle_descriptions)));
+    
+    if (my_familiar() != $familiar[magic dragonfish])
+        description.listAppend("Run magic dragonfish familiar.");
+    else if ($familiar[magic dragonfish].familiar_weight() < 20)
+        description.listAppend("Gain " + (20 - $familiar[magic dragonfish].familiar_weight()) + " pounds on your magic dragonfish.");
+    
+    if (missing_hobopolis_spells.count() > 0)
+        description.listAppend("Could acquire " + missing_hobopolis_spells.listJoinComponents(", ", "or") + " from the mall.");
+    
+    if ($skill[frigidalmatian].skill_is_usable() && $effect[frigidalmatian].have_effect() == 0)
+        description.listAppend("Could cast frigidalmatian. (expensive)");
+    
+    if (my_basestat($stat[mysticality]) < 400)
+        description.listAppend("May want to gain " + (400 - my_basestat($stat[mysticality])) + " more mysticality.");
+    
+    description.listAppend(pluralise(time_remaining, "turn", "turns") + " remaining in race.");
+    
+    
+    
+    
+    //$location[A Deserted Stretch of I-911]
+	optional_task_entries.listAppend(ChecklistEntryMake("__effect hare-brained", "place.php?whichplace=ioty2014_hare", ChecklistSubentryMake("Hare Race", modifiers, description)));
+}
+
+void IOTMGrimstoneStepmotherGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    int minutes_to_midnight = get_property_int("cinderellaMinutesToMidnight");
+    if (minutes_to_midnight <= 0)
+        return;
+    
+    if (__misc_state["in run"] && !($locations[the prince's kitchen,the prince's balcony,the prince's lounge,the prince's canapes table,the prince's restroom,the prince's dance floor] contains __last_adventure_location) && minutes_to_midnight < 30)
+        return;
+    
+    int score = get_property_int("cinderellaScore");
+    string [int] description;
+    string [int] modifiers;
+    
+    
+    if (minutes_to_midnight > 0)
+    {
+        string line;
+        line = pluralise(minutes_to_midnight, "minute", "minutes") + " to midnight.";
+        
+        if (score > 0)
+            line += " " + pluralise(score, "point", "points") + " earned.";
+        
+        description.listAppend(line);
+    }
+    
+    /*
+        The idea behind this solution is you want to put three items into cindy's purse.
+        The first two make her ignore her hankerchief and go to the restroom - where the doctored soap gives her puffy eyes - whereupon she returns and confirms the disease rumor.
+        The third is the mouse, which you confront her about. Then later she'll not have the purse at all and go to the restroom again.
+        
+        There are other solutions, but I don't know them. Find them! It's a fun puzzle.
+    */
+    
+    string [int][int] minute_to_action;
+    minute_to_action[30] = listMake("Lounge", "Take a cigar from the sideboard"); //I say, old chap
+    minute_to_action[29] = listMake("Balcony", "Examine the flowers."); //to give to prince
+    minute_to_action[28] = listMake("Canapés Table", "Give your carnation to the Prince."); //causes sneezing fit at 23, 13, 3
+    minute_to_action[27] = listMake("Canapés Table", "Slip something into Cindy's purse while she's distracted", "The cigar."); //Make her leave when sneezing
+    minute_to_action[26] = listMake("Balcony", "Examine the flowers."); //For doctoring
+    minute_to_action[25] = listMake("Restroom", "Rub the flower on the soap."); //For 23 sneezing.
+    minute_to_action[24] = listMake("Lounge", "Start a rumor about Cinderella", "Cinderella has a terrible disease."); //Points!
+    minute_to_action[23] = listMake("Lounge", "Take the empty cigar box."); //Mouse trap setup. 3 points (from sneezing)
+    minute_to_action[22] = listMake("Kitchen", "Inspect the kitchen pantry."); //Acquire cinnamon, notice mouse hole.
+    minute_to_action[21] = listMake("Canapés Table", "Take a piece of cheese."); //Mouse trap setup.
+    minute_to_action[20] = listMake("Kitchen", "Set a trap for the mouse."); //Set up mouse trap with cigar box and cheese. (if we had room, soap too, but that adds one point and there's no room - used in 31-point solution)
+    minute_to_action[19] = listMake("Canapés Table", "Slip something into Cindy's purse while she's distracted", "The cinnamon."); //For 13 sneezing fit, makes her ignore hankerchief.
+    minute_to_action[18] = listMake("Lounge", "Take the whiskey flask."); //To make cindy drunk. 5 points (prince hears rumor)
+    minute_to_action[17] = listMake("Canapés Table", "Pour some whisky into Cindy's glass."); //Cindy's drunk - used at 16, 6, and extra points from soap.
+    minute_to_action[16] = listMake("Balcony", "Examine the flowers."); //For stealing a hairpin from baronness. 6 points (16 behavior hits, she's drunk)
+    minute_to_action[15] = listMake("Balcony", "Speak with the Baroness."); //First step baronness
+    minute_to_action[14] = listMake("Balcony", "Ask the Baroness what troubles her."); //Makes baronness move to dance floor
+    minute_to_action[13] = listMake("Dance Floor", "Give your carnation to the Baroness and steal one of her hairpins."); //Now we can steal a hairpin. 11 points (sneezing fit with disease rumor)
+    minute_to_action[12] = listMake("Restroom", "Look in the medicine cabinet", "Pick the lock", "Take the bottle of syrup of ipecac."); //Which we use to pick the lock of the medicine cabinet, acquiring ipecac.
+    minute_to_action[11] = listMake("Kitchen", "Dose the tray of cannoli with ipecac."); //Ipecac we use here.
+    minute_to_action[10] = listMake("Restroom", "Take some soap."); //We'll be throwing it later.
+    minute_to_action[9] = listMake("Canapés Table", "Offer Cindy your 'customized' cannoli."); //Makes her throw up in eight turns. (no cinnamon)
+    minute_to_action[8] = listMake("Kitchen", "Take the mouse out of the trap."); //It showed up. Hello mouse.
+    minute_to_action[7] = listMake("Canapés Table", "Slip something into Cindy's purse while she's distracted", "The mouse."); //Third time.
+    minute_to_action[6] = listMake("Canapés Table", "Ask Cindy to loan you her handkerchief."); //Hey, is that a mouse in your purse? 13 points. (one from mouse, one from 6 behavior)
+    minute_to_action[5] = listMake("Dance Floor", "Kick some soap at Cindy."); //She's on the dance floor. Let's make her dance. 15 points. (dance!)
+    minute_to_action[4] = listMake("Restroom", "Take some soap."); //Dancing supplies.
+    minute_to_action[3] = listMake("Dance Floor", "Kick some soap at Cindy."); //Dance. 21 points (sneezing, dance!)
+    minute_to_action[2] = listMake("Restroom", "Take some soap."); //Dancing supplies.
+    minute_to_action[1] = listMake("Dance Floor", "Kick some soap at Cindy."); //She throws up. Dance. 32 points. (she threw up, dance!)
+    
+    if (false)
+    {
+        //output full details for reference:
+        string line;
+        foreach minute in minute_to_action
+        {
+            string description = minute_to_action[minute];
+            line = "|" + pluralise(minute, "minute", "minutes") + ":|*" + minute_to_action[minute].listJoinComponents(" > ") + line;
+        }
+        description.listAppend(line);
+    }
+    //FIXME add the other two trophies?
+    
+    
+    //int [int] needed_points_at_spot_to_be_following_correct_path; //score isn't tracked properly, and anyways there's split score per turn
+    
+    /*
+√30	take cigar
+√29	flower
+√28	give flower to prince
+√27	give cigar to cindy
+√26	flower
+√25	doctor soap
+√24	spread rumour (disease)
+√23	take empty cigar box
+√22	inspect kitchen
+√21	get cheese
+√20	set trap
+√19	plant cinnamon in cindy's purse
+√18	get whiskey
+√17	pour whiskey
+√16	flower
+√15	ask baronness
+√14	ask baronness x2
+√13	steal from baronness
+√12	steal ipecac
+√11	make cannoli (mouse available)
+√10	get soap
+√9	give cindy cannoli
+√8	get mouse
+√7	plant mouse
+√6	ask for hankerchief
+√5	kick soap
+√4	get soap
+√3	kick soap
+√2	get soap
+√1	kick soap
+    */
+    
+    boolean output_next_step = true;
+    //if (needed_points_at_spot_to_be_following_correct_path contains minutes_to_midnight && score != needed_points_at_spot_to_be_following_correct_path[minutes_to_midnight]) //they're doing a different route
+        //output_next_step = false;
+    
+    if (minute_to_action contains minutes_to_midnight && output_next_step)
+    {
+        description.listAppend("Next step for 32 points:|*" + minute_to_action[minutes_to_midnight].listJoinComponents(__html_right_arrow_character));
+        description.listAppend("Though, this is a fun puzzle to solve on your own.");
+    }
+    
+    //FIXME add suggestions for other two trophies (partners in crime, ending party early)
+	optional_task_entries.listAppend(ChecklistEntryMake("__item long-stemmed rose", "place.php?whichplace=ioty2014_cindy", ChecklistSubentryMake("The Prince's Ball", modifiers, description)));
+}
+
+void IOTMGrimstoneWolfGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    //FIXME I have no idea
+}
+
+void IOTMGrimstoneWitchGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    //FIXME I have no idea
+}
+
+void IOTMGrimstoneGnomeGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    //FIXME I have no idea
+}
+
+RegisterTaskGenerationFunction("IOTMGrimstoneGenerateTasks");
+void IOTMGrimstoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    //grimstoneMaskPath
+    //rumpelstiltskinTurnsUsed gives number of turns used getting materials. rumpelstiltskinKidsRescued gives the number of children rescued. It is likely that there are more messages than are documented on the wiki, so if some are missing and aren't parsed correctly, please put a note in the forum.
+    //cinderellaMinutesToMidnight gives number of turns remaining. cinderellaScore gives the current score. Also added grimstoneMaskPath which gives the current grimstone content available, "stepmother", "wolf", "witch", "gnome" or "hare".
+    
+    string mask_path = get_property("grimstoneMaskPath").to_lower_case();
+    
+    if ($effect[hare-brained].have_effect() > 0)
+        IOTMGrimstoneHareGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+    if (mask_path == "stepmother")
+        IOTMGrimstoneStepmotherGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+    if (mask_path == "wolf")
+        IOTMGrimstoneWolfGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+    if (mask_path == "witch")
+        IOTMGrimstoneWitchGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+    if (mask_path == "gnome")
+        IOTMGrimstoneGnomeGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+    if (mask_path == "tuxedo")
+        task_entries.listAppend(ChecklistEntryMake("__item long-stemmed rose", "place.php?whichplace=arcade", ChecklistSubentryMake("Believe in yourself", "", ""), -11));
 }
 
 
