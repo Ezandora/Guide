@@ -186,6 +186,33 @@ void generateChecklists(Checklist [int] ordered_output_checklists)
         {
             call checklist_generation_function_name(checklist_collection);
         }
+        
+        foreach checklist_name in __specific_checklist_1_generation_function_names
+        {
+            ChecklistEntry [int] checklist_entries = checklist_collection.lookup(checklist_name).entries;
+            foreach key, function_name in __specific_checklist_1_generation_function_names[checklist_name]
+            {
+                call function_name(checklist_entries);
+            }
+        }
+        foreach key, request in __specific_checklist_generation_requests
+        {
+            int argument_count = request.checklist_names.count();
+            string function_name = request.function_name;
+            //"call request.function_name()" will not work
+            if (argument_count == 3)
+            {
+                call function_name(checklist_collection.lookup(request.checklist_names[0]).entries, checklist_collection.lookup(request.checklist_names[1]).entries, checklist_collection.lookup(request.checklist_names[2]).entries);
+            }
+            else if (argument_count == 2)
+            {
+                call function_name(checklist_collection.lookup(request.checklist_names[0]).entries, checklist_collection.lookup(request.checklist_names[1]).entries);
+            }
+            else if (argument_count == 1)
+            {
+                call function_name(checklist_collection.lookup(request.checklist_names[0]).entries);
+            }
+        }
     }
     //Convert checklist_collection to checklists:
     checklists = ChecklistCollectionMergeWithLinearList(checklist_collection, checklists);

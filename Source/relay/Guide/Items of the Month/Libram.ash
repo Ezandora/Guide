@@ -12,7 +12,8 @@ static
     initialiseLibramSkills();
 }
 
-void SLibramGenerateResource(ChecklistEntry [int] resource_entries)
+RegisterResourceGenerationFunction("IOTMLibramGenerateResource");
+void IOTMLibramGenerateResource(ChecklistEntry [int] resource_entries)
 {
 	if (__misc_state["bookshelf accessible"])
 	{

@@ -102,7 +102,8 @@ void smithsnessGenerateSmithereensSuggestions(string [int] smithereen_suggestion
 	
 }
 
-void SSmithsnessGenerateResource(ChecklistEntry [int] resource_entries)
+RegisterResourceGenerationFunction("IOTMSmithsnessGenerateResource");
+void IOTMSmithsnessGenerateResource(ChecklistEntry [int] resource_entries)
 {
 	if (__misc_state["in run"] && $item[handful of smithereens].available_amount() > 0)
 	{

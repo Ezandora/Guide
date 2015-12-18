@@ -88,7 +88,7 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         
         subentry.entries.listAppend("Find Gnasir after " + pluralise(turns_until_gnasir_found, "turn", "turns") + ".");
     }
-    else if (get_property_int("gnasirProgress") == 0 && exploration <= 14 && $location[the arid, extra-dry desert].noncombatTurnsAttemptedInLocation() == 0)
+    else if (get_property_int("gnasirProgress") == 0 && exploration <= 14 && !$location[the arid, extra-dry desert].noncombat_queue.contains_text("A Sietch in Time"))
     {
         subentry.entries.listAppend("Find Gnasir next turn.");
     }
@@ -109,7 +109,8 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
                 subentry.entries.listAppend("Give stone rose to Gnasir.");
             else
             {
-                string line = "Potentially adventure in Oasis for stone rose.";
+                string line = "Potentially adventure in Oasis for stone rose";
+                line += ".";
                 if (delayRemainingInLocation($location[the oasis]) > 0)
                 {
                     string hipster_text = "";

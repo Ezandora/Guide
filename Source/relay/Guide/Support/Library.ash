@@ -321,6 +321,19 @@ int available_amount(boolean [item] items)
     return count;
 }
 
+int creatable_amount(boolean [item] items)
+{
+    //Usage:
+    //$items[disco ball, corrupted stardust].available_amount()
+    //Returns the total number of all items.
+    int count = 0;
+    foreach it in items
+    {
+        count += it.creatable_amount();
+    }
+    return count;
+}
+
 int item_amount(boolean [item] items)
 {
     int count = 0;
@@ -1379,4 +1392,40 @@ item [int] generateEquipmentToEquipForExtraExperienceOnStat(stat desired_stat)
         }
     }
     return items_equipping;
+}
+
+
+
+float averageAdventuresForConsumable(item it, boolean assume_monday)
+{
+	float adventures = 0.0;
+	string [int] adventures_string = it.adventures.split_string("-");
+	foreach key, v in adventures_string
+	{
+		float a = v.to_float();
+		if (a < 0)
+			continue;
+		adventures += a * (1.0 / to_float(adventures_string.count()));
+	}
+	
+	if ($skill[saucemaven].have_skill() && $items[hot hi mein,cold hi mein,sleazy hi mein,spooky hi mein,stinky hi mein,Hell ramen,fettucini Inconnu,gnocchetti di Nietzsche,spaghetti with Skullheads,spaghetti con calaveras] contains it)
+	{
+		if ($classes[sauceror,pastamancer] contains my_class())
+			adventures += 5;
+		else
+			adventures += 3;
+	}
+	
+	if ($skill[pizza lover].have_skill() && it.to_lower_case().contains_text("pizza"))
+	{
+		adventures += it.fullness;
+	}
+	if (it.to_lower_case().contains_text("lasagna") && !assume_monday)
+		adventures += 5;
+	//FIXME lasagna properly
+	return adventures;
+}
+float averageAdventuresForConsumable(item it)
+{
+    return averageAdventuresForConsumable(it, false);
 }

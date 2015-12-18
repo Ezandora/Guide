@@ -1,6 +1,6 @@
 
 
-void SPShadyPastGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+void IOTMPShadyPastGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     string [int] description;
     string [int] modifiers;
@@ -108,7 +108,7 @@ void SPShadyPastGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
 	optional_task_entries.listAppend(ChecklistEntryMake("chinatown", "place.php?whichplace=junggate_1", ChecklistSubentryMake("The Suspicious-Looking Guy's Shady Past", modifiers, description),$locations[chinatown shops, chinatown tenement, triad factory,1st floor\, shiawase-mitsuhama building,2nd floor\, shiawase-mitsuhama building,3rd floor\, shiawase-mitsuhama building]));
 }
 
-void SPOldManGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+void IOTMPOldManGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     string [int] description;
     string [int] modifiers;
@@ -172,7 +172,7 @@ void SPOldManGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 	optional_task_entries.listAppend(ChecklistEntryMake("__item inflatable duck", "", ChecklistSubentryMake("The Old Man's Bathtime Adventure", modifiers, description),$locations[The Old Man's Bathtime Adventures]));
 }
 
-void SPMeatGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+void IOTMPMeatGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     string [int] description;
     string [int] modifiers;
@@ -196,7 +196,7 @@ void SPMeatGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 	optional_task_entries.listAppend(ChecklistEntryMake("meat", "place.php?whichplace=junggate_6", ChecklistSubentryMake("The Meatsmith's Brainspace", modifiers, description),$locations[The Nightmare Meatrealm]));
 }
 
-void SPGourdGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+void IOTMPGourdGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     string [int] description;
     string [int] modifiers;
@@ -239,7 +239,7 @@ void SPGourdGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	optional_task_entries.listAppend(ChecklistEntryMake("__item gourd potion", "place.php?whichplace=junggate_2", ChecklistSubentryMake("The Gourd", modifiers, description),$locations[The gourd!]));
 }
 
-void SPCrackpotGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+void IOTMPCrackpotGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     string [int] description;
     string [int] modifiers;
@@ -390,7 +390,7 @@ void SPCrackpotGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
 
 
 
-void SPJickGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+void IOTMPJickGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     string [int] description;
     string [int] modifiers;
@@ -408,7 +408,7 @@ void SPJickGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 
 
 
-void SPArtistGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+void IOTMPArtistGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     string [int] description;
     string [int] modifiers;
@@ -497,7 +497,8 @@ void SPArtistGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 	optional_task_entries.listAppend(ChecklistEntryMake("__effect My Breakfast With Andrea", "place.php?whichplace=junggate_5", ChecklistSubentryMake("The Pretentious Artist's Obsession", modifiers, description),$locations[a kitchen drawer, a grocery bag]));
 }
 
-void SPsychoanalyticGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+RegisterTaskGenerationFunction("IOTMPsychoanalyticGenerateTasks");
+void IOTMPsychoanalyticGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     if (!get_property_boolean("_psychoJarUsed"))
         return;
@@ -505,33 +506,33 @@ void SPsychoanalyticGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
     if ($locations[chinatown shops, chinatown tenement, triad factory,1st floor\, shiawase-mitsuhama building,2nd floor\, shiawase-mitsuhama building,3rd floor\, shiawase-mitsuhama building] contains __last_adventure_location)
     {
         //√
-        SPShadyPastGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+        IOTMPShadyPastGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     }
     if ($locations[The Old Man's Bathtime Adventures] contains __last_adventure_location)
     {
         //√
-        SPOldManGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+        IOTMPOldManGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     }
     if ($locations[The Nightmare Meatrealm] contains __last_adventure_location)
     {
-        SPMeatGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+        IOTMPMeatGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     }
     if ($locations[The gourd!] contains __last_adventure_location)
     {
-        SPGourdGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+        IOTMPGourdGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     }
     if ($locations[anger man's level, fear man's level, doubt man's level, regret man's level] contains __last_adventure_location)
     {
         //√
-        SPCrackpotGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+        IOTMPCrackpotGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     }
     if ($locations[the tower of procedurally-generated skeletons] contains __last_adventure_location)
     {
-        SPJickGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+        IOTMPJickGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     }
     if ($locations[a kitchen drawer, a grocery bag] contains __last_adventure_location)
     {
         //√
-        SPArtistGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+        IOTMPArtistGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     }
 }

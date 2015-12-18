@@ -116,7 +116,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 			if ($effect[Filthworm Guard Stench].have_effect() == 0)
             {
                 url = "inventory.php?which=3";
-				details.listAppend("Use filthworm royal guard scent gland");
+				details.listAppend("Use filthworm royal guard scent gland.");
             }
 			modifiers.listClear();
             modifiers.listAppend("+meat");

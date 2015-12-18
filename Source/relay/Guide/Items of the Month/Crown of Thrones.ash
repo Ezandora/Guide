@@ -70,7 +70,7 @@ void listAppend(COTSuggestionSet [int] list, COTSuggestionSet entry)
 }
 
 
-void SCOTGenerateSuggestions(string [int] description)
+void IOTMCOTGenerateSuggestions(string [int] description)
 {
     familiar enthroned_familiar = my_enthroned_familiar();
     familiar bjorned_familiar = my_bjorned_familiar();
@@ -247,7 +247,8 @@ void SCOTGenerateSuggestions(string [int] description)
         description.listAppend(HTMLGenerateSimpleTableLines(familiar_options));
 }
 
-void SCOTGenerateResource(ChecklistEntry [int] resource_entries)
+RegisterResourceGenerationFunction("IOTMCOTGenerateResource");
+void IOTMCOTGenerateResource(ChecklistEntry [int] resource_entries)
 {
 	if ($item[crown of thrones].available_amount() == 0 && $item[Buddy Bjorn].available_amount() == 0)
 		return;
@@ -265,7 +266,7 @@ void SCOTGenerateResource(ChecklistEntry [int] resource_entries)
     
     if (($item[crown of thrones].equipped_amount() > 0 || $item[Buddy Bjorn].equipped_amount() > 0) || __misc_state["in run"])
     {
-        SCOTGenerateSuggestions(description);
+        IOTMCOTGenerateSuggestions(description);
     }
     
 	if (enthroned_familiar != $familiar[none])

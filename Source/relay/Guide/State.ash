@@ -754,16 +754,11 @@ void setUpState()
 
 void setUpQuestStateViaMafia()
 {
-	//Mafia's internal quest tracking system will sometimes need a quest log load to update.
-	//It seems to work like this:
-	//"unstarted" - quest not started
-	//"started" - quest started, no progress (by log) we can see
-	//"step1" - quest started, first log step completed
-	//"stepX" - quest started, X steps completed
-	//"finished" - quest ended
-	
 	QuestsInit();
 	SetsInit();
+    
+    foreach key, function_name in __init_functions
+        call function_name();
 	
 	//Opening guild quest
 	if (true)

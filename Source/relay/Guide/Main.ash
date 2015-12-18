@@ -4,6 +4,7 @@ import "relay/Guide/Support/List.ash"
 import "relay/Guide/Sections/Globals.ash"
 import "relay/Guide/Sections/Data.ash"
 import "relay/Guide/Support/Counter.ash"
+import "relay/Guide/Support/Library 2.ash"
 import "relay/Guide/State.ash"
 import "relay/Guide/Missing Items.ash"
 import "relay/Guide/Support/Math.ash"
@@ -18,6 +19,7 @@ import "relay/Guide/Sections/API.ash"
 import "relay/Guide/Sections/Navigation Bar.ash"
 import "relay/Guide/Sections/Tests.ash"
 import "relay/Guide/Sections/CSS.ash"
+import "relay/Guide/Items of the Month/Items of the Month import.ash"
 
 
 void runMain(string relay_filename)

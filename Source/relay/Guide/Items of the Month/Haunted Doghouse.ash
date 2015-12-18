@@ -1,5 +1,5 @@
-
-void SHauntedDoghouseGenerateResource(ChecklistEntry [int] resource_entries)
+RegisterResourceGenerationFunction("IOTMHauntedDoghouseGenerateResource");
+void IOTMHauntedDoghouseGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (!__misc_state["in run"])
         return;

@@ -1,5 +1,3 @@
-
-
 void SDispensaryGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
 	//Not sure how I feel about this. The dispensary is very useful, but not necessary to complete an ascension.

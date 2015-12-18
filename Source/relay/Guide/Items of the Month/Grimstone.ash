@@ -1,4 +1,4 @@
-void SGrimstoneHareGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+void IOTMGrimstoneHareGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     string [int] description;
     string [int] modifiers;
@@ -121,7 +121,7 @@ void SGrimstoneHareGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 	optional_task_entries.listAppend(ChecklistEntryMake("__effect hare-brained", "place.php?whichplace=ioty2014_hare", ChecklistSubentryMake("Hare Race", modifiers, description)));
 }
 
-void SGrimstoneStepmotherGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+void IOTMGrimstoneStepmotherGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     int minutes_to_midnight = get_property_int("cinderellaMinutesToMidnight");
     if (minutes_to_midnight <= 0)
@@ -249,22 +249,23 @@ void SGrimstoneStepmotherGenerateTasks(ChecklistEntry [int] task_entries, Checkl
 	optional_task_entries.listAppend(ChecklistEntryMake("__item long-stemmed rose", "place.php?whichplace=ioty2014_cindy", ChecklistSubentryMake("The Prince's Ball", modifiers, description)));
 }
 
-void SGrimstoneWolfGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+void IOTMGrimstoneWolfGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     //FIXME I have no idea
 }
 
-void SGrimstoneWitchGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+void IOTMGrimstoneWitchGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     //FIXME I have no idea
 }
 
-void SGrimstoneGnomeGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+void IOTMGrimstoneGnomeGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     //FIXME I have no idea
 }
 
-void SGrimstoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+RegisterTaskGenerationFunction("IOTMGrimstoneGenerateTasks");
+void IOTMGrimstoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     //grimstoneMaskPath
     //rumpelstiltskinTurnsUsed gives number of turns used getting materials. rumpelstiltskinKidsRescued gives the number of children rescued. It is likely that there are more messages than are documented on the wiki, so if some are missing and aren't parsed correctly, please put a note in the forum.
@@ -273,15 +274,15 @@ void SGrimstoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     string mask_path = get_property("grimstoneMaskPath").to_lower_case();
     
     if ($effect[hare-brained].have_effect() > 0)
-        SGrimstoneHareGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+        IOTMGrimstoneHareGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     if (mask_path == "stepmother")
-        SGrimstoneStepmotherGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+        IOTMGrimstoneStepmotherGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     if (mask_path == "wolf")
-        SGrimstoneWolfGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+        IOTMGrimstoneWolfGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     if (mask_path == "witch")
-        SGrimstoneWitchGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+        IOTMGrimstoneWitchGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     if (mask_path == "gnome")
-        SGrimstoneGnomeGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+        IOTMGrimstoneGnomeGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     if (mask_path == "tuxedo")
         task_entries.listAppend(ChecklistEntryMake("__item long-stemmed rose", "place.php?whichplace=arcade", ChecklistSubentryMake("Believe in yourself", "", ""), -11));
 }

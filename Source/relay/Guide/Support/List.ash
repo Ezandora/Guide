@@ -951,3 +951,45 @@ boolean listContainsValue(monster [int] list, monster vo)
     }
     return false;
 }
+
+monster [int] listInvert(boolean [monster] monsters)
+{
+    monster [int] out;
+    foreach m, value in monsters
+    {
+        if (value)
+            out.listAppend(m);
+    }
+    return out;
+}
+
+location [int] listInvert(boolean [location] list)
+{
+    location [int] out;
+    foreach k, value in list
+    {
+        if (value)
+            out.listAppend(k);
+    }
+    return out;
+}
+
+skill [int] listConvertStringsToSkills(string [int] list)
+{
+    skill [int] out;
+    foreach key, s in list
+    {
+        out.listAppend(s.to_skill());
+    }
+    return out;
+}
+
+monster [int] listConvertStringsToMonsters(string [int] list)
+{
+    monster [int] out;
+    foreach key, s in list
+    {
+        out.listAppend(s.to_monster());
+    }
+    return out;
+}

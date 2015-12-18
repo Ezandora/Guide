@@ -86,7 +86,8 @@ DNASuggestion [int] __phylum_potion_suggestions;
 DNASuggestion [int] __phylum_potion_reminder_suggestions;
 effect __current_dna_intrinsic = $effect[none];
 
-void SDNAInit()
+RegisterInitFunction("IOTMDNAInit");
+void IOTMDNAInit()
 {
     if (get_campground()[$item[Little Geneticist DNA-Splicing Lab]] == 0)
         return;
@@ -321,7 +322,8 @@ void SDNAInit()
     }
 }
 
-void SDNAGenerateResource(ChecklistEntry [int] resource_entries)
+RegisterResourceGenerationFunction("IOTMDNAGenerateResource");
+void IOTMDNAGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (__misc_state["campground unavailable"])
         return;
@@ -479,7 +481,8 @@ void SDNAGenerateResource(ChecklistEntry [int] resource_entries)
     
 }
 
-void SDNAGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+RegisterTaskGenerationFunction("IOTMDNAGenerateTasks");
+void IOTMDNAGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     if (__misc_state["campground unavailable"])
         return;

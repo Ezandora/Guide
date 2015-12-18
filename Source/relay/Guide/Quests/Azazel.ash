@@ -53,7 +53,11 @@ void QAzazelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         ChecklistSubentry subentry;
         
         subentry.header = base_quest_state.quest_name;
-        subentry.entries.listAppend("Consume " + consumable + ".");
+        string line = "Consume " + consumable;
+        if ((consumable == $item[steel lasagna] && availableFullness() < 5) || (consumable == $item[steel-scented air freshener] && availableSpleen() < 5))
+            line += " once you have enough space";
+        line += ".";
+        subentry.entries.listAppend(line);
         optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, "", subentry));
         return;
     }
@@ -236,6 +240,11 @@ void QAzazelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         entry.subentries.listAppend(subentry);
     }
     
+    if ((my_path_id() == PATH_TEETOTALER || my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_ZOMBIE_SLAYER) && availableFullness() < 5)
+        entry.subentries.listAppend(ChecklistSubentryMake(HTMLGenerateSpanFont("Won't work, need five fullness to eat lasagna.", "red"), "", ""));
+        
+    if (my_path_id() == PATH_OXYGENARIAN && availableSpleen() < 5)
+        entry.subentries.listAppend(ChecklistSubentryMake(HTMLGenerateSpanFont("Won't work, need five spleen to consume steel-scented air freshener.", "red"), "", ""));
 	
 	optional_task_entries.listAppend(entry);
 }

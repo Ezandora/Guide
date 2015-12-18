@@ -476,7 +476,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     if (legendary_epic_weapon.available_amount_ignoring_storage() > 0)
         have_legendary_epic_weapon = true;
         
-	if (!__misc_state["in aftercore"] && !have_legendary_epic_weapon && $location[the "fun" house].turns_spent == 0)
+	if (!__misc_state["in aftercore"] && !have_legendary_epic_weapon && $location[the unquiet garves].turns_spent == 0)
 		return;
         
         
@@ -629,7 +629,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             
             item needed_item = lookupItem("fizzing spore pod");
             
-            if (needed_item.item_amount() < 6)
+            if (needed_item.available_amount() < 6)
             {
                 subentry.modifiers.listAppend("+item");
                 subentry.modifiers.listAppend("olfact angry mushroom guy");
@@ -637,7 +637,10 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             }
             else
             {
-                subentry.entries.listAppend("Make rubble go boom!");
+                if (needed_item.item_amount() < 6)
+                    subentry.entries.listAppend("Pull fizzing spore pod from hangk's, make rubble go boom!");
+                else
+                    subentry.entries.listAppend("Make rubble go boom!");
             }
         }
         else if (base_quest_state.mafia_internal_step == 16)

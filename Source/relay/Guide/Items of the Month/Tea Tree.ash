@@ -44,7 +44,8 @@ static
     initialiseTeaTreeTeas();
 }
 
-void STeaTreeGenerateResource(ChecklistEntry [int] resource_entries)
+RegisterResourceGenerationFunction("IOTMTeaTreeGenerateResource");
+void IOTMTeaTreeGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (!get_property_boolean("_pottedTeaTreeUsed") && get_campground()[lookupItem("potted tea tree")] > 0)
     {

@@ -1,6 +1,8 @@
 //This file isn't used in guide at all, currently, but I'd thought I'd release it anyways.
 //Classifies locations on whether they are adventure.php. Useful for scripts that need that information. Relevant for arrowing monsters, KOLHS, wandering monsters, semi-rare, etc.
 
+import "relay/Guide/Support/Math.ash";
+
 static
 {
     int [location] __adventure_php_locations;

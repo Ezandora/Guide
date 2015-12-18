@@ -1159,7 +1159,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         
     }
     
-    if ($item[portable cassette player].available_amount() > 0 && (__misc_state["in run"] || $item[portable cassette player].equipped_amount() > 0))
+    if ($item[portable cassette player].available_amount() > 0 && (__misc_state["in run"] || $item[portable cassette player].equipped_amount() > 0) && $item[portable cassette player].is_unrestricted())
     {
         string [int] description;
         string url = "";
@@ -1179,7 +1179,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         
         boolean [effect] buffs_to_display_for_future = $effects[Dangerous Zone Song,Flashy Dance Song];
         
-        boolean [effect] buffs_to_not_bother_display_current_for = $effects[Dark Orchestral Song,Pet Shop Song]; //+10% init is like +1% chance of extra modern zmobies, which saves an extremely small fraction of a turn. ignore, because cognitive load + you might run better accessories instead, like +ML
+        boolean [effect] buffs_to_not_bother_display_current_for = $effects[Dark Orchestral Song,Pet Shop Song]; //+10% init is like +1% chance of extra modern zmobies, which saves an extremely small fraction of a turn. ignore, because cognitive load + you might run better accessories instead, like +ML. plus, you have to use that weird fiddly technique because of +combat
         string [int] future_buffs;
         foreach mod_value, buff in buffs_activate_at
         {

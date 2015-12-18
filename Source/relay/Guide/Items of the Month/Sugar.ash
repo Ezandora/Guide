@@ -9,7 +9,8 @@ void SugarGenerateSuggestions(string [int] suggestions)
         suggestions.listAppend("Sugar chapeau: +50% spell damage (tower killing)");
 }
 
-void SSugarGenerateResource(ChecklistEntry [int] resource_entries)
+RegisterResourceGenerationFunction("IOTMSugarGenerateResource");
+void IOTMSugarGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (!$item[sugar sheet].is_unrestricted())
         return;

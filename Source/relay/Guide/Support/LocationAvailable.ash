@@ -72,7 +72,7 @@ float [monster] appearance_rates_adjusted(location l)
             source_altered[m] = v / minimum_monster_appearance;
     }
     
-    
+    //FIXME appearance_rates now seems to (?) take into account janitors moving. does it take into account laywers moving?
     boolean lawyers_relocated = (get_property_int("relocatePygmyLawyer") == my_ascensions());
     boolean janitors_relocated = (get_property_int("relocatePygmyJanitor") == my_ascensions());
     if (l == $location[the hidden park])
@@ -650,21 +650,6 @@ void locationAvailableRunDiagnostics()
 	}
 }
 
-string HTMLGenerateFutureTextByLocationAvailability(string base_text, location place)
-{
-    if (!locationAvailable(place) && place != $location[none])
-    {
-        base_text = HTMLGenerateSpanOfClass(base_text, "r_future_option");
-    }
-    return base_text;
-}
-
-string HTMLGenerateFutureTextByLocationAvailability(location place)
-{
-	return HTMLGenerateFutureTextByLocationAvailability(place.to_string(), place);
-}
-
-
 
 string [location] LAConvertLocationLookupToLocations(string [string] lookup_map)
 {
@@ -1012,6 +997,9 @@ static
             lookup_map[s] = "place.php?whichplace=nstower";
             
         lookup_map["Trick-or-treating"] = "place.php?whichplace=town&action=town_trickortreat";
+        lookup_map["The Deep Machine Tunnels"] = "place.php?whichplace=dmt";
+        
+        lookup_map["The Ruins of the Fully Automated Crimbo Factory"] = "place.php?whichplace=crimbo2015";
         
         __constant_clickable_urls = LAConvertLocationLookupToLocations(lookup_map);
     }

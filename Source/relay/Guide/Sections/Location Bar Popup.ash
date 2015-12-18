@@ -300,7 +300,7 @@ buffer generateItemInformationMethod2(location l, monster m, boolean try_for_min
                 slimeling_chance *= adjusted_base_drop_rate.to_float() * (1.0 + slimeling_base_drop_rate / 100.0);
                 effective_drop_rate += (100.0 - effective_drop_rate) * (slimeling_chance / 100.0);
             }
-            //not a quest item, not a 100% drop, etc
+            //not a quest item, ???
             //if (my_familiar() == $familiar[black cat])
             
             effective_drop_rate = clampf(floor(effective_drop_rate), 0.0, 100.0);
@@ -1103,7 +1103,7 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
                     stats_l1.listAppend(ka_dropped + " ka");
             }
             
-            if (m.expected_damage() > 1 && (m.expected_damage() > my_hp().to_float() * 0.75 || ($monsters[spider gremlin,batwinged gremlin,erudite gremlin,vegetable gremlin] contains m)) || spelunking)
+            if (m.expected_damage() > 1 && (m.expected_damage() >= my_hp().to_float() * 0.5 || ($monsters[spider gremlin,batwinged gremlin,erudite gremlin,vegetable gremlin] contains m)) || spelunking)
             {
                 string damage_text = m.expected_damage() + " dmg";
                 if (m.expected_damage() >= 0.75 * my_hp())

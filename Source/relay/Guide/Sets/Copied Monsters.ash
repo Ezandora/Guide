@@ -276,6 +276,60 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
     }
     ChecklistEntry copy_source_entry;
     
+    if (__misc_state["Chateau Mantegna available"] && !get_property_boolean("_chateauMonsterFought") && mafiaIsPastRevision(15115))
+    {
+        string url = "place.php?whichplace=chateau";
+        string header = "Chateau painting copy";
+        string [int] description;
+        monster current_monster = get_property_monster("chateauMonster");
+        
+        if (current_monster == $monster[none])
+            header += " available";
+        else
+            header += " fightable";
+        
+        if (__misc_state["in run"])
+        {
+            if ($item[alpine watercolor set].available_amount() == 0)
+                description.listAppend("Acquire an alpine watercolor set to copy something else.");
+            else
+                description.listAppend("Copy something else with alpine watercolor set.");
+            /*string line;
+            if (current_monster == $monster[none])
+                line += "Options:";
+            else
+                line += "Other options:";
+            
+            if ($item[alpine watercolor set].available_amount() == 0)
+            {
+                //url = "shop.php?whichshop=chateau";
+                line += " (buy alpine watercolor set first)";
+            }
+            else
+                line += " (copy with alpine watercolor set)";
+        
+            line += "|*" + potential_copies.listJoinComponents("|*");
+            description.listAppend(line);*/
+        }
+        
+        if (current_monster != $monster[none])
+        {
+            string [int] monster_description;
+            CopiedMonstersGenerateDescriptionForMonster(current_monster, monster_description, true, true);
+            string line = HTMLGenerateSpanOfClass("Currently have " + current_monster.to_string() + ".", "r_bold");
+            if (monster_description.count() > 0)
+                line += "|*" + monster_description.listJoinComponents("|*");
+            description.listPrepend(line);
+        }
+		//resource_entries.listAppend(ChecklistEntryMake("__item fancy oil painting", url, ChecklistSubentryMake(header, "", description)));
+        
+        
+        copy_source_entry.subentries.listAppend(ChecklistSubentryMake(header, "", description));
+        if (copy_source_entry.image_lookup_name == "")
+            copy_source_entry.image_lookup_name = "__item fancy oil painting";
+        if (copy_source_entry.url == "")
+            copy_source_entry.url = "place.php?whichplace=chateau";
+    }
 	if (copies_left > 0)
 	{
 		string [int] copy_source_list;
@@ -331,58 +385,6 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
         copy_source_entry.subentries.listAppend(ChecklistSubentryMake("Crappy camera copy available", "", description));
         if (copy_source_entry.image_lookup_name == "")
             copy_source_entry.image_lookup_name = "__item crappy camera";
-    }
-    if (__misc_state["Chateau Mantegna available"] && !get_property_boolean("_chateauMonsterFought") && mafiaIsPastRevision(15115))
-    {
-        string url = "place.php?whichplace=chateau";
-        string header = "Chateau painting copy";
-        string [int] description;
-        monster current_monster = get_property_monster("chateauMonster");
-        
-        if (current_monster == $monster[none])
-            header += " available";
-        else
-            header += " fightable";
-        
-        if (__misc_state["in run"])
-        {
-            if ($item[alpine watercolor set].available_amount() == 0)
-                description.listAppend("Acquire an alpine watercolor set to copy something else.");
-            else
-                description.listAppend("Copy something else with alpine watercolor set.");
-            /*string line;
-            if (current_monster == $monster[none])
-                line += "Options:";
-            else
-                line += "Other options:";
-            
-            if ($item[alpine watercolor set].available_amount() == 0)
-            {
-                //url = "shop.php?whichshop=chateau";
-                line += " (buy alpine watercolor set first)";
-            }
-            else
-                line += " (copy with alpine watercolor set)";
-        
-            line += "|*" + potential_copies.listJoinComponents("|*");
-            description.listAppend(line);*/
-        }
-        
-        if (current_monster != $monster[none])
-        {
-            string [int] monster_description;
-            CopiedMonstersGenerateDescriptionForMonster(current_monster, monster_description, true, true);
-            string line = HTMLGenerateSpanOfClass("Currently have " + current_monster.to_string() + ".", "r_bold");
-            if (monster_description.count() > 0)
-                line += "|*" + monster_description.listJoinComponents("|*");
-            description.listPrepend(line);
-        }
-		//resource_entries.listAppend(ChecklistEntryMake("__item fancy oil painting", url, ChecklistSubentryMake(header, "", description)));
-        
-        
-        copy_source_entry.subentries.listAppend(ChecklistSubentryMake(header, "", description));
-        if (copy_source_entry.image_lookup_name == "")
-            copy_source_entry.image_lookup_name = "__item fancy oil painting";
     }
     if (copy_source_entry.subentries.count() > 0)
     {

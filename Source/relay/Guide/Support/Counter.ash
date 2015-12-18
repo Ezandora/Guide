@@ -2,6 +2,7 @@ import "relay/Guide/Support/List.ash"
 import "relay/Guide/Support/Math.ash"
 import "relay/Guide/Support/Library.ash"
 import "relay/Guide/Support/HTML.ash"
+import "relay/Guide/Support/Holiday.ash"
 
 Record Counter
 {
@@ -381,23 +382,54 @@ boolean CounterWanderingMonsterMayHitNextTurn()
 {
     monster last_monster = get_property_monster("lastEncounter");
     
-    if ($monsters[Black Crayon Beast,Black Crayon Beetle,Black Crayon Constellation,Black Crayon Golem,Black Crayon Demon,Black Crayon Man,Black Crayon Elemental,Black Crayon Crimbo Elf,Black Crayon Fish,Black Crayon Goblin,Black Crayon Hippy,Black Crayon Hobo,Black Crayon Shambling Monstrosity,Black Crayon Manloid,Black Crayon Mer-kin,Black Crayon Frat Orc,Black Crayon Penguin,Black Crayon Pirate,Black Crayon Flower,Black Crayon Slime,Black Crayon Undead Thing,Black Crayon Spiraling Shape,angry bassist,blue-haired girl,evil ex-girlfriend,peeved roommate,random scenester] contains last_monster) //bit of a hack - if they just fought a hipster monster (hopefully not faxing it), then the wandering monster isn't up this turn. though... __last_turn_definitely_visited_adventure_php should handle that...
+    if (__last_turn_definitely_visited_adventure_php == -1 && $monsters[Black Crayon Beast,Black Crayon Beetle,Black Crayon Constellation,Black Crayon Golem,Black Crayon Demon,Black Crayon Man,Black Crayon Elemental,Black Crayon Crimbo Elf,Black Crayon Fish,Black Crayon Goblin,Black Crayon Hippy,Black Crayon Hobo,Black Crayon Shambling Monstrosity,Black Crayon Manloid,Black Crayon Mer-kin,Black Crayon Frat Orc,Black Crayon Penguin,Black Crayon Pirate,Black Crayon Flower,Black Crayon Slime,Black Crayon Undead Thing,Black Crayon Spiraling Shape,angry bassist,blue-haired girl,evil ex-girlfriend,peeved roommate,random scenester] contains last_monster) //bit of a hack - if they just fought a hipster monster (hopefully not faxing it), then the wandering monster isn't up this turn. though... __last_turn_definitely_visited_adventure_php should handle that...
     {
         return false;
     }
-    if (my_turncount() == __last_turn_definitely_visited_adventure_php && __last_turn_definitely_visited_adventure_php != -1 && !get_property("lastEncounter").contains_text("Lights Out")) //that adventure didn't advance the counter; no wandering monsters. also, does lights out override wanderers?
+    if (my_turncount() == __last_turn_definitely_visited_adventure_php && __last_turn_definitely_visited_adventure_php != -1 && !get_property("lastEncounter").contains_text("Lights Out")) //that adventure didn't advance the counter; no wandering monsters. also, does lights out override wanderers? but, what if there are TWO wandering monsters? the plot thickens
+    {
         return false;
+    }
     //FIXME use CounterWanderingMonsterMayHitInXTurns to implement this once we're sure it works
     foreach s in __wandering_monster_counter_names
     {
+        if (s == "Romantic Monster" && get_property_int("_romanticFightsLeft") == 0) //If mafia's tracking doesn't recognise the monster, then we can override by decrementing the romantic fights left. Added because of the machine elf tunnels.
+            continue;
         Counter c = CounterLookup(s);
         if (c.CounterExists() && c.CounterMayHitNextTurn())
+        {
             return true;
+        }
     }
     if (get_property_int("_romanticFightsLeft") > 0 && !CounterLookup("Romantic Monster").CounterExists() && my_path_id() != PATH_ONE_CRAZY_RANDOM_SUMMER) //mafia will clear the romantic monster window if it goes out of bounds
         return true;
     
+    //Disabled for now, because this is hard to predict:
+    /*boolean [string] holidays = getHolidaysToday();
+    foreach s in $strings[Feast of Boris,El Dia de Los Muertos Borrachos]
+    {
+        if (!holidays[s]) continue;
+        if (!CounterLookup("Holiday Monster").CounterExists())
+        {
+            return true;
+        }
+    }*/
     return false;
+}
+
+Counter [int] CounterWanderingMonsterWindowsActiveNextTurn()
+{
+    Counter [int] result;
+    if (!CounterWanderingMonsterMayHitNextTurn())
+        return result;
+    foreach s in __wandering_monster_counter_names
+    {
+        Counter c = CounterLookup(s);
+        if (c.CounterExists() && c.CounterMayHitNextTurn())
+            result[result.count()] = c;
+    }
+    return result;
+    
 }
 
 CountersInit();

@@ -31,7 +31,7 @@ void SCalculateUniverseGenerateResource(ChecklistEntry [int] resource_entries)
         int ice_cubes_needing_creation = lookupItem("perfect ice cube").available_amount();
         if (lookupSkill("Perfect Freeze").skill_is_usable() && !get_property_boolean("_perfectFreezeUsed"))
             ice_cubes_needing_creation += 1;
-        if (ice_cubes_needing_creation > 0 && $items[bottle of rum,bottle of vodka,boxed wine,bottle of gin,bottle of whiskey,bottle of tequila].available_amount() < ice_cubes_needing_creation)
+        if (ice_cubes_needing_creation > 0 && $items[bottle of rum,bottle of vodka,boxed wine,bottle of gin,bottle of whiskey,bottle of tequila].available_amount() < ice_cubes_needing_creation && __misc_state["can drink just about anything"])
         {
             //FIXME 18, 44, 75, and 99 are all valid for this - pick whichever we can summon now?
             useful_digits_and_their_reasons[99] = "base booze for perfect ice cube";
@@ -77,6 +77,10 @@ void SCalculateUniverseGenerateResource(ChecklistEntry [int] resource_entries)
         if (reason != "")
             table.listAppend(listMake(what_to_do, reason));
     }
+    
+    string table_description;
+    if (table.count() > 0)
+        table_description += "|*" + HTMLGenerateSimpleTableLines(table);
     if (mappings.count() > 0)
     {
         //FIXME full description?
@@ -99,12 +103,21 @@ void SCalculateUniverseGenerateResource(ChecklistEntry [int] resource_entries)
         tooltip_text.append(HTMLGenerateSimpleTableLines(mappings_final));
         
         string line = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip_text, "r_tooltip_inner_class") + "Full table", "r_tooltip_outer_class");
+        //we can't do full-width table entries because of colspan and display:table, so mimic it:
         //description.listAppend(line);
-        table.listAppend(listMake(line));
+        //table.listAppend(listMake(line));
+        if (table_description != "")
+            table_description += "<hr>";
+        table_description += line;
     }
-    if (table.count() > 1)
-        description.listAppend("Cast skill, enter the right number: (this changes, and is still being spaded)|*" + HTMLGenerateSimpleTableLines(table));
+    if (table_description != "")
+        description.listAppend("Cast skill, enter the right number: (this changes, and is still being spaded)" + table_description);
     else
         description.listAppend("Cast skill, enter the right number.");
+    
+    /*if (table.count() > 1)
+        description.listAppend("Cast skill, enter the right number: (this changes, and is still being spaded)|*" + HTMLGenerateSimpleTableLines(table));
+    else
+        description.listAppend("Cast skill, enter the right number.");*/
     resource_entries.listAppend(ChecklistEntryMake("__skill Calculate the Universe", "skillz.php", ChecklistSubentryMake("Calculate the Universe", "", description), 0));
 }

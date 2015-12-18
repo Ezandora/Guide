@@ -1,4 +1,5 @@
-void SPlasticVampireFangsGenerateResource(ChecklistEntry [int] resource_entries)
+RegisterResourceGenerationFunction("IOTMPlasticVampireFangsGenerateResource");
+void IOTMPlasticVampireFangsGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (!$item[plastic vampire fangs].is_unrestricted())
         return;

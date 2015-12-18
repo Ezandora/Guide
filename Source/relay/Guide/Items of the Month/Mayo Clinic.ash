@@ -1,4 +1,5 @@
-void SMayoClinicGenerateResource(ChecklistEntry [int] resource_entries)
+RegisterResourceGenerationFunction("IOTMMayoClinicGenerateResource");
+void IOTMMayoClinicGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (__misc_state["campground unavailable"])
         return;
@@ -36,8 +37,11 @@ void SMayoClinicGenerateResource(ChecklistEntry [int] resource_entries)
         
         choices.listAppend(listMake("Sphygmayomanometer", "+" + (20 + mayo_level) + "% all stats"));
         choices.listAppend(listMake("Tomayohawk-style reflex hammer", "Reusable combat item.|Staggers and deals mayo-level sleaze damage."));
-        if (!__misc_state["yellow ray available"])
-            choices.listAppend(listMake("Mayo lance", "Yellow ray. " + HTMLGenerateDivOfClass("Uses up blood mayo.", "r_word_wrap_group")));
+        string lance_description = "Yellow ray. ";
+        if (__misc_state["yellow ray available"])
+            lance_description = "Shorter yellow ray. ";
+        lance_description += HTMLGenerateDivOfClass("Uses up blood mayo.", "r_word_wrap_group");
+        choices.listAppend(listMake("Mayo lance", lance_description));
         
         if (!get_property_boolean("mayoWhipRented"))
         {
@@ -55,5 +59,13 @@ void SMayoClinicGenerateResource(ChecklistEntry [int] resource_entries)
         benefits.listAppend("+2 all resistance");
         description.listAppend("Gives " + benefits.listJoinComponents(", ", "and") + ".");
         resource_entries.listAppend(ChecklistEntryMake("__item bubblin' chemistry solution", "campground.php?action=workshed", ChecklistSubentryMake("Mayo Tank Soak", "", description), 8));
+    }
+    if ($item[mayo lance].available_amount() > 0)
+    {
+        string [int] description;
+        int turns_yellow_ray_will_be = clampi(150 - get_property_int("mayoLevel") * 5, 0, 150);
+        description.listAppend(pluralise(turns_yellow_ray_will_be, "turn", "turns") + " yellow ray. Affected by mayo level.");
+        resource_entries.listAppend(ChecklistEntryMake("__item mayo lance", "", ChecklistSubentryMake("Mayo lance", "", description), 8));
+        
     }
 }

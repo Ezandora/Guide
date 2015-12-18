@@ -27,7 +27,8 @@ void listAppend(DOECSummon [int] list, DOECSummon entry)
 	list[position] = entry;
 }
 
-void SDeckOfEveryCardGenerateResource(ChecklistEntry [int] resource_entries)
+RegisterResourceGenerationFunction("IOTMDeckOfEveryCardGenerateResource");
+void IOTMDeckOfEveryCardGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if ($item[Deck of Every Card].available_amount() == 0 || !$item[Deck of Every Card].is_unrestricted())
         return;
