@@ -72,9 +72,8 @@ float [monster] appearance_rates_adjusted(location l)
             source_altered[m] = v / minimum_monster_appearance;
     }
     
-    //FIXME appearance_rates now seems to (?) take into account janitors moving. does it take into account laywers moving?
-    boolean lawyers_relocated = (get_property_int("relocatePygmyLawyer") == my_ascensions());
-    boolean janitors_relocated = (get_property_int("relocatePygmyJanitor") == my_ascensions());
+    boolean lawyers_relocated = get_property_ascension("relocatePygmyLawyer");
+    boolean janitors_relocated = get_property_ascension("relocatePygmyJanitor");
     if (l == $location[the hidden park])
     {
         if (janitors_relocated)
@@ -259,9 +258,9 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
 	switch (loc)
 	{
 		case $location[The Castle in the Clouds in the Sky (Ground floor)]:
-			return get_property_int("lastCastleGroundUnlock") == my_ascensions();
+			return get_property_ascension("lastCastleGroundUnlock");
 		case $location[The Castle in the Clouds in the Sky (Top floor)]:
-			return get_property_int("lastCastleTopUnlock") == my_ascensions();
+			return get_property_ascension("lastCastleTopUnlock");
 		case $location[The Haunted Kitchen]:
 		case $location[The Haunted Conservatory]:
             return true; //FIXME exact detection
@@ -270,12 +269,12 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
                 return true;
             else
                 return false;
-			//return get_property_int("lastManorUnlock") == my_ascensions();
+			//return get_property_ascension("lastManorUnlock");
 		case $location[The Haunted Bedroom]:
 		case $location[The Haunted Bathroom]:
         case $location[the haunted gallery]:
             //FIXME detect this
-			return get_property_int("lastSecondFloorUnlock") == my_ascensions(); //FIXME test against questM21Dance
+			return get_property_ascension("lastSecondFloorUnlock"); //FIXME test against questM21Dance
         case $location[the haunted ballroom]:
             return questPropertyPastInternalStepNumber("questM21Dance", 4);
         case $location[The Haunted Laboratory]:
@@ -327,7 +326,7 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
 		case $location[the hidden park]:
 			return questPropertyPastInternalStepNumber("questL11Worship", 4);
         case $location[the hidden temple]:
-            return (get_property_int("lastTempleUnlock") == my_ascensions());
+            return get_property_ascension("lastTempleUnlock");
 		case $location[the spooky forest]:
 			return __la_zone_is_unlocked["Woods"];
 		case $location[The Smut Orc Logging Camp]:
@@ -433,9 +432,9 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
         case $location[The Hidden Office Building]:
             return get_property_int("hiddenOfficeProgress") >= 1;
         case $location[The Enormous Greater-Than Sign]:
-            return my_basestat(my_primestat()) >= 45 && get_property_int("lastPlusSignUnlock") != my_ascensions();
+            return my_basestat(my_primestat()) >= 45 && !get_property_ascension("lastPlusSignUnlock");
         case $location[The dungeons of doom]:
-            return my_basestat(my_primestat()) >= 45 && get_property_int("lastPlusSignUnlock") == my_ascensions();
+            return my_basestat(my_primestat()) >= 45 && get_property_ascension("lastPlusSignUnlock");
         case $location[The "Fun" House]:
             return questPropertyPastInternalStepNumber("questG04Nemesis", 2); //FIXME is 2 correct?
         case $location[The Dark Neck of the Woods]:
@@ -461,7 +460,7 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
         case $location[whitey's grove]:
             return questPropertyPastInternalStepNumber("questG02Whitecastle", 1) || questPropertyPastInternalStepNumber("questL11Palindome", 4); //FIXME what step for questL11Palindome?
         case $location[the Obligatory pirate's cove]:
-            return get_property_int("lastIslandUnlock") == my_ascensions() && !(QuestState("questL12War").mafia_internal_step >= 2 && !QuestState("questL12War").finished);
+            return get_property_ascension("lastIslandUnlock") && !(QuestState("questL12War").mafia_internal_step >= 2 && !QuestState("questL12War").finished);
         case $location[Inside the Palindome]:
             return $item[talisman o' namsilat].equipped_amount() > 0; //technically
         case $location[The Valley of Rof L'm Fao]:
@@ -1000,6 +999,7 @@ static
         lookup_map["The Deep Machine Tunnels"] = "place.php?whichplace=dmt";
         
         lookup_map["The Ruins of the Fully Automated Crimbo Factory"] = "place.php?whichplace=crimbo2015";
+        lookup_map["The X-32-F Combat Training Snowman"] = "place.php?whichplace=snojo";
         
         __constant_clickable_urls = LAConvertLocationLookupToLocations(lookup_map);
     }

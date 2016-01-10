@@ -1155,7 +1155,7 @@ void QStenchAirportGarbageGenerateTasks(ChecklistEntry [int] task_entries)
 
 void QStenchAirportWartDinseyGenerateTasks(ChecklistEntry [int] task_entries)
 {
-    if (get_property_int("lastWartDinseyDefeated") == my_ascensions())
+    if (get_property_ascension("lastWartDinseyDefeated"))
         return;
         
     item dinsey_item;
@@ -1420,8 +1420,7 @@ void QHotAirportGenerateResource(ChecklistEntry [int] resource_entries)
     if (!__misc_state["hot airport available"])
         return;
     //Elevator:
-    
-    if (false && !get_property_boolean("_discothequeElevatorRidden")) //FIXME replace with what this is named
+    if (mafiaIsPastRevision(16434) && !get_property_boolean("_infernoDiscoVisited")) //FIXME replace with what this is named
     {
         int potential_disco_style_level = 0;
         int current_disco_style_level = 0;
@@ -1437,6 +1436,8 @@ void QHotAirportGenerateResource(ChecklistEntry [int] resource_entries)
         
         string [int] description;
         string url = "place.php?whichplace=airport_hot&action=airport4_zone1";
+        if (current_disco_style_level == 0)
+            url = "inventory.php?which=2";
         /*
         Requires... disco style? (velvet gear)
         Floor 1: Gain 100 points in each stat!
@@ -1476,7 +1477,7 @@ void QHotAirportGenerateResource(ChecklistEntry [int] resource_entries)
         if (__misc_state["need to level"])
             floors.listAppend(DiscoFloorMake(1, "+100 all substats."));
         
-        floors.listAppend(DiscoFloorMake(2, "+100?% item for 20? turns."));
+        floors.listAppend(DiscoFloorMake(2, "+100% item for 20 turns."));
         floors.listAppend(DiscoFloorMake(3, "Fight Travoltron."));
         if (inebriety_limit() > 0)
         {
@@ -1498,7 +1499,7 @@ void QHotAirportGenerateResource(ChecklistEntry [int] resource_entries)
             if (floor.floor_number > current_disco_style_level || floor.grey_out)
             {
                 if (floor.floor_number > current_disco_style_level)
-                    line += " (wear style)";
+                    line += " (wear smooth velvet)";
                 line = HTMLGenerateSpanFont(line, "grey");
             }
             description.listAppend(line);

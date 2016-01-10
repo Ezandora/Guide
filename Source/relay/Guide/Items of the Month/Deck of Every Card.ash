@@ -204,7 +204,7 @@ void IOTMDeckOfEveryCardGenerateResource(ChecklistEntry [int] resource_entries)
         {
             summons.listAppend(DOECSummonMake("Sheep", "3 stone wool."));
         }
-        else if ($item[stone wool].available_amount() - wool_needed <= 0 && get_property_int("lastTempleAdventures") != my_ascensions() && my_path_id() != PATH_SLOW_AND_STEADY)
+        else if ($item[stone wool].available_amount() - wool_needed <= 0 && !get_property_ascension("lastTempleAdventures") && my_path_id() != PATH_SLOW_AND_STEADY)
         {
             summons.listAppend(DOECSummonMake("Sheep", "Stone wool for +3 adventures via temple."));
         }

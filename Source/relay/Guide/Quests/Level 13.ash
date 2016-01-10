@@ -911,10 +911,6 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 
                 subentry.entries.listAppend(per_round_damage + " damage/round.");
             }
-            else if ($skill[Garbage Nova].skill_is_usable())
-            {
-                subentry.entries.listAppend("Cast garbage nova four times with enough buffed mysticality. Umm... I don't know what that is. Maybe two hundred.");
-            }
             else if ($skill[saucegeyser].skill_is_usable())
             {
                 boolean need_modifier_output = true;

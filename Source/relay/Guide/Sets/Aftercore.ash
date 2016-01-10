@@ -153,7 +153,7 @@ void SAftercoreThingsToDoGenerateTasks(ChecklistEntry [int] task_entries, Checkl
         if (description_items.count() > 0)
             options.listAppend(AftercoreOptionMake("mer-kin temple in the sea", "", listMake("can find " + description_items.listJoinComponents(", ", "or"))));
     }
-    if (__misc_state["stench airport available"] && get_property_int("lastWartDinseyDefeated") != my_ascensions())
+    if (__misc_state["stench airport available"] && !get_property_ascension("lastWartDinseyDefeated"))
     {
         item dinsey_item;
         if (my_class() == $class[seal clubber])

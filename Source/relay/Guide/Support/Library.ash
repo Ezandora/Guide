@@ -35,6 +35,12 @@ monster get_property_monster(string property)
 	return get_property(property).to_monster();
 }
 
+//Returns true if the propery is equal to my_ascensions(). Commonly used in mafia properties.
+boolean get_property_ascension(string property)
+{
+    return get_property_int(property) == my_ascensions();
+}
+
 buffer to_buffer(string str)
 {
 	buffer result;
@@ -1335,7 +1341,7 @@ int equippable_amount(item it)
 
 boolean haveSeenBadMoonEncounter(int encounter_id)
 {
-    if (get_property_int("lastBadMoonReset") != my_ascensions()) //badMoonEncounter values are not reset when you ascend
+    if (!get_property_ascension("lastBadMoonReset")) //badMoonEncounter values are not reset when you ascend
         return false;
     return get_property_boolean("badMoonEncounter" + encounter_id);
 }

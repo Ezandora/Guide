@@ -118,7 +118,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     
     //if (lookupItem("7301").available_amount() == 0 || lookupItem("7302").available_amount() == 0) //first floor can be skipped via faxing
         //second_floor_probably_open = false;
-    if (get_property_int("lastSecondFloorUnlock") == my_ascensions()) //updates properly now
+    if (get_property_ascension("lastSecondFloorUnlock")) //updates properly now
         second_floor_probably_open = true;
     if (get_property("questM20Necklace") == "finished") //mafia will erroneously set questM20Necklace to finished in certain (unknown) cases. could be an error in QuestDatabase.java's reset(), but I am uncertain what caused the bug locally (it also set lastSecondFloorUnlock to current, though it is not unlocked) note - still in effect. additional information: south of the border?
         second_floor_probably_open = true;
@@ -173,7 +173,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
                             
                         if (delayRemainingInLocation($location[the haunted gallery]) > 0)
                         {
-                            string line = "Delay(?) for " + pluralise(delayRemainingInLocation($location[the haunted gallery]), "turn", "turns") + ".";
+                            string line = "Delay for " + pluralise(delayRemainingInLocation($location[the haunted gallery]), "turn", "turns") + ".";
                             if (__misc_state["have hipster"])
                             {
                                 modifiers.listAppend(__misc_state_string["hipster name"]+"?");
@@ -302,7 +302,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
                     if (__misc_state["free runs available"])
                         modifiers2.listAppend("free runs");
                         
-                    subentries2.listAppend(ChecklistSubentryMake("Burn " + pluralise($location[the haunted ballroom].delayRemainingInLocation(), "turn(?)", "turns(?)") + " delay in haunted ballroom", modifiers2, ""));
+                    subentries2.listAppend(ChecklistSubentryMake("Burn " + pluralise($location[the haunted ballroom].delayRemainingInLocation(), "turn", "turns") + " delay in haunted ballroom", modifiers2, ""));
                     ChecklistEntry entry2 = ChecklistEntryMake("__half Haunted Ballroom", $location[the haunted ballroom].getClickableURLForLocation(), subentries2, $locations[the haunted ballroom]);
                     entry2.importance_level = 5;
                     optional_task_entries.listAppend(entry2);

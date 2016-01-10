@@ -136,8 +136,8 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         //Not sure exactly how these work.
         //8 appears to be finished.
         //1 appears to be "area unlocked"
-        boolean hidden_tavern_unlocked = (get_property_int("hiddenTavernUnlock") == my_ascensions());
-        boolean janitors_relocated_to_park = (get_property_int("relocatePygmyJanitor") == my_ascensions());
+        boolean hidden_tavern_unlocked = get_property_ascension("hiddenTavernUnlock");
+        boolean janitors_relocated_to_park = get_property_ascension("relocatePygmyJanitor");
         boolean have_machete = false;
     
         have_machete = __dense_liana_machete_items.available_amount() > 0;

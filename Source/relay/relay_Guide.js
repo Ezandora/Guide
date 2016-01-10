@@ -13,7 +13,6 @@ var __guide_importance_bar_visible = false;
 var __guide_colset_type = -1; //1 for long, 2 for short
 
 var __guide_colset_long_kol_default = "200,3*,*";
-//var __guide_colset_long_kol_default_regex = /([0-9][0-9]*),3\*,[\*0123456789][0-9]*/;
 var __guide_colset_long_kol_default_regex = /([0-9][0-9]*),(3\*|[0-9][0-9]*%),[\*0123456789][0-9]*/; //firefox generic matching
 var __guide_colset_long_2 = ",3*,25%,20%";
 var __guide_colset_long_3_chatpane_slightly_visible = ",3*,30%,0%";
@@ -26,7 +25,6 @@ var __guide_observed_long_charpane_size = 200;
 
 
 var __guide_colset_short_kol_default = "4*,*";
-//var __guide_colset_short_kol_default_regex = /4\*,[\*0123456789][0-9]*/;
 var __guide_colset_short_kol_default_regex = /(4\*|[0-9][0-9]*%),[\*0123456789][0-9]*/; //firefox generic matching
 var __guide_colset_short_2 = "*,25%,20%";
 var __guide_colset_short_3_chatpane_slightly_visible = "*,30%,0%";

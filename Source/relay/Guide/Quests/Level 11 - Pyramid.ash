@@ -120,7 +120,7 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
         int pyramid_position = get_property_int("pyramidPosition");
         
         //Uncertain:
-        //if (get_property_int("lastPyramidReset") == my_ascensions())
+        //if (get_property_ascension("lastPyramidReset"))
         if (pyramid_position > 0) //does this work?
             have_pyramid_position = true;
         

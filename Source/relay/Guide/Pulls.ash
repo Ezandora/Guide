@@ -428,6 +428,8 @@ void generatePullList(Checklist [int] checklists)
     {
         if (my_primestat() == $stat[moxie] || my_basestat($stat[moxie]) >= 35)
             pullable_item_list.listAppend(GPItemMake($item[iFlail], "-combat, +11 ML, +5 familiar weight"));
+        if (__misc_state["Torso aware"]) //FIXME exclusiveness with camouflage T-shirt. probably should pull camou if we're over muscle stat, otherwise stealth vest, or whichever we have
+            pullable_item_list.listAppend(GPItemMake($item[xiblaxian stealth vest], "-combat shirt"));
         pullable_item_list.listAppend(GPItemMake($item[duonoculars], "-combat, +5 ML"));
         pullable_item_list.listAppend(GPItemMake($item[ring of conflict], "-combat"));
         if ($item[red shoe].can_equip())
@@ -436,7 +438,7 @@ void generatePullList(Checklist [int] checklists)
 	
 	pullable_item_list.listAppend(GPItemMake($item[ten-leaf clover], "Various turn saving.|Generic pull.", 20));
     
-    if (get_property_int("lastTempleUnlock") != my_ascensions() && $item[spooky-gro fertilizer].available_amount() == 0)
+    if (!get_property_ascension("lastTempleUnlock") && $item[spooky-gro fertilizer].available_amount() == 0)
         pullable_item_list.listAppend(GPItemMake($item[spooky-gro fertilizer], "Saves 2.5 turns while unlocking temple."));
 	
 	string [int] scrip_reasons;
@@ -483,6 +485,12 @@ void generatePullList(Checklist [int] checklists)
     }
     if (lookupItem("Mr. Cheeng's spectacles") != $item[none])
         pullable_item_list.listAppend(GPItemMake(lookupItem("Mr. Cheeng's spectacles"), "+15% item, +30% spell damage, acquire random potions in-combat.|Not particularly optimal, but fun."));
+    
+    int pills_pullable = clampi(20 - (get_property_int("_powerPillUses") + $item[power pill].available_amount()), 0, 20);
+    if (pills_pullable > 0)
+    {
+        pullable_item_list.listAppend(GPItemMake($item[power pill], "Saves one turn each.", pills_pullable));
+    }
 	
 	
 	boolean currently_trendy = (my_path_id() == PATH_TRENDY);

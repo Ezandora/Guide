@@ -109,7 +109,7 @@ void IOTMTomesGenerateResource(ChecklistEntry [int] resource_entries)
                 {
                     if ($skill[the ode to booze].skill_is_usable())
                         description.listAppend("Bucket of wine: 28 adventures nightcap with ode");
-                    else if (get_property_int("hiddenTavernUnlock") != my_ascensions() && $item[ye olde meade].available_amount() == 0) //just use fog murderers or meade instead, about the same
+                    else if (!get_property_ascension("hiddenTavernUnlock") && $item[ye olde meade].available_amount() == 0) //just use fog murderers or meade instead, about the same
                         description.listAppend("Bucket of wine: 18 adventures nightcap");
                 }
                     

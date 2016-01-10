@@ -9,7 +9,7 @@ void generateMisc(Checklist [int] checklists)
 		string [int] king_messages;
 		king_messages.listAppend("You know, whenever.");
 		king_messages.listAppend("Or become the new naughty sorceress?");
-		unimportant_task_entries.listAppend(ChecklistEntryMake("king imprismed", "lair6.php", ChecklistSubentryMake("Free the King", "", king_messages)));
+		unimportant_task_entries.listAppend(ChecklistEntryMake("king imprismed", "place.php?whichplace=nstower", ChecklistSubentryMake("Free the King", "", king_messages)));
 		
 		checklists.listAppend(ChecklistMake("Unimportant Tasks", unimportant_task_entries));
 	}

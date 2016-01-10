@@ -3,7 +3,8 @@ static
 	int [string] __moon_sign_id_lookup;
 	void initialiseMoonSignIDLookup()
 	{
-        __moon_sign_id_lookup[""] = 0; //???
+        __moon_sign_id_lookup[""] = 0;
+        __moon_sign_id_lookup["None"] = 0;
 		__moon_sign_id_lookup["Mongoose"] = 1;
 		__moon_sign_id_lookup["Wallaby"] = 2;
 		__moon_sign_id_lookup["Vole"] = 3;

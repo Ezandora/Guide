@@ -228,7 +228,7 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 			if (missing_washing_items.count() == 0)
             {
                 have_all_fcle_items = true;
-                url = "inventory.php?which=3";
+                //url = "inventory.php?which=3";
                 line += " Adventure once to complete quest.";
 				//line += " " + HTMLGenerateSpanFont("Use rigging shampoo, mizzenmast mop, and ball polish", "red") + ", then adventure to complete quest.";
             }

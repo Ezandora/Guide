@@ -92,7 +92,7 @@ void setUpState()
     }
     
 	__misc_state["in aftercore"] = get_property_boolean("kingLiberated");
-    //if (get_property_int("lastKingLiberation") == my_ascensions() && my_ascensions() != 0)
+    //if (get_property_ascension("lastKingLiberation") && my_ascensions() != 0)
         //__misc_state["in aftercore"] = true;
 	__misc_state["in run"] = !__misc_state["in aftercore"];
     if (__misc_state["Example mode"])
@@ -154,7 +154,7 @@ void setUpState()
 	
 	
 	__misc_state["MMJs buyable"] = false;
-	if (get_property_int("lastGuildStoreOpen") == my_ascensions())
+	if (get_property_ascension("lastGuildStoreOpen"))
 	{
 		if (my_class() == $class[pastamancer] || my_class() == $class[sauceror] || (my_class() == $class[accordion thief] && my_level() >= 9))
             __misc_state["MMJs buyable"] = true;
@@ -502,7 +502,7 @@ void setUpState()
     
     if (get_property("peteMotorbikeGasTank") == "Extra-Buoyant Tank")
         mysterious_island_unlocked = true;
-    if (get_property_int("lastIslandUnlock") == my_ascensions())
+    if (get_property_ascension("lastIslandUnlock"))
         mysterious_island_unlocked = true;
             
     
@@ -514,7 +514,7 @@ void setUpState()
 	__misc_state["desert beach available"] = false;
     if (get_property("peteMotorbikeGasTank") == "Large Capacity Tank")
         __misc_state["desert beach available"] = true;
-    if (get_property_int("lastDesertUnlock") == my_ascensions())
+    if (get_property_ascension("lastDesertUnlock"))
         __misc_state["desert beach available"] = true;
 	if ($location[south of the border].locationAvailable())
 		__misc_state["desert beach available"] = true;
@@ -522,7 +522,7 @@ void setUpState()
 		__misc_state["desert beach available"] = true;
 	
 	string ballroom_song = "";
-	if (get_property("lastQuartetAscension") == my_ascensions())
+	if (get_property_ascension("lastQuartetAscension"))
 	{
 		//1 and 3 are a guess
 		if (get_property("lastQuartetRequest") == "1")
@@ -566,7 +566,7 @@ void setUpState()
 	else if (familiar_is_usable($familiar[obtuse angel]))
 		__misc_state_string["obtuse angel name"] = "Obtuse Angel";
 	
-	if (get_property_int("lastPlusSignUnlock") == my_ascensions())
+	if (get_property_ascension("lastPlusSignUnlock"))
 		__misc_state["dungeons of doom unlocked"] = true;
 	else
 		__misc_state["dungeons of doom unlocked"] = false;

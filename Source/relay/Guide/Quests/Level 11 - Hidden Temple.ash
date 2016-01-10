@@ -2,7 +2,7 @@ void QLevel11HiddenTempleInit()
 {
     QuestState state;
 
-    if (get_property_int("lastTempleUnlock") == my_ascensions())
+    if (get_property_ascension("lastTempleUnlock"))
         QuestStateParseMafiaQuestPropertyValue(state, "finished");
     else if (__quest_state["Level 2"].startable)
     {

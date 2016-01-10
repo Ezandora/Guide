@@ -24,7 +24,7 @@ void generateDailyResources(Checklist [int] checklists)
 	SetsGenerateResources(resource_entries);
     QuestsGenerateResources(resource_entries);
 	
-	if (!get_property_boolean("_fancyHotDogEaten") && availableFullness() > 0 && __misc_state["VIP available"] && __misc_state["can eat just about anything"]) //too expensive to use outside a run? well, more that it's information overload
+	if (!get_property_boolean("_fancyHotDogEaten") && availableFullness() > 0 && __misc_state["VIP available"] && __misc_state["can eat just about anything"] && $item[Clan hot dog stand].is_unrestricted()) //too expensive to use outside a run? well, more that it's information overload
 	{
 		
 		string name = "Fancy hot dog edible";
@@ -182,7 +182,7 @@ void generateDailyResources(Checklist [int] checklists)
         description.listAppend(pluralise(my_ascensions(), "king", "kings") + " freed.");
         string image_name;
         image_name = "__effect sleepy";
-		resource_entries.listAppend(ChecklistEntryMake(image_name, "lair6.php", ChecklistSubentryMake("1 Prism", "", description), 10));
+		resource_entries.listAppend(ChecklistEntryMake(image_name, "place.php?whichplace=nstower", ChecklistSubentryMake("1 Prism", "", description), 10));
 	}
     
     if ((get_property("sidequestOrchardCompleted") == "hippy" || get_property("sidequestOrchardCompleted") == "fratboy") && !get_property_boolean("_hippyMeatCollected"))

@@ -627,7 +627,6 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
     
     float [monster] appearance_rates_adjusted = l.appearance_rates_adjusted();
     float [monster] appearance_rates_next_turn = l.appearance_rates(true);
-    //should we take into account the combat queue, etc?
     
     string [monster] monsters_that_we_cannot_encounter;
     if ($effect[Ancient Annoying Serpent Poison].have_effect() == 0)

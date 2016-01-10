@@ -216,6 +216,7 @@ string generateRandomMessage()
     paths[PATH_ACTUALLY_ED_THE_UNDYING] = "UNDYING!";
     paths[PATH_ONE_CRAZY_RANDOM_SUMMER] = "dance the mersenne twist";
     paths[PATH_COMMUNITY_SERVICE] = "make the world a better place";
+    //paths[PATH_WEST_OF_LOATHING] = "draw";
     //paths[PATH_CLASS_ACT_3] = "buttons for the people";
     //paths[PATH_AVATAR_OF_THE_NAUGHTY_SORCERESS] = "go forth to your lair! have some tea";
     
@@ -282,7 +283,7 @@ string generateRandomMessage()
         random_messages.listAppend(HTMLGenerateTagWrap("a", "visit the bounty hunter hunter sometime", generateMainLinkMap("bounty.php")));
 	}
     if (__misc_state["in aftercore"])
-        random_messages.listAppend(HTMLGenerateTagWrap("a", "ascension is waiting for you", generateMainLinkMap("lair6.php")));
+        random_messages.listAppend(HTMLGenerateTagWrap("a", "ascension is waiting for you", generateMainLinkMap("place.php?whichplace=nstower")));
     
     if (my_adventures() == 0)
         random_messages.listAppend("nowhere left to go");

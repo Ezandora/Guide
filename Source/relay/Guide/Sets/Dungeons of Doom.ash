@@ -23,7 +23,7 @@ void SDungeonsOfDoomGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
     if (turns_attempted == 0) //no, they haven't started yet
         return;
     
-    if (get_property_int("lastPlusSignUnlock") == my_ascensions())
+    if (get_property_ascension("lastPlusSignUnlock"))
     {
         should_output = false;
         //Dungeons of doom unlocked.

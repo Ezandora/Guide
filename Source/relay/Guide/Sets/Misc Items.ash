@@ -482,7 +482,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
 			description.listAppend(quest_needed + " to unlock hidden city.");
 		if (__misc_state["need to level"])
 			description.listAppend("Cave bar.");
-		if (get_property_int("lastTempleAdventures") != my_ascensions() && my_path_id() != PATH_SLOW_AND_STEADY)
+		if (!get_property_ascension("lastTempleAdventures") && my_path_id() != PATH_SLOW_AND_STEADY)
         {
             string line = "+3 adventures, +3 duration to ten effects. (once/ascension)";
             if (!__quest_state["Level 12"].state_boolean["Nuns Finished"])
@@ -537,7 +537,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
 		}
 	}
     
-    if (!get_property_boolean("_defectiveTokenChecked") && get_property_int("lastArcadeAscension") == my_ascensions())
+    if (!get_property_boolean("_defectiveTokenChecked") && get_property_ascension("lastArcadeAscension"))
     {
         resource_entries.listAppend(ChecklistEntryMake("__item jackass plumber home game", "place.php?whichplace=arcade", ChecklistSubentryMake("Broken arcade game", "", "May find a defective game grid token."), importance_level_item));
     }
@@ -1033,7 +1033,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__item BittyCar MeatCar", "inventory.php?which=3", ChecklistSubentryMake("BittyCar " + available_items.listJoinComponents(", ", "or") + " usable", "", description), importance_level_unimportant_item));
     }
     
-    if (in_run && !__quest_state["Level 13"].state_boolean["Stat race completed"] && __quest_state["Level 13"].state_string["Stat race type"] != "mysticality" && get_property_int("lastGoofballBuy") != my_ascensions() && __quest_state["Level 3"].started)
+    if (in_run && !__quest_state["Level 13"].state_boolean["Stat race completed"] && __quest_state["Level 13"].state_string["Stat race type"] != "mysticality" && !get_property_ascension("lastGoofballBuy") && __quest_state["Level 3"].started)
     {
         resource_entries.listAppend(ChecklistEntryMake("__item bottle of goofballs", "tavern.php?place=susguy", ChecklistSubentryMake("Bottle of goofballs obtainable", "", "For the lair stat test.|Costs nothing, but be careful..."), importance_level_unimportant_item));
     }

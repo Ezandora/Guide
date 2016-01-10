@@ -51,7 +51,7 @@ void IOTMBarrelGodGenerateResource(ChecklistEntry [int] resource_entries)
         string [int] plurals;
         foreach key, it in barrels_around
         {
-            plurals.listAppend(it.pluralise());
+            plurals.listAppend(pluralise(it.item_amount(), it));
         }
         string url = "inv_use.php?pwd=" + my_hash() + "&whichitem=" + barrels_around[0].to_int() + "&choice=1";
         string [int] description;

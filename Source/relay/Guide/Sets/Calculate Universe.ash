@@ -36,6 +36,10 @@ void SCalculateUniverseGenerateResource(ChecklistEntry [int] resource_entries)
             //FIXME 18, 44, 75, and 99 are all valid for this - pick whichever we can summon now?
             useful_digits_and_their_reasons[99] = "base booze for perfect ice cube";
         }
+        if (__quest_state["level 5"].mafia_internal_step < 3 && have_outfit_components("Knob Goblin Harem Girl Disguise") && $item[Knob Goblin Perfume].available_amount() == 0 && $effect[Knob Goblin Perfume].have_effect() == 0 && in_ronin())
+        {
+            useful_digits_and_their_reasons[9] = "knob goblin perfume for boss fight";
+        }
     }
     if (my_level() < 13)
     {
@@ -55,7 +59,7 @@ void SCalculateUniverseGenerateResource(ChecklistEntry [int] resource_entries)
     calculateNumberologyInputValuesForOutputs(desired_digits, digit_inputs_to_outputs, digit_inputs_to_deltas);
     
     string [int][int] table;
-    table.listAppend(listMake("#", "For"));
+    table.listAppend(listMake("Enter", "For"));
     string [int][int] mappings;
     
     foreach digit, reason in useful_digits_and_their_reasons
@@ -66,7 +70,7 @@ void SCalculateUniverseGenerateResource(ChecklistEntry [int] resource_entries)
             if (__setting_enable_outputting_all_numberology_options)
                 mappings.listAppend(listMake(digit_inputs_to_outputs[digit].to_string(), digit.to_string()));
                 //mappings.listAppend(digit_inputs_to_outputs[digit] + " -> " + digit);
-            what_to_do = digit_inputs_to_outputs[digit];
+            what_to_do = digit_inputs_to_outputs[digit].to_string();// + HTMLGenerateSpanFont(" (" + digit + ")", "gray", "0.9em");
         }
         else if (digit_inputs_to_deltas contains digit)
         {
@@ -75,7 +79,10 @@ void SCalculateUniverseGenerateResource(ChecklistEntry [int] resource_entries)
         else
             what_to_do = "Unknown result to end in " + digit;
         if (reason != "")
-            table.listAppend(listMake(what_to_do, reason));
+        {
+            //table.listAppend(listMake(what_to_do, reason));
+            table.listAppend(listMake(what_to_do, reason + HTMLGenerateSpanFont(" (" + digit + ")", "gray", "0.9em")));
+        }
     }
     
     string table_description;
@@ -111,7 +118,7 @@ void SCalculateUniverseGenerateResource(ChecklistEntry [int] resource_entries)
         table_description += line;
     }
     if (table_description != "")
-        description.listAppend("Cast skill, enter the right number: (this changes, and is still being spaded)" + table_description);
+        description.listAppend("Cast skill, enter the right number: (this changes)" + table_description);
     else
         description.listAppend("Cast skill, enter the right number.");
     

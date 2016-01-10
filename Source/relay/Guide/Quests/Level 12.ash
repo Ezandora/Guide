@@ -222,7 +222,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
         if ($item[ice nine].available_amount() == 0 && __misc_state["can equip just about any weapon"] && $item[ice harvest].available_amount() >= 9 && $item[ice nine].is_unrestricted()) //is this safe? unfinished ice sculpture is really nice, and ice bucket in sneaky pete...
             details.listAppend("Possibly make and equip an ice nine. (+30% meat 1h weapon)");
                 
-        if ($effect[Sinuses For Miles].have_effect() > 0 && get_property_int("lastTempleAdventures") != my_ascensions() && $item[stone wool].available_amount() > 0 && get_property_int("lastTempleUnlock") == my_ascensions())
+        if ($effect[Sinuses For Miles].have_effect() > 0 && !get_property_ascension("lastTempleAdventures") && $item[stone wool].available_amount() > 0 && get_property_ascension("lastTempleUnlock"))
             details.listAppend("Potentially use stone wool and visit the hidden temple to extend Sinuses for Miles for 3 turns.");
         
         

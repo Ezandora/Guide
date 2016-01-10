@@ -52,6 +52,7 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
 	property_summons_to_skills["_summonCarrotUsed"] = listMake($skill[Summon Carrot]);
 	property_summons_to_skills["_summonAnnoyanceUsed"] = listMake($skill[summon annoyance]);
     property_summons_to_skills["_perfectFreezeUsed"] = listMake(lookupSkill("Perfect Freeze"));
+    property_summons_to_skills["_communismUsed"] = listMake(lookupSkill("Communism!"));
     skills_to_title_notes[$skill[summon annoyance]] = get_property_int("summonAnnoyanceCost") + " swagger";
     
     

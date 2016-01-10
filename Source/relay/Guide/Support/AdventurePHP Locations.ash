@@ -57,6 +57,15 @@ boolean locationVisitsAdventurePHP(location l)
     return false;
 }
 
+boolean locationAllowsWanderingMonsters(location l)
+{
+    if (l == $location[the shore\, inc.])
+        return false;
+    if (l == lookupLocation("The X-32-F Combat Training Snowman"))
+        return false;
+    return l.locationVisitsAdventurePHP();
+}
+
 int snarfblatForLocation(location l)
 {
     if (__adventure_php_locations contains l)

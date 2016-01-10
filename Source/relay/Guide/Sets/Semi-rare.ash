@@ -59,7 +59,7 @@ void SemirareGenerateDescription(string [int] description)
             description.listAppend(line);
 	}
 	location last_location = $location[none];
-	if (get_property_int("lastSemirareReset") == my_ascensions() && get_property("semirareLocation") != "")
+	if (get_property_ascension("lastSemirareReset") && get_property("semirareLocation") != "")
 	{
 		last_location = get_property_location("semirareLocation");
         if (last_location != $location[none])

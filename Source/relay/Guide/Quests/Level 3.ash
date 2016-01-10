@@ -128,7 +128,7 @@ void QLevel3GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
     
     string url = "tavern.php";
     
-    if (get_property_int("lastCellarReset") == my_ascensions() && base_quest_state.mafia_internal_step > 1)
+    if (get_property_ascension("lastCellarReset") && base_quest_state.mafia_internal_step > 1)
         url = "cellar.php";
 	
 	if (wait_until_level_eleven)

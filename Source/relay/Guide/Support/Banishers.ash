@@ -148,7 +148,7 @@ string BanishSourceForMonster(monster m)
     return BanishForMonster(m).banish_source;
 }
 
-boolean [string] activeBanishNamesForLocation(location l)
+int [string] activeBanishNameCountsForLocation(location l)
 {
     Banish [int] banishes_active = BanishesActive();
     
@@ -161,21 +161,31 @@ boolean [string] activeBanishNamesForLocation(location l)
         }
     }
     
-    boolean [string] banish_names;
+    int [string] banish_name_counts;
     foreach key, m in l.get_monsters()
     {
         if (names contains m)
-            banish_names[names[m]] = true;
+            banish_name_counts[names[m]] += 1;
         if (my_path_id() == PATH_ONE_CRAZY_RANDOM_SUMMER)
         {
             foreach m2 in names
             {
                 if (m2.to_string().to_lower_case().contains_text(m.to_string().to_lower_case())) //FIXME complete hack, wrong, substrings, 1337, etc
-                    banish_names[names[m2]] = true;
+                    banish_name_counts[names[m2]] += 1;
             }
         }
     }
-    return banish_names;
+    return banish_name_counts;
+}
+
+boolean [string] activeBanishNamesForLocation(location l)
+{
+    boolean [string] result;
+    
+    foreach banish_name, count in l.activeBanishNameCountsForLocation()
+        result[banish_name] = (count > 0);
+    
+    return result;
 }
 
 int BanishLength(string banish_name)
