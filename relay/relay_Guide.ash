@@ -39604,7 +39604,7 @@ void IOTMGrimstoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 RegisterResourceGenerationFunction("IOTMSnojoGenerateResource");
 void IOTMSnojoGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (!get_property_boolean("snojoAvailable") || in_bad_moon() || !$item[X-32-F snowman crate].is_unrestricted())
+    if (!get_property_boolean("snojoAvailable") || in_bad_moon() || !lookupItem("X-32-F snowman crate").is_unrestricted())
         return;
     
     int fights_remaining = clampi(10 - get_property_int("_snojoFreeFights"), 0, 10);
