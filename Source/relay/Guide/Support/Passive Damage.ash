@@ -108,7 +108,7 @@ static
         
         foreach f in $familiars[]
         {
-            if (!f.combat && !($familiars[Doppelshifter,Comma Chameleon,Mad Hatrack,Robot Reindeer,Fancypants Scarecrow,Mini-Adventurer] contains f))
+            if (!(f.physical_damage || f.elemental_damage) && !($familiars[Doppelshifter,Comma Chameleon,Mad Hatrack,Robot Reindeer,Fancypants Scarecrow,Mini-Adventurer] contains f))
                 continue;
             __known_sources.listAppend(PassiveDamageSourceMake(PDS_DAMAGE_TYPE_ACTIVE, PDS_SOURCE_TYPE_FAMILIAR));
             __known_sources.listExactLastObject().chance_of_acting = 0.333; //most
