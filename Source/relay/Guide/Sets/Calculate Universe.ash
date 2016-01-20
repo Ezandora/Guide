@@ -59,7 +59,7 @@ void SCalculateUniverseGenerateResource(ChecklistEntry [int] resource_entries)
     calculateNumberologyInputValuesForOutputs(desired_digits, digit_inputs_to_outputs, digit_inputs_to_deltas);
     
     string [int][int] table;
-    table.listAppend(listMake("Enter", "For"));
+    table.listAppend(listMake(HTMLGenerateSpanOfClass("Enter", "r_bold"), HTMLGenerateSpanOfClass("For", "r_bold")));
     string [int][int] mappings;
     
     foreach digit, reason in useful_digits_and_their_reasons

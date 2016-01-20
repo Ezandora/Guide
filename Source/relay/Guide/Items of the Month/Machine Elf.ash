@@ -68,6 +68,7 @@ void IOTMMachineElfFamiliarGenerateResource(ChecklistEntry [int] resource_entrie
             monster_descriptions[lookupMonster("Thinker of Thoughts")] = "circle";
             
             
+            
             foreach source, result in abstraction_conversions
             {
                 string result_description = __machine_elf_abstractions_description[result];
@@ -86,6 +87,8 @@ void IOTMMachineElfFamiliarGenerateResource(ChecklistEntry [int] resource_entrie
                 
                 description.listAppend(line);
             }
+            if (lookupItem("abstraction: thought").item_amount() == 0)
+                description.listAppend("Possibly run the machine elf elsewhere first, for transmutable potions.");
         }
         ChecklistSubentry [int] subentries;
         subentries.listAppend(ChecklistSubentryMake(pluralise(free_fights_remaining, "free elf fight", "free elf fights"), modifiers, description));

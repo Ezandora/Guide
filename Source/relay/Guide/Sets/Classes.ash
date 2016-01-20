@@ -62,9 +62,9 @@ void SSealClubberInfernalSealsGenerateResource(ChecklistEntry [int] resource_ent
     //initialise all the seals:
     SealSummon [int] seal_summons;
     //seal_summons.listAppend(SealSummonMake($monster[SUMMONED_MONSTER], $item[FIGURINE], CAN_BUY_IN_STORE_OR_HERMIT, SEAL_CLUBBER_CANDLES_REQUIRED, IMBUED_SEAL_BLUBBER_CANDLES_REQUIRED, MINIMUM_LEVEL, $item[ITEM_DROPPED], "ITEM_DROPPED_DESCRIPTION"));
-    seal_summons.listAppend(SealSummonMake($monster[broodling seal], $item[figurine of a cute baby seal], true, 5, 0, 5, $item[severed flipper], "", $item[none]));
+    seal_summons.listAppend(SealSummonMake($monster[broodling seal], $item[figurine of a cute baby seal], true, 5, 0, 5, $item[severed flipper], "low-level club", $item[none]));
     
-    seal_summons.listAppend(SealSummonMake($monster[Centurion of Sparky], $item[figurine of an armored seal], true, 10, 0, 9, $item[ingot of seal-iron], ($items[ingot of seal-iron,bad-ass club].available_amount() == 0 ? "+10ML craftable club" : ""), $item[none]));
+    seal_summons.listAppend(SealSummonMake($monster[Centurion of Sparky], $item[figurine of an armored seal], true, 10, 0, 9, $item[ingot of seal-iron], ($items[ingot of seal-iron,bad-ass club,creepy-ass club,evil-ass club,frigid-ass club,hot-ass club,nasty-ass club].available_amount() == 0 ? "+10ML craftable club" : ""), $item[none]));
     
     seal_summons.listAppend(SealSummonMake($monster[hermetic seal], $item[figurine of an ancient seal], true, 3, 0, 6, $item[powdered sealbone], "imbued candle source", $item[none]));
     

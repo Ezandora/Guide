@@ -1,4 +1,3 @@
-import "relay/Guide/Items of the Month/Machine Elf.ash";
 import "relay/Guide/Items of the Month/Barrel God.ash";
 import "relay/Guide/Items of the Month/Tea Tree.ash";
 import "relay/Guide/Items of the Month/Speakeasy.ash";
@@ -15,4 +14,5 @@ import "relay/Guide/Items of the Month/Plastic Vampire Fangs.ash";
 import "relay/Guide/Items of the Month/DNA.ash";
 import "relay/Guide/Items of the Month/Psychoanalytic.ash";
 import "relay/Guide/Items of the Month/Grimstone.ash";
+import "relay/Guide/Items of the Month/Machine Elf.ash";
 import "relay/Guide/Items of the Month/Snojo.ash";

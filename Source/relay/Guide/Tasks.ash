@@ -339,7 +339,7 @@ void generateTasks(Checklist [int] checklists)
 	{
 		string [int] potential_targets;
 		
-		if (!have_outfit_components("Filthy Hippy Disguise"))
+		if (!have_outfit_components("Filthy Hippy Disguise") && !(get_property("sidequestOrchardCompleted") == "hippy" || get_property("sidequestOrchardCompleted") == "fratboy"))
 			potential_targets.listAppend("Mysterious Island Hippy for outfit. (allows hippy store access; free redorant for +combat)");
 		if (!have_outfit_components("War Hippy Fatigues") && !have_outfit_components("Frat Warrior Fatigues"))
 			potential_targets.listAppend("Hippy/frat war outfit?");

@@ -1431,6 +1431,7 @@ float averageAdventuresForConsumable(item it, boolean assume_monday)
 	//FIXME lasagna properly
 	return adventures;
 }
+
 float averageAdventuresForConsumable(item it)
 {
     return averageAdventuresForConsumable(it, false);

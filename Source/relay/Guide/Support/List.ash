@@ -156,6 +156,14 @@ void listAppend(slot [int] list, slot entry)
 	list[position] = entry;
 }
 
+void listAppend(thrall [int] list, thrall entry)
+{
+	int position = list.count();
+	while (list contains position)
+		position += 1;
+	list[position] = entry;
+}
+
 
 
 

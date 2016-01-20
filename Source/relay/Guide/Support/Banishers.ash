@@ -188,6 +188,17 @@ boolean [string] activeBanishNamesForLocation(location l)
     return result;
 }
 
+Banish BanishByName(string name)
+{
+    foreach key, banish in BanishesActive()
+    {
+        if (banish.banish_source == name)
+            return banish;
+    }
+    Banish blank;
+    return blank;
+}
+
 int BanishLength(string banish_name)
 {
     int length = __banish_source_length[banish_name];

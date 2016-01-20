@@ -59,7 +59,7 @@ boolean locationVisitsAdventurePHP(location l)
 
 boolean locationAllowsWanderingMonsters(location l)
 {
-    if (l == $location[the shore\, inc.])
+    if (l == $location[The Shore\, Inc. Travel Agency])
         return false;
     if (l == lookupLocation("The X-32-F Combat Training Snowman"))
         return false;

@@ -62,10 +62,28 @@ void IOTMMayoClinicGenerateResource(ChecklistEntry [int] resource_entries)
     }
     if ($item[mayo lance].available_amount() > 0)
     {
+        string url = "";
         string [int] description;
         int turns_yellow_ray_will_be = clampi(150 - get_property_int("mayoLevel") * 5, 0, 150);
-        description.listAppend(pluralise(turns_yellow_ray_will_be, "turn", "turns") + " yellow ray. Affected by mayo level.");
-        resource_entries.listAppend(ChecklistEntryMake("__item mayo lance", "", ChecklistSubentryMake("Mayo lance", "", description), 8));
+        if (get_property_int("mayoLevel") == 0)
+        {
+            string line = "Need blood mayo to yellow ray";
+            if ($effect[everything looks yellow].have_effect() > 0)
+                line += " later";
+            line += ".|Use mayo packets while eating.";
+            description.listAppend(line);
+            if (availableFullness() > 0)
+                url = "campground.php?action=workshed";
+        }
+        else
+        {
+            string line = pluralise(turns_yellow_ray_will_be, "turn", "turns") + " yellow ray";
+            if ($effect[everything looks yellow].have_effect() > 0)
+                line += " later";
+            line += ". Affected by mayo level.";
+            description.listAppend(line);
+        }
+        resource_entries.listAppend(ChecklistEntryMake("__item mayo lance", url, ChecklistSubentryMake("Mayo lance", "", description), 8));
         
     }
 }

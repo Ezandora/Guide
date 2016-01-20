@@ -758,7 +758,11 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         {
             subentry.entries.listAppend("Cast Bind Spaghetti Elemental to level up your spaghetti elemental to three in advance.");
         }
-        
+        if (base_quest_state.mafia_internal_step == 17)
+        {
+            subentry.entries.listAppend("Possibly speak to your guild?");
+            url = "guild.php";
+        }
     }
     else if (base_quest_state.mafia_internal_step == 15 && false)
     {
