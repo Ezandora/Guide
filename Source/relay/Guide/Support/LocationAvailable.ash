@@ -41,7 +41,7 @@ float [monster] appearance_rates_adjusted(location l)
     //FIXME domed city of ronald/grimacia doesn't take into account alien appearance rate
     float [monster] source = l.appearance_rates();
     
-    if (l == $location[the sleazy back alley])
+    if (l == $location[the sleazy back alley]) //FIXME is mafia's data files incorrect, or the wiki's?
         source[$monster[none]] = MIN(MAX(0, 20 - combat_rate_modifier()), 100);
     
     float minimum_monster_appearance = 1000000000.0;
@@ -465,6 +465,20 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
             return $item[talisman o' namsilat].equipped_amount() > 0; //technically
         case $location[The Valley of Rof L'm Fao]:
             return QuestState("questL09Topping").finished;
+        case $location[Swamp Beaver Territory]:
+            return get_property_boolean("maraisBeaverUnlock");
+        case $location[The Corpse Bog]:
+            return get_property_boolean("maraisCorpseUnlock");
+        case $location[The Dark and Spooky Swamp]:
+            return get_property_boolean("maraisDarkUnlock");
+        case $location[The Weird Swamp Village]:
+            return get_property_boolean("maraisVillageUnlock");
+        case $location[The Wildlife Sanctuarrrrrgh]:
+            return get_property_boolean("maraisWildlifeUnlock");
+        case $location[The Ruined Wizard Tower]:
+            return get_property_boolean("maraisWizardUnlock");
+        case $location[The Edge of the Swamp]:
+            return QuestState("questM18Swamp").started;
 		default:
 			break;
 	}
@@ -964,6 +978,7 @@ static
         lookup_map["The Skeleton Store"] = "place.php?whichplace=town_market";
         lookup_map["Madness Bakery"] = "place.php?whichplace=town_right";
         lookup_map["The Fungal Nethers"] = "place.php?whichplace=nemesiscave";
+        lookup_map["Thugnderdome"] = "gnomes.php";
         foreach s in $strings[The Hallowed Halls,Shop Class,Chemistry Class,Art Class]
             lookup_map[s] = "place.php?whichplace=KOLHS";
         foreach s in $strings[The Edge of the Swamp,The Dark and Spooky Swamp,The Corpse Bog,The Ruined Wizard Tower,The Wildlife Sanctuarrrrrgh,Swamp Beaver Territory,The Weird Swamp Village]

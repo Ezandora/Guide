@@ -1,5 +1,4 @@
 import "relay/Guide/Sections/Location Bar Popup.ash";
-import "relay/Guide/Sets/Bad Moon.ash";
 
 buffer generateLocationBar(boolean displaying_navbar)
 {

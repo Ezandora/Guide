@@ -1,3 +1,185 @@
+void generateRandomMessageLocation(string [int] random_messages)
+{
+    if (__last_adventure_location == $location[none])
+        return;
+    string message = "";
+    switch (__last_adventure_location)
+    {
+        case $location[the penultimate fantasy airship]:
+            message = "insert disc 2 to continue"; break;
+        case $location[a-boo peak]:
+            message = "allons-y!"; break;
+        case $location[twin peak]:
+            message = "fire walk with me"; break;
+        case $location[The Arrrboretum]:
+            message = "save the planet"; break;
+        case $location[the red queen's garden]:
+            message = "curiouser and curiouser"; break;
+        case $location[A Massive Ziggurat]:
+            message = "1.21 ziggurats"; break;
+        case $location[McMillicancuddy's Barn]:
+            message = "dooks"; break;
+        case $location[The Roman Forum]:
+            message = "they go the house"; break;
+        case $location[the battlefield (hippy uniform)]:
+            message = "love and war"; break;
+        case $location[the middle chamber]:
+            message = "pyramid laundry machine"; break;
+        case $location[the arid, extra-dry desert]:
+            message = "can't remember your name"; break;
+        case $location[outside the club]:
+            message = "around the world around the world around the world around the world"; break;
+        case $location[the hidden temple]:
+            message = "beware of temple guards"; break;
+        case $location[sonar]:
+            message = "one ping only"; break;
+        case $location[galley]:
+            message = "hungry?"; break;
+        case $location[science lab]:
+            message = "poetry in motion"; break;
+        case $location[fear man's level]:
+        case $location[doubt man's level]:
+        case $location[regret man's level]:
+        case $location[anger man's level]:
+            message = "<em>this isn't me</em>"; break;
+        case $location[domed city of ronaldus]:
+        case $location[domed city of grimacia]:
+        case $location[hamburglaris shield generator]:
+            message = "spaaaace!"; break;
+        case $location[The Mansion of Dr. Weirdeaux]:
+        case $location[The Deep Dark Jungle]:
+        case $location[The Secret Government Laboratory]:
+            message = "they know where you live, " + get_property("System.user.name").to_lower_case(); break;
+        case $location[The castle in the clouds in the sky (ground floor)]:
+        case $location[The castle in the clouds in the sky (basement)]:
+        case $location[The castle in the clouds in the sky (top floor)]:
+            if (my_class() == $class[disco bandit])
+                message = "making castles of your disco";
+            break;
+        case $location[The Prince's Restroom]:
+        case $location[The Prince's Dance Floor]:
+        case $location[The Prince's Kitchen]:
+        case $location[The Prince's Balcony]:
+        case $location[The Prince's Lounge]:
+        case $location[The Prince's Canapes table]:
+            message = "social sabotage"; break;
+        case $location[anemone mine (mining)]:
+        case $location[itznotyerzitz mine (in disguise)]:
+        case $location[the knob shaft (mining)]:
+        case $location[The Crimbonium Mine]:
+        case lookupLocation("The Velvet / Gold Mine (Mining)"):
+            message = "street sneaky pete don't you call me cause I can't go"; break;
+
+    }
+    if (message != "")
+        random_messages.listAppend(message);
+}
+
+    
+void generateRandomMessageFamiliar(string [int] random_messages)
+{
+    string lowercase_player_name = my_name().to_lower_case().HTMLEscapeString();
+    if (my_familiar() == $familiar[none])
+        return;
+    string message = "";
+    switch (my_familiar())
+    {
+        case $familiar[none]:
+            message = "even introverts need friends"; break;
+        case $familiar[crimbo shrub]:
+            if (format_today_to_string("MM") == "07")
+                message = "crimbo in july"; break;
+        case $familiar[black cat]:
+            message = "aww, cute kitty!"; break;
+        case $familiar[temporal riftlet]:
+            message = "master of time and space"; break;
+        case $familiar[Frumious Bandersnatch]:
+            message = "frabjous"; break;
+        case $familiar[Pair of Stomping Boots]:
+            if (__misc_state["free runs usable"])
+                message = "running away again?";
+            break;
+        case $familiar[baby sandworm]:
+            message = "the waters of life"; break;
+        case $familiar[baby bugged bugbear]:
+            message = "expected }, found }&#x030b;&#x0311;&#x0300;&#x0306;&#x034a;&#x0311;&#x0314;&#x034f;&#x0331;&#x0329;&#x0320;&#x0330; &#x0323;&#x033b;&#x034a;&#x0345;f&#x031d;&#x034e;&#x0330;&#x0325;&#x0319;&#x0363;&#x0366;&#x0365;&#x030e;,&#x031c;&#x0318;&#x0316;&#x036d;&#x034b; &#x0332;&#x0349;&#x032e;&#x032d;&#x032a;&#x0323;&#x034c;&#x034b;&#x0364;&#x0309;&#x0357;&#x036a;&#x0304;&#x0315;;&#x0339;&#x033c;&#x030b;&#x0308;&#x035b;&#x034a; &#x0327;&#x0354;&#x0325;&#x0324;&#x300c;&#x0359;&#x033a;&#x033b;&#x0356;&#x032f;&#x035b;&#x0300;&#x0313;&#x030f;&#x0351;&#x0300;l&#x034d;&#x030d;&#x030d;&#x030d;&#x0351;i&#x0316;&#x0316;&#x0359;&#x0342;&#x036a;&#x036e;&#x030d; &#x0313;&#x0351;&#x0309;&#x0300;&#x0306;&#x0489;&#x0320;&#x031c;&#x035a;&#x031c;&#x0339;1&#x0336;&#x0354;&#x0329;&#x032c;&#x0326;&#x0326;&#x034d;&#x0365;7&#x035b;&#x0489;&#x032c;&#x032f;&#x0347;&#x033b;&#x0356;&#x0349;1&#x0306;&#x0311;&#x0302;&#x0352;&#x0313;&#x300d;&#x0327;&#x033c;&#x031c;&#x0339;&#x0318;&#x0355;&#x0346;&#x033e;&#x0301;&#x0346;&#x0350;&#x036f;&#x0367;"; //causes severe rendering slowdown; working as intended
+            break;
+        case $familiar[mechanical songbird]:
+            message = "a little glowing friend"; break;
+        case $familiar[nanorhino]:
+            message = "write every day"; break;
+        case $familiar[rogue program]:
+            message = "ascends for the users"; break;
+        case $familiar[O.A.F.]:
+            message = "helping"; break;
+        case $familiar[Bank Piggy]:
+        case $familiar[Egg Benedict]:
+        case $familiar[Floating Eye]:
+        case $familiar[Money-Making Goblin]:
+        case $familiar[Oyster Bunny]:
+        case $familiar[Plastic Grocery Bag]:
+        case $familiar[Snowhitman]:
+        case $familiar[Vampire Bat]:
+        case $familiar[Worm Doctor]:
+            message = "hacker"; break;
+        case $familiar[adorable space buddy]:
+            message = "far beyond the stars"; break;
+        case $familiar[happy medium]:
+            message = "karma slave"; //what mistakes could I have made?
+            break;
+        case $familiar[wild hare]:
+            message = "or you wouldn't have come here"; //you must be mad
+            break;
+        case $familiar[artistic goth kid]:
+            message = "life is pain, " + lowercase_player_name; break;
+        case $familiar[angry jung man]:
+            message = "personal trauma"; break;
+        case $familiar[unconscious collective]:
+            message = "zzz"; break;
+        case $familiar[dataspider]:
+            message = "spiders are your friends"; break;
+        case $familiar[stocking mimic]:
+            message = "delicious candy"; break;
+        case $familiar[cocoabo]:
+            message = "flightless bird"; break;
+        case $familiar[whirling maple leaf]:
+            message = "canadian pride"; break;
+        case $familiar[Hippo Ballerina]:
+            message = "spin spin spin"; break;
+        case $familiar[Mutant Cactus Bud]:
+            message = "always watching"; break;
+        case $familiar[ghuol whelp]:
+            message = "&#x00af;\\_(&#x30c4;)_/&#x00af;"; //¯\_(ツ)_/¯
+            break;
+        case $familiar[bulky buddy box]:
+            message = "&#x2665;&#xfe0e;"; //♥︎
+            break;
+        case $familiar[emo squid]:
+            message = "sob"; break;
+        case $familiar[fancypants scarecrow]:
+            message = "the best in terms of pants"; break;
+        case $familiar[jumpsuited hound dog]:
+            message = "a little less conversation"; break;
+        case $familiar[Gluttonous Green Ghost]:
+            message = "I think he can hear you, " + lowercase_player_name; break;
+        case $familiar[hand turkey]:
+            message = "a rare bird"; break;
+        case $familiar[reanimated reanimator]:
+            message = "weird science"; break;
+        case $familiar[Twitching Space Critter]:
+            message = "right right right right down right agh"; break;
+        case $familiar[slimeling]:
+            message = "lost mother"; break;
+        case $familiar[Puck Man]:
+        case $familiar[Ms. Puck Man]:
+            message = "&#5607; &bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;"; break;
+        case lookupFamiliar("Lil' Barrel Mimic"):
+            message = ":D"; break;
+    }
+    if (message != "")
+        random_messages.listAppend(message);
+}
+
 string generateRandomMessage()
 {
 	string [int] random_messages;
@@ -68,45 +250,7 @@ string generateRandomMessage()
         random_messages.listAppend("the faster your runs, the longer they take");
     }
     
-    string [location] location_messages;
-    foreach l in $locations[domed city of ronaldus,domed city of grimacia,hamburglaris shield generator]
-        location_messages[l] = "spaaaace!";
-    location_messages[$location[the penultimate fantasy airship]] = "insert disc 2 to continue";
-    location_messages[$location[a-boo peak]] = "allons-y!";
-    location_messages[$location[twin peak]] = "fire walk with me";
-    location_messages[$location[The Arrrboretum]] = "save the planet";
-    location_messages[$location[the red queen's garden]] = "curiouser and curiouser";
-    location_messages[$location[A Massive Ziggurat]] = "1.21 ziggurats";
-    location_messages[$location[McMillicancuddy's Barn]] = "dooks";
-    location_messages[$location[The Roman Forum]] = "they go the house";
-    location_messages[$location[the battlefield (hippy uniform)]] = "love and war";
-    location_messages[$location[the middle chamber]] = "pyramid laundry machine";
-    location_messages[$location[the arid, extra-dry desert]] = "can't remember your name";
-    location_messages[$location[outside the club]] = "around the world around the world around the world around the world";
-    location_messages[$location[the hidden temple]] = "beware of temple guards";
-    if (my_class() == $class[disco bandit])
-    {
-        foreach l in $locations[The castle in the clouds in the sky (ground floor),The castle in the clouds in the sky (basement),The castle in the clouds in the sky (top floor)]
-            location_messages[l] = "making castles of your disco";
-    }
-    string conspiracy = "they know where you live, " + get_property("System.user.name").to_lower_case();
-    foreach s in $strings[The Mansion of Dr. Weirdeaux,The Deep Dark Jungle,The Secret Government Laboratory]
-        location_messages[lookupLocation(s)] = conspiracy;
-    foreach s in $strings[anemone mine (mining),itznotyerzitz mine (in disguise),the knob shaft (mining),The Crimbonium Mine,The Velvet / Gold Mine (Mining)]
-        location_messages[lookupLocation(s)] = "street sneaky pete don't you call me cause I can't go";
-    location_messages[$location[sonar]] = "one ping only";
-    location_messages[$location[galley]] = "hungry?";
-    location_messages[$location[science lab]] = "poetry in motion";
-    
-    foreach l in $locations[The Prince's Restroom,The Prince's Dance Floor,The Prince's Kitchen,The Prince's Balcony,The Prince's Lounge,The Prince's Canapes table]
-        location_messages[l] = "social sabotage";
-    
-    foreach l in $locations[fear man's level,doubt man's level,regret man's level,anger man's level]
-        location_messages[l] = "<em>this isn't me</em>";
-    
-    if (location_messages contains __last_adventure_location)
-        random_messages.listAppend(location_messages[__last_adventure_location]);
-    
+    generateRandomMessageLocation(random_messages);
 
     random_messages.listAppend(HTMLGenerateTagWrap("a", "if you're feeling stressed, play alice's army", generateMainLinkMap("aagame.php")));
 	random_messages.listAppend("consider your mistakes creative spading");
@@ -190,38 +334,63 @@ string generateRandomMessage()
     
     random_messages.listAppend("click click click");
     
-    string [int] paths;
-    paths[PATH_OXYGENARIAN] = "the slow path";
-    paths[PATH_BEES_HATE_YOU] = "bzzzzzz";
-    paths[PATH_WAY_OF_THE_SURPRISING_FIST] = "martial arts and crafts";
-    paths[PATH_TRENDY] = "played out";
-    paths[PATH_AVATAR_OF_BORIS] = "testosterone poisoning";
-    paths[PATH_BUGBEAR_INVASION] = "bugbears!";
-    paths[PATH_ZOMBIE_SLAYER] = "consumerism metaphor";
-    paths[PATH_CLASS_ACT] = "try the sequel";
-    paths[PATH_AVATAR_OF_JARLSBERG] = "nerd";
-    paths[PATH_BIG] = "everything's so tiny...";
-    paths[PATH_KOLHS] = "did you study?";
-    paths[PATH_CLASS_ACT_2] = "lonely guild trainer";
-    paths[PATH_AVATAR_OF_SNEAKY_PETE] = "sunglasses at night";
-    if (!in_hardcore())
-        paths[PATH_SLOW_AND_STEADY] = "infinite pulls";
-    else
-        paths[PATH_SLOW_AND_STEADY] = "skip a day if you like";
-    paths[PATH_HEAVY_RAINS] = "survive";
-    paths[PATH_PICKY] = "combinatorial ascension";
-    if ($skill[cannelloni cannon].skill_is_usable() && !$skill[cannelloni cocoon].skill_is_usable()) //such an easy mistake...
-        paths[PATH_PICKY] = "cannelloni confusion";
-    paths[PATH_STANDARD] = "no past no path";
-    paths[PATH_ACTUALLY_ED_THE_UNDYING] = "UNDYING!";
-    paths[PATH_ONE_CRAZY_RANDOM_SUMMER] = "dance the mersenne twist";
-    paths[PATH_COMMUNITY_SERVICE] = "make the world a better place";
-    //paths[PATH_WEST_OF_LOATHING] = "draw";
-    //paths[PATH_CLASS_ACT_3] = "buttons for the people";
-    //paths[PATH_AVATAR_OF_THE_NAUGHTY_SORCERESS] = "go forth to your lair! have some tea";
-    
-    if (paths contains my_path_id())
-        random_messages.listAppend(paths[my_path_id()]);
+    switch (my_path_id())
+    {
+        case PATH_OXYGENARIAN:
+            random_messages.listAppend("the slow path"); break;
+        case PATH_BEES_HATE_YOU:
+            random_messages.listAppend("bzzzzzz"); break;
+        case PATH_WAY_OF_THE_SURPRISING_FIST:
+            random_messages.listAppend("martial arts and crafts"); break;
+        case PATH_TRENDY:
+            random_messages.listAppend("played out"); break;
+        case PATH_AVATAR_OF_BORIS:
+            random_messages.listAppend("testosterone poisoning"); break;
+        case PATH_BUGBEAR_INVASION:
+            random_messages.listAppend("bugbears!"); break;
+        case PATH_ZOMBIE_SLAYER:
+            random_messages.listAppend("consumerism metaphor"); break;
+        case PATH_CLASS_ACT:
+            random_messages.listAppend("try the sequel"); break;
+        case PATH_AVATAR_OF_JARLSBERG:
+            random_messages.listAppend("nerd"); break;
+        case PATH_BIG:
+            random_messages.listAppend("everything's so tiny..."); break;
+        case PATH_KOLHS:
+            random_messages.listAppend("did you study?"); break;
+        case PATH_CLASS_ACT_2:
+            random_messages.listAppend("lonely guild trainer"); break;
+        case PATH_AVATAR_OF_SNEAKY_PETE:
+            random_messages.listAppend("sunglasses at night"); break;
+        case PATH_SLOW_AND_STEADY:
+            if (!in_hardcore())
+                random_messages.listAppend("infinite pulls");
+            else
+                random_messages.listAppend("skip a day if you like");
+            break;
+        case PATH_HEAVY_RAINS:
+            random_messages.listAppend("survive"); break;
+        case PATH_PICKY:
+            if ($skill[cannelloni cannon].skill_is_usable() && !$skill[cannelloni cocoon].skill_is_usable()) //such an easy mistake...
+                random_messages.listAppend("cannelloni confusion");
+            else
+                random_messages.listAppend("combinatorial ascension");
+            break;
+        case PATH_STANDARD:
+            random_messages.listAppend("no past no path"); break;
+        case PATH_ACTUALLY_ED_THE_UNDYING:
+            random_messages.listAppend("UNDYING!"); break;
+        case PATH_ONE_CRAZY_RANDOM_SUMMER:
+            random_messages.listAppend("dance the mersenne twist"); break;
+        case PATH_COMMUNITY_SERVICE:
+            random_messages.listAppend("make the world a better place"); break;
+        case PATH_AVATAR_OF_WEST_OF_LOATHING:
+            random_messages.listAppend("draw"); break;
+        /*case PATH_CLASS_ACT_3:
+            random_messages.listAppend("buttons for the people"); break;
+        case PATH_AVATAR_OF_THE_NAUGHTY_SORCERESS:
+            random_messages.listAppend("go forth to your lair! have some tea"); break;*/
+    }
     
     random_messages.listAppend("I don't know either, sorry");
     
@@ -303,51 +472,7 @@ string generateRandomMessage()
     if (hippy_stone_broken() && pvp_attacks_left() > 0)
         random_messages.listAppend(HTMLGenerateTagWrap("a", "aggressive friendship", generateMainLinkMap("peevpee.php")));
         
-    string [familiar] familiar_messages;
-    familiar_messages[$familiar[none]] = "even introverts need friends";
-    familiar_messages[$familiar[black cat]] = "aww, cute kitty!";
-    familiar_messages[$familiar[temporal riftlet]] = "master of time and space";
-    familiar_messages[$familiar[Frumious Bandersnatch]] = "frabjous";
-    if (__misc_state["free runs usable"])
-        familiar_messages[$familiar[Pair of Stomping Boots]] = "running away again?";
-    familiar_messages[$familiar[baby sandworm]] = "the waters of life";
-    familiar_messages[$familiar[baby bugged bugbear]] = "expected }, found }&#x030b;&#x0311;&#x0300;&#x0306;&#x034a;&#x0311;&#x0314;&#x034f;&#x0331;&#x0329;&#x0320;&#x0330; &#x0323;&#x033b;&#x034a;&#x0345;f&#x031d;&#x034e;&#x0330;&#x0325;&#x0319;&#x0363;&#x0366;&#x0365;&#x030e;,&#x031c;&#x0318;&#x0316;&#x036d;&#x034b; &#x0332;&#x0349;&#x032e;&#x032d;&#x032a;&#x0323;&#x034c;&#x034b;&#x0364;&#x0309;&#x0357;&#x036a;&#x0304;&#x0315;;&#x0339;&#x033c;&#x030b;&#x0308;&#x035b;&#x034a; &#x0327;&#x0354;&#x0325;&#x0324;&#x300c;&#x0359;&#x033a;&#x033b;&#x0356;&#x032f;&#x035b;&#x0300;&#x0313;&#x030f;&#x0351;&#x0300;l&#x034d;&#x030d;&#x030d;&#x030d;&#x0351;i&#x0316;&#x0316;&#x0359;&#x0342;&#x036a;&#x036e;&#x030d; &#x0313;&#x0351;&#x0309;&#x0300;&#x0306;&#x0489;&#x0320;&#x031c;&#x035a;&#x031c;&#x0339;1&#x0336;&#x0354;&#x0329;&#x032c;&#x0326;&#x0326;&#x034d;&#x0365;7&#x035b;&#x0489;&#x032c;&#x032f;&#x0347;&#x033b;&#x0356;&#x0349;1&#x0306;&#x0311;&#x0302;&#x0352;&#x0313;&#x300d;&#x0327;&#x033c;&#x031c;&#x0339;&#x0318;&#x0355;&#x0346;&#x033e;&#x0301;&#x0346;&#x0350;&#x036f;&#x0367;"; //causes severe rendering slowdown; working as intended
-    familiar_messages[$familiar[mechanical songbird]] = "a little glowing friend";
-    familiar_messages[$familiar[nanorhino]] = "write every day";
-    familiar_messages[$familiar[rogue program]] = "ascends for the users";
-    familiar_messages[$familiar[O.A.F.]] = "helping";
-    foreach f in $familiars[Bank Piggy,Egg Benedict,Floating Eye,Money-Making Goblin,Oyster Bunny,Plastic Grocery Bag,Snowhitman,Vampire Bat,Worm Doctor]
-        familiar_messages[f] = "hacker";
-    familiar_messages[$familiar[adorable space buddy]] = "far beyond the stars";
-    familiar_messages[$familiar[happy medium]] = "karma slave"; //what mistakes could I have made?
-    familiar_messages[$familiar[wild hare]] = "or you wouldn't have come here"; //you must be mad
-    familiar_messages[$familiar[artistic goth kid]] = "life is pain, " + lowercase_player_name;
-    familiar_messages[$familiar[angry jung man]] = "personal trauma";
-    familiar_messages[$familiar[unconscious collective]] = "zzz";
-    familiar_messages[$familiar[dataspider]] = "spiders are your friends";
-    familiar_messages[$familiar[stocking mimic]] = "delicious candy";
-    familiar_messages[$familiar[cocoabo]] = "flightless bird";
-    familiar_messages[$familiar[whirling maple leaf]] = "canadian pride";
-    familiar_messages[$familiar[Hippo Ballerina]] = "spin spin spin";
-    familiar_messages[$familiar[Mutant Cactus Bud]] = "always watching";
-    familiar_messages[$familiar[ghuol whelp]] = "&#x00af;\\_(&#x30c4;)_/&#x00af;"; //¯\_(ツ)_/¯
-    familiar_messages[$familiar[bulky buddy box]] = "&#x2665;&#xfe0e;"; //♥︎
-    familiar_messages[$familiar[emo squid]] = "sob";
-    familiar_messages[$familiar[fancypants scarecrow]] = "the best in terms of pants";
-    familiar_messages[$familiar[jumpsuited hound dog]] = "a little less conversation";
-    familiar_messages[$familiar[Gluttonous Green Ghost]] = "I think he can hear you, " + lowercase_player_name;
-    familiar_messages[$familiar[hand turkey]] = "a rare bird";
-    familiar_messages[$familiar[reanimated reanimator]] = "weird science";
-    familiar_messages[$familiar[Twitching Space Critter]] = "right right right right down right agh";
-    familiar_messages[$familiar[slimeling]] = "lost mother";
-    if (format_today_to_string("MM") == "07")
-        familiar_messages[$familiar[Crimbo Shrub]] = "crimbo in july";
-    familiar_messages[$familiar[Ms. Puck Man]] = "&#5607; &bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;";
-    familiar_messages[$familiar[Puck Man]] = familiar_messages[$familiar[Ms. Puck Man]];
-    familiar_messages[lookupFamiliar("Lil' Barrel Mimic")] = ":D";
-    
-    if (familiar_messages contains my_familiar() && !__misc_state["familiars temporarily blocked"])
-        random_messages.listAppend(familiar_messages[my_familiar()]);
+    generateRandomMessageFamiliar(random_messages);
         
     if (get_property_boolean("_warbearGyrocopterUsed"))
         random_messages.listAppend("[gyroseaten] => 109");
@@ -375,14 +500,19 @@ string generateRandomMessage()
     else if (current_hour == 6)
         random_messages.listAppend("the dawn is your enemy");
     
-    string [class] class_messages;
-    class_messages[$class[disco bandit]] = "making discos of your castles";
-    class_messages[$class[seal clubber]] = "I &#x2663;&#xfe0e; seals";
-    class_messages[$class[turtle tamer]] = "friends everywhere you go";
-    class_messages[$class[sauceror]] = "journey of the sauceror";
-    
-    if (class_messages contains my_class())
-        random_messages.listAppend(class_messages[my_class()]);
+    switch (my_class())
+    {
+        case $class[disco bandit]:
+            random_messages.listAppend("making discos of your castles"); break;
+        case $class[seal clubber]:
+            random_messages.listAppend("I &#x2663;&#xfe0e; seals"); break;
+        case $class[turtle tamer]:
+            random_messages.listAppend("friends everywhere you go"); break;
+        case $class[sauceror]:
+            random_messages.listAppend("journey of the sauceror"); break;
+        case lookupClass("Snake Oiler"):
+            random_messages.listAppend("ten points to slytherin"); break;
+    }
     
     
     if (__misc_state["Chateau Mantegna available"] && get_property_monster("chateauMonster").phylum == $phylum[fish] && !get_property_boolean("_chateauMonsterFought"))
@@ -450,8 +580,6 @@ string generateRandomMessage()
     monster_messages[$monster[urge to stare at your hands]] = ".&#x20dd;.&#x20dd;"; //.⃝.⃝
     if (my_path_id() == PATH_HEAVY_RAINS)
         monster_messages[$monster[pygmy bowler]] = "right into the gutter"; //come back!
-    monster_messages[$monster[extremely annoyed witch]] = "am I blue?"; //you dare to strike... quit it!
-    monster_messages[$monster[surprised and annoyed witch]] = "these tears in my eyes, telling you";
     monster_messages[$monster[Ron "The Weasel" Copperhead]] = "RONALD WEASLEY! HOW DARE YOU STEAL THAT ZEPPELIN<br>" + ChecklistGenerateModifierSpan("your father's now facing an inquiry at work and it's entirely YOUR FAULT");
     monster_messages[$monster[Mr. Loathing]] = HTMLGenerateTagWrap("a", "ruuun! go! get to the towah!", generateMainLinkMap("place.php?whichplace=nstower"));
     if (my_hp() < my_maxhp())
@@ -467,6 +595,8 @@ string generateRandomMessage()
     else
         monster_messages[lookupMonster("Lavalos")] = "all life begins with nu and ends with nu";
     monster_messages[$monster[sk8 gnome]] = "he was a sk8 gnome she said see u l8 gnome";
+    monster_messages[lookupMonster("the inquisitor")] = "nothing is up";
+    monster_messages[lookupMonster("doc clock")] = "your defeat will happen at " + (current_hour > 12 ? current_hour - 12 : current_hour) + ":" + current_minute + " precisely"; // + (current_hour >= 12 ? " PM" : " AM")
     
     string day_cycle;
     if (current_hour >= 5 && current_hour <= 11)
@@ -619,6 +749,11 @@ string generateRandomMessage()
         }
         else
             random_messages.listAppend("ascend? yes! play? no!");
+    }
+    if (limit_mode() == "batman" && !encounter_override)
+    {
+		random_messages.listClear();
+        random_messages.listAppend("a superstitious, cowardly lot");
     }
     
     if (format_today_to_string("YYYYMMdd") == "20151021") //october 21st, 2015

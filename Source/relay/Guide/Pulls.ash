@@ -226,6 +226,8 @@ void generatePullList(Checklist [int] checklists)
                 pullable_item_list.listAppend(GPItemMake($item[cane-mail shirt], "+20ML shirt", 1));
         }
     }
+    pullable_item_list.listAppend(GPItemMake(lookupItem("Clara's Bell"), "Forces a non-combat, once/day.", 1));
+    pullable_item_list.listAppend(GPItemMake(lookupItem("replica bat-oomerang"), "Saves three turns/day.", 1));
     
     if (__misc_state["spooky airport available"] && __misc_state["need to level"] && __misc_state["can drink just about anything"] && $effect[jungle juiced].have_effect() == 0)
     {

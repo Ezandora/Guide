@@ -16,3 +16,4 @@ import "relay/Guide/Items of the Month/Psychoanalytic.ash";
 import "relay/Guide/Items of the Month/Grimstone.ash";
 import "relay/Guide/Items of the Month/Machine Elf.ash";
 import "relay/Guide/Items of the Month/Snojo.ash";
+import "relay/Guide/Items of the Month/Telegraph Office.ash";

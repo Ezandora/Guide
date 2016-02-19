@@ -200,6 +200,14 @@ void listAppend(int [int][int] list, int [int] entry)
 	list[position] = entry;
 }
 
+void listAppend(item [int][int] list, item [int] entry)
+{
+	int position = list.count();
+	while (list contains position)
+		position += 1;
+	list[position] = entry;
+}
+
 void listAppend(skill [int] list, boolean [skill] entry)
 {
     foreach v in entry

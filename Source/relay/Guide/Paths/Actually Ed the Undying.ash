@@ -1,4 +1,6 @@
-void SActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+
+RegisterTaskGenerationFunction("PathActuallyEdtheUndyingGenerateTasks");
+void PathActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     if (my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING) return;
     
@@ -119,7 +121,8 @@ void SActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, Check
     }
 }
 
-void SActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] resource_entries)
+RegisterResourceGenerationFunction("PathActuallyEdtheUndyingGenerateResource");
+void PathActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING) return;
     item ka = $item[Ka coin];

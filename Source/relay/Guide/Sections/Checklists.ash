@@ -1,5 +1,5 @@
 import "relay/Guide/Sections/Tests.ash"
-
+import "relay/Guide/Limit Mode/Batfellow.ash";
 
 void generateMisc(Checklist [int] checklists)
 {
@@ -145,15 +145,16 @@ void generateChecklists(Checklist [int] ordered_output_checklists)
     {
         LimitModeSpelunkingGenerateChecklists(checklists);
     }
+    else if (limit_mode() == "batman")
+    {
+        LimitModeBatfellowGenerateChecklists(checklists);
+    }
     else if (!playerIsLoggedIn())
     {
-        //Hmm. I think emptying everything is the way to go, because if we're not online, we'll be inaccurate. Best to give no advice than some.
-        //But, it might break in the future if our playerIsLoggedIn() detection is inaccurate?
-        
 		Checklist task_entries = lookupChecklist(checklists, "Tasks");
         
         string image_name;
-        image_name = "disco bandit"; //tricky - they may not have this image in their image cache. Display nothing?
+        image_name = "disco bandit";
 		task_entries.entries.listAppend(ChecklistEntryMake(image_name, "", ChecklistSubentryMake("Log in", "+internet", "An Adventurer is You!"), -11));
     }
     else if (__misc_state["In valhalla"])

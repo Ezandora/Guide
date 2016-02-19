@@ -29,7 +29,7 @@ void QMartyGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 	
 	subentry.header = base_quest_state.quest_name;
     
-    
+    //FIXME use locationAvailable(), as mafia has tracking for area unlocks:
     
     int fork_ncs_seen = 0;
     foreach key, NC in $location[the edge of the swamp].locationSeenNoncombats()

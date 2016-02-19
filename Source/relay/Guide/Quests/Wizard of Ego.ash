@@ -79,9 +79,17 @@ void QWizardOfEgoGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
             url = "guild.php";
             subentry.entries.listAppend("Return to your guild.");
         }
-        else if ($items[grave robbing shovel, rusty grave robbing shovel].available_amount() == 0)
+        else if ($items[grave robbing shovel, rusty grave robbing shovel].item_amount() == 0 && $item[grave robbing shovel].equipped_amount() == 0 && $item[rusty grave robbing shovel].equipped_amount() == 0)
         {
-            subentry.entries.listAppend("Acquire a grave robbing shovel. (from mall)");
+            string line = "Acquire a grave robbing shovel.";
+            if ($items[grave robbing shovel, rusty grave robbing shovel].available_amount() == 0)
+                line += " (from mall)";
+            else if ($item[grave robbing shovel].storage_amount() + $item[rusty grave robbing shovel].storage_amount() > 0)
+            {
+                line += " (from hagnk's)";
+                url = "storage.php?which=2";
+            }
+            subentry.entries.listAppend(line);
         }
         else
         {

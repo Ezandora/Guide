@@ -300,7 +300,7 @@ void generateDailyResources(Checklist [int] checklists)
             else if (chateau[$item[bowl of potpourri]] > 0)
                 desired_stat = $stat[moxie];
             item [int] items_equipping = generateEquipmentToEquipForExtraExperienceOnStat(desired_stat);
-            if (items_equipping.count() > 0)
+            if (items_equipping.count() > 0 && __misc_state["need to level"])
                 description.listAppend("Could equip " + items_equipping.listJoinComponents(", ", "or") + " for more stats.");
         }
         

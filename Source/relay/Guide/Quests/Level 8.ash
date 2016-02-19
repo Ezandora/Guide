@@ -149,8 +149,8 @@ void QLevel8GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             
             item [int] items_needed;
             if ($item[ninja rope].available_amount() == 0) items_needed.listAppend($item[ninja rope]);
-            if ($item[ninja carabiner].available_amount() == 0) items_needed.listAppend($item[ninja carabiner]);
             if ($item[ninja crampons].available_amount() == 0) items_needed.listAppend($item[ninja crampons]);
+            if ($item[ninja carabiner].available_amount() == 0) items_needed.listAppend($item[ninja carabiner]);
             
             if (items_needed.count() == 0)
             {

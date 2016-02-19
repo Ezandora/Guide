@@ -677,7 +677,7 @@ void setUpState()
     __misc_state_string["resting url"] = "campground.php";
     __misc_state_string["resting description"] = "your campsite";
     __misc_state["recommend resting at campsite"] = true;
-    if (__misc_state["Chateau Mantegna available"] && (my_level() < 13 || __misc_state["need to level"] || $item[pantsgiving].available_amount() == 0))
+    if (__misc_state["Chateau Mantegna available"])// && (my_level() < 13 || __misc_state["need to level"] || $item[pantsgiving].available_amount() == 0))
     {
         __misc_state_string["resting url"] = "place.php?whichplace=chateau";
         __misc_state_string["resting description"] = "Chateau Mantegna";

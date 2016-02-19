@@ -17,7 +17,7 @@ void IOTMSnojoGenerateResource(ChecklistEntry [int] resource_entries)
             
         }
     }
-    if (lookupSkill("Snokebomb").have_skill() && mafiaIsPastRevision(10000000))
+    if (lookupSkill("Snokebomb").have_skill() && mafiaIsPastRevision(16599))
     {
         int snokes_left = clampi(3 - get_property_int("_snokebombUsed"), 0, 3);
         if (snokes_left > 0)
@@ -113,7 +113,12 @@ void IOTMSnojoGenerateResource(ChecklistEntry [int] resource_entries)
             if (reward_descriptions[training_equipment_for_stat[current_stat]] != "")
                 winnings[reward_descriptions[training_equipment_for_stat[current_stat]]] = 11;
             if (consumable_reward_for_stat[current_stat] != $item[none])
-                winnings[consumable_reward_for_stat[current_stat].to_string()] = MAX(7, ceil(wins.to_float() / 7.0) * 7);
+            {
+                int value = ceil(wins.to_float() / 7.0) * 7;
+                if (value == wins)
+                    value += 7;
+                winnings[consumable_reward_for_stat[current_stat].to_string()] = MAX(7, value);
+            }
         }
         
         //Output in order of upcoming appearance:
@@ -138,17 +143,29 @@ void IOTMSnojoGenerateResource(ChecklistEntry [int] resource_entries)
         if (various_winnings_upcoming.count() > 0)
             description.listAppend(various_winnings_upcoming.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".");
         
-        if (wins >= 50 && setting != "TOURNAMENT")
+        if (setting != "TOURNAMENT" && (!__misc_state["in run"] || wins >= 50))
         {
+            //Skill scrolls:
             string [int] switchables;
-            if (get_property_int("snojoMuscleWins") < 50)
+            if (get_property_int("snojoMuscleWins") < 50 && setting != "MUSCLE")
                 switchables.listAppend("muscle");
-            if (get_property_int("snojoMoxieWins") < 50)
+            if (get_property_int("snojoMoxieWins") < 50 && setting != "MOXIE")
                 switchables.listAppend("moxie");
-            if (get_property_int("snojoMysticalityWins") < 50)
+            if (get_property_int("snojoMysticalityWins") < 50 && setting != "MYSTICALITY")
                 switchables.listAppend("mysticality");
             if (switchables.count() > 0)
-                description.listAppend("Could switch to " + switchables.listJoinComponents(", ", "or") + " for skill scrolls.");
+            {
+                string line = "Could switch to " + switchables.listJoinComponents(", ", "or") + " for ";
+                string additional = "";
+                if (wins < 50)
+                    additional = "different ";
+                if (switchables.count() > 1)
+                    line += additional + "skill scrolls";
+                else
+                    line += "a " + additional + "skill scroll";
+                line += ".";
+                description.listAppend(line);
+            }
         }
         if (__misc_state["in run"])
         {
@@ -181,6 +198,8 @@ void IOTMSnojoGenerateResource(ChecklistEntry [int] resource_entries)
         int importance = 6;
         if (__misc_state["in run"])
             importance = 0;
-        resource_entries.listAppend(ChecklistEntryMake("__item snow suit", "place.php?whichplace=snojo", ChecklistSubentryMake(pluralise(fights_remaining, "free Snojo fight", "free Snojo fights"), "", description), importance));
+        ChecklistSubentry [int] subentries;
+        subentries.listAppend(ChecklistSubentryMake(pluralise(fights_remaining, "free Snojo fight", "free Snojo fights"), "", description));
+        resource_entries.listAppend(ChecklistEntryMake("__item snow suit", "place.php?whichplace=snojo", subentries, importance, lookupLocations("the x-32-f combat training snowman")));
     }
 }

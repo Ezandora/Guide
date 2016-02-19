@@ -20,6 +20,7 @@ import "relay/Guide/Sections/Navigation Bar.ash"
 import "relay/Guide/Sections/Tests.ash"
 import "relay/Guide/Sections/CSS.ash"
 import "relay/Guide/Items of the Month/Items of the Month import.ash"
+import "relay/Guide/Paths/Paths import.ash"
 
 
 void runMain(string relay_filename)
@@ -53,6 +54,8 @@ void runMain(string relay_filename)
 	generateChecklists(ordered_output_checklists);
 	
     string guide_title = "Guide";
+    if (limit_mode() == "batman")
+        guide_title = "Bat-Guide";
 	
 	PageSetTitle(guide_title);
 	
@@ -165,7 +168,7 @@ void runMain(string relay_filename)
     }
     
     
-	PageWrite(HTMLGenerateSpanOfStyle("Guide", "font-weight:bold; font-size:1.5em"));
+	PageWrite(HTMLGenerateSpanOfStyle(guide_title, "font-weight:bold; font-size:1.5em"));
 	
 	outputChecklists(ordered_output_checklists);
 	

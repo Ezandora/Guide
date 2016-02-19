@@ -17,18 +17,11 @@ void SetsGenerateResources(ChecklistEntry [int] resource_entries)
 	SMiscItemsGenerateResource(resource_entries);
 	SCopiedMonstersGenerateResource(resource_entries);
     SPulveriseGenerateResource(resource_entries);
-    SWOTSFGenerateResource(resource_entries);
     SCountersGenerateResource(resource_entries);
     SFaxGenerateResource(resource_entries);
-    SJarlsbergGenerateResource(resource_entries);
-    SSneakyPeteGenerateResource(resource_entries);
-    SHeavyRainsGenerateResource(resource_entries);
-    SBugbearInvasionGenerateResource(resource_entries);
     SClassesGenerateResource(resource_entries);
     SEquipmentGenerateResource(resource_entries);
-    SActuallyEdtheUndyingGenerateResource(resource_entries);
     S8bitRealmGenerateResource(resource_entries);
-    SBadMoonGenerateResource(resource_entries);
     SCalculateUniverseGenerateResource(resource_entries);
     SEventsGenerateResource(resource_entries);
 }
@@ -45,8 +38,6 @@ void SetsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 	S8bitRealmGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SDailyDungeonGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SCountersGenerateTasks(task_entries, optional_task_entries, future_task_entries);
-	SWOTSFGenerateTasks(task_entries, optional_task_entries, future_task_entries);
-	SKOLHSGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SBountyHunterHunterGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SOldLevel9GenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SFaxGenerateTasks(task_entries, optional_task_entries, future_task_entries);
@@ -54,16 +45,10 @@ void SetsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 	SOlfactionGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SHolidayGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SRemindersGenerateTasks(task_entries, optional_task_entries, future_task_entries);
-	SSneakyPeteGenerateTasks(task_entries, optional_task_entries, future_task_entries);
-	SHeavyRainsGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SEventsGenerateTasks(task_entries, optional_task_entries, future_task_entries);
-	SBugbearInvasionGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SClassesGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SEquipmentGenerateTasks(task_entries, optional_task_entries, future_task_entries);
-	SActuallyEdtheUndyingGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SMiscItemsGenerateTasks(task_entries, optional_task_entries, future_task_entries);
-	SBadMoonGenerateTasks(task_entries, optional_task_entries, future_task_entries);
-	SCommunityServiceGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     SPVPGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 }
 

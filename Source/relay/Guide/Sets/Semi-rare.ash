@@ -1,32 +1,4 @@
-
-record Semirare
-{
-    location place;
-    string [int] reasons;
-    int importance;
-};
-
-Semirare SemirareMake(location place, string [int] reasons, int importance)
-{
-    Semirare result;
-    result.place = place;
-    result.reasons = reasons;
-    result.importance = importance;
-    return result;
-}
-
-Semirare SemirareMake(location place, string reason, int importance)
-{
-    return SemirareMake(place, listMake(reason), importance);
-}
-
-void listAppend(Semirare [int] list, Semirare entry)
-{
-	int position = list.count();
-	while (list contains position)
-		position += 1;
-	list[position] = entry;
-}
+import "relay/Guide/Support/Location Choice.ash";
 
 void SemirareGenerateDescription(string [int] description)
 {
@@ -67,7 +39,7 @@ void SemirareGenerateDescription(string [int] description)
 	}
 	
 	
-    Semirare [int] semirares;
+    LocationChoice [int] semirares;
 	//Generate things to do:
 	if (__misc_state["in run"])
 	{
@@ -86,30 +58,30 @@ void SemirareGenerateDescription(string [int] description)
                         reasons.listAppend("dispensary access (+item, +familiar weight, cheapish MP)");
                 }
                 if (reasons.count() > 0)
-                    semirares.listAppend(SemirareMake($location[cobb's knob barracks], "|*Acquire KGE outfit for " + reasons.listJoinComponents(", ", "and"), 0));
+                    semirares.listAppend(LocationChoiceMake($location[cobb's knob barracks], "|*Acquire KGE outfit for " + reasons.listJoinComponents(", ", "and"), 0));
 			}
 			if (!have_outfit_components("Mining Gear") && !__quest_state["Level 8"].state_boolean["Past mine"])
-				semirares.listAppend(SemirareMake($location[Itznotyerzitz Mine], "|*Acquire mining gear for trapper quest.|*Run +234% item to get drop.", 0));
+				semirares.listAppend(LocationChoiceMake($location[Itznotyerzitz Mine], "|*Acquire mining gear for trapper quest.|*Run +234% item to get drop.", 0));
 		}
         int wool_needed = 1;
         if ($item[the nostril of the serpent].available_amount() == 0)
             wool_needed += 1;
 		if ($item[stone wool].available_amount() < wool_needed && !locationAvailable($location[the hidden park]))
 		{
-			semirares.listAppend(SemirareMake($location[The Hidden Temple], "|*Acquire stone wool for unlocking hidden city.|*Run +100% item. (or up to +400% item for +3 adventures)", 0));
+			semirares.listAppend(LocationChoiceMake($location[The Hidden Temple], "|*Acquire stone wool for unlocking hidden city.|*Run +100% item. (or up to +400% item for +3 adventures)", 0));
 		}
 		if ($item[Mick's IcyVapoHotness Inhaler].available_amount() == 0 && $effect[Sinuses For Miles].have_effect() == 0 && !__quest_state["Level 12"].state_boolean["Nuns Finished"])
-			semirares.listAppend(SemirareMake($location[the castle in the clouds in the sky (top floor)], "|*+200% meat inhaler (10 turns), for nuns quest.", 0));
+			semirares.listAppend(LocationChoiceMake($location[the castle in the clouds in the sky (top floor)], "|*+200% meat inhaler (10 turns), for nuns quest.", 0));
 	
 		//limerick dungeon - +100% item
 		if ($item[cyclops eyedrops].available_amount() == 0 && $effect[One Very Clear Eye].have_effect() == 0)
-			semirares.listAppend(SemirareMake($location[the limerick dungeon], "|*+100% items eyedrops (10 turns), for tomb rats and low drops.", 0));
+			semirares.listAppend(LocationChoiceMake($location[the limerick dungeon], "|*+100% items eyedrops (10 turns), for tomb rats and low drops.", 0));
         if (in_bad_moon() && $item[bram's choker].available_amount() == 0)
-			semirares.listAppend(SemirareMake($location[The Haunted Boiler Room], "|*-5% combat accessory.", 0));
+			semirares.listAppend(LocationChoiceMake($location[The Haunted Boiler Room], "|*-5% combat accessory.", 0));
 		//three turn generation SRs go here
 		if (my_path_id() != PATH_SLOW_AND_STEADY)
 		{
-			Semirare food_semirares;
+			LocationChoice food_semirares;
 			food_semirares.importance = 11;
 		
 			string [int] line;
@@ -131,24 +103,29 @@ void SemirareGenerateDescription(string [int] description)
             if ($item[clay].available_amount() >= 1 && ($item[leather].available_amount() >= 3 || $item[parchment].available_amount() >= 1))
                 can_create_golem = true;
             if (!can_create_golem)
-                semirares.listAppend(SemirareMake($location[Ye Olde Medievale Villagee], "Small golem (towerkilling)", 0));
+                semirares.listAppend(LocationChoiceMake($location[Ye Olde Medievale Villagee], "Small golem (towerkilling)", 0));
         }*/
         if (in_bad_moon() && __quest_state["Level 13"].state_boolean["shadow will need to be defeated"] && $item[scented massage oil].available_amount() + $item[scented massage oil].closet_amount() == 0 && !$skill[Ambidextrous Funkslinging].have_skill())
-            semirares.listAppend(SemirareMake($location[Cobb's Knob Harem], "|*Scented massage oil for shadow.", 0)); //theoretically, we could ignore this for DBs that aren't in a black cat run
+            semirares.listAppend(LocationChoiceMake($location[Cobb's Knob Harem], "|*Scented massage oil for shadow.", 0)); //theoretically, we could ignore this for DBs that aren't in a black cat run
 	}
 		
 	//aftercore? sea quest, sand dollars, giant pearl
 	
-	sort semirares by value.importance;
-	
-	foreach key in semirares
-	{
-		Semirare sr = semirares[key];
-		string [int] explanation = sr.reasons;
-		
-		
+    LocationChoiceSort(semirares);
+    
+    //Post-process:
+    foreach key in semirares
+    {
+		LocationChoice sr = semirares[key];
 		if (last_location == sr.place && sr.place != $location[none])
-			explanation.listAppend(HTMLGenerateSpanOfClass("Can't use yet, last semi-rare was here", "r_bold"));
+			sr.reasons.listAppend(HTMLGenerateSpanOfClass("Can't use yet, last semi-rare was here", "r_bold"));
+    }
+	
+    description.listAppendList(LocationChoiceGenerateDescription(semirares));
+	/*foreach key in semirares
+	{
+		LocationChoice sr = semirares[key];
+		string [int] explanation = sr.reasons;
 		
 		if (explanation.count() == 0)
 			continue;
@@ -175,7 +152,7 @@ void SemirareGenerateDescription(string [int] description)
 			line = HTMLGenerateDivOfClass(line, "r_future_option");
 		}
 		description.listAppend(line);
-	}
+	}*/
 }
 
 

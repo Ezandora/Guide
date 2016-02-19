@@ -1,4 +1,6 @@
-void SHeavyRainsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+
+RegisterTaskGenerationFunction("PathHeavyRainsGenerateTasks");
+void PathHeavyRainsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
 	if (my_path_id() != PATH_HEAVY_RAINS)
 		return;
@@ -163,7 +165,8 @@ void SHeavyRainsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
     }
 }
 
-void SHeavyRainsGenerateResource(ChecklistEntry [int] resource_entries)
+RegisterResourceGenerationFunction("PathHeavyRainsGenerateResource");
+void PathHeavyRainsGenerateResource(ChecklistEntry [int] resource_entries)
 {
 	if (my_path_id() != PATH_HEAVY_RAINS)
 		return;

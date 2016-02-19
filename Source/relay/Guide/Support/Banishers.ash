@@ -52,7 +52,7 @@ static
     __banish_source_length["walk away from explosion"] = 30;
     __banish_source_length["tennis ball"] = 30;
     __banish_source_length["curse of vacation"] = -1;
-    __banish_source_length["ice hotel bell"] = -1; //think?
+    __banish_source_length["ice hotel bell"] = -1;
     __banish_source_length["bundle of &quot;fragrant&quot; herbs"] = -1;
 }
 

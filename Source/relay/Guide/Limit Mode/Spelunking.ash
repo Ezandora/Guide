@@ -7,6 +7,7 @@ http://forums.kingdomofloathing.com/vb/showthread.php?p=4721915#post4721915
 http://forums.kingdomofloathing.com/vb/showthread.php?p=4713383#post4713383
 http://forums.kingdomofloathing.com/vb/showthread.php?p=4717434#post4717434
 http://forums.kingdomofloathing.com/vb/showthread.php?p=4730373#post4730373
+http://forums.kingdomofloathing.com/vb/showpost.php?p=4749602&postcount=19
 */
 
 //should we record spelunkyUpgrades here? may not use them
@@ -815,7 +816,19 @@ void LimitModeSpelunkingGenerateChecklists(Checklist [int] checklists)
         description.listAppend("Gives ten more turns on victory.");
         
         
-        description.listAppend("Defeating it involves... the boomerang? Ropes? Maybe the fedora? Spring boots? Skeleton?");
+        string [int] ideas;
+        foreach it in $items[spring boots,boomerang,spelunking fedora]
+        {
+            if (it.equipped_amount() == 0)
+                ideas.listAppend(it);
+        }
+        if (spelunking_status.buddy != "Skeleton")
+            ideas.listAppend("skeleton");
+        ideas.listAppend("ropes");
+        
+        
+            
+        description.listAppend("Defeating it involves... " + ideas.listJoinComponents(", ") + "?");
         
         optional_task_entries.listAppend(ChecklistEntryMake("__item ghost trap", url, ChecklistSubentryMake("Possibly attack the ghost", "", description)));
     }
@@ -839,6 +852,7 @@ void LimitModeSpelunkingGenerateChecklists(Checklist [int] checklists)
             description.listAppend(tasks.listJoinComponents(", ", "then").capitaliseFirstLetter() + "?");
             description.listAppend("Or acquire sticky bombs.");
         }
+        description.listAppend("Appears after defeating five mummies in the area.");
         optional_task_entries.listAppend(ChecklistEntryMake("__item Bananubis's Staff", spelunking_url, ChecklistSubentryMake("Defeat Bananubis", "", description)));
     }
     
@@ -859,7 +873,20 @@ void LimitModeSpelunkingGenerateChecklists(Checklist [int] checklists)
             {
                 if (!spelunking_status.areas_unlocked[$location[the snake pit]])
                     description.listAppend("Possibly acquire sticky bombs from the spider queen.");
-                description.listAppend("Umm... spring boots, skeleton, shotgun, rock?, ropes, fedora?");
+                    
+                string [int] ideas;
+                foreach it in $items[spring boots,shotgun,spelunking fedora,rock]
+                {
+                    if (it.equipped_amount() == 0)
+                        ideas.listAppend(it);
+                }
+                if (spelunking_status.buddy != "Skeleton")
+                    ideas.listAppend("skeleton");
+                ideas.listAppend("ropes");
+                
+                
+                    
+                description.listAppend("Umm... " + ideas.listJoinComponents(", ") + "?");
             }
         }
         optional_task_entries.listAppend(ChecklistEntryMake("__item LOLmec statuette", spelunking_url, ChecklistSubentryMake("Defeat LOLmec", "", description)));
@@ -966,7 +993,7 @@ void LimitModeSpelunkingGenerateChecklists(Checklist [int] checklists)
         //lolmec's lair
         //yomama's lair
         if (spelunking_status.areas_unlocked[$location[hell]] && !spelunking_status.areas_unlocked[$location[yomama's throne]])
-            areas_to_adventure_in.listAppend("Hell: unlock Yomama's throne.");
+            areas_to_adventure_in.listAppend("Hell: unlock Yomama's throne after seven combats won.");
             
         if (spelunking_status.areas_unlocked[$location[the temple ruins]])
             areas_to_adventure_in.listAppend("Temple ruins: to collect gold.");

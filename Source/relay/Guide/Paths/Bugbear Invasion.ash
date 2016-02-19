@@ -1,4 +1,6 @@
-void SBugbearInvasionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+
+RegisterTaskGenerationFunction("PathBugbearInvasionGenerateTasks");
+void PathBugbearInvasionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
 	if (my_path_id() != PATH_BUGBEAR_INVASION)
 		return;
@@ -479,7 +481,8 @@ void SBugbearInvasionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistE
     }
 }
 
-void SBugbearInvasionGenerateResource(ChecklistEntry [int] resource_entries)
+RegisterResourceGenerationFunction("PathBugbearInvasionGenerateResource");
+void PathBugbearInvasionGenerateResource(ChecklistEntry [int] resource_entries)
 {
 	if (my_path_id() != PATH_BUGBEAR_INVASION)
 		return;

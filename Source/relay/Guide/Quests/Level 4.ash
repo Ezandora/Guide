@@ -156,7 +156,7 @@ void QLevel4GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             if (__misc_state["yellow ray available"] && sonars_needed > 0)
                 subentry.entries.listAppend("Potentially yellow ray for sonar-in-a-biscuit.");
             if (sonars_needed > 0)
-                subentry.entries.listAppend("Run +item in the beanbat and batrat burrow for biscuits. (15% drop)");
+                subentry.entries.listAppend("Run +item in the batrat and ratbat burrow for biscuits. (15% drop)");
             subentry.modifiers.listAppend("+566% item");
         }
         //subentry.entries.listAppend("Run +meat in the boss bat's lair, if you wish. (250 meat drop)");

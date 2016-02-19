@@ -123,7 +123,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
         {
             string line = "Have " + pluralise($item[a-boo clue]) + ".";
             
-            float clue_drop_rate = item_drop_multiplier * 0.15;
+            float clue_drop_rate = clampf(item_drop_multiplier * 0.15, 0.0, 1.0);
             line += " " + clue_drop_rate.roundForOutput(2) + " clues/adventure at +" + ((item_drop_multiplier - 1) * 100.0).roundForOutput(1) + "% item.";
             
             details.listAppend(line);

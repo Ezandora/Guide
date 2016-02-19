@@ -1,4 +1,4 @@
-void SJarlsbergGenerateStaff(ChecklistEntry entry, item staff, string property_name, string description, boolean always_output)
+void PathJarlsbergGenerateStaff(ChecklistEntry entry, item staff, string property_name, string description, boolean always_output)
 {
     if (staff.available_amount() == 0)
         return;
@@ -25,7 +25,8 @@ void SJarlsbergGenerateStaff(ChecklistEntry entry, item staff, string property_n
 }
 
 
-void SJarlsbergGenerateResource(ChecklistEntry [int] resource_entries)
+RegisterResourceGenerationFunction("PathJarlsbergGenerateResource");
+void PathJarlsbergGenerateResource(ChecklistEntry [int] resource_entries)
 {
 	if (my_path_id() != PATH_AVATAR_OF_JARLSBERG)
 		return;
@@ -39,7 +40,7 @@ void SJarlsbergGenerateResource(ChecklistEntry [int] resource_entries)
     //Show uses:
     //_jiggleCheesedMonsters split by |
     
-    SJarlsbergGenerateStaff(entry, $item[Staff of the All-Steak], "_jiggleSteak", "+300% items.", false);
+    PathJarlsbergGenerateStaff(entry, $item[Staff of the All-Steak], "_jiggleSteak", "+300% items.", false);
     
     if (true)
     {
@@ -51,7 +52,7 @@ void SJarlsbergGenerateResource(ChecklistEntry [int] resource_entries)
             always_output = true;
             cream_line += "|Following a " + olfacted_monster.HTMLEscapeString() + ".";
         }
-        SJarlsbergGenerateStaff(entry, $item[Staff of the Cream of the Cream], "_jiggleCream", cream_line, always_output);
+        PathJarlsbergGenerateStaff(entry, $item[Staff of the Cream of the Cream], "_jiggleCream", cream_line, always_output);
     }
     if (true)
     {
@@ -65,9 +66,9 @@ void SJarlsbergGenerateResource(ChecklistEntry [int] resource_entries)
             always_output = true;
         }
         
-        SJarlsbergGenerateStaff(entry, $item[Staff of the Standalone Cheese], "_jiggleCheese", cheese_line, always_output);
+        PathJarlsbergGenerateStaff(entry, $item[Staff of the Standalone Cheese], "_jiggleCheese", cheese_line, always_output);
     }
-    SJarlsbergGenerateStaff(entry, $item[Staff of the Staff of Life], "_jiggleLife", "Restores all HP.", false);
+    PathJarlsbergGenerateStaff(entry, $item[Staff of the Staff of Life], "_jiggleLife", "Restores all HP.", false);
     
     if (entry.subentries.count() > 0)
         resource_entries.listAppend(entry);

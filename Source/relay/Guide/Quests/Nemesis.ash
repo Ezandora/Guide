@@ -373,6 +373,11 @@ void QNemesisGenerateClownTasks(ChecklistSubentry subentry)
             else
                 line += "|Find sources in the Fun House.";
         }
+        int delay_turns_remaining = delayRemainingInLocation($location[the "fun" house]);
+        if (delay_turns_remaining > 0)
+        {
+            subentry.entries.listAppend(pluraliseWordy(delay_turns_remaining, "more turn", "more turns").capitaliseFirstLetter() + " before non-combat can show up.");
+        }
         
         subentry.entries.listAppend(line);
         
@@ -502,7 +507,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         //4 can be nearing end
         //5 -> return it
         //6 -> returning (?
-        if (have_epic_weapon)
+        if (have_epic_weapon && false) //not true anymore
         {
             subentry.entries.listAppend("Speak to your guild.");
             url = "guild.php";

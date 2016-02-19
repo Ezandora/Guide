@@ -171,7 +171,8 @@ BadMoonAdventure [int] BadMoonAdventuresForLocation(location l)
     return result;
 }
 
-void SBadMoonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+RegisterTaskGenerationFunction("PathBadMoonGenerateTasks");
+void PathBadMoonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     if (!in_bad_moon())
         return;
@@ -327,7 +328,8 @@ void SBadMoonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     //FIXME do we want the init semi-rare potion? it's only +100%... but, that might save a lot of turns?
 }
 
-void SBadMoonGenerateResource(ChecklistEntry [int] resource_entries)
+RegisterResourceGenerationFunction("PathBadMoonGenerateResource");
+void PathBadMoonGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (!in_bad_moon())
         return;
@@ -366,7 +368,7 @@ void SBadMoonGenerateResource(ChecklistEntry [int] resource_entries)
     }
 }
 
-void SBadMoonGenerateCategoryChecklistEntry(BadMoonAdventure [string][int] adventures_by_category, ChecklistEntry [int] bad_moon_adventures_entries, string [int] categories, string image_name, string header, string [int] initial_d_escription)
+void PathBadMoonGenerateCategoryChecklistEntry(BadMoonAdventure [string][int] adventures_by_category, ChecklistEntry [int] bad_moon_adventures_entries, string [int] categories, string image_name, string header, string [int] initial_d_escription)
 {
     string [int][int] description_active;
     string [int][int] description_inactive;
@@ -454,13 +456,13 @@ void SBadMoonGenerateCategoryChecklistEntry(BadMoonAdventure [string][int] adven
     }
 }
 
-void SBadMoonGenerateCategoryChecklistEntry(BadMoonAdventure [string][int] adventures_by_category, ChecklistEntry [int] bad_moon_adventures_entries, string [int] categories, string image_name, string header)
+void PathBadMoonGenerateCategoryChecklistEntry(BadMoonAdventure [string][int] adventures_by_category, ChecklistEntry [int] bad_moon_adventures_entries, string [int] categories, string image_name, string header)
 {
-    SBadMoonGenerateCategoryChecklistEntry(adventures_by_category, bad_moon_adventures_entries, categories, image_name, header, listMakeBlankString());
+    PathBadMoonGenerateCategoryChecklistEntry(adventures_by_category, bad_moon_adventures_entries, categories, image_name, header, listMakeBlankString());
 }
 
-RegisterChecklistGenerationFunction("SBadMoonGenerateChecklists");
-void SBadMoonGenerateChecklists(ChecklistCollection checklist_collection)
+RegisterChecklistGenerationFunction("PathBadMoonGenerateChecklists");
+void PathBadMoonGenerateChecklists(ChecklistCollection checklist_collection)
 {
     if (!in_bad_moon())
         return;
@@ -496,18 +498,18 @@ void SBadMoonGenerateChecklists(ChecklistCollection checklist_collection)
     
     BadMoonAdventure [string][int] adventures_by_category = AllBadMoonAdventuresByCategory();
     
-    SBadMoonGenerateCategoryChecklistEntry(adventures_by_category, bad_moon_adventures_entries, listMake("meat"), "__item dense meat stack", "Meat");
+    PathBadMoonGenerateCategoryChecklistEntry(adventures_by_category, bad_moon_adventures_entries, listMake("meat"), "__item dense meat stack", "Meat");
     if (my_familiar() != $familiar[black cat])
-        SBadMoonGenerateCategoryChecklistEntry(adventures_by_category, bad_moon_adventures_entries, listMake("Familiar hatchlings"), "__item Familiar-Gro&trade; Terrarium", "Familiar hatchlings");
-    SBadMoonGenerateCategoryChecklistEntry(adventures_by_category, bad_moon_adventures_entries, listMake("ITEM_DROP"), "__item Mr. Cheeng's spectacles", "Item buffs");
-    SBadMoonGenerateCategoryChecklistEntry(adventures_by_category, bad_moon_adventures_entries, listMake("MEAT_DROP"), "__item old leather wallet", "Meat buffs");
+        PathBadMoonGenerateCategoryChecklistEntry(adventures_by_category, bad_moon_adventures_entries, listMake("Familiar hatchlings"), "__item Familiar-Gro&trade; Terrarium", "Familiar hatchlings");
+    PathBadMoonGenerateCategoryChecklistEntry(adventures_by_category, bad_moon_adventures_entries, listMake("ITEM_DROP"), "__item Mr. Cheeng's spectacles", "Item buffs");
+    PathBadMoonGenerateCategoryChecklistEntry(adventures_by_category, bad_moon_adventures_entries, listMake("MEAT_DROP"), "__item old leather wallet", "Meat buffs");
     
     string [int] elemental_damage_ordering = listMake("ELEMENTALDAMAGE1", "ELEMENTALDAMAGE2");
     if (my_level() >= 10)
         elemental_damage_ordering = listMake("ELEMENTALDAMAGE2", "ELEMENTALDAMAGE1"); //don't encourage the +20 buffs until later
-    SBadMoonGenerateCategoryChecklistEntry(adventures_by_category, bad_moon_adventures_entries, listMake("RESIST1", "RESIST2"), "__item yak anorak", "Elemental resist buffs");
-    SBadMoonGenerateCategoryChecklistEntry(adventures_by_category, bad_moon_adventures_entries, listMake("STAT2", "STAT1", "STAT3"), "__effect Phorcefullness", "Stat buffs");
-    SBadMoonGenerateCategoryChecklistEntry(adventures_by_category, bad_moon_adventures_entries, elemental_damage_ordering, "__item oversized snowflake", "Elemental damage buffs", listMake("For defeating ghosts."));
+    PathBadMoonGenerateCategoryChecklistEntry(adventures_by_category, bad_moon_adventures_entries, listMake("RESIST1", "RESIST2"), "__item yak anorak", "Elemental resist buffs");
+    PathBadMoonGenerateCategoryChecklistEntry(adventures_by_category, bad_moon_adventures_entries, listMake("STAT2", "STAT1", "STAT3"), "__effect Phorcefullness", "Stat buffs");
+    PathBadMoonGenerateCategoryChecklistEntry(adventures_by_category, bad_moon_adventures_entries, elemental_damage_ordering, "__item oversized snowflake", "Elemental damage buffs", listMake("For defeating ghosts."));
     
     if (!$skill[torso awaregness].have_skill() && !haveSeenBadMoonEncounter(44) && $location[the hidden temple].locationAvailable())
     {

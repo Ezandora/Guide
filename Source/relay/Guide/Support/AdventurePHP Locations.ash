@@ -52,6 +52,8 @@ static
 
 boolean locationVisitsAdventurePHP(location l)
 {
+    if (l.to_url().contains_text("adventure.php"))
+        return true;
     if (__adventure_php_locations contains l)
         return true;
     return false;

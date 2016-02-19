@@ -1,4 +1,5 @@
 import "relay/Guide/Support/Banishers.ash";
+import "relay/Guide/Paths/Bad Moon.ash";
 
 static
 {
@@ -742,9 +743,11 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
     {
         if (m == $monster[none])
             continue;
-        monster_display_order.listAppend(m);
         float rate = appearance_rates_adjusted[m];
         float next_rate = appearance_rates_next_turn[m];
+        if (rate <= 0.0 && l == lookupLocation("Investigating a Plaintive Telegram"))
+            continue;
+        monster_display_order.listAppend(m);
         if (rate > 0.0 && m != $monster[none])
         {
             if (last_rate == -1.0)
@@ -1064,7 +1067,7 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
             string [int] stats_l2;
             //if (m.base_hp > 0)
                 //stats_l1.listAppend(m.base_hp + " HP");
-            if (m.phylum != $phylum[none])
+            if (m.phylum != $phylum[none] && !spelunking)
             {
                 string line;
                 if ($monsters[broodling seal] contains m)
@@ -1092,6 +1095,8 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
             }
             if (m.base_attack > 0)
                 stats_l2.listAppend(m.base_attack + " ML");
+            if (spelunking)
+                stats_l2.listAppend(m.base_hp + " HP");
             //if (m.raw_defense > 0)
                 //stats_l2.listAppend(m.raw_defense + " def");
             
@@ -1125,7 +1130,11 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
             {
                 string line = stats_l1.listJoinComponents(" / ");
                 if (stats_l2.count() > 0)
-                    line += "<br>" + stats_l2.listJoinComponents(" / ");
+                {
+                    if (stats_l1.count() > 0)
+                        line += "<br>";
+                    line += stats_l2.listJoinComponents(" / ");
+                }
                 fl_entries.listAppend(line);
                 fl_entry_styles[fl_entries.count() - 1] = "text-align:right;";
                 fl_entry_width_weight[fl_entries.count() - 1] = 1.4;

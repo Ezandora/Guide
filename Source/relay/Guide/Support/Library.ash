@@ -55,31 +55,35 @@ buffer copyBuffer(buffer buf)
     return result;
 }
 
-int PATH_UNKNOWN = -1;
-int PATH_NONE = 0;
-int PATH_TEETOTALER = 1;
-int PATH_BOOZETAFARIAN = 2;
-int PATH_OXYGENARIAN = 3;
+static
+{
+    int PATH_UNKNOWN = -1;
+    int PATH_NONE = 0;
+    int PATH_TEETOTALER = 1;
+    int PATH_BOOZETAFARIAN = 2;
+    int PATH_OXYGENARIAN = 3;
 
-int PATH_BEES_HATE_YOU = 9;
-int PATH_WAY_OF_THE_SURPRISING_FIST = 10;
-int PATH_TRENDY = 11;
-int PATH_AVATAR_OF_BORIS = 12;
-int PATH_BUGBEAR_INVASION = 13;
-int PATH_ZOMBIE_SLAYER = 14;
-int PATH_CLASS_ACT = 15;
-int PATH_AVATAR_OF_JARLSBERG = 16;
-int PATH_BIG = 17;
-int PATH_KOLHS = 18;
-int PATH_CLASS_ACT_2 = 19;
-int PATH_AVATAR_OF_SNEAKY_PETE = 20;
-int PATH_SLOW_AND_STEADY = 21;
-int PATH_HEAVY_RAINS = 22;
-int PATH_PICKY = 23;
-int PATH_STANDARD = 24;
-int PATH_ACTUALLY_ED_THE_UNDYING = 25;
-int PATH_ONE_CRAZY_RANDOM_SUMMER = 26;
-int PATH_COMMUNITY_SERVICE = 27;
+    int PATH_BEES_HATE_YOU = 9;
+    int PATH_WAY_OF_THE_SURPRISING_FIST = 10;
+    int PATH_TRENDY = 11;
+    int PATH_AVATAR_OF_BORIS = 12;
+    int PATH_BUGBEAR_INVASION = 13;
+    int PATH_ZOMBIE_SLAYER = 14;
+    int PATH_CLASS_ACT = 15;
+    int PATH_AVATAR_OF_JARLSBERG = 16;
+    int PATH_BIG = 17;
+    int PATH_KOLHS = 18;
+    int PATH_CLASS_ACT_2 = 19;
+    int PATH_AVATAR_OF_SNEAKY_PETE = 20;
+    int PATH_SLOW_AND_STEADY = 21;
+    int PATH_HEAVY_RAINS = 22;
+    int PATH_PICKY = 23;
+    int PATH_STANDARD = 24;
+    int PATH_ACTUALLY_ED_THE_UNDYING = 25;
+    int PATH_ONE_CRAZY_RANDOM_SUMMER = 26;
+    int PATH_COMMUNITY_SERVICE = 27;
+    int PATH_AVATAR_OF_WEST_OF_LOATHING = 28;
+}
 
 int __my_path_id_cached = -11;
 int my_path_id()
@@ -134,6 +138,8 @@ int my_path_id()
         __my_path_id_cached = PATH_ONE_CRAZY_RANDOM_SUMMER;
     else if (path_name == "Community Service" || path_name == "25")
         __my_path_id_cached = PATH_COMMUNITY_SERVICE;
+    else if (path_name == "Avatar of West of Loathing")
+        __my_path_id_cached = PATH_AVATAR_OF_WEST_OF_LOATHING;
     else
         __my_path_id_cached = PATH_UNKNOWN;
     return __my_path_id_cached;
@@ -670,6 +676,7 @@ int totalDelayForLocation(location place)
     place_delays[$location[the haunted bathroom]] = 5;
     place_delays[$location[the haunted ballroom]] = 5; //FIXME rumored
     place_delays[$location[the penultimate fantasy airship]] = 25;
+    place_delays[$location[the "fun" house]] = 10;
     //the haunted billiards room does not contain delay
     //yojimbos_law saw it on turn two on 2014-7-14, immediately after seeing the pool cue adventure, as have I
     //also failure at 16 skill
@@ -862,6 +869,28 @@ boolean [location] lookupLocations(string names_string)
 monster lookupMonster(string name)
 {
     return name.to_monster();
+}
+
+boolean [monster] lookupMonsters(string names_string)
+{
+    boolean [monster] result;
+    
+    string [int] names = names_string.split_string();
+    foreach key, name in names
+    {
+        if (name.length() == 0)
+            continue;
+        monster m = name.to_monster();
+        if (m != $monster[none])
+            result[m] = true;
+    }
+    
+    return result;
+}
+
+class lookupClass(string name)
+{
+    return name.to_class();
 }
 
 boolean monsterDropsItem(monster m, item it)
