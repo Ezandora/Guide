@@ -217,7 +217,7 @@ void QLevel5GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             stat stat_race_type = __quest_state["Level 13"].state_string["Stat race type"].to_stat();
             
             int change_mcd_to = -1;
-            if (stat_race_type == $stat[muscle] && (current_mcd() == 3 || current_mcd() == 7))
+            if (stat_race_type == $stat[muscle] && (current_mcd() == 3 || current_mcd() == 7) && my_path_id() != PATH_AVATAR_OF_WEST_OF_LOATHING)
                 change_mcd_to = -2;
             else if (stat_race_type == $stat[mysticality])
                 change_mcd_to = 3;
@@ -226,7 +226,10 @@ void QLevel5GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
                 
             if (change_mcd_to != -1 && change_mcd_to != current_mcd())
             {
-                subentry.entries.listAppend("For the king fight, change MCD to " + change_mcd_to + " for the tower stat test. (+" + stat_race_type.to_lower_case() + ")");
+                string mcd_change_text = change_mcd_to;
+                if (change_mcd_to == -2)
+                    mcd_change_text = "anything besides 3 or 7";
+                subentry.entries.listAppend("For the king fight, change MCD to " + mcd_change_text + " for the tower stat test. (+" + stat_race_type.to_lower_case() + ")");
             }
         }
 	}

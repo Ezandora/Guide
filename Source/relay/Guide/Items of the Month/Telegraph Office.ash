@@ -49,7 +49,7 @@ void IOTMTelegraphOfficeGenerateTasks(ChecklistEntry [int] task_entries, Checkli
     monster [string] boss_for_quest;
     
     boss_for_quest["Missing: Fancy Man"] = lookupMonster("Jeff the Fancy Skeleton");
-    boss_for_quest["Help! Desperados!"] = lookupMonster("Pecos Dave");
+    boss_for_quest["Help!  Desperados!"] = lookupMonster("Pecos Dave");
     boss_for_quest["Missing: Pioneer Daughter"] = lookupMonster("Daisy the Unclean");
     
     boss_for_quest["Big Gambling Tournament Announced"] = lookupMonster("Snake-Eyes Glenn");
@@ -98,7 +98,15 @@ void IOTMTelegraphOfficeGenerateTasks(ChecklistEntry [int] task_entries, Checkli
         }
         else if (boss == lookupMonster("Pecos Dave"))
         {
-            //FIXME
+            description.listAppend("Attack with multiple sources of damage.");
+            if (lookupItem("wicker slicker").available_amount() > 0 && $skill[shell up].have_skill())
+            {
+                if (lookupItem("wicker slicker").equipped_amount() > 0)
+                    description.listAppend("Shell up on alternate rounds?");
+                else
+                    description.listAppend("Equip wicker slicker and shell up on alternate rounds?");
+            }
+            frigidalmatian_eligible = true;
         }
         else if (boss == lookupMonster("Daisy the Unclean"))
         {
@@ -201,4 +209,9 @@ void IOTMTelegraphOfficeGenerateResource(ChecklistEntry [int] resource_entries)
         
         resource_entries.listAppend(ChecklistEntryMake("__item clara's bell", "inventory.php?which=3", ChecklistSubentryMake("Clara's Bell", "", description), 5));
     }
+    
+    //skills:
+    //_bowleggedSwaggerUsed
+    //bend hell - double elemental damage/elemental spell damage
+    //
 }

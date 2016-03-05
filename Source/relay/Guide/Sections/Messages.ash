@@ -644,6 +644,7 @@ string generateRandomMessage()
     encounter_messages["Meet Frank"] = "don't trust the skull";
     encounter_messages["The Mirror in the Tower has the View that is True"] = "shatter the false reality";
     encounter_messages["A Tombstone"] = "peperony and chease";
+    encounter_messages["Witchess Puzzles"] = "this etch a sketch is hard";
     
     if (encounter_messages contains get_property("lastEncounter"))
     {

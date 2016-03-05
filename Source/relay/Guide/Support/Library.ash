@@ -680,7 +680,6 @@ int totalDelayForLocation(location place)
     //the haunted billiards room does not contain delay
     //yojimbos_law saw it on turn two on 2014-7-14, immediately after seeing the pool cue adventure, as have I
     //also failure at 16 skill
-    //place_delays[$location[the haunted everyroominthemanor]] = 5;
     
     if (place_delays contains place)
         return place_delays[place];

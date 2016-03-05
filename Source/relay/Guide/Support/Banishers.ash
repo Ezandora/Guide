@@ -54,6 +54,7 @@ static
     __banish_source_length["curse of vacation"] = -1;
     __banish_source_length["ice hotel bell"] = -1;
     __banish_source_length["bundle of &quot;fragrant&quot; herbs"] = -1;
+    __banish_source_length["snokebomb"] = 30;
 }
 
 Banish [int] __banishes_active_cache;
@@ -94,7 +95,7 @@ Banish [int] BanishesActive()
         b.banish_turn_length = 0;
         if (__banish_source_length contains b.banish_source)
             b.banish_turn_length = __banish_source_length[b.banish_source];
-        if (b.banish_source == "batter up!" || b.banish_source == "deathchucks" || b.banish_source == "dirty stinkbomb" || b.banish_source == "nanorhino" || b.banish_source == "spooky music box mechanism")
+        if (b.banish_source == "batter up!" || b.banish_source == "deathchucks" || b.banish_source == "dirty stinkbomb" || b.banish_source == "nanorhino" || b.banish_source == "spooky music box mechanism" || b.banish_source == "ice hotel bell")
             b.custom_reset_conditions = "rollover";
         result.listAppend(b);
     }
