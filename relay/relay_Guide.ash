@@ -2,7 +2,7 @@
 
 since 17.1; //the earliest main release that is usable in modern KOL (unequip bug)
 //These settings are for development. Don't worry about editing them.
-string __version = "1.3.10";
+string __version = "1.3.11";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -2072,7 +2072,6 @@ int totalDelayForLocation(location place)
     //the haunted billiards room does not contain delay
     //yojimbos_law saw it on turn two on 2014-7-14, immediately after seeing the pool cue adventure, as have I
     //also failure at 16 skill
-    //place_delays[$location[the haunted everyroominthemanor]] = 5;
     
     if (place_delays contains place)
         return place_delays[place];
@@ -7419,7 +7418,7 @@ void QLevel5GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             stat stat_race_type = __quest_state["Level 13"].state_string["Stat race type"].to_stat();
             
             int change_mcd_to = -1;
-            if (stat_race_type == $stat[muscle] && (current_mcd() == 3 || current_mcd() == 7))
+            if (stat_race_type == $stat[muscle] && (current_mcd() == 3 || current_mcd() == 7) && my_path_id() != PATH_AVATAR_OF_WEST_OF_LOATHING)
                 change_mcd_to = -2;
             else if (stat_race_type == $stat[mysticality])
                 change_mcd_to = 3;
@@ -7428,7 +7427,10 @@ void QLevel5GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
                 
             if (change_mcd_to != -1 && change_mcd_to != current_mcd())
             {
-                subentry.entries.listAppend("For the king fight, change MCD to " + change_mcd_to + " for the tower stat test. (+" + stat_race_type.to_lower_case() + ")");
+                string mcd_change_text = change_mcd_to;
+                if (change_mcd_to == -2)
+                    mcd_change_text = "anything besides 3 or 7";
+                subentry.entries.listAppend("For the king fight, change MCD to " + mcd_change_text + " for the tower stat test. (+" + stat_race_type.to_lower_case() + ")");
             }
         }
 	}
@@ -24660,7 +24662,10 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
     
     if (target_monster != $monster[none])
     {
-        subentry.entries.listAppend("From a " + target_monster + " in " + target_locations.listJoinComponents(", ", "or") + ".");
+        string monster_text = target_monster;
+        if (last_monster() == target_monster)
+            monster_text = HTMLGenerateSpanOfClass(monster_text, "r_bold");
+        subentry.entries.listAppend("From a " + monster_text + " in " + target_locations.listJoinComponents(", ", "or") + ".");
         subentry.modifiers.listAppend("olfact " + target_monster);
         subentry.modifiers.listAppend("banish");
     }
@@ -25897,6 +25902,7 @@ static
     __banish_source_length["curse of vacation"] = -1;
     __banish_source_length["ice hotel bell"] = -1;
     __banish_source_length["bundle of &quot;fragrant&quot; herbs"] = -1;
+    __banish_source_length["snokebomb"] = 30;
 }
 
 Banish [int] __banishes_active_cache;
@@ -25937,7 +25943,7 @@ Banish [int] BanishesActive()
         b.banish_turn_length = 0;
         if (__banish_source_length contains b.banish_source)
             b.banish_turn_length = __banish_source_length[b.banish_source];
-        if (b.banish_source == "batter up!" || b.banish_source == "deathchucks" || b.banish_source == "dirty stinkbomb" || b.banish_source == "nanorhino" || b.banish_source == "spooky music box mechanism")
+        if (b.banish_source == "batter up!" || b.banish_source == "deathchucks" || b.banish_source == "dirty stinkbomb" || b.banish_source == "nanorhino" || b.banish_source == "spooky music box mechanism" || b.banish_source == "ice hotel bell")
             b.custom_reset_conditions = "rollover";
         result.listAppend(b);
     }
@@ -31413,6 +31419,7 @@ string generateRandomMessage()
     encounter_messages["Meet Frank"] = "don't trust the skull";
     encounter_messages["The Mirror in the Tower has the View that is True"] = "shatter the false reality";
     encounter_messages["A Tombstone"] = "peperony and chease";
+    encounter_messages["Witchess Puzzles"] = "this etch a sketch is hard";
     
     if (encounter_messages contains get_property("lastEncounter"))
     {
@@ -39041,7 +39048,7 @@ void IOTMTelegraphOfficeGenerateTasks(ChecklistEntry [int] task_entries, Checkli
     monster [string] boss_for_quest;
     
     boss_for_quest["Missing: Fancy Man"] = lookupMonster("Jeff the Fancy Skeleton");
-    boss_for_quest["Help! Desperados!"] = lookupMonster("Pecos Dave");
+    boss_for_quest["Help!  Desperados!"] = lookupMonster("Pecos Dave");
     boss_for_quest["Missing: Pioneer Daughter"] = lookupMonster("Daisy the Unclean");
     
     boss_for_quest["Big Gambling Tournament Announced"] = lookupMonster("Snake-Eyes Glenn");
@@ -39090,7 +39097,15 @@ void IOTMTelegraphOfficeGenerateTasks(ChecklistEntry [int] task_entries, Checkli
         }
         else if (boss == lookupMonster("Pecos Dave"))
         {
-            //FIXME
+            description.listAppend("Attack with multiple sources of damage.");
+            if (lookupItem("wicker slicker").available_amount() > 0 && $skill[shell up].have_skill())
+            {
+                if (lookupItem("wicker slicker").equipped_amount() > 0)
+                    description.listAppend("Shell up on alternate rounds?");
+                else
+                    description.listAppend("Equip wicker slicker and shell up on alternate rounds?");
+            }
+            frigidalmatian_eligible = true;
         }
         else if (boss == lookupMonster("Daisy the Unclean"))
         {
@@ -39193,6 +39208,11 @@ void IOTMTelegraphOfficeGenerateResource(ChecklistEntry [int] resource_entries)
         
         resource_entries.listAppend(ChecklistEntryMake("__item clara's bell", "inventory.php?which=3", ChecklistSubentryMake("Clara's Bell", "", description), 5));
     }
+    
+    //skills:
+    //_bowleggedSwaggerUsed
+    //bend hell - double elemental damage/elemental spell damage
+    //
 }
 
 RegisterTaskGenerationFunction("PathActuallyEdtheUndyingGenerateTasks");
