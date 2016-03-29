@@ -320,6 +320,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
             {
                 modifiers.listAppend("-combat");
                 modifiers.listAppend("+item");
+                modifiers.listAppend("olfact a topiary animal");
             }
 				
             if (!item_completed && !can_complete_item)

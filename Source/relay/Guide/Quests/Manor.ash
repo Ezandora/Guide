@@ -448,7 +448,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
             {
                 if ($item[pool cue].available_amount() == 0)
                 {
-                    subentry.entries.listAppend("Find pool cue. (superlikely?)");
+                    subentry.entries.listAppend("Find pool cue.");
                 }
                 else if ($item[pool cue].equipped_amount() == 0)
                 {

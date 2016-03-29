@@ -977,6 +977,7 @@ static
         lookup_map["The Secret Council Warehouse"] = "tutorial.php";
         lookup_map["The Skeleton Store"] = "place.php?whichplace=town_market";
         lookup_map["Madness Bakery"] = "place.php?whichplace=town_right";
+        lookup_map["Investigating a Plaintive Telegram"] = "place.php?whichplace=town_right";
         lookup_map["The Fungal Nethers"] = "place.php?whichplace=nemesiscave";
         lookup_map["Thugnderdome"] = "gnomes.php";
         foreach s in $strings[The Hallowed Halls,Shop Class,Chemistry Class,Art Class]

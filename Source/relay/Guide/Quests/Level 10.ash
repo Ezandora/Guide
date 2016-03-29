@@ -269,7 +269,18 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             {
                 request_minus_combat = true;
                 subentry.modifiers.listAppend("-combat");
-                subentry.entries.listAppend("Try to acquire the electric boning knife if you see it. (foodie NC)");
+                string line = "Try to acquire the electric boning knife if you see it. (foodie NC)";
+                string [int] ncs_to_spend_turn_on;
+                foreach s in $strings[There's No Ability Like Possibility,Putting Off Is Off-Putting,Huzzah!]
+                {
+                    if (!$location[The Castle in the Clouds in the Sky (Ground floor)].noncombat_queue.contains_text(s))
+                    {
+                        ncs_to_spend_turn_on.listAppend(s);
+                    }
+                }
+                if (ncs_to_spend_turn_on.count() > 0)
+                    line += "|Avoid skipping NCs " + ncs_to_spend_turn_on.listJoinComponents(", ", "and") + " exactly once each, to make the knife appear faster. (don't do this after unlocking the top floor)";
+                subentry.entries.listAppend(line);
             }
             if (!request_minus_combat && CounterWanderingMonsterMayHitNextTurn())
             {

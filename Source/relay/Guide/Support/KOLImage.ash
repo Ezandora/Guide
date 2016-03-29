@@ -433,11 +433,17 @@ buffer KOLImageGenerateImageHTML(string lookup_name, boolean should_centre, Vec2
 	lookup_name = to_lower_case(lookup_name);
     
     boolean half_sized_output = false;
+    boolean item_sized_output = false;
 	lookup_name = lookup_name.to_lower_case();
     if (lookup_name.stringHasPrefix("__half "))
     {
         lookup_name = lookup_name.substring(7);
         half_sized_output = true;
+    }
+    if (lookup_name.stringHasPrefix("__itemsize "))
+    {
+        lookup_name = lookup_name.substring(11);
+        item_sized_output = true;
     }
     
     __kol_image_generate_image_html_return_final_size = Vec2iZero();
@@ -469,6 +475,13 @@ buffer KOLImageGenerateImageHTML(string lookup_name, boolean should_centre, Vec2
         {
             effective_image_size.x = round(effective_image_size.x.to_float() * 0.5);
             effective_image_size.y = round(effective_image_size.y.to_float() * 0.5);
+        }
+        if (item_sized_output)
+        {
+            //FIXME this will result in incorrect proportions for nonsquare images
+            //also crop? what crop?
+            effective_image_size.x = MIN(effective_image_size.x, 30.0);
+            effective_image_size.y = MIN(effective_image_size.y, 30.0);
         }
         if (have_crop)
             effective_image_size = Vec2iMake(image_crop.max_coordinate.x - image_crop.min_coordinate.x + 1, image_crop.max_coordinate.y - image_crop.min_coordinate.y + 1);
