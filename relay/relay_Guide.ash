@@ -2,7 +2,7 @@
 
 since 17.1; //the earliest main release that is usable in modern KOL (unequip bug)
 //These settings are for development. Don't worry about editing them.
-string __version = "1.3.11";
+string __version = "1.3.12";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -4724,6 +4724,7 @@ static
         lookup_map["The Secret Council Warehouse"] = "tutorial.php";
         lookup_map["The Skeleton Store"] = "place.php?whichplace=town_market";
         lookup_map["Madness Bakery"] = "place.php?whichplace=town_right";
+        lookup_map["Investigating a Plaintive Telegram"] = "place.php?whichplace=town_right";
         lookup_map["The Fungal Nethers"] = "place.php?whichplace=nemesiscave";
         lookup_map["Thugnderdome"] = "gnomes.php";
         foreach s in $strings[The Hallowed Halls,Shop Class,Chemistry Class,Art Class]
@@ -5722,11 +5723,17 @@ buffer KOLImageGenerateImageHTML(string lookup_name, boolean should_centre, Vec2
 	lookup_name = to_lower_case(lookup_name);
     
     boolean half_sized_output = false;
+    boolean item_sized_output = false;
 	lookup_name = lookup_name.to_lower_case();
     if (lookup_name.stringHasPrefix("__half "))
     {
         lookup_name = lookup_name.substring(7);
         half_sized_output = true;
+    }
+    if (lookup_name.stringHasPrefix("__itemsize "))
+    {
+        lookup_name = lookup_name.substring(11);
+        item_sized_output = true;
     }
     
     __kol_image_generate_image_html_return_final_size = Vec2iZero();
@@ -5758,6 +5765,13 @@ buffer KOLImageGenerateImageHTML(string lookup_name, boolean should_centre, Vec2
         {
             effective_image_size.x = round(effective_image_size.x.to_float() * 0.5);
             effective_image_size.y = round(effective_image_size.y.to_float() * 0.5);
+        }
+        if (item_sized_output)
+        {
+            //FIXME this will result in incorrect proportions for nonsquare images
+            //also crop? what crop?
+            effective_image_size.x = MIN(effective_image_size.x, 30.0);
+            effective_image_size.y = MIN(effective_image_size.y, 30.0);
         }
         if (have_crop)
             effective_image_size = Vec2iMake(image_crop.max_coordinate.x - image_crop.min_coordinate.x + 1, image_crop.max_coordinate.y - image_crop.min_coordinate.y + 1);
@@ -8903,6 +8917,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
             {
                 modifiers.listAppend("-combat");
                 modifiers.listAppend("+item");
+                modifiers.listAppend("olfact a topiary animal");
             }
 				
             if (!item_completed && !can_complete_item)
@@ -9452,7 +9467,18 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             {
                 request_minus_combat = true;
                 subentry.modifiers.listAppend("-combat");
-                subentry.entries.listAppend("Try to acquire the electric boning knife if you see it. (foodie NC)");
+                string line = "Try to acquire the electric boning knife if you see it. (foodie NC)";
+                string [int] ncs_to_spend_turn_on;
+                foreach s in $strings[There's No Ability Like Possibility,Putting Off Is Off-Putting,Huzzah!]
+                {
+                    if (!$location[The Castle in the Clouds in the Sky (Ground floor)].noncombat_queue.contains_text(s))
+                    {
+                        ncs_to_spend_turn_on.listAppend(s);
+                    }
+                }
+                if (ncs_to_spend_turn_on.count() > 0)
+                    line += "|Avoid skipping NCs " + ncs_to_spend_turn_on.listJoinComponents(", ", "and") + " exactly once each, to make the knife appear faster. (don't do this after unlocking the top floor)";
+                subentry.entries.listAppend(line);
             }
             if (!request_minus_combat && CounterWanderingMonsterMayHitNextTurn())
             {
@@ -15039,7 +15065,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
             {
                 if ($item[pool cue].available_amount() == 0)
                 {
-                    subentry.entries.listAppend("Find pool cue. (superlikely?)");
+                    subentry.entries.listAppend("Find pool cue.");
                 }
                 else if ($item[pool cue].equipped_amount() == 0)
                 {
@@ -34274,6 +34300,20 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
                 stats_l2.listAppend(m.base_attack + " ML");
             if (spelunking)
                 stats_l2.listAppend(m.base_hp + " HP");
+            if (lookupSkill("Extract Oil").have_skill())
+            {
+                string oil_type = "";
+                if (lookupMonsters("Aggressive grass snake,Bacon snake,Batsnake,Black adder,Burning Snake of Fire,Coal snake,Diamondback rattler,Frontwinder,Frozen Solid Snake,King snake,Licorice snake,Mutant rattlesnake,Prince snake,Sewer snake with a sewer snake in it,Snakeleton,The Snake With Like Ten Heads,Tomb asp,Trouser Snake,Whitesnake") contains m)
+                    oil_type = "snake oil";
+                else if ($phylums[beast,dude,hippy,humanoid,orc,pirate] contains m.phylum)
+                    oil_type = "skin oil";
+                else if ($phylums[bug,construct,constellation,demon,elemental,elf,fish,goblin,hobo,horror,mer-kin,penguin,plant,slime,weird] contains m.phylum)
+                    oil_type = "unusual oil";
+                else if ($phylums[undead] contains m.phylum)
+                    oil_type = "eldritch oil";
+                if (oil_type != "")
+                    stats_l2.listAppend(oil_type);
+            }
             //if (m.raw_defense > 0)
                 //stats_l2.listAppend(m.raw_defense + " def");
             
@@ -39214,6 +39254,67 @@ void IOTMTelegraphOfficeGenerateResource(ChecklistEntry [int] resource_entries)
     //bend hell - double elemental damage/elemental spell damage
     //
 }
+RegisterResourceGenerationFunction("IOTMWitchessGenerateResource");
+void IOTMWitchessGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if (in_bad_moon() || get_campground()[lookupItem("Witchess Set")] == 0)
+        return;
+    if (!mafiaIsPastRevision(16813))
+        return;
+    
+    if (get_property_int("_witchessFights") < 5)
+    {
+        string [int] description;
+        int fights_remaining = clampi(5 - get_property_int("_witchessFights"), 0, 5);
+        
+        string [int][int] fight_descriptions;
+        //fight_descriptions.listAppend(listMake(HTMLGenerateSpanOfClass("Piece", "r_bold"), HTMLGenerateSpanOfClass("Drop", "r_bold")));
+        if (__misc_state["in run"])
+        {
+            //√pawn - +50% init potion for moderns
+            if (__quest_state["Level 7"].state_boolean["alcove needs speed tricks"] && lookupItem("armored prawn").available_amount() == 0 && lookupItem("armored prawn").to_effect().have_effect() == 0)
+            {
+                fight_descriptions.listAppend(listMake("Pawn", "+50% init potion."));
+            }
+            //rook - +ML / +stat potion
+            fight_descriptions.listAppend(listMake("Rook", "+25 ML/+statgain potion. (25 turns)"));
+            //ox - shield
+            if (lookupItem("ox-head shield").available_amount() == 0)
+                fight_descriptions.listAppend(listMake("Ox", "+100HP, +2 all res, +8 PVP fights shield."));
+            //king - club
+            if ((my_path_id() == PATH_COMMUNITY_SERVICE || my_primestat() == $stat[muscle]) && lookupItem("dented scepter").available_amount() == 0)
+                fight_descriptions.listAppend(listMake("King", "+5 muscle stats/fight, +50% muscle, +50% weapon damage club."));
+            //queen - -combat hat
+            if (lookupItem("very pointy crown").available_amount() == 0)
+                fight_descriptions.listAppend(listMake("Queen", "-combat, +5 adventures, +50% moxie, +5 moxie stats/fight hat.|Queen is exceptionally difficult to defeat, probably requiring deleveling via items" + ($skill[tricky knifework].have_skill() ? ", or maybe knife tricks" : "") + "."));
+            //witch - myst broom
+            if ((my_path_id() == PATH_COMMUNITY_SERVICE || my_primestat() == $stat[mysticality]) && lookupItem("battle broom").available_amount() == 0)
+                fight_descriptions.listAppend(listMake("Witch", "+5 myst stats/fight, +50% myst, +100% spell damage accessory.|Immune to spells, but not skills."));
+        }
+        //knight - epic food, +meat drop
+        if (__misc_state["can eat just about anything"])
+        {
+            fight_descriptions.listAppend(listMake("Knight", "+100% meat epic food."));
+        }
+        //bishop - epic drink, +50% item
+        if (__misc_state["can drink just about anything"])
+        {
+            fight_descriptions.listAppend(listMake("Bishop", "+50% item epic drink."));
+        }
+        
+        if (fight_descriptions.count() > 0)
+        {
+            //Bold the piece names:
+            foreach key in fight_descriptions
+            {
+                fight_descriptions[key][0] = HTMLGenerateSpanOfClass(fight_descriptions[key][0], "r_bold");
+            }
+            description.listAppend(HTMLGenerateSimpleTableLines(fight_descriptions));
+        }
+        
+        resource_entries.listAppend(ChecklistEntryMake("__itemsize __monster Witchess Pawn", "campground.php?action=witchess", ChecklistSubentryMake(pluralise(fights_remaining, "witchess fight", "witchess fights"), "", description), 4));
+    }
+}
 
 RegisterTaskGenerationFunction("PathActuallyEdtheUndyingGenerateTasks");
 void PathActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -39902,6 +40003,64 @@ void PathAvatarOfWestOfLoathingGenerateResource(ChecklistEntry [int] resource_en
 		return;
     
     //Oils:
+    
+    string image_name = "";
+    ChecklistSubentry [int] subentries;
+    float [int] subentries_sort_value;
+    
+    string [item] tonic_descriptions;
+    tonic_descriptions[lookupItem("Eldritch oil")] = "craftable";
+    tonic_descriptions[lookupItem("Unusual oil")] = "+50% item (20 turns), craftable";
+    tonic_descriptions[lookupItem("Skin oil")] = "+100% moxie (20 turns), craftable";
+    tonic_descriptions[lookupItem("Snake oil")] = "+venom/medicine, craftable";
+    
+    tonic_descriptions[lookupItem("patent alacrity tonic")] = "+100% init (20 turns)"; //eldritch + unusual
+    tonic_descriptions[lookupItem("patent sallowness tonic")] = "+30 ML (50 turns)"; //eldritch + skin
+    tonic_descriptions[lookupItem("patent avarice tonic")] = "+50% meat (30 turns)"; //skin + unusual
+    tonic_descriptions[lookupItem("patent invisibility tonic")] = "-15% combat (30 turns)"; //eldritch + snake
+    tonic_descriptions[lookupItem("patent aggression tonic")] = "+15% combat (30 turns)"; //unusual + snake
+    tonic_descriptions[lookupItem("patent preventative tonic")] = "+3 all res (30 turns)"; //skin + snake
+    
+    foreach it in tonic_descriptions
+    {
+        if (it.available_amount() == 0 && it.creatable_amount() == 0)
+            continue;
+        
+        string description = tonic_descriptions[it];
+        if (image_name == "")
+            image_name = "__item " + it;
+        string name;
+        if (it.available_amount() > 0)
+            name = pluralise(it);
+        if (it.creatable_amount() > 0)
+        {
+            if (it.available_amount() != 0)
+                name += " (" + it.creatable_amount() + " craftable)";
+            else
+                name = pluralise(it.creatable_amount(), "craftable " + it, "craftable " + it.plural);
+        }
+        if (it.available_amount() == 0)
+        {
+            subentries_sort_value[subentries.count()] = 1.0;
+            name = HTMLGenerateSpanFont(name, "grey");
+            description = HTMLGenerateSpanFont(description, "grey");
+        }
+        else
+        {
+            subentries_sort_value[subentries.count()] = 0.0;
+        }
+        subentries.listAppend(ChecklistSubentryMake(name, "", description));
+    }
+    sort subentries by subentries_sort_value[index];
+    if (subentries.count() > 0)
+        resource_entries.listAppend(ChecklistEntryMake(image_name, "", subentries, 8));
+}
+
+
+RegisterTaskGenerationFunction("PathAvatarOfWestOfLoathingGenerateTasks");
+void PathAvatarOfWestOfLoathingGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    
 }
 
 
