@@ -85,6 +85,8 @@ void PathAvatarOfWestOfLoathingGenerateResource(ChecklistEntry [int] resource_en
 RegisterTaskGenerationFunction("PathAvatarOfWestOfLoathingGenerateTasks");
 void PathAvatarOfWestOfLoathingGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
+	if (my_path_id() != PATH_AVATAR_OF_WEST_OF_LOATHING)
+		return;
     string skill_url;
     ChecklistSubentry [int] skill_subentries;
     
