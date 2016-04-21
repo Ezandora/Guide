@@ -2,7 +2,7 @@
 
 since 17.1; //the earliest main release that is usable in modern KOL (unequip bug)
 //These settings are for development. Don't worry about editing them.
-string __version = "1.3.13";
+string __version = "1.3.14";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -40242,6 +40242,8 @@ void PathAvatarOfWestOfLoathingGenerateResource(ChecklistEntry [int] resource_en
 RegisterTaskGenerationFunction("PathAvatarOfWestOfLoathingGenerateTasks");
 void PathAvatarOfWestOfLoathingGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
+	if (my_path_id() != PATH_AVATAR_OF_WEST_OF_LOATHING)
+		return;
     string skill_url;
     ChecklistSubentry [int] skill_subentries;
     
