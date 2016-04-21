@@ -757,7 +757,7 @@ string generateRandomMessage()
         random_messages.listAppend("a superstitious, cowardly lot");
     }
     
-    if (format_today_to_string("YYYYMMdd") == "20151021") //october 21st, 2015
+    if (format_today_to_string("yyyyMMdd") == "20151021") //october 21st, 2015
     {
         //kept active for any time travelers
 		random_messages.listClear();

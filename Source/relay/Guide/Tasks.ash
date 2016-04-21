@@ -370,6 +370,12 @@ void generateTasks(Checklist [int] checklists)
 		
 		if (item_drop_modifier_ignoring_plants() < 234.0 && !__misc_state["in aftercore"])
 			potential_targets.listAppend("Anything with 30% drop if you can't 234%. (dwarf foreman, bob racecar, drum machines, etc)");
+            
+        
+        if (__misc_state_string["yellow ray source"] == "Unleash Cowrruption" && lookupEffect("Cowrruption").have_effect() == 0)
+        {
+            potential_targets.listAppend(HTMLGenerateSpanFont("Acquire cowrruption first.", "red"));
+        }
 		
 		optional_task_entries.listAppend(ChecklistEntryMake(__misc_state_string["yellow ray image name"], "", ChecklistSubentryMake("Fire yellow ray", "", potential_targets), 5));
 	}

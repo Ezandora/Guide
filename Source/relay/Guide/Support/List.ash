@@ -242,6 +242,14 @@ void listAppendList(skill [int] list, skill [int] entries)
         list.listAppend(entries[key]);
 }
 
+void listPrepend(location [int] list, location entry)
+{
+	int position = 0;
+	while (list contains position)
+		position -= 1;
+	list[position] = entry;
+}
+
 
 void listClear(string [int] list)
 {

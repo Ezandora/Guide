@@ -169,6 +169,9 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
         
         int spins_needed = (next_position_needed - pyramid_position + 10) % 5;
         int total_spins_needed = spins_needed + additional_turns_after_that;
+        int spins_available = $item[tomb ratchet].available_amount() + $item[crumbling wooden wheel].available_amount();
+        
+        int extra_spin_sources_needed = clampi(total_spins_needed - spins_available, 0, 11);
         
         //Pyramid unlocked:
         if (should_generate_control_room_information)
@@ -207,9 +210,6 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
         
         if (!done_with_wheel_turning)
         {
-            int amount = $item[tomb ratchet].available_amount() + $item[crumbling wooden wheel].available_amount();
-            
-            int extra_spin_sources_needed = clampi(total_spins_needed - amount, 0, 11);
             if (extra_spin_sources_needed > 0)
                 subentry.entries.listAppend("Need " + HTMLGenerateSpanFont(int_to_wordy(extra_spin_sources_needed), "red") + " more ratchet/wheel" + ((extra_spin_sources_needed > 1) ? "s" : "") + ".");
             else

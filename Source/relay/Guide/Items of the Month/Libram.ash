@@ -1,17 +1,3 @@
-static
-{
-    skill [int] __libram_skills;
-    void initialiseLibramSkills()
-    {
-		foreach s in $skills[]
-        {
-			if (s.libram)
-				__libram_skills.listAppend(s);
-        }
-    }
-    initialiseLibramSkills();
-}
-
 RegisterResourceGenerationFunction("IOTMLibramGenerateResource");
 void IOTMLibramGenerateResource(ChecklistEntry [int] resource_entries)
 {
@@ -21,7 +7,7 @@ void IOTMLibramGenerateResource(ChecklistEntry [int] resource_entries)
 		
 		
 		string [int] librams_usable;
-		foreach key, s in __libram_skills
+		foreach s in __libram_skills
         {
 			if (s.skill_is_usable())
 				librams_usable.listAppend(s.to_string());

@@ -1,26 +1,6 @@
 import "relay/Guide/Support/Banishers.ash";
 import "relay/Guide/Paths/Bad Moon.ash";
 
-static
-{
-    boolean [item] __items_that_craft_food;
-    
-    void initialiseItemsThatCraftFood()
-    {
-        foreach crafted_item in $items[]
-        {
-            string craft_type = crafted_item.craft_type();
-            if (!craft_type.contains_text("Cooking"))
-                continue;
-            foreach it in crafted_item.get_ingredients()
-            {
-                __items_that_craft_food[it] = true;
-            }
-        }
-    }
-    initialiseItemsThatCraftFood();
-}
-
 Record LBPItemInformation
 {
     string image_url;
@@ -1099,15 +1079,7 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
                 stats_l2.listAppend(m.base_hp + " HP");
             if (lookupSkill("Extract Oil").have_skill())
             {
-                string oil_type = "";
-                if (lookupMonsters("Aggressive grass snake,Bacon snake,Batsnake,Black adder,Burning Snake of Fire,Coal snake,Diamondback rattler,Frontwinder,Frozen Solid Snake,King snake,Licorice snake,Mutant rattlesnake,Prince snake,Sewer snake with a sewer snake in it,Snakeleton,The Snake With Like Ten Heads,Tomb asp,Trouser Snake,Whitesnake") contains m)
-                    oil_type = "snake oil";
-                else if ($phylums[beast,dude,hippy,humanoid,orc,pirate] contains m.phylum)
-                    oil_type = "skin oil";
-                else if ($phylums[bug,construct,constellation,demon,elemental,elf,fish,goblin,hobo,horror,mer-kin,penguin,plant,slime,weird] contains m.phylum)
-                    oil_type = "unusual oil";
-                else if ($phylums[undead] contains m.phylum)
-                    oil_type = "eldritch oil";
+                string oil_type = lookupAWOLOilForMonster(m);
                 if (oil_type != "")
                     stats_l2.listAppend(oil_type);
             }

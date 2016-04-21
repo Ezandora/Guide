@@ -350,7 +350,7 @@ void CountersReparse()
     CountersInit();
 }
 
-boolean [string] __wandering_monster_counter_names = $strings[Romantic Monster,Rain Monster,Holiday Monster,Nemesis Assassin,Bee];
+boolean [string] __wandering_monster_counter_names = $strings[Romantic Monster,Rain Monster,Holiday Monster,Nemesis Assassin,Bee,WoL Monster];
 
 
 //This is for ascension automation scripts. Call this immediately before adventuring in an adventure.php zone.
@@ -386,9 +386,11 @@ boolean CounterWanderingMonsterMayHitNextTurn()
     {
         return false;
     }
-    if (my_turncount() == __last_turn_definitely_visited_adventure_php && __last_turn_definitely_visited_adventure_php != -1 && !get_property("lastEncounter").contains_text("Lights Out")) //that adventure didn't advance the counter; no wandering monsters. also, does lights out override wanderers? but, what if there are TWO wandering monsters? the plot thickens
+    if (my_turncount() == __last_turn_definitely_visited_adventure_php && __last_turn_definitely_visited_adventure_php != -1) //that adventure didn't advance the counter; no wandering monsters. also, does lights out override wanderers? but, what if there are TWO wandering monsters? the plot thickens
     {
-        return false;
+        string last_encounter = get_property("lastEncounter");
+        if (!($strings[Lights Out,Wooof! Wooooooof!,Playing Fetch*,Your Dog Found Something Again] contains last_encounter))
+            return false;
     }
     //FIXME use CounterWanderingMonsterMayHitInXTurns to implement this once we're sure it works
     foreach s in __wandering_monster_counter_names
@@ -430,6 +432,18 @@ Counter [int] CounterWanderingMonsterWindowsActiveNextTurn()
     }
     return result;
     
+}
+
+boolean CounterWanderingMonsterWillHitNextTurn()
+{
+    if (!CounterWanderingMonsterMayHitNextTurn())
+        return false;
+    foreach key, c in CounterWanderingMonsterWindowsActiveNextTurn()
+    {
+        if (c.CounterWillHitExactlyInTurnRange(0, 0))
+            return true;
+    }
+    return false;
 }
 
 CountersInit();

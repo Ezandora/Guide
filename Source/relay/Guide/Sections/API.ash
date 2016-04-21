@@ -145,7 +145,7 @@ string [string] generateAPIResponse()
         }
         result["logged in"] = playerIsLoggedIn();
     }
-    if (false)
+    if (my_path_id() == PATH_AVATAR_OF_WEST_OF_LOATHING || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE)
     {
         int skill_count = 0;
         foreach s in $skills[]

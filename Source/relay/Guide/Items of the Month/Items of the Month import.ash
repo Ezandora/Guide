@@ -18,3 +18,4 @@ import "relay/Guide/Items of the Month/Machine Elf.ash";
 import "relay/Guide/Items of the Month/Snojo.ash";
 import "relay/Guide/Items of the Month/Telegraph Office.ash";
 import "relay/Guide/Items of the Month/Witchess.ash";
+import "relay/Guide/Items of the Month/Clan Floundry.ash";

@@ -488,7 +488,8 @@ void generatePullList(Checklist [int] checklists)
     if (lookupItem("Mr. Cheeng's spectacles") != $item[none])
         pullable_item_list.listAppend(GPItemMake(lookupItem("Mr. Cheeng's spectacles"), "+15% item, +30% spell damage, acquire random potions in-combat.|Not particularly optimal, but fun."));
     
-    int pills_pullable = clampi(20 - (get_property_int("_powerPillUses") + $item[power pill].available_amount()), 0, 20);
+    //int pills_pullable = clampi(20 - (get_property_int("_powerPillUses") + $item[power pill].available_amount()), 0, 20);
+    int pills_pullable = clampi(20 - get_property_int("_powerPillUses"), 0, 20);
     if (pills_pullable > 0)
     {
         pullable_item_list.listAppend(GPItemMake($item[power pill], "Saves one turn each.", pills_pullable));

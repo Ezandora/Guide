@@ -128,6 +128,7 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
     window_image_names["Bee"] = "__effect Float Like a Butterfly, Smell Like a Bee"; //bzzz!
     window_image_names["Holiday Monster"] = "__familiar hand turkey";
     window_image_names["Rain Monster"] = "__familiar personal raincloud";
+    window_image_names["WoL Monster"] = "__effect Cowrruption";
     //window_image_names["Event Monster"] = ""; //no idea
     
     boolean [string] counter_blacklist = $strings[Romantic Monster,Semi-rare];

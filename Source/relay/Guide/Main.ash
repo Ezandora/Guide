@@ -1,5 +1,6 @@
 import "relay/Guide/Settings.ash"
 import "relay/Guide/Support/Library.ash"
+import "relay/Guide/Support/Statics.ash"
 import "relay/Guide/Support/List.ash"
 import "relay/Guide/Sections/Globals.ash"
 import "relay/Guide/Sections/Data.ash"

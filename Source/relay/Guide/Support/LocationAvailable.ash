@@ -295,6 +295,8 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
             return true;
         case $location[The VERY Unquiet Garves]:
             return get_property("questL07Cyrptic") == "finished";
+        case $location[The Wreck of the Edgar Fitzsimmons]:
+            return questPropertyPastInternalStepNumber("questS02Monkees", 2);
         case $location[the boss bat's lair]:
             if ($location[the boss bat's lair].combatTurnsAttemptedInLocation() > 0)
                 return true;
@@ -479,6 +481,8 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
             return get_property_boolean("maraisWizardUnlock");
         case $location[The Edge of the Swamp]:
             return QuestState("questM18Swamp").started;
+        case $location[madness bakery]:
+            return QuestState("questM25Armorer").started;
 		default:
 			break;
 	}
@@ -980,6 +984,7 @@ static
         lookup_map["Investigating a Plaintive Telegram"] = "place.php?whichplace=town_right";
         lookup_map["The Fungal Nethers"] = "place.php?whichplace=nemesiscave";
         lookup_map["Thugnderdome"] = "gnomes.php";
+        lookup_map["The Overgrown Lot"] = "place.php?whichplace=town_wrong";
         foreach s in $strings[The Hallowed Halls,Shop Class,Chemistry Class,Art Class]
             lookup_map[s] = "place.php?whichplace=KOLHS";
         foreach s in $strings[The Edge of the Swamp,The Dark and Spooky Swamp,The Corpse Bog,The Ruined Wizard Tower,The Wildlife Sanctuarrrrrgh,Swamp Beaver Territory,The Weird Swamp Village]

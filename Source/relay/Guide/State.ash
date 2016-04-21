@@ -198,6 +198,12 @@ void setUpState()
         yellow_ray_source = "Mayo Lance";
         yellow_ray_image_name = "__item mayo lance";
     }
+    if (lookupSkill("Unleash Cowrruption").have_skill())
+    {
+        yellow_ray_available = true;
+        yellow_ray_source = "Unleash Cowrruption";
+        yellow_ray_image_name = "__skill Unleash Cowrruption";
+    }
     if ($familiar[Crimbo Shrub].familiar_is_usable() && get_property("shrubGifts") == "yellow" && !(my_daycount() == 1 && get_property("_shrubDecorated") == "false"))
     {
         yellow_ray_available = true;
@@ -369,6 +375,10 @@ void setUpState()
 		//skills_temporarily_missing = true;
 		//familiars_temporarily_missing = true;
 	}
+    if (my_path_id() == PATH_AVATAR_OF_WEST_OF_LOATHING)
+    {
+        skills_temporarily_missing = true;
+    }
 	__misc_state["skills temporarily missing"] = skills_temporarily_missing;
 	__misc_state["familiars temporarily missing"] = familiars_temporarily_missing;
 	__misc_state["familiars temporarily blocked"] = familiars_temporarily_blocked;
@@ -599,15 +609,9 @@ void setUpState()
     {
         //calculate if we need -combat sources:
         int minus_combat_source_count = 0;
+        int minus_combat_from_accessories = 0;
         
-        int minus_combat_from_accessories =0;
-        //No silent beret, because mohawk wig:
-        boolean [item] minus_combat_items = $items[ring of conflict,red shoe,bram's choker,space trip safety headphones,fuzzy slippers of hatred,quiets-your-steps,over-the-shoulder folder holder].makeConstantItemArrayMutable();
-        
-        minus_combat_items[$item[duonoculars]] = true;
-        minus_combat_items[$item[Xiblaxian stealth vest]] = true;
-        //ignore Xiblaxian stealth cowl, Xiblaxian stealth trousers, and silent hat, because they take up valuable slots
-        foreach it in minus_combat_items
+        foreach it in __minus_combat_equipment
         {
             if (!(it.can_equip() && it.available_amount() > 0))
                 continue;
@@ -615,50 +619,57 @@ void setUpState()
                 continue;
             if (it == $item[over-the-shoulder folder holder])
             {
-                //check if we have the -combat folder:
-                boolean [item] equipped_folders;
-                foreach s in $slots[folder1,folder2,folder3,folder4,folder5]
-                {
-                    equipped_folders[s.equipped_item()] = true;
-                }
-                if (equipped_folders contains $item[folder (Ex-Files)])
-                    continue;
-                if (!(equipped_folders contains $item[folder (skull and crossbones)]))
-                    continue;
             }
+            int value = -it.numeric_modifier("combat rate");
             if ($slots[acc1,acc2,acc3] contains it.to_slot())
-                minus_combat_from_accessories += 1;
+                minus_combat_from_accessories += value;
             else
-                minus_combat_source_count += 1;
+                minus_combat_source_count += value;
+        }
+        if ($item[over-the-shoulder folder holder].available_amount() > 0)
+        {
+            //check if we have the -combat folder:
+            boolean [item] equipped_folders;
+            foreach s in $slots[folder1,folder2,folder3,folder4,folder5]
+            {
+                equipped_folders[s.equipped_item()] = true;
+            }
+            if (!(equipped_folders contains $item[folder (Ex-Files)]))
+            {
+                if (equipped_folders contains $item[folder (skull and crossbones)])
+                {
+                    minus_combat_from_accessories += 5;
+                }
+            }
         }
         
-        minus_combat_source_count += MIN(3, minus_combat_from_accessories); //three at most
+        minus_combat_source_count += MIN(3 * 5, minus_combat_from_accessories); //three at most
         
         if ($skill[smooth movement].skill_is_usable())
-            minus_combat_source_count += 1;
+            minus_combat_source_count += 5;
         if ($skill[the sonata of sneakiness].skill_is_usable())
-            minus_combat_source_count += 1;
+            minus_combat_source_count += 5;
         if ($items[crown of thrones,buddy bjorn].available_amount() > 0 && $familiar[grimstone golem].have_familiar() && !__misc_state["familiars temporarily blocked"])
-            minus_combat_source_count += 1;
+            minus_combat_source_count += 5;
         if (my_path_id() == PATH_AVATAR_OF_BORIS && $skill[song of solitude].skill_is_usable())
-            minus_combat_source_count += 4;
+            minus_combat_source_count += 5 * 4;
         if (my_path_id() == PATH_ZOMBIE_SLAYER && $skill[disquiet riot].skill_is_usable())
-            minus_combat_source_count += 4;
+            minus_combat_source_count += 5 * 4;
         if (my_path_id() == PATH_AVATAR_OF_JARLSBERG && $skill[chocolatesphere].skill_is_usable())
-            minus_combat_source_count += 3;
+            minus_combat_source_count += 5 * 3;
         if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE)
         {
             if ($skill[Brood].skill_is_usable())
-                minus_combat_source_count += 2;
+                minus_combat_source_count += 5 * 2;
             if (get_property("peteMotorbikeMuffler") == "Extra-Quiet Muffler" && $skill[Rev Engine].skill_is_usable())
-                minus_combat_source_count += 3;
+                minus_combat_source_count += 5 * 3;
         }
         if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
         {
             if ($skill[Shelter of Shed].have_skill())
-                minus_combat_source_count += 4;
+                minus_combat_source_count += 5 * 4;
         }
-        if (minus_combat_source_count >= 5)
+        if (minus_combat_source_count >= 25)
             __misc_state["can reasonably reach -25% combat"] = true;
     }
     

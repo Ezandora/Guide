@@ -6,7 +6,7 @@ void SEventsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 
 void SCrimbo2015GenerateResource(ChecklistEntry [int] resource_entries)
 {
-    string year_and_month = format_today_to_string("YYYYMM");
+    string year_and_month = format_today_to_string("yyyyMM");
     if (year_and_month != "201512")
         return;
     if (mafiaIsPastRevision(16544) && !in_ronin())

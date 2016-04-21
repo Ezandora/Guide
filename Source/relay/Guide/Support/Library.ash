@@ -1464,3 +1464,16 @@ float averageAdventuresForConsumable(item it)
 {
     return averageAdventuresForConsumable(it, false);
 }
+
+string lookupAWOLOilForMonster(monster m)
+{
+    if (lookupMonsters("Aggressive grass snake,Bacon snake,Batsnake,Black adder,Burning Snake of Fire,Coal snake,Diamondback rattler,Frontwinder,Frozen Solid Snake,King snake,Licorice snake,Mutant rattlesnake,Prince snake,Sewer snake with a sewer snake in it,Snakeleton,The Snake With Like Ten Heads,Tomb asp,Trouser Snake,Whitesnake") contains m)
+        return "snake oil";
+    else if ($phylums[beast,dude,hippy,humanoid,orc,pirate] contains m.phylum)
+        return "skin oil";
+    else if ($phylums[bug,construct,constellation,demon,elemental,elf,fish,goblin,hobo,horror,mer-kin,penguin,plant,slime,weird] contains m.phylum)
+        return "unusual oil";
+    else if ($phylums[undead] contains m.phylum)
+        return "eldritch oil";
+    return "";
+}
