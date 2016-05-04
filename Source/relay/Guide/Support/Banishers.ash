@@ -55,6 +55,13 @@ static
     __banish_source_length["ice hotel bell"] = -1;
     __banish_source_length["bundle of &quot;fragrant&quot; herbs"] = -1;
     __banish_source_length["snokebomb"] = 30;
+    __banish_source_length["beancannon"] = -1;
+    
+    int [string] __banish_simultaneous_limit;
+    __banish_simultaneous_limit["beancannon"] = 5;
+    __banish_simultaneous_limit["banishing shout"] = 3;
+    __banish_simultaneous_limit["howl of the alpha"] = 3;
+    __banish_simultaneous_limit["staff of the standalone cheese"] = 5;
 }
 
 Banish [int] __banishes_active_cache;

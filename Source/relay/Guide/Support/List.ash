@@ -283,6 +283,14 @@ void listClear(location [int] list)
 	}
 }
 
+void listClear(monster [int] list)
+{
+	foreach i in list
+	{
+		remove list[i];
+	}
+}
+
 void listClear(skill [int] list)
 {
 	foreach i in list

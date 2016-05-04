@@ -237,7 +237,10 @@ buffer generateItemInformationMethod2(location l, monster m, boolean try_for_min
                 item_modifier += numeric_modifier("Candy Drop");
             if ($slots[hat,weapon,off-hand,back,shirt,pants,acc1,acc2,acc3] contains it.to_slot()) //assuming familiar equipment isn't "gear"
                 item_modifier += numeric_modifier("Gear Drop");
-            //does Bear Essence give special picnic baskets you find, or does it affect picnic baskets in-game?
+            if (it == $item[black picnic basket] && $skill[Bear Essence].have_skill())
+            {
+                item_modifier += 20.0 * MAX(1, get_property_int("skillLevel134"));
+            }
             if (item_is_pickpockable_only)
             {
                 if (__misc_state["can pickpocket"])

@@ -73,3 +73,24 @@ static
     }
     initialiseMinusCombatEquipment();
 }
+
+static
+{
+    boolean [item] __beancannon_source_items = lookupItems("Heimz Fortified Kidney Beans,Hellfire Spicy Beans,Mixed Garbanzos and Chickpeas,Pork 'n' Pork 'n' Pork 'n' Beans,Shrub's Premium Baked Beans,Tesla's Electroplated Beans,Frigid Northern Beans,Trader Olaf's Exotic Stinkbeans,World's Blackest-Eyed Peas");
+}
+
+static
+{
+    //This would be a good mafia proxy value. Feature request?
+    boolean [skill] __combat_skills_that_are_spells;
+    void initialiseCombatSkillsThatAreSpells()
+    {
+        foreach s in $skills[Awesome Balls of Fire,Bake,Blend,Blinding Flash,Boil,Candyblast,Cannelloni Cannon,Carbohydrate Cudgel,Chop,CLEESH,Conjure Relaxing Campfire,Creepy Lullaby,Curdle,Doubt Shackles,Eggsplosion,Fear Vapor,Fearful Fettucini,Freeze,Fry,Grease Lightning,Grill,Haggis Kick,Inappropriate Backrub,K&auml;seso&szlig;esturm,Mudbath,Noodles of Fire,Rage Flame,Raise Backup Dancer,Ravioli Shurikens,Salsaball,Saucegeyser,Saucemageddon,Saucestorm,Saucy Salve,Shrap,Slice,Snowclone,Spaghetti Spear,Stream of Sauce,Stringozzi Serpent,Stuffed Mortar Shell,Tear Wave,Toynado,Volcanometeor Showeruption,Wassail,Wave of Sauce,Weapon of the Pastalord]
+        {
+            __combat_skills_that_are_spells[s] = true;
+        }
+        foreach s in lookupSkills("Lavafava,Pungent Mung,Beanstorm") //FIXME cowcall? snakewhip?
+            __combat_skills_that_are_spells[s] = true;
+    }
+    initialiseCombatSkillsThatAreSpells();
+}

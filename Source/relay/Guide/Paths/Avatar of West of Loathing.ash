@@ -79,6 +79,47 @@ void PathAvatarOfWestOfLoathingGenerateResource(ChecklistEntry [int] resource_en
     sort subentries by subentries_sort_value[index];
     if (subentries.count() > 0)
         resource_entries.listAppend(ChecklistEntryMake(image_name, "", subentries, 8));
+    
+    
+    
+    if (lookupSkill("Beancannon").have_skill() && in_ronin())
+    {
+        string [int] banish_sources;
+        int banish_count = 0;
+        int equipped_amount = 0;
+        foreach it in __beancannon_source_items
+        {
+            if (it.available_amount() == 0)
+                continue;
+            banish_count += it.available_amount();
+            string description = it;
+            if (it.available_amount() > 1)
+                description = it.pluralise();
+            equipped_amount += it.equipped_amount();
+            banish_sources.listAppend(description);
+        }
+        if (banish_count > 0)
+        {
+            string [int] description;
+            description.listAppend("From " + banish_sources.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".");
+            string url = "";
+            if (equipped_amount == 0)
+            {
+                description.listAppend("Equip one before banishing.");
+                url = "inventory.php?which=2";
+            }
+            resource_entries.listAppend(ChecklistEntryMake("__skill beancannon", url, ChecklistSubentryMake(pluralise(banish_count, "beancannon banish", "beancannon banishes"), "", description), 8));
+        }
+    }
+    
+    if (lookupSkill("Long Con").have_skill() && mafiaIsPastRevision(16812) && get_property_int("_longConUsed") < 5 && in_ronin())
+    {
+        int uses_remaining = clampi(5 - get_property_int("_longConUsed"), 0, 5);
+        string [int] description;
+        string line = "Olfaction.";
+        description.listAppend(line);
+        resource_entries.listAppend(ChecklistEntryMake("__effect Greaser Lightnin'", "", ChecklistSubentryMake(pluralise(uses_remaining, "long con", "long cons") + " remaining", "", description), 8));
+    }
 }
 
 
@@ -145,20 +186,6 @@ void PathAvatarOfWestOfLoathingGenerateTasks(ChecklistEntry [int] task_entries, 
         skill_subentries.listAppend(ChecklistSubentryMake(title, "", "Use " + tale + "."));
     }
     
-    /*foreach it in $items[tales of the west: cow punching,Tales of the West: Beanslinging,Tales of the West: Snake Oiling]
-    {
-        if (it.available_amount() == 0)
-            continue;
-        string type = it.to_string().replace_string("Tales of the West: ", "");
-        string title = "Learn a " + type + " skill";
-        if (it.available_amount() > 1)
-            title = "Learn " + it.available_amount().int_to_wordy() + " " + type + " skills";
-        subentries.listAppend(ChecklistSubentryMake(title, "", "Use " + it + "."));
-        if (url == "")
-        {
-            url = "inv_use.php?pwd=" + my_hash() + "&whichitem=" + it.to_int();
-        }
-    }*/
     if (skill_subentries.count() > 0)
     {
         task_entries.listAppend(ChecklistEntryMake("__item tales of the west: beanslinging", skill_url, skill_subentries, priority));
