@@ -2,7 +2,7 @@
 
 since 17.1; //the earliest main release that is usable in modern KOL (unequip bug)
 //These settings are for development. Don't worry about editing them.
-string __version = "1.3.14";
+string __version = "1.3.15";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -659,6 +659,14 @@ void listClear(item [int] list)
 }
 
 void listClear(location [int] list)
+{
+	foreach i in list
+	{
+		remove list[i];
+	}
+}
+
+void listClear(monster [int] list)
 {
 	foreach i in list
 	{
@@ -2953,6 +2961,27 @@ static
     initialiseMinusCombatEquipment();
 }
 
+static
+{
+    boolean [item] __beancannon_source_items = lookupItems("Heimz Fortified Kidney Beans,Hellfire Spicy Beans,Mixed Garbanzos and Chickpeas,Pork 'n' Pork 'n' Pork 'n' Beans,Shrub's Premium Baked Beans,Tesla's Electroplated Beans,Frigid Northern Beans,Trader Olaf's Exotic Stinkbeans,World's Blackest-Eyed Peas");
+}
+
+static
+{
+    //This would be a good mafia proxy value. Feature request?
+    boolean [skill] __combat_skills_that_are_spells;
+    void initialiseCombatSkillsThatAreSpells()
+    {
+        foreach s in $skills[Awesome Balls of Fire,Bake,Blend,Blinding Flash,Boil,Candyblast,Cannelloni Cannon,Carbohydrate Cudgel,Chop,CLEESH,Conjure Relaxing Campfire,Creepy Lullaby,Curdle,Doubt Shackles,Eggsplosion,Fear Vapor,Fearful Fettucini,Freeze,Fry,Grease Lightning,Grill,Haggis Kick,Inappropriate Backrub,K&auml;seso&szlig;esturm,Mudbath,Noodles of Fire,Rage Flame,Raise Backup Dancer,Ravioli Shurikens,Salsaball,Saucegeyser,Saucemageddon,Saucestorm,Saucy Salve,Shrap,Slice,Snowclone,Spaghetti Spear,Stream of Sauce,Stringozzi Serpent,Stuffed Mortar Shell,Tear Wave,Toynado,Volcanometeor Showeruption,Wassail,Wave of Sauce,Weapon of the Pastalord]
+        {
+            __combat_skills_that_are_spells[s] = true;
+        }
+        foreach s in lookupSkills("Lavafava,Pungent Mung,Beanstorm") //FIXME cowcall? snakewhip?
+            __combat_skills_that_are_spells[s] = true;
+    }
+    initialiseCombatSkillsThatAreSpells();
+}
+
 //Runtime variables:
 location __last_adventure_location;
 
@@ -3675,7 +3704,7 @@ boolean CounterWanderingMonsterMayHitNextTurn()
     if (my_turncount() == __last_turn_definitely_visited_adventure_php && __last_turn_definitely_visited_adventure_php != -1) //that adventure didn't advance the counter; no wandering monsters. also, does lights out override wanderers? but, what if there are TWO wandering monsters? the plot thickens
     {
         string last_encounter = get_property("lastEncounter");
-        if (!($strings[Lights Out,Wooof! Wooooooof!,Playing Fetch*,Your Dog Found Something Again] contains last_encounter))
+        if (!($strings[Lights Out,Wooof! Wooooooof!,Playing Fetch*,Your Dog Found Something Again,Gunbowwowder] contains last_encounter))
             return false;
     }
     //FIXME use CounterWanderingMonsterMayHitInXTurns to implement this once we're sure it works
@@ -26047,6 +26076,13 @@ static
     __banish_source_length["ice hotel bell"] = -1;
     __banish_source_length["bundle of &quot;fragrant&quot; herbs"] = -1;
     __banish_source_length["snokebomb"] = 30;
+    __banish_source_length["beancannon"] = -1;
+    
+    int [string] __banish_simultaneous_limit;
+    __banish_simultaneous_limit["beancannon"] = 5;
+    __banish_simultaneous_limit["banishing shout"] = 3;
+    __banish_simultaneous_limit["howl of the alpha"] = 3;
+    __banish_simultaneous_limit["staff of the standalone cheese"] = 5;
 }
 
 Banish [int] __banishes_active_cache;
@@ -33576,7 +33612,10 @@ buffer generateItemInformationMethod2(location l, monster m, boolean try_for_min
                 item_modifier += numeric_modifier("Candy Drop");
             if ($slots[hat,weapon,off-hand,back,shirt,pants,acc1,acc2,acc3] contains it.to_slot()) //assuming familiar equipment isn't "gear"
                 item_modifier += numeric_modifier("Gear Drop");
-            //does Bear Essence give special picnic baskets you find, or does it affect picnic baskets in-game?
+            if (it == $item[black picnic basket] && $skill[Bear Essence].have_skill())
+            {
+                item_modifier += 20.0 * MAX(1, get_property_int("skillLevel134"));
+            }
             if (item_is_pickpockable_only)
             {
                 if (__misc_state["can pickpocket"])
@@ -40236,6 +40275,47 @@ void PathAvatarOfWestOfLoathingGenerateResource(ChecklistEntry [int] resource_en
     sort subentries by subentries_sort_value[index];
     if (subentries.count() > 0)
         resource_entries.listAppend(ChecklistEntryMake(image_name, "", subentries, 8));
+    
+    
+    
+    if (lookupSkill("Beancannon").have_skill() && in_ronin())
+    {
+        string [int] banish_sources;
+        int banish_count = 0;
+        int equipped_amount = 0;
+        foreach it in __beancannon_source_items
+        {
+            if (it.available_amount() == 0)
+                continue;
+            banish_count += it.available_amount();
+            string description = it;
+            if (it.available_amount() > 1)
+                description = it.pluralise();
+            equipped_amount += it.equipped_amount();
+            banish_sources.listAppend(description);
+        }
+        if (banish_count > 0)
+        {
+            string [int] description;
+            description.listAppend("From " + banish_sources.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".");
+            string url = "";
+            if (equipped_amount == 0)
+            {
+                description.listAppend("Equip one before banishing.");
+                url = "inventory.php?which=2";
+            }
+            resource_entries.listAppend(ChecklistEntryMake("__skill beancannon", url, ChecklistSubentryMake(pluralise(banish_count, "beancannon banish", "beancannon banishes"), "", description), 8));
+        }
+    }
+    
+    if (lookupSkill("Long Con").have_skill() && mafiaIsPastRevision(16812) && get_property_int("_longConUsed") < 5 && in_ronin())
+    {
+        int uses_remaining = clampi(5 - get_property_int("_longConUsed"), 0, 5);
+        string [int] description;
+        string line = "Olfaction.";
+        description.listAppend(line);
+        resource_entries.listAppend(ChecklistEntryMake("__effect Greaser Lightnin'", "", ChecklistSubentryMake(pluralise(uses_remaining, "long con", "long cons") + " remaining", "", description), 8));
+    }
 }
 
 
@@ -40302,20 +40382,6 @@ void PathAvatarOfWestOfLoathingGenerateTasks(ChecklistEntry [int] task_entries, 
         skill_subentries.listAppend(ChecklistSubentryMake(title, "", "Use " + tale + "."));
     }
     
-    /*foreach it in $items[tales of the west: cow punching,Tales of the West: Beanslinging,Tales of the West: Snake Oiling]
-    {
-        if (it.available_amount() == 0)
-            continue;
-        string type = it.to_string().replace_string("Tales of the West: ", "");
-        string title = "Learn a " + type + " skill";
-        if (it.available_amount() > 1)
-            title = "Learn " + it.available_amount().int_to_wordy() + " " + type + " skills";
-        subentries.listAppend(ChecklistSubentryMake(title, "", "Use " + it + "."));
-        if (url == "")
-        {
-            url = "inv_use.php?pwd=" + my_hash() + "&whichitem=" + it.to_int();
-        }
-    }*/
     if (skill_subentries.count() > 0)
     {
         task_entries.listAppend(ChecklistEntryMake("__item tales of the west: beanslinging", skill_url, skill_subentries, priority));
