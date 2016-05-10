@@ -78,6 +78,22 @@ void IOTMTeaTreeGenerateResource(ChecklistEntry [int] resource_entries)
             tea_options.listAppend(listMake("Royal", "Mall selling, royal leaderboarding"));
             tea_options.listAppend(listMake("Gill", "Fishy (30 turns)"));
         }
+        if (!__quest_state["Level 13"].state_boolean["Elemental damage race completed"] && __quest_state["Level 13"].state_string["Elemental damage race type"] != "")
+        {
+            //
+            element type = __quest_state["Level 13"].state_string["Elemental damage race type"].to_element();
+            item [element] element_tea_map;
+            element_tea_map[$element[sleaze]] = lookupItem("Improprie Tea");
+            element_tea_map[$element[spooky]] = lookupItem("cuppa Boo tea");
+            element_tea_map[$element[hot]] = lookupItem("cuppa Flamibili tea");
+            element_tea_map[$element[stench]] = lookupItem("cuppa Nas tea");
+            element_tea_map[$element[cold]] = lookupItem("cuppa Yet tea");
+            
+            item tea = element_tea_map[type];
+            string type_class = "r_element_" + type + "_desaturated";
+            if (tea != $item[none] && tea.available_amount() == 0)
+                tea_options.listAppend(listMake(tea.replace_string(" tea", "").replace_string("cuppa ", "").capitaliseFirstLetter(), HTMLGenerateSpanOfClass(__tea_tree_teas[tea], type_class) + " for lair race."));
+        }
         
         if (tea_options.count() > 0)
             options.listAppend(HTMLGenerateSimpleTableLines(tea_options));
@@ -113,7 +129,7 @@ void IOTMTeaTreeGenerateResource(ChecklistEntry [int] resource_entries)
         }
         if (teas_found.count() > 0)
         {
-            resource_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(teas_found.listJoinComponents(", ", "and").capitaliseFirstLetter() + " tea", "", reasons_found.listJoinComponents(", ", "or").capitaliseFirstLetter() + (one_tea_gives_effect ? " (30 turns)" : "")), 8));
+            resource_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(teas_found.listJoinComponents(", ", "and").capitaliseFirstLetter() + " tea", "", reasons_found.listJoinComponents(", ", "and").capitaliseFirstLetter() + (one_tea_gives_effect ? " (30 turns)" : "")), 8));
         }
     }
 }

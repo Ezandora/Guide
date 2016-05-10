@@ -368,6 +368,11 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         }
         if (hospital_progress < 8)
         {
+            boolean [item] hospital_outfit_pieces = $items[bloodied surgical dungarees,surgical mask,head mirror,half-size scalpel].makeConstantItemArrayMutable();
+            boolean hospital_outfit_pieces_is_complete = true;
+            if (__misc_state["Torso aware"])
+                hospital_outfit_pieces[$item[surgical apron]] = true;
+            
             ChecklistSubentry subentry;
             subentry.header = "Hidden Hospital";
             if (hospital_progress == 7 || $item[dripping stone sphere].available_amount() > 0)
@@ -380,7 +385,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
             }
             else
             {
-                if ($items[surgical apron,bloodied surgical dungarees,surgical mask,head mirror,half-size scalpel].items_missing().count() > 0)
+                if (hospital_outfit_pieces.items_missing().count() > 0)
                 {
                     subentry.entries.listAppend("Olfact surgeon.");
                     if (!$monster[pygmy orderlies].is_banished())
@@ -390,7 +395,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         
                 string [int] items_we_have_unequipped;
                 item [int] items_we_have_equipped;
-                foreach it in $items[surgical apron,bloodied surgical dungarees,surgical mask,head mirror,half-size scalpel]
+                foreach it in hospital_outfit_pieces
                 {
                     boolean can_equip = true;
                     if (it.to_slot() == $slot[shirt] && !__misc_state["Torso aware"])

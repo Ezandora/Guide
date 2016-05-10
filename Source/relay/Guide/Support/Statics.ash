@@ -94,3 +94,26 @@ static
     }
     initialiseCombatSkillsThatAreSpells();
 }
+
+static
+{
+    boolean [monster] __snakes;
+    void initialiseSnakes()
+    {
+        __snakes = lookupMonsters("aggressive grass snake,Bacon snake,Batsnake,Black adder,Burning Snake of Fire,Coal snake,Diamondback rattler,Frontwinder,Frozen Solid Snake,King snake,Licorice snake,Mutant rattlesnake,Prince snake,Sewer snake with a sewer snake in it,Snakeleton,The Snake With Like Ten Heads,Tomb asp,Trouser Snake,Whitesnake");
+    }
+    initialiseSnakes();
+}
+
+item lookupAWOLOilForMonster(monster m)
+{
+    if (__snakes contains m)
+        return lookupItem("snake oil");
+    else if ($phylums[beast,dude,hippy,humanoid,orc,pirate] contains m.phylum)
+        return lookupItem("skin oil");
+    else if ($phylums[bug,construct,constellation,demon,elemental,elf,fish,goblin,hobo,horror,mer-kin,penguin,plant,slime,weird] contains m.phylum)
+        return lookupItem("unusual oil");
+    else if ($phylums[undead] contains m.phylum)
+        return lookupItem("eldritch oil");
+    return $item[none];
+}

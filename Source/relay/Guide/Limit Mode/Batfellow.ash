@@ -543,9 +543,9 @@ void LimitModeBatfellowGenerateChecklists(Checklist [int] checklists)
 RegisterResourceGenerationFunction("BatfellowGenerateResource");
 void BatfellowGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (lookupItem("replica bat-oomerang").available_amount() > 0 && false)
+    if (lookupItem("replica bat-oomerang").available_amount() > 0 && mafiaIsPastRevision(16927))
     {
-        int remaining = clampi(3 - get_property_int("_batoomerangUses"), 0, 3);
+        int remaining = clampi(3 - get_property_int("_usedReplicaBatoomerang"), 0, 3);
         if (remaining > 0)
             resource_entries.listAppend(ChecklistEntryMake("__item replica bat-oomerang", "", ChecklistSubentryMake(pluralise(remaining, "replica bat-oomerang use", "replica bat-oomerang uses"), "", "Free instakill."), 5));
     }

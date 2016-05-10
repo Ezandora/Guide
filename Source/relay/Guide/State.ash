@@ -191,6 +191,12 @@ void setUpState()
 		yellow_ray_source = source.to_string();
 		yellow_ray_image_name = "__item " + source.to_string();
     }
+    if (lookupItem("viral video").available_amount() > 0)
+    {
+		yellow_ray_available = true;
+		yellow_ray_source = "viral video";
+		yellow_ray_image_name = "__item viral video";
+    }
     
     if ($item[mayo lance].available_amount() > 0 && get_property_int("mayoLevel") > 0)
     {

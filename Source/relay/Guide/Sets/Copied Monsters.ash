@@ -375,6 +375,12 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
         if (copy_source_entry.image_lookup_name == "")
             copy_source_entry.image_lookup_name = "__item sticky clay homunculus";
     }
+    if (lookupItem("print screen button").available_amount() > 0)
+    {
+        copy_source_entry.subentries.listAppend(ChecklistSubentryMake(pluralise(lookupItem("print screen button").available_amount(), "print screen copy", "print screen copies") + " available", "", ""));
+        if (copy_source_entry.image_lookup_name == "")
+            copy_source_entry.image_lookup_name = "__item print screen button";
+    }
     if (!get_property_boolean("_crappyCameraUsed") && $item[crappy camera].available_amount() > 0)
     {
         string [int] description;// = listCopy(potential_copies);
@@ -414,6 +420,7 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
 		SCopiedMonstersGenerateResourceForCopyType(resource_entries, $item[envyfish egg], "envyfish egg", "envyfishMonster");
 	if (!get_property_boolean("_iceSculptureUsed"))
 		SCopiedMonstersGenerateResourceForCopyType(resource_entries, $item[ice sculpture], "ice sculpture", "iceSculptureMonster");
+    SCopiedMonstersGenerateResourceForCopyType(resource_entries, lookupItem("screencapped monster"), "screencapped monster", "screencappedMonster");
         
 	//if (__misc_state["Chateau Mantegna available"] && !get_property_boolean("_chateauMonsterFought") && mafiaIsPastRevision(15115))
 		//SCopiedMonstersGenerateResourceForCopyType(resource_entries, $item[none], "chateau painting", "chateauMonster");

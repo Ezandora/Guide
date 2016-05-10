@@ -344,7 +344,10 @@ void generatePullList(Checklist [int] checklists)
     }
 	
 	//Quest-relevant items:
-	
+	if (lookupFamiliar("Intergnat").familiar_is_usable())
+    {
+        pullable_item_list.listAppend(GPItemMake(lookupItem("infinite BACON machine"), "One copy/day with ~seven turns of intergnat.", 1));
+    }
 	if (!__quest_state["Level 9"].state_boolean["bridge complete"])
 	{
 		int boxes_needed = MIN(__quest_state["Level 9"].state_int["bridge fasteners needed"], __quest_state["Level 9"].state_int["bridge lumber needed"]) / 5;

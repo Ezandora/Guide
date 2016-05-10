@@ -14,7 +14,7 @@ void generateMisc(Checklist [int] checklists)
 		checklists.listAppend(ChecklistMake("Unimportant Tasks", unimportant_task_entries));
 	}
 	
-	if (availableDrunkenness() < 0 && $item[drunkula's wineglass].equipped_amount() == 0)
+	if (availableDrunkenness() < 0 && ($item[drunkula's wineglass].equipped_amount() == 0 || my_adventures() == 0))
 	{
         //They're drunk, so tasks aren't as relevant. Re-arrange everything:
         string url;

@@ -21,13 +21,15 @@ void PathAvatarOfWestOfLoathingGenerateResource(ChecklistEntry [int] resource_en
                 int percentage_left = clampi(100 - (oils_extracted - 5) * 10, 0, 100);
                 description = percentage_left + "% chance.";
             }
-            string monster_oil_type = lookupAWOLOilForMonster(last_monster());
-            if (monster_oil_type != "")
+            item monster_oil_type = lookupAWOLOilForMonster(last_monster());
+            if (monster_oil_type != $item[none])
             {
                 if (description != "")
                     description += " ";
-                description += monster_oil_type + " against " + last_monster() + ".";
+                description += monster_oil_type.capitaliseFirstLetter() + " against " + last_monster() + ".";
             }
+            if (image_name == "")
+                image_name = "__item Snake oil";
             subentries.listAppend(ChecklistSubentryMake(pluralise(oils_remaining, "extractable oil", "extractable oils"), "", description));
         }
     }

@@ -389,7 +389,7 @@ boolean CounterWanderingMonsterMayHitNextTurn()
     if (my_turncount() == __last_turn_definitely_visited_adventure_php && __last_turn_definitely_visited_adventure_php != -1) //that adventure didn't advance the counter; no wandering monsters. also, does lights out override wanderers? but, what if there are TWO wandering monsters? the plot thickens
     {
         string last_encounter = get_property("lastEncounter");
-        if (!($strings[Lights Out,Wooof! Wooooooof!,Playing Fetch*,Your Dog Found Something Again,Gunbowwowder] contains last_encounter))
+        if (!($strings[Lights Out,Wooof! Wooooooof!,Playing Fetch*,Your Dog Found Something Again,Gunbowwowder,Seeing-Eyes Dog] contains last_encounter))
             return false;
     }
     //FIXME use CounterWanderingMonsterMayHitInXTurns to implement this once we're sure it works
@@ -440,6 +440,9 @@ boolean CounterWanderingMonsterWillHitNextTurn()
         return false;
     foreach key, c in CounterWanderingMonsterWindowsActiveNextTurn()
     {
+        Vec2i range = c.CounterGetWindowRange();
+        if (range.y <= 0)
+            return true;
         if (c.CounterWillHitExactlyInTurnRange(0, 0))
             return true;
     }
