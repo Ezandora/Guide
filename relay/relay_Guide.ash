@@ -2,7 +2,7 @@
 
 since 17.1; //the earliest main release that is usable in modern KOL (unequip bug)
 //These settings are for development. Don't worry about editing them.
-string __version = "1.3.15";
+string __version = "1.3.16";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -2282,7 +2282,7 @@ boolean [monster] lookupMonsters(string names_string)
 {
     boolean [monster] result;
     
-    string [int] names = names_string.split_string();
+    string [int] names = names_string.split_string(",");
     foreach key, name in names
     {
         if (name.length() == 0)
@@ -2872,19 +2872,6 @@ float averageAdventuresForConsumable(item it)
 {
     return averageAdventuresForConsumable(it, false);
 }
-
-string lookupAWOLOilForMonster(monster m)
-{
-    if (lookupMonsters("Aggressive grass snake,Bacon snake,Batsnake,Black adder,Burning Snake of Fire,Coal snake,Diamondback rattler,Frontwinder,Frozen Solid Snake,King snake,Licorice snake,Mutant rattlesnake,Prince snake,Sewer snake with a sewer snake in it,Snakeleton,The Snake With Like Ten Heads,Tomb asp,Trouser Snake,Whitesnake") contains m)
-        return "snake oil";
-    else if ($phylums[beast,dude,hippy,humanoid,orc,pirate] contains m.phylum)
-        return "skin oil";
-    else if ($phylums[bug,construct,constellation,demon,elemental,elf,fish,goblin,hobo,horror,mer-kin,penguin,plant,slime,weird] contains m.phylum)
-        return "unusual oil";
-    else if ($phylums[undead] contains m.phylum)
-        return "eldritch oil";
-    return "";
-}
 static
 {
     skill [class][int] __skills_by_class;
@@ -2980,6 +2967,29 @@ static
             __combat_skills_that_are_spells[s] = true;
     }
     initialiseCombatSkillsThatAreSpells();
+}
+
+static
+{
+    boolean [monster] __snakes;
+    void initialiseSnakes()
+    {
+        __snakes = lookupMonsters("aggressive grass snake,Bacon snake,Batsnake,Black adder,Burning Snake of Fire,Coal snake,Diamondback rattler,Frontwinder,Frozen Solid Snake,King snake,Licorice snake,Mutant rattlesnake,Prince snake,Sewer snake with a sewer snake in it,Snakeleton,The Snake With Like Ten Heads,Tomb asp,Trouser Snake,Whitesnake");
+    }
+    initialiseSnakes();
+}
+
+item lookupAWOLOilForMonster(monster m)
+{
+    if (__snakes contains m)
+        return lookupItem("snake oil");
+    else if ($phylums[beast,dude,hippy,humanoid,orc,pirate] contains m.phylum)
+        return lookupItem("skin oil");
+    else if ($phylums[bug,construct,constellation,demon,elemental,elf,fish,goblin,hobo,horror,mer-kin,penguin,plant,slime,weird] contains m.phylum)
+        return lookupItem("unusual oil");
+    else if ($phylums[undead] contains m.phylum)
+        return lookupItem("eldritch oil");
+    return $item[none];
 }
 
 //Runtime variables:
@@ -3704,7 +3714,7 @@ boolean CounterWanderingMonsterMayHitNextTurn()
     if (my_turncount() == __last_turn_definitely_visited_adventure_php && __last_turn_definitely_visited_adventure_php != -1) //that adventure didn't advance the counter; no wandering monsters. also, does lights out override wanderers? but, what if there are TWO wandering monsters? the plot thickens
     {
         string last_encounter = get_property("lastEncounter");
-        if (!($strings[Lights Out,Wooof! Wooooooof!,Playing Fetch*,Your Dog Found Something Again,Gunbowwowder] contains last_encounter))
+        if (!($strings[Lights Out,Wooof! Wooooooof!,Playing Fetch*,Your Dog Found Something Again,Gunbowwowder,Seeing-Eyes Dog] contains last_encounter))
             return false;
     }
     //FIXME use CounterWanderingMonsterMayHitInXTurns to implement this once we're sure it works
@@ -3755,6 +3765,9 @@ boolean CounterWanderingMonsterWillHitNextTurn()
         return false;
     foreach key, c in CounterWanderingMonsterWindowsActiveNextTurn()
     {
+        Vec2i range = c.CounterGetWindowRange();
+        if (range.y <= 0)
+            return true;
         if (c.CounterWillHitExactlyInTurnRange(0, 0))
             return true;
     }
@@ -8399,6 +8412,12 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
         if (copy_source_entry.image_lookup_name == "")
             copy_source_entry.image_lookup_name = "__item sticky clay homunculus";
     }
+    if (lookupItem("print screen button").available_amount() > 0)
+    {
+        copy_source_entry.subentries.listAppend(ChecklistSubentryMake(pluralise(lookupItem("print screen button").available_amount(), "print screen copy", "print screen copies") + " available", "", ""));
+        if (copy_source_entry.image_lookup_name == "")
+            copy_source_entry.image_lookup_name = "__item print screen button";
+    }
     if (!get_property_boolean("_crappyCameraUsed") && $item[crappy camera].available_amount() > 0)
     {
         string [int] description;// = listCopy(potential_copies);
@@ -8438,6 +8457,7 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
 		SCopiedMonstersGenerateResourceForCopyType(resource_entries, $item[envyfish egg], "envyfish egg", "envyfishMonster");
 	if (!get_property_boolean("_iceSculptureUsed"))
 		SCopiedMonstersGenerateResourceForCopyType(resource_entries, $item[ice sculpture], "ice sculpture", "iceSculptureMonster");
+    SCopiedMonstersGenerateResourceForCopyType(resource_entries, lookupItem("screencapped monster"), "screencapped monster", "screencappedMonster");
         
 	//if (__misc_state["Chateau Mantegna available"] && !get_property_boolean("_chateauMonsterFought") && mafiaIsPastRevision(15115))
 		//SCopiedMonstersGenerateResourceForCopyType(resource_entries, $item[none], "chateau painting", "chateauMonster");
@@ -11567,6 +11587,11 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         }
         if (hospital_progress < 8)
         {
+            boolean [item] hospital_outfit_pieces = $items[bloodied surgical dungarees,surgical mask,head mirror,half-size scalpel].makeConstantItemArrayMutable();
+            boolean hospital_outfit_pieces_is_complete = true;
+            if (__misc_state["Torso aware"])
+                hospital_outfit_pieces[$item[surgical apron]] = true;
+            
             ChecklistSubentry subentry;
             subentry.header = "Hidden Hospital";
             if (hospital_progress == 7 || $item[dripping stone sphere].available_amount() > 0)
@@ -11579,7 +11604,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
             }
             else
             {
-                if ($items[surgical apron,bloodied surgical dungarees,surgical mask,head mirror,half-size scalpel].items_missing().count() > 0)
+                if (hospital_outfit_pieces.items_missing().count() > 0)
                 {
                     subentry.entries.listAppend("Olfact surgeon.");
                     if (!$monster[pygmy orderlies].is_banished())
@@ -11589,7 +11614,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         
                 string [int] items_we_have_unequipped;
                 item [int] items_we_have_equipped;
-                foreach it in $items[surgical apron,bloodied surgical dungarees,surgical mask,head mirror,half-size scalpel]
+                foreach it in hospital_outfit_pieces
                 {
                     boolean can_equip = true;
                     if (it.to_slot() == $slot[shirt] && !__misc_state["Torso aware"])
@@ -27231,7 +27256,10 @@ void generatePullList(Checklist [int] checklists)
     }
 	
 	//Quest-relevant items:
-	
+	if (lookupFamiliar("Intergnat").familiar_is_usable())
+    {
+        pullable_item_list.listAppend(GPItemMake(lookupItem("infinite BACON machine"), "One copy/day with ~seven turns of intergnat.", 1));
+    }
 	if (!__quest_state["Level 9"].state_boolean["bridge complete"])
 	{
 		int boxes_needed = MIN(__quest_state["Level 9"].state_int["bridge fasteners needed"], __quest_state["Level 9"].state_int["bridge lumber needed"]) / 5;
@@ -28020,6 +28048,12 @@ void setUpState()
 		yellow_ray_available = true;
 		yellow_ray_source = source.to_string();
 		yellow_ray_image_name = "__item " + source.to_string();
+    }
+    if (lookupItem("viral video").available_amount() > 0)
+    {
+		yellow_ray_available = true;
+		yellow_ray_source = "viral video";
+		yellow_ray_image_name = "__item viral video";
     }
     
     if ($item[mayo lance].available_amount() > 0 && get_property_int("mayoLevel") > 0)
@@ -32510,9 +32544,9 @@ void LimitModeBatfellowGenerateChecklists(Checklist [int] checklists)
 RegisterResourceGenerationFunction("BatfellowGenerateResource");
 void BatfellowGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (lookupItem("replica bat-oomerang").available_amount() > 0 && false)
+    if (lookupItem("replica bat-oomerang").available_amount() > 0 && mafiaIsPastRevision(16927))
     {
-        int remaining = clampi(3 - get_property_int("_batoomerangUses"), 0, 3);
+        int remaining = clampi(3 - get_property_int("_usedReplicaBatoomerang"), 0, 3);
         if (remaining > 0)
             resource_entries.listAppend(ChecklistEntryMake("__item replica bat-oomerang", "", ChecklistSubentryMake(pluralise(remaining, "replica bat-oomerang use", "replica bat-oomerang uses"), "", "Free instakill."), 5));
     }
@@ -32531,7 +32565,7 @@ void generateMisc(Checklist [int] checklists)
 		checklists.listAppend(ChecklistMake("Unimportant Tasks", unimportant_task_entries));
 	}
 	
-	if (availableDrunkenness() < 0 && $item[drunkula's wineglass].equipped_amount() == 0)
+	if (availableDrunkenness() < 0 && ($item[drunkula's wineglass].equipped_amount() == 0 || my_adventures() == 0))
 	{
         //They're drunk, so tasks aren't as relevant. Re-arrange everything:
         string url;
@@ -35835,6 +35869,22 @@ void IOTMTeaTreeGenerateResource(ChecklistEntry [int] resource_entries)
             tea_options.listAppend(listMake("Royal", "Mall selling, royal leaderboarding"));
             tea_options.listAppend(listMake("Gill", "Fishy (30 turns)"));
         }
+        if (!__quest_state["Level 13"].state_boolean["Elemental damage race completed"] && __quest_state["Level 13"].state_string["Elemental damage race type"] != "")
+        {
+            //
+            element type = __quest_state["Level 13"].state_string["Elemental damage race type"].to_element();
+            item [element] element_tea_map;
+            element_tea_map[$element[sleaze]] = lookupItem("Improprie Tea");
+            element_tea_map[$element[spooky]] = lookupItem("cuppa Boo tea");
+            element_tea_map[$element[hot]] = lookupItem("cuppa Flamibili tea");
+            element_tea_map[$element[stench]] = lookupItem("cuppa Nas tea");
+            element_tea_map[$element[cold]] = lookupItem("cuppa Yet tea");
+            
+            item tea = element_tea_map[type];
+            string type_class = "r_element_" + type + "_desaturated";
+            if (tea != $item[none] && tea.available_amount() == 0)
+                tea_options.listAppend(listMake(tea.replace_string(" tea", "").replace_string("cuppa ", "").capitaliseFirstLetter(), HTMLGenerateSpanOfClass(__tea_tree_teas[tea], type_class) + " for lair race."));
+        }
         
         if (tea_options.count() > 0)
             options.listAppend(HTMLGenerateSimpleTableLines(tea_options));
@@ -35870,7 +35920,7 @@ void IOTMTeaTreeGenerateResource(ChecklistEntry [int] resource_entries)
         }
         if (teas_found.count() > 0)
         {
-            resource_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(teas_found.listJoinComponents(", ", "and").capitaliseFirstLetter() + " tea", "", reasons_found.listJoinComponents(", ", "or").capitaliseFirstLetter() + (one_tea_gives_effect ? " (30 turns)" : "")), 8));
+            resource_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(teas_found.listJoinComponents(", ", "and").capitaliseFirstLetter() + " tea", "", reasons_found.listJoinComponents(", ", "and").capitaliseFirstLetter() + (one_tea_gives_effect ? " (30 turns)" : "")), 8));
         }
     }
 }
@@ -36380,7 +36430,7 @@ void IOTMMayoClinicGenerateResource(ChecklistEntry [int] resource_entries)
             string line = "Need blood mayo to yellow ray";
             if ($effect[everything looks yellow].have_effect() > 0)
                 line += " later";
-            line += ".|Use mayo packets while eating.";
+            line += ".|Use a mayo packet.";
             description.listAppend(line);
             if (availableFullness() > 0)
                 url = "campground.php?action=workshed";
@@ -39513,6 +39563,67 @@ void IOTMClanFloundryGenerateResource(ChecklistEntry [int] resource_entries)
     
     resource_entries.listAppend(ChecklistEntryMake("__item fishy fish", "clan_viplounge.php?action=floundry", ChecklistSubentryMake("Rentable floundry equipment", "", description), 8));
 }
+RegisterResourceGenerationFunction("IOTMIntergnatGenerateResource");
+void IOTMIntergnatGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if (lookupItem("infinite BACON machine").available_amount() > 0 && !get_property_boolean("_baconMachineUsed") && mafiaIsPastRevision(16926))
+    {
+        //suggest using it:
+        resource_entries.listAppend(ChecklistEntryMake("__item infinite BACON machine", "inventory.php?which=3", ChecklistSubentryMake("Infinite BACON machine", "", "100 BACON/day."), 7));
+    }
+    if (lookupItem("daily dungeon malware").available_amount() > 0 && __misc_state_int["fat loot tokens needed"] > 0)
+    {
+        resource_entries.listAppend(ChecklistEntryMake("__item daily dungeon malware", "da.php", ChecklistSubentryMake("Daily dungeon malware", "", "Use on a daily dungeon monster to gain a fat loot token."), 7));
+    }
+    int bacon_amount = lookupItem("BACON").available_amount();
+    if (__misc_state["in run"] && bacon_amount > 0)
+    {
+        /*
+        Viral video - YR if they don't have one.
+        Print screen button - Copy, kind of unlimited use.
+        Daily dungeon malware - It seems very expensive for what it does, but, we could suggest it?
+        
+        Gallon of milk - food, though not amazing. The debuff causes issues, but mostly just for the alcove.
+        */
+        coinmaster meme_shop = "Internet Meme Shop".to_coinmaster();
+        if (meme_shop != $coinmaster[none])
+        {
+            string [item] bacon_description;
+            if (!__misc_state["yellow ray available"] & $effect[everything looks yellow].have_effect() == 0)
+                bacon_description[lookupItem("Viral video")] = "yellow ray";
+            bacon_description[lookupItem("print screen button")] = "copies a monster";
+            if (__misc_state_int["fat loot tokens needed"] > 0)
+                bacon_description[lookupItem("daily dungeon malware")] = "expensive DD token source";
+            if (availableFullness() >= 15)
+                bacon_description[lookupItem("gallon of milk")] = "lazy/expensive food source. Incurs a debuff";
+            
+            string [int][int] table;
+            foreach it, item_description in bacon_description
+            {
+                int bacon_cost = meme_shop.sell_price(it);
+                string [int] line;
+                line.listAppend(it.capitaliseFirstLetter());
+                line.listAppend(bacon_cost);
+                line.listAppend(item_description.capitaliseFirstLetter() + ".");
+                if (bacon_cost > bacon_amount)
+                {
+                    foreach key in line
+                    {
+                        line[key] = HTMLGenerateSpanFont(line[key], "grey");
+                    }
+                }
+                table.listAppend(line);
+            }
+            if (table.count() > 0)
+            {
+                string [int] description;
+                description.listAppend(HTMLGenerateSimpleTableLines(table));
+                
+                resource_entries.listAppend(ChecklistEntryMake("__item BACON", "shop.php?whichshop=bacon", ChecklistSubentryMake(pluralise(lookupItem("BACON")), "", description), 7));
+            }
+        }
+    }
+}
 
 RegisterTaskGenerationFunction("PathActuallyEdtheUndyingGenerateTasks");
 void PathActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -40217,13 +40328,15 @@ void PathAvatarOfWestOfLoathingGenerateResource(ChecklistEntry [int] resource_en
                 int percentage_left = clampi(100 - (oils_extracted - 5) * 10, 0, 100);
                 description = percentage_left + "% chance.";
             }
-            string monster_oil_type = lookupAWOLOilForMonster(last_monster());
-            if (monster_oil_type != "")
+            item monster_oil_type = lookupAWOLOilForMonster(last_monster());
+            if (monster_oil_type != $item[none])
             {
                 if (description != "")
                     description += " ";
-                description += monster_oil_type + " against " + last_monster() + ".";
+                description += monster_oil_type.capitaliseFirstLetter() + " against " + last_monster() + ".";
             }
+            if (image_name == "")
+                image_name = "__item Snake oil";
             subentries.listAppend(ChecklistSubentryMake(pluralise(oils_remaining, "extractable oil", "extractable oils"), "", description));
         }
     }
