@@ -101,7 +101,7 @@ void IOTMDeckOfEveryCardGenerateResource(ChecklistEntry [int] resource_entries)
     if (in_run)
         summons.listAppend(DOECSummonMake("X - The Wheel of Fortune", "+100% item for 20 turns."));
     
-    if (in_run && __misc_state["need to level"])
+    if (in_run && __misc_state["need to level"] && my_path_id() != PATH_THE_SOURCE)
     {
         string card_name = "Cardiff";
         if (my_primestat() == $stat[muscle])

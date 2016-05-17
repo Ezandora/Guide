@@ -36,8 +36,6 @@ string [string] generateAPIResponse()
     result["pulls remaining"] = pulls_remaining();
     result["location"] = my_location();
     
-    
-    
     if (true)
     {
         int [effect] my_effects = my_effects();

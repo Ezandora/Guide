@@ -339,7 +339,9 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                     {
                         subentry.entries.listAppend("Grab the massive dumbbell from gym.");
                         if (non_combat_rate != 0.0)
-                            turn_estimation = 2.0 / non_combat_rate;
+                        {
+                            turn_estimation = 1.0 / non_combat_rate + (1.0 / (non_combat_rate * (2.0 / 3.0)));
+                        }
                     }
                     
                 }
@@ -347,7 +349,7 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 {
                     subentry.entries.listAppend("Place the massive dumbbell in the Open Source dumbwaiter.");
                     if (non_combat_rate != 0.0)
-                        turn_estimation = 1.0 / non_combat_rate;
+                        turn_estimation = 1.0 / (non_combat_rate * (2.0 / 3.0));
                 }
             }
             

@@ -80,7 +80,7 @@ void PathAvatarOfWestOfLoathingGenerateResource(ChecklistEntry [int] resource_en
     }
     sort subentries by subentries_sort_value[index];
     if (subentries.count() > 0)
-        resource_entries.listAppend(ChecklistEntryMake(image_name, "", subentries, 8));
+        resource_entries.listAppend(ChecklistEntryMake(image_name, "", subentries, 2));
     
     
     

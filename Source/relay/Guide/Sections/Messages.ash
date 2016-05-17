@@ -386,6 +386,8 @@ string generateRandomMessage()
             random_messages.listAppend("make the world a better place"); break;
         case PATH_AVATAR_OF_WEST_OF_LOATHING:
             random_messages.listAppend("draw"); break;
+        case PATH_THE_SOURCE:
+            random_messages.listAppend("it is not the spoon that ascends, it is only yourself"); break;
         /*case PATH_CLASS_ACT_3:
             random_messages.listAppend("buttons for the people"); break;
         case PATH_AVATAR_OF_THE_NAUGHTY_SORCERESS:
@@ -730,7 +732,10 @@ string generateRandomMessage()
 	if ($effect[beaten up].have_effect() > 0 && limit_mode().length() == 0 && !already_output_relevant_beaten_up_effect)
 	{
 		random_messages.listClear();
-        random_messages.listAppend("ow");
+        if (my_path_id() == PATH_THE_SOURCE)
+            random_messages.listAppend("not like this");
+        else
+            random_messages.listAppend("ow");
 	}
 	if (my_turncount() <= 0)
 	{

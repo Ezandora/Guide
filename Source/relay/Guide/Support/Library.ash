@@ -83,6 +83,7 @@ static
     int PATH_ONE_CRAZY_RANDOM_SUMMER = 26;
     int PATH_COMMUNITY_SERVICE = 27;
     int PATH_AVATAR_OF_WEST_OF_LOATHING = 28;
+    int PATH_THE_SOURCE = 29;
 }
 
 int __my_path_id_cached = -11;
@@ -140,6 +141,8 @@ int my_path_id()
         __my_path_id_cached = PATH_COMMUNITY_SERVICE;
     else if (path_name == "Avatar of West of Loathing")
         __my_path_id_cached = PATH_AVATAR_OF_WEST_OF_LOATHING;
+    else if (path_name == "The Source")
+        __my_path_id_cached = PATH_THE_SOURCE;
     else
         __my_path_id_cached = PATH_UNKNOWN;
     return __my_path_id_cached;
