@@ -2,7 +2,7 @@
 
 since 17.1; //the earliest main release that is usable in modern KOL (unequip bug)
 //These settings are for development. Don't worry about editing them.
-string __version = "1.4";
+string __version = "1.4.1";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -1892,12 +1892,12 @@ item [int] missing_outfit_components(string outfit_name)
     return missing_components;
 }
 
+
 //have_outfit() will tell you if you have an outfit, but only if you pass stat checks. This does not stat check:
 boolean have_outfit_components(string outfit_name)
 {
     return (outfit_name.missing_outfit_components().count() == 0);
 }
-
 
 string [int] __int_to_wordy_map;
 string int_to_wordy(int v) //Not complete, only supports a handful:
@@ -2762,7 +2762,7 @@ int nextLibramSummonMPCost()
 
 int equippable_amount(item it)
 {
-    if (!it.can_equip()) return 0;
+    if (!it.can_equip()) return it.equipped_amount();
     if (it.available_amount() == 0) return 0;
     if ($slots[acc1, acc2, acc3] contains it.to_slot() && it.available_amount() > 1 && !it.boolean_modifier("Single equip"))
         return MIN(3, it.available_amount());
@@ -2874,6 +2874,91 @@ float averageAdventuresForConsumable(item it, boolean assume_monday)
 float averageAdventuresForConsumable(item it)
 {
     return averageAdventuresForConsumable(it, false);
+}
+string [string] __user_preferences_private;
+boolean __read_user_preferences_initially = false;
+
+
+
+//File implementation:
+//Preferred, but not chosen in case this somehow triggers an HD read too often:
+/*string __user_preferences_file_name = "data/relay_ezandora_guide_preferences_" + my_id() + ".txt";
+void readUserPreferences()
+{
+    __read_user_preferences_initially = true;
+    file_to_map(__user_preferences_file_name, __user_preferences_private);
+}
+
+void writeUserPreferences()
+{
+    map_to_file(__user_preferences_private, __user_preferences_file_name);
+}*/
+
+
+string __user_preferences_property_name = "ezandora_guide_preferences";
+void readUserPreferences()
+{
+    string [string] blank;
+    __user_preferences_private = blank;
+    string guide_value = get_property(__user_preferences_property_name);
+    foreach key, pair in guide_value.split_string_alternate(";")
+    {
+        string [int] split = pair.split_string_alternate("=");
+        if (split.count() != 2)
+            continue;
+        __user_preferences_private[split[0]] = split[1];
+    }
+    __read_user_preferences_initially = true;
+}
+
+void writeUserPreferences()
+{
+    buffer output_value;
+    boolean first = true;
+    foreach key, value in __user_preferences_private
+    {
+        if (!first)
+            output_value.append(";");
+        else
+            first = false;
+        output_value.append(key);
+        output_value.append("=");
+        output_value.append(value);
+    }
+    set_property(__user_preferences_property_name, output_value);
+}
+
+
+string PreferenceGet(string name)
+{
+    if (!__read_user_preferences_initially)
+        readUserPreferences();
+    
+    return __user_preferences_private[name];
+}
+
+boolean PreferenceGetBoolean(string name)
+{
+    return PreferenceGet(name).to_boolean();
+}
+
+void PreferenceSet(string name, string value)
+{
+    if (!__read_user_preferences_initially)
+        readUserPreferences();
+    __user_preferences_private[name] = value;
+    writeUserPreferences();
+}
+
+
+void processSetUserPreferences(string [string] form_fields)
+{
+    foreach key, value in form_fields
+    {
+        if (key == "set user preferences")
+            continue;
+        PreferenceSet(key, value);
+    }
 }
 static
 {
@@ -3073,6 +3158,10 @@ string __refresh_image_data = "data:image/gif;base64,R0lGODlhgACAAPeIAG1tbW5ubvP
 string __bad_moon_small_image_data = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABsAAAAbCAYAAACN1PRVAAACyUlEQVR4AZ2WzUsbXRSHVUQhgi0iSgmYtFS7aJG2WdQgiCGlqyKKC1+yaHFRhQpFsCAKIqgLRZOFLgItqYK4SCRI03FTtFCC1Fr84P0PJItQQjbNR5vU5NdzBicMYT4u88CDMPfMfSA4M7dGEAf5gvSTETJ2/TdAviSdAGrMNMNLfiRR7draGmZmZuD1elFfX8/XJPKZldhNMkxCy+npaahJJpNYWVlBW1sbr0fJVtHYA/KnXqixsRHFYhF6jI+P81yafGgWu08WSOg5Pz8PM0KhEM9ekY/0Yjbyl1GotrYWmUwG1ZTLZQwPD6OhoQHZbBbM5uYm3/ObvKEVk0gYOTAwgGqOjo7Q3t4ur3s8HuRyOSiMjY3x9cPqmJuEmTs7O1AzOztbWdva2oIWLS0tvO5Rx76KxPi/jrm4uIDT6ZSv9ff3w4hgMMhzJ0rMLhLq7OyEwsbGhnxtfX0dTCKRQD6fhxalUgk2m43n73DslUhsaGgIapR//8nJSXm9o6MDqVQKWgwODvLMG44FRWK8qRZ1dXWVmdPTU2jBDzytv+fYJ5HY4uIitIhGo+ju7sbExIT8k2kRDochv/aIQ5HY6uoqrCJJEu/xmWP7IrHl5WVYZXd3F/IvSLwTifEzZRW/3897hDj2WiQ2OjoKq4yMjPAeUxxzisR6e3thlebmZt7jHilzYhZramrC8fExzs/PcXZ2VvHy8hJGbG9v8/3/q19XT0lYNZ1OQw+73c4zz9UxJm62qdvtlh/QpaUl2YWFBX736X5M+dhA9/3Q+sS0kldGsZ6eHogSi8WU+25pxZgnJIw8ODiAGXt7e8p8n9kZpI/8oxdzuVwwYm5ujuf+kh7R09Vt8oteMB6PQ02hUJA/Ow6HA9ffxrtWzo3/kd+qY11dXYhEIggEAvD5fMqx4DvpMz83muMi35IfyH3ykJTIEDlFPhY5Ef8DCuHZP51PEtAAAAAASUVORK5CYII=";
 
 string __matrix_glyphs = "data:image/png;base64,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";
+
+string __red_pill_image = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAIsUlEQVR4Ae3d/29ddR3H8Xv6ZVvazs4C2Ro1G0EX2RzGkQgJigP9QTSUqb8sWVKjCQqaKCGpASWZzi1CMAG3KBolJfEHg4jBCNHhUMMUMTPYL260a0tpu663a9fvu12/3B6fP5xPcnPb7dPz5d7POZ/z/uHxB8Dr+WnOOffu3IzruikmbP8PFBKAkACEBCAkACEBCAlASABCAhASgJAAhAQgAVQ45VSBD+AefAOP4/v4Lr6Mu1EPB5mgVjx5LHuWCixiwXMF856c5zLmMIsZzzSmMIkJzyWMYwwXMYosRjwXMIzzGMIgBvAu+vGOp89xMr3owTlPl+dtnPWc8fzP01Gg3dPmU6kHb8AX8TT+gjEsw72GRfThFTyG21CVnAAkgG14EG9iCW4ERvAM7oATzwAkgL1oxRW4JdSFh7EpHgFIALvwEpbhltEUWrDBTAASwPX4hTrxBp3DveUNQAK4D8NwY+QEdkkApQ2gEkeQhxtDSzjG+A3RByABbMbLcONsBRhHCwHUSADRBFCJV5MxPpAHehn/znABSADV+DXcuCscX2H8PFoZvtF/ABKAg6eSND4KxwfA8DN4BBslgPUH8DW4CT79avxCvQSwXwLQB3AX5iw5/QAWPYx/Eh+RANYefyuGLTv9BeMDjL+EVsbfDgmgwCtw7T39KgCA8XM4zPi1SH0An0vX+EAOGMJBAnDSGkAF2lIbAC4DJwlgexoDaErz+CqAOWCWAL7H+JvSEoCDf1hz4acJYF5Za3zMehj/HTQTQKXtAdwmf/oLAsCMZxpoJ4C7bA7gWctOv358/elneGAKk8CLjH+jbQHUYgLuanL6pzyTmADmcZQA6mwJYL9c+BWMf/XTz/jAJWCYAJoJwEl6AM/Yf+GnP/2zutNfFMC4hwDeJIDbkxzAWT9DyOkvGB8XgTwBtBLADUkLYBvyabnty/k6/QXjawIY9RDAOON/E1VJCeA+ufALe/oLAsAI0EkAn0lCAIfltg/rHB9qfFxlfFzAMPASAdwU4wD0X/SU2z796c961PgqgPPAFQJ4nAA2xzGA/9g6vvnTz/gY8hDACAF8hQAq4hTAgPW3fdrxw5/+kauefjU+MAACOEMATXEJIBt6LLnw059+NT76PYz/KnabDmAs3Rd+KMmffhSPXxwA+vhaGgEcJ4AGUwF0asaQ0x/gwk9/+oE+MD6cUQL4kokA/iqnvzQXfvrTD4fxPT1g/D/iQ+UM4HiaTv9sOW771PjrPf3oUQEAC4z/UzSWI4AHNaPI8/7oTr9+fHSjC5ghgEcZf2MpA/hgup/3h7/tG9affv2f/uLx8baH8fvwhVIF4OCinP4At30BLvx0p79rzQAAxn8Ne0rxcfBvrDr95m/7wPiRnH41PsDwy/gZrosygK+m7nm/ods+/ekvHr84AKDTcSYY/luojiKAm4yNb+DTPpO3fb3hTj+ATnQA57AvXADAafN/+hP7aR/jQ3vhF9HpR0cBhp/Do6gKE8DD8iXPwvFLf9sX9PR3rA5A+TOjvjdoAPWYScOnfZPBT3+5bvv0f/qLx0cb0I2b/QcAHINbQJ73a05/1Ld9Z32c/vbVAShZ3BokgPcjF+fn/Yjn837zp7/YOD7mLwDgCbjhyfP+0Ld9wcdXRnGj3wDqMShf84rXhV+gAIDTqFl/AMA9ibvtM/A1r6AXftCMj2jGV1r9BBDgn4vJp339Jm770LZ++/0GsAGvJ+WlDuZPv/kLP40stq0/AKARg2n9kueFuN/2+dfqLwBgD0bhBpem5/3mT7/GLf4CAHYjm/J/3aMCMH/bF84L/gMAdqJbnvfH/rZPJ48d/gMAbsAJS17qkNzn/eE9GSwAwMEPkLP9a16RXfgZuO3TyIYJQNmHQSte6oCR9Jx+5dPhAgA24RHMJPNrXijLhR+CXPiVNoAjUQSgNOI55OW2L/anX/lXlAEoH8cbBk6/uU/7HMO3fcEtY0uU4ysOwx/EkHzaZ/7CT+OT0QeAFaCW8X+IXPjbPnneXyIPlS4A5IEdjP8clix5qUP8nvcH95PSB4BlYA/Dn7TjpQ4WnH7ghfIFgCWgmfEnjX3JM2W3fRp/L38AYPytDP8s8qU9/XLbp/FfMwFgAbiV8U/JlzwNjA+0mQ0AjO8w/AEMWPJSh2ScfuAt8wFgHqhh+BaMx/6lDjaMD7wWnwCQAxoY/xjjL1nyUgcUjR+fAH4fxwDUL3fuZvwT5l/qYOnpB56IcwDqlzub0GPBSx3iNT7w9fgHAGwggBbGnzbxvD+q098RvwA+lZQA1C93vo/xf2vJSx1Mj7+ILUkLQP1y5z60W/JSB1MB/BuZZAYAVDL+A4w/Jl/yDORI0gNQv9y5hfGfYvjFRL7UwYwV7LUlAPXLnR9m/D9BnvfrtSNjVwAYBT5PAN3yvP+aHrI3ABBANQE8wPjD8rx/lUu4zvYA1C931jH+Ucafj9VLHcw6ikxaAlC/3LmT8d+IzUsdzJlHY/oCAONXMP79GE3lbR/wI2TSGoD65c56xv8xwy+U+7avzaxBbJYA8C4YfydeTsnpn8VHkVEkAA8B3EkA/7T8tu/byKxFAgABOIx/kOGHLDz9z8O5dgASgPrlzlocZvycJeOfRt263xQqAQAEsJ3hn8dKgm/7erA1yLuCJQB0AZ9l+KEEnv4R7EBGAggTABj/PTjE+NMG/nVPEOdxCzKRBCABAIy/leF/hXyMT//r2IZM1AFIADgD7GX4UzEbfxlPYiMypQxAAgDjOzjA6AMxCKAdn1CDSgBlCQBg9BocwmUD4/ejGVXISABmAlCuZ/jHkC1DAB24H5vUiBKA6QDQDlTyP/VevIjZCEefxC9xNyrVeHELQAJAGzw1aMJxvIWcjy9sDuJvOIQ7UI2MkowAJIBidbgd38HP8Qec8ob+HZ7GAewKcsqDB+C66SUkAMtJAEICEBKAkACEBCAkACEBCAlASABCAhASgPg/csK8SMv+MG0AAAAASUVORK5CYII=";
+
+string __blue_pill_image = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAJMElEQVR4AezStw3CABRF0Q+9gwdgGTqmoGcEKiowOWOgJuecmc0861uip6CAV5wBrnTF9/0/Rr8dSByAOABxAOIAxAGIAxAHIA5AHIA4AHEAEqf//KYoxCABKXAhA2lIQhwsiIB8rPd4695DN3E8ZXtXsTuBi2qfVesUOordPKjGXqxAfadqW1XdiFVZw0qVl2KWFqo4V4UZTMXMT5Q7FjM3EiOQHcJAjFd79/9b1V3Hcfxc2kLT3q7ItkCjCSxToiAzssQtmU6m/uCXjKH+QkJCosl0i4kuSzBbnMNBiSNz2dZGUaGU0iWsTth0NI4vc2bonMHM4aKRfdFQJBTBfSmzbLR3x+e56Ttt8jHXcz89537O55z3D49/gNfz05zPvZd7t0QGg47u3cDmAWDTrqAcuacfO4Py9yJ9wMbIjqB89/Zp3/2plbQHX4Av4UEcwllMIqzhIl7FMO7CNWj2JwANYBFuxXOYQJiA09iG61DSALIZwEr0422EKfobbkerBpCNAJbhcfnT3kBvYAPmagBuArgMP5ET79BLuLGxAWgAN+EUwgw5gGXpBqABNKEbFYQZNIEehl+gASQfQAf2I8wyRo+cwwa0aQDJBNCEg56MP9MrjH+9BjC7AFowiNC/AA6FjF9BPwF0aQD1B1DCA16OD4aHODjG+HdgXvwANICvIfT49Mv4wLaqVwhgjQbw/wO4AW/5Pz5kfDB+FQEcZvwPQwP4HxbiVG5Ovzk+noxMoJ/xF0MDgBj2e/x4AQjGH8cmxm9H4QP4vLfjw2J8AIx/EusIoFTUAObghYKdfhkfYvgw4y8uYgCrizi+EUDvMPafx3cIoLUoAZTw25xd+4wAYowvAYTzeyJP/J0A1jN+U94DuEZPvzF+2Bl5KPLLY7ghzwH0+RtAon/6ZwYg41cxfGQvrshbAO14raAPfrVPv4wvAYDxL2ALAZTzEsCaAlz74p9+Gd88/RIAHgsJ4BTjr0fJ9wC2FeDBL6nTX8X4U/aFnffve44ArvU5gL/WOYaefhkfjB9ecv/eCuP343LfAliESjGufRann9Frn34QAMOLc4z/DTT7EsBNCPXBr/bpZ/gap386AIYXLxLAZ3wIYBNC6LWvzj/9xumHBMD4GIo8zvhXZjkA84Oeeu2zP/0yvgSwNfLI27iXADqyGMAfcze+xenvtDj95vjG6Y/GB+6N7DlNAF8hgDlZCuBE4a59vbO99tV1+mX8KgIICeAvBLA6KwGM6uv99g9+sU+/jA/Gn/LwQQJY7jqAs4V/8EPtP/0i9oOfnH5zfEgAjB+ZIIBexl/gKoAXode+hB/8Ypx+xp/SPYjdZ/BlFwH82tnQevoxKAGEHZsjA0/gA40MoFevfTEe/KxO/564p39mAJF3COCHBNDViABu1df7U7r2Gac/xvhg/CoCGCOAOwlgXpoBvL/wr/dbnP4Yf/qBGH/6YY4Pxp+y81UC+GJaAZTwL6vB9PV+iwe/GKffDCAkAPQ9hRVJBxDZ48ODnxlAhh/80JHM6Zfxqxh/Ej8igEuTDOCrFqPp6/3Jn35zfDMA7AjLd+94jeG/iZYkArjS/fjZfLdPxhd2D36YOT5i/+k3x5cAsD3yElbNJgBxNO2x9fQP1nH6ZXwzABlfMORbuBPNswngdr321RgfyV/7bE//diEBiCfxHtsAOjFWgHf7YnzMy/W1zxy/xukX4jg+ZBNApCfRgfXdPovTvzP+6TfHF6O42iaA92HcblR9vR9xX+9P/vSbzuGj9QQgtuqDXwqv9yf/4BfHGVxRbwCdGPH/wQ8evN5vce2LG4A4ira4AYjP6bt98T/mFf/aNyBqjZ/A6Tf01xOA2OZgfH/f7WN4B9e+eqypN4C5eMaLd/vcf8jTDCDla5+FUSyKG4DowkhRr30M78u1L67+egIQK3CmwP+7x/5jXg4e/GK4qp4AxHKMItRrHxxe+xLwqE0AkaU4HmNwfb0/m6dfVLDEJoDI5Tjg8Zc62L/eD/ev9yfmPpsARAn3YDwT174e+9Pv/7XP2qhFAIZVGPH8Sx18fLcvKZ+2CMDQijswpv+7x/ba52B8oDuJAEQXdqFSgGuf76df/D7JAMTH8GzO3u1z9TGvtE1ifpLjixKjr8NJ/7/Uwf3HvFL2ieQDAMNH2rGZAMbtr336en/KbksxAHFoCePvwkQir/ejoB/zSsNDjQhAfr51BcMfdvkxL33wMzzauADA+JH1jP+6Xvucji9+0/gAwPgLGb+P0Sv+f6mDl6df/MlVAPLLnVfjiP9f6uD+2mfpBdcBREoMvxYnYr3bpx/yTNLz7gMAw0faGH0Dzjn6UocCXPsMT2UnADB8ZAF6GH8iJ1/qAGP8rASwL3MBCAJYTgAHPPhSBx9Pv9ia5QDklztXM/7L+jGvVHzdhwACApjL8BvwZuO+1OFh8/R79np/DJ/0IwAwfuS9DP+znHypg2sXMd+vAMD4kVWMf8zphzz9P/1/QOBnACCAJgK4hQDO+v+lDk50+x4AHgsIYD4BPMD4F/Xdvtjexcq8BCC/3PlBhv+VvtsXyzEEeQtAfrnzCwx/XF/vr+m2/AYAxm/BLYx/Sl/vN/wbl+Y9gCoCKDP+Fk7/BQ+/1CEtWxAUJQAMBQSwlACedf+/e5y7gK4iBoBH5jD+zThTnHf7DN9HUNQA5Jc7Oxn/Bwz/TkGufWIEHRrA9C93LsV+F1/q4MB5fATBNA2givGvx+9qnn7/r33fMsfXACSASIkA1jH+yRye/iGUNIBaAYAAsLudADYx/nhOHvyOohz/m0I1gIAAMLCY8YfwrsfXvpexEEH9AWgA8sudn2X4kx6e/tNYgmA2AWgAYPxLsJEA3vTkwe+fuApBMgFoAFWMv5Dhd6CS4dP/DBYhSD4ADQB9kZWMfyRj40/iPsxDoAGkGQAIoEQAaxn9RAYCOIaPy6AaQGMCkF/ubMNG/MfB8P/AejQj0ADcBCAu4x/zLowiTNmfcTNaZUQNwH0A8g/ahBuxF+cTHP11bMen0CTjZS8ADWCmNqxGL57HeB0f2BzB09iI69CCQHgRgAZgKONafBs/xi9wBE/j53gQa7FMTnkjBGEYFpfKeQBKA1AagNIAlAagNAClASgNQGkASgNQGoDSANR/AWJ2EQGXgXEIAAAAAElFTkSuQmCC";
 
 
 
@@ -3696,21 +3785,16 @@ void CounterAdviseLastTurnAttemptedAdventurePHP(int turn)
     __last_turn_definitely_visited_adventure_php = turn;
 }
 
-boolean CounterWanderingMonsterMayHitInXTurns(int turns)
-{
-    foreach s in __wandering_monster_counter_names
-    {
-        if (CounterLookup(s).CounterExists() && CounterLookup(s).CounterMayHitInXTurns(turns))
-            return true;
-    }
-    if (get_property_int("_romanticFightsLeft") > 0 && !CounterLookup("Romantic Monster").CounterExists() && my_path_id() != PATH_ONE_CRAZY_RANDOM_SUMMER) //mafia will clear the romantic monster window if it goes out of bounds
-        return true;
-    return false;
-}
-
 boolean CounterWanderingMonsterMayHitNextTurn()
 {
     monster last_monster = get_property_monster("lastEncounter");
+    
+    if (my_path_id() == PATH_THE_SOURCE)
+    {
+        int interval = get_property_int("sourceInterval");
+        if (interval == 200 || interval == 400)
+            return true;
+    }
     
     if (__last_turn_definitely_visited_adventure_php == -1 && $monsters[Black Crayon Beast,Black Crayon Beetle,Black Crayon Constellation,Black Crayon Golem,Black Crayon Demon,Black Crayon Man,Black Crayon Elemental,Black Crayon Crimbo Elf,Black Crayon Fish,Black Crayon Goblin,Black Crayon Hippy,Black Crayon Hobo,Black Crayon Shambling Monstrosity,Black Crayon Manloid,Black Crayon Mer-kin,Black Crayon Frat Orc,Black Crayon Penguin,Black Crayon Pirate,Black Crayon Flower,Black Crayon Slime,Black Crayon Undead Thing,Black Crayon Spiraling Shape,angry bassist,blue-haired girl,evil ex-girlfriend,peeved roommate,random scenester] contains last_monster) //bit of a hack - if they just fought a hipster monster (hopefully not faxing it), then the wandering monster isn't up this turn. though... __last_turn_definitely_visited_adventure_php should handle that...
     {
@@ -3746,6 +3830,21 @@ boolean CounterWanderingMonsterMayHitNextTurn()
             return true;
         }
     }*/
+    return false;
+}
+
+
+boolean CounterWanderingMonsterMayHitInXTurns(int turns)
+{
+    if (CounterWanderingMonsterMayHitNextTurn())
+        return true;
+    foreach s in __wandering_monster_counter_names
+    {
+        if (CounterLookup(s).CounterExists() && CounterLookup(s).CounterMayHitInXTurns(turns))
+            return true;
+    }
+    //if (get_property_int("_romanticFightsLeft") > 0 && !CounterLookup("Romantic Monster").CounterExists() && my_path_id() != PATH_ONE_CRAZY_RANDOM_SUMMER) //mafia will clear the romantic monster window if it goes out of bounds
+        //return true;
     return false;
 }
 
@@ -4994,6 +5093,67 @@ string getClickableURLForLocationIfAvailable(location l)
         return "";
 }
 
+
+Record EquipmentStatRequirement
+{
+    stat requirement_stat;
+    int requirement_amount;
+};
+static
+{
+    EquipmentStatRequirement [item] __equipment_stat_requirements;
+}
+
+void initialiseEquipmentRequirements()
+{
+    if (__equipment_stat_requirements.count() > 0)
+        return;
+    Record equipment_txt_entry
+    {
+        int power;
+        string requirement;
+        string weapon_description;
+    };
+    equipment_txt_entry [item] entries;
+    file_to_map("data/equipment.txt", entries);
+    
+    foreach it, entry in entries
+    {
+        if (entry.requirement == "" || entry.requirement == "none")
+            continue;
+        int requirement_integer = entry.requirement.split_string(" ")[1].to_int_silent();
+        if (requirement_integer <= 0)
+            continue;
+        stat known_stat = $stat[none];
+        if (entry.requirement.contains_text("Mus: "))
+        {
+            known_stat = $stat[muscle];
+        }
+        else if (entry.requirement.contains_text("Mys: "))
+        {
+            known_stat = $stat[mysticality];
+        }
+        else if (entry.requirement.contains_text("Mox: "))
+        {
+            known_stat = $stat[moxie];
+        }
+        if (known_stat != $stat[none])
+        {
+            EquipmentStatRequirement requirement;
+            requirement.requirement_stat = known_stat;
+            requirement.requirement_amount = requirement_integer;
+            
+            __equipment_stat_requirements[it] = requirement;
+            //__equipment_stat_requirements[it][known_stat] = requirement_integer;
+        }
+    }
+}
+EquipmentStatRequirement StatRequirementForEquipment(item it)
+{
+    initialiseEquipmentRequirements();
+    return __equipment_stat_requirements[it];
+}
+
 string HTMLGenerateFutureTextByLocationAvailability(string base_text, location place)
 {
     if (!place.locationAvailable() && place != $location[none])
@@ -5006,6 +5166,52 @@ string HTMLGenerateFutureTextByLocationAvailability(string base_text, location p
 string HTMLGenerateFutureTextByLocationAvailability(location place)
 {
 	return HTMLGenerateFutureTextByLocationAvailability(place.to_string(), place);
+}
+
+
+
+boolean can_equip_replacement(item it)
+{
+    if (it.equipped_amount() > 0)
+        return true;
+    if (my_class() == $class[pastamancer])
+    {
+        //Bind Undead Elbow Macaroni -> equalises muscle
+        //Bind Penne Dreadful -> equalises moxie
+        EquipmentStatRequirement requirement = it.StatRequirementForEquipment();
+        
+        if (requirement.requirement_stat == $stat[none])
+            return true;
+        if (my_basestat(requirement.requirement_stat) >= requirement.requirement_amount)
+            return true;
+        if (requirement.requirement_stat == $stat[mysticality])
+            return false;
+        
+        if (requirement.requirement_stat == $stat[muscle])
+        {
+            if ($skill[bind undead elbow macaroni].have_skill() && my_basestat($stat[mysticality]) >= requirement.requirement_amount)
+                return true;
+        }
+        else if (requirement.requirement_stat == $stat[moxie])
+        {
+            if ($skill[Bind Penne Dreadful].have_skill() && my_basestat($stat[mysticality]) >= requirement.requirement_amount)
+                return true;
+        }
+    }
+    return it.can_equip();
+}
+
+boolean can_equip_outfit(string outfit_name)
+{
+    if (!have_outfit_components(outfit_name))
+        return false;
+    item [int] outfit_pieces = outfit_pieces(outfit_name);
+    foreach key, it in outfit_pieces
+    {
+        if (!it.can_equip_replacement())
+            return false;
+    }
+    return true;
 }
 
 
@@ -5612,6 +5818,7 @@ static
         building_images["plant up sea daisy"] = KOLImageMake("images/otherimages/friarplants/plant40.gif", Vec2iMake(64,100), RectMake(3, 6, 60, 92));
         building_images["sunflower face"] = KOLImageMake("images/otherimages/friarplants/plant40.gif", Vec2iMake(64,100), RectMake(6, 6, 58, 52));
         
+        building_images["ringing phone"] = KOLImageMake("images/otherimages/spookyraven/srphonering.gif", Vec2iMake(30, 51), RectMake(0, 16, 30, 46));
         
         building_images["basic hot dog"] = KOLImageMake("images/itemimages/jarl_regdog.gif", Vec2iMake(30,30));
         building_images["Island War Arena"] = KOLImageMake("images/otherimages/bigisland/6.gif", Vec2iMake(100,100), RectMake(17, 28, 89, 76));
@@ -20676,6 +20883,8 @@ void QMeatsmithInit()
 void QMeatsmithGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
 	QuestState base_quest_state = __quest_state["Meatsmith"];
+    if (base_quest_state.finished)
+        return;
     
     if (__last_adventure_location != $location[the skeleton store] || __last_adventure_location == $location[none])
         return;
@@ -20686,6 +20895,7 @@ void QMeatsmithGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
 	
 	string active_url = "place.php?whichplace=town_market";
     
+    boolean done = false;
     boolean have_reason_to_add = false;
     
 	if (!base_quest_state.started)
@@ -20708,6 +20918,9 @@ void QMeatsmithGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     else if (base_quest_state.mafia_internal_step == 2)
     {
         have_reason_to_add = true;
+        done = true;
+        subentry.entries.listAppend("Return to the meatsmith.");
+        active_url = "shop.php?whichshop=meatsmith";
     }
     
     if ($item[ring of telling skeletons what to do].item_amount() == 0)
@@ -20723,7 +20936,8 @@ void QMeatsmithGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         have_reason_to_add = true;
     }
     
-    subentry.entries.listAppend("Non-combat appears every fourth adventure."); //except the first time for some reason? needs spading
+    if (!done)
+        subentry.entries.listAppend("Non-combat appears every fourth adventure."); //except the first time for some reason? needs spading
     
     boolean [location] relevant_locations;
     relevant_locations[$location[the skeleton store]] = true;
@@ -26155,7 +26369,7 @@ Banish [int] BanishesActive()
         b.banish_turn_length = 0;
         if (__banish_source_length contains b.banish_source)
             b.banish_turn_length = __banish_source_length[b.banish_source];
-        if (b.banish_source == "batter up!" || b.banish_source == "deathchucks" || b.banish_source == "dirty stinkbomb" || b.banish_source == "nanorhino" || b.banish_source == "spooky music box mechanism" || b.banish_source == "ice hotel bell")
+        if (b.banish_source == "batter up!" || b.banish_source == "deathchucks" || b.banish_source == "dirty stinkbomb" || b.banish_source == "nanorhino" || b.banish_source == "spooky music box mechanism" || b.banish_source == "ice hotel bell" || b.banish_source == "beancannon")
             b.custom_reset_conditions = "rollover";
         result.listAppend(b);
     }
@@ -26861,6 +27075,75 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
         }
     }
 }
+//demonSummoned
+RegisterResourceGenerationFunction("SDemonSummonGenerateResource");
+void SDemonSummonGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if (!QuestState("questL11Manor").finished)
+        return;
+    if (get_property_boolean("demonSummoned"))
+        return;
+    //thin black candle >= 3
+    //scroll of ancient forbidden unspeakable evil
+    //FIXME suggest running intergnat?
+    
+    if ($item[thin black candle].available_amount() >= 3 && $item[scroll of ancient forbidden unspeakable evil].available_amount() + $item[scroll of ancient forbidden unspeakable evil].creatable_amount() > 0)
+    {
+        string [int] description;
+        string url = "place.php?whichplace=manor4&action=manor4_chamber";
+        
+        if ($item[thin black candle].item_amount() < 3 && $item[thin black candle].available_amount() >= 3)
+        {
+            description.listAppend("Pull 3 thin black candles.");
+            url = "";
+        }
+        if ($item[scroll of ancient forbidden unspeakable evil].available_amount() == 0 && $item[scroll of ancient forbidden unspeakable evil].creatable_amount() > 0)
+        {
+            description.listAppend("Create a scroll of scroll of ancient forbidden unspeakable evil.");
+            url = "";
+        }
+        
+        string [int][int] john;
+        //Prenatural greed.
+        string [string] demons;
+        demons["demonName2"] = "+100% meat";
+        if (lookupFamiliar("intergnat").familiar_is_usable())
+        {
+            if (!get_property("demonName12").contains_text("Neil")) //FIXME what if neil is on their friends list?
+            {
+                description.listAppend("Could run intergnat for demon name.");
+            }
+            else
+            {
+                if (my_level() == 11)
+                    demons["demonName12"] += "Antique machete, tomb ratchet, and cigarette lighter.";
+                else if (my_level() == 12)
+                    demons["demonName12"] += "Star chart.";
+                else if (my_level() == 13)
+                    demons["demonName12"] += "+50% init buff.";
+                else
+                    demons["demonName12"] += "1000 meat.";
+                demons["demonName12"] += "|+10% item, +20% meat, +50% init, +spell/weapon damage buff.";
+                if (my_familiar() != lookupFamiliar("intergnat"))
+                    demons["demonName12"] += "|Make sure to switch to your intergnat familiar before summoning.";
+            }
+        }
+        //Intergnat.
+        
+        foreach property, description in demons
+        {
+            string property_value = get_property(property);
+            if (property_value == "")
+                continue;
+            john.listAppend(listMake(property_value, description));
+        }
+        
+        if (john.count() > 0)
+            description.listAppend(HTMLGenerateSimpleTableLines(john));
+        
+        resource_entries.listAppend(ChecklistEntryMake("__item thin black candle", url, ChecklistSubentryMake("Demon summonable", "", description), 7));
+    }
+}
 
 void SetsInit()
 {
@@ -27029,11 +27312,20 @@ void generatePullList(Checklist [int] checklists)
         {
             pullable_item_list.listAppend(GPItemMake(lookupItem("basaltamander buckler"), "+25% to mainstat gain, offhand."));
             pullable_item_list.listAppend(GPItemMake(lookupItem("blue LavaCo Lamp&trade;"), "+5 adventures, 50 turns of +50% mainstat gain after rollover."));
+            if (my_path_id() == PATH_THE_SOURCE)
+            {
+                int amount = 3;
+                if (lookupItem("battle broom").available_amount() > 0)
+                    amount = 2;
+                pullable_item_list.listAppend(GPItemMake(lookupItem("wal-mart nametag"), "+4 mainstat/fight", amount));
+            }
         }
         else if (my_primestat() == $stat[moxie])
         {
             pullable_item_list.listAppend(GPItemMake($item[backwoods banjo], "+25% to mainstat gain, 2h weapon."));
             pullable_item_list.listAppend(GPItemMake(lookupItem("green LavaCo Lamp&trade;"), "+5 adventures, 50 turns of +50% mainstat gain after rollover."));
+            if (my_path_id() == PATH_THE_SOURCE)
+                pullable_item_list.listAppend(GPItemMake(lookupItem("wal-mart overalls"), "+4 mainstat/fight"));
         }
     }
 	
@@ -27416,7 +27708,14 @@ void generatePullList(Checklist [int] checklists)
     {
         pullable_item_list.listAppend(GPItemMake($item[power pill], "Saves one turn each.", pills_pullable));
     }
-	
+    if (my_meat() < 1000)
+        pullable_item_list.listAppend(GPItemMake($item[1\,970 carat gold], "Autosells for 19700 meat.|Not optimal in the slightest.", 1));
+	if ($skill[ancestral recall].have_skill() && my_adventures() < 10)
+    {
+        int casts = get_property_int("_ancestralRecallCasts");
+        if (casts < 10)
+            pullable_item_list.listAppend(GPItemMake($item[blue mana], "+3 adventures each.|Probably a bad idea.", clampi(10 - casts, 0, 10)));
+    }
 	
 	boolean currently_trendy = (my_path_id() == PATH_TRENDY);
 	foreach key in pullable_item_list
@@ -28326,7 +28625,7 @@ void setUpState()
 	//wand
 	
 	boolean wand_of_nagamar_needed = true;
-	if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_BUGBEAR_INVASION || my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_KOLHS || my_path_id() == PATH_HEAVY_RAINS || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_COMMUNITY_SERVICE)
+	if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_BUGBEAR_INVASION || my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_KOLHS || my_path_id() == PATH_HEAVY_RAINS || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_THE_SOURCE)
 		wand_of_nagamar_needed = false;
 		
 	int ruby_w_needed = 1;
@@ -30871,7 +31170,10 @@ void generateDailyResources(Checklist [int] checklists)
         else if (__misc_state_string["resting description"] == "Chateau Mantegna")
         {
             //FIXME what goes here
-            description.listAppend("HP/MP/stats.");
+            if (my_path_id() == PATH_THE_SOURCE)
+                description.listAppend("HP/MP.");
+            else
+                description.listAppend("HP/MP/stats.");
             if (my_level() < 9)
                 description.listAppend("May want to wait until level 9(?) for more stats from resting.");
             
@@ -35435,7 +35737,7 @@ string [string] generateAPIResponse()
     
     if (true)
     {
-        boolean [string] relevant_mafia_properties = $strings[merkinQuestPath,questF01Primordial,questF02Hyboria,questF03Future,questF04Elves,questF05Clancy,questG01Meatcar,questG02Whitecastle,questG03Ego,questG04Nemesis,questG05Dark,questG06Delivery,questI01Scapegoat,questI02Beat,questL02Larva,questL03Rat,questL04Bat,questL05Goblin,questL06Friar,questL07Cyrptic,questL08Trapper,questL09Topping,questL10Garbage,questL11MacGuffin,questL11Manor,questL11Palindome,questL11Pyramid,questL11Worship,questL12War,questL13Final,questM01Untinker,questM02Artist,questM03Bugbear,questM04Galaktic,questM05Toot,questM06Gourd,questM07Hammer,questM08Baker,questM09Rocks,questM10Azazel,questM11Postal,questM12Pirate,questM13Escape,questM14Bounty,questM15Lol,questS01OldGuy,questS02Monkees,sidequestArenaCompleted,sidequestFarmCompleted,sidequestJunkyardCompleted,sidequestLighthouseCompleted,sidequestNunsCompleted,sidequestOrchardCompleted,cyrptAlcoveEvilness,cyrptCrannyEvilness,cyrptNicheEvilness,cyrptNookEvilness,desertExploration,gnasirProgress,relayCounters,timesRested,currentEasyBountyItem,currentHardBountyItem,currentSpecialBountyItem,volcanoMaze1,_lastDailyDungeonRoom,seahorseName,chasmBridgeProgress,_aprilShower,lastAdventure,lastEncounter,_floristPlantsUsed,_fireStartingKitUsed,_psychoJarUsed,hiddenHospitalProgress,hiddenBowlingAlleyProgress,hiddenApartmentProgress,hiddenOfficeProgress,pyramidPosition,parasolUsed,_discoKnife,lastPlusSignUnlock,olfactedMonster,photocopyMonster,lastTempleUnlock,volcanoMaze1,blankOutUsed,peteMotorbikeCowling,peteMotorbikeGasTank,peteMotorbikeHeadlight,peteMotorbikeMuffler,peteMotorbikeSeat,peteMotorbikeTires,_petePeeledOut,_navelRunaways,_peteRiotIncited,_petePartyThrown,hiddenTavernUnlock,_dnaPotionsMade,_psychokineticHugUsed,dnaSyringe,_warbearGyrocopterUsed,questM20Necklace,questM21Dance,grimstoneMaskPath,cinderellaMinutesToMidnight,merkinVocabularyMastery,_pirateBellowUsed,questM21Dance,_defectiveTokenChecked,questG07Myst,questG08Moxie,questESpClipper,questESpGore,questESpJunglePun,questESpFakeMedium,questESlMushStash,questESlAudit,questESlBacteria,questESlCheeseburger,questESlCocktail,questESlSprinkles,questESlSalt,questESlFish,questESlDebt,_pickyTweezersUsed,_bittycar,questESpSerum,questESpOutOfOrder,_shrubDecorated,questESpEVE,questESpSmokes,questG09Muscle,_rapidPrototypingUsed,nsTowerDoorKeysUsed,_chateauDeskHarvested,lastGoofballBuy,nsChallenge1,nsChallenge2,nsContestants1,nsContestants2,nsContestants3,lastDesertUnlock,questM18Swamp,edPiece,warehouseProgress,questEStFishTrash,questEStNastyBears,questEStSocialJusticeI,questEStSocialJusticeII,questEStSuperLuber,questEStZippityDooDah,_summonAnnoyanceUsed,questEStWorkWithFood,questM24Doc,questEStGiveMeFuel,_mayoTankSoaked,_feastUsed,spelunkyNextNoncombat,spelunkySacrifices,spelunkyStatus,spelunkyUpgrades,spelunkyWinCount,_deckCardsDrawn,_glarkCableUses,_banderRunaways,questM25Armorer,pyramidBombUsed,_powerPillUses,nextAdventure,_barrelPrayer,questECoBucket,_machineTunnelsAdv,_snojoFreeFights,snojoSetting,_lastCombatStarted,batmanZone,batmanUpgrades,batmanTimeLeft,batmanStats,questLTTQuestByWire];
+        boolean [string] relevant_mafia_properties = $strings[merkinQuestPath,questF01Primordial,questF02Hyboria,questF03Future,questF04Elves,questF05Clancy,questG01Meatcar,questG02Whitecastle,questG03Ego,questG04Nemesis,questG05Dark,questG06Delivery,questI01Scapegoat,questI02Beat,questL02Larva,questL03Rat,questL04Bat,questL05Goblin,questL06Friar,questL07Cyrptic,questL08Trapper,questL09Topping,questL10Garbage,questL11MacGuffin,questL11Manor,questL11Palindome,questL11Pyramid,questL11Worship,questL12War,questL13Final,questM01Untinker,questM02Artist,questM03Bugbear,questM04Galaktic,questM05Toot,questM06Gourd,questM07Hammer,questM08Baker,questM09Rocks,questM10Azazel,questM11Postal,questM12Pirate,questM13Escape,questM14Bounty,questM15Lol,questS01OldGuy,questS02Monkees,sidequestArenaCompleted,sidequestFarmCompleted,sidequestJunkyardCompleted,sidequestLighthouseCompleted,sidequestNunsCompleted,sidequestOrchardCompleted,cyrptAlcoveEvilness,cyrptCrannyEvilness,cyrptNicheEvilness,cyrptNookEvilness,desertExploration,gnasirProgress,relayCounters,timesRested,currentEasyBountyItem,currentHardBountyItem,currentSpecialBountyItem,volcanoMaze1,_lastDailyDungeonRoom,seahorseName,chasmBridgeProgress,_aprilShower,lastAdventure,lastEncounter,_floristPlantsUsed,_fireStartingKitUsed,_psychoJarUsed,hiddenHospitalProgress,hiddenBowlingAlleyProgress,hiddenApartmentProgress,hiddenOfficeProgress,pyramidPosition,parasolUsed,_discoKnife,lastPlusSignUnlock,olfactedMonster,photocopyMonster,lastTempleUnlock,volcanoMaze1,blankOutUsed,peteMotorbikeCowling,peteMotorbikeGasTank,peteMotorbikeHeadlight,peteMotorbikeMuffler,peteMotorbikeSeat,peteMotorbikeTires,_petePeeledOut,_navelRunaways,_peteRiotIncited,_petePartyThrown,hiddenTavernUnlock,_dnaPotionsMade,_psychokineticHugUsed,dnaSyringe,_warbearGyrocopterUsed,questM20Necklace,questM21Dance,grimstoneMaskPath,cinderellaMinutesToMidnight,merkinVocabularyMastery,_pirateBellowUsed,questM21Dance,_defectiveTokenChecked,questG07Myst,questG08Moxie,questESpClipper,questESpGore,questESpJunglePun,questESpFakeMedium,questESlMushStash,questESlAudit,questESlBacteria,questESlCheeseburger,questESlCocktail,questESlSprinkles,questESlSalt,questESlFish,questESlDebt,_pickyTweezersUsed,_bittycar,questESpSerum,questESpOutOfOrder,_shrubDecorated,questESpEVE,questESpSmokes,questG09Muscle,_rapidPrototypingUsed,nsTowerDoorKeysUsed,_chateauDeskHarvested,lastGoofballBuy,nsChallenge1,nsChallenge2,nsContestants1,nsContestants2,nsContestants3,lastDesertUnlock,questM18Swamp,edPiece,warehouseProgress,questEStFishTrash,questEStNastyBears,questEStSocialJusticeI,questEStSocialJusticeII,questEStSuperLuber,questEStZippityDooDah,_summonAnnoyanceUsed,questEStWorkWithFood,questM24Doc,questEStGiveMeFuel,_mayoTankSoaked,_feastUsed,spelunkyNextNoncombat,spelunkySacrifices,spelunkyStatus,spelunkyUpgrades,spelunkyWinCount,_deckCardsDrawn,_glarkCableUses,_banderRunaways,questM25Armorer,pyramidBombUsed,_powerPillUses,nextAdventure,_barrelPrayer,questECoBucket,_machineTunnelsAdv,_snojoFreeFights,snojoSetting,_lastCombatStarted,batmanZone,batmanUpgrades,batmanTimeLeft,batmanStats,questLTTQuestByWire,questM26Oracle];
         
         if (false)
         {
@@ -35466,7 +35768,7 @@ string [string] generateAPIResponse()
         }
         result["logged in"] = playerIsLoggedIn();
     }
-    if (my_path_id() == PATH_AVATAR_OF_WEST_OF_LOATHING || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE)
+    if (my_path_id() == PATH_AVATAR_OF_WEST_OF_LOATHING || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_THE_SOURCE)
     {
         int skill_count = 0;
         foreach s in $skills[]
@@ -39415,7 +39717,7 @@ void IOTMTelegraphOfficeGenerateResource(ChecklistEntry [int] resource_entries)
         //8 - umm... maybe the extreme slow? unimportant?
         //9 - twin peak
         //10 - top/bottom of the castle, best place in the game(?)
-        //11 - copperhead, protestors, probably not the hidden city?, hidden temple but marginal, palindome but marginal, pyramid in situations where you can't run lots of +item, poop deck, haunted billiards room, haunted bathroom
+        //11 - copperhead, protestors, fun hidden city exploit, hidden temple but marginal, palindome but marginal, pyramid in situations where you can't run lots of +item, poop deck, haunted billiards room, haunted bathroom
         //12 - starting the war(??)
         
         //2 - mosquito - not terribly important
@@ -39443,9 +39745,38 @@ void IOTMTelegraphOfficeGenerateResource(ChecklistEntry [int] resource_entries)
     }
     
     //skills:
-    //_bowleggedSwaggerUsed
+    //Bow-Legged Swagger -> _bowleggedSwaggerUsed
+    //Bend Hell -> _bendHellUsed
+    //Steely-Eyed Squint -> _steelyEyedSquintUsed
     //bend hell - double elemental damage/elemental spell damage
-    //
+    if (true)
+    {
+        string [skill] telegraph_skill_properties;
+        telegraph_skill_properties[lookupSkill("Bow-Legged Swagger")] = "_bowleggedSwaggerUsed";
+        telegraph_skill_properties[lookupSkill("Bend Hell")] = "_bendHellUsed";
+        telegraph_skill_properties[lookupSkill("Steely-Eyed Squint")] = "_steelyEyedSquintUsed";
+        
+        string [skill] telegraph_skill_descriptions;
+        telegraph_skill_descriptions[lookupSkill("Bow-Legged Swagger")] = "Double +initiative and physical damage. Once/day.";
+        telegraph_skill_descriptions[lookupSkill("Bend Hell")] = "Double elemental damage/elemental spell damage. Once/day.";
+        telegraph_skill_descriptions[lookupSkill("Steely-Eyed Squint")] = "Double +item. Once/day.";
+        
+        string image_name;
+        ChecklistSubentry [int] subentries;
+        foreach s, property in telegraph_skill_properties
+        {
+            if (!s.have_skill())
+                continue;
+            if (get_property_boolean(property))
+                continue;
+            
+            if (image_name == "")
+                image_name = "__skill " + s;
+            subentries.listAppend(ChecklistSubentryMake(s + " castable", "", telegraph_skill_descriptions[s]));
+        }
+        if (subentries.count() > 0)
+            resource_entries.listAppend(ChecklistEntryMake(image_name, "skillz.php", subentries, 9));
+    }
 }
 RegisterResourceGenerationFunction("IOTMWitchessGenerateResource");
 void IOTMWitchessGenerateResource(ChecklistEntry [int] resource_entries)
@@ -41530,6 +41861,178 @@ void PathWOTSFGenerateResource(ChecklistEntry [int] resource_entries)
 		resource_entries.listAppend(ChecklistEntryMake("__item Teachings of the Fist", "", ChecklistSubentryMake("Teachings of the Fist", "", "Found in " + missing_areas.listJoinComponents(", ", "and") + "."), 5));
 		
 }
+RegisterTaskGenerationFunction("PathTheSourceGenerateTasks");
+void PathTheSourceGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+	if (my_path_id() != PATH_THE_SOURCE)
+		return;
+    if (!mafiaIsPastRevision(16944))
+        return;
+    
+    /*
+    questM26Oracle
+    sourceOracleTarget
+    sourceAgentsDefeated
+    sourceEnlightenment
+    sourcePoints
+    */
+    
+    int enlightenment = get_property_int("sourceEnlightenment");
+    int learned_skill_count = 0;
+    foreach s in lookupSkills("Overclocked,Bullet Time,True Disbeliever,Code Block,Disarmament,Big Guns,Humiliating Hack,Source Kick,Reboot,Restore,Data Siphon")
+    {
+        if (s.have_skill())
+            learned_skill_count += 1;
+    }
+    if (enlightenment > 0 && learned_skill_count < 11)
+    {
+        string [int] description;
+        
+        skill [int] desired_skill_order;
+        desired_skill_order.listAppend(lookupSkill("Big Guns")); //tons of damage
+        desired_skill_order.listAppend(lookupSkill("Humiliating Hack")); //delevel a bunch
+        desired_skill_order.listAppend(lookupSkill("Data Siphon")); //restore MP from attacks
+        desired_skill_order.listAppend(lookupSkill("Overclocked")); //+init
+        desired_skill_order.listAppend(lookupSkill("Source Kick")); //also a lot of damage...?
+        
+        desired_skill_order.listAppend(lookupSkill("Restore")); //restore HP
+        desired_skill_order.listAppend(lookupSkill("Bullet Time")); //dodge 3 ranged
+        desired_skill_order.listAppend(lookupSkill("True Disbeliever")); //dodge 3 hack
+        desired_skill_order.listAppend(lookupSkill("Code Block")); //dodge 3 melee
+        
+        desired_skill_order.listAppend(lookupSkill("Disarmament")); //something
+        desired_skill_order.listAppend(lookupSkill("Reboot")); //removes latency
+        
+        foreach key, s in desired_skill_order
+        {
+            if (!s.have_skill())
+            {
+                description.listAppend("Maybe " + s + " next.");
+                break;
+            }
+        }
+        
+        task_entries.listAppend(ChecklistEntryMake("ringing phone", "place.php?whichplace=manor1&action=manor1_sourcephone_ring", ChecklistSubentryMake("Learn source skill", "", description), -11));
+    }
+    
+    if (enlightenment + learned_skill_count < 11)
+    {
+        boolean later = false;
+        string title = "";
+        string [int] description;
+        string url = "";
+        string target = get_property("sourceOracleTarget");
+        location target_location = target.to_location();
+        if (lookupItem("no spoon").available_amount() > 0)
+        {
+            title = "Return to the Oracle";
+            url = "place.php?whichplace=town_wrong&action=townwrong_oracle";
+        }
+        else if (target == "" || !QuestState("questM26Oracle").started)
+        {
+            title = "Visit the Oracle";
+            url = "place.php?whichplace=town_wrong&action=townwrong_oracle";
+            string line = "If you want another source skill.";
+            if (learned_skill_count > 0)
+                line += " (have " + learned_skill_count + " so far.)";
+            description.listAppend(line);
+        }
+        else if (target_location != $location[none])
+        {
+            title = "Oracle Quest";
+            url = target_location.getClickableURLForLocation();
+            if (!target_location.locationAvailable())
+            {
+                later = true;
+                title += " later";
+                if (target_location == $location[the skeleton store])
+                {
+                    later = false;
+                    title = "Start the skeleton store quest";
+                    description.listAppend("Visit the meatsmith.");
+                    url = "shop.php?whichshop=meatsmith&action=talk";
+                }
+                else if (target_location == $location[madness bakery])
+                {
+                    later = false;
+                    title = "Start the madness bakery quest";
+                    description.listAppend("Visit the Armory and Leggery.");
+                    url = "shop.php?whichshop=armory&action=talk";
+                }
+                else if (target_location == $location[the overgrown lot])
+                {
+                    later = false;
+                    title = "Start the Galaktik quest";
+                    description.listAppend("Visit Doc Galaktik.");
+                    url = "shop.php?whichshop=doc&action=talk";
+                }
+                description.listAppend("Unlock " + target_location + " first.");
+            }
+            else
+            {
+                description.listAppend("Adventure in " + target_location + ".");
+                description.listAppend("No spoon unappears after eleven combat turns.");
+            }
+        }
+        
+        if (title != "")
+        {
+            ChecklistEntry entry = ChecklistEntryMake("__item cookie cookie", url, ChecklistSubentryMake(title, "", description), -1);
+            if (target_location != $location[none] && target_location == __last_adventure_location)
+                entry.should_highlight = true;
+            if (later)
+                future_task_entries.listAppend(entry);
+            else
+                optional_task_entries.listAppend(entry);
+        }
+    }
+    
+    int source_interval = get_property_int("sourceInterval");
+    if (source_interval == 200 || source_interval == 400)
+    {
+        string [int] description;
+        if (monster_level_adjustment() > 0)
+            description.listAppend("Possibly remove +ML.");
+        //FIXME mention init, stats
+        
+        string stat_description;
+        
+        if (get_property_int("sourceAgentsDefeated") > 0)
+            stat_description += pluralise(get_property_int("sourceAgentsDefeated"), "agent", "agents") + " defeated so far. ";
+        stat_description += lookupMonster("Source agent").base_attack + " attack.";
+        float our_init = initiative_modifier();
+        if (lookupSkill("Overclocked").have_skill())
+            our_init += 200;
+        float chance_to_get_jump = clampf(100 - lookupMonster("Source Agent").base_initiative + our_init, 0.0, 100.0);
+        if (chance_to_get_jump >= 100.0)
+            stat_description += "|Will gain initiative on agent.";
+        else if (chance_to_get_jump <= 0.0)
+            stat_description += "|Will not gain initiative on agent.";
+        else
+            stat_description += "|" + round(chance_to_get_jump) + "% chance to gain initiative on agent.";
+        description.listAppend(stat_description);
+        if (__last_adventure_location == $location[the haunted bedroom])
+            description.listAppend("Won't appear in the haunted bedroom, so may want to go somewhere else?");
+        task_entries.listAppend(ChecklistEntryMake("__item software glitch", "", ChecklistSubentryMake("Source agent now or soon", "", description), -11));
+    }
+    else if (source_interval > 0)
+    {
+        string [int] description;
+        int turns = (source_interval - 400) / 200;
+        if (get_property_int("sourceAgentsDefeated") > 0)
+            description.listAppend(pluralise(get_property_int("sourceAgentsDefeated"), "agent", "agents") + " defeated so far.");
+        if (QuestState("questM26Oracle").in_progress)
+            description.listAppend("Oracle quests won't advance the counter.");
+        optional_task_entries.listAppend(ChecklistEntryMake("__item software glitch", "", ChecklistSubentryMake("Source agent after ~" + pluralise(turns, "won combat", "won combats"), "", description)));
+    }
+}
+
+RegisterResourceGenerationFunction("PathTheSourceGenerateResource");
+void PathTheSourceGenerateResource(ChecklistEntry [int] resource_entries)
+{
+	if (my_path_id() != PATH_THE_SOURCE)
+		return;
+}
 
 
 void runMain(string relay_filename)
@@ -41546,6 +42049,13 @@ void runMain(string relay_filename)
 	{
 		output_body_tag_only = true;
 	}
+    else if (form_fields["set user preferences"] != "")
+    {
+        processSetUserPreferences(form_fields);
+        return;
+    }
+    else if (form_fields.count() > 0)
+        print_html("Form fields: " + form_fields.to_json());
 	
 	if (__setting_debug_mode && __setting_debug_enable_example_mode_in_aftercore && get_property_boolean("kingLiberated"))
 	{
@@ -41708,6 +42218,36 @@ void runMain(string relay_filename)
             PageWrite(HTMLGenerateDivOfStyle(HTMLGenerateTagPrefix("img", image_map), "max-height:0px;width:100%;text-align:right;"));
         }
     }
+    boolean matrix_enabled = false;
+    if (my_path_id() == PATH_THE_SOURCE || $familiars[dataspider,Baby Bugged Bugbear] contains my_familiar())
+    {
+        matrix_enabled = !PreferenceGetBoolean("matrix disabled");
+        if (true)
+        {
+            //We support disabling this feature, largely because it causes someone's browser to crash. Probably bad RAM.
+            //I personally consider that to be a path-appropriate feature, but...
+            string [string] image_map;
+            image_map["width"] = "16";
+            image_map["height"] = "16";
+            image_map["class"] = "r_button";
+            image_map["id"] = "button_refresh";
+            image_map["style"] = "position:relative;top:-16px;left:3px;visibility:visible;";
+            if (matrix_enabled)
+            {
+                image_map["src"] = __red_pill_image;
+                image_map["onclick"] = "setMatrixStatus(true)";
+                image_map["alt"] = "Matrix enabled";
+            }
+            else
+            {
+                image_map["src"] = __blue_pill_image;
+                image_map["onclick"] = "setMatrixStatus(false)";
+                image_map["alt"] = "Matrix disabled";
+            }
+            image_map["title"] = image_map["alt"];
+            PageWrite(HTMLGenerateDivOfStyle(HTMLGenerateTagPrefix("img", image_map), "max-height:0px;width:100%;text-align:left;"));
+        }
+    }
     
 	PageWrite("</div>");
 	PageWrite("</div>");
@@ -41723,13 +42263,12 @@ void runMain(string relay_filename)
     }
     PageWriteHead("<script type=\"text/javascript\" src=\"relay_Guide.js\"></script>");
     
-    
-    if (my_path_id() == PATH_THE_SOURCE || $familiars[dataspider,Baby Bugged Bugbear] contains my_familiar())
+    if (matrix_enabled)
     {
         PageWrite(HTMLGenerateTagPrefix("div", mapMake("style", "opacity:0;visibility:hidden;background:black;position:fixed;top:0;left:0;z-index:303;width:100%;height:100%;", "id", "matrix_canvas_holder", "onclick", "matrixStopAnimation();", "onmousemove", "matrixStopAnimation();")));
         PageWrite(HTMLGenerateTagWrap("canvas", "", mapMake("width", "1", "height", "1", "id", "matrix_canvas", "style", "")));
         PageWrite("</div>");
-        PageWrite(HTMLGenerateTagPrefix("img", mapMake("src", __matrix_glyphs, "id", "matrix_glyphs", "style", "display:none")));
+        PageWrite(HTMLGenerateTagPrefix("img", mapMake("src", __matrix_glyphs, "id", "matrix_glyphs", "style", "display:none;")));
     }
     
     if (drunk)
