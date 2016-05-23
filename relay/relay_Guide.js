@@ -770,7 +770,8 @@ function recalculateTimerInterval()
     if (__matrix_last_event_time == undefined)
     	__matrix_last_event_time = timeInMilliseconds();
     var seconds_since_last_matrix_event = (timeInMilliseconds() - __matrix_last_event_time) / 1000.0;
-    if (Math.min(seconds_since_last_reload, seconds_since_last_matrix_event) > 5 * 60 && !__matrix_animating)
+    var matrix_activation_time = 5 * 60;
+    if (Math.min(seconds_since_last_reload, seconds_since_last_matrix_event) > matrix_activation_time && !__matrix_animating)
         matrixStartAnimation();
 }
 
@@ -978,4 +979,15 @@ function alterLocationPopupBarVisibility(event, visibility)
         blackout_box.style.opacity = 0.0;
         popup_box.style.bottom = "-" + popup_box.clientHeight + "px";
     }
+}
+
+function setMatrixStatus(status)
+{
+	var request = new XMLHttpRequest();
+	var form_data = "set user preferences=true&matrix disabled=" + status;
+	
+	request.open("POST", __guide_ash_url, false);
+	request.send(form_data);
+    
+    document.location.reload(true);
 }
