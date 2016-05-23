@@ -1,5 +1,6 @@
 import "relay/Guide/Settings.ash"
 import "relay/Guide/Support/Library.ash"
+import "relay/Guide/Sections/User Preferences.ash"
 import "relay/Guide/Support/Statics.ash"
 import "relay/Guide/Support/List.ash"
 import "relay/Guide/Sections/Globals.ash"
@@ -38,6 +39,13 @@ void runMain(string relay_filename)
 	{
 		output_body_tag_only = true;
 	}
+    else if (form_fields["set user preferences"] != "")
+    {
+        processSetUserPreferences(form_fields);
+        return;
+    }
+    else if (form_fields.count() > 0)
+        print_html("Form fields: " + form_fields.to_json());
 	
 	if (__setting_debug_mode && __setting_debug_enable_example_mode_in_aftercore && get_property_boolean("kingLiberated"))
 	{
@@ -200,6 +208,36 @@ void runMain(string relay_filename)
             PageWrite(HTMLGenerateDivOfStyle(HTMLGenerateTagPrefix("img", image_map), "max-height:0px;width:100%;text-align:right;"));
         }
     }
+    boolean matrix_enabled = false;
+    if (my_path_id() == PATH_THE_SOURCE || $familiars[dataspider,Baby Bugged Bugbear] contains my_familiar())
+    {
+        matrix_enabled = !PreferenceGetBoolean("matrix disabled");
+        if (true)
+        {
+            //We support disabling this feature, largely because it causes someone's browser to crash. Probably bad RAM.
+            //I personally consider that to be a path-appropriate feature, but...
+            string [string] image_map;
+            image_map["width"] = "16";
+            image_map["height"] = "16";
+            image_map["class"] = "r_button";
+            image_map["id"] = "button_refresh";
+            image_map["style"] = "position:relative;top:-16px;left:3px;visibility:visible;";
+            if (matrix_enabled)
+            {
+                image_map["src"] = __red_pill_image;
+                image_map["onclick"] = "setMatrixStatus(true)";
+                image_map["alt"] = "Matrix enabled";
+            }
+            else
+            {
+                image_map["src"] = __blue_pill_image;
+                image_map["onclick"] = "setMatrixStatus(false)";
+                image_map["alt"] = "Matrix disabled";
+            }
+            image_map["title"] = image_map["alt"];
+            PageWrite(HTMLGenerateDivOfStyle(HTMLGenerateTagPrefix("img", image_map), "max-height:0px;width:100%;text-align:left;"));
+        }
+    }
     
 	PageWrite("</div>");
 	PageWrite("</div>");
@@ -215,13 +253,12 @@ void runMain(string relay_filename)
     }
     PageWriteHead("<script type=\"text/javascript\" src=\"relay_Guide.js\"></script>");
     
-    
-    if (my_path_id() == PATH_THE_SOURCE || $familiars[dataspider,Baby Bugged Bugbear] contains my_familiar())
+    if (matrix_enabled)
     {
         PageWrite(HTMLGenerateTagPrefix("div", mapMake("style", "opacity:0;visibility:hidden;background:black;position:fixed;top:0;left:0;z-index:303;width:100%;height:100%;", "id", "matrix_canvas_holder", "onclick", "matrixStopAnimation();", "onmousemove", "matrixStopAnimation();")));
         PageWrite(HTMLGenerateTagWrap("canvas", "", mapMake("width", "1", "height", "1", "id", "matrix_canvas", "style", "")));
         PageWrite("</div>");
-        PageWrite(HTMLGenerateTagPrefix("img", mapMake("src", __matrix_glyphs, "id", "matrix_glyphs", "style", "display:none")));
+        PageWrite(HTMLGenerateTagPrefix("img", mapMake("src", __matrix_glyphs, "id", "matrix_glyphs", "style", "display:none;")));
     }
     
     if (drunk)

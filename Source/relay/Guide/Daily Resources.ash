@@ -286,7 +286,10 @@ void generateDailyResources(Checklist [int] checklists)
         else if (__misc_state_string["resting description"] == "Chateau Mantegna")
         {
             //FIXME what goes here
-            description.listAppend("HP/MP/stats.");
+            if (my_path_id() == PATH_THE_SOURCE)
+                description.listAppend("HP/MP.");
+            else
+                description.listAppend("HP/MP/stats.");
             if (my_level() < 9)
                 description.listAppend("May want to wait until level 9(?) for more stats from resting.");
             

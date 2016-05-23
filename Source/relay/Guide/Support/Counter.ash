@@ -366,21 +366,16 @@ void CounterAdviseLastTurnAttemptedAdventurePHP(int turn)
     __last_turn_definitely_visited_adventure_php = turn;
 }
 
-boolean CounterWanderingMonsterMayHitInXTurns(int turns)
-{
-    foreach s in __wandering_monster_counter_names
-    {
-        if (CounterLookup(s).CounterExists() && CounterLookup(s).CounterMayHitInXTurns(turns))
-            return true;
-    }
-    if (get_property_int("_romanticFightsLeft") > 0 && !CounterLookup("Romantic Monster").CounterExists() && my_path_id() != PATH_ONE_CRAZY_RANDOM_SUMMER) //mafia will clear the romantic monster window if it goes out of bounds
-        return true;
-    return false;
-}
-
 boolean CounterWanderingMonsterMayHitNextTurn()
 {
     monster last_monster = get_property_monster("lastEncounter");
+    
+    if (my_path_id() == PATH_THE_SOURCE)
+    {
+        int interval = get_property_int("sourceInterval");
+        if (interval == 200 || interval == 400)
+            return true;
+    }
     
     if (__last_turn_definitely_visited_adventure_php == -1 && $monsters[Black Crayon Beast,Black Crayon Beetle,Black Crayon Constellation,Black Crayon Golem,Black Crayon Demon,Black Crayon Man,Black Crayon Elemental,Black Crayon Crimbo Elf,Black Crayon Fish,Black Crayon Goblin,Black Crayon Hippy,Black Crayon Hobo,Black Crayon Shambling Monstrosity,Black Crayon Manloid,Black Crayon Mer-kin,Black Crayon Frat Orc,Black Crayon Penguin,Black Crayon Pirate,Black Crayon Flower,Black Crayon Slime,Black Crayon Undead Thing,Black Crayon Spiraling Shape,angry bassist,blue-haired girl,evil ex-girlfriend,peeved roommate,random scenester] contains last_monster) //bit of a hack - if they just fought a hipster monster (hopefully not faxing it), then the wandering monster isn't up this turn. though... __last_turn_definitely_visited_adventure_php should handle that...
     {
@@ -416,6 +411,21 @@ boolean CounterWanderingMonsterMayHitNextTurn()
             return true;
         }
     }*/
+    return false;
+}
+
+
+boolean CounterWanderingMonsterMayHitInXTurns(int turns)
+{
+    if (CounterWanderingMonsterMayHitNextTurn())
+        return true;
+    foreach s in __wandering_monster_counter_names
+    {
+        if (CounterLookup(s).CounterExists() && CounterLookup(s).CounterMayHitInXTurns(turns))
+            return true;
+    }
+    //if (get_property_int("_romanticFightsLeft") > 0 && !CounterLookup("Romantic Monster").CounterExists() && my_path_id() != PATH_ONE_CRAZY_RANDOM_SUMMER) //mafia will clear the romantic monster window if it goes out of bounds
+        //return true;
     return false;
 }
 

@@ -18,6 +18,8 @@ void QMeatsmithInit()
 void QMeatsmithGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
 	QuestState base_quest_state = __quest_state["Meatsmith"];
+    if (base_quest_state.finished)
+        return;
     
     if (__last_adventure_location != $location[the skeleton store] || __last_adventure_location == $location[none])
         return;
@@ -28,6 +30,7 @@ void QMeatsmithGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
 	
 	string active_url = "place.php?whichplace=town_market";
     
+    boolean done = false;
     boolean have_reason_to_add = false;
     
 	if (!base_quest_state.started)
@@ -50,6 +53,9 @@ void QMeatsmithGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     else if (base_quest_state.mafia_internal_step == 2)
     {
         have_reason_to_add = true;
+        done = true;
+        subentry.entries.listAppend("Return to the meatsmith.");
+        active_url = "shop.php?whichshop=meatsmith";
     }
     
     if ($item[ring of telling skeletons what to do].item_amount() == 0)
@@ -65,7 +71,8 @@ void QMeatsmithGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         have_reason_to_add = true;
     }
     
-    subentry.entries.listAppend("Non-combat appears every fourth adventure."); //except the first time for some reason? needs spading
+    if (!done)
+        subentry.entries.listAppend("Non-combat appears every fourth adventure."); //except the first time for some reason? needs spading
     
     boolean [location] relevant_locations;
     relevant_locations[$location[the skeleton store]] = true;

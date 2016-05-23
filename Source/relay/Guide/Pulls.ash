@@ -110,11 +110,20 @@ void generatePullList(Checklist [int] checklists)
         {
             pullable_item_list.listAppend(GPItemMake(lookupItem("basaltamander buckler"), "+25% to mainstat gain, offhand."));
             pullable_item_list.listAppend(GPItemMake(lookupItem("blue LavaCo Lamp&trade;"), "+5 adventures, 50 turns of +50% mainstat gain after rollover."));
+            if (my_path_id() == PATH_THE_SOURCE)
+            {
+                int amount = 3;
+                if (lookupItem("battle broom").available_amount() > 0)
+                    amount = 2;
+                pullable_item_list.listAppend(GPItemMake(lookupItem("wal-mart nametag"), "+4 mainstat/fight", amount));
+            }
         }
         else if (my_primestat() == $stat[moxie])
         {
             pullable_item_list.listAppend(GPItemMake($item[backwoods banjo], "+25% to mainstat gain, 2h weapon."));
             pullable_item_list.listAppend(GPItemMake(lookupItem("green LavaCo Lamp&trade;"), "+5 adventures, 50 turns of +50% mainstat gain after rollover."));
+            if (my_path_id() == PATH_THE_SOURCE)
+                pullable_item_list.listAppend(GPItemMake(lookupItem("wal-mart overalls"), "+4 mainstat/fight"));
         }
     }
 	
@@ -497,7 +506,14 @@ void generatePullList(Checklist [int] checklists)
     {
         pullable_item_list.listAppend(GPItemMake($item[power pill], "Saves one turn each.", pills_pullable));
     }
-	
+    if (my_meat() < 1000)
+        pullable_item_list.listAppend(GPItemMake($item[1\,970 carat gold], "Autosells for 19700 meat.|Not optimal in the slightest.", 1));
+	if ($skill[ancestral recall].have_skill() && my_adventures() < 10)
+    {
+        int casts = get_property_int("_ancestralRecallCasts");
+        if (casts < 10)
+            pullable_item_list.listAppend(GPItemMake($item[blue mana], "+3 adventures each.|Probably a bad idea.", clampi(10 - casts, 0, 10)));
+    }
 	
 	boolean currently_trendy = (my_path_id() == PATH_TRENDY);
 	foreach key in pullable_item_list

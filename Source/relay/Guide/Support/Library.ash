@@ -484,12 +484,12 @@ item [int] missing_outfit_components(string outfit_name)
     return missing_components;
 }
 
+
 //have_outfit() will tell you if you have an outfit, but only if you pass stat checks. This does not stat check:
 boolean have_outfit_components(string outfit_name)
 {
     return (outfit_name.missing_outfit_components().count() == 0);
 }
-
 
 string [int] __int_to_wordy_map;
 string int_to_wordy(int v) //Not complete, only supports a handful:
@@ -1354,7 +1354,7 @@ int nextLibramSummonMPCost()
 
 int equippable_amount(item it)
 {
-    if (!it.can_equip()) return 0;
+    if (!it.can_equip()) return it.equipped_amount();
     if (it.available_amount() == 0) return 0;
     if ($slots[acc1, acc2, acc3] contains it.to_slot() && it.available_amount() > 1 && !it.boolean_modifier("Single equip"))
         return MIN(3, it.available_amount());

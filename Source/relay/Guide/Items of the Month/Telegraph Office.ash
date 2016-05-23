@@ -183,7 +183,7 @@ void IOTMTelegraphOfficeGenerateResource(ChecklistEntry [int] resource_entries)
         //8 - umm... maybe the extreme slow? unimportant?
         //9 - twin peak
         //10 - top/bottom of the castle, best place in the game(?)
-        //11 - copperhead, protestors, probably not the hidden city?, hidden temple but marginal, palindome but marginal, pyramid in situations where you can't run lots of +item, poop deck, haunted billiards room, haunted bathroom
+        //11 - copperhead, protestors, fun hidden city exploit, hidden temple but marginal, palindome but marginal, pyramid in situations where you can't run lots of +item, poop deck, haunted billiards room, haunted bathroom
         //12 - starting the war(??)
         
         //2 - mosquito - not terribly important
@@ -211,7 +211,36 @@ void IOTMTelegraphOfficeGenerateResource(ChecklistEntry [int] resource_entries)
     }
     
     //skills:
-    //_bowleggedSwaggerUsed
+    //Bow-Legged Swagger -> _bowleggedSwaggerUsed
+    //Bend Hell -> _bendHellUsed
+    //Steely-Eyed Squint -> _steelyEyedSquintUsed
     //bend hell - double elemental damage/elemental spell damage
-    //
+    if (true)
+    {
+        string [skill] telegraph_skill_properties;
+        telegraph_skill_properties[lookupSkill("Bow-Legged Swagger")] = "_bowleggedSwaggerUsed";
+        telegraph_skill_properties[lookupSkill("Bend Hell")] = "_bendHellUsed";
+        telegraph_skill_properties[lookupSkill("Steely-Eyed Squint")] = "_steelyEyedSquintUsed";
+        
+        string [skill] telegraph_skill_descriptions;
+        telegraph_skill_descriptions[lookupSkill("Bow-Legged Swagger")] = "Double +initiative and physical damage. Once/day.";
+        telegraph_skill_descriptions[lookupSkill("Bend Hell")] = "Double elemental damage/elemental spell damage. Once/day.";
+        telegraph_skill_descriptions[lookupSkill("Steely-Eyed Squint")] = "Double +item. Once/day.";
+        
+        string image_name;
+        ChecklistSubentry [int] subentries;
+        foreach s, property in telegraph_skill_properties
+        {
+            if (!s.have_skill())
+                continue;
+            if (get_property_boolean(property))
+                continue;
+            
+            if (image_name == "")
+                image_name = "__skill " + s;
+            subentries.listAppend(ChecklistSubentryMake(s + " castable", "", telegraph_skill_descriptions[s]));
+        }
+        if (subentries.count() > 0)
+            resource_entries.listAppend(ChecklistEntryMake(image_name, "skillz.php", subentries, 9));
+    }
 }
