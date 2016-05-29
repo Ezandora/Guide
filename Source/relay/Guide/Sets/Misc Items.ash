@@ -1241,4 +1241,14 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         //description.listAppend("Modulus " + modulus + ".");
         resource_entries.listAppend(ChecklistEntryMake("__item portable cassette player", url, ChecklistSubentryMake("Portable cassette player buffs", "", description), 10));
     }
+    if (is_wearing_outfit("Hodgman's Regal Frippery"))
+    {
+        int underling_summons_remaining = clampi(5 - get_property_int("_hoboUnderlingSummons"), 0, 5);
+        if (underling_summons_remaining > 0)
+        {
+            string [int] description;
+            description.listAppend("Combat skill while wearing the frippery. For a single fight, adds +100% meat (joke) or +100% item (dance).");
+            resource_entries.listAppend(ChecklistEntryMake("__skill Summon hobo underling", "", ChecklistSubentryMake(pluralise(underling_summons_remaining, "hobo underling summon", "hobo underling summons"), "", description), -1));
+        }
+    }
 }

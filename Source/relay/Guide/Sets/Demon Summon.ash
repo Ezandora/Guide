@@ -39,14 +39,24 @@ void SDemonSummonGenerateResource(ChecklistEntry [int] resource_entries)
             else
             {
                 if (my_level() == 11)
-                    demons["demonName12"] += "Antique machete, tomb ratchet, and cigarette lighter.";
+                {
+                    if (__dense_liana_machete_items.available_amount() == 0)
+                        demons["demonName12"] += "Antique machete, tomb ratchet, and cigarette lighter.";
+                    else
+                        demons["demonName12"] += "Tomb ratchet, and cigarette lighter.";
+                }
                 else if (my_level() == 12)
-                    demons["demonName12"] += "Star chart.";
+                {
+                    if ($items[richard's star key,star chart].available_amount() == 0)
+                        demons["demonName12"] += "Star chart.";
+                }
                 else if (my_level() == 13)
                     demons["demonName12"] += "+50% init buff.";
                 else
                     demons["demonName12"] += "1000 meat.";
-                demons["demonName12"] += "|+10% item, +20% meat, +50% init, +spell/weapon damage buff.";
+                if (demons["demonName12"] != "")
+                    demons["demonName12"] += "|";
+                demons["demonName12"] += "+10% item, +20% meat, +50% init, +spell/weapon damage buff.";
                 if (my_familiar() != lookupFamiliar("intergnat"))
                     demons["demonName12"] += "|Make sure to switch to your intergnat familiar before summoning.";
             }

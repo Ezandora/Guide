@@ -36,6 +36,8 @@ void readUserPreferences()
 
 void writeUserPreferences()
 {
+    if (!__read_user_preferences_initially)
+        readUserPreferences();
     buffer output_value;
     boolean first = true;
     foreach key, value in __user_preferences_private

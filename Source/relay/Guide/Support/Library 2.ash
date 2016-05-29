@@ -21,6 +21,9 @@ boolean can_equip_replacement(item it)
 {
     if (it.equipped_amount() > 0)
         return true;
+    boolean can_equip = it.can_equip();
+    if (can_equip)
+        return true;
     if (my_class() == $class[pastamancer])
     {
         //Bind Undead Elbow Macaroni -> equalises muscle
@@ -45,7 +48,7 @@ boolean can_equip_replacement(item it)
                 return true;
         }
     }
-    return it.can_equip();
+    return can_equip;
 }
 
 boolean can_equip_outfit(string outfit_name)

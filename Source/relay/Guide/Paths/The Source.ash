@@ -26,11 +26,12 @@ void PathTheSourceGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
         string [int] description;
         
         skill [int] desired_skill_order;
-        desired_skill_order.listAppend(lookupSkill("Big Guns")); //tons of damage
+        if (get_property_int("sourcePoints") < 3) //once you have three, you can always go the hack-siphon-kick route
+            desired_skill_order.listAppend(lookupSkill("Big Guns")); //tons of damage
         desired_skill_order.listAppend(lookupSkill("Humiliating Hack")); //delevel a bunch
         desired_skill_order.listAppend(lookupSkill("Data Siphon")); //restore MP from attacks
-        desired_skill_order.listAppend(lookupSkill("Overclocked")); //+init
         desired_skill_order.listAppend(lookupSkill("Source Kick")); //also a lot of damage...?
+        desired_skill_order.listAppend(lookupSkill("Overclocked")); //+init
         
         desired_skill_order.listAppend(lookupSkill("Restore")); //restore HP
         desired_skill_order.listAppend(lookupSkill("Bullet Time")); //dodge 3 ranged
@@ -39,6 +40,7 @@ void PathTheSourceGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
         
         desired_skill_order.listAppend(lookupSkill("Disarmament")); //something
         desired_skill_order.listAppend(lookupSkill("Reboot")); //removes latency
+        desired_skill_order.listAppend(lookupSkill("Big Guns")); //tons of damage
         
         foreach key, s in desired_skill_order
         {
@@ -140,16 +142,33 @@ void PathTheSourceGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
         float our_init = initiative_modifier();
         if (lookupSkill("Overclocked").have_skill())
             our_init += 200;
-        float chance_to_get_jump = clampf(100 - lookupMonster("Source Agent").base_initiative + our_init, 0.0, 100.0);
+        float agent_initiative = lookupMonster("Source Agent").base_initiative;
+        float chance_to_get_jump = clampf(100 - agent_initiative + our_init, 0.0, 100.0);
         if (chance_to_get_jump >= 100.0)
             stat_description += "|Will gain initiative on agent.";
         else if (chance_to_get_jump <= 0.0)
-            stat_description += "|Will not gain initiative on agent.";
+            stat_description += "|Will not gain initiative on agent. Need " + round(agent_initiative - our_init) + "% more init.";
         else
             stat_description += "|" + round(chance_to_get_jump) + "% chance to gain initiative on agent.";
         description.listAppend(stat_description);
         if (__last_adventure_location == $location[the haunted bedroom])
             description.listAppend("Won't appear in the haunted bedroom, so may want to go somewhere else?");
+        if (lookupSkill("Humiliating Hack").have_skill())
+        {
+            string [int] delevelers;
+            if ($skill[ruthless efficiency].have_skill() && $effect[ruthlessly efficient].have_effect() == 0)
+            {
+                delevelers.listAppend("cast ruthless efficiency");
+            }
+            if ($item[dark porquoise ring].available_amount() > 0 && $item[dark porquoise ring].equipped_amount() == 0 && $item[dark porquoise ring].can_equip())
+            {
+                delevelers.listAppend("equip dark porquoise ring");
+            }
+            if (delevelers.count() > 0)
+            {
+                description.listAppend("Possibly " + delevelers.listJoinComponents(", ", "or") + " for better deleveling.");
+            }
+        }
         task_entries.listAppend(ChecklistEntryMake("__item software glitch", "", ChecklistSubentryMake("Source agent now or soon", "", description), -11));
     }
     else if (source_interval > 0)

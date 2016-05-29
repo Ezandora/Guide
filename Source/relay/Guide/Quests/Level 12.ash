@@ -583,7 +583,12 @@ void QLevel12GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             if (stats_needed.count() == 0)
                 subentry.entries.listAppend("Wear war outfit, run -combat, adventure in other side's camp.");
             else
-                subentry.entries.listAppend("Acquire " + stats_needed.listJoinComponents(", ", "and") + " to wear war outfit.");
+            {
+                string line = "Acquire " + stats_needed.listJoinComponents(", ", "and") + " to wear war outfit.";
+                if (my_class() == $class[pastamancer] && (is_wearing_outfit("War Hippy Fatigues") || is_wearing_outfit("Frat Warrior Fatigues")))
+                    line += "|Or... wear it anyways, because you're a pastamancer.";
+                subentry.entries.listAppend(line);
+            }
             
             
             //need 70 moxie, 70 myst
