@@ -2,7 +2,7 @@
 
 since 17.1; //the earliest main release that is usable in modern KOL (unequip bug)
 //These settings are for development. Don't worry about editing them.
-string __version = "1.4.1";
+string __version = "1.4.2";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -2913,6 +2913,8 @@ void readUserPreferences()
 
 void writeUserPreferences()
 {
+    if (!__read_user_preferences_initially)
+        readUserPreferences();
     buffer output_value;
     boolean first = true;
     foreach key, value in __user_preferences_private
@@ -5174,6 +5176,9 @@ boolean can_equip_replacement(item it)
 {
     if (it.equipped_amount() > 0)
         return true;
+    boolean can_equip = it.can_equip();
+    if (can_equip)
+        return true;
     if (my_class() == $class[pastamancer])
     {
         //Bind Undead Elbow Macaroni -> equalises muscle
@@ -5198,7 +5203,7 @@ boolean can_equip_replacement(item it)
                 return true;
         }
     }
-    return it.can_equip();
+    return can_equip;
 }
 
 boolean can_equip_outfit(string outfit_name)
@@ -13025,7 +13030,12 @@ void QLevel12GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             if (stats_needed.count() == 0)
                 subentry.entries.listAppend("Wear war outfit, run -combat, adventure in other side's camp.");
             else
-                subentry.entries.listAppend("Acquire " + stats_needed.listJoinComponents(", ", "and") + " to wear war outfit.");
+            {
+                string line = "Acquire " + stats_needed.listJoinComponents(", ", "and") + " to wear war outfit.";
+                if (my_class() == $class[pastamancer] && (is_wearing_outfit("War Hippy Fatigues") || is_wearing_outfit("Frat Warrior Fatigues")))
+                    line += "|Or... wear it anyways, because you're a pastamancer.";
+                subentry.entries.listAppend(line);
+            }
             
             
             //need 70 moxie, 70 myst
@@ -23781,6 +23791,16 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         //description.listAppend("Modulus " + modulus + ".");
         resource_entries.listAppend(ChecklistEntryMake("__item portable cassette player", url, ChecklistSubentryMake("Portable cassette player buffs", "", description), 10));
     }
+    if (is_wearing_outfit("Hodgman's Regal Frippery"))
+    {
+        int underling_summons_remaining = clampi(5 - get_property_int("_hoboUnderlingSummons"), 0, 5);
+        if (underling_summons_remaining > 0)
+        {
+            string [int] description;
+            description.listAppend("Combat skill while wearing the frippery. For a single fight, adds +100% meat (joke) or +100% item (dance).");
+            resource_entries.listAppend(ChecklistEntryMake("__skill Summon hobo underling", "", ChecklistSubentryMake(pluralise(underling_summons_remaining, "hobo underling summon", "hobo underling summons"), "", description), -1));
+        }
+    }
 }
 
 void SCouncilGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -27116,14 +27136,24 @@ void SDemonSummonGenerateResource(ChecklistEntry [int] resource_entries)
             else
             {
                 if (my_level() == 11)
-                    demons["demonName12"] += "Antique machete, tomb ratchet, and cigarette lighter.";
+                {
+                    if (__dense_liana_machete_items.available_amount() == 0)
+                        demons["demonName12"] += "Antique machete, tomb ratchet, and cigarette lighter.";
+                    else
+                        demons["demonName12"] += "Tomb ratchet, and cigarette lighter.";
+                }
                 else if (my_level() == 12)
-                    demons["demonName12"] += "Star chart.";
+                {
+                    if ($items[richard's star key,star chart].available_amount() == 0)
+                        demons["demonName12"] += "Star chart.";
+                }
                 else if (my_level() == 13)
                     demons["demonName12"] += "+50% init buff.";
                 else
                     demons["demonName12"] += "1000 meat.";
-                demons["demonName12"] += "|+10% item, +20% meat, +50% init, +spell/weapon damage buff.";
+                if (demons["demonName12"] != "")
+                    demons["demonName12"] += "|";
+                demons["demonName12"] += "+10% item, +20% meat, +50% init, +spell/weapon damage buff.";
                 if (my_familiar() != lookupFamiliar("intergnat"))
                     demons["demonName12"] += "|Make sure to switch to your intergnat familiar before summoning.";
             }
@@ -41889,11 +41919,12 @@ void PathTheSourceGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
         string [int] description;
         
         skill [int] desired_skill_order;
-        desired_skill_order.listAppend(lookupSkill("Big Guns")); //tons of damage
+        if (get_property_int("sourcePoints") < 3) //once you have three, you can always go the hack-siphon-kick route
+            desired_skill_order.listAppend(lookupSkill("Big Guns")); //tons of damage
         desired_skill_order.listAppend(lookupSkill("Humiliating Hack")); //delevel a bunch
         desired_skill_order.listAppend(lookupSkill("Data Siphon")); //restore MP from attacks
-        desired_skill_order.listAppend(lookupSkill("Overclocked")); //+init
         desired_skill_order.listAppend(lookupSkill("Source Kick")); //also a lot of damage...?
+        desired_skill_order.listAppend(lookupSkill("Overclocked")); //+init
         
         desired_skill_order.listAppend(lookupSkill("Restore")); //restore HP
         desired_skill_order.listAppend(lookupSkill("Bullet Time")); //dodge 3 ranged
@@ -41902,6 +41933,7 @@ void PathTheSourceGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
         
         desired_skill_order.listAppend(lookupSkill("Disarmament")); //something
         desired_skill_order.listAppend(lookupSkill("Reboot")); //removes latency
+        desired_skill_order.listAppend(lookupSkill("Big Guns")); //tons of damage
         
         foreach key, s in desired_skill_order
         {
@@ -42003,16 +42035,33 @@ void PathTheSourceGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
         float our_init = initiative_modifier();
         if (lookupSkill("Overclocked").have_skill())
             our_init += 200;
-        float chance_to_get_jump = clampf(100 - lookupMonster("Source Agent").base_initiative + our_init, 0.0, 100.0);
+        float agent_initiative = lookupMonster("Source Agent").base_initiative;
+        float chance_to_get_jump = clampf(100 - agent_initiative + our_init, 0.0, 100.0);
         if (chance_to_get_jump >= 100.0)
             stat_description += "|Will gain initiative on agent.";
         else if (chance_to_get_jump <= 0.0)
-            stat_description += "|Will not gain initiative on agent.";
+            stat_description += "|Will not gain initiative on agent. Need " + round(agent_initiative - our_init) + "% more init.";
         else
             stat_description += "|" + round(chance_to_get_jump) + "% chance to gain initiative on agent.";
         description.listAppend(stat_description);
         if (__last_adventure_location == $location[the haunted bedroom])
             description.listAppend("Won't appear in the haunted bedroom, so may want to go somewhere else?");
+        if (lookupSkill("Humiliating Hack").have_skill())
+        {
+            string [int] delevelers;
+            if ($skill[ruthless efficiency].have_skill() && $effect[ruthlessly efficient].have_effect() == 0)
+            {
+                delevelers.listAppend("cast ruthless efficiency");
+            }
+            if ($item[dark porquoise ring].available_amount() > 0 && $item[dark porquoise ring].equipped_amount() == 0 && $item[dark porquoise ring].can_equip())
+            {
+                delevelers.listAppend("equip dark porquoise ring");
+            }
+            if (delevelers.count() > 0)
+            {
+                description.listAppend("Possibly " + delevelers.listJoinComponents(", ", "or") + " for better deleveling.");
+            }
+        }
         task_entries.listAppend(ChecklistEntryMake("__item software glitch", "", ChecklistSubentryMake("Source agent now or soon", "", description), -11));
     }
     else if (source_interval > 0)
