@@ -218,8 +218,11 @@ void IOTMTelegraphOfficeGenerateResource(ChecklistEntry [int] resource_entries)
     if (true)
     {
         string [skill] telegraph_skill_properties;
-        telegraph_skill_properties[lookupSkill("Bow-Legged Swagger")] = "_bowleggedSwaggerUsed";
-        telegraph_skill_properties[lookupSkill("Bend Hell")] = "_bendHellUsed";
+        if (__misc_state["in run"])
+        {
+            telegraph_skill_properties[lookupSkill("Bow-Legged Swagger")] = "_bowleggedSwaggerUsed";
+            telegraph_skill_properties[lookupSkill("Bend Hell")] = "_bendHellUsed";
+        }
         telegraph_skill_properties[lookupSkill("Steely-Eyed Squint")] = "_steelyEyedSquintUsed";
         
         string [skill] telegraph_skill_descriptions;

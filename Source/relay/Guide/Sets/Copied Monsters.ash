@@ -52,6 +52,8 @@ string generateNinjaSafetyGuide(boolean show_colour)
 
 void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [int] description, boolean show_details, boolean from_copy)
 {
+    if (!__misc_state["in run"])
+        return;
     monster_name = monster_name.to_lower_case();
 	if (monster_name == "ninja snowman assassin")
 	{

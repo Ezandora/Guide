@@ -1,7 +1,7 @@
 RegisterResourceGenerationFunction("IOTMWitchessGenerateResource");
 void IOTMWitchessGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (in_bad_moon() || get_campground()[lookupItem("Witchess Set")] == 0)
+    if (in_bad_moon() || get_campground()[lookupItem("Witchess Set")] == 0 || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
         return;
     if (!mafiaIsPastRevision(16813))
         return;

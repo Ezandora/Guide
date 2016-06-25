@@ -22,6 +22,7 @@ void SFamiliarsGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [
 		
 		string [int] potential_targets;
         //a short list:
+        //FIXME writing desk
         if (__quest_state["Level 7"].state_int["alcove evilness"] > 31)
             potential_targets.listAppend("modern zmobie");
             

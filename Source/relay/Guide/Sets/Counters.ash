@@ -129,7 +129,10 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
     window_image_names["Holiday Monster"] = "__familiar hand turkey";
     window_image_names["Rain Monster"] = "__familiar personal raincloud";
     window_image_names["WoL Monster"] = "__effect Cowrruption";
+    window_image_names["Digitize Monster"] = "__item source essence";
     //window_image_names["Event Monster"] = ""; //no idea
+    
+    
     
     boolean [string] counter_blacklist = $strings[Romantic Monster,Semi-rare];
     
@@ -162,7 +165,19 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
         
         ChecklistSubentry subentry;
         string url;
-        subentry.header = window_name;
+        string window_display_name = window_name;
+        
+        if (window_name == "Digitize Monster")
+        {
+            string monster_name = get_property("_sourceTerminalDigitizeMonster").to_lower_case();
+            if (monster_name == "")
+                window_display_name = "Digitised monster";
+            else
+                window_display_name = "Digitised " + monster_name;
+        }
+        //if (window_name == "Romantic Monster")
+            //window_display_name = "Arrowed " + __misc_state_string["Romantic Monster Name"].to_lower_case();
+        subentry.header = window_display_name;
         
         
         if (turn_range.y <= 0)
@@ -173,6 +188,14 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
             subentry.header += " in [" + turn_range.x + " to " + turn_range.y + "] turns.";
         
         
+        if (window_name == "Digitize Monster")
+        {
+            //Display next window:
+            int next_window_count = get_property_int("_sourceTerminalDigitizeMonsterCount") + 1;
+            Vec2i next_window_range = Vec2iMake(15 + 10 * next_window_count, 25 + 10 * next_window_count);
+            subentry.entries.listAppend("Next window will be [" + next_window_range.x + " to " + next_window_range.y + "] turns.");
+            //FIXME suggest re-digitising if the count is over a certain amount and they have two left and it's not a witchess monster?
+        }
         if (window_name == "Rain Monster" && my_path_id() == PATH_HEAVY_RAINS)
         {
             subentry.entries = SCountersGenerateDescriptionForRainMonster();

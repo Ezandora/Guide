@@ -58,7 +58,6 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
         else
         {
             url = "manor3.php";
-            //FIXME can bees hate you use the fast path?
         
             if (use_fast_route && $item[lord spookyraven's spectacles].available_amount() == 0 && !recipe_was_autoread)
             {

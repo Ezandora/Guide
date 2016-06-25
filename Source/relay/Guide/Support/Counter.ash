@@ -188,40 +188,19 @@ buffer CounterDescription(Counter c)
 
 Counter [string] __active_counters; //Try to avoid referencing directly
 
-Counter CounterLookup(string counter_name, Error found)
-{
-    if (__active_counters contains counter_name)
-    {
-        return __active_counters[counter_name];
-    }
-    else
-    {
-        found.ErrorSet();
-        return CounterMake();
-    }
-}
-
-Counter CounterLookup(string counter_name)
-{
-    return CounterLookup(counter_name, ErrorMake());
-}
-
-string [int] CounterGetAllNames()
-{
-    string [int] names;
-    foreach name in __active_counters
-        names.listAppend(name);
-    return names;
-}
-
-
 boolean __counters_inited = false;
+int __counters_turn_inited = -1;
 void CountersInit()
 {
-    if (__counters_inited)
+    if (__counters_inited && __counters_turn_inited == my_turncount())
         return;
     __counters_inited = true;
+    __counters_turn_inited = my_turncount();
 
+    foreach key in __active_counters
+    {
+        remove __active_counters[key];
+    }
 
     //parse counters:
 	//Examples:
@@ -340,6 +319,33 @@ void CountersInit()
     }
 }
 
+Counter CounterLookup(string counter_name, Error found)
+{
+    CountersInit();
+    if (__active_counters contains counter_name)
+    {
+        return __active_counters[counter_name];
+    }
+    else
+    {
+        found.ErrorSet();
+        return CounterMake();
+    }
+}
+
+Counter CounterLookup(string counter_name)
+{
+    return CounterLookup(counter_name, ErrorMake());
+}
+
+string [int] CounterGetAllNames()
+{
+    string [int] names;
+    foreach name in __active_counters
+        names.listAppend(name);
+    return names;
+}
+
 void CountersReparse()
 {
     __counters_inited = false;
@@ -350,7 +356,7 @@ void CountersReparse()
     CountersInit();
 }
 
-boolean [string] __wandering_monster_counter_names = $strings[Romantic Monster,Rain Monster,Holiday Monster,Nemesis Assassin,Bee,WoL Monster];
+boolean [string] __wandering_monster_counter_names = $strings[Romantic Monster,Rain Monster,Holiday Monster,Nemesis Assassin,Bee,WoL Monster,Digitize Monster];
 
 
 //This is for ascension automation scripts. Call this immediately before adventuring in an adventure.php zone.
@@ -376,6 +382,8 @@ boolean CounterWanderingMonsterMayHitNextTurn()
         if (interval == 200 || interval == 400)
             return true;
     }
+    if (get_property("questG04Nemesis") == "step17") //first wanderer in nemesis quest
+        return true;
     
     if (__last_turn_definitely_visited_adventure_php == -1 && $monsters[Black Crayon Beast,Black Crayon Beetle,Black Crayon Constellation,Black Crayon Golem,Black Crayon Demon,Black Crayon Man,Black Crayon Elemental,Black Crayon Crimbo Elf,Black Crayon Fish,Black Crayon Goblin,Black Crayon Hippy,Black Crayon Hobo,Black Crayon Shambling Monstrosity,Black Crayon Manloid,Black Crayon Mer-kin,Black Crayon Frat Orc,Black Crayon Penguin,Black Crayon Pirate,Black Crayon Flower,Black Crayon Slime,Black Crayon Undead Thing,Black Crayon Spiraling Shape,angry bassist,blue-haired girl,evil ex-girlfriend,peeved roommate,random scenester] contains last_monster) //bit of a hack - if they just fought a hipster monster (hopefully not faxing it), then the wandering monster isn't up this turn. though... __last_turn_definitely_visited_adventure_php should handle that...
     {

@@ -30,7 +30,7 @@ void SDemonSummonGenerateResource(ChecklistEntry [int] resource_entries)
         //Prenatural greed.
         string [string] demons;
         demons["demonName2"] = "+100% meat";
-        if (lookupFamiliar("intergnat").familiar_is_usable())
+        if (lookupFamiliar("intergnat").familiar_is_usable() && in_ronin())
         {
             if (!get_property("demonName12").contains_text("Neil")) //FIXME what if neil is on their friends list?
             {

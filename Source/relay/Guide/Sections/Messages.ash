@@ -387,7 +387,11 @@ string generateRandomMessage()
         case PATH_AVATAR_OF_WEST_OF_LOATHING:
             random_messages.listAppend("draw"); break;
         case PATH_THE_SOURCE:
-            random_messages.listAppend("it is not the spoon that ascends, it is only yourself"); break;
+            if (my_daycount() % 2 == 0)
+                random_messages.listAppend("don't think you aren't. know you aren't.");
+            else
+                random_messages.listAppend("it is not the spoon that ascends, it is only yourself");
+            break;
         /*case PATH_CLASS_ACT_3:
             random_messages.listAppend("buttons for the people"); break;
         case PATH_AVATAR_OF_THE_NAUGHTY_SORCERESS:
@@ -732,10 +736,25 @@ string generateRandomMessage()
 	if ($effect[beaten up].have_effect() > 0 && limit_mode().length() == 0 && !already_output_relevant_beaten_up_effect)
 	{
 		random_messages.listClear();
-        if (my_path_id() == PATH_THE_SOURCE)
-            random_messages.listAppend("not like this");
-        else
-            random_messages.listAppend("ow");
+        
+        
+        switch (my_path_id())
+        {
+            case PATH_BEES_HATE_YOU:
+                random_messages.listAppend("BZZZZZZ"); break;
+            case PATH_ONE_CRAZY_RANDOM_SUMMER:
+                random_messages.listAppend("tick, tock"); break;
+            case PATH_ACTUALLY_ED_THE_UNDYING:
+                random_messages.listAppend("DYING!"); break;
+            case PATH_COMMUNITY_SERVICE:
+                random_messages.listAppend("no good deed goes unpunished"); break;
+            case PATH_AVATAR_OF_WEST_OF_LOATHING:
+                random_messages.listAppend("shucks"); break;
+            case PATH_THE_SOURCE:
+                random_messages.listAppend("not like this"); break;
+            default:
+                random_messages.listAppend("ow"); break;
+        }
 	}
 	if (my_turncount() <= 0)
 	{

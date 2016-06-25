@@ -549,4 +549,25 @@ void BatfellowGenerateResource(ChecklistEntry [int] resource_entries)
         if (remaining > 0)
             resource_entries.listAppend(ChecklistEntryMake("__item replica bat-oomerang", "", ChecklistSubentryMake(pluralise(remaining, "replica bat-oomerang use", "replica bat-oomerang uses"), "", "Free instakill."), 5));
     }
+    if (lookupItem("The Jokester's Gun").available_amount() > 0 && mafiaIsPastRevision(16986) && !get_property_boolean("_firedJokestersGun"))
+    {
+        int importance = 5;
+        string [int] description;
+        description.listAppend("Free instakill.");
+        if (lookupItem("The Jokester's Gun").equipped_amount() == 0)
+        {
+            string line = "Equip it";
+            if (!lookupItem("The Jokester's Gun").can_equip())
+            {
+                line += ", once you can. (need 50 moxie)";
+                importance = 8;
+            }
+            else
+                line += " first.";
+            description.listAppend(line);
+        }
+        else
+            description.listAppend("Fire the Jokester's Gun skill in combat.");
+        resource_entries.listAppend(ChecklistEntryMake("__item The Jokester's Gun", "", ChecklistSubentryMake("The Jokester's Gun firing", "", description), importance));
+    }
 }
