@@ -18788,7 +18788,7 @@ void QSpookyravenLightsOutGenerateTasks(ChecklistEntry [int] task_entries, Check
 {
 	QSpookyravenLightsOutGenerateEntry(task_entries, optional_task_entries, true);
     
-    if (__iotms_usable[$item[haunted doghouse]] && get_property_int("lastLightsOutTurn") < total_turns_played() && total_turns_played() % 37 == 0 && __misc_state["in run"])
+    if (__iotms_usable[lookupItem("haunted doghouse")] && get_property_int("lastLightsOutTurn") < total_turns_played() && total_turns_played() % 37 == 0 && __misc_state["in run"])
     {
         boolean [location] all_lights_out_locations;
         all_lights_out_locations[$location[the haunted storage room]] = true;
