@@ -130,45 +130,8 @@ void PathTheSourceGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
     if (source_interval == 200 || source_interval == 400)
     {
         string [int] description;
-        if (monster_level_adjustment() > 0)
-            description.listAppend("Possibly remove +ML.");
-        //FIXME mention init, stats
+        CopiedMonstersGenerateDescriptionForMonster("source agent", description, true, false);
         
-        string stat_description;
-        
-        if (get_property_int("sourceAgentsDefeated") > 0)
-            stat_description += pluralise(get_property_int("sourceAgentsDefeated"), "agent", "agents") + " defeated so far. ";
-        stat_description += lookupMonster("Source agent").base_attack + " attack.";
-        float our_init = initiative_modifier();
-        if (lookupSkill("Overclocked").have_skill())
-            our_init += 200;
-        float agent_initiative = lookupMonster("Source Agent").base_initiative;
-        float chance_to_get_jump = clampf(100 - agent_initiative + our_init, 0.0, 100.0);
-        if (chance_to_get_jump >= 100.0)
-            stat_description += "|Will gain initiative on agent.";
-        else if (chance_to_get_jump <= 0.0)
-            stat_description += "|Will not gain initiative on agent. Need " + round(agent_initiative - our_init) + "% more init.";
-        else
-            stat_description += "|" + round(chance_to_get_jump) + "% chance to gain initiative on agent.";
-        description.listAppend(stat_description);
-        if (__last_adventure_location == $location[the haunted bedroom])
-            description.listAppend("Won't appear in the haunted bedroom, so may want to go somewhere else?");
-        if (lookupSkill("Humiliating Hack").have_skill())
-        {
-            string [int] delevelers;
-            if ($skill[ruthless efficiency].have_skill() && $effect[ruthlessly efficient].have_effect() == 0)
-            {
-                delevelers.listAppend("cast ruthless efficiency");
-            }
-            if ($item[dark porquoise ring].available_amount() > 0 && $item[dark porquoise ring].equipped_amount() == 0 && $item[dark porquoise ring].can_equip())
-            {
-                delevelers.listAppend("equip dark porquoise ring");
-            }
-            if (delevelers.count() > 0)
-            {
-                description.listAppend("Possibly " + delevelers.listJoinComponents(", ", "or") + " for better deleveling.");
-            }
-        }
         task_entries.listAppend(ChecklistEntryMake("__item software glitch", "", ChecklistSubentryMake("Source agent now or soon", "", description), -11));
     }
     else if (source_interval > 0)

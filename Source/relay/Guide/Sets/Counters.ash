@@ -167,9 +167,11 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
         string url;
         string window_display_name = window_name;
         
+        monster fighting_monster;
         if (window_name == "Digitize Monster")
         {
-            string monster_name = get_property("_sourceTerminalDigitizeMonster").to_lower_case();
+            fighting_monster = get_property("_sourceTerminalDigitizeMonster").to_monster();
+            string monster_name = fighting_monster.to_lower_case();
             if (monster_name == "")
                 window_display_name = "Digitised monster";
             else
@@ -194,11 +196,26 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
             int next_window_count = get_property_int("_sourceTerminalDigitizeMonsterCount") + 1;
             Vec2i next_window_range = Vec2iMake(15 + 10 * next_window_count, 25 + 10 * next_window_count);
             subentry.entries.listAppend("Next window will be [" + next_window_range.x + " to " + next_window_range.y + "] turns.");
-            //FIXME suggest re-digitising if the count is over a certain amount and they have two left and it's not a witchess monster?
+            
+            //calculate the limit:
+            boolean [string] chips = getInstalledSourceTerminalSingleChips();
+            int digitisations = get_property_int("_sourceTerminalDigitizeUses");
+            int digitisation_limit = 1;
+            if (chips["TRAM"])
+                digitisation_limit += 1;
+            if (chips["TRIGRAM"])
+                digitisation_limit += 1;
+            int digitisations_left = clampi(digitisation_limit - digitisations, 0, 3);
+            if (get_property_int("_sourceTerminalDigitizeMonsterCount") >= 2 && digitisations < digitisation_limit)
+                subentry.entries.listAppend("Could re-digitise to reset the window.");
         }
         if (window_name == "Rain Monster" && my_path_id() == PATH_HEAVY_RAINS)
         {
             subentry.entries = SCountersGenerateDescriptionForRainMonster();
+        }
+        if (fighting_monster != $monster[none])
+        {
+            CopiedMonstersGenerateDescriptionForMonster(fighting_monster, subentry.entries, (turn_range.x <= 0), false);
         }
         
         if (turn_range.x <= 0)

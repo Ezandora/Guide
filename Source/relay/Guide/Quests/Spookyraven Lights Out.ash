@@ -141,6 +141,39 @@ void QSpookyravenLightsOutGenerateEntry(ChecklistEntry [int] task_entries, Check
 void QSpookyravenLightsOutGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
 	QSpookyravenLightsOutGenerateEntry(task_entries, optional_task_entries, true);
+    
+    if (__iotms_usable[lookupItem("haunted doghouse")] && get_property_int("lastLightsOutTurn") < total_turns_played() && total_turns_played() % 37 == 0 && __misc_state["in run"])
+    {
+        boolean [location] all_lights_out_locations;
+        all_lights_out_locations[$location[the haunted storage room]] = true;
+        all_lights_out_locations[$location[the haunted Laundry Room]] = true;
+        all_lights_out_locations[$location[the haunted Bathroom]] = true;
+        all_lights_out_locations[$location[the haunted Kitchen]] = true;
+        all_lights_out_locations[$location[the haunted Library]] = true;
+        all_lights_out_locations[$location[the haunted Ballroom]] = true;
+        all_lights_out_locations[$location[the haunted Gallery]] = true;
+        all_lights_out_locations[$location[the haunted Bedroom]] = true;
+        all_lights_out_locations[$location[the haunted Nursery]] = true;
+        all_lights_out_locations[$location[the haunted Conservatory]] = true;
+        all_lights_out_locations[$location[the haunted Billiards Room]] = true;
+        all_lights_out_locations[$location[the haunted Wine Cellar]] = true;
+        all_lights_out_locations[$location[the haunted Boiler Room]] = true;
+        all_lights_out_locations[$location[the haunted Laboratory]] = true;
+        
+        location [int] possible_locations;
+        foreach l in all_lights_out_locations
+        {
+            if (l.combatTurnsAttemptedInLocation() < 5)
+                continue;
+            if (l.noncombat_queue.contains_text("Wooooooof!"))
+                continue;
+            possible_locations.listAppend(l);
+        }
+        if (possible_locations.count() > 0)
+        {
+            task_entries.listAppend(ChecklistEntryMake("__half Lights Out", possible_locations[0].getClickableURLForLocation(), ChecklistSubentryMake("Lights Out Exploit", "", "Adventure in " + possible_locations.listJoinComponents(", ", "or") + " to potentially trigger a halloweiner adventure."), -11));
+        }
+    }
 }
 
 void QSpookyravenLightsOutGenerateResource(ChecklistEntry [int] resource_entries)

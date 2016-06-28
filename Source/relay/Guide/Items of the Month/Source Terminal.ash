@@ -1,10 +1,30 @@
-boolean [string] getInstalledSourceTerminalSingleChips()
+void IOTMSourceTerminalGenerateDigitiseTargets(string [int] description)
 {
-    string [int] chips = get_property("sourceTerminalChips").split_string_alternate(",");
-    boolean [string] result;
-    foreach key, s in chips
-        result[s] = true;
-    return result;
+    string [int] potential_targets;
+    if (__quest_state["Level 7"].state_int["alcove evilness"] > 31)
+        potential_targets.listAppend("modern zmobie");
+    if (!__quest_state["Level 8"].state_boolean["Mountain climbed"] && $items[ninja rope,ninja carabiner,ninja crampons].available_amount() == 0 && !have_outfit_components("eXtreme Cold-Weather Gear"))
+        potential_targets.listAppend("ninja assassin");
+    if (!__quest_state["Level 12"].state_boolean["Lighthouse Finished"] && $item[barrel of gunpowder].available_amount() < 5)
+        potential_targets.listAppend("lobsterfrogman");
+    //FIXME witchess bishop or knight
+    if (__iotms_usable[lookupItem("Witchess Set")] && get_property_int("_witchessFights") < 5)
+    {
+        string [int] witchess_list;
+        if (__misc_state["can eat just about anything"])
+            witchess_list.listAppend("knight");
+        if (__misc_state["can drink just about anything"])
+            witchess_list.listAppend("bishop");
+        witchess_list.listAppend("rook");
+        potential_targets.listAppend("witchess " + witchess_list.listJoinComponents("/"));
+    }
+    int desks_remaining = clampi(5 - get_property_int("writingDesksDefeated"), 0, 5);
+    if (desks_remaining > 1 && !get_property_ascension("lastSecondFloorUnlock") && $item[Lady Spookyraven's necklace].available_amount() == 0 && get_property("questM20Necklace") != "finished" && mafiaIsPastRevision(15244))
+        potential_targets.listAppend("writing desk");
+    if (potential_targets.count() > 0)
+        description.listAppend("Could target a " + potential_targets.listJoinComponents(", ", "or") + ".");
+    if (get_property_int("_sourceTerminalDigitizeMonsterCount") >= 2)
+        description.listAppend("Could re-digitise to reset the window.");
 }
 
 RegisterTaskGenerationFunction("IOTMSourceTerminalGenerateTasks");
@@ -18,14 +38,7 @@ void IOTMSourceTerminalGenerateTasks(ChecklistEntry [int] task_entries, Checklis
     
     boolean [string] chips = getInstalledSourceTerminalSingleChips();
     //Learn extract/a skill if we don't have one:
-    string skill_1_name = get_property("sourceTerminalEducate1");
-    string skill_2_name = get_property("sourceTerminalEducate2");
-    
-    boolean [skill] skills_have;
-    if (skill_1_name != "")
-        skills_have[skill_1_name.replace_string(".edu", "").to_skill()] = true;
-    if (skill_2_name != "")
-        skills_have[skill_2_name.replace_string(".edu", "").to_skill()] = true;
+    boolean [skill] skills_have = getActiveSourceTerminalSkills();
     int skill_limit = 1;
     if (chips["DRAM"])
         skill_limit = 2;
@@ -76,17 +89,7 @@ void IOTMSourceTerminalGenerateTasks(ChecklistEntry [int] task_entries, Checklis
     if (get_property_int("_sourceTerminalDigitizeUses") == 0 && __misc_state["in run"])
     {
         string [int] description;
-        //FIXME suggested monsters
-		string [int] potential_targets;
-        if (__quest_state["Level 7"].state_int["alcove evilness"] > 31)
-            potential_targets.listAppend("modern zmobie");
-        if (!__quest_state["Level 8"].state_boolean["Mountain climbed"] && $items[ninja rope,ninja carabiner,ninja crampons].available_amount() == 0 && !have_outfit_components("eXtreme Cold-Weather Gear"))
-            potential_targets.listAppend("ninja assassin");
-        if (!__quest_state["Level 12"].state_boolean["Lighthouse Finished"] && $item[barrel of gunpowder].available_amount() < 5)
-            potential_targets.listAppend("lobsterfrogman");
-        //FIXME witchess bishop or knight
-        //FIXME writing desk
-        //potential_targets not added as of yet
+        IOTMSourceTerminalGenerateDigitiseTargets(description);
         subentries.listAppend(ChecklistSubentryMake("Digitise a monster", "", description));
     }
     //Complicated, since we have three uses, and those are sort of resources...
@@ -132,11 +135,51 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
         //substats.enh is probably less than 150 mainstat. that's not a lot... +item is much more useful
         subentries.listAppend(ChecklistSubentryMake(pluralise(enhancements_remaining, "source enhancement", "source enhancements") + " remaining", "", description));
     }
-    //FIXME
-    //Duplication of a monster:
-    //FIXME
+    if (mafiaIsPastRevision(17031) && !get_property_boolean("_sourceTerminalDuplicateUsed") && __misc_state["in run"])
+    {
+        //Duplication of a monster:
+        string [int] description;
+        boolean [skill] skills_have = getActiveSourceTerminalSkills();
+        
+        string line = "Doubles";
+        if (my_path_id() == PATH_THE_SOURCE)
+            line = "Triples";
+        line += " item drops from a monster, once/day.|Makes them stronger, so be careful.";
+        description.listAppend(line);
+        if (!skills_have[lookupSkill("Duplicate")])
+        {
+            description.listAppend("Learn with command \"educate duplicate.edu\".");
+        }
+        
+        string [int] potential_targets;
+        //FIXME grey out if the area isn't available?
+        if ($item[goat cheese].available_amount() < 2 && !__quest_state["Level 8"].state_boolean["Past mine"])
+            potential_targets.listAppend("diary goat");
+        if (!__quest_state["Level 11"].finished && !__quest_state["Level 11 Palindome"].finished && $item[talisman o' namsilat].available_amount() == 0 && $items[gaudy key,snakehead charrrm].available_amount() < 2)
+            potential_targets.listAppend("gaudy pirate");
+        if (potential_targets.count() > 0)
+            description.listAppend("Could use on a " + potential_targets.listJoinComponents(", ", "or") + ".");
+        
+        subentries.listAppend(ChecklistSubentryMake("Duplication usable", "", description));
+    }
     //Portscans: (the source)
-    //FIXME
+    int portscans_remaining = clampi(3 - get_property_int("_sourceTerminalPortscanUses"), 0, 3);
+    if (mafiaIsPastRevision(17031) && portscans_remaining > 0 && my_path_id() == PATH_THE_SOURCE)
+    {
+        //Should we suggest portscan outside of the source?
+        //It's three scaling monsters a day, that can make one government potion/run, if optimally used in delay-burning areas. Otherwise, they're +turncount for no reason.
+        //So, do we give advice that's easy to get wrong?
+        
+        string [int] description;
+        description.listAppend("Cast to summon an agent next turn. Make sure to use it to burn delay.");
+        if (my_path_id() == PATH_THE_SOURCE)
+            description.listAppend("To use optimally, cast once. Then set your autoattack to portscan, and adventure in a delay-burning area.|This will chain the agents, causing them to cost a single turn.");
+        if (get_property_int("sourceInterval") != 0 && my_path_id() == PATH_THE_SOURCE)
+            description.listAppend("Wait a bit, this is better after an agent had just appeared.");
+        
+        subentries.listAppend(ChecklistSubentryMake(pluralise(portscans_remaining, "portscan", "portscans") + " remaining", "", description));
+        
+    }
     //Extrudes:
     int extrudes_remaining = clampi(3 - get_property_int("_sourceTerminalExtrudes"), 0, 3);
     
@@ -207,7 +250,7 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
         string monster_name = get_property("_sourceTerminalDigitizeMonster").to_lower_case();
         if (monster_name != "")
             description.listAppend("Currently set to " + monster_name + ".");
-        //FIXME suggested monsters
+        IOTMSourceTerminalGenerateDigitiseTargets(description);
         
         subentries.listAppend(ChecklistSubentryMake(pluralise(digitisations_left, "digitisation", "digitisations") + " remaining", "", description));
     }

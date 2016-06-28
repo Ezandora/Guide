@@ -129,6 +129,65 @@ void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [in
 		if (item_drop_modifier_ignoring_plants() < 234.0)
 			description.listAppend(HTMLGenerateSpanFont("Need +234% item.", "red"));
     }
+    else if (monster_name == "source agent")
+    {
+        if (monster_level_adjustment() > 0)
+            description.listAppend("Possibly remove +ML.");
+        string stat_description;
+        
+        if (get_property_int("sourceAgentsDefeated") > 0)
+            stat_description += pluralise(get_property_int("sourceAgentsDefeated"), "agent", "agents") + " defeated so far. ";
+        stat_description += lookupMonster("Source agent").base_attack + " attack.";
+        float our_init = initiative_modifier();
+        if (lookupSkill("Overclocked").have_skill())
+            our_init += 200;
+        float agent_initiative = lookupMonster("Source Agent").base_initiative;
+        float chance_to_get_jump = clampf(100 - agent_initiative + our_init, 0.0, 100.0);
+        boolean might_not_gain_init = false;
+        if (my_thrall() == $thrall[spaghetti elemental] && my_thrall().level >= 5)
+            stat_description += "|Will effectively gain initiative on agent.";
+        else if (chance_to_get_jump >= 100.0)
+            stat_description += "|Will gain initiative on agent.";
+        else if (chance_to_get_jump <= 0.0)
+        {
+            stat_description += "|Will not gain initiative on agent. Need " + round(agent_initiative - our_init) + "% more init.";
+            might_not_gain_init = true;
+        }
+        else
+        {
+            stat_description += "|" + round(chance_to_get_jump) + "% chance to gain initiative on agent.";
+            might_not_gain_init = true;
+        }
+        if (might_not_gain_init)
+        {
+            if (my_class() == $class[pastamancer] && $skill[bind spaghetti elemental].have_skill() && my_thrall() != $thrall[spaghetti elemental])
+            {
+                stat_description += " Or run ";
+                if ($thrall[spaghetti elemental].level < 5)
+                    stat_description += "and level up ";
+                stat_description += "a spaghetti elemental to block the first attack.";
+            }
+        }
+        description.listAppend(stat_description);
+        if (__last_adventure_location == $location[the haunted bedroom])
+            description.listAppend("Won't appear in the haunted bedroom, so may want to go somewhere else?");
+        if (lookupSkill("Humiliating Hack").have_skill())
+        {
+            string [int] delevelers;
+            if ($skill[ruthless efficiency].have_skill() && $effect[ruthlessly efficient].have_effect() == 0)
+            {
+                delevelers.listAppend("cast ruthless efficiency");
+            }
+            if ($item[dark porquoise ring].available_amount() > 0 && $item[dark porquoise ring].equipped_amount() == 0 && $item[dark porquoise ring].can_equip())
+            {
+                delevelers.listAppend("equip dark porquoise ring");
+            }
+            if (delevelers.count() > 0)
+            {
+                description.listAppend("Possibly " + delevelers.listJoinComponents(", ", "or") + " for better deleveling.");
+            }
+        }
+    }
     
     if (__misc_state["monsters can be nearly impossible to kill"] && monster_level_adjustment() > 0)
         description.listAppend(HTMLGenerateSpanFont("Possibly remove +ML to survive. (at +" + monster_level_adjustment() + " ML)", "red"));

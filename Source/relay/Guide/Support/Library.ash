@@ -1467,3 +1467,26 @@ float averageAdventuresForConsumable(item it)
 {
     return averageAdventuresForConsumable(it, false);
 }
+
+boolean [string] getInstalledSourceTerminalSingleChips()
+{
+    string [int] chips = get_property("sourceTerminalChips").split_string_alternate(",");
+    boolean [string] result;
+    foreach key, s in chips
+        result[s] = true;
+    return result;
+}
+
+boolean [skill] getActiveSourceTerminalSkills()
+{
+    string skill_1_name = get_property("sourceTerminalEducate1");
+    string skill_2_name = get_property("sourceTerminalEducate2");
+    
+    boolean [skill] skills_have;
+    if (skill_1_name != "")
+        skills_have[skill_1_name.replace_string(".edu", "").to_skill()] = true;
+    if (skill_2_name != "")
+        skills_have[skill_2_name.replace_string(".edu", "").to_skill()] = true;
+    return skills_have;
+}
+
