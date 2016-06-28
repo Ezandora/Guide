@@ -2910,8 +2910,8 @@ void initialiseIOTMsUsable()
         //Campground items:
         if (campground[lookupItem("source terminal")] > 0)
             __iotms_usable[lookupItem("source terminal")] = true;
-        if (campground[$item[haunted doghouse]] > 0)
-            __iotms_usable[$item[haunted doghouse]] = true;
+        if (campground[lookupItem("haunted doghouse")] > 0)
+            __iotms_usable[lookupItem("haunted doghouse")] = true;
         if (campground[lookupItem("Witchess Set")] > 0)
             __iotms_usable[lookupItem("Witchess Set")] = true;
     }
