@@ -2,7 +2,7 @@
 
 since 17.1; //the earliest main release that is usable in modern KOL (unequip bug)
 //These settings are for development. Don't worry about editing them.
-string __version = "1.4.3";
+string __version = "1.4.4";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -2875,6 +2875,49 @@ float averageAdventuresForConsumable(item it)
 {
     return averageAdventuresForConsumable(it, false);
 }
+
+boolean [string] getInstalledSourceTerminalSingleChips()
+{
+    string [int] chips = get_property("sourceTerminalChips").split_string_alternate(",");
+    boolean [string] result;
+    foreach key, s in chips
+        result[s] = true;
+    return result;
+}
+
+boolean [skill] getActiveSourceTerminalSkills()
+{
+    string skill_1_name = get_property("sourceTerminalEducate1");
+    string skill_2_name = get_property("sourceTerminalEducate2");
+    
+    boolean [skill] skills_have;
+    if (skill_1_name != "")
+        skills_have[skill_1_name.replace_string(".edu", "").to_skill()] = true;
+    if (skill_2_name != "")
+        skills_have[skill_2_name.replace_string(".edu", "").to_skill()] = true;
+    return skills_have;
+}
+boolean [item] __iotms_usable;
+
+void initialiseIOTMsUsable()
+{
+    foreach key in __iotms_usable
+        remove __iotms_usable[key];
+    
+    if (!in_bad_moon() && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING)
+    {
+        int [item] campground = get_campground();
+        //Campground items:
+        if (campground[lookupItem("source terminal")] > 0)
+            __iotms_usable[lookupItem("source terminal")] = true;
+        if (campground[$item[haunted doghouse]] > 0)
+            __iotms_usable[$item[haunted doghouse]] = true;
+        if (campground[lookupItem("Witchess Set")] > 0)
+            __iotms_usable[lookupItem("Witchess Set")] = true;
+    }
+}
+
+initialiseIOTMsUsable();
 string [string] __user_preferences_private;
 boolean __read_user_preferences_initially = false;
 
@@ -8390,6 +8433,65 @@ void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [in
         description.listAppend("Have " + pluralise($item[star]) + " and " + pluralise($item[line]) + ".");
 		if (item_drop_modifier_ignoring_plants() < 234.0)
 			description.listAppend(HTMLGenerateSpanFont("Need +234% item.", "red"));
+    }
+    else if (monster_name == "source agent")
+    {
+        if (monster_level_adjustment() > 0)
+            description.listAppend("Possibly remove +ML.");
+        string stat_description;
+        
+        if (get_property_int("sourceAgentsDefeated") > 0)
+            stat_description += pluralise(get_property_int("sourceAgentsDefeated"), "agent", "agents") + " defeated so far. ";
+        stat_description += lookupMonster("Source agent").base_attack + " attack.";
+        float our_init = initiative_modifier();
+        if (lookupSkill("Overclocked").have_skill())
+            our_init += 200;
+        float agent_initiative = lookupMonster("Source Agent").base_initiative;
+        float chance_to_get_jump = clampf(100 - agent_initiative + our_init, 0.0, 100.0);
+        boolean might_not_gain_init = false;
+        if (my_thrall() == $thrall[spaghetti elemental] && my_thrall().level >= 5)
+            stat_description += "|Will effectively gain initiative on agent.";
+        else if (chance_to_get_jump >= 100.0)
+            stat_description += "|Will gain initiative on agent.";
+        else if (chance_to_get_jump <= 0.0)
+        {
+            stat_description += "|Will not gain initiative on agent. Need " + round(agent_initiative - our_init) + "% more init.";
+            might_not_gain_init = true;
+        }
+        else
+        {
+            stat_description += "|" + round(chance_to_get_jump) + "% chance to gain initiative on agent.";
+            might_not_gain_init = true;
+        }
+        if (might_not_gain_init)
+        {
+            if (my_class() == $class[pastamancer] && $skill[bind spaghetti elemental].have_skill() && my_thrall() != $thrall[spaghetti elemental])
+            {
+                stat_description += " Or run ";
+                if ($thrall[spaghetti elemental].level < 5)
+                    stat_description += "and level up ";
+                stat_description += "a spaghetti elemental to block the first attack.";
+            }
+        }
+        description.listAppend(stat_description);
+        if (__last_adventure_location == $location[the haunted bedroom])
+            description.listAppend("Won't appear in the haunted bedroom, so may want to go somewhere else?");
+        if (lookupSkill("Humiliating Hack").have_skill())
+        {
+            string [int] delevelers;
+            if ($skill[ruthless efficiency].have_skill() && $effect[ruthlessly efficient].have_effect() == 0)
+            {
+                delevelers.listAppend("cast ruthless efficiency");
+            }
+            if ($item[dark porquoise ring].available_amount() > 0 && $item[dark porquoise ring].equipped_amount() == 0 && $item[dark porquoise ring].can_equip())
+            {
+                delevelers.listAppend("equip dark porquoise ring");
+            }
+            if (delevelers.count() > 0)
+            {
+                description.listAppend("Possibly " + delevelers.listJoinComponents(", ", "or") + " for better deleveling.");
+            }
+        }
     }
     
     if (__misc_state["monsters can be nearly impossible to kill"] && monster_level_adjustment() > 0)
@@ -18685,6 +18787,39 @@ void QSpookyravenLightsOutGenerateEntry(ChecklistEntry [int] task_entries, Check
 void QSpookyravenLightsOutGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
 	QSpookyravenLightsOutGenerateEntry(task_entries, optional_task_entries, true);
+    
+    if (__iotms_usable[$item[haunted doghouse]] && get_property_int("lastLightsOutTurn") < total_turns_played() && total_turns_played() % 37 == 0 && __misc_state["in run"])
+    {
+        boolean [location] all_lights_out_locations;
+        all_lights_out_locations[$location[the haunted storage room]] = true;
+        all_lights_out_locations[$location[the haunted Laundry Room]] = true;
+        all_lights_out_locations[$location[the haunted Bathroom]] = true;
+        all_lights_out_locations[$location[the haunted Kitchen]] = true;
+        all_lights_out_locations[$location[the haunted Library]] = true;
+        all_lights_out_locations[$location[the haunted Ballroom]] = true;
+        all_lights_out_locations[$location[the haunted Gallery]] = true;
+        all_lights_out_locations[$location[the haunted Bedroom]] = true;
+        all_lights_out_locations[$location[the haunted Nursery]] = true;
+        all_lights_out_locations[$location[the haunted Conservatory]] = true;
+        all_lights_out_locations[$location[the haunted Billiards Room]] = true;
+        all_lights_out_locations[$location[the haunted Wine Cellar]] = true;
+        all_lights_out_locations[$location[the haunted Boiler Room]] = true;
+        all_lights_out_locations[$location[the haunted Laboratory]] = true;
+        
+        location [int] possible_locations;
+        foreach l in all_lights_out_locations
+        {
+            if (l.combatTurnsAttemptedInLocation() < 5)
+                continue;
+            if (l.noncombat_queue.contains_text("Wooooooof!"))
+                continue;
+            possible_locations.listAppend(l);
+        }
+        if (possible_locations.count() > 0)
+        {
+            task_entries.listAppend(ChecklistEntryMake("__half Lights Out", possible_locations[0].getClickableURLForLocation(), ChecklistSubentryMake("Lights Out Exploit", "", "Adventure in " + possible_locations.listJoinComponents(", ", "or") + " to potentially trigger a halloweiner adventure."), -11));
+        }
+    }
 }
 
 void QSpookyravenLightsOutGenerateResource(ChecklistEntry [int] resource_entries)
@@ -24913,9 +25048,11 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
         string url;
         string window_display_name = window_name;
         
+        monster fighting_monster;
         if (window_name == "Digitize Monster")
         {
-            string monster_name = get_property("_sourceTerminalDigitizeMonster").to_lower_case();
+            fighting_monster = get_property("_sourceTerminalDigitizeMonster").to_monster();
+            string monster_name = fighting_monster.to_lower_case();
             if (monster_name == "")
                 window_display_name = "Digitised monster";
             else
@@ -24940,11 +25077,26 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
             int next_window_count = get_property_int("_sourceTerminalDigitizeMonsterCount") + 1;
             Vec2i next_window_range = Vec2iMake(15 + 10 * next_window_count, 25 + 10 * next_window_count);
             subentry.entries.listAppend("Next window will be [" + next_window_range.x + " to " + next_window_range.y + "] turns.");
-            //FIXME suggest re-digitising if the count is over a certain amount and they have two left and it's not a witchess monster?
+            
+            //calculate the limit:
+            boolean [string] chips = getInstalledSourceTerminalSingleChips();
+            int digitisations = get_property_int("_sourceTerminalDigitizeUses");
+            int digitisation_limit = 1;
+            if (chips["TRAM"])
+                digitisation_limit += 1;
+            if (chips["TRIGRAM"])
+                digitisation_limit += 1;
+            int digitisations_left = clampi(digitisation_limit - digitisations, 0, 3);
+            if (get_property_int("_sourceTerminalDigitizeMonsterCount") >= 2 && digitisations < digitisation_limit)
+                subentry.entries.listAppend("Could re-digitise to reset the window.");
         }
         if (window_name == "Rain Monster" && my_path_id() == PATH_HEAVY_RAINS)
         {
             subentry.entries = SCountersGenerateDescriptionForRainMonster();
+        }
+        if (fighting_monster != $monster[none])
+        {
+            CopiedMonstersGenerateDescriptionForMonster(fighting_monster, subentry.entries, (turn_range.x <= 0), false);
         }
         
         if (turn_range.x <= 0)
@@ -40071,13 +40223,33 @@ void IOTMIntergnatGenerateResource(ChecklistEntry [int] resource_entries)
         }
     }
 }
-boolean [string] getInstalledSourceTerminalSingleChips()
+void IOTMSourceTerminalGenerateDigitiseTargets(string [int] description)
 {
-    string [int] chips = get_property("sourceTerminalChips").split_string_alternate(",");
-    boolean [string] result;
-    foreach key, s in chips
-        result[s] = true;
-    return result;
+    string [int] potential_targets;
+    if (__quest_state["Level 7"].state_int["alcove evilness"] > 31)
+        potential_targets.listAppend("modern zmobie");
+    if (!__quest_state["Level 8"].state_boolean["Mountain climbed"] && $items[ninja rope,ninja carabiner,ninja crampons].available_amount() == 0 && !have_outfit_components("eXtreme Cold-Weather Gear"))
+        potential_targets.listAppend("ninja assassin");
+    if (!__quest_state["Level 12"].state_boolean["Lighthouse Finished"] && $item[barrel of gunpowder].available_amount() < 5)
+        potential_targets.listAppend("lobsterfrogman");
+    //FIXME witchess bishop or knight
+    if (__iotms_usable[lookupItem("Witchess Set")] && get_property_int("_witchessFights") < 5)
+    {
+        string [int] witchess_list;
+        if (__misc_state["can eat just about anything"])
+            witchess_list.listAppend("knight");
+        if (__misc_state["can drink just about anything"])
+            witchess_list.listAppend("bishop");
+        witchess_list.listAppend("rook");
+        potential_targets.listAppend("witchess " + witchess_list.listJoinComponents("/"));
+    }
+    int desks_remaining = clampi(5 - get_property_int("writingDesksDefeated"), 0, 5);
+    if (desks_remaining > 1 && !get_property_ascension("lastSecondFloorUnlock") && $item[Lady Spookyraven's necklace].available_amount() == 0 && get_property("questM20Necklace") != "finished" && mafiaIsPastRevision(15244))
+        potential_targets.listAppend("writing desk");
+    if (potential_targets.count() > 0)
+        description.listAppend("Could target a " + potential_targets.listJoinComponents(", ", "or") + ".");
+    if (get_property_int("_sourceTerminalDigitizeMonsterCount") >= 2)
+        description.listAppend("Could re-digitise to reset the window.");
 }
 
 RegisterTaskGenerationFunction("IOTMSourceTerminalGenerateTasks");
@@ -40091,14 +40263,7 @@ void IOTMSourceTerminalGenerateTasks(ChecklistEntry [int] task_entries, Checklis
     
     boolean [string] chips = getInstalledSourceTerminalSingleChips();
     //Learn extract/a skill if we don't have one:
-    string skill_1_name = get_property("sourceTerminalEducate1");
-    string skill_2_name = get_property("sourceTerminalEducate2");
-    
-    boolean [skill] skills_have;
-    if (skill_1_name != "")
-        skills_have[skill_1_name.replace_string(".edu", "").to_skill()] = true;
-    if (skill_2_name != "")
-        skills_have[skill_2_name.replace_string(".edu", "").to_skill()] = true;
+    boolean [skill] skills_have = getActiveSourceTerminalSkills();
     int skill_limit = 1;
     if (chips["DRAM"])
         skill_limit = 2;
@@ -40149,17 +40314,7 @@ void IOTMSourceTerminalGenerateTasks(ChecklistEntry [int] task_entries, Checklis
     if (get_property_int("_sourceTerminalDigitizeUses") == 0 && __misc_state["in run"])
     {
         string [int] description;
-        //FIXME suggested monsters
-		string [int] potential_targets;
-        if (__quest_state["Level 7"].state_int["alcove evilness"] > 31)
-            potential_targets.listAppend("modern zmobie");
-        if (!__quest_state["Level 8"].state_boolean["Mountain climbed"] && $items[ninja rope,ninja carabiner,ninja crampons].available_amount() == 0 && !have_outfit_components("eXtreme Cold-Weather Gear"))
-            potential_targets.listAppend("ninja assassin");
-        if (!__quest_state["Level 12"].state_boolean["Lighthouse Finished"] && $item[barrel of gunpowder].available_amount() < 5)
-            potential_targets.listAppend("lobsterfrogman");
-        //FIXME witchess bishop or knight
-        //FIXME writing desk
-        //potential_targets not added as of yet
+        IOTMSourceTerminalGenerateDigitiseTargets(description);
         subentries.listAppend(ChecklistSubentryMake("Digitise a monster", "", description));
     }
     //Complicated, since we have three uses, and those are sort of resources...
@@ -40205,11 +40360,51 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
         //substats.enh is probably less than 150 mainstat. that's not a lot... +item is much more useful
         subentries.listAppend(ChecklistSubentryMake(pluralise(enhancements_remaining, "source enhancement", "source enhancements") + " remaining", "", description));
     }
-    //FIXME
-    //Duplication of a monster:
-    //FIXME
+    if (mafiaIsPastRevision(17031) && !get_property_boolean("_sourceTerminalDuplicateUsed") && __misc_state["in run"])
+    {
+        //Duplication of a monster:
+        string [int] description;
+        boolean [skill] skills_have = getActiveSourceTerminalSkills();
+        
+        string line = "Doubles";
+        if (my_path_id() == PATH_THE_SOURCE)
+            line = "Triples";
+        line += " item drops from a monster, once/day.|Makes them stronger, so be careful.";
+        description.listAppend(line);
+        if (!skills_have[lookupSkill("Duplicate")])
+        {
+            description.listAppend("Learn with command \"educate duplicate.edu\".");
+        }
+        
+        string [int] potential_targets;
+        //FIXME grey out if the area isn't available?
+        if ($item[goat cheese].available_amount() < 2 && !__quest_state["Level 8"].state_boolean["Past mine"])
+            potential_targets.listAppend("diary goat");
+        if (!__quest_state["Level 11"].finished && !__quest_state["Level 11 Palindome"].finished && $item[talisman o' namsilat].available_amount() == 0 && $items[gaudy key,snakehead charrrm].available_amount() < 2)
+            potential_targets.listAppend("gaudy pirate");
+        if (potential_targets.count() > 0)
+            description.listAppend("Could use on a " + potential_targets.listJoinComponents(", ", "or") + ".");
+        
+        subentries.listAppend(ChecklistSubentryMake("Duplication usable", "", description));
+    }
     //Portscans: (the source)
-    //FIXME
+    int portscans_remaining = clampi(3 - get_property_int("_sourceTerminalPortscanUses"), 0, 3);
+    if (mafiaIsPastRevision(17031) && portscans_remaining > 0 && my_path_id() == PATH_THE_SOURCE)
+    {
+        //Should we suggest portscan outside of the source?
+        //It's three scaling monsters a day, that can make one government potion/run, if optimally used in delay-burning areas. Otherwise, they're +turncount for no reason.
+        //So, do we give advice that's easy to get wrong?
+        
+        string [int] description;
+        description.listAppend("Cast to summon an agent next turn. Make sure to use it to burn delay.");
+        if (my_path_id() == PATH_THE_SOURCE)
+            description.listAppend("To use optimally, cast once. Then set your autoattack to portscan, and adventure in a delay-burning area.|This will chain the agents, causing them to cost a single turn.");
+        if (get_property_int("sourceInterval") != 0 && my_path_id() == PATH_THE_SOURCE)
+            description.listAppend("Wait a bit, this is better after an agent had just appeared.");
+        
+        subentries.listAppend(ChecklistSubentryMake(pluralise(portscans_remaining, "portscan", "portscans") + " remaining", "", description));
+        
+    }
     //Extrudes:
     int extrudes_remaining = clampi(3 - get_property_int("_sourceTerminalExtrudes"), 0, 3);
     
@@ -40280,7 +40475,7 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
         string monster_name = get_property("_sourceTerminalDigitizeMonster").to_lower_case();
         if (monster_name != "")
             description.listAppend("Currently set to " + monster_name + ".");
-        //FIXME suggested monsters
+        IOTMSourceTerminalGenerateDigitiseTargets(description);
         
         subentries.listAppend(ChecklistSubentryMake(pluralise(digitisations_left, "digitisation", "digitisations") + " remaining", "", description));
     }
@@ -42315,45 +42510,8 @@ void PathTheSourceGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
     if (source_interval == 200 || source_interval == 400)
     {
         string [int] description;
-        if (monster_level_adjustment() > 0)
-            description.listAppend("Possibly remove +ML.");
-        //FIXME mention init, stats
+        CopiedMonstersGenerateDescriptionForMonster("source agent", description, true, false);
         
-        string stat_description;
-        
-        if (get_property_int("sourceAgentsDefeated") > 0)
-            stat_description += pluralise(get_property_int("sourceAgentsDefeated"), "agent", "agents") + " defeated so far. ";
-        stat_description += lookupMonster("Source agent").base_attack + " attack.";
-        float our_init = initiative_modifier();
-        if (lookupSkill("Overclocked").have_skill())
-            our_init += 200;
-        float agent_initiative = lookupMonster("Source Agent").base_initiative;
-        float chance_to_get_jump = clampf(100 - agent_initiative + our_init, 0.0, 100.0);
-        if (chance_to_get_jump >= 100.0)
-            stat_description += "|Will gain initiative on agent.";
-        else if (chance_to_get_jump <= 0.0)
-            stat_description += "|Will not gain initiative on agent. Need " + round(agent_initiative - our_init) + "% more init.";
-        else
-            stat_description += "|" + round(chance_to_get_jump) + "% chance to gain initiative on agent.";
-        description.listAppend(stat_description);
-        if (__last_adventure_location == $location[the haunted bedroom])
-            description.listAppend("Won't appear in the haunted bedroom, so may want to go somewhere else?");
-        if (lookupSkill("Humiliating Hack").have_skill())
-        {
-            string [int] delevelers;
-            if ($skill[ruthless efficiency].have_skill() && $effect[ruthlessly efficient].have_effect() == 0)
-            {
-                delevelers.listAppend("cast ruthless efficiency");
-            }
-            if ($item[dark porquoise ring].available_amount() > 0 && $item[dark porquoise ring].equipped_amount() == 0 && $item[dark porquoise ring].can_equip())
-            {
-                delevelers.listAppend("equip dark porquoise ring");
-            }
-            if (delevelers.count() > 0)
-            {
-                description.listAppend("Possibly " + delevelers.listJoinComponents(", ", "or") + " for better deleveling.");
-            }
-        }
         task_entries.listAppend(ChecklistEntryMake("__item software glitch", "", ChecklistSubentryMake("Source agent now or soon", "", description), -11));
     }
     else if (source_interval > 0)
