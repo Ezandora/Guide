@@ -31,7 +31,8 @@ void runMain(string relay_filename)
 	string [string] form_fields = form_fields();
 	if (form_fields["API status"] != "")
 	{
-        write(generateAPIResponse().to_json());
+        string [string] api_response = generateAPIResponse();
+        write(api_response.to_json());
         return;
 	}
     

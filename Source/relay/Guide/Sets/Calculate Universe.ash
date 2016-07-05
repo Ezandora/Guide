@@ -3,8 +3,19 @@ void SCalculateUniverseGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (!lookupSkill("Calculate the Universe").have_skill())
         return;
-    if (get_property_boolean("_universeCalculated"))
+    int uses_remaining = 1;
+    if (get_property_boolean("_universeCalculated") && !mafiaIsPastRevision(17039))
         return;
+    if (mafiaIsPastRevision(17039))
+    {
+        int universe_calculated = get_property_int("_universeCalculated");
+        int limit = 1;
+        int skill_number = get_property_int("skillLevel144");
+        limit = max(skill_number, limit);
+        if (universe_calculated >= limit)
+            return;
+        uses_remaining = limit - universe_calculated;
+    }
     
     string [int] description;
     
@@ -126,5 +137,8 @@ void SCalculateUniverseGenerateResource(ChecklistEntry [int] resource_entries)
         description.listAppend("Cast skill, enter the right number: (this changes, and is still being spaded)|*" + HTMLGenerateSimpleTableLines(table));
     else
         description.listAppend("Cast skill, enter the right number.");*/
-    resource_entries.listAppend(ChecklistEntryMake("__skill Calculate the Universe", "skillz.php", ChecklistSubentryMake("Calculate the Universe", "", description), 0));
+    string title = "Calculate the Universe";
+    if (uses_remaining > 1)
+        title = pluralise(uses_remaining, "Calculate the Universe", "Calculate the Universes");
+    resource_entries.listAppend(ChecklistEntryMake("__skill Calculate the Universe", "skillz.php", ChecklistSubentryMake(title, "", description), 0));
 }

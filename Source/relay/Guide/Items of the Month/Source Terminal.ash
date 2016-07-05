@@ -135,7 +135,7 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
         //substats.enh is probably less than 150 mainstat. that's not a lot... +item is much more useful
         subentries.listAppend(ChecklistSubentryMake(pluralise(enhancements_remaining, "source enhancement", "source enhancements") + " remaining", "", description));
     }
-    if (mafiaIsPastRevision(17031) && !get_property_boolean("_sourceTerminalDuplicateUsed") && __misc_state["in run"])
+    if (mafiaIsPastRevision(17031) && (!get_property_boolean("_sourceTerminalDuplicateUsed") || my_path_id() == PATH_THE_SOURCE) && __misc_state["in run"])
     {
         //Duplication of a monster:
         string [int] description;
@@ -157,6 +157,11 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
             potential_targets.listAppend("diary goat");
         if (!__quest_state["Level 11"].finished && !__quest_state["Level 11 Palindome"].finished && $item[talisman o' namsilat].available_amount() == 0 && $items[gaudy key,snakehead charrrm].available_amount() < 2)
             potential_targets.listAppend("gaudy pirate");
+        if (my_path_id() == PATH_THE_SOURCE)
+        {
+            //5x copies
+            //LFM, filthworms, evil eyes, tomb rats?, star monsters, Green Ops Soldier?
+        }
         if (potential_targets.count() > 0)
             description.listAppend("Could use on a " + potential_targets.listJoinComponents(", ", "or") + ".");
         

@@ -171,7 +171,7 @@ void QSpookyravenLightsOutGenerateTasks(ChecklistEntry [int] task_entries, Check
         }
         if (possible_locations.count() > 0)
         {
-            task_entries.listAppend(ChecklistEntryMake("__half Lights Out", possible_locations[0].getClickableURLForLocation(), ChecklistSubentryMake("Lights Out Exploit", "", "Adventure in " + possible_locations.listJoinComponents(", ", "or") + " to potentially trigger a halloweiner adventure."), -11));
+            task_entries.listAppend(ChecklistEntryMake("__half Lights Out", possible_locations[0].getClickableURLForLocation(), ChecklistSubentryMake("Lights Out Exploit", "", "Adventure in " + possible_locations.listJoinComponents(", ", "or") + " to potentially trigger a halloweiner adventure.|It won't cost a turn."), -11));
         }
     }
 }

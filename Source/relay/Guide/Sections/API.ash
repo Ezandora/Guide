@@ -137,7 +137,8 @@ string [string] generateAPIResponse()
                     first = false;
                 else
                     mafia_properties.append(",");*/
-                mafia_properties.append(get_property(property_name));
+                string value = get_property(property_name);
+                mafia_properties.append(value);
             }
             result["mafia properties"] = mafia_properties.to_string();
         }
