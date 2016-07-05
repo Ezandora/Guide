@@ -2,7 +2,7 @@
 
 since 17.1; //the earliest main release that is usable in modern KOL (unequip bug)
 //These settings are for development. Don't worry about editing them.
-string __version = "1.4.4";
+string __version = "1.4.5";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -8786,7 +8786,7 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
 		SCopiedMonstersGenerateResourceForCopyType(resource_entries, $item[envyfish egg], "envyfish egg", "envyfishMonster");
 	if (!get_property_boolean("_iceSculptureUsed"))
 		SCopiedMonstersGenerateResourceForCopyType(resource_entries, $item[ice sculpture], "ice sculpture", "iceSculptureMonster");
-    SCopiedMonstersGenerateResourceForCopyType(resource_entries, lookupItem("screencapped monster"), "screencapped monster", "screencappedMonster");
+    SCopiedMonstersGenerateResourceForCopyType(resource_entries, lookupItem("screencapped monster"), "screencapped", "screencappedMonster");
         
 	//if (__misc_state["Chateau Mantegna available"] && !get_property_boolean("_chateauMonsterFought") && mafiaIsPastRevision(15115))
 		//SCopiedMonstersGenerateResourceForCopyType(resource_entries, $item[none], "chateau painting", "chateauMonster");
@@ -18817,7 +18817,7 @@ void QSpookyravenLightsOutGenerateTasks(ChecklistEntry [int] task_entries, Check
         }
         if (possible_locations.count() > 0)
         {
-            task_entries.listAppend(ChecklistEntryMake("__half Lights Out", possible_locations[0].getClickableURLForLocation(), ChecklistSubentryMake("Lights Out Exploit", "", "Adventure in " + possible_locations.listJoinComponents(", ", "or") + " to potentially trigger a halloweiner adventure."), -11));
+            task_entries.listAppend(ChecklistEntryMake("__half Lights Out", possible_locations[0].getClickableURLForLocation(), ChecklistSubentryMake("Lights Out Exploit", "", "Adventure in " + possible_locations.listJoinComponents(", ", "or") + " to potentially trigger a halloweiner adventure.|It won't cost a turn."), -11));
         }
     }
 }
@@ -27134,8 +27134,19 @@ void SCalculateUniverseGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (!lookupSkill("Calculate the Universe").have_skill())
         return;
-    if (get_property_boolean("_universeCalculated"))
+    int uses_remaining = 1;
+    if (get_property_boolean("_universeCalculated") && !mafiaIsPastRevision(17039))
         return;
+    if (mafiaIsPastRevision(17039))
+    {
+        int universe_calculated = get_property_int("_universeCalculated");
+        int limit = 1;
+        int skill_number = get_property_int("skillLevel144");
+        limit = max(skill_number, limit);
+        if (universe_calculated >= limit)
+            return;
+        uses_remaining = limit - universe_calculated;
+    }
     
     string [int] description;
     
@@ -27257,7 +27268,10 @@ void SCalculateUniverseGenerateResource(ChecklistEntry [int] resource_entries)
         description.listAppend("Cast skill, enter the right number: (this changes, and is still being spaded)|*" + HTMLGenerateSimpleTableLines(table));
     else
         description.listAppend("Cast skill, enter the right number.");*/
-    resource_entries.listAppend(ChecklistEntryMake("__skill Calculate the Universe", "skillz.php", ChecklistSubentryMake("Calculate the Universe", "", description), 0));
+    string title = "Calculate the Universe";
+    if (uses_remaining > 1)
+        title = pluralise(uses_remaining, "Calculate the Universe", "Calculate the Universes");
+    resource_entries.listAppend(ChecklistEntryMake("__skill Calculate the Universe", "skillz.php", ChecklistSubentryMake(title, "", description), 0));
 }
 void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
@@ -36017,7 +36031,8 @@ string [string] generateAPIResponse()
                     first = false;
                 else
                     mafia_properties.append(",");*/
-                mafia_properties.append(get_property(property_name));
+                string value = get_property(property_name);
+                mafia_properties.append(value);
             }
             result["mafia properties"] = mafia_properties.to_string();
         }
@@ -40360,7 +40375,7 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
         //substats.enh is probably less than 150 mainstat. that's not a lot... +item is much more useful
         subentries.listAppend(ChecklistSubentryMake(pluralise(enhancements_remaining, "source enhancement", "source enhancements") + " remaining", "", description));
     }
-    if (mafiaIsPastRevision(17031) && !get_property_boolean("_sourceTerminalDuplicateUsed") && __misc_state["in run"])
+    if (mafiaIsPastRevision(17031) && (!get_property_boolean("_sourceTerminalDuplicateUsed") || my_path_id() == PATH_THE_SOURCE) && __misc_state["in run"])
     {
         //Duplication of a monster:
         string [int] description;
@@ -40382,6 +40397,11 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
             potential_targets.listAppend("diary goat");
         if (!__quest_state["Level 11"].finished && !__quest_state["Level 11 Palindome"].finished && $item[talisman o' namsilat].available_amount() == 0 && $items[gaudy key,snakehead charrrm].available_amount() < 2)
             potential_targets.listAppend("gaudy pirate");
+        if (my_path_id() == PATH_THE_SOURCE)
+        {
+            //5x copies
+            //LFM, filthworms, evil eyes, tomb rats?, star monsters, Green Ops Soldier?
+        }
         if (potential_targets.count() > 0)
             description.listAppend("Could use on a " + potential_targets.listJoinComponents(", ", "or") + ".");
         
@@ -40482,6 +40502,7 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
     if (subentries.count() > 0)
         resource_entries.listAppend(ChecklistEntryMake("__item source essence", "campground.php?action=terminal", subentries, 5));
 }
+
 
 RegisterTaskGenerationFunction("PathActuallyEdtheUndyingGenerateTasks");
 void PathActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -42539,7 +42560,8 @@ void runMain(string relay_filename)
 	string [string] form_fields = form_fields();
 	if (form_fields["API status"] != "")
 	{
-        write(generateAPIResponse().to_json());
+        string [string] api_response = generateAPIResponse();
+        write(api_response.to_json());
         return;
 	}
     
