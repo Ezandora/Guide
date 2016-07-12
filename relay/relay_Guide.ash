@@ -2,7 +2,7 @@
 
 since 17.1; //the earliest main release that is usable in modern KOL (unequip bug)
 //These settings are for development. Don't worry about editing them.
-string __version = "1.4.5";
+string __version = "1.4.6";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -2903,8 +2903,10 @@ void initialiseIOTMsUsable()
 {
     foreach key in __iotms_usable
         remove __iotms_usable[key];
+    if (in_bad_moon())
+        return;
     
-    if (!in_bad_moon() && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING)
+    if (my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING)
     {
         int [item] campground = get_campground();
         //Campground items:
@@ -2915,6 +2917,8 @@ void initialiseIOTMsUsable()
         if (campground[lookupItem("Witchess Set")] > 0)
             __iotms_usable[lookupItem("Witchess Set")] = true;
     }
+    if (get_property_boolean("hasDetectiveSchool"))
+            __iotms_usable[lookupItem("detective school application")] = true;
 }
 
 initialiseIOTMsUsable();
@@ -3297,7 +3301,7 @@ buffer HTMLGenerateDivOfClass(string source, string class_name, string extra_sty
 buffer HTMLGenerateDivOfStyle(string source, string style)
 {
 	if (style == "")
-		return source.to_buffer();
+		return HTMLGenerateTagWrap("div", source);
 	
 	return HTMLGenerateTagWrap("div", source, mapMake("style", style));
 }
@@ -8449,7 +8453,7 @@ void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [in
         float agent_initiative = lookupMonster("Source Agent").base_initiative;
         float chance_to_get_jump = clampf(100 - agent_initiative + our_init, 0.0, 100.0);
         boolean might_not_gain_init = false;
-        if (my_thrall() == $thrall[spaghetti elemental] && my_thrall().level >= 5)
+        if (my_thrall() == $thrall[spaghetti elemental] && my_thrall().level >= 5 && monster_level_adjustment() <= 150)
             stat_description += "|Will effectively gain initiative on agent.";
         else if (chance_to_get_jump >= 100.0)
             stat_description += "|Will gain initiative on agent.";
@@ -21466,7 +21470,11 @@ void SemirareGenerateDescription(string [int] description)
                 line += ".";
             
         }
-        if (line != "")
+        if (CounterLookup("Semi-rare").CounterMayHitNextTurn())
+        {
+            description.listAppend("Already in counter window, probably should ignore this?");
+        }
+        else if (line != "")
             description.listAppend(line);
 	}
 	location last_location = $location[none];
@@ -21677,7 +21685,7 @@ void SSemirareGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
 	}
     if (very_important && __misc_state["monsters can be nearly impossible to kill"] && monster_level_adjustment() > 0)
         description.listAppend(HTMLGenerateSpanFont("Possibly remove +ML to survive. (at +" + monster_level_adjustment() + " ML)", "red"));
-	boolean very_important_reduces_size = description.count() > 2;
+	boolean very_important_reduces_size = description.count() > 1;
     
 	if (title != "")
 	{
@@ -25016,6 +25024,7 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
     
     
     boolean [string] counter_blacklist = $strings[Romantic Monster,Semi-rare];
+    boolean [string] non_range_whitelist = $strings[Digitize Monster];
     
     string [int] all_counter_names = CounterGetAllNames();
     
@@ -25028,18 +25037,22 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
             continue;
         
         Counter c = CounterLookup(window_name);
-        if (!c.CounterIsRange())
+        if (!c.CounterIsRange() && !(non_range_whitelist contains window_name))
             continue;
         
+        boolean counter_is_range = c.CounterIsRange();
         Vec2i turn_range = c.CounterGetWindowRange();
+        int next_exact_turn = c.CounterGetNextExactTurn();
         
-        if (!(turn_range.x <= 10 && from_task) && !(turn_range.x > 10 && !from_task))
+        if (counter_is_range && !(turn_range.x <= 10 && from_task) && !(turn_range.x > 10 && !from_task))
             continue;
         
         
         
         boolean very_important = false;
-        if (turn_range.x <= 0)
+        if (turn_range.x <= 0 && counter_is_range)
+            very_important = true;
+        if (!counter_is_range && next_exact_turn <= 0)
             very_important = true;
         
         
@@ -25063,7 +25076,14 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
         subentry.header = window_display_name;
         
         
-        if (turn_range.y <= 0)
+        if (!counter_is_range)
+        {
+            if (next_exact_turn <= 0)
+                subentry.header += " now";
+            else
+                subentry.header += " after " + pluralise(next_exact_turn, "more turn", "more turns");
+        }
+        else if (turn_range.y <= 0)
             subentry.header += " now or soon";
         else if (turn_range.x <= 0)
             subentry.header += " between now and " + turn_range.y + " turns.";
@@ -25075,8 +25095,10 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
         {
             //Display next window:
             int next_window_count = get_property_int("_sourceTerminalDigitizeMonsterCount") + 1;
-            Vec2i next_window_range = Vec2iMake(15 + 10 * next_window_count, 25 + 10 * next_window_count);
-            subentry.entries.listAppend("Next window will be [" + next_window_range.x + " to " + next_window_range.y + "] turns.");
+            //Vec2i next_window_range = Vec2iMake(15 + 10 * next_window_count, 25 + 10 * next_window_count);
+            int next_turn_count = next_window_count * 10 + 10;
+            //subentry.entries.listAppend("Next window will be [" + next_window_range.x + " to " + next_window_range.y + "] turns.");
+            subentry.entries.listAppend("Next gap will be " + next_turn_count + " turns.");
             
             //calculate the limit:
             boolean [string] chips = getInstalledSourceTerminalSingleChips();
@@ -34204,31 +34226,62 @@ buffer generateItemInformationMethod2(location l, monster m, boolean try_for_min
             }
         }
         
+        string [int] item_drop_modifiers_to_display;
         if (adjusted_base_drop_rate > 0 && adjusted_base_drop_rate < 100)
         {
 
             float effective_drop_rate = adjusted_base_drop_rate;
             float item_modifier = l.item_drop_modifier_for_location();
             if (it.fullness > 0 || (__items_that_craft_food contains it))
+            {
                 item_modifier += numeric_modifier("Food Drop");
+                item_drop_modifiers_to_display.listAppend("+food");
+            }
             if (it.inebriety > 0)
+            {
                 item_modifier += numeric_modifier("Booze Drop");
+                item_drop_modifiers_to_display.listAppend("+booze");
+            }
             if (it.to_slot() == $slot[hat])
+            {
                 item_modifier += numeric_modifier("Hat Drop");
+                item_drop_modifiers_to_display.listAppend("+hat");
+            }
             if (it.to_slot() == $slot[weapon])
+            {
                 item_modifier += numeric_modifier("Weapon Drop");
+                item_drop_modifiers_to_display.listAppend("+weapon");
+            }
             if (it.to_slot() == $slot[off-hand])
+            {
                 item_modifier += numeric_modifier("Offhand Drop");
+                item_drop_modifiers_to_display.listAppend("+offhand");
+            }
             if (it.to_slot() == $slot[shirt])
+            {
                 item_modifier += numeric_modifier("Shirt Drop");
+                item_drop_modifiers_to_display.listAppend("+shirt");
+            }
             if (it.to_slot() == $slot[pants])
+            {
                 item_modifier += numeric_modifier("Pants Drop");
+                item_drop_modifiers_to_display.listAppend("+pants");
+            }
             if ($slots[acc1,acc2,acc3] contains it.to_slot())
+            {
                 item_modifier += numeric_modifier("Accessory Drop");
+                item_drop_modifiers_to_display.listAppend("+accessory");
+            }
             if (it.candy)
+            {
                 item_modifier += numeric_modifier("Candy Drop");
+                item_drop_modifiers_to_display.listAppend("+candy");
+            }
             if ($slots[hat,weapon,off-hand,back,shirt,pants,acc1,acc2,acc3] contains it.to_slot()) //assuming familiar equipment isn't "gear"
+            {
                 item_modifier += numeric_modifier("Gear Drop");
+                item_drop_modifiers_to_display.listAppend("+gear");
+            }
             if (it == $item[black picnic basket] && $skill[Bear Essence].have_skill())
             {
                 item_modifier += 20.0 * MAX(1, get_property_int("skillLevel134"));
@@ -34322,6 +34375,12 @@ buffer generateItemInformationMethod2(location l, monster m, boolean try_for_min
                 info.item_drop_base_information = base_drop_rate + "?%";
             else
                 info.item_drop_base_information = base_drop_rate + "%";
+        }
+        if (item_drop_modifiers_to_display.count() > 0)
+        {
+            if (info.item_drop_base_information != "")
+                info.item_drop_base_information += ", ";
+            info.item_drop_base_information += item_drop_modifiers_to_display.listJoinComponents(", ") + " drop";
         }
         if (item_is_conditional)
             info.tags.listAppend("conditional");
@@ -36006,7 +36065,7 @@ string [string] generateAPIResponse()
     
     if (true)
     {
-        boolean [string] relevant_mafia_properties = $strings[merkinQuestPath,questF01Primordial,questF02Hyboria,questF03Future,questF04Elves,questF05Clancy,questG01Meatcar,questG02Whitecastle,questG03Ego,questG04Nemesis,questG05Dark,questG06Delivery,questI01Scapegoat,questI02Beat,questL02Larva,questL03Rat,questL04Bat,questL05Goblin,questL06Friar,questL07Cyrptic,questL08Trapper,questL09Topping,questL10Garbage,questL11MacGuffin,questL11Manor,questL11Palindome,questL11Pyramid,questL11Worship,questL12War,questL13Final,questM01Untinker,questM02Artist,questM03Bugbear,questM04Galaktic,questM05Toot,questM06Gourd,questM07Hammer,questM08Baker,questM09Rocks,questM10Azazel,questM11Postal,questM12Pirate,questM13Escape,questM14Bounty,questM15Lol,questS01OldGuy,questS02Monkees,sidequestArenaCompleted,sidequestFarmCompleted,sidequestJunkyardCompleted,sidequestLighthouseCompleted,sidequestNunsCompleted,sidequestOrchardCompleted,cyrptAlcoveEvilness,cyrptCrannyEvilness,cyrptNicheEvilness,cyrptNookEvilness,desertExploration,gnasirProgress,relayCounters,timesRested,currentEasyBountyItem,currentHardBountyItem,currentSpecialBountyItem,volcanoMaze1,_lastDailyDungeonRoom,seahorseName,chasmBridgeProgress,_aprilShower,lastAdventure,lastEncounter,_floristPlantsUsed,_fireStartingKitUsed,_psychoJarUsed,hiddenHospitalProgress,hiddenBowlingAlleyProgress,hiddenApartmentProgress,hiddenOfficeProgress,pyramidPosition,parasolUsed,_discoKnife,lastPlusSignUnlock,olfactedMonster,photocopyMonster,lastTempleUnlock,volcanoMaze1,blankOutUsed,peteMotorbikeCowling,peteMotorbikeGasTank,peteMotorbikeHeadlight,peteMotorbikeMuffler,peteMotorbikeSeat,peteMotorbikeTires,_petePeeledOut,_navelRunaways,_peteRiotIncited,_petePartyThrown,hiddenTavernUnlock,_dnaPotionsMade,_psychokineticHugUsed,dnaSyringe,_warbearGyrocopterUsed,questM20Necklace,questM21Dance,grimstoneMaskPath,cinderellaMinutesToMidnight,merkinVocabularyMastery,_pirateBellowUsed,questM21Dance,_defectiveTokenChecked,questG07Myst,questG08Moxie,questESpClipper,questESpGore,questESpJunglePun,questESpFakeMedium,questESlMushStash,questESlAudit,questESlBacteria,questESlCheeseburger,questESlCocktail,questESlSprinkles,questESlSalt,questESlFish,questESlDebt,_pickyTweezersUsed,_bittycar,questESpSerum,questESpOutOfOrder,_shrubDecorated,questESpEVE,questESpSmokes,questG09Muscle,_rapidPrototypingUsed,nsTowerDoorKeysUsed,_chateauDeskHarvested,lastGoofballBuy,nsChallenge1,nsChallenge2,nsContestants1,nsContestants2,nsContestants3,lastDesertUnlock,questM18Swamp,edPiece,warehouseProgress,questEStFishTrash,questEStNastyBears,questEStSocialJusticeI,questEStSocialJusticeII,questEStSuperLuber,questEStZippityDooDah,_summonAnnoyanceUsed,questEStWorkWithFood,questM24Doc,questEStGiveMeFuel,_mayoTankSoaked,_feastUsed,spelunkyNextNoncombat,spelunkySacrifices,spelunkyStatus,spelunkyUpgrades,spelunkyWinCount,_deckCardsDrawn,_glarkCableUses,_banderRunaways,questM25Armorer,pyramidBombUsed,_powerPillUses,nextAdventure,_barrelPrayer,questECoBucket,_machineTunnelsAdv,_snojoFreeFights,snojoSetting,_lastCombatStarted,batmanZone,batmanUpgrades,batmanTimeLeft,batmanStats,questLTTQuestByWire,questM26Oracle,sourceTerminalEducate1,sourceTerminalEducate2,sourceTerminalEnquiry,_sourceTerminalDigitizeUses,_sourceTerminalEnhanceUses,_sourceTerminalExtrudes];
+        boolean [string] relevant_mafia_properties = $strings[merkinQuestPath,questF01Primordial,questF02Hyboria,questF03Future,questF04Elves,questF05Clancy,questG01Meatcar,questG02Whitecastle,questG03Ego,questG04Nemesis,questG05Dark,questG06Delivery,questI01Scapegoat,questI02Beat,questL02Larva,questL03Rat,questL04Bat,questL05Goblin,questL06Friar,questL07Cyrptic,questL08Trapper,questL09Topping,questL10Garbage,questL11MacGuffin,questL11Manor,questL11Palindome,questL11Pyramid,questL11Worship,questL12War,questL13Final,questM01Untinker,questM02Artist,questM03Bugbear,questM04Galaktic,questM05Toot,questM06Gourd,questM07Hammer,questM08Baker,questM09Rocks,questM10Azazel,questM11Postal,questM12Pirate,questM13Escape,questM14Bounty,questM15Lol,questS01OldGuy,questS02Monkees,sidequestArenaCompleted,sidequestFarmCompleted,sidequestJunkyardCompleted,sidequestLighthouseCompleted,sidequestNunsCompleted,sidequestOrchardCompleted,cyrptAlcoveEvilness,cyrptCrannyEvilness,cyrptNicheEvilness,cyrptNookEvilness,desertExploration,gnasirProgress,relayCounters,timesRested,currentEasyBountyItem,currentHardBountyItem,currentSpecialBountyItem,volcanoMaze1,_lastDailyDungeonRoom,seahorseName,chasmBridgeProgress,_aprilShower,lastAdventure,lastEncounter,_floristPlantsUsed,_fireStartingKitUsed,_psychoJarUsed,hiddenHospitalProgress,hiddenBowlingAlleyProgress,hiddenApartmentProgress,hiddenOfficeProgress,pyramidPosition,parasolUsed,_discoKnife,lastPlusSignUnlock,olfactedMonster,photocopyMonster,lastTempleUnlock,volcanoMaze1,blankOutUsed,peteMotorbikeCowling,peteMotorbikeGasTank,peteMotorbikeHeadlight,peteMotorbikeMuffler,peteMotorbikeSeat,peteMotorbikeTires,_petePeeledOut,_navelRunaways,_peteRiotIncited,_petePartyThrown,hiddenTavernUnlock,_dnaPotionsMade,_psychokineticHugUsed,dnaSyringe,_warbearGyrocopterUsed,questM20Necklace,questM21Dance,grimstoneMaskPath,cinderellaMinutesToMidnight,merkinVocabularyMastery,_pirateBellowUsed,questM21Dance,_defectiveTokenChecked,questG07Myst,questG08Moxie,questESpClipper,questESpGore,questESpJunglePun,questESpFakeMedium,questESlMushStash,questESlAudit,questESlBacteria,questESlCheeseburger,questESlCocktail,questESlSprinkles,questESlSalt,questESlFish,questESlDebt,_pickyTweezersUsed,_bittycar,questESpSerum,questESpOutOfOrder,_shrubDecorated,questESpEVE,questESpSmokes,questG09Muscle,_rapidPrototypingUsed,nsTowerDoorKeysUsed,_chateauDeskHarvested,lastGoofballBuy,nsChallenge1,nsChallenge2,nsContestants1,nsContestants2,nsContestants3,lastDesertUnlock,questM18Swamp,edPiece,warehouseProgress,questEStFishTrash,questEStNastyBears,questEStSocialJusticeI,questEStSocialJusticeII,questEStSuperLuber,questEStZippityDooDah,_summonAnnoyanceUsed,questEStWorkWithFood,questM24Doc,questEStGiveMeFuel,_mayoTankSoaked,_feastUsed,spelunkyNextNoncombat,spelunkySacrifices,spelunkyStatus,spelunkyUpgrades,spelunkyWinCount,_deckCardsDrawn,_glarkCableUses,_banderRunaways,questM25Armorer,pyramidBombUsed,_powerPillUses,nextAdventure,_barrelPrayer,questECoBucket,_machineTunnelsAdv,_snojoFreeFights,snojoSetting,_lastCombatStarted,batmanZone,batmanUpgrades,batmanTimeLeft,batmanStats,questLTTQuestByWire,questM26Oracle,sourceTerminalEducate1,sourceTerminalEducate2,sourceTerminalEnquiry,_sourceTerminalDigitizeUses,_sourceTerminalEnhanceUses,_sourceTerminalExtrudes,_detectiveCasesCompleted];
         
         if (false)
         {
@@ -40502,7 +40561,62 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
     if (subentries.count() > 0)
         resource_entries.listAppend(ChecklistEntryMake("__item source essence", "campground.php?action=terminal", subentries, 5));
 }
+RegisterTaskGenerationFunction("IOTMDetectiveSchoolGenerateTasks");
+void IOTMDetectiveSchoolGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    if (!mafiaIsPastRevision(17048))
+        return;
+    if (!__iotms_usable[lookupItem("detective school application")])
+        return;
+    
+    //Should we always mention this in aftercore?
+    //Hmm... I suppose.
+    int cases_remaining = clampi(3 - get_property_int("_detectiveCasesCompleted"), 0, 3);
+    if (cases_remaining > 0)
+    {
+        optional_task_entries.listAppend(ChecklistEntryMake("__item noir fedora", "place.php?whichplace=town_wrong&action=townwrong_precinct", ChecklistSubentryMake("Solve " + pluraliseWordy(cases_remaining, "more case", "more cases"), "", "Gives cop dollars."), 5));
+    }
+    if (lookupItems("plastic detective badge,bronze detective badge,silver detective badge,gold detective badge").available_amount() == 0)
+    {
+        optional_task_entries.listAppend(ChecklistEntryMake("__item plastic detective badge", "place.php?whichplace=town_wrong&action=townwrong_precinct", ChecklistSubentryMake("Collect your Precinct badge", "", ""), 5));
+        
+    }
+}
 
+RegisterResourceGenerationFunction("IOTMDetectiveSchoolGenerateResource");
+void IOTMDetectiveSchoolGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if (!mafiaIsPastRevision(17048))
+        return;
+    if (!__iotms_usable[lookupItem("detective school application")])
+        return;
+    
+    //FIXME mention how much more they need to upgrade to the next badge?
+    if (__misc_state["in run"])
+    {
+        int cop_dollars_have = lookupItem("cop dollar").available_amount();
+        if (cop_dollars_have > 0)
+        {
+            string [int] description;
+            
+            string [int] buyables;
+            
+            string [int] ml_types_can_eat_drink;
+            if (__misc_state["can eat just about anything"])
+                ml_types_can_eat_drink.listAppend("food");
+            if (__misc_state["can drink just about anything"])
+                ml_types_can_eat_drink.listAppend("drink");
+            if (ml_types_can_eat_drink.count() > 0 && cop_dollars_have >= 4)
+                buyables.listAppend(ml_types_can_eat_drink.listJoinComponents("/"));
+            if (cop_dollars_have >= 10)
+            {
+                buyables.listAppend("a -combat potion (50 turns)");
+            }
+            description.listAppend("Buy " + buyables.listJoinComponents(", ", "or") + ".");
+            resource_entries.listAppend(ChecklistEntryMake("__item cop dollar", "shop.php?whichshop=detective", ChecklistSubentryMake(pluralise(lookupItem("cop dollar")), "", description), 7));
+        }
+    }
+}
 
 RegisterTaskGenerationFunction("PathActuallyEdtheUndyingGenerateTasks");
 void PathActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -42552,6 +42666,64 @@ void PathTheSourceGenerateResource(ChecklistEntry [int] resource_entries)
 {
 	if (my_path_id() != PATH_THE_SOURCE)
 		return;
+}
+
+RegisterTaskGenerationFunction("PathZombieSlayerGenerateTasks");
+void PathZombieSlayerGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+	if (my_path_id() != PATH_ZOMBIE_SLAYER)
+		return;
+    //zombiePoints is the number of points "permed" on the character, not how many they have at the moment
+    //Let's see.. I think this means we can infer how many points they have to spend, right? You start with zombiePoints + 1, then gain one for each level you have, minus how many hunter brains you have, minus whether you've fought the right hunter yet... but, we can't know that information. Hmm. So, no, no reminder. Alas.
+    //We could, however, suggest they eat a hunter brain.
+    //ashq string out; foreach s in $skills[] if (s.class == $class[zombie master]) out += ", " + s; print(out);
+    if ($item[hunter brain].available_amount() > 0 && availableFullness() >= 1)
+    {
+        int zombie_skills_have = 0;
+        foreach s in $skills[Infectious Bite, Bite Minion, Lure Minions, Undying Greed, Hunter's Sprint, Insatiable Hunger, Devour Minions, Indefatigable, Skullcracker, Neurogourmet, Ravenous Pounce, Distracting Minion, Plague Claws, Flesh Mob, Elemental Obliviousness, Vigor Mortis, Virulence, Bilious Burst, Unyielding Flesh, Corpse Pile, Howl of the Alpha, Summon Minion, Zombie Chow, Smash & Graaagh, Scavenge, Meat Shields, Summon Horde, His Master's Voice, Ag-grave-ation, Disquiet Riot, Zombie Maestro, Recruit Zombie]
+        {
+            if (s.have_skill())
+                zombie_skills_have += 1;
+        }
+        if (zombie_skills_have < 30)
+        {
+            //probably should suggest eat X hunter brains but
+            optional_task_entries.listAppend(ChecklistEntryMake("__item hunter brain", "inventory.php?which=1", ChecklistSubentryMake("Eat a hunter brain", "", "Gain a skill point."), -1));
+        }
+    }
+    
+}
+
+RegisterResourceGenerationFunction("PathZombieSlayerGenerateResource");
+void PathZombieSlayerGenerateResource(ChecklistEntry [int] resource_entries)
+{
+	if (my_path_id() != PATH_ZOMBIE_SLAYER)
+		return;
+    
+    if ($item[right bear arm].available_amount() > 0 && $item[left bear arm].available_amount() > 0)
+    {
+        int bear_hugs_remaining = clampi(10 - get_property_int("_bearHugs"), 0, 10);
+        
+        if (bear_hugs_remaining > 0)
+        {
+            string url;
+            string [int] description;
+            description.listAppend("Converts monster to zombies. Ideally, use against group monsters.");
+            string [int] items_to_equip;
+            foreach it in $items[right bear arm,left bear arm]
+            {
+                if (it.equipped_amount() == 0)
+                    items_to_equip.listAppend(it);
+            }
+            if (items_to_equip.count() > 0)
+            {
+                url = "inventory.php?which=2";
+                description.listAppend("Equip " + items_to_equip.listJoinComponents(", ", "and") + ".");
+            }
+            resource_entries.listAppend(ChecklistEntryMake("__item right bear arm", url, ChecklistSubentryMake(pluralise(bear_hugs_remaining, "bear hug", "bear hugs"), "", description), 8));
+            
+        }
+    }
 }
 
 
