@@ -9,3 +9,4 @@ import "relay/Guide/Paths/Heavy Rains.ash";
 import "relay/Guide/Paths/KOLHS.ash";
 import "relay/Guide/Paths/Way of the Surprising Fist.ash";
 import "relay/Guide/Paths/The Source.ash";
+import "relay/Guide/Paths/Zombie Slayer.ash";

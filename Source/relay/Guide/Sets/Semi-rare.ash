@@ -27,7 +27,11 @@ void SemirareGenerateDescription(string [int] description)
                 line += ".";
             
         }
-        if (line != "")
+        if (CounterLookup("Semi-rare").CounterMayHitNextTurn())
+        {
+            description.listAppend("Already in counter window, probably should ignore this?");
+        }
+        else if (line != "")
             description.listAppend(line);
 	}
 	location last_location = $location[none];
@@ -238,7 +242,7 @@ void SSemirareGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
 	}
     if (very_important && __misc_state["monsters can be nearly impossible to kill"] && monster_level_adjustment() > 0)
         description.listAppend(HTMLGenerateSpanFont("Possibly remove +ML to survive. (at +" + monster_level_adjustment() + " ML)", "red"));
-	boolean very_important_reduces_size = description.count() > 2;
+	boolean very_important_reduces_size = description.count() > 1;
     
 	if (title != "")
 	{

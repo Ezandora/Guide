@@ -85,7 +85,7 @@ buffer HTMLGenerateDivOfClass(string source, string class_name, string extra_sty
 buffer HTMLGenerateDivOfStyle(string source, string style)
 {
 	if (style == "")
-		return source.to_buffer();
+		return HTMLGenerateTagWrap("div", source);
 	
 	return HTMLGenerateTagWrap("div", source, mapMake("style", style));
 }

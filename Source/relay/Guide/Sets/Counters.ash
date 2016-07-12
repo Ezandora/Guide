@@ -135,6 +135,7 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
     
     
     boolean [string] counter_blacklist = $strings[Romantic Monster,Semi-rare];
+    boolean [string] non_range_whitelist = $strings[Digitize Monster];
     
     string [int] all_counter_names = CounterGetAllNames();
     
@@ -147,18 +148,22 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
             continue;
         
         Counter c = CounterLookup(window_name);
-        if (!c.CounterIsRange())
+        if (!c.CounterIsRange() && !(non_range_whitelist contains window_name))
             continue;
         
+        boolean counter_is_range = c.CounterIsRange();
         Vec2i turn_range = c.CounterGetWindowRange();
+        int next_exact_turn = c.CounterGetNextExactTurn();
         
-        if (!(turn_range.x <= 10 && from_task) && !(turn_range.x > 10 && !from_task))
+        if (counter_is_range && !(turn_range.x <= 10 && from_task) && !(turn_range.x > 10 && !from_task))
             continue;
         
         
         
         boolean very_important = false;
-        if (turn_range.x <= 0)
+        if (turn_range.x <= 0 && counter_is_range)
+            very_important = true;
+        if (!counter_is_range && next_exact_turn <= 0)
             very_important = true;
         
         
@@ -182,7 +187,14 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
         subentry.header = window_display_name;
         
         
-        if (turn_range.y <= 0)
+        if (!counter_is_range)
+        {
+            if (next_exact_turn <= 0)
+                subentry.header += " now";
+            else
+                subentry.header += " after " + pluralise(next_exact_turn, "more turn", "more turns");
+        }
+        else if (turn_range.y <= 0)
             subentry.header += " now or soon";
         else if (turn_range.x <= 0)
             subentry.header += " between now and " + turn_range.y + " turns.";
@@ -194,8 +206,10 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
         {
             //Display next window:
             int next_window_count = get_property_int("_sourceTerminalDigitizeMonsterCount") + 1;
-            Vec2i next_window_range = Vec2iMake(15 + 10 * next_window_count, 25 + 10 * next_window_count);
-            subentry.entries.listAppend("Next window will be [" + next_window_range.x + " to " + next_window_range.y + "] turns.");
+            //Vec2i next_window_range = Vec2iMake(15 + 10 * next_window_count, 25 + 10 * next_window_count);
+            int next_turn_count = next_window_count * 10 + 10;
+            //subentry.entries.listAppend("Next window will be [" + next_window_range.x + " to " + next_window_range.y + "] turns.");
+            subentry.entries.listAppend("Next gap will be " + next_turn_count + " turns.");
             
             //calculate the limit:
             boolean [string] chips = getInstalledSourceTerminalSingleChips();

@@ -144,7 +144,7 @@ void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [in
         float agent_initiative = lookupMonster("Source Agent").base_initiative;
         float chance_to_get_jump = clampf(100 - agent_initiative + our_init, 0.0, 100.0);
         boolean might_not_gain_init = false;
-        if (my_thrall() == $thrall[spaghetti elemental] && my_thrall().level >= 5)
+        if (my_thrall() == $thrall[spaghetti elemental] && my_thrall().level >= 5 && monster_level_adjustment() <= 150)
             stat_description += "|Will effectively gain initiative on agent.";
         else if (chance_to_get_jump >= 100.0)
             stat_description += "|Will gain initiative on agent.";

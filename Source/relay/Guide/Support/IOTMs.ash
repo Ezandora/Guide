@@ -4,8 +4,10 @@ void initialiseIOTMsUsable()
 {
     foreach key in __iotms_usable
         remove __iotms_usable[key];
+    if (in_bad_moon())
+        return;
     
-    if (!in_bad_moon() && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING)
+    if (my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING)
     {
         int [item] campground = get_campground();
         //Campground items:
@@ -16,6 +18,8 @@ void initialiseIOTMsUsable()
         if (campground[lookupItem("Witchess Set")] > 0)
             __iotms_usable[lookupItem("Witchess Set")] = true;
     }
+    if (get_property_boolean("hasDetectiveSchool"))
+            __iotms_usable[lookupItem("detective school application")] = true;
 }
 
 initialiseIOTMsUsable();

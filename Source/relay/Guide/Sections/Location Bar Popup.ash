@@ -212,31 +212,62 @@ buffer generateItemInformationMethod2(location l, monster m, boolean try_for_min
             }
         }
         
+        string [int] item_drop_modifiers_to_display;
         if (adjusted_base_drop_rate > 0 && adjusted_base_drop_rate < 100)
         {
 
             float effective_drop_rate = adjusted_base_drop_rate;
             float item_modifier = l.item_drop_modifier_for_location();
             if (it.fullness > 0 || (__items_that_craft_food contains it))
+            {
                 item_modifier += numeric_modifier("Food Drop");
+                item_drop_modifiers_to_display.listAppend("+food");
+            }
             if (it.inebriety > 0)
+            {
                 item_modifier += numeric_modifier("Booze Drop");
+                item_drop_modifiers_to_display.listAppend("+booze");
+            }
             if (it.to_slot() == $slot[hat])
+            {
                 item_modifier += numeric_modifier("Hat Drop");
+                item_drop_modifiers_to_display.listAppend("+hat");
+            }
             if (it.to_slot() == $slot[weapon])
+            {
                 item_modifier += numeric_modifier("Weapon Drop");
+                item_drop_modifiers_to_display.listAppend("+weapon");
+            }
             if (it.to_slot() == $slot[off-hand])
+            {
                 item_modifier += numeric_modifier("Offhand Drop");
+                item_drop_modifiers_to_display.listAppend("+offhand");
+            }
             if (it.to_slot() == $slot[shirt])
+            {
                 item_modifier += numeric_modifier("Shirt Drop");
+                item_drop_modifiers_to_display.listAppend("+shirt");
+            }
             if (it.to_slot() == $slot[pants])
+            {
                 item_modifier += numeric_modifier("Pants Drop");
+                item_drop_modifiers_to_display.listAppend("+pants");
+            }
             if ($slots[acc1,acc2,acc3] contains it.to_slot())
+            {
                 item_modifier += numeric_modifier("Accessory Drop");
+                item_drop_modifiers_to_display.listAppend("+accessory");
+            }
             if (it.candy)
+            {
                 item_modifier += numeric_modifier("Candy Drop");
+                item_drop_modifiers_to_display.listAppend("+candy");
+            }
             if ($slots[hat,weapon,off-hand,back,shirt,pants,acc1,acc2,acc3] contains it.to_slot()) //assuming familiar equipment isn't "gear"
+            {
                 item_modifier += numeric_modifier("Gear Drop");
+                item_drop_modifiers_to_display.listAppend("+gear");
+            }
             if (it == $item[black picnic basket] && $skill[Bear Essence].have_skill())
             {
                 item_modifier += 20.0 * MAX(1, get_property_int("skillLevel134"));
@@ -330,6 +361,12 @@ buffer generateItemInformationMethod2(location l, monster m, boolean try_for_min
                 info.item_drop_base_information = base_drop_rate + "?%";
             else
                 info.item_drop_base_information = base_drop_rate + "%";
+        }
+        if (item_drop_modifiers_to_display.count() > 0)
+        {
+            if (info.item_drop_base_information != "")
+                info.item_drop_base_information += ", ";
+            info.item_drop_base_information += item_drop_modifiers_to_display.listJoinComponents(", ") + " drop";
         }
         if (item_is_conditional)
             info.tags.listAppend("conditional");
