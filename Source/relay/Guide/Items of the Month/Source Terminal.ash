@@ -135,7 +135,18 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
         //substats.enh is probably less than 150 mainstat. that's not a lot... +item is much more useful
         subentries.listAppend(ChecklistSubentryMake(pluralise(enhancements_remaining, "source enhancement", "source enhancements") + " remaining", "", description));
     }
-    if (mafiaIsPastRevision(17031) && (!get_property_boolean("_sourceTerminalDuplicateUsed") || my_path_id() == PATH_THE_SOURCE) && __misc_state["in run"])
+    
+	int total_duplicate_uses_available = 1;
+	if (my_path_id() == PATH_THE_SOURCE)
+		total_duplicate_uses_available = 5;
+	int duplicate_uses_remaining = clampi(total_duplicate_uses_available - get_property_int("_sourceTerminalDuplicateUses"), 0, total_duplicate_uses_available);
+    if (!mafiaIsPastRevision(17062))
+    {
+        duplicate_uses_remaining = 1;
+        if (get_property_boolean("_sourceTerminalDuplicateUsed"))
+            duplicate_uses_remaining = 0;
+    }
+    if (mafiaIsPastRevision(17031) && duplicate_uses_remaining > 0 && __misc_state["in run"])
     {
         //Duplication of a monster:
         string [int] description;
@@ -144,7 +155,10 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
         string line = "Doubles";
         if (my_path_id() == PATH_THE_SOURCE)
             line = "Triples";
-        line += " item drops from a monster, once/day.|Makes them stronger, so be careful.";
+        string times = "once/day";
+        if (total_duplicate_uses_available > 1)
+            times = total_duplicate_uses_available.int_to_wordy() + " times/day";
+        line += " item drops from a monster, " + times + ".|Makes them stronger, so be careful.";
         description.listAppend(line);
         if (!skills_have[lookupSkill("Duplicate")])
         {
@@ -165,7 +179,13 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
         if (potential_targets.count() > 0)
             description.listAppend("Could use on a " + potential_targets.listJoinComponents(", ", "or") + ".");
         
-        subentries.listAppend(ChecklistSubentryMake("Duplication usable", "", description));
+        string title = "Duplication castable";
+        if (total_duplicate_uses_available > 1)
+        {
+            title = pluralise(duplicate_uses_remaining, "duplication", "duplications");
+        }
+        
+        subentries.listAppend(ChecklistSubentryMake(title, "", description));
     }
     //Portscans: (the source)
     int portscans_remaining = clampi(3 - get_property_int("_sourceTerminalPortscanUses"), 0, 3);

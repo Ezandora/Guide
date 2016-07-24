@@ -16,6 +16,7 @@ Record Counter
     boolean found_end_turn_range;
     
     boolean initialised;
+    boolean waiting_for_adventure_php;
 };
 
 Counter CounterMake()
@@ -186,34 +187,14 @@ buffer CounterDescription(Counter c)
 }
 
 
-Counter [string] __active_counters; //Try to avoid referencing directly
-
-boolean __counters_inited = false;
-int __counters_turn_inited = -1;
-void CountersInit()
+void CountersParseProperty(string property_name, Counter [string] counters, boolean are_temp_counters)
 {
-    if (__counters_inited && __counters_turn_inited == my_turncount())
-        return;
-    __counters_inited = true;
-    __counters_turn_inited = my_turncount();
-
-    foreach key in __active_counters
+    foreach key in counters
     {
-        remove __active_counters[key];
+        remove counters[key];
     }
-
-    //parse counters:
-	//Examples:
-	//relayCounters(user, now '1378:Fortune Cookie:fortune.gif', default )
-	//relayCounters(user, now '1539:Semirare window begin loc=*:lparen.gif:1579:Semirare window end loc=*:rparen.gif', default )
-	//relayCounters(user, now '70:Semirare window begin:lparen.gif:80:Semirare window end loc=*:rparen.gif', default )
-	//relayCounters(user, now '1750:Romantic Monster window begin loc=*:lparen.gif:1760:Romantic Monster window end loc=*:rparen.gif', default )
-    //relayCounters(user, now '7604:Fortune Cookie:fortune.gif:7584:Fortune Cookie:fortune.gif', default )
-    //relayCounters(user, now '450:Fortune Cookie:fortune.gif:458:Fortune Cookie:fortune.gif:401:Dance Card loc=109:guildapp.gif', default )
-    //relayCounters(user, now '1271:Nemesis Assassin window begin loc=*:lparen.gif:1286:Nemesis Assassin window end loc=*:rparen.gif:1331:Fortune Cookie:fortune.gif', default )
-    //relayCounters(user, now '695:Nemesis Assassin window begin loc=*:lparen.gif:710:Nemesis Assassin window end loc=*:rparen.gif:780:Fortune Cookie:fortune.gif:685:Dance Card loc=109:guildapp.gif', default )
     
-	string counter_string = get_property("relayCounters");
+	string counter_string = get_property(property_name);
 	string [int] counter_split = split_string(counter_string, ":");
     
     if (true)
@@ -226,6 +207,8 @@ void CountersInit()
             if (counter_split[i].length() == 0)
                 continue;
             int turn_number = to_int_silent(counter_split[i]);
+            if (are_temp_counters)
+                turn_number += my_turncount();
             int turns_until_counter = turn_number - my_turncount();
             string counter_name_raw = counter_split[i + 1];
             string counter_gif = counter_split[i + 2];
@@ -276,8 +259,10 @@ void CountersInit()
             //Now create and edit our counter:
             
             Counter c = CounterMake();
-            if (__active_counters contains final_name)
-                c = __active_counters[final_name];
+            if (counters contains final_name)
+                c = counters[final_name];
+            if (are_temp_counters)
+                c.waiting_for_adventure_php = true;
             
             c.name = final_name;
             boolean should_add_gif = true;
@@ -307,24 +292,57 @@ void CountersInit()
             }
             else
             {
-                if (turns_until_counter >= 0)
+                //if (turns_until_counter >= 0)
+                if (true)
                 {
-                    c.exact_turns.listAppend(turns_until_counter);
+                    c.exact_turns.listAppend(MAX(0, turns_until_counter));
                     sort c.exact_turns by value;
                 }
             }
             
-            __active_counters[final_name] = c;
+            counters[final_name] = c;
         }
     }
 }
 
-Counter CounterLookup(string counter_name, Error found)
+Counter [string] __active_counters; //Try to avoid referencing directly
+Counter [string] __active_temp_counters;
+
+boolean __counters_inited = false;
+int __counters_turn_inited = -1;
+void CountersInit()
+{
+    if (__counters_inited && __counters_turn_inited == my_turncount())
+        return;
+    __counters_inited = true;
+    __counters_turn_inited = my_turncount();
+
+    //parse counters:
+	//Examples:
+	//relayCounters(user, now '1378:Fortune Cookie:fortune.gif', default )
+	//relayCounters(user, now '1539:Semirare window begin loc=*:lparen.gif:1579:Semirare window end loc=*:rparen.gif', default )
+	//relayCounters(user, now '70:Semirare window begin:lparen.gif:80:Semirare window end loc=*:rparen.gif', default )
+	//relayCounters(user, now '1750:Romantic Monster window begin loc=*:lparen.gif:1760:Romantic Monster window end loc=*:rparen.gif', default )
+    //relayCounters(user, now '7604:Fortune Cookie:fortune.gif:7584:Fortune Cookie:fortune.gif', default )
+    //relayCounters(user, now '450:Fortune Cookie:fortune.gif:458:Fortune Cookie:fortune.gif:401:Dance Card loc=109:guildapp.gif', default )
+    //relayCounters(user, now '1271:Nemesis Assassin window begin loc=*:lparen.gif:1286:Nemesis Assassin window end loc=*:rparen.gif:1331:Fortune Cookie:fortune.gif', default )
+    //relayCounters(user, now '695:Nemesis Assassin window begin loc=*:lparen.gif:710:Nemesis Assassin window end loc=*:rparen.gif:780:Fortune Cookie:fortune.gif:685:Dance Card loc=109:guildapp.gif', default )
+    //70:Semirare window begin:lparen.gif:80:Semirare window end loc=*:rparen.gif:57:Digitize Monster:watch.gif:57:Romantic Monster window begin loc=*:lparen.gif:67:Romantic Monster window end loc=*:rparen.gif
+    
+    CountersParseProperty("relayCounters", __active_counters, false);
+    CountersParseProperty("_tempRelayCounters", __active_temp_counters, true);
+}
+
+Counter CounterLookup(string counter_name, Error found, boolean allow_temp_counters)
 {
     CountersInit();
     if (__active_counters contains counter_name)
     {
         return __active_counters[counter_name];
+    }
+    else if (allow_temp_counters && __active_temp_counters contains counter_name)
+    {
+        return __active_temp_counters[counter_name];
     }
     else
     {
@@ -333,28 +351,42 @@ Counter CounterLookup(string counter_name, Error found)
     }
 }
 
+
+Counter CounterLookup(string counter_name, Error found)
+{
+    return CounterLookup(counter_name, found, false);
+}
+
 Counter CounterLookup(string counter_name)
 {
     return CounterLookup(counter_name, ErrorMake());
 }
 
-string [int] CounterGetAllNames()
+string [int] CounterGetAllNames(boolean allow_temp_counters)
 {
     string [int] names;
     foreach name in __active_counters
         names.listAppend(name);
+    if (allow_temp_counters)
+    {
+        foreach name in __active_temp_counters
+            names.listAppend(name);
+    }
     return names;
+}
+
+string [int] CounterGetAllNames()
+{
+    return CounterGetAllNames(false);
 }
 
 void CountersReparse()
 {
     __counters_inited = false;
-    foreach key in __active_counters
-    {
-        remove __active_counters[key];
-    }
     CountersInit();
 }
+
+
 
 boolean [string] __wandering_monster_counter_names = $strings[Romantic Monster,Rain Monster,Holiday Monster,Nemesis Assassin,Bee,WoL Monster,Digitize Monster];
 

@@ -49,6 +49,15 @@ void SAftercoreThingsToDoGenerateTasks(ChecklistEntry [int] task_entries, Checkl
         options.listAppend(AftercoreOptionMake("Felonia quest", "place.php?whichplace=knoll_friendly", listMake("speak to Mayor Zapruder", "rewards once/ascension mushroom fermenting solution")));
     }
     
+    if (!QuestState("questG04Nemesis").started)
+    {
+        string [int] things_gives;
+        things_gives.listAppend("instant karma");
+        if (my_class() == $class[disco bandit])
+            things_gives.listAppend("rave skills");
+        options.listAppend(AftercoreOptionMake("Nemesis quest", "guild.php", listMake("Rewards " + things_gives.listJoinComponents(", ", "and"))));
+    }
+    
     if (!QuestState("questF04Elves").started && $effect[transpondent].have_effect() == 0)
     {
         string url;

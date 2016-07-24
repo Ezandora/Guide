@@ -137,7 +137,7 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
     boolean [string] counter_blacklist = $strings[Romantic Monster,Semi-rare];
     boolean [string] non_range_whitelist = $strings[Digitize Monster];
     
-    string [int] all_counter_names = CounterGetAllNames();
+    string [int] all_counter_names = CounterGetAllNames(true);
     
     foreach key in all_counter_names
     {
@@ -147,7 +147,7 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
         if (counter_blacklist contains window_name)
             continue;
         
-        Counter c = CounterLookup(window_name);
+        Counter c = CounterLookup(window_name, ErrorMake(), true);
         if (!c.CounterIsRange() && !(non_range_whitelist contains window_name))
             continue;
         
@@ -159,11 +159,10 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
             continue;
         
         
-        
         boolean very_important = false;
         if (turn_range.x <= 0 && counter_is_range)
             very_important = true;
-        if (!counter_is_range && next_exact_turn <= 0)
+        if (!counter_is_range && next_exact_turn <= 3) //warn three turns ahead
             very_important = true;
         
         
@@ -231,8 +230,10 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
         {
             CopiedMonstersGenerateDescriptionForMonster(fighting_monster, subentry.entries, (turn_range.x <= 0), false);
         }
+        if (c.waiting_for_adventure_php)
+            subentry.entries.listAppend("Need to adventure in adventure.php to start counting.");
         
-        if (turn_range.x <= 0)
+        if ((turn_range.x <= 0 && counter_is_range) || (!counter_is_range && next_exact_turn <= 0))
         {
             if (get_property_boolean("dailyDungeonDone"))
             {

@@ -96,6 +96,7 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
             //subentry.entries.listAppend("Possibly make the blackberry galoshes via NC, if you get three blackberries.");
         }
         
+        boolean [familiar] relevant_familiars = $familiars[reassembled blackbird,reconstituted crow];
         familiar bird_needed_familiar;
         item bird_needed;
         if (my_path_id() == PATH_BEES_HATE_YOU)
@@ -125,11 +126,11 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
             {
                 subentry.entries.listAppend("Make a " + bird_needed + ".");
             }
-            else if (my_familiar() != bird_needed_familiar && bird_needed.available_amount() == 0)
+            else if (!(relevant_familiars contains my_familiar()) && bird_needed.available_amount() == 0)
             {
                 subentry.entries.listAppend(HTMLGenerateSpanFont("Bring along " + bird_needed_familiar + " to speed up quest.", "red"));
             }
-            else if (my_familiar() == bird_needed_familiar && bird_needed.available_amount() > 0)
+            else if ((relevant_familiars contains my_familiar()) && bird_needed.available_amount() > 0)
             {
                 subentry.entries.listAppend("Bring along another familiar, you don't need to use the bird anymore.");
             }

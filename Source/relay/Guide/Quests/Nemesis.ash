@@ -497,6 +497,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     {
         subentry.entries.listAppend("Speak to your guild to start the quest.|Then adventure in the Unquiet Garves until you unlock the tomb of the unknown, and solve the puzzle.");
         url = "guild.php";
+        return;
     }
     else if (base_quest_state.mafia_internal_step <= 4)
     {
