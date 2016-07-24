@@ -2,7 +2,7 @@
 
 since 17.1; //the earliest main release that is usable in modern KOL (unequip bug)
 //These settings are for development. Don't worry about editing them.
-string __version = "1.4.6";
+string __version = "1.4.7";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -1167,6 +1167,18 @@ string [string] mapMake(string key1, string value1, string key2, string value2, 
 	result[key4] = value4;
 	return result;
 }
+
+string [string] mapMake(string key1, string value1, string key2, string value2, string key3, string value3, string key4, string value4, string key5, string value5)
+{
+	string [string] result;
+	result[key1] = value1;
+	result[key2] = value2;
+	result[key3] = value3;
+	result[key4] = value4;
+	result[key5] = value5;
+	return result;
+}
+
 string [string] mapCopy(string [string] map)
 {
     string [string] result;
@@ -1365,6 +1377,17 @@ boolean listContainsValue(monster [int] list, monster vo)
             return true;
     }
     return false;
+}
+
+skill [int] listInvert(boolean [skill] list)
+{
+    skill [int] out;
+    foreach m, value in list
+    {
+        if (value)
+            out.listAppend(m);
+    }
+    return out;
 }
 
 monster [int] listInvert(boolean [monster] monsters)
@@ -3484,6 +3507,7 @@ Record Counter
     boolean found_end_turn_range;
     
     boolean initialised;
+    boolean waiting_for_adventure_php;
 };
 
 Counter CounterMake()
@@ -3654,34 +3678,14 @@ buffer CounterDescription(Counter c)
 }
 
 
-Counter [string] __active_counters; //Try to avoid referencing directly
-
-boolean __counters_inited = false;
-int __counters_turn_inited = -1;
-void CountersInit()
+void CountersParseProperty(string property_name, Counter [string] counters, boolean are_temp_counters)
 {
-    if (__counters_inited && __counters_turn_inited == my_turncount())
-        return;
-    __counters_inited = true;
-    __counters_turn_inited = my_turncount();
-
-    foreach key in __active_counters
+    foreach key in counters
     {
-        remove __active_counters[key];
+        remove counters[key];
     }
-
-    //parse counters:
-	//Examples:
-	//relayCounters(user, now '1378:Fortune Cookie:fortune.gif', default )
-	//relayCounters(user, now '1539:Semirare window begin loc=*:lparen.gif:1579:Semirare window end loc=*:rparen.gif', default )
-	//relayCounters(user, now '70:Semirare window begin:lparen.gif:80:Semirare window end loc=*:rparen.gif', default )
-	//relayCounters(user, now '1750:Romantic Monster window begin loc=*:lparen.gif:1760:Romantic Monster window end loc=*:rparen.gif', default )
-    //relayCounters(user, now '7604:Fortune Cookie:fortune.gif:7584:Fortune Cookie:fortune.gif', default )
-    //relayCounters(user, now '450:Fortune Cookie:fortune.gif:458:Fortune Cookie:fortune.gif:401:Dance Card loc=109:guildapp.gif', default )
-    //relayCounters(user, now '1271:Nemesis Assassin window begin loc=*:lparen.gif:1286:Nemesis Assassin window end loc=*:rparen.gif:1331:Fortune Cookie:fortune.gif', default )
-    //relayCounters(user, now '695:Nemesis Assassin window begin loc=*:lparen.gif:710:Nemesis Assassin window end loc=*:rparen.gif:780:Fortune Cookie:fortune.gif:685:Dance Card loc=109:guildapp.gif', default )
     
-	string counter_string = get_property("relayCounters");
+	string counter_string = get_property(property_name);
 	string [int] counter_split = split_string(counter_string, ":");
     
     if (true)
@@ -3694,6 +3698,8 @@ void CountersInit()
             if (counter_split[i].length() == 0)
                 continue;
             int turn_number = to_int_silent(counter_split[i]);
+            if (are_temp_counters)
+                turn_number += my_turncount();
             int turns_until_counter = turn_number - my_turncount();
             string counter_name_raw = counter_split[i + 1];
             string counter_gif = counter_split[i + 2];
@@ -3744,8 +3750,10 @@ void CountersInit()
             //Now create and edit our counter:
             
             Counter c = CounterMake();
-            if (__active_counters contains final_name)
-                c = __active_counters[final_name];
+            if (counters contains final_name)
+                c = counters[final_name];
+            if (are_temp_counters)
+                c.waiting_for_adventure_php = true;
             
             c.name = final_name;
             boolean should_add_gif = true;
@@ -3775,24 +3783,57 @@ void CountersInit()
             }
             else
             {
-                if (turns_until_counter >= 0)
+                //if (turns_until_counter >= 0)
+                if (true)
                 {
-                    c.exact_turns.listAppend(turns_until_counter);
+                    c.exact_turns.listAppend(MAX(0, turns_until_counter));
                     sort c.exact_turns by value;
                 }
             }
             
-            __active_counters[final_name] = c;
+            counters[final_name] = c;
         }
     }
 }
 
-Counter CounterLookup(string counter_name, Error found)
+Counter [string] __active_counters; //Try to avoid referencing directly
+Counter [string] __active_temp_counters;
+
+boolean __counters_inited = false;
+int __counters_turn_inited = -1;
+void CountersInit()
+{
+    if (__counters_inited && __counters_turn_inited == my_turncount())
+        return;
+    __counters_inited = true;
+    __counters_turn_inited = my_turncount();
+
+    //parse counters:
+	//Examples:
+	//relayCounters(user, now '1378:Fortune Cookie:fortune.gif', default )
+	//relayCounters(user, now '1539:Semirare window begin loc=*:lparen.gif:1579:Semirare window end loc=*:rparen.gif', default )
+	//relayCounters(user, now '70:Semirare window begin:lparen.gif:80:Semirare window end loc=*:rparen.gif', default )
+	//relayCounters(user, now '1750:Romantic Monster window begin loc=*:lparen.gif:1760:Romantic Monster window end loc=*:rparen.gif', default )
+    //relayCounters(user, now '7604:Fortune Cookie:fortune.gif:7584:Fortune Cookie:fortune.gif', default )
+    //relayCounters(user, now '450:Fortune Cookie:fortune.gif:458:Fortune Cookie:fortune.gif:401:Dance Card loc=109:guildapp.gif', default )
+    //relayCounters(user, now '1271:Nemesis Assassin window begin loc=*:lparen.gif:1286:Nemesis Assassin window end loc=*:rparen.gif:1331:Fortune Cookie:fortune.gif', default )
+    //relayCounters(user, now '695:Nemesis Assassin window begin loc=*:lparen.gif:710:Nemesis Assassin window end loc=*:rparen.gif:780:Fortune Cookie:fortune.gif:685:Dance Card loc=109:guildapp.gif', default )
+    //70:Semirare window begin:lparen.gif:80:Semirare window end loc=*:rparen.gif:57:Digitize Monster:watch.gif:57:Romantic Monster window begin loc=*:lparen.gif:67:Romantic Monster window end loc=*:rparen.gif
+    
+    CountersParseProperty("relayCounters", __active_counters, false);
+    CountersParseProperty("_tempRelayCounters", __active_temp_counters, true);
+}
+
+Counter CounterLookup(string counter_name, Error found, boolean allow_temp_counters)
 {
     CountersInit();
     if (__active_counters contains counter_name)
     {
         return __active_counters[counter_name];
+    }
+    else if (allow_temp_counters && __active_temp_counters contains counter_name)
+    {
+        return __active_temp_counters[counter_name];
     }
     else
     {
@@ -3801,28 +3842,42 @@ Counter CounterLookup(string counter_name, Error found)
     }
 }
 
+
+Counter CounterLookup(string counter_name, Error found)
+{
+    return CounterLookup(counter_name, found, false);
+}
+
 Counter CounterLookup(string counter_name)
 {
     return CounterLookup(counter_name, ErrorMake());
 }
 
-string [int] CounterGetAllNames()
+string [int] CounterGetAllNames(boolean allow_temp_counters)
 {
     string [int] names;
     foreach name in __active_counters
         names.listAppend(name);
+    if (allow_temp_counters)
+    {
+        foreach name in __active_temp_counters
+            names.listAppend(name);
+    }
     return names;
+}
+
+string [int] CounterGetAllNames()
+{
+    return CounterGetAllNames(false);
 }
 
 void CountersReparse()
 {
     __counters_inited = false;
-    foreach key in __active_counters
-    {
-        remove __active_counters[key];
-    }
     CountersInit();
 }
+
+
 
 boolean [string] __wandering_monster_counter_names = $strings[Romantic Monster,Rain Monster,Holiday Monster,Nemesis Assassin,Bee,WoL Monster,Digitize Monster];
 
@@ -12327,6 +12382,7 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
             //subentry.entries.listAppend("Possibly make the blackberry galoshes via NC, if you get three blackberries.");
         }
         
+        boolean [familiar] relevant_familiars = $familiars[reassembled blackbird,reconstituted crow];
         familiar bird_needed_familiar;
         item bird_needed;
         if (my_path_id() == PATH_BEES_HATE_YOU)
@@ -12356,11 +12412,11 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
             {
                 subentry.entries.listAppend("Make a " + bird_needed + ".");
             }
-            else if (my_familiar() != bird_needed_familiar && bird_needed.available_amount() == 0)
+            else if (!(relevant_familiars contains my_familiar()) && bird_needed.available_amount() == 0)
             {
                 subentry.entries.listAppend(HTMLGenerateSpanFont("Bring along " + bird_needed_familiar + " to speed up quest.", "red"));
             }
-            else if (my_familiar() == bird_needed_familiar && bird_needed.available_amount() > 0)
+            else if ((relevant_familiars contains my_familiar()) && bird_needed.available_amount() > 0)
             {
                 subentry.entries.listAppend("Bring along another familiar, you don't need to use the bird anymore.");
             }
@@ -16481,6 +16537,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     {
         subentry.entries.listAppend("Speak to your guild to start the quest.|Then adventure in the Unquiet Garves until you unlock the tomb of the unknown, and solve the puzzle.");
         url = "guild.php";
+        return;
     }
     else if (base_quest_state.mafia_internal_step <= 4)
     {
@@ -24252,6 +24309,15 @@ void SAftercoreThingsToDoGenerateTasks(ChecklistEntry [int] task_entries, Checkl
         options.listAppend(AftercoreOptionMake("Felonia quest", "place.php?whichplace=knoll_friendly", listMake("speak to Mayor Zapruder", "rewards once/ascension mushroom fermenting solution")));
     }
     
+    if (!QuestState("questG04Nemesis").started)
+    {
+        string [int] things_gives;
+        things_gives.listAppend("instant karma");
+        if (my_class() == $class[disco bandit])
+            things_gives.listAppend("rave skills");
+        options.listAppend(AftercoreOptionMake("Nemesis quest", "guild.php", listMake("Rewards " + things_gives.listJoinComponents(", ", "and"))));
+    }
+    
     if (!QuestState("questF04Elves").started && $effect[transpondent].have_effect() == 0)
     {
         string url;
@@ -25026,7 +25092,7 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
     boolean [string] counter_blacklist = $strings[Romantic Monster,Semi-rare];
     boolean [string] non_range_whitelist = $strings[Digitize Monster];
     
-    string [int] all_counter_names = CounterGetAllNames();
+    string [int] all_counter_names = CounterGetAllNames(true);
     
     foreach key in all_counter_names
     {
@@ -25036,7 +25102,7 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
         if (counter_blacklist contains window_name)
             continue;
         
-        Counter c = CounterLookup(window_name);
+        Counter c = CounterLookup(window_name, ErrorMake(), true);
         if (!c.CounterIsRange() && !(non_range_whitelist contains window_name))
             continue;
         
@@ -25048,11 +25114,10 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
             continue;
         
         
-        
         boolean very_important = false;
         if (turn_range.x <= 0 && counter_is_range)
             very_important = true;
-        if (!counter_is_range && next_exact_turn <= 0)
+        if (!counter_is_range && next_exact_turn <= 3) //warn three turns ahead
             very_important = true;
         
         
@@ -25120,8 +25185,10 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
         {
             CopiedMonstersGenerateDescriptionForMonster(fighting_monster, subentry.entries, (turn_range.x <= 0), false);
         }
+        if (c.waiting_for_adventure_php)
+            subentry.entries.listAppend("Need to adventure in adventure.php to start counting.");
         
-        if (turn_range.x <= 0)
+        if ((turn_range.x <= 0 && counter_is_range) || (!counter_is_range && next_exact_turn <= 0))
         {
             if (get_property_boolean("dailyDungeonDone"))
             {
@@ -36383,7 +36450,7 @@ void IOTMBarrelGodGenerateResource(ChecklistEntry [int] resource_entries)
             buff_description = "ode-to-booze type / +45% booze drops";
         
         if (buff_description != "")
-            description.listAppend(buff_description + " buff for 50 turns." + (lookupItem("map to the Biggest Barrel").available_amount() == 0 ? "|Chance of the map to the Biggest Barrel." : ""));
+            description.listAppend(buff_description + " buff for 50 turns." + (lookupItem("map to the Biggest Barrel").available_amount() == 0 && (my_daycount() >= 7 || !in_ronin()) ? "|Might give the map to the Biggest Barrel." : ""));
         
         resource_entries.listAppend(ChecklistEntryMake("barrel god", "da.php?barrelshrine=1", ChecklistSubentryMake("Barrel worship", "", description), 8));
     }
@@ -40434,7 +40501,18 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
         //substats.enh is probably less than 150 mainstat. that's not a lot... +item is much more useful
         subentries.listAppend(ChecklistSubentryMake(pluralise(enhancements_remaining, "source enhancement", "source enhancements") + " remaining", "", description));
     }
-    if (mafiaIsPastRevision(17031) && (!get_property_boolean("_sourceTerminalDuplicateUsed") || my_path_id() == PATH_THE_SOURCE) && __misc_state["in run"])
+    
+	int total_duplicate_uses_available = 1;
+	if (my_path_id() == PATH_THE_SOURCE)
+		total_duplicate_uses_available = 5;
+	int duplicate_uses_remaining = clampi(total_duplicate_uses_available - get_property_int("_sourceTerminalDuplicateUses"), 0, total_duplicate_uses_available);
+    if (!mafiaIsPastRevision(17062))
+    {
+        duplicate_uses_remaining = 1;
+        if (get_property_boolean("_sourceTerminalDuplicateUsed"))
+            duplicate_uses_remaining = 0;
+    }
+    if (mafiaIsPastRevision(17031) && duplicate_uses_remaining > 0 && __misc_state["in run"])
     {
         //Duplication of a monster:
         string [int] description;
@@ -40443,7 +40521,10 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
         string line = "Doubles";
         if (my_path_id() == PATH_THE_SOURCE)
             line = "Triples";
-        line += " item drops from a monster, once/day.|Makes them stronger, so be careful.";
+        string times = "once/day";
+        if (total_duplicate_uses_available > 1)
+            times = total_duplicate_uses_available.int_to_wordy() + " times/day";
+        line += " item drops from a monster, " + times + ".|Makes them stronger, so be careful.";
         description.listAppend(line);
         if (!skills_have[lookupSkill("Duplicate")])
         {
@@ -40464,7 +40545,13 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
         if (potential_targets.count() > 0)
             description.listAppend("Could use on a " + potential_targets.listJoinComponents(", ", "or") + ".");
         
-        subentries.listAppend(ChecklistSubentryMake("Duplication usable", "", description));
+        string title = "Duplication castable";
+        if (total_duplicate_uses_available > 1)
+        {
+            title = pluralise(duplicate_uses_remaining, "duplication", "duplications");
+        }
+        
+        subentries.listAppend(ChecklistSubentryMake(title, "", description));
     }
     //Portscans: (the source)
     int portscans_remaining = clampi(3 - get_property_int("_sourceTerminalPortscanUses"), 0, 3);
