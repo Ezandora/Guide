@@ -2,7 +2,7 @@
 
 since 17.1; //the earliest main release that is usable in modern KOL (unequip bug)
 //These settings are for development. Don't worry about editing them.
-string __version = "1.4.7";
+string __version = "1.4.8";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -773,6 +773,18 @@ string [int] listMake(string e1, string e2, string e3, string e4, string e5)
 	result.listAppend(e3);
 	result.listAppend(e4);
 	result.listAppend(e5);
+	return result;
+}
+
+string [int] listMake(string e1, string e2, string e3, string e4, string e5, string e6)
+{
+	string [int] result;
+	result.listAppend(e1);
+	result.listAppend(e2);
+	result.listAppend(e3);
+	result.listAppend(e4);
+	result.listAppend(e5);
+	result.listAppend(e6);
 	return result;
 }
 
@@ -3499,6 +3511,7 @@ Record Counter
 {
     string name;
     string location_id; //number or *
+    string mafia_informed_type; //"wander" seen
     string [int] mafia_gifs;
     int [int] exact_turns; //sorted order
     int range_start_turn;
@@ -3704,11 +3717,30 @@ void CountersParseProperty(string property_name, Counter [string] counters, bool
             string counter_name_raw = counter_split[i + 1];
             string counter_gif = counter_split[i + 2];
             string location_id;
+            string type;
             string intermediate_name = counter_name_raw;
             
             //Parse loc, remove it from intermediate name:
+            //loc=* type=wander
             
-            string [int][int] location_match = group_string(intermediate_name, " loc=([0-9*]*)");
+            string [string] set_properties;
+            
+            string [int][int] properties_found = intermediate_name.group_string(" ([^= ]*)=([^ ]*)");
+            //print_html("intermediate_name = " + intermediate_name + " properties_found = " + properties_found.to_json());
+            
+            foreach key in properties_found
+            {
+                string entire_match = properties_found[key][0];
+                set_properties[properties_found[key][1]] = properties_found[key][2];
+                intermediate_name = intermediate_name.replace_string(entire_match, "");
+            }
+            if (set_properties contains "loc")
+                location_id = set_properties["loc"];
+            if (set_properties contains "type")
+                type = set_properties["type"];
+            
+            /*string [int][int] location_match = group_string(intermediate_name, " loc=([0-9*]*)");
+            //print_html("intermediate_name = " + intermediate_name + " location_match = " + location_match.to_json());
             if (location_match.count() > 0)
             {
                 location_id = location_match[0][1];
@@ -3721,7 +3753,14 @@ void CountersParseProperty(string property_name, Counter [string] counters, bool
                     else
                         intermediate_name = "";
                 }
+            }*/
+            
+            if (intermediate_name.contains_text(" loc="))
+            {
+                //HACK - just remove the rest of it
+                
             }
+            //print_html("intermediate_name = " + intermediate_name);
             
             boolean is_window_start = false;
             boolean is_window_end = false;
@@ -3768,6 +3807,7 @@ void CountersParseProperty(string property_name, Counter [string] counters, bool
             if (should_add_gif)
                 c.mafia_gifs.listAppend(counter_gif);
             c.location_id = location_id;
+            c.mafia_informed_type = type;
             
             if (is_window_start)
             {
@@ -3822,6 +3862,9 @@ void CountersInit()
     
     CountersParseProperty("relayCounters", __active_counters, false);
     CountersParseProperty("_tempRelayCounters", __active_temp_counters, true);
+    
+    //print_html("__active_counters = " + __active_counters.to_json());
+    
 }
 
 Counter CounterLookup(string counter_name, Error found, boolean allow_temp_counters)
@@ -19135,7 +19178,7 @@ void QGuildGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     
     if (!base_quest_state.started)
     {
-		subentry.entries.listAppend("Talk to the your guild chief.");
+		subentry.entries.listAppend("Talk to your guild chief.");
         active_url = "guild.php";
     }
     else if (base_quest_state.mafia_internal_step == 1)
@@ -19188,7 +19231,7 @@ void QGuildGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 	}
     else if (base_quest_state.mafia_internal_step == 2)
     {
-		subentry.entries.listAppend("Talk to the your guild chief.");
+		subentry.entries.listAppend("Talk to your guild chief.");
         active_url = "guild.php";
     }
 	
@@ -25082,6 +25125,8 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
     window_image_names["Nemesis Assassin"] = "__familiar Penguin Goodfella"; //technically not always a penguin, but..
     window_image_names["Bee"] = "__effect Float Like a Butterfly, Smell Like a Bee"; //bzzz!
     window_image_names["Holiday Monster"] = "__familiar hand turkey";
+    if (getHolidaysToday()["El Dia De Los Muertos Borrachos"])
+        window_image_names["Holiday Monster"] = "__item corpse island iced tea";
     window_image_names["Rain Monster"] = "__familiar personal raincloud";
     window_image_names["WoL Monster"] = "__effect Cowrruption";
     window_image_names["Digitize Monster"] = "__item source essence";
@@ -25144,7 +25189,7 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
         if (!counter_is_range)
         {
             if (next_exact_turn <= 0)
-                subentry.header += " now";
+                subentry.header += HTMLGenerateSpanFont(" now", "red");
             else
                 subentry.header += " after " + pluralise(next_exact_turn, "more turn", "more turns");
         }
@@ -40702,6 +40747,49 @@ void IOTMDetectiveSchoolGenerateResource(ChecklistEntry [int] resource_entries)
             description.listAppend("Buy " + buyables.listJoinComponents(", ", "or") + ".");
             resource_entries.listAppend(ChecklistEntryMake("__item cop dollar", "shop.php?whichshop=detective", ChecklistSubentryMake(pluralise(lookupItem("cop dollar")), "", description), 7));
         }
+    }
+}
+RegisterTaskGenerationFunction("IOTMProtonicAcceleratorPackGenerateTasks");
+void IOTMProtonicAcceleratorPackGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    //Quest:
+    if (QuestState("questPAGhost").in_progress || get_property("ghostLocation") != "")
+    {
+        location ghost_location = get_property_location("ghostLocation");
+        string title = "Defeat the ghost in " + ghost_location;
+        string [int] description;
+        string url = ghost_location.getClickableURLForLocation();
+        description.listAppend("Won't cost a turn.");
+        if (lookupItem("protonic accelerator pack").equipped_amount() > 0)
+            description.listAppend("Cast \"shoot ghost\" three times, then \"trap ghost\".");
+        if (lookupItem("protonic accelerator pack").equipped_amount() == 0 && lookupItem("protonic accelerator pack").available_amount() > 0)
+        {
+            //Strictly speaking, they don't need the pack equipped to fight the monster, but they won't be able to trap it and get the item.
+            url = "inventory.php?which=2";
+            description.listAppend("Equip the protonic accelerator pack first.");
+        }
+        optional_task_entries.listAppend(ChecklistEntryMake("__item protonic accelerator pack", url, ChecklistSubentryMake(title, "", description), -1));
+    }
+}
+
+
+RegisterResourceGenerationFunction("IOTMProtonicAcceleratorPackGenerateResource");
+void IOTMProtonicAcceleratorPackGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if (lookupItem("protonic accelerator pack").available_amount() == 0)
+        return;
+    
+    if (!get_property_boolean("_streamsCrossed") &&__misc_state["in run"] && mafiaIsPastRevision(17085))
+    {
+        string [int] description;
+        string url = "showplayer.php?who=2807390"; //ProtonicBot is a real bot that will steal your turtle mechs at the first sign of defiance.
+        description.listAppend("+20% stats for 10 turns.");
+        if (lookupItem("protonic accelerator pack").equipped_amount() == 0)
+        {
+            url = "inventory.php?which=2";
+            description.listAppend("Equip the protonic accelerator pack first.");
+        }
+        resource_entries.listAppend(ChecklistEntryMake("__item protonic accelerator pack", url, ChecklistSubentryMake("Stream crossing", "", description), 8));
     }
 }
 
