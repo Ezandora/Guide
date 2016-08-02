@@ -71,7 +71,7 @@ void QGuildGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     
     if (!base_quest_state.started)
     {
-		subentry.entries.listAppend("Talk to the your guild chief.");
+		subentry.entries.listAppend("Talk to your guild chief.");
         active_url = "guild.php";
     }
     else if (base_quest_state.mafia_internal_step == 1)
@@ -124,7 +124,7 @@ void QGuildGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 	}
     else if (base_quest_state.mafia_internal_step == 2)
     {
-		subentry.entries.listAppend("Talk to the your guild chief.");
+		subentry.entries.listAppend("Talk to your guild chief.");
         active_url = "guild.php";
     }
 	

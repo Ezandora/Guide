@@ -8,6 +8,7 @@ Record Counter
 {
     string name;
     string location_id; //number or *
+    string mafia_informed_type; //"wander" seen
     string [int] mafia_gifs;
     int [int] exact_turns; //sorted order
     int range_start_turn;
@@ -213,11 +214,30 @@ void CountersParseProperty(string property_name, Counter [string] counters, bool
             string counter_name_raw = counter_split[i + 1];
             string counter_gif = counter_split[i + 2];
             string location_id;
+            string type;
             string intermediate_name = counter_name_raw;
             
             //Parse loc, remove it from intermediate name:
+            //loc=* type=wander
             
-            string [int][int] location_match = group_string(intermediate_name, " loc=([0-9*]*)");
+            string [string] set_properties;
+            
+            string [int][int] properties_found = intermediate_name.group_string(" ([^= ]*)=([^ ]*)");
+            //print_html("intermediate_name = " + intermediate_name + " properties_found = " + properties_found.to_json());
+            
+            foreach key in properties_found
+            {
+                string entire_match = properties_found[key][0];
+                set_properties[properties_found[key][1]] = properties_found[key][2];
+                intermediate_name = intermediate_name.replace_string(entire_match, "");
+            }
+            if (set_properties contains "loc")
+                location_id = set_properties["loc"];
+            if (set_properties contains "type")
+                type = set_properties["type"];
+            
+            /*string [int][int] location_match = group_string(intermediate_name, " loc=([0-9*]*)");
+            //print_html("intermediate_name = " + intermediate_name + " location_match = " + location_match.to_json());
             if (location_match.count() > 0)
             {
                 location_id = location_match[0][1];
@@ -230,7 +250,14 @@ void CountersParseProperty(string property_name, Counter [string] counters, bool
                     else
                         intermediate_name = "";
                 }
+            }*/
+            
+            if (intermediate_name.contains_text(" loc="))
+            {
+                //HACK - just remove the rest of it
+                
             }
+            //print_html("intermediate_name = " + intermediate_name);
             
             boolean is_window_start = false;
             boolean is_window_end = false;
@@ -277,6 +304,7 @@ void CountersParseProperty(string property_name, Counter [string] counters, bool
             if (should_add_gif)
                 c.mafia_gifs.listAppend(counter_gif);
             c.location_id = location_id;
+            c.mafia_informed_type = type;
             
             if (is_window_start)
             {
@@ -331,6 +359,9 @@ void CountersInit()
     
     CountersParseProperty("relayCounters", __active_counters, false);
     CountersParseProperty("_tempRelayCounters", __active_temp_counters, true);
+    
+    //print_html("__active_counters = " + __active_counters.to_json());
+    
 }
 
 Counter CounterLookup(string counter_name, Error found, boolean allow_temp_counters)

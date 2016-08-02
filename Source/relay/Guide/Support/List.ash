@@ -393,6 +393,18 @@ string [int] listMake(string e1, string e2, string e3, string e4, string e5)
 	return result;
 }
 
+string [int] listMake(string e1, string e2, string e3, string e4, string e5, string e6)
+{
+	string [int] result;
+	result.listAppend(e1);
+	result.listAppend(e2);
+	result.listAppend(e3);
+	result.listAppend(e4);
+	result.listAppend(e5);
+	result.listAppend(e6);
+	return result;
+}
+
 int [int] listMake(int e1)
 {
 	int [int] result;

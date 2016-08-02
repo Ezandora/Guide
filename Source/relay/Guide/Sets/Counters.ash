@@ -127,6 +127,8 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
     window_image_names["Nemesis Assassin"] = "__familiar Penguin Goodfella"; //technically not always a penguin, but..
     window_image_names["Bee"] = "__effect Float Like a Butterfly, Smell Like a Bee"; //bzzz!
     window_image_names["Holiday Monster"] = "__familiar hand turkey";
+    if (getHolidaysToday()["El Dia De Los Muertos Borrachos"])
+        window_image_names["Holiday Monster"] = "__item corpse island iced tea";
     window_image_names["Rain Monster"] = "__familiar personal raincloud";
     window_image_names["WoL Monster"] = "__effect Cowrruption";
     window_image_names["Digitize Monster"] = "__item source essence";
@@ -189,7 +191,7 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
         if (!counter_is_range)
         {
             if (next_exact_turn <= 0)
-                subentry.header += " now";
+                subentry.header += HTMLGenerateSpanFont(" now", "red");
             else
                 subentry.header += " after " + pluralise(next_exact_turn, "more turn", "more turns");
         }
