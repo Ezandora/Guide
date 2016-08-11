@@ -34,6 +34,14 @@ void generateMisc(Checklist [int] checklists)
 		lookupChecklist(checklists, "Tasks").entries.listClear();
 		lookupChecklist(checklists, "Optional Tasks").entries.listClear();
 		lookupChecklist(checklists, "Unimportant Tasks").entries.listClear();
+        
+        //Remove extra-important popups, because they won't work anymore:
+        Checklist future_checklist = lookupChecklist(checklists, "Future Tasks");
+        foreach key, c in future_checklist.entries
+        {
+            if (c.only_show_as_extra_important_pop_up)
+                remove future_checklist.entries[key];
+        }
 		
         string [int] description;
         string line = "You're drunk.";

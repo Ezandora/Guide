@@ -1,6 +1,7 @@
 import "relay/Guide/Support/LocationAvailable.ash"
 import "relay/Guide/Support/Equipment Requirement.ash"
 
+
 string HTMLGenerateFutureTextByLocationAvailability(string base_text, location place)
 {
     if (!place.locationAvailable() && place != $location[none])
@@ -15,6 +16,11 @@ string HTMLGenerateFutureTextByLocationAvailability(location place)
 	return HTMLGenerateFutureTextByLocationAvailability(place.to_string(), place);
 }
 
+//Alternate name, since last time I tried making this function then discovered the "generate future text" options which I cleverly named in such a way that I would never find it
+string HTMLGreyOutIfLocationUnavailable(string source, location l)
+{
+    return HTMLGenerateFutureTextByLocationAvailability(source, l);
+}
 
 
 boolean can_equip_replacement(item it)

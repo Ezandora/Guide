@@ -359,6 +359,14 @@ int item_amount(boolean [item] items)
     return count;
 }
 
+int have_effect(boolean [effect] effects)
+{
+    int count = 0;
+    foreach e in effects
+        count += e.have_effect();
+    return count;
+}
+
 int available_amount(item [int] items)
 {
     int count = 0;
@@ -1490,3 +1498,9 @@ boolean [skill] getActiveSourceTerminalSkills()
     return skills_have;
 }
 
+boolean monsterIsGhost(monster m)
+{
+    if ($monsters[Ancient ghost,Ancient protector spirit,Banshee librarian,Battlie Knight Ghost,Bettie Barulio,Chalkdust wraith,Claybender Sorcerer Ghost,Cold ghost,Contemplative ghost,Dusken Raider Ghost,Ghost,Ghost miner,Hot ghost,Lovesick ghost,Marcus Macurgeon,Marvin J. Sunny,Mayor Ghost,Mayor Ghost (Hard Mode),Model skeleton,Mortimer Strauss,Plaid ghost,Protector Spectre,Sexy sorority ghost,Sheet ghost,Sleaze ghost,Space Tourist Explorer Ghost,Spirit of New Wave (Inner Sanctum),Spooky ghost,Stench ghost,The ghost of Phil Bunion,Whatsian Commando Ghost,Wonderful Winifred Wongle] contains m)
+        return true;
+    return false;
+}

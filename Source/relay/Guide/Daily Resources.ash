@@ -290,7 +290,7 @@ void generateDailyResources(Checklist [int] checklists)
                 description.listAppend("HP/MP.");
             else
                 description.listAppend("HP/MP/stats.");
-            if (my_level() < 9)
+            if (my_level() < 9 && my_path_id() != PATH_THE_SOURCE)
                 description.listAppend("May want to wait until level 9(?) for more stats from resting.");
             
             stat desired_stat = $stat[none];

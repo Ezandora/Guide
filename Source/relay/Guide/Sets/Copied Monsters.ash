@@ -203,8 +203,8 @@ void generateCopiedMonstersEntry(ChecklistEntry [int] task_entries, ChecklistEnt
     string url = "";
     if (get_property_boolean("dailyDungeonDone"))
         url = $location[the daily dungeon].getClickableURLForLocation();
-    Counter romantic_arrow_counter = CounterLookup("Romantic Monster");
-	if (romantic_arrow_counter.CounterIsRange() || get_property_int("_romanticFightsLeft") > 0)
+    Counter romantic_arrow_counter = CounterLookup("Romantic Monster", ErrorMake(), true);
+	if (false && (romantic_arrow_counter.CounterIsRange() || get_property_int("_romanticFightsLeft") > 0))
 	{
         Vec2i turn_range = romantic_arrow_counter.CounterGetWindowRange();
         

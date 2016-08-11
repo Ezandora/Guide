@@ -168,13 +168,24 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
         string [int] potential_targets;
         //FIXME grey out if the area isn't available?
         if ($item[goat cheese].available_amount() < 2 && !__quest_state["Level 8"].state_boolean["Past mine"])
-            potential_targets.listAppend("diary goat");
+            potential_targets.listAppend(HTMLGenerateFutureTextByLocationAvailability("diary goat", $location[the goatlet]));
         if (!__quest_state["Level 11"].finished && !__quest_state["Level 11 Palindome"].finished && $item[talisman o' namsilat].available_amount() == 0 && $items[gaudy key,snakehead charrrm].available_amount() < 2)
-            potential_targets.listAppend("gaudy pirate");
+            potential_targets.listAppend(HTMLGenerateFutureTextByLocationAvailability("gaudy pirate", $location[belowdecks]));
         if (my_path_id() == PATH_THE_SOURCE)
         {
             //5x copies
             //LFM, filthworms, evil eyes, tomb rats?, star monsters, Green Ops Soldier?
+            //FIXME actually test for these
+            potential_targets.listAppend(HTMLGenerateFutureTextByLocationAvailability("lobsterfrogman", $location[sonofa beach]));
+            potential_targets.listAppend(HTMLGenerateFutureTextByLocationAvailability("filthworms", $location[the hatching chamber]));
+            potential_targets.listAppend(HTMLGenerateFutureTextByLocationAvailability("defiled nook?", $location[the defiled nook]));
+            potential_targets.listAppend(HTMLGenerateFutureTextByLocationAvailability("tomb rats?", $location[the middle chamber]));
+            potential_targets.listAppend(HTMLGenerateFutureTextByLocationAvailability("hole-in-the-sky monsters", $location[the hole in the sky]));
+            potential_targets.listAppend(HTMLGenerateFutureTextByLocationAvailability("green ops soldier", $location[the battlefield (frat uniform)]));
+            if (in_hardcore())
+                potential_targets.listAppend(HTMLGenerateFutureTextByLocationAvailability("bloopers?", $location[8-bit realm]));
+            if (__iotms_usable[lookupItem("Witchess Set")] && get_property_int("_witchessFights") < 5)
+                potential_targets.listAppend("witchess bishop/knight/rooks?");
         }
         if (potential_targets.count() > 0)
             description.listAppend("Could use on a " + potential_targets.listJoinComponents(", ", "or") + ".");

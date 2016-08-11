@@ -186,7 +186,7 @@ void generatePullList(Checklist [int] checklists)
 	pullable_item_list.listAppend(GPItemMake($item[pantsgiving], "5x banish/day|+2 stats/fight|+15% items|2 extra fullness (realistically)", 1));
     if (!__misc_state["familiars temporarily blocked"]) //relevant in heavy rains, on the +item/+meat underwater familiars
         pullable_item_list.listAppend(GPItemMake($item[snow suit], "+20 familiar weight for a while" + (($familiar[pair of stomping boots].is_unrestricted() && __misc_state["free runs usable"]) ? ", +4 free runs" : "") + "|+10% item|spleen items", 1));
-    if (!__misc_state["familiars temporarily blocked"])
+    if (!__misc_state["familiars temporarily blocked"] && (lookupItem("protonic accelerator pack").available_amount() == 0 || lookupFamiliar("machine elf").familiar_is_usable())) //if you have a machine elf, it might be worth pulling a bjorn with a protonic pack anyways
     {
         if ($item[Buddy Bjorn].storage_amount() > 0)
             pullable_item_list.listAppend(GPItemMake($item[Buddy Bjorn], "+10ML/+lots MP hat|or +item/+init/+meat/etc", 1));

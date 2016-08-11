@@ -132,11 +132,12 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
     window_image_names["Rain Monster"] = "__familiar personal raincloud";
     window_image_names["WoL Monster"] = "__effect Cowrruption";
     window_image_names["Digitize Monster"] = "__item source essence";
+    window_image_names["Romantic Monster"] = "__familiar " + __misc_state_string["obtuse angel name"];
     //window_image_names["Event Monster"] = ""; //no idea
     
     
     
-    boolean [string] counter_blacklist = $strings[Romantic Monster,Semi-rare];
+    boolean [string] counter_blacklist = $strings[Semi-rare]; //Romantic Monster,
     boolean [string] non_range_whitelist = $strings[Digitize Monster];
     
     string [int] all_counter_names = CounterGetAllNames(true);
@@ -152,12 +153,11 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
         Counter c = CounterLookup(window_name, ErrorMake(), true);
         if (!c.CounterIsRange() && !(non_range_whitelist contains window_name))
             continue;
-        
         boolean counter_is_range = c.CounterIsRange();
         Vec2i turn_range = c.CounterGetWindowRange();
         int next_exact_turn = c.CounterGetNextExactTurn();
         
-        if (counter_is_range && !(turn_range.x <= 10 && from_task) && !(turn_range.x > 10 && !from_task))
+        if (counter_is_range && !(turn_range.x <= 10 && from_task) && !(turn_range.x > 10 && !from_task) && window_name != "Romantic Monster")
             continue;
         
         
@@ -168,7 +168,6 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
             very_important = true;
         
         
-        
         ChecklistSubentry subentry;
         string url;
         string window_display_name = window_name;
@@ -176,15 +175,18 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
         monster fighting_monster;
         if (window_name == "Digitize Monster")
         {
-            fighting_monster = get_property("_sourceTerminalDigitizeMonster").to_monster();
+            fighting_monster = get_property_monster("_sourceTerminalDigitizeMonster");
             string monster_name = fighting_monster.to_lower_case();
             if (monster_name == "")
                 window_display_name = "Digitised monster";
             else
                 window_display_name = "Digitised " + monster_name;
         }
-        //if (window_name == "Romantic Monster")
-            //window_display_name = "Arrowed " + __misc_state_string["Romantic Monster Name"].to_lower_case();
+        if (window_name == "Romantic Monster")
+        {
+            fighting_monster = get_property_monster("romanticTarget");
+            window_display_name = "Arrowed " + __misc_state_string["Romantic Monster Name"].to_lower_case();
+        }
         subentry.header = window_display_name;
         
         

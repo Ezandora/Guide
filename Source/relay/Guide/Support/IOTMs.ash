@@ -19,7 +19,16 @@ void initialiseIOTMsUsable()
             __iotms_usable[lookupItem("Witchess Set")] = true;
     }
     if (get_property_boolean("hasDetectiveSchool"))
-            __iotms_usable[lookupItem("detective school application")] = true;
+        __iotms_usable[lookupItem("detective school application")] = true;
+    if (get_property_boolean("chateauAvailable"))
+        __iotms_usable[lookupItem("Chateau Mantegna room key")] = true;
+    
+    //Remove non-standard:
+    foreach it in __iotms_usable
+    {
+        if (!it.is_unrestricted())
+            remove __iotms_usable[it];
+    }
 }
 
 initialiseIOTMsUsable();

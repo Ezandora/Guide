@@ -609,7 +609,22 @@ string listJoinComponents(effect [int] list, string joining_string, string and_s
 		list_string.listAppend(list[key].to_string());
 	return listJoinComponents(list_string, joining_string, and_string);
 }
+
 string listJoinComponents(effect [int] list, string joining_string)
+{
+	return listJoinComponents(list, joining_string, "");
+}
+
+
+string listJoinComponents(familiar [int] list, string joining_string, string and_string)
+{
+	string [int] list_string;
+	foreach key in list
+		list_string.listAppend(list[key].to_string());
+	return listJoinComponents(list_string, joining_string, and_string);
+}
+
+string listJoinComponents(familiar [int] list, string joining_string)
 {
 	return listJoinComponents(list, joining_string, "");
 }
@@ -856,6 +871,16 @@ boolean [monster] listInvert(monster [int] list)
 	return result;
 }
 
+boolean [familiar] listInvert(familiar [int] list)
+{
+	boolean [familiar] result;
+	foreach key in list
+	{
+		result[list[key]] = true;
+	}
+	return result;
+}
+
 int [int] listConvertToInt(string [int] list)
 {
 	int [int] result;
@@ -1033,6 +1058,17 @@ monster [int] listInvert(boolean [monster] monsters)
 location [int] listInvert(boolean [location] list)
 {
     location [int] out;
+    foreach k, value in list
+    {
+        if (value)
+            out.listAppend(k);
+    }
+    return out;
+}
+
+familiar [int] listInvert(boolean [familiar] list)
+{
+    familiar [int] out;
     foreach k, value in list
     {
         if (value)

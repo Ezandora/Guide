@@ -208,7 +208,7 @@ void QHitsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] 
 				subentry.modifiers.listAppend("+234% item");
 		}
 		else
-			subentry.entries.listAppend("Can make everything.");
+			subentry.entries.listAppend("Can make Richard's Star Key.");
 	}
 	optional_task_entries.listAppend(ChecklistEntryMake("hole in the sky", active_url, subentry, $locations[the hole in the sky, the castle in the clouds in the sky (top floor)]));
 }

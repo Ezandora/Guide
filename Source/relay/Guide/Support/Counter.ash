@@ -198,138 +198,127 @@ void CountersParseProperty(string property_name, Counter [string] counters, bool
 	string counter_string = get_property(property_name);
 	string [int] counter_split = split_string(counter_string, ":");
     
-    if (true)
+    //Parse counters:
+    for i from 0 to (counter_split.count() - 1) by 3
     {
-        //Parse counters:
-        for i from 0 to (counter_split.count() - 1) by 3
+        if (i + 3 > counter_split.count())
+            break;
+        if (counter_split[i].length() == 0)
+            continue;
+        int turn_number = to_int_silent(counter_split[i]);
+        if (are_temp_counters)
+            turn_number += my_turncount();
+        int turns_until_counter = turn_number - my_turncount();
+        string counter_name_raw = counter_split[i + 1];
+        string counter_gif = counter_split[i + 2];
+        string location_id;
+        string type;
+        string intermediate_name = counter_name_raw;
+        
+        //Parse loc, remove it from intermediate name:
+        //loc=* type=wander
+        
+        string [string] set_properties;
+        
+        string [int][int] properties_found = intermediate_name.group_string(" ([^= ]*)=([^ ]*)");
+        //print_html("intermediate_name = " + intermediate_name + " properties_found = " + properties_found.to_json());
+        
+        foreach key in properties_found
         {
-            if (i + 3 > counter_split.count())
-                break;
-            if (counter_split[i].length() == 0)
-                continue;
-            int turn_number = to_int_silent(counter_split[i]);
-            if (are_temp_counters)
-                turn_number += my_turncount();
-            int turns_until_counter = turn_number - my_turncount();
-            string counter_name_raw = counter_split[i + 1];
-            string counter_gif = counter_split[i + 2];
-            string location_id;
-            string type;
-            string intermediate_name = counter_name_raw;
-            
-            //Parse loc, remove it from intermediate name:
-            //loc=* type=wander
-            
-            string [string] set_properties;
-            
-            string [int][int] properties_found = intermediate_name.group_string(" ([^= ]*)=([^ ]*)");
-            //print_html("intermediate_name = " + intermediate_name + " properties_found = " + properties_found.to_json());
-            
-            foreach key in properties_found
-            {
-                string entire_match = properties_found[key][0];
-                set_properties[properties_found[key][1]] = properties_found[key][2];
-                intermediate_name = intermediate_name.replace_string(entire_match, "");
-            }
-            if (set_properties contains "loc")
-                location_id = set_properties["loc"];
-            if (set_properties contains "type")
-                type = set_properties["type"];
-            
-            /*string [int][int] location_match = group_string(intermediate_name, " loc=([0-9*]*)");
-            //print_html("intermediate_name = " + intermediate_name + " location_match = " + location_match.to_json());
-            if (location_match.count() > 0)
-            {
-                location_id = location_match[0][1];
-                string end_string = " loc=" + location_id;
-                if (intermediate_name.stringHasSuffix(end_string))
-                {
-                    int clip_pos = intermediate_name.length() - end_string.length();
-                    if (clip_pos > 0)
-                        intermediate_name = intermediate_name.substring(0, clip_pos);
-                    else
-                        intermediate_name = "";
-                }
-            }*/
-            
-            if (intermediate_name.contains_text(" loc="))
-            {
-                //HACK - just remove the rest of it
-                
-            }
-            //print_html("intermediate_name = " + intermediate_name);
-            
-            boolean is_window_start = false;
-            boolean is_window_end = false;
-            //Convert intermediate name to our internal representation:
-            if (intermediate_name.contains_text("window begin"))
-            {
-                //generic window
-                intermediate_name = intermediate_name.substring(0, intermediate_name.index_of(" window begin"));
-                is_window_start = true;
-            }
-            else if (intermediate_name.contains_text("window end"))
-            {
-                //generic window
-                intermediate_name = intermediate_name.substring(0, intermediate_name.index_of(" window end"));
-                is_window_end = true;
-            }
-            
-            
-            string final_name = intermediate_name;
-            if (intermediate_name == "Fortune Cookie" || intermediate_name.stringHasPrefix("Semirare"))
-            {
-                final_name = "Semi-rare";
-            }
-            final_name = final_name.HTMLEscapeString();
-            
-            //Now create and edit our counter:
-            
-            Counter c = CounterMake();
-            if (counters contains final_name)
-                c = counters[final_name];
-            if (are_temp_counters)
-                c.waiting_for_adventure_php = true;
-            
-            c.name = final_name;
-            boolean should_add_gif = true;
-            if (c.mafia_gifs.count() > 0)
-            {
-                foreach key in c.mafia_gifs
-                {
-                    if (c.mafia_gifs[key] == counter_gif)
-                        should_add_gif = false;
-                }
-            }
-            if (should_add_gif)
-                c.mafia_gifs.listAppend(counter_gif);
-            c.location_id = location_id;
-            c.mafia_informed_type = type;
-            
-            if (is_window_start)
-            {
-                c.range_start_turn = turns_until_counter;
-                if (!c.found_end_turn_range) //haven't found an end turn range - implicitly set it to the start
-                    c.range_end_turn = turns_until_counter;
-                c.found_start_turn_range = true;
-            }
-            else if (is_window_end)
-            {
-                c.range_end_turn = turns_until_counter;
-                c.found_end_turn_range = true;
-            }
-            else
-            {
-                //if (turns_until_counter >= 0)
-                if (true)
-                {
-                    c.exact_turns.listAppend(MAX(0, turns_until_counter));
-                    sort c.exact_turns by value;
-                }
-            }
-            
-            counters[final_name] = c;
+            string entire_match = properties_found[key][0];
+            set_properties[properties_found[key][1]] = properties_found[key][2];
+            intermediate_name = intermediate_name.replace_string(entire_match, "");
         }
+        if (set_properties contains "loc")
+            location_id = set_properties["loc"];
+        if (set_properties contains "type")
+            type = set_properties["type"];
+        
+        /*string [int][int] location_match = group_string(intermediate_name, " loc=([0-9*]*)");
+        if (location_match.count() > 0)
+        {
+            location_id = location_match[0][1];
+            string end_string = " loc=" + location_id;
+            if (intermediate_name.stringHasSuffix(end_string))
+            {
+                int clip_pos = intermediate_name.length() - end_string.length();
+                if (clip_pos > 0)
+                    intermediate_name = intermediate_name.substring(0, clip_pos);
+                else
+                    intermediate_name = "";
+            }
+        }*/
+        
+        boolean is_window_start = false;
+        boolean is_window_end = false;
+        //Convert intermediate name to our internal representation:
+        if (intermediate_name.contains_text("window begin"))
+        {
+            //generic window
+            intermediate_name = intermediate_name.substring(0, intermediate_name.index_of(" window begin"));
+            is_window_start = true;
+        }
+        else if (intermediate_name.contains_text("window end"))
+        {
+            //generic window
+            intermediate_name = intermediate_name.substring(0, intermediate_name.index_of(" window end"));
+            is_window_end = true;
+        }
+        
+        
+        string final_name = intermediate_name;
+        if (intermediate_name == "Fortune Cookie" || intermediate_name.stringHasPrefix("Semirare"))
+        {
+            final_name = "Semi-rare";
+        }
+        final_name = final_name.HTMLEscapeString();
+        
+        //Now create and edit our counter:
+        
+        Counter c = CounterMake();
+        if (counters contains final_name)
+            c = counters[final_name];
+        if (are_temp_counters)
+            c.waiting_for_adventure_php = true;
+        
+        c.name = final_name;
+        boolean should_add_gif = true;
+        if (c.mafia_gifs.count() > 0)
+        {
+            foreach key in c.mafia_gifs
+            {
+                if (c.mafia_gifs[key] == counter_gif)
+                    should_add_gif = false;
+            }
+        }
+        if (should_add_gif)
+            c.mafia_gifs.listAppend(counter_gif);
+        c.location_id = location_id;
+        c.mafia_informed_type = type;
+        
+        if (is_window_start)
+        {
+            c.range_start_turn = turns_until_counter;
+            if (!c.found_end_turn_range) //haven't found an end turn range - implicitly set it to the start
+                c.range_end_turn = turns_until_counter;
+            c.found_start_turn_range = true;
+        }
+        else if (is_window_end)
+        {
+            c.range_end_turn = turns_until_counter;
+            c.found_end_turn_range = true;
+        }
+        else
+        {
+            //if (turns_until_counter >= 0)
+            if (true)
+            {
+                c.exact_turns.listAppend(MAX(0, turns_until_counter));
+                sort c.exact_turns by value;
+            }
+        }
+        
+        counters[final_name] = c;
     }
 }
 
@@ -338,12 +327,14 @@ Counter [string] __active_temp_counters;
 
 boolean __counters_inited = false;
 int __counters_turn_inited = -1;
+string __counters_inited_property_value;
 void CountersInit()
 {
-    if (__counters_inited && __counters_turn_inited == my_turncount())
+    if (__counters_inited && __counters_turn_inited == my_turncount() && __counters_inited_property_value == get_property("relayCounters"))
         return;
     __counters_inited = true;
     __counters_turn_inited = my_turncount();
+    __counters_inited_property_value = get_property("relayCounters");
 
     //parse counters:
 	//Examples:
@@ -357,6 +348,14 @@ void CountersInit()
     //relayCounters(user, now '695:Nemesis Assassin window begin loc=*:lparen.gif:710:Nemesis Assassin window end loc=*:rparen.gif:780:Fortune Cookie:fortune.gif:685:Dance Card loc=109:guildapp.gif', default )
     //70:Semirare window begin:lparen.gif:80:Semirare window end loc=*:rparen.gif:57:Digitize Monster:watch.gif:57:Romantic Monster window begin loc=*:lparen.gif:67:Romantic Monster window end loc=*:rparen.gif
     
+    foreach key in __active_counters
+    {
+        remove __active_counters[key];
+    }
+    foreach key in __active_temp_counters
+    {
+        remove __active_temp_counters[key];
+    }
     CountersParseProperty("relayCounters", __active_counters, false);
     CountersParseProperty("_tempRelayCounters", __active_temp_counters, true);
     
@@ -485,10 +484,10 @@ boolean CounterWanderingMonsterMayHitNextTurn()
     return false;
 }
 
-
-boolean CounterWanderingMonsterMayHitInXTurns(int turns)
+//only_detect_by_counter_names or in other words "not source agents", which we use in exactly one place for an obscure situation.
+boolean CounterWanderingMonsterMayHitInXTurns(int turns, boolean only_detect_by_counter_names)
 {
-    if (CounterWanderingMonsterMayHitNextTurn())
+    if (CounterWanderingMonsterMayHitNextTurn() && !only_detect_by_counter_names)
         return true;
     foreach s in __wandering_monster_counter_names
     {
@@ -498,6 +497,10 @@ boolean CounterWanderingMonsterMayHitInXTurns(int turns)
     //if (get_property_int("_romanticFightsLeft") > 0 && !CounterLookup("Romantic Monster").CounterExists() && my_path_id() != PATH_ONE_CRAZY_RANDOM_SUMMER) //mafia will clear the romantic monster window if it goes out of bounds
         //return true;
     return false;
+}
+boolean CounterWanderingMonsterMayHitInXTurns(int turns)
+{
+    return CounterWanderingMonsterMayHitInXTurns(turns, false);
 }
 
 Counter [int] CounterWanderingMonsterWindowsActiveNextTurn()
@@ -512,7 +515,19 @@ Counter [int] CounterWanderingMonsterWindowsActiveNextTurn()
             result[result.count()] = c;
     }
     return result;
-    
+}
+
+boolean CounterWanderingMonsterCountersHaveRange()
+{
+    foreach s in __wandering_monster_counter_names
+    {
+        Counter c = CounterLookup(s);
+        if (!c.CounterExists())
+            continue;
+        if (c.CounterIsRange())
+            return true;
+    }
+    return false;
 }
 
 boolean CounterWanderingMonsterWillHitNextTurn()

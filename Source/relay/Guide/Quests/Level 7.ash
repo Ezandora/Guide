@@ -123,6 +123,11 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
                 else
                     subentry.entries.listAppend("Use your evil eyes.");
             }
+            if (__iotms_usable[lookupItem("haunted doghouse")] && !$location[the defiled nook].noncombat_queue.contains_text("Seeing-Eyes Dog") && $location[the defiled nook].turns_spent >= 5)// && evilness <= 25 + 9)
+            {
+                //haunted doghouse adventures are a percentage chance, and the NC is skippable. more NCs, more chances, less turns spent
+                subentry.modifiers.listAppend("-combat");
+            }
 		
 			float evilness_remaining = evilness - 25;
 			evilness_remaining -= $item[evil eye].available_amount() * 3;
@@ -133,7 +138,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 				if (average_turns_remaining < theoretical_best_turns_remaining) //not sure about this. +344.91% item, 38 evilness, 4 optimal, 3.something not-optimal, what does it mean?
 					average_turns_remaining = theoretical_best_turns_remaining;
 		
-				subentry.entries.listAppend(roundForOutput(eyes_per_adventure * 100.0, 0) + "% chance of evil eyes");
+				subentry.entries.listAppend(roundForOutput(eyes_per_adventure * 100.0, 0) + "% chance of evil eyes.");
 				subentry.entries.listAppend("~" + roundForOutput(average_turns_remaining, 1) + " turns remain to boss. (theoretical best: " + theoretical_best_turns_remaining + ")");
 			}
 		}
