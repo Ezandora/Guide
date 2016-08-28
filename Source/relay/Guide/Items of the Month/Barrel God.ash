@@ -35,7 +35,7 @@ void IOTMBarrelGodGenerateResource(ChecklistEntry [int] resource_entries)
             buff_description = "ode-to-booze type / +45% booze drops";
         
         if (buff_description != "")
-            description.listAppend(buff_description + " buff for 50 turns." + (lookupItem("map to the Biggest Barrel").available_amount() == 0 && (my_daycount() >= 7 || !in_ronin()) ? "|Might give the map to the Biggest Barrel." : ""));
+            description.listAppend(buff_description.capitaliseFirstLetter() + " buff for 50 turns." + (lookupItem("map to the Biggest Barrel").available_amount() == 0 && (my_daycount() >= 7 || !in_ronin()) ? "|Might give the map to the Biggest Barrel." : ""));
         
         resource_entries.listAppend(ChecklistEntryMake("barrel god", "da.php?barrelshrine=1", ChecklistSubentryMake("Barrel worship", "", description), 8));
     }

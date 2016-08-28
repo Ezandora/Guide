@@ -18,7 +18,7 @@ void QPirateInit()
 	}
     
     
-	boolean hot_wings_relevant = knoll_available() || $item[frilly skirt].available_amount() > 0;
+	boolean hot_wings_relevant = knoll_available() || $item[frilly skirt].available_amount() > 0 || !in_hardcore();
     if (state.mafia_internal_step >= 4) //done that already
         hot_wings_relevant = false;
 	boolean need_more_hot_wings = $item[hot wing].available_amount() <3 && hot_wings_relevant;

@@ -513,7 +513,7 @@ void setUpState()
     computeFatLootTokens();
 	
 	boolean mysterious_island_unlocked = false;
-	if ($items[dingy dinghy, skeletal skiff, junk junk].available_amount() > 0)
+	if ($items[dingy dinghy, skeletal skiff].available_amount() > 0) //junk junk requires completing the quest first
 		mysterious_island_unlocked = true;
     
     if (get_property("peteMotorbikeGasTank") == "Extra-Buoyant Tank")

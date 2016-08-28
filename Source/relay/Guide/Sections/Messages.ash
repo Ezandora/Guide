@@ -252,7 +252,8 @@ string generateRandomMessage()
     
     generateRandomMessageLocation(random_messages);
 
-    random_messages.listAppend(HTMLGenerateTagWrap("a", "if you're feeling stressed, play alice's army", generateMainLinkMap("aagame.php")));
+    //random_messages.listAppend(HTMLGenerateTagWrap("a", "if you're feeling stressed, play alice's army", generateMainLinkMap("aagame.php")));
+    random_messages.listAppend(HTMLGenerateTagWrap("a", "if you're feeling stressed, play witchess", generateMainLinkMap("playwitchess.php?action=another")));
 	random_messages.listAppend("consider your mistakes creative spading");
     
     if (hippy_stone_broken())
@@ -391,6 +392,9 @@ string generateRandomMessage()
                 random_messages.listAppend("don't think you aren't. know you aren't.");
             else
                 random_messages.listAppend("it is not the spoon that ascends, it is only yourself");
+            break;
+        case PATH_NUCLEAR_AUTUMN:
+            random_messages.listAppend("I do want to set the world on " + HTMLGenerateSpanFont("fire", "red"));
             break;
         /*case PATH_CLASS_ACT_3:
             random_messages.listAppend("buttons for the people"); break;

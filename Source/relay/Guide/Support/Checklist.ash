@@ -151,6 +151,13 @@ ChecklistEntry ChecklistEntryMake(string image_lookup_name, string target_locati
 	return ChecklistEntryMake(image_lookup_name, target_location, subentries, importance);
 }
 
+ChecklistEntry ChecklistEntryMake(string image_lookup_name, string target_location, ChecklistSubentry subentry, int importance, boolean [location] highlight_if_last_adventured)
+{
+	ChecklistSubentry [int] subentries;
+	subentries[subentries.count()] = subentry;
+	return ChecklistEntryMake(image_lookup_name, target_location, subentries, importance, highlight_if_last_adventured);
+}
+
 ChecklistEntry ChecklistEntryMake(string image_lookup_name, string target_location, ChecklistSubentry subentry)
 {
 	return ChecklistEntryMake(image_lookup_name, target_location, subentry, CHECKLIST_DEFAULT_IMPORTANCE);

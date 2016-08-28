@@ -58,6 +58,12 @@ void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [in
 	if (monster_name == "ninja snowman assassin")
 	{
 		description.listAppend(generateNinjaSafetyGuide(show_details));
+        int components_missing = $items[ninja rope,ninja carabiner,ninja crampons].items_missing().count();
+        if (components_missing > 0)
+            description.listAppend("Need to fight " + components_missing.int_to_wordy() + " more.");
+        else
+            description.listAppend("Don't need to fight anymore.");
+        
         if (from_copy && $familiar[obtuse angel].familiar_is_usable() && $familiar[reanimated reanimator].familiar_is_usable())
         {
             string line = "Make sure to copy with angel, not the reanimator.";
@@ -144,8 +150,16 @@ void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [in
         float agent_initiative = lookupMonster("Source Agent").base_initiative;
         float chance_to_get_jump = clampf(100 - agent_initiative + our_init, 0.0, 100.0);
         boolean might_not_gain_init = false;
+        boolean avoid_displaying_init_otherwise = false;
         if (my_thrall() == $thrall[spaghetti elemental] && my_thrall().level >= 5 && monster_level_adjustment() <= 150)
+        {
             stat_description += "|Will effectively gain initiative on agent.";
+            if (!__iotms_usable[lookupItem("source terminal")] || get_property_int("_sourceTerminalPortscanUses") >= 3)
+                avoid_displaying_init_otherwise = true;
+        }
+        if (avoid_displaying_init_otherwise)
+        {
+        }
         else if (chance_to_get_jump >= 100.0)
             stat_description += "|Will gain initiative on agent.";
         else if (chance_to_get_jump <= 0.0)

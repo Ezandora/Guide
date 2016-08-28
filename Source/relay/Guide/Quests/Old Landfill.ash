@@ -21,8 +21,8 @@ void QOldLandfillGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
 		//return;
     if ($item[junk junk].available_amount() > 0)
         return;
-    if (__last_adventure_location != $location[the old landfill])
-        return;
+    //if (__last_adventure_location != $location[the old landfill])
+        //return;
     if (__misc_state["mysterious island available"])
         return;
 		

@@ -25,3 +25,7 @@ import "relay/Guide/Sets/Equipment.ash";
 import "relay/Guide/Sets/Calculate Universe.ash";
 import "relay/Guide/Sets/PVP.ash";
 import "relay/Guide/Sets/Demon Summon.ash";
+import "relay/Guide/Sets/Area Unlocks.ash";
+import "relay/Guide/Sets/Powerlevel.ash";
+import "relay/Guide/Sets/Florist.ash";
+import "relay/Guide/Sets/Misc Tasks.ash";

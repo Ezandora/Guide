@@ -49,7 +49,8 @@ void IOTMDetectiveSchoolGenerateResource(ChecklistEntry [int] resource_entries)
             {
                 buyables.listAppend("a -combat potion (50 turns)");
             }
-            description.listAppend("Buy " + buyables.listJoinComponents(", ", "or") + ".");
+            if (buyables.count() > 0)
+                description.listAppend("Buy " + buyables.listJoinComponents(", ", "or") + ".");
             resource_entries.listAppend(ChecklistEntryMake("__item cop dollar", "shop.php?whichshop=detective", ChecklistSubentryMake(pluralise(lookupItem("cop dollar")), "", description), 7));
         }
     }

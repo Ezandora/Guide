@@ -77,8 +77,8 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
                 description.listAppend("Potentially clover for 20 turns, versus 5.");
             task_entries.listAppend(ChecklistEntryMake("__effect ultrahydrated", "place.php?whichplace=desertbeach", ChecklistSubentryMake("Acquire ultrahydrated effect", "", description), -11));
         }
-        if (exploration > 0)
-            subentry.entries.listAppend("Need ultra-hydrated from The Oasis. (potential clover for 20 turns)");
+        //if (exploration > 0)
+            //subentry.entries.listAppend("Need ultra-hydrated from The Oasis. (potential clover for 20 turns)");
     }
     if (exploration < 10)
     {

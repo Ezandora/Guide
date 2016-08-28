@@ -98,6 +98,15 @@ void IOTMSpeakeasyGenerateResource(ChecklistEntry [int] resource_entries)
         options.listAppend(listMake("Phonus Balonus", "3", "+fights/+adventures"));
     }
     
+    if (my_path_id() == PATH_NUCLEAR_AUTUMN)
+    {
+        foreach key in options
+        {
+            if (options[key][1].to_int_silent() > 1)
+                remove options[key];
+        }
+    }
+    
     string [int] description;
     if (options.count() > 1)
         description.listAppend(HTMLGenerateSimpleTableLines(options));

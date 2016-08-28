@@ -6,7 +6,7 @@ void SemirareGenerateDescription(string [int] description)
     {
         boolean fortune_output = false;
         string line;
-        if (__misc_state["can eat just about anything"])
+        if (__misc_state["can eat just about anything"] && my_path_id() != PATH_NUCLEAR_AUTUMN)
         {
             line = "Eat a fortune cookie";
             if (availableFullness() <= 0)

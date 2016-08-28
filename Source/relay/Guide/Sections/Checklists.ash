@@ -57,7 +57,7 @@ void generateMisc(Checklist [int] checklists)
             description.listAppend("Or equip your wineglass.");
         }
         
-        if (in_ronin()) //after that, clan furniture affects it, so we can't give accurate readings
+        if (true)
         {
             int adventures_after_rollover = my_adventures() + 40;
             if (my_path_id() != PATH_SLOW_AND_STEADY)
@@ -188,7 +188,6 @@ void generateChecklists(Checklist [int] ordered_output_checklists)
         generateFloristFriar(checklists);
         
         
-        generateMisc(checklists);
         generateStrategy(checklists);
         
         foreach key, checklist_generation_function_name in __checklist_generation_function_names
@@ -223,8 +222,12 @@ void generateChecklists(Checklist [int] ordered_output_checklists)
             }
         }
     }
+    
+    
     //Convert checklist_collection to checklists:
     checklists = ChecklistCollectionMergeWithLinearList(checklist_collection, checklists);
+    
+    generateMisc(checklists); //Last, due to drunkenness re-arranging
 	
 	//Remove checklists that have no entries:
 	int [int] keys_to_remove;

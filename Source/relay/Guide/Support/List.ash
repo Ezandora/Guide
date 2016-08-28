@@ -1033,6 +1033,28 @@ boolean listContainsValue(monster [int] list, monster vo)
     return false;
 }
 
+string [int] listInvert(boolean [string] list)
+{
+    string [int] out;
+    foreach m, value in list
+    {
+        if (value)
+            out.listAppend(m);
+    }
+    return out;
+}
+
+int [int] listInvert(boolean [int] list)
+{
+    int [int] out;
+    foreach m, value in list
+    {
+        if (value)
+            out.listAppend(m);
+    }
+    return out;
+}
+
 skill [int] listInvert(boolean [skill] list)
 {
     skill [int] out;

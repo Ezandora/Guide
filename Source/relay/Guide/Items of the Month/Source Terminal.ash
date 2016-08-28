@@ -96,8 +96,11 @@ void IOTMSourceTerminalGenerateTasks(ChecklistEntry [int] task_entries, Checklis
     //Maybe suggest the first use, and always list in resources for the rest.
     //"Upgrade your source terminal" suggestions? Chips, essentially.
     
+    string url = "campground.php?action=terminal";
+    if (my_path_id() == PATH_NUCLEAR_AUTUMN)
+        url = "place.php?whichplace=falloutshelter&action=vault_term";
     if (subentries.count() > 0)
-        optional_task_entries.listAppend(ChecklistEntryMake("__item source essence", "campground.php?action=terminal", subentries, 5));
+        optional_task_entries.listAppend(ChecklistEntryMake("__item source essence", url, subentries, 5));
 }
 
 RegisterResourceGenerationFunction("IOTMSourceTerminalGenerateResource");
@@ -180,6 +183,7 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
             potential_targets.listAppend(HTMLGenerateFutureTextByLocationAvailability("filthworms", $location[the hatching chamber]));
             potential_targets.listAppend(HTMLGenerateFutureTextByLocationAvailability("defiled nook?", $location[the defiled nook]));
             potential_targets.listAppend(HTMLGenerateFutureTextByLocationAvailability("tomb rats?", $location[the middle chamber]));
+            potential_targets.listAppend(HTMLGenerateFutureTextByLocationAvailability("hedge trimmers", $location[twin peak]));
             potential_targets.listAppend(HTMLGenerateFutureTextByLocationAvailability("hole-in-the-sky monsters", $location[the hole in the sky]));
             potential_targets.listAppend(HTMLGenerateFutureTextByLocationAvailability("green ops soldier", $location[the battlefield (frat uniform)]));
             if (in_hardcore())
@@ -290,6 +294,9 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
         
         subentries.listAppend(ChecklistSubentryMake(pluralise(digitisations_left, "digitisation", "digitisations") + " remaining", "", description));
     }
+    string url = "campground.php?action=terminal";
+    if (my_path_id() == PATH_NUCLEAR_AUTUMN)
+        url = "place.php?whichplace=falloutshelter&action=vault_term";
     if (subentries.count() > 0)
-        resource_entries.listAppend(ChecklistEntryMake("__item source essence", "campground.php?action=terminal", subentries, 5));
+        resource_entries.listAppend(ChecklistEntryMake("__item source essence", url, subentries, 5));
 }

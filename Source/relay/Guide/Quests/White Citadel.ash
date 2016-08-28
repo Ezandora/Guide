@@ -91,9 +91,9 @@ void QWhiteCitadelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
         
         if (burnouts_remaining > 1)
         {
-            if (opium_grenade.storage_amount() > 1 && pulls_remaining() == -1)
+            if (opium_grenade.storage_amount() > 1 && pulls_remaining() == -1 && ceil(burnouts_remaining / 3.0) > $item[opium grenade].item_amount())
                 subentry.entries.listAppend("Pull some opium grenades from hagnk's.");
-            else if (opium_grenade.storage_amount() > 0 && pulls_remaining() == -1)
+            else if (opium_grenade.storage_amount() > 0 && pulls_remaining() == -1 && ceil(burnouts_remaining / 3.0) > $item[opium grenade].item_amount())
                 subentry.entries.listAppend("Pull an opium grenade from hagnk's.");
             else if (opium_grenade.available_amount() == 1)
                 subentry.entries.listAppend("Throw an opium grenade at burnouts.");
@@ -131,23 +131,36 @@ void QWhiteCitadelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
             poppy_two_drop_rate *= (1.0 - washaway_rate);
         }
         
-        float grenades_per_combat = (poppy_one_drop_rate + poppy_two_drop_rate) * 0.5;
+        float grenades_per_combat = clampf((poppy_one_drop_rate + poppy_two_drop_rate) * 0.5, 0.0, 1.0);
         
         float turns_remaining = burnouts_remaining;
         float burnouts_defeated_per_turn = 1.0 + grenades_per_combat * 2.0;
         
+        //How many can we cover with the grenades we have?
+        int maximum_grenades_needed = ceil(burnouts_remaining / 3.0);
+        grenades_have_now = MIN(maximum_grenades_needed, grenades_have_now);
+        
+        turns_remaining = grenades_have_now;
+        int burnouts_remaining_after_turns = MAX(0, burnouts_remaining - turns_remaining * 3.0);
+        
         if (burnouts_defeated_per_turn > 0.0)
+            turns_remaining += burnouts_remaining_after_turns / burnouts_defeated_per_turn;
+        
+        //turns_remaining = burnouts_remaining - MIN(maximum_grenades_needed, grenades_have_now) * 3;
+        
+        /*if (burnouts_defeated_per_turn > 0.0)
         {
             //very approximate:
             float operating_burnouts_remaining = burnouts_remaining;
             
             operating_burnouts_remaining -= 3.0 * grenades_have_now;
-            turns_remaining = grenades_have_now * 1.0;
+            //turns_remaining = grenades_have_now * 1.0;
             
-            turns_remaining += operating_burnouts_remaining / burnouts_defeated_per_turn;
-        }
+            turns_remaining = operating_burnouts_remaining / burnouts_defeated_per_turn;
+        }*/
+        
         turns_remaining = clampf(turns_remaining, 1.0, 30.0);
-        if (burnouts_remaining == 1)
+        if (turns_remaining < 1.05)
             subentry.entries.listAppend("One More Turn remaining.");
         else
             subentry.entries.listAppend("~" + turns_remaining.roundForOutput(1) + " turns remaining.");

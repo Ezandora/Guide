@@ -92,6 +92,78 @@ float [monster] appearance_rates_adjusted(location l)
         if (lawyers_relocated && (source_altered contains $monster[pygmy witch lawyer]))
             remove source_altered[$monster[pygmy witch lawyer]];
     }
+    if ($locations[domed city of grimacia,domed city of ronaldus] contains l)
+    {
+        boolean [monster] aliens;
+        boolean [monster] survivors;
+        float actual_percent_aliens = 0.0;
+        
+        
+        if (l == $location[domed city of grimacia])
+        {
+            aliens = $monsters[cat-alien,dog-alien,alielf];
+            survivors = $monsters[unhinged survivor,grizzled survivor,whiny survivor];
+            int grimace_phase = moon_phase() / 2;
+            if (grimace_phase == 4)
+                actual_percent_aliens = 0.3;
+            else if (grimace_phase < 2 || grimace_phase > 6)
+                actual_percent_aliens = 0.0;
+            else
+                actual_percent_aliens = 0.15;
+        }
+        else
+        {
+            aliens = $monsters[dogcat,hamsterpus,ferrelf];
+            survivors = $monsters[unlikely survivor,overarmed survivor,primitive survivor];
+            int ronald_phase = moon_phase() % 8;
+            if (ronald_phase == 4)
+                actual_percent_aliens = 0.3;
+            else if (ronald_phase < 2 || ronald_phase > 6)
+                actual_percent_aliens = 0.0;
+            else
+                actual_percent_aliens = 0.15;
+        }
+        //Readjust:
+        float source_percent_aliens = 0.0;
+        float source_percent_survivors = 0.0;
+        foreach m, rate in source_altered
+        {
+            if (aliens contains m)
+            {
+                if (actual_percent_aliens == 0.0)
+                    remove source_altered[m];
+                source_percent_aliens += rate;
+            }
+            if (survivors contains m)
+                source_percent_survivors += rate;
+        }
+        //Readjust:
+        
+        foreach m, rate in source_altered
+        {
+            float adjusted_rate = rate;
+            if (aliens contains m)
+            {
+                if (actual_percent_aliens == 0.0 || source_percent_aliens == 0.0)
+                {
+                    adjusted_rate = 0.0;
+                }
+                else
+                {
+                    adjusted_rate = rate / source_percent_aliens * actual_percent_aliens;
+                }
+            }
+            if (survivors contains m)
+            {
+                if (source_percent_survivors == 0.0)
+                    adjusted_rate = rate; //bugged, but don't change anything
+                else
+                    adjusted_rate = rate / source_percent_survivors * (1.0 - actual_percent_aliens);
+            }
+            source_altered[m] = adjusted_rate;
+        }
+        
+    }
     if (l == $location[The Nemesis' Lair])
     {
         boolean [monster] all_monsters_to_remove = $monsters[hellseal guardian,Gorgolok\, the Infernal Seal (Inner Sanctum),warehouse worker,Stella\, the Turtle Poacher (Inner Sanctum),evil spaghetti cult zealot,Spaghetti Elemental (Inner Sanctum),security slime,Lumpy\, the Sinister Sauceblob (Inner Sanctum),daft punk,Spirit of New Wave (Inner Sanctum),mariachi bruiser,Somerset Lopez\, Dread Mariachi (Inner Sanctum)];
@@ -371,6 +443,11 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
         case $location[The Toxic Teacups]:
         case $location[Uncle Gator's Country Fun-Time Liquid Waste Sluice]:
             return (get_property_boolean("_stenchAirportToday") || get_property_boolean("stenchAirportAlways"));
+        case $location[The SMOOCH Army HQ]:
+        case $location[The Velvet / Gold Mine]:
+        case $location[LavaCo&trade; Lamp Factory]:
+        case $location[The Bubblin' Caldera]:
+            return (get_property_boolean("_hotAirportToday") || get_property_boolean("hotAirportAlways"));
         case $location[Kokomo Resort]:
             return $effect[Tropical Contact High].have_effect() > 0;
         case $location[Dreadsylvanian Woods]:
@@ -459,6 +536,15 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
         case $location[A Kitchen Drawer]:
         case $location[A Grocery Bag]:
             return get_campground()[$item[jar of psychoses (The Pretentious Artist)]] > 0;
+        case $location[Chinatown Shops]: //needs tracking for the quest? maybe use the items?
+            return get_campground()[$item[jar of psychoses (The Suspicious-Looking Guy)]] > 0 && $item[strange goggles].available_amount() == 0;
+        case $location[Triad Factory]:
+            return $item[zaibatsu lobby card].available_amount() > 0 && $item[strange goggles].available_amount() == 0 && get_campground()[$item[jar of psychoses (The Suspicious-Looking Guy)]] > 0;
+        //case $location[1st Floor, Shiawase-Mitsuhama Building]:
+        //case $location[2nd Floor, Shiawase-Mitsuhama Building]:
+        //case $location[3rd Floor, Shiawase-Mitsuhama Building]:
+        case $location[Chinatown Tenement]:
+            return $item[test site key].available_amount() > 0 && get_campground()[$item[jar of psychoses (The Suspicious-Looking Guy)]] > 0;
         case $location[whitey's grove]:
             return questPropertyPastInternalStepNumber("questG02Whitecastle", 1) || questPropertyPastInternalStepNumber("questL11Palindome", 4); //FIXME what step for questL11Palindome?
         case $location[the Obligatory pirate's cove]:

@@ -47,6 +47,8 @@ void QGuildGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 {
     if (!($classes[seal clubber,turtle tamer,pastamancer,sauceror,disco bandit,accordion thief] contains my_class()))
         return;
+    if (my_path_id() == PATH_NUCLEAR_AUTUMN)
+        return;
 	QuestState base_quest_state = __quest_state["Guild"];
 	if (base_quest_state.finished)
 		return;
