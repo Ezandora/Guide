@@ -234,7 +234,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
         if (__misc_state_int["pulls available"] > 0 && meat_drop_modifier() < 1000.0)
         {
             int limit = 100;
-            if (meat_drop_modifier() < 600.0)
+            if (meat_drop_modifier() < 800.0)
                 limit = 50;
             boolean [item] blacklist = $items[uncle greenspan's bathroom finance guide,black snowcone];
             item [int] relevant_potions = ItemFilterGetPotionsCouldPullToAddToNumericModifier("Meat Drop", limit, blacklist);

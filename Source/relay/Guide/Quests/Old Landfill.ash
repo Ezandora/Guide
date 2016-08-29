@@ -17,12 +17,12 @@ void QOldLandfillInit()
 void QOldLandfillGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
 	QuestState base_quest_state = __quest_state["Old Landfill"];
-	//if (!base_quest_state.in_progress) //don't think it's tracked, not too important anyways
+	//if (!base_quest_state.in_progress) //this isn't actively tracked, so the best we can do is checking the last adventure location
 		//return;
-    if ($item[junk junk].available_amount() > 0)
+    if ($item[junk junk].available_amount() > 0) //FIXME returning to the hippy
         return;
-    //if (__last_adventure_location != $location[the old landfill])
-        //return;
+    if (__last_adventure_location != $location[the old landfill] && !base_quest_state.in_progress)
+        return;
     if (__misc_state["mysterious island available"])
         return;
 		

@@ -12,6 +12,8 @@ void QLevel11ManorInit()
     boolean use_fast_route = true;
     if (!__misc_state["can equip just about any weapon"])
         use_fast_route = false;
+    if (my_path_id() == PATH_NUCLEAR_AUTUMN && in_hardcore())
+        use_fast_route = false;
     
     state.state_boolean["Can use fast route"] = use_fast_route;
 
@@ -259,7 +261,7 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                         subentry.modifiers.listAppend("elemental resistance");
                         subentry.entries.listAppend("Fight Lord Spookyraven.");
                         
-                        if ($effect[Red Door Syndrome].have_effect() == 0 && my_meat() > 1000)
+                        if ($effect[Red Door Syndrome].have_effect() == 0 && my_meat() > 1000 && black_market_available())
                         {
                             subentry.entries.listAppend("A can of black paint can help with fighting him. Bit pricy. (1k meat)");
                         }
