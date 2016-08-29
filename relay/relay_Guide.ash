@@ -2,7 +2,7 @@
 
 since 17.1; //the earliest main release that is usable in modern KOL (unequip bug)
 //These settings are for development. Don't worry about editing them.
-string __version = "1.4.10";
+string __version = "1.4.11";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -11618,6 +11618,8 @@ void QLevel11ManorInit()
     boolean use_fast_route = true;
     if (!__misc_state["can equip just about any weapon"])
         use_fast_route = false;
+    if (my_path_id() == PATH_NUCLEAR_AUTUMN && in_hardcore())
+        use_fast_route = false;
     
     state.state_boolean["Can use fast route"] = use_fast_route;
 
@@ -11865,7 +11867,7 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                         subentry.modifiers.listAppend("elemental resistance");
                         subentry.entries.listAppend("Fight Lord Spookyraven.");
                         
-                        if ($effect[Red Door Syndrome].have_effect() == 0 && my_meat() > 1000)
+                        if ($effect[Red Door Syndrome].have_effect() == 0 && my_meat() > 1000 && black_market_available())
                         {
                             subentry.entries.listAppend("A can of black paint can help with fighting him. Bit pricy. (1k meat)");
                         }
@@ -13143,7 +13145,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
         if (__misc_state_int["pulls available"] > 0 && meat_drop_modifier() < 1000.0)
         {
             int limit = 100;
-            if (meat_drop_modifier() < 600.0)
+            if (meat_drop_modifier() < 800.0)
                 limit = 50;
             boolean [item] blacklist = $items[uncle greenspan's bathroom finance guide,black snowcone];
             item [int] relevant_potions = ItemFilterGetPotionsCouldPullToAddToNumericModifier("Meat Drop", limit, blacklist);
@@ -21541,12 +21543,12 @@ void QOldLandfillInit()
 void QOldLandfillGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
 	QuestState base_quest_state = __quest_state["Old Landfill"];
-	//if (!base_quest_state.in_progress) //don't think it's tracked, not too important anyways
+	//if (!base_quest_state.in_progress) //this isn't actively tracked, so the best we can do is checking the last adventure location
 		//return;
-    if ($item[junk junk].available_amount() > 0)
+    if ($item[junk junk].available_amount() > 0) //FIXME returning to the hippy
         return;
-    //if (__last_adventure_location != $location[the old landfill])
-        //return;
+    if (__last_adventure_location != $location[the old landfill] && !base_quest_state.in_progress)
+        return;
     if (__misc_state["mysterious island available"])
         return;
 		
@@ -29899,7 +29901,7 @@ void setUpState()
 	//wand
 	
 	boolean wand_of_nagamar_needed = true;
-	if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_BUGBEAR_INVASION || my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_KOLHS || my_path_id() == PATH_HEAVY_RAINS || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_THE_SOURCE)
+	if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_BUGBEAR_INVASION || my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_KOLHS || my_path_id() == PATH_HEAVY_RAINS || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_THE_SOURCE || my_path_id() == PATH_NUCLEAR_AUTUMN)
 		wand_of_nagamar_needed = false;
 		
 	int ruby_w_needed = 1;
