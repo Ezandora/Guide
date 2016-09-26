@@ -11,18 +11,25 @@ void initialiseIOTMsUsable()
     {
         int [item] campground = get_campground();
         //Campground items:
-        if (campground[lookupItem("source terminal")] > 0)
-            __iotms_usable[lookupItem("source terminal")] = true;
-        if (campground[lookupItem("haunted doghouse")] > 0)
-            __iotms_usable[lookupItem("haunted doghouse")] = true;
-        if (campground[lookupItem("Witchess Set")] > 0)
-            __iotms_usable[lookupItem("Witchess Set")] = true;
+        if (campground[$item[source terminal]] > 0)
+            __iotms_usable[$item[source terminal]] = true;
+        if (campground[$item[haunted doghouse]] > 0)
+            __iotms_usable[$item[haunted doghouse]] = true;
+        if (campground[$item[Witchess Set]] > 0)
+            __iotms_usable[$item[Witchess Set]] = true;
+        if (campground[$item[potted tea tree]] > 0)
+            __iotms_usable[$item[potted tea tree]] = true;
     }
     if (get_property_boolean("hasDetectiveSchool"))
-        __iotms_usable[lookupItem("detective school application")] = true;
+        __iotms_usable[$item[detective school application]] = true;
     if (get_property_boolean("chateauAvailable"))
-        __iotms_usable[lookupItem("Chateau Mantegna room key")] = true;
-    
+        __iotms_usable[$item[Chateau Mantegna room key]] = true;
+    if (get_property_boolean("barrelShrineUnlocked"))
+        __iotms_usable[$item[shrine to the Barrel god]] = true;
+    if (get_property_boolean("snojoAvailable"))
+        __iotms_usable[$item[X-32-F snowman crate]] = true;
+    if (get_property_boolean("telegraphOfficeAvailable"))
+        __iotms_usable[$item[LT&T telegraph office deed]] = true;
     //Remove non-standard:
     foreach it in __iotms_usable
     {

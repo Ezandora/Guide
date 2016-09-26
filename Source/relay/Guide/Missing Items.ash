@@ -221,7 +221,7 @@ void generateMissingItems(Checklist [int] checklists)
         else if (!in_bad_moon())
             description.listAppend("Or towerkill.");
         if (!can_towerkill && !__quest_state["Level 13"].state_boolean["past tower level 2"] && $location[the castle in the clouds in the sky (top floor)].locationAvailable())
-            description.listAppend("Chances of finding go up if you wait until you're at the wall of meat.");
+            description.listAppend("Chances of finding go up if you wait until you're at the wall of bones.");
         items_needed_entries.listAppend(ChecklistEntryMake("__item electric boning knife", $location[the castle in the clouds in the sky (ground floor)].getClickableURLForLocation(), ChecklistSubentryMake("Electric boning knife", "-combat", description)));
     }
     if ($item[beehive].available_amount() == 0 && __quest_state["Level 13"].state_boolean["wall of skin will need to be defeated"])

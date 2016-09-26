@@ -13,13 +13,15 @@ void SPowerlevelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
             mcd_max_limit = 11;
             url = "place.php?whichplace=canadia&action=lc_mcd";
         }
-        if (knoll_available())
+        else if (knoll_available())
         {
             if ($item[detuned radio].available_amount() > 0)
                 url = "inventory.php?which=3";
             else
                 url = "shop.php?whichshop=gnoll";
         }
+        else if (gnomads_available())
+            url = "gnomes.php?place=machine";
         //FIXME URLs for the other ones
 		if (current_mcd() < mcd_max_limit && have_mcd && monster_level_adjustment() < 150 && !in_bad_moon())
 		{

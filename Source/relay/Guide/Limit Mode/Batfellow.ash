@@ -58,33 +58,33 @@ void LimitModeBatfellowGenerateResources(ChecklistEntry [int] resource_entries, 
     }
     
     string [item] item_descriptions;
-    item_descriptions[lookupItem("bat-oomerang")] = "Deals 20 damage, disarms foes, speeds up sewers.";
-    item_descriptions[lookupItem("bat-jute")] = "Against a monster with ten or less HP, defeats foe and increases progress that fight.|Speeds up the library.";
-    item_descriptions[lookupItem("bat-o-mite")] = "Instakill, speeds up asylum.";
+    item_descriptions[$item[bat-oomerang]] = "Deals 20 damage, disarms foes, speeds up sewers.";
+    item_descriptions[$item[bat-jute]] = "Against a monster with ten or less HP, defeats foe and increases progress that fight.|Speeds up the library.";
+    item_descriptions[$item[bat-o-mite]] = "Instakill, speeds up asylum.";
     
-    item_descriptions[lookupItem("incriminating evidence")] = "Trade for armour upgrades and progress increasers.";//, which also help with the trivia company and the conservatory.";
-    item_descriptions[lookupItem("dangerous chemicals")] = "Trade for health upgrades and HP restorers.";//, which also help with the foundry and the reservoir.";
-    item_descriptions[lookupItem("kidnapped orphan")] = "Trade for attack upgrades and free instakills.";//, which also help with the clock factory and cemetary.";
+    item_descriptions[$item[incriminating evidence]] = "Trade for armour upgrades and progress increasers.";//, which also help with the trivia company and the conservatory.";
+    item_descriptions[$item[dangerous chemicals]] = "Trade for health upgrades and HP restorers.";//, which also help with the foundry and the reservoir.";
+    item_descriptions[$item[kidnapped orphan]] = "Trade for attack upgrades and free instakills.";//, which also help with the clock factory and cemetary.";
     
     
-    item_descriptions[lookupItem("high-grade metal")] = "make bat-oomeranges (damages)";
-    item_descriptions[lookupItem("high-tensile-strength fibers")] = "makes bat-jutes (damages)";
-    item_descriptions[lookupItem("high-grade explosives")] = "makes bat-o-mites (kills?)";
+    item_descriptions[$item[high-grade metal]] = "make bat-oomeranges (damages)";
+    item_descriptions[$item[high-tensile-strength fibers]] = "makes bat-jutes (damages)";
+    item_descriptions[$item[high-grade explosives]] = "makes bat-o-mites (kills?)";
     
-    item_descriptions[lookupItem("experimental gene therapy")] = "";
-    item_descriptions[lookupItem("ultracoagulator")] = "restores all HP, speeds up foundry and reservoir";
-    item_descriptions[lookupItem("self-defense training")] = "";
-    item_descriptions[lookupItem("fingerprint dusting kit")] = "4% progress/fight, speeds up trivia company and conservatory";
-    item_descriptions[lookupItem("confidence-building hug")] = "";
-    item_descriptions[lookupItem("exploding kickball")] = "skips monster to advance the NC, speeds up clock factory and cemetary";
-    item_descriptions[lookupItem("glob of Bat-Glue")] = "stuns for multiple rounds, speeds up conservatory";
-    item_descriptions[lookupItem("Bat-Aid&trade; bandage")] = "restores 20 HP, speeds up reservoir";
-    item_descriptions[lookupItem("bat-bearing")] = "stuns foes, deals 15 damage, speeds up cemetary";
+    item_descriptions[$item[experimental gene therapy]] = "";
+    item_descriptions[$item[ultracoagulator]] = "restores all HP, speeds up foundry and reservoir";
+    item_descriptions[$item[self-defense training]] = "";
+    item_descriptions[$item[fingerprint dusting kit]] = "4% progress/fight, speeds up trivia company and conservatory";
+    item_descriptions[$item[confidence-building hug]] = "";
+    item_descriptions[$item[exploding kickball]] = "skips monster to advance the NC, speeds up clock factory and cemetary";
+    item_descriptions[$item[glob of Bat-Glue]] = "stuns for multiple rounds, speeds up conservatory";
+    item_descriptions[$item[Bat-Aid&trade; bandage]] = "restores 20 HP, speeds up reservoir";
+    item_descriptions[$item[bat-bearing]] = "stuns foes, deals 15 damage, speeds up cemetary";
     
     item [int][int] item_groupings;
-    item_groupings.listAppend(listMake(lookupItem("bat-oomerang"), lookupItem("bat-jute"), lookupItem("bat-o-mite")));
-    item_groupings.listAppend(listMake(lookupItem("incriminating evidence"), lookupItem("dangerous chemicals"), lookupItem("kidnapped orphan")));
-    item_groupings.listAppend(listMake(lookupItem("high-grade metal"), lookupItem("high-tensile-strength fibers"), lookupItem("high-grade explosives")));
+    item_groupings.listAppend(listMake($item[bat-oomerang], $item[bat-jute], $item[bat-o-mite]));
+    item_groupings.listAppend(listMake($item[incriminating evidence], $item[dangerous chemicals], $item[kidnapped orphan]));
+    item_groupings.listAppend(listMake($item[high-grade metal], $item[high-tensile-strength fibers], $item[high-grade explosives]));
     
     foreach it in item_descriptions
         item_groupings.listAppend(listMake(it));
@@ -169,9 +169,9 @@ static
         area.image_name = "sunflower face";
         area.zone = "Center Park (Low Crime)";
         area.boss = lookupMonster("Kudzu");
-        area.nc_twenty_five_progress_requirements[lookupItem("glob of Bat-Glue")] = 1;
-        area.nc_fifty_progress_requirements[lookupItem("fingerprint dusting kit")] = 3;
-        area.nc_reward_items[lookupItem("dangerous chemicals")] = 5;
+        area.nc_twenty_five_progress_requirements[$item[glob of Bat-Glue]] = 1;
+        area.nc_fifty_progress_requirements[$item[fingerprint dusting kit]] = 3;
+        area.nc_reward_items[$item[dangerous chemicals]] = 5;
         __batfellow_bosses[__batfellow_bosses.count()] = area;
         
         area = BatfellowBossAreaMake();
@@ -180,9 +180,9 @@ static
         area.image_name = "__item personal raindrop"; //"__item ketchup hound";
         area.zone = "Center Park (Low Crime)";
         area.boss = lookupMonster("Mansquito");
-        area.nc_twenty_five_progress_requirements[lookupItem("Bat-Aid&trade; bandage")] = 1;
-        area.nc_fifty_progress_requirements[lookupItem("ultracoagulator")] = 3;
-        area.nc_reward_items[lookupItem("kidnapped orphan")] = 5;
+        area.nc_twenty_five_progress_requirements[$item[Bat-Aid&trade; bandage]] = 1;
+        area.nc_fifty_progress_requirements[$item[ultracoagulator]] = 3;
+        area.nc_reward_items[$item[kidnapped orphan]] = 5;
         __batfellow_bosses[__batfellow_bosses.count()] = area;
         
         area = BatfellowBossAreaMake();
@@ -191,9 +191,9 @@ static
         area.image_name = "__item grave robbing shovel";
         area.zone = "Center Park (Low Crime)";
         area.boss = lookupMonster("Miss Graves");
-        area.nc_twenty_five_progress_requirements[lookupItem("bat-bearing")] = 1;
-        area.nc_fifty_progress_requirements[lookupItem("exploding kickball")] = 3;
-        area.nc_reward_items[lookupItem("incriminating evidence")] = 5;
+        area.nc_twenty_five_progress_requirements[$item[bat-bearing]] = 1;
+        area.nc_fifty_progress_requirements[$item[exploding kickball]] = 3;
+        area.nc_reward_items[$item[incriminating evidence]] = 5;
         __batfellow_bosses[__batfellow_bosses.count()] = area;
         
         
@@ -203,8 +203,8 @@ static
         area.image_name = "__item jet bennie marble";
         area.zone = "Slums (Moderate Crime)";
         area.boss = lookupMonster("The Author");
-        area.nc_twenty_five_progress_requirements[lookupItem("bat-o-mite")] = 1;
-        area.nc_reward_items[lookupItem("high-grade metal")] = 6;
+        area.nc_twenty_five_progress_requirements[$item[bat-o-mite]] = 1;
+        area.nc_reward_items[$item[high-grade metal]] = 6;
         __batfellow_bosses[__batfellow_bosses.count()] = area;
         
         area = BatfellowBossAreaMake();
@@ -213,8 +213,8 @@ static
         area.image_name = "__item helmet turtle";
         area.zone = "Slums (Moderate Crime)";
         area.boss = lookupMonster("The Plumber");
-        area.nc_twenty_five_progress_requirements[lookupItem("bat-oomerang")] = 1;
-        area.nc_reward_items[lookupItem("high-grade explosive")] = 6;
+        area.nc_twenty_five_progress_requirements[$item[bat-oomerang]] = 1;
+        area.nc_reward_items[$item[high-grade explosives]] = 6;
         __batfellow_bosses[__batfellow_bosses.count()] = area;
         
         area = BatfellowBossAreaMake();
@@ -223,8 +223,8 @@ static
         area.image_name = "__item very overdue library book";
         area.zone = "Slums (Moderate Crime)";
         area.boss = lookupMonster("The Mad Libber");
-        area.nc_twenty_five_progress_requirements[lookupItem("bat-jute")] = 1;
-        area.nc_reward_items[lookupItem("high-tensile-strength fibers")] = 6;
+        area.nc_twenty_five_progress_requirements[$item[bat-jute]] = 1;
+        area.nc_reward_items[$item[high-tensile-strength fibers]] = 6;
         __batfellow_bosses[__batfellow_bosses.count()] = area;
         
         
@@ -234,9 +234,9 @@ static
         area.image_name = "__item borrowed time";
         area.zone = "Industrial District (High Crime)";
         area.boss = lookupMonster("Doc Clock");
-        area.nc_twenty_five_progress_requirements[lookupItem("exploding kickball")] = 1;
-        area.nc_reward_items[lookupItem("kidnapped orphan")] = 6;
-        area.nc_reward_items[lookupItem("high-grade explosive")] = 6;
+        area.nc_twenty_five_progress_requirements[$item[exploding kickball]] = 1;
+        area.nc_reward_items[$item[kidnapped orphan]] = 6;
+        area.nc_reward_items[$item[high-grade explosives]] = 6;
         area.strategies.listAppend("Bat-oomerang the time bandits, to prevent them from stealing time?");
         area.strategies.listAppend("Gain resources from the NC?");
         __batfellow_bosses[__batfellow_bosses.count()] = area;
@@ -247,9 +247,9 @@ static
         area.image_name = "__item handful of fire";
         area.zone = "Industrial District (High Crime)";
         area.boss = lookupMonster("Mr. Burns");
-        area.nc_twenty_five_progress_requirements[lookupItem("ultracoagulator")] = 1;
-        area.nc_reward_items[lookupItem("dangerous chemicals")] = 6;
-        area.nc_reward_items[lookupItem("high-grade metal")] = 6;
+        area.nc_twenty_five_progress_requirements[$item[ultracoagulator]] = 1;
+        area.nc_reward_items[$item[dangerous chemicals]] = 6;
+        area.nc_reward_items[$item[high-grade metal]] = 6;
         area.strategies.listAppend("Gain resources from the NC?");
         __batfellow_bosses[__batfellow_bosses.count()] = area;
         
@@ -259,9 +259,9 @@ static
         area.image_name = "__item Trivial Avocations Card: What?";
         area.zone = "Industrial District (High Crime)";
         area.boss = lookupMonster("The Inquisitor");
-        area.nc_twenty_five_progress_requirements[lookupItem("fingerprint dusting kit")] = 1;
-        area.nc_reward_items[lookupItem("incriminating evidence")] = 6;
-        area.nc_reward_items[lookupItem("high-tensile-strength fibers")] = 6;
+        area.nc_twenty_five_progress_requirements[$item[fingerprint dusting kit]] = 1;
+        area.nc_reward_items[$item[incriminating evidence]] = 6;
+        area.nc_reward_items[$item[high-tensile-strength fibers]] = 6;
         area.strategies.listAppend("Gain resources from the NC?");
         __batfellow_bosses[__batfellow_bosses.count()] = area;
     }
@@ -408,12 +408,12 @@ void LimitModeBatfellowBatCavernGenerateTaskResources(ChecklistEntry [int] task_
             found_tasks = true;
         }
     }
-    if (state.zone == "Bat-Cavern" && lookupItems("high-grade metal,high-tensile-strength fibers,high-grade explosives").available_amount() > 0)
+    if (state.zone == "Bat-Cavern" && $items[high-grade metal,high-tensile-strength fibers,high-grade explosives].available_amount() > 0)
     {
         item [item] fabricator_conversions;
-        fabricator_conversions[lookupItem("high-grade metal")] = lookupItem("bat-oomerang");
-        fabricator_conversions[lookupItem("high-tensile-strength fibers")] = lookupItem("bat-jute");
-        fabricator_conversions[lookupItem("high-grade explosives")] = lookupItem("bat-o-mite");
+        fabricator_conversions[$item[high-grade metal]] = $item[bat-oomerang];
+        fabricator_conversions[$item[high-tensile-strength fibers]] = $item[bat-jute];
+        fabricator_conversions[$item[high-grade explosives]] = $item[bat-o-mite];
         int cost_per_conversion = 3;
         if (state.upgrades["Improved 3-D Bat-Printer"])
             cost_per_conversion = 2;
@@ -447,15 +447,15 @@ void LimitModeBatfellowDowntownGenerateTasks(ChecklistEntry [int] task_entries, 
 {
     if (state.zone != "Downtown")
         return;
-    item evidence = lookupItem("incriminating evidence");
-    item chemicals = lookupItem("dangerous chemicals");
-    item orphans = lookupItem("kidnapped orphan");
+    item evidence = $item[incriminating evidence];
+    item chemicals = $item[dangerous chemicals];
+    item orphans = $item[kidnapped orphan];
     boolean found_tasks = false;
     if (orphans.available_amount() > 0)
     {
         string [int] description;
         string [int] options;
-        int hug_price = 3 + 3 * lookupItem("confidence-boosting hug").available_amount();
+        int hug_price = 3 + 3 * $item[confidence-building hug].available_amount();
         if (hug_price <= orphans.available_amount())
             options.listAppend("+1 damage upgrades");
         options.listAppend("freekill kickballs");
@@ -467,7 +467,7 @@ void LimitModeBatfellowDowntownGenerateTasks(ChecklistEntry [int] task_entries, 
     {
         string [int] description;
         string [int] options;
-        int hug_price = 3 + 3 * lookupItem("experimental gene therapy").available_amount();
+        int hug_price = 3 + 3 * $item[experimental gene therapy].available_amount();
         if (hug_price <= chemicals.available_amount())
             options.listAppend("+10 HP upgrades");
         options.listAppend("HP-restoring ultracoagulators");
@@ -479,7 +479,7 @@ void LimitModeBatfellowDowntownGenerateTasks(ChecklistEntry [int] task_entries, 
     {
         string [int] description;
         string [int] options;
-        int hug_price = 3 + 3 * lookupItem("self-defense training").available_amount();
+        int hug_price = 3 + 3 * $item[self-defense training].available_amount();
         if (hug_price <= evidence.available_amount())
             options.listAppend("+armour upgrades");
         options.listAppend("progress-increasing fingerprint dusting kits");
@@ -543,21 +543,21 @@ void LimitModeBatfellowGenerateChecklists(Checklist [int] checklists)
 RegisterResourceGenerationFunction("BatfellowGenerateResource");
 void BatfellowGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (lookupItem("replica bat-oomerang").available_amount() > 0 && mafiaIsPastRevision(16927))
+    if ($item[replica bat-oomerang].available_amount() > 0 && mafiaIsPastRevision(16927))
     {
         int remaining = clampi(3 - get_property_int("_usedReplicaBatoomerang"), 0, 3);
         if (remaining > 0)
             resource_entries.listAppend(ChecklistEntryMake("__item replica bat-oomerang", "", ChecklistSubentryMake(pluralise(remaining, "replica bat-oomerang use", "replica bat-oomerang uses"), "", "Free instakill."), 5));
     }
-    if (lookupItem("The Jokester's Gun").available_amount() > 0 && mafiaIsPastRevision(16986) && !get_property_boolean("_firedJokestersGun"))
+    if ($item[The Jokester's Gun].available_amount() > 0 && mafiaIsPastRevision(16986) && !get_property_boolean("_firedJokestersGun"))
     {
         int importance = 5;
         string [int] description;
         description.listAppend("Free instakill.");
-        if (lookupItem("The Jokester's Gun").equipped_amount() == 0)
+        if ($item[The Jokester's Gun].equipped_amount() == 0)
         {
             string line = "Equip it";
-            if (!lookupItem("The Jokester's Gun").can_equip())
+            if (!$item[The Jokester's Gun].can_equip())
             {
                 line += ", once you can. (need 50 moxie)";
                 importance = 8;

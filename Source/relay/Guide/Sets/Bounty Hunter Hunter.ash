@@ -124,7 +124,7 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
         string monster_text = target_monster;
         if (last_monster() == target_monster)
             monster_text = HTMLGenerateSpanOfClass(monster_text, "r_bold");
-        subentry.entries.listAppend("From a " + monster_text + " in " + target_locations.listJoinComponents(", ", "or") + ".");
+        subentry.entries.listAppend("From " + monster_text + " in " + target_locations.listJoinComponents(", ", "or") + ".");
         subentry.modifiers.listAppend("olfact " + target_monster);
         subentry.modifiers.listAppend("banish");
     }

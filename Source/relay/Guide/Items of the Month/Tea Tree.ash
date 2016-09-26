@@ -3,43 +3,43 @@ static
     string [item] __tea_tree_teas;
     void initialiseTeaTreeTeas()
     {
-        __tea_tree_teas[lookupItem("cuppa Activi tea")] = "adventures, stats";
-        __tea_tree_teas[lookupItem("cuppa Alacri tea")] = "+50% init";
-        __tea_tree_teas[lookupItem("cuppa Boo tea")] = "+30 spooky damage";
-        __tea_tree_teas[lookupItem("cuppa Chari tea")] = "+50% meat";
-        __tea_tree_teas[lookupItem("cuppa Craft tea")] = "crafting";
-        __tea_tree_teas[lookupItem("cuppa Cruel tea")] = "+5 fights for spleen";
-        __tea_tree_teas[lookupItem("cuppa Dexteri tea")] = "+50 moxie";
-        __tea_tree_teas[lookupItem("cuppa Feroci tea")] = "+50 muscle";
-        __tea_tree_teas[lookupItem("cuppa Flamibili tea")] = "+30 hot damage";
-        __tea_tree_teas[lookupItem("cuppa Flexibili tea")] = "+3 moxie stats/fight";
-        __tea_tree_teas[lookupItem("cuppa Frost tea")] = "+3 hot res";
-        __tea_tree_teas[lookupItem("cuppa Gill tea")] = "fishy";
-        __tea_tree_teas[lookupItem("cuppa Impregnabili tea")] = "30 DR";
-        __tea_tree_teas[lookupItem("cuppa Improprie tea")] = "+30 sleaze damage";
-        __tea_tree_teas[lookupItem("cuppa Insani tea")] = "+3 OCRS modifiers, teleporting(?)";
-        __tea_tree_teas[lookupItem("cuppa Irritabili tea")] = "+combat";
-        __tea_tree_teas[lookupItem("cuppa Loyal tea")] = "+5 familiar weight";
-        __tea_tree_teas[lookupItem("cuppa Mana tea")] = "+30 max MP, ~4 MP regen";
-        __tea_tree_teas[lookupItem("cuppa Mediocri tea")] = "+30 ML";
-        __tea_tree_teas[lookupItem("cuppa Monstrosi tea")] = "-30 ML";
-        __tea_tree_teas[lookupItem("cuppa Morbidi tea")] = "+3 spooky res";
-        __tea_tree_teas[lookupItem("cuppa Nas tea")] = "+30 stench damage";
-        __tea_tree_teas[lookupItem("cuppa Net tea")] = "+3 stench res";
-        __tea_tree_teas[lookupItem("cuppa Neuroplastici tea")] = "+3 myst stat/fight";
-        __tea_tree_teas[lookupItem("cuppa Obscuri tea")] = "-combat";
-        __tea_tree_teas[lookupItem("cuppa Physicali tea")] = "+3 muscle stats/fight";
-        __tea_tree_teas[lookupItem("cuppa Proprie tea")] = "+3 sleaze res";
-        __tea_tree_teas[lookupItem("cuppa Royal tea")] = "+1 royalty";
-        __tea_tree_teas[lookupItem("cuppa Serendipi Tea")] = "+25% item";
-        __tea_tree_teas[lookupItem("cuppa Sobrie tea")] = "-1 drunkenness";
-        __tea_tree_teas[lookupItem("cuppa Toast tea")] = "+3 cold res";
-        __tea_tree_teas[lookupItem("cuppa Twen tea")] = "+20 various stats";
-        __tea_tree_teas[lookupItem("cuppa Uncertain tea")] = "random effect";
-        __tea_tree_teas[lookupItem("cuppa Vitali tea")] = "+30 max HP, ~4 HP regen";
-        __tea_tree_teas[lookupItem("Cuppa Voraci tea")] = "+1 stomach capacity today";
-        __tea_tree_teas[lookupItem("cuppa Wit tea")] = "+50 myst";
-        __tea_tree_teas[lookupItem("cuppa Yet tea")] = "+30 cold damage";
+        __tea_tree_teas[$item[cuppa Activi tea]] = "adventures, stats";
+        __tea_tree_teas[$item[cuppa Alacri tea]] = "+50% init";
+        __tea_tree_teas[$item[cuppa Boo tea]] = "+30 spooky damage";
+        __tea_tree_teas[$item[cuppa Chari tea]] = "+50% meat";
+        __tea_tree_teas[$item[cuppa Craft tea]] = "crafting";
+        __tea_tree_teas[$item[cuppa Cruel tea]] = "+5 fights for spleen";
+        __tea_tree_teas[$item[cuppa Dexteri tea]] = "+50 moxie";
+        __tea_tree_teas[$item[cuppa Feroci tea]] = "+50 muscle";
+        __tea_tree_teas[$item[cuppa Flamibili tea]] = "+30 hot damage";
+        __tea_tree_teas[$item[cuppa Flexibili tea]] = "+3 moxie stats/fight";
+        __tea_tree_teas[$item[cuppa Frost tea]] = "+3 hot res";
+        __tea_tree_teas[$item[cuppa Gill tea]] = "fishy";
+        __tea_tree_teas[$item[cuppa Impregnabili tea]] = "30 DR";
+        __tea_tree_teas[$item[cuppa Improprie tea]] = "+30 sleaze damage";
+        __tea_tree_teas[$item[cuppa Insani tea]] = "+3 OCRS modifiers, teleporting(?)";
+        __tea_tree_teas[$item[cuppa Irritabili tea]] = "+combat";
+        __tea_tree_teas[$item[cuppa Loyal tea]] = "+5 familiar weight";
+        __tea_tree_teas[$item[cuppa Mana tea]] = "+30 max MP, ~4 MP regen";
+        __tea_tree_teas[$item[cuppa Mediocri tea]] = "+30 ML";
+        __tea_tree_teas[$item[cuppa Monstrosi tea]] = "-30 ML";
+        __tea_tree_teas[$item[cuppa Morbidi tea]] = "+3 spooky res";
+        __tea_tree_teas[$item[cuppa Nas tea]] = "+30 stench damage";
+        __tea_tree_teas[$item[cuppa Net tea]] = "+3 stench res";
+        __tea_tree_teas[$item[cuppa Neuroplastici tea]] = "+3 myst stat/fight";
+        __tea_tree_teas[$item[cuppa Obscuri tea]] = "-combat";
+        __tea_tree_teas[$item[cuppa Physicali tea]] = "+3 muscle stats/fight";
+        __tea_tree_teas[$item[cuppa Proprie tea]] = "+3 sleaze res";
+        __tea_tree_teas[$item[cuppa Royal tea]] = "+1 royalty";
+        __tea_tree_teas[$item[cuppa Serendipi Tea]] = "+25% item";
+        __tea_tree_teas[$item[cuppa Sobrie tea]] = "-1 drunkenness";
+        __tea_tree_teas[$item[cuppa Toast tea]] = "+3 cold res";
+        __tea_tree_teas[$item[cuppa Twen tea]] = "+20 various stats";
+        __tea_tree_teas[$item[cuppa Uncertain tea]] = "random effect";
+        __tea_tree_teas[$item[cuppa Vitali tea]] = "+30 max HP, ~4 HP regen";
+        __tea_tree_teas[$item[Cuppa Voraci tea]] = "+1 stomach capacity today";
+        __tea_tree_teas[$item[cuppa Wit tea]] = "+50 myst";
+        __tea_tree_teas[$item[cuppa Yet tea]] = "+30 cold damage";
     }
     initialiseTeaTreeTeas();
 }
@@ -47,7 +47,7 @@ static
 RegisterResourceGenerationFunction("IOTMTeaTreeGenerateResource");
 void IOTMTeaTreeGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (!get_property_boolean("_pottedTeaTreeUsed") && get_campground()[lookupItem("potted tea tree")] > 0)
+    if (!get_property_boolean("_pottedTeaTreeUsed") && __iotms_usable[$item[potted tea tree]])
     {
         string [int] options;
         //+50% Combat Initiative?
@@ -83,11 +83,11 @@ void IOTMTeaTreeGenerateResource(ChecklistEntry [int] resource_entries)
             //
             element type = __quest_state["Level 13"].state_string["Elemental damage race type"].to_element();
             item [element] element_tea_map;
-            element_tea_map[$element[sleaze]] = lookupItem("Improprie Tea");
-            element_tea_map[$element[spooky]] = lookupItem("cuppa Boo tea");
-            element_tea_map[$element[hot]] = lookupItem("cuppa Flamibili tea");
-            element_tea_map[$element[stench]] = lookupItem("cuppa Nas tea");
-            element_tea_map[$element[cold]] = lookupItem("cuppa Yet tea");
+            element_tea_map[$element[sleaze]] = $item[cuppa Improprie Tea];
+            element_tea_map[$element[spooky]] = $item[cuppa Boo tea];
+            element_tea_map[$element[hot]] = $item[cuppa Flamibili tea];
+            element_tea_map[$element[stench]] = $item[cuppa Nas tea];
+            element_tea_map[$element[cold]] = $item[cuppa Yet tea];
             
             item tea = element_tea_map[type];
             string type_class = "r_element_" + type + "_desaturated";

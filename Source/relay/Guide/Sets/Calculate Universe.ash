@@ -39,7 +39,7 @@ void SCalculateUniverseGenerateResource(ChecklistEntry [int] resource_entries)
             useful_digits_and_their_reasons[51] = "War frat orc to YR";
         useful_digits_and_their_reasons[14] = "1400 meat (autosell 14 moxie weeds)";
         
-        int ice_cubes_needing_creation = lookupItem("perfect ice cube").available_amount();
+        int ice_cubes_needing_creation = $item[perfect ice cube].available_amount();
         if (lookupSkill("Perfect Freeze").skill_is_usable() && !get_property_boolean("_perfectFreezeUsed"))
             ice_cubes_needing_creation += 1;
         if (ice_cubes_needing_creation > 0 && $items[bottle of rum,bottle of vodka,boxed wine,bottle of gin,bottle of whiskey,bottle of tequila].available_amount() < ice_cubes_needing_creation && __misc_state["can drink just about anything"])

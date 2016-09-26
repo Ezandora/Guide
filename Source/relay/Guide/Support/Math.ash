@@ -301,3 +301,10 @@ float averagef(float a, float b)
 {
     return (a + b) * 0.5;
 }
+
+boolean numberIsInRangeInclusive(int v, int min, int max)
+{
+    if (v < min) return false;
+    if (v > max) return false;
+    return true;
+}

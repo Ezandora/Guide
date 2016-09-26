@@ -2,14 +2,14 @@
 RegisterResourceGenerationFunction("IOTMClanFloundryGenerateResource");
 void IOTMClanFloundryGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (!__misc_state["VIP available"] || !lookupItem("Clan Floundry").is_unrestricted())
+    if (!__misc_state["VIP available"] || !$item[Clan Floundry].is_unrestricted())
         return;
     if (!__misc_state["in run"])
         return;
     
     //if (get_property_boolean("_floundryFabricated") || !mafiaIsPastRevision(18000))
         //return;
-    foreach it in lookupItems("bass clarinet,fish hatchet,carpe,codpiece,troutsers,tunac")
+    foreach it in $items[bass clarinet,fish hatchet,carpe,codpiece,troutsers,tunac]
     {
         if (it.available_amount() > 0)
             return;

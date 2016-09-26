@@ -8,7 +8,7 @@ void IOTMSourceTerminalGenerateDigitiseTargets(string [int] description)
     if (!__quest_state["Level 12"].state_boolean["Lighthouse Finished"] && $item[barrel of gunpowder].available_amount() < 5)
         potential_targets.listAppend("lobsterfrogman");
     //FIXME witchess bishop or knight
-    if (__iotms_usable[lookupItem("Witchess Set")] && get_property_int("_witchessFights") < 5)
+    if (__iotms_usable[$item[Witchess Set]] && get_property_int("_witchessFights") < 5)
     {
         string [int] witchess_list;
         if (__misc_state["can eat just about anything"])
@@ -30,7 +30,7 @@ void IOTMSourceTerminalGenerateDigitiseTargets(string [int] description)
 RegisterTaskGenerationFunction("IOTMSourceTerminalGenerateTasks");
 void IOTMSourceTerminalGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-    if (in_bad_moon() || get_campground()[lookupItem("Source Terminal")] == 0 || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
+    if (in_bad_moon() || get_campground()[$item[Source Terminal]] == 0 || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
         return;
     if (!mafiaIsPastRevision(17011))
         return;
@@ -106,7 +106,7 @@ void IOTMSourceTerminalGenerateTasks(ChecklistEntry [int] task_entries, Checklis
 RegisterResourceGenerationFunction("IOTMSourceTerminalGenerateResource");
 void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (in_bad_moon() || get_campground()[lookupItem("Source Terminal")] == 0 || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
+    if (in_bad_moon() || get_campground()[$item[Source Terminal]] == 0 || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
         return;
     
     boolean [string] chips = getInstalledSourceTerminalSingleChips();
@@ -188,7 +188,7 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
             potential_targets.listAppend(HTMLGenerateFutureTextByLocationAvailability("green ops soldier", $location[the battlefield (frat uniform)]));
             if (in_hardcore())
                 potential_targets.listAppend(HTMLGenerateFutureTextByLocationAvailability("bloopers?", $location[8-bit realm]));
-            if (__iotms_usable[lookupItem("Witchess Set")] && get_property_int("_witchessFights") < 5)
+            if (__iotms_usable[$item[Witchess Set]] && get_property_int("_witchessFights") < 5)
                 potential_targets.listAppend("witchess bishop/knight/rooks?");
         }
         if (potential_targets.count() > 0)
@@ -225,7 +225,7 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
     
     if (extrudes_remaining > 0 && mafiaIsPastRevision(16992))
     {
-        int essence = lookupItem("source essence").available_amount();
+        int essence = $item[source essence].available_amount();
         string [int] description;
         if (__misc_state["can eat just about anything"])
         {
@@ -246,9 +246,9 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
         if (!__misc_state["in run"])
         {
             //In aftercore, suggest chips we don't have. Also the shades.
-            if (lookupItem("source shades").available_amount() == 0 && essence >= 100)
+            if ($item[source shades].available_amount() == 0 && essence >= 100)
                 description.listAppend("Source Shades: extra essence extracted when equipped.");
-            if (!lookupFamiliar("software bug").have_familiar() && essence >= 10000)
+            if (!$familiar[software bug].have_familiar() && essence >= 10000)
                 description.listAppend("Software bug: pet rock.");
             string [int] chips_missing;
             foreach s in $strings[CRAM,DRAM,TRAM]

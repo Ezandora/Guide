@@ -1252,7 +1252,7 @@ void QHotAirportLavaCoLampGenerateTasks(ChecklistEntry [int] task_entries)
     if (__last_adventure_location != lookupLocation("LavaCo&trade; Lamp Factory")) //dave's not here, man
         return;
     
-    item [int] missing_lamps = lookupItems("Red LavaCo Lamp&trade;,Green LavaCo Lamp&trade;,Blue LavaCo Lamp&trade;").items_missing();
+    item [int] missing_lamps = $items[Red LavaCo Lamp&trade;,Green LavaCo Lamp&trade;,Blue LavaCo Lamp&trade;].items_missing();
     
     if (missing_lamps.count() == 0)
         return;
@@ -1281,7 +1281,7 @@ void QHotAirportLavaCoLampGenerateTasks(ChecklistEntry [int] task_entries)
     if (capped_item.available_amount() == 0)
     {
         boolean have_all_items = true;
-        if (lookupItem("SMOOCH bottlecap").available_amount() == 0)
+        if ($item[SMOOCH bottlecap].available_amount() == 0)
         {
             have_all_items = false;
             string line;
@@ -1301,7 +1301,7 @@ void QHotAirportLavaCoLampGenerateTasks(ChecklistEntry [int] task_entries)
             {
                 subdescription.listAppend("Acquire " + lava_glob_item + " in LavaCo NC: Use the glob dyer" + __html_right_arrow_character + "Dye them " + colour + ".");
             }
-            if (lookupItem("full lava bottle").available_amount() > 0)
+            if ($item[full lava bottle].available_amount() > 0)
             {
                 if (lava_glob_item.available_amount() > 0)
                 {
@@ -1311,17 +1311,17 @@ void QHotAirportLavaCoLampGenerateTasks(ChecklistEntry [int] task_entries)
             }
             else
             {
-                if (lookupItem("empty lava bottle").item_amount() > 0)
+                if ($item[empty lava bottle].item_amount() > 0)
                 {
                     subdescription.listAppend("Adventure in the LavaCo&trade; Lamp Factory, use the squirter.");
                 }
-                else if (lookupItem("empty lava bottle").available_amount() > 0)
+                else if ($item[empty lava bottle].available_amount() > 0)
                 {
                     subdescription.listAppend("Acquire an empty lava bottle. (From hagnk's?)");
                 }
                 else
                 {
-                    if (lookupItem("New Age healing crystal").item_amount() > 0)
+                    if ($item[New Age healing crystal].item_amount() > 0)
                     {
                         subdescription.listAppend("Adventure in the LavaCo&trade; Lamp Factory, use the klin.");
                     }
@@ -1338,20 +1338,20 @@ void QHotAirportLavaCoLampGenerateTasks(ChecklistEntry [int] task_entries)
             url = "craft.php?mode=combine";
         }
     }
-    else if (lookupItem("LavaCo&trade; Lamp housing").available_amount() > 0)
+    else if ($item[LavaCo&trade; Lamp housing].available_amount() > 0)
     {
         description.listAppend("Combine " + capped_item + " and LavaCo&trade; Lamp housing.");
         url = "craft.php?mode=combine";
     }
     
-    if (lookupItem("LavaCo&trade; Lamp housing").available_amount() == 0)
+    if ($item[LavaCo&trade; Lamp housing].available_amount() == 0)
     {
         boolean have_all_items = true;
-        if (lookupItem("crystalline light bulb").item_amount() == 0)
+        if ($item[crystalline light bulb].item_amount() == 0)
         {
             have_all_items = false;
             
-            if (lookupItem("glowing New Age crystal").item_amount() > 0)
+            if ($item[glowing New Age crystal].item_amount() > 0)
             {
                 description.listAppend("Adventure in the LavaCo&trade; Lamp Factory, use the bulber.");
             }
@@ -1360,30 +1360,30 @@ void QHotAirportLavaCoLampGenerateTasks(ChecklistEntry [int] task_entries)
                 description.listAppend("Acquire glowing New Age crystal. (mall, or healing crystal golem in the mine))");
             }
         }
-        if (lookupItem("heat-resistant sheet metal").item_amount() == 0)
+        if ($item[heat-resistant sheet metal].item_amount() == 0)
         {
             have_all_items = false;
             description.listAppend("Buy heat-resistant sheet metal from the mall.");
         }
-        if (lookupItem("insulated gold wire").item_amount() == 0)
+        if ($item[insulated gold wire].item_amount() == 0)
         {
             have_all_items = false;
             
             
-            if (lookupItem("insulated gold wire").available_amount() > 0)
+            if ($item[insulated gold wire].available_amount() > 0)
             {
                 description.listAppend("Acquire insulated gold wire. (in hagnk's?)");
             }
-            else if (lookupItem("insulated gold wire").creatable_amount() > 0)
+            else if ($item[insulated gold wire].creatable_amount() > 0)
             {
                 description.listAppend("Make insulated gold wire. (thin gold wire + unsmoothed velvet");
                 url = "craft.php?mode=combine";
             }
             else
             {
-                if (lookupItem("thin gold wire").available_amount() == 0)
+                if ($item[thin gold wire].available_amount() == 0)
                 {
-                    if (lookupItem("1,970 carat gold").item_amount() == 0)
+                    if ($item[1\,970 carat gold].item_amount() == 0)
                     {
                         description.listAppend("Acquire 1,970 carat gold by mining in the mine.");
                     }
@@ -1392,7 +1392,7 @@ void QHotAirportLavaCoLampGenerateTasks(ChecklistEntry [int] task_entries)
                         description.listAppend("Adventure in the LavaCo&trade; Lamp Factory, use the wire puller.");
                     }
                 }
-                if (lookupItem("unsmoothed velvet").available_amount() == 0)
+                if ($item[unsmoothed velvet].available_amount() == 0)
                     description.listAppend("Buy unsmoothed velvet in the mall.");
             }
         }
@@ -1425,7 +1425,7 @@ void QHotAirportGenerateResource(ChecklistEntry [int] resource_entries)
         int potential_disco_style_level = 0;
         int current_disco_style_level = 0;
         item [int] items_to_equip_for_additional_style;
-        foreach it in lookupItems("smooth velvet pocket square,smooth velvet socks,smooth velvet hat,smooth velvet shirt,smooth velvet hanky,smooth velvet pants")
+        foreach it in $items[smooth velvet pocket square,smooth velvet socks,smooth velvet hat,smooth velvet shirt,smooth velvet hanky,smooth velvet pants]
         {
             if (it.equipped_amount() > 0)
                 current_disco_style_level += 1;
@@ -1518,7 +1518,7 @@ void QColdAirportGenerateTasks(ChecklistEntry [int] task_entries)
 {
     if (!__misc_state["cold airport available"])
         return;
-    if (lookupItem("Walford's bucket").available_amount() > 0 && QuestState("questECoBucket").in_progress) //need quest tracking as well, you keep the bucket
+    if ($item[Walford's bucket].available_amount() > 0 && QuestState("questECoBucket").in_progress) //need quest tracking as well, you keep the bucket
     {
         string title = "";
         string [int] modifiers;
@@ -1548,7 +1548,7 @@ void QColdAirportGenerateTasks(ChecklistEntry [int] task_entries)
                 nc_helps_in_hotel = false;
             if (nc_helps_in_hotel)
             {
-                if (lookupItem("bellhop's hat").equipped_amount() == 0 && desired_item != "moonbeams")
+                if ($item[bellhop's hat].equipped_amount() == 0 && desired_item != "moonbeams")
                     tasks.listAppend("equip bellhop's hat");
                 tasks.listAppend("run -combat");
             }
@@ -1594,7 +1594,7 @@ void QColdAirportGenerateTasks(ChecklistEntry [int] task_entries)
             }
             if (desired_item == "blood")
                 tasks.listAppend("use tin snips every fight");
-            if (desired_item == "bolts" && lookupItem("VYKEA hex key").equipped_amount() == 0)
+            if (desired_item == "bolts" && $item[VYKEA hex key].equipped_amount() == 0)
                 tasks.listAppend("equip VYKEA hex key");
             if (desired_item == "chum" && meat_drop_modifier() < 250.0)
             {
@@ -1615,7 +1615,7 @@ void QColdAirportGenerateTasks(ChecklistEntry [int] task_entries)
             options.listAppend(vkyea_string);
             
             tasks.listClear();
-            if (lookupItem("Walford's bucket").equipped_amount() == 0)
+            if ($item[Walford's bucket].equipped_amount() == 0)
             {
                 url = "inventory.php?which=2";
                 tasks.listAppend("equip walford's bucket");

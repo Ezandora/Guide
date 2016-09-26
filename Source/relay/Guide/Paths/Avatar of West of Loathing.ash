@@ -36,17 +36,17 @@ void PathAvatarOfWestOfLoathingGenerateResource(ChecklistEntry [int] resource_en
     float [int] subentries_sort_value;
     
     string [item] tonic_descriptions;
-    tonic_descriptions[lookupItem("Eldritch oil")] = "craftable";
-    tonic_descriptions[lookupItem("Unusual oil")] = "+50% item (20 turns), craftable";
-    tonic_descriptions[lookupItem("Skin oil")] = "+100% moxie (20 turns), craftable";
-    tonic_descriptions[lookupItem("Snake oil")] = "+venom/medicine, craftable";
+    tonic_descriptions[$item[Eldritch oil]] = "craftable";
+    tonic_descriptions[$item[Unusual oil]] = "+50% item (20 turns), craftable";
+    tonic_descriptions[$item[Skin oil]] = "+100% moxie (20 turns), craftable";
+    tonic_descriptions[$item[Snake oil]] = "+venom/medicine, craftable";
     
-    tonic_descriptions[lookupItem("patent alacrity tonic")] = "+100% init (20 turns)"; //eldritch + unusual
-    tonic_descriptions[lookupItem("patent sallowness tonic")] = "+30 ML (50 turns)"; //eldritch + skin
-    tonic_descriptions[lookupItem("patent avarice tonic")] = "+50% meat (30 turns)"; //skin + unusual
-    tonic_descriptions[lookupItem("patent invisibility tonic")] = "-15% combat (30 turns)"; //eldritch + snake
-    tonic_descriptions[lookupItem("patent aggression tonic")] = "+15% combat (30 turns)"; //unusual + snake
-    tonic_descriptions[lookupItem("patent preventative tonic")] = "+3 all res (30 turns)"; //skin + snake
+    tonic_descriptions[$item[patent alacrity tonic]] = "+100% init (20 turns)"; //eldritch + unusual
+    tonic_descriptions[$item[patent sallowness tonic]] = "+30 ML (50 turns)"; //eldritch + skin
+    tonic_descriptions[$item[patent avarice tonic]] = "+50% meat (30 turns)"; //skin + unusual
+    tonic_descriptions[$item[patent invisibility tonic]] = "-15% combat (30 turns)"; //eldritch + snake
+    tonic_descriptions[$item[patent aggression tonic]] = "+15% combat (30 turns)"; //unusual + snake
+    tonic_descriptions[$item[patent preventative tonic]] = "+3 all res (30 turns)"; //skin + snake
     
     foreach it in tonic_descriptions
     {
@@ -140,9 +140,9 @@ void PathAvatarOfWestOfLoathingGenerateTasks(ChecklistEntry [int] task_entries, 
     class_points[lookupClass("Snake Oiler")] += get_property_int("awolPointsSnakeoiler");
     
     item [class] tale_for_class;
-    tale_for_class[lookupClass("Cow Puncher")] = lookupItem("tales of the west: Cow Punching");
-    tale_for_class[lookupClass("Beanslinger")] = lookupItem("Tales of the West: Beanslinging");
-    tale_for_class[lookupClass("Snake Oiler")] = lookupItem("Tales of the West: Snake Oiling");
+    tale_for_class[lookupClass("Cow Puncher")] = $item[tales of the west: Cow Punching];
+    tale_for_class[lookupClass("Beanslinger")] = $item[Tales of the West: Beanslinging];
+    tale_for_class[lookupClass("Snake Oiler")] = $item[Tales of the West: Snake Oiling];
     
     boolean [class] have_advanced_skills_for_class;
     if (lookupSkill("Unleash Cowrruption").have_skill() || lookupSkill("Hard Drinker").have_skill() || lookupSkill("Walk: Cautious Prowl").have_skill())
@@ -193,7 +193,7 @@ void PathAvatarOfWestOfLoathingGenerateTasks(ChecklistEntry [int] task_entries, 
         task_entries.listAppend(ChecklistEntryMake("__item tales of the west: beanslinging", skill_url, skill_subentries, priority));
     }
     
-    if (my_class() == lookupClass("Cow Puncher") && lookupItem("corrupted marrow").available_amount() > 0 && lookupItem("corrupted marrow").to_effect().have_effect() < 100 && in_ronin())
+    if (my_class() == lookupClass("Cow Puncher") && $item[corrupted marrow].available_amount() > 0 && $item[corrupted marrow].to_effect().have_effect() < 100 && in_ronin())
     {
         task_entries.listAppend(ChecklistEntryMake("__effect Cowrruption", "inventory.php?which=3", ChecklistSubentryMake("Use corrupted marrow", "", "+200% weapon damage/spell damage"), -11));
     }

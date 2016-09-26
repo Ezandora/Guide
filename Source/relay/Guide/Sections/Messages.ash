@@ -173,7 +173,7 @@ void generateRandomMessageFamiliar(string [int] random_messages)
         case $familiar[Puck Man]:
         case $familiar[Ms. Puck Man]:
             message = "&#5607; &bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;"; break;
-        case lookupFamiliar("Lil' Barrel Mimic"):
+        case $familiar[Lil' Barrel Mimic]:
             message = ":D"; break;
     }
     if (message != "")
@@ -236,7 +236,7 @@ string generateRandomMessage()
         }
     }
     
-    if (lookupItem("The One Mood Ring").equipped_amount() > 0 || $item[mood ring].equipped_amount() > 0)
+    if ($item[The One Mood Ring].equipped_amount() > 0 || $item[mood ring].equipped_amount() > 0)
     {
         string [int] moods = split_string("grateful,awake,accomplished,disappointed,enraged,tired,exhausted,amused,crushed,peaceful,energetic,listless,hyper,jubilant,hungry,sad,bewildered,alone,quixotic,recumbent,bored,excited,relaxed,lonely,curious,guilty,jealous,cheerful,depressed,stressed,infuriated,pleased,crappy,aggravated,okay,rejuvenated,apathetic,bittersweet,optimistic,exanimate,complacent,devious,rejected,blissful,discontent,sympathetic,mellow,refreshed,ecstatic,lazy,morose,dark,mischievous,bouncy,thankful,melancholy,content,drained,numb,uncomfortable,indifferent,groggy,calm,irate,determined,giggly,good,confused,anxious,relieved,mad,accepted,happy,angry,lethargic,shocked,indescribable,satisfied,gloomy,irritated,pessimistic,rushed,frustrated,surprised,annoyed,sleepy,touched,enthralled,cynical,envious,hopeful,ashamed,chipper,loved,giddy,restless", ",");
         string mood_today = moods[gameday_to_int()];

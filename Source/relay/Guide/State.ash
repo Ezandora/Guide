@@ -191,7 +191,7 @@ void setUpState()
 		yellow_ray_source = source.to_string();
 		yellow_ray_image_name = "__item " + source.to_string();
     }
-    if (lookupItem("viral video").available_amount() > 0)
+    if ($item[viral video].available_amount() > 0)
     {
 		yellow_ray_available = true;
 		yellow_ray_source = "viral video";
@@ -381,7 +381,7 @@ void setUpState()
 		//skills_temporarily_missing = true;
 		//familiars_temporarily_missing = true;
 	}
-    if (my_path_id() == PATH_AVATAR_OF_WEST_OF_LOATHING)
+    if (my_path_id() == PATH_AVATAR_OF_WEST_OF_LOATHING || my_path_id() == PATH_NUCLEAR_AUTUMN)
     {
         skills_temporarily_missing = true;
     }

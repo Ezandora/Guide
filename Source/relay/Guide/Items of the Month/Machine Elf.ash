@@ -4,12 +4,12 @@ static
     
     void machineElfAbstractionDescriptionsInit()
     {
-        __machine_elf_abstractions_description[lookupItem("abstraction: motion")] = "+100% init";
-        __machine_elf_abstractions_description[lookupItem("abstraction: certainty")] = "+100% item";
-        __machine_elf_abstractions_description[lookupItem("abstraction: joy")] = "+10 familiar weight";
-        __machine_elf_abstractions_description[lookupItem("abstraction: category")] = "+25% mysticality gains";
-        __machine_elf_abstractions_description[lookupItem("abstraction: perception")] = "+25% moxie gains";
-        __machine_elf_abstractions_description[lookupItem("abstraction: purpose")] = "+25% muscle gains";
+        __machine_elf_abstractions_description[$item[abstraction: motion]] = "+100% init";
+        __machine_elf_abstractions_description[$item[abstraction: certainty]] = "+100% item";
+        __machine_elf_abstractions_description[$item[abstraction: joy]] = "+10 familiar weight";
+        __machine_elf_abstractions_description[$item[abstraction: category]] = "+25% mysticality gains";
+        __machine_elf_abstractions_description[$item[abstraction: perception]] = "+25% moxie gains";
+        __machine_elf_abstractions_description[$item[abstraction: purpose]] = "+25% muscle gains";
     }
     machineElfAbstractionDescriptionsInit();
 }
@@ -17,7 +17,7 @@ static
 RegisterResourceGenerationFunction("IOTMMachineElfFamiliarGenerateResource");
 void IOTMMachineElfFamiliarGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (!lookupFamiliar("machine elf").familiar_is_usable())
+    if (!$familiar[machine elf].familiar_is_usable())
         return;
     
     int free_fights_remaining = clampi(5 - get_property_int("_machineTunnelsAdv"), 0, 5);
@@ -30,7 +30,7 @@ void IOTMMachineElfFamiliarGenerateResource(ChecklistEntry [int] resource_entrie
         if (!__misc_state["in run"] || !__misc_state["need to level"])
             importance = 6;
         string [int] tasks;
-        if (my_familiar() != lookupFamiliar("machine elf"))
+        if (my_familiar() != $familiar[machine elf])
         {
             url = "familiar.php";
             tasks.listAppend("bring along your machine elf");
@@ -52,15 +52,15 @@ void IOTMMachineElfFamiliarGenerateResource(ChecklistEntry [int] resource_entrie
             //abstraction: action -> circle monster -> abstraction: joy (+10 familiar weight)
             //FIXME suggest abstraction methods.
             item [item] abstraction_conversions;
-            abstraction_conversions[lookupItem("abstraction: sensation")] = lookupItem("abstraction: motion");
-            abstraction_conversions[lookupItem("abstraction: thought")] = lookupItem("abstraction: certainty");
+            abstraction_conversions[$item[abstraction: sensation]] = $item[abstraction: motion];
+            abstraction_conversions[$item[abstraction: thought]] = $item[abstraction: certainty];
             if (!__misc_state["familiars temporarily blocked"])
-                abstraction_conversions[lookupItem("abstraction: action")] = lookupItem("abstraction: joy");
+                abstraction_conversions[$item[abstraction: action]] = $item[abstraction: joy];
             
             monster [item] abstraction_monsters;
-            abstraction_monsters[lookupItem("abstraction: sensation")] = lookupMonster("Performer of Actions");
-            abstraction_monsters[lookupItem("abstraction: thought")] = lookupMonster("Perceiver of Sensations");
-            abstraction_monsters[lookupItem("abstraction: action")] = lookupMonster("Thinker of Thoughts");
+            abstraction_monsters[$item[abstraction: sensation]] = lookupMonster("Performer of Actions");
+            abstraction_monsters[$item[abstraction: thought]] = lookupMonster("Perceiver of Sensations");
+            abstraction_monsters[$item[abstraction: action]] = lookupMonster("Thinker of Thoughts");
             
             string [monster] monster_descriptions;
             monster_descriptions[lookupMonster("Performer of Actions")] = "square";
@@ -87,7 +87,7 @@ void IOTMMachineElfFamiliarGenerateResource(ChecklistEntry [int] resource_entrie
                 
                 description.listAppend(line);
             }
-            if (lookupItem("abstraction: thought").item_amount() == 0)
+            if ($item[abstraction: thought].item_amount() == 0)
                 description.listAppend("Possibly run the machine elf elsewhere first, for transmutable potions.");
         }
         ChecklistSubentry [int] subentries;
@@ -103,18 +103,18 @@ void IOTMMachineElfGenerateResource(ChecklistEntry [int] resource_entries)
     {
         boolean [item] useful_abstractions;
         
-        useful_abstractions[lookupItem("abstraction: motion")] = true;
-        useful_abstractions[lookupItem("abstraction: certainty")] = true;
+        useful_abstractions[$item[abstraction: motion]] = true;
+        useful_abstractions[$item[abstraction: certainty]] = true;
         if (!__misc_state["familiars temporarily blocked"])
-            useful_abstractions[lookupItem("abstraction: joy")] = true;
+            useful_abstractions[$item[abstraction: joy]] = true;
         if (__misc_state["need to level"])
         {
             if (my_primestat() == $stat[muscle])
-                useful_abstractions[lookupItem("abstraction: purpose")] = true;
+                useful_abstractions[$item[abstraction: purpose]] = true;
             else if (my_primestat() == $stat[mysticality])
-                useful_abstractions[lookupItem("abstraction: category")] = true;
+                useful_abstractions[$item[abstraction: category]] = true;
             else if (my_primestat() == $stat[moxie])
-                useful_abstractions[lookupItem("abstraction: perception")] = true;
+                useful_abstractions[$item[abstraction: perception]] = true;
         }
         
         string image_name = "";

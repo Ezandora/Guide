@@ -155,10 +155,10 @@ void SAreaUnlocksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
                 line_string += " (probably slower?)";
             subentry.entries.listAppend(line_string);
         }
-        if (my_path_id() == PATH_NUCLEAR_AUTUMN && (lookupFamiliar("ms. puck man").familiar_is_usable() || lookupFamiliar("puck man").familiar_is_usable()))
+        if (my_path_id() == PATH_NUCLEAR_AUTUMN && ($familiar[ms. puck man].familiar_is_usable() || $familiar[puck man].familiar_is_usable()))
         {
             string line = "Or build a yellow submarine.";
-            string [int] missing_components = lookupItem("yellow submarine").missingComponentsToMakeItemInHumanReadableFormat();
+            string [int] missing_components = $item[yellow submarine].missingComponentsToMakeItemInHumanReadableFormat();
             if (missing_components.count() > 0)
                 line += " Need " + missing_components.listJoinComponents(", ", "and") + ".";
             subentry.entries.listAppend(line);

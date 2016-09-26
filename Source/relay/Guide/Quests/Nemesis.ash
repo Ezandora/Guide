@@ -633,7 +633,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             //more fizzing spore pods to blow up the blockade in your Nemesis' cave.
             //Take those fizzing spore pods to the rubble!
             
-            item needed_item = lookupItem("fizzing spore pod");
+            item needed_item = $item[fizzing spore pod];
             
             if (needed_item.available_amount() < 6)
             {
@@ -644,7 +644,10 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             else
             {
                 if (needed_item.item_amount() < 6)
-                    subentry.entries.listAppend("Pull fizzing spore pod from hangk's, make rubble go boom!");
+                {
+                    int delta = 6 - needed_item.item_amount();
+                    subentry.entries.listAppend("Pull " + pluralise(delta, $item[fizzing spore pod]) + " from hangk's, make rubble go boom!");
+                }
                 else
                     subentry.entries.listAppend("Make rubble go boom!");
             }

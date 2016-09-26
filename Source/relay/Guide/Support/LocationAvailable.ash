@@ -345,8 +345,7 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
 		case $location[The Haunted Bedroom]:
 		case $location[The Haunted Bathroom]:
         case $location[the haunted gallery]:
-            //FIXME detect this
-			return get_property_ascension("lastSecondFloorUnlock"); //FIXME test against questM21Dance
+			return get_property_ascension("lastSecondFloorUnlock") && QuestState("questM21Dance").started;
         case $location[the haunted ballroom]:
             return questPropertyPastInternalStepNumber("questM21Dance", 4);
         case $location[The Haunted Laboratory]:
@@ -448,6 +447,10 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
         case $location[LavaCo&trade; Lamp Factory]:
         case $location[The Bubblin' Caldera]:
             return (get_property_boolean("_hotAirportToday") || get_property_boolean("hotAirportAlways"));
+        case $location[The Ice Hotel]:
+        case $location[VYKEA]:
+        case $location[The Ice Hole]:
+            return (get_property_boolean("_coldAirportToday") || get_property_boolean("coldAirportAlways"));
         case $location[Kokomo Resort]:
             return $effect[Tropical Contact High].have_effect() > 0;
         case $location[Dreadsylvanian Woods]:
@@ -721,6 +724,11 @@ boolean locationAvailable(location loc, Error able_to_find)
 boolean locationAvailable(location loc)
 {
 	return locationAvailable(loc, ErrorMake());
+}
+
+void locationAvailableResetCache()
+{
+    __la_commons_were_inited = false;
 }
 
 

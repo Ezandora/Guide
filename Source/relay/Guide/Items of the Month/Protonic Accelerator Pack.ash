@@ -12,14 +12,14 @@ void IOTMProtonicAcceleratorPackGenerateTasks(ChecklistEntry [int] task_entries,
         string [int] description;
         string url = ghost_location.getClickableURLForLocation();
         description.listAppend("Won't cost a turn.");
-        if (lookupItem("protonic accelerator pack").equipped_amount() > 0)
+        if ($item[protonic accelerator pack].equipped_amount() > 0)
             description.listAppend("Cast \"shoot ghost\" three times, then \"trap ghost\".");
         item [int] items_to_equip;
-        if (lookupItem("protonic accelerator pack").equipped_amount() == 0 && lookupItem("protonic accelerator pack").available_amount() > 0)
+        if ($item[protonic accelerator pack].equipped_amount() == 0 && $item[protonic accelerator pack].available_amount() > 0)
         {
             //Strictly speaking, they don't need the pack equipped to fight the monster, but they won't be able to trap it and get the item.
             url = "inventory.php?which=2";
-            items_to_equip.listAppend(lookupItem("protonic accelerator pack"));
+            items_to_equip.listAppend($item[protonic accelerator pack]);
         }
         if (ghost_location == $location[inside the palindome] && $item[Talisman o' Namsilat].equipped_amount() == 0)
         {
@@ -34,6 +34,58 @@ void IOTMProtonicAcceleratorPackGenerateTasks(ChecklistEntry [int] task_entries,
                 items_to_equip.listAppend($item[talisman o' namsilat]);
             }
         }
+        if (ghost_location == $location[the skeleton store] && !ghost_location.locationAvailable())
+        {
+            //bone with a price tag on it
+            if (my_path_id() == PATH_NUCLEAR_AUTUMN)
+            {
+                if ($item[bone with a price tag on it].available_amount() > 0)
+                {
+                    url = "inventory.php?which=3"; //FIXME guess
+                    description.listAppend("Use the bone with a price tag on it to unlock the store.");
+                }
+            }
+            else
+            {
+                url = "shop.php?whichshop=meatsmith&action=talk";
+                description.listAppend("Talk to the meatsmith and start his quest.");
+            }
+        }
+        if (ghost_location == $location[The Overgrown Lot] && !ghost_location.locationAvailable())
+        {
+            //bone with a price tag on it
+            if (my_path_id() == PATH_NUCLEAR_AUTUMN)
+            {
+                if ($item[map to a hidden booze cache].available_amount() > 0)
+                {
+                    url = "inventory.php?which=3"; //FIXME guess
+                    description.listAppend("Use the map to a hidden booze cache to unlock the store.");
+                }
+            }
+            else
+            {
+                url = "shop.php?whichshop=doc&action=talk";
+                description.listAppend("Talk to Doc Galaktik and start his quest.");
+            }
+        }
+        if (ghost_location == $location[Madness Bakery] && !ghost_location.locationAvailable())
+        {
+            //bone with a price tag on it
+            if (my_path_id() == PATH_NUCLEAR_AUTUMN)
+            {
+                if ($item[hypnotic breadcrumbs].available_amount() > 0)
+                {
+                    url = "inventory.php?which=3"; //FIXME guess
+                    description.listAppend("Use the hypnotic breadcrumbs to unlock the store.");
+                }
+            }
+            else
+            {
+                url = "shop.php?whichshop=armory&action=talk";
+                description.listAppend("Talk to Armorer and start his quest.");
+            }
+        }
+        
         if (items_to_equip.count() > 0)
             description.listAppend("Equip the " + items_to_equip.listJoinComponents(", ", "and") + " first.");
         if (ghost_location != $location[none])
@@ -45,7 +97,7 @@ void IOTMProtonicAcceleratorPackGenerateTasks(ChecklistEntry [int] task_entries,
 RegisterResourceGenerationFunction("IOTMProtonicAcceleratorPackGenerateResource");
 void IOTMProtonicAcceleratorPackGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (lookupItem("protonic accelerator pack").available_amount() == 0)
+    if ($item[protonic accelerator pack].available_amount() == 0)
         return;
     
     if (!get_property_boolean("_streamsCrossed") &&__misc_state["in run"] && mafiaIsPastRevision(17085))
@@ -53,7 +105,7 @@ void IOTMProtonicAcceleratorPackGenerateResource(ChecklistEntry [int] resource_e
         string [int] description;
         string url = "showplayer.php?who=2807390"; //ProtonicBot is a real bot that will steal your turtle mechs at the first sign of defiance.
         description.listAppend("+20% stats for 10 turns.");
-        if (lookupItem("protonic accelerator pack").equipped_amount() == 0)
+        if ($item[protonic accelerator pack].equipped_amount() == 0)
         {
             url = "inventory.php?which=2";
             description.listAppend("Equip the protonic accelerator pack first.");

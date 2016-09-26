@@ -39,7 +39,7 @@ void SMiscTasksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
 			potential_targets.listAppend("Anything with 30% drop if you can't 234%. (dwarf foreman, bob racecar, drum machines, etc)");
             
         
-        if (__misc_state_string["yellow ray source"] == "Unleash Cowrruption" && lookupEffect("Cowrruption").have_effect() == 0)
+        if (__misc_state_string["yellow ray source"] == "Unleash Cowrruption" && $effect[Cowrruption].have_effect() == 0)
         {
             potential_targets.listAppend(HTMLGenerateSpanFont("Acquire cowrruption first.", "red"));
         }
@@ -113,9 +113,14 @@ void SMiscTasksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         
 		string [int] description;
 		string [int] modifiers;
-        modifiers.listAppend("-combat");
 		description.listAppend("Missing " + missing_pieces.listJoinComponents(", ", "and") + ".");
-			description.listAppend("Run -combat.");
+        if (my_level() >= 9)
+        {
+            modifiers.listAppend("-combat");
+            description.listAppend("Run -combat.");
+        }
+        else
+            description.listAppend("Possibly wait until level 9, to unlock NCs in the area.");
 		optional_task_entries.listAppend(ChecklistEntryMake("__item homoerotic frat-paddle", "island.php", ChecklistSubentryMake("Acquire a frat boy ensemble?", modifiers, description), $locations[frat house]));
     }
 		
@@ -140,18 +145,18 @@ void SMiscTasksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
                 effect relevant_lamp_effect;
                 if (my_primestat() == $stat[muscle])
                 {
-                    relevant_lamp = lookupItem("red LavaCo Lamp&trade;");
-                    relevant_lamp_effect = lookupEffect("Red Menace");
+                    relevant_lamp = $item[red LavaCo Lamp&trade;];
+                    relevant_lamp_effect = $effect[Red Menace];
                 }
                 else if (my_primestat() == $stat[mysticality])
                 {
-                    relevant_lamp = lookupItem("blue LavaCo Lamp&trade;");
-                    relevant_lamp_effect = lookupEffect("Blue Eyed Devil");
+                    relevant_lamp = $item[blue LavaCo Lamp&trade;];
+                    relevant_lamp_effect = $effect[Blue Eyed Devil];
                 }
                 else if (my_primestat() == $stat[moxie])
                 {
-                    relevant_lamp = lookupItem("green LavaCo Lamp&trade;");
-                    relevant_lamp_effect = lookupEffect("Green Peace");
+                    relevant_lamp = $item[green LavaCo Lamp&trade;];
+                    relevant_lamp_effect = $effect[Green Peace];
                 }
                 if (relevant_lamp != $item[none] && relevant_lamp_effect != $effect[none] && relevant_lamp.available_amount() > 0 && relevant_lamp_effect.have_effect() == 0)
                 {

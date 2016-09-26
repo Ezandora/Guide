@@ -62,7 +62,7 @@ void PathTheSourceGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
         string url = "";
         string target = get_property("sourceOracleTarget");
         location target_location = target.to_location();
-        if (lookupItem("no spoon").available_amount() > 0)
+        if ($item[no spoon].available_amount() > 0)
         {
             title = "Return to the Oracle";
             url = "place.php?whichplace=town_wrong&action=townwrong_oracle";

@@ -35,13 +35,13 @@ void IOTMBarrelGodGenerateResource(ChecklistEntry [int] resource_entries)
             buff_description = "ode-to-booze type / +45% booze drops";
         
         if (buff_description != "")
-            description.listAppend(buff_description.capitaliseFirstLetter() + " buff for 50 turns." + (lookupItem("map to the Biggest Barrel").available_amount() == 0 && (my_daycount() >= 7 || !in_ronin()) ? "|Might give the map to the Biggest Barrel." : ""));
+            description.listAppend(buff_description.capitaliseFirstLetter() + " buff for 50 turns." + ($item[map to the Biggest Barrel].available_amount() == 0 && (my_daycount() >= 7 || !in_ronin()) ? "|Might give the map to the Biggest Barrel." : ""));
         
         resource_entries.listAppend(ChecklistEntryMake("barrel god", "da.php?barrelshrine=1", ChecklistSubentryMake("Barrel worship", "", description), 8));
     }
     
     item [int] barrels_around;
-    foreach it in lookupItems("little firkin,normal barrel,big tun,weathered barrel,dusty barrel,disintegrating barrel,moist barrel,rotting barrel,mouldering barrel,barnacled barrel")
+    foreach it in $items[little firkin,normal barrel,big tun,weathered barrel,dusty barrel,disintegrating barrel,moist barrel,rotting barrel,mouldering barrel,barnacled barrel]
     {
         if (it.item_amount() > 0)
             barrels_around.listAppend(it);
@@ -64,7 +64,7 @@ RegisterTaskGenerationFunction("IOTMBarrelGodGenerateTasks");
 void IOTMBarrelGodGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     //we could suggest they defeat the barrelmech if they have the map anyways... hmm
-    if (lookupItem("map to the Biggest Barrel").available_amount() > 0 && (!lookupItem("chest barrel").haveAtLeastXOfItemEverywhere(1) || !lookupItem("barrelhead").haveAtLeastXOfItemEverywhere(1) || !lookupItem("bottoms of the barrel").haveAtLeastXOfItemEverywhere(1)))
+    if ($item[map to the Biggest Barrel].available_amount() > 0 && (!$item[chest barrel].haveAtLeastXOfItemEverywhere(1) || !$item[barrelhead].haveAtLeastXOfItemEverywhere(1) || !$item[bottoms of the barrel].haveAtLeastXOfItemEverywhere(1)))
     {
         string [int] description;
         description.listAppend("Use map to the Biggest Barrel.");

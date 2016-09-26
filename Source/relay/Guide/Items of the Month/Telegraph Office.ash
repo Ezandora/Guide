@@ -3,11 +3,11 @@ import "relay/Guide/Support/Location Choice.ash";
 RegisterTaskGenerationFunction("IOTMTelegraphOfficeGenerateTasks");
 void IOTMTelegraphOfficeGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-    if (in_bad_moon() || !get_property_boolean("telegraphOfficeAvailable"))
+    if (!__iotms_usable[$item[LT&T telegraph office deed]])
         return;
     
     
-    if (lookupItem("your cowboy boots").available_amount() == 0)
+    if ($item[your cowboy boots].available_amount() == 0)
     {
         optional_task_entries.listAppend(ChecklistEntryMake("__item your cowboy boots", "place.php?whichplace=town_right", ChecklistSubentryMake("Acquire your cowboy boots", "", "Visit the LT&T office."), 0));
         
@@ -99,9 +99,9 @@ void IOTMTelegraphOfficeGenerateTasks(ChecklistEntry [int] task_entries, Checkli
         else if (boss == lookupMonster("Pecos Dave"))
         {
             description.listAppend("Attack with multiple sources of damage.");
-            if (lookupItem("wicker slicker").available_amount() > 0 && $skill[shell up].have_skill())
+            if ($item[wicker slicker].available_amount() > 0 && $skill[shell up].have_skill())
             {
-                if (lookupItem("wicker slicker").equipped_amount() > 0)
+                if ($item[wicker slicker].equipped_amount() > 0)
                     description.listAppend("Shell up on alternate rounds?");
                 else
                     description.listAppend("Equip wicker slicker and shell up on alternate rounds?");
@@ -170,7 +170,7 @@ void IOTMTelegraphOfficeGenerateTasks(ChecklistEntry [int] task_entries, Checkli
 RegisterResourceGenerationFunction("IOTMTelegraphOfficeGenerateResource");
 void IOTMTelegraphOfficeGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (__misc_state["in run"] && lookupItem("Clara's bell").available_amount() > 0 && !get_property_boolean("_claraBellUsed"))
+    if (__misc_state["in run"] && $item[Clara's bell].available_amount() > 0 && !get_property_boolean("_claraBellUsed"))
     {
         string [int] description;
         description.listAppend("Ring for a non-combat next turn, once/day.");

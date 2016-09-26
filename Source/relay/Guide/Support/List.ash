@@ -720,6 +720,14 @@ string [int] listCopy(string [int] l)
     return result;
 }
 
+int [int] listCopy(int [int] l)
+{
+    int [int] result;
+    foreach key in l
+        result[key] = l[key];
+    return result;
+}
+
 monster [int] listCopy(monster [int] l)
 {
     monster [int] result;
@@ -834,6 +842,17 @@ string [string] mapCopy(string [string] map)
 boolean [string] listInvert(string [int] list)
 {
 	boolean [string] result;
+	foreach key in list
+	{
+		result[list[key]] = true;
+	}
+	return result;
+}
+
+
+boolean [int] listInvert(int [int] list)
+{
+	boolean [int] result;
 	foreach key in list
 	{
 		result[list[key]] = true;

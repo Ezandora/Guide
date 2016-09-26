@@ -98,7 +98,10 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         if (!base_quest_state.state_boolean["Black Paint Given"])
         {
             if ($item[can of black paint].available_amount() == 0)
-                subentry.entries.listAppend("Buy can of black paint, give it to Gnasir.");
+            {
+                if (black_market_available())
+                    subentry.entries.listAppend("Buy can of black paint, give it to Gnasir.");
+            }
             else
                 subentry.entries.listAppend("Give can of black paint to Gnasir.");
                 

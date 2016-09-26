@@ -39,8 +39,10 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
 	skill [string][int] property_summons_to_skills;
 	int [string] property_summon_limits;
 	
-	property_summons_to_skills["reagentSummons"] = listMake($skill[advanced saucecrafting], $skill[the way of sauce]);
-	property_summons_to_skills["noodleSummons"] = listMake($skill[Pastamastery], $skill[Transcendental Noodlecraft]);
+    if ($skill[advanced saucecrafting].have_skill())
+        property_summons_to_skills["reagentSummons"] = listMake($skill[advanced saucecrafting], $skill[the way of sauce]);
+    if ($skill[Pastamastery].have_skill())
+        property_summons_to_skills["noodleSummons"] = listMake($skill[Pastamastery], $skill[Transcendental Noodlecraft]);
     if ($skill[Advanced Cocktailcrafting].have_skill())
         property_summons_to_skills["cocktailSummons"] = listMake($skill[Advanced Cocktailcrafting], $skill[Superhuman Cocktailcrafting]);
 	property_summons_to_skills["_coldOne"] = listMake($skill[Grab a Cold One]);

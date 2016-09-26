@@ -154,7 +154,7 @@ void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [in
         if (my_thrall() == $thrall[spaghetti elemental] && my_thrall().level >= 5 && monster_level_adjustment() <= 150)
         {
             stat_description += "|Will effectively gain initiative on agent.";
-            if (!__iotms_usable[lookupItem("source terminal")] || get_property_int("_sourceTerminalPortscanUses") >= 3)
+            if (!__iotms_usable[$item[source terminal]] || get_property_int("_sourceTerminalPortscanUses") >= 3)
                 avoid_displaying_init_otherwise = true;
         }
         if (avoid_displaying_init_otherwise)
@@ -450,9 +450,9 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
         if (copy_source_entry.image_lookup_name == "")
             copy_source_entry.image_lookup_name = "__item sticky clay homunculus";
     }
-    if (lookupItem("print screen button").available_amount() > 0)
+    if ($item[print screen button].available_amount() > 0)
     {
-        copy_source_entry.subentries.listAppend(ChecklistSubentryMake(pluralise(lookupItem("print screen button").available_amount(), "print screen copy", "print screen copies") + " available", "", ""));
+        copy_source_entry.subentries.listAppend(ChecklistSubentryMake(pluralise($item[print screen button].available_amount(), "print screen copy", "print screen copies") + " available", "", ""));
         if (copy_source_entry.image_lookup_name == "")
             copy_source_entry.image_lookup_name = "__item print screen button";
     }
@@ -495,7 +495,7 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
 		SCopiedMonstersGenerateResourceForCopyType(resource_entries, $item[envyfish egg], "envyfish egg", "envyfishMonster");
 	if (!get_property_boolean("_iceSculptureUsed"))
 		SCopiedMonstersGenerateResourceForCopyType(resource_entries, $item[ice sculpture], "ice sculpture", "iceSculptureMonster");
-    SCopiedMonstersGenerateResourceForCopyType(resource_entries, lookupItem("screencapped monster"), "screencapped", "screencappedMonster");
+    SCopiedMonstersGenerateResourceForCopyType(resource_entries, $item[screencapped monster], "screencapped", "screencappedMonster");
         
 	//if (__misc_state["Chateau Mantegna available"] && !get_property_boolean("_chateauMonsterFought") && mafiaIsPastRevision(15115))
 		//SCopiedMonstersGenerateResourceForCopyType(resource_entries, $item[none], "chateau painting", "chateauMonster");

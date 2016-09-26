@@ -48,7 +48,7 @@ void IOTMSnojoGenerateResource(ChecklistEntry [int] resource_entries)
 
 
     //Everything past here is for snojo owners:
-    if (!get_property_boolean("snojoAvailable") || in_bad_moon() || !lookupItem("X-32-F snowman crate").is_unrestricted())
+    if (!__iotms_usable[$item[X-32-F snowman crate]])
         return;
     
     int fights_remaining = clampi(10 - get_property_int("_snojoFreeFights"), 0, 10);
@@ -57,21 +57,21 @@ void IOTMSnojoGenerateResource(ChecklistEntry [int] resource_entries)
     if (fights_remaining > 0)
     {
         item [stat] training_equipment_for_stat;
-        training_equipment_for_stat[$stat[muscle]] = lookupItem("training belt");
-        training_equipment_for_stat[$stat[mysticality]] = lookupItem("training legwarmers");
-        training_equipment_for_stat[$stat[moxie]] = lookupItem("training helmet");
+        training_equipment_for_stat[$stat[muscle]] = $item[training belt];
+        training_equipment_for_stat[$stat[mysticality]] = $item[training legwarmers];
+        training_equipment_for_stat[$stat[moxie]] = $item[training helmet];
         
         item [stat] consumable_reward_for_stat;
-        consumable_reward_for_stat[$stat[muscle]] = lookupItem("ancient medicinal herbs");
-        consumable_reward_for_stat[$stat[mysticality]] = lookupItem("ice rice");
-        consumable_reward_for_stat[$stat[moxie]] = lookupItem("iced plum wine");
+        consumable_reward_for_stat[$stat[muscle]] = $item[ancient medicinal herbs];
+        consumable_reward_for_stat[$stat[mysticality]] = $item[ice rice];
+        consumable_reward_for_stat[$stat[moxie]] = $item[iced plum wine];
         
         string [item] reward_descriptions;
-        reward_descriptions[lookupItem("training belt")] = "+25 ML accessory";
-        reward_descriptions[lookupItem("training helmet")] = "+25% item hat";
-        reward_descriptions[lookupItem("training legwarmers")] = "+5 res accessory";
-        reward_descriptions[lookupItem("ice rice")] = "epic food";
-        reward_descriptions[lookupItem("iced plum wine")] = "epic drink";
+        reward_descriptions[$item[training belt]] = "+25 ML accessory";
+        reward_descriptions[$item[training helmet]] = "+25% item hat";
+        reward_descriptions[$item[training legwarmers]] = "+5 res accessory";
+        reward_descriptions[$item[ice rice]] = "epic food";
+        reward_descriptions[$item[iced plum wine]] = "epic drink";
         
         
         string [int] description;

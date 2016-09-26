@@ -3,7 +3,7 @@ void IOTMDetectiveSchoolGenerateTasks(ChecklistEntry [int] task_entries, Checkli
 {
     if (!mafiaIsPastRevision(17048))
         return;
-    if (!__iotms_usable[lookupItem("detective school application")])
+    if (!__iotms_usable[$item[detective school application]])
         return;
     
     //Should we always mention this in aftercore?
@@ -13,7 +13,7 @@ void IOTMDetectiveSchoolGenerateTasks(ChecklistEntry [int] task_entries, Checkli
     {
         optional_task_entries.listAppend(ChecklistEntryMake("__item noir fedora", "place.php?whichplace=town_wrong&action=townwrong_precinct", ChecklistSubentryMake("Solve " + pluraliseWordy(cases_remaining, "more case", "more cases"), "", "Gives cop dollars."), 5));
     }
-    if (lookupItems("plastic detective badge,bronze detective badge,silver detective badge,gold detective badge").available_amount() == 0)
+    if ($items[plastic detective badge,bronze detective badge,silver detective badge,gold detective badge].available_amount() == 0)
     {
         optional_task_entries.listAppend(ChecklistEntryMake("__item plastic detective badge", "place.php?whichplace=town_wrong&action=townwrong_precinct", ChecklistSubentryMake("Collect your Precinct badge", "", ""), 5));
         
@@ -25,13 +25,13 @@ void IOTMDetectiveSchoolGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (!mafiaIsPastRevision(17048))
         return;
-    if (!__iotms_usable[lookupItem("detective school application")])
+    if (!__iotms_usable[$item[detective school application]])
         return;
     
     //FIXME mention how much more they need to upgrade to the next badge?
     if (__misc_state["in run"])
     {
-        int cop_dollars_have = lookupItem("cop dollar").available_amount();
+        int cop_dollars_have = $item[cop dollar].available_amount();
         if (cop_dollars_have > 0)
         {
             string [int] description;
@@ -51,7 +51,7 @@ void IOTMDetectiveSchoolGenerateResource(ChecklistEntry [int] resource_entries)
             }
             if (buyables.count() > 0)
                 description.listAppend("Buy " + buyables.listJoinComponents(", ", "or") + ".");
-            resource_entries.listAppend(ChecklistEntryMake("__item cop dollar", "shop.php?whichshop=detective", ChecklistSubentryMake(pluralise(lookupItem("cop dollar")), "", description), 7));
+            resource_entries.listAppend(ChecklistEntryMake("__item cop dollar", "shop.php?whichshop=detective", ChecklistSubentryMake(pluralise($item[cop dollar]), "", description), 7));
         }
     }
 }

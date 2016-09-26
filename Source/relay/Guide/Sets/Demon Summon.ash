@@ -30,7 +30,7 @@ void SDemonSummonGenerateResource(ChecklistEntry [int] resource_entries)
         //Prenatural greed.
         string [string] demons;
         demons["demonName2"] = "+100% meat";
-        if (lookupFamiliar("intergnat").familiar_is_usable() && in_ronin())
+        if ($familiar[intergnat].familiar_is_usable() && in_ronin())
         {
             if (!get_property("demonName12").contains_text("Neil")) //FIXME what if neil is on their friends list?
             {
@@ -57,7 +57,7 @@ void SDemonSummonGenerateResource(ChecklistEntry [int] resource_entries)
                 if (demons["demonName12"] != "")
                     demons["demonName12"] += "|";
                 demons["demonName12"] += "+10% item, +20% meat, +50% init, +spell/weapon damage buff.";
-                if (my_familiar() != lookupFamiliar("intergnat"))
+                if (my_familiar() != $familiar[intergnat])
                     demons["demonName12"] += "|Make sure to switch to your intergnat familiar before summoning.";
             }
         }

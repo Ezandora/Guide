@@ -12,7 +12,7 @@ void SCrimbo2015GenerateResource(ChecklistEntry [int] resource_entries)
     if (mafiaIsPastRevision(16544) && !in_ronin())
     {
         int herb_uses_left = clampi(10 - get_property_int("_fragrantHerbsUsed"), 0, 10);
-        if (lookupItem("bundle of &quot;fragrant&quot; herbs").available_amount() > 0 && herb_uses_left > 0)
+        if ($item[bundle of &quot;fragrant&quot; herbs].available_amount() > 0 && herb_uses_left > 0)
         {
             string [int] description;
             description.listAppend("Free run/banish three monsters at once.");
@@ -29,7 +29,7 @@ void SCrimbo2015GenerateResource(ChecklistEntry [int] resource_entries)
             resource_entries.listAppend(ChecklistEntryMake("__item bundle of &quot;fragrant&quot; herbs", "", ChecklistSubentryMake(pluralise(herb_uses_left, "fragrant herb banish", "fragrant herb banishes"), "", description), 3));
         }
         int stockpile_uses_left = clampi(10 - get_property_int("_nuclearStockpileUsed"), 0, 10);
-        if (lookupItem("nuclear stockpile").available_amount() > 0 && stockpile_uses_left > 0)
+        if ($item[nuclear stockpile].available_amount() > 0 && stockpile_uses_left > 0)
         {
             string [int] description;
             description.listAppend("Does not cost a turn.");

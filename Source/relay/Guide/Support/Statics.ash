@@ -60,23 +60,25 @@ static
 static
 {
     boolean [item] __minus_combat_equipment;
-    void initialiseMinusCombatEquipment()
+    boolean [item] __equipment;
+    void initialiseEquipment()
     {
         foreach it in $items[]
         {
             if (it.to_slot() == $slot[none])
                 continue;
-            if (it.numeric_modifier("combat rate") >= 0)
-                continue;
-            __minus_combat_equipment[it] = true;
+            __equipment[it] = true;
+            if (it.numeric_modifier("combat rate") < 0)
+                __minus_combat_equipment[it] = true;
+            
         }
     }
-    initialiseMinusCombatEquipment();
+    initialiseEquipment();
 }
 
 static
 {
-    boolean [item] __beancannon_source_items = lookupItems("Heimz Fortified Kidney Beans,Hellfire Spicy Beans,Mixed Garbanzos and Chickpeas,Pork 'n' Pork 'n' Pork 'n' Beans,Shrub's Premium Baked Beans,Tesla's Electroplated Beans,Frigid Northern Beans,Trader Olaf's Exotic Stinkbeans,World's Blackest-Eyed Peas");
+    boolean [item] __beancannon_source_items = $items[Heimz Fortified Kidney Beans,Hellfire Spicy Beans,Mixed Garbanzos and Chickpeas,Pork 'n' Pork 'n' Pork 'n' Beans,Shrub's Premium Baked Beans,Tesla's Electroplated Beans,Frigid Northern Beans,Trader Olaf's Exotic Stinkbeans,World's Blackest-Eyed Peas];
 }
 
 static
@@ -108,12 +110,12 @@ static
 item lookupAWOLOilForMonster(monster m)
 {
     if (__snakes contains m)
-        return lookupItem("snake oil");
+        return $item[snake oil];
     else if ($phylums[beast,dude,hippy,humanoid,orc,pirate] contains m.phylum)
-        return lookupItem("skin oil");
+        return $item[skin oil];
     else if ($phylums[bug,construct,constellation,demon,elemental,elf,fish,goblin,hobo,horror,mer-kin,penguin,plant,slime,weird] contains m.phylum)
-        return lookupItem("unusual oil");
+        return $item[unusual oil];
     else if ($phylums[undead] contains m.phylum)
-        return lookupItem("eldritch oil");
+        return $item[eldritch oil];
     return $item[none];
 }

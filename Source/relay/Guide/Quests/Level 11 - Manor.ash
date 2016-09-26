@@ -228,7 +228,8 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                         //line += "Go search for:|*" + places.listJoinComponents("<hr>|*");
                         line += "Go search in the Haunted " + places.listJoinComponents(", ", "and");
                         subentry.entries.listAppend(line);
-                        subentry.entries.listAppend("Read the recipe if you haven't.");
+                        /*if (!recipe_was_autoread)
+                            subentry.entries.listAppend("Read the recipe.");*/
                         
                         //are these scheduled, or regular NCs?
                         //assuming scheduled for now
@@ -267,12 +268,12 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                         }
                     }
                 }
-                if (use_fast_route)
+                if (use_fast_route && !recipe_was_autoread_with_glasses)
                 {
                     if ($item[unstable fulminate].available_amount() == 0 && !output_final_fight_info && $item[bottle of Chateau de Vinegar].available_amount() == 0 && $item[bottle of Chateau de Vinegar].available_amount() == 0 && !recipe_will_be_autoread)
                         subentry.entries.listAppend("Remember to wear Spookyraven's spectacles/read the recipe if you haven't.");
                 }
-                else
+                else if (!recipe_was_autoread)
                     subentry.entries.listAppend("Remember to read the recipe if you haven't.");
             }
         }
