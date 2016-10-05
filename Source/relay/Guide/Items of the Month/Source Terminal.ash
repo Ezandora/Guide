@@ -86,7 +86,7 @@ void IOTMSourceTerminalGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         subentries.listAppend(ChecklistSubentryMake("Set an enquiry", "", description));
     }
     //"Digitise something" like arrow something?
-    if (get_property_int("_sourceTerminalDigitizeUses") == 0 && __misc_state["in run"])
+    if (get_property_int("_sourceTerminalDigitizeUses") == 0 && __misc_state["in run"] && my_path_id() != PATH_ZOMBIE_SLAYER)
     {
         string [int] description;
         IOTMSourceTerminalGenerateDigitiseTargets(description);
@@ -149,6 +149,8 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
         if (get_property_boolean("_sourceTerminalDuplicateUsed"))
             duplicate_uses_remaining = 0;
     }
+    if (my_path_id() == PATH_ZOMBIE_SLAYER)
+        duplicate_uses_remaining = 0;
     if (mafiaIsPastRevision(17031) && duplicate_uses_remaining > 0 && __misc_state["in run"])
     {
         //Duplication of a monster:
@@ -223,7 +225,7 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
     //Extrudes:
     int extrudes_remaining = clampi(3 - get_property_int("_sourceTerminalExtrudes"), 0, 3);
     
-    if (extrudes_remaining > 0 && mafiaIsPastRevision(16992))
+    if (extrudes_remaining > 0 && mafiaIsPastRevision(16992) && my_path_id() != PATH_ZOMBIE_SLAYER)
     {
         int essence = $item[source essence].available_amount();
         string [int] description;
@@ -283,6 +285,8 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
         digitisation_limit += 1;
     if (chips["TRIGRAM"])
         digitisation_limit += 1;
+    if (my_path_id() == PATH_ZOMBIE_SLAYER)
+        digitisation_limit = 0;
     int digitisations_left = clampi(digitisation_limit - digitisations, 0, 3);
     if (digitisations_left > 0)
     {

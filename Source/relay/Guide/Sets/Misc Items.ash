@@ -726,7 +726,6 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
     {
         string [int] description;
         description.listAppend("Use to visit the Twin Peak non-combat.");
-        description.listAppend("Can be used to burn delay - adventure somewhere with delay, then use the trimmers.");
         resource_entries.listAppend(ChecklistEntryMake("__item " + $item[rusty hedge trimmers], "inventory.php?which=3", ChecklistSubentryMake(pluralise($item[rusty hedge trimmers]), "", description), importance_level_unimportant_item));
     }
     

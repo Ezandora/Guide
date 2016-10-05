@@ -1125,6 +1125,18 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
             }
             //if (m.raw_defense > 0)
                 //stats_l2.listAppend(m.raw_defense + " def");
+            if (true)
+            {
+                boolean manuel_available = $monster[spooky vampire].monster_factoids_available(false) > 0;
+                if (manuel_available)
+                {
+                    int factoids_left = 3 - monster_factoids_available(m, false);
+                    if (m.attributes.contains_text("ULTRARARE"))
+                        factoids_left = 0;
+                    if (factoids_left > 0)
+                        stats_l2.listAppend(factoids_left + " more fact" + (factoids_left > 1 ? "s" : ""));
+                }
+            }
             
             if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
             {

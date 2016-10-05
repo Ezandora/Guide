@@ -2,7 +2,7 @@ RegisterTaskGenerationFunction("IOTMIntergnatGenerateTasks");
 void IOTMIntergnatGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     
-    if (!get_property_boolean("demonSummoned") && __misc_state["in run"] && !__quest_state["Level 13"].state_boolean["king waiting to be freed"])
+    if (!get_property_boolean("demonSummoned") && __misc_state["in run"] && !__quest_state["Level 13"].state_boolean["king waiting to be freed"] && $familiar[intergnat].familiar_is_usable() && my_path_id() != PATH_AVATAR_OF_SNEAKY_PETE)
     {
         //Should we show this if they aren't using the intergnat? ... Yes?
         //demonName12, thin black candle, scroll of ancient forbidden unspeakable evil

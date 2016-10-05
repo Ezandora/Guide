@@ -225,8 +225,8 @@ void QSleazeAirportGenerateTasks(ChecklistEntry [int] task_entries)
     questESlFish - Taco Dan, Sunken Yacht, tacoDanFishMeat
     questESlDebt - (?)Broden, Sunken Yacht
     */
-    if (__misc_state["in run"] && !($locations[the sunken party yacht,sloppy seconds diner,the fun-guy mansion] contains __last_adventure_location)) //too many
-        return;
+    //if (__misc_state["in run"] && !($locations[the sunken party yacht,sloppy seconds diner,the fun-guy mansion] contains __last_adventure_location)) //too many
+        //return;
     ChecklistEntry [int] subtask_entries;
     QSleazeAirportMushStashGenerateTasks(subtask_entries); //√
     QSleazeAirportAuditGenerateTasks(subtask_entries); //√
@@ -791,8 +791,8 @@ void QSpookyAirportGenerateTasks(ChecklistEntry [int] task_entries)
 {
     if (!__misc_state["spooky airport available"])
         return;
-    if (__misc_state["in run"] && !($locations[the mansion of dr. weirdeaux,the secret government laboratory,the deep dark jungle] contains __last_adventure_location)) //a common strategy is to accept an island quest in-run, then finish it upon prism break to do two quests in a day. so, don't clutter their interface unless they're adventuring there? hmm...
-        return;
+    //if (__misc_state["in run"] && !($locations[the mansion of dr. weirdeaux,the secret government laboratory,the deep dark jungle] contains __last_adventure_location)) //a common strategy is to accept an island quest in-run, then finish it upon prism break to do two quests in a day. so, don't clutter their interface unless they're adventuring there? hmm...
+        //return;
     
     QSpookyAirportClipperGenerateTasks(task_entries);
     QSpookyAirportEVEGenerateTasks(task_entries);
@@ -1230,8 +1230,8 @@ void QStenchAirportGenerateTasks(ChecklistEntry [int] task_entries)
 {
     if (!__misc_state["stench airport available"])
         return;
-    if (__misc_state["in run"] && !($locations[Pirates of the Garbage Barges,Barf Mountain,The Toxic Teacups,Uncle Gator's Country Fun-Time Liquid Waste Sluice] contains __last_adventure_location))
-        return;
+    //if (__misc_state["in run"] && !($locations[Pirates of the Garbage Barges,Barf Mountain,The Toxic Teacups,Uncle Gator's Country Fun-Time Liquid Waste Sluice] contains __last_adventure_location))
+        //return;
     QStenchAirportFishTrashGenerateTasks(task_entries);
     QStenchAirportNastyBearsGenerateTasks(task_entries);
     QStenchAirportSocialJusticeIGenerateTasks(task_entries);

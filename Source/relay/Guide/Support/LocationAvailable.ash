@@ -1086,7 +1086,7 @@ static
         foreach s in $strings[Ye Olde Medievale Villagee,Portal to Terrible Parents,Rumpelstiltskin's Workshop]
             lookup_map[s] = "place.php?whichplace=ioty2014_rumple";
             
-        foreach s in $strings[The Cave Before Time,An Illicit Bohemian Party,Moonshiners' Woods,The Roman Forum,The Post-Mall,The Rowdy Saloon,The Spooky Old Abandoned Mine,Globe Theatre Main Stage,Globe Theatre Backstage]
+        foreach s in $strings[The Cave Before Time,An Illicit Bohemian Party,Moonshiners' Woods,The Roman Forum,The Post-Mall,The Rowdy Saloon,The Spooky Old Abandoned Mine,Globe Theatre Main Stage,Globe Theatre Backstage,12 West Main,KoL Con Clan Party House]
             lookup_map[s] = "place.php?whichplace=twitch";
         foreach s in $strings[The Fun-Guy Mansion,Sloppy Seconds Diner,The Sunken Party Yacht]
             lookup_map[s] = "place.php?whichplace=airport_sleaze";

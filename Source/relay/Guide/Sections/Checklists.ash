@@ -62,8 +62,9 @@ void generateMisc(Checklist [int] checklists)
             int adventures_after_rollover = my_adventures() + 40;
             if (my_path_id() != PATH_SLOW_AND_STEADY)
                 adventures_after_rollover += numeric_modifier("adventures");
-            if (get_property_boolean("_borrowedTimeUsed"))
-                adventures_after_rollover -= 20;
+            //if (get_property_boolean("_borrowedTimeUsed"))
+                //adventures_after_rollover -= 20;
+            adventures_after_rollover += get_property_int("extraRolloverAdventures");
             
             adventures_after_rollover = clampi(adventures_after_rollover, 0, 200);
             if (getHolidaysTomorrow()["Labór Day"] && my_path_id() != PATH_SLOW_AND_STEADY)

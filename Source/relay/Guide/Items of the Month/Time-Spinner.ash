@@ -20,7 +20,7 @@ void IOTMTimeSpinnerGenerateResource(ChecklistEntry [int] resource_entries)
         //Delicious meal - 3 minutes
         if (__misc_state["can eat just about anything"] && availableFullness() > 0)
         {
-            description.listAppend(HTMLGenerateSpanOfClass(pluralise(amount, "meal", "meals"), "r_bold") + ": Re-eat something else this ascension.");
+            description.listAppend(HTMLGenerateSpanOfClass(pluralise(amount, "meal", "meals"), "r_bold") + ": Re-eat something else today.");
         }
     }
     //Way back in time - 1 minute, stats, costs a turn(?)

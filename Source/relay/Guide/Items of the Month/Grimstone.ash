@@ -127,8 +127,8 @@ void IOTMGrimstoneStepmotherGenerateTasks(ChecklistEntry [int] task_entries, Che
     if (minutes_to_midnight <= 0)
         return;
     
-    if (__misc_state["in run"] && !($locations[the prince's kitchen,the prince's balcony,the prince's lounge,the prince's canapes table,the prince's restroom,the prince's dance floor] contains __last_adventure_location) && minutes_to_midnight < 30)
-        return;
+    //if (__misc_state["in run"] && !($locations[the prince's kitchen,the prince's balcony,the prince's lounge,the prince's canapes table,the prince's restroom,the prince's dance floor] contains __last_adventure_location) && minutes_to_midnight < 30)
+        //return;
     
     int score = get_property_int("cinderellaScore");
     string [int] description;
