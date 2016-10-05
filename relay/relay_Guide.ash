@@ -2,7 +2,7 @@
 
 since 17.4; //the earliest main release that is usable in modern KOL (cookie bug)
 //These settings are for development. Don't worry about editing them.
-string __version = "1.4.12";
+string __version = "1.4.13";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -5406,7 +5406,7 @@ static
         foreach s in $strings[Ye Olde Medievale Villagee,Portal to Terrible Parents,Rumpelstiltskin's Workshop]
             lookup_map[s] = "place.php?whichplace=ioty2014_rumple";
             
-        foreach s in $strings[The Cave Before Time,An Illicit Bohemian Party,Moonshiners' Woods,The Roman Forum,The Post-Mall,The Rowdy Saloon,The Spooky Old Abandoned Mine,Globe Theatre Main Stage,Globe Theatre Backstage]
+        foreach s in $strings[The Cave Before Time,An Illicit Bohemian Party,Moonshiners' Woods,The Roman Forum,The Post-Mall,The Rowdy Saloon,The Spooky Old Abandoned Mine,Globe Theatre Main Stage,Globe Theatre Backstage,12 West Main,KoL Con Clan Party House]
             lookup_map[s] = "place.php?whichplace=twitch";
         foreach s in $strings[The Fun-Guy Mansion,Sloppy Seconds Diner,The Sunken Party Yacht]
             lookup_map[s] = "place.php?whichplace=airport_sleaze";
@@ -19780,8 +19780,8 @@ void QSleazeAirportGenerateTasks(ChecklistEntry [int] task_entries)
     questESlFish - Taco Dan, Sunken Yacht, tacoDanFishMeat
     questESlDebt - (?)Broden, Sunken Yacht
     */
-    if (__misc_state["in run"] && !($locations[the sunken party yacht,sloppy seconds diner,the fun-guy mansion] contains __last_adventure_location)) //too many
-        return;
+    //if (__misc_state["in run"] && !($locations[the sunken party yacht,sloppy seconds diner,the fun-guy mansion] contains __last_adventure_location)) //too many
+        //return;
     ChecklistEntry [int] subtask_entries;
     QSleazeAirportMushStashGenerateTasks(subtask_entries); //√
     QSleazeAirportAuditGenerateTasks(subtask_entries); //√
@@ -20346,8 +20346,8 @@ void QSpookyAirportGenerateTasks(ChecklistEntry [int] task_entries)
 {
     if (!__misc_state["spooky airport available"])
         return;
-    if (__misc_state["in run"] && !($locations[the mansion of dr. weirdeaux,the secret government laboratory,the deep dark jungle] contains __last_adventure_location)) //a common strategy is to accept an island quest in-run, then finish it upon prism break to do two quests in a day. so, don't clutter their interface unless they're adventuring there? hmm...
-        return;
+    //if (__misc_state["in run"] && !($locations[the mansion of dr. weirdeaux,the secret government laboratory,the deep dark jungle] contains __last_adventure_location)) //a common strategy is to accept an island quest in-run, then finish it upon prism break to do two quests in a day. so, don't clutter their interface unless they're adventuring there? hmm...
+        //return;
     
     QSpookyAirportClipperGenerateTasks(task_entries);
     QSpookyAirportEVEGenerateTasks(task_entries);
@@ -20785,8 +20785,8 @@ void QStenchAirportGenerateTasks(ChecklistEntry [int] task_entries)
 {
     if (!__misc_state["stench airport available"])
         return;
-    if (__misc_state["in run"] && !($locations[Pirates of the Garbage Barges,Barf Mountain,The Toxic Teacups,Uncle Gator's Country Fun-Time Liquid Waste Sluice] contains __last_adventure_location))
-        return;
+    //if (__misc_state["in run"] && !($locations[Pirates of the Garbage Barges,Barf Mountain,The Toxic Teacups,Uncle Gator's Country Fun-Time Liquid Waste Sluice] contains __last_adventure_location))
+        //return;
     QStenchAirportFishTrashGenerateTasks(task_entries);
     QStenchAirportNastyBearsGenerateTasks(task_entries);
     QStenchAirportSocialJusticeIGenerateTasks(task_entries);
@@ -23848,7 +23848,6 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
     {
         string [int] description;
         description.listAppend("Use to visit the Twin Peak non-combat.");
-        description.listAppend("Can be used to burn delay - adventure somewhere with delay, then use the trimmers.");
         resource_entries.listAppend(ChecklistEntryMake("__item " + $item[rusty hedge trimmers], "inventory.php?which=3", ChecklistSubentryMake(pluralise($item[rusty hedge trimmers]), "", description), importance_level_unimportant_item));
     }
     
@@ -29963,7 +29962,7 @@ void setUpState()
 	//wand
 	
 	boolean wand_of_nagamar_needed = true;
-	if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_BUGBEAR_INVASION || my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_KOLHS || my_path_id() == PATH_HEAVY_RAINS || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_THE_SOURCE || my_path_id() == PATH_NUCLEAR_AUTUMN)
+	if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_BUGBEAR_INVASION || my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_KOLHS || my_path_id() == PATH_HEAVY_RAINS || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_THE_SOURCE)
 		wand_of_nagamar_needed = false;
 		
 	int ruby_w_needed = 1;
@@ -30181,10 +30180,13 @@ void setUpState()
             __misc_state["can reasonably reach -25% combat"] = true;
     }
     
-    foreach s in $strings[spooky,sleaze,hot,cold,stench]
+    if (!in_bad_moon())
     {
-        if (get_property_boolean(s + "AirportAlways") || get_property_boolean("_" + s + "AirportToday"))
-            __misc_state[s + " airport available"] = true;
+        foreach s in $strings[spooky,sleaze,hot,cold,stench]
+        {
+            if (get_property_boolean(s + "AirportAlways") || get_property_boolean("_" + s + "AirportToday"))
+                __misc_state[s + " airport available"] = true;
+        }
     }
     
     if (get_property_boolean("chateauAvailable") && !in_bad_moon() && $item[Chateau Mantegna room key].is_unrestricted())
@@ -33716,8 +33718,9 @@ void generateMisc(Checklist [int] checklists)
             int adventures_after_rollover = my_adventures() + 40;
             if (my_path_id() != PATH_SLOW_AND_STEADY)
                 adventures_after_rollover += numeric_modifier("adventures");
-            if (get_property_boolean("_borrowedTimeUsed"))
-                adventures_after_rollover -= 20;
+            //if (get_property_boolean("_borrowedTimeUsed"))
+                //adventures_after_rollover -= 20;
+            adventures_after_rollover += get_property_int("extraRolloverAdventures");
             
             adventures_after_rollover = clampi(adventures_after_rollover, 0, 200);
             if (getHolidaysTomorrow()["Labór Day"] && my_path_id() != PATH_SLOW_AND_STEADY)
@@ -35648,6 +35651,18 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
             }
             //if (m.raw_defense > 0)
                 //stats_l2.listAppend(m.raw_defense + " def");
+            if (true)
+            {
+                boolean manuel_available = $monster[spooky vampire].monster_factoids_available(false) > 0;
+                if (manuel_available)
+                {
+                    int factoids_left = 3 - monster_factoids_available(m, false);
+                    if (m.attributes.contains_text("ULTRARARE"))
+                        factoids_left = 0;
+                    if (factoids_left > 0)
+                        stats_l2.listAppend(factoids_left + " more fact" + (factoids_left > 1 ? "s" : ""));
+                }
+            }
             
             if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
             {
@@ -39881,8 +39896,8 @@ void IOTMGrimstoneStepmotherGenerateTasks(ChecklistEntry [int] task_entries, Che
     if (minutes_to_midnight <= 0)
         return;
     
-    if (__misc_state["in run"] && !($locations[the prince's kitchen,the prince's balcony,the prince's lounge,the prince's canapes table,the prince's restroom,the prince's dance floor] contains __last_adventure_location) && minutes_to_midnight < 30)
-        return;
+    //if (__misc_state["in run"] && !($locations[the prince's kitchen,the prince's balcony,the prince's lounge,the prince's canapes table,the prince's restroom,the prince's dance floor] contains __last_adventure_location) && minutes_to_midnight < 30)
+        //return;
     
     int score = get_property_int("cinderellaScore");
     string [int] description;
@@ -40758,7 +40773,7 @@ RegisterTaskGenerationFunction("IOTMIntergnatGenerateTasks");
 void IOTMIntergnatGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     
-    if (!get_property_boolean("demonSummoned") && __misc_state["in run"] && !__quest_state["Level 13"].state_boolean["king waiting to be freed"])
+    if (!get_property_boolean("demonSummoned") && __misc_state["in run"] && !__quest_state["Level 13"].state_boolean["king waiting to be freed"] && $familiar[intergnat].familiar_is_usable() && my_path_id() != PATH_AVATAR_OF_SNEAKY_PETE)
     {
         //Should we show this if they aren't using the intergnat? ... Yes?
         //demonName12, thin black candle, scroll of ancient forbidden unspeakable evil
@@ -40944,7 +40959,7 @@ void IOTMSourceTerminalGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         subentries.listAppend(ChecklistSubentryMake("Set an enquiry", "", description));
     }
     //"Digitise something" like arrow something?
-    if (get_property_int("_sourceTerminalDigitizeUses") == 0 && __misc_state["in run"])
+    if (get_property_int("_sourceTerminalDigitizeUses") == 0 && __misc_state["in run"] && my_path_id() != PATH_ZOMBIE_SLAYER)
     {
         string [int] description;
         IOTMSourceTerminalGenerateDigitiseTargets(description);
@@ -41007,6 +41022,8 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
         if (get_property_boolean("_sourceTerminalDuplicateUsed"))
             duplicate_uses_remaining = 0;
     }
+    if (my_path_id() == PATH_ZOMBIE_SLAYER)
+        duplicate_uses_remaining = 0;
     if (mafiaIsPastRevision(17031) && duplicate_uses_remaining > 0 && __misc_state["in run"])
     {
         //Duplication of a monster:
@@ -41081,7 +41098,7 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
     //Extrudes:
     int extrudes_remaining = clampi(3 - get_property_int("_sourceTerminalExtrudes"), 0, 3);
     
-    if (extrudes_remaining > 0 && mafiaIsPastRevision(16992))
+    if (extrudes_remaining > 0 && mafiaIsPastRevision(16992) && my_path_id() != PATH_ZOMBIE_SLAYER)
     {
         int essence = $item[source essence].available_amount();
         string [int] description;
@@ -41141,6 +41158,8 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
         digitisation_limit += 1;
     if (chips["TRIGRAM"])
         digitisation_limit += 1;
+    if (my_path_id() == PATH_ZOMBIE_SLAYER)
+        digitisation_limit = 0;
     int digitisations_left = clampi(digitisation_limit - digitisations, 0, 3);
     if (digitisations_left > 0)
     {
@@ -41352,7 +41371,7 @@ void IOTMTimeSpinnerGenerateResource(ChecklistEntry [int] resource_entries)
         //Delicious meal - 3 minutes
         if (__misc_state["can eat just about anything"] && availableFullness() > 0)
         {
-            description.listAppend(HTMLGenerateSpanOfClass(pluralise(amount, "meal", "meals"), "r_bold") + ": Re-eat something else this ascension.");
+            description.listAppend(HTMLGenerateSpanOfClass(pluralise(amount, "meal", "meals"), "r_bold") + ": Re-eat something else today.");
         }
     }
     //Way back in time - 1 minute, stats, costs a turn(?)
