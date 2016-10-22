@@ -2,7 +2,7 @@
 
 since 17.4; //the earliest main release that is usable in modern KOL (cookie bug)
 //These settings are for development. Don't worry about editing them.
-string __version = "1.4.14";
+string __version = "1.4.15";
 
 //Debugging:
 boolean __setting_debug_mode = false;
