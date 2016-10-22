@@ -2,7 +2,7 @@
 
 since 17.4; //the earliest main release that is usable in modern KOL (cookie bug)
 //These settings are for development. Don't worry about editing them.
-string __version = "1.4.13";
+string __version = "1.4.14";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -43516,7 +43516,7 @@ void PathNuclearAutumnGenerateTasks(ChecklistEntry [int] task_entries, Checklist
     
     if (get_property_int("falloutShelterLevel") >= 2 && (my_turncount() >= 50 || get_property_boolean("falloutShelterChronoUsed")))
     {
-        if ($item[Rad-Pro (1 oz.)].to_effect().have_effect() <= 1 && my_meat() >= 500)
+        if ($item[Rad-Pro (1 oz.)].to_effect().have_effect() <= 1 && my_meat() >= 500 && $item[lead umbrella].equipped_amount() == 0)
         {
             url = "shop.php?whichshop=vault1";
             if ($item[Rad-Pro (1 oz.)].available_amount() > 0)
