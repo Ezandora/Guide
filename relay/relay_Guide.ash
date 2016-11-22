@@ -2,7 +2,7 @@
 
 since 17.4; //the earliest main release that is usable in modern KOL (cookie bug)
 //These settings are for development. Don't worry about editing them.
-string __version = "1.4.15";
+string __version = "1.4.16";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -2296,8 +2296,9 @@ int totalDelayForLocation(location place)
     place_delays[$location[the haunted ballroom]] = 5; //FIXME rumored
     place_delays[$location[the penultimate fantasy airship]] = 25;
     place_delays[$location[the "fun" house]] = 10;
+    place_delays[$location[The Castle in the Clouds in the Sky (Ground Floor)]] = 11; //???
+    place_delays[$location[the outskirts of cobb's knob]] = 11; //??
     //the haunted billiards room does not contain delay
-    //yojimbos_law saw it on turn two on 2014-7-14, immediately after seeing the pool cue adventure, as have I
     //also failure at 16 skill
     
     if (place_delays contains place)
@@ -3734,7 +3735,6 @@ boolean CounterMayHitNextTurn(Counter c)
         return true; //maaaybe?
     return false;
 }
-
 boolean CounterMayHitInXTurns(Counter c, int turns_limit)
 {
     if (!c.initialised)
@@ -3788,6 +3788,20 @@ boolean CounterWillHitExactlyInTurnRange(Counter c, int start_turn_range, int en
     }
     return false;
 }
+
+boolean CounterWillHitNextTurn(Counter c)
+{
+    if (c.CounterIsRange())
+    {
+        Vec2i range = c.CounterGetWindowRange();
+        if (range.y <= 0)
+            return true;
+    }
+    if (c.CounterWillHitExactlyInTurnRange(0, 0))
+        return true;
+    return false;
+}
+
 
 boolean CounterExists(Counter c)
 {
@@ -3846,8 +3860,19 @@ void CountersParseProperty(string property_name, Counter [string] counters, bool
     }
     
 	string counter_string = get_property(property_name);
-	string [int] counter_split = split_string(counter_string, ":");
-    
+    /*Strangeness:
+> get _tempRelayCounters
+
+15:Romantic Monster window begin loc=*:lparen.gif|25:Romantic Monster window end loc=* type=wander:rparen.gif|7:Digitize Monster loc=* type=wander:watch.gif|7:Digitize Monster loc=* type=wander:watch.gif|7:Digitize Monster loc=* type=wander:watch.gif|
+
+> get relayCounters
+
+70:Semirare window begin:lparen.gif:80:Semirare window end loc=*:rparen.gif
+
+    Why does one use | as a seperator, and the other doesn't?
+    */
+	string [int] counter_split = split_string(counter_string.replace_string("|", ":"), ":"); //FIXME | properly
+    //print_html("counter_split = " + counter_split.to_json());
     //Parse counters:
     for i from 0 to (counter_split.count() - 1) by 3
     {
@@ -3864,6 +3889,7 @@ void CountersParseProperty(string property_name, Counter [string] counters, bool
         string location_id;
         string type;
         string intermediate_name = counter_name_raw;
+        //print_html("intermediate_name = " + intermediate_name + ", turn_number = " + turn_number + ", turns_until_counter = " + turns_until_counter);
         
         //Parse loc, remove it from intermediate name:
         //loc=* type=wander
@@ -3960,6 +3986,10 @@ void CountersParseProperty(string property_name, Counter [string] counters, bool
         }
         else
         {
+            if (c.name == "Dance Card" && turns_until_counter < 0) //bug: dance card is still in relayCounters after being met
+            {
+                continue;
+            }
             //if (turns_until_counter >= 0)
             if (true)
             {
@@ -4186,10 +4216,7 @@ boolean CounterWanderingMonsterWillHitNextTurn()
         return false;
     foreach key, c in CounterWanderingMonsterWindowsActiveNextTurn()
     {
-        Vec2i range = c.CounterGetWindowRange();
-        if (range.y <= 0)
-            return true;
-        if (c.CounterWillHitExactlyInTurnRange(0, 0))
+        if (c.CounterWillHitNextTurn())
             return true;
     }
     return false;
@@ -9669,7 +9696,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
             details.listAppend(line);
         }
         
-        if (!black_market_available() && my_path_id() != PATH_WAY_OF_THE_SURPRISING_FIST)
+        if (!black_market_available() && my_path_id() != PATH_WAY_OF_THE_SURPRISING_FIST && my_path_id() != PATH_NUCLEAR_AUTUMN)
         {
             details.listAppend("Possibly unlock the black market first, for cans of black paint. (+2 " + HTMLGenerateSpanOfClass("spooky", "r_element_spooky") + "/" + HTMLGenerateSpanOfClass("cold", "r_element_cold") + " res buff, 1k meat)");
         }
@@ -23191,6 +23218,8 @@ void SMiscItemsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             {
                 try_for_seal_tooth = true;
             }
+            if (my_path_id() == PATH_NUCLEAR_AUTUMN)
+                try_for_seal_tooth = false;
             
             if (try_for_seal_tooth)
             {
@@ -25476,7 +25505,7 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
         if (counter_is_range && !(turn_range.x <= 10 && from_task) && !(turn_range.x > 10 && !from_task) && window_name != "Romantic Monster")
             continue;
         
-        
+        //print_html("c = " + c.to_json());
         boolean very_important = false;
         if (turn_range.x <= 0 && counter_is_range)
             very_important = true;
@@ -29381,6 +29410,20 @@ void generatePullList(Checklist [int] checklists)
 	{
 		pullable_item_list.listAppend(GPItemMake($item[Shore Inc. Ship Trip Scrip], "Saves three turns each.|" + scrip_reasons.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".", scrip_needed));
 	}
+    //FIXME add hat/stuffing fluffer/blank-out
+    if (availableSpleen() >= 2 && my_path_id() != PATH_NUCLEAR_AUTUMN)
+    {
+		pullable_item_list.listAppend(GPItemMake(lookupItem("turkey blaster"), "Burns five turns of delay in last adventured area. Costs spleen, limited uses/day.", 3)); //FIXME learn what this limit is. also suggest in advance?
+    }
+    if (__quest_state["Level 7"].state_boolean["alcove needs speed tricks"]) //only area that realistically could use it
+    {
+        pullable_item_list.listAppend(GPItemMake(lookupItem("gravy boat"), "Wear to save two turns in the cyrpt.")); //marginal, especially since you're pulling a bunch of turkey blasters, but...
+        
+    }
+    if (!__quest_state["Level 12"].finished && __quest_state["Level 12"].state_int["frat boys left on battlefield"] >= 936 && __quest_state["Level 12"].state_int["hippies left on battlefield"] >= 936)
+    {
+        pullable_item_list.listAppend(GPItemMake(lookupItem("stuffing fluffer"), "Saves eight turns if you use two at the start of fighting in the war.", 2));
+    }
     
     if (!__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && __quest_state["Level 11 Desert"].state_int["Desert Exploration"] < 95)
     {
@@ -29414,7 +29457,7 @@ void generatePullList(Checklist [int] checklists)
     
     //int pills_pullable = clampi(20 - (get_property_int("_powerPillUses") + $item[power pill].available_amount()), 0, 20);
     int pills_pullable = clampi(20 - get_property_int("_powerPillUses"), 0, 20);
-    if (pills_pullable > 0)
+    if (pills_pullable > 0 && ($familiar[ms. puck man].have_familiar() || $familiar[puck man].have_familiar()))
     {
         pullable_item_list.listAppend(GPItemMake($item[power pill], "Saves one turn each.", pills_pullable));
     }
@@ -29426,6 +29469,8 @@ void generatePullList(Checklist [int] checklists)
         if (casts < 10)
             pullable_item_list.listAppend(GPItemMake($item[blue mana], "+3 adventures each.|Probably a bad idea.", clampi(10 - casts, 0, 10)));
     }
+    
+    
 	
 	boolean currently_trendy = (my_path_id() == PATH_TRENDY);
 	foreach key in pullable_item_list
@@ -32681,6 +32726,16 @@ string generateRandomMessage()
     else
         day_cycle = "night";
     monster_messages[lookupMonster("Travoltron")] = now_to_string("EEEE").to_lower_case() + " " + day_cycle + " fever";
+    
+    if (my_daycount() == 2 && (my_adventures() == 0 || availableDrunkenness() < 0) && availableFullness() == 0 && availableDrunkenness() <= 0 && my_path_id() != PATH_OXYGENARIAN && __quest_state["Level 12"].started && !__quest_state["Level 13"].state_boolean["king waiting to be freed"] && my_path_id() != PATH_NUCLEAR_AUTUMN && my_path_id() != PATH_SLOW_AND_STEADY)
+    {
+        //detect failed two-day runs, and provide psychological support:
+        random_messages.listClear();
+        if (__quest_state["Level 13"].started)
+            random_messages.listAppend("ever so close");
+        else
+            random_messages.listAppend("three days is fine");
+    }
     
     boolean already_output_relevant_beaten_up_effect = false;
     if ((my_hp() == 0 || $effect[beaten up].have_effect() > 0) && beaten_up_monster_messages contains last_monster() && last_monster() != $monster[none])
@@ -37577,7 +37632,7 @@ void IOTMMayoClinicGenerateResource(ChecklistEntry [int] resource_entries)
         lance_description += HTMLGenerateDivOfClass("Uses up blood mayo.", "r_word_wrap_group");
         choices.listAppend(listMake("Mayo lance", lance_description));
         
-        if (!get_property_boolean("mayoWhipRented"))
+        if (!get_property_boolean("mayoWhipRented") && !get_property_boolean("itemBoughtPerAscension8266"))
         {
             choices.listAppend(listMake("Miracle whip", "Weapon, usable " + HTMLGenerateSpanFont("once", "red") + " per run.|+50% item, +100% meat, +50% init."));
         }
@@ -41046,7 +41101,7 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
         string [int] potential_targets;
         //FIXME grey out if the area isn't available?
         if ($item[goat cheese].available_amount() < 2 && !__quest_state["Level 8"].state_boolean["Past mine"])
-            potential_targets.listAppend(HTMLGenerateFutureTextByLocationAvailability("diary goat", $location[the goatlet]));
+            potential_targets.listAppend(HTMLGenerateFutureTextByLocationAvailability("dairy goat", $location[the goatlet]));
         if (!__quest_state["Level 11"].finished && !__quest_state["Level 11 Palindome"].finished && $item[talisman o' namsilat].available_amount() == 0 && $items[gaudy key,snakehead charrrm].available_amount() < 2)
             potential_targets.listAppend(HTMLGenerateFutureTextByLocationAvailability("gaudy pirate", $location[belowdecks]));
         if (my_path_id() == PATH_THE_SOURCE)
@@ -41102,14 +41157,14 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
     {
         int essence = $item[source essence].available_amount();
         string [int] description;
-        if (__misc_state["can eat just about anything"])
+        if (__misc_state["can eat just about anything"] && my_path_id() != PATH_NUCLEAR_AUTUMN)
         {
             string line = "Food: 4 fullness epic.";
             if (essence < 10)
                 line = HTMLGenerateSpanFont(line, "grey");
             description.listAppend(line);
         }
-        if (__misc_state["can drink just about anything"])
+        if (__misc_state["can drink just about anything"] && my_path_id() != PATH_NUCLEAR_AUTUMN)
         {
             string line = "Drink: 4 inebriety epic.";
             if (__misc_state["in run"])
@@ -41246,6 +41301,7 @@ void IOTMProtonicAcceleratorPackGenerateTasks(ChecklistEntry [int] task_entries,
         location ghost_location = get_property_location("ghostLocation");
         string title = "Defeat the ghost in " + ghost_location;
         string [int] description;
+        string [int] modifiers;
         string url = ghost_location.getClickableURLForLocation();
         description.listAppend("Won't cost a turn.");
         if ($item[protonic accelerator pack].equipped_amount() > 0)
@@ -41324,8 +41380,27 @@ void IOTMProtonicAcceleratorPackGenerateTasks(ChecklistEntry [int] task_entries,
         
         if (items_to_equip.count() > 0)
             description.listAppend("Equip the " + items_to_equip.listJoinComponents(", ", "and") + " first.");
+        
+        element [location] elements_to_resist;
+        elements_to_resist[$location[Cobb's Knob Treasury]] = $element[spooky];
+        elements_to_resist[$location[The Haunted Conservatory]] = $element[stench];
+        elements_to_resist[$location[The Haunted Gallery]] = $element[hot];
+        elements_to_resist[$location[The Haunted Kitchen]] = $element[cold];
+        elements_to_resist[$location[The Haunted Wine Cellar]] = $element[sleaze];
+        elements_to_resist[$location[The Icy Peak]] = $element[hot];
+        elements_to_resist[$location[Inside the Palindome]] = $element[spooky];
+        elements_to_resist[$location[Madness Bakery]] = $element[hot];
+        elements_to_resist[$location[The Old Landfill]] = $element[stench];
+        elements_to_resist[$location[The Overgrown Lot]] = $element[sleaze];
+        elements_to_resist[$location[The Skeleton Store]] = $element[spooky];
+        elements_to_resist[$location[The Smut Orc Logging Camp]] = $element[spooky];
+        elements_to_resist[$location[The Spooky Forest]] = $element[spooky];
+        
+        if (elements_to_resist contains ghost_location)
+            modifiers.listAppend(HTMLGenerateSpanOfClass("+" + elements_to_resist[ghost_location] + " resist", "r_element_" + elements_to_resist[ghost_location]));
+            
         if (ghost_location != $location[none])
-            optional_task_entries.listAppend(ChecklistEntryMake("__item protonic accelerator pack", url, ChecklistSubentryMake(title, "", description), priority));
+            optional_task_entries.listAppend(ChecklistEntryMake("__item protonic accelerator pack", url, ChecklistSubentryMake(title, modifiers, description), priority));
     }
 }
 
@@ -41395,6 +41470,109 @@ void IOTMTimeSpinnerGenerateResource(ChecklistEntry [int] resource_entries)
     //Play a time prank - 1 minute, heart
     
     resource_entries.listAppend(ChecklistEntryMake("Hourglass", "inv_use.php?whichitem=9104&pwd=" + my_hash(), ChecklistSubentryMake(pluralise(minutes_left, "Time-Spinner minute", "Time-Spinner minutes"), "", description), 5));
+}
+RegisterResourceGenerationFunction("IOTMThanksgardenGenerateResource");
+void IOTMThanksgardenGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if (!__misc_state["in run"])
+        return;
+    
+    item turkey_blaster = lookupItem("turkey blaster");
+    item stuffing_fluffer = lookupItem("stuffing fluffer");
+    item cashew = lookupItem("cashew");
+    item cornucopia = lookupItem("cornucopia");
+    
+    ChecklistSubentry [int] subentries;
+    string url;
+    string image_name;
+    
+    
+    
+    if (cornucopia.available_amount() > 0)
+    {
+        string [int] description;
+        description.listAppend("Open for thanksgarden food.");
+        if (image_name == "")
+            image_name = "__item cornucopia";
+        if (url == "")
+            url = "inventory.php?which=3";
+        subentries.listAppend(ChecklistSubentryMake(pluralise(cornucopia), "", description));
+    }
+    if (cashew.available_amount() > 0)
+    {
+        string [int] description;
+        string [int] options;
+        if (my_path_id() != PATH_NUCLEAR_AUTUMN)
+            options.listAppend("turkey blasters to burn delay");
+        if (!__quest_state["Level 12"].finished)
+            options.listAppend("stuffing fluffers for the war");
+        if (my_path_id() != PATH_NUCLEAR_AUTUMN)
+            options.listAppend("various foods");
+        if (__quest_state["Level 7"].state_boolean["alcove needs speed tricks"])
+            options.listAppend("gravy boat for the cyrpt (somewhat marginal)");
+        if (options.count() > 0)
+            description.listAppend("Could make into " + options.listJoinComponents(", ", "or") + ".");
+        
+        string [int] foods_we_can_make;
+        
+        if (image_name == "")
+            image_name = "__item cashew";
+        if (url == "")
+            url = "shop.php?whichshop=thankshop";
+        subentries.listAppend(ChecklistSubentryMake(pluralise(cashew), "", description));
+    }
+    
+    if (turkey_blaster.available_amount() > 0 && my_path_id() != PATH_NUCLEAR_AUTUMN)
+    {
+        string [int] description;
+        int uses_left = clampi(3 - get_property_int("_turkeyBlastersUsed"), 0, 3);
+        int pre_spleen_uses_left = uses_left;
+        uses_left = MIN(uses_left, availableSpleen() / 2);
+        
+        string [int] delay_areas;
+        foreach l in $locations[the outskirts of cobb's knob,the spooky forest,The Castle in the Clouds in the Sky (Ground Floor),the haunted gallery,the haunted bathroom,the haunted ballroom,the boss bat's lair]
+        {
+            if (l.delayRemainingInLocation() > 1)
+                delay_areas.listAppend(l);
+        }
+        
+        description.listAppend("Will burn five turns of delay in the last area you've adventured.");
+        if (delay_areas.count() > 0)
+            description.listAppend("Suggested areas:|*" + delay_areas.listJoinComponents(", ", "and") + ".");
+        if (uses_left == 0)
+        {
+            if (pre_spleen_uses_left > 0)
+                description.listAppend("Cannot use any more today; no spleen room.");
+            else
+                description.listAppend("Cannot use any more today.");
+        }
+        else
+            description.listAppend("Can use " + pluraliseWordy(uses_left, "More Time", "more times") + " today.");
+        
+        
+        if (image_name == "")
+            image_name = "__item turkey blaster";
+        if (url == "")
+            url = "inventory.php?which=1";
+        subentries.listAppend(ChecklistSubentryMake(pluralise(turkey_blaster), "", description));
+    }
+    if (!__quest_state["Level 12"].finished && __quest_state["Level 12"].state_int["frat boys left on battlefield"] > 0 && __quest_state["Level 12"].state_int["hippies left on battlefield"] > 0 && stuffing_fluffer.available_amount() > 0)
+    {
+        string [int] description;
+        description.listAppend("Clears out level twelve armies. Use before adventuring on the battlefield.");
+        
+        if (image_name == "")
+            image_name = "__item stuffing fluffer";
+        if (url == "")
+            url = "inventory.php?which=3";
+        subentries.listAppend(ChecklistSubentryMake(pluralise(stuffing_fluffer), "", description));
+    }
+    
+    
+    if (subentries.count() > 0)
+    {
+        resource_entries.listAppend(ChecklistEntryMake(image_name, url, subentries, 4));
+    }
 }
 
 RegisterTaskGenerationFunction("PathActuallyEdtheUndyingGenerateTasks");
