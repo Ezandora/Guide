@@ -10,6 +10,7 @@ void IOTMProtonicAcceleratorPackGenerateTasks(ChecklistEntry [int] task_entries,
         location ghost_location = get_property_location("ghostLocation");
         string title = "Defeat the ghost in " + ghost_location;
         string [int] description;
+        string [int] modifiers;
         string url = ghost_location.getClickableURLForLocation();
         description.listAppend("Won't cost a turn.");
         if ($item[protonic accelerator pack].equipped_amount() > 0)
@@ -88,8 +89,27 @@ void IOTMProtonicAcceleratorPackGenerateTasks(ChecklistEntry [int] task_entries,
         
         if (items_to_equip.count() > 0)
             description.listAppend("Equip the " + items_to_equip.listJoinComponents(", ", "and") + " first.");
+        
+        element [location] elements_to_resist;
+        elements_to_resist[$location[Cobb's Knob Treasury]] = $element[spooky];
+        elements_to_resist[$location[The Haunted Conservatory]] = $element[stench];
+        elements_to_resist[$location[The Haunted Gallery]] = $element[hot];
+        elements_to_resist[$location[The Haunted Kitchen]] = $element[cold];
+        elements_to_resist[$location[The Haunted Wine Cellar]] = $element[sleaze];
+        elements_to_resist[$location[The Icy Peak]] = $element[hot];
+        elements_to_resist[$location[Inside the Palindome]] = $element[spooky];
+        elements_to_resist[$location[Madness Bakery]] = $element[hot];
+        elements_to_resist[$location[The Old Landfill]] = $element[stench];
+        elements_to_resist[$location[The Overgrown Lot]] = $element[sleaze];
+        elements_to_resist[$location[The Skeleton Store]] = $element[spooky];
+        elements_to_resist[$location[The Smut Orc Logging Camp]] = $element[spooky];
+        elements_to_resist[$location[The Spooky Forest]] = $element[spooky];
+        
+        if (elements_to_resist contains ghost_location)
+            modifiers.listAppend(HTMLGenerateSpanOfClass("+" + elements_to_resist[ghost_location] + " resist", "r_element_" + elements_to_resist[ghost_location]));
+            
         if (ghost_location != $location[none])
-            optional_task_entries.listAppend(ChecklistEntryMake("__item protonic accelerator pack", url, ChecklistSubentryMake(title, "", description), priority));
+            optional_task_entries.listAppend(ChecklistEntryMake("__item protonic accelerator pack", url, ChecklistSubentryMake(title, modifiers, description), priority));
     }
 }
 

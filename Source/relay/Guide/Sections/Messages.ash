@@ -619,6 +619,16 @@ string generateRandomMessage()
         day_cycle = "night";
     monster_messages[lookupMonster("Travoltron")] = now_to_string("EEEE").to_lower_case() + " " + day_cycle + " fever";
     
+    if (my_daycount() == 2 && (my_adventures() == 0 || availableDrunkenness() < 0) && availableFullness() == 0 && availableDrunkenness() <= 0 && my_path_id() != PATH_OXYGENARIAN && __quest_state["Level 12"].started && !__quest_state["Level 13"].state_boolean["king waiting to be freed"] && my_path_id() != PATH_NUCLEAR_AUTUMN && my_path_id() != PATH_SLOW_AND_STEADY)
+    {
+        //detect failed two-day runs, and provide psychological support:
+        random_messages.listClear();
+        if (__quest_state["Level 13"].started)
+            random_messages.listAppend("ever so close");
+        else
+            random_messages.listAppend("three days is fine");
+    }
+    
     boolean already_output_relevant_beaten_up_effect = false;
     if ((my_hp() == 0 || $effect[beaten up].have_effect() > 0) && beaten_up_monster_messages contains last_monster() && last_monster() != $monster[none])
     {

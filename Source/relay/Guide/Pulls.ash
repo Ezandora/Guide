@@ -471,6 +471,20 @@ void generatePullList(Checklist [int] checklists)
 	{
 		pullable_item_list.listAppend(GPItemMake($item[Shore Inc. Ship Trip Scrip], "Saves three turns each.|" + scrip_reasons.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".", scrip_needed));
 	}
+    //FIXME add hat/stuffing fluffer/blank-out
+    if (availableSpleen() >= 2 && my_path_id() != PATH_NUCLEAR_AUTUMN)
+    {
+		pullable_item_list.listAppend(GPItemMake(lookupItem("turkey blaster"), "Burns five turns of delay in last adventured area. Costs spleen, limited uses/day.", 3)); //FIXME learn what this limit is. also suggest in advance?
+    }
+    if (__quest_state["Level 7"].state_boolean["alcove needs speed tricks"]) //only area that realistically could use it
+    {
+        pullable_item_list.listAppend(GPItemMake(lookupItem("gravy boat"), "Wear to save two turns in the cyrpt.")); //marginal, especially since you're pulling a bunch of turkey blasters, but...
+        
+    }
+    if (!__quest_state["Level 12"].finished && __quest_state["Level 12"].state_int["frat boys left on battlefield"] >= 936 && __quest_state["Level 12"].state_int["hippies left on battlefield"] >= 936)
+    {
+        pullable_item_list.listAppend(GPItemMake(lookupItem("stuffing fluffer"), "Saves eight turns if you use two at the start of fighting in the war.", 2));
+    }
     
     if (!__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && __quest_state["Level 11 Desert"].state_int["Desert Exploration"] < 95)
     {
@@ -504,7 +518,7 @@ void generatePullList(Checklist [int] checklists)
     
     //int pills_pullable = clampi(20 - (get_property_int("_powerPillUses") + $item[power pill].available_amount()), 0, 20);
     int pills_pullable = clampi(20 - get_property_int("_powerPillUses"), 0, 20);
-    if (pills_pullable > 0)
+    if (pills_pullable > 0 && ($familiar[ms. puck man].have_familiar() || $familiar[puck man].have_familiar()))
     {
         pullable_item_list.listAppend(GPItemMake($item[power pill], "Saves one turn each.", pills_pullable));
     }
@@ -516,6 +530,8 @@ void generatePullList(Checklist [int] checklists)
         if (casts < 10)
             pullable_item_list.listAppend(GPItemMake($item[blue mana], "+3 adventures each.|Probably a bad idea.", clampi(10 - casts, 0, 10)));
     }
+    
+    
 	
 	boolean currently_trendy = (my_path_id() == PATH_TRENDY);
 	foreach key in pullable_item_list

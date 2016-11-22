@@ -188,7 +188,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
             details.listAppend(line);
         }
         
-        if (!black_market_available() && my_path_id() != PATH_WAY_OF_THE_SURPRISING_FIST)
+        if (!black_market_available() && my_path_id() != PATH_WAY_OF_THE_SURPRISING_FIST && my_path_id() != PATH_NUCLEAR_AUTUMN)
         {
             details.listAppend("Possibly unlock the black market first, for cans of black paint. (+2 " + HTMLGenerateSpanOfClass("spooky", "r_element_spooky") + "/" + HTMLGenerateSpanOfClass("cold", "r_element_cold") + " res buff, 1k meat)");
         }

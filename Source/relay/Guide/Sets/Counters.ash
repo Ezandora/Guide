@@ -160,7 +160,7 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
         if (counter_is_range && !(turn_range.x <= 10 && from_task) && !(turn_range.x > 10 && !from_task) && window_name != "Romantic Monster")
             continue;
         
-        
+        //print_html("c = " + c.to_json());
         boolean very_important = false;
         if (turn_range.x <= 0 && counter_is_range)
             very_important = true;

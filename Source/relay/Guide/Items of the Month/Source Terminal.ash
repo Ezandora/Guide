@@ -173,7 +173,7 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
         string [int] potential_targets;
         //FIXME grey out if the area isn't available?
         if ($item[goat cheese].available_amount() < 2 && !__quest_state["Level 8"].state_boolean["Past mine"])
-            potential_targets.listAppend(HTMLGenerateFutureTextByLocationAvailability("diary goat", $location[the goatlet]));
+            potential_targets.listAppend(HTMLGenerateFutureTextByLocationAvailability("dairy goat", $location[the goatlet]));
         if (!__quest_state["Level 11"].finished && !__quest_state["Level 11 Palindome"].finished && $item[talisman o' namsilat].available_amount() == 0 && $items[gaudy key,snakehead charrrm].available_amount() < 2)
             potential_targets.listAppend(HTMLGenerateFutureTextByLocationAvailability("gaudy pirate", $location[belowdecks]));
         if (my_path_id() == PATH_THE_SOURCE)
@@ -229,14 +229,14 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
     {
         int essence = $item[source essence].available_amount();
         string [int] description;
-        if (__misc_state["can eat just about anything"])
+        if (__misc_state["can eat just about anything"] && my_path_id() != PATH_NUCLEAR_AUTUMN)
         {
             string line = "Food: 4 fullness epic.";
             if (essence < 10)
                 line = HTMLGenerateSpanFont(line, "grey");
             description.listAppend(line);
         }
-        if (__misc_state["can drink just about anything"])
+        if (__misc_state["can drink just about anything"] && my_path_id() != PATH_NUCLEAR_AUTUMN)
         {
             string line = "Drink: 4 inebriety epic.";
             if (__misc_state["in run"])

@@ -769,8 +769,9 @@ int totalDelayForLocation(location place)
     place_delays[$location[the haunted ballroom]] = 5; //FIXME rumored
     place_delays[$location[the penultimate fantasy airship]] = 25;
     place_delays[$location[the "fun" house]] = 10;
+    place_delays[$location[The Castle in the Clouds in the Sky (Ground Floor)]] = 11; //???
+    place_delays[$location[the outskirts of cobb's knob]] = 11; //??
     //the haunted billiards room does not contain delay
-    //yojimbos_law saw it on turn two on 2014-7-14, immediately after seeing the pool cue adventure, as have I
     //also failure at 16 skill
     
     if (place_delays contains place)

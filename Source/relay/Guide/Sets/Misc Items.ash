@@ -69,6 +69,8 @@ void SMiscItemsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             {
                 try_for_seal_tooth = true;
             }
+            if (my_path_id() == PATH_NUCLEAR_AUTUMN)
+                try_for_seal_tooth = false;
             
             if (try_for_seal_tooth)
             {

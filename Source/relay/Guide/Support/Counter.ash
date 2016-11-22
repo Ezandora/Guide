@@ -84,7 +84,6 @@ boolean CounterMayHitNextTurn(Counter c)
         return true; //maaaybe?
     return false;
 }
-
 boolean CounterMayHitInXTurns(Counter c, int turns_limit)
 {
     if (!c.initialised)
@@ -138,6 +137,20 @@ boolean CounterWillHitExactlyInTurnRange(Counter c, int start_turn_range, int en
     }
     return false;
 }
+
+boolean CounterWillHitNextTurn(Counter c)
+{
+    if (c.CounterIsRange())
+    {
+        Vec2i range = c.CounterGetWindowRange();
+        if (range.y <= 0)
+            return true;
+    }
+    if (c.CounterWillHitExactlyInTurnRange(0, 0))
+        return true;
+    return false;
+}
+
 
 boolean CounterExists(Counter c)
 {
@@ -196,8 +209,19 @@ void CountersParseProperty(string property_name, Counter [string] counters, bool
     }
     
 	string counter_string = get_property(property_name);
-	string [int] counter_split = split_string(counter_string, ":");
-    
+    /*Strangeness:
+> get _tempRelayCounters
+
+15:Romantic Monster window begin loc=*:lparen.gif|25:Romantic Monster window end loc=* type=wander:rparen.gif|7:Digitize Monster loc=* type=wander:watch.gif|7:Digitize Monster loc=* type=wander:watch.gif|7:Digitize Monster loc=* type=wander:watch.gif|
+
+> get relayCounters
+
+70:Semirare window begin:lparen.gif:80:Semirare window end loc=*:rparen.gif
+
+    Why does one use | as a seperator, and the other doesn't?
+    */
+	string [int] counter_split = split_string(counter_string.replace_string("|", ":"), ":"); //FIXME | properly
+    //print_html("counter_split = " + counter_split.to_json());
     //Parse counters:
     for i from 0 to (counter_split.count() - 1) by 3
     {
@@ -214,6 +238,7 @@ void CountersParseProperty(string property_name, Counter [string] counters, bool
         string location_id;
         string type;
         string intermediate_name = counter_name_raw;
+        //print_html("intermediate_name = " + intermediate_name + ", turn_number = " + turn_number + ", turns_until_counter = " + turns_until_counter);
         
         //Parse loc, remove it from intermediate name:
         //loc=* type=wander
@@ -310,6 +335,10 @@ void CountersParseProperty(string property_name, Counter [string] counters, bool
         }
         else
         {
+            if (c.name == "Dance Card" && turns_until_counter < 0) //bug: dance card is still in relayCounters after being met
+            {
+                continue;
+            }
             //if (turns_until_counter >= 0)
             if (true)
             {
@@ -536,10 +565,7 @@ boolean CounterWanderingMonsterWillHitNextTurn()
         return false;
     foreach key, c in CounterWanderingMonsterWindowsActiveNextTurn()
     {
-        Vec2i range = c.CounterGetWindowRange();
-        if (range.y <= 0)
-            return true;
-        if (c.CounterWillHitExactlyInTurnRange(0, 0))
+        if (c.CounterWillHitNextTurn())
             return true;
     }
     return false;
