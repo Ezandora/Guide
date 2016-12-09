@@ -2,7 +2,7 @@
 
 since 17.4; //the earliest main release that is usable in modern KOL (cookie bug)
 //These settings are for development. Don't worry about editing them.
-string __version = "1.4.16";
+string __version = "1.4.17";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -3062,6 +3062,21 @@ boolean monsterIsGhost(monster m)
         return true;
     return false;
 }
+
+boolean item_is_pvp_stealable(item it)
+{
+	if (it == $item[amulet of yendor])
+		return true;
+	if (!it.tradeable)
+		return false;
+	if (!it.discardable)
+		return false;
+	if (it.quest)
+		return false;
+	if (it.gift)
+		return false;
+	return true;
+}
 boolean [item] __iotms_usable;
 
 void initialiseIOTMsUsable()
@@ -3570,6 +3585,15 @@ string HTMLStripTags(string html)
 string [string] generateMainLinkMap(string url)
 {
     return mapMake("class", "r_a_undecorated", "href", url, "target", "mainpane");
+}
+
+
+
+string HTMLGreyOutTextUnlessTrue(string text, boolean conditional)
+{
+    if (conditional)
+        return text;
+    return HTMLGenerateSpanFont(text, "gray");
 }
 boolean [string] getHolidaysForDate(string realworld_date, int game_day)
 {
@@ -5453,6 +5477,8 @@ static
             lookup_map[s] = "place.php?whichplace=bugbearship";
         foreach s in $strings[Sweet-Ade Lake,Eager Rice Burrows,Gumdrop Forest]
             lookup_map[s] = "place.php?whichplace=ioty2014_candy";
+        foreach s in $strings[Gingerbread Industrial Zone,Gingerbread Train Station,Gingerbread Sewers,Gingerbread Upscale Retail District]
+            lookup_map[s] = "place.php?whichplace=gingerbreadcity";
             
         foreach s in $strings[Fastest Adventurer Contest,Strongest Adventurer Contest,Smartest Adventurer Contest,Smoothest Adventurer Contest,A Crowd of (Stat) Adventurers,Hottest Adventurer Contest,Coldest Adventurer Contest,Spookiest Adventurer Contest,Stinkiest Adventurer Contest,Sleaziest Adventurer Contest,A Crowd of (Element) Adventurers,The Hedge Maze,Tower Level 1,Tower Level 2,Tower Level 3,Tower Level 4,Tower Level 5,The Naughty Sorceress' Chamber]
             lookup_map[s] = "place.php?whichplace=nstower";
@@ -9907,7 +9933,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
             
             
             string line = "Run +" + HTMLGenerateSpanFont("20/50", "", "0.8em") + "/100 ML (at ";
-            string adjustment = "+" + oil_ml + " ML";
+            string adjustment = (oil_ml > 0 ? "+" : "") + oil_ml + " ML";
             if (oil_ml < 100)
                 adjustment = HTMLGenerateSpanFont(adjustment, "red");
             adjustment += ")";
@@ -12879,9 +12905,9 @@ static
     item [string][int] __if_potions_with_numeric_modifiers;
     
     
-    void ItemFilterInitialise()
+    /*void ItemFilterInitialise()
     {
-        /*boolean [string] modifier_names = $strings[Meat Drop,Initiative,Muscle,Mysticality,Moxie,Muscle Percent,Mysticality Percent,Moxie Percent];
+        boolean [string] modifier_names = $strings[Meat Drop,Initiative,Muscle,Mysticality,Moxie,Muscle Percent,Mysticality Percent,Moxie Percent];
         
         foreach modifier in modifier_names
         {
@@ -12899,11 +12925,11 @@ static
                     __if_potions_with_numeric_modifiers[modifier].listAppend(it);
                 }
             }
-        }*/
+        }
     }
     
     
-    ItemFilterInitialise();
+    ItemFilterInitialise();*/
 }
 
 
@@ -19048,6 +19074,7 @@ void QWizardOfEgoGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         }
         else
         {
+            url = "place.php?whichplace=cemetery";
             subentry.entries.listAppend("Adventure at the unquiet garves.");
         }
     }
@@ -21100,7 +21127,8 @@ void QColdAirportGenerateTasks(ChecklistEntry [int] task_entries)
 {
     if (!__misc_state["cold airport available"])
         return;
-    if ($item[Walford's bucket].available_amount() > 0 && QuestState("questECoBucket").in_progress) //need quest tracking as well, you keep the bucket
+    string desired_walford_item = get_property("walfordBucketItem").to_lower_case();
+    if ($item[Walford's bucket].available_amount() > 0 && QuestState("questECoBucket").in_progress && desired_walford_item != "") //need quest tracking as well, you keep the bucket. FIXME should we be testing against desired_walford_item?
     {
         string title = "";
         string [int] modifiers;
@@ -21115,7 +21143,6 @@ void QColdAirportGenerateTasks(ChecklistEntry [int] task_entries)
         }
         else
         {
-            string desired_item = get_property("walfordBucketItem").to_lower_case();
             title = "Walford's quest";
             
             modifiers.listAppend("-combat");
@@ -21126,31 +21153,31 @@ void QColdAirportGenerateTasks(ChecklistEntry [int] task_entries)
             string [int] tasks;
             string hotel_string = "The Ice Hotel.";
             boolean nc_helps_in_hotel = true;
-            if (desired_item == "milk" || desired_item == "rain")
+            if (desired_walford_item == "milk" || desired_walford_item == "rain")
                 nc_helps_in_hotel = false;
             if (nc_helps_in_hotel)
             {
-                if ($item[bellhop's hat].equipped_amount() == 0 && desired_item != "moonbeams")
+                if ($item[bellhop's hat].equipped_amount() == 0 && desired_walford_item != "moonbeams")
                     tasks.listAppend("equip bellhop's hat");
                 tasks.listAppend("run -combat");
             }
-            if (desired_item == "moonbeams" && $slot[hat].equipped_item() != $item[none])
+            if (desired_walford_item == "moonbeams" && $slot[hat].equipped_item() != $item[none])
             {
                 tasks.listAppend("unequip your hat");
             }
-            if (desired_item == "blood")
+            if (desired_walford_item == "blood")
                 tasks.listAppend("use tin snips every fight");
-            if (desired_item == "chicken" && numeric_modifier("food drop") < 50.0)
+            if (desired_walford_item == "chicken" && numeric_modifier("food drop") < 50.0)
             {
                 modifiers.listAppend("+50% food drop");
                 tasks.listAppend("run +50% food drop");
             }
-            if (desired_item == "milk" && numeric_modifier("booze drop") < 50.0)
+            if (desired_walford_item == "milk" && numeric_modifier("booze drop") < 50.0)
             {
                 modifiers.listAppend("+50% booze drop");
                 tasks.listAppend("run +50% booze drop");
             }
-            if (desired_item == "rain")
+            if (desired_walford_item == "rain")
                 tasks.listAppend("cast hot spells");
             //FIXME verify all (ice?)
             
@@ -21164,26 +21191,26 @@ void QColdAirportGenerateTasks(ChecklistEntry [int] task_entries)
             tasks.listClear();
             string vkyea_string = "VYKEA.";
             boolean nc_helps_in_vykea = true;
-            if (desired_item == "blood")
+            if (desired_walford_item == "blood")
                 nc_helps_in_vykea = false;
             if (nc_helps_in_vykea)
             {
                 tasks.listAppend("run -combat");
             }
-            if (desired_item == "moonbeams" && $slot[hat].equipped_item() != $item[none])
+            if (desired_walford_item == "moonbeams" && $slot[hat].equipped_item() != $item[none])
             {
                 tasks.listAppend("unequip your hat");
             }
-            if (desired_item == "blood")
+            if (desired_walford_item == "blood")
                 tasks.listAppend("use tin snips every fight");
-            if (desired_item == "bolts" && $item[VYKEA hex key].equipped_amount() == 0)
+            if (desired_walford_item == "bolts" && $item[VYKEA hex key].equipped_amount() == 0)
                 tasks.listAppend("equip VYKEA hex key");
-            if (desired_item == "chum" && meat_drop_modifier() < 250.0)
+            if (desired_walford_item == "chum" && meat_drop_modifier() < 250.0)
             {
                 modifiers.listAppend("+250% meat");
                 tasks.listAppend("run +250% meat");
             }
-            if (desired_item == "balls" && item_drop_modifier() < 50)
+            if (desired_walford_item == "balls" && item_drop_modifier() < 50)
             {
                 modifiers.listAppend("+50% item");
                 tasks.listAppend("run +50% item");
@@ -21206,7 +21233,7 @@ void QColdAirportGenerateTasks(ChecklistEntry [int] task_entries)
             description.listAppend(tasks.listJoinComponents(", ", "then").capitaliseFirstLetter() + ":|*" + options.listJoinComponents("<hr>|*"));
             
             
-            description.listAppend(progress + "% done collecting " + desired_item + ".");
+            description.listAppend(progress + "% done collecting " + desired_walford_item + ".");
         }
         task_entries.listAppend(ChecklistEntryMake("__item Walford's bucket", url, ChecklistSubentryMake(title, modifiers, description), lookupLocations("The Ice Hotel,VYKEA,The Ice Hole")));
     }
@@ -27172,6 +27199,7 @@ int BanishLength(string banish_name)
 
 void SEventsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
+    return;
 }
 
 void SCrimbo2015GenerateResource(ChecklistEntry [int] resource_entries)
@@ -33486,7 +33514,7 @@ void LimitModeBatfellowBossesGenerateTasks(ChecklistEntry [int] task_entries, Ba
 
 void LimitModeBatfellowJokesterGenerateTasks(ChecklistEntry [int] task_entries, BatState state)
 {
-    
+    return;
 }
 
 void LimitModeBatfellowBatCavernGenerateTaskResources(ChecklistEntry [int] task_entries, ChecklistEntry [int] resource_entries, BatState state)
@@ -39515,7 +39543,7 @@ void IOTMPGourdGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         {
             string line = it;
             if (it.available_amount() == 0 && !(items_implicitly_have contains it))
-                line = HTMLGenerateSpanFont(line, "grey");
+                line = HTMLGenerateSpanFont(line, "gray");
             components.listAppend(line);
         }
         description.listAppend("Truthsayer is (" + components.listJoinComponents(" + ") + "), found from gourd monsters.");
@@ -40076,16 +40104,19 @@ void IOTMGrimstoneStepmotherGenerateTasks(ChecklistEntry [int] task_entries, Che
 void IOTMGrimstoneWolfGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     //FIXME I have no idea
+    return;
 }
 
 void IOTMGrimstoneWitchGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     //FIXME I have no idea
+    return;
 }
 
 void IOTMGrimstoneGnomeGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     //FIXME I have no idea
+    return;
 }
 
 RegisterTaskGenerationFunction("IOTMGrimstoneGenerateTasks");
@@ -41498,18 +41529,19 @@ void IOTMThanksgardenGenerateResource(ChecklistEntry [int] resource_entries)
             url = "inventory.php?which=3";
         subentries.listAppend(ChecklistSubentryMake(pluralise(cornucopia), "", description));
     }
-    if (cashew.available_amount() > 0)
+    int cashew_amount = cashew.available_amount();
+    if (cashew_amount > 0)
     {
         string [int] description;
         string [int] options;
         if (my_path_id() != PATH_NUCLEAR_AUTUMN)
-            options.listAppend("turkey blasters to burn delay");
+            options.listAppend(HTMLGreyOutTextUnlessTrue("turkey blasters to burn delay", cashew_amount >= 3));
         if (!__quest_state["Level 12"].finished)
-            options.listAppend("stuffing fluffers for the war");
+            options.listAppend(HTMLGreyOutTextUnlessTrue("stuffing fluffers for the war", cashew_amount >= 3));
         if (my_path_id() != PATH_NUCLEAR_AUTUMN)
             options.listAppend("various foods");
         if (__quest_state["Level 7"].state_boolean["alcove needs speed tricks"])
-            options.listAppend("gravy boat for the cyrpt (somewhat marginal)");
+            options.listAppend(HTMLGreyOutTextUnlessTrue("gravy boat for the cyrpt (somewhat marginal)", cashew_amount >= 3));
         if (options.count() > 0)
             description.listAppend("Could make into " + options.listJoinComponents(", ", "or") + ".");
         
