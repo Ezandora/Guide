@@ -399,7 +399,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
             
             
             string line = "Run +" + HTMLGenerateSpanFont("20/50", "", "0.8em") + "/100 ML (at ";
-            string adjustment = "+" + oil_ml + " ML";
+            string adjustment = (oil_ml > 0 ? "+" : "") + oil_ml + " ML";
             if (oil_ml < 100)
                 adjustment = HTMLGenerateSpanFont(adjustment, "red");
             adjustment += ")";

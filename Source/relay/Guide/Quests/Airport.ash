@@ -1518,7 +1518,8 @@ void QColdAirportGenerateTasks(ChecklistEntry [int] task_entries)
 {
     if (!__misc_state["cold airport available"])
         return;
-    if ($item[Walford's bucket].available_amount() > 0 && QuestState("questECoBucket").in_progress) //need quest tracking as well, you keep the bucket
+    string desired_walford_item = get_property("walfordBucketItem").to_lower_case();
+    if ($item[Walford's bucket].available_amount() > 0 && QuestState("questECoBucket").in_progress && desired_walford_item != "") //need quest tracking as well, you keep the bucket. FIXME should we be testing against desired_walford_item?
     {
         string title = "";
         string [int] modifiers;
@@ -1533,7 +1534,6 @@ void QColdAirportGenerateTasks(ChecklistEntry [int] task_entries)
         }
         else
         {
-            string desired_item = get_property("walfordBucketItem").to_lower_case();
             title = "Walford's quest";
             
             modifiers.listAppend("-combat");
@@ -1544,31 +1544,31 @@ void QColdAirportGenerateTasks(ChecklistEntry [int] task_entries)
             string [int] tasks;
             string hotel_string = "The Ice Hotel.";
             boolean nc_helps_in_hotel = true;
-            if (desired_item == "milk" || desired_item == "rain")
+            if (desired_walford_item == "milk" || desired_walford_item == "rain")
                 nc_helps_in_hotel = false;
             if (nc_helps_in_hotel)
             {
-                if ($item[bellhop's hat].equipped_amount() == 0 && desired_item != "moonbeams")
+                if ($item[bellhop's hat].equipped_amount() == 0 && desired_walford_item != "moonbeams")
                     tasks.listAppend("equip bellhop's hat");
                 tasks.listAppend("run -combat");
             }
-            if (desired_item == "moonbeams" && $slot[hat].equipped_item() != $item[none])
+            if (desired_walford_item == "moonbeams" && $slot[hat].equipped_item() != $item[none])
             {
                 tasks.listAppend("unequip your hat");
             }
-            if (desired_item == "blood")
+            if (desired_walford_item == "blood")
                 tasks.listAppend("use tin snips every fight");
-            if (desired_item == "chicken" && numeric_modifier("food drop") < 50.0)
+            if (desired_walford_item == "chicken" && numeric_modifier("food drop") < 50.0)
             {
                 modifiers.listAppend("+50% food drop");
                 tasks.listAppend("run +50% food drop");
             }
-            if (desired_item == "milk" && numeric_modifier("booze drop") < 50.0)
+            if (desired_walford_item == "milk" && numeric_modifier("booze drop") < 50.0)
             {
                 modifiers.listAppend("+50% booze drop");
                 tasks.listAppend("run +50% booze drop");
             }
-            if (desired_item == "rain")
+            if (desired_walford_item == "rain")
                 tasks.listAppend("cast hot spells");
             //FIXME verify all (ice?)
             
@@ -1582,26 +1582,26 @@ void QColdAirportGenerateTasks(ChecklistEntry [int] task_entries)
             tasks.listClear();
             string vkyea_string = "VYKEA.";
             boolean nc_helps_in_vykea = true;
-            if (desired_item == "blood")
+            if (desired_walford_item == "blood")
                 nc_helps_in_vykea = false;
             if (nc_helps_in_vykea)
             {
                 tasks.listAppend("run -combat");
             }
-            if (desired_item == "moonbeams" && $slot[hat].equipped_item() != $item[none])
+            if (desired_walford_item == "moonbeams" && $slot[hat].equipped_item() != $item[none])
             {
                 tasks.listAppend("unequip your hat");
             }
-            if (desired_item == "blood")
+            if (desired_walford_item == "blood")
                 tasks.listAppend("use tin snips every fight");
-            if (desired_item == "bolts" && $item[VYKEA hex key].equipped_amount() == 0)
+            if (desired_walford_item == "bolts" && $item[VYKEA hex key].equipped_amount() == 0)
                 tasks.listAppend("equip VYKEA hex key");
-            if (desired_item == "chum" && meat_drop_modifier() < 250.0)
+            if (desired_walford_item == "chum" && meat_drop_modifier() < 250.0)
             {
                 modifiers.listAppend("+250% meat");
                 tasks.listAppend("run +250% meat");
             }
-            if (desired_item == "balls" && item_drop_modifier() < 50)
+            if (desired_walford_item == "balls" && item_drop_modifier() < 50)
             {
                 modifiers.listAppend("+50% item");
                 tasks.listAppend("run +50% item");
@@ -1624,7 +1624,7 @@ void QColdAirportGenerateTasks(ChecklistEntry [int] task_entries)
             description.listAppend(tasks.listJoinComponents(", ", "then").capitaliseFirstLetter() + ":|*" + options.listJoinComponents("<hr>|*"));
             
             
-            description.listAppend(progress + "% done collecting " + desired_item + ".");
+            description.listAppend(progress + "% done collecting " + desired_walford_item + ".");
         }
         task_entries.listAppend(ChecklistEntryMake("__item Walford's bucket", url, ChecklistSubentryMake(title, modifiers, description), lookupLocations("The Ice Hotel,VYKEA,The Ice Hole")));
     }

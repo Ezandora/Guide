@@ -172,3 +172,12 @@ string [string] generateMainLinkMap(string url)
 {
     return mapMake("class", "r_a_undecorated", "href", url, "target", "mainpane");
 }
+
+
+
+string HTMLGreyOutTextUnlessTrue(string text, boolean conditional)
+{
+    if (conditional)
+        return text;
+    return HTMLGenerateSpanFont(text, "gray");
+}

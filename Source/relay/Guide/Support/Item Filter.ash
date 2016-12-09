@@ -4,9 +4,9 @@ static
     item [string][int] __if_potions_with_numeric_modifiers;
     
     
-    void ItemFilterInitialise()
+    /*void ItemFilterInitialise()
     {
-        /*boolean [string] modifier_names = $strings[Meat Drop,Initiative,Muscle,Mysticality,Moxie,Muscle Percent,Mysticality Percent,Moxie Percent];
+        boolean [string] modifier_names = $strings[Meat Drop,Initiative,Muscle,Mysticality,Moxie,Muscle Percent,Mysticality Percent,Moxie Percent];
         
         foreach modifier in modifier_names
         {
@@ -24,11 +24,11 @@ static
                     __if_potions_with_numeric_modifiers[modifier].listAppend(it);
                 }
             }
-        }*/
+        }
     }
     
     
-    ItemFilterInitialise();
+    ItemFilterInitialise();*/
 }
 
 

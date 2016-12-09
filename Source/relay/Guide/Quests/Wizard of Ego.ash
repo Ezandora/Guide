@@ -93,6 +93,7 @@ void QWizardOfEgoGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         }
         else
         {
+            url = "place.php?whichplace=cemetery";
             subentry.entries.listAppend("Adventure at the unquiet garves.");
         }
     }

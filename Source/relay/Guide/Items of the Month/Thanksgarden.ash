@@ -25,18 +25,19 @@ void IOTMThanksgardenGenerateResource(ChecklistEntry [int] resource_entries)
             url = "inventory.php?which=3";
         subentries.listAppend(ChecklistSubentryMake(pluralise(cornucopia), "", description));
     }
-    if (cashew.available_amount() > 0)
+    int cashew_amount = cashew.available_amount();
+    if (cashew_amount > 0)
     {
         string [int] description;
         string [int] options;
         if (my_path_id() != PATH_NUCLEAR_AUTUMN)
-            options.listAppend("turkey blasters to burn delay");
+            options.listAppend(HTMLGreyOutTextUnlessTrue("turkey blasters to burn delay", cashew_amount >= 3));
         if (!__quest_state["Level 12"].finished)
-            options.listAppend("stuffing fluffers for the war");
+            options.listAppend(HTMLGreyOutTextUnlessTrue("stuffing fluffers for the war", cashew_amount >= 3));
         if (my_path_id() != PATH_NUCLEAR_AUTUMN)
             options.listAppend("various foods");
         if (__quest_state["Level 7"].state_boolean["alcove needs speed tricks"])
-            options.listAppend("gravy boat for the cyrpt (somewhat marginal)");
+            options.listAppend(HTMLGreyOutTextUnlessTrue("gravy boat for the cyrpt (somewhat marginal)", cashew_amount >= 3));
         if (options.count() > 0)
             description.listAppend("Could make into " + options.listJoinComponents(", ", "or") + ".");
         

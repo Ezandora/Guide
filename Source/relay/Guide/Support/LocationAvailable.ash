@@ -1106,6 +1106,8 @@ static
             lookup_map[s] = "place.php?whichplace=bugbearship";
         foreach s in $strings[Sweet-Ade Lake,Eager Rice Burrows,Gumdrop Forest]
             lookup_map[s] = "place.php?whichplace=ioty2014_candy";
+        foreach s in $strings[Gingerbread Industrial Zone,Gingerbread Train Station,Gingerbread Sewers,Gingerbread Upscale Retail District]
+            lookup_map[s] = "place.php?whichplace=gingerbreadcity";
             
         foreach s in $strings[Fastest Adventurer Contest,Strongest Adventurer Contest,Smartest Adventurer Contest,Smoothest Adventurer Contest,A Crowd of (Stat) Adventurers,Hottest Adventurer Contest,Coldest Adventurer Contest,Spookiest Adventurer Contest,Stinkiest Adventurer Contest,Sleaziest Adventurer Contest,A Crowd of (Element) Adventurers,The Hedge Maze,Tower Level 1,Tower Level 2,Tower Level 3,Tower Level 4,Tower Level 5,The Naughty Sorceress' Chamber]
             lookup_map[s] = "place.php?whichplace=nstower";

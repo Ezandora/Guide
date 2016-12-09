@@ -346,7 +346,7 @@ void LimitModeBatfellowBossesGenerateTasks(ChecklistEntry [int] task_entries, Ba
 
 void LimitModeBatfellowJokesterGenerateTasks(ChecklistEntry [int] task_entries, BatState state)
 {
-    
+    return;
 }
 
 void LimitModeBatfellowBatCavernGenerateTaskResources(ChecklistEntry [int] task_entries, ChecklistEntry [int] resource_entries, BatState state)

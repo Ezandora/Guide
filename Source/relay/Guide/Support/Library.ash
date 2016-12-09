@@ -1535,3 +1535,18 @@ boolean monsterIsGhost(monster m)
         return true;
     return false;
 }
+
+boolean item_is_pvp_stealable(item it)
+{
+	if (it == $item[amulet of yendor])
+		return true;
+	if (!it.tradeable)
+		return false;
+	if (!it.discardable)
+		return false;
+	if (it.quest)
+		return false;
+	if (it.gift)
+		return false;
+	return true;
+}

@@ -229,7 +229,7 @@ void IOTMPGourdGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         {
             string line = it;
             if (it.available_amount() == 0 && !(items_implicitly_have contains it))
-                line = HTMLGenerateSpanFont(line, "grey");
+                line = HTMLGenerateSpanFont(line, "gray");
             components.listAppend(line);
         }
         description.listAppend("Truthsayer is (" + components.listJoinComponents(" + ") + "), found from gourd monsters.");
