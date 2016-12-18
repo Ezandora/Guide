@@ -2,7 +2,7 @@
 RegisterResourceGenerationFunction("PathAvatarOfWestOfLoathingGenerateResource");
 void PathAvatarOfWestOfLoathingGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (my_path_id() != PATH_AVATAR_OF_WEST_OF_LOATHING)
+	if ((my_path_id() != PATH_AVATAR_OF_WEST_OF_LOATHING) && (my_class() != lookupClass("Snake Oiler")) && (my_class() != lookupClass("Beanslinger")) && (my_class() != lookupClass("Cow Puncher")))
 		return;
     
     //Oils:
