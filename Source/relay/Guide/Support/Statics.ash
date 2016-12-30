@@ -1,9 +1,11 @@
+
 static
 {
     skill [class][int] __skills_by_class;
     
     void initialiseSkillsByClass()
     {
+        if (__skills_by_class.count() > 0) return;
         foreach s in $skills[]
         {
             if (s.class != $class[none])
@@ -23,26 +25,6 @@ static
 
 static
 {
-    boolean [item] __items_that_craft_food;
-    
-    void initialiseItemsThatCraftFood()
-    {
-        foreach crafted_item in $items[]
-        {
-            string craft_type = crafted_item.craft_type();
-            if (!craft_type.contains_text("Cooking"))
-                continue;
-            foreach it in crafted_item.get_ingredients()
-            {
-                __items_that_craft_food[it] = true;
-            }
-        }
-    }
-    initialiseItemsThatCraftFood();
-}
-
-static
-{
     boolean [skill] __libram_skills;
     
     void initialiseLibramSkills()
@@ -59,21 +41,33 @@ static
 
 static
 {
+    boolean [item] __items_that_craft_food;
     boolean [item] __minus_combat_equipment;
     boolean [item] __equipment;
-    void initialiseEquipment()
+    void initialiseItems()
     {
         foreach it in $items[]
         {
-            if (it.to_slot() == $slot[none])
-                continue;
-            __equipment[it] = true;
-            if (it.numeric_modifier("combat rate") < 0)
-                __minus_combat_equipment[it] = true;
+            //Crafting:
+            string craft_type = it.craft_type();
+            if (craft_type.contains_text("Cooking"))
+            {
+                foreach ingredient in it.get_ingredients()
+                {
+                    __items_that_craft_food[ingredient] = true;
+                }
+            }
             
+            //Equipment:
+            if (it.to_slot() != $slot[none])
+            {
+                __equipment[it] = true;
+                if (it.numeric_modifier("combat rate") < 0)
+                    __minus_combat_equipment[it] = true;
+            }
         }
     }
-    initialiseEquipment();
+    initialiseItems();
 }
 
 static

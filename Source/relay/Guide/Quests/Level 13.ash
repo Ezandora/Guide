@@ -159,7 +159,7 @@ boolean generateTowerFamiliarWeightMethod(string [int] how, string [int] immedia
     {
         if (get_property_int("_speakeasyDrinksDrunk") <3 && availableDrunkenness() >= 3)
         {
-            boolean have_effect = $effect[Hip to the Jive].have_effect() > 0;
+            boolean have_effect = $effect[1701].have_effect() > 0; //hip to the jive
             weight_modifiers.listAppend(TFWMInternalModifierMake("Speakeasy hot socks", have_effect, true, true, 10.0));
         }
         

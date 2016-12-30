@@ -245,6 +245,28 @@ buffer generateLocationBar(boolean displaying_navbar)
     {
         custom_location_information = "Floor " + __misc_state_int["Basement Floor"];
     }
+    else if (lookupLocations("Your Bung Chakra,Your Guts Chakra,Your Liver Chakra,Your Nipple Chakra,Your Nose Chakra,Your Hat Chakra,Crimbo's Sack,Crimbo's Boots,Crimbo's Jelly,Crimbo's Reindeer,Crimbo's Beard,Crimbo's Hat") contains l)
+    {
+        string [location] property_name_for_location;
+        property_name_for_location[lookupLocation("Your Bung Chakra")] = "crimbo16BungChakraCleanliness";
+        property_name_for_location[lookupLocation("Your Guts Chakra")] = "crimbo16GutsChakraCleanliness";
+        property_name_for_location[lookupLocation("Your Liver Chakra")] = "crimbo16LiverChakraCleanliness";
+        property_name_for_location[lookupLocation("Your Nipple Chakra")] = "crimbo16NippleChakraCleanliness";
+        property_name_for_location[lookupLocation("Your Nose Chakra")] = "crimbo16NoseChakraCleanliness";
+        property_name_for_location[lookupLocation("Your Hat Chakra")] = "crimbo16HatChakraCleanliness";
+        property_name_for_location[lookupLocation("Crimbo's Sack")] = "crimbo16SackChakraCleanliness";
+        property_name_for_location[lookupLocation("Crimbo's Boots")] = "crimbo16BootsChakraCleanliness";
+        property_name_for_location[lookupLocation("Crimbo's Jelly")] = "crimbo16JellyChakraCleanliness";
+        property_name_for_location[lookupLocation("Crimbo's Reindeer")] = "crimbo16ReindeerChakraCleanliness";
+        property_name_for_location[lookupLocation("Crimbo's Beard")] = "crimbo16BeardChakraCleanliness";
+        property_name_for_location[lookupLocation("Crimbo's Hat")] = "crimbo16CrimboHatChakraCleanliness";
+        
+        string property_name = property_name_for_location[l];
+        if (property_name != "")
+        {
+            custom_location_information = get_property_int(property_name) + "% clean";
+        }
+    }
         
     //else if (pressure_penalties contains l)
         //custom_location_information = pressure_penalties[l] + "% pressure";

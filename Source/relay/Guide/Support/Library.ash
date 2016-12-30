@@ -890,7 +890,7 @@ boolean [location] lookupLocations(string names_string)
 {
     boolean [location] result;
     
-    string [int] names = names_string.split_string();
+    string [int] names = names_string.split_string(",");
     foreach key, name in names
     {
         if (name.length() == 0)
@@ -1549,4 +1549,23 @@ boolean item_is_pvp_stealable(item it)
 	if (it.gift)
 		return false;
 	return true;
+}
+
+int effective_familiar_weight(familiar f)
+{
+    int weight = f.familiar_weight();
+    
+    boolean is_moved = false;
+    string [int] familiars_used_on = get_property("_feastedFamiliars").split_string_alternate(";");
+    foreach key, f_name in familiars_used_on
+    {
+        if (f_name.to_familiar() == f)
+        {
+            is_moved = true;
+            break;
+        }
+    }
+    if (is_moved)
+        weight += 10;
+    return weight;
 }

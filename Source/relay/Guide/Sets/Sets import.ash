@@ -29,3 +29,4 @@ import "relay/Guide/Sets/Area Unlocks.ash";
 import "relay/Guide/Sets/Powerlevel.ash";
 import "relay/Guide/Sets/Florist.ash";
 import "relay/Guide/Sets/Misc Tasks.ash";
+import "relay/Guide/Sets/Sweet Synthesis.ash";

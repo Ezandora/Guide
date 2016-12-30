@@ -489,7 +489,7 @@ string [item] SpelunkingGenerateEquipmentDescriptions(SpelunkingStatus spelunkin
     }
     
     equipment_descriptions[$item[crumbling skull]] = "Can throw for 20 damage.|Afterward, can find another.";
-    equipment_descriptions[$item[rock]] = "Can throw for 30 damage.|Afterward, can find another.";
+    equipment_descriptions[$item[8042]] = "Can throw for 30 damage.|Afterward, can find another.";
     equipment_descriptions[$item[pot]] = "2 DR, can throw for 20 damage/10 gold.";
     equipment_descriptions[$item[heavy pickaxe]] = "+5 all attributes";
     equipment_descriptions[$item[torch]] = "Deals 8-10 damage first round of combat.|Finds random bombs/ropes/gold.|Can be thrown for 100 damage.|Can be thrown at Yomama for recurring damage.";
@@ -555,7 +555,7 @@ void SpelunkingGenerateEquipmentEntries(Checklist [int] checklists, SpelunkingSt
     
     item [slot][int] equipment_per_slot;
     
-    foreach it in $items[trusty whip,sturdy machete,shotgun,boomerang,plasma rifle,Bananubis's Staff,crumbling skull,rock,pot,heavy pickaxe,torch,The Joke Book of the Dead,cursed coffee cup,spelunking fedora,mining helmet,X-ray goggles,The Clown Crown,yellow cape,jetpack,spring boots,spiked boots]
+    foreach it in $items[trusty whip,sturdy machete,shotgun,boomerang,plasma rifle,Bananubis's Staff,crumbling skull,8042,pot,heavy pickaxe,torch,The Joke Book of the Dead,cursed coffee cup,spelunking fedora,mining helmet,X-ray goggles,The Clown Crown,yellow cape,jetpack,spring boots,spiked boots]
     {
         if (it.available_amount() == 0)
             continue;
@@ -761,7 +761,7 @@ void LimitModeSpelunkingGenerateChecklists(Checklist [int] checklists)
             else if ($item[jetpack].available_amount() == 0)
                 next_item = $item[jetpack];
             else
-                next_item = $item[rock];
+                next_item = $item[8042];
             results.listAppend(next_item);
         }
         else if (spelunking_status.sacrifices == 2)
@@ -875,7 +875,7 @@ void LimitModeSpelunkingGenerateChecklists(Checklist [int] checklists)
                     description.listAppend("Possibly acquire sticky bombs from the spider queen.");
                     
                 string [int] ideas;
-                foreach it in $items[spring boots,shotgun,spelunking fedora,rock]
+                foreach it in $items[spring boots,shotgun,spelunking fedora,8042]
                 {
                     if (it.equipped_amount() == 0)
                         ideas.listAppend(it);

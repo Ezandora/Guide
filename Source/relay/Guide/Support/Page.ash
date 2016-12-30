@@ -326,7 +326,7 @@ string HTMLGenerateIndentedText(string text)
 }
 
 
-string HTMLGenerateSimpleTableLines(string [int][int] lines)
+string HTMLGenerateSimpleTableLines(string [int][int] lines, boolean dividers_are_visible)
 {
 	buffer result;
 	
@@ -391,7 +391,12 @@ string HTMLGenerateSimpleTableLines(string [int][int] lines)
                 result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_stl_container_row")));
                 for i from 1 to last_cell_count //no colspan with display:table, generate extra (zero-padding, zero-margin) cells:
                 {
-                    result.append(HTMLGenerateDivOfClass("<hr>", "r_stl_entry"));
+                    string separator = "";
+                    if (dividers_are_visible)
+                        separator = "<hr>";
+                    else
+                        separator = "<hr style=\"opacity:0\">"; //laziness - generate an invisible HR, so there's still spacing
+                    result.append(HTMLGenerateDivOfClass(separator, "r_stl_entry"));
                 }
                 result.append("</div>");
                 last_cell_count = 0;
@@ -418,6 +423,11 @@ string HTMLGenerateSimpleTableLines(string [int][int] lines)
         result.append("</div>");
 	}
 	return result.to_string();
+}
+
+string HTMLGenerateSimpleTableLines(string [int][int] lines)
+{
+    return HTMLGenerateSimpleTableLines(lines, true);
 }
 
 string HTMLGenerateElementSpan(element e, string additional_text, boolean desaturated)

@@ -2,7 +2,7 @@
 RegisterResourceGenerationFunction("PathAvatarOfWestOfLoathingGenerateResource");
 void PathAvatarOfWestOfLoathingGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (my_path_id() != PATH_AVATAR_OF_WEST_OF_LOATHING)
+	if (my_path_id() != PATH_AVATAR_OF_WEST_OF_LOATHING && !($classes[snake oiler,beanslinger,cow puncher] contains my_class()))
 		return;
     
     //Oils:
@@ -83,7 +83,7 @@ void PathAvatarOfWestOfLoathingGenerateResource(ChecklistEntry [int] resource_en
         resource_entries.listAppend(ChecklistEntryMake(image_name, "", subentries, 2));
     
     
-    
+    //Should we display beancannon in aftercore? I guess we could suggest a cheap source of it...? Maybe another time.
     if (lookupSkill("Beancannon").have_skill() && in_ronin())
     {
         string [int] banish_sources;
@@ -100,21 +100,25 @@ void PathAvatarOfWestOfLoathingGenerateResource(ChecklistEntry [int] resource_en
             equipped_amount += it.equipped_amount();
             banish_sources.listAppend(description);
         }
-        if (banish_count > 0)
+        if (banish_count > 0 || !in_ronin())
         {
             string [int] description;
-            description.listAppend("From " + banish_sources.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".");
+            if (banish_sources.count() > 0)
+                description.listAppend("From " + banish_sources.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".");
             string url = "";
             if (equipped_amount == 0)
             {
                 description.listAppend("Equip one before banishing.");
                 url = "inventory.php?which=2";
             }
-            resource_entries.listAppend(ChecklistEntryMake("__skill beancannon", url, ChecklistSubentryMake(pluralise(banish_count, "beancannon banish", "beancannon banishes"), "", description), 8));
+            string title = pluralise(banish_count, "beancannon banish", "beancannon banishes");
+            if (!in_ronin())
+                title = "Beancannon banishes";
+            resource_entries.listAppend(ChecklistEntryMake("__skill beancannon", url, ChecklistSubentryMake(title, "", description), 8));
         }
     }
     
-    if (lookupSkill("Long Con").have_skill() && mafiaIsPastRevision(16812) && get_property_int("_longConUsed") < 5 && in_ronin())
+    if (lookupSkill("Long Con").have_skill() && mafiaIsPastRevision(16812) && get_property_int("_longConUsed") < 5)
     {
         int uses_remaining = clampi(5 - get_property_int("_longConUsed"), 0, 5);
         string [int] description;

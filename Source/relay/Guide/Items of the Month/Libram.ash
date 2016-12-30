@@ -57,7 +57,7 @@ void IOTMLibramGenerateResource(ChecklistEntry [int] resource_entries)
 		}
 	}
 	
-	if (__misc_state["in run"])
+	if (__misc_state["in run"] || true)
 	{
 		boolean [item] all_possible_bricko_fights = $items[bricko eye brick,bricko airship,bricko bat,bricko cathedral,bricko elephant,bricko gargantuchicken,bricko octopus,bricko ooze,bricko oyster,bricko python,bricko turtle,bricko vacuum cleaner];
 		
@@ -67,6 +67,8 @@ void IOTMLibramGenerateResource(ChecklistEntry [int] resource_entries)
 			bricko_potential_fights_available += it.available_amount();
 		}
 		bricko_potential_fights_available = MIN(10 - get_property_int("_brickoFights"), bricko_potential_fights_available);
+        if (!in_ronin())
+            bricko_potential_fights_available = clampi(10 - get_property_int("_brickoFights"), 0, 10);
 		if (bricko_potential_fights_available > 0)
 		{
 			ChecklistSubentry subentry;

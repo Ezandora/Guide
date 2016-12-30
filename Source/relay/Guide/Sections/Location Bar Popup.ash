@@ -1131,7 +1131,7 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
                 if (manuel_available)
                 {
                     int factoids_left = 3 - monster_factoids_available(m, false);
-                    if (m.attributes.contains_text("ULTRARARE"))
+                    if (m.attributes.contains_text("ULTRARARE") || m.attributes.contains_text("NOMANUEL")) //ULTRARARE test may be superfluous
                         factoids_left = 0;
                     if (factoids_left > 0)
                         stats_l2.listAppend(factoids_left + " more fact" + (factoids_left > 1 ? "s" : ""));

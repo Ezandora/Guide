@@ -627,7 +627,7 @@ void locationAvailablePrivateInit()
 	locations_unlocked_by_item[$location[Cobb's Knob Menagerie\, Level 3]] = $item[Cobb's Knob Menagerie key];
 	
 	//locations_unlocked_by_item[$location[the haunted ballroom]] = $item[spookyraven ballroom key];
-	locations_unlocked_by_item[$location[The Haunted Library]] = $item[spookyraven library key];
+	locations_unlocked_by_item[$location[The Haunted Library]] = $item[7302]; //library key
 	//locations_unlocked_by_item[$location[The Haunted Gallery]] = $item[spookyraven gallery key];
 	locations_unlocked_by_item[$location[The Castle in the Clouds in the Sky (Basement)]] = $item[S.O.C.K.];
 	locations_unlocked_by_item[$location[the hole in the sky]] = $item[steam-powered model rocketship];
@@ -1117,6 +1117,10 @@ static
         
         lookup_map["The Ruins of the Fully Automated Crimbo Factory"] = "place.php?whichplace=crimbo2015";
         lookup_map["The X-32-F Combat Training Snowman"] = "place.php?whichplace=snojo";
+        foreach s in $strings[Your Bung Chakra,Your Guts Chakra,Your Liver Chakra,Your Nipple Chakra,Your Nose Chakra,Your Hat Chakra]
+            lookup_map[s] = "place.php?whichplace=crimbo2016m";
+        foreach s in $strings[Crimbo's Sack,Crimbo's Boots,Crimbo's Jelly,Crimbo's Reindeer,Crimbo's Beard,Crimbo's Hat]
+            lookup_map[s] = "place.php?whichplace=crimbo2016c";
         
         __constant_clickable_urls = LAConvertLocationLookupToLocations(lookup_map);
     }

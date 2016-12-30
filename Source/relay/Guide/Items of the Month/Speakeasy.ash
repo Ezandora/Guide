@@ -30,7 +30,7 @@ void IOTMSpeakeasyGenerateResource(ChecklistEntry [int] resource_entries)
     //FIXME every drink
     //FIXME gray out drinks we can't drink at the moment (drunkenness, meat)
     
-    if ($effect[Hip to the Jive].have_effect() == 0 && !__misc_state["familiars temporarily blocked"] && __misc_state["in run"])
+    if ($effect[1701].have_effect() == 0 && !__misc_state["familiars temporarily blocked"] && __misc_state["in run"]) //hip to the jive
     {
         string [int] description;
         description.listAppend("+10 familiar weight");

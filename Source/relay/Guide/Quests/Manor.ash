@@ -403,7 +403,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         /*if ($effect[chalky hand].have_effect() > 0)
             estimated_pool_skill += 3;
             
-        if ($item[staff of fats].equipped_amount() > 0)
+        if ($item[2268].equipped_amount() > 0) //staff of fats
             estimated_pool_skill += 5;
         if (lookupItem("7961").equipped_amount() > 0)
             estimated_pool_skill += 5;
@@ -437,9 +437,9 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
             {
                 subentry.entries.listAppend("Untinker the Staff of Ed, almost.");
             }
-            else if ($item[staff of fats].available_amount() > 0)
+            else if ($item[2268].available_amount() > 0) //staff of fats
             {
-                if ($item[staff of fats].equipped_amount() == 0)
+                if ($item[2268].equipped_amount() == 0) //staff of fats
                 {
                     subentry.entries.listAppend("Equip the Staff of Fats for +pool skill.");
                 }
