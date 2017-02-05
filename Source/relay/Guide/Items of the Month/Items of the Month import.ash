@@ -26,3 +26,5 @@ import "relay/Guide/Items of the Month/Protonic Accelerator Pack.ash";
 import "relay/Guide/Items of the Month/Time-Spinner.ash";
 import "relay/Guide/Items of the Month/Thanksgarden.ash";
 import "relay/Guide/Items of the Month/Gingerbread City.ash";
+import "relay/Guide/Items of the Month/Space Jellyfish.ash";
+import "relay/Guide/Items of the Month/Tunnel of Love.ash";

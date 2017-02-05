@@ -53,6 +53,15 @@ float randomf()
 //err is set if value is not an integer.
 int to_int_silent(string value, Error err)
 {
+    //to_int() supports floating-point values. is_integer() will return false.
+    //So manually strip out everything past the dot.
+    //We probably should just ask for to_int() to be silent in the first place.
+    int dot_position = value.index_of(".");
+    if (dot_position != -1 && dot_position > 0) //two separate concepts - is it valid, and is it past the first position. I like testing against both, for safety against future changes.
+    {
+        value = value.substring(0, dot_position);
+    }
+    
 	if (is_integer(value))
         return to_int(value);
     ErrorSet(err, "Unknown integer \"" + value + "\".");
@@ -62,6 +71,17 @@ int to_int_silent(string value, Error err)
 int to_int_silent(string value)
 {
 	return to_int_silent(value, ErrorMake());
+}
+
+//Silly conversions in case we chose the wrong function, removing the need for a int -> string -> int hit.
+int to_int_silent(int value)
+{
+    return value;
+}
+
+int to_int_silent(float value)
+{
+    return value;
 }
 
 

@@ -57,6 +57,11 @@ void generateMisc(Checklist [int] checklists)
             description.listAppend("Or equip your wineglass.");
         }
         
+        int pvp_fights_gained = numeric_modifier("pvp fights").to_int() + 10;
+        int pvp_fights_after_rollover_before_caps = pvp_attacks_left() + pvp_fights_gained;
+        int pvp_fights_after_rollover = MIN(pvp_fights_after_rollover_before_caps, 100);
+        if (today_is_pvp_season_end())
+            pvp_fights_after_rollover = 0;
         if (true)
         {
             int adventures_after_rollover = my_adventures() + 40;
@@ -69,7 +74,13 @@ void generateMisc(Checklist [int] checklists)
             adventures_after_rollover = clampi(adventures_after_rollover, 0, 200);
             if (getHolidaysTomorrow()["Labór Day"] && my_path_id() != PATH_SLOW_AND_STEADY)
                 adventures_after_rollover += 10;
-            description.listAppend("Will start with " + adventures_after_rollover + " adventures tomorrow.");
+            
+            string [int] all_tomorrows_parties;
+            all_tomorrows_parties.listAppend(pluralise(adventures_after_rollover, "adventure", "adventures")); //it should be impossible to have under twenty adventures after rollover, but why should that stop us from checking the singular case?
+            if (hippy_stone_broken() && pvp_fights_after_rollover > 0)
+                all_tomorrows_parties.listAppend(pluralise(pvp_fights_after_rollover, "fight", "fights"));
+            
+            description.listAppend("Will start with " + all_tomorrows_parties.listJoinComponents(", ", "and") + " tomorrow.");
         }
         
         int rollover_adventures_from_equipment = 0;
@@ -97,9 +108,7 @@ void generateMisc(Checklist [int] checklists)
         
         if (hippy_stone_broken())
         {
-            int pvp_fights_gained = numeric_modifier("pvp fights").to_int_silent() + 10;
-            int pvp_fights_after_rollover = pvp_attacks_left() + pvp_fights_gained;
-            int pvp_fights_lost = MAX(0, pvp_fights_after_rollover - 100);
+            int pvp_fights_lost = pvp_fights_after_rollover_before_caps - pvp_fights_after_rollover;//MAX(0, pvp_fights_after_rollover_before_caps - 100);
             if (pvp_fights_lost > 0 && pvp_attacks_left() > 0)
             {
                 description.listAppend("Fight " + pluralise(MIN(pvp_attacks_left(), pvp_fights_lost), "time", "times") + " to avoid losing fights to rollover.");

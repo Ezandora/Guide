@@ -44,9 +44,10 @@ void SOlfactionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
                 location_wanted_monster[$location[the hidden office building]] = $monster[pygmy witch accountant];
                 
             if (!__quest_state["Level 11 Hidden City"].state_boolean["Bowling alley finished"])
-            location_wanted_monster[$location[the hidden bowling alley]] = $monster[pygmy bowler];
+                location_wanted_monster[$location[the hidden bowling alley]] = $monster[pygmy bowler];
         }
-        location_wanted_monster[$location[cobb's knob harem]] = $monster[knob goblin harem girl];
+        if (!have_outfit_components("Knob Goblin Harem Girl Disguise"))
+            location_wanted_monster[$location[cobb's knob harem]] = $monster[knob goblin harem girl];
         if (in_hardcore())
             location_wanted_monster[$location[The Dark Neck of the Woods]] = $monster[Hellion];
         if ($skill[summon smithsness].skill_is_usable() && $item[dirty hobo gloves].available_amount() == 0 && $item[hand in glove].available_amount() == 0 && __misc_state["need to level"])

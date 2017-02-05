@@ -1,12 +1,15 @@
 void IOTMSourceTerminalGenerateDigitiseTargets(string [int] description)
 {
     string [int] potential_targets;
+    int desks_remaining = clampi(5 - get_property_int("writingDesksDefeated"), 0, 5);
+    if (desks_remaining > 1 && !get_property_ascension("lastSecondFloorUnlock") && $item[Lady Spookyraven's necklace].available_amount() == 0 && get_property("questM20Necklace") != "finished" && mafiaIsPastRevision(15244))
+        potential_targets.listAppend("writing desk");
+    if (!__quest_state["Level 12"].state_boolean["Lighthouse Finished"] && $item[barrel of gunpowder].available_amount() < 5)
+        potential_targets.listAppend("lobsterfrogman");
     if (__quest_state["Level 7"].state_int["alcove evilness"] > 31)
         potential_targets.listAppend("modern zmobie");
     if (!__quest_state["Level 8"].state_boolean["Mountain climbed"] && $items[ninja rope,ninja carabiner,ninja crampons].available_amount() == 0 && !have_outfit_components("eXtreme Cold-Weather Gear"))
         potential_targets.listAppend("ninja assassin");
-    if (!__quest_state["Level 12"].state_boolean["Lighthouse Finished"] && $item[barrel of gunpowder].available_amount() < 5)
-        potential_targets.listAppend("lobsterfrogman");
     //FIXME witchess bishop or knight
     if (__iotms_usable[$item[Witchess Set]] && get_property_int("_witchessFights") < 5)
     {
@@ -18,9 +21,6 @@ void IOTMSourceTerminalGenerateDigitiseTargets(string [int] description)
         witchess_list.listAppend("rook");
         potential_targets.listAppend("witchess " + witchess_list.listJoinComponents("/"));
     }
-    int desks_remaining = clampi(5 - get_property_int("writingDesksDefeated"), 0, 5);
-    if (desks_remaining > 1 && !get_property_ascension("lastSecondFloorUnlock") && $item[Lady Spookyraven's necklace].available_amount() == 0 && get_property("questM20Necklace") != "finished" && mafiaIsPastRevision(15244))
-        potential_targets.listAppend("writing desk");
     if (potential_targets.count() > 0)
         description.listAppend("Could target a " + potential_targets.listJoinComponents(", ", "or") + ".");
     if (get_property_int("_sourceTerminalDigitizeMonsterCount") >= 2)

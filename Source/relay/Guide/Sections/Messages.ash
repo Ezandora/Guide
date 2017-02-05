@@ -175,6 +175,33 @@ void generateRandomMessageFamiliar(string [int] random_messages)
             message = "&#5607; &bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;"; break;
         case $familiar[Lil' Barrel Mimic]:
             message = ":D"; break;
+        case $familiar[pet rock]:
+            message = "what if the rock's eyebrow froze that way. would anyone notice?"; break;
+        case lookupFamiliar("space jellyfish"):
+            if (__quest_state["Level 13"].state_boolean["king waiting to be freed"])
+            {
+                int obtained = 0;
+                int obtainable = 0;
+                foreach it in $items[]
+                {
+                    if (it.quest) continue; //these disappear
+                    if (it.item_amount_almost_everywhere() > 0)
+                        obtained += 1;
+                    obtainable += 1;
+                }
+                float rate = to_float(obtained) / to_float(obtainable);
+                random_messages.listClear();
+                message = "SEE YOU NEXT MISSION<br>your rate for collecting items is " + to_int(rate * 100) + "%";
+            }
+            else if (my_level() == 1 || my_turncount() <= 2)
+            {
+                random_messages.listClear();
+                message = "the last jellyfish is in captivity<br>the kingdom is at peace";
+            }
+            
+            break;
+        case lookupFamiliar("bad vibe"):
+            message = "it's <i>all your fault</i>"; break;
     }
     if (message != "")
         random_messages.listAppend(message);
@@ -303,6 +330,9 @@ string generateRandomMessage()
     {
         random_messages.listAppend("Could not connect to secondary database server:2003 - Can't connect to MySQL server on '10.0.0.51' (99)");
     }
+    
+    if ((gameday_to_int() & 31) == 0)
+        random_messages.listAppend("seek the alchemist"); //a young lady's illustrated ascension guide
     
     string [effect] effect_messages;
     
@@ -481,8 +511,7 @@ string generateRandomMessage()
         random_messages.listAppend("superpositioned semi-rare");
     if (hippy_stone_broken() && pvp_attacks_left() > 0)
         random_messages.listAppend(HTMLGenerateTagWrap("a", "aggressive friendship", generateMainLinkMap("peevpee.php")));
-        
-    generateRandomMessageFamiliar(random_messages);
+    
         
     if (get_property_boolean("_warbearGyrocopterUsed"))
         random_messages.listAppend("[gyroseaten] => 109");
@@ -529,6 +558,7 @@ string generateRandomMessage()
     {
         random_messages.listAppend(HTMLGenerateTagWrap("a", "personal aquarium", generateMainLinkMap("place.php?whichplace=chateau"))); //WhiteWizard42:  feeeeesh. feesh in the waaaall
     }
+    generateRandomMessageFamiliar(random_messages);
         
     if (last_monster().phylum == $phylum[penguin])
     {

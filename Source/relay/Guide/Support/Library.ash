@@ -1,5 +1,6 @@
 import "relay/Guide/Support/Math.ash"
 import "relay/Guide/Support/List.ash"
+import "relay/Guide/Support/Strings.ash"
 
 boolean mafiaIsPastRevision(int revision_number)
 {
@@ -8,52 +9,6 @@ boolean mafiaIsPastRevision(int revision_number)
     return (get_revision() >= revision_number);
 }
 
-//Additions to standard API:
-//Auto-conversion property functions:
-boolean get_property_boolean(string property)
-{
-	return get_property(property).to_boolean();
-}
-
-int get_property_int(string property)
-{
-	return get_property(property).to_int_silent();
-}
-
-location get_property_location(string property)
-{
-	return get_property(property).to_location();
-}
-
-float get_property_float(string property)
-{
-	return get_property(property).to_float();
-}
-
-monster get_property_monster(string property)
-{
-	return get_property(property).to_monster();
-}
-
-//Returns true if the propery is equal to my_ascensions(). Commonly used in mafia properties.
-boolean get_property_ascension(string property)
-{
-    return get_property_int(property) == my_ascensions();
-}
-
-buffer to_buffer(string str)
-{
-	buffer result;
-	result.append(str);
-	return result;
-}
-
-buffer copyBuffer(buffer buf)
-{
-    buffer result;
-    result.append(buf);
-    return result;
-}
 
 static
 {
@@ -194,6 +149,8 @@ boolean skill_is_usable(skill s)
         return false;
     if (!s.is_unrestricted())
         return false;
+    if ($skills[rapid prototyping] contains s)
+        return $item[hand turkey outline].is_unrestricted();
     return true;
 }
 
@@ -239,25 +196,6 @@ boolean [effect] makeConstantEffectArrayMutable(boolean [effect] array)
     return result;
 }
 
-//split_string returns an immutable array, which will error on certain edits
-//Use this function - it converts to an editable map.
-string [int] split_string_mutable(string source, string delimiter)
-{
-	string [int] result;
-	string [int] immutable_array = split_string(source, delimiter);
-	foreach key in immutable_array
-		result[key] = immutable_array[key];
-	return result;
-}
-
-//This returns [] for empty strings. This isn't standard for split(), but is more useful for passing around lists. Hacky, I suppose.
-string [int] split_string_alternate(string source, string delimiter)
-{
-    if (source.length() == 0)
-        return listMakeBlankString();
-    return split_string_mutable(source, delimiter);
-}
-
 //Same as my_primestat(), except refers to substat
 stat my_primesubstat()
 {
@@ -279,41 +217,6 @@ item [int] items_missing(boolean [item] items)
             result.listAppend(it);
     }
     return result;
-}
-
-string slot_to_string(slot s)
-{
-    if (s == $slot[acc1] || s == $slot[acc2] || s == $slot[acc3])
-        return "accessory";
-    else if (s == $slot[sticker1] || s == $slot[sticker2] || s == $slot[sticker3])
-        return "sticker";
-    else if (s == $slot[folder1] || s == $slot[folder2] || s == $slot[folder3] || s == $slot[folder4] || s == $slot[folder5])
-        return "folder";
-    else if (s == $slot[fakehand])
-        return "fake hand";
-    else if (s == $slot[crown-of-thrones])
-        return "crown of thrones";
-    else if (s == $slot[buddy-bjorn])
-        return "buddy bjorn";
-    return s;
-}
-
-string slot_to_plural_string(slot s)
-{
-    if (s == $slot[acc1] || s == $slot[acc2] || s == $slot[acc3])
-        return "accessories";
-    else if (s == $slot[hat])
-        return "hats";
-    else if (s == $slot[weapon])
-        return "weapons";
-    else if (s == $slot[off-hand])
-        return "off-hands";
-    else if (s == $slot[shirt])
-        return "shirts";
-    else if (s == $slot[back])
-        return "back items";
-    
-    return s.slot_to_string();
 }
 
 int storage_amount(boolean [item] items)
@@ -476,12 +379,6 @@ boolean have_familiar_replacement(boolean [familiar] familiars)
     return false;
 }
 
-
-string format_today_to_string(string desired_format)
-{
-    return format_date_time("yyyyMMdd", today_to_string(), desired_format);
-}
-
 item [int] missing_outfit_components(string outfit_name)
 {
     item [int] outfit_pieces = outfit_pieces(outfit_name);
@@ -500,18 +397,6 @@ item [int] missing_outfit_components(string outfit_name)
 boolean have_outfit_components(string outfit_name)
 {
     return (outfit_name.missing_outfit_components().count() == 0);
-}
-
-string [int] __int_to_wordy_map;
-string int_to_wordy(int v) //Not complete, only supports a handful:
-{
-    if (__int_to_wordy_map.count() == 0)
-    {
-        __int_to_wordy_map = split_string("zero,one,two,three,four,five,six,seven,eight,nine,ten,eleven,twelve,thirteen,fourteen,fifteen,sixteen,seventeen,eighteen,nineteen,twenty,twenty-one,twenty-two,twenty-three,twenty-four,twenty-five,twenty-six,twenty-seven,twenty-eight,twenty-nine,thirty,thirty-one", ",");
-    }
-    if (__int_to_wordy_map contains v)
-        return __int_to_wordy_map[v];
-    return v.to_string();
 }
 
 //Non-API-related functions:
@@ -542,92 +427,6 @@ int availableDrunkenness()
 int availableSpleen()
 {
 	return spleen_limit() - my_spleen_use();
-}
-
-boolean stringHasPrefix(string s, string prefix)
-{
-	if (s.length() < prefix.length())
-		return false;
-	else if (s.length() == prefix.length())
-		return (s == prefix);
-	else if (substring(s, 0, prefix.length()) == prefix)
-		return true;
-	return false;
-}
-
-boolean stringHasSuffix(string s, string suffix)
-{
-	if (s.length() < suffix.length())
-		return false;
-	else if (s.length() == suffix.length())
-		return (s == suffix);
-	else if (substring(s, s.length() - suffix.length()) == suffix)
-		return true;
-	return false;
-}
-
-string capitaliseFirstLetter(string v)
-{
-	buffer buf = v.to_buffer();
-	if (v.length() <= 0)
-		return v;
-	buf.replace(0, 1, buf.char_at(0).to_upper_case());
-	return buf.to_string();
-}
-
-string pluralise(float value, string non_plural, string plural)
-{
-	if (value == 1.0)
-		return value + " " + non_plural;
-	else
-		return value + " " + plural;
-}
-
-string pluralise(int value, string non_plural, string plural)
-{
-	if (value == 1)
-		return value + " " + non_plural;
-	else
-		return value + " " + plural;
-}
-
-string pluralise(int value, item i)
-{
-	return pluralise(value, i.to_string(), i.plural);
-}
-
-string pluralise(item i) //whatever we have around
-{
-	return pluralise(i.available_amount(), i);
-}
-
-string pluralise(effect e)
-{
-    return pluralise(e.have_effect(), "turn", "turns") + " of " + e;
-}
-
-string pluraliseWordy(int value, string non_plural, string plural)
-{
-	if (value == 1)
-    {
-        if (non_plural == "more time") //we're gonna celebrate
-            return "One More Time";
-        else if (non_plural == "more turn")
-            return "One More Turn";
-		return value.int_to_wordy() + " " + non_plural;
-    }
-	else
-		return value.int_to_wordy() + " " + plural;
-}
-
-string pluraliseWordy(int value, item i)
-{
-	return pluraliseWordy(value, i.to_string(), i.plural);
-}
-
-string pluraliseWordy(item i) //whatever we have around
-{
-	return pluraliseWordy(i.available_amount(), i);
 }
 
 item [int] missingComponentsToMakeItemPrivateImplementation(item it, int it_amounted_needed, int recursion_limit_remaining)
@@ -1568,4 +1367,28 @@ int effective_familiar_weight(familiar f)
     if (is_moved)
         weight += 10;
     return weight;
+}
+
+boolean today_is_pvp_season_end()
+{
+    string today = format_today_to_string("MMdd");
+    if (today == "0228" && false) //FIXME support this by calculating leap years.
+        return true;
+    else if (today == "0229") //will always be true, but won't always be there
+        return true;
+    else if (today == "0430")
+        return true;
+    else if (today == "0630")
+        return true;
+    else if (today == "0831")
+        return true;
+    else if (today == "1031")
+        return true;
+    else if (today == "1231")
+        return true;
+    else if (today == "REPLACEME")
+        return true;
+    else if (today == "REPLACEME")
+        return true;
+    return false;
 }

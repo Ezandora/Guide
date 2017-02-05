@@ -1,5 +1,4 @@
 import "relay/Guide/Support/List.ash"
-import "relay/Guide/Support/Library.ash"
 
 
 float __setting_indention_width_in_em = 1.45;
@@ -111,14 +110,22 @@ buffer HTMLGenerateSpanOfClass(string source, string class_name)
 buffer HTMLGenerateSpanOfStyle(string source, string style)
 {
 	if (style == "")
-		return source.to_buffer();
+    {
+        buffer out;
+        out.append(source);
+        return out;
+    }
 	return HTMLGenerateTagWrap("span", source, mapMake("style", style));
 }
 
 buffer HTMLGenerateSpanFont(string source, string font_colour, string font_size)
 {
 	if (font_colour == "" && font_size == "")
-		return source.to_buffer();
+    {
+        buffer out;
+        out.append(source);
+        return out;
+    }
 		
 	buffer style;
 	

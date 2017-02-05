@@ -1121,7 +1121,7 @@ static
             lookup_map[s] = "place.php?whichplace=crimbo2016m";
         foreach s in $strings[Crimbo's Sack,Crimbo's Boots,Crimbo's Jelly,Crimbo's Reindeer,Crimbo's Beard,Crimbo's Hat]
             lookup_map[s] = "place.php?whichplace=crimbo2016c";
-        
+        lookup_map["An Eldritch Horror"] = "place.php?whichplace=town";
         __constant_clickable_urls = LAConvertLocationLookupToLocations(lookup_map);
     }
     initialiseConstantClickableURLs();

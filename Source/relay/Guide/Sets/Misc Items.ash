@@ -896,9 +896,10 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
     {
         resource_entries.listAppend(ChecklistEntryMake("__item burned government manual fragment", "inventory.php?which=3", ChecklistSubentryMake(pluralise($item[burned government manual fragment]), "", "Foreign language study.|Will disappear on ascension."), importance_level_unimportant_item));
     }
-    if ($item[lynyrd snare].available_amount() > 0 && in_run && __misc_state["need to level"]) //FIXME tracking number used today
+    if ($item[lynyrd snare].available_amount() > 0 && get_property_int("_lynyrdSnareUses") < 3)// && in_run && __misc_state["need to level"])
     {
-        resource_entries.listAppend(ChecklistEntryMake("__item lynyrd snare", "inventory.php?which=3", ChecklistSubentryMake(pluralise($item[lynyrd snare]), "", "Free fight when used."), importance_level_unimportant_item));
+        int uses_remaining = MIN($item[lynyrd snare].available_amount(), clampi(3 - get_property_int("_lynyrdSnareUses"), 0, 3));
+        resource_entries.listAppend(ChecklistEntryMake("__item lynyrd snare", "inventory.php?which=3", ChecklistSubentryMake(pluralise(uses_remaining,$item[lynyrd snare]), "", "Free fight when used."), importance_level_unimportant_item));
     }
     if (in_run && $item[red box].available_amount() > 0)
     {

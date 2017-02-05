@@ -86,6 +86,19 @@ void runMain(string relay_filename)
     if (drunk)
         PageWrite(HTMLGenerateTagPrefix("div", mapMake("style", "-webkit-filter:blur(4.0px) brightness(1.01);"))); //FIXME make this animated
     
+    boolean buggy = (my_familiar() == $familiar[software bug] || $item[iShield].equipped_amount() > 0);
+    if (buggy)
+    {
+        //Ideally we'd want to layer over a mosaic filter, giving a Cinepak look, but pixel manipulation techniques are limited in HTML.
+        string chosen_font;
+        //chosen_font = "'Comic Sans MS', cursive, sans-serif;"; //DO NOT USE
+        //chosen_font = "'Courier New', Courier, monospace;";
+        chosen_font = "'Helvetica Neue',Arial, Helvetica, sans-serif;font-weight:300;";
+        PageWrite(HTMLGenerateTagPrefix("div", mapMake("style", "font-family:" + chosen_font)));
+        //PageWrite(HTMLGenerateTagPrefix("div", mapMake("style", "")));
+        //
+    }
+    
     boolean displaying_navbar = false;
 	if (__setting_show_navbar)
 	{
@@ -264,6 +277,8 @@ void runMain(string relay_filename)
     }
     
     if (drunk)
+        PageWrite("</div>");
+    if (buggy)
         PageWrite("</div>");
     
     if (output_body_tag_only)
