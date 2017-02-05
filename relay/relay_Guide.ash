@@ -2,7 +2,7 @@
 
 since 17.4; //the earliest main release that is usable in modern KOL (cookie bug)
 //These settings are for development. Don't worry about editing them.
-string __version = "1.4.18";
+string __version = "1.4.19";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -133,6 +133,15 @@ float randomf()
 //err is set if value is not an integer.
 int to_int_silent(string value, Error err)
 {
+    //to_int() supports floating-point values. is_integer() will return false.
+    //So manually strip out everything past the dot.
+    //We probably should just ask for to_int() to be silent in the first place.
+    int dot_position = value.index_of(".");
+    if (dot_position != -1 && dot_position > 0) //two separate concepts - is it valid, and is it past the first position. I like testing against both, for safety against future changes.
+    {
+        value = value.substring(0, dot_position);
+    }
+    
 	if (is_integer(value))
         return to_int(value);
     ErrorSet(err, "Unknown integer \"" + value + "\".");
@@ -142,6 +151,17 @@ int to_int_silent(string value, Error err)
 int to_int_silent(string value)
 {
 	return to_int_silent(value, ErrorMake());
+}
+
+//Silly conversions in case we chose the wrong function, removing the need for a int -> string -> int hit.
+int to_int_silent(int value)
+{
+    return value;
+}
+
+int to_int_silent(float value)
+{
+    return value;
 }
 
 
@@ -1528,12 +1548,181 @@ monster [int] listConvertStringsToMonsters(string [int] list)
     return out;
 }
 
-boolean mafiaIsPastRevision(int revision_number)
+
+buffer to_buffer(string str)
 {
-    if (get_revision() <= 0) //get_revision reports zero in certain cases; assume they're on a recent version
-        return true;
-    return (get_revision() >= revision_number);
+	buffer result;
+	result.append(str);
+	return result;
 }
+
+buffer copyBuffer(buffer buf)
+{
+    buffer result;
+    result.append(buf);
+    return result;
+}
+
+//split_string returns an immutable array, which will error on certain edits
+//Use this function - it converts to an editable map.
+string [int] split_string_mutable(string source, string delimiter)
+{
+	string [int] result;
+	string [int] immutable_array = split_string(source, delimiter);
+	foreach key in immutable_array
+		result[key] = immutable_array[key];
+	return result;
+}
+
+//This returns [] for empty strings. This isn't standard for split(), but is more useful for passing around lists. Hacky, I suppose.
+string [int] split_string_alternate(string source, string delimiter)
+{
+    if (source.length() == 0)
+        return listMakeBlankString();
+    return split_string_mutable(source, delimiter);
+}
+
+string slot_to_string(slot s)
+{
+    if (s == $slot[acc1] || s == $slot[acc2] || s == $slot[acc3])
+        return "accessory";
+    else if (s == $slot[sticker1] || s == $slot[sticker2] || s == $slot[sticker3])
+        return "sticker";
+    else if (s == $slot[folder1] || s == $slot[folder2] || s == $slot[folder3] || s == $slot[folder4] || s == $slot[folder5])
+        return "folder";
+    else if (s == $slot[fakehand])
+        return "fake hand";
+    else if (s == $slot[crown-of-thrones])
+        return "crown of thrones";
+    else if (s == $slot[buddy-bjorn])
+        return "buddy bjorn";
+    return s;
+}
+
+string slot_to_plural_string(slot s)
+{
+    if (s == $slot[acc1] || s == $slot[acc2] || s == $slot[acc3])
+        return "accessories";
+    else if (s == $slot[hat])
+        return "hats";
+    else if (s == $slot[weapon])
+        return "weapons";
+    else if (s == $slot[off-hand])
+        return "off-hands";
+    else if (s == $slot[shirt])
+        return "shirts";
+    else if (s == $slot[back])
+        return "back items";
+    
+    return s.slot_to_string();
+}
+
+
+string format_today_to_string(string desired_format)
+{
+    return format_date_time("yyyyMMdd", today_to_string(), desired_format);
+}
+
+
+string [int] __int_to_wordy_map;
+string int_to_wordy(int v) //Not complete, only supports a handful:
+{
+    if (__int_to_wordy_map.count() == 0)
+    {
+        __int_to_wordy_map = split_string("zero,one,two,three,four,five,six,seven,eight,nine,ten,eleven,twelve,thirteen,fourteen,fifteen,sixteen,seventeen,eighteen,nineteen,twenty,twenty-one,twenty-two,twenty-three,twenty-four,twenty-five,twenty-six,twenty-seven,twenty-eight,twenty-nine,thirty,thirty-one", ",");
+    }
+    if (__int_to_wordy_map contains v)
+        return __int_to_wordy_map[v];
+    return v.to_string();
+}
+
+
+boolean stringHasPrefix(string s, string prefix)
+{
+	if (s.length() < prefix.length())
+		return false;
+	else if (s.length() == prefix.length())
+		return (s == prefix);
+	else if (substring(s, 0, prefix.length()) == prefix)
+		return true;
+	return false;
+}
+
+boolean stringHasSuffix(string s, string suffix)
+{
+	if (s.length() < suffix.length())
+		return false;
+	else if (s.length() == suffix.length())
+		return (s == suffix);
+	else if (substring(s, s.length() - suffix.length()) == suffix)
+		return true;
+	return false;
+}
+
+string capitaliseFirstLetter(string v)
+{
+	buffer buf = v.to_buffer();
+	if (v.length() <= 0)
+		return v;
+	buf.replace(0, 1, buf.char_at(0).to_upper_case());
+	return buf.to_string();
+}
+
+string pluralise(float value, string non_plural, string plural)
+{
+	if (value == 1.0)
+		return value + " " + non_plural;
+	else
+		return value + " " + plural;
+}
+
+string pluralise(int value, string non_plural, string plural)
+{
+	if (value == 1)
+		return value + " " + non_plural;
+	else
+		return value + " " + plural;
+}
+
+string pluralise(int value, item i)
+{
+	return pluralise(value, i.to_string(), i.plural);
+}
+
+string pluralise(item i) //whatever we have around
+{
+	return pluralise(i.available_amount(), i);
+}
+
+string pluralise(effect e)
+{
+    return pluralise(e.have_effect(), "turn", "turns") + " of " + e;
+}
+
+string pluraliseWordy(int value, string non_plural, string plural)
+{
+	if (value == 1)
+    {
+        if (non_plural == "more time") //we're gonna celebrate
+            return "One More Time";
+        else if (non_plural == "more turn")
+            return "One More Turn";
+		return value.int_to_wordy() + " " + non_plural;
+    }
+	else
+		return value.int_to_wordy() + " " + plural;
+}
+
+string pluraliseWordy(int value, item i)
+{
+	return pluraliseWordy(value, i.to_string(), i.plural);
+}
+
+string pluraliseWordy(item i) //whatever we have around
+{
+	return pluraliseWordy(i.available_amount(), i);
+}
+
 
 //Additions to standard API:
 //Auto-conversion property functions:
@@ -1568,19 +1757,13 @@ boolean get_property_ascension(string property)
     return get_property_int(property) == my_ascensions();
 }
 
-buffer to_buffer(string str)
+boolean mafiaIsPastRevision(int revision_number)
 {
-	buffer result;
-	result.append(str);
-	return result;
+    if (get_revision() <= 0) //get_revision reports zero in certain cases; assume they're on a recent version
+        return true;
+    return (get_revision() >= revision_number);
 }
 
-buffer copyBuffer(buffer buf)
-{
-    buffer result;
-    result.append(buf);
-    return result;
-}
 
 static
 {
@@ -1721,6 +1904,8 @@ boolean skill_is_usable(skill s)
         return false;
     if (!s.is_unrestricted())
         return false;
+    if ($skills[rapid prototyping] contains s)
+        return $item[hand turkey outline].is_unrestricted();
     return true;
 }
 
@@ -1766,25 +1951,6 @@ boolean [effect] makeConstantEffectArrayMutable(boolean [effect] array)
     return result;
 }
 
-//split_string returns an immutable array, which will error on certain edits
-//Use this function - it converts to an editable map.
-string [int] split_string_mutable(string source, string delimiter)
-{
-	string [int] result;
-	string [int] immutable_array = split_string(source, delimiter);
-	foreach key in immutable_array
-		result[key] = immutable_array[key];
-	return result;
-}
-
-//This returns [] for empty strings. This isn't standard for split(), but is more useful for passing around lists. Hacky, I suppose.
-string [int] split_string_alternate(string source, string delimiter)
-{
-    if (source.length() == 0)
-        return listMakeBlankString();
-    return split_string_mutable(source, delimiter);
-}
-
 //Same as my_primestat(), except refers to substat
 stat my_primesubstat()
 {
@@ -1806,41 +1972,6 @@ item [int] items_missing(boolean [item] items)
             result.listAppend(it);
     }
     return result;
-}
-
-string slot_to_string(slot s)
-{
-    if (s == $slot[acc1] || s == $slot[acc2] || s == $slot[acc3])
-        return "accessory";
-    else if (s == $slot[sticker1] || s == $slot[sticker2] || s == $slot[sticker3])
-        return "sticker";
-    else if (s == $slot[folder1] || s == $slot[folder2] || s == $slot[folder3] || s == $slot[folder4] || s == $slot[folder5])
-        return "folder";
-    else if (s == $slot[fakehand])
-        return "fake hand";
-    else if (s == $slot[crown-of-thrones])
-        return "crown of thrones";
-    else if (s == $slot[buddy-bjorn])
-        return "buddy bjorn";
-    return s;
-}
-
-string slot_to_plural_string(slot s)
-{
-    if (s == $slot[acc1] || s == $slot[acc2] || s == $slot[acc3])
-        return "accessories";
-    else if (s == $slot[hat])
-        return "hats";
-    else if (s == $slot[weapon])
-        return "weapons";
-    else if (s == $slot[off-hand])
-        return "off-hands";
-    else if (s == $slot[shirt])
-        return "shirts";
-    else if (s == $slot[back])
-        return "back items";
-    
-    return s.slot_to_string();
 }
 
 int storage_amount(boolean [item] items)
@@ -2003,12 +2134,6 @@ boolean have_familiar_replacement(boolean [familiar] familiars)
     return false;
 }
 
-
-string format_today_to_string(string desired_format)
-{
-    return format_date_time("yyyyMMdd", today_to_string(), desired_format);
-}
-
 item [int] missing_outfit_components(string outfit_name)
 {
     item [int] outfit_pieces = outfit_pieces(outfit_name);
@@ -2027,18 +2152,6 @@ item [int] missing_outfit_components(string outfit_name)
 boolean have_outfit_components(string outfit_name)
 {
     return (outfit_name.missing_outfit_components().count() == 0);
-}
-
-string [int] __int_to_wordy_map;
-string int_to_wordy(int v) //Not complete, only supports a handful:
-{
-    if (__int_to_wordy_map.count() == 0)
-    {
-        __int_to_wordy_map = split_string("zero,one,two,three,four,five,six,seven,eight,nine,ten,eleven,twelve,thirteen,fourteen,fifteen,sixteen,seventeen,eighteen,nineteen,twenty,twenty-one,twenty-two,twenty-three,twenty-four,twenty-five,twenty-six,twenty-seven,twenty-eight,twenty-nine,thirty,thirty-one", ",");
-    }
-    if (__int_to_wordy_map contains v)
-        return __int_to_wordy_map[v];
-    return v.to_string();
 }
 
 //Non-API-related functions:
@@ -2069,92 +2182,6 @@ int availableDrunkenness()
 int availableSpleen()
 {
 	return spleen_limit() - my_spleen_use();
-}
-
-boolean stringHasPrefix(string s, string prefix)
-{
-	if (s.length() < prefix.length())
-		return false;
-	else if (s.length() == prefix.length())
-		return (s == prefix);
-	else if (substring(s, 0, prefix.length()) == prefix)
-		return true;
-	return false;
-}
-
-boolean stringHasSuffix(string s, string suffix)
-{
-	if (s.length() < suffix.length())
-		return false;
-	else if (s.length() == suffix.length())
-		return (s == suffix);
-	else if (substring(s, s.length() - suffix.length()) == suffix)
-		return true;
-	return false;
-}
-
-string capitaliseFirstLetter(string v)
-{
-	buffer buf = v.to_buffer();
-	if (v.length() <= 0)
-		return v;
-	buf.replace(0, 1, buf.char_at(0).to_upper_case());
-	return buf.to_string();
-}
-
-string pluralise(float value, string non_plural, string plural)
-{
-	if (value == 1.0)
-		return value + " " + non_plural;
-	else
-		return value + " " + plural;
-}
-
-string pluralise(int value, string non_plural, string plural)
-{
-	if (value == 1)
-		return value + " " + non_plural;
-	else
-		return value + " " + plural;
-}
-
-string pluralise(int value, item i)
-{
-	return pluralise(value, i.to_string(), i.plural);
-}
-
-string pluralise(item i) //whatever we have around
-{
-	return pluralise(i.available_amount(), i);
-}
-
-string pluralise(effect e)
-{
-    return pluralise(e.have_effect(), "turn", "turns") + " of " + e;
-}
-
-string pluraliseWordy(int value, string non_plural, string plural)
-{
-	if (value == 1)
-    {
-        if (non_plural == "more time") //we're gonna celebrate
-            return "One More Time";
-        else if (non_plural == "more turn")
-            return "One More Turn";
-		return value.int_to_wordy() + " " + non_plural;
-    }
-	else
-		return value.int_to_wordy() + " " + plural;
-}
-
-string pluraliseWordy(int value, item i)
-{
-	return pluraliseWordy(value, i.to_string(), i.plural);
-}
-
-string pluraliseWordy(item i) //whatever we have around
-{
-	return pluraliseWordy(i.available_amount(), i);
 }
 
 item [int] missingComponentsToMakeItemPrivateImplementation(item it, int it_amounted_needed, int recursion_limit_remaining)
@@ -3096,6 +3123,30 @@ int effective_familiar_weight(familiar f)
         weight += 10;
     return weight;
 }
+
+boolean today_is_pvp_season_end()
+{
+    string today = format_today_to_string("MMdd");
+    if (today == "0228" && false) //FIXME support this by calculating leap years.
+        return true;
+    else if (today == "0229") //will always be true, but won't always be there
+        return true;
+    else if (today == "0430")
+        return true;
+    else if (today == "0630")
+        return true;
+    else if (today == "0831")
+        return true;
+    else if (today == "1031")
+        return true;
+    else if (today == "1231")
+        return true;
+    else if (today == "REPLACEME")
+        return true;
+    else if (today == "REPLACEME")
+        return true;
+    return false;
+}
 boolean [item] __iotms_usable;
 
 void initialiseIOTMsUsable()
@@ -3428,7 +3479,6 @@ string __blue_pill_image = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAA
 
 
 
-
 float __setting_indention_width_in_em = 1.45;
 string __setting_indention_width = __setting_indention_width_in_em + "em";
 
@@ -3538,14 +3588,22 @@ buffer HTMLGenerateSpanOfClass(string source, string class_name)
 buffer HTMLGenerateSpanOfStyle(string source, string style)
 {
 	if (style == "")
-		return source.to_buffer();
+    {
+        buffer out;
+        out.append(source);
+        return out;
+    }
 	return HTMLGenerateTagWrap("span", source, mapMake("style", style));
 }
 
 buffer HTMLGenerateSpanFont(string source, string font_colour, string font_size)
 {
 	if (font_colour == "" && font_size == "")
-		return source.to_buffer();
+    {
+        buffer out;
+        out.append(source);
+        return out;
+    }
 		
 	buffer style;
 	
@@ -5505,7 +5563,7 @@ static
             lookup_map[s] = "place.php?whichplace=crimbo2016m";
         foreach s in $strings[Crimbo's Sack,Crimbo's Boots,Crimbo's Jelly,Crimbo's Reindeer,Crimbo's Beard,Crimbo's Hat]
             lookup_map[s] = "place.php?whichplace=crimbo2016c";
-        
+        lookup_map["An Eldritch Horror"] = "place.php?whichplace=town";
         __constant_clickable_urls = LAConvertLocationLookupToLocations(lookup_map);
     }
     initialiseConstantClickableURLs();
@@ -7886,7 +7944,7 @@ void QLevel3GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         //drunken rat kings seem to happen after the combat/non-combat check, so recommend +combat if they need tangles:
         
         string combat_type_to_run = "-combat/maybe +combat";
-        if (ncs_skippable > 0 && ($item[tangle of rat tails].available_amount() * 3 + $item[tomb ratchet].available_amount() >= 11 || !need_to_complete_pyramid)) //technically should check if we're done with the pyramid moving, not level 11 finished, but that's harder to test
+        if (ncs_skippable > 0)// && ($item[tangle of rat tails].available_amount() * 3 + $item[tomb ratchet].available_amount() >= 11 || !need_to_complete_pyramid)) //technically should check if we're done with the pyramid moving, not level 11 finished, but that's harder to test. on second thought, just -combat if we can skip at least one?
             combat_type_to_run = "-combat";
         string line;
         if (additionals.count() > 0)
@@ -13990,7 +14048,7 @@ static
         __known_sources.listExactLastObject().source_equipment = $item[hand in glove];
         
         //FIXME wrong, but a good preliminary:
-        foreach it in $items[MagiMechTech NanoMechaMech,bottle opener belt buckle,old-school calculator watch,ant hoe,ant pick,ant pitchfork,ant rake,ant sickle,fishy wand,moveable feast,oversized fish scaler,plastic pumpkin bucket,tiny bowler,cup of infinite pencils,double-ice box,smirking shrunken head,mr. haggis,stapler bear,dubious loincloth,muddy skirt,bottle of Goldschn&ouml;ckered,acid-squirting flower,ironic oversized sunglasses,hippy protest button,cannonball charrrm bracelet,groovy prism necklace,spiky turtle shoulderpads,double-ice cap,parasitic headgnawer,eelskin hat,balloon shield,hot plate,Ol' Scratch's stove door,Oscus's garbage can lid,eelskin shield,eelskin pants,buddy bjorn,shocked shell,crown of thrones]
+        foreach it in $items[MagiMechTech NanoMechaMech,bottle opener belt buckle,old school calculator watch,ant hoe,ant pick,ant pitchfork,ant rake,ant sickle,fishy wand,moveable feast,oversized fish scaler,plastic pumpkin bucket,tiny bowler,cup of infinite pencils,double-ice box,smirking shrunken head,mr. haggis,stapler bear,dubious loincloth,muddy skirt,bottle of Goldschn&ouml;ckered,acid-squirting flower,ironic oversized sunglasses,hippy protest button,cannonball charrrm bracelet,groovy prism necklace,spiky turtle shoulderpads,double-ice cap,parasitic headgnawer,eelskin hat,balloon shield,hot plate,Ol' Scratch's stove door,Oscus's garbage can lid,eelskin shield,eelskin pants,buddy bjorn,shocked shell,crown of thrones]
         {
             __known_sources.listAppend(PassiveDamageSourceMake(PDS_DAMAGE_TYPE_ACTIVE, PDS_SOURCE_TYPE_EQUIPMENT));
             __known_sources.listExactLastObject().PassiveDamageSourceAddDamage(1);
@@ -14998,7 +15056,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 subentry.entries.listAppend(HTMLGenerateSpanFont(passives_to_remove.listJoinComponents("|"), "red"));
             //FIXME HACK USE A LIBRARY
             /*string [int] things_to_do;
-            foreach it in $items[hand in glove,MagiMechTech NanoMechaMech,bottle opener belt buckle,old-school calculator watch,ant hoe,ant pick,ant pitchfork,ant rake,ant sickle,fishy wand,moveable feast,oversized fish scaler,plastic pumpkin bucket,tiny bowler,cup of infinite pencils,double-ice box,smirking shrunken head,mr. haggis,stapler bear,dubious loincloth,muddy skirt,bottle of Goldschn&ouml;ckered,acid-squirting flower,ironic oversized sunglasses,hippy protest button,cannonball charrrm bracelet,groovy prism necklace,spiky turtle shoulderpads,double-ice cap,parasitic headgnawer,eelskin hat,balloon shield,hot plate,Ol' Scratch's stove door,Oscus's garbage can lid,eelskin shield,eelskin pants,buddy bjorn]
+            foreach it in $items[hand in glove,MagiMechTech NanoMechaMech,bottle opener belt buckle,old school calculator watch,ant hoe,ant pick,ant pitchfork,ant rake,ant sickle,fishy wand,moveable feast,oversized fish scaler,plastic pumpkin bucket,tiny bowler,cup of infinite pencils,double-ice box,smirking shrunken head,mr. haggis,stapler bear,dubious loincloth,muddy skirt,bottle of Goldschn&ouml;ckered,acid-squirting flower,ironic oversized sunglasses,hippy protest button,cannonball charrrm bracelet,groovy prism necklace,spiky turtle shoulderpads,double-ice cap,parasitic headgnawer,eelskin hat,balloon shield,hot plate,Ol' Scratch's stove door,Oscus's garbage can lid,eelskin shield,eelskin pants,buddy bjorn]
             {
                 if (it.equipped_amount() > 0)
                     things_to_do.listAppend("unequip " + it);
@@ -17402,7 +17460,7 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
             description.listAppend("Make sure not to have anything along that will attack him. (familiars, etc)");
             //umm... this probably won't be updated:
             string [int] things_to_do;
-            foreach it in $items[hand in glove,MagiMechTech NanoMechaMech,bottle opener belt buckle,old-school calculator watch,ant hoe,ant pick,ant pitchfork,ant rake,ant sickle,fishy wand,moveable feast,oversized fish scaler,plastic pumpkin bucket,tiny bowler,cup of infinite pencils,double-ice box,smirking shrunken head,mr. haggis,stapler bear,dubious loincloth,muddy skirt,bottle of Goldschn&ouml;ckered,acid-squirting flower,ironic oversized sunglasses,hippy protest button,cannonball charrrm bracelet,groovy prism necklace,spiky turtle shoulderpads,double-ice cap,parasitic headgnawer,eelskin hat,balloon shield,hot plate,Ol' Scratch's stove door,Oscus's garbage can lid,eelskin shield,eelskin pants]
+            foreach it in $items[hand in glove,MagiMechTech NanoMechaMech,bottle opener belt buckle,old school calculator watch,ant hoe,ant pick,ant pitchfork,ant rake,ant sickle,fishy wand,moveable feast,oversized fish scaler,plastic pumpkin bucket,tiny bowler,cup of infinite pencils,double-ice box,smirking shrunken head,mr. haggis,stapler bear,dubious loincloth,muddy skirt,bottle of Goldschn&ouml;ckered,acid-squirting flower,ironic oversized sunglasses,hippy protest button,cannonball charrrm bracelet,groovy prism necklace,spiky turtle shoulderpads,double-ice cap,parasitic headgnawer,eelskin hat,balloon shield,hot plate,Ol' Scratch's stove door,Oscus's garbage can lid,eelskin shield,eelskin pants]
             {
                 if (it.equipped_amount() > 0)
                     things_to_do.listAppend("unequip " + it);
@@ -24099,9 +24157,10 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
     {
         resource_entries.listAppend(ChecklistEntryMake("__item burned government manual fragment", "inventory.php?which=3", ChecklistSubentryMake(pluralise($item[burned government manual fragment]), "", "Foreign language study.|Will disappear on ascension."), importance_level_unimportant_item));
     }
-    if ($item[lynyrd snare].available_amount() > 0 && in_run && __misc_state["need to level"]) //FIXME tracking number used today
+    if ($item[lynyrd snare].available_amount() > 0 && get_property_int("_lynyrdSnareUses") < 3)// && in_run && __misc_state["need to level"])
     {
-        resource_entries.listAppend(ChecklistEntryMake("__item lynyrd snare", "inventory.php?which=3", ChecklistSubentryMake(pluralise($item[lynyrd snare]), "", "Free fight when used."), importance_level_unimportant_item));
+        int uses_remaining = MIN($item[lynyrd snare].available_amount(), clampi(3 - get_property_int("_lynyrdSnareUses"), 0, 3));
+        resource_entries.listAppend(ChecklistEntryMake("__item lynyrd snare", "inventory.php?which=3", ChecklistSubentryMake(pluralise(uses_remaining,$item[lynyrd snare]), "", "Free fight when used."), importance_level_unimportant_item));
     }
     if (in_run && $item[red box].available_amount() > 0)
     {
@@ -26464,9 +26523,10 @@ void SOlfactionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
                 location_wanted_monster[$location[the hidden office building]] = $monster[pygmy witch accountant];
                 
             if (!__quest_state["Level 11 Hidden City"].state_boolean["Bowling alley finished"])
-            location_wanted_monster[$location[the hidden bowling alley]] = $monster[pygmy bowler];
+                location_wanted_monster[$location[the hidden bowling alley]] = $monster[pygmy bowler];
         }
-        location_wanted_monster[$location[cobb's knob harem]] = $monster[knob goblin harem girl];
+        if (!have_outfit_components("Knob Goblin Harem Girl Disguise"))
+            location_wanted_monster[$location[cobb's knob harem]] = $monster[knob goblin harem girl];
         if (in_hardcore())
             location_wanted_monster[$location[The Dark Neck of the Woods]] = $monster[Hellion];
         if ($skill[summon smithsness].skill_is_usable() && $item[dirty hobo gloves].available_amount() == 0 && $item[hand in glove].available_amount() == 0 && __misc_state["need to level"])
@@ -27815,21 +27875,9 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 {
     if (!hippy_stone_broken())
         return;
-    if (pvp_attacks_left() > 0)
+    if (pvp_attacks_left() > 0 && today_is_pvp_season_end())
     {
-        string today = format_today_to_string("MMdd");
-        boolean [string] season_end_dates;
-        //season_end_dates["0228"] = true; //FIXME support this by calculating leap years.
-        season_end_dates["0430"] = true;
-        season_end_dates["0630"] = true;
-        season_end_dates["0831"] = true;
-        season_end_dates["1031"] = true;
-        season_end_dates["1231"] = true;
-        
-        if (season_end_dates contains today)
-        {
-            optional_task_entries.listAppend(ChecklistEntryMake("__effect Swordholder", "peevpee.php?place=fight", ChecklistSubentryMake("Run all of your fights", "", listMake("Season ends today.", "Make sure to get the seasonal item if you haven't, as well."))));
-        }
+        optional_task_entries.listAppend(ChecklistEntryMake("__effect Swordholder", "peevpee.php?place=fight", ChecklistSubentryMake("Run all of your fights", "", listMake("Season ends today.", "Make sure to get the seasonal item if you haven't, as well."))));
     }
 }
 //demonSummoned
@@ -32604,6 +32652,33 @@ void generateRandomMessageFamiliar(string [int] random_messages)
             message = "&#5607; &bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;&nbsp;&bull;"; break;
         case $familiar[Lil' Barrel Mimic]:
             message = ":D"; break;
+        case $familiar[pet rock]:
+            message = "what if the rock's eyebrow froze that way. would anyone notice?"; break;
+        case lookupFamiliar("space jellyfish"):
+            if (__quest_state["Level 13"].state_boolean["king waiting to be freed"])
+            {
+                int obtained = 0;
+                int obtainable = 0;
+                foreach it in $items[]
+                {
+                    if (it.quest) continue; //these disappear
+                    if (it.item_amount_almost_everywhere() > 0)
+                        obtained += 1;
+                    obtainable += 1;
+                }
+                float rate = to_float(obtained) / to_float(obtainable);
+                random_messages.listClear();
+                message = "SEE YOU NEXT MISSION<br>your rate for collecting items is " + to_int(rate * 100) + "%";
+            }
+            else if (my_level() == 1 || my_turncount() <= 2)
+            {
+                random_messages.listClear();
+                message = "the last jellyfish is in captivity<br>the kingdom is at peace";
+            }
+            
+            break;
+        case lookupFamiliar("bad vibe"):
+            message = "it's <i>all your fault</i>"; break;
     }
     if (message != "")
         random_messages.listAppend(message);
@@ -32732,6 +32807,9 @@ string generateRandomMessage()
     {
         random_messages.listAppend("Could not connect to secondary database server:2003 - Can't connect to MySQL server on '10.0.0.51' (99)");
     }
+    
+    if ((gameday_to_int() & 31) == 0)
+        random_messages.listAppend("seek the alchemist"); //a young lady's illustrated ascension guide
     
     string [effect] effect_messages;
     
@@ -32910,8 +32988,7 @@ string generateRandomMessage()
         random_messages.listAppend("superpositioned semi-rare");
     if (hippy_stone_broken() && pvp_attacks_left() > 0)
         random_messages.listAppend(HTMLGenerateTagWrap("a", "aggressive friendship", generateMainLinkMap("peevpee.php")));
-        
-    generateRandomMessageFamiliar(random_messages);
+    
         
     if (get_property_boolean("_warbearGyrocopterUsed"))
         random_messages.listAppend("[gyroseaten] => 109");
@@ -32958,6 +33035,7 @@ string generateRandomMessage()
     {
         random_messages.listAppend(HTMLGenerateTagWrap("a", "personal aquarium", generateMainLinkMap("place.php?whichplace=chateau"))); //WhiteWizard42:  feeeeesh. feesh in the waaaall
     }
+    generateRandomMessageFamiliar(random_messages);
         
     if (last_monster().phylum == $phylum[penguin])
     {
@@ -34089,6 +34167,11 @@ void generateMisc(Checklist [int] checklists)
             description.listAppend("Or equip your wineglass.");
         }
         
+        int pvp_fights_gained = numeric_modifier("pvp fights").to_int() + 10;
+        int pvp_fights_after_rollover_before_caps = pvp_attacks_left() + pvp_fights_gained;
+        int pvp_fights_after_rollover = MIN(pvp_fights_after_rollover_before_caps, 100);
+        if (today_is_pvp_season_end())
+            pvp_fights_after_rollover = 0;
         if (true)
         {
             int adventures_after_rollover = my_adventures() + 40;
@@ -34101,7 +34184,13 @@ void generateMisc(Checklist [int] checklists)
             adventures_after_rollover = clampi(adventures_after_rollover, 0, 200);
             if (getHolidaysTomorrow()["Labór Day"] && my_path_id() != PATH_SLOW_AND_STEADY)
                 adventures_after_rollover += 10;
-            description.listAppend("Will start with " + adventures_after_rollover + " adventures tomorrow.");
+            
+            string [int] all_tomorrows_parties;
+            all_tomorrows_parties.listAppend(pluralise(adventures_after_rollover, "adventure", "adventures")); //it should be impossible to have under twenty adventures after rollover, but why should that stop us from checking the singular case?
+            if (hippy_stone_broken() && pvp_fights_after_rollover > 0)
+                all_tomorrows_parties.listAppend(pluralise(pvp_fights_after_rollover, "fight", "fights"));
+            
+            description.listAppend("Will start with " + all_tomorrows_parties.listJoinComponents(", ", "and") + " tomorrow.");
         }
         
         int rollover_adventures_from_equipment = 0;
@@ -34129,9 +34218,7 @@ void generateMisc(Checklist [int] checklists)
         
         if (hippy_stone_broken())
         {
-            int pvp_fights_gained = numeric_modifier("pvp fights").to_int_silent() + 10;
-            int pvp_fights_after_rollover = pvp_attacks_left() + pvp_fights_gained;
-            int pvp_fights_lost = MAX(0, pvp_fights_after_rollover - 100);
+            int pvp_fights_lost = pvp_fights_after_rollover_before_caps - pvp_fights_after_rollover;//MAX(0, pvp_fights_after_rollover_before_caps - 100);
             if (pvp_fights_lost > 0 && pvp_attacks_left() > 0)
             {
                 description.listAppend("Fight " + pluralise(MIN(pvp_attacks_left(), pvp_fights_lost), "time", "times") + " to avoid losing fights to rollover.");
@@ -36987,7 +37074,7 @@ string [string] generateAPIResponse()
     
     if (true)
     {
-        boolean [string] relevant_mafia_properties = $strings[merkinQuestPath,questF01Primordial,questF02Hyboria,questF03Future,questF04Elves,questF05Clancy,questG01Meatcar,questG02Whitecastle,questG03Ego,questG04Nemesis,questG05Dark,questG06Delivery,questI01Scapegoat,questI02Beat,questL02Larva,questL03Rat,questL04Bat,questL05Goblin,questL06Friar,questL07Cyrptic,questL08Trapper,questL09Topping,questL10Garbage,questL11MacGuffin,questL11Manor,questL11Palindome,questL11Pyramid,questL11Worship,questL12War,questL13Final,questM01Untinker,questM02Artist,questM03Bugbear,questM04Galaktic,questM05Toot,questM06Gourd,questM07Hammer,questM08Baker,questM09Rocks,questM10Azazel,questM11Postal,questM12Pirate,questM13Escape,questM14Bounty,questM15Lol,questS01OldGuy,questS02Monkees,sidequestArenaCompleted,sidequestFarmCompleted,sidequestJunkyardCompleted,sidequestLighthouseCompleted,sidequestNunsCompleted,sidequestOrchardCompleted,cyrptAlcoveEvilness,cyrptCrannyEvilness,cyrptNicheEvilness,cyrptNookEvilness,desertExploration,gnasirProgress,relayCounters,timesRested,currentEasyBountyItem,currentHardBountyItem,currentSpecialBountyItem,volcanoMaze1,_lastDailyDungeonRoom,seahorseName,chasmBridgeProgress,_aprilShower,lastAdventure,lastEncounter,_floristPlantsUsed,_fireStartingKitUsed,_psychoJarUsed,hiddenHospitalProgress,hiddenBowlingAlleyProgress,hiddenApartmentProgress,hiddenOfficeProgress,pyramidPosition,parasolUsed,_discoKnife,lastPlusSignUnlock,olfactedMonster,photocopyMonster,lastTempleUnlock,volcanoMaze1,blankOutUsed,peteMotorbikeCowling,peteMotorbikeGasTank,peteMotorbikeHeadlight,peteMotorbikeMuffler,peteMotorbikeSeat,peteMotorbikeTires,_petePeeledOut,_navelRunaways,_peteRiotIncited,_petePartyThrown,hiddenTavernUnlock,_dnaPotionsMade,_psychokineticHugUsed,dnaSyringe,_warbearGyrocopterUsed,questM20Necklace,questM21Dance,grimstoneMaskPath,cinderellaMinutesToMidnight,merkinVocabularyMastery,_pirateBellowUsed,questM21Dance,_defectiveTokenChecked,questG07Myst,questG08Moxie,questESpClipper,questESpGore,questESpJunglePun,questESpFakeMedium,questESlMushStash,questESlAudit,questESlBacteria,questESlCheeseburger,questESlCocktail,questESlSprinkles,questESlSalt,questESlFish,questESlDebt,_pickyTweezersUsed,_bittycar,questESpSerum,questESpOutOfOrder,_shrubDecorated,questESpEVE,questESpSmokes,questG09Muscle,_rapidPrototypingUsed,nsTowerDoorKeysUsed,_chateauDeskHarvested,lastGoofballBuy,nsChallenge1,nsChallenge2,nsContestants1,nsContestants2,nsContestants3,lastDesertUnlock,questM18Swamp,edPiece,warehouseProgress,questEStFishTrash,questEStNastyBears,questEStSocialJusticeI,questEStSocialJusticeII,questEStSuperLuber,questEStZippityDooDah,_summonAnnoyanceUsed,questEStWorkWithFood,questM24Doc,questEStGiveMeFuel,_mayoTankSoaked,_feastUsed,spelunkyNextNoncombat,spelunkySacrifices,spelunkyStatus,spelunkyUpgrades,spelunkyWinCount,_deckCardsDrawn,_glarkCableUses,_banderRunaways,questM25Armorer,pyramidBombUsed,_powerPillUses,nextAdventure,_barrelPrayer,questECoBucket,_machineTunnelsAdv,_snojoFreeFights,snojoSetting,_lastCombatStarted,batmanZone,batmanUpgrades,batmanTimeLeft,batmanStats,questLTTQuestByWire,questM26Oracle,sourceTerminalEducate1,sourceTerminalEducate2,sourceTerminalEnquiry,_sourceTerminalDigitizeUses,_sourceTerminalEnhanceUses,_sourceTerminalExtrudes,_detectiveCasesCompleted,_pottedTeaTreeUsed,lastIslandUnlock,falloutShelterChronoUsed,_timeSpinnerMinutesUsed];
+        boolean [string] relevant_mafia_properties = $strings[merkinQuestPath,questF01Primordial,questF02Hyboria,questF03Future,questF04Elves,questF05Clancy,questG01Meatcar,questG02Whitecastle,questG03Ego,questG04Nemesis,questG05Dark,questG06Delivery,questI01Scapegoat,questI02Beat,questL02Larva,questL03Rat,questL04Bat,questL05Goblin,questL06Friar,questL07Cyrptic,questL08Trapper,questL09Topping,questL10Garbage,questL11MacGuffin,questL11Manor,questL11Palindome,questL11Pyramid,questL11Worship,questL12War,questL13Final,questM01Untinker,questM02Artist,questM03Bugbear,questM04Galaktic,questM05Toot,questM06Gourd,questM07Hammer,questM08Baker,questM09Rocks,questM10Azazel,questM11Postal,questM12Pirate,questM13Escape,questM14Bounty,questM15Lol,questS01OldGuy,questS02Monkees,sidequestArenaCompleted,sidequestFarmCompleted,sidequestJunkyardCompleted,sidequestLighthouseCompleted,sidequestNunsCompleted,sidequestOrchardCompleted,cyrptAlcoveEvilness,cyrptCrannyEvilness,cyrptNicheEvilness,cyrptNookEvilness,desertExploration,gnasirProgress,relayCounters,timesRested,currentEasyBountyItem,currentHardBountyItem,currentSpecialBountyItem,volcanoMaze1,_lastDailyDungeonRoom,seahorseName,chasmBridgeProgress,_aprilShower,lastAdventure,lastEncounter,_floristPlantsUsed,_fireStartingKitUsed,_psychoJarUsed,hiddenHospitalProgress,hiddenBowlingAlleyProgress,hiddenApartmentProgress,hiddenOfficeProgress,pyramidPosition,parasolUsed,_discoKnife,lastPlusSignUnlock,olfactedMonster,photocopyMonster,lastTempleUnlock,volcanoMaze1,blankOutUsed,peteMotorbikeCowling,peteMotorbikeGasTank,peteMotorbikeHeadlight,peteMotorbikeMuffler,peteMotorbikeSeat,peteMotorbikeTires,_petePeeledOut,_navelRunaways,_peteRiotIncited,_petePartyThrown,hiddenTavernUnlock,_dnaPotionsMade,_psychokineticHugUsed,dnaSyringe,_warbearGyrocopterUsed,questM20Necklace,questM21Dance,grimstoneMaskPath,cinderellaMinutesToMidnight,merkinVocabularyMastery,_pirateBellowUsed,questM21Dance,_defectiveTokenChecked,questG07Myst,questG08Moxie,questESpClipper,questESpGore,questESpJunglePun,questESpFakeMedium,questESlMushStash,questESlAudit,questESlBacteria,questESlCheeseburger,questESlCocktail,questESlSprinkles,questESlSalt,questESlFish,questESlDebt,_pickyTweezersUsed,_bittycar,questESpSerum,questESpOutOfOrder,_shrubDecorated,questESpEVE,questESpSmokes,questG09Muscle,_rapidPrototypingUsed,nsTowerDoorKeysUsed,_chateauDeskHarvested,lastGoofballBuy,nsChallenge1,nsChallenge2,nsContestants1,nsContestants2,nsContestants3,lastDesertUnlock,questM18Swamp,edPiece,warehouseProgress,questEStFishTrash,questEStNastyBears,questEStSocialJusticeI,questEStSocialJusticeII,questEStSuperLuber,questEStZippityDooDah,_summonAnnoyanceUsed,questEStWorkWithFood,questM24Doc,questEStGiveMeFuel,_mayoTankSoaked,_feastUsed,spelunkyNextNoncombat,spelunkySacrifices,spelunkyStatus,spelunkyUpgrades,spelunkyWinCount,_deckCardsDrawn,_glarkCableUses,_banderRunaways,questM25Armorer,pyramidBombUsed,_powerPillUses,nextAdventure,_barrelPrayer,questECoBucket,_machineTunnelsAdv,_snojoFreeFights,snojoSetting,_lastCombatStarted,batmanZone,batmanUpgrades,batmanTimeLeft,batmanStats,questLTTQuestByWire,questM26Oracle,sourceTerminalEducate1,sourceTerminalEducate2,sourceTerminalEnquiry,_sourceTerminalDigitizeUses,_sourceTerminalEnhanceUses,_sourceTerminalExtrudes,_detectiveCasesCompleted,_pottedTeaTreeUsed,lastIslandUnlock,falloutShelterChronoUsed,_timeSpinnerMinutesUsed,_lynyrdSnareUses];
         
         if (false)
         {
@@ -41277,12 +41364,15 @@ void IOTMIntergnatGenerateResource(ChecklistEntry [int] resource_entries)
 void IOTMSourceTerminalGenerateDigitiseTargets(string [int] description)
 {
     string [int] potential_targets;
+    int desks_remaining = clampi(5 - get_property_int("writingDesksDefeated"), 0, 5);
+    if (desks_remaining > 1 && !get_property_ascension("lastSecondFloorUnlock") && $item[Lady Spookyraven's necklace].available_amount() == 0 && get_property("questM20Necklace") != "finished" && mafiaIsPastRevision(15244))
+        potential_targets.listAppend("writing desk");
+    if (!__quest_state["Level 12"].state_boolean["Lighthouse Finished"] && $item[barrel of gunpowder].available_amount() < 5)
+        potential_targets.listAppend("lobsterfrogman");
     if (__quest_state["Level 7"].state_int["alcove evilness"] > 31)
         potential_targets.listAppend("modern zmobie");
     if (!__quest_state["Level 8"].state_boolean["Mountain climbed"] && $items[ninja rope,ninja carabiner,ninja crampons].available_amount() == 0 && !have_outfit_components("eXtreme Cold-Weather Gear"))
         potential_targets.listAppend("ninja assassin");
-    if (!__quest_state["Level 12"].state_boolean["Lighthouse Finished"] && $item[barrel of gunpowder].available_amount() < 5)
-        potential_targets.listAppend("lobsterfrogman");
     //FIXME witchess bishop or knight
     if (__iotms_usable[$item[Witchess Set]] && get_property_int("_witchessFights") < 5)
     {
@@ -41294,9 +41384,6 @@ void IOTMSourceTerminalGenerateDigitiseTargets(string [int] description)
         witchess_list.listAppend("rook");
         potential_targets.listAppend("witchess " + witchess_list.listJoinComponents("/"));
     }
-    int desks_remaining = clampi(5 - get_property_int("writingDesksDefeated"), 0, 5);
-    if (desks_remaining > 1 && !get_property_ascension("lastSecondFloorUnlock") && $item[Lady Spookyraven's necklace].available_amount() == 0 && get_property("questM20Necklace") != "finished" && mafiaIsPastRevision(15244))
-        potential_targets.listAppend("writing desk");
     if (potential_targets.count() > 0)
         description.listAppend("Could target a " + potential_targets.listJoinComponents(", ", "or") + ".");
     if (get_property_int("_sourceTerminalDigitizeMonsterCount") >= 2)
@@ -41932,6 +42019,203 @@ void IOTMGingerbreadCityGenerateResource(ChecklistEntry [int] resource_entries)
         //It doesn't seem amazing in aftercore, so we're not displaying it? Is that the right decision?
         //Almost all of its enchantments are better on other hats. And you can't choose which one you get, so it'd just be annoying the user.
         resource_entries.listAppend(ChecklistEntryMake("__skill Ceci N'Est Pas Un Chapeau", "skillz.php", ChecklistSubentryMake("Ceci N'Est Pas Un Chapeau", "", "Random enchantment hat, 300MP."), 10));
+    }
+    
+    if (lookupSkill("Gingerbread Mob Hit").have_skill() && mafiaIsPastRevision(17566))
+    {
+        if (!get_property_boolean("_gingerbreadMobHitUsed"))
+        {
+            string [int] description;
+            description.listAppend("Combat skill, win a fight without taking a turn.");
+            //FIXME replace with a better image
+            resource_entries.listAppend(ChecklistEntryMake("__familiar Penguin Goodfella", "", ChecklistSubentryMake("Gingerbread mob hit", "", description), 0));
+            
+        }
+    }
+    
+    //http://kol.coldfront.net/thekolwiki/index.php/A_GingerGuide_to_Gingerbread_City
+    
+    //Things to acquire/unlock:
+    //Studying in the library, which lets you acquire the seven-day sugar raygun.
+    //Unlocking various areas.
+    //Chocolate puppy.
+    //Moneybag
+    //gingerbread pistol
+    //chocolate pocketwatch
+    //Two skills...?
+    //Laying track (does this reset on ascension...?) for a briefcase with lots of sprinkles...?
+    //Studying train schedules for ???
+    //Gingerbread Best outfit components.
+    //Um... candy crowbar -> breaking in? Do you ever do this in run? No, I think?
+    //Counterfeit city to sell.
+    //Gingerbread cigarette to sell.
+    //Chocolate sculpture to sell.
+    //Gingerbread gavel
+    //More...?
+    if (lookupLocations("Gingerbread Industrial Zone,Gingerbread Train Station,Gingerbread Sewers,Gingerbread Upscale Retail District") contains __last_adventure_location)
+    {
+        //Show details:
+        /*
+        Unlocks:
+            gingerAdvanceClockUnlocked
+            gingerRetailUnlocked 
+            gingerSewersUnlocked 
+            gingerExtraAdventures - +10 adventures in area
+        
+        gingerSubwayLineUnlocked
+        
+        _gingerBiggerAlligators - a born liverpooler
+        _gingerbreadMobHitUsed - used once/day free kill
+        gingerNegativesDropped
+        gingerTrainScheduleStudies - times studied the schedule
+        gingerDigCount - times went digging at the train station
+        gingerLawChoice - times studied law
+        gingerMuscleChoice - times laid track
+        */
+        //There's no per-turn tracker for this area.
+    }
+}
+
+RegisterTaskGenerationFunction("IOTMSpaceJellyfishGenerateTasks");
+void IOTMSpaceJellyfishGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    if (!lookupFamiliar("space jellyfish").familiar_is_usable())
+        return;
+    if (!get_property_boolean("_seaJellyHarvested") && my_level() >= 11)
+    {
+        string url = "place.php?whichplace=thesea&action=thesea_left2";
+        string [int] description;
+        if (!QuestState("questS01OldGuy").started)
+        {
+            url = "oldman.php";
+            description.listAppend("Visit the old man first.");
+        }
+        else if (my_familiar() != lookupFamiliar("space jellyfish"))
+        {
+            url = "familiar.php";
+            description.listAppend("Bring along your space jellyfish first.");
+        }
+        description.listAppend("Once/day.");
+        optional_task_entries.listAppend(ChecklistEntryMake("__familiar space jellyfish", url, ChecklistSubentryMake("Harvest sea jelly", "", description)));
+    }
+}
+
+
+RegisterResourceGenerationFunction("IOTMSpaceJellyfishGenerateResource");
+void IOTMSpaceJellyfishGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if (!lookupFamiliar("space jellyfish").familiar_is_usable())
+        return;
+    
+    ChecklistEntry entry;
+	entry.url = "";
+	entry.image_lookup_name = "__familiar space jellyfish";
+    entry.importance_level = 5;
+    
+    //_spaceJellyfishDrops
+    //_hotJellyUses
+    if (my_familiar() != lookupFamiliar("space jellyfish"))
+    {
+        entry.url = "familiar.php";
+    }
+    
+    int [int] percent_chance_at_use;
+    percent_chance_at_use[0] = 100;
+    //FIXME spade rest
+    
+    if (__misc_state["in run"])
+    {
+        /*
+        hot - free run/banish
+        spooky - YR with no cooldown
+        stench - clara's bell, more or less
+        
+        The other two aren't too useful in-run.
+        */
+        if (get_property_int("_hotJellyUses") > 0)
+        {
+            entry.subentries.listAppend(ChecklistSubentryMake(pluralise(get_property_int("_hotJellyUses"), "breath out", "breath outs"), "", "Use as a combat skill. Free run/banish."));
+        }
+        
+        string [item] jelly_descriptions;
+        jelly_descriptions[lookupItem("hot jelly")] = "Free run/banish.";
+        jelly_descriptions[lookupItem("spooky jelly")] = "YR with no cooldown.";
+        jelly_descriptions[lookupItem("stench jelly")] = "Forces non-combat.";
+        foreach it, desc in jelly_descriptions
+        {
+            if (it.available_amount() > 0)
+            {
+                entry.subentries.listAppend(ChecklistSubentryMake(pluralise(it), "", desc));
+            }
+        }
+        
+        
+        
+        int extractions = get_property_int("_spaceJellyfishDrops");
+        string [int] description;
+        string line = "Extract jelly against elemental monsters.";
+        if (percent_chance_at_use contains extractions)
+            line += "|" + percent_chance_at_use[extractions] + "% chance of success.";
+        
+        //Should we list common areas to find these?
+        //Spooky is defiled alcove. Hot is the level six quest. Stench is level twelve, i.e. level never before you need it.
+        line += "|*" + HTMLGenerateSpanOfClass("Stench", "r_bold r_element_stench_desaturated") + " - forces non-combat";
+        if (!__quest_state["Level 12"].finished)
+            line += " (try hippies)";
+        line += "|*" + HTMLGenerateSpanOfClass("Spooky", "r_bold r_element_spooky_desaturated") + " - YR with no cooldown";
+        if (!__quest_state["Level 7"].finished)
+            line += " (try cyrpt)";
+        line += "|*" + HTMLGenerateSpanOfClass("Hot", "r_bold r_element_hot_desaturated") + " - free run/banish";
+        if (!__quest_state["Level 12"].finished)
+            line += " (try friars)";
+        description.listAppend(line);
+        if (availableDrunkenness() >= 0)
+            entry.subentries.listAppend(ChecklistSubentryMake(pluralise(extractions, "jelly extraction", "jelly extractions"), "", description));
+    }
+    
+    
+    if (entry.subentries.count() > 0)
+        resource_entries.listAppend(entry);
+}
+RegisterTaskGenerationFunction("IOTMTunnelOfLoveGenerateTasks");
+void IOTMTunnelOfLoveGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    //FIXME whatever these end up being named:
+    if (!get_property_boolean("tunnelOfLoveAvailable"))
+        return;
+    if (get_property_boolean("_tunnelOfLoveVisited"))
+        return;
+    
+    string [int] description;
+    //equipment: cardigan, epaulettes, earrings
+    //50-turn buffs: Lovebotamy (10 stats/fight), Open Heart Surgery (+10 familiar weight), Wandering Eye Surgery (+50% item)
+    //item: boomerang (arrow), toy dart gun (???), chocolate (adventures), flowers (???), elephant (???), TOAST! (toasty!)
+    
+    
+    optional_task_entries.listAppend(ChecklistEntryMake("__item pink candy heart", "place.php?whichplace=town_wrong", ChecklistSubentryMake("Take a love trip", "", description)));
+}
+
+RegisterResourceGenerationFunction("IOTMTunnelOfLoveGenerateResource");
+void IOTMTunnelOfLoveGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    //mostly the boomerang
+    //what does sokka throw? a boomeraang!
+    
+    if (__misc_state["in run"])
+    {
+        item enamorang = lookupItem("LOV Enamorang");
+        if (enamorang.available_amount() > 0)
+        {
+            resource_entries.listAppend(ChecklistEntryMake("__item LOV Enamorang", "", ChecklistSubentryMake(pluralise(enamorang), "", "Copies the monster once as an arrow."), 5));
+            
+        }
+        item chocolate = lookupItem("LOV Extraterrestrial Chocolate");
+        if (chocolate.available_amount() > 0 && my_path_id() != PATH_SLOW_AND_STEADY)
+        {
+            //FIXME list other chocolates?
+            resource_entries.listAppend(ChecklistEntryMake("__item LOV Extraterrestrial Chocolate", "", ChecklistSubentryMake(pluralise(chocolate), "", "Adventures!"), 5));
+            
+        }
     }
 }
 
@@ -44268,6 +44552,19 @@ void runMain(string relay_filename)
     if (drunk)
         PageWrite(HTMLGenerateTagPrefix("div", mapMake("style", "-webkit-filter:blur(4.0px) brightness(1.01);"))); //FIXME make this animated
     
+    boolean buggy = (my_familiar() == $familiar[software bug] || $item[iShield].equipped_amount() > 0);
+    if (buggy)
+    {
+        //Ideally we'd want to layer over a mosaic filter, giving a Cinepak look, but pixel manipulation techniques are limited in HTML.
+        string chosen_font;
+        //chosen_font = "'Comic Sans MS', cursive, sans-serif;"; //DO NOT USE
+        //chosen_font = "'Courier New', Courier, monospace;";
+        chosen_font = "'Helvetica Neue',Arial, Helvetica, sans-serif;font-weight:300;";
+        PageWrite(HTMLGenerateTagPrefix("div", mapMake("style", "font-family:" + chosen_font)));
+        //PageWrite(HTMLGenerateTagPrefix("div", mapMake("style", "")));
+        //
+    }
+    
     boolean displaying_navbar = false;
 	if (__setting_show_navbar)
 	{
@@ -44446,6 +44743,8 @@ void runMain(string relay_filename)
     }
     
     if (drunk)
+        PageWrite("</div>");
+    if (buggy)
         PageWrite("</div>");
     
     if (output_body_tag_only)
