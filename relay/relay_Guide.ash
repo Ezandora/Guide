@@ -44575,9 +44575,9 @@ void PathGelatinousNoobGenerateTasks(ChecklistEntry [int] task_entries, Checklis
 	if (my_path_id() != PATH_GELATINOUS_NOOB)
 		return;
     
-    //FIXME 15 guess
-    //noobDeferredPoints is unspaded
-    int total_absorptions = 2 + MIN(15, my_level());// + get_property_int("noobDeferredPoints");
+    //FIXME 13 guess
+    //noobDeferredPoints does something else; seems to be a choice at the start of the ascension?
+    int total_absorptions = 2 + MIN(13, my_level());
     int absorptions_used = get_property_int("_noobSkillCount");
     int absorptions_left = total_absorptions - absorptions_used;
     if (!mafiaIsPastRevision(17821)) //tracking
