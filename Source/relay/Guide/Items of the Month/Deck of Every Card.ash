@@ -258,17 +258,17 @@ void IOTMDeckOfEveryCardGenerateResource(ChecklistEntry [int] resource_entries)
         if (stat_race_type == $stat[muscle])
         {
             card_name = "XI - Strength";
-            relevant_effect = lookupEffect("1912");
+            relevant_effect = to_effect("1912");
         }
         else if (stat_race_type == $stat[mysticality])
         {
             card_name = "I - The Magician";
-            relevant_effect = lookupEffect("1911");
+            relevant_effect = to_effect("1911");
         }
         else if (stat_race_type == $stat[moxie])
         {
             card_name = "0 - The Fool";
-            relevant_effect = lookupEffect("1910");
+            relevant_effect = to_effect("1910");
         }
         if (relevant_effect.have_effect() == 0)
             summons.listAppend(DOECSummonMake(card_name, "+200% " + stat_race_type.to_lower_case() + " for lair races. (marginal)"));

@@ -1,7 +1,7 @@
 RegisterResourceGenerationFunction("IOTMGingerbreadCityGenerateResource");
 void IOTMGingerbreadCityGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (lookupSkill("Ceci N'Est Pas Un Chapeau").have_skill() && !get_property_boolean("_ceciHatUsed") && my_basestat($stat[moxie]) >= 150 && __misc_state["in run"])
+    if ($skill[Ceci N'Est Pas Un Chapeau].have_skill() && !get_property_boolean("_ceciHatUsed") && my_basestat($stat[moxie]) >= 150 && __misc_state["in run"])
     {
         //Umm... I guess?
         //It doesn't seem amazing in aftercore, so we're not displaying it? Is that the right decision?
@@ -9,7 +9,7 @@ void IOTMGingerbreadCityGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__skill Ceci N'Est Pas Un Chapeau", "skillz.php", ChecklistSubentryMake("Ceci N'Est Pas Un Chapeau", "", "Random enchantment hat, 300MP."), 10));
     }
     
-    if (lookupSkill("Gingerbread Mob Hit").have_skill() && mafiaIsPastRevision(17566))
+    if ($skill[Gingerbread Mob Hit].have_skill() && mafiaIsPastRevision(17566))
     {
         if (!get_property_boolean("_gingerbreadMobHitUsed"))
         {
@@ -40,7 +40,7 @@ void IOTMGingerbreadCityGenerateResource(ChecklistEntry [int] resource_entries)
     //Chocolate sculpture to sell.
     //Gingerbread gavel
     //More...?
-    if (lookupLocations("Gingerbread Industrial Zone,Gingerbread Train Station,Gingerbread Sewers,Gingerbread Upscale Retail District") contains __last_adventure_location)
+    if ($locations[Gingerbread Industrial Zone,Gingerbread Train Station,Gingerbread Sewers,Gingerbread Upscale Retail District] contains __last_adventure_location)
     {
         //Show details:
         /*

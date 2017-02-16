@@ -5,7 +5,7 @@ void QLevel11ManorInit()
     state.quest_name = "Lord Spookyraven Quest";
     state.image_name = "Spookyraven manor";
     
-    if (($items[2286,Headpiece of the Staff of Ed].available_amount() > 0 || lookupItem("2325").available_amount() > 0) && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING) //eye of ed
+    if (($items[2286,Headpiece of the Staff of Ed].available_amount() > 0 || to_item("2325").available_amount() > 0) && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING) //eye of ed
         QuestStateParseMafiaQuestPropertyValue(state, "finished");
     
     

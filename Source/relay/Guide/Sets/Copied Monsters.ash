@@ -143,11 +143,11 @@ void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [in
         
         if (get_property_int("sourceAgentsDefeated") > 0)
             stat_description += pluralise(get_property_int("sourceAgentsDefeated"), "agent", "agents") + " defeated so far. ";
-        stat_description += lookupMonster("Source agent").base_attack + " attack.";
+        stat_description += $monster[Source agent].base_attack + " attack.";
         float our_init = initiative_modifier();
-        if (lookupSkill("Overclocked").have_skill())
+        if ($skill[Overclocked].have_skill())
             our_init += 200;
-        float agent_initiative = lookupMonster("Source Agent").base_initiative;
+        float agent_initiative = $monster[Source Agent].base_initiative;
         float chance_to_get_jump = clampf(100 - agent_initiative + our_init, 0.0, 100.0);
         boolean might_not_gain_init = false;
         boolean avoid_displaying_init_otherwise = false;
@@ -185,7 +185,7 @@ void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [in
         description.listAppend(stat_description);
         if (__last_adventure_location == $location[the haunted bedroom])
             description.listAppend("Won't appear in the haunted bedroom, so may want to go somewhere else?");
-        if (lookupSkill("Humiliating Hack").have_skill())
+        if ($skill[Humiliating Hack].have_skill())
         {
             string [int] delevelers;
             if ($skill[ruthless efficiency].have_skill() && $effect[ruthlessly efficient].have_effect() == 0)

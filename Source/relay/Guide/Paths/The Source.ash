@@ -27,20 +27,20 @@ void PathTheSourceGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
         
         skill [int] desired_skill_order;
         if (get_property_int("sourcePoints") < 3) //once you have three, you can always go the hack-siphon-kick route
-            desired_skill_order.listAppend(lookupSkill("Big Guns")); //tons of damage
-        desired_skill_order.listAppend(lookupSkill("Humiliating Hack")); //delevel a bunch
-        desired_skill_order.listAppend(lookupSkill("Data Siphon")); //restore MP from attacks
-        desired_skill_order.listAppend(lookupSkill("Source Kick")); //also a lot of damage...?
-        desired_skill_order.listAppend(lookupSkill("Overclocked")); //+init
+            desired_skill_order.listAppend($skill[Big Guns]); //tons of damage
+        desired_skill_order.listAppend($skill[Humiliating Hack]); //delevel a bunch
+        desired_skill_order.listAppend($skill[Data Siphon]); //restore MP from attacks
+        desired_skill_order.listAppend($skill[Source Kick]); //also a lot of damage...?
+        desired_skill_order.listAppend($skill[Overclocked]); //+init
         
-        desired_skill_order.listAppend(lookupSkill("Restore")); //restore HP
-        desired_skill_order.listAppend(lookupSkill("Bullet Time")); //dodge 3 ranged
-        desired_skill_order.listAppend(lookupSkill("True Disbeliever")); //dodge 3 hack
-        desired_skill_order.listAppend(lookupSkill("Code Block")); //dodge 3 melee
+        desired_skill_order.listAppend($skill[Restore]); //restore HP
+        desired_skill_order.listAppend($skill[Bullet Time]); //dodge 3 ranged
+        desired_skill_order.listAppend($skill[True Disbeliever]); //dodge 3 hack
+        desired_skill_order.listAppend($skill[Code Block]); //dodge 3 melee
         
-        desired_skill_order.listAppend(lookupSkill("Disarmament")); //something
-        desired_skill_order.listAppend(lookupSkill("Reboot")); //removes latency
-        desired_skill_order.listAppend(lookupSkill("Big Guns")); //tons of damage
+        desired_skill_order.listAppend($skill[Disarmament]); //something
+        desired_skill_order.listAppend($skill[Reboot]); //removes latency
+        desired_skill_order.listAppend($skill[Big Guns]); //tons of damage
         
         foreach key, s in desired_skill_order
         {

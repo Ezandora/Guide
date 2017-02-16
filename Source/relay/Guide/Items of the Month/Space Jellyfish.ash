@@ -2,7 +2,7 @@
 RegisterTaskGenerationFunction("IOTMSpaceJellyfishGenerateTasks");
 void IOTMSpaceJellyfishGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-    if (!lookupFamiliar("space jellyfish").familiar_is_usable())
+    if (!$familiar[space jellyfish].familiar_is_usable())
         return;
     if (!get_property_boolean("_seaJellyHarvested") && my_level() >= 11)
     {
@@ -13,7 +13,7 @@ void IOTMSpaceJellyfishGenerateTasks(ChecklistEntry [int] task_entries, Checklis
             url = "oldman.php";
             description.listAppend("Visit the old man first.");
         }
-        else if (my_familiar() != lookupFamiliar("space jellyfish"))
+        else if (my_familiar() != $familiar[space jellyfish])
         {
             url = "familiar.php";
             description.listAppend("Bring along your space jellyfish first.");
@@ -27,7 +27,7 @@ void IOTMSpaceJellyfishGenerateTasks(ChecklistEntry [int] task_entries, Checklis
 RegisterResourceGenerationFunction("IOTMSpaceJellyfishGenerateResource");
 void IOTMSpaceJellyfishGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (!lookupFamiliar("space jellyfish").familiar_is_usable())
+    if (!$familiar[space jellyfish].familiar_is_usable())
         return;
     
     ChecklistEntry entry;
@@ -37,7 +37,7 @@ void IOTMSpaceJellyfishGenerateResource(ChecklistEntry [int] resource_entries)
     
     //_spaceJellyfishDrops
     //_hotJellyUses
-    if (my_familiar() != lookupFamiliar("space jellyfish"))
+    if (my_familiar() != $familiar[space jellyfish])
     {
         entry.url = "familiar.php";
     }
@@ -46,7 +46,7 @@ void IOTMSpaceJellyfishGenerateResource(ChecklistEntry [int] resource_entries)
     percent_chance_at_use[0] = 100;
     //FIXME spade rest
     
-    if (__misc_state["in run"])
+    if (__misc_state["in run"] && spleen_limit() > 0)
     {
         /*
         hot - free run/banish
@@ -61,9 +61,9 @@ void IOTMSpaceJellyfishGenerateResource(ChecklistEntry [int] resource_entries)
         }
         
         string [item] jelly_descriptions;
-        jelly_descriptions[lookupItem("hot jelly")] = "Free run/banish.";
-        jelly_descriptions[lookupItem("spooky jelly")] = "YR with no cooldown.";
-        jelly_descriptions[lookupItem("stench jelly")] = "Forces non-combat.";
+        jelly_descriptions[$item[hot jelly]] = "Free run/banish.";
+        jelly_descriptions[$item[spooky jelly]] = "YR with no cooldown.";
+        jelly_descriptions[$item[stench jelly]] = "Forces non-combat.";
         foreach it, desc in jelly_descriptions
         {
             if (it.available_amount() > 0)

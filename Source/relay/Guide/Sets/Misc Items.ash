@@ -857,10 +857,10 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         string description = "-10% combat. (20 turns)";
         resource_entries.listAppend(ChecklistEntryMake("__item pile of ashes", "inventory.php?which=3", ChecklistSubentryMake(pluralise($item[pile of ashes]), "", description), importance_level_unimportant_item));
     }
-    if (lookupItem("7259").available_amount() > 0 && in_run)
+    if (to_item("7259").available_amount() > 0 && in_run)
     {
         string description = "Open for elemental damage combat items.";
-        resource_entries.listAppend(ChecklistEntryMake("__item " + lookupItem("7259"), "inventory.php?which=3", ChecklistSubentryMake(pluralise(lookupItem("7259")), "", description), importance_level_unimportant_item));
+        resource_entries.listAppend(ChecklistEntryMake("__item " + to_item("7259"), "inventory.php?which=3", ChecklistSubentryMake(pluralise(to_item("7259")), "", description), importance_level_unimportant_item));
     }
     
     if ($item[gym membership card].available_amount() > 0 && in_run && __misc_state["need to level"])

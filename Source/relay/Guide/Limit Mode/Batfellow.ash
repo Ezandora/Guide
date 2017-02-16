@@ -164,33 +164,33 @@ static
     void initialiseBatfellowBossAreas()
     {
         BatfellowBossArea area = BatfellowBossAreaMake();
-        area.area = lookupLocation("Gotpork Conservatory of Flowers");
+        area.area = $location[Gotpork Conservatory of Flowers];
         area.short_name = "Conservatory";
         area.image_name = "sunflower face";
         area.zone = "Center Park (Low Crime)";
-        area.boss = lookupMonster("Kudzu");
+        area.boss = $monster[Kudzu];
         area.nc_twenty_five_progress_requirements[$item[glob of Bat-Glue]] = 1;
         area.nc_fifty_progress_requirements[$item[fingerprint dusting kit]] = 3;
         area.nc_reward_items[$item[dangerous chemicals]] = 5;
         __batfellow_bosses[__batfellow_bosses.count()] = area;
         
         area = BatfellowBossAreaMake();
-        area.area = lookupLocation("Gotpork Municipal Reservoir");
+        area.area = $location[Gotpork Municipal Reservoir];
         area.short_name = "Reservoir";
         area.image_name = "__item personal raindrop"; //"__item ketchup hound";
         area.zone = "Center Park (Low Crime)";
-        area.boss = lookupMonster("Mansquito");
+        area.boss = $monster[Mansquito];
         area.nc_twenty_five_progress_requirements[$item[Bat-Aid&trade; bandage]] = 1;
         area.nc_fifty_progress_requirements[$item[ultracoagulator]] = 3;
         area.nc_reward_items[$item[kidnapped orphan]] = 5;
         __batfellow_bosses[__batfellow_bosses.count()] = area;
         
         area = BatfellowBossAreaMake();
-        area.area = lookupLocation("Gotpork Gardens Cemetery");
+        area.area = $location[Gotpork Gardens Cemetery];
         area.short_name = "Cemetery";
         area.image_name = "__item grave robbing shovel";
         area.zone = "Center Park (Low Crime)";
-        area.boss = lookupMonster("Miss Graves");
+        area.boss = $monster[Miss Graves];
         area.nc_twenty_five_progress_requirements[$item[bat-bearing]] = 1;
         area.nc_fifty_progress_requirements[$item[exploding kickball]] = 3;
         area.nc_reward_items[$item[incriminating evidence]] = 5;
@@ -198,42 +198,42 @@ static
         
         
         area = BatfellowBossAreaMake();
-        area.area = lookupLocation("Porkham Asylum");
+        area.area = $location[Porkham Asylum];
         area.short_name = "Asylum";
         area.image_name = "__item jet bennie marble";
         area.zone = "Slums (Moderate Crime)";
-        area.boss = lookupMonster("The Author");
+        area.boss = $monster[The Author];
         area.nc_twenty_five_progress_requirements[$item[bat-o-mite]] = 1;
         area.nc_reward_items[$item[high-grade metal]] = 6;
         __batfellow_bosses[__batfellow_bosses.count()] = area;
         
         area = BatfellowBossAreaMake();
-        area.area = lookupLocation("Gotpork City Sewers");
+        area.area = $location[Gotpork City Sewers];
         area.short_name = "Sewers";
         area.image_name = "__item helmet turtle";
         area.zone = "Slums (Moderate Crime)";
-        area.boss = lookupMonster("The Plumber");
+        area.boss = $monster[The Plumber];
         area.nc_twenty_five_progress_requirements[$item[bat-oomerang]] = 1;
         area.nc_reward_items[$item[high-grade explosives]] = 6;
         __batfellow_bosses[__batfellow_bosses.count()] = area;
         
         area = BatfellowBossAreaMake();
-        area.area = lookupLocation("The Old Gotpork Library");
+        area.area = $location[The Old Gotpork Library];
         area.short_name = "Library";
         area.image_name = "__item very overdue library book";
         area.zone = "Slums (Moderate Crime)";
-        area.boss = lookupMonster("The Mad Libber");
+        area.boss = $monster[The Mad Libber];
         area.nc_twenty_five_progress_requirements[$item[bat-jute]] = 1;
         area.nc_reward_items[$item[high-tensile-strength fibers]] = 6;
         __batfellow_bosses[__batfellow_bosses.count()] = area;
         
         
         area = BatfellowBossAreaMake();
-        area.area = lookupLocation("Gotpork Clock, Inc.");
+        area.area = $location[Gotpork Clock, Inc.];
         area.short_name = "Clock";
         area.image_name = "__item borrowed time";
         area.zone = "Industrial District (High Crime)";
-        area.boss = lookupMonster("Doc Clock");
+        area.boss = $monster[Doc Clock];
         area.nc_twenty_five_progress_requirements[$item[exploding kickball]] = 1;
         area.nc_reward_items[$item[kidnapped orphan]] = 6;
         area.nc_reward_items[$item[high-grade explosives]] = 6;
@@ -242,11 +242,11 @@ static
         __batfellow_bosses[__batfellow_bosses.count()] = area;
         
         area = BatfellowBossAreaMake();
-        area.area = lookupLocation("Gotpork Foundry");
+        area.area = $location[Gotpork Foundry];
         area.short_name = "Foundry";
         area.image_name = "__item handful of fire";
         area.zone = "Industrial District (High Crime)";
-        area.boss = lookupMonster("Mr. Burns");
+        area.boss = $monster[Mr. Burns];
         area.nc_twenty_five_progress_requirements[$item[ultracoagulator]] = 1;
         area.nc_reward_items[$item[dangerous chemicals]] = 6;
         area.nc_reward_items[$item[high-grade metal]] = 6;
@@ -254,11 +254,11 @@ static
         __batfellow_bosses[__batfellow_bosses.count()] = area;
         
         area = BatfellowBossAreaMake();
-        area.area = lookupLocation("Trivial Pursuits, LLC");
+        area.area = $location[Trivial Pursuits, LLC];
         area.short_name = "Trivial Company";
         area.image_name = "__item Trivial Avocations Card: What?";
         area.zone = "Industrial District (High Crime)";
-        area.boss = lookupMonster("The Inquisitor");
+        area.boss = $monster[The Inquisitor];
         area.nc_twenty_five_progress_requirements[$item[fingerprint dusting kit]] = 1;
         area.nc_reward_items[$item[incriminating evidence]] = 6;
         area.nc_reward_items[$item[high-tensile-strength fibers]] = 6;

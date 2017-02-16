@@ -131,7 +131,7 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
             }
         }
         
-        if (lookupItem("7301").available_amount() == 0 && get_property("questM20Necklace") != "finished" && $item[Lady Spookyraven's necklace].available_amount() == 0)
+        if (to_item("7301").available_amount() == 0 && get_property("questM20Necklace") != "finished" && $item[Lady Spookyraven's necklace].available_amount() == 0)
         {
             int effective_writing_desks_encountering = get_property_int("writingDesksDefeated");
             if (get_property_monster("romanticTarget") == $monster[writing desk])

@@ -58,14 +58,14 @@ void IOTMMachineElfFamiliarGenerateResource(ChecklistEntry [int] resource_entrie
                 abstraction_conversions[$item[abstraction: action]] = $item[abstraction: joy];
             
             monster [item] abstraction_monsters;
-            abstraction_monsters[$item[abstraction: sensation]] = lookupMonster("Performer of Actions");
-            abstraction_monsters[$item[abstraction: thought]] = lookupMonster("Perceiver of Sensations");
-            abstraction_monsters[$item[abstraction: action]] = lookupMonster("Thinker of Thoughts");
+            abstraction_monsters[$item[abstraction: sensation]] = $monster[Performer of Actions];
+            abstraction_monsters[$item[abstraction: thought]] = $monster[Perceiver of Sensations];
+            abstraction_monsters[$item[abstraction: action]] = $monster[Thinker of Thoughts];
             
             string [monster] monster_descriptions;
-            monster_descriptions[lookupMonster("Performer of Actions")] = "square";
-            monster_descriptions[lookupMonster("Perceiver of Sensations")] = "triangle";
-            monster_descriptions[lookupMonster("Thinker of Thoughts")] = "circle";
+            monster_descriptions[$monster[Performer of Actions]] = "square";
+            monster_descriptions[$monster[Perceiver of Sensations]] = "triangle";
+            monster_descriptions[$monster[Thinker of Thoughts]] = "circle";
             
             
             
@@ -92,7 +92,7 @@ void IOTMMachineElfFamiliarGenerateResource(ChecklistEntry [int] resource_entrie
         }
         ChecklistSubentry [int] subentries;
         subentries.listAppend(ChecklistSubentryMake(pluralise(free_fights_remaining, "free elf fight", "free elf fights"), modifiers, description));
-        resource_entries.listAppend(ChecklistEntryMake("__familiar machine elf", url, subentries, importance, lookupLocations("the deep machine tunnels")));
+        resource_entries.listAppend(ChecklistEntryMake("__familiar machine elf", url, subentries, importance, $locations[the deep machine tunnels]));
     }
 }
 

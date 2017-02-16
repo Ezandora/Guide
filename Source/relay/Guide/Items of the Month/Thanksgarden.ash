@@ -4,10 +4,10 @@ void IOTMThanksgardenGenerateResource(ChecklistEntry [int] resource_entries)
     if (!__misc_state["in run"])
         return;
     
-    item turkey_blaster = lookupItem("turkey blaster");
-    item stuffing_fluffer = lookupItem("stuffing fluffer");
-    item cashew = lookupItem("cashew");
-    item cornucopia = lookupItem("cornucopia");
+    item turkey_blaster = $item[turkey blaster];
+    item stuffing_fluffer = $item[stuffing fluffer];
+    item cashew = $item[cashew];
+    item cornucopia = $item[cornucopia];
     
     ChecklistSubentry [int] subentries;
     string url;

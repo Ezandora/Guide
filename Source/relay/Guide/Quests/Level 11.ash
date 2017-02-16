@@ -187,7 +187,7 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     else if (base_quest_state.mafia_internal_step < 4)
     {
         //Have diary:
-        if (lookupItem("2334").available_amount() == 0) //$item[holy macguffin] has shadow aliasing problem
+        if (to_item("2334").available_amount() == 0) //$item[holy macguffin] has shadow aliasing problem
         {
             //nothing to say
             //subentry.entries.listAppend("Retrieve the MacGuffin.");

@@ -474,16 +474,16 @@ void generatePullList(Checklist [int] checklists)
     //FIXME add hat/stuffing fluffer/blank-out
     if (availableSpleen() >= 2 && my_path_id() != PATH_NUCLEAR_AUTUMN)
     {
-		pullable_item_list.listAppend(GPItemMake(lookupItem("turkey blaster"), "Burns five turns of delay in last adventured area. Costs spleen, limited uses/day.", 3)); //FIXME learn what this limit is. also suggest in advance?
+		pullable_item_list.listAppend(GPItemMake($item[turkey blaster], "Burns five turns of delay in last adventured area. Costs spleen, limited uses/day.", 3)); //FIXME learn what this limit is. also suggest in advance?
     }
     if (__quest_state["Level 7"].state_boolean["alcove needs speed tricks"]) //only area that realistically could use it
     {
-        pullable_item_list.listAppend(GPItemMake(lookupItem("gravy boat"), "Wear to save two turns in the cyrpt.")); //marginal, especially since you're pulling a bunch of turkey blasters, but...
+        pullable_item_list.listAppend(GPItemMake($item[gravy boat], "Wear to save two turns in the cyrpt.")); //marginal, especially since you're pulling a bunch of turkey blasters, but...
         
     }
     if (!__quest_state["Level 12"].finished && __quest_state["Level 12"].state_int["frat boys left on battlefield"] >= 936 && __quest_state["Level 12"].state_int["hippies left on battlefield"] >= 936)
     {
-        pullable_item_list.listAppend(GPItemMake(lookupItem("stuffing fluffer"), "Saves eight turns if you use two at the start of fighting in the war.", 2));
+        pullable_item_list.listAppend(GPItemMake($item[stuffing fluffer], "Saves eight turns if you use two at the start of fighting in the war.", 2));
     }
     
     if (!__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && __quest_state["Level 11 Desert"].state_int["Desert Exploration"] < 95)
@@ -561,13 +561,30 @@ void generatePullList(Checklist [int] checklists)
 		int max_wanted = gp_item.max_wanted;
 		
         int found_total;
-        foreach key in items
+        foreach key, it in items
         {
-			item it = items[key];
             found_total += it.available_amount();
         }
         if (found_total >= max_wanted)
             continue;
+        if (my_path_id() == PATH_GELATINOUS_NOOB)
+        {
+            boolean allowed = false;
+            boolean [item] whitelist = $items[gravy boat,blackberry galoshes,machetito,muculent machete,antique machete,Mr. Cheeng's spectacles,buddy bjorn,crown of thrones,navel ring of navel gazing,greatest american pants,plastic vampire fangs,the jokester's gun];
+            foreach key, it in items
+            {
+                if ($slots[hat,weapon,off-hand,back,shirt,pants,acc1,acc2,acc3] contains it.to_slot() && !(whitelist contains it) && !it.discardable && !__items_in_outfits[it])
+                {
+                }
+                else
+                    allowed = true;
+            }
+            if (!allowed)
+            {
+                //print_html("Rejecting " + items[0]);
+                continue;
+            }
+        }
 		
 		foreach key in items
 		{

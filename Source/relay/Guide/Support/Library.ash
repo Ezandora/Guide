@@ -40,6 +40,7 @@ static
     int PATH_AVATAR_OF_WEST_OF_LOATHING = 28;
     int PATH_THE_SOURCE = 29;
     int PATH_NUCLEAR_AUTUMN = 30;
+    int PATH_GELATINOUS_NOOB = 31;
 }
 
 int __my_path_id_cached = -11;
@@ -101,6 +102,8 @@ int my_path_id()
         __my_path_id_cached = PATH_THE_SOURCE;
     else if (path_name == "Nuclear Autumn" || path_name == "28")
         __my_path_id_cached = PATH_NUCLEAR_AUTUMN;
+    else if (path_name == "Gelatinous Noob")
+        __my_path_id_cached = PATH_GELATINOUS_NOOB;
     else
         __my_path_id_cached = PATH_UNKNOWN;
     return __my_path_id_cached;
@@ -1328,7 +1331,7 @@ boolean monsterIsGhost(monster m)
 {
     if ($monsters[Ancient ghost,Ancient protector spirit,Banshee librarian,Battlie Knight Ghost,Bettie Barulio,Chalkdust wraith,Claybender Sorcerer Ghost,Cold ghost,Contemplative ghost,Dusken Raider Ghost,Ghost,Ghost miner,Hot ghost,Lovesick ghost,Marcus Macurgeon,Marvin J. Sunny,Mayor Ghost,Mayor Ghost (Hard Mode),Model skeleton,Mortimer Strauss,Plaid ghost,Protector Spectre,Sexy sorority ghost,Sheet ghost,Sleaze ghost,Space Tourist Explorer Ghost,Spirit of New Wave (Inner Sanctum),Spooky ghost,Stench ghost,The ghost of Phil Bunion,Whatsian Commando Ghost,Wonderful Winifred Wongle] contains m)
         return true;
-    if (lookupMonsters("boneless blobghost,ghost of Vanillica \"Trashblossom\" Gorton,restless ghost,The Icewoman,the ghost of Monsieur Baguelle,The ghost of Lord Montague Spookyraven,The Headless Horseman,The ghost of Ebenoozer Screege,The ghost of Sam McGee,The ghost of Richard Cockingham,The ghost of Jim Unfortunato,The ghost of Waldo the Carpathian,the ghost of Oily McBindle") contains m)
+    if ($monsters[boneless blobghost,the ghost of Vanillica \"Trashblossom\" Gorton,restless ghost,The Icewoman,the ghost of Monsieur Baguelle,The ghost of Lord Montague Spookyraven,The Headless Horseman,The ghost of Ebenoozer Screege,The ghost of Sam McGee,The ghost of Richard Cockingham,The ghost of Jim Unfortunato,The ghost of Waldo the Carpathian,the ghost of Oily McBindle] contains m)
         return true;
     if (lookupMonster("Emily Koops, a spooky lime") == m)
         return true;

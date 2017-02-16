@@ -217,7 +217,7 @@ buffer generateLocationBar(boolean displaying_navbar)
         custom_location_information = pluralise(__quest_state["Level 12"].state_int["frat boys left on battlefield"], "frat boy", "frat boys");
     else if (l == $location[the battlefield (frat uniform)])
         custom_location_information = pluralise(__quest_state["Level 12"].state_int["hippies left on battlefield"], "hippy", "hippies");
-    else if ($locations[The Briny Deeps,The Brinier Deepers,The Briniest Deepests,An Octopus's Garden,The Wreck of the Edgar Fitzsimmons,Madness Reef,The Mer-Kin Outpost,The Skate Park,The Coral Corral,Mer-kin Colosseum,Mer-kin Library,Mer-kin Gymnasium,Mer-kin Elementary School,The Marinara Trench,Anemone Mine,The Dive Bar,The Caliginous Abyss] contains l || (l == lookupLocation("The Ice Hole") && l != $location[none]))
+    else if ($locations[The Briny Deeps,The Brinier Deepers,The Briniest Deepests,An Octopus's Garden,The Wreck of the Edgar Fitzsimmons,Madness Reef,The Mer-Kin Outpost,The Skate Park,The Coral Corral,Mer-kin Colosseum,Mer-kin Library,Mer-kin Gymnasium,Mer-kin Elementary School,The Marinara Trench,Anemone Mine,The Dive Bar,The Caliginous Abyss] contains l || (l == $location[The Ice Hole] && l != $location[none]))
     {
         Error error;
         float pressure_penalty = l.pressurePenaltyForLocation(error);
@@ -245,21 +245,21 @@ buffer generateLocationBar(boolean displaying_navbar)
     {
         custom_location_information = "Floor " + __misc_state_int["Basement Floor"];
     }
-    else if (lookupLocations("Your Bung Chakra,Your Guts Chakra,Your Liver Chakra,Your Nipple Chakra,Your Nose Chakra,Your Hat Chakra,Crimbo's Sack,Crimbo's Boots,Crimbo's Jelly,Crimbo's Reindeer,Crimbo's Beard,Crimbo's Hat") contains l)
+    else if ($locations[Your Bung Chakra,Your Guts Chakra,Your Liver Chakra,Your Nipple Chakra,Your Nose Chakra,Your Hat Chakra,Crimbo's Sack,Crimbo's Boots,Crimbo's Jelly,Crimbo's Reindeer,Crimbo's Beard,Crimbo's Hat] contains l)
     {
         string [location] property_name_for_location;
-        property_name_for_location[lookupLocation("Your Bung Chakra")] = "crimbo16BungChakraCleanliness";
-        property_name_for_location[lookupLocation("Your Guts Chakra")] = "crimbo16GutsChakraCleanliness";
-        property_name_for_location[lookupLocation("Your Liver Chakra")] = "crimbo16LiverChakraCleanliness";
-        property_name_for_location[lookupLocation("Your Nipple Chakra")] = "crimbo16NippleChakraCleanliness";
-        property_name_for_location[lookupLocation("Your Nose Chakra")] = "crimbo16NoseChakraCleanliness";
-        property_name_for_location[lookupLocation("Your Hat Chakra")] = "crimbo16HatChakraCleanliness";
-        property_name_for_location[lookupLocation("Crimbo's Sack")] = "crimbo16SackChakraCleanliness";
-        property_name_for_location[lookupLocation("Crimbo's Boots")] = "crimbo16BootsChakraCleanliness";
-        property_name_for_location[lookupLocation("Crimbo's Jelly")] = "crimbo16JellyChakraCleanliness";
-        property_name_for_location[lookupLocation("Crimbo's Reindeer")] = "crimbo16ReindeerChakraCleanliness";
-        property_name_for_location[lookupLocation("Crimbo's Beard")] = "crimbo16BeardChakraCleanliness";
-        property_name_for_location[lookupLocation("Crimbo's Hat")] = "crimbo16CrimboHatChakraCleanliness";
+        property_name_for_location[$location[Your Bung Chakra]] = "crimbo16BungChakraCleanliness";
+        property_name_for_location[$location[Your Guts Chakra]] = "crimbo16GutsChakraCleanliness";
+        property_name_for_location[$location[Your Liver Chakra]] = "crimbo16LiverChakraCleanliness";
+        property_name_for_location[$location[Your Nipple Chakra]] = "crimbo16NippleChakraCleanliness";
+        property_name_for_location[$location[Your Nose Chakra]] = "crimbo16NoseChakraCleanliness";
+        property_name_for_location[$location[Your Hat Chakra]] = "crimbo16HatChakraCleanliness";
+        property_name_for_location[$location[Crimbo's Sack]] = "crimbo16SackChakraCleanliness";
+        property_name_for_location[$location[Crimbo's Boots]] = "crimbo16BootsChakraCleanliness";
+        property_name_for_location[$location[Crimbo's Jelly]] = "crimbo16JellyChakraCleanliness";
+        property_name_for_location[$location[Crimbo's Reindeer]] = "crimbo16ReindeerChakraCleanliness";
+        property_name_for_location[$location[Crimbo's Beard]] = "crimbo16BeardChakraCleanliness";
+        property_name_for_location[$location[Crimbo's Hat]] = "crimbo16CrimboHatChakraCleanliness";
         
         string property_name = property_name_for_location[l];
         if (property_name != "")

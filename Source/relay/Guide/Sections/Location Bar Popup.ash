@@ -765,7 +765,7 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
             continue;
         float rate = appearance_rates_adjusted[m];
         float next_rate = appearance_rates_next_turn[m];
-        if (rate <= 0.0 && l == lookupLocation("Investigating a Plaintive Telegram"))
+        if (rate <= 0.0 && l == $location[Investigating a Plaintive Telegram])
             continue;
         monster_display_order.listAppend(m);
         if (rate > 0.0 && m != $monster[none])
@@ -1117,7 +1117,7 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
                 stats_l2.listAppend(m.base_attack + " ML");
             if (spelunking)
                 stats_l2.listAppend(m.base_hp + " HP");
-            if (lookupSkill("Extract Oil").have_skill())
+            if ($skill[Extract Oil].have_skill())
             {
                 string oil_type = lookupAWOLOilForMonster(m);
                 if (oil_type != "")

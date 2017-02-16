@@ -2,7 +2,7 @@ RegisterResourceGenerationFunction("IOTMSnojoGenerateResource");
 void IOTMSnojoGenerateResource(ChecklistEntry [int] resource_entries)
 {
     ChecklistEntry snojo_skill_entry;
-    if (lookupSkill("Shattering Punch").have_skill() && mafiaIsPastRevision(16617))
+    if ($skill[Shattering Punch].have_skill() && mafiaIsPastRevision(16617))
     {
         int punches_left = clampi(3 - get_property_int("_shatteringPunchUsed"), 0, 3);
         if (punches_left > 0)
@@ -17,7 +17,7 @@ void IOTMSnojoGenerateResource(ChecklistEntry [int] resource_entries)
             
         }
     }
-    if (lookupSkill("Snokebomb").have_skill() && mafiaIsPastRevision(16599))
+    if ($skill[Snokebomb].have_skill() && mafiaIsPastRevision(16599))
     {
         int snokes_left = clampi(3 - get_property_int("_snokebombUsed"), 0, 3);
         if (snokes_left > 0)
@@ -200,6 +200,6 @@ void IOTMSnojoGenerateResource(ChecklistEntry [int] resource_entries)
             importance = 0;
         ChecklistSubentry [int] subentries;
         subentries.listAppend(ChecklistSubentryMake(pluralise(fights_remaining, "free Snojo fight", "free Snojo fights"), "", description));
-        resource_entries.listAppend(ChecklistEntryMake("__item snow suit", "place.php?whichplace=snojo", subentries, importance, lookupLocations("the x-32-f combat training snowman")));
+        resource_entries.listAppend(ChecklistEntryMake("__item snow suit", "place.php?whichplace=snojo", subentries, importance, $locations[the x-32-f combat training snowman]));
     }
 }

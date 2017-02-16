@@ -63,9 +63,9 @@ boolean locationAllowsWanderingMonsters(location l)
 {
     if ($locations[The Shore\, Inc. Travel Agency,Noob Cave] contains l)
         return false;
-    if (l == lookupLocation("The X-32-F Combat Training Snowman") && l != $location[none])
+    if (l == $location[The X-32-F Combat Training Snowman])
         return false;
-    if (lookupLocations("Gingerbread Industrial Zone,Gingerbread Train Station,Gingerbread Sewers,Gingerbread Upscale Retail District") contains l && l != $location[none])
+    if ($locations[Gingerbread Industrial Zone,Gingerbread Train Station,Gingerbread Sewers,Gingerbread Upscale Retail District] contains l && l != $location[none])
         return false;
     return l.locationVisitsAdventurePHP();
 }

@@ -6,8 +6,8 @@ void QManorInit()
     
     state.state_boolean["need ballroom song set"] = false;
     
-    if (false)
-        state.state_boolean["need ballroom song set"] = true; //this is too confusing; don't bother suggesting
+    if (my_path_id() == PATH_GELATINOUS_NOOB || in_bad_moon())
+        state.state_boolean["need ballroom song set"] = true;
     
     //Trace every quest where it's worth setting the song:
     //Let's see...
@@ -116,7 +116,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     
     boolean second_floor_probably_open = false;
     
-    //if (lookupItem("7301").available_amount() == 0 || lookupItem("7302").available_amount() == 0) //first floor can be skipped via faxing
+    //if (to_item("7301").available_amount() == 0 || to_item("7302").available_amount() == 0) //first floor can be skipped via faxing
         //second_floor_probably_open = false;
     if (get_property_ascension("lastSecondFloorUnlock")) //updates properly now
         second_floor_probably_open = true;
@@ -333,7 +333,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         url = "inventory.php?which=3";
         image_name = "__item telegram from Lady Spookyraven";
     }
-    else if (lookupItem("7301").available_amount() == 0) //Spookyraven billiards room key
+    else if (to_item("7301").available_amount() == 0) //Spookyraven billiards room key
     {
         if (my_path_id() == PATH_COMMUNITY_SERVICE && __last_adventure_location != $location[the haunted kitchen])
             return;
@@ -390,7 +390,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         if (inebriety_limit() > 10 && my_inebriety() < 10)
             subentry.entries.listAppend("Try not to drink past ten, the billiards room is next.");
     }
-    else if (lookupItem("7302").available_amount() == 0) //Spookyraven library key
+    else if (to_item("7302").available_amount() == 0) //Spookyraven library key
     {
         //Find key:
         subentry.header = "Adventure in the Haunted Billiards Room";
@@ -405,7 +405,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
             
         if ($item[2268].equipped_amount() > 0) //staff of fats
             estimated_pool_skill += 5;
-        if (lookupItem("7961").equipped_amount() > 0)
+        if (to_item("7961").equipped_amount() > 0)
             estimated_pool_skill += 5;
         if ($item[pool cue].equipped_amount() > 0)
             estimated_pool_skill += 3;

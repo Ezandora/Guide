@@ -239,7 +239,7 @@ void PathActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] resource_entr
         if (__misc_state["hot airport available"])
         {
             places_to_farm_ka.listAppend("smooch army HQ");
-            if (url.length() == 0) url = lookupLocation("The SMOOCH Army HQ").getClickableURLForLocation();
+            if (url.length() == 0) url = $location[The SMOOCH Army HQ].getClickableURLForLocation();
         }
         if (__misc_state["mysterious island available"] && !__quest_state["Level 12"].in_progress && my_level() < 9) //we test if we're under level 9 and the level 12 quest isn't in progress. maybe they ate a lot of hot dogs. it could happen!
         {

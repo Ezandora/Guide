@@ -21,6 +21,12 @@ string HTMLGreyOutIfLocationUnavailable(string source, location l)
 {
     return HTMLGenerateFutureTextByLocationAvailability(source, l);
 }
+string HTMLBoldIfTrue(string base_text, boolean conditional)
+{
+    if (conditional)
+        return HTMLGenerateSpanOfClass(base_text, "r_bold");
+    return base_text;
+}
 
 
 boolean can_equip_replacement(item it)

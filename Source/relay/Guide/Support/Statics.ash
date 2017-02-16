@@ -44,6 +44,7 @@ static
     boolean [item] __items_that_craft_food;
     boolean [item] __minus_combat_equipment;
     boolean [item] __equipment;
+    boolean [item] __items_in_outfits;
     void initialiseItems()
     {
         foreach it in $items[]
@@ -65,6 +66,11 @@ static
                 if (it.numeric_modifier("combat rate") < 0)
                     __minus_combat_equipment[it] = true;
             }
+        }
+        foreach key, outfit_name in all_normal_outfits()
+        {
+            foreach key, it in outfit_pieces(outfit_name)
+                __items_in_outfits[it] = true;
         }
     }
     initialiseItems();
@@ -96,7 +102,7 @@ static
     boolean [monster] __snakes;
     void initialiseSnakes()
     {
-        __snakes = lookupMonsters("aggressive grass snake,Bacon snake,Batsnake,Black adder,Burning Snake of Fire,Coal snake,Diamondback rattler,Frontwinder,Frozen Solid Snake,King snake,Licorice snake,Mutant rattlesnake,Prince snake,Sewer snake with a sewer snake in it,Snakeleton,The Snake With Like Ten Heads,Tomb asp,Trouser Snake,Whitesnake");
+        __snakes = $monsters[aggressive grass snake,Bacon snake,Batsnake,Black adder,Burning Snake of Fire,Coal snake,Diamondback rattler,Frontwinder,Frozen Solid Snake,King snake,Licorice snake,Mutant rattlesnake,Prince snake,Sewer snake with a sewer snake in it,Snakeleton,The Snake With Like Ten Heads,Tomb asp,Trouser Snake,Whitesnake];
     }
     initialiseSnakes();
 }

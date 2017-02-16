@@ -47,9 +47,9 @@ void IOTMSourceTerminalGenerateTasks(ChecklistEntry [int] task_entries, Checklis
     {
         //FIXME this could be rewritten to suggest turbo + compress, when we have enough extractions.
         string [int] possible_skills;
-        if (!skills_have[lookupSkill("Extract")])
+        if (!skills_have[$skill[Extract]])
             possible_skills.listAppend("Extract");
-        if (!skills_have[lookupSkill("Turbo")])
+        if (!skills_have[$skill[Turbo]])
             possible_skills.listAppend("Turbo");
         
         string linker = "or";
@@ -165,7 +165,7 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
             times = total_duplicate_uses_available.int_to_wordy() + " times/day";
         line += " item drops from a monster, " + times + ".|Makes them stronger, so be careful.";
         description.listAppend(line);
-        if (!skills_have[lookupSkill("Duplicate")])
+        if (!skills_have[$skill[Duplicate]])
         {
             description.listAppend("Learn with command \"educate duplicate.edu\".");
         }

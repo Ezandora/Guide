@@ -99,12 +99,12 @@ string [string] generateAPIResponse()
                 output[it.to_int()] = it.available_amount();
         }
         
-        /*boolean [item] relevant_items_strings = lookupItemsArray($strings[]);
+        boolean [item] relevant_items_strings = lookupItemsArray($strings[cornucopia]);
         foreach it in relevant_items_strings
         {
             if (it.available_amount() > 0)
                 output[it.to_int()] = it.available_amount();
-        }*/
+        }
         
         result["relevant items"] = output.to_json();
         
@@ -144,7 +144,7 @@ string [string] generateAPIResponse()
         }
         result["logged in"] = playerIsLoggedIn();
     }
-    if (my_path_id() == PATH_AVATAR_OF_WEST_OF_LOATHING || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_THE_SOURCE)
+    if (my_path_id() == PATH_AVATAR_OF_WEST_OF_LOATHING || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_THE_SOURCE || my_path_id() == PATH_GELATINOUS_NOOB)
     {
         int skill_count = 0;
         foreach s in $skills[]

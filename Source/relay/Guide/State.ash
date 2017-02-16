@@ -204,7 +204,7 @@ void setUpState()
         yellow_ray_source = "Mayo Lance";
         yellow_ray_image_name = "__item mayo lance";
     }
-    if (lookupSkill("Unleash Cowrruption").have_skill())
+    if ($skill[Unleash Cowrruption].have_skill())
     {
         yellow_ray_available = true;
         yellow_ray_source = "Unleash Cowrruption";

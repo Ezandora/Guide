@@ -67,7 +67,7 @@ void generateRandomMessageLocation(string [int] random_messages)
         case $location[itznotyerzitz mine (in disguise)]:
         case $location[the knob shaft (mining)]:
         case $location[The Crimbonium Mine]:
-        case lookupLocation("The Velvet / Gold Mine (Mining)"):
+        case $location[The Velvet / Gold Mine (Mining)]:
             message = "street sneaky pete don't you call me cause I can't go"; break;
 
     }
@@ -177,7 +177,7 @@ void generateRandomMessageFamiliar(string [int] random_messages)
             message = ":D"; break;
         case $familiar[pet rock]:
             message = "what if the rock's eyebrow froze that way. would anyone notice?"; break;
-        case lookupFamiliar("space jellyfish"):
+        case $familiar[space jellyfish]:
             if (__quest_state["Level 13"].state_boolean["king waiting to be freed"])
             {
                 int obtained = 0;
@@ -200,8 +200,8 @@ void generateRandomMessageFamiliar(string [int] random_messages)
             }
             
             break;
-        case lookupFamiliar("bad vibe"):
-            message = "it's <i>all your fault</i>"; break;
+        case $familiar[bad vibe]:
+            message = "<i>it's all your fault</i>"; break;
     }
     if (message != "")
         random_messages.listAppend(message);
@@ -549,7 +549,7 @@ string generateRandomMessage()
             random_messages.listAppend("friends everywhere you go"); break;
         case $class[sauceror]:
             random_messages.listAppend("journey of the sauceror"); break;
-        case lookupClass("Snake Oiler"):
+        case $class[Snake Oiler]:
             random_messages.listAppend("ten points to slytherin"); break;
     }
     
@@ -614,7 +614,7 @@ string generateRandomMessage()
     monster_messages[$monster[Black Crayon Spiraling Shape]] = "be what you're like";
     monster_messages[$monster[best-selling novelist]] = "fiction to escape reality";
     monster_messages[$monster[7-Foot Dwarf Replicant]] = "it's too bad she won't live<br>but then again, who does?";
-    monster_messages[lookupMonster("Avatar of Jarlsberg")] = "smoked cheese";
+    monster_messages[$monster[The Avatar of Jarlsberg]] = "smoked cheese";
     monster_messages[$monster[giant sandworm]] = "walk without rhythm";
     monster_messages[$monster[bookbat]] = "tattered scrap of dignity";
     monster_messages[$monster[urge to stare at your hands]] = ".&#x20dd;.&#x20dd;"; //.⃝.⃝
@@ -625,18 +625,18 @@ string generateRandomMessage()
     if (my_hp() < my_maxhp())
         monster_messages[$monster[smooth criminal]] = "you've been hit by<br>you've been struck by<br><i>a smooth criminal</i>";
     monster_messages[$monster[demonic icebox]] = "zuul";
-    monster_messages[lookupMonster("angry mushroom guy")] = "touch fizzy, get dizzy";
+    monster_messages[$monster[angry mushroom guy]] = "touch fizzy, get dizzy";
     beaten_up_monster_messages[$monster[storm cow]] = "<pre>^__^            <br>(oo)\\_______    <br>(__)\\       )\\/\\<br>    ||----w |   <br>    ||     ||   </pre>";
-    monster_messages[lookupMonster("Barrelmech of Diogenes")] = "just let me throw a barrel at it";
-    //beaten_up_monster_messages[lookupMonster("Lavalos")] = HTMLGenerateTagWrap("span", "but... the future refused to change", mapMake("onclick", "var l = new Audio('" + __lavalos_sound_data + "'); l.play();", "class", "r_clickable")); //copyright, etc
-    beaten_up_monster_messages[lookupMonster("Lavalos")] = "but... the future refused to change";
+    monster_messages[$monster[The Barrelmech of Diogenes]] = "just let me throw a barrel at it";
+    //beaten_up_monster_messages[$monster[Lavalos]] = HTMLGenerateTagWrap("span", "but... the future refused to change", mapMake("onclick", "var l = new Audio('" + __lavalos_sound_data + "'); l.play();", "class", "r_clickable")); //copyright, etc
+    beaten_up_monster_messages[$monster[Lavalos]] = "but... the future refused to change";
     if (current_hour >= 5 && current_hour <= 11)
-        monster_messages[lookupMonster("Lavalos")] = "good morning, " + lowercase_player_name + "!";
+        monster_messages[$monster[Lavalos]] = "good morning, " + lowercase_player_name + "!";
     else
-        monster_messages[lookupMonster("Lavalos")] = "all life begins with nu and ends with nu";
+        monster_messages[$monster[Lavalos]] = "all life begins with nu and ends with nu";
     monster_messages[$monster[sk8 gnome]] = "he was a sk8 gnome she said see u l8 gnome";
-    monster_messages[lookupMonster("the inquisitor")] = "nothing is up";
-    monster_messages[lookupMonster("doc clock")] = "your defeat will happen at " + (current_hour > 12 ? current_hour - 12 : current_hour) + ":" + current_minute + " precisely"; // + (current_hour >= 12 ? " PM" : " AM")
+    monster_messages[$monster[the inquisitor]] = "nothing is up";
+    monster_messages[$monster[doc clock]] = "your defeat will happen at " + (current_hour > 12 ? current_hour - 12 : current_hour) + ":" + current_minute + " precisely"; // + (current_hour >= 12 ? " PM" : " AM")
     
     string day_cycle;
     if (current_hour >= 5 && current_hour <= 11)
@@ -647,7 +647,7 @@ string generateRandomMessage()
         day_cycle = "evening";
     else
         day_cycle = "night";
-    monster_messages[lookupMonster("Travoltron")] = now_to_string("EEEE").to_lower_case() + " " + day_cycle + " fever";
+    monster_messages[$monster[Travoltron]] = now_to_string("EEEE").to_lower_case() + " " + day_cycle + " fever";
     
     if (my_daycount() == 2 && (my_adventures() == 0 || availableDrunkenness() < 0) && availableFullness() == 0 && availableDrunkenness() <= 0 && my_path_id() != PATH_OXYGENARIAN && __quest_state["Level 12"].started && !__quest_state["Level 13"].state_boolean["king waiting to be freed"] && my_path_id() != PATH_NUCLEAR_AUTUMN && my_path_id() != PATH_SLOW_AND_STEADY)
     {

@@ -48,17 +48,17 @@ void IOTMTelegraphOfficeGenerateTasks(ChecklistEntry [int] task_entries, Checkli
     
     monster [string] boss_for_quest;
     
-    boss_for_quest["Missing: Fancy Man"] = lookupMonster("Jeff the Fancy Skeleton");
-    boss_for_quest["Help!  Desperados!"] = lookupMonster("Pecos Dave");
-    boss_for_quest["Missing: Pioneer Daughter"] = lookupMonster("Daisy the Unclean");
+    boss_for_quest["Missing: Fancy Man"] = $monster[Jeff the Fancy Skeleton];
+    boss_for_quest["Help!  Desperados!"] = $monster[Pecos Dave];
+    boss_for_quest["Missing: Pioneer Daughter"] = $monster[Daisy the Unclean];
     
-    boss_for_quest["Big Gambling Tournament Announced"] = lookupMonster("Snake-Eyes Glenn");
-    boss_for_quest["Haunted Boneyard"] = lookupMonster("Pharaoh Amoon-Ra Cowtep");
-    boss_for_quest["Sheriff Wanted"] = lookupMonster("Former Sheriff Dan Driscoll");
+    boss_for_quest["Big Gambling Tournament Announced"] = $monster[Snake-Eyes Glenn];
+    boss_for_quest["Haunted Boneyard"] = $monster[Pharaoh Amoon-Ra Cowtep];
+    boss_for_quest["Sheriff Wanted"] = $monster[Former Sheriff Dan Driscoll];
     
-    boss_for_quest["Missing: Many Children"] = lookupMonster("clara");
-    boss_for_quest["Wagon Train Escort Wanted"] = lookupMonster("Granny Hackleton");
-    boss_for_quest["Madness at the Mine"] = lookupMonster("unusual construct");
+    boss_for_quest["Missing: Many Children"] = $monster[clara];
+    boss_for_quest["Wagon Train Escort Wanted"] = $monster[Granny Hackleton];
+    boss_for_quest["Madness at the Mine"] = $monster[unusual construct];
     
     
     
@@ -74,29 +74,29 @@ void IOTMTelegraphOfficeGenerateTasks(ChecklistEntry [int] task_entries, Checkli
         else
             description.listAppend("Defeat " + boss + ".");
         boolean frigidalmatian_eligible = false;
-        if (boss == lookupMonster("clara"))
+        if (boss == $monster[clara])
         {
             modifiers.listAppend("+elemental resistance");
             description.listAppend("Use high-damage spells, like shrap + snow mobile/green lantern.");
             frigidalmatian_eligible = true;
         }
-        else if (boss == lookupMonster("Granny Hackleton"))
+        else if (boss == $monster[Granny Hackleton])
         {
             description.listAppend("Use different high-damage combat items, or frigidalmatian and attack.");
             //FIXME suggest a list of combat items to use
             frigidalmatian_eligible = true;
         }
-        else if (boss == lookupMonster("unusual construct"))
+        else if (boss == $monster[unusual construct])
         {
             description.listAppend("Each round, you have to respond with the correct shiny disc to survive. Mafia will select the correct one.|Maybe funksling with new-age hurting crystals.");
             frigidalmatian_eligible = true;
         }
-        else if (boss == lookupMonster("Jeff the Fancy Skeleton"))
+        else if (boss == $monster[Jeff the Fancy Skeleton])
         {
             description.listAppend("Attack with a blunt weapon.");
             description.listAppend("Combat items won't work, skills are mostly blocked.");
         }
-        else if (boss == lookupMonster("Pecos Dave"))
+        else if (boss == $monster[Pecos Dave])
         {
             description.listAppend("Attack with multiple sources of damage.");
             if ($item[wicker slicker].available_amount() > 0 && $skill[shell up].have_skill())
@@ -108,19 +108,19 @@ void IOTMTelegraphOfficeGenerateTasks(ChecklistEntry [int] task_entries, Checkli
             }
             frigidalmatian_eligible = true;
         }
-        else if (boss == lookupMonster("Daisy the Unclean"))
+        else if (boss == $monster[Daisy the Unclean])
         {
             //FIXME
         }
-        else if (boss == lookupMonster("Snake-Eyes Glenn"))
+        else if (boss == $monster[Snake-Eyes Glenn])
         {
             description.listAppend("Immune to all but a single element type each round.|Previous round's second roll indicates which.");
         }
-        else if (boss == lookupMonster("Pharaoh Amoon-Ra Cowtep"))
+        else if (boss == $monster[Pharaoh Amoon-Ra Cowtep])
         {
             description.listAppend("Avoid attacking with spell damage.");
         }
-        else if (boss == lookupMonster("Former Sheriff Dan Driscoll"))
+        else if (boss == $monster[Former Sheriff Dan Driscoll])
         {
             description.listAppend("Acquire passive damage (glowing syringes?), attack repeatedly.");
             frigidalmatian_eligible = true;
@@ -164,7 +164,7 @@ void IOTMTelegraphOfficeGenerateTasks(ChecklistEntry [int] task_entries, Checkli
             description.listAppend(s + " = " + get_property(s));
     }
     
-    optional_task_entries.listAppend(ChecklistEntryMake("__item sea cowboy hat", "inventory.php?which=3", ChecklistSubentryMake(quest_name, modifiers, description), lookupLocations("Investigating a Plaintive Telegram")));
+    optional_task_entries.listAppend(ChecklistEntryMake("__item sea cowboy hat", "inventory.php?which=3", ChecklistSubentryMake(quest_name, modifiers, description), $locations[Investigating a Plaintive Telegram]));
 }
 
 RegisterResourceGenerationFunction("IOTMTelegraphOfficeGenerateResource");
@@ -220,15 +220,15 @@ void IOTMTelegraphOfficeGenerateResource(ChecklistEntry [int] resource_entries)
         string [skill] telegraph_skill_properties;
         if (__misc_state["in run"])
         {
-            telegraph_skill_properties[lookupSkill("Bow-Legged Swagger")] = "_bowleggedSwaggerUsed";
-            telegraph_skill_properties[lookupSkill("Bend Hell")] = "_bendHellUsed";
+            telegraph_skill_properties[$skill[Bow-Legged Swagger]] = "_bowleggedSwaggerUsed";
+            telegraph_skill_properties[$skill[Bend Hell]] = "_bendHellUsed";
         }
-        telegraph_skill_properties[lookupSkill("Steely-Eyed Squint")] = "_steelyEyedSquintUsed";
+        telegraph_skill_properties[$skill[Steely-Eyed Squint]] = "_steelyEyedSquintUsed";
         
         string [skill] telegraph_skill_descriptions;
-        telegraph_skill_descriptions[lookupSkill("Bow-Legged Swagger")] = "Double +initiative and physical damage. Once/day.";
-        telegraph_skill_descriptions[lookupSkill("Bend Hell")] = "Double elemental damage/elemental spell damage. Once/day.";
-        telegraph_skill_descriptions[lookupSkill("Steely-Eyed Squint")] = "Double +item. Once/day.";
+        telegraph_skill_descriptions[$skill[Bow-Legged Swagger]] = "Double +initiative and physical damage. Once/day.";
+        telegraph_skill_descriptions[$skill[Bend Hell]] = "Double elemental damage/elemental spell damage. Once/day.";
+        telegraph_skill_descriptions[$skill[Steely-Eyed Squint]] = "Double +item. Once/day.";
         
         string image_name;
         ChecklistSubentry [int] subentries;

@@ -55,86 +55,86 @@ int synthesis_price(item it)
 static
 {
     string [effect] __sweet_synthesis_buff_descriptions;
-    __sweet_synthesis_buff_descriptions[lookupEffect("Synthesis: Hot")] = "+9 hot res";
-    __sweet_synthesis_buff_descriptions[lookupEffect("Synthesis: Cold")] = "+9 cold res";
-    __sweet_synthesis_buff_descriptions[lookupEffect("Synthesis: Pungent")] = "+9 stench res";
-    __sweet_synthesis_buff_descriptions[lookupEffect("Synthesis: Scary")] = "+9 spooky res";
-    __sweet_synthesis_buff_descriptions[lookupEffect("Synthesis: Greasy")] = "+9 sleaze res";
+    __sweet_synthesis_buff_descriptions[$effect[Synthesis: Hot]] = "+9 hot res";
+    __sweet_synthesis_buff_descriptions[$effect[Synthesis: Cold]] = "+9 cold res";
+    __sweet_synthesis_buff_descriptions[$effect[Synthesis: Pungent]] = "+9 stench res";
+    __sweet_synthesis_buff_descriptions[$effect[Synthesis: Scary]] = "+9 spooky res";
+    __sweet_synthesis_buff_descriptions[$effect[Synthesis: Greasy]] = "+9 sleaze res";
     
-    __sweet_synthesis_buff_descriptions[lookupEffect("Synthesis: Strong")] = "+300% muscle";
-    __sweet_synthesis_buff_descriptions[lookupEffect("Synthesis: Smart")] = "+300% myst";
-    __sweet_synthesis_buff_descriptions[lookupEffect("Synthesis: Cool")] = "+300% moxie";
-    __sweet_synthesis_buff_descriptions[lookupEffect("Synthesis: Hardy")] = "+300% max HP";
-    __sweet_synthesis_buff_descriptions[lookupEffect("Synthesis: Energy")] = "+300% max MP";
+    __sweet_synthesis_buff_descriptions[$effect[Synthesis: Strong]] = "+300% muscle";
+    __sweet_synthesis_buff_descriptions[$effect[Synthesis: Smart]] = "+300% myst";
+    __sweet_synthesis_buff_descriptions[$effect[Synthesis: Cool]] = "+300% moxie";
+    __sweet_synthesis_buff_descriptions[$effect[Synthesis: Hardy]] = "+300% max HP";
+    __sweet_synthesis_buff_descriptions[$effect[Synthesis: Energy]] = "+300% max MP";
     
-    __sweet_synthesis_buff_descriptions[lookupEffect("Synthesis: Greed")] = "+300% meat";
-    __sweet_synthesis_buff_descriptions[lookupEffect("Synthesis: Collection")] = "+150% item";
-    __sweet_synthesis_buff_descriptions[lookupEffect("Synthesis: Movement")] = "+50% muscle gain";
-    __sweet_synthesis_buff_descriptions[lookupEffect("Synthesis: Learning")] = "+50% myst gain";
-    __sweet_synthesis_buff_descriptions[lookupEffect("Synthesis: Style")] = "+50% moxie gain";
+    __sweet_synthesis_buff_descriptions[$effect[Synthesis: Greed]] = "+300% meat";
+    __sweet_synthesis_buff_descriptions[$effect[Synthesis: Collection]] = "+150% item";
+    __sweet_synthesis_buff_descriptions[$effect[Synthesis: Movement]] = "+50% muscle gain";
+    __sweet_synthesis_buff_descriptions[$effect[Synthesis: Learning]] = "+50% myst gain";
+    __sweet_synthesis_buff_descriptions[$effect[Synthesis: Style]] = "+50% moxie gain";
     
     int [effect] __sweet_synthesis_buff_tiers;
-    __sweet_synthesis_buff_tiers[lookupEffect("Synthesis: Hot")] = 1;
-    __sweet_synthesis_buff_tiers[lookupEffect("Synthesis: Cold")] = 1;
-    __sweet_synthesis_buff_tiers[lookupEffect("Synthesis: Pungent")] = 1;
-    __sweet_synthesis_buff_tiers[lookupEffect("Synthesis: Scary")] = 1;
-    __sweet_synthesis_buff_tiers[lookupEffect("Synthesis: Greasy")] = 1;
+    __sweet_synthesis_buff_tiers[$effect[Synthesis: Hot]] = 1;
+    __sweet_synthesis_buff_tiers[$effect[Synthesis: Cold]] = 1;
+    __sweet_synthesis_buff_tiers[$effect[Synthesis: Pungent]] = 1;
+    __sweet_synthesis_buff_tiers[$effect[Synthesis: Scary]] = 1;
+    __sweet_synthesis_buff_tiers[$effect[Synthesis: Greasy]] = 1;
     
-    __sweet_synthesis_buff_tiers[lookupEffect("Synthesis: Strong")] = 2;
-    __sweet_synthesis_buff_tiers[lookupEffect("Synthesis: Smart")] = 2;
-    __sweet_synthesis_buff_tiers[lookupEffect("Synthesis: Cool")] = 2;
-    __sweet_synthesis_buff_tiers[lookupEffect("Synthesis: Hardy")] = 2;
-    __sweet_synthesis_buff_tiers[lookupEffect("Synthesis: Energy")] = 2;
+    __sweet_synthesis_buff_tiers[$effect[Synthesis: Strong]] = 2;
+    __sweet_synthesis_buff_tiers[$effect[Synthesis: Smart]] = 2;
+    __sweet_synthesis_buff_tiers[$effect[Synthesis: Cool]] = 2;
+    __sweet_synthesis_buff_tiers[$effect[Synthesis: Hardy]] = 2;
+    __sweet_synthesis_buff_tiers[$effect[Synthesis: Energy]] = 2;
     
-    __sweet_synthesis_buff_tiers[lookupEffect("Synthesis: Greed")] = 3;
-    __sweet_synthesis_buff_tiers[lookupEffect("Synthesis: Collection")] = 3;
-    __sweet_synthesis_buff_tiers[lookupEffect("Synthesis: Movement")] = 3;
-    __sweet_synthesis_buff_tiers[lookupEffect("Synthesis: Learning")] = 3;
-    __sweet_synthesis_buff_tiers[lookupEffect("Synthesis: Style")] = 3;
+    __sweet_synthesis_buff_tiers[$effect[Synthesis: Greed]] = 3;
+    __sweet_synthesis_buff_tiers[$effect[Synthesis: Collection]] = 3;
+    __sweet_synthesis_buff_tiers[$effect[Synthesis: Movement]] = 3;
+    __sweet_synthesis_buff_tiers[$effect[Synthesis: Learning]] = 3;
+    __sweet_synthesis_buff_tiers[$effect[Synthesis: Style]] = 3;
     
     int [effect] __sweet_synthesis_buff_subid;
-    __sweet_synthesis_buff_subid[lookupEffect("Synthesis: Hot")] = 1;
-    __sweet_synthesis_buff_subid[lookupEffect("Synthesis: Cold")] = 2;
-    __sweet_synthesis_buff_subid[lookupEffect("Synthesis: Pungent")] = 3;
-    __sweet_synthesis_buff_subid[lookupEffect("Synthesis: Scary")] = 4;
-    __sweet_synthesis_buff_subid[lookupEffect("Synthesis: Greasy")] = 5;
+    __sweet_synthesis_buff_subid[$effect[Synthesis: Hot]] = 1;
+    __sweet_synthesis_buff_subid[$effect[Synthesis: Cold]] = 2;
+    __sweet_synthesis_buff_subid[$effect[Synthesis: Pungent]] = 3;
+    __sweet_synthesis_buff_subid[$effect[Synthesis: Scary]] = 4;
+    __sweet_synthesis_buff_subid[$effect[Synthesis: Greasy]] = 5;
     
-    __sweet_synthesis_buff_subid[lookupEffect("Synthesis: Strong")] = 1;
-    __sweet_synthesis_buff_subid[lookupEffect("Synthesis: Smart")] = 2;
-    __sweet_synthesis_buff_subid[lookupEffect("Synthesis: Cool")] = 3;
-    __sweet_synthesis_buff_subid[lookupEffect("Synthesis: Hardy")] = 4;
-    __sweet_synthesis_buff_subid[lookupEffect("Synthesis: Energy")] = 5;
+    __sweet_synthesis_buff_subid[$effect[Synthesis: Strong]] = 1;
+    __sweet_synthesis_buff_subid[$effect[Synthesis: Smart]] = 2;
+    __sweet_synthesis_buff_subid[$effect[Synthesis: Cool]] = 3;
+    __sweet_synthesis_buff_subid[$effect[Synthesis: Hardy]] = 4;
+    __sweet_synthesis_buff_subid[$effect[Synthesis: Energy]] = 5;
     
-    __sweet_synthesis_buff_subid[lookupEffect("Synthesis: Greed")] = 1;
-    __sweet_synthesis_buff_subid[lookupEffect("Synthesis: Collection")] = 2;
-    __sweet_synthesis_buff_subid[lookupEffect("Synthesis: Movement")] = 3;
-    __sweet_synthesis_buff_subid[lookupEffect("Synthesis: Learning")] = 4;
-    __sweet_synthesis_buff_subid[lookupEffect("Synthesis: Style")] = 5;
+    __sweet_synthesis_buff_subid[$effect[Synthesis: Greed]] = 1;
+    __sweet_synthesis_buff_subid[$effect[Synthesis: Collection]] = 2;
+    __sweet_synthesis_buff_subid[$effect[Synthesis: Movement]] = 3;
+    __sweet_synthesis_buff_subid[$effect[Synthesis: Learning]] = 4;
+    __sweet_synthesis_buff_subid[$effect[Synthesis: Style]] = 5;
     
     effect [int] __sweet_synthesis_buff_output_order;
-    __sweet_synthesis_buff_output_order.listAppend(lookupEffect("Synthesis: Greed"));
-    __sweet_synthesis_buff_output_order.listAppend(lookupEffect("Synthesis: Collection"));
-    __sweet_synthesis_buff_output_order.listAppend(lookupEffect("Synthesis: Movement"));
-    __sweet_synthesis_buff_output_order.listAppend(lookupEffect("Synthesis: Learning"));
-    __sweet_synthesis_buff_output_order.listAppend(lookupEffect("Synthesis: Style"));
+    __sweet_synthesis_buff_output_order.listAppend($effect[Synthesis: Greed]);
+    __sweet_synthesis_buff_output_order.listAppend($effect[Synthesis: Collection]);
+    __sweet_synthesis_buff_output_order.listAppend($effect[Synthesis: Movement]);
+    __sweet_synthesis_buff_output_order.listAppend($effect[Synthesis: Learning]);
+    __sweet_synthesis_buff_output_order.listAppend($effect[Synthesis: Style]);
     
-    __sweet_synthesis_buff_output_order.listAppend(lookupEffect("Synthesis: Strong"));
-    __sweet_synthesis_buff_output_order.listAppend(lookupEffect("Synthesis: Smart"));
-    __sweet_synthesis_buff_output_order.listAppend(lookupEffect("Synthesis: Cool"));
-    __sweet_synthesis_buff_output_order.listAppend(lookupEffect("Synthesis: Hardy"));
-    __sweet_synthesis_buff_output_order.listAppend(lookupEffect("Synthesis: Energy"));
+    __sweet_synthesis_buff_output_order.listAppend($effect[Synthesis: Strong]);
+    __sweet_synthesis_buff_output_order.listAppend($effect[Synthesis: Smart]);
+    __sweet_synthesis_buff_output_order.listAppend($effect[Synthesis: Cool]);
+    __sweet_synthesis_buff_output_order.listAppend($effect[Synthesis: Hardy]);
+    __sweet_synthesis_buff_output_order.listAppend($effect[Synthesis: Energy]);
     
-    __sweet_synthesis_buff_output_order.listAppend(lookupEffect("Synthesis: Hot"));
-    __sweet_synthesis_buff_output_order.listAppend(lookupEffect("Synthesis: Cold"));
-    __sweet_synthesis_buff_output_order.listAppend(lookupEffect("Synthesis: Pungent"));
-    __sweet_synthesis_buff_output_order.listAppend(lookupEffect("Synthesis: Scary"));
-    __sweet_synthesis_buff_output_order.listAppend(lookupEffect("Synthesis: Greasy"));
+    __sweet_synthesis_buff_output_order.listAppend($effect[Synthesis: Hot]);
+    __sweet_synthesis_buff_output_order.listAppend($effect[Synthesis: Cold]);
+    __sweet_synthesis_buff_output_order.listAppend($effect[Synthesis: Pungent]);
+    __sweet_synthesis_buff_output_order.listAppend($effect[Synthesis: Scary]);
+    __sweet_synthesis_buff_output_order.listAppend($effect[Synthesis: Greasy]);
 }
 
 RegisterResourceGenerationFunction("SSweetSynthesisGenerateResource");
 void SSweetSynthesisGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (!lookupSkill("Sweet Synthesis").skill_is_usable())
+    if (!$skill[Sweet Synthesis].skill_is_usable())
         return;
     if (availableSpleen() == 0)
         return;

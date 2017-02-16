@@ -1249,7 +1249,7 @@ void QHotAirportLavaCoLampGenerateTasks(ChecklistEntry [int] task_entries)
     if (in_ronin())
         return;
         
-    if (__last_adventure_location != lookupLocation("LavaCo&trade; Lamp Factory")) //dave's not here, man
+    if (__last_adventure_location != $location[LavaCo&trade; Lamp Factory]) //dave's not here, man
         return;
     
     item [int] missing_lamps = $items[Red LavaCo Lamp&trade;,Green LavaCo Lamp&trade;,Blue LavaCo Lamp&trade;].items_missing();
@@ -1273,9 +1273,9 @@ void QHotAirportLavaCoLampGenerateTasks(ChecklistEntry [int] task_entries)
         
     string colour = colours_missing[0];
     
-    item capped_item = lookupItem("capped " + colour + " lava bottle");
-    item uncapped_item = lookupItem("uncapped " + colour + " lava bottle");
-    item lava_glob_item = lookupItem(colour + " lava globs");
+    item capped_item = to_item("capped " + colour + " lava bottle");
+    item uncapped_item = to_item("uncapped " + colour + " lava bottle");
+    item lava_glob_item = to_item(colour + " lava globs");
     
         
     if (capped_item.available_amount() == 0)
@@ -1404,7 +1404,7 @@ void QHotAirportLavaCoLampGenerateTasks(ChecklistEntry [int] task_entries)
     }
     
     
-	task_entries.listAppend(ChecklistEntryMake("__item " + missing_lamps[0], url, ChecklistSubentryMake("Make a " + colours_missing.listJoinComponents(", ", "and") + " LavaCo Lamp&trade;", modifiers, description), lookupLocations("LavaCo&trade; Lamp Factory")));
+	task_entries.listAppend(ChecklistEntryMake("__item " + missing_lamps[0], url, ChecklistSubentryMake("Make a " + colours_missing.listJoinComponents(", ", "and") + " LavaCo Lamp&trade;", modifiers, description), $locations[LavaCo&trade; Lamp Factory]));
 }
 
 void QHotAirportGenerateTasks(ChecklistEntry [int] task_entries)
@@ -1524,7 +1524,7 @@ void QColdAirportGenerateTasks(ChecklistEntry [int] task_entries)
         string title = "";
         string [int] modifiers;
         string [int] description;
-        string url = lookupLocation("The Ice Hotel").getClickableURLForLocation();
+        string url = $location[The Ice Hotel].getClickableURLForLocation();
         int progress = get_property_int("walfordBucketProgress");
         if (progress >= 100)
         {
@@ -1626,7 +1626,7 @@ void QColdAirportGenerateTasks(ChecklistEntry [int] task_entries)
             
             description.listAppend(progress + "% done collecting " + desired_walford_item + ".");
         }
-        task_entries.listAppend(ChecklistEntryMake("__item Walford's bucket", url, ChecklistSubentryMake(title, modifiers, description), lookupLocations("The Ice Hotel,VYKEA,The Ice Hole")));
+        task_entries.listAppend(ChecklistEntryMake("__item Walford's bucket", url, ChecklistSubentryMake(title, modifiers, description), $locations[The Ice Hotel,VYKEA,The Ice Hole]));
     }
 }
 

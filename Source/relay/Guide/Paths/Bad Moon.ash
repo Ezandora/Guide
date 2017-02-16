@@ -61,32 +61,32 @@ static
     BadMoonAdventure [location] __static_bad_moon_adventures_by_location;
     void initialiseStaticBadMoonAdventures()
     {
-        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(2, lookupLocation("The Haunted Pantry"), "STAT1", "+20 myst, -5 muscle/moxie", "", false)); //FIXME is there a conditional on this?
-        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(3, lookupLocation("The Sleazy Back Alley"), "STAT1", "+20 moxie, -5 myst/muscle", "", false));
-        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(4, lookupLocation("Cobb's Knob Treasury"), "STAT2", "+40 muscle, -50% familiar weight", "", false));
-        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(5, lookupLocation("Cobb's Knob Kitchens"), "STAT2", "+40 myst, -50% familiar weight", "", false));
-        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(6, lookupLocation("Cobb's Knob Harem"), "STAT2", "+40 moxie, -50% familiar weight", "", false));
-        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(7, lookupLocation("Frat House"), "STAT3", "+50% muscle, -50% myst", "", false));
-        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(8, lookupLocation("Frat House In Disguise"), "STAT3", "+50% muscle, -50% moxie", "", false));
-        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(9, lookupLocation("Hippy Camp"), "STAT3", "+50% myst, -50% moxie", "", false));
-        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(10, lookupLocation("Hippy Camp In Disguise"), "STAT3", "+50% myst, -50% muscle", "", false));
-        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(11, lookupLocation("The Obligatory Pirate's Cove"), "STAT3", "+50% moxie, -50% muscle", "", false));
+        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(2, $location[The Haunted Pantry], "STAT1", "+20 myst, -5 muscle/moxie", "", false)); //FIXME is there a conditional on this?
+        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(3, $location[The Sleazy Back Alley], "STAT1", "+20 moxie, -5 myst/muscle", "", false));
+        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(4, $location[Cobb's Knob Treasury], "STAT2", "+40 muscle, -50% familiar weight", "", false));
+        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(5, $location[Cobb's Knob Kitchens], "STAT2", "+40 myst, -50% familiar weight", "", false));
+        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(6, $location[Cobb's Knob Harem], "STAT2", "+40 moxie, -50% familiar weight", "", false));
+        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(7, $location[Frat House], "STAT3", "+50% muscle, -50% myst", "", false));
+        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(8, $location[Frat House In Disguise], "STAT3", "+50% muscle, -50% moxie", "", false));
+        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(9, $location[Hippy Camp], "STAT3", "+50% myst, -50% moxie", "", false));
+        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(10, $location[Hippy Camp In Disguise], "STAT3", "+50% myst, -50% muscle", "", false));
+        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(11, $location[The Obligatory Pirate's Cove], "STAT3", "+50% moxie, -50% muscle", "", false));
         //12 is gone?
-        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(15, lookupLocation("The Haunted Kitchen"), "ELEMENTALDAMAGE1", "+10 " + HTMLGenerateElementSpanDesaturated($element[hot]) + " damage, -2 DR", "", false));
-        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(17, lookupLocation("The Haunted Library"), "ELEMENTALDAMAGE1", "+10 " + HTMLGenerateElementSpanDesaturated($element[spooky]) + " damage, -2 DR", "", false));
-        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(18, lookupLocation("Guano Junction"), "ELEMENTALDAMAGE1", "+10 " + HTMLGenerateElementSpanDesaturated($element[stench]) + " damage, -2 DR", "", false));
-        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(20, lookupLocation("The Icy Peak"), "ELEMENTALDAMAGE2", "+20 " + HTMLGenerateElementSpanDesaturated($element[cold]) + " damage, ~2 HP lost/round", "", false));
-        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(28, lookupLocation("Tower Ruins"), "RESIST1", "+2 " + HTMLGenerateElementSpanDesaturated($element[spooky], "res") + ", 2x damage from stench/hot", "", false));
-        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(32, lookupLocation("Cobb's Knob Laboratory"), "ITEM_DROP", "+50% item, -5 stats/fight", "", false));
-        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(33, lookupLocation("The Haunted Bathroom"), "ITEM_DROP", "+100% item, -20 all stats", "", false));
-        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(34, lookupLocation("The Unquiet Garves"), "MEAT_DROP", "+50% meat, -50% init", "", false));
-        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(35, lookupLocation("The VERY Unquiet Garves"), "MEAT_DROP", "+200% meat, -50% item", "", false));
-        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(38, lookupLocation("the spooky forest"), "meat", "1000 meat", "", false));
-        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(41, lookupLocation("south of the border"), "meat", "4000 meat, beaten up", "", false));
-        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(43, lookupLocation("Noob Cave"), "Familiar Hatchlings", "Black cat hatchling, 14 drunkenness", "", false));
-        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(46, lookupLocation("A Barroom Brawl"), "Familiar Hatchlings", "Leprechaun hatchling, one drunkenness", "", false));
-        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(47, lookupLocation("The Hidden Temple"), "ITEMS", "Loaded dice", "", false));
-        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(48, lookupLocation("The Haunted Conservatory"), "Familiar Hatchlings", "Potato sprout", "", false));
+        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(15, $location[The Haunted Kitchen], "ELEMENTALDAMAGE1", "+10 " + HTMLGenerateElementSpanDesaturated($element[hot]) + " damage, -2 DR", "", false));
+        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(17, $location[The Haunted Library], "ELEMENTALDAMAGE1", "+10 " + HTMLGenerateElementSpanDesaturated($element[spooky]) + " damage, -2 DR", "", false));
+        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(18, $location[Guano Junction], "ELEMENTALDAMAGE1", "+10 " + HTMLGenerateElementSpanDesaturated($element[stench]) + " damage, -2 DR", "", false));
+        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(20, $location[The Icy Peak], "ELEMENTALDAMAGE2", "+20 " + HTMLGenerateElementSpanDesaturated($element[cold]) + " damage, ~2 HP lost/round", "", false));
+        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(28, $location[Tower Ruins], "RESIST1", "+2 " + HTMLGenerateElementSpanDesaturated($element[spooky], "res") + ", 2x damage from stench/hot", "", false));
+        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(32, $location[Cobb's Knob Laboratory], "ITEM_DROP", "+50% item, -5 stats/fight", "", false));
+        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(33, $location[The Haunted Bathroom], "ITEM_DROP", "+100% item, -20 all stats", "", false));
+        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(34, $location[The Unquiet Garves], "MEAT_DROP", "+50% meat, -50% init", "", false));
+        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(35, $location[The VERY Unquiet Garves], "MEAT_DROP", "+200% meat, -50% item", "", false));
+        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(38, $location[the spooky forest], "meat", "1000 meat", "", false));
+        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(41, $location[south of the border], "meat", "4000 meat, beaten up", "", false));
+        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(43, $location[Noob Cave], "Familiar Hatchlings", "Black cat hatchling, 14 drunkenness", "", false));
+        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(46, $location[A Barroom Brawl], "Familiar Hatchlings", "Leprechaun hatchling, one drunkenness", "", false));
+        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(47, $location[The Hidden Temple], "ITEMS", "Loaded dice", "", false));
+        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(48, $location[The Haunted Conservatory], "Familiar Hatchlings", "Potato sprout", "", false));
     }
     initialiseStaticBadMoonAdventures();
 }
@@ -112,25 +112,25 @@ BadMoonAdventure [int] AllBadMoonAdventures()
     adventures.listAppend(BadMoonAdventureMake(39, $location[the degrassi knoll garage], "meat", "2000 meat, -myst debuff", "finish meatcar guild quest", !QuestState("questG01Meatcar").finished));
     adventures.listAppend(BadMoonAdventureMake(40, $location[the bat hole entrance], "meat", "3000 meat, -moxie debuff", "open boss bat's lair", __quest_state["Level 4"].state_int["areas unlocked"] < 3));
     
-    adventures.listAppend(BadMoonAdventureMake(1, lookupLocation("Outskirts of Cobb's Knob"), "STAT1", "+20 muscle, -5 myst/moxie", "find encryption key", $item[knob goblin encryption key].available_amount() == 0 && !$location[cobb's knob kitchens].locationAvailable()));
-    adventures.listAppend(BadMoonAdventureMake(13, lookupLocation("The Haunted Billiards Room"), "DAMAGE1", "+10 damage, -2 DR", "open the Haunted Library", !$location[the haunted library].locationAvailable()));
-    adventures.listAppend(BadMoonAdventureMake(14, lookupLocation("The Goatlet"), "ELEMENTALDAMAGE1", "+10 " + HTMLGenerateElementSpanDesaturated($element[cold]) + " damage, -2 DR", "unlock the eXtreme Slope", !$location[the extreme slope].locationAvailable()));
-    //adventures.listAppend(BadMoonAdventureMake(19, lookupLocation("The Castle in the Clouds in the Sky (somewhere)"), "DAMAGE2", "+20 melee damage, ~2 HP lost/round", "completed trash quest", REPLACEMEB)); //FIXME investigate this
-    //adventures.listAppend(BadMoonAdventureMake(21, lookupLocation("Oasis"), "ELEMENTALDAMAGE2", "+20 " + HTMLGenerateElementSpanDesaturated($element[hot]) + " damage, ~2 HP lost/round", "find worm-riding hooks", REPLACEMEB)); //??
-    adventures.listAppend(BadMoonAdventureMake(22, lookupLocation("The Hole in the Sky"), "ELEMENTALDAMAGE2", "+20 " + HTMLGenerateElementSpanDesaturated($element[sleaze]) + " damage, ~2 HP lost/round", "make Richard's star key", $item[richard's star key].available_amount() == 0));
-    adventures.listAppend(BadMoonAdventureMake(23, lookupLocation("The Haunted Ballroom"), "ELEMENTALDAMAGE2", "+20 " + HTMLGenerateElementSpanDesaturated($element[spooky]) + " damage, ~2 HP lost/round", "open Spookyraven basement", !$location[the haunted wine cellar].locationAvailable()));
-    adventures.listAppend(BadMoonAdventureMake(24, lookupLocation("The Black Forest"), "ELEMENTALDAMAGE2", "+20 " + HTMLGenerateElementSpanDesaturated($element[stench]) + " damage, ~2 HP lost/round", "open black market", !black_market_available()));
-    adventures.listAppend(BadMoonAdventureMake(25, lookupLocation("Inside the Palindome"), "RESIST1", "+2 " + HTMLGenerateElementSpanDesaturated($element[cold], "res") + ", 2x damage from hot/spooky", "defeat Dr. Awkward", !QuestState("questL11Palindome").finished));
-    //adventures.listAppend(BadMoonAdventureMake(26, lookupLocation("REPLACEME"), "RESIST1", "+2 " + HTMLGenerateElementSpanDesaturated($element[hot], "res") + ", 2x damage from stench/sleaze", "REASONWHYNOTREPLACEME", REPLACEMEB)); //Pot-Unlucky - UNKNOWN
-    adventures.listAppend(BadMoonAdventureMake(27, lookupLocation("The Valley of Rof L'm Fao"), "RESIST1", "+2 " + HTMLGenerateElementSpanDesaturated($element[sleaze], "res") + ", 2x damage from cold/spooky", "acquire facsimile dictionary", $item[facsimile dictionary].available_amount() == 0));
-    adventures.listAppend(BadMoonAdventureMake(29, lookupLocation("The Arid, Extra-Dry Desert"), "RESIST1", "+2 " + HTMLGenerateElementSpanDesaturated($element[stench], "res") + ", 2x damage from cold/sleaze", "need to have ultrahydrated", $effect[ultrahydrated].have_effect() > 0));
-    adventures.listAppend(BadMoonAdventureMake(30, lookupLocation("Beanbat Chamber"), "RESIST2", "+1 all res, -10% stats", "plant beanstalk", !__quest_state["Level 10"].state_boolean["beanstalk grown"]));
-    adventures.listAppend(BadMoonAdventureMake(31, lookupLocation("The Haunted Wine Cellar"), "RESIST2", "+2 all res, -20% stats", "defeat Lord Spookyraven", !__quest_state["Level 11 Manor"].finished));
-    adventures.listAppend(BadMoonAdventureMake(36, lookupLocation("8-bit realm"), "DAMAGE_REDUCTION", "+4 DR, -8 damage", "acquire digital key", $item[digital key].available_amount() == 0));
-    adventures.listAppend(BadMoonAdventureMake(37, lookupLocation("The Penultimate Fantasy Airship"), "DAMAGE_REDUCTION", "+8 DR, -8 damage", "unlock castle", $item[s.o.c.k.].available_amount() == 0));
+    adventures.listAppend(BadMoonAdventureMake(1, $location[the Outskirts of Cobb's Knob], "STAT1", "+20 muscle, -5 myst/moxie", "find encryption key", $item[knob goblin encryption key].available_amount() == 0 && !$location[cobb's knob kitchens].locationAvailable()));
+    adventures.listAppend(BadMoonAdventureMake(13, $location[The Haunted Billiards Room], "DAMAGE1", "+10 damage, -2 DR", "open the Haunted Library", !$location[the haunted library].locationAvailable()));
+    adventures.listAppend(BadMoonAdventureMake(14, $location[The Goatlet], "ELEMENTALDAMAGE1", "+10 " + HTMLGenerateElementSpanDesaturated($element[cold]) + " damage, -2 DR", "unlock the eXtreme Slope", !$location[the extreme slope].locationAvailable()));
+    //adventures.listAppend(BadMoonAdventureMake(19, $location[The Castle in the Clouds in the Sky (somewhere)], "DAMAGE2", "+20 melee damage, ~2 HP lost/round", "completed trash quest", REPLACEMEB)); //FIXME investigate this
+    //adventures.listAppend(BadMoonAdventureMake(21, $location[Oasis], "ELEMENTALDAMAGE2", "+20 " + HTMLGenerateElementSpanDesaturated($element[hot]) + " damage, ~2 HP lost/round", "find worm-riding hooks", REPLACEMEB)); //??
+    adventures.listAppend(BadMoonAdventureMake(22, $location[The Hole in the Sky], "ELEMENTALDAMAGE2", "+20 " + HTMLGenerateElementSpanDesaturated($element[sleaze]) + " damage, ~2 HP lost/round", "make Richard's star key", $item[richard's star key].available_amount() == 0));
+    adventures.listAppend(BadMoonAdventureMake(23, $location[The Haunted Ballroom], "ELEMENTALDAMAGE2", "+20 " + HTMLGenerateElementSpanDesaturated($element[spooky]) + " damage, ~2 HP lost/round", "open Spookyraven basement", !$location[the haunted wine cellar].locationAvailable()));
+    adventures.listAppend(BadMoonAdventureMake(24, $location[The Black Forest], "ELEMENTALDAMAGE2", "+20 " + HTMLGenerateElementSpanDesaturated($element[stench]) + " damage, ~2 HP lost/round", "open black market", !black_market_available()));
+    adventures.listAppend(BadMoonAdventureMake(25, $location[Inside the Palindome], "RESIST1", "+2 " + HTMLGenerateElementSpanDesaturated($element[cold], "res") + ", 2x damage from hot/spooky", "defeat Dr. Awkward", !QuestState("questL11Palindome").finished));
+    //adventures.listAppend(BadMoonAdventureMake(26, $location[REPLACEME], "RESIST1", "+2 " + HTMLGenerateElementSpanDesaturated($element[hot], "res") + ", 2x damage from stench/sleaze", "REASONWHYNOTREPLACEME", REPLACEMEB)); //Pot-Unlucky - UNKNOWN
+    adventures.listAppend(BadMoonAdventureMake(27, $location[The Valley of Rof L'm Fao], "RESIST1", "+2 " + HTMLGenerateElementSpanDesaturated($element[sleaze], "res") + ", 2x damage from cold/spooky", "acquire facsimile dictionary", $item[facsimile dictionary].available_amount() == 0));
+    adventures.listAppend(BadMoonAdventureMake(29, $location[The Arid, Extra-Dry Desert], "RESIST1", "+2 " + HTMLGenerateElementSpanDesaturated($element[stench], "res") + ", 2x damage from cold/sleaze", "need to have ultrahydrated", $effect[ultrahydrated].have_effect() > 0));
+    adventures.listAppend(BadMoonAdventureMake(30, $location[the Beanbat Chamber], "RESIST2", "+1 all res, -10% stats", "plant beanstalk", !__quest_state["Level 10"].state_boolean["beanstalk grown"]));
+    adventures.listAppend(BadMoonAdventureMake(31, $location[The Haunted Wine Cellar], "RESIST2", "+2 all res, -20% stats", "defeat Lord Spookyraven", !__quest_state["Level 11 Manor"].finished));
+    adventures.listAppend(BadMoonAdventureMake(36, $location[8-bit realm], "DAMAGE_REDUCTION", "+4 DR, -8 damage", "acquire digital key", $item[digital key].available_amount() == 0));
+    adventures.listAppend(BadMoonAdventureMake(37, $location[The Penultimate Fantasy Airship], "DAMAGE_REDUCTION", "+8 DR, -8 damage", "unlock castle", $item[s.o.c.k.].available_amount() == 0));
     QuestState white_citadel_quest = QuestState("questG02Whitecastle");
     adventures.listAppend(BadMoonAdventureMake(42, $location[whitey's grove], "meat", "5000 meat, -20% stats debuff", "finish white citadel quest? (this needs spading)", !(!white_citadel_quest.started || white_citadel_quest.finished)));
-    //adventures.listAppend(BadMoonAdventureMake(45, lookupLocation("The Arid, Extra-Dry Desert"), "ITEMS", "anticheese", "need to not have ultrahydrated", $effect[ultrahydrated].have_effect() == 0)); //is this still here?
+    //adventures.listAppend(BadMoonAdventureMake(45, $location[The Arid, Extra-Dry Desert], "ITEMS", "anticheese", "need to not have ultrahydrated", $effect[ultrahydrated].have_effect() == 0)); //is this still here?
     
     adventures.listAppend(BadMoonAdventureMake(44, $location[the spooky forest], "SKILLS", "torso awaregness, -50% muscle debuff", "unlock hidden temple", !get_property_ascension("lastTempleUnlock")));
     

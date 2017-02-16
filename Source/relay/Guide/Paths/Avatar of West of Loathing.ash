@@ -9,7 +9,7 @@ void PathAvatarOfWestOfLoathingGenerateResource(ChecklistEntry [int] resource_en
     string image_name = "";
     ChecklistSubentry [int] subentries;
     
-    if (mafiaIsPastRevision(16881) && lookupSkill("Extract Oil").have_skill())
+    if (mafiaIsPastRevision(16881) && $skill[Extract Oil].have_skill())
     {
         int oils_extracted = get_property_int("_oilExtracted");
         int oils_remaining = clampi(15 - oils_extracted, 0, 15);
@@ -84,7 +84,7 @@ void PathAvatarOfWestOfLoathingGenerateResource(ChecklistEntry [int] resource_en
     
     
     //Should we display beancannon in aftercore? I guess we could suggest a cheap source of it...? Maybe another time.
-    if (lookupSkill("Beancannon").have_skill() && in_ronin())
+    if ($skill[Beancannon].have_skill() && in_ronin())
     {
         string [int] banish_sources;
         int banish_count = 0;
@@ -118,7 +118,7 @@ void PathAvatarOfWestOfLoathingGenerateResource(ChecklistEntry [int] resource_en
         }
     }
     
-    if (lookupSkill("Long Con").have_skill() && mafiaIsPastRevision(16812) && get_property_int("_longConUsed") < 5)
+    if ($skill[Long Con].have_skill() && mafiaIsPastRevision(16812) && get_property_int("_longConUsed") < 5)
     {
         int uses_remaining = clampi(5 - get_property_int("_longConUsed"), 0, 5);
         string [int] description;
@@ -139,22 +139,22 @@ void PathAvatarOfWestOfLoathingGenerateTasks(ChecklistEntry [int] task_entries, 
     
     int [class] class_points;
     class_points[my_class()] = my_level();
-    class_points[lookupClass("Cow Puncher")] += get_property_int("awolPointsCowpuncher");
-    class_points[lookupClass("Beanslinger")] += get_property_int("awolPointsBeanslinger");
-    class_points[lookupClass("Snake Oiler")] += get_property_int("awolPointsSnakeoiler");
+    class_points[$class[Cow Puncher]] += get_property_int("awolPointsCowpuncher");
+    class_points[$class[Beanslinger]] += get_property_int("awolPointsBeanslinger");
+    class_points[$class[Snake Oiler]] += get_property_int("awolPointsSnakeoiler");
     
     item [class] tale_for_class;
-    tale_for_class[lookupClass("Cow Puncher")] = $item[tales of the west: Cow Punching];
-    tale_for_class[lookupClass("Beanslinger")] = $item[Tales of the West: Beanslinging];
-    tale_for_class[lookupClass("Snake Oiler")] = $item[Tales of the West: Snake Oiling];
+    tale_for_class[$class[Cow Puncher]] = $item[tales of the west: Cow Punching];
+    tale_for_class[$class[Beanslinger]] = $item[Tales of the West: Beanslinging];
+    tale_for_class[$class[Snake Oiler]] = $item[Tales of the West: Snake Oiling];
     
     boolean [class] have_advanced_skills_for_class;
-    if (lookupSkill("Unleash Cowrruption").have_skill() || lookupSkill("Hard Drinker").have_skill() || lookupSkill("Walk: Cautious Prowl").have_skill())
-        have_advanced_skills_for_class[lookupClass("Cow Puncher")] = true;
-    if (lookupSkill("Beancannon").have_skill() || lookupSkill("Prodigious Appetite").have_skill() || lookupSkill("Walk: Prideful Strut").have_skill())
-        have_advanced_skills_for_class[lookupClass("Beanslinger")] = true;
-    if (lookupSkill("Long Con").have_skill() || lookupSkill("Tolerant Constitution").have_skill() || lookupSkill("Walk: Leisurely Amble").have_skill())
-        have_advanced_skills_for_class[lookupClass("Snake Oiler")] = true;
+    if ($skill[Unleash Cowrruption].have_skill() || $skill[Hard Drinker].have_skill() || $skill[Walk: Cautious Prowl].have_skill())
+        have_advanced_skills_for_class[$class[Cow Puncher]] = true;
+    if ($skill[Beancannon].have_skill() || $skill[Prodigious Appetite].have_skill() || $skill[Walk: Prideful Strut].have_skill())
+        have_advanced_skills_for_class[$class[Beanslinger]] = true;
+    if ($skill[Long Con].have_skill() || $skill[Tolerant Constitution].have_skill() || $skill[Walk: Leisurely Amble].have_skill())
+        have_advanced_skills_for_class[$class[Snake Oiler]] = true;
     float priority = 0;
     foreach c in class_points
     {
@@ -197,7 +197,7 @@ void PathAvatarOfWestOfLoathingGenerateTasks(ChecklistEntry [int] task_entries, 
         task_entries.listAppend(ChecklistEntryMake("__item tales of the west: beanslinging", skill_url, skill_subentries, priority));
     }
     
-    if (my_class() == lookupClass("Cow Puncher") && $item[corrupted marrow].available_amount() > 0 && $item[corrupted marrow].to_effect().have_effect() < 100 && in_ronin())
+    if (my_class() == $class[Cow Puncher] && $item[corrupted marrow].available_amount() > 0 && $item[corrupted marrow].to_effect().have_effect() < 100 && in_ronin())
     {
         task_entries.listAppend(ChecklistEntryMake("__effect Cowrruption", "inventory.php?which=3", ChecklistSubentryMake("Use corrupted marrow", "", "+200% weapon damage/spell damage"), -11));
     }
