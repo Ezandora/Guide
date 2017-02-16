@@ -44576,7 +44576,8 @@ void PathGelatinousNoobGenerateTasks(ChecklistEntry [int] task_entries, Checklis
 		return;
     
     //FIXME 15 guess
-    int total_absorptions = 2 + MIN(15, my_level()) + get_property_int("noobDeferredPoints");
+    //noobDeferredPoints is unspaded
+    int total_absorptions = 2 + MIN(15, my_level());// + get_property_int("noobDeferredPoints");
     int absorptions_used = get_property_int("_noobSkillCount");
     int absorptions_left = total_absorptions - absorptions_used;
     if (!mafiaIsPastRevision(17821)) //tracking
