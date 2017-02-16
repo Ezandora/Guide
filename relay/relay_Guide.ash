@@ -29893,7 +29893,8 @@ void generatePullList(Checklist [int] checklists)
         if (my_path_id() == PATH_GELATINOUS_NOOB)
         {
             boolean allowed = false;
-            boolean [item] whitelist = $items[gravy boat,blackberry galoshes,machetito,muculent machete,antique machete,Mr. Cheeng's spectacles,buddy bjorn,crown of thrones,navel ring of navel gazing,greatest american pants,plastic vampire fangs,the jokester's gun];
+            boolean [item] whitelist = $items[blackberry galoshes,machetito,muculent machete,antique machete,Mr. Cheeng's spectacles,buddy bjorn,crown of thrones,navel ring of navel gazing,greatest american pants,plastic vampire fangs,the jokester's gun].makeConstantItemArrayMutable();
+            whitelist[lookupItem("gravy boat")] = true;
             foreach key, it in items
             {
                 if ($slots[hat,weapon,off-hand,back,shirt,pants,acc1,acc2,acc3] contains it.to_slot() && !(whitelist contains it) && !it.discardable && !__items_in_outfits[it])
