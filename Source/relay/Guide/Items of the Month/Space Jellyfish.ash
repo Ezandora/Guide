@@ -4,7 +4,7 @@ void IOTMSpaceJellyfishGenerateTasks(ChecklistEntry [int] task_entries, Checklis
 {
     if (!$familiar[space jellyfish].familiar_is_usable())
         return;
-    if (!get_property_boolean("_seaJellyHarvested") && my_level() >= 11)
+    if (!get_property_boolean("_seaJellyHarvested") && my_level() >= 11 && !__misc_state["sea access blocked"])
     {
         string url = "place.php?whichplace=thesea&action=thesea_left2";
         string [int] description;

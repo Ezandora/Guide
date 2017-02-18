@@ -4,7 +4,7 @@ void IOTMTunnelOfLoveGenerateTasks(ChecklistEntry [int] task_entries, ChecklistE
     //FIXME whatever these end up being named:
     if (!mafiaIsPastRevision(17805))
         return;
-    if (!get_property_boolean("loveTunnelAvailable"))
+    if (!__iotms_usable[lookupItem("heart-shaped crate")])
         return;
     if (get_property_boolean("_loveTunnelUsed"))
         return;

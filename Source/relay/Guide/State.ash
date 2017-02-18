@@ -768,6 +768,10 @@ void setUpState()
         if (juice_cost > 0.0)
             __misc_state_float["meat per MP"] = MIN(__misc_state_float["meat per MP"], juice_cost / mp_restored);
     }
+    
+    //FIXME all avatar paths:
+    if (my_path_id() == PATH_GELATINOUS_NOOB || my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_KOLHS || my_path_id() == PATH_CLASS_ACT_2 || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_THE_SOURCE)
+        __misc_state["sea access blocked"] = true;
 
 }
 

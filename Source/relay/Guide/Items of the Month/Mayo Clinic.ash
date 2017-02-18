@@ -41,10 +41,9 @@ void IOTMMayoClinicGenerateResource(ChecklistEntry [int] resource_entries)
         if (__misc_state["yellow ray available"])
             lance_description = "Shorter yellow ray. ";
         lance_description += HTMLGenerateDivOfClass("Uses up blood mayo.", "r_word_wrap_group");
-        if (fullness_limit() > 0)
-            choices.listAppend(listMake("Mayo lance", lance_description));
+        choices.listAppend(listMake("Mayo lance", lance_description));
         
-        if (!get_property_boolean("mayoWhipRented") && !get_property_boolean("itemBoughtPerAscension8266"))
+        if (!get_property_boolean("mayoWhipRented") && !get_property_boolean("itemBoughtPerAscension8266") &&  my_path_id() != PATH_GELATINOUS_NOOB)
         {
             choices.listAppend(listMake("Miracle whip", "Weapon, usable " + HTMLGenerateSpanFont("once", "red") + " per run.|+50% item, +100% meat, +50% init."));
         }

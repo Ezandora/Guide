@@ -446,7 +446,7 @@ void generatePullList(Checklist [int] checklists)
             pullable_item_list.listAppend(GPItemMake($item[xiblaxian stealth vest], "-combat shirt"));
         pullable_item_list.listAppend(GPItemMake($item[duonoculars], "-combat, +5 ML"));
         pullable_item_list.listAppend(GPItemMake($item[ring of conflict], "-combat"));
-        if ($item[red shoe].can_equip())
+        if ($item[red shoe].can_equip() || my_path_id() == PATH_GELATINOUS_NOOB)
             pullable_item_list.listAppend(GPItemMake($item[red shoe], "-combat"));
     }
 	
@@ -529,6 +529,10 @@ void generatePullList(Checklist [int] checklists)
         int casts = get_property_int("_ancestralRecallCasts");
         if (casts < 10)
             pullable_item_list.listAppend(GPItemMake($item[blue mana], "+3 adventures each.|Probably a bad idea.", clampi(10 - casts, 0, 10)));
+    }
+    if (my_path_id() == PATH_GELATINOUS_NOOB || my_path_id() == PATH_NUCLEAR_AUTUMN)
+    {
+        pullable_item_list.listAppend(GPItemMake($item[filthy lucre], "Turn into odor extractors for olfaction.", 6));
     }
     
     

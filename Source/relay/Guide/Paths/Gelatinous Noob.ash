@@ -62,6 +62,8 @@ void PathGelatinousNoobGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 blocklist[$item[goat cheese pizza]] = true;
             }
             blocklist[$item[print screen button]] = true;
+            if (__quest_state["Pirate Quest"].state_boolean["hot wings relevant"] && $item[hot wing].available_amount() <= 3)
+                blocklist[$item[hot wing]] = true;
             
                 
             //Collect a list for each grouping:
@@ -121,12 +123,20 @@ void PathGelatinousNoobGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 grouping_should_grey_out[grouping_index] = should_grey_out;
                 string [int] relevant_items_out;
                 sort relevant_items by (value.historical_price() <= 0 ? 999999999 : value.historical_price());
-                foreach key, it in relevant_items
+                if (relevant_items[0].npc_price() > 0 && relevant_items[0].npc_price() <= 1000) //something cheap and obtainable? ignore the rest
                 {
-                    if (key > 2) break;
-                    relevant_items_out.listAppend(it);
+                    //examples: fermenting powder, herbs, pickled egg
+                    relevant_items_out.listAppend(relevant_items[0]);
                 }
-                if (pulls_remaining() > 0 && !on_first && pullable_item != $item[none])
+                else
+                {
+                    foreach key, it in relevant_items
+                    {
+                        if (key > 2) break;
+                        relevant_items_out.listAppend(it);
+                    }
+                }
+                if (pulls_remaining() > 0 && (!on_first || relevant_items.count() == 0) && pullable_item != $item[none])
                 {
                     string line = pullable_item + " (pull";
                     if (!should_grey_out)
@@ -147,7 +157,7 @@ void PathGelatinousNoobGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 skill [int] group_skills = grouping_to_group_skills[grouping_index];
                 skill relevant_items_skill = grouping_to_relevant_items_skill[grouping_index];
                 
-                //print_html("s = " + s + " group_skills = " + group_skills.to_json());
+                //print_html("s = " + s + " group_skills = " + group_skills.to_json() + ", relevant_items = " + relevant_items.to_json());
                 
                 //description.listAppend(relevant_items_skill + ": " + __gelatinous_skill_ids_to_descriptions[relevant_items_skill.to_int()]);
                 string line = HTMLGenerateSpanOfClass(__gelatinous_skill_ids_to_descriptions[relevant_items_skill.to_int()], "r_bold");
@@ -160,7 +170,7 @@ void PathGelatinousNoobGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 }
                 
             }
-            description.listAppend("Or equipment, for their buffs." + (combat_rate_modifier() > -25 ? "|*Bram's choker, ring of conflict, duonoculars, or rusted shootin' iron especially." : ""));
+            description.listAppend("Or equipment, for their buffs." + (combat_rate_modifier() > -25 ? "|*Bram's choker, ring of conflict, duonoculars, rusted shootin' iron, or red shoe especially." : ""));
             if (lookupSkill("Large Intestine").have_skill())
                 description.listAppend("Or potted cactus, for extra adventures.");
             //foreach s in __gelatinous_items_that_give_skill
