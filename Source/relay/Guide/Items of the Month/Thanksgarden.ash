@@ -30,11 +30,11 @@ void IOTMThanksgardenGenerateResource(ChecklistEntry [int] resource_entries)
     {
         string [int] description;
         string [int] options;
-        if (my_path_id() != PATH_NUCLEAR_AUTUMN)
-            options.listAppend(HTMLGreyOutTextUnlessTrue("turkey blasters to burn delay", cashew_amount >= 3));
+        if (my_path_id() != PATH_NUCLEAR_AUTUMN && spleen_limit() > 0)
+            options.listAppend(HTMLGreyOutTextUnlessTrue(pluralise($item[turkey blaster].creatable_amount(), $item[turkey blaster]) + " to burn delay", cashew_amount >= 3));
         if (!__quest_state["Level 12"].finished)
-            options.listAppend(HTMLGreyOutTextUnlessTrue("stuffing fluffers for the war", cashew_amount >= 3));
-        if (my_path_id() != PATH_NUCLEAR_AUTUMN)
+            options.listAppend(HTMLGreyOutTextUnlessTrue(pluralise($item[stuffing fluffer].creatable_amount(), $item[stuffing fluffer]) + " for the war", cashew_amount >= 3));
+        if (my_path_id() != PATH_NUCLEAR_AUTUMN && fullness_limit() > 0)
             options.listAppend("various foods");
         if (__quest_state["Level 7"].state_boolean["alcove needs speed tricks"])
             options.listAppend(HTMLGreyOutTextUnlessTrue("gravy boat for the cyrpt (somewhat marginal)", cashew_amount >= 3));

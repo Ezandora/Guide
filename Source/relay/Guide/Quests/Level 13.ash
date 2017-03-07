@@ -157,7 +157,7 @@ boolean generateTowerFamiliarWeightMethod(string [int] how, string [int] immedia
     }
     if (__misc_state["VIP available"] && __misc_state["can drink just about anything"])
     {
-        if (get_property_int("_speakeasyDrinksDrunk") <3 && availableDrunkenness() >= 3)
+        if (get_property_int("_speakeasyDrinksDrunk") <3 && availableDrunkenness() >= 3 && $item[clan speakeasy].is_unrestricted())
         {
             boolean have_effect = $effect[1701].have_effect() > 0; //hip to the jive
             weight_modifiers.listAppend(TFWMInternalModifierMake("Speakeasy hot socks", have_effect, true, true, 10.0));

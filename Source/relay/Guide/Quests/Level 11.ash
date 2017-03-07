@@ -180,7 +180,10 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
                 url = "place.php?whichplace=desertbeach";
                 subentry.header = "Vacation at the shore";
                 image_name = "__item your father's MacGuffin diary";
-                subentry.entries.listAppend("To acquire your father's diary.");
+                string diary_owner = "your father's";
+                if (my_path_id() == PATH_GELATINOUS_NOOB)
+                    diary_owner = "an archeologist's";
+                subentry.entries.listAppend("To acquire " + diary_owner + " diary.");
             }
         }
     }

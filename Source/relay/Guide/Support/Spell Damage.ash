@@ -9,7 +9,7 @@ __flavour_lookup[$element[sleaze]] = $effect[Spirit of Bacon Grease];
 
 float damageForElementAgainstElement(float base_damage, element attacking_element, element defence_element)
 {
-    if (defence_element == $element[none])
+    if (defence_element == $element[none] || attacking_element == $element[none])
         return base_damage;
     if (attacking_element == defence_element)
         return 1;
@@ -42,7 +42,8 @@ float damageForElementAgainstElement(float base_damage, element attacking_elemen
     attack_versus_element[$element[cold]][$element[stench]] = 2.0;
     
     
-    return MAX(1, base_damage * attack_versus_element[attacking_element][defence_element]);
+    float final = MAX(1, base_damage * attack_versus_element[attacking_element][defence_element]);
+    return final;
 }
 
 element currentFlavourElement()

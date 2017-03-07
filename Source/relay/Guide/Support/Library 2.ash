@@ -1,5 +1,6 @@
 import "relay/Guide/Support/LocationAvailable.ash"
 import "relay/Guide/Support/Equipment Requirement.ash"
+import "relay/Guide/Support/HTML.ash"
 
 
 string HTMLGenerateFutureTextByLocationAvailability(string base_text, location place)

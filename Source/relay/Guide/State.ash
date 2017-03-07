@@ -381,7 +381,7 @@ void setUpState()
 		//skills_temporarily_missing = true;
 		//familiars_temporarily_missing = true;
 	}
-    if (my_path_id() == PATH_AVATAR_OF_WEST_OF_LOATHING || my_path_id() == PATH_NUCLEAR_AUTUMN)
+    if (my_path_id() == PATH_AVATAR_OF_WEST_OF_LOATHING || my_path_id() == PATH_NUCLEAR_AUTUMN || my_path_id() == PATH_GELATINOUS_NOOB)
     {
         skills_temporarily_missing = true;
     }

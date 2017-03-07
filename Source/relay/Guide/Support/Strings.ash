@@ -207,3 +207,8 @@ boolean get_property_ascension(string property)
 {
     return get_property_int(property) == my_ascensions();
 }
+
+element get_property_element(string property)
+{
+    return get_property(property).to_element();
+}

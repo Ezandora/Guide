@@ -188,11 +188,12 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             item_descriptions[$item[resolution: be sexier]] = "+2 moxie stats/fight (20 turns)";
             item_effects[$item[resolution: be sexier]] = $effect[Irresistible Resolve];
             
-            if (in_ronin() && !in_bad_moon() && my_primestat() == $stat[moxie]) //better used for +init otherwise
+            //Always better used for +init, since the tower tests came into existence?
+            /*if (in_ronin() && !in_bad_moon() && my_primestat() == $stat[moxie]) //better used for +init otherwise
             {
                 item_descriptions[$item[old bronzer]] = "+2 moxie stats/fight (25 turns)";
                 item_effects[$item[old bronzer]] = $effect[Sepia Tan];
-            }
+            }*/
         }
 
         if (__misc_state["need to level muscle"])

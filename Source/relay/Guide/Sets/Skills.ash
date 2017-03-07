@@ -188,4 +188,10 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
 		entry.should_indent_after_first_subentry = true;
 		resource_entries.listAppend(entry);
 	}
+    
+    
+    if (lookupSkill("Evoke Eldritch Horror").have_skill() && !get_property_boolean("_eldritchHorrorEvoked"))
+    {
+        resource_entries.listAppend(ChecklistEntryMake("__skill Evoke Eldritch Horror", "skillz.php", ChecklistSubentryMake("Evoke Eldritch Horror", "", "Free fight."), 5));
+    }
 }

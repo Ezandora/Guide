@@ -178,8 +178,8 @@ void generateDailyResources(Checklist [int] checklists)
 	if (__quest_state["Level 13"].state_boolean["king waiting to be freed"])
 	{
 		string [int] description;
-		description.listAppend("Contains 1 monarch.");
-        description.listAppend(pluralise(my_ascensions(), "king", "kings") + " freed.");
+		description.listAppend("Contains one (1) monarch.");
+        description.listAppend(pluralise(my_ascensions(), "king", "kings") + " freed." + (my_ascensions() > 250 ? " Collect them all!" : ""));
         string image_name;
         image_name = "__effect sleepy";
 		resource_entries.listAppend(ChecklistEntryMake(image_name, "place.php?whichplace=nstower", ChecklistSubentryMake("1 Prism", "", description), 10));

@@ -222,6 +222,17 @@ item [int] items_missing(boolean [item] items)
     return result;
 }
 
+skill [int] skills_missing(boolean [skill] skills)
+{
+    skill [int] result;
+    foreach s in skills
+    {
+        if (!s.have_skill())
+            result.listAppend(s);
+    }
+    return result;
+}
+
 int storage_amount(boolean [item] items)
 {
     int count = 0;
@@ -1372,11 +1383,24 @@ int effective_familiar_weight(familiar f)
     return weight;
 }
 
+boolean year_is_leap_year(int year)
+{
+    if (year % 4 != 0) return false;
+    if (year % 100 != 0) return true;
+    if (year % 400 != 0) return false;
+    return true;
+}
+
 boolean today_is_pvp_season_end()
 {
     string today = format_today_to_string("MMdd");
-    if (today == "0228" && false) //FIXME support this by calculating leap years.
-        return true;
+    if (today == "0228")
+    {
+        int year = format_today_to_string("yyyy").to_int();
+        boolean is_leap_year = year_is_leap_year(year);
+        if (!is_leap_year)
+            return true;
+    }
     else if (today == "0229") //will always be true, but won't always be there
         return true;
     else if (today == "0430")
@@ -1388,10 +1412,6 @@ boolean today_is_pvp_season_end()
     else if (today == "1031")
         return true;
     else if (today == "1231")
-        return true;
-    else if (today == "REPLACEME")
-        return true;
-    else if (today == "REPLACEME")
         return true;
     return false;
 }

@@ -7,6 +7,8 @@ void IOTMSpeakeasyGenerateResource(ChecklistEntry [int] resource_entries)
 
     if (!(__misc_state["can drink just about anything"] && get_property_int("_speakeasyDrinksDrunk") <3 && mafiaIsPastRevision(14155) && availableDrunkenness() >= 0))
         return;
+    if (!$item[clan speakeasy].is_unrestricted())
+        return;
         
     //speakeasy:
     /*

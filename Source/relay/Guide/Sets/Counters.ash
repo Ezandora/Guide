@@ -1,4 +1,5 @@
 import "relay/Guide/Support/Counter.ash"
+import "relay/Guide/Support/Holiday.ash"
 
 void SCountersInit()
 {
@@ -133,12 +134,13 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
     window_image_names["WoL Monster"] = "__effect Cowrruption";
     window_image_names["Digitize Monster"] = "__item source essence";
     window_image_names["Romantic Monster"] = "__familiar " + __misc_state_string["obtuse angel name"];
+    window_image_names["Enamorang Monster"] = "__item lov enamorang";
     //window_image_names["Event Monster"] = ""; //no idea
     
     
     
     boolean [string] counter_blacklist = $strings[Semi-rare]; //Romantic Monster,
-    boolean [string] non_range_whitelist = $strings[Digitize Monster];
+    boolean [string] non_range_whitelist = $strings[Digitize Monster,Enamorang Monster];
     
     string [int] all_counter_names = CounterGetAllNames(true);
     
@@ -182,10 +184,24 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
             else
                 window_display_name = "Digitised " + monster_name;
         }
+        if (window_name == "Enamorang Monster")
+        {
+            fighting_monster = get_property_monster("enamorangMonster");
+            string monster_name = fighting_monster.to_lower_case();
+            if (monster_name == "")
+                window_display_name = "Boomerang'd monster";
+            else
+                window_display_name = "Boomerang'd " + monster_name;
+        }
         if (window_name == "Romantic Monster")
         {
             fighting_monster = get_property_monster("romanticTarget");
             window_display_name = "Arrowed " + __misc_state_string["Romantic Monster Name"].to_lower_case();
+        }
+        if (window_name == "Nemesis Assassin" && __quest_state["Nemesis"].mafia_internal_step >= 26)
+        {
+            //someone reported they saw this window after going past the relevant quest step; safety ignore
+            continue;
         }
         subentry.header = window_display_name;
         

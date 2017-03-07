@@ -70,7 +70,9 @@ void IOTMMayoClinicGenerateResource(ChecklistEntry [int] resource_entries)
             string line = "Need blood mayo to yellow ray";
             if ($effect[everything looks yellow].have_effect() > 0)
                 line += " later";
-            line += ".|Use a mayo packet.";
+            line += ".";
+            if (get_property("mayoInMouth") == "")
+                line += "|Use a mayo packet.";
             description.listAppend(line);
             if (availableFullness() > 0)
                 url = "campground.php?action=workshed";

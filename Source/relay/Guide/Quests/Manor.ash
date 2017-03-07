@@ -85,7 +85,7 @@ void QManorInit()
 
 void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (!__quest_state["Manor Unlock"].in_progress)
+	if (!__quest_state["Manor Unlock"].in_progress && __misc_state["in run"])
 		return;
     
     boolean should_output_optionally = false;
@@ -128,7 +128,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     if ($item[telegram from Lady Spookyraven].available_amount() > 0)
         second_floor_probably_open = false;
     
-    if (second_floor_probably_open)
+    if (second_floor_probably_open && __misc_state["in run"])
     {
         if ($item[Lady Spookyraven's necklace].available_amount() > 0 && get_property("questM20Necklace") != "finished")
         {
@@ -342,7 +342,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         image_name = "__item tiny knife and fork";
         subentry.entries.listAppend("To unlock the Haunted Billiards Room.");
         
-        if (get_property("romanticTarget").to_monster() == $monster[writing desk] && get_property_int("_romanticFightsLeft") > 0 || get_property_int("writingDesksDefeated") > 0)
+        if (get_property("romanticTarget").to_monster() == $monster[writing desk] && get_property_int("_romanticFightsLeft") > 0 || get_property_int("writingDesksDefeated") > 0 && __misc_state["in run"])
         {
             subentry.entries.listAppend(HTMLGenerateSpanFont("Avoid adventuring here,", "red") + " as you seem to be using the writing desk trick?|Need to fight " + pluraliseWordy(clampi(5 - get_property_int("writingDesksDefeated"), 0, 5), "more writing desk.", "more writing desks."));
         }
@@ -487,7 +487,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
             subentry.entries.listAppend("Drunkenness effect: " + pool_skill_string + " pool skill.");
         }
     }
-    else
+    else if (!second_floor_probably_open)
     {
         //Library:
         subentry.header = "Adventure in the Haunted Library";

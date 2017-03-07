@@ -1,8 +1,6 @@
 import "relay/Guide/Support/List.ash"
 import "relay/Guide/Support/Math.ash"
 import "relay/Guide/Support/Library.ash"
-import "relay/Guide/Support/HTML.ash"
-import "relay/Guide/Support/Holiday.ash"
 
 Record Counter
 {
@@ -84,6 +82,7 @@ boolean CounterMayHitNextTurn(Counter c)
         return true; //maaaybe?
     return false;
 }
+
 boolean CounterMayHitInXTurns(Counter c, int turns_limit)
 {
     if (!c.initialised)
@@ -104,13 +103,15 @@ boolean CounterMayHitInXTurns(Counter c, int turns_limit)
     //turn range:
     else if (c.found_start_turn_range)
     {
-        if (c.range_start_turn <= turns_limit)
+        if (c.range_start_turn <= turns_limit && c.range_end_turn >= 0)
             return true;
         else
             return false;
     }
-    else if (c.found_end_turn_range)
+    else if (c.found_end_turn_range && c.range_end_turn >= 0)
+    {
         return true; //maaaybe?
+    }
     return false;
 }
 
@@ -166,7 +167,9 @@ boolean CounterExists(Counter c)
 buffer CounterDescription(Counter c)
 {
     if (!c.initialised)
+    {
         return "Uninitialised".to_buffer();
+    }
     buffer description;
     description.append(c.name);
     if (!c.CounterExists())
@@ -209,7 +212,7 @@ void CountersParseProperty(string property_name, Counter [string] counters, bool
     }
     
 	string counter_string = get_property(property_name);
-    /*Strangeness:
+    /*_tempRelayCounters uses | as a separator, relayCounters does not:
 > get _tempRelayCounters
 
 15:Romantic Monster window begin loc=*:lparen.gif|25:Romantic Monster window end loc=* type=wander:rparen.gif|7:Digitize Monster loc=* type=wander:watch.gif|7:Digitize Monster loc=* type=wander:watch.gif|7:Digitize Monster loc=* type=wander:watch.gif|
@@ -217,8 +220,6 @@ void CountersParseProperty(string property_name, Counter [string] counters, bool
 > get relayCounters
 
 70:Semirare window begin:lparen.gif:80:Semirare window end loc=*:rparen.gif
-
-    Why does one use | as a seperator, and the other doesn't?
     */
 	string [int] counter_split = split_string(counter_string.replace_string("|", ":"), ":"); //FIXME | properly
     //print_html("counter_split = " + counter_split.to_json());
@@ -296,7 +297,7 @@ void CountersParseProperty(string property_name, Counter [string] counters, bool
         {
             final_name = "Semi-rare";
         }
-        final_name = final_name.HTMLEscapeString();
+        final_name = final_name.entity_encode();
         
         //Now create and edit our counter:
         
@@ -416,6 +417,11 @@ Counter CounterLookup(string counter_name, Error found)
     return CounterLookup(counter_name, found, false);
 }
 
+Counter CounterLookup(string counter_name, boolean allow_temp_counters)
+{
+    return CounterLookup(counter_name, ErrorMake(), allow_temp_counters);
+}
+
 Counter CounterLookup(string counter_name)
 {
     return CounterLookup(counter_name, ErrorMake());
@@ -447,7 +453,7 @@ void CountersReparse()
 
 
 
-boolean [string] __wandering_monster_counter_names = $strings[Romantic Monster,Rain Monster,Holiday Monster,Nemesis Assassin,Bee,WoL Monster,Digitize Monster];
+boolean [string] __wandering_monster_counter_names = $strings[Romantic Monster,Rain Monster,Holiday Monster,Nemesis Assassin,Bee,WoL Monster,Digitize Monster,Enamorang Monster];
 
 
 //This is for ascension automation scripts. Call this immediately before adventuring in an adventure.php zone.
