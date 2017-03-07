@@ -2,7 +2,7 @@
 
 since 17.6; //the earliest main release that supports map literals
 //These settings are for development. Don't worry about editing them.
-string __version = "1.4.21";
+string __version = "1.4.22";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -1757,6 +1757,11 @@ boolean get_property_ascension(string property)
     return get_property_int(property) == my_ascensions();
 }
 
+element get_property_element(string property)
+{
+    return get_property(property).to_element();
+}
+
 boolean mafiaIsPastRevision(int revision_number)
 {
     if (get_revision() <= 0) //get_revision reports zero in certain cases; assume they're on a recent version
@@ -1973,6 +1978,17 @@ item [int] items_missing(boolean [item] items)
     {
         if (it.available_amount() == 0)
             result.listAppend(it);
+    }
+    return result;
+}
+
+skill [int] skills_missing(boolean [skill] skills)
+{
+    skill [int] result;
+    foreach s in skills
+    {
+        if (!s.have_skill())
+            result.listAppend(s);
     }
     return result;
 }
@@ -3127,11 +3143,24 @@ int effective_familiar_weight(familiar f)
     return weight;
 }
 
+boolean year_is_leap_year(int year)
+{
+    if (year % 4 != 0) return false;
+    if (year % 100 != 0) return true;
+    if (year % 400 != 0) return false;
+    return true;
+}
+
 boolean today_is_pvp_season_end()
 {
     string today = format_today_to_string("MMdd");
-    if (today == "0228" && false) //FIXME support this by calculating leap years.
-        return true;
+    if (today == "0228")
+    {
+        int year = format_today_to_string("yyyy").to_int();
+        boolean is_leap_year = year_is_leap_year(year);
+        if (!is_leap_year)
+            return true;
+    }
     else if (today == "0229") //will always be true, but won't always be there
         return true;
     else if (today == "0430")
@@ -3143,10 +3172,6 @@ boolean today_is_pvp_season_end()
     else if (today == "1031")
         return true;
     else if (today == "1231")
-        return true;
-    else if (today == "REPLACEME")
-        return true;
-    else if (today == "REPLACEME")
         return true;
     return false;
 }
@@ -3488,279 +3513,6 @@ string __blue_pill_image = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAA
 
 
 
-
-
-float __setting_indention_width_in_em = 1.45;
-string __setting_indention_width = __setting_indention_width_in_em + "em";
-
-string __html_right_arrow_character = "&#9658;";
-
-buffer HTMLGenerateTagPrefix(string tag, string [string] attributes)
-{
-	buffer result;
-	result.append("<");
-	result.append(tag);
-	foreach attribute_name, attribute_value in attributes
-	{
-		//string attribute_value = attributes[attribute_name];
-		result.append(" ");
-		result.append(attribute_name);
-		if (attribute_value != "")
-		{
-			boolean is_integer = attribute_value.is_integer(); //don't put quotes around integer attributes (i.e. width, height)
-			
-			result.append("=");
-			if (!is_integer)
-				result.append("\"");
-			result.append(attribute_value);
-			if (!is_integer)
-				result.append("\"");
-		}
-	}
-	result.append(">");
-	return result;
-}
-
-buffer HTMLGenerateTagPrefix(string tag)
-{
-    buffer result;
-    result.append("<");
-    result.append(tag);
-    result.append(">");
-    return result;
-}
-
-buffer HTMLGenerateTagSuffix(string tag)
-{
-    buffer result;
-    result.append("</");
-    result.append(tag);
-    result.append(">");
-    return result;
-}
-
-buffer HTMLGenerateTagWrap(string tag, string source, string [string] attributes)
-{
-    buffer result;
-    result.append(HTMLGenerateTagPrefix(tag, attributes));
-    result.append(source);
-    result.append(HTMLGenerateTagSuffix(tag));
-	return result;
-}
-
-buffer HTMLGenerateTagWrap(string tag, string source)
-{
-    buffer result;
-    result.append(HTMLGenerateTagPrefix(tag));
-    result.append(source);
-    result.append(HTMLGenerateTagSuffix(tag));
-	return result;
-}
-
-buffer HTMLGenerateDivOfClass(string source, string class_name)
-{
-	if (class_name == "")
-		return HTMLGenerateTagWrap("div", source);
-	else
-		return HTMLGenerateTagWrap("div", source, mapMake("class", class_name));
-}
-
-buffer HTMLGenerateDivOfClass(string source, string class_name, string extra_style)
-{
-	return HTMLGenerateTagWrap("div", source, mapMake("class", class_name, "style", extra_style));
-}
-
-buffer HTMLGenerateDivOfStyle(string source, string style)
-{
-	if (style == "")
-		return HTMLGenerateTagWrap("div", source);
-	
-	return HTMLGenerateTagWrap("div", source, mapMake("style", style));
-}
-
-buffer HTMLGenerateDiv(string source)
-{
-    return HTMLGenerateTagWrap("div", source);
-}
-
-buffer HTMLGenerateSpan(string source)
-{
-    return HTMLGenerateTagWrap("span", source);
-}
-
-buffer HTMLGenerateSpanOfClass(string source, string class_name)
-{
-	if (class_name == "")
-		return HTMLGenerateTagWrap("span", source);
-	else
-		return HTMLGenerateTagWrap("span", source, mapMake("class", class_name));
-}
-
-buffer HTMLGenerateSpanOfStyle(string source, string style)
-{
-	if (style == "")
-    {
-        buffer out;
-        out.append(source);
-        return out;
-    }
-	return HTMLGenerateTagWrap("span", source, mapMake("style", style));
-}
-
-buffer HTMLGenerateSpanFont(string source, string font_colour, string font_size)
-{
-	if (font_colour == "" && font_size == "")
-    {
-        buffer out;
-        out.append(source);
-        return out;
-    }
-		
-	buffer style;
-	
-	if (font_colour != "")
-    {
-		//style += "color:" + font_colour + ";";
-        style.append("color:");
-        style.append(font_colour);
-        style.append(";");
-    }
-	if (font_size != "")
-    {
-		//style += "font-size:" + font_size + ";";
-        style.append("font-size:");
-        style.append(font_size);
-        style.append(";");
-    }
-	return HTMLGenerateSpanOfStyle(source, style.to_string());
-}
-
-buffer HTMLGenerateSpanFont(string source, string font_colour)
-{
-    return HTMLGenerateSpanFont(source, font_colour, "");
-}
-
-string HTMLConvertStringToAnchorID(string id)
-{
-    if (id.length() == 0)
-        return id;
-    
-	id = to_string(replace_string(id, " ", "_"));
-	//ID and NAME must begin with a letter ([A-Za-z]) and may be followed by any number of letters, digits ([0-9]), hyphens ("-"), underscores ("_"), colons (":"), and periods (".")
-    
-	//FIXME do that
-	return id;
-}
-
-string HTMLEscapeString(string line)
-{
-    return entity_encode(line);
-}
-
-string HTMLStripTags(string html)
-{
-    matcher pattern = create_matcher("<[^>]*>", html);
-    return pattern.replace_all("");
-}
-
-
-string [string] generateMainLinkMap(string url)
-{
-    return mapMake("class", "r_a_undecorated", "href", url, "target", "mainpane");
-}
-
-
-
-string HTMLGreyOutTextUnlessTrue(string text, boolean conditional)
-{
-    if (conditional)
-        return text;
-    return HTMLGenerateSpanFont(text, "gray");
-}
-boolean [string] getHolidaysForDate(string realworld_date, int game_day)
-{
-    boolean [string] holidays;
-    
-    if (realworld_date == "0202")
-        holidays["Groundhog Day"] = true;
-    //april fools
-    else if (realworld_date == "0401")
-        holidays["April Fool's Day"] = true;
-    //Talk Like a Pirate Day - september 19th
-    else if (realworld_date == "0919")
-        holidays["Talk Like a Pirate Day"] = true;
-    else if (realworld_date == "1031")
-        holidays["Halloween"] = true;
-    else if (realworld_date == "0214")
-        holidays["Valentine's Day"] = true;
-    else if (realworld_date == "0525")
-        holidays["Towel Day"] = true;
-    
-    //Crimbo
-    if (now_to_string("M").to_int_silent() == 12)
-        holidays["Crimbo"] = true;
-        
-    //Friday the 13th
-    if (format_today_to_string("EEE d") == "Fri 13")
-        holidays["Friday the 13th"] = true;
-    
-    
-    
-    //Festival of Jarlsberg - acquire the party hat? - Jarlsuary 1
-    if (game_day == 0)
-        holidays["Festival of Jarlsberg"] = true;
-    //Valentine's Day! - Frankuary 4
-    else if (game_day == 11)
-        holidays["Valentine's Day"] = true;
-    //St. Sneaky Pete's Day - Starch 3
-    else if (game_day == 18)
-        holidays["St. Sneaky Pete's Day"] = true;
-    //Oyster Egg Day - April 2
-    else if (game_day == 25)
-        holidays["Oyster Egg Day"] = true;
-    //El Dia de Los Muertos Borrachos? just wandering monsters... - Martinus 2
-    else if (game_day == 33)
-        holidays["El Dia de Los Muertos Borrachos"] = true;
-    //Generic Summer Holiday - Bill 3
-    else if (game_day == 42)
-        holidays["Generic Summer Holiday"] = true;
-    //Dependence Day - Bor 4
-    else if (game_day == 51)
-        holidays["Dependence Day"] = true;
-    //Arrrbor Day - Petember 4
-    else if (game_day == 59)
-        holidays["Arrrbor Day"] = true;
-    //Labór Day - Carlvember 6
-    else if (game_day == 69)
-        holidays["Labór Day"] = true;
-    //Halloween / halloween tomorrow, save adventures? - Porktober 8
-    else if (game_day == 79)
-        holidays["Halloween"] = true;
-    //feast of boris...? - Boozember 7
-    else if (game_day == 86)
-        holidays["Feast of Boris"] = true;
-    //Yuletide? - Dougtember 4
-    else if (game_day == 91)
-        holidays["Yuletide"] = true;
-        
-    
-    return holidays;
-}
-
-boolean [string] getHolidaysToday()
-{
-    boolean [string] holidays = getHolidaysForDate(format_today_to_string("MMdd"), gameday_to_int()); //FIXME Y10K error
-    if (holiday() != "")
-        holidays[holiday()] = true;
-    return holidays;
-}
-
-boolean [string] getHolidaysTomorrow()
-{
-    //FIXME support next real-world day
-    return getHolidaysForDate("", ((gameday_to_int() + 1) % 96));
-}
-
 Record Counter
 {
     string name;
@@ -3841,6 +3593,7 @@ boolean CounterMayHitNextTurn(Counter c)
         return true; //maaaybe?
     return false;
 }
+
 boolean CounterMayHitInXTurns(Counter c, int turns_limit)
 {
     if (!c.initialised)
@@ -3861,13 +3614,15 @@ boolean CounterMayHitInXTurns(Counter c, int turns_limit)
     //turn range:
     else if (c.found_start_turn_range)
     {
-        if (c.range_start_turn <= turns_limit)
+        if (c.range_start_turn <= turns_limit && c.range_end_turn >= 0)
             return true;
         else
             return false;
     }
-    else if (c.found_end_turn_range)
+    else if (c.found_end_turn_range && c.range_end_turn >= 0)
+    {
         return true; //maaaybe?
+    }
     return false;
 }
 
@@ -3923,7 +3678,9 @@ boolean CounterExists(Counter c)
 buffer CounterDescription(Counter c)
 {
     if (!c.initialised)
+    {
         return "Uninitialised".to_buffer();
+    }
     buffer description;
     description.append(c.name);
     if (!c.CounterExists())
@@ -3966,7 +3723,7 @@ void CountersParseProperty(string property_name, Counter [string] counters, bool
     }
     
 	string counter_string = get_property(property_name);
-    /*Strangeness:
+    /*_tempRelayCounters uses | as a separator, relayCounters does not:
 > get _tempRelayCounters
 
 15:Romantic Monster window begin loc=*:lparen.gif|25:Romantic Monster window end loc=* type=wander:rparen.gif|7:Digitize Monster loc=* type=wander:watch.gif|7:Digitize Monster loc=* type=wander:watch.gif|7:Digitize Monster loc=* type=wander:watch.gif|
@@ -3974,8 +3731,6 @@ void CountersParseProperty(string property_name, Counter [string] counters, bool
 > get relayCounters
 
 70:Semirare window begin:lparen.gif:80:Semirare window end loc=*:rparen.gif
-
-    Why does one use | as a seperator, and the other doesn't?
     */
 	string [int] counter_split = split_string(counter_string.replace_string("|", ":"), ":"); //FIXME | properly
     //print_html("counter_split = " + counter_split.to_json());
@@ -4053,7 +3808,7 @@ void CountersParseProperty(string property_name, Counter [string] counters, bool
         {
             final_name = "Semi-rare";
         }
-        final_name = final_name.HTMLEscapeString();
+        final_name = final_name.entity_encode();
         
         //Now create and edit our counter:
         
@@ -4173,6 +3928,11 @@ Counter CounterLookup(string counter_name, Error found)
     return CounterLookup(counter_name, found, false);
 }
 
+Counter CounterLookup(string counter_name, boolean allow_temp_counters)
+{
+    return CounterLookup(counter_name, ErrorMake(), allow_temp_counters);
+}
+
 Counter CounterLookup(string counter_name)
 {
     return CounterLookup(counter_name, ErrorMake());
@@ -4204,7 +3964,7 @@ void CountersReparse()
 
 
 
-boolean [string] __wandering_monster_counter_names = $strings[Romantic Monster,Rain Monster,Holiday Monster,Nemesis Assassin,Bee,WoL Monster,Digitize Monster];
+boolean [string] __wandering_monster_counter_names = $strings[Romantic Monster,Rain Monster,Holiday Monster,Nemesis Assassin,Bee,WoL Monster,Digitize Monster,Enamorang Monster];
 
 
 //This is for ascension automation scripts. Call this immediately before adventuring in an adventure.php zone.
@@ -5702,6 +5462,196 @@ EquipmentStatRequirement StatRequirementForEquipment(item it)
 {
     initialiseEquipmentRequirements();
     return __equipment_stat_requirements[it];
+}
+
+
+
+float __setting_indention_width_in_em = 1.45;
+string __setting_indention_width = __setting_indention_width_in_em + "em";
+
+string __html_right_arrow_character = "&#9658;";
+
+buffer HTMLGenerateTagPrefix(string tag, string [string] attributes)
+{
+	buffer result;
+	result.append("<");
+	result.append(tag);
+	foreach attribute_name, attribute_value in attributes
+	{
+		//string attribute_value = attributes[attribute_name];
+		result.append(" ");
+		result.append(attribute_name);
+		if (attribute_value != "")
+		{
+			boolean is_integer = attribute_value.is_integer(); //don't put quotes around integer attributes (i.e. width, height)
+			
+			result.append("=");
+			if (!is_integer)
+				result.append("\"");
+			result.append(attribute_value);
+			if (!is_integer)
+				result.append("\"");
+		}
+	}
+	result.append(">");
+	return result;
+}
+
+buffer HTMLGenerateTagPrefix(string tag)
+{
+    buffer result;
+    result.append("<");
+    result.append(tag);
+    result.append(">");
+    return result;
+}
+
+buffer HTMLGenerateTagSuffix(string tag)
+{
+    buffer result;
+    result.append("</");
+    result.append(tag);
+    result.append(">");
+    return result;
+}
+
+buffer HTMLGenerateTagWrap(string tag, string source, string [string] attributes)
+{
+    buffer result;
+    result.append(HTMLGenerateTagPrefix(tag, attributes));
+    result.append(source);
+    result.append(HTMLGenerateTagSuffix(tag));
+	return result;
+}
+
+buffer HTMLGenerateTagWrap(string tag, string source)
+{
+    buffer result;
+    result.append(HTMLGenerateTagPrefix(tag));
+    result.append(source);
+    result.append(HTMLGenerateTagSuffix(tag));
+	return result;
+}
+
+buffer HTMLGenerateDivOfClass(string source, string class_name)
+{
+	if (class_name == "")
+		return HTMLGenerateTagWrap("div", source);
+	else
+		return HTMLGenerateTagWrap("div", source, mapMake("class", class_name));
+}
+
+buffer HTMLGenerateDivOfClass(string source, string class_name, string extra_style)
+{
+	return HTMLGenerateTagWrap("div", source, mapMake("class", class_name, "style", extra_style));
+}
+
+buffer HTMLGenerateDivOfStyle(string source, string style)
+{
+	if (style == "")
+		return HTMLGenerateTagWrap("div", source);
+	
+	return HTMLGenerateTagWrap("div", source, mapMake("style", style));
+}
+
+buffer HTMLGenerateDiv(string source)
+{
+    return HTMLGenerateTagWrap("div", source);
+}
+
+buffer HTMLGenerateSpan(string source)
+{
+    return HTMLGenerateTagWrap("span", source);
+}
+
+buffer HTMLGenerateSpanOfClass(string source, string class_name)
+{
+	if (class_name == "")
+		return HTMLGenerateTagWrap("span", source);
+	else
+		return HTMLGenerateTagWrap("span", source, mapMake("class", class_name));
+}
+
+buffer HTMLGenerateSpanOfStyle(string source, string style)
+{
+	if (style == "")
+    {
+        buffer out;
+        out.append(source);
+        return out;
+    }
+	return HTMLGenerateTagWrap("span", source, mapMake("style", style));
+}
+
+buffer HTMLGenerateSpanFont(string source, string font_colour, string font_size)
+{
+	if (font_colour == "" && font_size == "")
+    {
+        buffer out;
+        out.append(source);
+        return out;
+    }
+		
+	buffer style;
+	
+	if (font_colour != "")
+    {
+		//style += "color:" + font_colour + ";";
+        style.append("color:");
+        style.append(font_colour);
+        style.append(";");
+    }
+	if (font_size != "")
+    {
+		//style += "font-size:" + font_size + ";";
+        style.append("font-size:");
+        style.append(font_size);
+        style.append(";");
+    }
+	return HTMLGenerateSpanOfStyle(source, style.to_string());
+}
+
+buffer HTMLGenerateSpanFont(string source, string font_colour)
+{
+    return HTMLGenerateSpanFont(source, font_colour, "");
+}
+
+string HTMLConvertStringToAnchorID(string id)
+{
+    if (id.length() == 0)
+        return id;
+    
+	id = to_string(replace_string(id, " ", "_"));
+	//ID and NAME must begin with a letter ([A-Za-z]) and may be followed by any number of letters, digits ([0-9]), hyphens ("-"), underscores ("_"), colons (":"), and periods (".")
+    
+	//FIXME do that
+	return id;
+}
+
+string HTMLEscapeString(string line)
+{
+    return entity_encode(line);
+}
+
+string HTMLStripTags(string html)
+{
+    matcher pattern = create_matcher("<[^>]*>", html);
+    return pattern.replace_all("");
+}
+
+
+string [string] generateMainLinkMap(string url)
+{
+    return mapMake("class", "r_a_undecorated", "href", url, "target", "mainpane");
+}
+
+
+
+string HTMLGreyOutTextUnlessTrue(string text, boolean conditional)
+{
+    if (conditional)
+        return text;
+    return HTMLGenerateSpanFont(text, "gray");
 }
 
 
@@ -12959,7 +12909,10 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
                 url = "place.php?whichplace=desertbeach";
                 subentry.header = "Vacation at the shore";
                 image_name = "__item your father's MacGuffin diary";
-                subentry.entries.listAppend("To acquire your father's diary.");
+                string diary_owner = "your father's";
+                if (my_path_id() == PATH_GELATINOUS_NOOB)
+                    diary_owner = "an archeologist's";
+                subentry.entries.listAppend("To acquire " + diary_owner + " diary.");
             }
         }
     }
@@ -13792,7 +13745,7 @@ __flavour_lookup[$element[sleaze]] = $effect[Spirit of Bacon Grease];
 
 float damageForElementAgainstElement(float base_damage, element attacking_element, element defence_element)
 {
-    if (defence_element == $element[none])
+    if (defence_element == $element[none] || attacking_element == $element[none])
         return base_damage;
     if (attacking_element == defence_element)
         return 1;
@@ -13825,7 +13778,8 @@ float damageForElementAgainstElement(float base_damage, element attacking_elemen
     attack_versus_element[$element[cold]][$element[stench]] = 2.0;
     
     
-    return MAX(1, base_damage * attack_versus_element[attacking_element][defence_element]);
+    float final = MAX(1, base_damage * attack_versus_element[attacking_element][defence_element]);
+    return final;
 }
 
 element currentFlavourElement()
@@ -14396,7 +14350,7 @@ boolean generateTowerFamiliarWeightMethod(string [int] how, string [int] immedia
     }
     if (__misc_state["VIP available"] && __misc_state["can drink just about anything"])
     {
-        if (get_property_int("_speakeasyDrinksDrunk") <3 && availableDrunkenness() >= 3)
+        if (get_property_int("_speakeasyDrinksDrunk") <3 && availableDrunkenness() >= 3 && $item[clan speakeasy].is_unrestricted())
         {
             boolean have_effect = $effect[1701].have_effect() > 0; //hip to the jive
             weight_modifiers.listAppend(TFWMInternalModifierMake("Speakeasy hot socks", have_effect, true, true, 10.0));
@@ -15762,7 +15716,7 @@ void QManorInit()
 
 void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (!__quest_state["Manor Unlock"].in_progress)
+	if (!__quest_state["Manor Unlock"].in_progress && __misc_state["in run"])
 		return;
     
     boolean should_output_optionally = false;
@@ -15805,7 +15759,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     if ($item[telegram from Lady Spookyraven].available_amount() > 0)
         second_floor_probably_open = false;
     
-    if (second_floor_probably_open)
+    if (second_floor_probably_open && __misc_state["in run"])
     {
         if ($item[Lady Spookyraven's necklace].available_amount() > 0 && get_property("questM20Necklace") != "finished")
         {
@@ -16019,7 +15973,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         image_name = "__item tiny knife and fork";
         subentry.entries.listAppend("To unlock the Haunted Billiards Room.");
         
-        if (get_property("romanticTarget").to_monster() == $monster[writing desk] && get_property_int("_romanticFightsLeft") > 0 || get_property_int("writingDesksDefeated") > 0)
+        if (get_property("romanticTarget").to_monster() == $monster[writing desk] && get_property_int("_romanticFightsLeft") > 0 || get_property_int("writingDesksDefeated") > 0 && __misc_state["in run"])
         {
             subentry.entries.listAppend(HTMLGenerateSpanFont("Avoid adventuring here,", "red") + " as you seem to be using the writing desk trick?|Need to fight " + pluraliseWordy(clampi(5 - get_property_int("writingDesksDefeated"), 0, 5), "more writing desk.", "more writing desks."));
         }
@@ -16164,7 +16118,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
             subentry.entries.listAppend("Drunkenness effect: " + pool_skill_string + " pool skill.");
         }
     }
-    else
+    else if (!second_floor_probably_open)
     {
         //Library:
         subentry.header = "Adventure in the Haunted Library";
@@ -23275,6 +23229,12 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
 		entry.should_indent_after_first_subentry = true;
 		resource_entries.listAppend(entry);
 	}
+    
+    
+    if (lookupSkill("Evoke Eldritch Horror").have_skill() && !get_property_boolean("_eldritchHorrorEvoked"))
+    {
+        resource_entries.listAppend(ChecklistEntryMake("__skill Evoke Eldritch Horror", "skillz.php", ChecklistSubentryMake("Evoke Eldritch Horror", "", "Free fight."), 5));
+    }
 }
 void SMiscItemsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
@@ -25474,6 +25434,89 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 
 }
 
+boolean [string] getHolidaysForDate(string realworld_date, int game_day)
+{
+    boolean [string] holidays;
+    
+    if (realworld_date == "0202")
+        holidays["Groundhog Day"] = true;
+    //april fools
+    else if (realworld_date == "0401")
+        holidays["April Fool's Day"] = true;
+    //Talk Like a Pirate Day - september 19th
+    else if (realworld_date == "0919")
+        holidays["Talk Like a Pirate Day"] = true;
+    else if (realworld_date == "1031")
+        holidays["Halloween"] = true;
+    else if (realworld_date == "0214")
+        holidays["Valentine's Day"] = true;
+    else if (realworld_date == "0525")
+        holidays["Towel Day"] = true;
+    
+    //Crimbo
+    if (now_to_string("M").to_int_silent() == 12)
+        holidays["Crimbo"] = true;
+        
+    //Friday the 13th
+    if (format_today_to_string("EEE d") == "Fri 13")
+        holidays["Friday the 13th"] = true;
+    
+    
+    
+    //Festival of Jarlsberg - acquire the party hat? - Jarlsuary 1
+    if (game_day == 0)
+        holidays["Festival of Jarlsberg"] = true;
+    //Valentine's Day! - Frankuary 4
+    else if (game_day == 11)
+        holidays["Valentine's Day"] = true;
+    //St. Sneaky Pete's Day - Starch 3
+    else if (game_day == 18)
+        holidays["St. Sneaky Pete's Day"] = true;
+    //Oyster Egg Day - April 2
+    else if (game_day == 25)
+        holidays["Oyster Egg Day"] = true;
+    //El Dia de Los Muertos Borrachos? just wandering monsters... - Martinus 2
+    else if (game_day == 33)
+        holidays["El Dia de Los Muertos Borrachos"] = true;
+    //Generic Summer Holiday - Bill 3
+    else if (game_day == 42)
+        holidays["Generic Summer Holiday"] = true;
+    //Dependence Day - Bor 4
+    else if (game_day == 51)
+        holidays["Dependence Day"] = true;
+    //Arrrbor Day - Petember 4
+    else if (game_day == 59)
+        holidays["Arrrbor Day"] = true;
+    //Labór Day - Carlvember 6
+    else if (game_day == 69)
+        holidays["Labór Day"] = true;
+    //Halloween / halloween tomorrow, save adventures? - Porktober 8
+    else if (game_day == 79)
+        holidays["Halloween"] = true;
+    //feast of boris...? - Boozember 7
+    else if (game_day == 86)
+        holidays["Feast of Boris"] = true;
+    //Yuletide? - Dougtember 4
+    else if (game_day == 91)
+        holidays["Yuletide"] = true;
+        
+    
+    return holidays;
+}
+
+boolean [string] getHolidaysToday()
+{
+    boolean [string] holidays = getHolidaysForDate(format_today_to_string("MMdd"), gameday_to_int()); //FIXME Y10K error
+    if (holiday() != "")
+        holidays[holiday()] = true;
+    return holidays;
+}
+
+boolean [string] getHolidaysTomorrow()
+{
+    //FIXME support next real-world day
+    return getHolidaysForDate("", ((gameday_to_int() + 1) % 96));
+}
 
 void SCountersInit()
 {
@@ -25608,12 +25651,13 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
     window_image_names["WoL Monster"] = "__effect Cowrruption";
     window_image_names["Digitize Monster"] = "__item source essence";
     window_image_names["Romantic Monster"] = "__familiar " + __misc_state_string["obtuse angel name"];
+    window_image_names["Enamorang Monster"] = "__item lov enamorang";
     //window_image_names["Event Monster"] = ""; //no idea
     
     
     
     boolean [string] counter_blacklist = $strings[Semi-rare]; //Romantic Monster,
-    boolean [string] non_range_whitelist = $strings[Digitize Monster];
+    boolean [string] non_range_whitelist = $strings[Digitize Monster,Enamorang Monster];
     
     string [int] all_counter_names = CounterGetAllNames(true);
     
@@ -25657,10 +25701,24 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
             else
                 window_display_name = "Digitised " + monster_name;
         }
+        if (window_name == "Enamorang Monster")
+        {
+            fighting_monster = get_property_monster("enamorangMonster");
+            string monster_name = fighting_monster.to_lower_case();
+            if (monster_name == "")
+                window_display_name = "Boomerang'd monster";
+            else
+                window_display_name = "Boomerang'd " + monster_name;
+        }
         if (window_name == "Romantic Monster")
         {
             fighting_monster = get_property_monster("romanticTarget");
             window_display_name = "Arrowed " + __misc_state_string["Romantic Monster Name"].to_lower_case();
+        }
+        if (window_name == "Nemesis Assassin" && __quest_state["Nemesis"].mafia_internal_step >= 26)
+        {
+            //someone reported they saw this window after going past the relevant quest step; safety ignore
+            continue;
         }
         subentry.header = window_display_name;
         
@@ -26882,11 +26940,12 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             item_descriptions[$item[resolution: be sexier]] = "+2 moxie stats/fight (20 turns)";
             item_effects[$item[resolution: be sexier]] = $effect[Irresistible Resolve];
             
-            if (in_ronin() && !in_bad_moon() && my_primestat() == $stat[moxie]) //better used for +init otherwise
+            //Always better used for +init, since the tower tests came into existence?
+            /*if (in_ronin() && !in_bad_moon() && my_primestat() == $stat[moxie]) //better used for +init otherwise
             {
                 item_descriptions[$item[old bronzer]] = "+2 moxie stats/fight (25 turns)";
                 item_effects[$item[old bronzer]] = $effect[Sepia Tan];
-            }
+            }*/
         }
 
         if (__misc_state["need to level muscle"])
@@ -28773,7 +28832,7 @@ void SMiscTasksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
 				potential_targets.listAppend("A bat. (sonar-in-a-biscuit)");
 		}
         
-        if (__misc_state["stench airport available"] && $item[filthy child leash].available_amount() == 0 && !__misc_state["familiars temporarily blocked"] && $items[ittah bittah hookah,astral pet sweater,snow suit,lead necklace].available_amount() == 0 && in_ronin() && my_path_id() != PATH_HEAVY_RAINS)
+        if (__misc_state["stench airport available"] && $item[filthy child leash].available_amount() == 0 && !__misc_state["familiars temporarily blocked"] && $items[ittah bittah hookah,astral pet sweater,snow suit,lead necklace].available_amount() == 0 && in_ronin() && my_path_id() != PATH_HEAVY_RAINS && my_path_id() != PATH_GELATINOUS_NOOB)
         {
             potential_targets.listAppend("Horrible tourist family (barf mountain) - +5 familiar weight leash.");
         }
@@ -28838,14 +28897,19 @@ void SMiscTasksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     
     if (__misc_state["in run"] && (inebriety_limit() == 0 || my_path_id() == PATH_SLOW_AND_STEADY) && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING)
     {
-        //may be removed in the future?
-        //FIXME does this burn delay?
+        string url = "";
         string [int] modifiers;
 		if (__misc_state["have hipster"] && get_property_int("_hipsterAdv") < 7)
 		{
 			modifiers.listAppend(__misc_state_string["hipster name"]);
 		}
-		optional_task_entries.listAppend(ChecklistEntryMake("__item dead guy's watch", "", ChecklistSubentryMake("Use rollover runaway", modifiers, listMake("At the end of the day, enter a combat, but don't finish it. Rollover will end it for you.", "This gives an extra chance to look for a non-combat.")), 8));
+        string [int] description = listMake("At the end of the day, enter a combat, but don't finish it. Rollover will end it for you.", "This gives an extra chance to look for a non-combat.");
+        if (__quest_state["Level 3"].in_progress)
+        {
+            description.listAppend("Try using it to explore the typical tavern.");
+            url = "cellar.php";
+        }
+		optional_task_entries.listAppend(ChecklistEntryMake("__item dead guy's watch", url, ChecklistSubentryMake("Use rollover runaway", modifiers, description), 8));
     }
     
     //I'm not sure if you ever need a frat boy ensemble in-run, even if you're doing the hippy side on the war? If you need war hippy fatigues, the faster (?) way is acquire hippy outfit -> frat warrior fatigues -> start the war / use desert adventure for hippy fatigues. But if they're sure...
@@ -30334,7 +30398,7 @@ void setUpState()
 		//skills_temporarily_missing = true;
 		//familiars_temporarily_missing = true;
 	}
-    if (my_path_id() == PATH_AVATAR_OF_WEST_OF_LOATHING || my_path_id() == PATH_NUCLEAR_AUTUMN)
+    if (my_path_id() == PATH_AVATAR_OF_WEST_OF_LOATHING || my_path_id() == PATH_NUCLEAR_AUTUMN || my_path_id() == PATH_GELATINOUS_NOOB)
     {
         skills_temporarily_missing = true;
     }
@@ -32265,8 +32329,8 @@ void generateDailyResources(Checklist [int] checklists)
 	if (__quest_state["Level 13"].state_boolean["king waiting to be freed"])
 	{
 		string [int] description;
-		description.listAppend("Contains 1 monarch.");
-        description.listAppend(pluralise(my_ascensions(), "king", "kings") + " freed.");
+		description.listAppend("Contains one (1) monarch.");
+        description.listAppend(pluralise(my_ascensions(), "king", "kings") + " freed." + (my_ascensions() > 250 ? " Collect them all!" : ""));
         string image_name;
         image_name = "__effect sleepy";
 		resource_entries.listAppend(ChecklistEntryMake(image_name, "place.php?whichplace=nstower", ChecklistSubentryMake("1 Prism", "", description), 10));
@@ -37092,7 +37156,7 @@ string [string] generateAPIResponse()
     else if (true)
     {
         //Checking every item is slow. But certain items won't trigger a reload, but need to. So:
-        boolean [item] relevant_items = $items[photocopied monster,4-d camera,pagoda plans,Elf Farm Raffle ticket,skeleton key,heavy metal thunderrr guitarrr,heavy metal sonata,Hey Deze nuts,rave whistle,damp old boot,map to Professor Jacking's laboratory,world's most unappetizing beverage,squirmy violent party snack,White Citadel Satisfaction Satchel,rusty screwdriver,giant pinky ring,The Lost Pill Bottle,GameInformPowerDailyPro magazine,dungeoneering kit,Knob Goblin encryption key,dinghy plans,Sneaky Pete's key,Jarlsberg's key,Boris's key,fat loot token,bridge,chrome ore,asbestos ore,linoleum ore,csa fire-starting kit,tropical orchid,stick of dynamite,barbed-wire fence,psychoanalytic jar,digital key,Richard's star key,star hat,star crossbow,star staff,star sword,Wand of Nagamar,Azazel's tutu,Azazel's unicorn,Azazel's lollipop,smut orc keepsake box,blessed large box,massive sitar,hammer of smiting,chelonian morningstar,17-alarm saucepan,shagadelic disco banjo,squeezebox of the ages,E.M.U. helmet,E.M.U. harness,E.M.U. joystick,E.M.U. rocket thrusters,E.M.U. unit,wriggling flytrap pellet,Mer-kin trailmap,Mer-kin stashbox,Makeshift yakuza mask,Novelty tattoo sleeves,strange goggles,zaibatsu level 2 card,zaibatsu level 3 card,flickering pixel,jar of oil,bowl of scorpions,molybdenum magnet,steel lasagna,steel margarita,steel-scented air freshener,Grandma's Map,mer-kin healscroll,scented massage oil,soggy used band-aid,extra-strength red potion,red pixel potion,red potion,filthy poultice,gauze garter,green pixel potion,cartoon heart,red plastic oyster egg,Manual of Dexterity,Manual of Labor,Manual of Transmission,wet stunt nut stew,lost key,resolution: be more adventurous,sugar sheet,sack lunch,glob of Blank-Out,gaudy key,plus sign,Newbiesport&trade; tent,Frobozz Real-Estate Company Instant House (TM),dry cleaning receipt,book of matches,rock band flyers,jam band flyers,disassembled clover,continuum transfunctioner,UV-resistant compass,eyepatch,carton of astral energy drinks,astral hot dog dinner,astral six-pack,gym membership card,tattered scrap of paper,bowling ball, snow boards,reassembled blackbird,reconstituted crow,louder than bomb,odd silver coin,grimstone mask,empty rain-doh can,Lord Spookyraven's spectacles,lump of Brituminous coal,bone rattle,mer-kin knucklebone,spooky glove,steam-powered model rocketship,crappy camera,shaking crappy camera,hedge maze puzzle,ghost of a necklace,telegram from Lady Spookyraven,Lady Spookyraven's finest gown,recipe: mortar-dissolving solution,disposable instant camera,unstable fulminate,thunder thigh,aquaconda brain,lightning milk,White Citadel Satisfaction Satchel,handful of smithereens,Loathing Legion jackhammer,lynyrd skin,red zeppelin ticket,lynyrd snare,glark cable,Fernswarthy's key,bottle of G&uuml;-Gone,BURT,handful of juicy garbage,Jeff Goldblum larva,imbued seal-blubber candle,claw of the infernal seal,junk junk,sea lasso,seal tooth,worthless trinket,worthless gewgaw,worthless knick-knack,gnollish toolbox,poppy,opium grenade,talisman o' namsilat,toxic globule,yellow pixel,greek pasta spoon of peril,hellseal disguise,8042,uncapped red lava bottle,uncapped green lava bottle,uncapped blue lava bottle,capped red lava bottle,capped green lava bottle,capped blue lava bottle,insulated gold wire,little firkin,normal barrel,big tun,weathered barrel,dusty barrel,disintegrating barrel,moist barrel,rotting barrel,mouldering barrel,barnacled barrel,incriminating evidence,dangerous chemicals,kidnapped orphan,bat-oomerang,bat-jute,bat-o-mite,rad];
+        boolean [item] relevant_items = $items[photocopied monster,4-d camera,pagoda plans,Elf Farm Raffle ticket,skeleton key,heavy metal thunderrr guitarrr,heavy metal sonata,Hey Deze nuts,rave whistle,damp old boot,map to Professor Jacking's laboratory,world's most unappetizing beverage,squirmy violent party snack,White Citadel Satisfaction Satchel,rusty screwdriver,giant pinky ring,The Lost Pill Bottle,GameInformPowerDailyPro magazine,dungeoneering kit,Knob Goblin encryption key,dinghy plans,Sneaky Pete's key,Jarlsberg's key,Boris's key,fat loot token,bridge,chrome ore,asbestos ore,linoleum ore,csa fire-starting kit,tropical orchid,stick of dynamite,barbed-wire fence,psychoanalytic jar,digital key,Richard's star key,star hat,star crossbow,star staff,star sword,Wand of Nagamar,Azazel's tutu,Azazel's unicorn,Azazel's lollipop,smut orc keepsake box,blessed large box,massive sitar,hammer of smiting,chelonian morningstar,17-alarm saucepan,shagadelic disco banjo,squeezebox of the ages,E.M.U. helmet,E.M.U. harness,E.M.U. joystick,E.M.U. rocket thrusters,E.M.U. unit,wriggling flytrap pellet,Mer-kin trailmap,Mer-kin stashbox,Makeshift yakuza mask,Novelty tattoo sleeves,strange goggles,zaibatsu level 2 card,zaibatsu level 3 card,flickering pixel,jar of oil,bowl of scorpions,molybdenum magnet,steel lasagna,steel margarita,steel-scented air freshener,Grandma's Map,mer-kin healscroll,scented massage oil,soggy used band-aid,extra-strength red potion,red pixel potion,red potion,filthy poultice,gauze garter,green pixel potion,cartoon heart,red plastic oyster egg,Manual of Dexterity,Manual of Labor,Manual of Transmission,wet stunt nut stew,lost key,resolution: be more adventurous,sugar sheet,sack lunch,glob of Blank-Out,gaudy key,plus sign,Newbiesport&trade; tent,Frobozz Real-Estate Company Instant House (TM),dry cleaning receipt,book of matches,rock band flyers,jam band flyers,disassembled clover,continuum transfunctioner,UV-resistant compass,eyepatch,carton of astral energy drinks,astral hot dog dinner,astral six-pack,gym membership card,tattered scrap of paper,bowling ball, snow boards,reassembled blackbird,reconstituted crow,louder than bomb,odd silver coin,grimstone mask,empty rain-doh can,Lord Spookyraven's spectacles,lump of Brituminous coal,bone rattle,mer-kin knucklebone,spooky glove,steam-powered model rocketship,crappy camera,shaking crappy camera,hedge maze puzzle,ghost of a necklace,telegram from Lady Spookyraven,Lady Spookyraven's finest gown,recipe: mortar-dissolving solution,disposable instant camera,unstable fulminate,thunder thigh,aquaconda brain,lightning milk,White Citadel Satisfaction Satchel,handful of smithereens,Loathing Legion jackhammer,lynyrd skin,red zeppelin ticket,lynyrd snare,glark cable,Fernswarthy's key,bottle of G&uuml;-Gone,BURT,handful of juicy garbage,Jeff Goldblum larva,imbued seal-blubber candle,claw of the infernal seal,junk junk,sea lasso,seal tooth,worthless trinket,worthless gewgaw,worthless knick-knack,gnollish toolbox,poppy,opium grenade,talisman o' namsilat,toxic globule,yellow pixel,greek pasta spoon of peril,hellseal disguise,8042,uncapped red lava bottle,uncapped green lava bottle,uncapped blue lava bottle,capped red lava bottle,capped green lava bottle,capped blue lava bottle,insulated gold wire,little firkin,normal barrel,big tun,weathered barrel,dusty barrel,disintegrating barrel,moist barrel,rotting barrel,mouldering barrel,barnacled barrel,incriminating evidence,dangerous chemicals,kidnapped orphan,bat-oomerang,bat-jute,bat-o-mite,rad,cashew,stuffing fluffer];
         
         
         int [int] output;
@@ -37625,6 +37689,8 @@ void IOTMSpeakeasyGenerateResource(ChecklistEntry [int] resource_entries)
 
     if (!(__misc_state["can drink just about anything"] && get_property_int("_speakeasyDrinksDrunk") <3 && mafiaIsPastRevision(14155) && availableDrunkenness() >= 0))
         return;
+    if (!$item[clan speakeasy].is_unrestricted())
+        return;
         
     //speakeasy:
     /*
@@ -38131,7 +38197,9 @@ void IOTMMayoClinicGenerateResource(ChecklistEntry [int] resource_entries)
             string line = "Need blood mayo to yellow ray";
             if ($effect[everything looks yellow].have_effect() > 0)
                 line += " later";
-            line += ".|Use a mayo packet.";
+            line += ".";
+            if (get_property("mayoInMouth") == "")
+                line += "|Use a mayo packet.";
             description.listAppend(line);
             if (availableFullness() > 0)
                 url = "campground.php?action=workshed";
@@ -40902,7 +40970,7 @@ void IOTMSnojoGenerateResource(ChecklistEntry [int] resource_entries)
                 item consumable = consumable_reward_for_stat[s];
                 
                 string [int] acquirable_descriptions;
-                if (training_equipment.available_amount() == 0)
+                if (training_equipment.available_amount() == 0 && my_path_id() != PATH_GELATINOUS_NOOB)
                 {
                     acquirable_descriptions.listAppend("a " + reward_descriptions[training_equipment]);
                 }
@@ -41984,11 +42052,11 @@ void IOTMThanksgardenGenerateResource(ChecklistEntry [int] resource_entries)
     {
         string [int] description;
         string [int] options;
-        if (my_path_id() != PATH_NUCLEAR_AUTUMN)
-            options.listAppend(HTMLGreyOutTextUnlessTrue("turkey blasters to burn delay", cashew_amount >= 3));
+        if (my_path_id() != PATH_NUCLEAR_AUTUMN && spleen_limit() > 0)
+            options.listAppend(HTMLGreyOutTextUnlessTrue(pluralise($item[turkey blaster].creatable_amount(), $item[turkey blaster]) + " to burn delay", cashew_amount >= 3));
         if (!__quest_state["Level 12"].finished)
-            options.listAppend(HTMLGreyOutTextUnlessTrue("stuffing fluffers for the war", cashew_amount >= 3));
-        if (my_path_id() != PATH_NUCLEAR_AUTUMN)
+            options.listAppend(HTMLGreyOutTextUnlessTrue(pluralise($item[stuffing fluffer].creatable_amount(), $item[stuffing fluffer]) + " for the war", cashew_amount >= 3));
+        if (my_path_id() != PATH_NUCLEAR_AUTUMN && fullness_limit() > 0)
             options.listAppend("various foods");
         if (__quest_state["Level 7"].state_boolean["alcove needs speed tricks"])
             options.listAppend(HTMLGreyOutTextUnlessTrue("gravy boat for the cyrpt (somewhat marginal)", cashew_amount >= 3));
@@ -44549,8 +44617,8 @@ static
 {
     item [skill][int] __gelatinous_items_that_give_skill;
     
-    string [int] __gelatinous_skill_ids_to_descriptions {23001:"+1 hot res", 23002:"+1 hot res", 23003:"+2 hot res", 23004:"+2 hot res", 23005:"+3 hot res", 23006:"+1 cold res", 23007:"+1 cold res", 23008:"+2 cold res", 23009:"+2 cold res", 23010:"+3 cold res", 23011:"+1 stench res", 23012:"+1 stench res", 23013:"+2 stench res", 23014:"+2 stench res", 23015:"+3 stench res", 23016:"+1 spooky res", 23017:"+1 spooky res", 23018:"+2 spooky res", 23019:"+2 spooky res", 23020:"+3 spooky res", 23021:"+1 sleaze res", 23022:"+1 sleaze res", 23023:"+2 sleaze res", 23024:"+2 sleaze res", 23025:"+3 sleaze res", 23026:"+30 DA", 23027:"+40 DA", 23028:"+50 DA", 23029:"+60 DA", 23030:"+70 DA", 23031:"+5 DR", 23032:"+5 DR", 23033:"+10 DR", 23034:"+10 DR", 23035:"+20 DR", 23036:"+10% init", 23037:"+20% init", 23038:"+30% init", 23039:"+40% init", 23040:"+50% init", 23041:"+3 stats/fight", 23042:"+3 stats/fight", 23043:"+5 stats/fight", 23044:"+5 stats/fight", 23045:"+7 stats/fight", 23046:"+1 adv/absorbed item", 23047:"+1 adv/absorbed item", 23048:"+2 adv/absorbed item", 23049:"+2 adv/absorbed item", 23050:"+3 adv/absorbed item", 23051:"+5 stats/absorbed item", 23052:"+10 stats/absorbed item", 23053:"+15 stats/absorbed item", 23054:"+20 stats/absorbed item", 23055:"+25 stats/absorbed item", 23056:"+20% HP", 23057:"+30% HP", 23058:"+40% HP", 23059:"+50% HP", 23060:"+100% HP", 23061:"+20% MP", 23062:"+30% MP", 23063:"+40% MP", 23064:"+50% MP", 23065:"+100% MP", 23066:"+20% item", 23067:"+20% item", 23068:"+30% item", 23069:"+40% item", 23070:"+50% item", 23071:"+10% pickpocket", 23072:"+20% pickpocket", 23073:"+30% pickpocket", 23074:"+40% pickpocket", 23075:"+50% pickpocket", 23076:"+30% meat", 23077:"+40% meat", 23078:"+50% meat", 23079:"+60% meat", 23080:"+70% meat", 23081:"+5 muscle", 23082:"+10 muscle", 23083:"+15 muscle", 23084:"+20 muscle", 23085:"+25 muscle", 23086:"+5 myst", 23087:"+10 myst", 23088:"+15 myst", 23089:"+20 myst", 23090:"+25 myst", 23091:"+5 moxie", 23092:"+10 moxie", 23093:"+15 moxie", 23094:"+20 moxie", 23095:"+25 moxie", 23096:"+7 damage", 23097:"+9 damage", 23098:"+11 damage", 23099:"+13 damage", 23100:"+15 damage", 23101:"+3 Hot Damage", 23102:"+5 Hot Damage", 23103:"+7 Hot Damage", 23104:"+9 Hot Damage", 23105:"+11 Hot Damage", 23106:"+3 Cold Damage", 23107:"+5 Cold Damage", 23108:"+7 Cold Damage", 23109:"+9 Cold Damage", 23110:"+11 Cold Damage", 23111:"+3 Stench Damage", 23112:"+5 Stench Damage", 23113:"+7 Stench Damage", 23114:"+9 Stench Damage", 23115:"+11 Stench Damage", 23116:"+3 Spooky Damage", 23117:"+5 Spooky Damage", 23118:"+7 Spooky Damage", 23119:"+9 Spooky Damage", 23120:"+11 Spooky Damage", 23121:"+3 Sleaze Damage", 23122:"+5 Sleaze Damage", 23123:"+7 Sleaze Damage", 23124:"+9 Sleaze Damage", 23125:"+11 Sleaze Damage"};
-    int [int] __gelatinous_evaluation_order {0:23046, 1:23047, 2:23048, 3:23049, 4:23050, 5:23051, 6:23052, 7:23053, 8:23054, 9:23055, 10:23041, 11:23042, 12:23043, 13:23044, 14:23045, 15:23066, 16:23067, 17:23068, 18:23069, 19:23070, 20:23076, 21:23077, 22:23078, 23:23079, 24:23080, 25:23026, 26:23027, 27:23028, 28:23029, 29:23030, 30:23031, 31:23032, 32:23033, 33:23034, 34:23035, 35:23036, 36:23037, 37:23038, 38:23039, 39:23040, 40:23056, 41:23057, 42:23058, 43:23059, 44:23060, 45:23061, 46:23062, 47:23063, 48:23064, 49:23065, 50:23071, 51:23072, 52:23073, 53:23074, 54:23075, 55:23001, 56:23002, 57:23003, 58:23004, 59:23005, 60:23006, 61:23007, 62:23008, 63:23009, 64:23010, 65:23011, 66:23012, 67:23013, 68:23014, 69:23015, 70:23016, 71:23017, 72:23018, 73:23019, 74:23020, 75:23021, 76:23022, 77:23023, 78:23024, 79:23025, 80:23081, 81:23082, 82:23083, 83:23084, 84:23085, 85:23086, 86:23087, 87:23088, 88:23089, 89:23090, 90:23091, 91:23092, 92:23093, 93:23094, 94:23095, 95:23096, 96:23097, 97:23098, 98:23099, 99:23100, 100:23101, 101:23102, 102:23103, 103:23104, 104:23105, 105:23106, 106:23107, 107:23108, 108:23109, 109:23110, 110:23111, 111:23112, 112:23113, 113:23114, 114:23115, 115:23116, 116:23117, 117:23118, 118:23119, 119:23120, 120:23121, 121:23122, 122:23123, 123:23124, 124:23125};
+    string [int] __gelatinous_skill_ids_to_descriptions {23001:"+1 hot res", 23002:"+1 hot res", 23003:"+2 hot res", 23004:"+2 hot res", 23005:"+3 hot res", 23006:"+1 cold res", 23007:"+1 cold res", 23008:"+2 cold res", 23009:"+2 cold res", 23010:"+3 cold res", 23011:"+1 stench res", 23012:"+1 stench res", 23013:"+2 stench res", 23014:"+2 stench res", 23015:"+3 stench res", 23016:"+1 spooky res", 23017:"+1 spooky res", 23018:"+2 spooky res", 23019:"+2 spooky res", 23020:"+3 spooky res", 23021:"+1 sleaze res", 23022:"+1 sleaze res", 23023:"+2 sleaze res", 23024:"+2 sleaze res", 23025:"+3 sleaze res", 23026:"+30 DA", 23027:"+40 DA", 23028:"+50 DA", 23029:"+60 DA", 23030:"+70 DA", 23031:"+5 DR", 23032:"+5 DR", 23033:"+10 DR", 23034:"+10 DR", 23035:"+20 DR", 23036:"+10% init", 23037:"+20% init", 23038:"+30% init", 23039:"+40% init", 23040:"+50% init", 23041:"+3 stats/fight", 23042:"+3 stats/fight", 23043:"+5 stats/fight", 23044:"+5 stats/fight", 23045:"+7 stats/fight", 23046:"+1 adv/absorbed item", 23047:"+1 adv/absorbed item", 23048:"+2 adv/absorbed item", 23049:"+2 adv/absorbed item", 23050:"+3 adv/absorbed item", 23051:"+5 stats/absorbed item", 23052:"+10 stats/absorbed item", 23053:"+15 stats/absorbed item", 23054:"+20 stats/absorbed item", 23055:"+25 stats/absorbed item", 23056:"+20% HP", 23057:"+30% HP", 23058:"+40% HP", 23059:"+50% HP", 23060:"+100% HP", 23061:"+20% MP", 23062:"+30% MP", 23063:"+40% MP", 23064:"+50% MP", 23065:"+100% MP", 23066:"+20% item", 23067:"+20% item", 23068:"+30% item", 23069:"+40% item", 23070:"+50% item", 23071:"+10% pickpocket", 23072:"+20% pickpocket", 23073:"+30% pickpocket", 23074:"+40% pickpocket", 23075:"+50% pickpocket", 23076:"+30% meat", 23077:"+40% meat", 23078:"+50% meat", 23079:"+60% meat", 23080:"+70% meat", 23081:"+5 muscle", 23082:"+10 muscle", 23083:"+15 muscle", 23084:"+20 muscle", 23085:"+25 muscle", 23086:"+5 myst", 23087:"+10 myst", 23088:"+15 myst", 23089:"+20 myst", 23090:"+25 myst", 23091:"+5 moxie", 23092:"+10 moxie", 23093:"+15 moxie", 23094:"+20 moxie", 23095:"+25 moxie", 23096:"+7 damage", 23097:"+9 damage", 23098:"+11 damage", 23099:"+13 damage", 23100:"+15 damage", 23101:"+3 Hot Damage", 23102:"+5 Hot Damage", 23103:"+7 Hot Damage", 23104:"+9 Hot Damage", 23105:"+11 Hot Damage", 23106:"+3 Cold Damage", 23107:"+5 Cold Damage", 23108:"+7 Cold Damage", 23109:"+9 Cold Damage", 23110:"+11 Cold Damage", 23111:"+3 Stench Damage", 23112:"+5 Stench Damage", 23113:"+7 Stench Damage", 23114:"+9 Stench Damage", 23115:"+11 Stench Damage", 23116:"+3 Spooky Damage", 23117:"+5 Spooky Damage", 23118:"+7 Spooky Damage", 23119:"+9 Spooky Damage", 23120:"+11 Spooky Damage", 23121:"+3 Sleaze Damage", 23122:"+5 Sleaze Damage", 23123:"+7 Sleaze Damage", 23124:"+9 Sleaze Damage", 23125:"+11 Sleaze Damage", 23301:"-combat buff", 23302:"-combat buff", 23303:"-combat buff", 23304:"+combat buff", 23305:"+combat buff", 23306:"+combat buff"};
+    int [int] __gelatinous_evaluation_order {0:23301, 1:23302, 2:23303, 3:23304, 4:23305, 5:23306, 6:23046, 7:23047, 8:23048, 9:23049, 10:23050, 11:23051, 12:23052, 13:23053, 14:23054, 15:23055, 16:23041, 17:23042, 18:23043, 19:23044, 20:23045, 21:23066, 22:23067, 23:23068, 24:23069, 25:23070, 26:23076, 27:23077, 28:23078, 29:23079, 30:23080, 31:23026, 32:23027, 33:23028, 34:23029, 35:23030, 36:23031, 37:23032, 38:23033, 39:23034, 40:23035, 41:23036, 42:23037, 43:23038, 44:23039, 45:23040, 46:23056, 47:23057, 48:23058, 49:23059, 50:23060, 51:23061, 52:23062, 53:23063, 54:23064, 55:23065, 56:23071, 57:23072, 58:23073, 59:23074, 60:23075, 61:23001, 62:23002, 63:23003, 64:23004, 65:23005, 66:23006, 67:23007, 68:23008, 69:23009, 70:23010, 71:23011, 72:23012, 73:23013, 74:23014, 75:23015, 76:23016, 77:23017, 78:23018, 79:23019, 80:23020, 81:23021, 82:23022, 83:23023, 84:23024, 85:23025, 86:23081, 87:23082, 88:23083, 89:23084, 90:23085, 91:23086, 92:23087, 93:23088, 94:23089, 95:23090, 96:23091, 97:23092, 98:23093, 99:23094, 100:23095, 101:23096, 102:23097, 103:23098, 104:23099, 105:23100, 106:23101, 107:23102, 108:23103, 109:23104, 110:23105, 111:23106, 112:23107, 113:23108, 114:23109, 115:23110, 116:23111, 117:23112, 118:23113, 119:23114, 120:23115, 121:23116, 122:23117, 123:23118, 124:23119, 125:23120, 126:23121, 127:23122, 128:23123, 129:23124, 130:23125};
     
     int [int] __gelatinous_skill_raw_modifier_number {23001:1, 23002:1, 23003:2, 23004:2, 23005:3, 23006:1, 23007:1, 23008:2, 23009:2, 23010:3, 23011:1, 23012:1, 23013:2, 23014:2, 23015:3, 23016:1, 23017:1, 23018:2, 23019:2, 23020:3, 23021:1, 23022:1, 23023:2, 23024:2, 23025:3, 23026:30, 23027:40, 23028:50, 23029:60, 23030:70, 23031:5, 23032:5, 23033:10, 23034:10, 23035:20, 23036:10, 23037:20, 23038:30, 23039:40, 23040:50, 23041:3, 23042:3, 23043:5, 23044:5, 23045:7, 23046:1, 23047:1, 23048:2, 23049:2, 23050:3, 23051:5, 23052:10, 23053:15, 23054:20, 23055:25, 23056:20, 23057:30, 23058:40, 23059:50, 23060:100, 23061:20, 23062:30, 23063:40, 23064:50, 23065:100, 23066:20, 23067:20, 23068:30, 23069:40, 23070:50, 23071:10, 23072:20, 23073:30, 23074:40, 23075:50, 23076:30, 23077:40, 23078:50, 23079:60, 23080:70, 23081:5, 23082:10, 23083:15, 23084:20, 23085:25, 23086:5, 23087:10, 23088:15, 23089:20, 23090:25, 23091:5, 23092:10, 23093:15, 23094:20, 23095:25, 23096:7, 23097:9, 23098:11, 23099:13, 23100:15, 23101:3, 23102:5, 23103:7, 23104:9, 23105:11, 23106:3, 23107:5, 23108:7, 23109:9, 23110:11, 23111:3, 23112:5, 23113:7, 23114:9, 23115:11, 23116:3, 23117:5, 23118:7, 23119:9, 23120:11, 23121:3, 23122:5, 23123:7, 23124:9, 23125:11};
 }
@@ -44568,6 +44636,20 @@ void initialiseGelatinousStatics()
 			continue;
         
         int lookup = it.descid.to_int_silent() % 125 + 23001;
+        int item_id = it.to_int();
+        //Hardcoded:
+        if (item_id == 9353)
+            lookup = 23302;
+        else if (item_id == 9349)
+            lookup = 23304;
+        else if (item_id == 9357)
+            lookup = 23301;
+        else if (item_id == 9359)
+            lookup = 23306;
+        else if (item_id == 9361)
+            lookup = 23305;
+        else if (item_id == 9354)
+            lookup = 23303;
         skill s = lookup.to_skill();
         if (!(__gelatinous_items_that_give_skill contains s))
             __gelatinous_items_that_give_skill[s] = listMakeBlankItem();
@@ -44584,10 +44666,9 @@ void PathGelatinousNoobGenerateTasks(ChecklistEntry [int] task_entries, Checklis
 	if (my_path_id() != PATH_GELATINOUS_NOOB)
 		return;
     
-    //FIXME 13 guess
-    //noobDeferredPoints does something else; seems to be a choice at the start of the ascension?
     int total_absorptions = 2 + MIN(13, my_level());
     int absorptions_used = get_property_int("_noobSkillCount");
+    //int absorptions_used = my_absorbs(); //FIXME next point release, 17.7
     int absorptions_left = total_absorptions - absorptions_used;
     if (!mafiaIsPastRevision(17821)) //tracking
         absorptions_left = 0;
@@ -44608,22 +44689,39 @@ void PathGelatinousNoobGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 blocklist[$item[goat cheese]] = true;
                 blocklist[$item[goat cheese pizza]] = true;
             }
-            blocklist[$item[print screen button]] = true;
+            foreach it in $items[print screen button,spooky-gro fertilizer,cuppa obscuri tea]
+                blocklist[it] = true;
             if (__quest_state["Pirate Quest"].state_boolean["hot wings relevant"] && $item[hot wing].available_amount() <= 3)
                 blocklist[$item[hot wing]] = true;
-            
                 
             //Collect a list for each grouping:
+            
+            int [int][int] first_level_group_evaluation_indices;
+            for grouping_index from 23125 to 23001 by -5
+            {
+                int [int] group_indices;
+                for i from grouping_index to grouping_index - 4 by -1
+                {
+                    group_indices.listAppend(i);
+                }
+                first_level_group_evaluation_indices[grouping_index] = group_indices;
+            }
+            first_level_group_evaluation_indices[23301] = listMake(23303, 23302, 23301);
+            first_level_group_evaluation_indices[23304] = listMake(23306, 23305, 23304);
             
             string [int][int] grouping_to_relevant_items;
             
             skill [int][int] grouping_to_group_skills;
             skill [int] grouping_to_relevant_items_skill;
             boolean [int] grouping_should_grey_out;
-            for grouping_index from 23125 to 23001 by -5
+            //for grouping_index from 23125 to 23001 by -5
+            foreach grouping_index in first_level_group_evaluation_indices
             {
+                int [int] group_indices = first_level_group_evaluation_indices[grouping_index];
+                
                 skill [int] group_skills;
-                for i from grouping_index to grouping_index - 4 by -1
+                //for i from grouping_index to grouping_index - 4 by -1
+                foreach key2, i in group_indices
                 {
                    skill s = i.to_skill();
                    if (s.have_skill()) continue;
@@ -44669,7 +44767,9 @@ void PathGelatinousNoobGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 }
                 grouping_should_grey_out[grouping_index] = should_grey_out;
                 string [int] relevant_items_out;
-                sort relevant_items by (value.historical_price() <= 0 ? 999999999 : value.historical_price());
+                //sort relevant_items by (value.historical_price() <= 0 ? 999999999 : value.historical_price());
+                //NPC price is more relevant in-run, since cost of acquisition.
+                sort relevant_items by (value.npc_price() > 0 ? value.npc_price() : (value.historical_price() <= 0 ? 999999999 : value.historical_price()));
                 if (relevant_items[0].npc_price() > 0 && relevant_items[0].npc_price() <= 1000) //something cheap and obtainable? ignore the rest
                 {
                     //examples: fermenting powder, herbs, pickled egg
@@ -44694,9 +44794,10 @@ void PathGelatinousNoobGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 }
                 grouping_to_relevant_items[grouping_index] = relevant_items_out;
             }
+            
             foreach key, s_id in __gelatinous_evaluation_order
             {
-                if (s_id % 5 != 0) continue;
+                if (s_id % 5 != 0 && s_id != 23301 && s_id != 23304) continue;
                 skill s = s_id.to_skill();
                 int grouping_index = s_id;
                 
@@ -44707,10 +44808,40 @@ void PathGelatinousNoobGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 //print_html("s = " + s + " group_skills = " + group_skills.to_json() + ", relevant_items = " + relevant_items.to_json());
                 
                 //description.listAppend(relevant_items_skill + ": " + __gelatinous_skill_ids_to_descriptions[relevant_items_skill.to_int()]);
-                string line = HTMLGenerateSpanOfClass(__gelatinous_skill_ids_to_descriptions[relevant_items_skill.to_int()], "r_bold");
-                if (relevant_items.count() > 0)
+                string extra_data;
+                if (lookupFamiliar("robortender").familiar_is_usable())
                 {
-                    line += ": " + relevant_items.listJoinComponents(", ", "or") + ".";
+                    phylum [int] phylums_to_run_against;
+                    if (grouping_index == 23301)
+                    {
+                        if (!lookupSkill("bendable knees").have_skill() && lookupItem("bottle of gregnadigne").available_amount() == 0)
+                            phylums_to_run_against.listAppend($phylum[humanoid]);
+                        if (!lookupSkill("retractable toes").have_skill() && lookupItem("cocktail mushroom").available_amount() == 0)
+                            phylums_to_run_against.listAppend($phylum[goblin]);
+                        if (!lookupSkill("ink gland").have_skill() && lookupItem("shot of granola liqueur").available_amount() == 0)
+                            phylums_to_run_against.listAppend($phylum[hippy]);
+                    }
+                    if (grouping_index == 23304)
+                    {
+                        if (!lookupSkill("frown muscles").have_skill() && lookupItem("bottle of novelty hot sauce").available_amount() == 0)
+                            phylums_to_run_against.listAppend($phylum[demon]);
+                        if (!lookupSkill("anger glands").have_skill() && lookupItem("limepatch").available_amount() == 0)
+                            phylums_to_run_against.listAppend($phylum[pirate]);
+                        if (!lookupSkill("powerful vocal chords").have_skill() && lookupItem("baby oil shooter").available_amount() == 0)
+                            phylums_to_run_against.listAppend($phylum[orc]);
+                    }
+                    if (phylums_to_run_against.count() > 0)
+                        extra_data += "Run robortender against " + phylums_to_run_against.listJoinComponents(", ", "and");
+                }
+                
+                string line = HTMLGenerateSpanOfClass(__gelatinous_skill_ids_to_descriptions[relevant_items_skill.to_int()], "r_bold");
+                if (relevant_items.count() > 0 || extra_data != "")
+                {
+                    if (relevant_items.count() > 0)
+                        line += ": " + relevant_items.listJoinComponents(", ", "or");
+                    if (extra_data != "")
+                        line += "|*" + extra_data;
+                    line += ".";
                     if (grouping_should_grey_out[grouping_index])
                         line = HTMLGenerateSpanFont(line, "gray");
                     description.listAppend(line);
@@ -44719,7 +44850,7 @@ void PathGelatinousNoobGenerateTasks(ChecklistEntry [int] task_entries, Checklis
             }
             description.listAppend("Or equipment, for their buffs." + (combat_rate_modifier() > -25 ? "|*Bram's choker, ring of conflict, duonoculars, rusted shootin' iron, or red shoe especially." : ""));
             if (lookupSkill("Large Intestine").have_skill())
-                description.listAppend("Or potted cactus, for extra adventures.");
+                description.listAppend("Or potted cactus, for +5 adventures.");
             //foreach s in __gelatinous_items_that_give_skill
             /*foreach key, s_id in __gelatinous_evaluation_order
             {
@@ -44760,8 +44891,91 @@ void PathGelatinousNoobGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 description.listAppend(line);
             }*/
         }
-        
         optional_task_entries.listAppend(ChecklistEntryMake("__familiar Gelatinous Cubeling", "inventory.php", ChecklistSubentryMake("Absorb " + pluralise(absorptions_left, "item", "items"), "", description), -1));
+    }
+    
+    if (lookupFamiliar("Robortender").have_familiar())
+    {
+    
+        string url = "";
+        
+        if (my_familiar() != lookupFamiliar("Robortender"))
+            url = "familiar.php";
+        phylum [int] phylums_to_run_against;
+        location [int] suggested_locations;
+        string [int] matchup_type;
+        boolean have_minus = false;
+        boolean have_plus = false;
+        if (!lookupSkill("bendable knees").have_skill() && lookupItem("bottle of gregnadigne").available_amount() == 0)
+        {
+            phylums_to_run_against.listAppend($phylum[humanoid]);
+            suggested_locations.listAppend($location[the old landfill]);
+            matchup_type.listAppend("-");
+            have_minus = true;
+        }
+        if (!lookupSkill("retractable toes").have_skill() && lookupItem("cocktail mushroom").available_amount() == 0)
+        {
+            phylums_to_run_against.listAppend($phylum[goblin]);
+            suggested_locations.listAppend($location[the outskirts of cobb's knob]);
+            matchup_type.listAppend("-");
+            have_minus = true;
+        }
+        if (!lookupSkill("ink gland").have_skill() && lookupItem("shot of granola liqueur").available_amount() == 0)
+        {
+            phylums_to_run_against.listAppend($phylum[hippy]);
+            suggested_locations.listAppend($location[hippy camp]);
+            matchup_type.listAppend("-");
+            have_minus = true;
+        }
+        if (!lookupSkill("frown muscles").have_skill() && lookupItem("bottle of novelty hot sauce").available_amount() == 0)
+        {
+            phylums_to_run_against.listAppend($phylum[demon]);
+            suggested_locations.listAppend($location[the dark heart of the woods]);
+            matchup_type.listAppend("+");
+            have_plus = true;
+        }
+        if (!lookupSkill("anger glands").have_skill() && lookupItem("limepatch").available_amount() == 0)
+        {
+            phylums_to_run_against.listAppend($phylum[pirate]);
+            suggested_locations.listAppend($location[the obligatory pirate's cove]);
+            matchup_type.listAppend("+");
+            have_plus = true;
+        }
+        if (!lookupSkill("powerful vocal chords").have_skill() && lookupItem("baby oil shooter").available_amount() == 0)
+        {
+            phylums_to_run_against.listAppend($phylum[orc]);
+            suggested_locations.listAppend($location[frat house]);
+            matchup_type.listAppend("+");
+            have_plus = true;
+        }
+            
+        string [int] skill_types;
+        if (have_minus)
+            skill_types.listAppend("-combat");
+        if (have_plus)
+            skill_types.listAppend("+combat");
+        string [int] description;
+        description.listAppend("Collect components for " + skill_types.listJoinComponents(", ", "and") + " skills.");
+        if (suggested_locations.count() > 0)
+        {
+            string [int] locations_out;
+            foreach key, l in suggested_locations
+            {
+                locations_out.listAppend(l + " (" + matchup_type[key] + ")");
+            }
+            description.listAppend("Could look in " + locations_out.listJoinComponents(", ", "and") + ".");
+            if (url == "")
+                url = suggested_locations[0].getClickableURLForLocation();
+        }
+        if (phylums_to_run_against.count() > 0)
+        {
+            string [int] phylums_out;
+            foreach key, p in phylums_to_run_against
+            {
+                phylums_out.listAppend(p + " (" + matchup_type[key] + ")");
+            }
+            optional_task_entries.listAppend(ChecklistEntryMake("__familiar Robortender", url, ChecklistSubentryMake("Run robortender against " + phylums_out.listJoinComponents(", ", "and"), "", description), 5));
+        }
     }
 }
 
