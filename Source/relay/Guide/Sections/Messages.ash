@@ -69,7 +69,8 @@ void generateRandomMessageLocation(string [int] random_messages)
         case $location[The Crimbonium Mine]:
         case $location[The Velvet / Gold Mine (Mining)]:
             message = "street sneaky pete don't you call me cause I can't go"; break;
-
+        case lookupLocation("Through the Spacegate"):
+            message = "oh look! rocks!";
     }
     if (message != "")
         random_messages.listAppend(message);
@@ -426,6 +427,9 @@ string generateRandomMessage()
         case PATH_NUCLEAR_AUTUMN:
             random_messages.listAppend("I do want to set the world on " + HTMLGenerateSpanFont("fire", "red"));
             break;
+        case PATH_GELATINOUS_NOOB:
+            random_messages.listAppend("you jelly?");
+            break;
         /*case PATH_CLASS_ACT_3:
             random_messages.listAppend("buttons for the people"); break;
         case PATH_AVATAR_OF_THE_NAUGHTY_SORCERESS:
@@ -630,6 +634,8 @@ string generateRandomMessage()
     monster_messages[$monster[The Barrelmech of Diogenes]] = "just let me throw a barrel at it";
     //beaten_up_monster_messages[$monster[Lavalos]] = HTMLGenerateTagWrap("span", "but... the future refused to change", mapMake("onclick", "var l = new Audio('" + __lavalos_sound_data + "'); l.play();", "class", "r_clickable")); //copyright, etc
     beaten_up_monster_messages[$monster[Lavalos]] = "but... the future refused to change";
+    if ($item[protonic accelerator pack].equipped_amount() > 0 && last_monster().monsterIsGhost())
+        beaten_up_monster_messages[last_monster()] = "venkman makes it look easy";
     if (current_hour >= 5 && current_hour <= 11)
         monster_messages[$monster[Lavalos]] = "good morning, " + lowercase_player_name + "!";
     else
@@ -649,7 +655,7 @@ string generateRandomMessage()
         day_cycle = "night";
     monster_messages[$monster[Travoltron]] = now_to_string("EEEE").to_lower_case() + " " + day_cycle + " fever";
     
-    if (my_daycount() == 2 && (my_adventures() == 0 || availableDrunkenness() < 0) && availableFullness() == 0 && availableDrunkenness() <= 0 && my_path_id() != PATH_OXYGENARIAN && __quest_state["Level 12"].started && !__quest_state["Level 13"].state_boolean["king waiting to be freed"] && my_path_id() != PATH_NUCLEAR_AUTUMN && my_path_id() != PATH_SLOW_AND_STEADY)
+    if (my_daycount() == 2 && (my_adventures() == 0 || availableDrunkenness() < 0) && availableFullness() == 0 && availableDrunkenness() <= 0 && my_path_id() != PATH_OXYGENARIAN && __quest_state["Level 12"].started && !__quest_state["Level 13"].state_boolean["king waiting to be freed"] && my_path_id() != PATH_NUCLEAR_AUTUMN && my_path_id() != PATH_SLOW_AND_STEADY && !__quest_state["Level 13"].finished)
     {
         //detect failed two-day runs, and provide psychological support:
         random_messages.listClear();

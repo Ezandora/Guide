@@ -42,8 +42,14 @@ void listAppendList(boolean [item] destination, boolean [item] source)
 
 void listAppendList(boolean [string] destination, boolean [string] source)
 {
-    foreach it, value in source
-        destination[it] = value;
+    foreach key, value in source
+        destination[key] = value;
+}
+
+void listAppendList(boolean [skill] destination, boolean [skill] source)
+{
+    foreach key, value in source
+        destination[key] = value;
 }
 
 void listAppend(item [int] list, item entry)
@@ -1110,6 +1116,17 @@ location [int] listInvert(boolean [location] list)
 familiar [int] listInvert(boolean [familiar] list)
 {
     familiar [int] out;
+    foreach k, value in list
+    {
+        if (value)
+            out.listAppend(k);
+    }
+    return out;
+}
+
+item [int] listInvert(boolean [item] list)
+{
+    item [int] out;
     foreach k, value in list
     {
         if (value)

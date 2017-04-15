@@ -184,7 +184,7 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 				todo.listAppend("go in through the side door");
 				method = todo.listJoinComponents(", ", "then").capitaliseFirstLetter() + ".";
 			}
-			else if (knoll_available() || $item[frilly skirt].available_amount() > 0)
+			else if (knoll_available() || ($item[frilly skirt].available_amount() > 0 && $item[hot wing].available_amount() >= 3))
 			{
 				string [int] todo;
                 if (insult_count < 6)
@@ -199,7 +199,16 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 			}
 			else
 			{
-				method = "Not sure how to approach this efficiently, sorry.";
+                //Non-knoll sign.
+                //I think the fastest method is frilly skirt?
+                if ($item[hot wing].available_amount() >= 3 && my_familiar() != $familiar[black cat])
+                    method = "Farm a frilly skirt in the knoll gym. (+300% item)";
+                else
+                {
+                    method = "Acquire a frat boy outfit in the frat house? (-combat" + (my_level() < 9 ? " after level 9" : "") + ")";
+                    if (!__quest_state["Level 6"].finished)
+                        method += "|Or collect hot wings from the friar demons" + ($item[frilly skirt].available_amount() == 0 ? ", and frilly skirt from the knoll gym" : "") + ".";
+                }
 			}
             line += "|" + method;
 			subentry.entries.listAppend(line);

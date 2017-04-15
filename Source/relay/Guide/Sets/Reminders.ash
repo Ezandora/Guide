@@ -206,11 +206,11 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             item_effects[$item[resolution: be stronger]] = $effect[Strong Resolve];
             
             
-            if (in_ronin() && !in_bad_moon())
+            /*if (in_ronin() && !in_bad_moon())
             {
                 item_descriptions[$item[old eyebrow pencil]] = "+2 muscle stats/fight (25 turns)";
                 item_effects[$item[old eyebrow pencil]] = $effect[Browbeaten];
-            }
+            }*/
         }
         if (__misc_state["need to level mysticality"])
         {
@@ -222,11 +222,11 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             item_effects[$item[resolution: be smarter]] = $effect[Brilliant Resolve];
             
             
-            if (in_ronin() && !in_bad_moon())
+            /*if (in_ronin() && !in_bad_moon())
             {
                 item_descriptions[$item[old rosewater cream]] = "+2 mysticality stats/fight (25 turns)";
                 item_effects[$item[old rosewater cream]] = $effect[Rosewater Mark];
-            }
+            }*/
         }
         
         if (my_level() >= 11)

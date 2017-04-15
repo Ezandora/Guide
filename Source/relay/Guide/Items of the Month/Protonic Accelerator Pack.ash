@@ -1,3 +1,5 @@
+import "relay/Guide/Support/Monster Data.ash";
+
 RegisterTaskGenerationFunction("IOTMProtonicAcceleratorPackGenerateTasks");
 void IOTMProtonicAcceleratorPackGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
@@ -8,13 +10,50 @@ void IOTMProtonicAcceleratorPackGenerateTasks(ChecklistEntry [int] task_entries,
         if (__misc_state["in run"])
             priority = -1;
         location ghost_location = get_property_location("ghostLocation");
+        monster ghost = __protonic_monster_for_location[ghost_location];
+        float ml_in_location = ghost_location.monster_level_adjustment_for_location();
         string title = "Defeat the ghost in " + ghost_location;
         string [int] description;
         string [int] modifiers;
         string url = ghost_location.getClickableURLForLocation();
         description.listAppend("Won't cost a turn.");
         if ($item[protonic accelerator pack].equipped_amount() > 0)
-            description.listAppend("Cast \"shoot ghost\" three times, then \"trap ghost\".");
+        {
+            float expected_damage = ghost.expectedDamageFromGhostAfterCastingShootGhost();
+            float hp_needed = expected_damage * 3;
+            
+            //FIXME initial hit damage
+            //don't know if expected_damage() will be correct, it isn't always
+            float initial_hit_damage = ghost.expected_damage();
+            float elemental_ml_damage = 0.0;
+            if (ml_in_location >= 26.0 && ghost.defense_element != $element[none])
+            {
+                //[Monster Attack] * MIN( ( [Bonus ML] - 25 ) / 500 , 1 / 2 )
+                //FIXME range. 1.1?
+                elemental_ml_damage = 1.1 * ghost.base_attack * min(0.5, (ml_in_location - 25.0) / 500.0);
+                elemental_ml_damage *= 1.0 - elemental_resistance(ghost.defense_element) / 100.0;
+                elemental_ml_damage = ceil(elemental_ml_damage);
+            }
+            hp_needed += elemental_ml_damage + initial_hit_damage;
+            
+            if (hp_needed >= my_maxhp())
+            {
+                description.listAppend(HTMLGenerateSpanFont("Do not cast \"shoot ghost\", you won't survive.", "red"));
+                if (ml_in_location <= 50)
+                    description.listAppend("Or stun the monster for multiple rounds, and cast \"shoot ghost\" three times, then \"trap ghost\".");
+            }
+            else if (hp_needed >= my_hp())
+            {
+                description.listAppend(HTMLGenerateSpanFont("Restore HP", "red") + " to cast \"shoot ghost\".");
+                if (ml_in_location <= 50)
+                    description.listAppend("Or stun the monster for multiple rounds, and cast \"shoot ghost\" three times, then \"trap ghost\".");
+            }
+            else
+            {
+                description.listAppend("Cast \"shoot ghost\" three times, then \"trap ghost\".");
+            }
+            description.listAppend("After casting \"shoot ghost\", the ghost will deal " + expected_damage.to_int() + " damage/round.");
+        }
         item [int] items_to_equip;
         if ($item[protonic accelerator pack].equipped_amount() == 0 && $item[protonic accelerator pack].available_amount() > 0)
         {

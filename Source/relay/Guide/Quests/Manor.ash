@@ -89,6 +89,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 		return;
     
     boolean should_output_optionally = false;
+    boolean should_output_futurally = false;
 	QuestState base_quest_state = __quest_state["Manor Unlock"];
     
     boolean [location] relevant_locations = $locations[the haunted kitchen, the haunted library, the haunted billiards room, the haunted bedroom, the haunted ballroom, the haunted gallery, the haunted bathroom];
@@ -316,6 +317,8 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
                     subentry.modifiers.listAppend("-combat");
                     
                     subentry.entries.listAppend("Adventure in the Haunted Ballroom. May not be relevant.");
+                    if (!$location[the haunted ballroom].noncombat_queue.contains_text("Curtains")) //initiate NC rejection
+                        subentry.entries.listAppend(HTMLGenerateSpanFont("Do not skip the curtains NC the first time", "red") + ", this will make the ballroom song more likely to appear.");
                     
                     if (my_turncount() > 200 || base_quest_state.state_boolean["ballroom song effectively set"])
                     {
@@ -345,6 +348,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         if (get_property("romanticTarget").to_monster() == $monster[writing desk] && get_property_int("_romanticFightsLeft") > 0 || get_property_int("writingDesksDefeated") > 0 && __misc_state["in run"])
         {
             subentry.entries.listAppend(HTMLGenerateSpanFont("Avoid adventuring here,", "red") + " as you seem to be using the writing desk trick?|Need to fight " + pluraliseWordy(clampi(5 - get_property_int("writingDesksDefeated"), 0, 5), "more writing desk.", "more writing desks."));
+            should_output_futurally = true;
         }
         
         float drawers_per_turn = 0.0;
@@ -450,6 +454,10 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
                 {
                     subentry.entries.listAppend("Find pool cue.");
                 }
+                else if (my_path_id() == PATH_GELATINOUS_NOOB)
+                {
+                    subentry.entries.listAppend("Absorb pool cue for +pool skill?");
+                }
                 else if ($item[pool cue].equipped_amount() == 0)
                 {
                     subentry.entries.listAppend("Equip pool cue for +pool skill.");
@@ -517,7 +525,9 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         if (image_name.length() == 0)
             image_name = base_quest_state.image_name;
         ChecklistEntry entry = ChecklistEntryMake(image_name, url, subentry, relevant_locations);
-        if (should_output_optionally)
+        if (should_output_futurally)
+            future_task_entries.listAppend(entry);
+        else if (should_output_optionally)
             optional_task_entries.listAppend(entry);
         else
             task_entries.listAppend(entry);

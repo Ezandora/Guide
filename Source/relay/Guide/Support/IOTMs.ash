@@ -32,6 +32,8 @@ void initialiseIOTMsUsable()
         __iotms_usable[$item[LT&T telegraph office deed]] = true;
     if (get_property_boolean("loveTunnelAvailable"))
         __iotms_usable[lookupItem("heart-shaped crate")] = true;
+    if (get_property_boolean("spacegateAlways") || get_property_boolean("_spacegateToday"))
+        __iotms_usable[lookupItem("Spacegate access badge")] = true;
     //Remove non-standard:
     foreach it in __iotms_usable
     {

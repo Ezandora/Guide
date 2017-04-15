@@ -454,7 +454,7 @@ void CountersReparse()
 
 
 boolean [string] __wandering_monster_counter_names = $strings[Romantic Monster,Rain Monster,Holiday Monster,Nemesis Assassin,Bee,WoL Monster,Digitize Monster,Enamorang Monster];
-
+string [string] __wandering_monster_property_lookups {"Romantic Monster":"romanticTarget", "Digitize Monster": "_sourceTerminalDigitizeMonster", "Enamorang Monster":"enamorangMonster"};
 
 //This is for ascension automation scripts. Call this immediately before adventuring in an adventure.php zone.
 //This will enable tracking of zero-adventure encounters that mean a wandering monster will not appear next turn. Affects CounterWanderingMonsterMayHitNextTurn() only.
@@ -538,6 +538,29 @@ boolean CounterWanderingMonsterMayHitInXTurns(int turns)
     return CounterWanderingMonsterMayHitInXTurns(turns, false);
 }
 
+boolean CounterWanderingMonsterWillHitInXTurns(int turns)
+{
+    //CounterWillHitExactlyInTurnRange
+    foreach s in __wandering_monster_counter_names
+    {
+        if (CounterLookup(s).CounterExists() && CounterLookup(s).CounterWillHitExactlyInTurnRange(0, turns))
+            return true;
+    }
+    return false;
+}
+
+Counter [int] CounterWanderingMonsterWindowsActiveInXTurns(int turns)
+{
+    Counter [int] result;
+    foreach s in __wandering_monster_counter_names
+    {
+        Counter c = CounterLookup(s);
+        if (c.CounterExists() && c.CounterMayHitInXTurns(turns))
+            result[result.count()] = c;
+    }
+    return result;
+}
+
 Counter [int] CounterWanderingMonsterWindowsActiveNextTurn()
 {
     Counter [int] result;
@@ -549,6 +572,32 @@ Counter [int] CounterWanderingMonsterWindowsActiveNextTurn()
         if (c.CounterExists() && c.CounterMayHitNextTurn())
             result[result.count()] = c;
     }
+    return result;
+}
+
+boolean [monster] CounterWanderingMonstersActiveNextTurn()
+{
+    boolean [monster] result;
+    foreach key, c in CounterWanderingMonsterWindowsActiveNextTurn()
+    {
+        if (__wandering_monster_property_lookups contains c.name)
+            result[get_property_monster(__wandering_monster_property_lookups[c.name])] = true;
+        //result
+    }
+    //FIXME determine Rain Monster,Holiday Monster,Nemesis Assassin,Bee,WoL Monster
+    return result;
+}
+
+boolean [monster] CounterWanderingMonstersActiveInXTurns(int turns)
+{
+    boolean [monster] result;
+    foreach key, c in CounterWanderingMonsterWindowsActiveInXTurns(turns)
+    {
+        if (__wandering_monster_property_lookups contains c.name)
+            result[get_property_monster(__wandering_monster_property_lookups[c.name])] = true;
+        //result
+    }
+    //FIXME determine Rain Monster,Holiday Monster,Nemesis Assassin,Bee,WoL Monster
     return result;
 }
 
@@ -564,6 +613,7 @@ boolean CounterWanderingMonsterCountersHaveRange()
     }
     return false;
 }
+
 
 boolean CounterWanderingMonsterWillHitNextTurn()
 {

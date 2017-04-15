@@ -1,3 +1,6 @@
+
+import "relay/Guide/Support/Library.ash"
+
 Record Banish
 {
     monster banished_monster;

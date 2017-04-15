@@ -304,7 +304,8 @@ void QSleazeAirportGenerateResource(ChecklistEntry [int] resource_entries)
             description.listAppend("Found once every seven days.");
             if ($effect[fishy].have_effect() == 0)
                 description.listAppend("Possibly acquire fishy effect first.");
-            
+            if ($item[clara's bell].available_amount() > 0 && !get_property_boolean("_claraBellUsed"))
+                description.listAppend("Use clara's bell to instantly acquire. Won't need fishy.");
             ChecklistEntry entry = ChecklistEntryMake("__item ultimate mind destroyer", $location[The Sunken Party Yacht].getClickableURLForLocation(), ChecklistSubentryMake("Ultimate Mind Destroyer collectable", "free runs", description), $locations[The Sunken Party Yacht]);
             entry.importance_level = 8;
             resource_entries.listAppend(entry);

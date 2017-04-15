@@ -349,7 +349,7 @@ void setUpState()
 	__misc_state["have olfaction equivalent"] = some_olfact_available;
     __misc_state_string["olfaction equivalent monster"] = olfacted_monster;
 	
-    if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
+    if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_NUCLEAR_AUTUMN)
         __misc_state["campground unavailable"] = true;
 	
 	boolean skills_temporarily_missing = false;

@@ -173,10 +173,17 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                     if ($item[wet stew].available_amount() == 0 && ($item[bird rib].available_amount() == 0 || $item[lion oil].available_amount() == 0))
                     {
                         string [int] components;
+                        monster [int] monsters_need_to_meet;
                         if ($item[bird rib].available_amount() == 0)
+                        {
                             components.listAppend($item[bird rib]);
+                            monsters_need_to_meet.listAppend($monster[whitesnake]);
+                        }
                         if ($item[lion oil].available_amount() == 0)
+                        {
                             components.listAppend($item[lion oil]);
+                            monsters_need_to_meet.listAppend($monster[white lion]);
+                        }
                         string line = "Adventure in Whitey's Grove to acquire " + components.listJoinComponents("", "and") + ".";
                       
                         line += "|";
@@ -192,7 +199,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                         subentry.entries.listAppend(line);
                       
                         if ($item[white page].available_amount() > 0)
-                            subentry.entries.listAppend("Can use your white pages to dial them up.");
+                            subentry.entries.listAppend("Can use your white pages to dial up a " + monsters_need_to_meet.listJoinComponents(", ", "or a") + ".");
                       
                         subentry.modifiers.listAppend("+combat");
                         subentry.modifiers.listAppend("+300% item/food drop");

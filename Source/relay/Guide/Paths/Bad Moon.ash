@@ -1,3 +1,7 @@
+
+import "relay/Guide/QuestState.ash"
+import "relay/Guide/Support/LocationAvailable.ash"
+
 Record BadMoonAdventure
 {
     int encounter_id;

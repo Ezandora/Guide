@@ -50,6 +50,7 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
     string turns_remaining_string = "";
     
     boolean need_plus_combat = false;
+    int plus_combat_needed = 25;
     boolean need_minus_combat = false;
     
     
@@ -106,16 +107,24 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
                     turns_remaining_string = " ~" + pluralise(round(turns_remaining), "turn remains", "turns remain") + ".";
                 }
             }
-            if (noncombats_wanted && appearance_rates[$monster[none]] != 0.0)
+            int base_combat_rate = appearance_rates[$monster[none]];
+            if (base_combat_rate != 0)
+                base_combat_rate += combat_rate_modifier();
+            base_combat_rate = MAX(0.0, base_combat_rate);
+            
+            if (noncombats_wanted && base_combat_rate != 0.0)
                 need_minus_combat = true;
-            else if (!noncombats_skippable && appearance_rates[$monster[none]] != 0.0)
+            else if (!noncombats_skippable && base_combat_rate != 0.0)
+            {
                 need_plus_combat = true;
+                plus_combat_needed = base_combat_rate;
+            }
         }
     }
     
     
     if (need_plus_combat)
-        subentry.modifiers.listAppend("+combat");
+        subentry.modifiers.listAppend("+" + plus_combat_needed + "% combat");
     if (need_minus_combat)
         subentry.modifiers.listAppend("-combat");
     

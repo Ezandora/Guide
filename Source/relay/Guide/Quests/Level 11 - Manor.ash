@@ -14,6 +14,8 @@ void QLevel11ManorInit()
         use_fast_route = false;
     if (my_path_id() == PATH_NUCLEAR_AUTUMN && in_hardcore())
         use_fast_route = false;
+    if (in_bad_moon()) //This is possible, but certainly not plausible.
+        use_fast_route = false;
     
     state.state_boolean["Can use fast route"] = use_fast_route;
 
@@ -223,7 +225,7 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                             places.listAppend(l.to_string().replace_string("The Haunted ", ""));
                         }
                         string line = "Scavenger hunt! ";
-                        if (use_fast_route || !in_bad_moon())
+                        if (use_fast_route)
                             line = "Alternatively, scavenger hunt! (likely much slower)|*";
                         //line += "Go search for:|*" + places.listJoinComponents("<hr>|*");
                         line += "Go search in the Haunted " + places.listJoinComponents(", ", "and");
@@ -268,13 +270,14 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                         }
                     }
                 }
-                if (use_fast_route && !recipe_was_autoread_with_glasses)
+                //This is covered elsewhere, in that mess of if statements up there.
+                /*if (use_fast_route && !recipe_was_autoread_with_glasses)
                 {
                     if ($item[unstable fulminate].available_amount() == 0 && !output_final_fight_info && $item[bottle of Chateau de Vinegar].available_amount() == 0 && $item[bottle of Chateau de Vinegar].available_amount() == 0 && !recipe_will_be_autoread)
                         subentry.entries.listAppend("Remember to wear Spookyraven's spectacles/read the recipe if you haven't.");
                 }
                 else if (!recipe_was_autoread)
-                    subentry.entries.listAppend("Remember to read the recipe if you haven't.");
+                    subentry.entries.listAppend("Remember to read the recipe if you haven't.");*/
             }
         }
     }

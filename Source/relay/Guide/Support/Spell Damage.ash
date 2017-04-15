@@ -12,7 +12,9 @@ float damageForElementAgainstElement(float base_damage, element attacking_elemen
     if (defence_element == $element[none] || attacking_element == $element[none])
         return base_damage;
     if (attacking_element == defence_element)
-        return 1;
+        return MIN(base_damage, 1);
+    if (base_damage < 1)
+        return 0.0;
     
     boolean [element] relevant_elements = $elements[sleaze,stench,hot,spooky,cold];
     float [element,element] attack_versus_element;

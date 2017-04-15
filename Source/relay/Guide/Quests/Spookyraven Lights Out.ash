@@ -152,7 +152,8 @@ void QSpookyravenLightsOutGenerateTasks(ChecklistEntry [int] task_entries, Check
         all_lights_out_locations[$location[the haunted Library]] = true;
         all_lights_out_locations[$location[the haunted Ballroom]] = true;
         all_lights_out_locations[$location[the haunted Gallery]] = true;
-        all_lights_out_locations[$location[the haunted Bedroom]] = true;
+        if ($location[the haunted Bedroom].turns_spent < 10)
+            all_lights_out_locations[$location[the haunted Bedroom]] = true;
         all_lights_out_locations[$location[the haunted Nursery]] = true;
         all_lights_out_locations[$location[the haunted Conservatory]] = true;
         all_lights_out_locations[$location[the haunted Billiards Room]] = true;

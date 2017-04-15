@@ -144,7 +144,7 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
 	
 	foreach property in property_summons_to_skills
 	{
-		if (get_property_int(property) > property_summon_limits[property] || get_property_boolean(property))
+		if (get_property_int(property) >= property_summon_limits[property] || get_property_boolean(property))
 			continue;
 		foreach key in property_summons_to_skills[property]
 		{

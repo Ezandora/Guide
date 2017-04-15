@@ -62,7 +62,7 @@ void IOTMWitchessGenerateResource(ChecklistEntry [int] resource_entries)
         subentries.listAppend(ChecklistSubentryMake(pluralise(fights_remaining, "witchess fight", "witchess fights"), "", description));
         //resource_entries.listAppend(ChecklistEntryMake(, "campground.php?action=witchess", );
     }
-    if (!get_property_boolean("_witchessBuff") && mafiaIsPastRevision(16879))
+    if (!get_property_boolean("_witchessBuff") && mafiaIsPastRevision(16879) && !__misc_state["familiars temporarily blocked"])
     {
         int familiar_weight_modifier = MAX(5, get_property_int("puzzleChampBonus"));
         if (image_name == "")

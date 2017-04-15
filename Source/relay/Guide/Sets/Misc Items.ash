@@ -421,9 +421,9 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         
 		
 		if (!__quest_state["Level 9"].state_boolean["bridge complete"])
-			subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Orc logging camp, for bridge building", $location[the smut orc logging camp]));
+			subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Orc logging camp, for bridge building. (3/3)", $location[the smut orc logging camp]));
 		if ($item[a-boo clue].available_amount() < 4 && (__quest_state["Level 9"].state_int["a-boo peak hauntedness"] > 0 || !__quest_state["Level 9"].state_boolean["bridge complete"]))
-			subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("A-Boo clues", $location[a-boo peak]));
+			subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("A-Boo clues. (2)", $location[a-boo peak]));
 		if (__misc_state["wand of nagamar needed"] && $item[wand of nagamar].creatable_amount() == 0)
 			subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Wand of nagamar components (castle basement)", $location[the castle in the clouds in the sky (basement)]));
 		boolean have_all_gum = $item[pack of chewing gum].available_amount() > 0 || ($item[jaba&ntilde;ero-flavored chewing gum].available_amount() > 0 && $item[lime-and-chile-flavored chewing gum].available_amount() > 0 && $item[pickle-flavored chewing gum].available_amount() > 0 && $item[tamarind-flavored chewing gum].available_amount() > 0);
@@ -432,6 +432,14 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
 		if (!__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && !(get_property_boolean("lovebugsUnlocked") && $item[bottle of lovebug pheromones].is_unrestricted())) //taking a gamble here - I'm assuming you'd never clover for ultrahydrated if you have lovebugs. even if you run out of ultrahydrated, you'll likely get it again in a hurry
         {
 			subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Ultrahydrated (Oasis)", $location[the oasis]));
+        }
+        if (!__quest_state["Level 8"].state_boolean["Past mine"])
+        {
+            item ore_needed = __quest_state["Level 8"].state_string["ore needed"].to_item();
+            if (ore_needed == $item[none])
+                subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Mining ore. (1)", $location[itznotyerzitz mine]));
+            else
+                subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability(ore_needed.capitaliseFirstLetter() + ". (1)", $location[itznotyerzitz mine]));
         }
 		if (__misc_state["need to level"] && !__misc_state["Stat gain from NCs reduced"])
         {

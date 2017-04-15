@@ -324,8 +324,19 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
 			return true;
 		return false;
 	}
+    if ($strings[Crimbo05,Crimbo14,Crimbo15,Crimbo16] contains zone)
+        return false;
     if (zone == "Woods" && !__la_zone_is_unlocked["Woods"])
         return false;
+    if (loc.parentdesc == "Batfellow Area")
+        return limit_mode() == "batman";
+    if (zone == "Spelunky Area")
+        return limit_mode() == "spelunky";
+    if (zone == "Twitch")
+        return get_property_boolean("timeTowerAvailable");
+    if (zone == "The Prince's Ball")
+        return get_property("grimstoneMaskPath").to_lower_case() == "stepmother" && get_property_int("cinderellaMinutesToMidnight") > 0;
+    
 	
 	switch (loc)
 	{
@@ -335,7 +346,7 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
 			return get_property_ascension("lastCastleTopUnlock");
 		case $location[The Haunted Kitchen]:
 		case $location[The Haunted Conservatory]:
-            return true; //FIXME exact detection
+            return questPropertyPastInternalStepNumber("questM20Necklace", 1);
 		case $location[The Haunted Billiards Room]:
             if ($item[7301].available_amount() > 0)
                 return true;
@@ -424,7 +435,8 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
         case $location[the defiled nook]:
 			return questPropertyPastInternalStepNumber("questL07Cyrptic", 1) && get_property_int("cyrptNookEvilness") > 0;
 		case $location[south of the border]:
-			return $items[pumpkin carriage,desert bus pass, bitchin' meatcar, tin lizzie].available_amount() > 0;
+        case $location[The Shore\, Inc. Travel Agency]:
+			return get_property_ascension("lastDesertUnlock");
         case $location[Portal to Terrible Parents]:
         case $location[Rumpelstiltskin's Workshop]:
         case $location[Ye Olde Medievale Villagee]:
@@ -748,14 +760,14 @@ void locationAvailableRunDiagnostics()
 	}
 	if (unknown_locations_by_zone.count() > 0)
 	{
-		print("Unknown locations in location availability tester:");
+		print_html("Unknown locations in location availability tester:");
 		foreach zone in unknown_locations_by_zone
 		{
 			print(zone + ":");
 			foreach key in unknown_locations_by_zone[zone]
 			{
 				location loc = unknown_locations_by_zone[zone][key];
-				print("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + loc);
+				print_html("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + loc);
 			}
 		}
 	}
@@ -1122,6 +1134,8 @@ static
         foreach s in $strings[Crimbo's Sack,Crimbo's Boots,Crimbo's Jelly,Crimbo's Reindeer,Crimbo's Beard,Crimbo's Hat]
             lookup_map[s] = "place.php?whichplace=crimbo2016c";
         lookup_map["An Eldritch Horror"] = "place.php?whichplace=town";
+        
+        lookup_map["Through the Spacegate"] = "place.php?whichplace=spacegate";
         __constant_clickable_urls = LAConvertLocationLookupToLocations(lookup_map);
     }
     initialiseConstantClickableURLs();
@@ -1189,3 +1203,8 @@ string getClickableURLForLocationIfAvailable(location l)
     else
         return "";
 }
+
+/*void main()
+{
+    locationAvailableRunDiagnostics();
+}*/

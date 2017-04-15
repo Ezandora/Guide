@@ -164,7 +164,11 @@ void IOTMTelegraphOfficeGenerateTasks(ChecklistEntry [int] task_entries, Checkli
             description.listAppend(s + " = " + get_property(s));
     }
     
-    optional_task_entries.listAppend(ChecklistEntryMake("__item sea cowboy hat", "inventory.php?which=3", ChecklistSubentryMake(quest_name, modifiers, description), $locations[Investigating a Plaintive Telegram]));
+    ChecklistEntry entry = ChecklistEntryMake("__item sea cowboy hat", "inventory.php?which=3", ChecklistSubentryMake(quest_name, modifiers, description), $locations[Investigating a Plaintive Telegram]);
+    if (__misc_state["in run"])
+        future_task_entries.listAppend(entry);
+    else
+        optional_task_entries.listAppend(entry);
 }
 
 RegisterResourceGenerationFunction("IOTMTelegraphOfficeGenerateResource");

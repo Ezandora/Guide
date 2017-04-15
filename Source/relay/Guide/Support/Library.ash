@@ -576,14 +576,14 @@ int totalDelayForLocation(location place)
     place_delays[$location[the haunted bedroom]] = 6; //a guess from spading
     place_delays[$location[the boss bat's lair]] = 4;
     place_delays[$location[the oasis]] = 5;
-    //place_delays[$location[the hidden park]] = 5; //no
+    place_delays[$location[the hidden park]] = 6;
     place_delays[$location[the haunted gallery]] = 5; //FIXME this is a guess, spade
     place_delays[$location[the haunted bathroom]] = 5;
     place_delays[$location[the haunted ballroom]] = 5; //FIXME rumored
     place_delays[$location[the penultimate fantasy airship]] = 25;
     place_delays[$location[the "fun" house]] = 10;
-    place_delays[$location[The Castle in the Clouds in the Sky (Ground Floor)]] = 11; //???
-    place_delays[$location[the outskirts of cobb's knob]] = 11; //??
+    place_delays[$location[The Castle in the Clouds in the Sky (Ground Floor)]] = 10;
+    place_delays[$location[the outskirts of cobb's knob]] = 10;
     //the haunted billiards room does not contain delay
     //also failure at 16 skill
     
@@ -1340,12 +1340,14 @@ boolean [skill] getActiveSourceTerminalSkills()
 
 boolean monsterIsGhost(monster m)
 {
-    if ($monsters[Ancient ghost,Ancient protector spirit,Banshee librarian,Battlie Knight Ghost,Bettie Barulio,Chalkdust wraith,Claybender Sorcerer Ghost,Cold ghost,Contemplative ghost,Dusken Raider Ghost,Ghost,Ghost miner,Hot ghost,Lovesick ghost,Marcus Macurgeon,Marvin J. Sunny,Mayor Ghost,Mayor Ghost (Hard Mode),Model skeleton,Mortimer Strauss,Plaid ghost,Protector Spectre,Sexy sorority ghost,Sheet ghost,Sleaze ghost,Space Tourist Explorer Ghost,Spirit of New Wave (Inner Sanctum),Spooky ghost,Stench ghost,The ghost of Phil Bunion,Whatsian Commando Ghost,Wonderful Winifred Wongle] contains m)
+    if (m.attributes.contains_text("GHOST"))
+        return true;
+    /*if ($monsters[Ancient ghost,Ancient protector spirit,Banshee librarian,Battlie Knight Ghost,Bettie Barulio,Chalkdust wraith,Claybender Sorcerer Ghost,Cold ghost,Contemplative ghost,Dusken Raider Ghost,Ghost,Ghost miner,Hot ghost,Lovesick ghost,Marcus Macurgeon,Marvin J. Sunny,Mayor Ghost,Mayor Ghost (Hard Mode),Model skeleton,Mortimer Strauss,Plaid ghost,Protector Spectre,Sexy sorority ghost,Sheet ghost,Sleaze ghost,Space Tourist Explorer Ghost,Spirit of New Wave (Inner Sanctum),Spooky ghost,Stench ghost,The ghost of Phil Bunion,Whatsian Commando Ghost,Wonderful Winifred Wongle] contains m)
         return true;
     if ($monsters[boneless blobghost,the ghost of Vanillica \"Trashblossom\" Gorton,restless ghost,The Icewoman,the ghost of Monsieur Baguelle,The ghost of Lord Montague Spookyraven,The Headless Horseman,The ghost of Ebenoozer Screege,The ghost of Sam McGee,The ghost of Richard Cockingham,The ghost of Jim Unfortunato,The ghost of Waldo the Carpathian,the ghost of Oily McBindle] contains m)
         return true;
     if (lookupMonster("Emily Koops, a spooky lime") == m)
-        return true;
+        return true;*/
     return false;
 }
 
@@ -1414,4 +1416,53 @@ boolean today_is_pvp_season_end()
     else if (today == "1231")
         return true;
     return false;
+}
+
+boolean monster_has_zero_turn_cost(monster m)
+{
+    if (m.attributes.contains_text("FREE"))
+        return true;
+        
+    if ($monsters[lynyrd] contains m) return true; //not marked as FREE in attributes
+    //if ($monsters[Black Crayon Beast,Black Crayon Beetle,Black Crayon Constellation,Black Crayon Golem,Black Crayon Demon,Black Crayon Man,Black Crayon Elemental,Black Crayon Crimbo Elf,Black Crayon Fish,Black Crayon Goblin,Black Crayon Hippy,Black Crayon Hobo,Black Crayon Shambling Monstrosity,Black Crayon Manloid,Black Crayon Mer-kin,Black Crayon Frat Orc,Black Crayon Penguin,Black Crayon Pirate,Black Crayon Flower,Black Crayon Slime,Black Crayon Undead Thing,Black Crayon Spiraling Shape,broodling seal,Centurion of Sparky,heat seal,hermetic seal,navy seal,Servant of Grodstank,shadow of Black Bubbles,Spawn of Wally,watertight seal,wet seal,lynyrd,BRICKO airship,BRICKO bat,BRICKO cathedral,BRICKO elephant,BRICKO gargantuchicken,BRICKO octopus,BRICKO ooze,BRICKO oyster,BRICKO python,BRICKO turtle,BRICKO vacuum cleaner,Witchess Bishop,Witchess King,Witchess Knight,Witchess Ox,Witchess Pawn,Witchess Queen,Witchess Rook,Witchess Witch,The ghost of Ebenoozer Screege,The ghost of Lord Montague Spookyraven,The ghost of Waldo the Carpathian,The Icewoman,The ghost of Jim Unfortunato,the ghost of Sam McGee,the ghost of Monsieur Baguelle,the ghost of Vanillica "Trashblossom" Gorton,the ghost of Oily McBindle,boneless blobghost,The ghost of Richard Cockingham,The Headless Horseman,Emily Koops\, a spooky lime,time-spinner prank,random scenester,angry bassist,blue-haired girl,evil ex-girlfriend,peeved roommate] contains m)
+        //return true;
+    if (m == $monster[x-32-f combat training Snowman] && get_property_int("_snojoFreeFights") < 10)
+        return true;
+    if (my_familiar() == $familiar[machine elf] && my_location() == $location[the deep machine tunnels] && get_property_int("_machineTunnelsAdv") < 5)
+        return true;
+    return false;
+}
+
+static
+{
+    int [location] __location_combat_rates;
+}
+void initialiseLocationCombatRates()
+{
+    if (__location_combat_rates.count() > 0)
+        return;
+    int [location] rates;
+    file_to_map("data/combats.txt", __location_combat_rates);
+    //print_html("__location_combat_rates = " + __location_combat_rates.to_json());
+}
+//initialiseLocationCombatRates();
+int combatRateOfLocation(location l)
+{
+    initialiseLocationCombatRates();
+    //Some revamps changed the combat rate; here we have some not-quite-true-but-close assumptions:
+    if (l == $location[the haunted ballroom])
+        return 95;
+    if (__location_combat_rates contains l)
+    {
+        int rate = __location_combat_rates[l];
+        if (rate < 0)
+            rate = 100;
+        return rate;
+    }
+    return 100; //Unknown
+    
+    /*float base_rate = l.appearance_rates()[$monster[none]];
+    if (base_rate == 0.0)
+        return 0;
+    return base_rate + combat_rate_modifier();*/
 }
