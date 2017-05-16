@@ -2,7 +2,7 @@
 
 since 17.6; //the earliest main release that supports map literals
 //These settings are for development. Don't worry about editing them.
-string __version = "1.4.23";
+string __version = "1.4.24";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -1818,6 +1818,7 @@ static
     int PATH_THE_SOURCE = 29;
     int PATH_NUCLEAR_AUTUMN = 30;
     int PATH_GELATINOUS_NOOB = 31;
+    int PATH_LICENSE_TO_ADVENTURE = 32;
 }
 
 int __my_path_id_cached = -11;
@@ -1881,6 +1882,8 @@ int my_path_id()
         __my_path_id_cached = PATH_NUCLEAR_AUTUMN;
     else if (path_name == "Gelatinous Noob")
         __my_path_id_cached = PATH_GELATINOUS_NOOB;
+    else if (path_name == "License to Adventure")
+        __my_path_id_cached = PATH_LICENSE_TO_ADVENTURE;
     else
         __my_path_id_cached = PATH_UNKNOWN;
     return __my_path_id_cached;
@@ -1898,7 +1901,7 @@ boolean have_familiar_replacement(familiar f)
 boolean familiar_is_usable(familiar f)
 {
     //r13998 has most of these
-    if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
+    if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_LICENSE_TO_ADVENTURE)
         return false;
     if (!is_unrestricted(f))
         return false;
@@ -3069,6 +3072,13 @@ float averageAdventuresForConsumable(item it, boolean assume_monday)
 			continue;
 		adventures += a * (1.0 / to_float(adventures_string.count()));
 	}
+    if (it == $item[White Citadel burger])
+    {
+        if (in_bad_moon())
+            adventures = 2; //worst case scenario
+        else
+            adventures = 9; //saved across lifetimes
+    }
 	
 	if ($skill[saucemaven].have_skill() && $items[hot hi mein,cold hi mein,sleazy hi mein,spooky hi mein,stinky hi mein,Hell ramen,fettucini Inconnu,gnocchetti di Nietzsche,spaghetti with Skullheads,spaghetti con calaveras] contains it)
 	{
@@ -3242,6 +3252,21 @@ int combatRateOfLocation(location l)
     if (base_rate == 0.0)
         return 0;
     return base_rate + combat_rate_modifier();*/
+}
+
+//Specifically checks whether you can eat this item right now - fullness/drunkenness, meat, etc.
+boolean CafeItemEdible(item it)
+{
+    //Mafia does not seem to support accessing its cafe data via ASH.
+    //So, do the same thing. There's four mafia supports - Chez Snootee, Crimbo Cafe, Hell's Kitchen, and MicroBrewery.
+    if (it.fullness > availableFullness())
+        return false;
+    if (it.inebriety > availableDrunkenness())
+        return false;
+    //FIXME rest
+    if (it == $item[Jumbo Dr. Lucifer] && in_bad_moon() && my_meat() >= 150)
+        return true;
+    return false;
 }
 boolean [item] __iotms_usable;
 
@@ -3422,6 +3447,7 @@ static
     boolean [item] __minus_combat_equipment;
     boolean [item] __equipment;
     boolean [item] __items_in_outfits;
+    boolean [string][item] __equipment_by_numeric_modifier;
     void initialiseItems()
     {
         foreach it in $items[]
@@ -3451,6 +3477,22 @@ static
         }
     }
     initialiseItems();
+}
+
+boolean [item] equipmentWithNumericModifier(string modifier)
+{
+    if (!(__equipment_by_numeric_modifier contains modifier))
+    {
+        //Build it:
+        boolean [item] blank;
+        __equipment_by_numeric_modifier[modifier] = blank;
+        foreach it in __equipment
+        {
+            if (it.numeric_modifier(modifier) != 0.0)
+                __equipment_by_numeric_modifier[modifier][it] = true;
+        }
+    }
+    return __equipment_by_numeric_modifier[modifier];
 }
 
 static
@@ -22491,7 +22533,6 @@ void QHitsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] 
 {
 	if (!HITSStillRelevant())
 		return;
-	
 	ChecklistSubentry subentry;
 	subentry.header = "Hole in the Sky";
 	
@@ -22541,6 +22582,13 @@ void QHitsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] 
     		have_met_stars_requirement = false;
     	if (lines_remaining[key] > 0)
     		have_met_lines_requirement = false;
+    }
+    
+    if (__misc_state["Example mode"])
+    {
+        star_charts_remaining = 1;
+        have_met_stars_requirement = false;
+        have_met_lines_requirement = false;
     }
     
     if (have_met_stars_requirement)
@@ -22646,6 +22694,67 @@ void QHitsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] 
             
 			if (!have_met_stars_requirement || !have_met_lines_requirement)
 				subentry.modifiers.listAppend("+234% item");
+                
+            if ($familiar[space jellyfish].familiar_is_usable())
+            {
+                //Space Directions NC:
+                //39, 46
+                int turns_spent = $location[the hole in the sky].turns_spent;
+                boolean nc_up = false;
+                int turns_to_next_nc = 0;
+                if (turns_spent < 2)
+                    turns_to_next_nc = 2 - turns_spent;
+                else
+                    turns_to_next_nc = 7 - (turns_spent - 2) % 7;
+                    
+                if (turns_spent == 2)
+                    nc_up = true;
+                else if ((turns_spent - 2) % 7 == 0)
+                    nc_up = true;
+                if (nc_up)
+                {
+                    //Apparently skipping the NC just makes it re-appear the next adventure?
+                    if (true) //get_property("lastEncounter") != "Space Directions")
+                    {
+                        string line = "";
+                        string [int] choices;
+                        boolean an = false;
+                        if (star_charts_remaining > 0)
+                        {
+                            choices.listAppend("astronomer");
+                            an = true;
+                        }
+                        if (!have_met_stars_requirement || !have_met_lines_requirement)
+                        {
+                            choices.listAppend("camel's toe");
+                        }
+                        if ($familiar[space jellyfish] != my_familiar())
+                            line = HTMLGenerateSpanFont("Bring along your space jellyfish", "red") + ", it'll let you choose a " + choices.listJoinComponents(", ", "or");
+                        else
+                            line = "Jellyfish NC next adventure. Will let you fight a" + (an ? "n" : "") + " " + choices.listJoinComponents(", ", "or");
+                        /*if (star_charts_remaining > 0)
+                        {
+                            choices.listAppend("astronomer");
+                            line = HTMLGenerateSpanFont("Bring along your space jellyfish", colour) + ", it'll let you choose an astronomer/camel";
+                        }
+                        else
+                            line = HTMLGenerateSpanFont("Possibly bring along your space jellyfish", colour) + ", it'll let you choose an camel";*/
+                        line += " this adventure.";
+                        if (!have_met_stars_requirement || !have_met_lines_requirement)
+                            line += "|Though that will reduce your +item, so choose wisely.";
+                        subentry.entries.listAppend(line);
+                    }
+                }
+                else
+                {
+                    if (get_property_int("singleFamiliarRun").to_familiar() != $familiar[space jellyfish] && $familiar[space jellyfish] == my_familiar())
+                    {
+                        subentry.entries.listAppend(HTMLGenerateSpanFont("Switch to another familiar?", "red"));
+                    }
+                    string line = pluraliseWordy(turns_to_next_nc, "more turn", "more turns").capitaliseFirstLetter() + " to jellyfish choice NC.";
+                    subentry.entries.listAppend(line);
+                }
+            }
 		}
 		else
 			subentry.entries.listAppend("Can make Richard's Star Key.");
@@ -25531,7 +25640,7 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
     //Pop up a warning:
     if (__last_adventure_location == $location[the daily dungeon] && avoid_using_skeleton_key && $item[skeleton key].available_amount() > 0)
     {
-        task_entries.listAppend(ChecklistEntryMake("__item skeleton key", "", ChecklistSubentryMake("Avoid using the skeleton key in the daily dungeon", "", listMake("Running low, will need one for the gates.")), -11));
+        task_entries.listAppend(ChecklistEntryMake("__item skeleton key", "", ChecklistSubentryMake("Avoid using the skeleton key in the daily dungeon", "", listMake("Running low, will need one for the tower.")), -11));
     }
     
     if (get_property_int("_lastDailyDungeonRoom") > 0)
@@ -30304,7 +30413,11 @@ void setUpState()
             }
             i += 1;
         }
-    }
+    }	
+	if (__setting_debug_mode && __setting_debug_enable_example_mode_in_aftercore && get_property_boolean("kingLiberated"))
+	{
+		__misc_state["Example mode"] = true;
+	}
     
 	__misc_state["in aftercore"] = get_property_boolean("kingLiberated");
     //if (get_property_ascension("lastKingLiberation") && my_ascensions() != 0)
@@ -30355,7 +30468,7 @@ void setUpState()
 	}
 	
 	__misc_state["can drink just about anything"] = true;
-	if (my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_KOLHS || inebriety_limit() == 0)
+	if (my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_KOLHS || my_path_id() == PATH_LICENSE_TO_ADVENTURE || inebriety_limit() == 0)
 	{
 		__misc_state["can drink just about anything"] = false;
 	}
@@ -30549,20 +30662,30 @@ void setUpState()
 	
 	string olfacted_monster = "";
 	boolean some_olfact_available = false;
+    boolean some_reusable_olfact_available = false;
 	if ($skill[Transcendent Olfaction].skill_is_usable())
     {
 		some_olfact_available = true;
+        some_reusable_olfact_available = true;
         if ($effect[on the trail].have_effect() > 0)
             olfacted_monster = get_property("olfactedMonster");
     }
     if ($item[odor extractor].available_amount() > 0)
+    {
         some_olfact_available = true;
+    }
     if ($familiar[nosy nose].familiar_is_usable()) //weakened, but still relevant
+    {
         some_olfact_available = true;
+    }
     if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
+    {
         some_olfact_available = true;
+        some_reusable_olfact_available = true;
+    }
 	__misc_state["have olfaction equivalent"] = some_olfact_available;
     __misc_state_string["olfaction equivalent monster"] = olfacted_monster;
+	__misc_state["have reusable olfaction equivalent"] = some_reusable_olfact_available;
 	
     if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_NUCLEAR_AUTUMN)
         __misc_state["campground unavailable"] = true;
@@ -30600,6 +30723,8 @@ void setUpState()
     {
         skills_temporarily_missing = true;
     }
+    if (my_path_id() == PATH_LICENSE_TO_ADVENTURE)
+        familiars_temporarily_blocked = true;
 	__misc_state["skills temporarily missing"] = skills_temporarily_missing;
 	__misc_state["familiars temporarily missing"] = familiars_temporarily_missing;
 	__misc_state["familiars temporarily blocked"] = familiars_temporarily_blocked;
@@ -31319,7 +31444,7 @@ void generateMissingItems(Checklist [int] checklists)
             subentry.modifiers.listAppend(HTMLGenerateSpanOfClass("+" + e, type_class_desaturated) + " res");
         }
         if (relevant_elements.count() > 0)
-            subentry.entries.listAppend(relevant_elements.listJoinComponents(", ", "and").capitaliseFirstLetter() + " resistance for the hedge maze.");
+            subentry.entries.listAppend(relevant_elements.listJoinComponents(", ", "and").capitaliseFirstLetter() + " for the hedge maze.");
         
         subentry.header = sources.listJoinComponents(", ", "and").capitaliseFirstLetter() + " sources";
         if (subentry.modifiers.count() > 0)
@@ -33225,6 +33350,9 @@ string generateRandomMessage()
             break;
         case PATH_GELATINOUS_NOOB:
             random_messages.listAppend("you jelly?");
+            break;
+        case PATH_LICENSE_TO_ADVENTURE:
+            random_messages.listAppend("FOR YOUR EYES ONLY");
             break;
         /*case PATH_CLASS_ACT_3:
             random_messages.listAppend("buttons for the people"); break;
@@ -40914,19 +41042,67 @@ void IOTMMachineElfFamiliarGenerateResource(ChecklistEntry [int] resource_entrie
     if (!$familiar[machine elf].familiar_is_usable())
         return;
     
+    string url = "place.php?whichplace=dmt";
+    if (my_familiar() != $familiar[machine elf])
+        url = "familiar.php";
+    int importance = 0;
+    if (!__misc_state["in run"] || !__misc_state["need to level"])
+        importance = 6;
+    
+    ChecklistEntry entry;
+    entry.image_lookup_name = "__familiar machine elf";
+    entry.url = url;
+    entry.importance_level = importance;
+    if (__last_adventure_location == $location[the deep machine tunnels])
+        entry.should_highlight = true;
+    
+    
+    
+    
+    //This test is incredibly inaccurate, because all sorts of things end up in the NC queue. (We All Wear Masks, Approach the Jellyfish, The Mad Tea Party)
+    boolean duplication_nc_probably_visited = true;
+    if ($location[the deep machine tunnels].noncombat_queue == "")
+        duplication_nc_probably_visited = false;
+    else if ($location[the deep machine tunnels].noncombatTurnsAttemptedInLocation() >= 5)
+    {
+        duplication_nc_probably_visited = true;
+    }
+    else
+    {
+        duplication_nc_probably_visited = false;
+        //Look for known strings for the second part of the NC name:
+        //The full list I've seen is:
+        //Across The Universe,Backwards In Time,Forwards In Time,Into The 4th Dimension,Into The 5th Dimension,Into The 6th Dimension,Into The 7th Dimension,Into The 8th Dimension,Into The 9th Dimension,Into The Ether,Into Your Body,Into Your Consciousness,Into Your Courage,Into Your Dreams,Into Your Experience,Into Your Eye,Into Your Heart,Into Your Life,Into Your Liver,Into Your Memories,Into Your Mind,Into Your Pineal Gland,Into Your Regrets,Into Your Soul,Into Your Third Ear,Into Your Third Eye,Into Your Thoughts,Into Your Timeline,Into Your Voice,Sideways In Time
+        foreach s in $strings[Across The Universe,Backwards In Time,Forwards In Time,Sideways In Time,Into The ,Into Your ]
+        {
+            if ($location[the deep machine tunnels].noncombat_queue.contains_text(s))
+            {
+                duplication_nc_probably_visited = true;
+                break;
+            }
+        }
+    }
+    if (!duplication_nc_probably_visited && $location[the deep machine tunnels].turns_spent >= 5)
+    {
+        string [int] description;
+        description.listAppend("Next" + ($location[the deep machine tunnels].turns_spent > 5 ? "(?)" : "") + " turn in the DMT. Costs a turn.");
+        description.listAppend("Copy a PVPable potion, food, drink, or spleen item.");
+        item [int] suggested_items;
+        if (suggested_items.count() > 0)
+            description.listAppend("Possibly " + suggested_items.listJoinComponents(", ", "or") + ".");
+        entry.subentries.listAppend(ChecklistSubentryMake("Item duplication available", "", description));
+    }
+    
+    
+    
     int free_fights_remaining = clampi(5 - get_property_int("_machineTunnelsAdv"), 0, 5);
     if (free_fights_remaining > 0 && mafiaIsPastRevision(16550))
     {
-        string url = "place.php?whichplace=dmt";
         string [int] description;
         string [int] modifiers;
-        int importance = 0;
-        if (!__misc_state["in run"] || !__misc_state["need to level"])
-            importance = 6;
         string [int] tasks;
         if (my_familiar() != $familiar[machine elf])
         {
-            url = "familiar.php";
             tasks.listAppend("bring along your machine elf");
         }
         tasks.listAppend("adventure in the machine tunnels");
@@ -40984,9 +41160,11 @@ void IOTMMachineElfFamiliarGenerateResource(ChecklistEntry [int] resource_entrie
             if ($item[abstraction: thought].item_amount() == 0)
                 description.listAppend("Possibly run the machine elf elsewhere first, for transmutable potions.");
         }
-        ChecklistSubentry [int] subentries;
-        subentries.listAppend(ChecklistSubentryMake(pluralise(free_fights_remaining, "free elf fight", "free elf fights"), modifiers, description));
-        resource_entries.listAppend(ChecklistEntryMake("__familiar machine elf", url, subentries, importance, $locations[the deep machine tunnels]));
+        entry.subentries.listAppend(ChecklistSubentryMake(pluralise(free_fights_remaining, "free elf fight", "free elf fights"), modifiers, description));
+    }
+    if (entry.subentries.count() > 0)
+    {
+        resource_entries.listAppend(entry);
     }
 }
 
@@ -41950,7 +42128,7 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
                 line = HTMLGenerateSpanFont(line, "grey");
             description.listAppend(line);
         }
-        if (__misc_state["can drink just about anything"] && my_path_id() != PATH_NUCLEAR_AUTUMN)
+        if ((my_path_id() == PATH_LICENSE_TO_ADVENTURE || __misc_state["can drink just about anything"]) && my_path_id() != PATH_NUCLEAR_AUTUMN)
         {
             string line = "Drink: 4 inebriety epic.";
             if (__misc_state["in run"])
@@ -42781,6 +42959,62 @@ void IOTMSpacegateGenerateResource(ChecklistEntry [int] resource_entries)
             description.listAppend("30 turns, once/day.|" + options.listJoinComponents(", ", "or").capitaliseFirstLetter() + ".");
             
             resource_entries.listAppend(ChecklistEntryMake("__item plus sign", "place.php?whichplace=spacegate&action=sg_vaccinator", ChecklistSubentryMake("Vaccination", "", description), 8));
+        }
+    }
+    if (__misc_state["in run"] && my_primestat() == $stat[moxie] && __misc_state["need to level"] && get_property("_spacegatePlanetName") == "")
+    {
+        //Dial TFHSXKK:
+        string [int] description;
+        description.listAppend("Dial TFHSXKK, and skip every adventure until you reach Paradise Under a Strange Sun.|Will give 1000 stats and cost a turn. Not strictly optimal.");
+        resource_entries.listAppend(ChecklistEntryMake("__item portable spacegate", "place.php?whichplace=spacegate&action=sg_Terminal", ChecklistSubentryMake("Spacegate dial", "", description), 8));
+    }
+}
+RegisterResourceGenerationFunction("IOTMNewYouGenerateResource");
+void IOTMNewYouGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if (__misc_state["in run"])
+    {
+        string [item] affirmation_effects;
+        string [item] affirmation_combat_uses;
+        affirmation_effects[lookupItem("Daily Affirmation: Adapt to Change Eventually")] = "+4 stats/fight, +50% init";
+        if (!__misc_state["need to level"])
+            affirmation_effects[lookupItem("Daily Affirmation: Adapt to Change Eventually")] = "+50% init";
+        affirmation_effects[lookupItem("Daily Affirmation: Always be Collecting")] = "+50% item, +100% meat";
+        affirmation_effects[lookupItem("Daily Affirmation: Be a Mind Master")] = "+100% spell damage, 15 MP regen";
+        affirmation_effects[lookupItem("Daily Affirmation: Be Superficially interested")] = "-combat / +combat (togglable)";
+        affirmation_effects[lookupItem("Daily Affirmation: Keep Free Hate in your Heart")] = "+30 ML";
+        affirmation_effects[lookupItem("Daily Affirmation: Think Win-Lose")] = "+50% all stats";
+        affirmation_effects[lookupItem("Daily Affirmation: Work For Hours a Week")] = "+5 familiar weight, 15 HP regen";
+        if (__misc_state["familiars temporarily blocked"])
+            affirmation_effects[lookupItem("Daily Affirmation: Work For Hours a Week")] = "15 HP regen";
+        
+        
+        affirmation_combat_uses[lookupItem("Daily Affirmation: Adapt to Change Eventually")] = ""; //monster change
+        affirmation_combat_uses[lookupItem("Daily Affirmation: Always be Collecting")] = "duplicate item drops";
+        affirmation_combat_uses[lookupItem("Daily Affirmation: Be a Mind Master")] = "banish for 80 turns";
+        if (!__misc_state["have reusable olfaction equivalent"])
+            affirmation_combat_uses[lookupItem("Daily Affirmation: Be Superficially interested")] = "olfact weakly";
+        if (hippy_stone_broken())
+            affirmation_combat_uses[lookupItem("Daily Affirmation: Keep Free Hate in your Heart")] = "gain 3 PVP fights";
+        affirmation_combat_uses[lookupItem("Daily Affirmation: Think Win-Lose")] = "instakill";
+        affirmation_combat_uses[lookupItem("Daily Affirmation: Work For Hours a Week")] = "earn some meat";
+        
+        ChecklistEntry entry;
+        foreach it in affirmation_effects
+        {
+            if (it.item_amount() == 0) continue;
+            if (entry.image_lookup_name == "")
+                entry.image_lookup_name = "__item " + it;
+            string combat_text = "";
+            if (affirmation_combat_uses[it] != "")
+                combat_text = "Or throw in combat to " + affirmation_combat_uses[it] + ".";
+            entry.subentries.listAppend(ChecklistSubentryMake(pluralise(it), "100 turns, " + affirmation_effects[it], combat_text));
+        }
+        if (entry.subentries.count() > 0)
+        {
+            entry.url = "inventory.php?which=3";
+            entry.importance_level = 6;
+            resource_entries.listAppend(entry);
         }
     }
 }
@@ -45445,11 +45679,6 @@ void runMain(string relay_filename)
     }
     else if (form_fields.count() > 0)
         print_html("Form fields: " + form_fields.to_json());
-	
-	if (__setting_debug_mode && __setting_debug_enable_example_mode_in_aftercore && get_property_boolean("kingLiberated"))
-	{
-		__misc_state["Example mode"] = true;
-	}
 	
     
     locationCompatibilityInit();
