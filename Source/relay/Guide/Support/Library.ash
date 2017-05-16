@@ -41,6 +41,7 @@ static
     int PATH_THE_SOURCE = 29;
     int PATH_NUCLEAR_AUTUMN = 30;
     int PATH_GELATINOUS_NOOB = 31;
+    int PATH_LICENSE_TO_ADVENTURE = 32;
 }
 
 int __my_path_id_cached = -11;
@@ -104,6 +105,8 @@ int my_path_id()
         __my_path_id_cached = PATH_NUCLEAR_AUTUMN;
     else if (path_name == "Gelatinous Noob")
         __my_path_id_cached = PATH_GELATINOUS_NOOB;
+    else if (path_name == "License to Adventure")
+        __my_path_id_cached = PATH_LICENSE_TO_ADVENTURE;
     else
         __my_path_id_cached = PATH_UNKNOWN;
     return __my_path_id_cached;
@@ -121,7 +124,7 @@ boolean have_familiar_replacement(familiar f)
 boolean familiar_is_usable(familiar f)
 {
     //r13998 has most of these
-    if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
+    if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_LICENSE_TO_ADVENTURE)
         return false;
     if (!is_unrestricted(f))
         return false;
@@ -1292,6 +1295,13 @@ float averageAdventuresForConsumable(item it, boolean assume_monday)
 			continue;
 		adventures += a * (1.0 / to_float(adventures_string.count()));
 	}
+    if (it == $item[White Citadel burger])
+    {
+        if (in_bad_moon())
+            adventures = 2; //worst case scenario
+        else
+            adventures = 9; //saved across lifetimes
+    }
 	
 	if ($skill[saucemaven].have_skill() && $items[hot hi mein,cold hi mein,sleazy hi mein,spooky hi mein,stinky hi mein,Hell ramen,fettucini Inconnu,gnocchetti di Nietzsche,spaghetti with Skullheads,spaghetti con calaveras] contains it)
 	{
@@ -1465,4 +1475,19 @@ int combatRateOfLocation(location l)
     if (base_rate == 0.0)
         return 0;
     return base_rate + combat_rate_modifier();*/
+}
+
+//Specifically checks whether you can eat this item right now - fullness/drunkenness, meat, etc.
+boolean CafeItemEdible(item it)
+{
+    //Mafia does not seem to support accessing its cafe data via ASH.
+    //So, do the same thing. There's four mafia supports - Chez Snootee, Crimbo Cafe, Hell's Kitchen, and MicroBrewery.
+    if (it.fullness > availableFullness())
+        return false;
+    if (it.inebriety > availableDrunkenness())
+        return false;
+    //FIXME rest
+    if (it == $item[Jumbo Dr. Lucifer] && in_bad_moon() && my_meat() >= 150)
+        return true;
+    return false;
 }

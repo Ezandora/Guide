@@ -430,6 +430,9 @@ string generateRandomMessage()
         case PATH_GELATINOUS_NOOB:
             random_messages.listAppend("you jelly?");
             break;
+        case PATH_LICENSE_TO_ADVENTURE:
+            random_messages.listAppend("FOR YOUR EYES ONLY");
+            break;
         /*case PATH_CLASS_ACT_3:
             random_messages.listAppend("buttons for the people"); break;
         case PATH_AVATAR_OF_THE_NAUGHTY_SORCERESS:

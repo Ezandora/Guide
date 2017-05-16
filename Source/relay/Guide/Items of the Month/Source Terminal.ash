@@ -236,7 +236,7 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
                 line = HTMLGenerateSpanFont(line, "grey");
             description.listAppend(line);
         }
-        if (__misc_state["can drink just about anything"] && my_path_id() != PATH_NUCLEAR_AUTUMN)
+        if ((my_path_id() == PATH_LICENSE_TO_ADVENTURE || __misc_state["can drink just about anything"]) && my_path_id() != PATH_NUCLEAR_AUTUMN)
         {
             string line = "Drink: 4 inebriety epic.";
             if (__misc_state["in run"])

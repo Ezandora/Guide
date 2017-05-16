@@ -89,7 +89,11 @@ void setUpState()
             }
             i += 1;
         }
-    }
+    }	
+	if (__setting_debug_mode && __setting_debug_enable_example_mode_in_aftercore && get_property_boolean("kingLiberated"))
+	{
+		__misc_state["Example mode"] = true;
+	}
     
 	__misc_state["in aftercore"] = get_property_boolean("kingLiberated");
     //if (get_property_ascension("lastKingLiberation") && my_ascensions() != 0)
@@ -140,7 +144,7 @@ void setUpState()
 	}
 	
 	__misc_state["can drink just about anything"] = true;
-	if (my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_KOLHS || inebriety_limit() == 0)
+	if (my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_KOLHS || my_path_id() == PATH_LICENSE_TO_ADVENTURE || inebriety_limit() == 0)
 	{
 		__misc_state["can drink just about anything"] = false;
 	}
@@ -334,20 +338,30 @@ void setUpState()
 	
 	string olfacted_monster = "";
 	boolean some_olfact_available = false;
+    boolean some_reusable_olfact_available = false;
 	if ($skill[Transcendent Olfaction].skill_is_usable())
     {
 		some_olfact_available = true;
+        some_reusable_olfact_available = true;
         if ($effect[on the trail].have_effect() > 0)
             olfacted_monster = get_property("olfactedMonster");
     }
     if ($item[odor extractor].available_amount() > 0)
+    {
         some_olfact_available = true;
+    }
     if ($familiar[nosy nose].familiar_is_usable()) //weakened, but still relevant
+    {
         some_olfact_available = true;
+    }
     if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
+    {
         some_olfact_available = true;
+        some_reusable_olfact_available = true;
+    }
 	__misc_state["have olfaction equivalent"] = some_olfact_available;
     __misc_state_string["olfaction equivalent monster"] = olfacted_monster;
+	__misc_state["have reusable olfaction equivalent"] = some_reusable_olfact_available;
 	
     if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_NUCLEAR_AUTUMN)
         __misc_state["campground unavailable"] = true;
@@ -385,6 +399,8 @@ void setUpState()
     {
         skills_temporarily_missing = true;
     }
+    if (my_path_id() == PATH_LICENSE_TO_ADVENTURE)
+        familiars_temporarily_blocked = true;
 	__misc_state["skills temporarily missing"] = skills_temporarily_missing;
 	__misc_state["familiars temporarily missing"] = familiars_temporarily_missing;
 	__misc_state["familiars temporarily blocked"] = familiars_temporarily_blocked;

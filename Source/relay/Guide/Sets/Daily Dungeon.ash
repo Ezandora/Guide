@@ -131,7 +131,7 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
     //Pop up a warning:
     if (__last_adventure_location == $location[the daily dungeon] && avoid_using_skeleton_key && $item[skeleton key].available_amount() > 0)
     {
-        task_entries.listAppend(ChecklistEntryMake("__item skeleton key", "", ChecklistSubentryMake("Avoid using the skeleton key in the daily dungeon", "", listMake("Running low, will need one for the gates.")), -11));
+        task_entries.listAppend(ChecklistEntryMake("__item skeleton key", "", ChecklistSubentryMake("Avoid using the skeleton key in the daily dungeon", "", listMake("Running low, will need one for the tower.")), -11));
     }
     
     if (get_property_int("_lastDailyDungeonRoom") > 0)

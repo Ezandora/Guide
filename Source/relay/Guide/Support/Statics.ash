@@ -45,6 +45,7 @@ static
     boolean [item] __minus_combat_equipment;
     boolean [item] __equipment;
     boolean [item] __items_in_outfits;
+    boolean [string][item] __equipment_by_numeric_modifier;
     void initialiseItems()
     {
         foreach it in $items[]
@@ -74,6 +75,22 @@ static
         }
     }
     initialiseItems();
+}
+
+boolean [item] equipmentWithNumericModifier(string modifier)
+{
+    if (!(__equipment_by_numeric_modifier contains modifier))
+    {
+        //Build it:
+        boolean [item] blank;
+        __equipment_by_numeric_modifier[modifier] = blank;
+        foreach it in __equipment
+        {
+            if (it.numeric_modifier(modifier) != 0.0)
+                __equipment_by_numeric_modifier[modifier][it] = true;
+        }
+    }
+    return __equipment_by_numeric_modifier[modifier];
 }
 
 static

@@ -20,19 +20,67 @@ void IOTMMachineElfFamiliarGenerateResource(ChecklistEntry [int] resource_entrie
     if (!$familiar[machine elf].familiar_is_usable())
         return;
     
+    string url = "place.php?whichplace=dmt";
+    if (my_familiar() != $familiar[machine elf])
+        url = "familiar.php";
+    int importance = 0;
+    if (!__misc_state["in run"] || !__misc_state["need to level"])
+        importance = 6;
+    
+    ChecklistEntry entry;
+    entry.image_lookup_name = "__familiar machine elf";
+    entry.url = url;
+    entry.importance_level = importance;
+    if (__last_adventure_location == $location[the deep machine tunnels])
+        entry.should_highlight = true;
+    
+    
+    
+    
+    //This test is incredibly inaccurate, because all sorts of things end up in the NC queue. (We All Wear Masks, Approach the Jellyfish, The Mad Tea Party)
+    boolean duplication_nc_probably_visited = true;
+    if ($location[the deep machine tunnels].noncombat_queue == "")
+        duplication_nc_probably_visited = false;
+    else if ($location[the deep machine tunnels].noncombatTurnsAttemptedInLocation() >= 5)
+    {
+        duplication_nc_probably_visited = true;
+    }
+    else
+    {
+        duplication_nc_probably_visited = false;
+        //Look for known strings for the second part of the NC name:
+        //The full list I've seen is:
+        //Across The Universe,Backwards In Time,Forwards In Time,Into The 4th Dimension,Into The 5th Dimension,Into The 6th Dimension,Into The 7th Dimension,Into The 8th Dimension,Into The 9th Dimension,Into The Ether,Into Your Body,Into Your Consciousness,Into Your Courage,Into Your Dreams,Into Your Experience,Into Your Eye,Into Your Heart,Into Your Life,Into Your Liver,Into Your Memories,Into Your Mind,Into Your Pineal Gland,Into Your Regrets,Into Your Soul,Into Your Third Ear,Into Your Third Eye,Into Your Thoughts,Into Your Timeline,Into Your Voice,Sideways In Time
+        foreach s in $strings[Across The Universe,Backwards In Time,Forwards In Time,Sideways In Time,Into The ,Into Your ]
+        {
+            if ($location[the deep machine tunnels].noncombat_queue.contains_text(s))
+            {
+                duplication_nc_probably_visited = true;
+                break;
+            }
+        }
+    }
+    if (!duplication_nc_probably_visited && $location[the deep machine tunnels].turns_spent >= 5)
+    {
+        string [int] description;
+        description.listAppend("Next" + ($location[the deep machine tunnels].turns_spent > 5 ? "(?)" : "") + " turn in the DMT. Costs a turn.");
+        description.listAppend("Copy a PVPable potion, food, drink, or spleen item.");
+        item [int] suggested_items;
+        if (suggested_items.count() > 0)
+            description.listAppend("Possibly " + suggested_items.listJoinComponents(", ", "or") + ".");
+        entry.subentries.listAppend(ChecklistSubentryMake("Item duplication available", "", description));
+    }
+    
+    
+    
     int free_fights_remaining = clampi(5 - get_property_int("_machineTunnelsAdv"), 0, 5);
     if (free_fights_remaining > 0 && mafiaIsPastRevision(16550))
     {
-        string url = "place.php?whichplace=dmt";
         string [int] description;
         string [int] modifiers;
-        int importance = 0;
-        if (!__misc_state["in run"] || !__misc_state["need to level"])
-            importance = 6;
         string [int] tasks;
         if (my_familiar() != $familiar[machine elf])
         {
-            url = "familiar.php";
             tasks.listAppend("bring along your machine elf");
         }
         tasks.listAppend("adventure in the machine tunnels");
@@ -90,9 +138,11 @@ void IOTMMachineElfFamiliarGenerateResource(ChecklistEntry [int] resource_entrie
             if ($item[abstraction: thought].item_amount() == 0)
                 description.listAppend("Possibly run the machine elf elsewhere first, for transmutable potions.");
         }
-        ChecklistSubentry [int] subentries;
-        subentries.listAppend(ChecklistSubentryMake(pluralise(free_fights_remaining, "free elf fight", "free elf fights"), modifiers, description));
-        resource_entries.listAppend(ChecklistEntryMake("__familiar machine elf", url, subentries, importance, $locations[the deep machine tunnels]));
+        entry.subentries.listAppend(ChecklistSubentryMake(pluralise(free_fights_remaining, "free elf fight", "free elf fights"), modifiers, description));
+    }
+    if (entry.subentries.count() > 0)
+    {
+        resource_entries.listAppend(entry);
     }
 }
 

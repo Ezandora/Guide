@@ -29,4 +29,11 @@ void IOTMSpacegateGenerateResource(ChecklistEntry [int] resource_entries)
             resource_entries.listAppend(ChecklistEntryMake("__item plus sign", "place.php?whichplace=spacegate&action=sg_vaccinator", ChecklistSubentryMake("Vaccination", "", description), 8));
         }
     }
+    if (__misc_state["in run"] && my_primestat() == $stat[moxie] && __misc_state["need to level"] && get_property("_spacegatePlanetName") == "")
+    {
+        //Dial TFHSXKK:
+        string [int] description;
+        description.listAppend("Dial TFHSXKK, and skip every adventure until you reach Paradise Under a Strange Sun.|Will give 1000 stats and cost a turn. Not strictly optimal.");
+        resource_entries.listAppend(ChecklistEntryMake("__item portable spacegate", "place.php?whichplace=spacegate&action=sg_Terminal", ChecklistSubentryMake("Spacegate dial", "", description), 8));
+    }
 }

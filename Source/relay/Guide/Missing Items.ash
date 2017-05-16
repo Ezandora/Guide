@@ -278,7 +278,7 @@ void generateMissingItems(Checklist [int] checklists)
             subentry.modifiers.listAppend(HTMLGenerateSpanOfClass("+" + e, type_class_desaturated) + " res");
         }
         if (relevant_elements.count() > 0)
-            subentry.entries.listAppend(relevant_elements.listJoinComponents(", ", "and").capitaliseFirstLetter() + " resistance for the hedge maze.");
+            subentry.entries.listAppend(relevant_elements.listJoinComponents(", ", "and").capitaliseFirstLetter() + " for the hedge maze.");
         
         subentry.header = sources.listJoinComponents(", ", "and").capitaliseFirstLetter() + " sources";
         if (subentry.modifiers.count() > 0)

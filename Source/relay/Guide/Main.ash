@@ -49,11 +49,6 @@ void runMain(string relay_filename)
     else if (form_fields.count() > 0)
         print_html("Form fields: " + form_fields.to_json());
 	
-	if (__setting_debug_mode && __setting_debug_enable_example_mode_in_aftercore && get_property_boolean("kingLiberated"))
-	{
-		__misc_state["Example mode"] = true;
-	}
-	
     
     locationCompatibilityInit();
 	PageInit();

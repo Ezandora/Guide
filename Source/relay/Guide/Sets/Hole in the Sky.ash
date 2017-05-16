@@ -51,7 +51,6 @@ void QHitsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] 
 {
 	if (!HITSStillRelevant())
 		return;
-	
 	ChecklistSubentry subentry;
 	subentry.header = "Hole in the Sky";
 	
@@ -101,6 +100,13 @@ void QHitsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] 
     		have_met_stars_requirement = false;
     	if (lines_remaining[key] > 0)
     		have_met_lines_requirement = false;
+    }
+    
+    if (__misc_state["Example mode"])
+    {
+        star_charts_remaining = 1;
+        have_met_stars_requirement = false;
+        have_met_lines_requirement = false;
     }
     
     if (have_met_stars_requirement)
@@ -206,6 +212,67 @@ void QHitsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] 
             
 			if (!have_met_stars_requirement || !have_met_lines_requirement)
 				subentry.modifiers.listAppend("+234% item");
+                
+            if ($familiar[space jellyfish].familiar_is_usable())
+            {
+                //Space Directions NC:
+                //39, 46
+                int turns_spent = $location[the hole in the sky].turns_spent;
+                boolean nc_up = false;
+                int turns_to_next_nc = 0;
+                if (turns_spent < 2)
+                    turns_to_next_nc = 2 - turns_spent;
+                else
+                    turns_to_next_nc = 7 - (turns_spent - 2) % 7;
+                    
+                if (turns_spent == 2)
+                    nc_up = true;
+                else if ((turns_spent - 2) % 7 == 0)
+                    nc_up = true;
+                if (nc_up)
+                {
+                    //Apparently skipping the NC just makes it re-appear the next adventure?
+                    if (true) //get_property("lastEncounter") != "Space Directions")
+                    {
+                        string line = "";
+                        string [int] choices;
+                        boolean an = false;
+                        if (star_charts_remaining > 0)
+                        {
+                            choices.listAppend("astronomer");
+                            an = true;
+                        }
+                        if (!have_met_stars_requirement || !have_met_lines_requirement)
+                        {
+                            choices.listAppend("camel's toe");
+                        }
+                        if ($familiar[space jellyfish] != my_familiar())
+                            line = HTMLGenerateSpanFont("Bring along your space jellyfish", "red") + ", it'll let you choose a " + choices.listJoinComponents(", ", "or");
+                        else
+                            line = "Jellyfish NC next adventure. Will let you fight a" + (an ? "n" : "") + " " + choices.listJoinComponents(", ", "or");
+                        /*if (star_charts_remaining > 0)
+                        {
+                            choices.listAppend("astronomer");
+                            line = HTMLGenerateSpanFont("Bring along your space jellyfish", colour) + ", it'll let you choose an astronomer/camel";
+                        }
+                        else
+                            line = HTMLGenerateSpanFont("Possibly bring along your space jellyfish", colour) + ", it'll let you choose an camel";*/
+                        line += " this adventure.";
+                        if (!have_met_stars_requirement || !have_met_lines_requirement)
+                            line += "|Though that will reduce your +item, so choose wisely.";
+                        subentry.entries.listAppend(line);
+                    }
+                }
+                else
+                {
+                    if (get_property_int("singleFamiliarRun").to_familiar() != $familiar[space jellyfish] && $familiar[space jellyfish] == my_familiar())
+                    {
+                        subentry.entries.listAppend(HTMLGenerateSpanFont("Switch to another familiar?", "red"));
+                    }
+                    string line = pluraliseWordy(turns_to_next_nc, "more turn", "more turns").capitaliseFirstLetter() + " to jellyfish choice NC.";
+                    subentry.entries.listAppend(line);
+                }
+            }
 		}
 		else
 			subentry.entries.listAppend("Can make Richard's Star Key.");
