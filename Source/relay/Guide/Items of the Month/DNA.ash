@@ -89,7 +89,7 @@ effect __current_dna_intrinsic = $effect[none];
 RegisterInitFunction("IOTMDNAInit");
 void IOTMDNAInit()
 {
-    if (get_campground()[$item[Little Geneticist DNA-Splicing Lab]] == 0)
+    if (!__iotms_usable[$item[Little Geneticist DNA-Splicing Lab]])
         return;
 
 
@@ -327,7 +327,7 @@ void IOTMDNAGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (__misc_state["campground unavailable"])
         return;
-    if (get_campground()[$item[Little Geneticist DNA-Splicing Lab]] == 0)
+    if (!__iotms_usable[$item[Little Geneticist DNA-Splicing Lab]])
         return;
     
     //Player has a genetic engineering lab installed. Let's play with our DNA!
@@ -486,7 +486,7 @@ void IOTMDNAGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 {
     if (__misc_state["campground unavailable"])
         return;
-    if (get_campground()[$item[Little Geneticist DNA-Splicing Lab]] == 0)
+    if (!__iotms_usable[$item[Little Geneticist DNA-Splicing Lab]])
         return;
     
     //Reminders:

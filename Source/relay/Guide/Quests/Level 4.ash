@@ -130,7 +130,7 @@ void QLevel4GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         
         if (__misc_state["can use clovers"] && sonars_needed >= 2)
             subentry.entries.listAppend("Potentially clover Guano Junction for two sonar-in-a-biscuit");
-        if ($item[enchanted bean].available_amount() == 0 && !__quest_state["level 10"].state_boolean["beanstalk grown"])
+        if ($item[enchanted bean].available_amount() == 0 && !__quest_state["Level 10"].state_boolean["beanstalk grown"])
         {
             if ($location[the beanbat chamber].locationAvailable())
                 subentry.entries.listAppend("Run +100% item in the beanbat chamber for a single turn for enchanted bean. (50% drop)");

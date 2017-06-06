@@ -108,7 +108,7 @@ static
         {
             __combat_skills_that_are_spells[s] = true;
         }
-        foreach s in lookupSkills("Lavafava,Pungent Mung,Beanstorm") //FIXME cowcall? snakewhip?
+        foreach s in $skills[Lavafava,Pungent Mung,Beanstorm] //FIXME cowcall? snakewhip?
             __combat_skills_that_are_spells[s] = true;
     }
     initialiseCombatSkillsThatAreSpells();

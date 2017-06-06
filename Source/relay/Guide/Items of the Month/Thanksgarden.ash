@@ -40,7 +40,7 @@ void IOTMThanksgardenGenerateResource(ChecklistEntry [int] resource_entries)
 
         Returned: 0
         */
-        if (my_path_id() != PATH_NUCLEAR_AUTUMN && spleen_limit() > 0)
+        if (my_path_id() != PATH_NUCLEAR_AUTUMN && spleen_limit() > 0 && $item[cashew].available_amount() >= 3)
             options.listAppend(HTMLGreyOutTextUnlessTrue(pluralise($item[cashew].available_amount() / 3, $item[turkey blaster]) + " to burn delay", cashew_amount >= 3));
         if (!__quest_state["Level 12"].finished)
             options.listAppend(HTMLGreyOutTextUnlessTrue(pluralise($item[cashew].available_amount() / 3, $item[stuffing fluffer]) + " for the war", cashew_amount >= 3));

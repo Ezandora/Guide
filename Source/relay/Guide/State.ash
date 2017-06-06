@@ -251,6 +251,12 @@ void setUpState()
 		yellow_ray_source = "Flash Headlight";
 		yellow_ray_image_name = "__skill Easy Riding";
     }
+    if (lookupSkill("disintegrate").have_skill() && my_maxmp() >= 150)
+    {
+		yellow_ray_available = true;
+		yellow_ray_source = "Disintegrate";
+		yellow_ray_image_name = "__skill Disintegrate";
+    }
 	
 	if (yellow_ray_available)
 		yellow_ray_potentially_available = true;
@@ -477,7 +483,7 @@ void setUpState()
 	//wand
 	
 	boolean wand_of_nagamar_needed = true;
-	if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_BUGBEAR_INVASION || my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_KOLHS || my_path_id() == PATH_HEAVY_RAINS || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_THE_SOURCE)
+	if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_BUGBEAR_INVASION || my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_KOLHS || my_path_id() == PATH_HEAVY_RAINS || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_THE_SOURCE || my_path_id() == PATH_LICENSE_TO_ADVENTURE)
 		wand_of_nagamar_needed = false;
 		
 	int ruby_w_needed = 1;

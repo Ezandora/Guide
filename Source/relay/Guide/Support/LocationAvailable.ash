@@ -584,6 +584,8 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
             return QuestState("questM18Swamp").started;
         case $location[madness bakery]:
             return QuestState("questM25Armorer").started;
+        case $location[sonofa beach]:
+            return QuestState("questL12War").mafia_internal_step >= 2;
 		default:
 			break;
 	}

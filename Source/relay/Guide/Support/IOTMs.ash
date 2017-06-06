@@ -19,6 +19,10 @@ void initialiseIOTMsUsable()
             __iotms_usable[$item[Witchess Set]] = true;
         if (campground[$item[potted tea tree]] > 0)
             __iotms_usable[$item[potted tea tree]] = true;
+        if (campground[$item[portable mayo clinic]] > 0)
+            __iotms_usable[$item[portable mayo clinic]] = true;
+        if (campground[$item[Little Geneticist DNA-Splicing Lab]] > 0)
+            __iotms_usable[$item[Little Geneticist DNA-Splicing Lab]] = true;
     }
     if (get_property_boolean("hasDetectiveSchool"))
         __iotms_usable[$item[detective school application]] = true;

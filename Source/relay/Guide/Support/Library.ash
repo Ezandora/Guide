@@ -1,6 +1,7 @@
 import "relay/Guide/Support/Math.ash"
 import "relay/Guide/Support/List.ash"
 import "relay/Guide/Support/Strings.ash"
+import "relay/Guide/Support/Statics.ash"
 
 boolean mafiaIsPastRevision(int revision_number)
 {
@@ -1231,36 +1232,40 @@ boolean haveSeenBadMoonEncounter(int encounter_id)
 //FIXME make this use static etc. Probably extend Item Filter.ash to support equipment.
 item [int] generateEquipmentForExtraExperienceOnStat(stat desired_stat, boolean require_can_equip_currently)
 {
-    boolean [item] experience_percent_modifiers;
-    string numeric_modifier_string;
+    //boolean [item] experience_percent_modifiers;
+    /*string numeric_modifier_string;
     if (desired_stat == $stat[muscle])
     {
-        experience_percent_modifiers = $items[trench lighter,fake washboard];
+        //experience_percent_modifiers = $items[trench lighter,fake washboard];
         numeric_modifier_string = "Muscle";
     }
     else if (desired_stat == $stat[mysticality])
     {
-        experience_percent_modifiers = lookupItems("trench lighter,basaltamander buckler");
+        //experience_percent_modifiers = lookupItems("trench lighter,basaltamander buckler");
         numeric_modifier_string = "Mysticality";
     }
     else if (desired_stat == $stat[moxie])
     {
-        experience_percent_modifiers = $items[trench lighter,backwoods banjo];
+        //experience_percent_modifiers = $items[trench lighter,backwoods banjo];
         numeric_modifier_string = "Moxie";
     }
     else
         return listMakeBlankItem();
-    item [slot] item_slots;
     if (numeric_modifier_string != "")
-        numeric_modifier_string += " Experience Percent";
+        numeric_modifier_string += " Experience Percent";*/
+        
+    item [slot] item_slots;
+    string numeric_modifier_string = desired_stat + " Experience Percent";
 
-    foreach it in experience_percent_modifiers
+    //foreach it in experience_percent_modifiers
+    foreach it in equipmentWithNumericModifier(numeric_modifier_string)
     {
         if (it.available_amount() > 0 && (!require_can_equip_currently || it.can_equip()) && item_slots[it.to_slot()].numeric_modifier(numeric_modifier_string) < it.numeric_modifier(numeric_modifier_string))
         {
             item_slots[it.to_slot()] = it;
         }
     }
+    
     item [int] items_could_equip;
     foreach s, it in item_slots
         items_could_equip.listAppend(it);

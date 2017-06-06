@@ -55,7 +55,7 @@ string [int] SCountersGenerateDescriptionForRainMonster()
     monster_descriptions["aquaconda"] = "rain skill";
     monster_descriptions["storm cow"] = "lightning skill";
     
-    if (get_campground()[$item[Little Geneticist DNA-Splicing Lab]] > 0 && mafiaIsPastRevision(13918) && !get_property_boolean("_dnaHybrid") && $effect[Human-Fish Hybrid].have_effect() == 0 && !__misc_state["familiars temporarily blocked"])
+    if (__iotms_usable[$item[Little Geneticist DNA-Splicing Lab]] && mafiaIsPastRevision(13918) && !get_property_boolean("_dnaHybrid") && $effect[Human-Fish Hybrid].have_effect() == 0 && !__misc_state["familiars temporarily blocked"])
     {
         //FIXME all once spaded
         //NOT giant isopod

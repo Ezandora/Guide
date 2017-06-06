@@ -194,7 +194,8 @@ void generateDailyResources(Checklist [int] checklists)
         string [int] description;
         if (get_property("sidequestArenaCompleted") == "hippy")
         {
-            description.listAppend("+5 familiar weight.");
+            if (!__misc_state["familiars temporarily blocked"])
+                description.listAppend("+5 familiar weight.");
             description.listAppend("Or +20% item.");
             if (__misc_state["need to level"])
                 description.listAppend("Or +5 stats/fight.");

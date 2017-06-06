@@ -343,7 +343,8 @@ void CountersParseProperty(string property_name, Counter [string] counters, bool
             //if (turns_until_counter >= 0)
             if (true)
             {
-                c.exact_turns.listAppend(MAX(0, turns_until_counter));
+                if (turns_until_counter >= 0 || c.name != "Semi-Rare")
+                    c.exact_turns.listAppend(MAX(0, turns_until_counter));
                 sort c.exact_turns by value;
             }
         }
