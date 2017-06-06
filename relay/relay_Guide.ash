@@ -2,7 +2,7 @@
 
 since 17.6; //the earliest main release that supports map literals
 //These settings are for development. Don't worry about editing them.
-string __version = "1.4.24";
+string __version = "1.4.25";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -1779,6 +1779,149 @@ element get_property_element(string property)
     return get_property(property).to_element();
 }
 
+static
+{
+    skill [class][int] __skills_by_class;
+    
+    void initialiseSkillsByClass()
+    {
+        if (__skills_by_class.count() > 0) return;
+        foreach s in $skills[]
+        {
+            if (s.class != $class[none])
+            {
+                if (!(__skills_by_class contains s.class))
+                {
+                    skill [int] blank;
+                    __skills_by_class[s.class] = blank;
+                }
+                __skills_by_class[s.class].listAppend(s);
+            }
+        }
+    }
+    initialiseSkillsByClass();
+}
+
+
+static
+{
+    boolean [skill] __libram_skills;
+    
+    void initialiseLibramSkills()
+    {
+        foreach s in $skills[]
+        {
+            if (s.libram)
+                __libram_skills[s] = true;
+        }
+    }
+    initialiseLibramSkills();
+}
+
+
+static
+{
+    boolean [item] __items_that_craft_food;
+    boolean [item] __minus_combat_equipment;
+    boolean [item] __equipment;
+    boolean [item] __items_in_outfits;
+    boolean [string][item] __equipment_by_numeric_modifier;
+    void initialiseItems()
+    {
+        foreach it in $items[]
+        {
+            //Crafting:
+            string craft_type = it.craft_type();
+            if (craft_type.contains_text("Cooking"))
+            {
+                foreach ingredient in it.get_ingredients()
+                {
+                    __items_that_craft_food[ingredient] = true;
+                }
+            }
+            
+            //Equipment:
+            if (it.to_slot() != $slot[none])
+            {
+                __equipment[it] = true;
+                if (it.numeric_modifier("combat rate") < 0)
+                    __minus_combat_equipment[it] = true;
+            }
+        }
+        foreach key, outfit_name in all_normal_outfits()
+        {
+            foreach key, it in outfit_pieces(outfit_name)
+                __items_in_outfits[it] = true;
+        }
+    }
+    initialiseItems();
+}
+
+boolean [item] equipmentWithNumericModifier(string modifier)
+{
+    if (!(__equipment_by_numeric_modifier contains modifier))
+    {
+        //Build it:
+        boolean [item] blank;
+        __equipment_by_numeric_modifier[modifier] = blank;
+        foreach it in __equipment
+        {
+            if (it.numeric_modifier(modifier) != 0.0)
+                __equipment_by_numeric_modifier[modifier][it] = true;
+        }
+    }
+    return __equipment_by_numeric_modifier[modifier];
+}
+
+static
+{
+    boolean [item] __beancannon_source_items = $items[Heimz Fortified Kidney Beans,Hellfire Spicy Beans,Mixed Garbanzos and Chickpeas,Pork 'n' Pork 'n' Pork 'n' Beans,Shrub's Premium Baked Beans,Tesla's Electroplated Beans,Frigid Northern Beans,Trader Olaf's Exotic Stinkbeans,World's Blackest-Eyed Peas];
+}
+
+static
+{
+    //This would be a good mafia proxy value. Feature request?
+    boolean [skill] __combat_skills_that_are_spells;
+    void initialiseCombatSkillsThatAreSpells()
+    {
+        foreach s in $skills[Awesome Balls of Fire,Bake,Blend,Blinding Flash,Boil,Candyblast,Cannelloni Cannon,Carbohydrate Cudgel,Chop,CLEESH,Conjure Relaxing Campfire,Creepy Lullaby,Curdle,Doubt Shackles,Eggsplosion,Fear Vapor,Fearful Fettucini,Freeze,Fry,Grease Lightning,Grill,Haggis Kick,Inappropriate Backrub,K&auml;seso&szlig;esturm,Mudbath,Noodles of Fire,Rage Flame,Raise Backup Dancer,Ravioli Shurikens,Salsaball,Saucegeyser,Saucemageddon,Saucestorm,Saucy Salve,Shrap,Slice,Snowclone,Spaghetti Spear,Stream of Sauce,Stringozzi Serpent,Stuffed Mortar Shell,Tear Wave,Toynado,Volcanometeor Showeruption,Wassail,Wave of Sauce,Weapon of the Pastalord]
+        {
+            __combat_skills_that_are_spells[s] = true;
+        }
+        foreach s in $skills[Lavafava,Pungent Mung,Beanstorm] //FIXME cowcall? snakewhip?
+            __combat_skills_that_are_spells[s] = true;
+    }
+    initialiseCombatSkillsThatAreSpells();
+}
+
+static
+{
+    boolean [monster] __snakes;
+    void initialiseSnakes()
+    {
+        __snakes = $monsters[aggressive grass snake,Bacon snake,Batsnake,Black adder,Burning Snake of Fire,Coal snake,Diamondback rattler,Frontwinder,Frozen Solid Snake,King snake,Licorice snake,Mutant rattlesnake,Prince snake,Sewer snake with a sewer snake in it,Snakeleton,The Snake With Like Ten Heads,Tomb asp,Trouser Snake,Whitesnake];
+    }
+    initialiseSnakes();
+}
+
+item lookupAWOLOilForMonster(monster m)
+{
+    if (__snakes contains m)
+        return $item[snake oil];
+    else if ($phylums[beast,dude,hippy,humanoid,orc,pirate] contains m.phylum)
+        return $item[skin oil];
+    else if ($phylums[bug,construct,constellation,demon,elemental,elf,fish,goblin,hobo,horror,mer-kin,penguin,plant,slime,weird] contains m.phylum)
+        return $item[unusual oil];
+    else if ($phylums[undead] contains m.phylum)
+        return $item[eldritch oil];
+    return $item[none];
+}
+
+static
+{
+    monster [location] __protonic_monster_for_location {$location[Cobb's Knob Treasury]:$monster[The ghost of Ebenoozer Screege], $location[The Haunted Conservatory]:$monster[The ghost of Lord Montague Spookyraven], $location[The Haunted Gallery]:$monster[The ghost of Waldo the Carpathian], $location[The Haunted Kitchen]:$monster[The Icewoman], $location[The Haunted Wine Cellar]:$monster[The ghost of Jim Unfortunato], $location[The Icy Peak]:$monster[the ghost of Sam McGee], $location[Inside the Palindome]:$monster[Emily Koops, a spooky lime], $location[Madness Bakery]:$monster[the ghost of Monsieur Baguelle], $location[The Old Landfill]:$monster[the ghost of Vanillica "Trashblossom" Gorton], $location[The Overgrown Lot]:$monster[the ghost of Oily McBindle], $location[The Skeleton Store]:$monster[boneless blobghost], $location[The Smut Orc Logging Camp]:$monster[The ghost of Richard Cockingham], $location[The Spooky Forest]:$monster[The Headless Horseman]};
+}
+
 boolean mafiaIsPastRevision(int revision_number)
 {
     if (get_revision() <= 0) //get_revision reports zero in certain cases; assume they're on a recent version
@@ -3008,36 +3151,40 @@ boolean haveSeenBadMoonEncounter(int encounter_id)
 //FIXME make this use static etc. Probably extend Item Filter.ash to support equipment.
 item [int] generateEquipmentForExtraExperienceOnStat(stat desired_stat, boolean require_can_equip_currently)
 {
-    boolean [item] experience_percent_modifiers;
-    string numeric_modifier_string;
+    //boolean [item] experience_percent_modifiers;
+    /*string numeric_modifier_string;
     if (desired_stat == $stat[muscle])
     {
-        experience_percent_modifiers = $items[trench lighter,fake washboard];
+        //experience_percent_modifiers = $items[trench lighter,fake washboard];
         numeric_modifier_string = "Muscle";
     }
     else if (desired_stat == $stat[mysticality])
     {
-        experience_percent_modifiers = lookupItems("trench lighter,basaltamander buckler");
+        //experience_percent_modifiers = lookupItems("trench lighter,basaltamander buckler");
         numeric_modifier_string = "Mysticality";
     }
     else if (desired_stat == $stat[moxie])
     {
-        experience_percent_modifiers = $items[trench lighter,backwoods banjo];
+        //experience_percent_modifiers = $items[trench lighter,backwoods banjo];
         numeric_modifier_string = "Moxie";
     }
     else
         return listMakeBlankItem();
-    item [slot] item_slots;
     if (numeric_modifier_string != "")
-        numeric_modifier_string += " Experience Percent";
+        numeric_modifier_string += " Experience Percent";*/
+        
+    item [slot] item_slots;
+    string numeric_modifier_string = desired_stat + " Experience Percent";
 
-    foreach it in experience_percent_modifiers
+    //foreach it in experience_percent_modifiers
+    foreach it in equipmentWithNumericModifier(numeric_modifier_string)
     {
         if (it.available_amount() > 0 && (!require_can_equip_currently || it.can_equip()) && item_slots[it.to_slot()].numeric_modifier(numeric_modifier_string) < it.numeric_modifier(numeric_modifier_string))
         {
             item_slots[it.to_slot()] = it;
         }
     }
+    
     item [int] items_could_equip;
     foreach s, it in item_slots
         items_could_equip.listAppend(it);
@@ -3289,6 +3436,10 @@ void initialiseIOTMsUsable()
             __iotms_usable[$item[Witchess Set]] = true;
         if (campground[$item[potted tea tree]] > 0)
             __iotms_usable[$item[potted tea tree]] = true;
+        if (campground[$item[portable mayo clinic]] > 0)
+            __iotms_usable[$item[portable mayo clinic]] = true;
+        if (campground[$item[Little Geneticist DNA-Splicing Lab]] > 0)
+            __iotms_usable[$item[Little Geneticist DNA-Splicing Lab]] = true;
     }
     if (get_property_boolean("hasDetectiveSchool"))
         __iotms_usable[$item[detective school application]] = true;
@@ -3401,148 +3552,6 @@ void processSetUserPreferences(string [string] form_fields)
     }
 }
 
-static
-{
-    skill [class][int] __skills_by_class;
-    
-    void initialiseSkillsByClass()
-    {
-        if (__skills_by_class.count() > 0) return;
-        foreach s in $skills[]
-        {
-            if (s.class != $class[none])
-            {
-                if (!(__skills_by_class contains s.class))
-                {
-                    skill [int] blank;
-                    __skills_by_class[s.class] = blank;
-                }
-                __skills_by_class[s.class].listAppend(s);
-            }
-        }
-    }
-    initialiseSkillsByClass();
-}
-
-
-static
-{
-    boolean [skill] __libram_skills;
-    
-    void initialiseLibramSkills()
-    {
-        foreach s in $skills[]
-        {
-            if (s.libram)
-                __libram_skills[s] = true;
-        }
-    }
-    initialiseLibramSkills();
-}
-
-
-static
-{
-    boolean [item] __items_that_craft_food;
-    boolean [item] __minus_combat_equipment;
-    boolean [item] __equipment;
-    boolean [item] __items_in_outfits;
-    boolean [string][item] __equipment_by_numeric_modifier;
-    void initialiseItems()
-    {
-        foreach it in $items[]
-        {
-            //Crafting:
-            string craft_type = it.craft_type();
-            if (craft_type.contains_text("Cooking"))
-            {
-                foreach ingredient in it.get_ingredients()
-                {
-                    __items_that_craft_food[ingredient] = true;
-                }
-            }
-            
-            //Equipment:
-            if (it.to_slot() != $slot[none])
-            {
-                __equipment[it] = true;
-                if (it.numeric_modifier("combat rate") < 0)
-                    __minus_combat_equipment[it] = true;
-            }
-        }
-        foreach key, outfit_name in all_normal_outfits()
-        {
-            foreach key, it in outfit_pieces(outfit_name)
-                __items_in_outfits[it] = true;
-        }
-    }
-    initialiseItems();
-}
-
-boolean [item] equipmentWithNumericModifier(string modifier)
-{
-    if (!(__equipment_by_numeric_modifier contains modifier))
-    {
-        //Build it:
-        boolean [item] blank;
-        __equipment_by_numeric_modifier[modifier] = blank;
-        foreach it in __equipment
-        {
-            if (it.numeric_modifier(modifier) != 0.0)
-                __equipment_by_numeric_modifier[modifier][it] = true;
-        }
-    }
-    return __equipment_by_numeric_modifier[modifier];
-}
-
-static
-{
-    boolean [item] __beancannon_source_items = $items[Heimz Fortified Kidney Beans,Hellfire Spicy Beans,Mixed Garbanzos and Chickpeas,Pork 'n' Pork 'n' Pork 'n' Beans,Shrub's Premium Baked Beans,Tesla's Electroplated Beans,Frigid Northern Beans,Trader Olaf's Exotic Stinkbeans,World's Blackest-Eyed Peas];
-}
-
-static
-{
-    //This would be a good mafia proxy value. Feature request?
-    boolean [skill] __combat_skills_that_are_spells;
-    void initialiseCombatSkillsThatAreSpells()
-    {
-        foreach s in $skills[Awesome Balls of Fire,Bake,Blend,Blinding Flash,Boil,Candyblast,Cannelloni Cannon,Carbohydrate Cudgel,Chop,CLEESH,Conjure Relaxing Campfire,Creepy Lullaby,Curdle,Doubt Shackles,Eggsplosion,Fear Vapor,Fearful Fettucini,Freeze,Fry,Grease Lightning,Grill,Haggis Kick,Inappropriate Backrub,K&auml;seso&szlig;esturm,Mudbath,Noodles of Fire,Rage Flame,Raise Backup Dancer,Ravioli Shurikens,Salsaball,Saucegeyser,Saucemageddon,Saucestorm,Saucy Salve,Shrap,Slice,Snowclone,Spaghetti Spear,Stream of Sauce,Stringozzi Serpent,Stuffed Mortar Shell,Tear Wave,Toynado,Volcanometeor Showeruption,Wassail,Wave of Sauce,Weapon of the Pastalord]
-        {
-            __combat_skills_that_are_spells[s] = true;
-        }
-        foreach s in lookupSkills("Lavafava,Pungent Mung,Beanstorm") //FIXME cowcall? snakewhip?
-            __combat_skills_that_are_spells[s] = true;
-    }
-    initialiseCombatSkillsThatAreSpells();
-}
-
-static
-{
-    boolean [monster] __snakes;
-    void initialiseSnakes()
-    {
-        __snakes = $monsters[aggressive grass snake,Bacon snake,Batsnake,Black adder,Burning Snake of Fire,Coal snake,Diamondback rattler,Frontwinder,Frozen Solid Snake,King snake,Licorice snake,Mutant rattlesnake,Prince snake,Sewer snake with a sewer snake in it,Snakeleton,The Snake With Like Ten Heads,Tomb asp,Trouser Snake,Whitesnake];
-    }
-    initialiseSnakes();
-}
-
-item lookupAWOLOilForMonster(monster m)
-{
-    if (__snakes contains m)
-        return $item[snake oil];
-    else if ($phylums[beast,dude,hippy,humanoid,orc,pirate] contains m.phylum)
-        return $item[skin oil];
-    else if ($phylums[bug,construct,constellation,demon,elemental,elf,fish,goblin,hobo,horror,mer-kin,penguin,plant,slime,weird] contains m.phylum)
-        return $item[unusual oil];
-    else if ($phylums[undead] contains m.phylum)
-        return $item[eldritch oil];
-    return $item[none];
-}
-
-static
-{
-    monster [location] __protonic_monster_for_location {$location[Cobb's Knob Treasury]:$monster[The ghost of Ebenoozer Screege], $location[The Haunted Conservatory]:$monster[The ghost of Lord Montague Spookyraven], $location[The Haunted Gallery]:$monster[The ghost of Waldo the Carpathian], $location[The Haunted Kitchen]:$monster[The Icewoman], $location[The Haunted Wine Cellar]:$monster[The ghost of Jim Unfortunato], $location[The Icy Peak]:$monster[the ghost of Sam McGee], $location[Inside the Palindome]:$monster[Emily Koops, a spooky lime], $location[Madness Bakery]:$monster[the ghost of Monsieur Baguelle], $location[The Old Landfill]:$monster[the ghost of Vanillica "Trashblossom" Gorton], $location[The Overgrown Lot]:$monster[the ghost of Oily McBindle], $location[The Skeleton Store]:$monster[boneless blobghost], $location[The Smut Orc Logging Camp]:$monster[The ghost of Richard Cockingham], $location[The Spooky Forest]:$monster[The Headless Horseman]};
-}
 
 //Runtime variables:
 location __last_adventure_location;
@@ -3971,7 +3980,8 @@ void CountersParseProperty(string property_name, Counter [string] counters, bool
             //if (turns_until_counter >= 0)
             if (true)
             {
-                c.exact_turns.listAppend(MAX(0, turns_until_counter));
+                if (turns_until_counter >= 0 || c.name != "Semi-Rare")
+                    c.exact_turns.listAppend(MAX(0, turns_until_counter));
                 sort c.exact_turns by value;
             }
         }
@@ -4964,6 +4974,8 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
             return QuestState("questM18Swamp").started;
         case $location[madness bakery]:
             return QuestState("questM25Armorer").started;
+        case $location[sonofa beach]:
+            return QuestState("questL12War").mafia_internal_step >= 2;
 		default:
 			break;
 	}
@@ -8267,7 +8279,7 @@ void QLevel4GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         
         if (__misc_state["can use clovers"] && sonars_needed >= 2)
             subentry.entries.listAppend("Potentially clover Guano Junction for two sonar-in-a-biscuit");
-        if ($item[enchanted bean].available_amount() == 0 && !__quest_state["level 10"].state_boolean["beanstalk grown"])
+        if ($item[enchanted bean].available_amount() == 0 && !__quest_state["Level 10"].state_boolean["beanstalk grown"])
         {
             if ($location[the beanbat chamber].locationAvailable())
                 subentry.entries.listAppend("Run +100% item in the beanbat chamber for a single turn for enchanted bean. (50% drop)");
@@ -24343,7 +24355,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         description.listAppend("Wear to take you places.");
         description.listAppend("The prince's ball (stepmother) lets you find odd silver coins.|Up to six, one adventure each.");
         //description.listAppend("Rumpelstiltskin's for towerkilling with small golem.|Small golem is a 5k/round combat item.|Involves the semi-rare in village. Don't know the details, sorry."); //only somewhat relevant in obscure edge cases
-        if ($effect[Human-Fish Hybrid].have_effect() == 0 && get_campground()[$item[Little Geneticist DNA-Splicing Lab]] > 0 && !__misc_state["familiars temporarily blocked"])
+        if ($effect[Human-Fish Hybrid].have_effect() == 0 && __iotms_usable[$item[Little Geneticist DNA-Splicing Lab]] && !__misc_state["familiars temporarily blocked"])
             description.listAppend("Candy witch for human-fish hybrid. (+10 familiar weight)");
         if (get_property("grimstoneMaskPath") != "")
             description.listAppend("Currently on the path of " + get_property("grimstoneMaskPath") + ".");
@@ -25867,7 +25879,7 @@ string [int] SCountersGenerateDescriptionForRainMonster()
     monster_descriptions["aquaconda"] = "rain skill";
     monster_descriptions["storm cow"] = "lightning skill";
     
-    if (get_campground()[$item[Little Geneticist DNA-Splicing Lab]] > 0 && mafiaIsPastRevision(13918) && !get_property_boolean("_dnaHybrid") && $effect[Human-Fish Hybrid].have_effect() == 0 && !__misc_state["familiars temporarily blocked"])
+    if (__iotms_usable[$item[Little Geneticist DNA-Splicing Lab]] && mafiaIsPastRevision(13918) && !get_property_boolean("_dnaHybrid") && $effect[Human-Fish Hybrid].have_effect() == 0 && !__misc_state["familiars temporarily blocked"])
     {
         //FIXME all once spaded
         //NOT giant isopod
@@ -28159,7 +28171,7 @@ void SCalculateUniverseGenerateResource(ChecklistEntry [int] resource_entries)
             //FIXME 18, 44, 75, and 99 are all valid for this - pick whichever we can summon now?
             useful_digits_and_their_reasons[99] = "base booze for perfect ice cube";
         }
-        if (__quest_state["level 5"].mafia_internal_step < 3 && have_outfit_components("Knob Goblin Harem Girl Disguise") && $item[Knob Goblin Perfume].available_amount() == 0 && $effect[Knob Goblin Perfume].have_effect() == 0 && in_ronin())
+        if (__quest_state["Level 5"].mafia_internal_step < 3 && have_outfit_components("Knob Goblin Harem Girl Disguise") && $item[Knob Goblin Perfume].available_amount() == 0 && $effect[Knob Goblin Perfume].have_effect() == 0 && in_ronin())
         {
             useful_digits_and_their_reasons[9] = "knob goblin perfume for boss fight";
         }
@@ -30575,6 +30587,12 @@ void setUpState()
 		yellow_ray_source = "Flash Headlight";
 		yellow_ray_image_name = "__skill Easy Riding";
     }
+    if (lookupSkill("disintegrate").have_skill() && my_maxmp() >= 150)
+    {
+		yellow_ray_available = true;
+		yellow_ray_source = "Disintegrate";
+		yellow_ray_image_name = "__skill Disintegrate";
+    }
 	
 	if (yellow_ray_available)
 		yellow_ray_potentially_available = true;
@@ -30801,7 +30819,7 @@ void setUpState()
 	//wand
 	
 	boolean wand_of_nagamar_needed = true;
-	if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_BUGBEAR_INVASION || my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_KOLHS || my_path_id() == PATH_HEAVY_RAINS || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_THE_SOURCE)
+	if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_BUGBEAR_INVASION || my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_KOLHS || my_path_id() == PATH_HEAVY_RAINS || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_THE_SOURCE || my_path_id() == PATH_LICENSE_TO_ADVENTURE)
 		wand_of_nagamar_needed = false;
 		
 	int ruby_w_needed = 1;
@@ -32683,7 +32701,8 @@ void generateDailyResources(Checklist [int] checklists)
         string [int] description;
         if (get_property("sidequestArenaCompleted") == "hippy")
         {
-            description.listAppend("+5 familiar weight.");
+            if (!__misc_state["familiars temporarily blocked"])
+                description.listAppend("+5 familiar weight.");
             description.listAppend("Or +20% item.");
             if (__misc_state["need to level"])
                 description.listAppend("Or +5 stats/fight.");
@@ -39710,7 +39729,7 @@ effect __current_dna_intrinsic = $effect[none];
 RegisterInitFunction("IOTMDNAInit");
 void IOTMDNAInit()
 {
-    if (get_campground()[$item[Little Geneticist DNA-Splicing Lab]] == 0)
+    if (!__iotms_usable[$item[Little Geneticist DNA-Splicing Lab]])
         return;
 
 
@@ -39948,7 +39967,7 @@ void IOTMDNAGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (__misc_state["campground unavailable"])
         return;
-    if (get_campground()[$item[Little Geneticist DNA-Splicing Lab]] == 0)
+    if (!__iotms_usable[$item[Little Geneticist DNA-Splicing Lab]])
         return;
     
     //Player has a genetic engineering lab installed. Let's play with our DNA!
@@ -40107,7 +40126,7 @@ void IOTMDNAGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 {
     if (__misc_state["campground unavailable"])
         return;
-    if (get_campground()[$item[Little Geneticist DNA-Splicing Lab]] == 0)
+    if (!__iotms_usable[$item[Little Geneticist DNA-Splicing Lab]])
         return;
     
     //Reminders:
@@ -42641,7 +42660,7 @@ void IOTMThanksgardenGenerateResource(ChecklistEntry [int] resource_entries)
 
         Returned: 0
         */
-        if (my_path_id() != PATH_NUCLEAR_AUTUMN && spleen_limit() > 0)
+        if (my_path_id() != PATH_NUCLEAR_AUTUMN && spleen_limit() > 0 && $item[cashew].available_amount() >= 3)
             options.listAppend(HTMLGreyOutTextUnlessTrue(pluralise($item[cashew].available_amount() / 3, $item[turkey blaster]) + " to burn delay", cashew_amount >= 3));
         if (!__quest_state["Level 12"].finished)
             options.listAppend(HTMLGreyOutTextUnlessTrue(pluralise($item[cashew].available_amount() / 3, $item[stuffing fluffer]) + " for the war", cashew_amount >= 3));
@@ -45653,6 +45672,16 @@ void PathGelatinousNoobGenerateTasks(ChecklistEntry [int] task_entries, Checklis
             }
             optional_task_entries.listAppend(ChecklistEntryMake("__familiar Robortender", url, ChecklistSubentryMake("Run robortender against " + phylums_out.listJoinComponents(", ", "and"), "", description), 5));
         }
+    }
+}
+RegisterTaskGenerationFunction("PathLicenseToAdventureGenerateTasks");
+void PathLicenseToAdventureGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    if (my_path_id() != PATH_LICENSE_TO_ADVENTURE)
+        return;
+    if (lookupItem("Victor's Spoils").available_amount() > 0)
+    {
+        task_entries.listAppend(ChecklistEntryMake("__item victor's spoils", "inventory.php?which=3", ChecklistSubentryMake("Use Victor's Spoils", "", "Gives eleven adventures."), 3));
     }
 }
 
