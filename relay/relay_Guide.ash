@@ -3461,43 +3461,7 @@ int licenseToAdventureSocialCapitalAvailable()
     
     
     int social_capital_used = 0;
-    int [string] social_capital_purchases = {
-    "bondAdv":1,
-    "bondBeach":1,
-    "bondBeat":1,
-    "bondBooze":2,
-    "bondBridge":3, //√
-    "bondDR":1,
-    "bondDesert":5,
-    "bondDrunk1":2,
-    "bondDrunk2":3,
-    "bondHP":1,
-    "bondHoney":5,
-    "bondInit":1,
-    "bondItem1":1,
-    "bondItem2":2,
-    "bondItem3":4, //√
-    "bondJetpack":3, //√
-    "bondMPregen":3,
-    "bondMartiniDelivery":1,
-    "bondMartiniPlus":3,
-    "bondMartiniTurn":1,
-    "bondMeat":1,
-    "bondMox1":1,
-    "bondMox2":3,
-    "bondMus1":1,
-    "bondMus2":3,
-    "bondMys1":1,
-    "bondMys2":3,
-    "bondSpleen":4,
-    "bondStat":2,
-    "bondStat2":4,
-    "bondStealth":3,
-    "bondStealth2":4,
-    "bondSymbols":3, //√
-    "bondWar":3, //√
-    "bondWeapon2":3,
-    "bondWpn":1};
+    int [string] social_capital_purchases = {"bondAdv":1, "bondBeach":1, "bondBeat":1, "bondBooze":2, "bondBridge":3, "bondDR":1, "bondDesert":5, "bondDrunk1":2, "bondDrunk2":3, "bondHP":1, "bondHoney":5, "bondInit":1, "bondItem1":1, "bondItem2":2, "bondItem3":4, "bondJetpack":3, "bondMPregen":3, "bondMartiniDelivery":1, "bondMartiniPlus":3, "bondMartiniTurn":1, "bondMeat":1, "bondMox1":1, "bondMox2":3, "bondMus1":1, "bondMus2":3, "bondMys1":1, "bondMys2":3, "bondSpleen":4, "bondStat":2, "bondStat2":4, "bondStealth":3, "bondStealth2":4, "bondSymbols":3, "bondWar":3, "bondWeapon2":3, "bondWpn":1};
     foreach property_name, value in social_capital_purchases
     {
         if (get_property_boolean(property_name))
