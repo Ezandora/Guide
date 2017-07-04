@@ -573,26 +573,33 @@ string lastCombatInLocation(location place)
     return "";
 }
 
+static
+{
+    int [location] __place_delays;
+    __place_delays[$location[the spooky forest]] = 5;
+    __place_delays[$location[the haunted bedroom]] = 6; //a guess from spading
+    __place_delays[$location[the boss bat's lair]] = 4;
+    __place_delays[$location[the oasis]] = 5;
+    __place_delays[$location[the hidden park]] = 6; //6? does turkey blaster give four turns sometimes...?
+    __place_delays[$location[the haunted gallery]] = 5; //FIXME this is a guess, spade
+    __place_delays[$location[the haunted bathroom]] = 5;
+    __place_delays[$location[the haunted ballroom]] = 5; //FIXME rumored
+    __place_delays[$location[the penultimate fantasy airship]] = 25;
+    __place_delays[$location[the "fun" house]] = 10;
+    __place_delays[$location[The Castle in the Clouds in the Sky (Ground Floor)]] = 10;
+    __place_delays[$location[the outskirts of cobb's knob]] = 10;
+    __place_delays[$location[the hidden apartment building]] = 8;
+    __place_delays[$location[the hidden office building]] = 10;
+    __place_delays[$location[the upper chamber]] = 5;
+}
+
 int totalDelayForLocation(location place)
 {
-    int [location] place_delays;
-    place_delays[$location[the spooky forest]] = 5;
-    place_delays[$location[the haunted bedroom]] = 6; //a guess from spading
-    place_delays[$location[the boss bat's lair]] = 4;
-    place_delays[$location[the oasis]] = 5;
-    place_delays[$location[the hidden park]] = 6;
-    place_delays[$location[the haunted gallery]] = 5; //FIXME this is a guess, spade
-    place_delays[$location[the haunted bathroom]] = 5;
-    place_delays[$location[the haunted ballroom]] = 5; //FIXME rumored
-    place_delays[$location[the penultimate fantasy airship]] = 25;
-    place_delays[$location[the "fun" house]] = 10;
-    place_delays[$location[The Castle in the Clouds in the Sky (Ground Floor)]] = 10;
-    place_delays[$location[the outskirts of cobb's knob]] = 10;
     //the haunted billiards room does not contain delay
     //also failure at 16 skill
     
-    if (place_delays contains place)
-        return place_delays[place];
+    if (__place_delays contains place)
+        return __place_delays[place];
     return -1;
 }
 
@@ -1495,4 +1502,72 @@ boolean CafeItemEdible(item it)
     if (it == $item[Jumbo Dr. Lucifer] && in_bad_moon() && my_meat() >= 150)
         return true;
     return false;
+}
+
+static
+{
+    int [string] __lta_social_capital_purchases;
+    void initialiseLTASocialCapitalPurchases()
+    {
+        __lta_social_capital_purchases["bondAdv"] = 1;
+        __lta_social_capital_purchases["bondBeach"] = 1;
+        __lta_social_capital_purchases["bondBeat"] = 1;
+        __lta_social_capital_purchases["bondBooze"] = 2;
+        __lta_social_capital_purchases["bondBridge"] = 3;
+        __lta_social_capital_purchases["bondDR"] = 1;
+        __lta_social_capital_purchases["bondDesert"] = 5;
+        __lta_social_capital_purchases["bondDrunk1"] = 2;
+        __lta_social_capital_purchases["bondDrunk2"] = 3;
+        __lta_social_capital_purchases["bondHP"] = 1;
+        __lta_social_capital_purchases["bondHoney"] = 5;
+        __lta_social_capital_purchases["bondInit"] = 1;
+        __lta_social_capital_purchases["bondItem1"] = 1;
+        __lta_social_capital_purchases["bondItem2"] = 2;
+        __lta_social_capital_purchases["bondItem3"] = 4;
+        __lta_social_capital_purchases["bondJetpack"] = 3;
+        __lta_social_capital_purchases["bondMPregen"] = 3;
+        __lta_social_capital_purchases["bondMartiniDelivery"] = 1;
+        __lta_social_capital_purchases["bondMartiniPlus"] = 3;
+        __lta_social_capital_purchases["bondMartiniTurn"] = 1;
+        __lta_social_capital_purchases["bondMeat"] = 1;
+        __lta_social_capital_purchases["bondMox1"] = 1;
+        __lta_social_capital_purchases["bondMox2"] = 3;
+        __lta_social_capital_purchases["bondMus1"] = 1;
+        __lta_social_capital_purchases["bondMus2"] = 3;
+        __lta_social_capital_purchases["bondMys1"] = 1;
+        __lta_social_capital_purchases["bondMys2"] = 3;
+        __lta_social_capital_purchases["bondSpleen"] = 4;
+        __lta_social_capital_purchases["bondStat"] = 2;
+        __lta_social_capital_purchases["bondStat2"] = 4;
+        __lta_social_capital_purchases["bondStealth"] = 3;
+        __lta_social_capital_purchases["bondStealth2"] = 4;
+        __lta_social_capital_purchases["bondSymbols"] = 3;
+        __lta_social_capital_purchases["bondWar"] = 3;
+        __lta_social_capital_purchases["bondWeapon2"] = 3;
+        __lta_social_capital_purchases["bondWpn"] = 1;
+    }
+    initialiseLTASocialCapitalPurchases();
+}
+
+int licenseToAdventureSocialCapitalAvailable()
+{
+    int total_social_capital = 0;
+    total_social_capital += 1 + MIN(23, get_property_int("bondPoints"));
+    foreach level in $ints[3,6,9,12,15]
+    {
+        if (my_level() >= level)
+            total_social_capital += 1;
+    }
+    total_social_capital += 2 * get_property_int("bondVillainsDefeated");
+    
+    
+    
+    int social_capital_used = 0;
+    foreach property_name, value in __lta_social_capital_purchases
+    {
+        if (get_property_boolean(property_name))
+            social_capital_used += value;
+    }
+    
+    return total_social_capital - social_capital_used;
 }

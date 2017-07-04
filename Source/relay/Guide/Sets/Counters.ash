@@ -253,9 +253,28 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
         if (c.waiting_for_adventure_php)
             subentry.entries.listAppend("Need to adventure in adventure.php to start counting.");
         
-        if ((turn_range.x <= 0 && counter_is_range) || (!counter_is_range && next_exact_turn <= 0))
+        if (turn_range.x <= 0) // && counter_is_range || (!counter_is_range && next_exact_turn <= 0))
         {
-            if (get_property_boolean("dailyDungeonDone"))
+            if (my_path_id() != PATH_COMMUNITY_SERVICE && __misc_state["in run"])
+            {
+                location [int] possible_locations;
+                foreach l in __place_delays
+                {
+                    if (l == $location[the hidden park] && __dense_liana_machete_items.available_amount() > 0)
+                    {
+                        continue;
+                    }
+                    if (l.locationAvailable() && l.delayRemainingInLocation() > 0)
+                        possible_locations.listAppend(l);
+                }
+                if (possible_locations.count() > 0)
+                {
+                    subentry.entries.listAppend("Adventure in " + possible_locations.listJoinComponents(", ", "or") + " to burn delay.");
+                    if (url == "")
+                        url = possible_locations[0].getClickableURLForLocation();
+                }
+            }
+            /*if (get_property_boolean("dailyDungeonDone"))
             {
                 url = "da.php";
                 subentry.entries.listAppend("Could check for free in the daily dungeon.");
@@ -264,7 +283,7 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
             {
                 url = $location[the hidden park].getClickableURLForLocation();
                 subentry.entries.listAppend("Could check for free in one of the shrines.");
-            }
+            }*/
         }
         
         string image_name = "__item Pok&euml;mann figurine: Frank"; //default - some person

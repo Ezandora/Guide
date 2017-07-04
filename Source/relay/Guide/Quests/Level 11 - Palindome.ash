@@ -63,10 +63,15 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
         {
             if ($items[gaudy key,snakehead charrrm].available_amount() < 2)
             {
-                subentry.modifiers.listAppend("olfact gaudy pirate");
-                string line = "Olfact/copy gaudy pirate belowdecks";
-                line += ".";
-                subentry.entries.listAppend(line);
+                if ($items[gaudy key,snakehead charrrm].available_amount() == 0)
+                {
+                    subentry.modifiers.listAppend("olfact gaudy pirate");
+                    string line = "Olfact/copy gaudy pirate belowdecks";
+                    line += ".";
+                    subentry.entries.listAppend(line);
+                }
+                else
+                    subentry.entries.listAppend("Find a single gaudy pirate.");
             }
             else
                 url = "inventory.php?which=3";
@@ -187,12 +192,15 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                         string line = "Adventure in Whitey's Grove to acquire " + components.listJoinComponents("", "and") + ".";
                       
                         line += "|";
-                        if ($location[whitey's grove].item_drop_modifier_for_location() + numeric_modifier("food drop") >= 300.0)
+                        int food_drop_have = $location[whitey's grove].item_drop_modifier_for_location() + numeric_modifier("food drop");
+                        if (food_drop_have >= 300.0)
                         {
                             line += "Have +300% item";
                         }
                         else
-                            line += HTMLGenerateSpanFont("Need +300% item", "red");
+                        {
+                            line += HTMLGenerateSpanFont("Need +300% item", "red") + " (missing " + (300 - food_drop_have) + "%)";
+                        }
                         line += " and +combat.";
                         if (familiar_is_usable($familiar[jumpsuited hound dog]))
                             line += " (hound dog is useful for this)";

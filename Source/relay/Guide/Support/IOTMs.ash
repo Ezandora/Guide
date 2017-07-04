@@ -11,18 +11,11 @@ void initialiseIOTMsUsable()
     {
         int [item] campground = get_campground();
         //Campground items:
-        if (campground[$item[source terminal]] > 0)
-            __iotms_usable[$item[source terminal]] = true;
-        if (campground[$item[haunted doghouse]] > 0)
-            __iotms_usable[$item[haunted doghouse]] = true;
-        if (campground[$item[Witchess Set]] > 0)
-            __iotms_usable[$item[Witchess Set]] = true;
-        if (campground[$item[potted tea tree]] > 0)
-            __iotms_usable[$item[potted tea tree]] = true;
-        if (campground[$item[portable mayo clinic]] > 0)
-            __iotms_usable[$item[portable mayo clinic]] = true;
-        if (campground[$item[Little Geneticist DNA-Splicing Lab]] > 0)
-            __iotms_usable[$item[Little Geneticist DNA-Splicing Lab]] = true;
+        foreach it in $items[source terminal, haunted doghouse, Witchess Set, potted tea tree, portable mayo clinic, Little Geneticist DNA-Splicing Lab, cornucopia]
+        {
+            if (campground[it] > 0)
+                __iotms_usable[it] = true;
+        }
     }
     if (get_property_boolean("hasDetectiveSchool"))
         __iotms_usable[$item[detective school application]] = true;
@@ -38,6 +31,10 @@ void initialiseIOTMsUsable()
         __iotms_usable[lookupItem("heart-shaped crate")] = true;
     if (get_property_boolean("spacegateAlways") || get_property_boolean("_spacegateToday"))
         __iotms_usable[lookupItem("Spacegate access badge")] = true;
+    if (get_property_boolean("gingerbreadCityAvailable") || get_property_boolean("_gingerbreadCityToday"))
+        __iotms_usable[$item[Build-a-City Gingerbread kit]] = true;
+    if (lookupItem("kremlin's greatest briefcase").available_amount() > 0)
+        __iotms_usable[lookupItem("kremlin's greatest briefcase")] = true;
     //Remove non-standard:
     foreach it in __iotms_usable
     {

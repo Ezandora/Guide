@@ -1097,6 +1097,11 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             subentry.header = "You await";
             image_name = "Disco Bandit";
         }
+        if (my_path_id() == PATH_LICENSE_TO_ADVENTURE)
+        {
+            subentry.header = "\"Blofeld\" awaits";
+            image_name = "__monster \"Blofeld\"";
+        }
         //don't think blocking works anymore? not sure
         /*if (!__misc_state["familiars temporarily blocked"] && my_path_id() != PATH_HEAVY_RAINS)
         {

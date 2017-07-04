@@ -282,7 +282,7 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                     line += "|Avoid skipping NCs " + ncs_to_spend_turn_on.listJoinComponents(", ", "and") + " exactly once each, to make the knife appear faster. (don't do this after unlocking the top floor)";
                 subentry.entries.listAppend(line);
             }
-            if (!request_minus_combat && CounterWanderingMonsterMayHitNextTurn())
+            if (!request_minus_combat && CounterWanderingMonsterMayHitNextTurn() && !CounterWanderingMonsterWillHitNextTurn())
             {
                 request_minus_combat = true;
                 subentry.modifiers.listAppend("-combat");

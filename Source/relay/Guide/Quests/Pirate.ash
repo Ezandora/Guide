@@ -249,6 +249,7 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 				if ($location[the f'c'le].item_drop_modifier_for_location() < 234.0)
 					additional_line = "This location can be a nightmare without +234% item.";
                     
+                subentry.modifiers.listAppend("banish chatty/crusty pirate");
                 if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
                 {
                     monster [int] monsters_left;

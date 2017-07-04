@@ -79,6 +79,9 @@ static
 
 boolean [item] equipmentWithNumericModifier(string modifier)
 {
+    boolean [item] dynamic_items;
+    dynamic_items[to_item("kremlin's greatest briefcase")] = true;
+    dynamic_items[$item[your cowboy boots]] = true;
     if (!(__equipment_by_numeric_modifier contains modifier))
     {
         //Build it:
@@ -86,11 +89,31 @@ boolean [item] equipmentWithNumericModifier(string modifier)
         __equipment_by_numeric_modifier[modifier] = blank;
         foreach it in __equipment
         {
+            if (dynamic_items contains it) continue;
             if (it.numeric_modifier(modifier) != 0.0)
                 __equipment_by_numeric_modifier[modifier][it] = true;
         }
     }
-    return __equipment_by_numeric_modifier[modifier];
+    //Certain equipment is dynamic. Inspect them dynamically:
+    boolean [item] extra_results;
+    foreach it in dynamic_items
+    {
+        if (it.numeric_modifier(modifier) != 0.0)
+        {
+            extra_results[it] = true;
+        }
+    }
+    if (extra_results.count() == 0)
+        return __equipment_by_numeric_modifier[modifier];
+    else
+    {
+        //Add extras:
+        foreach it in __equipment_by_numeric_modifier[modifier]
+        {
+            extra_results[it] = true;
+        }
+        return extra_results;
+    }
 }
 
 static

@@ -617,6 +617,11 @@ void QLevel12GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             frat_boys_defeated_per_combat += 3;
             hippies_defeated_per_combat += 3;
         }
+        if (my_path_id() == PATH_LICENSE_TO_ADVENTURE && get_property_boolean("bondWar"))
+        {
+            frat_boys_defeated_per_combat += 3;
+            hippies_defeated_per_combat += 3;
+        }
         
         
         subentry.modifiers.listAppend("+item");

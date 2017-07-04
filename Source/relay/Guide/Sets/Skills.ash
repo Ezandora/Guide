@@ -116,6 +116,10 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
     }
     property_summons_to_skills["_candySummons"] = listMake($skill[Summon Crimbo Candy]);
     property_summons_to_skills["_summonResortPassUsed"] = listMake($skill[Summon Kokomo Resort Pass]);
+    property_summons_to_skills["_incredibleSelfEsteemCast"] = listMake(lookupSkill("Incredible Self-Esteem"));
+    skills_to_details[lookupSkill("Incredible Self-Esteem")] = "Gives or extends affirmation buffs.";
+    if (__misc_state["in run"] && lookupItem("Daily Affirmation: Always be Collecting").available_amount() > 0 && lookupItem("Daily Affirmation: Always be Collecting").to_effect().have_effect() == 0)
+        skills_to_details[lookupSkill("Incredible Self-Esteem")] += "|Possibly use Always be Collecting affirmation before casting.";
     
     foreach s in $skills[Summon Hilarious Objects,Summon Tasteful Items,Summon Alice's Army Cards,Summon Geeky Gifts]
         skills_to_urls[s] = "campground.php?action=bookshelf";

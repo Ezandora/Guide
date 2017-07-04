@@ -629,6 +629,11 @@ buffer generateLocationBarTable(string [int] table_entries, string [int] table_e
 }
 
 
+static
+{
+    boolean __manuel_available = false;
+    boolean __did_check_manuel_available = false;
+}
 
 buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_location_name_is_centre_aligned)
 {
@@ -1127,8 +1132,13 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
                 //stats_l2.listAppend(m.raw_defense + " def");
             if (true)
             {
-                boolean manuel_available = $monster[spooky vampire].monster_factoids_available(false) > 0;
-                if (manuel_available)
+                if (!__did_check_manuel_available)
+                {
+                    //so, if the manuel isn't available, we incur a quest log load every time. so don't do that.
+                    __manuel_available = $monster[spooky vampire].monster_factoids_available(false) > 0;
+                    __did_check_manuel_available = true;
+                }
+                if (__manuel_available)
                 {
                     int factoids_left = 3 - monster_factoids_available(m, false);
                     if (m.attributes.contains_text("ULTRARARE") || m.attributes.contains_text("NOMANUEL")) //ULTRARARE test may be superfluous

@@ -85,7 +85,7 @@ void IOTMThanksgardenGenerateResource(ChecklistEntry [int] resource_entries)
                 description.listAppend("Cannot use any more today.");
         }
         else
-            description.listAppend("Can use " + pluraliseWordy(uses_left, "More Time", "more times") + " today.");
+            description.listAppend("Can use " + pluraliseWordy(uses_left, "more time", "more times") + " today.");
         
         
         if (image_name == "")
@@ -110,5 +110,27 @@ void IOTMThanksgardenGenerateResource(ChecklistEntry [int] resource_entries)
     if (subentries.count() > 0)
     {
         resource_entries.listAppend(ChecklistEntryMake(image_name, url, subentries, 4));
+    }
+    
+}
+
+RegisterTaskGenerationFunction("IOTMThanksgardenGenerateTasks");
+void IOTMThanksgardenGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    int delay_limit = 4;
+    if (get_property_int("_turkeyBlastersUsed") < 3 && availableSpleen() >= 2 && $item[turkey blaster].available_amount() + $item[turkey blaster].creatable_amount() > 0 && get_property_location("lastAdventure").delayRemainingInLocation() >= delay_limit)
+    {
+        string url = "";
+        if ($item[turkey blaster].available_amount() > 0)
+            url = "inventory.php?which=1";
+        else
+            url = "shop.php?whichshop=thankshop";
+        location last_location = get_property_location("lastAdventure");
+        string description = "Save " + MIN(5, last_location.delayRemainingInLocation()) + " turns in " + last_location + ".";
+        boolean allow = true;
+        if ($locations[the penultimate fantasy airship,the hidden office building,the hidden apartment building] contains last_location)
+            allow = false;
+        if (allow)
+            task_entries.listAppend(ChecklistEntryMake("__item turkey blaster", url, ChecklistSubentryMake("Chew turkey blaster", "", description), -11));
     }
 }

@@ -142,38 +142,64 @@ void QSpookyravenLightsOutGenerateTasks(ChecklistEntry [int] task_entries, Check
 {
 	QSpookyravenLightsOutGenerateEntry(task_entries, optional_task_entries, true);
     
-    if (__iotms_usable[$item[haunted doghouse]] && get_property_int("lastLightsOutTurn") < total_turns_played() && total_turns_played() % 37 == 0 && __misc_state["in run"])
+    if (get_property_int("lastLightsOutTurn") < total_turns_played() && total_turns_played() % 37 == 0 && __misc_state["in run"])
     {
-        boolean [location] all_lights_out_locations;
-        all_lights_out_locations[$location[the haunted storage room]] = true;
-        all_lights_out_locations[$location[the haunted Laundry Room]] = true;
-        all_lights_out_locations[$location[the haunted Bathroom]] = true;
-        all_lights_out_locations[$location[the haunted Kitchen]] = true;
-        all_lights_out_locations[$location[the haunted Library]] = true;
-        all_lights_out_locations[$location[the haunted Ballroom]] = true;
-        all_lights_out_locations[$location[the haunted Gallery]] = true;
-        if ($location[the haunted Bedroom].turns_spent < 10)
-            all_lights_out_locations[$location[the haunted Bedroom]] = true;
-        all_lights_out_locations[$location[the haunted Nursery]] = true;
-        all_lights_out_locations[$location[the haunted Conservatory]] = true;
-        all_lights_out_locations[$location[the haunted Billiards Room]] = true;
-        all_lights_out_locations[$location[the haunted Wine Cellar]] = true;
-        all_lights_out_locations[$location[the haunted Boiler Room]] = true;
-        all_lights_out_locations[$location[the haunted Laboratory]] = true;
-        
-        location [int] possible_locations;
-        foreach l in all_lights_out_locations
+        string [int] exploit_description;
+        string url = "";
+        if (__iotms_usable[$item[haunted doghouse]])
         {
-            if (l.combatTurnsAttemptedInLocation() < 5)
-                continue;
-            if (l.noncombat_queue.contains_text("Wooooooof!"))
-                continue;
-            possible_locations.listAppend(l);
+            location [int] possible_locations;
+            boolean [location] all_lights_out_locations;
+            all_lights_out_locations[$location[the haunted storage room]] = true;
+            all_lights_out_locations[$location[the haunted Laundry Room]] = true;
+            //all_lights_out_locations[$location[the haunted Bathroom]] = true; //Very small chance of a demon name, which costs a turn. It happened to me!
+            all_lights_out_locations[$location[the haunted Kitchen]] = true;
+            all_lights_out_locations[$location[the haunted Library]] = true;
+            all_lights_out_locations[$location[the haunted Ballroom]] = true;
+            all_lights_out_locations[$location[the haunted Gallery]] = true;
+            if ($location[the haunted Bedroom].turns_spent < 10)
+                all_lights_out_locations[$location[the haunted Bedroom]] = true;
+            all_lights_out_locations[$location[the haunted Nursery]] = true;
+            all_lights_out_locations[$location[the haunted Conservatory]] = true;
+            all_lights_out_locations[$location[the haunted Billiards Room]] = true;
+            all_lights_out_locations[$location[the haunted Wine Cellar]] = true;
+            all_lights_out_locations[$location[the haunted Boiler Room]] = true;
+            all_lights_out_locations[$location[the haunted Laboratory]] = true;
+            
+            foreach l in all_lights_out_locations
+            {
+                if (l.combatTurnsAttemptedInLocation() < 5)
+                    continue;
+                if (l.noncombat_queue.contains_text("Wooooooof!"))
+                    continue;
+                possible_locations.listAppend(l);
+            }
+            if (possible_locations.count() > 0)
+            {
+                exploit_description.listAppend("Adventure in " + possible_locations.listJoinComponents(", ", "or") + " to potentially trigger a halloweiner adventure.|It won't cost a turn.");
+                url = possible_locations[0].getClickableURLForLocation();
+            }
         }
-        if (possible_locations.count() > 0)
+        if ($item[turkey blaster].available_amount() + $item[turkey blaster].creatable_amount() > 0 && availableSpleen() >= 2 && get_property_int("_turkeyBlastersUsed") < 3)
         {
-            task_entries.listAppend(ChecklistEntryMake("__half Lights Out", possible_locations[0].getClickableURLForLocation(), ChecklistSubentryMake("Lights Out Exploit", "", "Adventure in " + possible_locations.listJoinComponents(", ", "or") + " to potentially trigger a halloweiner adventure.|It won't cost a turn."), -11));
+            location [int] possible_locations;
+            foreach l in $locations[the haunted gallery,the haunted bathroom]
+            {
+                if (l.delayRemainingInLocation() >= 4)
+                {
+                    possible_locations.listAppend(l);
+                    
+                }
+            }
+            if (possible_locations.count() > 0)
+            {
+                exploit_description.listAppend("Adventure in " + possible_locations.listJoinComponents(", ", "or") + ", then chew a turkey blaster to burn delay.");
+                if (url == "")
+                    url = possible_locations[0].getClickableURLForLocation();
+            }
         }
+        if (exploit_description.count() > 0)
+            task_entries.listAppend(ChecklistEntryMake("__half Lights Out", url, ChecklistSubentryMake("Lights Out Exploit", "", exploit_description), -11));
     }
 }
 
