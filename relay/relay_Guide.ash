@@ -3446,6 +3446,50 @@ boolean CafeItemEdible(item it)
     return false;
 }
 
+static
+{
+    int [string] __lta_social_capital_purchases;
+    void initialiseLTASocialCapitalPurchases()
+    {
+        __lta_social_capital_purchases["bondAdv"] = 1;
+        __lta_social_capital_purchases["bondBeach"] = 1;
+        __lta_social_capital_purchases["bondBeat"] = 1;
+        __lta_social_capital_purchases["bondBooze"] = 2;
+        __lta_social_capital_purchases["bondBridge"] = 3;
+        __lta_social_capital_purchases["bondDR"] = 1;
+        __lta_social_capital_purchases["bondDesert"] = 5;
+        __lta_social_capital_purchases["bondDrunk1"] = 2;
+        __lta_social_capital_purchases["bondDrunk2"] = 3;
+        __lta_social_capital_purchases["bondHP"] = 1;
+        __lta_social_capital_purchases["bondHoney"] = 5;
+        __lta_social_capital_purchases["bondInit"] = 1;
+        __lta_social_capital_purchases["bondItem1"] = 1;
+        __lta_social_capital_purchases["bondItem2"] = 2;
+        __lta_social_capital_purchases["bondItem3"] = 4;
+        __lta_social_capital_purchases["bondJetpack"] = 3;
+        __lta_social_capital_purchases["bondMPregen"] = 3;
+        __lta_social_capital_purchases["bondMartiniDelivery"] = 1;
+        __lta_social_capital_purchases["bondMartiniPlus"] = 3;
+        __lta_social_capital_purchases["bondMartiniTurn"] = 1;
+        __lta_social_capital_purchases["bondMeat"] = 1;
+        __lta_social_capital_purchases["bondMox1"] = 1;
+        __lta_social_capital_purchases["bondMox2"] = 3;
+        __lta_social_capital_purchases["bondMus1"] = 1;
+        __lta_social_capital_purchases["bondMus2"] = 3;
+        __lta_social_capital_purchases["bondMys1"] = 1;
+        __lta_social_capital_purchases["bondMys2"] = 3;
+        __lta_social_capital_purchases["bondSpleen"] = 4;
+        __lta_social_capital_purchases["bondStat"] = 2;
+        __lta_social_capital_purchases["bondStat2"] = 4;
+        __lta_social_capital_purchases["bondStealth"] = 3;
+        __lta_social_capital_purchases["bondStealth2"] = 4;
+        __lta_social_capital_purchases["bondSymbols"] = 3;
+        __lta_social_capital_purchases["bondWar"] = 3;
+        __lta_social_capital_purchases["bondWeapon2"] = 3;
+        __lta_social_capital_purchases["bondWpn"] = 1;
+    }
+    initialiseLTASocialCapitalPurchases();
+}
 
 int licenseToAdventureSocialCapitalAvailable()
 {
@@ -3461,8 +3505,7 @@ int licenseToAdventureSocialCapitalAvailable()
     
     
     int social_capital_used = 0;
-    int [string] social_capital_purchases = {"bondAdv":1, "bondBeach":1, "bondBeat":1, "bondBooze":2, "bondBridge":3, "bondDR":1, "bondDesert":5, "bondDrunk1":2, "bondDrunk2":3, "bondHP":1, "bondHoney":5, "bondInit":1, "bondItem1":1, "bondItem2":2, "bondItem3":4, "bondJetpack":3, "bondMPregen":3, "bondMartiniDelivery":1, "bondMartiniPlus":3, "bondMartiniTurn":1, "bondMeat":1, "bondMox1":1, "bondMox2":3, "bondMus1":1, "bondMus2":3, "bondMys1":1, "bondMys2":3, "bondSpleen":4, "bondStat":2, "bondStat2":4, "bondStealth":3, "bondStealth2":4, "bondSymbols":3, "bondWar":3, "bondWeapon2":3, "bondWpn":1};
-    foreach property_name, value in social_capital_purchases
+    foreach property_name, value in __lta_social_capital_purchases
     {
         if (get_property_boolean(property_name))
             social_capital_used += value;
