@@ -29568,9 +29568,42 @@ static
 }
 
 
-item [int][int] calculateSweetSynthesisCandyCombinations(int tier, int subid)
+
+int synthesis_price(item it)
 {
-    item [int][int] result;
+    if (!it.tradeable)
+        return 999999999;
+    int price = it.historical_price();
+    if (price <= 0)
+        return 999999999;
+    return price;
+}
+
+Record CandyCombination
+{
+    item candy_1;
+    item candy_2;
+};
+
+CandyCombination CandyCombinationMake(item candy_1, item candy_2)
+{
+    CandyCombination cc;
+    cc.candy_1 = candy_1;
+    cc.candy_2 = candy_2;
+    return cc;
+}
+
+static
+{
+    CandyCombination [int][int][int] __candy_combination_cache;
+}
+
+CandyCombination [int] calculateSweetSynthesisCandyCombinations(int tier, int subid)
+{
+    if (__candy_combination_cache[tier][subid].count() > 0)
+        return __candy_combination_cache[tier][subid];
+    
+    CandyCombination [int] result;
     boolean [item] candy_1;
     boolean [item] candy_2;
     
@@ -29598,20 +29631,12 @@ item [int][int] calculateSweetSynthesisCandyCombinations(int tier, int subid)
             int item_2_id = item_2.to_int();
             if ((item_1_id + item_2_id) % 5 != (subid - 1))
                 continue;
-            result.listAppend(listMake(item_1, item_2));
+            result[result.count()] = CandyCombinationMake(item_1, item_2);
         }
     }
+    sort result by (value.candy_1.synthesis_price() + value.candy_2.synthesis_price());
+    __candy_combination_cache[tier][subid] = result;
     return result;
-}
-
-int synthesis_price(item it)
-{
-    if (!it.tradeable)
-        return 999999999;
-    int price = it.historical_price();
-    if (price <= 0)
-        return 999999999;
-    return price;
 }
 
 static
@@ -29720,29 +29745,56 @@ void SSweetSynthesisGenerateResource(ChecklistEntry [int] resource_entries)
     {
         if (e == $effect[none])
             continue;
-        item [int][int] combinations = calculateSweetSynthesisCandyCombinations(__sweet_synthesis_buff_tiers[e], __sweet_synthesis_buff_subid[e]);
+        CandyCombination [int] combinations = calculateSweetSynthesisCandyCombinations(__sweet_synthesis_buff_tiers[e], __sweet_synthesis_buff_subid[e]);
+        
         
         //If we're in aftercore, show the cheapest combination.
         //If we're in ronin, show all combinations we have components for.
-        item [int][int] final_combinations;
+        CandyCombination [int] final_combinations;
         //final_combinations = combinations;
         if (in_ronin())
         {
             //All we have enough for:
             //int [int][item] combinations_seen;
             
-            sort combinations by (value[0].synthesis_price() + value[1].synthesis_price()); //fast reject - we'll stop running once we reach the display limit
             
-            boolean [string] combinations_seen_json;
+            /*item [int][int] second_stage_combinations;
+            //Sort on smaller list:
+            //Note that combinations is, like, 4426, 4371, 4450, 4465, 4489, 1919, 1952, 1913, 1890, 1862, 813, 790, 805, 832, and 856.
             foreach key in combinations
+            {
+                item item_1 = combinations[key][0];
+                
+                if (item_1.available_amount() + item_1.closet_amount() == 0)
+                    continue;
+                item item_2 = combinations[key][1];
+                if (item_2.available_amount() + item_2.closet_amount() == 0)
+                    continue;
+                //if (!(item_1.available_amount() + item_1.closet_amount() > 0 && item_2.available_amount() + item_2.closet_amount() > 0 && !(item_1 == item_2 && item_1.available_amount() < 2)))
+                if (item_1 == item_2 && item_1.available_amount() + item_1.closet_amount() < 2)
+                    continue;
+                second_stage_combinations.listAppend(combinations[key]);
+            }
+            sort second_stage_combinations by (value[0].synthesis_price() + value[1].synthesis_price()); //fast reject - we'll stop running once we reach the display limit
+            */
+            boolean [string] combinations_seen_json;
+            foreach key, cc in combinations
             {
                 if (final_combinations.count() >= setting_maximum_display_limit + 1)
                     break;
-                item item_1 = combinations[key][0];
-                item item_2 = combinations[key][1];
+                //So, using item_amount() is three times faster than available_amount(), even though it ignores a bunch of stuff. Which is a difference of 0.3 seconds vs 0.1 seconds.
+                if (cc.candy_1.item_amount() + cc.candy_1.closet_amount() == 0)
+                    continue;
+                if (cc.candy_2.item_amount() + cc.candy_2.closet_amount() == 0)
+                    continue;
+                if (cc.candy_1 == cc.candy_2 && cc.candy_1.item_amount() + cc.candy_1.closet_amount() < 2)
+                    continue;
+                
+                //if (!(item_1.available_amount() + item_1.closet_amount() > 0 && item_2.available_amount() + item_2.closet_amount() > 0 && !(item_1 == item_2 && item_1.available_amount() < 2)))
+                    //continue;
                 int [item] combination_presence;
-                combination_presence[item_1] += 1;
-                combination_presence[item_2] += 1;
+                combination_presence[cc.candy_1] += 1;
+                combination_presence[cc.candy_2] += 1;
                 //Use a JSON to discover if we've seen this combination before. Seems to be the fastest way to check if we've seen a map before?
                 //It shouldn't be too slow... right? Right?
                 string presence_json = combination_presence.to_json();
@@ -29771,19 +29823,17 @@ void SSweetSynthesisGenerateResource(ChecklistEntry [int] resource_entries)
                     continue;
                 }
                 
-                if (item_1.available_amount() + item_1.closet_amount() > 0 && item_2.available_amount() + item_2.closet_amount() > 0 && !(item_1 == item_2 && item_1.available_amount() < 2))
-                {
-                    final_combinations.listAppend(listMake(item_1, item_2));
-                    //combinations_seen[combinations_seen.count()] = combination_presence;
-                    combinations_seen_json[presence_json] = true;
-                }
+                
+                final_combinations[final_combinations.count()] = cc;
+                //combinations_seen[combinations_seen.count()] = combination_presence;
+                combinations_seen_json[presence_json] = true;
             }
         }
         else
         {
             //Find cheapest:
-            sort combinations by (value[0].synthesis_price() + value[1].synthesis_price());
-            final_combinations.listAppend(combinations[0]);
+            //This is already pre-sorted.
+            final_combinations[final_combinations.count()] = combinations[0];
         }
         if (final_combinations.count() > 0)
         {
@@ -29798,9 +29848,9 @@ void SSweetSynthesisGenerateResource(ChecklistEntry [int] resource_entries)
                 approximate_line_count += 1;
                 if (line.length() != 0)
                     line.append("<br>");
-                line.append(final_combinations[key][0]);
+                line.append(final_combinations[key].candy_1);
                 line.append(" + ");
-                line.append(final_combinations[key][1]);
+                line.append(final_combinations[key].candy_2);
             }
             table_lines.listAppend(HTMLGenerateSpanOfClass(__sweet_synthesis_buff_descriptions[e], "r_bold") + "<br>" + HTMLGenerateSpanOfStyle(line, "font-size:0.8em;color:#333333"));
             //table.listAppend(listMake(__sweet_synthesis_buff_descriptions[e], line));
@@ -36270,6 +36320,11 @@ buffer generateLocationBarTable(string [int] table_entries, string [int] table_e
 }
 
 
+static
+{
+    boolean __manuel_available = false;
+    boolean __did_check_manuel_available = false;
+}
 
 buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_location_name_is_centre_aligned)
 {
@@ -36768,8 +36823,13 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
                 //stats_l2.listAppend(m.raw_defense + " def");
             if (true)
             {
-                boolean manuel_available = $monster[spooky vampire].monster_factoids_available(false) > 0;
-                if (manuel_available)
+                if (!__did_check_manuel_available)
+                {
+                    //so, if the manuel isn't available, we incur a quest log load every time. so don't do that.
+                    __manuel_available = $monster[spooky vampire].monster_factoids_available(false) > 0;
+                    __did_check_manuel_available = true;
+                }
+                if (__manuel_available)
                 {
                     int factoids_left = 3 - monster_factoids_available(m, false);
                     if (m.attributes.contains_text("ULTRARARE") || m.attributes.contains_text("NOMANUEL")) //ULTRARARE test may be superfluous
