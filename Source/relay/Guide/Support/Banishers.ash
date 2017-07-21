@@ -60,6 +60,7 @@ static
     __banish_source_length["snokebomb"] = 30;
     __banish_source_length["beancannon"] = -1;
     __banish_source_length["KGB tranquilizer dart"] = 20;
+    __banish_source_length["Spring-Loaded Front Bumper"] = 30;
     
     int [string] __banish_simultaneous_limit;
     __banish_simultaneous_limit["beancannon"] = 5;
@@ -198,7 +199,6 @@ boolean [string] activeBanishNamesForLocation(location l)
     
     foreach banish_name, count in l.activeBanishNameCountsForLocation()
         result[banish_name] = (count > 0);
-    
     return result;
 }
 
@@ -219,4 +219,14 @@ int BanishLength(string banish_name)
     if (length < 0)
         length = 2147483647;
     return length;
+}
+
+boolean BanishIsActive(string name)
+{
+    foreach key, banish in BanishesActive()
+    {
+        if (banish.banish_source == name)
+            return true;
+    }
+    return false;
 }

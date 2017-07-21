@@ -1568,6 +1568,7 @@ int licenseToAdventureSocialCapitalAvailable()
         if (get_property_boolean(property_name))
             social_capital_used += value;
     }
+    //print_html("total_social_capital = " + total_social_capital + ", social_capital_used = " + social_capital_used);
     
     return total_social_capital - social_capital_used;
 }

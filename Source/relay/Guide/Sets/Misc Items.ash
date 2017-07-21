@@ -1263,7 +1263,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
     }
     if (lookupItem("license to chill").available_amount() > 0 && !get_property_boolean("_licenseToChillUsed") && mafiaIsPastRevision(18122))
     {
-        resource_entries.listAppend(ChecklistEntryMake("__item License to Chill", "", ChecklistSubentryMake("License to Chill", "", "+5 adventures, extend effects by one turn, HP/MP restore, statgain"), 10));
+        resource_entries.listAppend(ChecklistEntryMake("__item License to Chill", "inventory.php?which=3", ChecklistSubentryMake("License to Chill", "", "+5 adventures, extend effects by one turn, HP/MP restore, statgain"), 10));
         
     }
 }

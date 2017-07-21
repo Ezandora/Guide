@@ -1154,3 +1154,20 @@ monster [int] listConvertStringsToMonsters(string [int] list)
     }
     return out;
 }
+
+int [int] stringToIntIntList(string input, string delimiter)
+{
+	int [int] out;
+	if (input == "")
+		return out;
+	foreach key, v in input.split_string(delimiter)
+	{
+		out.listAppend(v.to_int());
+	}
+	return out;
+}
+
+int [int] stringToIntIntList(string input)
+{
+	return stringToIntIntList(input, ",");
+}

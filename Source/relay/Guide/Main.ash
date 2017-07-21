@@ -3,6 +3,7 @@ import "relay/Guide/Support/Library.ash"
 import "relay/Guide/Support/IOTMs.ash"
 import "relay/Guide/Sections/User Preferences.ash"
 import "relay/Guide/Support/Statics.ash"
+import "relay/Guide/Support/Statics 2.ash"
 import "relay/Guide/Support/List.ash"
 import "relay/Guide/Sections/Globals.ash"
 import "relay/Guide/Sections/Data.ash"
@@ -277,7 +278,7 @@ void runMain(string relay_filename)
         PageWrite("</div>");
     
     if (output_body_tag_only)
-    	write(__global_page.body_contents);
+    	write(PageGenerateBodyContents());
     else
 		PageGenerateAndWriteOut();
 }

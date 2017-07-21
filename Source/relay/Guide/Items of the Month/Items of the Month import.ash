@@ -31,3 +31,4 @@ import "relay/Guide/Items of the Month/Tunnel of Love.ash";
 import "relay/Guide/Items of the Month/Spacegate.ash";
 import "relay/Guide/Items of the Month/New You.ash";
 import "relay/Guide/Items of the Month/KGBriefcase.ash";
+import "relay/Guide/Items of the Month/Asdon Martin.ash";

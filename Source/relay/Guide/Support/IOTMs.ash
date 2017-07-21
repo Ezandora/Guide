@@ -16,6 +16,8 @@ void initialiseIOTMsUsable()
             if (campground[it] > 0)
                 __iotms_usable[it] = true;
         }
+        if (campground[lookupItem("Asdon Martin keyfob")] > 0)
+            __iotms_usable[lookupItem("Asdon Martin keyfob")] = true;
     }
     if (get_property_boolean("hasDetectiveSchool"))
         __iotms_usable[$item[detective school application]] = true;
