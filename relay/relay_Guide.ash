@@ -2,7 +2,7 @@
 
 since 17.6; //the earliest main release that supports map literals
 //These settings are for development. Don't worry about editing them.
-string __version = "1.4.26";
+string __version = "1.4.27";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -1564,6 +1564,24 @@ monster [int] listConvertStringsToMonsters(string [int] list)
     }
     return out;
 }
+
+int [int] stringToIntIntList(string input, string delimiter)
+{
+	int [int] out;
+	if (input == "")
+		return out;
+	foreach key, v in input.split_string(delimiter)
+	{
+		out.listAppend(v.to_int());
+	}
+	return out;
+}
+
+int [int] stringToIntIntList(string input)
+{
+	return stringToIntIntList(input, ",");
+}
+
 
 
 buffer to_buffer(string str)
@@ -3510,6 +3528,7 @@ int licenseToAdventureSocialCapitalAvailable()
         if (get_property_boolean(property_name))
             social_capital_used += value;
     }
+    //print_html("total_social_capital = " + total_social_capital + ", social_capital_used = " + social_capital_used);
     
     return total_social_capital - social_capital_used;
 }
@@ -3531,6 +3550,8 @@ void initialiseIOTMsUsable()
             if (campground[it] > 0)
                 __iotms_usable[it] = true;
         }
+        if (campground[lookupItem("Asdon Martin keyfob")] > 0)
+            __iotms_usable[lookupItem("Asdon Martin keyfob")] = true;
     }
     if (get_property_boolean("hasDetectiveSchool"))
         __iotms_usable[$item[detective school application]] = true;
@@ -3647,6 +3668,23 @@ void processSetUserPreferences(string [string] form_fields)
     }
 }
 
+
+
+static
+{
+    //mr. fusion:
+    boolean [item] __pvpable_food_and_drinks;
+    void initialisePVPFoodAndDrinks()
+    {
+        foreach it in $items[]
+        {
+            if (it.fullness == 0 && it.inebriety == 0) continue;
+            if (!it.item_is_pvp_stealable()) continue;
+            __pvpable_food_and_drinks[it] = true;
+        }
+    }
+    initialisePVPFoodAndDrinks();
+}
 
 //Runtime variables:
 location __last_adventure_location;
@@ -5948,6 +5986,8 @@ string HTMLGreyOutTextUnlessTrue(string text, boolean conditional)
 }
 
 
+
+
 string HTMLGenerateFutureTextByLocationAvailability(string base_text, location place)
 {
     if (!place.locationAvailable() && place != $location[none])
@@ -6020,6 +6060,101 @@ boolean can_equip_outfit(string outfit_name)
             return false;
     }
     return true;
+}
+
+
+//Probably not a good place for it:
+boolean asdonMartinPassesFuelableTests(item craft, boolean [item] ingredients_blacklisted)
+{
+    if ($items[wad of dough,flat dough] contains craft) return false;
+    if (craft.craft_type().contains_text("(fancy)"))
+        return true;
+    boolean all_npc = true;
+    foreach it, amount in craft.get_ingredients()
+    {
+        if (ingredients_blacklisted[it]) return true;
+        if (it.item_amount() >= amount) continue;
+        if (it.asdonMartinPassesFuelableTests(ingredients_blacklisted))
+            return true;
+        if (it.npc_price() == 0)
+            all_npc = false;
+    }
+    if (craft.get_ingredients().count() == 0)
+        all_npc = false;
+    if (all_npc)
+        return true;
+    return false;
+}
+
+item [int] asdonMartinGenerateListOfFuelables()
+{
+    item [int] fuelables;
+    boolean [item] blacklist;
+    if (!QuestState("questL11Black").finished) //FIXME no
+        blacklist[$item[blackberry]] = true; //FIXME test properly?
+    blacklist[$item[stunt nuts]] = true;
+    blacklist[$item[wet stew]] = true; //FIXME I guess maybe not after
+    blacklist[$item[goat cheese]] = true;
+    blacklist[$item[hot wing]] = true;
+    blacklist[$item[glass of goat's milk]] = true;
+    blacklist[$item[soft green echo eyedrop antidote martini]] = true; //if it's not created, FIXME
+    blacklist[$item[cashew]] = true;
+    blacklist[$item[warm gravy]] = true; //don't steal my boat
+    foreach it in $items[Falcon&trade; Maltese Liquor, hardboiled egg]
+        blacklist[it] = true; //don't steal my -combat
+    blacklist[$item[loaf of soda bread]] = true; //elsewhere
+    foreach it in $items[hot buttered roll,ketchup,catsup]
+        blacklist[it] = true; //hermit
+    foreach it in $items[bottle of gin,bottle of rum,bottle of vodka,bottle of whiskey,bottle of tequila] //too useful for crafting?
+        blacklist[it] = true;
+    blacklist[$item[bowl of scorpions]] = true; //weirdness, npc_price() didn't work...?
+    foreach it in __pvpable_food_and_drinks
+    {
+        if (blacklist[it]) continue;
+        if (it.npc_price() > 0) continue;
+        if (it.historical_price() >= 20000) continue;
+        if (it.item_amount() == 0)
+        {
+            if (it.creatable_amount() == 0)
+                continue;
+            if (it.asdonMartinPassesFuelableTests(blacklist))
+                continue;
+        }
+        if (my_path_id() == PATH_LICENSE_TO_ADVENTURE)
+        {
+            if (it.inebriety > 0 && it.image == "martini.gif")
+                continue;
+        }
+        int [item] ingredients = it.get_ingredients();
+        if (ingredients.count() > 0)
+        {
+            boolean reject = false;
+            //Various things count as being from a "store":
+            foreach it in $items[yellow pixel,handful of barley]
+            {
+                if (ingredients[it] > 0)
+                {
+                    reject = true;
+                    break;
+                }
+            }
+            if (reject)
+                continue;
+        }
+        float average_adventures = it.averageAdventuresForConsumable();
+        if (average_adventures == 0.0)
+            continue;
+            
+        float soda_bread_efficiency = to_float($item[wad of dough].npc_price() + $item[soda water].npc_price()) / 6.0;
+        if (soda_bread_efficiency < 1.0) soda_bread_efficiency = 100000.0;
+        if (it.autosell_price() > 0 && it.autosell_price().to_float() / average_adventures > soda_bread_efficiency)
+        {
+            continue;
+        }
+        fuelables.listAppend(it);
+    }
+    sort fuelables by -value.averageAdventuresForConsumable();
+    return fuelables;
 }
 
 
@@ -6120,6 +6255,16 @@ Page __global_page;
 Page Page()
 {
 	return __global_page;
+}
+
+buffer PageGenerateBodyContents(Page page_in)
+{
+    return page_in.body_contents;
+}
+
+buffer PageGenerateBodyContents()
+{
+    return Page().PageGenerateBodyContents();
 }
 
 buffer PageGenerate(Page page_in)
@@ -6298,7 +6443,7 @@ void PageSetBodyAttribute(string attribute, string value)
 void PageInit()
 {
 	PageAddCSSClass("a", "r_a_undecorated", "text-decoration:none;color:inherit;");
-	PageAddCSSClass("div", "r_centre", "margin-left:auto; margin-right:auto;text-align:center;");
+	PageAddCSSClass("", "r_centre", "margin-left:auto; margin-right:auto;text-align:center;");
 	PageAddCSSClass("", "r_bold", "font-weight:bold;");
 	PageAddCSSClass("", "r_end_floating_elements", "clear:both;");
 	
@@ -11652,7 +11797,7 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         }
         else
         {
-            if ($item[uv-resistant compass].available_amount() == 0)
+            if ($item[uv-resistant compass].available_amount() == 0 && !(my_path_id() == PATH_LICENSE_TO_ADVENTURE && get_property_boolean("bondDesert")))
             {
                 line = "Acquire";
                 if (have_blacklight_bulb)
@@ -24949,7 +25094,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
     }
     if (lookupItem("license to chill").available_amount() > 0 && !get_property_boolean("_licenseToChillUsed") && mafiaIsPastRevision(18122))
     {
-        resource_entries.listAppend(ChecklistEntryMake("__item License to Chill", "", ChecklistSubentryMake("License to Chill", "", "+5 adventures, extend effects by one turn, HP/MP restore, statgain"), 10));
+        resource_entries.listAppend(ChecklistEntryMake("__item License to Chill", "inventory.php?which=3", ChecklistSubentryMake("License to Chill", "", "+5 adventures, extend effects by one turn, HP/MP restore, statgain"), 10));
         
     }
 }
@@ -26242,6 +26387,7 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
                     {
                         continue;
                     }
+                    if (l == $location[the oasis]) continue;
                     if (l.locationAvailable() && l.delayRemainingInLocation() > 0)
                         possible_locations.listAppend(l);
                 }
@@ -27521,7 +27667,12 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     }
     
     boolean have_blacklight_bulb = (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE && get_property("peteMotorbikeHeadlight") == "Blacklight Bulb");
-    if (__last_adventure_location == $location[the arid\, extra-dry desert] && !__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && __misc_state["in run"] && !have_blacklight_bulb && __quest_state["Level 11 Desert"].state_int["Desert Exploration"] < 99)
+    boolean have_alternate_uv_source = false;
+    if (have_blacklight_bulb)
+        have_alternate_uv_source = true;
+    if (my_path_id() == PATH_LICENSE_TO_ADVENTURE && get_property_boolean("bondDesert"))
+        have_alternate_uv_source = true;
+    if (__last_adventure_location == $location[the arid\, extra-dry desert] && !__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && __misc_state["in run"] && !have_alternate_uv_source && __quest_state["Level 11 Desert"].state_int["Desert Exploration"] < 99)
     {
         boolean have_uv_compass_equipped = __quest_state["Level 11 Desert"].state_boolean["Have UV-Compass eqipped"];
         
@@ -27694,6 +27845,7 @@ static
     __banish_source_length["snokebomb"] = 30;
     __banish_source_length["beancannon"] = -1;
     __banish_source_length["KGB tranquilizer dart"] = 20;
+    __banish_source_length["Spring-Loaded Front Bumper"] = 30;
     
     int [string] __banish_simultaneous_limit;
     __banish_simultaneous_limit["beancannon"] = 5;
@@ -27832,7 +27984,6 @@ boolean [string] activeBanishNamesForLocation(location l)
     
     foreach banish_name, count in l.activeBanishNameCountsForLocation()
         result[banish_name] = (count > 0);
-    
     return result;
 }
 
@@ -27853,6 +28004,16 @@ int BanishLength(string banish_name)
     if (length < 0)
         length = 2147483647;
     return length;
+}
+
+boolean BanishIsActive(string name)
+{
+    foreach key, banish in BanishesActive()
+    {
+        if (banish.banish_source == name)
+            return true;
+    }
+    return false;
 }
 
 void SEventsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -43328,6 +43489,68 @@ void IOTMKGBriefcaseGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(entry);
 }
 
+
+
+RegisterTaskGenerationFunction("IOTMAsdonMartinGenerateTasks");
+void IOTMAsdonMartinGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    if (!__iotms_usable[lookupItem("Asdon martin keyfob")])
+        return;
+    //BanishIsActive
+    //FIXME test get_fuel() in point release
+    if (!BanishIsActive("Spring-Loaded Front Bumper") && __misc_state["in run"])
+    {
+        task_entries.listAppend(ChecklistEntryMake("__item Asdon Martin keyfob", "campground.php?action=fuelconvertor", ChecklistSubentryMake("Cast Spring-Loaded Front Bumper", "", "Banish/free run, costs 50 fuel."), -11));
+    }
+}
+
+RegisterResourceGenerationFunction("IOTMAsdonMartinGenerateResource");
+void IOTMAsdonMartinGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if (!__iotms_usable[lookupItem("Asdon martin keyfob")])
+        return;
+    if (__misc_state["in run"])
+    {
+        item [int] fuelables = asdonMartinGenerateListOfFuelables();
+        if (fuelables.count() > 0)
+        {
+            string [int] fuelables_extended;
+            foreach key, fuelable in fuelables
+            {
+                string line;
+                line = " (";
+                line += fuelable.averageAdventuresForConsumable().round();
+                if (fuelable.item_amount() == 0)
+                {
+                    line += ", ";
+                    boolean first = true;
+                    foreach it in fuelable.get_ingredients()
+                    {
+                        if (first)
+                            first = false;
+                        else
+                            line += " + ";
+                        line += it;
+                    }
+                }
+                line += ")";
+                line = fuelable.to_string() + HTMLGenerateSpanOfClass(line, "r_cl_modifier_inline");
+                fuelables_extended.listAppend(line);
+                if (key >= 5 && true)
+                {
+                    fuelables_extended.listAppend("(...)");
+                    break;
+                }
+            }
+            string [int] description;
+            description.listAppend("Could fuel with:|*" + fuelables_extended.listJoinComponents("|*", ""));//|Total of " + total_fuelable + " fuelable.");
+            if ($item[loaf of soda bread].creatable_amount() > 0)
+                description.listAppend("Or create and feed loaf of soda breads.");
+            resource_entries.listAppend(ChecklistEntryMake("__item Asdon Martin keyfob", "campground.php?action=fuelconvertor", ChecklistSubentryMake("Fuel", "", description), 8));
+        }
+    }
+}
+
 RegisterTaskGenerationFunction("PathActuallyEdtheUndyingGenerateTasks");
 void PathActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
@@ -46331,7 +46554,7 @@ void runMain(string relay_filename)
         PageWrite("</div>");
     
     if (output_body_tag_only)
-    	write(__global_page.body_contents);
+    	write(PageGenerateBodyContents());
     else
 		PageGenerateAndWriteOut();
 }
