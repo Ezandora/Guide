@@ -2,7 +2,7 @@
 
 since 17.6; //the earliest main release that supports map literals
 //These settings are for development. Don't worry about editing them.
-string __version = "1.4.28";
+string __version = "1.4.29";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -6107,11 +6107,10 @@ item [int] asdonMartinGenerateListOfFuelables()
         blacklist[it] = true; //hermit
     foreach it in $items[bottle of gin,bottle of rum,bottle of vodka,bottle of whiskey,bottle of tequila] //too useful for crafting?
         blacklist[it] = true;
-    blacklist[$item[bowl of scorpions]] = true; //weirdness, npc_price() didn't work...?
     foreach it in __pvpable_food_and_drinks
     {
         if (blacklist[it]) continue;
-        if (it.npc_price() > 0) continue;
+        if (it.is_npc_item()) continue;
         if (it.historical_price() >= 20000) continue;
         if (it.item_amount() == 0)
         {
@@ -43591,6 +43590,18 @@ void IOTMAsdonMartinGenerateResource(ChecklistEntry [int] resource_entries)
         if (entry.url == "")
             entry.url = "campground.php?action=workshed";
         entry.subentries.listAppend(ChecklistSubentryMake("Asdon Missile", "", "Costs 100 fuel, instakill + YR-equivalent."));
+    }
+    if (BanishIsActive("Spring-Loaded Front Bumper"))
+    {
+        Banish b = BanishByName("Spring-Loaded Front Bumper");
+        int turns_left = b.banish_turn_length - (my_turncount() - b.turn_banished);
+        
+        if (turns_left > 0 && turns_left <= 30)
+        {
+            entry.subentries.listAppend(ChecklistSubentryMake(pluralise(turns_left, "turn", "turns") + " to next asdon bumper", "", "Banish/runaway."));
+            if (entry.image_lookup_name == "")
+                entry.image_lookup_name = "__item Asdon Martin keyfob";
+        }
     }
     if (entry.subentries.count() > 0)
     {
