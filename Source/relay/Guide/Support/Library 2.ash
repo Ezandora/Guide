@@ -137,7 +137,7 @@ item [int] asdonMartinGenerateListOfFuelables()
             if (it.asdonMartinPassesFuelableTests(blacklist))
                 continue;
         }
-        if (my_path_id() == PATH_LICENSE_TO_ADVENTURE)
+        if (my_path_id() == PATH_LICENSE_TO_ADVENTURE && false)
         {
             if (it.inebriety > 0 && it.image == "martini.gif")
                 continue;
