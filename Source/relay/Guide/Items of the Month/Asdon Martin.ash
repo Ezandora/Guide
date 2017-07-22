@@ -102,6 +102,18 @@ void IOTMAsdonMartinGenerateResource(ChecklistEntry [int] resource_entries)
             entry.url = "campground.php?action=workshed";
         entry.subentries.listAppend(ChecklistSubentryMake("Asdon Missile", "", "Costs 100 fuel, instakill + YR-equivalent."));
     }
+    if (BanishIsActive("Spring-Loaded Front Bumper"))
+    {
+        Banish b = BanishByName("Spring-Loaded Front Bumper");
+        int turns_left = b.banish_turn_length - (my_turncount() - b.turn_banished);
+        
+        if (turns_left > 0 && turns_left <= 30)
+        {
+            entry.subentries.listAppend(ChecklistSubentryMake(pluralise(turns_left, "turn", "turns") + " to next asdon bumper", "", "Banish/runaway."));
+            if (entry.image_lookup_name == "")
+                entry.image_lookup_name = "__item Asdon Martin keyfob";
+        }
+    }
     if (entry.subentries.count() > 0)
     {
         resource_entries.listAppend(entry);

@@ -124,11 +124,10 @@ item [int] asdonMartinGenerateListOfFuelables()
         blacklist[it] = true; //hermit
     foreach it in $items[bottle of gin,bottle of rum,bottle of vodka,bottle of whiskey,bottle of tequila] //too useful for crafting?
         blacklist[it] = true;
-    blacklist[$item[bowl of scorpions]] = true; //weirdness, npc_price() didn't work...?
     foreach it in __pvpable_food_and_drinks
     {
         if (blacklist[it]) continue;
-        if (it.npc_price() > 0) continue;
+        if (it.is_npc_item()) continue;
         if (it.historical_price() >= 20000) continue;
         if (it.item_amount() == 0)
         {
