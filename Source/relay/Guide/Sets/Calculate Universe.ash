@@ -47,7 +47,7 @@ void SCalculateUniverseGenerateResource(ChecklistEntry [int] resource_entries)
             //FIXME 18, 44, 75, and 99 are all valid for this - pick whichever we can summon now?
             useful_digits_and_their_reasons[99] = "base booze for perfect ice cube";
         }
-        if (__quest_state["Level 5"].mafia_internal_step < 3 && have_outfit_components("Knob Goblin Harem Girl Disguise") && $item[Knob Goblin Perfume].available_amount() == 0 && $effect[Knob Goblin Perfume].have_effect() == 0 && in_ronin())
+        if (__quest_state["Level 5"].mafia_internal_step < 3 && $item[Knob Goblin Perfume].available_amount() == 0 && $effect[Knob Goblin Perfume].have_effect() == 0 && in_ronin()) //have_outfit_components("Knob Goblin Harem Girl Disguise")
         {
             useful_digits_and_their_reasons[9] = "knob goblin perfume for boss fight";
         }

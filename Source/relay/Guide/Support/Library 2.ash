@@ -81,9 +81,9 @@ boolean can_equip_outfit(string outfit_name)
 
 
 //Probably not a good place for it:
-boolean asdonMartinPassesFuelableTests(item craft, boolean [item] ingredients_blacklisted)
+boolean asdonMartinFailsFuelableTestsPrivate(item craft, boolean [item] ingredients_blacklisted, item last_recurse_ingredient)
 {
-    if ($items[wad of dough,flat dough] contains craft) return false;
+    //if ($items[wad of dough,flat dough] contains craft) return false;
     if (craft.craft_type().contains_text("(fancy)"))
         return true;
     boolean all_npc = true;
@@ -91,7 +91,11 @@ boolean asdonMartinPassesFuelableTests(item craft, boolean [item] ingredients_bl
     {
         if (ingredients_blacklisted[it]) return true;
         if (it.item_amount() >= amount) continue;
-        if (it.asdonMartinPassesFuelableTests(ingredients_blacklisted))
+        if (it == last_recurse_ingredient) //wad of dough, flat dough, jolly roger charrrm
+        {
+            continue;
+        }
+        if (it.asdonMartinFailsFuelableTestsPrivate(ingredients_blacklisted, craft))
             return true;
         if (it.npc_price() == 0)
             all_npc = false;
@@ -101,6 +105,11 @@ boolean asdonMartinPassesFuelableTests(item craft, boolean [item] ingredients_bl
     if (all_npc)
         return true;
     return false;
+}
+
+boolean asdonMartinFailsFuelableTests(item craft, boolean [item] ingredients_blacklisted)
+{
+    return asdonMartinFailsFuelableTestsPrivate(craft, ingredients_blacklisted, $item[none]);
 }
 
 item [int] asdonMartinGenerateListOfFuelables()
@@ -124,6 +133,8 @@ item [int] asdonMartinGenerateListOfFuelables()
         blacklist[it] = true; //hermit
     foreach it in $items[bottle of gin,bottle of rum,bottle of vodka,bottle of whiskey,bottle of tequila] //too useful for crafting?
         blacklist[it] = true;
+    foreach it in $items[bottle of Calcutta Emerald,bottle of Lieutenant Freeman,bottle of Jorge Sinsonte,bottle of Definit,bottle of Domesticated Turkey,boxed champagne,bottle of Ooze-O,bottle of Pete's Sake,tangerine,kiwi,cocktail onion,kumquat,tonic water,raspberry] //nash crosby's still's results isn't feedable
+        blacklist[it] = true;
     foreach it in __pvpable_food_and_drinks
     {
         if (blacklist[it]) continue;
@@ -133,7 +144,7 @@ item [int] asdonMartinGenerateListOfFuelables()
         {
             if (it.creatable_amount() == 0)
                 continue;
-            if (it.asdonMartinPassesFuelableTests(blacklist))
+            if (it.asdonMartinFailsFuelableTests(blacklist))
                 continue;
         }
         if (my_path_id() == PATH_LICENSE_TO_ADVENTURE && false)
@@ -169,6 +180,6 @@ item [int] asdonMartinGenerateListOfFuelables()
         }
         fuelables.listAppend(it);
     }
-    sort fuelables by -value.averageAdventuresForConsumable();
+    sort fuelables by -value.averageAdventuresForConsumable() * value.item_amount();
     return fuelables;
 }

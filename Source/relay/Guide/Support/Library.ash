@@ -780,7 +780,8 @@ Record FloatHandle
 buffer generateTurnsToSeeNoncombat(int combat_rate, int noncombats_in_zone, string task, int max_turns_between_nc, int extra_starting_turns)
 {
     float turn_estimation = -1.0;
-    float noncombat_rate = 1.0 - (combat_rate + combat_rate_modifier()).to_float() / 100.0;
+    float combat_rate_modifier = combat_rate_modifier();
+    float noncombat_rate = 1.0 - (combat_rate + combat_rate_modifier).to_float() / 100.0;
     
     
     if (noncombats_in_zone > 0)
@@ -834,7 +835,7 @@ buffer generateTurnsToSeeNoncombat(int combat_rate, int noncombats_in_zone, stri
     if (noncombats_in_zone > 0)
     {
         result.append(" at ");
-        result.append(combat_rate_modifier().floor());
+        result.append(combat_rate_modifier.floor());
         result.append("% combat rate");
     }
     result.append(".");

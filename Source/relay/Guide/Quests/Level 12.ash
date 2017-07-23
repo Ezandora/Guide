@@ -521,7 +521,7 @@ void QLevel12GenerateBattlefieldDescription(ChecklistSubentry subentry, string s
         line += "|*" + pluralise(turns_to_reach, "turn", "turns") + " (" + pluralise(enemies_to_defeat_for_unlock, enemy_name, enemy_name_plural) + ") to unlock " + area_to_unlock + ".";
     }
     
-    if (areas_unlocked_but_not_completed.count() > 0)
+    if (areas_unlocked_but_not_completed.count() > 0 && enemies_remaining > 0)
         line += "|*Quests accessible: " + areas_unlocked_but_not_completed.listJoinComponents(", ", "and") + ".";
     
     subentry.entries.listAppend(line);

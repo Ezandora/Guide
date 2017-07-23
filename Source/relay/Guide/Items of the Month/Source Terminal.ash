@@ -195,7 +195,8 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
         }
         if (potential_targets.count() > 0)
             description.listAppend("Could use on a " + potential_targets.listJoinComponents(", ", "or") + ".");
-        
+        if (lookupItem("exploding cigar").item_amount() > 0)
+            description.listAppend("Use exploding cigar immediately after to win the fight.");
         string title = "Duplication castable";
         if (total_duplicate_uses_available > 1)
         {

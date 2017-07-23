@@ -32,7 +32,7 @@ void IOTMAsdonMartinGenerateResource(ChecklistEntry [int] resource_entries)
             {
                 string line;
                 line = " (";
-                line += fuelable.averageAdventuresForConsumable().round();
+                line += (fuelable.averageAdventuresForConsumable() * fuelable.item_amount()).round();
                 if (fuelable.item_amount() == 0)
                 {
                     line += ", ";
@@ -62,6 +62,8 @@ void IOTMAsdonMartinGenerateResource(ChecklistEntry [int] resource_entries)
                 if (!__misc_state["can eat just about anything"] && fuelable.fullness > 0)
                     cannot_consume_anyways = true;
                 if (!__misc_state["can drink just about anything"] && fuelable.inebriety > 0 && !(my_path_id() == PATH_LICENSE_TO_ADVENTURE && fuelable.image == "martini.gif"))
+                    cannot_consume_anyways = true;
+                if (!fuelable.is_unrestricted())
                     cannot_consume_anyways = true;
                 if (cannot_consume_anyways)
                     desired_colour = "#999999";
