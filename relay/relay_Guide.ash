@@ -2,7 +2,7 @@
 
 since 17.6; //the earliest main release that supports map literals
 //These settings are for development. Don't worry about editing them.
-string __version = "1.4.29";
+string __version = "1.4.30";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -2740,7 +2740,8 @@ Record FloatHandle
 buffer generateTurnsToSeeNoncombat(int combat_rate, int noncombats_in_zone, string task, int max_turns_between_nc, int extra_starting_turns)
 {
     float turn_estimation = -1.0;
-    float noncombat_rate = 1.0 - (combat_rate + combat_rate_modifier()).to_float() / 100.0;
+    float combat_rate_modifier = combat_rate_modifier();
+    float noncombat_rate = 1.0 - (combat_rate + combat_rate_modifier).to_float() / 100.0;
     
     
     if (noncombats_in_zone > 0)
@@ -2794,7 +2795,7 @@ buffer generateTurnsToSeeNoncombat(int combat_rate, int noncombats_in_zone, stri
     if (noncombats_in_zone > 0)
     {
         result.append(" at ");
-        result.append(combat_rate_modifier().floor());
+        result.append(combat_rate_modifier.floor());
         result.append("% combat rate");
     }
     result.append(".");
@@ -6064,9 +6065,9 @@ boolean can_equip_outfit(string outfit_name)
 
 
 //Probably not a good place for it:
-boolean asdonMartinPassesFuelableTests(item craft, boolean [item] ingredients_blacklisted)
+boolean asdonMartinFailsFuelableTestsPrivate(item craft, boolean [item] ingredients_blacklisted, item last_recurse_ingredient)
 {
-    if ($items[wad of dough,flat dough] contains craft) return false;
+    //if ($items[wad of dough,flat dough] contains craft) return false;
     if (craft.craft_type().contains_text("(fancy)"))
         return true;
     boolean all_npc = true;
@@ -6074,7 +6075,11 @@ boolean asdonMartinPassesFuelableTests(item craft, boolean [item] ingredients_bl
     {
         if (ingredients_blacklisted[it]) return true;
         if (it.item_amount() >= amount) continue;
-        if (it.asdonMartinPassesFuelableTests(ingredients_blacklisted))
+        if (it == last_recurse_ingredient) //wad of dough, flat dough, jolly roger charrrm
+        {
+            continue;
+        }
+        if (it.asdonMartinFailsFuelableTestsPrivate(ingredients_blacklisted, craft))
             return true;
         if (it.npc_price() == 0)
             all_npc = false;
@@ -6084,6 +6089,11 @@ boolean asdonMartinPassesFuelableTests(item craft, boolean [item] ingredients_bl
     if (all_npc)
         return true;
     return false;
+}
+
+boolean asdonMartinFailsFuelableTests(item craft, boolean [item] ingredients_blacklisted)
+{
+    return asdonMartinFailsFuelableTestsPrivate(craft, ingredients_blacklisted, $item[none]);
 }
 
 item [int] asdonMartinGenerateListOfFuelables()
@@ -6107,6 +6117,8 @@ item [int] asdonMartinGenerateListOfFuelables()
         blacklist[it] = true; //hermit
     foreach it in $items[bottle of gin,bottle of rum,bottle of vodka,bottle of whiskey,bottle of tequila] //too useful for crafting?
         blacklist[it] = true;
+    foreach it in $items[bottle of Calcutta Emerald,bottle of Lieutenant Freeman,bottle of Jorge Sinsonte,bottle of Definit,bottle of Domesticated Turkey,boxed champagne,bottle of Ooze-O,bottle of Pete's Sake,tangerine,kiwi,cocktail onion,kumquat,tonic water,raspberry] //nash crosby's still's results isn't feedable
+        blacklist[it] = true;
     foreach it in __pvpable_food_and_drinks
     {
         if (blacklist[it]) continue;
@@ -6116,7 +6128,7 @@ item [int] asdonMartinGenerateListOfFuelables()
         {
             if (it.creatable_amount() == 0)
                 continue;
-            if (it.asdonMartinPassesFuelableTests(blacklist))
+            if (it.asdonMartinFailsFuelableTests(blacklist))
                 continue;
         }
         if (my_path_id() == PATH_LICENSE_TO_ADVENTURE && false)
@@ -6152,7 +6164,7 @@ item [int] asdonMartinGenerateListOfFuelables()
         }
         fuelables.listAppend(it);
     }
-    sort fuelables by -value.averageAdventuresForConsumable();
+    sort fuelables by -value.averageAdventuresForConsumable() * value.item_amount();
     return fuelables;
 }
 
@@ -11657,6 +11669,8 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         exploration_per_turn += 2.0; //FIXME make completely accurate for first turn? not enough information available
     else if ($item[uv-resistant compass].available_amount() > 0)
         exploration_per_turn += 1.0;
+    if (my_path_id() == PATH_LICENSE_TO_ADVENTURE && get_property_boolean("bondDesert"))
+        exploration_per_turn += 2.0;
     
     boolean have_blacklight_bulb = (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE && get_property("peteMotorbikeHeadlight") == "Blacklight Bulb");
     if (have_blacklight_bulb)
@@ -14048,7 +14062,7 @@ void QLevel12GenerateBattlefieldDescription(ChecklistSubentry subentry, string s
         line += "|*" + pluralise(turns_to_reach, "turn", "turns") + " (" + pluralise(enemies_to_defeat_for_unlock, enemy_name, enemy_name_plural) + ") to unlock " + area_to_unlock + ".";
     }
     
-    if (areas_unlocked_but_not_completed.count() > 0)
+    if (areas_unlocked_but_not_completed.count() > 0 && enemies_remaining > 0)
         line += "|*Quests accessible: " + areas_unlocked_but_not_completed.listJoinComponents(", ", "and") + ".";
     
     subentry.entries.listAppend(line);
@@ -28507,7 +28521,7 @@ void SCalculateUniverseGenerateResource(ChecklistEntry [int] resource_entries)
             //FIXME 18, 44, 75, and 99 are all valid for this - pick whichever we can summon now?
             useful_digits_and_their_reasons[99] = "base booze for perfect ice cube";
         }
-        if (__quest_state["Level 5"].mafia_internal_step < 3 && have_outfit_components("Knob Goblin Harem Girl Disguise") && $item[Knob Goblin Perfume].available_amount() == 0 && $effect[Knob Goblin Perfume].have_effect() == 0 && in_ronin())
+        if (__quest_state["Level 5"].mafia_internal_step < 3 && $item[Knob Goblin Perfume].available_amount() == 0 && $effect[Knob Goblin Perfume].have_effect() == 0 && in_ronin()) //have_outfit_components("Knob Goblin Harem Girl Disguise")
         {
             useful_digits_and_their_reasons[9] = "knob goblin perfume for boss fight";
         }
@@ -42502,7 +42516,8 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
         }
         if (potential_targets.count() > 0)
             description.listAppend("Could use on a " + potential_targets.listJoinComponents(", ", "or") + ".");
-        
+        if (lookupItem("exploding cigar").item_amount() > 0)
+            description.listAppend("Use exploding cigar immediately after to win the fight.");
         string title = "Duplication castable";
         if (total_duplicate_uses_available > 1)
         {
@@ -43521,7 +43536,7 @@ void IOTMAsdonMartinGenerateResource(ChecklistEntry [int] resource_entries)
             {
                 string line;
                 line = " (";
-                line += fuelable.averageAdventuresForConsumable().round();
+                line += (fuelable.averageAdventuresForConsumable() * fuelable.item_amount()).round();
                 if (fuelable.item_amount() == 0)
                 {
                     line += ", ";
@@ -43551,6 +43566,8 @@ void IOTMAsdonMartinGenerateResource(ChecklistEntry [int] resource_entries)
                 if (!__misc_state["can eat just about anything"] && fuelable.fullness > 0)
                     cannot_consume_anyways = true;
                 if (!__misc_state["can drink just about anything"] && fuelable.inebriety > 0 && !(my_path_id() == PATH_LICENSE_TO_ADVENTURE && fuelable.image == "martini.gif"))
+                    cannot_consume_anyways = true;
+                if (!fuelable.is_unrestricted())
                     cannot_consume_anyways = true;
                 if (cannot_consume_anyways)
                     desired_colour = "#999999";
