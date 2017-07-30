@@ -6464,7 +6464,8 @@ item [int] asdonMartinGenerateListOfFuelables()
         {
             boolean reject = false;
             //Various things count as being from a "store":
-            foreach it in $items[yellow pixel,handful of barley,spacegate research]
+            //FIXME write coinmasters support, we already parse that
+            foreach it in lookupItems("yellow pixel,handful of barley,spacegate research")
             {
                 if (ingredients[it] > 0)
                 {
