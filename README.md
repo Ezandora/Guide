@@ -3,7 +3,7 @@ Guide
 
 Quick note on updating
 ----------------------
-The "svn update" command currently has a bug which will, on occasion, prevent Guide from updating correctly and not print a warning about it. As such, to update, you may need to run these commands:
+The "svn update" command formerly had a bug which will, on occasion, prevent Guide from updating correctly and not print a warning about it. As such, to update, you may need to run these commands:
 
 <pre>
 svn delete Ezandora-Guide-branches-Release

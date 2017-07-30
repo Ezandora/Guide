@@ -1,5 +1,6 @@
 
 import "relay/Guide/Support/Library 2.ash"
+import "relay/Guide/Support/Ingredients.ash"
 
 RegisterTaskGenerationFunction("IOTMAsdonMartinGenerateTasks");
 void IOTMAsdonMartinGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -30,14 +31,15 @@ void IOTMAsdonMartinGenerateResource(ChecklistEntry [int] resource_entries)
             string [int] fuelables_extended_part_2;
             foreach key, fuelable in fuelables
             {
+                int creatable_amount = fuelable.creatable_amount();
                 string line;
                 line = " (";
-                line += (fuelable.averageAdventuresForConsumable() * fuelable.item_amount()).round();
+                line += (fuelable.averageAdventuresForConsumable() * (creatable_amount + fuelable.item_amount())).round();
                 if (fuelable.item_amount() == 0)
                 {
                     line += ", ";
                     boolean first = true;
-                    foreach it in fuelable.get_ingredients()
+                    foreach it in fuelable.get_ingredients_fast()
                     {
                         if (first)
                             first = false;

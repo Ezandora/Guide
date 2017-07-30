@@ -223,6 +223,8 @@ int BanishLength(string banish_name)
 
 boolean BanishIsActive(string name)
 {
+    //if (name == "Spring-Loaded Front Bumper" && my_turncount() < 137 + 30) return true;
+    //if (name == "Spring-Loaded Front Bumper") abort("It's time.");
     foreach key, banish in BanishesActive()
     {
         if (banish.banish_source == name)

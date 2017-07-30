@@ -454,7 +454,7 @@ item [int] missingComponentsToMakeItemPrivateImplementation(item it, int it_amou
         return result;
 	if (it.available_amount() >= it_amounted_needed)
         return result;
-	int [item] ingredients = get_ingredients(it);
+	int [item] ingredients = get_ingredients_fast(it);
 	if (ingredients.count() == 0)
     {
         for i from 1 to (it_amounted_needed - it.available_amount())
@@ -611,7 +611,7 @@ int delayRemainingInLocation(location place)
         return -1;
     
     int turns_attempted = place.turns_spent;
-        
+    
     return MAX(0, delay_for_place - turns_attempted);
 }
 
@@ -1308,6 +1308,8 @@ float averageAdventuresForConsumable(item it, boolean assume_monday)
 			continue;
 		adventures += a * (1.0 / to_float(adventures_string.count()));
 	}
+    if (it == lookupItem("affirmation cookie"))
+        adventures += 3;
     if (it == $item[White Citadel burger])
     {
         if (in_bad_moon())
@@ -1324,6 +1326,7 @@ float averageAdventuresForConsumable(item it, boolean assume_monday)
 			adventures += 3;
 	}
 	
+    
 	if ($skill[pizza lover].have_skill() && it.to_lower_case().contains_text("pizza"))
 	{
 		adventures += it.fullness;

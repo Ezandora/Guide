@@ -1,4 +1,6 @@
 
+import "relay/Guide/Support/Ingredients.ash"
+
 static
 {
     skill [class][int] __skills_by_class;
@@ -54,7 +56,7 @@ static
             string craft_type = it.craft_type();
             if (craft_type.contains_text("Cooking"))
             {
-                foreach ingredient in it.get_ingredients()
+                foreach ingredient in it.get_ingredients_fast()
                 {
                     __items_that_craft_food[ingredient] = true;
                 }

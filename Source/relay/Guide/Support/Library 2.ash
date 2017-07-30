@@ -2,6 +2,7 @@ import "relay/Guide/Support/LocationAvailable.ash"
 import "relay/Guide/Support/Equipment Requirement.ash"
 import "relay/Guide/Support/HTML.ash"
 import "relay/Guide/Support/Statics 2.ash"
+import "relay/Guide/Support/Ingredients.ash"
 
 
 
@@ -81,35 +82,41 @@ boolean can_equip_outfit(string outfit_name)
 
 
 //Probably not a good place for it:
-boolean asdonMartinFailsFuelableTestsPrivate(item craft, boolean [item] ingredients_blacklisted, item last_recurse_ingredient)
+boolean asdonMartinFailsFuelableTestsPrivate(item craft, boolean [item] ingredients_blacklisted, boolean [item] crafts_seen)
 {
     //if ($items[wad of dough,flat dough] contains craft) return false;
     if (craft.craft_type().contains_text("(fancy)"))
         return true;
+    crafts_seen[craft] = true;
     boolean all_npc = true;
-    foreach it, amount in craft.get_ingredients()
+    foreach it, amount in craft.get_ingredients_fast()
     {
+        //print_html(craft + ": " + it);
         if (ingredients_blacklisted[it]) return true;
+        if (!it.is_npc_item())
+            all_npc = false;
+        
         if (it.item_amount() >= amount) continue;
-        if (it == last_recurse_ingredient) //wad of dough, flat dough, jolly roger charrrm
+        if (crafts_seen[it]) //wad of dough, flat dough, jolly roger charrrm
         {
             continue;
         }
-        if (it.asdonMartinFailsFuelableTestsPrivate(ingredients_blacklisted, craft))
+        if (it.asdonMartinFailsFuelableTestsPrivate(ingredients_blacklisted, crafts_seen))
             return true;
-        if (it.npc_price() == 0)
-            all_npc = false;
     }
-    if (craft.get_ingredients().count() == 0)
+    if (craft.get_ingredients_fast().count() == 0)
         all_npc = false;
     if (all_npc)
+    {
         return true;
+    }
     return false;
 }
 
 boolean asdonMartinFailsFuelableTests(item craft, boolean [item] ingredients_blacklisted)
 {
-    return asdonMartinFailsFuelableTestsPrivate(craft, ingredients_blacklisted, $item[none]);
+    boolean [item] crafts_seen; //slower than a "last item" test, but necessary (spooky wads)
+    return asdonMartinFailsFuelableTestsPrivate(craft, ingredients_blacklisted, crafts_seen);
 }
 
 item [int] asdonMartinGenerateListOfFuelables()
@@ -121,6 +128,9 @@ item [int] asdonMartinGenerateListOfFuelables()
     blacklist[$item[stunt nuts]] = true;
     blacklist[$item[wet stew]] = true; //FIXME I guess maybe not after
     blacklist[$item[goat cheese]] = true;
+    blacklist[$item[source essence]] = true; //that's silly
+    blacklist[$item[white pixel]] = true; //no!
+    blacklist[$item[turkey blaster]] = true;
     blacklist[$item[hot wing]] = true;
     blacklist[$item[glass of goat's milk]] = true;
     blacklist[$item[soft green echo eyedrop antidote martini]] = true; //if it's not created, FIXME
@@ -131,8 +141,11 @@ item [int] asdonMartinGenerateListOfFuelables()
     blacklist[$item[loaf of soda bread]] = true; //elsewhere
     foreach it in $items[hot buttered roll,ketchup,catsup]
         blacklist[it] = true; //hermit
-    foreach it in $items[bottle of gin,bottle of rum,bottle of vodka,bottle of whiskey,bottle of tequila] //too useful for crafting?
-        blacklist[it] = true;
+    if (my_path_id() != PATH_LICENSE_TO_ADVENTURE && inebriety_limit() > 0) //FIXME the test for can drink just about
+    {
+        foreach it in $items[bottle of gin,bottle of rum,bottle of vodka,bottle of whiskey,bottle of tequila] //too useful for crafting?
+            blacklist[it] = true;
+    }
     foreach it in $items[bottle of Calcutta Emerald,bottle of Lieutenant Freeman,bottle of Jorge Sinsonte,bottle of Definit,bottle of Domesticated Turkey,boxed champagne,bottle of Ooze-O,bottle of Pete's Sake,tangerine,kiwi,cocktail onion,kumquat,tonic water,raspberry] //nash crosby's still's results isn't feedable
         blacklist[it] = true;
     foreach it in __pvpable_food_and_drinks
@@ -145,19 +158,22 @@ item [int] asdonMartinGenerateListOfFuelables()
             if (it.creatable_amount() == 0)
                 continue;
             if (it.asdonMartinFailsFuelableTests(blacklist))
+            {
                 continue;
+            }
         }
         if (my_path_id() == PATH_LICENSE_TO_ADVENTURE && false)
         {
             if (it.inebriety > 0 && it.image == "martini.gif")
                 continue;
         }
-        int [item] ingredients = it.get_ingredients();
+        int [item] ingredients = it.get_ingredients_fast();
         if (ingredients.count() > 0)
         {
             boolean reject = false;
             //Various things count as being from a "store":
-            foreach it in $items[yellow pixel,handful of barley]
+            //FIXME write coinmasters support, we already parse that
+            foreach it in lookupItems("yellow pixel,handful of barley,spacegate research")
             {
                 if (ingredients[it] > 0)
                 {
@@ -180,6 +196,6 @@ item [int] asdonMartinGenerateListOfFuelables()
         }
         fuelables.listAppend(it);
     }
-    sort fuelables by -value.averageAdventuresForConsumable() * value.item_amount();
+    sort fuelables by -value.averageAdventuresForConsumable() * ((value.asdonMartinFailsFuelableTests(blacklist) ? 0 : value.creatable_amount()) + value.item_amount());
     return fuelables;
 }

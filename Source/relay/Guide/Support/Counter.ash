@@ -343,7 +343,7 @@ void CountersParseProperty(string property_name, Counter [string] counters, bool
             //if (turns_until_counter >= 0)
             if (true)
             {
-                if (turns_until_counter >= 0 || c.name != "Semi-Rare")
+                if (turns_until_counter >= 0 || c.name != "Semi-rare")
                     c.exact_turns.listAppend(MAX(0, turns_until_counter));
                 sort c.exact_turns by value;
             }
@@ -626,6 +626,20 @@ boolean CounterWanderingMonsterWillHitNextTurn()
             return true;
     }
     return false;
+}
+
+boolean CounterWanderingMonstersCurrentlyActiveAreFree()
+{
+    boolean [monster] monsters = CounterWanderingMonstersActiveNextTurn();
+    if (monsters.count() == 0)
+        return false;
+    foreach m in monsters
+    {
+        //FIXME is zero turn cost?
+        if (!m.monster_has_zero_turn_cost())
+            return false;
+    }
+    return true;
 }
 
 CountersInit();

@@ -96,7 +96,7 @@ void IOTMLibramGenerateResource(ChecklistEntry [int] resource_entries)
 			foreach fight in all_possible_bricko_fights
 			{
                 monster m = fight.to_string().to_monster(); //is there a better way to look this up?
-				int bricks_needed = get_ingredients(fight)[$item[bricko brick]];
+				int bricks_needed = get_ingredients_fast(fight)[$item[bricko brick]];
 				int monster_level = m.raw_attack;
 				int number_available = creatable_amount(fight);
 				if (number_available > 0)

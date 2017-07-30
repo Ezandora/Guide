@@ -130,7 +130,7 @@ void SAftercoreThingsToDoGenerateTasks(ChecklistEntry [int] task_entries, Checkl
         {
             if (haveAtLeastXOfItemEverywhere(loathing_piece, 1))
                 continue;
-            int [item] components = loathing_piece.get_ingredients();
+            int [item] components = loathing_piece.get_ingredients_fast();
             foreach component in components
             {
                 if (total_amount_of_item_wanted contains component) //if this component is part of our class components
