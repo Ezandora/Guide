@@ -2,7 +2,7 @@
 
 since 17.6; //the earliest main release that supports map literals
 //These settings are for development. Don't worry about editing them.
-string __version = "1.4.28";
+string __version = "1.4.31";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -1797,6 +1797,297 @@ element get_property_element(string property)
     return get_property(property).to_element();
 }
 
+
+/*
+Discovery - get_ingredients() takes up to 5.8ms per call, scaling to inventory size. Fixing the code in mafia might be possible, but it's old and looks complicated.
+This implementation is not 1:1 compatible, as it doesn't take into account your current status, but we don't generally need that information(?).
+*/
+
+//Relevant prototype:
+//int [item] get_ingredients_fast(item it)
+
+
+static
+{
+    int [item][item] __item_ingredients;
+}
+
+
+
+boolean parseDatafileItem(int [item] out, string item_name)
+{
+    if (item_name == "") return false;
+    
+    item it = item_name.to_item();
+    if (it != $item[none])
+    {
+        out[it] += 1;
+    }
+    else if (item_name.contains_text("("))
+    {
+        //Do complicated parsing.
+        //NOTE: "CRIMBCO Employee Handbook (chapter 1)" and "snow berries (7)" are both valid entries that mean different things.
+        string [int][int] matches = item_name.group_string("(.*?) \\(([0-9]*)\\)");
+        if (matches[0].count() == 3)
+        {
+            it = matches[0][1].to_item();
+            int amount = matches[0][2].to_int();
+            if (it != $item[none] && amount > 0)
+            {
+                out[it] += amount;
+            }
+        }
+    }
+    return true;
+}
+
+Record ConcoctionMapEntry
+{
+    //Only way I know how to parse this file with file_to_map. string [int] won't work, string [string] won't...
+    string craft_type;
+    string mixing_item_1;
+    string mixing_item_2;
+    string mixing_item_3;
+    string mixing_item_4;
+    string mixing_item_5;
+    string mixing_item_6;
+    string mixing_item_7;
+    string mixing_item_8;
+    string mixing_item_9;
+    string mixing_item_10;
+    string mixing_item_11;
+    string mixing_item_12;
+    string mixing_item_13;
+    string mixing_item_14;
+    string mixing_item_15;
+    string mixing_item_16;
+    string mixing_item_17;
+    string mixing_item_18;
+};
+
+void parseConcoction(int [item] ingredients, ConcoctionMapEntry c)
+{
+    //If this ever shows up somewhere, please understand, it's not my fault file_to_map works this way.
+    if (!parseDatafileItem(ingredients, c.mixing_item_1))
+        return;
+    if (!parseDatafileItem(ingredients, c.mixing_item_2))
+        return;
+    if (!parseDatafileItem(ingredients, c.mixing_item_3))
+        return;
+    if (!parseDatafileItem(ingredients, c.mixing_item_4))
+        return;
+    if (!parseDatafileItem(ingredients, c.mixing_item_5))
+        return;
+    if (!parseDatafileItem(ingredients, c.mixing_item_6))
+        return;
+    if (!parseDatafileItem(ingredients, c.mixing_item_7))
+        return;
+    if (!parseDatafileItem(ingredients, c.mixing_item_8))
+        return;
+    if (!parseDatafileItem(ingredients, c.mixing_item_9))
+        return;
+    if (!parseDatafileItem(ingredients, c.mixing_item_10))
+        return;
+    if (!parseDatafileItem(ingredients, c.mixing_item_11))
+        return;
+    if (!parseDatafileItem(ingredients, c.mixing_item_12))
+        return;
+    if (!parseDatafileItem(ingredients, c.mixing_item_13))
+        return;
+    if (!parseDatafileItem(ingredients, c.mixing_item_14))
+        return;
+    if (!parseDatafileItem(ingredients, c.mixing_item_15))
+        return;
+    if (!parseDatafileItem(ingredients, c.mixing_item_16))
+        return;
+    if (!parseDatafileItem(ingredients, c.mixing_item_17))
+        return;
+    if (!parseDatafileItem(ingredients, c.mixing_item_18))
+        return;
+}
+
+void initialiseItemIngredients()
+{
+    if (__item_ingredients.count() > 0) return;
+    
+    //Parse concoctions:
+    //Highest observed so far: 17.
+    if (true)
+    {
+        string [string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string] concoctions_map_2;
+        file_to_map("data/concoctions.txt", concoctions_map_2);
+        foreach crafting_thing, crafting_type, mixing_item_1, mixing_item_2, mixing_item_3, mixing_item_4, mixing_item_5, mixing_item_6, mixing_item_7, mixing_item_8, mixing_item_9, mixing_item_10, mixing_item_11, mixing_item_12, mixing_item_13, mixing_item_14, mixing_item_15, mixing_item_16, mixing_item_17, mixing_item_18 in concoctions_map_2
+        {
+            if (crafting_type == "SUSHI" || crafting_type == "VYKEA") continue; //not really items
+            item it = crafting_thing.to_item();
+            if (it == $item[none])
+            {
+                int [item] item_results;
+                parseDatafileItem(item_results, crafting_thing);
+                if (item_results.count() == 0)
+                {
+                    //print_html("Unknown crafting_thing " + crafting_thing);
+                    continue;
+                }
+                foreach it2 in item_results
+                    it = it2;
+            }
+            if (__item_ingredients contains it) continue; //mafia uses first defined entry
+            
+            int [item] ingredients;
+            //Create map entry:
+            ConcoctionMapEntry c;
+            c.craft_type = crafting_type;
+            c.mixing_item_1 = mixing_item_1;
+            c.mixing_item_2 = mixing_item_2;
+            c.mixing_item_3 = mixing_item_3;
+            c.mixing_item_4 = mixing_item_4;
+            c.mixing_item_5 = mixing_item_5;
+            c.mixing_item_6 = mixing_item_6;
+            c.mixing_item_7 = mixing_item_7;
+            c.mixing_item_8 = mixing_item_8;
+            c.mixing_item_9 = mixing_item_9;
+            c.mixing_item_10 = mixing_item_10;
+            c.mixing_item_11 = mixing_item_11;
+            c.mixing_item_12 = mixing_item_12;
+            c.mixing_item_13 = mixing_item_13;
+            c.mixing_item_14 = mixing_item_14;
+            c.mixing_item_15 = mixing_item_15;
+            c.mixing_item_16 = mixing_item_16;
+            c.mixing_item_17 = mixing_item_17;
+            c.mixing_item_18 = mixing_item_18;
+            
+            parseConcoction(ingredients, c);
+            
+            if (ingredients.count() > 0)
+                __item_ingredients[it] = ingredients;
+        }
+    }
+    else
+    {
+        //Not compatible.
+        //Concoction manager seems to read the first entry, not the second. file_to_map reads the second. Example: spooky wad.
+        //Or maybe it's just random which the concoction manager uses? Example: bloody beer vs. spooky wad. Or it picks the one we can make...?
+        ConcoctionMapEntry [string] concoctions_map;
+        file_to_map("data/concoctions.txt", concoctions_map);
+        foreach crafting_thing in concoctions_map
+        {
+            ConcoctionMapEntry c = concoctions_map[crafting_thing];
+            item it = crafting_thing.to_item();
+            if (it == $item[none])
+                continue;
+            
+            int [item] ingredients;
+            
+            parseConcoction(ingredients, c);
+            
+            if (__item_ingredients contains it) continue; //mafia uses first defined entry
+            if (ingredients.count() > 0)
+                __item_ingredients[it] = ingredients;
+        }
+    }
+    //Parse coinmasters:
+    
+    /*Record CoinmastersMapEntry
+    {
+        string buy_or_sell_type;
+        int amount;
+        item it;
+        string row_id;
+    };
+    CoinmastersMapEntry [string] coinmasters_map;*/
+    string [string,string,int,string] coinmasters_map;
+    file_to_map("data/coinmasters.txt", coinmasters_map);
+    //print_html("coinmasters_map = " + coinmasters_map.to_json());
+    foreach master_name, type, amount, item_string in coinmasters_map
+    {
+        //FIXME track if coinmaster is accessible?
+        //print_html(master_name + ", " + type + ", " + amount + ", " + item_string);
+        if (type != "buy") continue;
+        coinmaster c = master_name.to_coinmaster();
+        if (c == $coinmaster[none])
+        {
+            //Hmm....
+            //print_html(master_name + " is not a coinmaster");
+            continue;
+        }
+        if (c.item == $item[none]) //bat-fabricator
+            continue;
+        item it = item_string.to_item();
+        if (it == $item[none])
+        {
+            //peppermint tailings (10) at the moment
+            //FIXME write this
+            continue;
+        }
+        
+        if (it == $item[none])
+            continue;
+        
+        if (__item_ingredients contains it) continue;
+        
+        int [item] ingredients;
+        ingredients[c.item] = amount;
+        __item_ingredients[it] = ingredients;
+    }
+    
+}
+
+
+int [item] get_ingredients_fast(item it)
+{
+    //return it.get_ingredients();
+    if (__item_ingredients.count() == 0)
+        initialiseItemIngredients();
+    if (!(__item_ingredients contains it))
+    {
+        //This is six milliseconds per call, but only if the item has an ingredient(?), so be wary:
+        int [item] ground_truth = it.get_ingredients();
+        if (ground_truth.count() > 0) //We could cache it if it's empty, except sometimes that changes.
+            __item_ingredients[it] = ground_truth;
+    }
+    return __item_ingredients[it];
+}
+void testItemIngredients()
+{
+    initialiseItemIngredients();
+    print_html(__item_ingredients.count() + " ingredients known.");
+    foreach it in $items[]
+    {
+        int [item] ground_truth_ingredients = it.get_ingredients();
+        int [item] our_ingredients = get_ingredients_fast(it);
+        if (ground_truth_ingredients.count() == 0 && our_ingredients.count() == 0) continue;
+        
+        boolean passes = true;
+        if (ground_truth_ingredients.count() != our_ingredients.count())
+        {
+            passes = false;
+            if (ground_truth_ingredients.count() == 0 && our_ingredients.count() > 0) //probably just a coinmaster
+                continue;
+        }
+        else
+        {
+            foreach it2, amount in ground_truth_ingredients
+            {
+                if (our_ingredients[it2] != amount)
+                {
+                    passes = false;
+                    break;
+                }
+            }
+        }
+        if (!passes)
+        {
+            print_html(it + ": " + ground_truth_ingredients.to_json() + " vs " + our_ingredients.to_json());
+        }
+    }
+}
+
+void main()
+{
+    testItemIngredients();
+}
+
 static
 {
     skill [class][int] __skills_by_class;
@@ -1852,7 +2143,7 @@ static
             string craft_type = it.craft_type();
             if (craft_type.contains_text("Cooking"))
             {
-                foreach ingredient in it.get_ingredients()
+                foreach ingredient in it.get_ingredients_fast()
                 {
                     __items_that_craft_food[ingredient] = true;
                 }
@@ -2414,7 +2705,7 @@ item [int] missingComponentsToMakeItemPrivateImplementation(item it, int it_amou
         return result;
 	if (it.available_amount() >= it_amounted_needed)
         return result;
-	int [item] ingredients = get_ingredients(it);
+	int [item] ingredients = get_ingredients_fast(it);
 	if (ingredients.count() == 0)
     {
         for i from 1 to (it_amounted_needed - it.available_amount())
@@ -2571,7 +2862,7 @@ int delayRemainingInLocation(location place)
         return -1;
     
     int turns_attempted = place.turns_spent;
-        
+    
     return MAX(0, delay_for_place - turns_attempted);
 }
 
@@ -2740,7 +3031,8 @@ Record FloatHandle
 buffer generateTurnsToSeeNoncombat(int combat_rate, int noncombats_in_zone, string task, int max_turns_between_nc, int extra_starting_turns)
 {
     float turn_estimation = -1.0;
-    float noncombat_rate = 1.0 - (combat_rate + combat_rate_modifier()).to_float() / 100.0;
+    float combat_rate_modifier = combat_rate_modifier();
+    float noncombat_rate = 1.0 - (combat_rate + combat_rate_modifier).to_float() / 100.0;
     
     
     if (noncombats_in_zone > 0)
@@ -2794,7 +3086,7 @@ buffer generateTurnsToSeeNoncombat(int combat_rate, int noncombats_in_zone, stri
     if (noncombats_in_zone > 0)
     {
         result.append(" at ");
-        result.append(combat_rate_modifier().floor());
+        result.append(combat_rate_modifier.floor());
         result.append("% combat rate");
     }
     result.append(".");
@@ -3267,6 +3559,8 @@ float averageAdventuresForConsumable(item it, boolean assume_monday)
 			continue;
 		adventures += a * (1.0 / to_float(adventures_string.count()));
 	}
+    if (it == lookupItem("affirmation cookie"))
+        adventures += 3;
     if (it == $item[White Citadel burger])
     {
         if (in_bad_moon())
@@ -3283,6 +3577,7 @@ float averageAdventuresForConsumable(item it, boolean assume_monday)
 			adventures += 3;
 	}
 	
+    
 	if ($skill[pizza lover].have_skill() && it.to_lower_case().contains_text("pizza"))
 	{
 		adventures += it.fullness;
@@ -4113,7 +4408,7 @@ void CountersParseProperty(string property_name, Counter [string] counters, bool
             //if (turns_until_counter >= 0)
             if (true)
             {
-                if (turns_until_counter >= 0 || c.name != "Semi-Rare")
+                if (turns_until_counter >= 0 || c.name != "Semi-rare")
                     c.exact_turns.listAppend(MAX(0, turns_until_counter));
                 sort c.exact_turns by value;
             }
@@ -4396,6 +4691,20 @@ boolean CounterWanderingMonsterWillHitNextTurn()
             return true;
     }
     return false;
+}
+
+boolean CounterWanderingMonstersCurrentlyActiveAreFree()
+{
+    boolean [monster] monsters = CounterWanderingMonstersActiveNextTurn();
+    if (monsters.count() == 0)
+        return false;
+    foreach m in monsters
+    {
+        //FIXME is zero turn cost?
+        if (!m.monster_has_zero_turn_cost())
+            return false;
+    }
+    return true;
 }
 
 CountersInit();
@@ -5988,6 +6297,7 @@ string HTMLGreyOutTextUnlessTrue(string text, boolean conditional)
 
 
 
+
 string HTMLGenerateFutureTextByLocationAvailability(string base_text, location place)
 {
     if (!place.locationAvailable() && place != $location[none])
@@ -6064,26 +6374,41 @@ boolean can_equip_outfit(string outfit_name)
 
 
 //Probably not a good place for it:
-boolean asdonMartinPassesFuelableTests(item craft, boolean [item] ingredients_blacklisted)
+boolean asdonMartinFailsFuelableTestsPrivate(item craft, boolean [item] ingredients_blacklisted, boolean [item] crafts_seen)
 {
-    if ($items[wad of dough,flat dough] contains craft) return false;
+    //if ($items[wad of dough,flat dough] contains craft) return false;
     if (craft.craft_type().contains_text("(fancy)"))
         return true;
+    crafts_seen[craft] = true;
     boolean all_npc = true;
-    foreach it, amount in craft.get_ingredients()
+    foreach it, amount in craft.get_ingredients_fast()
     {
+        //print_html(craft + ": " + it);
         if (ingredients_blacklisted[it]) return true;
-        if (it.item_amount() >= amount) continue;
-        if (it.asdonMartinPassesFuelableTests(ingredients_blacklisted))
-            return true;
-        if (it.npc_price() == 0)
+        if (!it.is_npc_item())
             all_npc = false;
+        
+        if (it.item_amount() >= amount) continue;
+        if (crafts_seen[it]) //wad of dough, flat dough, jolly roger charrrm
+        {
+            continue;
+        }
+        if (it.asdonMartinFailsFuelableTestsPrivate(ingredients_blacklisted, crafts_seen))
+            return true;
     }
-    if (craft.get_ingredients().count() == 0)
+    if (craft.get_ingredients_fast().count() == 0)
         all_npc = false;
     if (all_npc)
+    {
         return true;
+    }
     return false;
+}
+
+boolean asdonMartinFailsFuelableTests(item craft, boolean [item] ingredients_blacklisted)
+{
+    boolean [item] crafts_seen; //slower than a "last item" test, but necessary (spooky wads)
+    return asdonMartinFailsFuelableTestsPrivate(craft, ingredients_blacklisted, crafts_seen);
 }
 
 item [int] asdonMartinGenerateListOfFuelables()
@@ -6095,6 +6420,9 @@ item [int] asdonMartinGenerateListOfFuelables()
     blacklist[$item[stunt nuts]] = true;
     blacklist[$item[wet stew]] = true; //FIXME I guess maybe not after
     blacklist[$item[goat cheese]] = true;
+    blacklist[$item[source essence]] = true; //that's silly
+    blacklist[$item[white pixel]] = true; //no!
+    blacklist[$item[turkey blaster]] = true;
     blacklist[$item[hot wing]] = true;
     blacklist[$item[glass of goat's milk]] = true;
     blacklist[$item[soft green echo eyedrop antidote martini]] = true; //if it's not created, FIXME
@@ -6105,32 +6433,38 @@ item [int] asdonMartinGenerateListOfFuelables()
     blacklist[$item[loaf of soda bread]] = true; //elsewhere
     foreach it in $items[hot buttered roll,ketchup,catsup]
         blacklist[it] = true; //hermit
-    foreach it in $items[bottle of gin,bottle of rum,bottle of vodka,bottle of whiskey,bottle of tequila] //too useful for crafting?
+    if (my_path_id() != PATH_LICENSE_TO_ADVENTURE && inebriety_limit() > 0) //FIXME the test for can drink just about
+    {
+        foreach it in $items[bottle of gin,bottle of rum,bottle of vodka,bottle of whiskey,bottle of tequila] //too useful for crafting?
+            blacklist[it] = true;
+    }
+    foreach it in $items[bottle of Calcutta Emerald,bottle of Lieutenant Freeman,bottle of Jorge Sinsonte,bottle of Definit,bottle of Domesticated Turkey,boxed champagne,bottle of Ooze-O,bottle of Pete's Sake,tangerine,kiwi,cocktail onion,kumquat,tonic water,raspberry] //nash crosby's still's results isn't feedable
         blacklist[it] = true;
-    blacklist[$item[bowl of scorpions]] = true; //weirdness, npc_price() didn't work...?
     foreach it in __pvpable_food_and_drinks
     {
         if (blacklist[it]) continue;
-        if (it.npc_price() > 0) continue;
+        if (it.is_npc_item()) continue;
         if (it.historical_price() >= 20000) continue;
         if (it.item_amount() == 0)
         {
             if (it.creatable_amount() == 0)
                 continue;
-            if (it.asdonMartinPassesFuelableTests(blacklist))
+            if (it.asdonMartinFailsFuelableTests(blacklist))
+            {
                 continue;
+            }
         }
         if (my_path_id() == PATH_LICENSE_TO_ADVENTURE && false)
         {
             if (it.inebriety > 0 && it.image == "martini.gif")
                 continue;
         }
-        int [item] ingredients = it.get_ingredients();
+        int [item] ingredients = it.get_ingredients_fast();
         if (ingredients.count() > 0)
         {
             boolean reject = false;
             //Various things count as being from a "store":
-            foreach it in $items[yellow pixel,handful of barley]
+            foreach it in $items[yellow pixel,handful of barley,spacegate research]
             {
                 if (ingredients[it] > 0)
                 {
@@ -6153,7 +6487,7 @@ item [int] asdonMartinGenerateListOfFuelables()
         }
         fuelables.listAppend(it);
     }
-    sort fuelables by -value.averageAdventuresForConsumable();
+    sort fuelables by -value.averageAdventuresForConsumable() * ((value.asdonMartinFailsFuelableTests(blacklist) ? 0 : value.creatable_amount()) + value.item_amount());
     return fuelables;
 }
 
@@ -11658,6 +11992,8 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         exploration_per_turn += 2.0; //FIXME make completely accurate for first turn? not enough information available
     else if ($item[uv-resistant compass].available_amount() > 0)
         exploration_per_turn += 1.0;
+    if (my_path_id() == PATH_LICENSE_TO_ADVENTURE && get_property_boolean("bondDesert"))
+        exploration_per_turn += 2.0;
     
     boolean have_blacklight_bulb = (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE && get_property("peteMotorbikeHeadlight") == "Blacklight Bulb");
     if (have_blacklight_bulb)
@@ -14049,7 +14385,7 @@ void QLevel12GenerateBattlefieldDescription(ChecklistSubentry subentry, string s
         line += "|*" + pluralise(turns_to_reach, "turn", "turns") + " (" + pluralise(enemies_to_defeat_for_unlock, enemy_name, enemy_name_plural) + ") to unlock " + area_to_unlock + ".";
     }
     
-    if (areas_unlocked_but_not_completed.count() > 0)
+    if (areas_unlocked_but_not_completed.count() > 0 && enemies_remaining > 0)
         line += "|*Quests accessible: " + areas_unlocked_but_not_completed.listJoinComponents(", ", "and") + ".";
     
     subentry.entries.listAppend(line);
@@ -25476,7 +25812,7 @@ void SAftercoreThingsToDoGenerateTasks(ChecklistEntry [int] task_entries, Checkl
         {
             if (haveAtLeastXOfItemEverywhere(loathing_piece, 1))
                 continue;
-            int [item] components = loathing_piece.get_ingredients();
+            int [item] components = loathing_piece.get_ingredients_fast();
             foreach component in components
             {
                 if (total_amount_of_item_wanted contains component) //if this component is part of our class components
@@ -28008,6 +28344,8 @@ int BanishLength(string banish_name)
 
 boolean BanishIsActive(string name)
 {
+    //if (name == "Spring-Loaded Front Bumper" && my_turncount() < 137 + 30) return true;
+    //if (name == "Spring-Loaded Front Bumper") abort("It's time.");
     foreach key, banish in BanishesActive()
     {
         if (banish.banish_source == name)
@@ -28508,7 +28846,7 @@ void SCalculateUniverseGenerateResource(ChecklistEntry [int] resource_entries)
             //FIXME 18, 44, 75, and 99 are all valid for this - pick whichever we can summon now?
             useful_digits_and_their_reasons[99] = "base booze for perfect ice cube";
         }
-        if (__quest_state["Level 5"].mafia_internal_step < 3 && have_outfit_components("Knob Goblin Harem Girl Disguise") && $item[Knob Goblin Perfume].available_amount() == 0 && $effect[Knob Goblin Perfume].have_effect() == 0 && in_ronin())
+        if (__quest_state["Level 5"].mafia_internal_step < 3 && $item[Knob Goblin Perfume].available_amount() == 0 && $effect[Knob Goblin Perfume].have_effect() == 0 && in_ronin()) //have_outfit_components("Knob Goblin Harem Girl Disguise")
         {
             useful_digits_and_their_reasons[9] = "knob goblin perfume for boss fight";
         }
@@ -30215,7 +30553,7 @@ void generatePullList(Checklist [int] checklists)
         }
         else if (my_primestat() == $stat[moxie])
         {
-            pullable_item_list.listAppend(GPItemMake($item[backwoods banjo], "+25% to mainstat gain, 2h weapon."));
+            pullable_item_list.listAppend(GPItemMake($item[backwoods banjo], "+20% to mainstat gain, 2h weapon."));
             pullable_item_list.listAppend(GPItemMake($item[green LavaCo Lamp&trade;], "+5 adventures, 50 turns of +50% mainstat gain after rollover."));
             if (my_path_id() == PATH_THE_SOURCE)
                 pullable_item_list.listAppend(GPItemMake($item[wal-mart overalls], "+4 mainstat/fight"));
@@ -39766,7 +40104,7 @@ void IOTMLibramGenerateResource(ChecklistEntry [int] resource_entries)
 			foreach fight in all_possible_bricko_fights
 			{
                 monster m = fight.to_string().to_monster(); //is there a better way to look this up?
-				int bricks_needed = get_ingredients(fight)[$item[bricko brick]];
+				int bricks_needed = get_ingredients_fast(fight)[$item[bricko brick]];
 				int monster_level = m.raw_attack;
 				int number_available = creatable_amount(fight);
 				if (number_available > 0)
@@ -42503,7 +42841,8 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
         }
         if (potential_targets.count() > 0)
             description.listAppend("Could use on a " + potential_targets.listJoinComponents(", ", "or") + ".");
-        
+        if (lookupItem("exploding cigar").item_amount() > 0)
+            description.listAppend("Use exploding cigar immediately after to win the fight.");
         string title = "Duplication castable";
         if (total_duplicate_uses_available > 1)
         {
@@ -43491,6 +43830,7 @@ void IOTMKGBriefcaseGenerateResource(ChecklistEntry [int] resource_entries)
 
 
 
+
 RegisterTaskGenerationFunction("IOTMAsdonMartinGenerateTasks");
 void IOTMAsdonMartinGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
@@ -43520,14 +43860,15 @@ void IOTMAsdonMartinGenerateResource(ChecklistEntry [int] resource_entries)
             string [int] fuelables_extended_part_2;
             foreach key, fuelable in fuelables
             {
+                int creatable_amount = fuelable.creatable_amount();
                 string line;
                 line = " (";
-                line += fuelable.averageAdventuresForConsumable().round();
+                line += (fuelable.averageAdventuresForConsumable() * (creatable_amount + fuelable.item_amount())).round();
                 if (fuelable.item_amount() == 0)
                 {
                     line += ", ";
                     boolean first = true;
-                    foreach it in fuelable.get_ingredients()
+                    foreach it in fuelable.get_ingredients_fast()
                     {
                         if (first)
                             first = false;
@@ -43552,6 +43893,8 @@ void IOTMAsdonMartinGenerateResource(ChecklistEntry [int] resource_entries)
                 if (!__misc_state["can eat just about anything"] && fuelable.fullness > 0)
                     cannot_consume_anyways = true;
                 if (!__misc_state["can drink just about anything"] && fuelable.inebriety > 0 && !(my_path_id() == PATH_LICENSE_TO_ADVENTURE && fuelable.image == "martini.gif"))
+                    cannot_consume_anyways = true;
+                if (!fuelable.is_unrestricted())
                     cannot_consume_anyways = true;
                 if (cannot_consume_anyways)
                     desired_colour = "#999999";
@@ -43591,6 +43934,18 @@ void IOTMAsdonMartinGenerateResource(ChecklistEntry [int] resource_entries)
         if (entry.url == "")
             entry.url = "campground.php?action=workshed";
         entry.subentries.listAppend(ChecklistSubentryMake("Asdon Missile", "", "Costs 100 fuel, instakill + YR-equivalent."));
+    }
+    if (BanishIsActive("Spring-Loaded Front Bumper"))
+    {
+        Banish b = BanishByName("Spring-Loaded Front Bumper");
+        int turns_left = b.banish_turn_length - (my_turncount() - b.turn_banished);
+        
+        if (turns_left > 0 && turns_left <= 30)
+        {
+            entry.subentries.listAppend(ChecklistSubentryMake(pluralise(turns_left, "turn", "turns") + " to next asdon bumper", "", "Banish/runaway."));
+            if (entry.image_lookup_name == "")
+                entry.image_lookup_name = "__item Asdon Martin keyfob";
+        }
     }
     if (entry.subentries.count() > 0)
     {
@@ -43882,7 +44237,7 @@ void PathActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] resource_entr
             resource_entries.listAppend(ChecklistEntryMake(image_name, "", subentries, 6));
     }
     
-    if ($skill[Lash of the cobra].have_skill() && mafiaIsPastRevision(15553) || true)
+    if ($skill[Lash of the cobra].have_skill() && mafiaIsPastRevision(15553))
     {
         int lashes_remaining = 30 - get_property_int("_edLashCount");
         if (lashes_remaining > 0)
