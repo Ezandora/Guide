@@ -177,6 +177,123 @@ void PathActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, Ch
         optional_task_entries.listAppend(ChecklistEntryMake(image_name, "place.php?whichplace=edbase&action=edbase_book", ChecklistSubentryMake("Buy Undying skills", "", description_buy_skills)));
     }
 
+    int spleen_limit = spleen_limit();
+    if ( spleen_limit < 35 )
+    {
+        /* The absolutely most important, crucial thing to do is get
+           Ed to have as many adventures as possible.  That mostly
+           involves upgrading his spleen.
+
+           This next bit sorts out how many adventures need to be
+           spent to purchase the spleen, AND the haunch to fill it...
+           ...and the oft-forgotten extra adventure to actually buy it all.
+           Nothing worse than having the exact amount of Ka, but 0 adventures
+           left, so no access to the underworld.
+         */
+        int ka_needed_for_spleen = 0;
+        int available_ka = $item[Ka coin].available_amount();
+        string [int] description;
+
+        if ( spleen_limit == 5 )
+        {
+            /* Extra Spleen */
+            description.listAppend("Buy an extra spleen (5 Ka)");
+            ka_needed_for_spleen += 5;
+        }
+        else if ( spleen_limit == 10 )
+        {
+            /* Another Extra Spleen */
+            description.listAppend("Buy another extra spleen (10 Ka)");
+            ka_needed_for_spleen += 10;
+        }
+        else if ( spleen_limit == 15 )
+        {
+            /* Yet Another Extra Spleen */
+            description.listAppend("Buy yet another extra spleen (15 Ka)");
+            ka_needed_for_spleen += 15;
+        }
+        else if ( spleen_limit == 20 )
+        {
+            /* Still Another Extra Spleen */
+            description.listAppend("Buy still another extra spleen (20 Ka)");
+            ka_needed_for_spleen += 20;
+        }
+        else if ( spleen_limit == 25 )
+        {
+            /* Just One More Extra Spleen */
+            description.listAppend("Buy just one more extra spleen (25 Ka)");
+            ka_needed_for_spleen += 25;
+        }
+        else if ( spleen_limit == 30 )
+        {
+            /* TODO worth recommending getting the liver and|or stomach here */
+            /* The Final Spleen */
+            description.listAppend("Buy the final spleen (30 Ka)");
+            ka_needed_for_spleen += 30;
+        }
+
+        int total_adventures_needed = 1; /* to go actually buy this stuff */
+
+        available_ka -= ka_needed_for_spleen;
+        if ( available_ka < 0 )
+        {
+            int adventures_needed_farming_for_spleen
+                = ceil(ka_needed_for_spleen.to_float() / 2.0);
+            description.listAppend("Have to spend " + adventures_needed_farming_for_spleen + " adventures farming at 2 Ka per adventure");
+            total_adventures_needed += adventures_needed_farming_for_spleen;
+        }
+
+        if ( available_ka < 0 )
+            available_ka = 0;
+
+        int [item] spleen_item_to_ka;
+        spleen_item_to_ka[ $item[mummified fig]           ] =  5;
+        spleen_item_to_ka[ $item[mummified loaf of bread] ] = 10;
+        spleen_item_to_ka[ $item[mummified beef haunch]   ] = 15;
+        string consumable_desc = "";
+        foreach spleen_item in $items[mummified beef haunch, mummified loaf of bread, mummified fig]
+        {
+            if (spleen_item.available_amount() > 0)
+                break;
+            int ka_cost = spleen_item_to_ka[spleen_item];
+
+            if ( available_ka > ka_cost ) /* got enough for a consumable */
+                break;
+
+            int adventures_needed = ceil((ka_cost-available_ka).to_float() / 2.0);
+
+            if ( consumable_desc.length() > 0 )
+            {
+                consumable_desc += ", or ";
+            }
+            else
+            {
+                total_adventures_needed += adventures_needed;
+            }
+            consumable_desc += "+" + adventures_needed + " adventures for a " + spleen_item.to_string();
+        }
+
+        if ( consumable_desc.length() > 0 )
+            description.listAppend("Plus " + consumable_desc);
+
+        description.listAppend("1 adventure needed to go to the underworld");
+
+        string running_out_of_adventures = "";
+        int adventures_left = my_adventures();
+        if (
+            total_adventures_needed < adventures_left
+                &&
+            total_adventures_needed > (adventures_left-5)
+        ) {
+            // running out of adventures, farm now!
+            running_out_of_adventures = "red";
+        }
+
+        description.listAppend(HTMLGenerateSpanFont("Total adventures needed: ~" + total_adventures_needed, running_out_of_adventures));
+
+        task_entries.listAppend(ChecklistEntryMake("__skill extra spleen", "", ChecklistSubentryMake("Upgrade spleen for more adventures", "", description), 0));
+    }
+
     if (my_level() >= 13 && QuestState("questL13Final").finished)
     {
         if ($item[7965].available_amount() > 0 || $item[2334].available_amount() > 0) //holy macguffins
