@@ -168,23 +168,55 @@ void PathActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] resource_entr
         ka_table.listAppend(listMake("talisman of Renenutet", 1, "+lots item for one combat"));
         //body upgrades:
         string [int][int] skill_upgrade_order;
+
+        // Upgraded legs allows for early farming of hippies/pirates, so
+        // it should be priority number one
+        skill_upgrade_order.listAppend(listMake("Upgraded Legs", 10, "+50% init"));
         skill_upgrade_order.listAppend(listMake("Extra Spleen", 5, "+5 spleen"));
         skill_upgrade_order.listAppend(listMake("Another Extra Spleen", 10, "+5 spleen"));
         skill_upgrade_order.listAppend(listMake("Yet Another Extra Spleen", 15, "+5 spleen"));
         skill_upgrade_order.listAppend(listMake("Still Another Extra Spleen", 20, "+5 spleen"));
-        skill_upgrade_order.listAppend(listMake("Replacement Stomach", 30, "+5 stomach")); //fortune cookie
+
+        /* XXX might want liver early anyway, as it allows for overdrinking */
+        boolean early_liver = false;
+        if (
+            $item[astral six-pack].is_unrestricted()
+                ||
+            $item[astral pilsner].is_unrestricted()
+        ) {
+            early_liver = true;
+            //Got astral booze
+            skill_upgrade_order.listAppend(listMake("Replacement Liver", 30, "can drink"));
+        }
+        else {
+            skill_upgrade_order.listAppend(listMake("Replacement Stomach", 30, "+5 stomach")); //fortune cookie
+        }
+
         skill_upgrade_order.listAppend(listMake("Just One More Extra Spleen", 25, "+5 spleen"));
         skill_upgrade_order.listAppend(listMake("Okay Seriously, This is the Last Spleen", 30, "+5 spleen"));
-        skill_upgrade_order.listAppend(listMake("Replacement Liver", 30, "can drink"));
-        skill_upgrade_order.listAppend(listMake("Upgraded Legs", 10, "+50% init"));
+
+        if ( !early_liver ) {
+            skill_upgrade_order.listAppend(listMake("Replacement Liver", 30, "can drink"));
+        }
+        else {
+            //Got astral booze
+            skill_upgrade_order.listAppend(listMake("Replacement Stomach", 30, "+5 stomach")); //fortune cookie
+        }
+
         skill_upgrade_order.listAppend(listMake("More Legs", 20, "+50% init"));
+        // Wards can come in late; mainly useful for Big Mountain & A-boo
         skill_upgrade_order.listAppend(listMake("Elemental Wards", 10, "+1 all res"));
         skill_upgrade_order.listAppend(listMake("More Elemental Wards", 20, "+2 all res"));
+        // DA & DR are useful during the war; allows flyers & magnet on
+        // the gremlins for example.
         skill_upgrade_order.listAppend(listMake("Tougher Skin", 10, "+100 DA"));
+        skill_upgrade_order.listAppend(listMake("Armor Plating", 10, "+10 DR")); //marginal
+
+        // A-boo
         skill_upgrade_order.listAppend(listMake("Even More Elemental Wards", 30, "+3 all res"));
+
         skill_upgrade_order.listAppend(listMake("Upgraded Spine", 20, "+50% moxie"));
         skill_upgrade_order.listAppend(listMake("Upgraded Arms", 20, "+50% muscle"));
-        skill_upgrade_order.listAppend(listMake("Armor Plating", 10, "+10 DR")); //marginal
         //skill_upgrade_order.listAppend(listMake("Bone Spikes", 20));
         //skill_upgrade_order.listAppend(listMake("Arm Blade", 20));
         //skill_upgrade_order.listAppend(listMake("Healing Scarabs")); //only useful if it prevents beaten up from non-combats?
