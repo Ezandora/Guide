@@ -3,27 +3,180 @@ RegisterTaskGenerationFunction("PathActuallyEdtheUndyingGenerateTasks");
 void PathActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     if (my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING) return;
-    
-    int skills_available = MIN(15, my_level()) - MIN(15, my_level()) / 3 + get_property_int("edPoints"); //assumption
-    
-    skills_available = MIN(21, skills_available);
-    
-    int skills_have = 0;
+
+    // points from previous Ed ascensions, or talismans of Seshats.
+    int initial_points = get_property_int("edPoints");
+
+    int skills_available = initial_points;
+    int total_skills     = 0;
+
+    // Skills are granted on every level, up to 14, except those divisible by 3
+    for i from 1 to my_level()
+    {
+        if (i > 14)
+            break;
+        if ( (i % 3) != 0 ) {
+            skills_available++;
+        }
+    }
+
+/*
+    CHEATSHEET:
+    17000 Prayer of Seshat
+    17001 Wisdom of Thoth
+    17002 Power of Heka
+    17003 Hide of Sobek
+    17004 Blessing of Serqet
+    17005 Shelter of Shed
+    17006 Bounty of Renenutet
+    17007 Fist of the Mummy
+    17008 Howl of the Jackal
+    17009 Roar of the Lion
+    17010 Storm of the Scarab
+    17011 Purr of the Feline
+    17012 Lash of the Cobra
+    17013 Wrath of Ra
+    17014 Curse of the Marshmallow
+    17015 Curse of Indecision
+    17016 Curse of Yuck
+    17017 Curse of Heredity
+    17018 Curse of Fortune
+    17019 Curse of Vacation
+    17020 Curse of Stench
+*/
+
+    boolean [int] skills_to_always_keep_active;
+    // No reason to ever run without Prayer of Seshat,
+    // few enough reasons for the other two that we might as
+    // well recommend them too
+    foreach s in $ints[17000, 17001, 17002, 17004]
+    {
+        skills_to_always_keep_active[s] = true;
+    }
+
+    string [int] skill_id_to_useful_desc;
+    //Prayer of Seshat
+    skill_id_to_useful_desc[17000] = "+3 myst substat per fight";
+    //Wisdom of Thoth
+    skill_id_to_useful_desc[17001] = "+10 Myst, +50% Myst";
+    //Power of Heka
+    skill_id_to_useful_desc[17002] = "Increased spell damage";
+    //Fist of the Mummy
+    skill_id_to_useful_desc[17007] = "Main attack spell, damage equals buffed Myst, up to 50";
+    //+ML
+    skill_id_to_useful_desc[17004] = "+20 ML, +" + roundForOutput(20 * __misc_state_float["ML to mainstat multiplier"], 2) + " mainstats/turn";
+
+    // Skill upgrades:
+    skill [int] skill_order;
+
+    boolean [skill] skills_recommended;
+    if ( initial_points < 6 ) {
+        /* First times as Ed; player will have 9 skills by level 13:
+           Recommend:
+            1. Prayer               (+ substats)                | level 1
+            2. Fist                 (main attack)               | level 2
+            3. Wisdom               (+ myst)                    | level 4
+            4. Power of Heka        (+ spellpower for Fist)     | level 5
+            5. Hide of Sobek        (+ elemental resist)        | level 7
+            6. Blessing of Serqet   (+20 ML)                    | level 8
+            7. Shelter of Shed      (-combat)                   | level 10
+            8. Bounty of Renenutet  (+50% item drop)            | level 11
+            9. whatever                                         | level 13
+            10. whatever                                        | level 14
+
+            With more skill points we might be able to do something
+            fancier, but pickpocket or yellow ray will not be as
+            useful as the +20 ML (stats, oily peak) or -combat (mcguffin);
+            +50% item drop + talisman of Renenutet + potentially the dancer
+            helps immensely in getting the glands, and may offset the
+            lack of a straight pickpocket.
+        */
+        /* XXX TODO BAD ASSUMPTION: no access to CI, chateau, etc, which
+           probably change the picture significantly.
+        */
+        foreach s in lookupSkillsInt($ints[17000, 17007, 17001, 17002, 17003, 17004, 17005, 17006])
+        {
+            skills_recommended[s] = true;
+            skill_order.listAppend(s);
+        }
+    }
+
     foreach s in lookupSkillsInt($ints[17000,17001,17002,17003,17004,17005,17006,17007,17008,17009,17010,17011,17012,17013,17014,17015,17016,17017,17018,17019,17020])
     {
-        if (s.skill_is_usable())
-            skills_have += 1;
+        if ( skills_recommended[s] ) /* already in the recommendations */
+            continue;
+        skill_order.listAppend(s);
     }
-    //FIXME describe what the next three skills do...?
-    
-    if (skills_available > skills_have)
+
+    skill [int] skill_recommendations;
+
+    foreach key in skill_order
     {
-        string image_name = "__skill wisdom of thoth";
-        string [int] description;
-        description.listAppend("At least " + pluraliseWordy(skills_available - skills_have, "skill", "skills") + " available.");
-        optional_task_entries.listAppend(ChecklistEntryMake(image_name, "place.php?whichplace=edbase&action=edbase_book", ChecklistSubentryMake("Buy Undying skills", "", description), 11));
+        skill s = skill_order[key];
+        if ( s.skill_is_usable() )
+        {
+            int skill_as_int    = s.to_int();
+            boolean keep_active = skills_to_always_keep_active[ skill_as_int ];
+            skills_available--;
+            total_skills++;
+            if ( !keep_active )
+                continue;
+
+            /* This skill is just so good that we recommend they keep it on */
+
+            string skill_name   = s.to_string();
+            effect skill_effect = lookupEffect(skill_name);
+
+            if ( skill_effect.have_effect() > 0 )
+                continue;
+
+            string image_name       = "__skill " + skill_name.to_lower_case();
+            string nice_description = skill_id_to_useful_desc[skill_as_int];
+            string [int] description;
+            description.listAppend(skill_name + " is available but not in effect. " + nice_description);
+
+            string url = "runskillz.php?action=Skillz&whichskill=" + skill_as_int + "&targetplayer=" + my_id() + "&pwd=" + my_hash() + "&quantity=1";
+
+            optional_task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake("Make Ed's life easier", "10 turns", description), -1));
+        }
+        else if ( skill_recommendations.count() < 3 )
+        {
+            /*  A skill they don't have.  Score! */
+            skill_recommendations.listAppend(s);
+        }
     }
-    
+
+    /* Go over skills they don't have, recommend up to 3 */
+    string image_name = "";
+    string [int] description_buy_skills;
+    foreach idx, s in skill_recommendations
+    {
+        skills_available--;
+        if ( total_skills > 20 || skills_available < 0 )
+            break; /* they got all of them, or they have no points */
+
+        total_skills++;
+
+        string skill_name       = s.to_string();
+        int skill_as_int        = s.to_int_silent();
+        string nice_description = skill_id_to_useful_desc[skill_as_int];
+
+        string skill_effect = lookupEffect(skill_name).to_string();
+
+        if ( image_name.length() == 0 )
+            image_name = "__skill " + skill_name.to_lower_case();
+
+        if ( nice_description.length() > 0 )
+            skill_name += ": " + nice_description;
+
+        description_buy_skills.listAppend(skill_name);
+    }
+
+    if ( image_name.length() > 0 ) {
+        description_buy_skills.listPrepend("Recommended progression: ");
+        optional_task_entries.listAppend(ChecklistEntryMake(image_name, "place.php?whichplace=edbase&action=edbase_book", ChecklistSubentryMake("Buy Undying skills", "", description_buy_skills)));
+    }
+
     if (my_level() >= 13 && QuestState("questL13Final").finished)
     {
         if ($item[7965].available_amount() > 0 || $item[2334].available_amount() > 0) //holy macguffins
