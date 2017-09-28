@@ -246,7 +246,13 @@ void PathActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] resource_entr
             places_to_farm_ka.listAppend("hippy camp");
             if (url.length() == 0) url = $location[hippy camp].getClickableURLForLocation();
         }
-        
+
+        if ( !__misc_state["mysterious island available"] )
+        {
+            places_to_farm_ka.listAppend("The Sleazy Back Alley (at ~1.5 Ka/adv, best to use the time unlocking the hippy camp)");
+            if (url.length() == 0) url = $location[The Sleazy Back Alley].getClickableURLForLocation();
+        }
+
         if (places_to_farm_ka.count() > 0)
             description.listAppend("Could farm ka in the " + places_to_farm_ka.listJoinComponents(", ", "or") + ".");
         
