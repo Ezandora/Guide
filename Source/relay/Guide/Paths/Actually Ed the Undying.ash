@@ -94,8 +94,10 @@ void PathActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, Ch
         /* XXX TODO BAD ASSUMPTION: no access to CI, chateau, etc, which
            probably change the picture significantly.
         */
-        foreach s in lookupSkillsInt($ints[17000, 17007, 17001, 17002, 17003, 17004, 17005, 17006])
+        /* CANNOT use lookupSkillsInt here, will return the wrong order! */
+        foreach i in $ints[17000, 17007, 17001, 17002, 17003, 17004, 17005, 17006]
         {
+            skill s = i.to_skill();
             skills_recommended[s] = true;
             skill_order.listAppend(s);
         }
