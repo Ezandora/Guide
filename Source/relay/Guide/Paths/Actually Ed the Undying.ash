@@ -180,7 +180,7 @@ void PathActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, Ch
     }
 
     int spleen_limit = spleen_limit();
-    if ( spleen_limit < 35 )
+    if ( spleen_limit > 0 && spleen_limit < 35 ) // spleen becomes 0 when in the underworld
     {
         /* The absolutely most important, crucial thing to do is get
            Ed to have as many adventures as possible.  That mostly
