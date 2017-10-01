@@ -29,6 +29,8 @@ void initialiseIOTMsUsable()
         __iotms_usable[$item[X-32-F snowman crate]] = true;
     if (get_property_boolean("telegraphOfficeAvailable"))
         __iotms_usable[$item[LT&T telegraph office deed]] = true;
+    if (get_property_boolean("lovebugsUnlocked"))
+        __iotms_usable[$item[bottle of lovebug pheromones]] = true;
     if (get_property_boolean("loveTunnelAvailable"))
         __iotms_usable[lookupItem("heart-shaped crate")] = true;
     if (get_property_boolean("spacegateAlways") || get_property_boolean("_spacegateToday"))
@@ -37,6 +39,8 @@ void initialiseIOTMsUsable()
         __iotms_usable[$item[Build-a-City Gingerbread kit]] = true;
     if (lookupItem("kremlin's greatest briefcase").available_amount() > 0)
         __iotms_usable[lookupItem("kremlin's greatest briefcase")] = true;
+    if (get_property_boolean("horseryAvailable"))
+        __iotms_usable[lookupItem("Horsery contract")] = true;
     //Remove non-standard:
     foreach it in __iotms_usable
     {

@@ -339,9 +339,9 @@ void generatePullList(Checklist [int] checklists)
                 //machetito
                 pullable_item_list.listAppend(GPItemMake($item[machetito], "Machete for dense liana", 1));
             }
-            else if (my_basestat($stat[muscle]) < 62 && $item[muculent machete].is_unrestricted())
+            else if ($item[muculent machete].is_unrestricted()) //my_basestat($stat[muscle]) < 62 &&
             {
-                //muculent machete
+                //muculent machete, also gives +5% meat, op ti mal
                 pullable_item_list.listAppend(GPItemMake($item[muculent machete], "Machete for dense liana", 1));
             }
             else

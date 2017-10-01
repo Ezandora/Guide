@@ -15,34 +15,35 @@ static
 {
     int PATH_UNKNOWN = -1;
     int PATH_NONE = 0;
-    int PATH_TEETOTALER = 1;
-    int PATH_BOOZETAFARIAN = 2;
+    int PATH_BOOZETAFARIAN = 1;
+    int PATH_TEETOTALER = 2;
     int PATH_OXYGENARIAN = 3;
 
-    int PATH_BEES_HATE_YOU = 9;
-    int PATH_WAY_OF_THE_SURPRISING_FIST = 10;
-    int PATH_TRENDY = 11;
-    int PATH_AVATAR_OF_BORIS = 12;
-    int PATH_BUGBEAR_INVASION = 13;
-    int PATH_ZOMBIE_SLAYER = 14;
-    int PATH_CLASS_ACT = 15;
-    int PATH_AVATAR_OF_JARLSBERG = 16;
-    int PATH_BIG = 17;
-    int PATH_KOLHS = 18;
-    int PATH_CLASS_ACT_2 = 19;
-    int PATH_AVATAR_OF_SNEAKY_PETE = 20;
-    int PATH_SLOW_AND_STEADY = 21;
-    int PATH_HEAVY_RAINS = 22;
-    int PATH_PICKY = 23;
-    int PATH_STANDARD = 24;
-    int PATH_ACTUALLY_ED_THE_UNDYING = 25;
-    int PATH_ONE_CRAZY_RANDOM_SUMMER = 26;
-    int PATH_COMMUNITY_SERVICE = 27;
-    int PATH_AVATAR_OF_WEST_OF_LOATHING = 28;
-    int PATH_THE_SOURCE = 29;
-    int PATH_NUCLEAR_AUTUMN = 30;
-    int PATH_GELATINOUS_NOOB = 31;
-    int PATH_LICENSE_TO_ADVENTURE = 32;
+    int PATH_BEES_HATE_YOU = 4;
+    int PATH_WAY_OF_THE_SURPRISING_FIST = 6;
+    int PATH_TRENDY = 7;
+    int PATH_AVATAR_OF_BORIS = 8;
+    int PATH_BUGBEAR_INVASION = 9;
+    int PATH_ZOMBIE_SLAYER = 10;
+    int PATH_CLASS_ACT = 11;
+    int PATH_AVATAR_OF_JARLSBERG = 12;
+    int PATH_BIG = 14;
+    int PATH_KOLHS = 15;
+    int PATH_CLASS_ACT_2 = 16;
+    int PATH_AVATAR_OF_SNEAKY_PETE = 17;
+    int PATH_SLOW_AND_STEADY = 18;
+    int PATH_HEAVY_RAINS = 19;
+    int PATH_PICKY = 21;
+    int PATH_STANDARD = 22;
+    int PATH_ACTUALLY_ED_THE_UNDYING = 23;
+    int PATH_ONE_CRAZY_RANDOM_SUMMER = 24;
+    int PATH_COMMUNITY_SERVICE = 25;
+    int PATH_AVATAR_OF_WEST_OF_LOATHING = 26;
+    int PATH_THE_SOURCE = 27;
+    int PATH_NUCLEAR_AUTUMN = 28;
+    int PATH_GELATINOUS_NOOB = 29;
+    int PATH_LICENSE_TO_ADVENTURE = 30;
+    int PATH_LIVE_ASCEND_REPEAT = 31;
 }
 
 int __my_path_id_cached = -11;
@@ -108,6 +109,8 @@ int my_path_id()
         __my_path_id_cached = PATH_GELATINOUS_NOOB;
     else if (path_name == "License to Adventure")
         __my_path_id_cached = PATH_LICENSE_TO_ADVENTURE;
+    else if (path_name == "Live. Ascend. Repeat.")
+        __my_path_id_cached = PATH_LIVE_ASCEND_REPEAT;
     else
         __my_path_id_cached = PATH_UNKNOWN;
     return __my_path_id_cached;
@@ -452,6 +455,7 @@ item [int] missingComponentsToMakeItemPrivateImplementation(item it, int it_amou
 	item [int] result;
     if (recursion_limit_remaining <= 0) //possible loop
         return result;
+    if ($items[dense meat stack,meat stack] contains it) return listMake(it); //meat from yesterday + fairy gravy boat? hmm... no
 	if (it.available_amount() >= it_amounted_needed)
         return result;
 	int [item] ingredients = get_ingredients_fast(it);
@@ -1469,6 +1473,15 @@ void initialiseLocationCombatRates()
         return;
     int [location] rates;
     file_to_map("data/combats.txt", __location_combat_rates);
+    //needs spading:
+    foreach l in $locations[the spooky forest]
+        __location_combat_rates[l] = 85;
+    __location_combat_rates[$location[the black forest]] = 95; //can't remember if this is correct
+    __location_combat_rates[$location[inside the palindome]] = 80; //this is not accurate, there's probably a turn cap or something
+    __location_combat_rates[$location[The Haunted Billiards Room]] = 85; //completely and absolutely wrong and unspaded; just here to make another script work
+    foreach l in $locations[the haunted gallery, the haunted bathroom, the haunted ballroom]
+        __location_combat_rates[l] = 90; //or 95? can't remember
+    __location_combat_rates[$location[Twin Peak]] = 90; //FIXME assumption
     //print_html("__location_combat_rates = " + __location_combat_rates.to_json());
 }
 //initialiseLocationCombatRates();

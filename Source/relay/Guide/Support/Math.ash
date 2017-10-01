@@ -173,6 +173,40 @@ boolean Vec2iValueInRange(Vec2i v, int value)
     return false;
 }
 
+boolean Vec2iEquals(Vec2i a, Vec2i b)
+{
+    if (a.x != b.x) return false;
+    if (a.y != b.y) return false;
+    return true;
+}
+
+string Vec2iDescription(Vec2i v)
+{
+    buffer out;
+    out.append("[");
+    out.append(v.x);
+    out.append(", ");
+    out.append(v.y);
+    out.append("]");
+    return out.to_string();
+}
+
+Vec2i Vec2iIntersection(Vec2i a, Vec2i b)
+{
+    Vec2i result;
+    result.x = max(a.x, b.x);
+    result.y = min(a.y, b.y);
+    return result;
+}
+
+boolean Vec2iIntersectsWithVec2i(Vec2i a, Vec2i b)
+{
+    //Assumed [min, max]:
+    if (a.y < b.x) return false;
+    if (a.x > b.y) return false;
+    return true;
+}
+
 record Vec2f
 {
 	float x; //or width
@@ -203,6 +237,18 @@ boolean Vec2fValueInRange(Vec2f v, float value)
     if (value >= v.x && value <= v.y)
         return true;
     return false;
+}
+
+
+string Vec2fDescription(Vec2f v)
+{
+    buffer out;
+    out.append("[");
+    out.append(v.x);
+    out.append(", ");
+    out.append(v.y);
+    out.append("]");
+    return out.to_string();
 }
 
 

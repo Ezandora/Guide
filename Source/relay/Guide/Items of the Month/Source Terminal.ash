@@ -86,7 +86,7 @@ void IOTMSourceTerminalGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         subentries.listAppend(ChecklistSubentryMake("Set an enquiry", "", description));
     }
     //"Digitise something" like arrow something?
-    if (get_property_int("_sourceTerminalDigitizeUses") == 0 && __misc_state["in run"] && my_path_id() != PATH_ZOMBIE_SLAYER)
+    if (get_property_int("_sourceTerminalDigitizeUses") == 0 && __misc_state["in run"] && my_path_id() != PATH_ZOMBIE_SLAYER && my_path_id() != PATH_LIVE_ASCEND_REPEAT)
     {
         string [int] description;
         IOTMSourceTerminalGenerateDigitiseTargets(description);
@@ -286,7 +286,7 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
         digitisation_limit += 1;
     if (chips["TRIGRAM"])
         digitisation_limit += 1;
-    if (my_path_id() == PATH_ZOMBIE_SLAYER)
+    if (my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_LIVE_ASCEND_REPEAT)
         digitisation_limit = 0;
     int digitisations_left = clampi(digitisation_limit - digitisations, 0, 3);
     if (digitisations_left > 0)

@@ -20,7 +20,16 @@ void IOTMTunnelOfLoveGenerateTasks(ChecklistEntry [int] task_entries, ChecklistE
     else
         description.listAppend("Equipment choice:|*" + HTMLBoldIfTrue("Eardigan", my_primestat() == $stat[muscle] && __misc_state["in run"] && my_level() < 13) + " (+25% muscle exp, +25 ML), " + HTMLBoldIfTrue("Epaulettes", my_primestat() == $stat[mysticality] && __misc_state["in run"] && my_level() < 13) + " (+25% myst exp), or " + HTMLBoldIfTrue("Earrings", (my_primestat() == $stat[moxie] && __misc_state["in run"] && my_level() < 13) || __misc_state["in aftercore"] || my_level() >= 13) + " (+25% moxie exp, +50% meat, +3 all res)");
     description.listAppend("Buff choice: (50 turns)|*+10 stats/fight, +10 familiar weight, or +50% item.");
-    description.listAppend("Item choice:|*Single-use wandering copier, chat hearts, or chocolate (adventures).");
+    
+    string [int] usable_items;
+    if (my_path_id() != PATH_LIVE_ASCEND_REPEAT)
+        usable_items.listAppend("single-use wandering copier");
+    usable_items.listAppend("chat hearts");
+    if (my_path_id() != PATH_SLOW_AND_STEADY)
+        usable_items.listAppend("chocolate (adventures)");
+    if ($familiar[space jellyfish].familiar_is_usable())
+        usable_items.listAppend("toast");
+    description.listAppend("Item choice:|*" + usable_items.listJoinComponents(", ", "or").capitaliseFirstLetter() + ".");
     
     optional_task_entries.listAppend(ChecklistEntryMake("__item pink candy heart", "place.php?whichplace=town_wrong", ChecklistSubentryMake("Take a love trip", "", description)));
 }

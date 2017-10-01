@@ -154,6 +154,8 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
         foreach key in damage_levels
         {
             int damage = damage_levels[key];
+            if ($item[glass pie plate].equipped_amount() > 0)
+                damage /= 2;
             
             int spooky_damage_at_level = damageTakenByElement(damage, $element[spooky]);
             int cold_damage_at_level = damageTakenByElement(damage, $element[cold]);
@@ -189,6 +191,8 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
                 line += hp_string;
                 line += " to survive 22% effectiveness clues.";
             }
+            if ($item[glass pie plate].available_amount() > 0 && $item[glass pie plate].can_equip() && $item[glass pie plate].equipped_amount() == 0)
+                line += "|Equip the glass pie plate for half damage.";
             
             details.listAppend(line);
         }

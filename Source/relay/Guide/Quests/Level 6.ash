@@ -46,7 +46,7 @@ float QLevel6TurnsToCompleteArea(location place)
     float turns_remaining = 0.0;
     int ncs_remaining = MAX(0, 3 - ncs_found);
     
-    float combat_rate = 0.85 + combat_rate_modifier() / 100.0;
+    float combat_rate = 0.9 + combat_rate_modifier() / 100.0;
     float noncombat_rate = 1.0 - combat_rate;
     
     if (noncombat_rate != 0.0)

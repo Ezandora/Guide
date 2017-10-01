@@ -11,6 +11,7 @@ This implementation is not 1:1 compatible, as it doesn't take into account your 
 static
 {
     int [item][item] __item_ingredients;
+    boolean [item] __item_is_purchasable_from_a_store;
 }
 
 
@@ -120,6 +121,7 @@ void initialiseItemIngredients()
         foreach crafting_thing, crafting_type, mixing_item_1, mixing_item_2, mixing_item_3, mixing_item_4, mixing_item_5, mixing_item_6, mixing_item_7, mixing_item_8, mixing_item_9, mixing_item_10, mixing_item_11, mixing_item_12, mixing_item_13, mixing_item_14, mixing_item_15, mixing_item_16, mixing_item_17, mixing_item_18 in concoctions_map_2
         {
             if (crafting_type == "SUSHI" || crafting_type == "VYKEA") continue; //not really items
+            if (crafting_type == "CLIPART") continue; //bucket of wine is not made of three turtle totems
             item it = crafting_thing.to_item();
             if (it == $item[none])
             {
@@ -133,6 +135,8 @@ void initialiseItemIngredients()
                 foreach it2 in item_results
                     it = it2;
             }
+            if (crafting_type.contains_text("ROW"))
+                __item_is_purchasable_from_a_store[it] = true;
             if (__item_ingredients contains it) continue; //mafia uses first defined entry
             
             int [item] ingredients;
@@ -225,6 +229,7 @@ void initialiseItemIngredients()
         if (it == $item[none])
             continue;
         
+        __item_is_purchasable_from_a_store[it] = true;
         if (__item_ingredients contains it) continue;
         
         int [item] ingredients;
@@ -249,6 +254,12 @@ int [item] get_ingredients_fast(item it)
     }
     return __item_ingredients[it];
 }
+
+boolean item_is_purchasable_from_a_store(item it)
+{
+    return __item_is_purchasable_from_a_store[it];
+}
+
 void testItemIngredients()
 {
     initialiseItemIngredients();
@@ -284,7 +295,7 @@ void testItemIngredients()
     }
 }
 
-void main()
+/*void main()
 {
     testItemIngredients();
-}
+}*/

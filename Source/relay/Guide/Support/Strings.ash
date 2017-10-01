@@ -213,3 +213,8 @@ element get_property_element(string property)
 {
     return get_property(property).to_element();
 }
+
+item get_property_item(string property)
+{
+    return get_property(property).to_item();
+}

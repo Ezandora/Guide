@@ -685,6 +685,8 @@ void setUpState()
             minus_combat_source_count += 5 * 4;
         if (my_path_id() == PATH_AVATAR_OF_JARLSBERG && $skill[chocolatesphere].skill_is_usable())
             minus_combat_source_count += 5 * 3;
+        if (__iotms_usable[lookupItem("Asdon Martin keyfob")])
+            minus_combat_source_count += 10;
         if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE)
         {
             if ($skill[Brood].skill_is_usable())
@@ -700,6 +702,8 @@ void setUpState()
         if (minus_combat_source_count >= 25)
             __misc_state["can reasonably reach -25% combat"] = true;
     }
+    if (my_path_id() == PATH_LIVE_ASCEND_REPEAT)
+        __misc_state["can reasonably reach -25% combat"] = true;
     
     if (!in_bad_moon())
     {

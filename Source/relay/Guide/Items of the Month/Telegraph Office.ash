@@ -93,7 +93,7 @@ void IOTMTelegraphOfficeGenerateTasks(ChecklistEntry [int] task_entries, Checkli
         }
         else if (boss == $monster[Jeff the Fancy Skeleton])
         {
-            description.listAppend("Attack with a blunt weapon.");
+            description.listAppend("Attack with a blunt weapon. (clubs, flails, saucepans...)");
             description.listAppend("Combat items won't work, skills are mostly blocked.");
         }
         else if (boss == $monster[Pecos Dave])
@@ -142,6 +142,10 @@ void IOTMTelegraphOfficeGenerateTasks(ChecklistEntry [int] task_entries, Checkli
                 if ($item[rain-doh green lantern].available_amount() > 0)
                 {
                     tasks.listAppend("equip rain-doh green lantern");
+                }
+                else if (lookupItems("meteorb,metal meteoroid").available_amount() > 0)
+                {
+                    tasks.listAppend("equip meteor orb");
                 }
                 else if ($item[snow mobile].is_unrestricted())
                 {

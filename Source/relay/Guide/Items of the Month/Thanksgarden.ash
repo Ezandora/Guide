@@ -126,7 +126,10 @@ void IOTMThanksgardenGenerateTasks(ChecklistEntry [int] task_entries, ChecklistE
         else
             url = "shop.php?whichshop=thankshop";
         location last_location = get_property_location("lastAdventure");
-        string description = "Save " + MIN(5, last_location.delayRemainingInLocation()) + " turns in " + last_location + ".";
+        string [int] description;
+        description.listAppend("Save " + MIN(5, last_location.delayRemainingInLocation()) + " turns in " + last_location + ".");
+        if (my_level() < 4)
+            description.listAppend("Reach level four first.");
         boolean allow = true;
         if ($locations[the penultimate fantasy airship,the hidden office building,the hidden apartment building] contains last_location)
             allow = false;

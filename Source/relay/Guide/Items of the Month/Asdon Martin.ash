@@ -21,7 +21,7 @@ void IOTMAsdonMartinGenerateResource(ChecklistEntry [int] resource_entries)
     if (!__iotms_usable[lookupItem("Asdon martin keyfob")])
         return;
     ChecklistEntry entry;
-    entry.importance_level = 8;
+    entry.importance_level = 0;
     if (__misc_state["in run"])
     {
         item [int] fuelables = asdonMartinGenerateListOfFuelables();
@@ -37,14 +37,17 @@ void IOTMAsdonMartinGenerateResource(ChecklistEntry [int] resource_entries)
                 line += (fuelable.averageAdventuresForConsumable() * (creatable_amount + fuelable.item_amount())).round();
                 if (fuelable.item_amount() == 0)
                 {
+                    if (fuelable.craft_type() == "Summon Clip Art") continue;
                     line += ", ";
                     boolean first = true;
-                    foreach it in fuelable.get_ingredients_fast()
+                    foreach it, amount in fuelable.get_ingredients_fast()
                     {
                         if (first)
                             first = false;
                         else
                             line += " + ";
+                        if (amount > 1)
+                            line += amount + " ";
                         line += it;
                     }
                 }
@@ -117,6 +120,8 @@ void IOTMAsdonMartinGenerateResource(ChecklistEntry [int] resource_entries)
             if (entry.image_lookup_name == "")
                 entry.image_lookup_name = "__item Asdon Martin keyfob";
         }
+        if (entry.url == "")
+            entry.url = "campground.php?action=workshed";
     }
     if (entry.subentries.count() > 0)
     {

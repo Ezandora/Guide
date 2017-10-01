@@ -21,6 +21,75 @@ void PathActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, Ch
         string image_name = "__skill wisdom of thoth";
         string [int] description;
         description.listAppend("At least " + pluraliseWordy(skills_available - skills_have, "skill", "skills") + " available.");
+        
+        skill [int] desired_skill_order;
+        
+        if (get_property_int("edPoints") >= 5 && get_property("sleazeAirportAlways").to_boolean())
+        {
+            desired_skill_order.listAppend($skill[Fist of the Mummy]);
+            desired_skill_order.listAppend($skill[Howl of the Jackal]);
+            desired_skill_order.listAppend($skill[Roar of the Lion]);
+            desired_skill_order.listAppend($skill[Prayer of Seshat]);
+            desired_skill_order.listAppend($skill[Wisdom of Thoth]);
+            desired_skill_order.listAppend($skill[Power of Heka]);
+            desired_skill_order.listAppend($skill[Hide of Sobek]);
+            desired_skill_order.listAppend($skill[Blessing of Serqet]);
+            desired_skill_order.listAppend($skill[Shelter of Shed]);
+            desired_skill_order.listAppend($skill[Bounty of Renenutet]);
+            
+            
+            desired_skill_order.listAppend($skill[Storm of the Scarab]);
+            desired_skill_order.listAppend($skill[Purr of the Feline]);
+            desired_skill_order.listAppend($skill[Lash of the Cobra]);
+            desired_skill_order.listAppend($skill[Wrath of Ra]);
+            
+            desired_skill_order.listAppend($skill[Curse of the Marshmallow]);
+            desired_skill_order.listAppend($skill[Curse of Indecision]);
+            desired_skill_order.listAppend($skill[Curse of Yuck]);
+            desired_skill_order.listAppend($skill[Curse of Heredity]);
+            desired_skill_order.listAppend($skill[Curse of Fortune]);
+            desired_skill_order.listAppend($skill[Curse of Vacation]);
+            
+            desired_skill_order.listAppend($skill[Curse of Stench]);
+        }
+        else
+        {
+            desired_skill_order.listAppend($skill[Fist of the Mummy]);
+            desired_skill_order.listAppend($skill[Prayer of Seshat]);
+            desired_skill_order.listAppend($skill[Wisdom of Thoth]);
+            desired_skill_order.listAppend($skill[Power of Heka]);
+            desired_skill_order.listAppend($skill[Hide of Sobek]);
+            desired_skill_order.listAppend($skill[Blessing of Serqet]);
+            desired_skill_order.listAppend($skill[Shelter of Shed]);
+            desired_skill_order.listAppend($skill[Bounty of Renenutet]);
+            
+            
+            desired_skill_order.listAppend($skill[Howl of the Jackal]);
+            desired_skill_order.listAppend($skill[Roar of the Lion]);
+            desired_skill_order.listAppend($skill[Storm of the Scarab]);
+            desired_skill_order.listAppend($skill[Purr of the Feline]);
+            desired_skill_order.listAppend($skill[Lash of the Cobra]);
+            desired_skill_order.listAppend($skill[Wrath of Ra]);
+            
+            desired_skill_order.listAppend($skill[Curse of the Marshmallow]);
+            desired_skill_order.listAppend($skill[Curse of Indecision]);
+            desired_skill_order.listAppend($skill[Curse of Yuck]);
+            desired_skill_order.listAppend($skill[Curse of Heredity]);
+            desired_skill_order.listAppend($skill[Curse of Fortune]);
+            desired_skill_order.listAppend($skill[Curse of Vacation]);
+            
+            desired_skill_order.listAppend($skill[Curse of Stench]);
+        }
+        skill [int] suggestions;
+        foreach key, s in desired_skill_order
+        {
+            if (s.have_skill())
+                continue;
+            suggestions.listAppend(s);
+            if (suggestions.count() >= skills_available - skills_have)
+                break;
+        }
+        description.listAppend("Maybe " + suggestions.listJoinComponents(", ", "and") + ".");
         optional_task_entries.listAppend(ChecklistEntryMake(image_name, "place.php?whichplace=edbase&action=edbase_book", ChecklistSubentryMake("Buy Undying skills", "", description), 11));
     }
     
@@ -245,6 +314,10 @@ void PathActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] resource_entr
         {
             places_to_farm_ka.listAppend("hippy camp");
             if (url.length() == 0) url = $location[hippy camp].getClickableURLForLocation();
+        }
+        if (!__misc_state["mysterious island available"] && my_basestat($stat[mysticality]) < 40)
+        {
+            places_to_farm_ka.listAppend("sleazy back alley (last resort)");
         }
         
         if (places_to_farm_ka.count() > 0)

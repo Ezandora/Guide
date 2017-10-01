@@ -126,7 +126,7 @@ void IOTMTomesGenerateResource(ChecklistEntry [int] resource_entries)
                     description.listAppend("Borrowed time: 20 adventures on last day");
                 
                 string [int] familiar_suggestions;
-                if (familiar_is_usable($familiar[he-boulder]) && $item[quadroculars].available_amount() == 0)
+                if (familiar_is_usable($familiar[he-boulder]) && $item[quadroculars].available_amount() == 0 && !lookupSkill("Disintegrate").have_skill())
                     familiar_suggestions.listAppend("He-Boulder 100-turn YR");
                 if (familiar_is_usable($familiar[obtuse angel]) && !familiar_is_usable($familiar[Reanimated Reanimator]))
                     familiar_suggestions.listAppend("+1 angel copy");

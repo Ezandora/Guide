@@ -3,8 +3,8 @@ void SOldLevel9GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
 {
     if ($location[The Valley of Rof L'm Fao].turnsAttemptedInLocation() == 0)
         return;
-    if (__misc_state["in run"])
-        return;
+    //if (__misc_state["in run"])
+        //return;
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questM15Lol", false); //don't issue a quest log load for this, no information gained
     if (!state.in_progress)

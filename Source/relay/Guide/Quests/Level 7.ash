@@ -114,7 +114,10 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             float eyes_value = 3.0;
             if (evilness < 29)
                 eyes_value = clampi(evilness - 25 - 1, 0, 3);
-			float evilness_per_adventure = MAX(1.0, 1.0 + eyes_per_adventure * eyes_value);
+			float evilness_per_adventure = 1.0;
+            if ($item[gravy boat].equipped_amount() > 0)
+                evilness_per_adventure += 1.0;
+            evilness_per_adventure = MAX(evilness_per_adventure, evilness_per_adventure + eyes_per_adventure * eyes_value);
 			
 			if ($item[evil eye].available_amount() > 0)
             {

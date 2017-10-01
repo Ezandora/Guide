@@ -265,7 +265,7 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
                         continue;
                     }
                     if (l == $location[the oasis]) continue;
-                    if (l.locationAvailable() && l.delayRemainingInLocation() > 0)
+                    if (l.delayRemainingInLocation() > 0 && l.locationAvailable())
                         possible_locations.listAppend(l);
                 }
                 if (possible_locations.count() > 0)

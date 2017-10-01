@@ -106,7 +106,7 @@ boolean asdonMartinFailsFuelableTestsPrivate(item craft, boolean [item] ingredie
     }
     if (craft.get_ingredients_fast().count() == 0)
         all_npc = false;
-    if (all_npc)
+    if (all_npc && crafts_seen.count() == 0) //hmm... what if it's a second level all-NPC?
     {
         return true;
     }
@@ -128,19 +128,22 @@ item [int] asdonMartinGenerateListOfFuelables()
     blacklist[$item[stunt nuts]] = true;
     blacklist[$item[wet stew]] = true; //FIXME I guess maybe not after
     blacklist[$item[goat cheese]] = true;
-    blacklist[$item[source essence]] = true; //that's silly
-    blacklist[$item[white pixel]] = true; //no!
     blacklist[$item[turkey blaster]] = true;
     blacklist[$item[hot wing]] = true;
     blacklist[$item[glass of goat's milk]] = true;
     blacklist[$item[soft green echo eyedrop antidote martini]] = true; //if it's not created, FIXME
-    blacklist[$item[cashew]] = true;
     blacklist[$item[warm gravy]] = true; //don't steal my boat
     foreach it in $items[Falcon&trade; Maltese Liquor, hardboiled egg]
         blacklist[it] = true; //don't steal my -combat
     blacklist[$item[loaf of soda bread]] = true; //elsewhere
     foreach it in $items[hot buttered roll,ketchup,catsup]
         blacklist[it] = true; //hermit
+        
+    //These aren't directly feedable, but indirectly make things:
+    blacklist[$item[source essence]] = true; //that's silly
+    blacklist[$item[white pixel]] = true; //no!
+    blacklist[$item[cashew]] = true;
+    
     if (my_path_id() != PATH_LICENSE_TO_ADVENTURE && inebriety_limit() > 0) //FIXME the test for can drink just about
     {
         foreach it in $items[bottle of gin,bottle of rum,bottle of vodka,bottle of whiskey,bottle of tequila] //too useful for crafting?
@@ -167,12 +170,16 @@ item [int] asdonMartinGenerateListOfFuelables()
             if (it.inebriety > 0 && it.image == "martini.gif")
                 continue;
         }
-        int [item] ingredients = it.get_ingredients_fast();
+        if (it.item_is_purchasable_from_a_store())
+        {
+            //print_html("Rejecting " + it);
+            continue;
+        }
+        /*int [item] ingredients = it.get_ingredients_fast();
         if (ingredients.count() > 0)
         {
             boolean reject = false;
             //Various things count as being from a "store":
-            //FIXME write coinmasters support, we already parse that
             foreach it in lookupItems("yellow pixel,handful of barley,spacegate research")
             {
                 if (ingredients[it] > 0)
@@ -183,7 +190,7 @@ item [int] asdonMartinGenerateListOfFuelables()
             }
             if (reject)
                 continue;
-        }
+        }*/
         float average_adventures = it.averageAdventuresForConsumable();
         if (average_adventures == 0.0)
             continue;
@@ -198,4 +205,36 @@ item [int] asdonMartinGenerateListOfFuelables()
     }
     sort fuelables by -value.averageAdventuresForConsumable() * ((value.asdonMartinFailsFuelableTests(blacklist) ? 0 : value.creatable_amount()) + value.item_amount());
     return fuelables;
+}
+
+
+
+
+boolean craftableUsingOnlyActiveNPCStoresPrivate(item it, boolean [item] crafts_seen)
+{
+    if (it.npc_price() > 0)
+        return true;
+    
+    int [item] ingredients = it.get_ingredients_fast();
+    if (ingredients.count() == 0) return false;
+    
+    if (crafts_seen[it])
+        return true;
+    
+    crafts_seen[it] = true;
+    
+    foreach ingredient in ingredients
+    {
+        if (!craftableUsingOnlyActiveNPCStoresPrivate(ingredient, crafts_seen))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+boolean craftableUsingOnlyActiveNPCStores(item it)
+{
+    boolean [item] crafts_seen;
+    return craftableUsingOnlyActiveNPCStoresPrivate(it, crafts_seen);
 }

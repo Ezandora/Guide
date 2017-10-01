@@ -433,6 +433,9 @@ string generateRandomMessage()
         case PATH_LICENSE_TO_ADVENTURE:
             random_messages.listAppend("FOR YOUR EYES ONLY");
             break;
+        case PATH_LIVE_ASCEND_REPEAT:
+            random_messages.listAppend("a single perfect day");
+            break;
         /*case PATH_CLASS_ACT_3:
             random_messages.listAppend("buttons for the people"); break;
         case PATH_AVATAR_OF_THE_NAUGHTY_SORCERESS:
@@ -704,6 +707,7 @@ string generateRandomMessage()
     encounter_messages["The Mirror in the Tower has the View that is True"] = "shatter the false reality";
     encounter_messages["A Tombstone"] = "peperony and chease";
     encounter_messages["Witchess Puzzles"] = "this etch a sketch is hard";
+    encounter_messages["Rubbed it the Right Way"] = "desire incarnate";
     
     if (encounter_messages contains get_property("lastEncounter"))
     {
@@ -812,7 +816,10 @@ string generateRandomMessage()
 	if (my_turncount() <= 0)
 	{
 		random_messages.listClear();
-		random_messages.listAppend("find yourself<br>starting back");
+        if (my_path_id() == PATH_LIVE_ASCEND_REPEAT)
+            random_messages.listAppend("I got you babe");
+        else
+            random_messages.listAppend("find yourself<br>starting back");
 	}
     if (limit_mode() == "Spelunky" && !encounter_override)
     {

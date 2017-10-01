@@ -351,6 +351,22 @@ void CountersParseProperty(string property_name, Counter [string] counters, bool
         
         counters[final_name] = c;
     }
+    
+    /*if (my_path_id() == PATH_LIVE_ASCEND_REPEAT)
+    {
+        //We already have this information:
+        //(won't always be accurate)
+        Counter c = CounterMake();
+        c.name = "Semi-rare";
+        int next_turn = 75;
+        while (next_turn < my_turncount())
+        {
+            next_turn += 110;
+        }
+        next_turn -= my_turncount();
+        c.exact_turns.listAppend(next_turn);
+        counters["Semi-rare"] = c;
+    }*/
 }
 
 Counter [string] __active_counters; //Try to avoid referencing directly
@@ -628,18 +644,41 @@ boolean CounterWanderingMonsterWillHitNextTurn()
     return false;
 }
 
-boolean CounterWanderingMonstersCurrentlyActiveAreFree()
+boolean CounterWanderingMonstersCurrentlyActiveNextTurnAreFree()
 {
     boolean [monster] monsters = CounterWanderingMonstersActiveNextTurn();
     if (monsters.count() == 0)
         return false;
     foreach m in monsters
     {
-        //FIXME is zero turn cost?
         if (!m.monster_has_zero_turn_cost())
             return false;
     }
     return true;
+}
+
+
+boolean CounterWanderingMonstersCurrentlyAroundAreFree()
+{
+    boolean [monster] monsters = CounterWanderingMonstersActiveInXTurns(10000); //FIXME better
+    if (monsters.count() == 0)
+        return false;
+    foreach m in monsters
+    {
+        if (!m.monster_has_zero_turn_cost())
+            return false;
+    }
+    return true;
+}
+
+boolean CounterWanderingMonstersCurrentlyAroundAreExact() //not exclusively, but at least one is
+{
+    foreach key, c in CounterWanderingMonsterWindowsActiveInXTurns(10000) //FIXME better
+    {
+        if (c.CounterExists() && !c.CounterIsRange())
+            return true;
+    }
+    return false;
 }
 
 CountersInit();

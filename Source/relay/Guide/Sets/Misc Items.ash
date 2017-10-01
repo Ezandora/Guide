@@ -565,7 +565,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
     if ($item[Platinum Yendorian Express Card].available_amount() > 0 && !get_property_boolean("expressCardUsed"))
     {
         string [int] description;
-        string line = "Extends buffs, restores HP";
+        string line = "Extends buffs, restores MP";
         if (get_property_int("_zapCount") > 0 && zap_wand_owned != $item[none] && zap_wand_owned.available_amount() > 0)
             line += ", cools down " + zap_wand_owned;
         line += ".";

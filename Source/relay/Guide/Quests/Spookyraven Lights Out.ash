@@ -185,7 +185,7 @@ void QSpookyravenLightsOutGenerateTasks(ChecklistEntry [int] task_entries, Check
             location [int] possible_locations;
             foreach l in $locations[the haunted gallery,the haunted bathroom]
             {
-                if (l.delayRemainingInLocation() >= 4)
+                if (l.delayRemainingInLocation() >= 4 && l.locationAvailable())
                 {
                     possible_locations.listAppend(l);
                     

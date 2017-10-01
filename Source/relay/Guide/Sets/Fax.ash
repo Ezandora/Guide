@@ -1,5 +1,5 @@
 
-string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
+string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes, boolean [monster] blocked_monsters)
 {
     string [int] potential_faxes;
     boolean can_arrow = false;
@@ -14,10 +14,24 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
     
     if (__misc_state["in run"])
     {
+        
+        if (!familiar_is_usable($familiar[angry jung man]))
+        {
+            //Can't pull for jar of psychoses, no jung man...
+            //It's time for a g-g-g-ghost! zoinks!
+            if (!__quest_state["Level 13"].state_boolean["digital key used"] && ($item[digital key].available_amount() + creatable_amount($item[digital key])) == 0)
+            {
+                string line = "Ghost - only if you can copy it.";
+                if (can_arrow)
+                    line += " (arrow?)";
+                line += "|*5 white pixels drop per ghost, speeds up digital key. Run +150% item.";
+                potential_faxes.listAppend(line);
+            }
+        }
         //sleepy mariachi
         if (familiar_is_usable($familiar[fancypants scarecrow]) || familiar_is_usable($familiar[mad hatrack]))
         {
-            if ($item[spangly mariachi pants].available_amount() == 0 && in_hardcore())
+            if ($item[spangly mariachi pants].available_amount() == 0 && in_hardcore() && $item[li'l ninja costume].available_amount() == 0)
             {
                 string fax = "";
                 fax += ChecklistGenerateModifierSpan("yellow ray");
@@ -40,7 +54,7 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
         }
         
         //ninja snowman assassin (copy only)
-        if (!__quest_state["Level 8"].state_boolean["Mountain climbed"])
+        if (!__quest_state["Level 8"].state_boolean["Mountain climbed"] && !blocked_monsters[$monster[ninja snowman assassin]])
         {
             int equipment_missing_count = $items[ninja carabiner,ninja crampons,ninja rope].items_missing().count();
             if (equipment_missing_count > 0)
@@ -70,7 +84,7 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
         if (!__quest_state["Level 8"].state_boolean["Past mine"] && missing_ore > 0 && !$skill[unaccompanied miner].skill_is_usable())
         {
             string fax = "";			
-            fax += ChecklistGenerateModifierSpan("+150% item or more");
+            fax += ChecklistGenerateModifierSpan("+150% item or ideally YR");
             fax += "Mining ores. Try to copy a few times.";
             if (__misc_state_string["obtuse angel name"] != "")
             {
@@ -117,20 +131,6 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
                 potential_faxes.listAppend("Baa'baa'bu'ran - Stone wool for hidden city unlock. Need +100% items (or as much as you can get for extra wool)");
         }
         
-        if (!familiar_is_usable($familiar[angry jung man]) && in_hardcore())
-        {
-            //Can't pull for jar of psychoses, no jung man...
-            //It's time for a g-g-g-ghost! zoinks!
-            if (!__quest_state["Level 13"].state_boolean["digital key used"] && ($item[digital key].available_amount() + creatable_amount($item[digital key])) == 0)
-            {
-                string line = "Ghost - only if you can copy it.";
-                if (can_arrow)
-                    line += " (arrow?)";
-                line += "|5 white pixels drop per ghost, speeds up digital key.|Run +150% item.";
-                potential_faxes.listAppend(line);
-            }
-        }
-        
         if (to_item("7301").available_amount() == 0 && get_property("questM20Necklace") != "finished" && $item[Lady Spookyraven's necklace].available_amount() == 0)
         {
             int effective_writing_desks_encountering = get_property_int("writingDesksDefeated");
@@ -146,7 +146,7 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
             }
         }
         
-        if (in_hardcore() && $item[Bram's choker].available_amount() == 0 && combat_rate_modifier() > -25.0 && !(__quest_state["Level 13"].in_progress || (__quest_state["Level 13"].finished && my_path_id() != PATH_BUGBEAR_INVASION)))
+        if (!__misc_state["can reasonably reach -25% combat"] && in_hardcore() && $item[Bram's choker].available_amount() == 0 && combat_rate_modifier() > -25.0 && !(__quest_state["Level 13"].in_progress || (__quest_state["Level 13"].finished && my_path_id() != PATH_BUGBEAR_INVASION)))
         {
             string line = "Bram the Stoker - drops a -5% combat accessory.";
             if (my_basestat($stat[mysticality]) < 50)
@@ -165,7 +165,7 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
         if (suggest_less_powerful_faxes)
         {
             //giant swarm of ghuol whelps
-            if (__quest_state["Level 7"].state_boolean["cranny needs speed tricks"])
+            if (__quest_state["Level 7"].state_boolean["cranny needs speed tricks"] && !blocked_monsters[$monster[giant swarm of ghuol whelps]])
             {
                 string line = "Giant swarm of ghuol whelps - +ML - with a copy possibly";
                 if (!__quest_state["Level 7"].started)
@@ -175,7 +175,7 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
                 potential_faxes.listAppend(line);
             }
             //modern zmobie
-            if (__quest_state["Level 7"].state_boolean["alcove needs speed tricks"])
+            if (__quest_state["Level 7"].state_boolean["alcove needs speed tricks"] && !blocked_monsters[$monster[modern zmobie]])
             {
                 string line = "Modern zmobie - with copies/arrows";
                 if (!__quest_state["Level 7"].started)
@@ -211,7 +211,7 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
                 potential_faxes.listAppend(description);
             }
             //drunken half-orc hobo (smiths)
-            if (in_hardcore() && $skill[summon smithsness].skill_is_usable() && $items[dirty hobo gloves,hand in glove].available_amount() == 0)
+            if (in_hardcore() && $skill[summon smithsness].skill_is_usable() && $items[dirty hobo gloves,hand in glove].available_amount() == 0 && false) //umm... I don't think this matters anymore
             {
                 string hobo_name = "Drunken half-orc hobo";
                 if (my_ascensions() % 2 == 1)
@@ -260,12 +260,12 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
             //blur
             if (!__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && $item[drum machine].available_amount() == 0 && !__quest_state["Level 11 Desert"].state_boolean["Wormridden"] && in_hardcore())
             {
-                potential_faxes.listAppend("Blur - +234% item for drum machine for possible desert exploration route.");
+                potential_faxes.listAppend("Blur - +234% item " + (item_drop_modifier() >= 234 ? "(have) " : "(don't have) ") + "for drum machine for possible desert exploration route.");
             }
             
-            if (in_hardcore() && knoll_available() && __quest_state["Level 11 Hidden City"].state_boolean["need machete for liana"])
+            if (in_hardcore() && knoll_available() && __quest_state["Level 11 Hidden City"].state_boolean["need machete for liana"] && $item[forest tears].available_amount() == 0)
             {
-                potential_faxes.listAppend("forest spirit - +234% item - forest tears can meatsmith into a muculent machete for dense liana");
+                potential_faxes.listAppend("forest spirit - +234% item - forest tears can meatsmith into a muculent machete for dense liana" + (($familiar[intergnat].familiar_is_usable() && my_level() <= 11) ? " (or use intergnat summon)" : ""));
             }
             //baa'baa'bu'ran
             //grungy pirate - for guitar (need 400% item/YR)
@@ -296,6 +296,12 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
     }
     
     return potential_faxes;
+}
+
+string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
+{
+    boolean [monster] blank;
+    return SFaxGeneratePotentialFaxes(suggest_less_powerful_faxes, blank);
 }
 
 void SFaxGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, boolean from_task)

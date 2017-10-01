@@ -126,7 +126,7 @@ void QNemesisGenerateIslandTasks(ChecklistSubentry subentry)
                 }
                 tasks.listAppend(line);
             }
-            tasks.listAppend("defeat a cult member");
+            tasks.listAppend("defeat an evil spaghetti cult middle-manager");
             
             subentry.entries.listAppend(tasks.listJoinComponents(", ", "then").capitaliseFirstLetter() + ".");
         }
@@ -322,7 +322,7 @@ void QNemesisGenerateClownTasks(ChecklistSubentry subentry)
         {
             int clownosity = numeric_modifier(it, "clownosity").floor();
             string description = it + " (" + clownosity + ")";
-            if (it.available_amount() > 0 && it.equipped_amount() == 0 && it.can_equip())
+            if (it.available_amount() + it.creatable_amount() > 0 && it.equipped_amount() == 0 && it.can_equip())
             {
                 available_clown_sources.listAppend(description);
                 if (possible_outfit[it.to_slot()].numeric_modifier("clownosity").floor() < clownosity)

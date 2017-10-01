@@ -32,3 +32,7 @@ import "relay/Guide/Items of the Month/Spacegate.ash";
 import "relay/Guide/Items of the Month/New You.ash";
 import "relay/Guide/Items of the Month/KGBriefcase.ash";
 import "relay/Guide/Items of the Month/Asdon Martin.ash";
+import "relay/Guide/Items of the Month/Meteor Lore.ash";
+import "relay/Guide/Items of the Month/GenieBottle.ash";
+import "relay/Guide/Items of the Month/Horsery.ash";
+

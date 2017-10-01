@@ -104,25 +104,10 @@ buffer PageGenerateBodyContents()
     return Page().PageGenerateBodyContents();
 }
 
-buffer PageGenerate(Page page_in)
+buffer PageGenerateStyle(Page page_in)
 {
-	buffer result;
-	
-	result.append("<!DOCTYPE html>\n"); //HTML 5 target
-	result.append("<html>\n");
-	
-	//Head:
-	result.append("\t<head>\n");
-	result.append("\t\t<title>");
-	result.append(page_in.title);
-	result.append("</title>\n");
-	if (page_in.head_contents.length() != 0)
-	{
-        result.append("\t\t");
-		result.append(page_in.head_contents);
-		result.append("\n");
-	}
-	//Write CSS styles:
+    buffer result;
+    
     if (page_in.defined_css_blocks.count() > 0)
     {
         if (true)
@@ -144,6 +129,34 @@ buffer PageGenerate(Page page_in)
             result.append("\t\t</style>\n");
         }
     }
+    return result;
+}
+
+buffer PageGenerateStyle()
+{
+    return Page().PageGenerateStyle();
+}
+
+buffer PageGenerate(Page page_in)
+{
+	buffer result;
+	
+	result.append("<!DOCTYPE html>\n"); //HTML 5 target
+	result.append("<html>\n");
+	
+	//Head:
+	result.append("\t<head>\n");
+	result.append("\t\t<title>");
+	result.append(page_in.title);
+	result.append("</title>\n");
+	if (page_in.head_contents.length() != 0)
+	{
+        result.append("\t\t");
+		result.append(page_in.head_contents);
+		result.append("\n");
+	}
+	//Write CSS styles:
+    result.append(PageGenerateStyle(page_in));
     result.append("\t</head>\n");
 	
 	//Body:

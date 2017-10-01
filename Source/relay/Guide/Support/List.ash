@@ -837,6 +837,19 @@ string [string] mapMake(string key1, string value1, string key2, string value2, 
 	return result;
 }
 
+
+string [string] mapMake(string key1, string value1, string key2, string value2, string key3, string value3, string key4, string value4, string key5, string value5, string key6, string value6)
+{
+	string [string] result;
+	result[key1] = value1;
+	result[key2] = value2;
+	result[key3] = value3;
+	result[key4] = value4;
+	result[key5] = value5;
+	result[key6] = value6;
+	return result;
+}
+
 string [string] mapCopy(string [string] map)
 {
     string [string] result;
