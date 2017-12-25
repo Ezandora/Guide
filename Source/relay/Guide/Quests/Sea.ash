@@ -2,8 +2,6 @@
 
 void QSeaInit()
 {
-	if (!__misc_state["in aftercore"])
-		return;
     
     //Have they adventured anywhere underwater?
     boolean have_adventured_in_relevant_area = false;
@@ -379,7 +377,7 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 	QuestState temple_quest_state = __quest_state["Sea Temple"];
 	QuestState monkees_quest_state = __quest_state["Sea Monkees"];
 	
-	if (!__misc_state["in aftercore"])
+	if (!__misc_state["in aftercore"] && !monkees_quest_state.started)
 		return;
     
 	boolean have_something_to_do_in_sea = false;
@@ -413,7 +411,7 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 			{
 				string line = "";
 				if ($item[sea lasso].item_amount() == 0)
-					line += HTMLGenerateSpanFont("Buy and use a sea lasso in each combat.", "red");
+					line += HTMLGenerateSpanFont((in_ronin() ? "Acquire" : "Buy") + " and use a sea lasso in each combat.", "red");
 				else
 					line += "Use a sea lasso in each combat.";
 				if ($item[sea cowboy hat].equipped_amount() == 0)

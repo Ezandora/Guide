@@ -226,7 +226,7 @@ void PathSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
     if ($skill[Check Mirror].skill_is_usable())
     {
         boolean have_intrinsic = false;
-        foreach s in $strings[Slicked-Back Do,Pompadour,Cowlick,Fauxhawk]
+        foreach s in $strings[1553,Pompadour,Cowlick,Fauxhawk]
         {
             effect e = s.lookupEffect();
             if (e == $effect[none])

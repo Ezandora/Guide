@@ -281,12 +281,21 @@ void IOTMDeckOfEveryCardGenerateResource(ChecklistEntry [int] resource_entries)
             summons.listAppend(DOECSummonMake("Random card", pluralise(card_summons_left, "luck of the draw", "lucks of the draw") + "."));
     }
     
+    boolean [string] cards_already_drawn = get_property("_deckCardsSeen").split_string("\\|").listInvert();
+    
     string [int][int] card_table;
     if (card_summons_left >= 5)
     {
         foreach key, summon in summons
         {
-            card_table.listAppend(listMake(summon.cards.listJoinComponents(" / "), summon.reason));
+            string [int] valid_cards;
+            foreach key, card in summon.cards
+            {
+                if (!cards_already_drawn[card])
+                    valid_cards.listAppend(card);
+            }
+            if (valid_cards.count() == 0) continue;
+            card_table.listAppend(listMake(valid_cards.listJoinComponents(" / "), summon.reason));
         }
     }
     

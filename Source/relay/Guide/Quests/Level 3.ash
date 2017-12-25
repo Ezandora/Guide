@@ -131,7 +131,7 @@ void QLevel3GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
     if (get_property_ascension("lastCellarReset") && base_quest_state.mafia_internal_step > 1)
         url = "cellar.php";
 	
-	if (wait_until_level_eleven)
+	if (wait_until_level_eleven && false) //Ehhh... no? It's like, a 5% difference?
 		optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the typical tavern cellar]));
 	else
 		task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the typical tavern cellar]));

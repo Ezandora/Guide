@@ -239,6 +239,16 @@ boolean Vec2fValueInRange(Vec2f v, float value)
     return false;
 }
 
+Vec2f Vec2fMultiply(Vec2f v, float c)
+{
+	return Vec2fMake(v.x * c, v.y * c);
+}
+Vec2f Vec2fAdd(Vec2f v, float c)
+{
+    return Vec2fMake(v.x + c, v.y + c);
+}
+
+
 
 string Vec2fDescription(Vec2f v)
 {

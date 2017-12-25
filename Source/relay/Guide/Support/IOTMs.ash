@@ -41,6 +41,20 @@ void initialiseIOTMsUsable()
         __iotms_usable[lookupItem("kremlin's greatest briefcase")] = true;
     if (get_property_boolean("horseryAvailable"))
         __iotms_usable[lookupItem("Horsery contract")] = true;
+    if (lookupItem("genie bottle").available_amount() > 0)
+        __iotms_usable[lookupItem("genie bottle")] = true;
+    if (lookupItem("portable pantogram").available_amount() > 0)
+        __iotms_usable[lookupItem("portable pantogram")] = true;
+    if (get_property_boolean("coldAirportAlways") || get_property_boolean("_coldAirportToday"))
+        __iotms_usable[$item[Airplane charter: The Glaciest]] = true;
+    if (get_property_boolean("hotAirportAlways") || get_property_boolean("_hotAirportToday"))
+        __iotms_usable[$item[Airplane charter: That 70s Volcano]] = true;
+    if (get_property_boolean("sleazeAirportAlways") || get_property_boolean("_sleazeAirportToday"))
+        __iotms_usable[$item[airplane charter: Spring Break Beach]] = true;
+    if (get_property_boolean("spookyAirportAlways") || get_property_boolean("_spookyAirportToday"))
+        __iotms_usable[$item[airplane charter: Conspiracy Island]] = true;
+    if (get_property_boolean("stenchAirportAlways") || get_property_boolean("_stenchAirportToday"))
+        __iotms_usable[$item[airplane charter: Dinseylandfill]] = true;
     //Remove non-standard:
     foreach it in __iotms_usable
     {

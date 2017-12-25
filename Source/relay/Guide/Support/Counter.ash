@@ -352,7 +352,7 @@ void CountersParseProperty(string property_name, Counter [string] counters, bool
         counters[final_name] = c;
     }
     
-    /*if (my_path_id() == PATH_LIVE_ASCEND_REPEAT)
+    /*if (my_path_id() == PATH_LIVE_ASCEND_REPEAT && !(counters contains "Semi-rare"))
     {
         //We already have this information:
         //(won't always be accurate)

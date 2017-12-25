@@ -1135,6 +1135,8 @@ static
             lookup_map[s] = "place.php?whichplace=crimbo2016m";
         foreach s in $strings[Crimbo's Sack,Crimbo's Boots,Crimbo's Jelly,Crimbo's Reindeer,Crimbo's Beard,Crimbo's Hat]
             lookup_map[s] = "place.php?whichplace=crimbo2016c";
+        foreach s in $strings[The Cheerless Spire (Level 1), The Cheerless Spire (Level 2), The Cheerless Spire (Level 3), The Cheerless Spire (Level 4), The Cheerless Spire (Level 5)]
+        	lookup_map[s] = "place.php?whichplace=crimbo17_silentnight";
         lookup_map["An Eldritch Horror"] = "place.php?whichplace=town";
         
         lookup_map["Through the Spacegate"] = "place.php?whichplace=spacegate";

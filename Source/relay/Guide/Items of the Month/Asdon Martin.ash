@@ -11,7 +11,7 @@ void IOTMAsdonMartinGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
     //FIXME test get_fuel() in point release
     if (!BanishIsActive("Spring-Loaded Front Bumper") && __misc_state["in run"])
     {
-        task_entries.listAppend(ChecklistEntryMake("__item Asdon Martin keyfob", "campground.php?action=fuelconvertor", ChecklistSubentryMake("Cast Spring-Loaded Front Bumper", "", "Banish/free run, costs 50 fuel."), -11));
+        task_entries.listAppend(ChecklistEntryMake("__item Asdon Martin keyfob", "campground.php?action=fuelconvertor", ChecklistSubentryMake("Cast Spring-Loaded Front Bumper", "", "Banish" + (__misc_state["free runs usable"] ? "/free run" : "") + ", costs 50 fuel."), -11));
     }
 }
 
@@ -94,7 +94,7 @@ void IOTMAsdonMartinGenerateResource(ChecklistEntry [int] resource_entries)
             //description.listAppend(HTMLGenerateSpanOfClass(HTMLGenerateTagWrap("span",HTMLGenerateSimpleTableLines(table, false), mapMake("class", "r_tooltip_inner_class", "style", "margin-top:-" + estimated_margin + "em;margin-left:-5em;")) + "Costs one spleen and two candies.", "r_tooltip_outer_class"));
             //description.listAppend("Could fuel with:|*" + fuelables_extended.listJoinComponents("|*", ""));
             description.listAppend(fuelables_extended.listJoinComponents("|*", ""));
-            entry.subentries.listAppend(ChecklistSubentryMake("Fuel", "", description));
+            entry.subentries.listAppend(ChecklistSubentryMake(get_fuel() + " Fuel", "", description));
             if (entry.url == "")
                 entry.url = "campground.php?action=fuelconvertor";
             if (entry.image_lookup_name == "")

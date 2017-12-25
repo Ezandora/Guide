@@ -35,4 +35,6 @@ import "relay/Guide/Items of the Month/Asdon Martin.ash";
 import "relay/Guide/Items of the Month/Meteor Lore.ash";
 import "relay/Guide/Items of the Month/GenieBottle.ash";
 import "relay/Guide/Items of the Month/Horsery.ash";
+import "relay/Guide/Items of the Month/XO Skeleton.ash";
+import "relay/Guide/Items of the Month/Portable Pantogram.ash";
 

@@ -79,6 +79,6 @@ void IOTMBarrelGodGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
             description.listAppend(line);
         }
         description.listAppend("Can only be fought once a day, until defeated.");
-        optional_task_entries.listAppend(ChecklistEntryMake("barrel god", "inventory.php?which=3", ChecklistSubentryMake("Defeat the Barrelmech", "", description), 8));
+        optional_task_entries.listAppend(ChecklistEntryMake("barrel god", "inventory.php?ftext=map+to+the+Biggest+Barrel", ChecklistSubentryMake("Defeat the Barrelmech", "", description), 8));
     }
 }

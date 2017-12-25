@@ -546,6 +546,64 @@ skill [int] listMake(skill e1, skill e2, skill e3, skill e4, skill e5)
 	return result;
 }
 
+
+monster [int] listMake(monster e1)
+{
+	monster [int] result;
+	result.listAppend(e1);
+	return result;
+}
+
+monster [int] listMake(monster e1, monster e2)
+{
+	monster [int] result;
+	result.listAppend(e1);
+	result.listAppend(e2);
+	return result;
+}
+
+monster [int] listMake(monster e1, monster e2, monster e3)
+{
+	monster [int] result;
+	result.listAppend(e1);
+	result.listAppend(e2);
+	result.listAppend(e3);
+	return result;
+}
+
+monster [int] listMake(monster e1, monster e2, monster e3, monster e4)
+{
+	monster [int] result;
+	result.listAppend(e1);
+	result.listAppend(e2);
+	result.listAppend(e3);
+	result.listAppend(e4);
+	return result;
+}
+
+monster [int] listMake(monster e1, monster e2, monster e3, monster e4, monster e5)
+{
+	monster [int] result;
+	result.listAppend(e1);
+	result.listAppend(e2);
+	result.listAppend(e3);
+	result.listAppend(e4);
+	result.listAppend(e5);
+	return result;
+}
+
+monster [int] listMake(monster e1, monster e2, monster e3, monster e4, monster e5, monster e6)
+{
+	monster [int] result;
+	result.listAppend(e1);
+	result.listAppend(e2);
+	result.listAppend(e3);
+	result.listAppend(e4);
+	result.listAppend(e5);
+	result.listAppend(e6);
+	return result;
+}
+
 string listJoinComponents(string [int] list, string joining_string, string and_string)
 {
 	buffer result;

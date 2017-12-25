@@ -251,6 +251,8 @@ string generateRandomMessage()
     string [string] holiday_messages;
     holiday_messages["Groundhog Day"] = "it's cold out there every day";
     holiday_messages["Crimbo"] = "merry crimbo";
+    if ($item[tommy gun].equipped_amount() > 0) //I believe ya, but my tommy gun don't!
+    	holiday_messages["Crimbo"] = "merry crimbo, ya filthy animal";
     holiday_messages["April Fool's Day"] = "you are ascending too quickly, ascend slower!";
     holiday_messages["Valentine's Day"] = HTMLGenerateSpanFont("&#x2665;&#xfe0e;", "pink", "3.0em");
     holiday_messages["Towel Day"] = "don't panic";
@@ -308,6 +310,7 @@ string generateRandomMessage()
         equipment_messages[$item[sneaky pete's breath spray]] = "every class a moxie class";
     foreach it in $items[twisted-up wet towel,sommelier's towel,time bandit time towel]
         equipment_messages[it] = "don't panic";
+    equipment_messages[$item[pirate fledges]] = "<img src=\"images/otherimages/12x12skull.gif\" style=\"mix-blend-mode:multiply;\"> oh, better far to live and die, under the brave black flag I fly! <img src=\"images/otherimages/12x12skull.gif\" style=\"mix-blend-mode:multiply;\">";
     
     foreach it in equipment_messages
     {
@@ -442,12 +445,15 @@ string generateRandomMessage()
             random_messages.listAppend("go forth to your lair! have some tea"); break;*/
     }
     
+    if (in_ronin() && my_adventures() <= 3)
+    	random_messages.listAppend("always tomorrow");
+    
     random_messages.listAppend("I don't know either, sorry");
     
     string lowercase_player_name = my_name().to_lower_case().HTMLEscapeString();
         
     random_messages.listAppend(HTMLGenerateTagWrap("a", "check the wiki", mapMake("class", "r_a_undecorated", "href", "http://kol.coldfront.net/thekolwiki/index.php/Main_Page", "target", "_blank")));
-    random_messages.listAppend("the RNG is only trying to help");
+    random_messages.listAppend("the RNG is only trying to " + ((random(1000) == 0) ? "hurt" : "help"));
     if (__misc_state["in run"])
     {
         int choice = gameday_to_int() & 3;
@@ -562,6 +568,9 @@ string generateRandomMessage()
         case $class[Snake Oiler]:
             random_messages.listAppend("ten points to slytherin"); break;
     }
+    
+    if (numeric_modifier("hot damage") <= 0.0 && gameday_to_int() % 4 == 0)
+    	random_messages.listAppend("have you tried fire");
     
     
     if (__misc_state["Chateau Mantegna available"] && get_property_monster("chateauMonster").phylum == $phylum[fish] && !get_property_boolean("_chateauMonsterFought"))

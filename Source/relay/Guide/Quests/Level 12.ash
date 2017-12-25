@@ -204,7 +204,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 		string [int] details;
 		int meat_gotten = get_property_int("currentNunneryMeat");
 		int meat_remaining = 100000 - meat_gotten;
-		details.listAppend(meat_remaining + " meat remaining");
+		details.listAppend(meat_remaining + " meat remaining.");
 	
 		float meat_drop_multiplier = meat_drop_modifier() / 100.0 + 1.0;
 		vec2i brigand_meat_drop_range = vec2iMake(800 * meat_drop_multiplier, 1200 * meat_drop_multiplier);
@@ -215,9 +215,14 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 		
 		//FIXME consider looking into tracking how long until the semi-rare item runs out, for turn calculation
 		if (turn_range.x == turn_range.y)
-			details.listAppend(pluralise(turn_range.x, "turn", "turns") + " remaining");
+			details.listAppend(pluralise(turn_range.x, "turn", "turns") + " remaining.");
 		else
-			details.listAppend("[" + turn_range.x + " to " + turn_range.y + "] turns remaining");
+			details.listAppend("[" + turn_range.x + " to " + turn_range.y + "] turns remaining.");
+        if (turn_range.x == 1 && turn_range.y == 2)
+        {
+        	float chance = 1.0 - TriangularDistributionCalculateCDF(meat_remaining + 1, brigand_meat_drop_range.x, brigand_meat_drop_range.y);
+         	details.listAppend((chance * 100.0).floor() + "% chance of completing in one turn.");   
+        }
         
         if ($item[ice nine].available_amount() == 0 && __misc_state["can equip just about any weapon"] && $item[ice harvest].available_amount() >= 9 && $item[ice nine].is_unrestricted() && $item[miracle whip].available_amount() == 0) //is this safe? unfinished ice sculpture is really nice, and ice bucket in sneaky pete...
             details.listAppend("Possibly make and equip an ice nine. (+30% meat 1h weapon)");

@@ -784,7 +784,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             float meat_multiplier = 1.0 + current_value / 100.0;
             float chance = 1.0 - TriangularDistributionCalculateCDF(1001.0, 160.0 * meat_multiplier, 240.0 * meat_multiplier);
             if (chance > 0.0)
-                subentry.entries.listAppend((chance * 100.0).floorForOutput(1) + "% chance of completing in one turn.");
+                subentry.entries.listAppend((chance * 100.0).floor() + "% chance of completing in one turn.");
         }
         else
             subentry.entries.listAppend("Should take one turn.");

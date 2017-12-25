@@ -147,7 +147,7 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                         
                         float boiler_per_adventure = appearance_rates[boiler_monster] / 100.0;
                         
-                        if (boiler_per_adventure != 0.0)
+                        if (boiler_per_adventure > 0.0)
                         {
                             float turns_needed = boilers_needed.to_float() / boiler_per_adventure;
                             subentry.entries.listAppend("~" + turns_needed.roundForOutput(1) + " total turns to charge fulminate.");
@@ -183,7 +183,10 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                                 image_name = "cabinet of Dr. Limpieza";
                         }
                         if (need_item_modifier)
-                            subentry.modifiers.listPrepend("+item"); //Probably +item. Possibly an increasing drop.
+                        {
+                            subentry.modifiers.listPrepend("+1900% item"); //+item, increasing drop
+                            subentry.entries.listAppend("Base drop rate is 5%, then 10%, 15%, etc, for each wine rack/cabinet defeated, individually.");
+                        }
                             
                         if ($item[bottle of Chateau de Vinegar].available_amount() > 0 && $item[blasting soda].available_amount() > 0)
                         {
