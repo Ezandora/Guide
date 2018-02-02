@@ -707,11 +707,20 @@ void setUpState()
     
     if (!in_bad_moon())
     {
-        foreach s in $strings[spooky,sleaze,hot,cold,stench]
-        {
-            if (get_property_boolean(s + "AirportAlways") || get_property_boolean("_" + s + "AirportToday"))
-                __misc_state[s + " airport available"] = true;
-        }
+				if (__iotms_usable[$item[Airplane charter: The Glaciest]] || get_property_boolean("_coldAirportToday"))
+					__misc_state["cold airport available"] = true;
+
+				if (__iotms_usable[$item[Airplane charter: That 70s Volcano]] || get_property_boolean("_hotAirportToday"))
+					__misc_state["hot airport available"] = true;
+
+				if (__iotms_usable[$item[Airplane charter: Spring Break Beach]] || get_property_boolean("_sleazeAirportToday"))
+					__misc_state["sleaze airport available"] = true;
+
+				if (__iotms_usable[$item[Airplane charter: Conspiracy Island]] || get_property_boolean("_spookyAirportToday"))
+					__misc_state["spooky airport available"] = true;
+
+				if (__iotms_usable[$item[Airplane charter: Dinseylandfill]] || get_property_boolean("_stenchAirportToday"))
+					__misc_state["stench airport available"] = true;
     }
     
     if (get_property_boolean("chateauAvailable") && !in_bad_moon() && $item[Chateau Mantegna room key].is_unrestricted())
