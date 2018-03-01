@@ -163,7 +163,7 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
             image_name = "__item forged identification documents";
             url = "shop.php?whichshop=blackmarket";
             subentry.entries.listAppend("From the black market");
-            if ($item[can of black paint].available_amount() == 0)
+            if ($item[can of black paint].available_amount() == 0 && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING)
                 subentry.entries.listAppend("Also buy a can of black paint while you're there, for the desert quest.");
         }
         else
