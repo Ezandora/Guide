@@ -44994,7 +44994,7 @@ void IOTMAsdonMartinGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
         return;
     //BanishIsActive
     //FIXME test get_fuel() in point release
-    if (!BanishIsActive("Spring-Loaded Front Bumper") && __misc_state["in run"] && (my_path_id() != PATH_POCKET_FAMILIARS || (__iotms_usable[$item[source terminal]] && __iotms_usable[$item[FantasyRealm membership packet]])))
+    if (!BanishIsActive("Spring-Loaded Front Bumper") && __misc_state["in run"] && (my_path_id() != PATH_POCKET_FAMILIARS || (__iotms_usable[$item[source terminal]] && __iotms_usable[lookupItem("FantasyRealm membership packet")])))
     {
     	string description = "Banish" + (__misc_state["free runs usable"] ? "/free run" : "") + ", ";
      
