@@ -37,6 +37,8 @@ boolean can_equip_replacement(item it)
 {
     if (it.equipped_amount() > 0)
         return true;
+    if (it.item_type() == "chefstaff" && !($skill[Spirit of Rigatoni].have_skill() || my_class() == $class[Avatar of Jarlsberg] || (my_class() == $class[sauceror] && $item[special sauce glove].equipped_amount() > 0)))
+    	return false;
     boolean can_equip = it.can_equip();
     if (can_equip)
         return true;
@@ -170,7 +172,7 @@ item [int] asdonMartinGenerateListOfFuelables()
             if (it.inebriety > 0 && it.image == "martini.gif")
                 continue;
         }
-        if (it.item_is_purchasable_from_a_store())
+        if (it.item_cannot_be_asdon_martined_because_it_was_purchased_from_a_store()) //the asdon martin wishes it was an AE86, so those work
         {
             //print_html("Rejecting " + it);
             continue;

@@ -11,111 +11,6 @@ boolean mafiaIsPastRevision(int revision_number)
 }
 
 
-static
-{
-    int PATH_UNKNOWN = -1;
-    int PATH_NONE = 0;
-    int PATH_BOOZETAFARIAN = 1;
-    int PATH_TEETOTALER = 2;
-    int PATH_OXYGENARIAN = 3;
-
-    int PATH_BEES_HATE_YOU = 4;
-    int PATH_WAY_OF_THE_SURPRISING_FIST = 6;
-    int PATH_TRENDY = 7;
-    int PATH_AVATAR_OF_BORIS = 8;
-    int PATH_BUGBEAR_INVASION = 9;
-    int PATH_ZOMBIE_SLAYER = 10;
-    int PATH_CLASS_ACT = 11;
-    int PATH_AVATAR_OF_JARLSBERG = 12;
-    int PATH_BIG = 14;
-    int PATH_KOLHS = 15;
-    int PATH_CLASS_ACT_2 = 16;
-    int PATH_AVATAR_OF_SNEAKY_PETE = 17;
-    int PATH_SLOW_AND_STEADY = 18;
-    int PATH_HEAVY_RAINS = 19;
-    int PATH_PICKY = 21;
-    int PATH_STANDARD = 22;
-    int PATH_ACTUALLY_ED_THE_UNDYING = 23;
-    int PATH_ONE_CRAZY_RANDOM_SUMMER = 24;
-    int PATH_COMMUNITY_SERVICE = 25;
-    int PATH_AVATAR_OF_WEST_OF_LOATHING = 26;
-    int PATH_THE_SOURCE = 27;
-    int PATH_NUCLEAR_AUTUMN = 28;
-    int PATH_GELATINOUS_NOOB = 29;
-    int PATH_LICENSE_TO_ADVENTURE = 30;
-    int PATH_LIVE_ASCEND_REPEAT = 31;
-}
-
-int __my_path_id_cached = -11;
-int my_path_id()
-{
-    if (__my_path_id_cached != -11)
-        return __my_path_id_cached;
-    string path_name = my_path();
-    
-    if (path_name == "" || path_name == "None")
-        __my_path_id_cached = PATH_NONE;
-    else if (path_name == "Teetotaler")
-        __my_path_id_cached = PATH_TEETOTALER;
-    else if (path_name == "Boozetafarian")
-        __my_path_id_cached = PATH_BOOZETAFARIAN;
-    else if (path_name == "Oxygenarian")
-        __my_path_id_cached = PATH_OXYGENARIAN;
-    else if (path_name == "Bees Hate You")
-        __my_path_id_cached = PATH_BEES_HATE_YOU;
-    else if (path_name == "Way of the Surprising Fist")
-        __my_path_id_cached = PATH_WAY_OF_THE_SURPRISING_FIST;
-    else if (path_name == "Trendy")
-        __my_path_id_cached = PATH_TRENDY;
-    else if (path_name == "Avatar of Boris")
-        __my_path_id_cached = PATH_AVATAR_OF_BORIS;
-    else if (path_name == "Bugbear Invasion")
-        __my_path_id_cached = PATH_BUGBEAR_INVASION;
-    else if (path_name == "Zombie Slayer")
-        __my_path_id_cached = PATH_ZOMBIE_SLAYER;
-    else if (path_name == "Class Act")
-        __my_path_id_cached = PATH_CLASS_ACT;
-    else if (path_name == "Avatar of Jarlsberg")
-        __my_path_id_cached = PATH_AVATAR_OF_JARLSBERG;
-    else if (path_name == "BIG!")
-        __my_path_id_cached = PATH_BIG;
-    else if (path_name == "KOLHS")
-        __my_path_id_cached = PATH_KOLHS;
-    else if (path_name == "Class Act II: A Class For Pigs")
-        __my_path_id_cached = PATH_CLASS_ACT_2;
-    else if (path_name == "Avatar of Sneaky Pete")
-        __my_path_id_cached = PATH_AVATAR_OF_SNEAKY_PETE;
-    else if (path_name == "Slow and Steady")
-        __my_path_id_cached = PATH_SLOW_AND_STEADY;
-    else if (path_name == "Heavy Rains")
-        __my_path_id_cached = PATH_HEAVY_RAINS;
-    else if (path_name == "Picky")
-        __my_path_id_cached = PATH_PICKY;
-    else if (path_name == "Standard")
-        __my_path_id_cached = PATH_STANDARD;
-    else if (path_name == "Actually Ed the Undying")
-        __my_path_id_cached = PATH_ACTUALLY_ED_THE_UNDYING;
-    else if (path_name == "One Crazy Random Summer")
-        __my_path_id_cached = PATH_ONE_CRAZY_RANDOM_SUMMER;
-    else if (path_name == "Community Service" || path_name == "25")
-        __my_path_id_cached = PATH_COMMUNITY_SERVICE;
-    else if (path_name == "Avatar of West of Loathing")
-        __my_path_id_cached = PATH_AVATAR_OF_WEST_OF_LOATHING;
-    else if (path_name == "The Source")
-        __my_path_id_cached = PATH_THE_SOURCE;
-    else if (path_name == "Nuclear Autumn" || path_name == "28")
-        __my_path_id_cached = PATH_NUCLEAR_AUTUMN;
-    else if (path_name == "Gelatinous Noob")
-        __my_path_id_cached = PATH_GELATINOUS_NOOB;
-    else if (path_name == "License to Adventure")
-        __my_path_id_cached = PATH_LICENSE_TO_ADVENTURE;
-    else if (path_name == "Live. Ascend. Repeat.")
-        __my_path_id_cached = PATH_LIVE_ASCEND_REPEAT;
-    else
-        __my_path_id_cached = PATH_UNKNOWN;
-    return __my_path_id_cached;
-}
-
 boolean have_familiar_replacement(familiar f)
 {
     //have_familiar bugs in avatar of sneaky pete for now, so:
@@ -128,9 +23,11 @@ boolean have_familiar_replacement(familiar f)
 boolean familiar_is_usable(familiar f)
 {
     //r13998 has most of these
-    if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_LICENSE_TO_ADVENTURE)
+    if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_LICENSE_TO_ADVENTURE || my_path_id() == PATH_POCKET_FAMILIARS)
         return false;
     if (!is_unrestricted(f))
+        return false;
+    if (my_path_id() == PATH_G_LOVER && !f.contains_text("g") && !f.contains_text("G"))
         return false;
 	int single_familiar_run = get_property_int("singleFamiliarRun");
 	if (single_familiar_run != -1 && my_turncount() >= 30) //after 30 turns, they're probably sure
@@ -159,8 +56,37 @@ boolean skill_is_usable(skill s)
         return false;
     if (!s.is_unrestricted())
         return false;
+    if (my_path_id() == PATH_G_LOVER && (!s.passive || s == $skill[meteor lore]) && !s.contains_text("g") && !s.contains_text("G"))
+    	return false;
     if ($skills[rapid prototyping] contains s)
         return $item[hand turkey outline].is_unrestricted();
+    return true;
+}
+
+boolean a_skill_is_usable(boolean [skill] skills)
+{
+	foreach s in skills
+	{
+		if (s.skill_is_usable()) return true;
+	}
+	return false;
+}
+
+boolean item_is_usable(item it)
+{
+    if (!it.is_unrestricted())
+        return false;
+    if (my_path_id() == PATH_G_LOVER && !it.contains_text("g") && !it.contains_text("G"))
+        return false;
+    if (my_path_id() == PATH_BEES_HATE_YOU && (it.contains_text("b") || it.contains_text("B")))
+    	return false;
+	return true;
+}
+
+boolean effect_is_usable(effect e)
+{
+    if (my_path_id() == PATH_G_LOVER && !e.contains_text("g") && !e.contains_text("G"))
+        return false;
     return true;
 }
 
@@ -1069,7 +995,7 @@ int stringCountSubstringMatches(string str, string substring)
 
 effect to_effect(item it)
 {
-	return effect_modifier(it, "effect");
+	return it.effect_modifier("effect");
 }
 
 
@@ -1272,6 +1198,9 @@ item [int] generateEquipmentForExtraExperienceOnStat(stat desired_stat, boolean 
     //foreach it in experience_percent_modifiers
     foreach it in equipmentWithNumericModifier(numeric_modifier_string)
     {
+    	slot s = it.to_slot();
+        if (s == $slot[shirt] && !($skill[Torso Awaregness].have_skill() || $skill[Best Dressed].have_skill()))
+        	continue;
         if (it.available_amount() > 0 && (!require_can_equip_currently || it.can_equip()) && item_slots[it.to_slot()].numeric_modifier(numeric_modifier_string) < it.numeric_modifier(numeric_modifier_string))
         {
             item_slots[it.to_slot()] = it;
@@ -1589,3 +1518,78 @@ int licenseToAdventureSocialCapitalAvailable()
     
     return total_social_capital - social_capital_used;
 }
+
+
+
+monster convertEncounterToMonster(string encounter)
+{
+    boolean [string] intergnat_strings;
+    intergnat_strings[" WITH SCIENCE!"] = true;
+    intergnat_strings["ELDRITCH HORROR "] = true;
+    intergnat_strings[" WITH BACON!!!"] = true;
+    intergnat_strings[" NAMED NEIL"] = true;
+    intergnat_strings[" AND TESLA!"] = true;
+    foreach s in intergnat_strings
+    {
+        if (encounter.contains_text(s))
+            encounter = encounter.replace_string(s, "");
+    }
+    if (encounter == "The Junk") //not a junksprite
+        return $monster[junk];
+    if ((encounter.stringHasPrefix("the ") || encounter.stringHasPrefix("The")) && encounter.to_monster() == $monster[none])
+    {
+        encounter = encounter.substring(4);
+        //print_html("now \"" + encounter + "\"");
+    }
+    //if (encounter == "the X-32-F Combat Training Snowman")
+        //return $monster[X-32-F Combat Training Snowman];
+    if (encounter == "clingy pirate")
+        return $monster[clingy pirate (male)]; //always accurate for my personal data
+    return encounter.to_monster();
+}
+
+
+
+
+
+//Mafia's text output doesn't handle very long strings with no spaces in them - they go horizontally past the text box. This is common for to_json()-types.
+//So, add spaces every so often if we need them:
+buffer processStringForPrinting(string str)
+{
+    buffer out;
+    int limit = 50;
+    int comma_limit = 25;
+    int characters_since_space = 0;
+    for i from 0 to str.length() - 1
+    {
+        if (str.length() == 0) break;
+        string c = str.char_at(i);
+        out.append(c);
+        
+        if (c == " ")
+            characters_since_space = 0;
+        else
+        {
+            characters_since_space++;
+            if (characters_since_space >= limit || (c == "," && characters_since_space >= comma_limit)) //prefer adding spaces after a comma
+            {
+                characters_since_space = 0;
+                out.append(" ");
+            }
+        }
+    }
+    return out;
+}
+void printSilent(string line, string font_colour)
+{
+    print_html("<font color=\"" + font_colour + "\">" + line.processStringForPrinting() + "</font>");
+}
+
+void printSilent(string line)
+{
+    print_html(line.processStringForPrinting());
+}
+
+
+
+

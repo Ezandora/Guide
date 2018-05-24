@@ -29,7 +29,7 @@ void initialiseIOTMsUsable()
         __iotms_usable[$item[X-32-F snowman crate]] = true;
     if (get_property_boolean("telegraphOfficeAvailable"))
         __iotms_usable[$item[LT&T telegraph office deed]] = true;
-    if (get_property_boolean("lovebugsUnlocked"))
+    if (get_property_boolean("lovebugsUnlocked") && $item[hand turkey outline].is_unrestricted())
         __iotms_usable[$item[bottle of lovebug pheromones]] = true;
     if (get_property_boolean("loveTunnelAvailable"))
         __iotms_usable[lookupItem("heart-shaped crate")] = true;
@@ -45,6 +45,8 @@ void initialiseIOTMsUsable()
         __iotms_usable[lookupItem("genie bottle")] = true;
     if (lookupItem("portable pantogram").available_amount() > 0)
         __iotms_usable[lookupItem("portable pantogram")] = true;
+    if (lookupItem("January's Garbage Tote").available_amount() > 0)
+        __iotms_usable[lookupItem("January's Garbage Tote")] = true;
     if (get_property_boolean("coldAirportAlways") || get_property_boolean("_coldAirportToday"))
         __iotms_usable[$item[Airplane charter: The Glaciest]] = true;
     if (get_property_boolean("hotAirportAlways") || get_property_boolean("_hotAirportToday"))
@@ -55,6 +57,10 @@ void initialiseIOTMsUsable()
         __iotms_usable[$item[airplane charter: Conspiracy Island]] = true;
     if (get_property_boolean("stenchAirportAlways") || get_property_boolean("_stenchAirportToday"))
         __iotms_usable[$item[airplane charter: Dinseylandfill]] = true;
+    if (get_property_boolean("_frToday") || get_property_boolean("frAlways"))
+    	__iotms_usable[lookupItem("FantasyRealm membership packet")] = true;
+    if (florist_available() && $item[hand turkey outline].is_unrestricted()) //Order of the Green Thumb Order Form is not marked as out of standard.
+    	__iotms_usable[$item[Order of the Green Thumb Order Form]] = true;
     //Remove non-standard:
     foreach it in __iotms_usable
     {

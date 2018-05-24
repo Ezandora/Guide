@@ -19,7 +19,10 @@ void QSpookyravenLightsOutGenerateEntry(ChecklistEntry [int] task_entries, Check
     
     Counter lights_out_counter = CounterLookup("Spookyraven Lights Out");
     if (lights_out_counter.CounterExists() && !lights_out_counter.CounterIsRange())
-        turns_until_next_lights_out = lights_out_counter.CounterGetNextExactTurn();
+    {
+        //turns_until_next_lights_out = lights_out_counter.CounterGetNextExactTurn(); //LYING.
+        turns_until_next_lights_out = 37 - total_turns_played() % 37;
+    }
         
     
     if (turns_until_next_lights_out == 37)

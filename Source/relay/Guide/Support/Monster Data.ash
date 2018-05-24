@@ -85,6 +85,7 @@ float expectedDamageFromGhostAfterCastingShootGhost(monster m)
         Approximate full formula:
         damage = (maximum_hp * ghost_specific_multiplier - DR) * resistance * DA
         Each ghost has a specific multiplier. We're assuming non-protonic ghosts are 30%. But I've only checked a few. The protonic ones vary.
+        Oh, and then the monster does 84 damage instead of 80 and you have nooo idea why and you get beaten up.
     */
     float percentage_multiplier = 0.3;
     if (__monster_data[m].is_protonic_ghost)

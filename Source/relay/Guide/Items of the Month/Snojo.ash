@@ -2,7 +2,7 @@ RegisterResourceGenerationFunction("IOTMSnojoGenerateResource");
 void IOTMSnojoGenerateResource(ChecklistEntry [int] resource_entries)
 {
     ChecklistEntry snojo_skill_entry;
-    if ($skill[Shattering Punch].have_skill() && mafiaIsPastRevision(16617))
+    if ($skill[Shattering Punch].skill_is_usable() && mafiaIsPastRevision(16617))
     {
         int punches_left = clampi(3 - get_property_int("_shatteringPunchUsed"), 0, 3);
         if (punches_left > 0)
@@ -17,7 +17,7 @@ void IOTMSnojoGenerateResource(ChecklistEntry [int] resource_entries)
             
         }
     }
-    if ($skill[Snokebomb].have_skill() && mafiaIsPastRevision(16599))
+    if ($skill[Snokebomb].skill_is_usable() && mafiaIsPastRevision(16599))
     {
         int snokes_left = clampi(3 - get_property_int("_snokebombUsed"), 0, 3);
         if (snokes_left > 0)

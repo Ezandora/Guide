@@ -256,6 +256,14 @@ void listPrepend(location [int] list, location entry)
 	list[position] = entry;
 }
 
+void listPrepend(item [int] list, item entry)
+{
+    int position = 0;
+    while (list contains position)
+        position -= 1;
+    list[position] = entry;
+}
+
 
 void listClear(string [int] list)
 {

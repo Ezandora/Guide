@@ -295,9 +295,14 @@ void setUpState()
         __misc_state["can cook for free"] = true;
         __misc_state["can bartend for free"] = true;
     }
+    if (lookupSkill("Expert Corner-Cutter").skill_is_usable() && get_property_int("_expertCornerCutterUsed") < 5)
+    {
+        __misc_state["can cook for free"] = true;
+        __misc_state["can bartend for free"] = true;
+    }
 	
 	boolean free_runs_usable = true;
-	if (my_path_id() == PATH_BIG)
+	if (my_path_id() == PATH_BIG || my_path_id() == PATH_POCKET_FAMILIARS) //more like "combat items not usable" but
 		free_runs_usable = false;
 	__misc_state["free runs usable"] = free_runs_usable;
 	
@@ -401,11 +406,11 @@ void setUpState()
 		//skills_temporarily_missing = true;
 		//familiars_temporarily_missing = true;
 	}
-    if (my_path_id() == PATH_AVATAR_OF_WEST_OF_LOATHING || my_path_id() == PATH_NUCLEAR_AUTUMN || my_path_id() == PATH_GELATINOUS_NOOB)
+    if (my_path_id() == PATH_AVATAR_OF_WEST_OF_LOATHING || my_path_id() == PATH_NUCLEAR_AUTUMN || my_path_id() == PATH_GELATINOUS_NOOB || my_path_id() == PATH_G_LOVER)
     {
         skills_temporarily_missing = true;
     }
-    if (my_path_id() == PATH_LICENSE_TO_ADVENTURE)
+    if (my_path_id() == PATH_LICENSE_TO_ADVENTURE || my_path_id() == PATH_POCKET_FAMILIARS)
         familiars_temporarily_blocked = true;
 	__misc_state["skills temporarily missing"] = skills_temporarily_missing;
 	__misc_state["familiars temporarily missing"] = familiars_temporarily_missing;
@@ -483,7 +488,7 @@ void setUpState()
 	//wand
 	
 	boolean wand_of_nagamar_needed = true;
-	if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_BUGBEAR_INVASION || my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_KOLHS || my_path_id() == PATH_HEAVY_RAINS || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_THE_SOURCE || my_path_id() == PATH_LICENSE_TO_ADVENTURE)
+	if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_BUGBEAR_INVASION || my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_KOLHS || my_path_id() == PATH_HEAVY_RAINS || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_THE_SOURCE || my_path_id() == PATH_LICENSE_TO_ADVENTURE || my_path_id() == PATH_POCKET_FAMILIARS)
 		wand_of_nagamar_needed = false;
 		
 	int ruby_w_needed = 1;

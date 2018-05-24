@@ -267,9 +267,9 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                         subentry.modifiers.listAppend("elemental resistance");
                         subentry.entries.listAppend("Fight Lord Spookyraven.");
                         
-                        if ($effect[Red Door Syndrome].have_effect() == 0 && my_meat() > 1000 && black_market_available())
+                        if ($effect[Red Door Syndrome].have_effect() == 0 && my_meat() > 1000 && black_market_available() && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING && my_path_id() != PATH_POCKET_FAMILIARS && $item[can of black paint].item_is_usable())
                         {
-                            subentry.entries.listAppend("A can of black paint can help with fighting him. Bit pricy. (1k meat)");
+                            subentry.entries.listAppend("A can of black paint can help with fighting him." + (my_meat() < 20000 ? " Bit pricy. (1k meat)" : ""));
                         }
                     }
                 }

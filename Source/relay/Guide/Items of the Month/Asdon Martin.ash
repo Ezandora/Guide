@@ -9,9 +9,21 @@ void IOTMAsdonMartinGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
         return;
     //BanishIsActive
     //FIXME test get_fuel() in point release
-    if (!BanishIsActive("Spring-Loaded Front Bumper") && __misc_state["in run"])
+    if (!BanishIsActive("Spring-Loaded Front Bumper") && __misc_state["in run"] && (my_path_id() != PATH_POCKET_FAMILIARS || (__iotms_usable[$item[source terminal]] && __iotms_usable[lookupItem("FantasyRealm membership packet")])))
     {
-        task_entries.listAppend(ChecklistEntryMake("__item Asdon Martin keyfob", "campground.php?action=fuelconvertor", ChecklistSubentryMake("Cast Spring-Loaded Front Bumper", "", "Banish" + (__misc_state["free runs usable"] ? "/free run" : "") + ", costs 50 fuel."), -11));
+    	string description = "Banish" + (__misc_state["free runs usable"] ? "/free run" : "") + ", ";
+     
+     	string fuel = "costs 50 fuel.";
+     	if (get_fuel() < 50)
+        {
+        	description += HTMLGenerateSpanFont(fuel, "red");
+         	description += "|" + HTMLGenerateSpanFont("Fuel up to 50 first.", "red");   
+        }
+        else
+            description += fuel;
+		if (my_path_id() == PATH_POCKET_FAMILIARS)
+			description += "|In FantasyRealm, where you can extract for consumables.";
+        task_entries.listAppend(ChecklistEntryMake("__item Asdon Martin keyfob", "campground.php?action=fuelconvertor", ChecklistSubentryMake("Cast Spring-Loaded Front Bumper", "", description), -11));
     }
 }
 
@@ -87,11 +99,11 @@ void IOTMAsdonMartinGenerateResource(ChecklistEntry [int] resource_entries)
             {
                 //fuelables_extended.listAppend("(...)");
                 int estimated_margin = fuelables_extended_part_2.count() * 1.2;
-                fuelables_extended.listAppend(HTMLGenerateSpanOfClass(HTMLGenerateTagWrap("span", fuelables_extended_part_2.listJoinComponents("<br>"), mapMake("class", "r_tooltip_inner_class", "style", "margin-top:-" + estimated_margin + "em;margin-left:-5em;")) + "Fuel list.", "r_tooltip_outer_class") + ($item[loaf of soda bread].creatable_amount() > 0 ? "|Or create and feed loaf of soda breads." : ""));
+                fuelables_extended.listAppend(HTMLGenerateSpanOfClass(HTMLGenerateTagWrap("span", fuelables_extended_part_2.listJoinComponents("<br>"), mapMake("class", "r_tooltip_inner_class r_tooltip_inner_class_margin", "style", "margin-top:-" + estimated_margin + "em;margin-left:-5em;")) + "Fuel list.", "r_tooltip_outer_class") + ($item[loaf of soda bread].creatable_amount() > 0 ? "|Or create and feed loaf of soda breads." : ""));
             }
             else if ($item[loaf of soda bread].creatable_amount() > 0)
                 description.listAppend("Or create and feed loaf of soda breads.");
-            //description.listAppend(HTMLGenerateSpanOfClass(HTMLGenerateTagWrap("span",HTMLGenerateSimpleTableLines(table, false), mapMake("class", "r_tooltip_inner_class", "style", "margin-top:-" + estimated_margin + "em;margin-left:-5em;")) + "Costs one spleen and two candies.", "r_tooltip_outer_class"));
+            //description.listAppend(HTMLGenerateSpanOfClass(HTMLGenerateTagWrap("span",HTMLGenerateSimpleTableLines(table, false), mapMake("class", "r_tooltip_inner_class  r_tooltip_inner_class_margin", "style", "margin-top:-" + estimated_margin + "em;margin-left:-5em;")) + "Costs one spleen and two candies.", "r_tooltip_outer_class"));
             //description.listAppend("Could fuel with:|*" + fuelables_extended.listJoinComponents("|*", ""));
             description.listAppend(fuelables_extended.listJoinComponents("|*", ""));
             entry.subentries.listAppend(ChecklistSubentryMake(get_fuel() + " Fuel", "", description));
@@ -101,7 +113,7 @@ void IOTMAsdonMartinGenerateResource(ChecklistEntry [int] resource_entries)
                 entry.image_lookup_name = "__item Asdon Martin keyfob";
         }
     }
-    if (!get_property_boolean("_missileLauncherUsed"))
+    if (!get_property_boolean("_missileLauncherUsed") && my_path_id() != PATH_POCKET_FAMILIARS && my_path_id() != PATH_G_LOVER)
     {
         if (entry.image_lookup_name == "")
             entry.image_lookup_name = "__skill asdon martin: missile launcher";

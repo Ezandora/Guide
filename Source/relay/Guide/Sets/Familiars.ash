@@ -122,7 +122,7 @@ void SFamiliarsPuckGenerateResource(ChecklistEntry [int] resource_entries)
             puck_subentries.listAppend(ChecklistSubentryMake(pluralise(power_pills_remaining, "power pill", "power pills") + " obtainable", "", description));
         }
     }
-    if (yellow_pixel != $item[none] && yellow_pixel.available_amount() > 0)
+    if (yellow_pixel != $item[none] && yellow_pixel.available_amount() > 0 && in_ronin())
     {
         string title = pluralise(yellow_pixel);
         string [int] description;

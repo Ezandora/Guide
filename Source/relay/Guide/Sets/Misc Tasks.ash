@@ -29,7 +29,7 @@ void SMiscTasksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
 				potential_targets.listAppend("A bat. (sonar-in-a-biscuit)");
 		}
         
-        if (__misc_state["stench airport available"] && $item[filthy child leash].available_amount() == 0 && !__misc_state["familiars temporarily blocked"] && $items[ittah bittah hookah,astral pet sweater,snow suit,lead necklace].available_amount() == 0 && in_ronin() && my_path_id() != PATH_HEAVY_RAINS && my_path_id() != PATH_GELATINOUS_NOOB)
+        if (__misc_state["stench airport available"] && $item[filthy child leash].available_amount() == 0 && !__misc_state["familiars temporarily blocked"] && $items[ittah bittah hookah,astral pet sweater,snow suit,lead necklace].available_amount() == 0 && in_ronin() && my_path_id() != PATH_HEAVY_RAINS && my_path_id() != PATH_GELATINOUS_NOOB && my_path_id() != PATH_G_LOVER)
         {
             potential_targets.listAppend("Horrible tourist family (barf mountain) - +5 familiar weight leash.");
         }
@@ -225,11 +225,11 @@ void SMiscTasksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     {
         item dwelling = get_dwelling();
         item upgraded_dwelling = $item[none];
-        if ($item[Frobozz Real-Estate Company Instant House (TM)].available_amount() > 0 && (dwelling == $item[big rock] || dwelling == $item[Newbiesport&trade; tent] || get_dwelling() == $item[cottage]))
+        if ($item[Frobozz Real-Estate Company Instant House (TM)].available_amount() > 0 && (dwelling == $item[big rock] || dwelling == $item[Newbiesport&trade; tent] || get_dwelling() == $item[cottage]) && my_path_id() != PATH_G_LOVER)
         {
             upgraded_dwelling = $item[Frobozz Real-Estate Company Instant House (TM)];
         }
-        else if ($item[Newbiesport&trade; tent].available_amount() > 0 && dwelling == $item[big rock])
+        else if ($item[Newbiesport&trade; tent].available_amount() > 0 && dwelling == $item[big rock] && my_path_id() != PATH_G_LOVER)
         {
             upgraded_dwelling = $item[Newbiesport&trade; tent];
         }

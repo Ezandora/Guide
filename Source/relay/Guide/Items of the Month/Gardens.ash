@@ -36,7 +36,7 @@ void generateGardenEntry(ChecklistEntry [int] resource_entries, boolean [item] g
 RegisterResourceGenerationFunction("IOTMGardensGenerateResource");
 void IOTMGardensGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (!__misc_state["in run"])
+	if (!__misc_state["in run"] || !in_ronin())
         return;
 
     //Garden items:

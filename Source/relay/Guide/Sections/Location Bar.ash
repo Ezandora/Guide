@@ -58,7 +58,7 @@ buffer generateLocationBar(boolean displaying_navbar)
     
     string [int] plant_data;
     
-    if (florist_available())
+    if (__iotms_usable[$item[Order of the Green Thumb Order Form]])
     {
         string [location, 3] florist_plants = get_florist_plants();
         

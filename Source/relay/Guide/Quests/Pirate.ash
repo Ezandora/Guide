@@ -8,6 +8,7 @@ void QPirateInit()
 	state.quest_name = "Pirate Quest";
 	state.image_name = "pirate quest";
 	
+	state.state_boolean["valid"] = true;
 	if (__misc_state["mysterious island available"] && !(my_path_id() == PATH_COMMUNITY_SERVICE || __misc_state["in aftercore"]))
 	{
 		state.startable = true;
@@ -42,6 +43,13 @@ void QPirateInit()
     if ($item[pirate fledges].available_amount() > 0 || $item[talisman o' namsilat].available_amount() > 0)
         QuestStateParseMafiaQuestPropertyValue(state, "finished");
 	__quest_state["Pirate Quest"] = state;
+	
+	if (my_path_id() == PATH_POCKET_FAMILIARS || my_path_id() == PATH_G_LOVER)
+	{
+		state.state_boolean["valid"] = false;
+        state.state_boolean["hot wings relevant"] = false;
+        state.state_boolean["need more hot wings"] = false;
+	}
 }
 
 
@@ -49,6 +57,8 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 {
 	if (!__quest_state["Pirate Quest"].in_progress)
 		return;
+    if (!__quest_state["Pirate Quest"].state_boolean["valid"])
+        return;
         
 	QuestState base_quest_state = __quest_state["Pirate Quest"];
 	ChecklistSubentry subentry;

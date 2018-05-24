@@ -69,7 +69,7 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
     int combats_remaining = exploration_remaining;
     combats_remaining = ceil(to_float(exploration_remaining) / exploration_per_turn);
     subentry.entries.listAppend(exploration_remaining + "% exploration remaining. (" + pluralise(combats_remaining, "combat", "combats") + ")");
-    if ($effect[ultrahydrated].have_effect() == 0)
+    if ($effect[ultrahydrated].have_effect() == 0 && my_path_id() != PATH_G_LOVER)
     {
         if (__last_adventure_location == $location[the arid, extra-dry desert])
         {
@@ -128,7 +128,10 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
                 subentry.entries.listAppend(line);
             }
         }
-        if (!base_quest_state.state_boolean["Manual Pages Given"])
+        if (my_path_id() == PATH_G_LOVER)
+        {
+        }
+        else if (!base_quest_state.state_boolean["Manual Pages Given"])
         {
             if ($item[worm-riding manual page].available_amount() == 15)
                 subentry.entries.listAppend("Give Gnasir the worm-riding manual pages.");
@@ -149,7 +152,7 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
                 subentry.entries.listAppend("Use drum machine.");
             }
         }
-        if (!base_quest_state.state_boolean["Wormridden"] && $item[drum machine].available_amount() == 0)
+        if (!base_quest_state.state_boolean["Wormridden"] && $item[drum machine].available_amount() == 0 && my_path_id() != PATH_G_LOVER)
         {
             if (base_quest_state.state_boolean["Manual Pages Given"])
                 subentry.entries.listAppend("Potentially acquire drum machine from blur. (+234% item), use drum machine.");
@@ -176,7 +179,7 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
             subentry.entries.listAppend(line);
         }
     }
-    if ($effect[ultrahydrated].have_effect() == 0)
+    if ($effect[ultrahydrated].have_effect() == 0 && my_path_id() != PATH_G_LOVER)
     {
         if (exploration > 0)
             subentry.entries.listAppend("Acquire ultrahydrated effect from oasis. (potential clover for 20 adventures)");

@@ -247,6 +247,10 @@ Vec2f Vec2fAdd(Vec2f v, float c)
 {
     return Vec2fMake(v.x + c, v.y + c);
 }
+float Vec2fAverage(Vec2f v)
+{
+    return (v.x + v.y) * 0.5;
+}
 
 
 

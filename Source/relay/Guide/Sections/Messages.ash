@@ -310,7 +310,7 @@ string generateRandomMessage()
         equipment_messages[$item[sneaky pete's breath spray]] = "every class a moxie class";
     foreach it in $items[twisted-up wet towel,sommelier's towel,time bandit time towel]
         equipment_messages[it] = "don't panic";
-    equipment_messages[$item[pirate fledges]] = "<img src=\"images/otherimages/12x12skull.gif\" style=\"mix-blend-mode:multiply;\"> oh, better far to live and die, under the brave black flag I fly! <img src=\"images/otherimages/12x12skull.gif\" style=\"mix-blend-mode:multiply;\">";
+    equipment_messages[$item[pirate fledges]] = "<img src=\"images/otherimages/12x12skull.gif\" style=\"mix-blend-mode:multiply;\"><strong> oh, better far to live and die, under the brave black flag I fly! </strong><img src=\"images/otherimages/12x12skull.gif\" style=\"mix-blend-mode:multiply;\">";
     
     foreach it in equipment_messages
     {
@@ -439,6 +439,12 @@ string generateRandomMessage()
         case PATH_LIVE_ASCEND_REPEAT:
             random_messages.listAppend("a single perfect day");
             break;
+        case PATH_POCKET_FAMILIARS:
+        	random_messages.listAppend("adorable slaves");
+            break;
+        case PATH_G_LOVER:
+            random_messages.listAppend("get going, guuuurl");
+            break;
         /*case PATH_CLASS_ACT_3:
             random_messages.listAppend("buttons for the people"); break;
         case PATH_AVATAR_OF_THE_NAUGHTY_SORCERESS:
@@ -500,7 +506,7 @@ string generateRandomMessage()
     if (__quest_state["Level 12"].in_progress && __quest_state["Level 12"].state_int["hippies left on battlefield"] < 1000 && __quest_state["Level 12"].state_int["frat boys left on battlefield"] < 1000)
         random_messages.listAppend("playing sides");
     
-	if (florist_available())
+	if (__iotms_usable[$item[Order of the Green Thumb Order Form]])
         random_messages.listAppend(HTMLGenerateTagWrap("a", "the forgotten friar cries himself to sleep", generateMainLinkMap("place.php?whichplace=forestvillage&amp;action=fv_friar")));
     
 	if (!__misc_state["skills temporarily missing"] && !$skill[Transcendent Olfaction].skill_is_usable())
@@ -717,7 +723,12 @@ string generateRandomMessage()
     encounter_messages["A Tombstone"] = "peperony and chease";
     encounter_messages["Witchess Puzzles"] = "this etch a sketch is hard";
     encounter_messages["Rubbed it the Right Way"] = "desire incarnate";
-    
+	if (my_class() == $class[turtle tamer])
+	{
+		//The Horror... needs disambiguation
+        foreach s in $strings[Nantucket Snapper,Blue Monday,Capital!,Training Day,Boxed In,Duel Nature,Slow Food,A Rolling Turtle Gathers No Moss,Slow Road to Hell,C'mere\, Little Fella,The Real Victims,Like That Time in Tortuga,Cleansing your Palette,Harem Scarum,Turtle in peril,No Man\, No Hole,Slow and Steady Wins the Brawl,Stormy Weather,Turtles of the Universe,O Turtle Were Art Thou,Allow 6-8 Weeks For Delivery,Kick the Can,Turtles All The Way Around,More eXtreme Than Usual,Jewel in the Rough,The worst kind of drowning]
+            encounter_messages[s] = "friend!";
+    }
     if (encounter_messages contains get_property("lastEncounter"))
     {
 		random_messages.listClear();
@@ -816,8 +827,16 @@ string generateRandomMessage()
                 random_messages.listAppend("no good deed goes unpunished"); break;
             case PATH_AVATAR_OF_WEST_OF_LOATHING:
                 random_messages.listAppend("shucks"); break;
+            case PATH_LIVE_ASCEND_REPEAT:
+                random_messages.listAppend("I got you babe"); break;
+            case PATH_LICENSE_TO_ADVENTURE:
+                random_messages.listAppend("you only live twice"); break;
             case PATH_THE_SOURCE:
                 random_messages.listAppend("not like this"); break;
+            case PATH_POCKET_FAMILIARS:
+                random_messages.listAppend(lowercase_player_name + "! now is not the time to use that!"); break;
+            case PATH_G_LOVER:
+                random_messages.listAppend("ghastly"); break;
             default:
                 random_messages.listAppend("ow"); break;
         }
@@ -827,6 +846,8 @@ string generateRandomMessage()
 		random_messages.listClear();
         if (my_path_id() == PATH_LIVE_ASCEND_REPEAT)
             random_messages.listAppend("I got you babe");
+        else if (my_path_id() == PATH_POCKET_FAMILIARS)
+            random_messages.listAppend("pika pika!");
         else
             random_messages.listAppend("find yourself<br>starting back");
 	}

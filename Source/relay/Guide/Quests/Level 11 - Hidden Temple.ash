@@ -20,6 +20,7 @@ void QLevel11HiddenTempleGenerateTasks(ChecklistEntry [int] task_entries, Checkl
 {
 	if (!__quest_state["Hidden Temple Unlock"].in_progress)
         return;
+    if (my_path_id() == PATH_G_LOVER) return;
         
     QuestState base_quest_state = __quest_state["Hidden Temple Unlock"];
     ChecklistSubentry subentry;

@@ -308,7 +308,7 @@ void SSweetSynthesisGenerateResource(ChecklistEntry [int] resource_entries)
         table.listAppend(building_line);
     int estimated_margin = approximate_line_count * 1.2;
     //description.listAppend("Costs one spleen and two candies.");
-    description.listAppend(HTMLGenerateSpanOfClass(HTMLGenerateTagWrap("span",HTMLGenerateSimpleTableLines(table, false), mapMake("class", "r_tooltip_inner_class", "style", "margin-top:-" + estimated_margin + "em;margin-left:-5em;")) + "Costs one spleen and two candies.", "r_tooltip_outer_class"));
+    description.listAppend(HTMLGenerateSpanOfClass(HTMLGenerateTagWrap("span",HTMLGenerateSimpleTableLines(table, false), mapMake("class", "r_tooltip_inner_class r_tooltip_inner_class_margin", "style", "margin-top:-" + estimated_margin + "em;margin-left:-5em;")) + "Costs one spleen and two candies.", "r_tooltip_outer_class"));
     
     
     if (table.count() > 0)

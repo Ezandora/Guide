@@ -1,7 +1,7 @@
 RegisterResourceGenerationFunction("IOTMNewYouGenerateResource");
 void IOTMNewYouGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (__misc_state["in run"])
+    if (__misc_state["in run"] && in_ronin())
     {
         string [item] affirmation_effects;
         string [item] affirmation_combat_uses;
@@ -32,6 +32,8 @@ void IOTMNewYouGenerateResource(ChecklistEntry [int] resource_entries)
         foreach it in affirmation_effects
         {
             if (it.item_amount() == 0) continue;
+            if (!it.item_is_usable()) continue;
+            if (!it.to_effect().effect_is_usable()) continue;
             if (entry.image_lookup_name == "")
                 entry.image_lookup_name = "__item " + it;
             string combat_text = "";

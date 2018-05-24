@@ -8,6 +8,7 @@ void IOTMMeteorLoreGenerateResource(ChecklistEntry [int] resource_entries)
         return;
     if (!__misc_state["in run"]) return;
     if (!mafiaIsPastRevision(18174)) return;
+    if (my_path_id() == PATH_G_LOVER) return;
     
     ChecklistEntry entry;
     entry.image_lookup_name = "__skill Meteor Lore";
@@ -54,7 +55,7 @@ void IOTMMeteorLoreGenerateResource(ChecklistEntry [int] resource_entries)
         description.listAppend("+200% weapon/spell damage, +20 familiar weight, for a single fight.");
         entry.subentries.listAppend(ChecklistSubentryMake(pluralise(meteor_shower_uses_remaining, "meteor shower", "meteor showers"), "", description));
     }
-    if (lookupItem("metal meteoroid").available_amount() > 0)
+    if (lookupItem("metal meteoroid").available_amount() > 0 && in_ronin())
     {
         string [int] description;
         description.listAppend("Craft into useful equipment.");

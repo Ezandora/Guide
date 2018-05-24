@@ -105,13 +105,13 @@ void smithsnessGenerateSmithereensSuggestions(string [int] smithereen_suggestion
 RegisterResourceGenerationFunction("IOTMSmithsnessGenerateResource");
 void IOTMSmithsnessGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (__misc_state["in run"] && $item[handful of smithereens].available_amount() > 0)
+	if (__misc_state["in run"] && $item[handful of smithereens].available_amount() > 0 && in_ronin())
 	{
 		string [int] smithereen_suggestions;
 		smithsnessGenerateSmithereensSuggestions(smithereen_suggestions);
 		resource_entries.listAppend(ChecklistEntryMake("__item handful of smithereens", "", ChecklistSubentryMake(pluralise($item[handful of smithereens]), "", smithereen_suggestions.listJoinComponents("<hr>")), 10));
 	}
-	if (__misc_state["in run"] && $item[lump of Brituminous coal].available_amount() > 0)
+	if (__misc_state["in run"] && $item[lump of Brituminous coal].available_amount() > 0 && in_ronin())
 	{
 		string [int] coal_suggestions;
 		smithsnessGenerateCoalSuggestions(coal_suggestions);

@@ -61,6 +61,8 @@ void SBuffUpkeepGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         skills_want_running.listAppend($skill[Bounty of Renenutet]);
     skills_want_running.listAppend($skill[Power of Heka]);
     skills_want_running.listAppend($skill[Wisdom of Thoth]);
+    if (my_primestat() == $stat[mysticality])
+	    skills_want_running.listAppend(lookupSkill("Inscrutable Gaze"));
     
     
     
@@ -78,7 +80,7 @@ void SBuffUpkeepGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
     skill [int] final_skills;
     foreach key, s in skills_want_running
     {
-        if (!s.have_skill() || !s.is_unrestricted())
+        if (!s.skill_is_usable() || !s.is_unrestricted())
             continue;
         effect e = s.to_effect();
         if (e == $effect[none])

@@ -87,8 +87,10 @@ item [int] ItemFilterGetPotionsCouldPullToAddToNumericModifier(string [int] modi
     {
         if (it.available_amount() > 0) continue;
         if (!it.tradeable && it.storage_amount() == 0) continue;
+        if (!it.item_is_usable()) continue;
         effect e = it.to_effect();
         if (e.have_effect() > 0) continue;
+        if (!e.effect_is_usable()) continue;
         float v = 0;
         foreach key, modifier in modifiers
             v += e.numeric_modifier(modifier);

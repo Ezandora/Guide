@@ -99,6 +99,9 @@ void generatePullList(Checklist [int] checklists)
 	
 	GPItem [int] pullable_item_list;
     
+    boolean combat_items_usable = true;
+    if (my_path_id() == PATH_POCKET_FAMILIARS)
+    	combat_items_usable = false;
     if (__misc_state["need to level"])
     {
         if (my_primestat() == $stat[muscle])
@@ -208,7 +211,11 @@ void generatePullList(Checklist [int] checklists)
 	pullable_item_list.listAppend(GPItemMake($item[greatest american pants], "navel runaways|others", 1));
 	pullable_item_list.listAppend(GPItemMake($item[juju mojo mask], "?", 1));
     if (__misc_state["free runs usable"])
+    {
         pullable_item_list.listAppend(GPItemMake($item[navel ring of navel gazing], "free runaways|easy fights", 1));
+        if (combat_items_usable)
+	        pullable_item_list.listAppend(GPItemMake($item[mafia middle finger ring], "one free runaway/banish/day", 1));
+    }
 	//pullable_item_list.listAppend(GPItemMake($item[haiku katana], "?", 1));
 	pullable_item_list.listAppend(GPItemMake($item[bottle-rocket crossbow], "?", 1));
 	pullable_item_list.listAppend(GPItemMake($item[jekyllin hide belt], "+variable% item", 3));
@@ -235,8 +242,10 @@ void generatePullList(Checklist [int] checklists)
                 pullable_item_list.listAppend(GPItemMake($item[cane-mail shirt], "+20ML shirt", 1));
         }
     }
-    pullable_item_list.listAppend(GPItemMake($item[Clara's Bell], "Forces a non-combat, once/day.", 1));
-    pullable_item_list.listAppend(GPItemMake($item[replica bat-oomerang], "Saves three turns/day.", 1));
+    if (my_path_id() != PATH_G_LOVER)
+	    pullable_item_list.listAppend(GPItemMake($item[Clara's Bell], "Forces a non-combat, once/day.", 1));
+    if (combat_items_usable)
+    	pullable_item_list.listAppend(GPItemMake($item[replica bat-oomerang], "Saves three turns/day.", 1));
     
     if (__misc_state["spooky airport available"] && __misc_state["need to level"] && __misc_state["can drink just about anything"] && $effect[jungle juiced].have_effect() == 0)
     {
@@ -270,11 +279,11 @@ void generatePullList(Checklist [int] checklists)
         if (__misc_state_int["fat loot tokens needed"] > 0)
         {
             string [int] which_pies;
-            if ($items[boris's key,boris's key lime pie].available_amount() == 0)
+            if ($items[boris's key,boris's key lime pie].available_amount() == 0 && my_path_id() != PATH_G_LOVER)
                 which_pies.listAppend("Boris");
             if ($items[jarlsberg's key,jarlsberg's key lime pie].available_amount() == 0)
                 which_pies.listAppend("Jarlsberg");
-            if ($items[sneaky pete's key,sneaky pete's key lime pie].available_amount() == 0)
+            if ($items[sneaky pete's key,sneaky pete's key lime pie].available_amount() == 0 && my_path_id() != PATH_G_LOVER)
                 which_pies.listAppend("Sneaky Pete");
             string line;
             if (which_pies.count() > 0)
@@ -286,12 +295,13 @@ void generatePullList(Checklist [int] checklists)
         }
         if (availableFullness() >= 5)
         {
-            if (my_level() >= 13)
+            if (my_level() >= 13 && my_path_id() != PATH_G_LOVER)
                 food_selections.listAppend("hi meins");
-            else if ($item[moon pie].is_unrestricted())
+            else if ($item[moon pie].is_unrestricted() && my_path_id() != PATH_G_LOVER)
                 food_selections.listAppend("moon pies");
             
-            food_selections.listAppend("fleetwood mac 'n' cheese" + (my_level() < 8 ? " (level 8)" : ""));
+            if (my_path_id() != PATH_G_LOVER)
+	            food_selections.listAppend("fleetwood mac 'n' cheese" + (my_level() < 8 ? " (level 8)" : ""));
             if ($item[karma shawarma].is_unrestricted())
                 food_selections.listAppend("karma shawarma? (expensive" + (my_level() < 7 ? ", level 7" : "") + ")");
             //FIXME maybe the new pasta?
@@ -324,7 +334,7 @@ void generatePullList(Checklist [int] checklists)
         pullable_item_list.listAppend(GPItemMake($item[bottle of blank-out], "run away from your problems", 1));
 	
 	
-    if (!__quest_state["Level 11 Hidden City"].finished && !__quest_state["Level 11"].finished && (get_property_int("hiddenApartmentProgress") < 1 || get_property_int("hiddenBowlingAlleyProgress") < 1 || get_property_int("hiddenHospitalProgress") < 1 || get_property_int("hiddenOfficeProgress") < 1) && __misc_state["can equip just about any weapon"])
+    if (!__quest_state["Level 11 Hidden City"].finished && !__quest_state["Level 11"].finished && (get_property_int("hiddenApartmentProgress") < 1 || get_property_int("hiddenBowlingAlleyProgress") < 1 || get_property_int("hiddenHospitalProgress") < 1 || get_property_int("hiddenOfficeProgress") < 1) && __misc_state["can equip just about any weapon"] && my_path_id() != PATH_POCKET_FAMILIARS)
     {
         boolean have_machete = false;
         foreach it in __dense_liana_machete_items
@@ -339,7 +349,7 @@ void generatePullList(Checklist [int] checklists)
                 //machetito
                 pullable_item_list.listAppend(GPItemMake($item[machetito], "Machete for dense liana", 1));
             }
-            else if ($item[muculent machete].is_unrestricted()) //my_basestat($stat[muscle]) < 62 &&
+            else if ($item[muculent machete].is_unrestricted() && my_path_id() != PATH_G_LOVER) //my_basestat($stat[muscle]) < 62 &&
             {
                 //muculent machete, also gives +5% meat, op ti mal
                 pullable_item_list.listAppend(GPItemMake($item[muculent machete], "Machete for dense liana", 1));
@@ -353,7 +363,7 @@ void generatePullList(Checklist [int] checklists)
     }
 	
 	//Quest-relevant items:
-	if ($familiar[Intergnat].familiar_is_usable())
+	if ($familiar[Intergnat].familiar_is_usable() && my_path_id() != PATH_G_LOVER)
     {
         pullable_item_list.listAppend(GPItemMake($item[infinite BACON machine], "One copy/day with ~seven turns of intergnat.", 1));
     }
@@ -363,7 +373,7 @@ void generatePullList(Checklist [int] checklists)
 		
 		boxes_needed = MIN(3, boxes_needed); //bridge! farming?
 		
-		if (boxes_needed > 0)
+		if (boxes_needed > 0 && my_path_id() != PATH_G_LOVER)
 			pullable_item_list.listAppend(GPItemMake($item[smut orc keepsake box], "Skip level 9 bridge building.", boxes_needed));
 	}
     if (__quest_state["Level 9"].state_int["peak tests remaining"] > 0)
@@ -412,7 +422,7 @@ void generatePullList(Checklist [int] checklists)
         }
     }
     
-    if ($item[talisman o' namsilat].available_amount() == 0 && !have_outfit_components("Swashbuckling Getup") && $item[pirate fledges].available_amount() == 0 && !__quest_state["Pirate Quest"].finished)
+    if (($item[talisman o' namsilat].available_amount() == 0 || !__quest_state["Level 9"].state_boolean["bridge complete"]) && !have_outfit_components("Swashbuckling Getup") && $item[pirate fledges].available_amount() == 0)// && !__quest_state["Pirate Quest"].finished)
     {
         item [int] missing_outfit_components = missing_outfit_components("Swashbuckling Getup");
         if (missing_outfit_components.count() > 0)
@@ -420,6 +430,8 @@ void generatePullList(Checklist [int] checklists)
             string entry = missing_outfit_components.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".";
             if ($item[eyepatch].available_amount() == 0)
                 entry += "|Or NPZR head/clockwork pirate skull to untinker for eyepatch/clockwork maid.";
+            if (!__quest_state["Pirate Quest"].state_boolean["valid"])
+            	entry += "|No, really! You can get a free bridge!";
             pullable_item_list.listAppend(GPItemMake("Swashbuckling Getup", "__item " + missing_outfit_components[0], entry));
         }
     }
@@ -444,7 +456,8 @@ void generatePullList(Checklist [int] checklists)
             pullable_item_list.listAppend(GPItemMake($item[iFlail], "-combat, +11 ML, +5 familiar weight"));
         if (__misc_state["Torso aware"]) //FIXME exclusiveness with camouflage T-shirt. probably should pull camou if we're over muscle stat, otherwise stealth vest, or whichever we have
             pullable_item_list.listAppend(GPItemMake($item[xiblaxian stealth vest], "-combat shirt"));
-        pullable_item_list.listAppend(GPItemMake($item[duonoculars], "-combat, +5 ML"));
+        if (my_path_id() != PATH_G_LOVER)
+	        pullable_item_list.listAppend(GPItemMake($item[duonoculars], "-combat, +5 ML"));
         pullable_item_list.listAppend(GPItemMake($item[ring of conflict], "-combat"));
         if ($item[red shoe].can_equip() || my_path_id() == PATH_GELATINOUS_NOOB)
             pullable_item_list.listAppend(GPItemMake($item[red shoe], "-combat"));
@@ -452,7 +465,7 @@ void generatePullList(Checklist [int] checklists)
 	
 	pullable_item_list.listAppend(GPItemMake($item[ten-leaf clover], "Various turn saving.|Generic pull.", 20));
     
-    if (!get_property_ascension("lastTempleUnlock") && $item[spooky-gro fertilizer].available_amount() == 0)
+    if (!get_property_ascension("lastTempleUnlock") && $item[spooky-gro fertilizer].available_amount() == 0 && my_path_id() != PATH_G_LOVER)
         pullable_item_list.listAppend(GPItemMake($item[spooky-gro fertilizer], "Saves 2.5 turns while unlocking temple."));
 	
 	string [int] scrip_reasons;
@@ -472,7 +485,7 @@ void generatePullList(Checklist [int] checklists)
 		pullable_item_list.listAppend(GPItemMake($item[Shore Inc. Ship Trip Scrip], "Saves three turns each.|" + scrip_reasons.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".", scrip_needed));
 	}
     //FIXME add hat/stuffing fluffer/blank-out
-    if (availableSpleen() >= 2 && my_path_id() != PATH_NUCLEAR_AUTUMN)
+    if (availableSpleen() >= 2 && my_path_id() != PATH_NUCLEAR_AUTUMN && my_path_id() != PATH_G_LOVER)
     {
 		pullable_item_list.listAppend(GPItemMake($item[turkey blaster], "Burns five turns of delay in last adventured area. Costs spleen, limited uses/day.", MIN(3 - get_property_int("_turkeyBlastersUsed"), MIN(availableSpleen() / 2, 3)))); //FIXME learn what this limit is. also suggest in advance?
     }
@@ -488,7 +501,7 @@ void generatePullList(Checklist [int] checklists)
     
     if (!__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && __quest_state["Level 11 Desert"].state_int["Desert Exploration"] < 95)
     {
-        if (!__quest_state["Level 11 Desert"].state_boolean["Wormridden"])
+        if (!__quest_state["Level 11 Desert"].state_boolean["Wormridden"] && my_path_id() != PATH_G_LOVER)
             pullable_item_list.listAppend(GPItemMake($item[drum machine], "30% desert exploration with pages.", 1));
         if (!__quest_state["Level 11 Desert"].state_boolean["Killing Jar Given"] && $location[the haunted bedroom].locationAvailable())
             pullable_item_list.listAppend(GPItemMake($item[killing jar], "15% desert exploration.", 1));
@@ -534,6 +547,7 @@ void generatePullList(Checklist [int] checklists)
     {
         pullable_item_list.listAppend(GPItemMake($item[filthy lucre], "Turn into odor extractors for olfaction.", 6));
     }
+    pullable_item_list.listAppend(GPItemMake($item[mafia thumb ring], "lazy turngen", 1));
     
     
 	

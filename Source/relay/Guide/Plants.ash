@@ -55,7 +55,7 @@ string [int] __plant_output_order; //MUST contain all plants
 
 void finaliseSetUpFloristState()
 {
-	if (!florist_available())
+	if (!__iotms_usable[$item[Order of the Green Thumb Order Form]])
 		return;
 	
 	//Set up suggestions:
@@ -241,7 +241,7 @@ void finaliseSetUpFloristState()
 
 void generateFloristFriar(Checklist [int] checklists)
 {
-	if (!florist_available())
+	if (!__iotms_usable[$item[Order of the Green Thumb Order Form]])
 		return;
     if (!__misc_state["in run"]) //currently, these suggestions are in-run only
         return;

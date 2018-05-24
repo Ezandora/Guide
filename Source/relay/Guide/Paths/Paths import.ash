@@ -13,3 +13,4 @@ import "relay/Guide/Paths/Zombie Slayer.ash";
 import "relay/Guide/Paths/Nuclear Autumn.ash";
 import "relay/Guide/Paths/Gelatinous Noob.ash";
 import "relay/Guide/Paths/License to Adventure.ash";
+import "relay/Guide/Paths/G-Lover.ash";

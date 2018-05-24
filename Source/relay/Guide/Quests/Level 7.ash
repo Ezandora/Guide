@@ -105,7 +105,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		
 		subentry.entries.listAppend(evilness_text["cyrptNookEvilness"]);
 		
-		if (evilness > 26)
+		if (evilness > 26 && my_path_id() != PATH_G_LOVER)
 		{
             subentry.modifiers.listAppend("+400% item");
             float item_drop = (100.0 + $location[the defiled nook].item_drop_modifier_for_location()) / 100.0;

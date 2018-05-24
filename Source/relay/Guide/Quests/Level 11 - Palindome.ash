@@ -8,7 +8,7 @@ void QLevel11PalindomeInit()
     state.state_boolean["Need instant camera"] = false;
     if ($item[photograph of a dog].available_amount() + $item[disposable instant camera].available_amount() == 0 && state.mafia_internal_step < 3)
         state.state_boolean["Need instant camera"] = true;
-    if (7270.to_item().available_amount() > 0)
+    if (7270.to_item().available_amount() > 0 || my_path_id() == PATH_POCKET_FAMILIARS || my_path_id() == PATH_G_LOVER)
         state.state_boolean["Need instant camera"] = false;
     
     state.state_boolean["dr. awkward's office unlocked"] = false;
@@ -48,9 +48,12 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
     {
         //1 -> find palindome
         url = "place.php?whichplace=cove";
-        subentry.entries.listAppend("Find the palindome. The pirates will know the way.");
+        if (__quest_state["Pirate Quest"].state_boolean["valid"])
+        	subentry.entries.listAppend("Find the palindome. The pirates will know the way.");
+        else
+            subentry.entries.listAppend("Find the palindome by completing the copperhead/zeppelin quest.");
         
-        if (!is_wearing_outfit("Swashbuckling Getup") && $item[pirate fledges].equipped_amount() == 0)
+        if (!is_wearing_outfit("Swashbuckling Getup") && $item[pirate fledges].equipped_amount() == 0 && $item[pirate fledges].available_amount() > 0)
         {
             if ($item[pirate fledges].available_amount() > 0 && $item[pirate fledges].can_equip())
                 subentry.entries.listAppend("Equip the pirate fledges first.");
@@ -58,8 +61,11 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                 subentry.entries.listAppend("Equip the Swashbuckling Getup first.");
             url = "inventory.php?which=2";
         }
-            
-        if ($location[the poop deck].noncombat_queue.contains_text("It's Always Swordfish") || $location[belowdecks].turnsAttemptedInLocation() > 0)
+        
+        if (!__quest_state["Pirate Quest"].state_boolean["valid"])
+        {
+        }
+        else if ($location[the poop deck].noncombat_queue.contains_text("It's Always Swordfish") || $location[belowdecks].turnsAttemptedInLocation() > 0)
         {
             if ($items[gaudy key,snakehead charrrm].available_amount() < 2)
             {
@@ -78,7 +84,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
             if ($item[gaudy key].available_amount() > 0)
                 subentry.entries.listAppend("Use " + $item[gaudy key].pluralise() + ".");
         }
-        else
+        else if ($item[pirate fledges].available_amount() > 0)
         {
             subentry.modifiers.listAppend("-combat");
             subentry.entries.listAppend("Run -combat on the Poop Deck to unlock belowdecks.");
@@ -103,6 +109,10 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                         subentry.entries.listAppend("If you encounter the wheel/O Cap'm adventure, take the helm, and sail to " + coordinates + ".");
                 }
             }
+        }
+        else
+        {
+            subentry.entries.listAppend("Do pirate quest first.");
         }
             
     }
@@ -270,7 +280,12 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
             
             if ($item[photograph of a dog].available_amount() == 0)
             {
-                if ($item[disposable instant camera].available_amount() == 0)
+            	if (my_path_id() == PATH_POCKET_FAMILIARS || my_path_id() == PATH_G_LOVER)
+                {
+                    need_to_adventure_in_palindome = true;
+                    subentry.entries.listAppend("Defeat Bob Racecar or Racecar Bobs until you acquire the photograph of a dog.");
+                }
+                else if ($item[disposable instant camera].available_amount() == 0)
                 {
                     subentry.modifiers.listClear();
                     url = $location[the haunted bedroom].getClickableURLForLocation();

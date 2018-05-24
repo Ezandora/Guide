@@ -38,7 +38,7 @@ void IOTMXOSkeletonGenerateResource(ChecklistEntry [int] resource_entries)
 		entry.subentries.listAppend(ChecklistSubentryMake(pluralise(hugs_remaining, "hug", "hugs"), "", description));
 	}
 	
-	if (__misc_state["in run"] || true)
+	if (__misc_state["in run"] && in_ronin())
 	{
         int xes = lookupItem("9543").available_amount();
         int os = lookupItem("9544").available_amount();

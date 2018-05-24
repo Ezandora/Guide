@@ -114,16 +114,16 @@ void QLevel11RonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         if (__misc_state["Torso aware"])
             relevant_lynyrdskin_items[$item[lynyrdskin tunic]] = true;
         
-        if ($item[lynyrd musk].available_amount() > 0 && $effect[Musky].have_effect() == 0)
+        if ($item[lynyrd musk].available_amount() > 0 && $effect[Musky].have_effect() == 0 && my_path_id() != PATH_G_LOVER)
         {
             subentry.entries.listAppend(HTMLGenerateSpanFont("Use lynyrd musk.", "red"));
             url = "inventory.php?which=3";
         }
-        if ($item[cigarette lighter].available_amount() > 0 && base_quest_state.state_boolean["need protestor speed tricks"])
+        if ($item[cigarette lighter].available_amount() > 0 && base_quest_state.state_boolean["need protestor speed tricks"] && my_path_id() != PATH_POCKET_FAMILIARS)
         {
             subentry.entries.listAppend(HTMLGenerateSpanFont("Use cigarette lighter in-combat.", "red"));
         }
-        if ($item[lynyrd snare].available_amount() > 0 && $items[lynyrdskin cap,lynyrdskin tunic,lynyrdskin breeches].items_missing().count() > 0) //FIXME daily tracking
+        if ($item[lynyrd snare].available_amount() > 0 && $items[lynyrdskin cap,lynyrdskin tunic,lynyrdskin breeches].items_missing().count() > 0 && $item[lynyrd snare].item_is_usable()) //FIXME daily tracking
         {
             subentry.entries.listAppend("Possibly use the lynyrd snare. (free combat)");
         }
@@ -198,16 +198,18 @@ void QLevel11RonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         subentry.entries.listAppend("Search for Ron in the zeppelin.");
         //possibly 50% chance of no progress without a ticket (unconfirmed chat rumour)
         
-        subentry.modifiers.listAppend("+234% item");
-        foreach m in $monsters[Red Herring,Red Snapper]
+        if (my_path_id() != PATH_POCKET_FAMILIARS)
         {
-            if (!m.is_banished())
-                subentry.modifiers.listAppend("banish " + m);
+            subentry.modifiers.listAppend("+234% item");
+            foreach m in $monsters[Red Herring,Red Snapper]
+            {
+                if (!m.is_banished())
+                    subentry.modifiers.listAppend("banish " + m);
+            }
+            
+            if (__misc_state["have olfaction equivalent"])
+                subentry.modifiers.listAppend("olfact red butler");
         }
-        
-        if (__misc_state["have olfaction equivalent"])
-            subentry.modifiers.listAppend("olfact red butler");
-        
         
         if ($item[red zeppelin ticket].available_amount() == 0)
         {
@@ -221,7 +223,7 @@ void QLevel11RonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
                 subentry.entries.listAppend("No ticket.");
         }
             
-        if (get_property_int("_glarkCableUses") < 5)
+        if (get_property_int("_glarkCableUses") < 5 && my_path_id() != PATH_POCKET_FAMILIARS)
         {
             if ($skill[Transcendent Olfaction].skill_is_usable() && !($effect[on the trail].have_effect() > 0 && get_property_monster("olfactedMonster") == $monster[red butler]))
                 subentry.entries.listAppend("Olfact red butlers for glark cables.");

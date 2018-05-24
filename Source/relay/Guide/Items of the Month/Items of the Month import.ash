@@ -37,4 +37,6 @@ import "relay/Guide/Items of the Month/GenieBottle.ash";
 import "relay/Guide/Items of the Month/Horsery.ash";
 import "relay/Guide/Items of the Month/XO Skeleton.ash";
 import "relay/Guide/Items of the Month/Portable Pantogram.ash";
+import "relay/Guide/Items of the Month/Garbage Tote.ash";
+import "relay/Guide/Items of the Month/Zutara.ash";
 

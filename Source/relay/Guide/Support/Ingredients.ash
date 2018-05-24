@@ -43,6 +43,7 @@ boolean parseDatafileItem(int [item] out, string item_name)
     return true;
 }
 
+
 Record ConcoctionMapEntry
 {
     //Only way I know how to parse this file with file_to_map. string [int] won't work, string [string] won't...
@@ -258,6 +259,12 @@ int [item] get_ingredients_fast(item it)
 boolean item_is_purchasable_from_a_store(item it)
 {
     return __item_is_purchasable_from_a_store[it];
+}
+
+boolean item_cannot_be_asdon_martined_because_it_was_purchased_from_a_store(item it)
+{
+	if ($items[wasabi pocky,tobiko pocky,natto pocky,wasabi-infused sake,tobiko-infused sake,natto-infused sake] contains it) return false;
+	return it.item_is_purchasable_from_a_store();
 }
 
 void testItemIngredients()

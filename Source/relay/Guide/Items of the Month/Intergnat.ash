@@ -52,7 +52,7 @@ void IOTMIntergnatGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__item daily dungeon malware", "da.php", ChecklistSubentryMake("Daily dungeon malware", "", "Use on a daily dungeon monster to gain a fat loot token."), 7));
     }
     int bacon_amount = $item[BACON].available_amount();
-    if (__misc_state["in run"] && bacon_amount > 0)
+    if (__misc_state["in run"] && bacon_amount > 0 && in_ronin())
     {
         /*
         Viral video - YR if they don't have one.
@@ -65,9 +65,10 @@ void IOTMIntergnatGenerateResource(ChecklistEntry [int] resource_entries)
         if (meme_shop != $coinmaster[none])
         {
             string [item] bacon_description;
-            if (!__misc_state["yellow ray available"] & $effect[everything looks yellow].have_effect() == 0)
+            if (!__misc_state["yellow ray available"] & $effect[everything looks yellow].have_effect() == 0 && my_path_id() != PATH_G_LOVER)
                 bacon_description[$item[Viral video]] = "yellow ray";
-            bacon_description[$item[print screen button]] = "copies a monster";
+            if (my_path_id() != PATH_G_LOVER)
+	            bacon_description[$item[print screen button]] = "copies a monster";
             if (__misc_state_int["fat loot tokens needed"] > 0)
                 bacon_description[$item[daily dungeon malware]] = "expensive DD token source";
             if (availableFullness() >= 15)

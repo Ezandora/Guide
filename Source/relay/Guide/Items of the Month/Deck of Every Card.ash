@@ -246,7 +246,7 @@ void IOTMDeckOfEveryCardGenerateResource(ChecklistEntry [int] resource_entries)
         tooltip_text.append(HTMLGenerateTagWrap("div", "Monster Cards", mapMake("class", "r_bold r_centre", "style", "padding-bottom:0.25em;")));
         tooltip_text.append(HTMLGenerateSimpleTableLines(tooltip_table));
         
-        string title = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip_text, "r_tooltip_inner_class") + "Monster card", "r_tooltip_outer_class");
+        string title = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip_text, "r_tooltip_inner_class r_tooltip_inner_class_margin") + "Monster card", "r_tooltip_outer_class");
         summons.listAppend(DOECSummonMake(title, "Past factoids."));
     }
     

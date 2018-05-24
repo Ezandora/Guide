@@ -71,9 +71,10 @@ void generateMisc(Checklist [int] checklists)
                 //adventures_after_rollover -= 20;
             adventures_after_rollover += get_property_int("extraRolloverAdventures");
             
-            adventures_after_rollover = clampi(adventures_after_rollover, 0, 200);
             if (getHolidaysTomorrow()["Labór Day"] && my_path_id() != PATH_SLOW_AND_STEADY)
                 adventures_after_rollover += 10;
+            
+            adventures_after_rollover = clampi(adventures_after_rollover, 0, 200);
             
             string [int] all_tomorrows_parties;
             all_tomorrows_parties.listAppend(pluralise(adventures_after_rollover, "adventure", "adventures")); //it should be impossible to have under twenty adventures after rollover, but why should that stop us from checking the singular case?

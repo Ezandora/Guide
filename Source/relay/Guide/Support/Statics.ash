@@ -1,6 +1,155 @@
 
 import "relay/Guide/Support/Ingredients.ash"
 
+
+
+static
+{
+    int PATH_UNKNOWN = -1;
+    int PATH_NONE = 0;
+    int PATH_BOOZETAFARIAN = 1;
+    int PATH_TEETOTALER = 2;
+    int PATH_OXYGENARIAN = 3;
+
+    int PATH_BEES_HATE_YOU = 4;
+    int PATH_WAY_OF_THE_SURPRISING_FIST = 6;
+    int PATH_TRENDY = 7;
+    int PATH_AVATAR_OF_BORIS = 8;
+    int PATH_BUGBEAR_INVASION = 9;
+    int PATH_ZOMBIE_SLAYER = 10;
+    int PATH_CLASS_ACT = 11;
+    int PATH_AVATAR_OF_JARLSBERG = 12;
+    int PATH_BIG = 14;
+    int PATH_KOLHS = 15;
+    int PATH_CLASS_ACT_2 = 16;
+    int PATH_AVATAR_OF_SNEAKY_PETE = 17;
+    int PATH_SLOW_AND_STEADY = 18;
+    int PATH_HEAVY_RAINS = 19;
+    int PATH_PICKY = 21;
+    int PATH_STANDARD = 22;
+    int PATH_ACTUALLY_ED_THE_UNDYING = 23;
+    int PATH_ONE_CRAZY_RANDOM_SUMMER = 24;
+    int PATH_COMMUNITY_SERVICE = 25;
+    int PATH_AVATAR_OF_WEST_OF_LOATHING = 26;
+    int PATH_THE_SOURCE = 27;
+    int PATH_NUCLEAR_AUTUMN = 28;
+    int PATH_GELATINOUS_NOOB = 29;
+    int PATH_LICENSE_TO_ADVENTURE = 30;
+    int PATH_LIVE_ASCEND_REPEAT = 31;
+    int PATH_POCKET_FAMILIARS = 32;
+    int PATH_G_LOVER = 33;
+}
+
+int __my_path_id_cached = -11;
+int my_path_id()
+{
+    if (__my_path_id_cached != -11)
+        return __my_path_id_cached;
+    string path_name = my_path();
+    
+    if (path_name == "" || path_name == "None")
+        __my_path_id_cached = PATH_NONE;
+    else if (path_name == "Teetotaler")
+        __my_path_id_cached = PATH_TEETOTALER;
+    else if (path_name == "Boozetafarian")
+        __my_path_id_cached = PATH_BOOZETAFARIAN;
+    else if (path_name == "Oxygenarian")
+        __my_path_id_cached = PATH_OXYGENARIAN;
+    else if (path_name == "Bees Hate You")
+        __my_path_id_cached = PATH_BEES_HATE_YOU;
+    else if (path_name == "Way of the Surprising Fist")
+        __my_path_id_cached = PATH_WAY_OF_THE_SURPRISING_FIST;
+    else if (path_name == "Trendy")
+        __my_path_id_cached = PATH_TRENDY;
+    else if (path_name == "Avatar of Boris")
+        __my_path_id_cached = PATH_AVATAR_OF_BORIS;
+    else if (path_name == "Bugbear Invasion")
+        __my_path_id_cached = PATH_BUGBEAR_INVASION;
+    else if (path_name == "Zombie Slayer")
+        __my_path_id_cached = PATH_ZOMBIE_SLAYER;
+    else if (path_name == "Class Act")
+        __my_path_id_cached = PATH_CLASS_ACT;
+    else if (path_name == "Avatar of Jarlsberg")
+        __my_path_id_cached = PATH_AVATAR_OF_JARLSBERG;
+    else if (path_name == "BIG!")
+        __my_path_id_cached = PATH_BIG;
+    else if (path_name == "KOLHS")
+        __my_path_id_cached = PATH_KOLHS;
+    else if (path_name == "Class Act II: A Class For Pigs")
+        __my_path_id_cached = PATH_CLASS_ACT_2;
+    else if (path_name == "Avatar of Sneaky Pete")
+        __my_path_id_cached = PATH_AVATAR_OF_SNEAKY_PETE;
+    else if (path_name == "Slow and Steady")
+        __my_path_id_cached = PATH_SLOW_AND_STEADY;
+    else if (path_name == "Heavy Rains")
+        __my_path_id_cached = PATH_HEAVY_RAINS;
+    else if (path_name == "Picky")
+        __my_path_id_cached = PATH_PICKY;
+    else if (path_name == "Standard")
+        __my_path_id_cached = PATH_STANDARD;
+    else if (path_name == "Actually Ed the Undying")
+        __my_path_id_cached = PATH_ACTUALLY_ED_THE_UNDYING;
+    else if (path_name == "One Crazy Random Summer")
+        __my_path_id_cached = PATH_ONE_CRAZY_RANDOM_SUMMER;
+    else if (path_name == "Community Service" || path_name == "25")
+        __my_path_id_cached = PATH_COMMUNITY_SERVICE;
+    else if (path_name == "Avatar of West of Loathing")
+        __my_path_id_cached = PATH_AVATAR_OF_WEST_OF_LOATHING;
+    else if (path_name == "The Source")
+        __my_path_id_cached = PATH_THE_SOURCE;
+    else if (path_name == "Nuclear Autumn" || path_name == "28")
+        __my_path_id_cached = PATH_NUCLEAR_AUTUMN;
+    else if (path_name == "Gelatinous Noob")
+        __my_path_id_cached = PATH_GELATINOUS_NOOB;
+    else if (path_name == "License to Adventure")
+        __my_path_id_cached = PATH_LICENSE_TO_ADVENTURE;
+    else if (path_name == "Live. Ascend. Repeat.")
+        __my_path_id_cached = PATH_LIVE_ASCEND_REPEAT;
+    else if (path_name == "Pocket Familiars" || path_name == "32")
+        __my_path_id_cached = PATH_POCKET_FAMILIARS;
+    else if (path_name == "G-Lover" || path_name == "33")
+        __my_path_id_cached = PATH_G_LOVER;
+    else
+        __my_path_id_cached = PATH_UNKNOWN;
+    return __my_path_id_cached;
+}
+
+float numeric_modifier_replacement(item it, string modifier)
+{
+    string modifier_lowercase = modifier.to_lower_case();
+    float additional = 0;
+    if (my_path_id() == PATH_G_LOVER && !it.contains_text("g") && !it.contains_text("G"))
+    	return 0.0;
+    if (it == $item[your cowboy boots])
+    {
+        if (modifier_lowercase == "monster level" && $slot[bootskin].equipped_item() == $item[diamondback skin])
+        {
+            return 20.0;
+        }
+        if (modifier_lowercase == "initiative" && $slot[bootspur].equipped_item() == $item[quicksilver spurs])
+            return 30;
+        if (modifier_lowercase == "item drop" && $slot[bootspur].equipped_item() == $item[nicksilver spurs])
+            return 30;
+        if (modifier_lowercase == "muscle percent" && $slot[bootskin].equipped_item() == $item[grizzled bearskin])
+            return 50.0;
+        if (modifier_lowercase == "mysticality percent" && $slot[bootskin].equipped_item() == $item[frontwinder skin])
+            return 50.0;
+        if (modifier_lowercase == "moxie percent" && $slot[bootskin].equipped_item() == $item[mountain lion skin])
+            return 50.0;
+        //FIXME deal with rest (resistance, etc)
+    }
+    //so, when we don't have the smithsness items equipped, they have a numeric modifier of zero.
+    //but, they always have an inherent value of five. so give them that.
+    //FIXME do other smithsness items
+    if (it == $item[a light that never goes out] && modifier_lowercase == "item drop")
+    {
+    	if (it.equipped_amount() == 0)
+     	   additional += 5;
+    }
+    return numeric_modifier(it, modifier) + additional;
+}
+
+
 static
 {
     skill [class][int] __skills_by_class;
@@ -81,9 +230,11 @@ static
 
 boolean [item] equipmentWithNumericModifier(string modifier)
 {
+	modifier = modifier.to_lower_case();
     boolean [item] dynamic_items;
     dynamic_items[to_item("kremlin's greatest briefcase")] = true;
     dynamic_items[$item[your cowboy boots]] = true;
+    dynamic_items[$item[a light that never goes out]] = true; //FIXME all smithsness items
     if (!(__equipment_by_numeric_modifier contains modifier))
     {
         //Build it:
@@ -100,11 +251,24 @@ boolean [item] equipmentWithNumericModifier(string modifier)
     boolean [item] extra_results;
     foreach it in dynamic_items
     {
-        if (it.numeric_modifier(modifier) != 0.0)
+        if (it.numeric_modifier_replacement(modifier) != 0.0)
         {
             extra_results[it] = true;
         }
     }
+    //damage + spell damage is basically the same for most things
+    string secondary_modifier = "";
+    foreach e in $elements[hot,cold,spooky,stench,sleaze]
+    {
+        if (modifier == e + " damage")
+            secondary_modifier = e + " spell damage";
+    }
+    if (secondary_modifier != "")
+    {
+    	foreach it in equipmentWithNumericModifier(secondary_modifier)
+        	extra_results[it] = true;
+    }
+    
     if (extra_results.count() == 0)
         return __equipment_by_numeric_modifier[modifier];
     else

@@ -241,12 +241,25 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
             int limit = 100;
             if (meat_drop_modifier() < 800.0)
                 limit = 50;
+            if (my_path_id() == PATH_G_LOVER)
+            	limit = 25;
+            limit = 0; //show them all - we'll go based off of turns saved
             boolean [item] blacklist = $items[uncle greenspan's bathroom finance guide,black snowcone];
             item [int] relevant_potions = ItemFilterGetPotionsCouldPullToAddToNumericModifier("Meat Drop", limit, blacklist);
             string [int] relevant_potions_output;
+            float average_turns_currently = meat_remaining / ((meat_drop_modifier() / 100.0 + 1.0) * 1000.0);
             foreach key, it in relevant_potions
             {
-                relevant_potions_output.listAppend(it + " (" + it.to_effect().numeric_modifier("meat drop").roundForOutput(0) + "%)");
+                effect e = it.to_effect();
+            	if (!e.effect_is_usable())
+                	continue;
+                if (!it.item_is_usable())
+                    continue;
+                //average_turns_currently - 
+                float meat_dropped_per_turn_with_item = ((meat_drop_modifier() + e.numeric_modifier("meat drop")) / 100.0 + 1.0) * 1000.0;
+                float turns_saved = average_turns_currently - meat_remaining / meat_dropped_per_turn_with_item;
+                if (turns_saved < 1.0) continue;
+                relevant_potions_output.listAppend(it + " (" + e.numeric_modifier("meat drop").roundForOutput(0) + "%, " + turns_saved.roundForOutput(1) + " turns saved)");
             }
             
             if (relevant_potions_output.count() > 0)
@@ -412,7 +425,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 	
 		optional_task_entries.listAppend(ChecklistEntryMake("Island War Lighthouse", "bigisland.php?place=lighthouse", ChecklistSubentryMake("Island War Lighthouse Quest", modifiers, details), $locations[sonofa beach]));
 	}
-	if (!base_quest_state.state_boolean["Arena Finished"])
+	if (!base_quest_state.state_boolean["Arena Finished"] && my_path_id() != PATH_G_LOVER && my_path_id() != PATH_POCKET_FAMILIARS)
 	{
 		string [int] modifiers;
 		modifiers.listAppend("+ML");
@@ -599,7 +612,7 @@ void QLevel12GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             //need 70 moxie, 70 myst
             
         }
-        if ($item[talisman o' namsilat].available_amount() == 0 && !__quest_state["Level 11 Palindome"].finished)
+        if ($item[talisman o' namsilat].available_amount() == 0 && !__quest_state["Level 11 Palindome"].finished && my_path_id() != PATH_G_LOVER)
         {
             subentry.entries.listAppend("May want to " + HTMLGenerateSpanFont("acquire the Talisman o' Nam", "red") + " first.");
         }

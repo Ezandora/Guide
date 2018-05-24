@@ -242,7 +242,7 @@ void IOTMTelegraphOfficeGenerateResource(ChecklistEntry [int] resource_entries)
         ChecklistSubentry [int] subentries;
         foreach s, property in telegraph_skill_properties
         {
-            if (!s.have_skill())
+            if (!s.skill_is_usable())
                 continue;
             if (get_property_boolean(property))
                 continue;

@@ -67,7 +67,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
                 break;
             }
         }
-        if (have_poison != $effect[none])
+        if (have_poison != $effect[none] && my_path_id() != PATH_G_LOVER)
         {
             string url = "";
             string [int] methods;
@@ -241,9 +241,11 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         {
             if (it.item_amount() == 0)
                 continue;
+            if (!it.item_is_usable()) continue;
             effect e = item_effects[it];
             if (e == $effect[none])
                 e = it.to_effect();
+            if (!e.effect_is_usable()) continue;
             if (e.have_effect() > 0)
                 continue;
             if (stat_items.image_lookup_name.length() == 0)
@@ -269,7 +271,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         }
     }
     
-    if ($item[evil eye].available_amount() > 0 && __quest_state["Level 7"].state_int["nook evilness"] > 25)
+    if ($item[evil eye].available_amount() > 0 && __quest_state["Level 7"].state_int["nook evilness"] > 25 && my_path_id() != PATH_G_LOVER)
     {
         task_entries.listAppend(ChecklistEntryMake("__item " + $item[evil eye], "inventory.php?which=3", ChecklistSubentryMake("Use " + $item[evil eye], "", "Three cyrpt nook beeps."), -11));
     }
@@ -323,7 +325,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             task_entries.listAppend(ChecklistEntryMake("__item " + $item[dance card], "inventory.php?which=3", ChecklistSubentryMake("Use " + $item[dance card], "", description), -11));
         }
     }
-    if (!__quest_state["Level 11 Hidden City"].finished && (__quest_state["Level 11 Hidden City"].state_boolean["Apartment finished"] || get_property_int("hiddenApartmentProgress") >= 7) && $effect[thrice-cursed].have_effect() > 0)
+    if (!__quest_state["Level 11 Hidden City"].finished && (__quest_state["Level 11 Hidden City"].state_boolean["Apartment finished"] || get_property_int("hiddenApartmentProgress") >= 7) && $effect[thrice-cursed].have_effect() > 0 && my_path_id() != PATH_G_LOVER)
     {
         string curse_removal_method;
         string url;
@@ -375,7 +377,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         description.listAppend("Window starts after " + pluraliseWordy(upcoming_in, "turn", "turns") + ".");
         
         string [int] options;
-        if (__misc_state["can eat just about anything"] && my_path_id() != PATH_NUCLEAR_AUTUMN)
+        if (__misc_state["can eat just about anything"] && my_path_id() != PATH_NUCLEAR_AUTUMN && my_path_id() != PATH_G_LOVER)
         {
             options.listAppend("eat a fortune cookie");
         }

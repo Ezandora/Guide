@@ -29,7 +29,7 @@ void IOTMDetectiveSchoolGenerateResource(ChecklistEntry [int] resource_entries)
         return;
     
     //FIXME mention how much more they need to upgrade to the next badge?
-    if (__misc_state["in run"])
+    if (__misc_state["in run"] && in_ronin())
     {
         int cop_dollars_have = $item[cop dollar].available_amount();
         if (cop_dollars_have > 0)

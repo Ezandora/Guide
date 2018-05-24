@@ -144,6 +144,8 @@ boolean CounterWillHitNextTurn(Counter c)
     if (c.CounterIsRange())
     {
         Vec2i range = c.CounterGetWindowRange();
+        if (c.name == "Semi-rare" && range.y <= 0)
+        	return false; //there's probably a lot of other ones where being negative means it won't happen
         if (range.y <= 0)
             return true;
     }
@@ -470,7 +472,8 @@ void CountersReparse()
 
 
 
-boolean [string] __wandering_monster_counter_names = $strings[Romantic Monster,Rain Monster,Holiday Monster,Nemesis Assassin,Bee,WoL Monster,Digitize Monster,Enamorang Monster];
+//Bee is wrong, mafia does not track properly.
+boolean [string] __wandering_monster_counter_names = $strings[Romantic Monster,Rain Monster,Holiday Monster,Nemesis Assassin,WoL Monster,Digitize Monster,Enamorang Monster];
 string [string] __wandering_monster_property_lookups {"Romantic Monster":"romanticTarget", "Digitize Monster": "_sourceTerminalDigitizeMonster", "Enamorang Monster":"enamorangMonster"};
 
 //This is for ascension automation scripts. Call this immediately before adventuring in an adventure.php zone.

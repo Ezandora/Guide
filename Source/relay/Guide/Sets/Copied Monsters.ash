@@ -334,7 +334,7 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
             potential_copies.listAppend("Modern zmobies.");
         if (!__quest_state["Level 8"].state_boolean["Mountain climbed"] && $items[ninja rope,ninja carabiner,ninja crampons].available_amount() == 0 && !have_outfit_components("eXtreme Cold-Weather Gear"))
             potential_copies.listAppend("Ninja assassin.");
-        if (!__quest_state["Level 11"].finished && !__quest_state["Level 11 Palindome"].finished && $item[talisman o' namsilat].available_amount() == 0 && $items[gaudy key,snakehead charrrm].available_amount() < 2)
+        if (!__quest_state["Level 11"].finished && !__quest_state["Level 11 Palindome"].finished && $item[talisman o' namsilat].available_amount() == 0 && $items[gaudy key,snakehead charrrm].available_amount() < 2 && my_path_id() != PATH_G_LOVER)
             potential_copies.listAppend("Gaudy pirate - copy once for extra key.");
         //√baa'baa. astronomer? √nuns trick brigand
         //FIXME astronomer when we can calculate that
@@ -455,6 +455,12 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
         copy_source_entry.subentries.listAppend(ChecklistSubentryMake(pluralise($item[print screen button].available_amount(), "print screen copy", "print screen copies") + " available", "", ""));
         if (copy_source_entry.image_lookup_name == "")
             copy_source_entry.image_lookup_name = "__item print screen button";
+    }
+    if ($item[LOV Enamorang].available_amount() > 0)
+    {
+        copy_source_entry.subentries.listAppend(ChecklistSubentryMake(pluralise($item[LOV Enamorang]), "", ""));
+        if (copy_source_entry.image_lookup_name == "")
+            copy_source_entry.image_lookup_name = "__item lov enamorang";
     }
     if (!get_property_boolean("_crappyCameraUsed") && $item[crappy camera].available_amount() > 0)
     {

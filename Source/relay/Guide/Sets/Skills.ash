@@ -22,13 +22,23 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
 		if (inigos_casts_remaining > 0)
 			resource_entries.listAppend(ChecklistEntryMake("__effect Inigo's Incantation of Inspiration", "skills.php", ChecklistSubentryMake(pluralise(inigos_casts_remaining, "Inigo's cast", "Inigo's casts") + " remaining", "", description), 4));
 	}
+	int free_crafts_left = 0;
+	if ($effect[Inigo's Incantation of Inspiration].have_effect() >= 5)
+	{
+        free_crafts_left += $effect[Inigo's Incantation of Inspiration].have_effect() / 5;
+	}
     if ($skill[rapid prototyping].skill_is_usable())
     {
-        int casts_remaining = clampi(5 - get_property_int("_rapidPrototypingUsed"), 0, 5);
-		string description = SSkillsPotentialCraftingOptions().listJoinComponents(", ").capitaliseFirstLetter();
-		if (casts_remaining > 0)
-			resource_entries.listAppend(ChecklistEntryMake("__item tenderizing hammer", "", ChecklistSubentryMake(pluralise(casts_remaining, "free craft", "free crafts") + " remaining", "", description), 4));
-        
+        free_crafts_left += clampi(5 - get_property_int("_rapidPrototypingUsed"), 0, 5);
+    }
+    if (lookupSkill("Expert Corner-Cutter").skill_is_usable())
+    {
+        free_crafts_left += clampi(5 - get_property_int("_expertCornerCutterUsed"), 0, 5);
+    }
+    if (free_crafts_left > 0)
+    {
+        string description = SSkillsPotentialCraftingOptions().listJoinComponents(", ").capitaliseFirstLetter();
+        resource_entries.listAppend(ChecklistEntryMake("__item tenderizing hammer", "", ChecklistSubentryMake(pluralise(free_crafts_left, "free craft", "free crafts") + " remaining", "", description), 4));
     }
 	ChecklistSubentry [int] subentries;
 	int importance = 11;
@@ -194,7 +204,7 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
 	}
     
     
-    if (lookupSkill("Evoke Eldritch Horror").have_skill() && !get_property_boolean("_eldritchHorrorEvoked"))
+    if (lookupSkill("Evoke Eldritch Horror").skill_is_usable() && !get_property_boolean("_eldritchHorrorEvoked"))
     {
         resource_entries.listAppend(ChecklistEntryMake("__skill Evoke Eldritch Horror", "skillz.php", ChecklistSubentryMake("Evoke Eldritch Horror", "", "Free fight."), 5));
     }

@@ -16,9 +16,10 @@ void IOTMSourceTerminalGenerateDigitiseTargets(string [int] description)
         string [int] witchess_list;
         if (__misc_state["can eat just about anything"])
             witchess_list.listAppend("knight");
-        if (__misc_state["can drink just about anything"])
+        if (__misc_state["can drink just about anything"] && my_path_id() != PATH_G_LOVER)
             witchess_list.listAppend("bishop");
-        witchess_list.listAppend("rook");
+        if (my_path_id() != PATH_G_LOVER)
+	        witchess_list.listAppend("rook");
         potential_targets.listAppend("witchess " + witchess_list.listJoinComponents("/"));
     }
     if (potential_targets.count() > 0)
@@ -43,7 +44,7 @@ void IOTMSourceTerminalGenerateTasks(ChecklistEntry [int] task_entries, Checklis
     if (chips["DRAM"])
         skill_limit = 2;
     int skills_need = skill_limit - skills_have.count();
-    if (skills_need > 0)
+    if (skills_need > 0 && my_path_id() != PATH_POCKET_FAMILIARS)
     {
         //FIXME this could be rewritten to suggest turbo + compress, when we have enough extractions.
         string [int] possible_skills;
@@ -59,7 +60,7 @@ void IOTMSourceTerminalGenerateTasks(ChecklistEntry [int] task_entries, Checklis
     }
     
     //Set an enquiry:
-    if (get_property("sourceTerminalEnquiry") == "")
+    if (get_property("sourceTerminalEnquiry") == "" && my_path_id() != PATH_G_LOVER)
     {
         //familiar - +5 familiar weight
         //monsters - +25 ML (in-run)
@@ -86,7 +87,7 @@ void IOTMSourceTerminalGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         subentries.listAppend(ChecklistSubentryMake("Set an enquiry", "", description));
     }
     //"Digitise something" like arrow something?
-    if (get_property_int("_sourceTerminalDigitizeUses") == 0 && __misc_state["in run"] && my_path_id() != PATH_ZOMBIE_SLAYER && my_path_id() != PATH_LIVE_ASCEND_REPEAT)
+    if (get_property_int("_sourceTerminalDigitizeUses") == 0 && __misc_state["in run"] && my_path_id() != PATH_ZOMBIE_SLAYER && my_path_id() != PATH_LIVE_ASCEND_REPEAT && my_path_id() != PATH_POCKET_FAMILIARS)
     {
         string [int] description;
         IOTMSourceTerminalGenerateDigitiseTargets(description);
@@ -128,10 +129,14 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
         turn_duration = clampi(turn_duration, 25, 100);
         string turns_description = " (" + turn_duration + " turns)";
         string [int] description;
-        description.listAppend("items.enh: +30% item." + turns_description);
-        description.listAppend("meat.enh: +60% meat." + turns_description);
-        if (__misc_state["in run"])
+        if (my_path_id() != PATH_G_LOVER)
+	        description.listAppend("items.enh: +30% item." + turns_description);
+        if (my_path_id() != PATH_G_LOVER)
+	        description.listAppend("meat.enh: +60% meat." + turns_description);
+        if (__misc_state["in run"] && my_path_id() != PATH_G_LOVER)
             description.listAppend("init.enh: +50% init." + turns_description);
+        if (my_path_id() == PATH_G_LOVER)
+            description.listAppend("damage.enh: +5 prismatic damage, only usable buff in this path." + turns_description);
         //the others are moderately boring
         //+critical hit? niche
         //+all elemental damage? useful in two places, but still niche enough to not be put here
@@ -149,9 +154,9 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
         if (get_property_boolean("_sourceTerminalDuplicateUsed"))
             duplicate_uses_remaining = 0;
     }
-    if (my_path_id() == PATH_ZOMBIE_SLAYER)
+    if (my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_POCKET_FAMILIARS)
         duplicate_uses_remaining = 0;
-    if (mafiaIsPastRevision(17031) && duplicate_uses_remaining > 0 && __misc_state["in run"])
+    if (mafiaIsPastRevision(17031) && duplicate_uses_remaining > 0 && __misc_state["in run"] && my_path_id() != PATH_G_LOVER)
     {
         //Duplication of a monster:
         string [int] description;
@@ -226,7 +231,7 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
     //Extrudes:
     int extrudes_remaining = clampi(3 - get_property_int("_sourceTerminalExtrudes"), 0, 3);
     
-    if (extrudes_remaining > 0 && mafiaIsPastRevision(16992) && my_path_id() != PATH_ZOMBIE_SLAYER)
+    if (extrudes_remaining > 0 && mafiaIsPastRevision(16992) && my_path_id() != PATH_ZOMBIE_SLAYER && my_path_id() != PATH_POCKET_FAMILIARS && my_path_id() != PATH_G_LOVER)
     {
         int essence = $item[source essence].available_amount();
         string [int] description;
@@ -286,7 +291,7 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
         digitisation_limit += 1;
     if (chips["TRIGRAM"])
         digitisation_limit += 1;
-    if (my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_LIVE_ASCEND_REPEAT)
+    if (my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_LIVE_ASCEND_REPEAT || my_path_id() == PATH_POCKET_FAMILIARS)
         digitisation_limit = 0;
     int digitisations_left = clampi(digitisation_limit - digitisations, 0, 3);
     if (digitisations_left > 0)

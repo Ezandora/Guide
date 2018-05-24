@@ -208,7 +208,7 @@ void generateMissingItems(Checklist [int] checklists)
         }
     }
     
-    if ($item[electric boning knife].available_amount() == 0 && __quest_state["Level 13"].state_boolean["wall of bones will need to be defeated"])
+    if ($item[electric boning knife].available_amount() == 0 && __quest_state["Level 13"].state_boolean["wall of bones will need to be defeated"] && my_path_id() != PATH_POCKET_FAMILIARS)
     {
         string [int] description;
         description.listAppend("Found from an NC on the ground floor of the castle in the clouds in the sky.");
@@ -224,7 +224,7 @@ void generateMissingItems(Checklist [int] checklists)
             description.listAppend("Chances of finding go up if you wait until you're at the wall of bones.");
         items_needed_entries.listAppend(ChecklistEntryMake("__item electric boning knife", $location[the castle in the clouds in the sky (ground floor)].getClickableURLForLocation(), ChecklistSubentryMake("Electric boning knife", "-combat", description)));
     }
-    if ($item[beehive].available_amount() == 0 && __quest_state["Level 13"].state_boolean["wall of skin will need to be defeated"])
+    if ($item[beehive].available_amount() == 0 && __quest_state["Level 13"].state_boolean["wall of skin will need to be defeated"] && my_path_id() != PATH_POCKET_FAMILIARS)
     {
         string [int] description;
         

@@ -6,14 +6,14 @@ void IOTMKGBriefcaseGenerateResource(ChecklistEntry [int] resource_entries)
     entry.image_lookup_name = "__item Kremlin's Greatest Briefcase";
     entry.importance_level = 5;
     entry.url = "place.php?whichplace=kgb";
-    if (get_property_int("_kgbTranquilizerDartUses") < 3)
+    if (get_property_int("_kgbTranquilizerDartUses") < 3 && my_path_id() != PATH_POCKET_FAMILIARS)
     {
         string [int] description;
         description.listAppend("Free run/banishes for twenty turns.|Use the KGB tranquilizer dart skill in-combat.");
         if (lookupItem("kremlin's greatest briefcase").equipped_amount() == 0)
         {
             description.listAppend("Equip the briefcase first.");
-            entry.url = "inventory.php?which=2";
+            //entry.url = "inventory.php?which=2";
         }
         entry.subentries.listAppend(ChecklistSubentryMake(pluralise(3 - get_property_int("_kgbTranquilizerDartUses"), "briefcase dart", "briefcase darts"), "", description));
     }

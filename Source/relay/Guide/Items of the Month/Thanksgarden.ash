@@ -15,7 +15,7 @@ void IOTMThanksgardenGenerateResource(ChecklistEntry [int] resource_entries)
     
     
     
-    if (cornucopia.available_amount() > 0)
+    if (cornucopia.available_amount() > 0 && in_ronin())
     {
         string [int] description;
         description.listAppend("Open for thanksgarden food.");
@@ -26,7 +26,7 @@ void IOTMThanksgardenGenerateResource(ChecklistEntry [int] resource_entries)
         subentries.listAppend(ChecklistSubentryMake(pluralise(cornucopia), "", description));
     }
     int cashew_amount = cashew.available_amount();
-    if (cashew_amount > 0)
+    if (cashew_amount > 0 && in_ronin())
     {
         string [int] description;
         string [int] options;

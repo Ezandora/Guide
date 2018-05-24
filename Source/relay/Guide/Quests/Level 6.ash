@@ -134,7 +134,8 @@ void QLevel6GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             subentry.entries.listAppend("Visit the dark heart of the woods for hot wings.");
         }
     }
-	
+	if (!get_property_ascension("lastTempleUnlock") && QuestState("questM16Temple").in_progress && $item[heavy-duty bendy straw].available_amount() == 0)
+        subentry.entries.listAppend("Potentially find a heavy-duty bendy straw, first.|From fallen archfiends in the dark heart of the woods.");
 	if (__misc_state_int["ruby w needed"] > 0)
 		subentry.entries.listAppend("Potentially find ruby W, if not clovering (w imp, dark neck, 30% drop)");
 	if (hot_wings_relevant)

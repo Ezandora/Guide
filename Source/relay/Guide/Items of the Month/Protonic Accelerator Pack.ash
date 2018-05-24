@@ -159,7 +159,7 @@ void IOTMProtonicAcceleratorPackGenerateResource(ChecklistEntry [int] resource_e
     if ($item[protonic accelerator pack].available_amount() == 0)
         return;
     
-    if (!get_property_boolean("_streamsCrossed") &&__misc_state["in run"] && mafiaIsPastRevision(17085))
+    if (!get_property_boolean("_streamsCrossed") &&__misc_state["in run"] && mafiaIsPastRevision(17085) && my_path_id() != PATH_G_LOVER)
     {
         string [int] description;
         string url = "showplayer.php?who=2807390"; //ProtonicBot is a real bot that will steal your turtle mechs at the first sign of defiance.

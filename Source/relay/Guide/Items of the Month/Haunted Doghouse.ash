@@ -3,7 +3,7 @@ void IOTMHauntedDoghouseGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (!__misc_state["in run"])
         return;
-    if ($item[tennis ball].available_amount() > 0)
+    if ($item[tennis ball].available_amount() > 0 && in_ronin())
     {
         resource_entries.listAppend(ChecklistEntryMake("__item tennis ball", "", ChecklistSubentryMake(pluralise($item[tennis ball]), "", "Free run/banish."), 6));
     }

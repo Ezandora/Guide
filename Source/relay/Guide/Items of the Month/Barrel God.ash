@@ -2,7 +2,7 @@
 RegisterResourceGenerationFunction("IOTMBarrelGodGenerateResource");
 void IOTMBarrelGodGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (!get_property_boolean("barrelShrineUnlocked") || in_bad_moon())
+    if (!__iotms_usable[$item[shrine to the Barrel god]])
         return;
     
     

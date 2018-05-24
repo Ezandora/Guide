@@ -1060,6 +1060,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         {
             if (it.item_amount() == 0)
                 continue;
+            if (!it.item_is_usable()) continue;
             if (it.item_amount() == 1)
                 healing_items_available.listAppend(it.to_string());
             else

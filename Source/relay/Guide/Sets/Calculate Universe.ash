@@ -1,7 +1,7 @@
 import "relay/Guide/Support/Numberology.ash"
 void SCalculateUniverseGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (!$skill[Calculate the Universe].have_skill())
+    if (!$skill[Calculate the Universe].skill_is_usable())
         return;
     int uses_remaining = 1;
     if (get_property_boolean("_universeCalculated") && !mafiaIsPastRevision(17039))

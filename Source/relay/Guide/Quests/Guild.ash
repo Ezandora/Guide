@@ -3,6 +3,8 @@ void QGuildInit()
 {
     if (!($classes[seal clubber,turtle tamer,pastamancer,sauceror,disco bandit,accordion thief] contains my_class()))
         return;
+    if (my_path_id() == PATH_POCKET_FAMILIARS)
+        return;
 	//questM02Artist
 	QuestState state;
     
@@ -46,6 +48,8 @@ void QGuildInit()
 void QGuildGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     if (!($classes[seal clubber,turtle tamer,pastamancer,sauceror,disco bandit,accordion thief] contains my_class()))
+        return;
+    if (my_path_id() == PATH_POCKET_FAMILIARS)
         return;
     if (my_path_id() == PATH_NUCLEAR_AUTUMN)
         return;

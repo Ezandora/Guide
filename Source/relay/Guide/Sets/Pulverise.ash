@@ -180,10 +180,11 @@ void SPulveriseGenerateResource(ChecklistEntry [int] resource_entries)
     
     string [int] details;
     
-    if (availableSpleen() > 0 && my_path_id() != PATH_SLOW_AND_STEADY)
+    //not relevant for adventures anymore:
+    /*if (availableSpleen() > 0 && my_path_id() != PATH_SLOW_AND_STEADY)
     {
         pulveriseAppendOutputListForProducts(details, "spleen wads", $items[cold wad,hot wad,sleaze wad,spooky wad,stench wad,twinkly wad], blacklist);
-    }
+    }*/
     
     /*if (__misc_state["mysticality guild store available"] && $skill[Transcendental Noodlecraft].skill_is_usable() && $skill[The Way of Sauce].skill_is_usable()) //can make hi mein?
     {

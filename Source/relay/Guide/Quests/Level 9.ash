@@ -50,6 +50,8 @@ void QLevel9Init()
 		state.state_boolean["can complete twin peaks quest quickly"] = false;
 	
 	state.state_float["oil peak pressure"] = get_property_float("oilPeakProgress");
+	if ($location[oil peak].noncombat_queue.contains_text("Unimpressed with Pressure"))
+        state.state_float["oil peak pressure"] = 0.0;
 	state.state_int["twin peak progress"] = get_property_int("twinPeakProgress");
 	state.state_int["a-boo peak hauntedness"] = get_property_int("booPeakProgress");
     if ($location[a-boo peak].noncombat_queue.contains_text("Come On Ghosty, Light My Pyre"))
@@ -126,7 +128,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
         
         if (true)
         {
-            string line = "Have " + pluralise($item[a-boo clue]) + ".";
+            string line = "Have " + pluralise(lookupItems("a-boo clue,glued a-boo clue").available_amount(), $item[a-boo clue]) + ".";
             
             float clue_drop_rate = clampf(item_drop_multiplier * 0.15, 0.0, 1.0);
             line += " " + clue_drop_rate.roundForOutput(2) + " clues/adventure at +" + ((item_drop_multiplier - 1) * 100.0).roundForOutput(1) + "% item.";

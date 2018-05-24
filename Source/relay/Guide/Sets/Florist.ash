@@ -3,8 +3,8 @@ import "relay/Guide/Plants.ash";
 RegisterTaskGenerationFunction("SFloristGenerateTasks");
 void SFloristGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-    	//Friar:
-	if (florist_available())
+    //Friar:
+	if (__iotms_usable[$item[Order of the Green Thumb Order Form]])
 	{
         string image_name = "sunflower face";
 		ChecklistSubentry subentry;

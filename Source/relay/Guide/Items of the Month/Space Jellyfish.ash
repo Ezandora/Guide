@@ -66,7 +66,7 @@ void IOTMSpaceJellyfishGenerateResource(ChecklistEntry [int] resource_entries)
         jelly_descriptions[$item[stench jelly]] = "Forces non-combat.";
         foreach it, desc in jelly_descriptions
         {
-            if (it.available_amount() > 0)
+            if (it.available_amount() > 0 && in_ronin())
             {
                 entry.subentries.listAppend(ChecklistSubentryMake(pluralise(it), "", desc));
             }

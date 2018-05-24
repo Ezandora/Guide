@@ -444,25 +444,25 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
         case $location[the mansion of dr. weirdeaux]:
         case $location[the secret government laboratory]:
         case $location[the deep dark jungle]:
-            return (get_property_boolean("_spookyAirportToday") || get_property_boolean("spookyAirportAlways"));
+            return $item[airplane charter: Conspiracy Island].is_unrestricted() && (get_property_boolean("_spookyAirportToday") || get_property_boolean("spookyAirportAlways"));
         case $location[the fun-guy mansion]:
         case $location[sloppy seconds diner]:
         case $location[the sunken party yacht]:
-            return (get_property_boolean("_sleazeAirportToday") || get_property_boolean("sleazeAirportAlways"));
+            return $item[airplane charter: Spring Break Beach].is_unrestricted() && (get_property_boolean("_sleazeAirportToday") || get_property_boolean("sleazeAirportAlways"));
         case $location[Pirates of the Garbage Barges]:
         case $location[Barf Mountain]:
         case $location[The Toxic Teacups]:
         case $location[Uncle Gator's Country Fun-Time Liquid Waste Sluice]:
-            return (get_property_boolean("_stenchAirportToday") || get_property_boolean("stenchAirportAlways"));
+            return $item[airplane charter: Dinseylandfill].is_unrestricted() && (get_property_boolean("_stenchAirportToday") || get_property_boolean("stenchAirportAlways"));
         case $location[The SMOOCH Army HQ]:
         case $location[The Velvet / Gold Mine]:
         case $location[LavaCo&trade; Lamp Factory]:
         case $location[The Bubblin' Caldera]:
-            return (get_property_boolean("_hotAirportToday") || get_property_boolean("hotAirportAlways"));
+            return $item[airplane charter: That 70s Volcano].is_unrestricted() && (get_property_boolean("_hotAirportToday") || get_property_boolean("hotAirportAlways"));
         case $location[The Ice Hotel]:
         case $location[VYKEA]:
         case $location[The Ice Hole]:
-            return (get_property_boolean("_coldAirportToday") || get_property_boolean("coldAirportAlways"));
+            return $item[airplane charter: The Glaciest].is_unrestricted() && (get_property_boolean("_coldAirportToday") || get_property_boolean("coldAirportAlways"));
         case $location[Kokomo Resort]:
             return $effect[Tropical Contact High].have_effect() > 0;
         case $location[Dreadsylvanian Woods]:
@@ -1137,6 +1137,8 @@ static
             lookup_map[s] = "place.php?whichplace=crimbo2016c";
         foreach s in $strings[The Cheerless Spire (Level 1), The Cheerless Spire (Level 2), The Cheerless Spire (Level 3), The Cheerless Spire (Level 4), The Cheerless Spire (Level 5)]
         	lookup_map[s] = "place.php?whichplace=crimbo17_silentnight";
+        foreach s in $strings[The Bandit Crossroads,The Putrid Swamp,Near the Witch's House,The Troll Fortress,The Sprawling Cemetery,The Cursed Village,The Foreboding Cave,The Faerie Cyrkle,The Evil Cathedral,The Towering Mountains,The Mystic Wood,The Druidic Campsite,The Old Rubee Mine]
+        	lookup_map[s] = "place.php?whichplace=realm_fantasy";
         lookup_map["An Eldritch Horror"] = "place.php?whichplace=town";
         
         lookup_map["Through the Spacegate"] = "place.php?whichplace=spacegate";

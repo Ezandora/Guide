@@ -112,6 +112,10 @@ void QAzazelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         int bus_passes_needed = MAX(0, 5 - $item[bus pass].available_amount());
         if (imp_air_needed == 0 && bus_passes_needed == 0)
         {
+        	if ($item[imp air].item_amount() < 5)
+            	subentry.entries.listAppend("Pull imp air.");
+            if ($item[bus pass].item_amount() < 5)
+                subentry.entries.listAppend("Pull bus passes.");
             subentry.entries.listAppend("Speak to the stranger.");
         }
         else

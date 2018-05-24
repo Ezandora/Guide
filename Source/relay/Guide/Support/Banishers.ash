@@ -29,6 +29,7 @@ static
 {
     int [string] __banish_source_length;
     //FIXME request this be exposed in ASH?
+    //all of these must be lowercase. because, okay?
     __banish_source_length["banishing shout"] = -1;
     __banish_source_length["batter up!"] = -1;
     __banish_source_length["chatterboxing"] = 20;
@@ -59,8 +60,9 @@ static
     __banish_source_length["bundle of &quot;fragrant&quot; herbs"] = -1;
     __banish_source_length["snokebomb"] = 30;
     __banish_source_length["beancannon"] = -1;
-    __banish_source_length["KGB tranquilizer dart"] = 20;
-    __banish_source_length["Spring-Loaded Front Bumper"] = 30;
+    __banish_source_length["kgb tranquilizer dart"] = 20;
+    __banish_source_length["spring-loaded front bumper"] = 30;
+    __banish_source_length["mafia middle finger ring"] = 60;
     
     int [string] __banish_simultaneous_limit;
     __banish_simultaneous_limit["beancannon"] = 5;
@@ -105,8 +107,8 @@ Banish [int] BanishesActive()
         b.banish_source = banished_monsters_string_split[key + 1];
         b.turn_banished = banished_monsters_string_split[key + 2].to_int();
         b.banish_turn_length = 0;
-        if (__banish_source_length contains b.banish_source)
-            b.banish_turn_length = __banish_source_length[b.banish_source];
+        if (__banish_source_length contains b.banish_source.to_lower_case())
+            b.banish_turn_length = __banish_source_length[b.banish_source.to_lower_case()];
         if (b.banish_source == "batter up!" || b.banish_source == "deathchucks" || b.banish_source == "dirty stinkbomb" || b.banish_source == "nanorhino" || b.banish_source == "spooky music box mechanism" || b.banish_source == "ice hotel bell" || b.banish_source == "beancannon")
             b.custom_reset_conditions = "rollover";
         if (b.banish_source == "ice house" && (!$item[ice house].is_unrestricted() || in_bad_moon())) //not relevant
@@ -215,7 +217,7 @@ Banish BanishByName(string name)
 
 int BanishLength(string banish_name)
 {
-    int length = __banish_source_length[banish_name];
+    int length = __banish_source_length[banish_name.to_lower_case()];
     if (length < 0)
         length = 2147483647;
     return length;
