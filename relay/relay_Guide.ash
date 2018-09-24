@@ -31602,13 +31602,15 @@ void SBuffUpkeepGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         }
     }
     boolean have_facial_expression = false;
-    foreach s in $skills[Arched Eyebrow of the Archmage,Disco Leer,Disco Smirk,Icy Glare,Knowing Smile,Patient Smile,Scowl of the Auk,Snarl of the Timberwolf,Stiff Upper Lip,Suspicious Gaze,Wizard Squint,Wry Smile,Inscrutable Gaze]
+    foreach s in $skills[Arched Eyebrow of the Archmage,Disco Leer,Disco Smirk,Icy Glare,Knowing Smile,Patient Smile,Scowl of the Auk,Snarl of the Timberwolf,Stiff Upper Lip,Suspicious Gaze,Wizard Squint,Wry Smile]
     {
         if (s == $skill[suspicious gaze] && get_property_int("cyrptAlcoveEvilness") <= 26 && QuestState("questL07Cyrptic").started) //only need suspicious gaze there
             continue;
         if (s.to_effect().have_effect() > 0)
             have_facial_expression = true;
     }
+    if (lookupSkill("Inscrutable Gaze").to_effect().have_effect() > 0)
+        have_facial_expression = true;
     
     if (__misc_state["need to level"] && !have_facial_expression)
     {
