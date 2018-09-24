@@ -15,7 +15,7 @@ void IOTMKGBriefcaseGenerateResource(ChecklistEntry [int] resource_entries)
             description.listAppend("Equip the briefcase first.");
             //entry.url = "inventory.php?which=2";
         }
-        entry.subentries.listAppend(ChecklistSubentryMake(pluralise(3 - get_property_int("_kgbTranquilizerDartUses"), "briefcase dart", "briefcase darts"), "", description));
+        resource_entries.listAppend(ChecklistEntryMake("__item Kremlin's Greatest Briefcase", "", ChecklistSubentryMake(pluralise(3 - get_property_int("_kgbTranquilizerDartUses"), "briefcase dart", "briefcase darts"), "", description)).ChecklistEntryTagEntry("banish"));
     }
     int clicks_remaining = clampi(22 - get_property_int("_kgbClicksUsed"), 0, 22);
     if (!mafiaIsPastRevision(18110))

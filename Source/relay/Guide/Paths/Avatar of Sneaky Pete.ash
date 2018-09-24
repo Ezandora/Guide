@@ -12,7 +12,6 @@ void PathSneakyPeteGenerateResource(ChecklistEntry [int] resource_entries)
 	entry.image_lookup_name = "";
     entry.importance_level = 1;
     
-    
     if (true)
     {
         int total_free_peel_outs_available = 10;
@@ -25,15 +24,23 @@ void PathSneakyPeteGenerateResource(ChecklistEntry [int] resource_entries)
         {
             string [int] description;
             
+            boolean is_banish = false;
             if (get_property("peteMotorbikeMuffler") == "Extra-Smelly Muffler")
+            {
                 description.listAppend("Free runaway/banish in-combat.");
+                is_banish = true;
+            }
             else
                 description.listAppend("Free runaway in-combat.");
             
             if (entry.image_lookup_name.length() == 0)
                 entry.image_lookup_name = "__skill Easy Riding";
         
-            entry.subentries.listAppend(ChecklistSubentryMake(pluralise(free_peel_outs_available, "peel out", "peel outs"), "10 MP/cast", description));
+        	ChecklistSubentry subentry = ChecklistSubentryMake(pluralise(free_peel_outs_available, "peel out", "peel outs"), "10 MP/cast", description);
+            if (is_banish)
+            	resource_entries.listAppend(ChecklistEntryMake("__skill Easy Riding", "", subentry).ChecklistEntryTagEntry("banish"));
+            else
+	            entry.subentries.listAppend(subentry);
         }
     }
     

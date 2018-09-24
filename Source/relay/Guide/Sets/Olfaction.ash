@@ -9,7 +9,7 @@ void SOlfactionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     
     //Add in some basic reminders to remove olfaction if adventuring in certain areas.
     
-    monster olfacted_monster = get_property("olfactedMonster").to_monster();
+    monster olfacted_monster = get_property_monster("olfactedMonster");
     if (olfacted_monster == $monster[none] || __last_adventure_location == $location[none])
         return;
     
@@ -27,7 +27,7 @@ void SOlfactionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         if (!__quest_state["Azazel"].finished)
         {
             location_wanted_monster[$location[infernal rackets backstage]] = $monster[serialbus];
-            location_wanted_monster[$location[the laugh floor]] = $monster[ch imp];
+            location_wanted_monster[$location[the laugh floor]] = $monster[CH Imp];
         }
         //Deliberately ignored - the quiet healer. (she's used to it) It's possible they may want to olfact the burly sidekick instead, and there's plenty of time in that area.
         
@@ -47,7 +47,7 @@ void SOlfactionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
                 location_wanted_monster[$location[the hidden bowling alley]] = $monster[pygmy bowler];
         }
         if (!have_outfit_components("Knob Goblin Harem Girl Disguise"))
-            location_wanted_monster[$location[cobb's knob harem]] = $monster[knob goblin harem girl];
+            location_wanted_monster[$location[cobb's knob harem]] = $monster[Knob Goblin Harem Girl];
         if (in_hardcore())
             location_wanted_monster[$location[The Dark Neck of the Woods]] = $monster[Hellion];
         if ($skill[summon smithsness].skill_is_usable() && $item[dirty hobo gloves].available_amount() == 0 && $item[hand in glove].available_amount() == 0 && __misc_state["need to level"])
@@ -57,7 +57,7 @@ void SOlfactionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         }
         location_wanted_monster[$location[fear man's level]] = $monster[morbid skull];
         if ($item[digital key].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["digital key used"] && $item[white pixel].available_amount() + $item[white pixel].creatable_amount() < 27)
-            location_wanted_monster[$location[8-bit realm]] = $monster[blooper];
+            location_wanted_monster[$location[8-bit realm]] = $monster[Blooper];
         
         
         if (!__quest_state["Level 11 Pyramid"].finished && olfacted_monster != $monster[tomb servant])

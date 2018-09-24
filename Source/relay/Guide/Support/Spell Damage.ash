@@ -118,7 +118,7 @@ float MLDamageMultiplier()
     return ml_damage_multiplier;
 }
 
-Vec2f skillExpectedDamageRange(monster m, skill s)
+Vec2f skillExpectedDamageRangeAlternate(monster m, skill s)
 {
     //FIXME spade how on earth to properly calculate this
     //for instance, how does elemental spell damage work?
@@ -185,8 +185,8 @@ Vec2f skillExpectedDamageRange(monster m, skill s)
     return expected_damage_range;
 }
 
-float skillExpectedDamage(monster m, skill s)
+float skillExpectedDamageAlternate(monster m, skill s)
 {
-    Vec2f range = skillExpectedDamageRange(m, s);
+    Vec2f range = skillExpectedDamageRangeAlternate(m, s);
     return (range.x + range.y) * 0.5;
 }

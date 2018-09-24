@@ -16,6 +16,8 @@ boolean [string] getHolidaysForDate(string realworld_date, int game_day)
         holidays["Valentine's Day"] = true;
     else if (realworld_date == "0525")
         holidays["Towel Day"] = true;
+    else if (realworld_date == "0704")
+        holidays["Dependence Day"] = true;
     
     //Crimbo
     if (now_to_string("M").to_int_silent() == 12)

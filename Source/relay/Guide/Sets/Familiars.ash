@@ -102,7 +102,7 @@ void SFamiliarsPuckGenerateResource(ChecklistEntry [int] resource_entries)
             else
                 header += " (" + power_pill_uses_left + " usable today)";
         }
-        puck_subentries.listAppend(ChecklistSubentryMake(header, "", "Use in combat to instakill without costing a turn."));
+        resource_entries.listAppend(ChecklistEntryMake("__item power pill", "", ChecklistSubentryMake(header, "", "Use in combat to instakill without costing a turn.")).ChecklistEntryTagEntry("free instakill"));
     }
     if ($familiar[Ms. Puck Man].familiar_is_usable() || $familiar[Puck Man].familiar_is_usable())
     {

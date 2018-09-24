@@ -71,6 +71,8 @@ void generateRandomMessageLocation(string [int] random_messages)
             message = "street sneaky pete don't you call me cause I can't go"; break;
         case lookupLocation("Through the Spacegate"):
             message = "oh look! rocks!";
+        case $location[hell]:
+            message = "that's a clean burning hell, I'll tell you what"; break;
     }
     if (message != "")
         random_messages.listAppend(message);
@@ -594,8 +596,9 @@ string generateRandomMessage()
     string [monster] monster_messages;
     string [monster] beaten_up_monster_messages;
     //TODO add a message for the procrastination giant
-    foreach m in $monsters[The Temporal Bandit,crazy bastard,Knott Slanding,hockey elemental,Hypnotist of Hey Deze,infinite meat bug,QuickBASIC elemental,The Master Of Thieves,Baiowulf,Count Bakula,the nuge] //Pooltergeist (Ultra-Rare)?
+    foreach m in $monsters[The Temporal Bandit,crazy bastard,Knott Slanding,hockey elemental,Hypnotist of Hey Deze,infinite meat bug,QuickBASIC Elemental,The Master of Thieves,Baiowulf,Count Bakula,The Nuge] //Pooltergeist (Ultra-Rare)?
         monster_messages[m] = "an ultra rare! congratulations!";
+    monster_messages[$monster[The Master of Thieves]] = "don't @ me";
     monster_messages[$monster[Dad Sea Monkee]] = "is always was always" + HTMLGenerateSpanFont(" is always was always", "#444444") + HTMLGenerateSpanFont(" is always was always", "#888888") + HTMLGenerateSpanFont(" is always was always", "#BBBBBB");
     
     foreach m in $monsters[Ed the Undying (1),Ed the Undying (2),Ed the Undying (3),Ed the Undying (4),Ed the Undying (5),Ed the Undying (6),Ed the Undying (7)]
@@ -613,14 +616,14 @@ string generateRandomMessage()
     monster_messages[$monster[ghastly organist]] = "phantom of the opera";
     monster_messages[$monster[The Man]] = "let the workers unite";
     monster_messages[$monster[The Big Wisniewski]] = "far out";
-    monster_messages[$monster[quiet healer]] = "...";
+    monster_messages[$monster[Quiet Healer]] = "...";
     monster_messages[$monster[menacing thug]] = "watch your back";
     monster_messages[$monster[sea cowboy]] = "pardon me";
     monster_messages[$monster[topiary golem]] = "almost ther... wait, golems?";
-    monster_messages[$monster[the server]] = "console cowboy";
+    monster_messages[$monster[The Server]] = "console cowboy";
     monster_messages[$monster[Fickle Finger of F8]] = "f/8 and be there";
     monster_messages[$monster[malevolent crop circle]] = "I want to believe";
-    monster_messages[$monster[enraged cow]] = "moo";
+    monster_messages[$monster[Enraged Cow]] = "moo";
     if ($item[bottle of blank-out].is_unrestricted())
         monster_messages[$monster[Claybender Sorcerer Ghost]] = "accio blank-out";
     else
@@ -642,13 +645,13 @@ string generateRandomMessage()
     monster_messages[$monster[The Avatar of Jarlsberg]] = "smoked cheese";
     monster_messages[$monster[giant sandworm]] = "walk without rhythm";
     monster_messages[$monster[bookbat]] = "tattered scrap of dignity";
-    monster_messages[$monster[urge to stare at your hands]] = ".&#x20dd;.&#x20dd;"; //.⃝.⃝
+    monster_messages[$monster[Urge to Stare at Your Hands]] = ".&#x20dd;.&#x20dd;"; //.⃝.⃝
     if (my_path_id() == PATH_HEAVY_RAINS)
         monster_messages[$monster[pygmy bowler]] = "right into the gutter"; //come back!
     monster_messages[$monster[Ron "The Weasel" Copperhead]] = "RONALD WEASLEY! HOW DARE YOU STEAL THAT ZEPPELIN<br>" + ChecklistGenerateModifierSpan("your father's now facing an inquiry at work and it's entirely YOUR FAULT");
     monster_messages[$monster[Mr. Loathing]] = HTMLGenerateTagWrap("a", "ruuun! go! get to the towah!", generateMainLinkMap("place.php?whichplace=nstower"));
     if (my_hp() < my_maxhp())
-        monster_messages[$monster[smooth criminal]] = "you've been hit by<br>you've been struck by<br><i>a smooth criminal</i>";
+        monster_messages[$monster[Smooth Criminal]] = "you've been hit by<br>you've been struck by<br><i>a smooth criminal</i>";
     monster_messages[$monster[demonic icebox]] = "zuul";
     monster_messages[$monster[angry mushroom guy]] = "touch fizzy, get dizzy";
     beaten_up_monster_messages[$monster[storm cow]] = "<pre>^__^            <br>(oo)\\_______    <br>(__)\\       )\\/\\<br>    ||----w |   <br>    ||     ||   </pre>";
@@ -662,8 +665,9 @@ string generateRandomMessage()
     else
         monster_messages[$monster[Lavalos]] = "all life begins with nu and ends with nu";
     monster_messages[$monster[sk8 gnome]] = "he was a sk8 gnome she said see u l8 gnome";
-    monster_messages[$monster[the inquisitor]] = "nothing is up";
-    monster_messages[$monster[doc clock]] = "your defeat will happen at " + (current_hour > 12 ? current_hour - 12 : current_hour) + ":" + current_minute + " precisely"; // + (current_hour >= 12 ? " PM" : " AM")
+    monster_messages[$monster[The Inquisitor]] = "nothing is up";
+    monster_messages[$monster[Doc Clock]] = "your defeat will happen at " + (current_hour > 12 ? current_hour - 12 : current_hour) + ":" + current_minute + " precisely"; // + (current_hour >= 12 ? " PM" : " AM")
+    monster_messages[lookupMonster("God Lobster")] = "what a grand and intoxicating innocence";
     
     string day_cycle;
     if (current_hour >= 5 && current_hour <= 11)
@@ -798,7 +802,7 @@ string generateRandomMessage()
     
     foreach s in $strings[rainDohMonster,spookyPuttyMonster,cameraMonster,photocopyMonster,envyfishMonster,iceSculptureMonster,crudeMonster,crappyCameraMonster,romanticTarget,chateauMonster]
     {
-        if (get_property(s) == "Quiet Healer")
+        if (get_property_monster(s) == $monster[Quiet Healer])
         {
             random_messages.listClear();
             random_messages.listAppend("you can't bring her back");
@@ -836,7 +840,9 @@ string generateRandomMessage()
             case PATH_POCKET_FAMILIARS:
                 random_messages.listAppend(lowercase_player_name + "! now is not the time to use that!"); break;
             case PATH_G_LOVER:
-                random_messages.listAppend("ghastly"); break;
+                random_messages.listAppend("the Gs will continue until morale improves"); break;
+            case PATH_DEMIGUISE:
+                random_messages.listAppend("who are you?"); break;
             default:
                 random_messages.listAppend("ow"); break;
         }

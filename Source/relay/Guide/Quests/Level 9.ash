@@ -25,8 +25,8 @@ void QLevel9Init()
 	else
 	{
 		int bridge_progress = get_property_int("chasmBridgeProgress");
-		int fasteners_have = bridge_progress + $item[thick caulk].available_amount() + $item[long hard screw].available_amount() + $item[messy butt joint].available_amount() + 5 * $item[smut orc keepsake box].available_amount() + 5 * $item[snow boards].available_amount();
-		int lumber_have = bridge_progress + $item[morningwood plank].available_amount() + $item[raging hardwood plank].available_amount() + $item[weirdwood plank].available_amount() + 5 * $item[smut orc keepsake box].available_amount() + 5 * $item[snow boards].available_amount();
+		int fasteners_have = bridge_progress + $item[thick caulk].available_amount() + $item[long hard screw].available_amount() + $item[messy butt joint].available_amount() + 5 * $item[smut orc keepsake box].usable_amount() + 5 * $item[snow boards].usable_amount();
+		int lumber_have = bridge_progress + $item[morningwood plank].available_amount() + $item[raging hardwood plank].available_amount() + $item[weirdwood plank].available_amount() + 5 * $item[smut orc keepsake box].usable_amount() + 5 * $item[snow boards].usable_amount();
         if (my_path_id() == PATH_LICENSE_TO_ADVENTURE && get_property_boolean("bondBridge"))
         {
             fasteners_have += 15;

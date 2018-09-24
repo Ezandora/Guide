@@ -166,7 +166,7 @@ buffer generateLocationBar(boolean displaying_navbar)
                     continue;
                 if (m == $monster[none])
                     continue;
-                if (m == $monster[bob racecar] || m == $monster[racecar bob] || m == $monster[drab bard])
+                if (m == $monster[Bob Racecar] || m == $monster[Racecar Bob] || m == $monster[Drab Bard])
                     likelyhood_of_dudes += monster_appearance_rates[m];
             }
             custom_location_information = likelyhood_of_dudes.round() + "% dudes";

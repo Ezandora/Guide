@@ -147,7 +147,7 @@ void QLevel11RonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
             url = "inventory.php?which=2";
         }
         
-        if ($skill[Transcendent Olfaction].skill_is_usable() && !($effect[on the trail].have_effect() > 0 && get_property_monster("olfactedMonster") == $monster[Blue Oyster Cultist]) && base_quest_state.state_boolean["need protestor speed tricks"])
+        if ($skill[Transcendent Olfaction].skill_is_usable() && !($effect[on the trail].have_effect() > 0 && get_property_monster("olfactedMonster") == $monster[Blue Oyster cultist]) && base_quest_state.state_boolean["need protestor speed tricks"])
             subentry.entries.listAppend("Olfact blue oyster cultists for protestor-skipping lighters.");
         
         if ($item[lynyrd skin].available_amount() > 0 && $skill[armorcraftiness].skill_is_usable())

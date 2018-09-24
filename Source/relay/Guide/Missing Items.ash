@@ -41,7 +41,7 @@ void generateMissingItems(Checklist [int] checklists)
             WandComponentSource source;
             source.component = $item[ruby w];
             source.drop_rate = 30;
-            source.monster_dropped_from = $monster[w imp];
+            source.monster_dropped_from = $monster[W imp];
             if (__quest_state["Level 6"].finished)
                 source.location_dropped_from = $location[Pandamonium Slums];
             else

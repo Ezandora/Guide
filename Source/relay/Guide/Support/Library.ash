@@ -83,6 +83,13 @@ boolean item_is_usable(item it)
 	return true;
 }
 
+//available_amount() except it tests against item_is_usable()
+int usable_amount(item it)
+{
+	if (!it.item_is_usable()) return 0;
+	return it.available_amount();
+}
+
 boolean effect_is_usable(effect e)
 {
     if (my_path_id() == PATH_G_LOVER && !e.contains_text("g") && !e.contains_text("G"))
@@ -1385,7 +1392,7 @@ boolean monster_has_zero_turn_cost(monster m)
     if ($monsters[lynyrd] contains m) return true; //not marked as FREE in attributes
     //if ($monsters[Black Crayon Beast,Black Crayon Beetle,Black Crayon Constellation,Black Crayon Golem,Black Crayon Demon,Black Crayon Man,Black Crayon Elemental,Black Crayon Crimbo Elf,Black Crayon Fish,Black Crayon Goblin,Black Crayon Hippy,Black Crayon Hobo,Black Crayon Shambling Monstrosity,Black Crayon Manloid,Black Crayon Mer-kin,Black Crayon Frat Orc,Black Crayon Penguin,Black Crayon Pirate,Black Crayon Flower,Black Crayon Slime,Black Crayon Undead Thing,Black Crayon Spiraling Shape,broodling seal,Centurion of Sparky,heat seal,hermetic seal,navy seal,Servant of Grodstank,shadow of Black Bubbles,Spawn of Wally,watertight seal,wet seal,lynyrd,BRICKO airship,BRICKO bat,BRICKO cathedral,BRICKO elephant,BRICKO gargantuchicken,BRICKO octopus,BRICKO ooze,BRICKO oyster,BRICKO python,BRICKO turtle,BRICKO vacuum cleaner,Witchess Bishop,Witchess King,Witchess Knight,Witchess Ox,Witchess Pawn,Witchess Queen,Witchess Rook,Witchess Witch,The ghost of Ebenoozer Screege,The ghost of Lord Montague Spookyraven,The ghost of Waldo the Carpathian,The Icewoman,The ghost of Jim Unfortunato,the ghost of Sam McGee,the ghost of Monsieur Baguelle,the ghost of Vanillica "Trashblossom" Gorton,the ghost of Oily McBindle,boneless blobghost,The ghost of Richard Cockingham,The Headless Horseman,Emily Koops\, a spooky lime,time-spinner prank,random scenester,angry bassist,blue-haired girl,evil ex-girlfriend,peeved roommate] contains m)
         //return true;
-    if (m == $monster[x-32-f combat training Snowman] && get_property_int("_snojoFreeFights") < 10)
+    if (m == $monster[X-32-F Combat Training Snowman] && get_property_int("_snojoFreeFights") < 10)
         return true;
     if (my_familiar() == $familiar[machine elf] && my_location() == $location[the deep machine tunnels] && get_property_int("_machineTunnelsAdv") < 5)
         return true;
@@ -1535,7 +1542,7 @@ monster convertEncounterToMonster(string encounter)
             encounter = encounter.replace_string(s, "");
     }
     if (encounter == "The Junk") //not a junksprite
-        return $monster[junk];
+        return $monster[Junk];
     if ((encounter.stringHasPrefix("the ") || encounter.stringHasPrefix("The")) && encounter.to_monster() == $monster[none])
     {
         encounter = encounter.substring(4);
@@ -1548,8 +1555,15 @@ monster convertEncounterToMonster(string encounter)
     return encounter.to_monster();
 }
 
-
-
+//Returns [0, 100]
+float resistanceLevelToResistancePercent(float level)
+{
+	float m = 0;
+	if (my_primestat() == $stat[mysticality])
+		m = 5;
+	if (level <= 3) return 10 * level + m;
+    return 90 - 50 * powf(5.0 / 6.0, level - 4) + m;
+}
 
 
 //Mafia's text output doesn't handle very long strings with no spaces in them - they go horizontally past the text box. This is common for to_json()-types.

@@ -61,7 +61,7 @@ boolean locationVisitsAdventurePHP(location l)
 
 boolean locationAllowsWanderingMonsters(location l)
 {
-    if ($locations[The Shore\, Inc. Travel Agency,Noob Cave] contains l)
+    if ($locations[The Shore\, Inc. Travel Agency,Noob Cave,The Dire Warren] contains l)
         return false;
     if (l == $location[The X-32-F Combat Training Snowman])
         return false;

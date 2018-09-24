@@ -1,7 +1,7 @@
-void PathJarlsbergGenerateStaff(ChecklistEntry entry, item staff, string property_name, string description, boolean always_output)
+boolean PathJarlsbergGenerateStaff(ChecklistEntry entry, item staff, string property_name, string description, boolean always_output)
 {
     if (staff.available_amount() == 0)
-        return;
+        return false;
     
     
     int uses_remaining = MAX(0, 5 - get_property_int(property_name));
@@ -12,16 +12,28 @@ void PathJarlsbergGenerateStaff(ChecklistEntry entry, item staff, string propert
         if (uses_remaining != 0)
         {
             title = uses_remaining + " " + staff.to_string().replace_string("Staff of the ", "");
-            if (uses_remaining == 1)
-                title += " use";
+            if (staff == $item[Staff of the Standalone Cheese])
+            {
+                if (uses_remaining == 1)
+                    title += " staff banish";
+                else
+                    title += " staff banishes";
+            }
             else
-                title += " uses";
+            {
+                if (uses_remaining == 1)
+                    title += " use";
+                else
+                    title += " uses";
+            }
         }
             //description = pluraliseWordy(uses_remaining, "use remains", "uses remain").capitaliseFirstLetter() + ".|" + description;
         entry.subentries.listAppend(ChecklistSubentryMake(title, "", description));
         if (entry.image_lookup_name == "")
             entry.image_lookup_name = "__item " + staff;
+        return true;
     }
+    return false;
 }
 
 
@@ -59,14 +71,18 @@ void PathJarlsbergGenerateResource(ChecklistEntry [int] resource_entries)
         //I must capture the avatar (of jarlsberg) to regain my honor
         string [int] banished_monsters = split_string_alternate(get_property("_jiggleCheesedMonsters"), "\\|");
         boolean always_output = false;
-        string cheese_line = "Banish monsters.";
+        string cheese_line = "";
         if (get_property("_jiggleCheesedMonsters") != "")
         {
-            cheese_line += "|Monsters banished: " + banished_monsters.listJoinComponents(", ", "and").HTMLEscapeString() + ".";
+            cheese_line += "Monsters banished: " + banished_monsters.listJoinComponents(", ", "and").HTMLEscapeString() + ".";
             always_output = true;
         }
         
-        PathJarlsbergGenerateStaff(entry, $item[Staff of the Standalone Cheese], "_jiggleCheese", cheese_line, always_output);
+    	ChecklistEntry entry2;
+        boolean should_add = PathJarlsbergGenerateStaff(entry2, $item[Staff of the Standalone Cheese], "_jiggleCheese", cheese_line, always_output);
+        entry2.ChecklistEntryTagEntry("banish");
+        if (should_add)
+	        resource_entries.listAppend(entry2);
     }
     PathJarlsbergGenerateStaff(entry, $item[Staff of the Staff of Life], "_jiggleLife", "Restores all HP.", false);
     

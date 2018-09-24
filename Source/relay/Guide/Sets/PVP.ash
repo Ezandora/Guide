@@ -72,7 +72,7 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
         }
         else if (mini == "Foreigner Reference")
         {
-            description.listAppend("Drink ice-cold Sir Schlitzs or ice-cold Willers." + (in_ronin() ? "|The Orcish Frat House has them." : ""));
+            description.listAppend("Drink ice-cold Sir Schlitzs or ice-cold Willers." + (in_ronin() ? "|The Orcish Frat House has them. Run +400% item" + (my_level() >= 9 ? " and +15% combat." : "") : ""));
         }
         else if (mini == "Best Served Repeatedly")
         {
@@ -96,9 +96,13 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 	            description.listAppend("Collect a Pan-Dimensional Gargle Blaster from Fernswarthy's basement. " + pluraliseWordy(floors_remaining, "floor", "floors") + " to go.");
             }
         }
-        else if (mini == "Frostily Ephemeral")
+        else if (mini == "Frostily Ephemeral" || mini == "Newest Born")
         {
             description.listAppend("Ascend to reset timer.");
+        }
+        else if (mini == "Karrrmic Battle" || mini == "Karmic Battle")
+        {
+            description.listAppend("Ascend to gain more karma.");
         }
         else if (mini == "Back to Square One")
         {
@@ -123,7 +127,7 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
         	//FIXME list
             description.listAppend("Defeat once/ascension bosses.");
         }
-        else if (mini == "Grave Robbery")
+        else if (mini == "Grave Robbery" || mini == "Bear Hunter")
         {
         	if ($item[wand of nagamar].available_amount() > 0)
 				description.listAppend("Ascend.");
@@ -159,12 +163,42 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
         	boolean [item] tea = $items[Corpse Island iced tea,cup of lukewarm tea,cup of &quot;tea&quot;,hippy herbal tea,Ice Island Long Tea,New Zealand iced tea];
             //description.listAppend("Drink tea.|" + );
             
-            string tooltip_text = tea.listInvert().listJoinComponents(", ", "or") + ".";
+            string tooltip_text = tea.listInvert().listJoinComponents(", ", "or").capitaliseFirstLetter() + ".";
             tooltip_text += "<hr>Cheapest is cup of lukewarm tea.<hr>Hippy herbal tea is guano coffee cup (bat guano, batrat, batrat burrow) + herbs (hippy store).";
             
             string title = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip_text, "r_tooltip_inner_class") + "Drink tea.", "r_tooltip_outer_class");
             description.listAppend(title);
+        }
+        else if (mini == "Scurvy Challenge")
+        {
+            boolean [item] fruit = $items[grapefruit,kumquat,lemon,lime,orange,pixel lemon,sea tangelo,tangerine,vinegar-soaked lemon slice];
+            //description.listAppend("Drink tea.|" + );
             
+            string tooltip_text = fruit.listInvert().listJoinComponents(", ", "or").capitaliseFirstLetter() + ".";
+            tooltip_text += "<hr>Check the hippy store, on the island.";
+            
+            string title = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip_text, "r_tooltip_inner_class") + "Eat fruit.", "r_tooltip_outer_class");
+            description.listAppend(title);
+        }
+        else if (mini == "Raw Carnivorery")
+        {
+        	//FIXME This could be dynamic, I bet the game is dynamic.
+            boolean [item] meat = $items[beefy fish meat, glistening fish meat, slick fish meat, &quot;meat&quot; stick, raw mincemeat, alien meat, dead meat bun, consummate meatloaf, VYKEA meatballs];
+            
+            string [int] entries;
+            foreach it in meat
+            {
+            	string entry = it;
+                if (entries.count() == 0) entry = entry.capitaliseFirstLetter();
+            	if (it.fullness == 1)
+                	entry = HTMLGenerateSpanOfClass(entry, "r_bold");
+                entries.listAppend(entry);
+            }
+            
+            string tooltip_text = entries.listJoinComponents(", ", "or") + ".";
+            
+            string title = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip_text, "r_tooltip_inner_class") + "Eat meat.", "r_tooltip_outer_class");
+            description.listAppend(title);
         }
         else if (mini == "That Britney Spears Number")
         {
@@ -191,9 +225,19 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
             attacking_description.listAppend("run zero effects");
             continue;
         }
-        else if (mini == "A Nice Cold One")
+        else if (mini == "Purrrity")
+        {
+            attacking_description.listAppend("run zero effects with R in their name");
+            continue;
+        }
+        else if (mini == "A Nice Cold One" || mini == "Thirrrsty forrr Booze")
         {
             attacking_modifiers.listAppend("+booze drop");
+            continue;
+        }
+        else if (mini == "Smellin' Like a Stinkin' Rose")
+        {
+            attacking_modifiers.listAppend("-combat");
             continue;
         }
         else if (mini == "Ready to Melt")
@@ -220,6 +264,36 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
             else
                 description.listAppend("Ascend Gnomish moon sign.");
         }
+        else if (mini == "Pirate Wars!")
+        {
+        	description.listAppend("Fight pirates, but not too many; the count resets every day.");
+        }
+        else if (mini == "Bilge Hunter")
+        {
+            description.listAppend("Run +300 ML and +combat, and fight drunken rat kings in the Typical Tavern basement.");
+            modifiers.listAppend("+300 ML");
+            modifiers.listAppend("+combat");
+        }
+        else if (mini == "Death to Ninja!")
+        {
+        	string [int] tasks;
+            if (!is_wearing_outfit("Swashbuckling Getup"))
+            	tasks.listAppend("equip swashbuckling getup");
+            tasks.listAppend("fight ninja");
+            description.listAppend(tasks.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".");
+        }
+        else if (mini == "Swimming with the Fishes")
+        {
+            description.listAppend("Spend turns underwater.");
+        }
+        else if (mini == "(Fur) Shirts and Skins")
+        {
+            description.listAppend("Collect furs and skins from monsters. (+item)|The icy peak? Olfact yeti.");
+        }
+        else if (mini == "With Your Bare Hands")
+        {
+            description.listAppend("Fight beast-type monsters without a weapon equipped.|The icy peak (olfact yeti) or the dire warren?");
+        }
         else if (mini == "Northern Digestion" || mini == "Frozen Dinners")
         {
         	if (canadia_available())
@@ -230,9 +304,40 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
             else
                 description.listAppend("Ascend canadia moon sign.");
         }
+        else if (mini == "Really Bloody")
+        {
+        	if (inebriety_limit() == 0)
+    	        description.listAppend("Ascend to drink Bloody Mary.");
+            else
+	            description.listAppend("Drink Bloody Mary.");
+        }
+        else if (mini == "Liver of the Damned")
+        {
+            if (inebriety_limit() == 0)
+                description.listAppend("Ascend to drink cursed bottles of rum.");
+            else
+                description.listAppend("Drink cursed bottles of rum.");
+            description.listAppend("Run -combat at the Poop Deck, set an open course to 1,1, open the cursed chests.");
+            modifiers.listAppend("-combat");
+        }
+        else if (mini == "Beast Master")
+        {
+            attacking_modifiers.listAppend("familiar weight");
+            continue;
+        }
+        else if (mini == "Letter of the Moment")
+        {
+            attacking_modifiers.listAppend("letter of the moment");
+            continue;
+        }
         else if (mini == "Barely Dressed")
         {
             attacking_description.listAppend("do not equip equipment");
+            continue;
+        }
+        else if (mini == "Dressed in Rrrags")
+        {
+            attacking_description.listAppend("wear short-named equipment");
             continue;
         }
         else if (mini == "Hibernation Ready" || mini == "All Bundled Up")
@@ -240,11 +345,21 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
             attacking_modifiers.listAppend("cold resistance");
             continue;
         }
+        else if (mini == "Loot Hunter")
+        {
+            attacking_modifiers.listAppend("+item");
+            continue;
+        }
+        else if (mini == "Safari Chic")
+        {
+            attacking_modifiers.listAppend("equipment autosell value");
+            continue;
+        }
         else if (mini == "Ice Hunter")
         {
             description.listAppend("Fight ice skates. Either fax/wish/copy them, or olfact them in the The Skate Park underwater.");
         }
-        else if (mini == "Bear Hugs All Around" || mini == "Sharing the Love (to stay warm)")
+        else if (mini == "Bear Hugs All Around" || mini == "Sharing the Love (to stay warm)" || mini == "Fair Game")
         {
             description.listAppend("Maximise fightgen, attack as many unique opponents as possible.");
         }
@@ -270,7 +385,7 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
             	modifiers.listAppend("+4 cold res");
                 string line = "Fight on the battlefield";
                 if (numeric_modifier("cold resistance") < 4)
-                	line += HTMLGenerateSpanFont(" with +4 cold resistance.", "red");
+                	line += HTMLGenerateSpanFont(" with +4 cold resistance", "red");
                 line += ".";
                 description.listAppend(line);
             }

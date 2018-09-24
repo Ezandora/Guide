@@ -213,11 +213,38 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 			turn_range = vec2iMake(ceil(to_float(meat_remaining) / to_float(brigand_meat_drop_range.y)),
 			ceil(to_float(meat_remaining) / to_float(brigand_meat_drop_range.x)));
 		
+  		string turns_extra = ".";
+      	string [int] extra_details;
+        if (get_property("boomBoxSong") == "Total Eclipse of Your Meat")
+        {
+            vec2i brigand_meat_drop_range_sing = vec2iMake(820 * meat_drop_multiplier, 1230 * meat_drop_multiplier);
+            vec2i turn_range_sing;
+            if (brigand_meat_drop_range_sing.x != 0 && brigand_meat_drop_range_sing.y != 0)
+                turn_range_sing = vec2iMake(ceil(to_float(meat_remaining) / to_float(brigand_meat_drop_range_sing.y)),
+                ceil(to_float(meat_remaining) / to_float(brigand_meat_drop_range_sing.x)));
+            turns_extra = ", if you don't sing.";
+            if (turn_range_sing.x == turn_range.x && turn_range_sing.y == turn_range.y)
+            {
+            	turns_extra = ".";
+            }
+            else if (turn_range_sing.x == turn_range_sing.y)
+                details.listAppend(pluralise(turn_range_sing.x, "turn", "turns") + " remaining, if you sing.");
+            else
+                details.listAppend("[" + turn_range_sing.x + " to " + turn_range_sing.y + "] turns remaining, if you sing.");
+            extra_details.listAppend("Be sure to Sing Along with your boombox every turn.");
+            /*float without = meat_remaining / (1000.0 * meat_drop_multiplier);
+            float with = meat_remaining / (1025.0 * meat_drop_multiplier);
+            details.listAppend("Singing saves " + (without - with) + " turns.");*/
+        }
+        
+              
 		//FIXME consider looking into tracking how long until the semi-rare item runs out, for turn calculation
 		if (turn_range.x == turn_range.y)
-			details.listAppend(pluralise(turn_range.x, "turn", "turns") + " remaining.");
+			details.listAppend(pluralise(turn_range.x, "turn", "turns") + " remaining" + turns_extra);
 		else
-			details.listAppend("[" + turn_range.x + " to " + turn_range.y + "] turns remaining.");
+			details.listAppend("[" + turn_range.x + " to " + turn_range.y + "] turns remaining" + turns_extra);
+        
+        
         if (turn_range.x == 1 && turn_range.y == 2)
         {
         	float chance = 1.0 - TriangularDistributionCalculateCDF(meat_remaining + 1, brigand_meat_drop_range.x, brigand_meat_drop_range.y);
@@ -265,7 +292,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
             if (relevant_potions_output.count() > 0)
                 details.listAppend("Could try pulling " + relevant_potions_output.listJoinComponents(", ", "or") + ".");
         }
-        
+        details.listAppendList(extra_details);
 		optional_task_entries.listAppend(ChecklistEntryMake("Island War Nuns", "bigisland.php?place=nunnery", ChecklistSubentryMake("Island War Nuns Quest", "+meat", details), $locations[the themthar hills]));
 	}
 	if (!base_quest_state.state_boolean["Junkyard Finished"])
@@ -354,15 +381,15 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 				details.listAppend("Talk to Yossarian to complete quest.");
 			else
             {
-                if ($item[dictionary].available_amount() > 0)
+                if ($item[dictionary].available_amount() > 0 && $item[dictionary].item_is_usable())
                 {
                     details.listAppend("Read from the dictionary to stasis gremlins.");
                 }
-                else if ($item[facsimile dictionary].available_amount() > 0)
+                else if ($item[facsimile dictionary].available_amount() > 0 && $item[facsimile dictionary].item_is_usable())
                 {
                     details.listAppend("Read from the facsimile dictionary to stasis gremlins.");
                 }
-                else if ($item[seal tooth].available_amount() > 0)
+                else if ($item[seal tooth].available_amount() > 0 && $item[seal tooth].item_is_usable())
                 {
                     details.listAppend("Use your seal tooth to stasis gremlins.");
                 }
@@ -370,9 +397,12 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
                 {
                     details.listAppend("Cast suckerpunch to stasis gremlins.");
                 }
-                else
+                else if ($item[seal tooth].item_is_usable())
                     details.listAppend(HTMLGenerateSpanFont("Acquire a seal tooth", "red") + " to stasis gremlins. (from hermit)");
-                if (!$monster[a.m.c. gremlin].is_banished())
+                else if ($item[beehive].available_amount() > 0)
+                    details.listAppend("Use your beehive to stasis gremlins.");
+                
+                if (!$monster[A.M.C. gremlin].is_banished())
                     details.listAppend("Potentially banish A.M.C. Gremlin.");
             }
 		}
@@ -471,7 +501,30 @@ void QLevel12GenerateBattlefieldDescription(ChecklistSubentry subentry, string s
         line = pluralise(enemies_remaining, enemy_name, enemy_name_plural) + " left.";
     }
     else
+    {
         line += "Fight " + boss_name + "!";
+        if (my_path_id() == PATH_DEMIGUISE && $effect[Flared Nostrils].have_effect() > 0)
+        	line += "|" + HTMLGenerateSpanFont("Remove Flared Nostrils", "red") + " or you will die.";
+        if (my_path_id() == PATH_DEMIGUISE)
+        {
+        	int damage_taken = 0;
+            damage_taken += ceil(my_maxhp() * 2.0 * (1.0 - elemental_resistance($element[stench]) / 100.0));
+            if ($effect[flared nostrils].have_effect() > 0)
+                damage_taken += ceil(my_maxhp() * 2.0 * 2.0);
+            else
+	            damage_taken += ceil(my_maxhp() * 2.0 * (1.0 - elemental_resistance($element[sleaze]) / 100.0));
+        	subentry.modifiers.listAppend(HTMLGenerateSpanOfClass("+stench res", "r_element_stench_desaturated"));
+            subentry.modifiers.listAppend(HTMLGenerateSpanOfClass("+sleaze res", "r_element_sleaze_desaturated"));
+            
+            line += "|Will take " + damage_taken + " damage at the start of combat";
+            if (damage_taken >= my_maxhp())
+            	line += ", " + HTMLGenerateSpanFont("which you cannot survive", "red");
+            line += ".";
+        	line += "|Run " + HTMLGenerateSpanOfClass("stench", "r_element_stench") + " and " + HTMLGenerateSpanOfClass("sleaze", "r_element_sleaze") + " resistance.";
+            if (my_hp() != my_maxhp())
+	            line += "|" + HTMLGenerateSpanFont("Also restore your HP.", "red");
+        }
+    }
     
     string outfit_name;
     if (side == "hippy")
@@ -495,11 +548,17 @@ void QLevel12GenerateBattlefieldDescription(ChecklistSubentry subentry, string s
     string area_to_unlock = "";
     string [int] areas_unlocked_but_not_completed;
     
-    foreach key in base_sidequest_list
+    boolean [string] areas_blocked;
+    if (my_path_id() == PATH_G_LOVER || my_path_id() == PATH_POCKET_FAMILIARS)
+        areas_blocked["Arena"] = true;
+    
+    foreach key, sidequest in base_sidequest_list
     {
-        if (!__quest_state["Level 12"].state_boolean[base_sidequest_list[key] + " Finished"])
+    	if (areas_blocked[sidequest])
+        	continue;
+        if (!__quest_state["Level 12"].state_boolean[sidequest + " Finished"])
         {
-            areas_unlocked_but_not_completed.listAppend(base_sidequest_list[key]);
+            areas_unlocked_but_not_completed.listAppend(sidequest);
         }
     }
     
@@ -519,6 +578,7 @@ void QLevel12GenerateBattlefieldDescription(ChecklistSubentry subentry, string s
     for i from 2 to 0 by -1
     {
         int threshold = unlock_threshold[i];
+        if (areas_blocked[sidequest_list[i]]) continue;
         if (!__quest_state["Level 12"].state_boolean[sidequest_list[i] + " Finished"])
         {
             if (enemies_defeated < threshold)

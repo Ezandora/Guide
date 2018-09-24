@@ -67,15 +67,15 @@ void PathBugbearInvasionGenerateTasks(ChecklistEntry [int] task_entries, Checkli
     property_names_for_areas[$location[Waste Processing]] = "statusWasteProcessing";
     
     string [location] image_name_for_location;
-    image_name_for_location[$location[Engineering]] = "__monster liquid metal bugbear";
-    image_name_for_location[$location[Galley]] = "__monster trendy bugbear chef";
-    image_name_for_location[$location[Medbay]] = "__monster anesthesiologist bugbear";
-    image_name_for_location[$location[Morgue]] = "__monster bugbear mortician";
-    image_name_for_location[$location[Navigation]] = "__monster N-space Virtual Assistant";
-    image_name_for_location[$location[Science Lab]] = "__monster bugbear scientist";
-    image_name_for_location[$location[Sonar]] = "__monster batbugbear";
-    image_name_for_location[$location[Special Ops]] = "__monster Black Ops Bugbear";
-    image_name_for_location[$location[Waste Processing]] = "__monster scavenger bugbear";
+    image_name_for_location[$location[Engineering]] = "__monster " + $monster[liquid metal bugbear];
+    image_name_for_location[$location[Galley]] = "__monster " + $monster[trendy bugbear chef];
+    image_name_for_location[$location[Medbay]] = "__monster " + $monster[anesthesiologist bugbear];
+    image_name_for_location[$location[Morgue]] = "__monster " + $monster[bugbear mortician];
+    image_name_for_location[$location[Navigation]] = "__monster " + $monster[N-space Virtual Assistant];
+    image_name_for_location[$location[Science Lab]] = "__monster " + $monster[bugbear scientist];
+    image_name_for_location[$location[Sonar]] = "__monster " + $monster[batbugbear];
+    image_name_for_location[$location[Special Ops]] = "__monster " + $monster[Black Ops Bugbear];
+    image_name_for_location[$location[Waste Processing]] = "__monster " + $monster[scavenger bugbear];
     
     
     string [location] printable_names_for_areas;
@@ -398,9 +398,9 @@ void PathBugbearInvasionGenerateTasks(ChecklistEntry [int] task_entries, Checkli
             {
                 //FIXME want tracking on liquid metal bugbears
                 modifiers.listAppend("+item");
-                if (!$monster[battlesuit bugbear type].is_banished())
+                if (!$monster[Battlesuit Bugbear Type].is_banished())
                 {
-                    modifiers.listAppend("banish " + $monster[battlesuit bugbear type]);
+                    modifiers.listAppend("banish " + $monster[Battlesuit Bugbear Type]);
                 }
                 description.listAppend("Collect drone self-destruct chips from drones, use them on liquid metal bugbears.");
                 if ($item[drone self-destruct chip].available_amount() > 0)

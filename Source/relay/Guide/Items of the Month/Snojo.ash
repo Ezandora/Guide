@@ -11,9 +11,9 @@ void IOTMSnojoGenerateResource(ChecklistEntry [int] resource_entries)
             description.listAppend("Win a fight without taking a turn.");
             
             
-            if (snojo_skill_entry.image_lookup_name == "")
-                snojo_skill_entry.image_lookup_name = "__skill shattering punch";
-            snojo_skill_entry.subentries.listAppend(ChecklistSubentryMake(pluralise(punches_left, "shattering punch", "shattering punches"), "", description));
+            //if (snojo_skill_entry.image_lookup_name == "")
+                //snojo_skill_entry.image_lookup_name = "__skill shattering punch";
+            resource_entries.listAppend(ChecklistEntryMake("__skill shattering punch", "", ChecklistSubentryMake(pluralise(punches_left, "shattering punch", "shattering punches"), "", description), 0).ChecklistEntryTagEntry("free instakill"));
             
         }
     }
@@ -33,7 +33,8 @@ void IOTMSnojoGenerateResource(ChecklistEntry [int] resource_entries)
                 //is this relevant? we don't describe this for pantsgiving
                 description.listAppend("Currently used on " + snoke_banish.banished_monster + " for " + pluralise(turns_left_of_banish, "more turn", "more turns") + ".");
             }
-            snojo_skill_entry.subentries.listAppend(ChecklistSubentryMake(pluralise(snokes_left, "snokebomb", "snokebombs"), "", description));
+            //snojo_skill_entry.subentries.listAppend(ChecklistSubentryMake(pluralise(snokes_left, "snokebomb", "snokebombs"), "", description));
+            resource_entries.listAppend(ChecklistEntryMake("__skill snokebomb", "", ChecklistSubentryMake(pluralise(snokes_left, "snokebomb", "snokebombs"), "", description), 0).ChecklistEntryTagEntry("banish"));
             
         }
     }
@@ -200,6 +201,6 @@ void IOTMSnojoGenerateResource(ChecklistEntry [int] resource_entries)
             importance = 0;
         ChecklistSubentry [int] subentries;
         subentries.listAppend(ChecklistSubentryMake(pluralise(fights_remaining, "free Snojo fight", "free Snojo fights"), "", description));
-        resource_entries.listAppend(ChecklistEntryMake("__item snow suit", "place.php?whichplace=snojo", subentries, importance, $locations[the x-32-f combat training snowman]));
+        resource_entries.listAppend(ChecklistEntryMake("__item snow suit", "place.php?whichplace=snojo", subentries, importance, $locations[the x-32-f combat training snowman]).ChecklistEntryTagEntry("daily free fight"));
     }
 }

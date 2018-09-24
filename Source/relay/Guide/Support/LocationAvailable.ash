@@ -337,6 +337,16 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
     if (zone == "The Prince's Ball")
         return get_property("grimstoneMaskPath").to_lower_case() == "stepmother" && get_property_int("cinderellaMinutesToMidnight") > 0;
     
+    if (loc == $location[hippy camp])
+    {
+    	//FIXME we don't know who won the war, do we? so only give information if the war hasn't started 
+    	if (get_property_ascension("lastIslandUnlock"))
+        {
+            if (!QuestState("questL12War").started) return true;
+        }
+        else
+        	return false;
+    }
 	
 	switch (loc)
 	{
@@ -380,6 +390,7 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
         case $location[The Wreck of the Edgar Fitzsimmons]:
             return questPropertyPastInternalStepNumber("questS02Monkees", 2);
         case $location[the boss bat's lair]:
+        	if (get_property("questL04Bat") == "finished") return false; //area closes
             if ($location[the boss bat's lair].combatTurnsAttemptedInLocation() > 0)
                 return true;
             return questPropertyPastInternalStepNumber("questL04Bat", 4);

@@ -49,7 +49,11 @@ int CounterGetNextExactTurn(Counter c)
     if (c.exact_turns.count() == 0)
         return -1;
     return c.exact_turns[0];
-    
+}
+
+boolean CounterIsExact(Counter c)
+{
+	return c.CounterGetNextExactTurn() > 0;
 }
 
 boolean CounterMayHitNextTurn(Counter c)
@@ -141,6 +145,8 @@ boolean CounterWillHitExactlyInTurnRange(Counter c, int start_turn_range, int en
 
 boolean CounterWillHitNextTurn(Counter c)
 {
+	if (c.name == "Holiday Monster") //mafia's tracking of these breaks, so, don't rely on it. thinking of El Dia de Los Muertos Borrachos specifically
+		return false;
     if (c.CounterIsRange())
     {
         Vec2i range = c.CounterGetWindowRange();

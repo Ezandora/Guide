@@ -59,8 +59,17 @@ void initialiseIOTMsUsable()
         __iotms_usable[$item[airplane charter: Dinseylandfill]] = true;
     if (get_property_boolean("_frToday") || get_property_boolean("frAlways"))
     	__iotms_usable[lookupItem("FantasyRealm membership packet")] = true;
+    if (get_property_boolean("_neverendingPartyToday") || get_property_boolean("neverendingPartyAlways"))
+        __iotms_usable[lookupItem("Neverending Party invitation envelope")] = true;
+        
     if (florist_available() && $item[hand turkey outline].is_unrestricted()) //Order of the Green Thumb Order Form is not marked as out of standard.
     	__iotms_usable[$item[Order of the Green Thumb Order Form]] = true;
+    if ($item[clan vip lounge key].item_amount() > 0)
+    {
+    	//FIXME all
+    	__iotms_usable[lookupItem("Clan Carnival Game")] = true;
+        __iotms_usable[$item[clan floundry]] = true;
+    }
     //Remove non-standard:
     foreach it in __iotms_usable
     {

@@ -8,7 +8,7 @@ static
     void generateFoldables()
     {
     	//FIXME load from data/foldgroups.txt
-        foreach it in $items[broken champagne bottle]
+        foreach it in $items[broken champagne bottle,makeshift garbage shirt]
         {
             foreach it2 in it.get_related("fold")
             {

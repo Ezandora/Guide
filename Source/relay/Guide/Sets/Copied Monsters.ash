@@ -143,7 +143,7 @@ void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [in
         
         if (get_property_int("sourceAgentsDefeated") > 0)
             stat_description += pluralise(get_property_int("sourceAgentsDefeated"), "agent", "agents") + " defeated so far. ";
-        stat_description += $monster[Source agent].base_attack + " attack.";
+        stat_description += $monster[Source Agent].base_attack + " attack.";
         float our_init = initiative_modifier();
         if ($skill[Overclocked].have_skill())
             our_init += 200;

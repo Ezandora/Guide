@@ -404,7 +404,7 @@ void QLevel13Init()
 	state.state_boolean["wall of bones will need to be defeated"] = !state.state_boolean["past tower level 3"];
 	state.state_boolean["shadow will need to be defeated"] = !state.state_boolean["past tower level 5"];
     //FIXME what paths don't fight the shadow?
-	state.state_boolean["king waiting to be freed"] = (state.mafia_internal_step == 13);
+	state.state_boolean["king waiting to be freed"] = (state.mafia_internal_step >= 14 && !state.finished);
     
     
     boolean [string] known_key_names = $strings[Boris's key,Jarlsberg's key,Sneaky Pete's key,Richard's star key,skeleton key,digital key];
@@ -510,12 +510,15 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 }
                 if (__misc_state_int["pulls available"] > 0)
                 {
-                    boolean [item] blacklist = $items[hare brush,freddie's blessing of mercury,ruby on canes];
+                    boolean [item] blacklist;// = $items[hare brush,freddie's blessing of mercury,ruby on canes];
                     item [int] relevant_potions = ItemFilterGetPotionsCouldPullToAddToNumericModifier("Initiative", 30, blacklist);
                     string [int] relevant_potions_output;
                     foreach key, it in relevant_potions
                     {
-                        relevant_potions_output.listAppend(it + " (" + it.to_effect().numeric_modifier("Initiative").roundForOutput(0) + "%)");
+                    	float initiative_modifier = it.to_effect().numeric_modifier("Initiative");
+                        if ($effect[Bow-Legged Swagger].have_effect() > 0)
+                        	initiative_modifier *= 2.0;
+                        relevant_potions_output.listAppend(it + " (" + initiative_modifier.roundForOutput(0) + "%)");
                     }
                     
                     if (relevant_potions_output.count() > 0)
@@ -549,9 +552,10 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 {
                     float base_stat = MAX(1.0, my_basestat(stat_type));
                     
-                    boolean [item] blacklist = $items[R&uuml;mpelstiltz,gummi snake,banana smoothie,banana supersucker,ennui-flavored potato chips,moonds,handful of laughing willow bark,ultrasoldier serum,kumquat supersucker,dennis's blessing of minerva,smart watch,mer-kin smartjuice,lump of saccharine maple sap,burt's blessing of bacchus,augmented-reality shades,mer-kin cooljuice,lobos mints,mariachi toothpaste,disco horoscope (virgo),pressurized potion of pulchritude,pressurized potion of perspicacity,pressurized potion of puissance,handful of crotchety pine needles,bruno's blessing of mars,fitness wristband,gummi salamander,bottle of fire,mer-kin strongjuice,snake,M-242,sparkler]; //limited/expensive/unusable content
-                    item [int] relevant_potions = ItemFilterGetPotionsCouldPullToAddToNumericModifier(stat_type, 50, blacklist);
-                    item [int] relevant_potions_source_2 = ItemFilterGetPotionsCouldPullToAddToNumericModifier(stat_type + " percent", 50.0 / base_stat * 100.0, blacklist);
+                    //R&uuml;mpelstiltz,gummi snake,handful of laughing willow bark,dennis's blessing of minerva,smart watch,mer-kin smartjuice,lump of saccharine maple sap,burt's blessing of bacchus,augmented-reality shades,mer-kin cooljuice,lobos mints,mariachi toothpaste,disco horoscope (virgo),pressurized potion of pulchritude,pressurized potion of perspicacity,pressurized potion of puissance,handful of crotchety pine needles,bruno's blessing of mars,fitness wristband,gummi salamander,bottle of fire,banana smoothie,banana supersucker,ennui-flavored potato chips,moonds,ultrasoldier serum,kumquat supersucker,mer-kin strongjuice,
+                    boolean [item] blacklist = $items[snake,M-242,sparkler]; //limited/expensive/unusable content
+                    item [int] relevant_potions = ItemFilterGetPotionsCouldPullToAddToNumericModifier(stat_type, MIN(600 - current_value, 25), blacklist);
+                    item [int] relevant_potions_source_2 = ItemFilterGetPotionsCouldPullToAddToNumericModifier(stat_type + " percent", 25.0 / base_stat * 100.0, blacklist);
                     
                     relevant_potions.listAppendList(relevant_potions_source_2);
                     
@@ -653,6 +657,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         {
             int [element] elements_needed_to_pass;
             string [int] resists_needed_for_hedge_maze = base_quest_state.state_string["Hedge maze elements needed"].split_string_alternate("\\|");
+            float total_damage_taken_from_resists = 0.0;
             if (resists_needed_for_hedge_maze.count() > 0)
             {
                 foreach key, element_name in resists_needed_for_hedge_maze
@@ -661,10 +666,18 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                     if (e == $element[none]) //wha?
                         continue;
                     elements_needed_to_pass[e] = 7;
+                    float percentage = 0.0;
+                    if (key == 0) percentage = 0.9;
+                    if (key == 1) percentage = 0.8;
+                    if (key == 2) percentage = 0.7;
+                    float resist = e.elemental_resistance() / 100.0;
+                    float damage_taken = my_maxhp() * percentage * (1.0 - resist);
+                    total_damage_taken_from_resists += damage_taken;  
                 }
             }
             else
             {
+            	total_damage_taken_from_resists = 10000;
                 elements_needed_to_pass[$element[hot]] = 7;
                 elements_needed_to_pass[$element[stench]] = 7;
                 elements_needed_to_pass[$element[spooky]] = 7;
@@ -682,7 +695,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                     amount_missing[e] = amount_needed - amount_have;
                 }
             }
-            if (amount_missing.count() > 0)
+            if (amount_missing.count() > 0 && total_damage_taken_from_resists >= my_maxhp())
             {
                 if ($familiar[exotic parrot].familiar_is_usable() && !__misc_state["familiars temporarily blocked"])
                     subentry.entries.listAppend("Potentially switch to the exotic parrot.");
@@ -918,7 +931,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                     subentry.entries.listAppend("Potentially switch to the magic dragonfish.");
                     
                 //Calculate saucegeyser damage:
-                float expected_saucegeyser_damage = skillExpectedDamageRange($monster[wall of bones], $skill[saucegeyser]).x;
+                float expected_saucegeyser_damage = skillExpectedDamageRangeAlternate($monster[wall of bones], $skill[saucegeyser]).x;
                 
                 subentry.entries.listAppend("Expected saucegeyser minimum damage: " + expected_saucegeyser_damage.roundForOutput(0));
                 if (expected_saucegeyser_damage >= 5000.0)
@@ -1011,7 +1024,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                             need_modifier_output = false;
                         }
                     }
-                    else
+                    else if ($item[hand turkey outline].is_unrestricted()) //FIXME test if we have an airport skill
                     {
                         subentry.entries.listAppend("Cast saucegeyser three times, then an airport skill?");
                     }

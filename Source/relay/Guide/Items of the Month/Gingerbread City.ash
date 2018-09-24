@@ -16,7 +16,7 @@ void IOTMGingerbreadCityGenerateResource(ChecklistEntry [int] resource_entries)
             string [int] description;
             description.listAppend("Combat skill, win a fight without taking a turn.");
             //FIXME replace with a better image
-            resource_entries.listAppend(ChecklistEntryMake("__familiar Penguin Goodfella", "", ChecklistSubentryMake("Gingerbread mob hit", "", description), 0));
+            resource_entries.listAppend(ChecklistEntryMake("__familiar Penguin Goodfella", "", ChecklistSubentryMake("Gingerbread mob hit", "", description), 0).ChecklistEntryTagEntry("free instakill"));
             
         }
     }

@@ -242,6 +242,17 @@ void generatePullList(Checklist [int] checklists)
                 pullable_item_list.listAppend(GPItemMake($item[cane-mail shirt], "+20ML shirt", 1));
         }
     }
+    if (__quest_state["Level 10"].mafia_internal_step >= 8)
+    {
+    	if (__quest_state["Level 10"].mafia_internal_step == 8 && $item[amulet of extreme plot significance].available_amount() == 0)
+        {
+        	pullable_item_list.listAppend(GPItemMake($item[amulet of extreme plot significance], "Speeds up castle basement.", 1));
+        }
+        if (!__quest_state["Level 10"].finished && $item[mohawk wig].available_amount() == 0)
+        {
+            pullable_item_list.listAppend(GPItemMake($item[mohawk wig], "Speeds up top floor of castle.", 1));
+        }
+    }
     if (my_path_id() != PATH_G_LOVER)
 	    pullable_item_list.listAppend(GPItemMake($item[Clara's Bell], "Forces a non-combat, once/day.", 1));
     if (combat_items_usable)
@@ -452,14 +463,14 @@ void generatePullList(Checklist [int] checklists)
     }
     if (!__misc_state["can reasonably reach -25% combat"])
     {
-        if (my_primestat() == $stat[moxie] || my_basestat($stat[moxie]) >= 35)
+        if ((my_primestat() == $stat[moxie] || my_basestat($stat[moxie]) >= 35) && $item[iFlail].item_is_usable())
             pullable_item_list.listAppend(GPItemMake($item[iFlail], "-combat, +11 ML, +5 familiar weight"));
-        if (__misc_state["Torso aware"]) //FIXME exclusiveness with camouflage T-shirt. probably should pull camou if we're over muscle stat, otherwise stealth vest, or whichever we have
+        if (__misc_state["Torso aware"] && $item[xiblaxian stealth vest].item_is_usable()) //FIXME exclusiveness with camouflage T-shirt. probably should pull camou if we're over muscle stat, otherwise stealth vest, or whichever we have
             pullable_item_list.listAppend(GPItemMake($item[xiblaxian stealth vest], "-combat shirt"));
-        if (my_path_id() != PATH_G_LOVER)
+        if ($item[duonoculars].item_is_usable())
 	        pullable_item_list.listAppend(GPItemMake($item[duonoculars], "-combat, +5 ML"));
         pullable_item_list.listAppend(GPItemMake($item[ring of conflict], "-combat"));
-        if ($item[red shoe].can_equip() || my_path_id() == PATH_GELATINOUS_NOOB)
+        if (($item[red shoe].can_equip() || my_path_id() == PATH_GELATINOUS_NOOB) && $item[red shoe].item_is_usable())
             pullable_item_list.listAppend(GPItemMake($item[red shoe], "-combat"));
     }
 	

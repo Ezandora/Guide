@@ -39,4 +39,9 @@ import "relay/Guide/Items of the Month/XO Skeleton.ash";
 import "relay/Guide/Items of the Month/Portable Pantogram.ash";
 import "relay/Guide/Items of the Month/Garbage Tote.ash";
 import "relay/Guide/Items of the Month/Zutara.ash";
+import "relay/Guide/Items of the Month/Neverending Party.ash";
+import "relay/Guide/Items of the Month/God Lobster.ash";
+import "relay/Guide/Items of the Month/BoomBox.ash";
+import "relay/Guide/Items of the Month/Cat Burglar.ash";
+import "relay/Guide/Items of the Month/Bastille Battalion.ash";
 

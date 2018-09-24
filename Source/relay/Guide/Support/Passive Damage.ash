@@ -240,7 +240,6 @@ string [int] PDSGenerateDescriptionToUneffectPassives()
         {
             bjorn_familiar_types.listAppend(pds.source_familiar);
         }
-        
     }
     string [int] result;
     if (effect_types.count() > 0)
@@ -251,6 +250,9 @@ string [int] PDSGenerateDescriptionToUneffectPassives()
         result.listAppend("Change familiar from " + familiar_types.listJoinComponents(", ", "and") + ".");
     if (bjorn_familiar_types.count() > 0)
         result.listAppend("Change bjorn/crown familiar from " + bjorn_familiar_types.listJoinComponents(", ", "and") + ".");
+    if (get_property("_horsery") == "pale horse") //FIXME make generic
+    	result.listAppend("Change to a different horse.");
+        
     return result;
 }
 

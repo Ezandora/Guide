@@ -56,7 +56,7 @@ void IOTMTelegraphOfficeGenerateTasks(ChecklistEntry [int] task_entries, Checkli
     boss_for_quest["Haunted Boneyard"] = $monster[Pharaoh Amoon-Ra Cowtep];
     boss_for_quest["Sheriff Wanted"] = $monster[Former Sheriff Dan Driscoll];
     
-    boss_for_quest["Missing: Many Children"] = $monster[clara];
+    boss_for_quest["Missing: Many Children"] = $monster[Clara];
     boss_for_quest["Wagon Train Escort Wanted"] = $monster[Granny Hackleton];
     boss_for_quest["Madness at the Mine"] = $monster[unusual construct];
     
@@ -74,7 +74,7 @@ void IOTMTelegraphOfficeGenerateTasks(ChecklistEntry [int] task_entries, Checkli
         else
             description.listAppend("Defeat " + boss + ".");
         boolean frigidalmatian_eligible = false;
-        if (boss == $monster[clara])
+        if (boss == $monster[Clara])
         {
             modifiers.listAppend("+elemental resistance");
             description.listAppend("Use high-damage spells, like shrap + snow mobile/green lantern.");

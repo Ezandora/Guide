@@ -30,18 +30,18 @@ static
         __monster_data[$monster[Space Tourist Explorer Ghost]].basic_attack_elements = $elements[sleaze,cold,hot,none];
         __monster_data[$monster[Whatsian Commando Ghost]].basic_attack_elements = $elements[sleaze,none];
         
-        __monster_data[$monster[the ghost of Ebenoozer Screege]].basic_attack_elements = $elements[spooky];
-        __monster_data[$monster[the ghost of Lord Montague Spookyraven]].basic_attack_elements = $elements[stench];
-        __monster_data[$monster[the ghost of Waldo the Carpathian]].basic_attack_elements = $elements[hot];
+        __monster_data[$monster[The ghost of Ebenoozer Screege]].basic_attack_elements = $elements[spooky];
+        __monster_data[$monster[The ghost of Lord Montague Spookyraven]].basic_attack_elements = $elements[stench];
+        __monster_data[$monster[The ghost of Waldo the Carpathian]].basic_attack_elements = $elements[hot];
         __monster_data[$monster[The Icewoman]].basic_attack_elements = $elements[cold];
-        __monster_data[$monster[the ghost of Jim Unfortunato]].basic_attack_elements = $elements[sleaze];
-        __monster_data[$monster[the ghost of Sam McGee]].basic_attack_elements = $elements[hot];
+        __monster_data[$monster[The ghost of Jim Unfortunato]].basic_attack_elements = $elements[sleaze];
+        __monster_data[$monster[The ghost of Sam McGee]].basic_attack_elements = $elements[hot];
         __monster_data[$monster[Emily Koops\, a spooky lime]].basic_attack_elements = $elements[spooky];
         __monster_data[$monster[the ghost of Monsieur Baguelle]].basic_attack_elements = $elements[hot];
-        __monster_data[$monster[the ghost of Vanillica "Trashblossom" Gorton]].basic_attack_elements = $elements[stench];
+        __monster_data[$monster[The ghost of Vanillica "Trashblossom" Gorton]].basic_attack_elements = $elements[stench];
         __monster_data[$monster[the ghost of Oily McBindle]].basic_attack_elements = $elements[sleaze];
         __monster_data[$monster[boneless blobghost]].basic_attack_elements = $elements[spooky];
-        __monster_data[$monster[the ghost of Richard Cockingham]].basic_attack_elements = $elements[spooky];
+        __monster_data[$monster[The ghost of Richard Cockingham]].basic_attack_elements = $elements[spooky];
         __monster_data[$monster[The Headless Horseman]].basic_attack_elements = $elements[spooky];
         
         __monster_data[$monster[chalkdust wraith]].basic_attack_elements = $elements[none];
@@ -56,19 +56,19 @@ static
         //percentage = 0.05 * (monster_id - 1946) + 0.4
         __monster_data[$monster[boneless blobghost]].shoot_ghost_hp_attack_percentage = 0.45;
         __monster_data[$monster[the ghost of Monsieur Baguelle]].shoot_ghost_hp_attack_percentage = 0.5;
-        __monster_data[$monster[the ghost of Ebenoozer Screege]].shoot_ghost_hp_attack_percentage = 0.65;
-        __monster_data[$monster[the ghost of Vanillica "Trashblossom" Gorton]].shoot_ghost_hp_attack_percentage = 0.75;
-        __monster_data[$monster[the ghost of Waldo the Carpathian]].shoot_ghost_hp_attack_percentage = 0.9;
+        __monster_data[$monster[The ghost of Ebenoozer Screege]].shoot_ghost_hp_attack_percentage = 0.65;
+        __monster_data[$monster[The ghost of Vanillica "Trashblossom" Gorton]].shoot_ghost_hp_attack_percentage = 0.75;
+        __monster_data[$monster[The ghost of Waldo the Carpathian]].shoot_ghost_hp_attack_percentage = 0.9;
         __monster_data[$monster[Emily Koops\, a spooky lime]].shoot_ghost_hp_attack_percentage = 0.95;
         
         //These are from historical logs:
         __monster_data[$monster[the ghost of Oily McBindle]].shoot_ghost_hp_attack_percentage = 0.4; //sleaze
         __monster_data[$monster[The Headless Horseman]].shoot_ghost_hp_attack_percentage = 0.55; //spooky
         __monster_data[$monster[The Icewoman]].shoot_ghost_hp_attack_percentage = 0.60; //cold
-        __monster_data[$monster[the ghost of Lord Montague Spookyraven]].shoot_ghost_hp_attack_percentage = 0.70; //stench
-        __monster_data[$monster[the ghost of Sam McGee]].shoot_ghost_hp_attack_percentage = 0.8; //hot
-        __monster_data[$monster[the ghost of Richard Cockingham]].shoot_ghost_hp_attack_percentage = 0.85; //spooky
-        __monster_data[$monster[the ghost of Jim Unfortunato]].shoot_ghost_hp_attack_percentage = 1.0; //sleaze
+        __monster_data[$monster[The ghost of Lord Montague Spookyraven]].shoot_ghost_hp_attack_percentage = 0.70; //stench
+        __monster_data[$monster[The ghost of Sam McGee]].shoot_ghost_hp_attack_percentage = 0.8; //hot
+        __monster_data[$monster[The ghost of Richard Cockingham]].shoot_ghost_hp_attack_percentage = 0.85; //spooky
+        __monster_data[$monster[The ghost of Jim Unfortunato]].shoot_ghost_hp_attack_percentage = 1.0; //sleaze
         
     }
     initialiseMonsterData();
@@ -111,7 +111,13 @@ float expectedDamageFromGhostAfterCastingShootGhost(monster m)
         //Go through each element:
         foreach e in __monster_data[m].basic_attack_elements
         {
-            float resistance_percent = elemental_resistance(e);
+        	float resistance = numeric_modifier(e + " resistance");
+            if (m == $monster[The ghost of Jim Unfortunato]) //this is a guess
+            	resistance -= 2.0;
+            //FIXME suspect others are the same
+            resistance = MAX(0, resistance);
+            
+            float resistance_percent = resistanceLevelToResistancePercent(resistance);//elemental_resistance(e);
             float damage = MAX(1, ceil(expected_damage * (1.0 - resistance_percent / 100.0)));
             if (damage < minimum_damage_seen)
                 minimum_damage_seen = damage;

@@ -57,11 +57,11 @@ void IOTMSpaceJellyfishGenerateResource(ChecklistEntry [int] resource_entries)
         */
         if (get_property_int("_hotJellyUses") > 0)
         {
-            entry.subentries.listAppend(ChecklistSubentryMake(pluralise(get_property_int("_hotJellyUses"), "breath out", "breath outs"), "", "Use as a combat skill. Free run/banish."));
+            resource_entries.listAppend(ChecklistEntryMake("__item hot jelly", "", ChecklistSubentryMake(pluralise(get_property_int("_hotJellyUses"), "breathe out", "breathe outs"), "", "Cast Breathe Out. Free run/banish.")).ChecklistEntryTagEntry("banish"));
         }
         
         string [item] jelly_descriptions;
-        jelly_descriptions[$item[hot jelly]] = "Free run/banish.";
+        //jelly_descriptions[$item[hot jelly]] = "Free run/banish.";
         jelly_descriptions[$item[spooky jelly]] = "YR with no cooldown.";
         jelly_descriptions[$item[stench jelly]] = "Forces non-combat.";
         foreach it, desc in jelly_descriptions
@@ -71,6 +71,9 @@ void IOTMSpaceJellyfishGenerateResource(ChecklistEntry [int] resource_entries)
                 entry.subentries.listAppend(ChecklistSubentryMake(pluralise(it), "", desc));
             }
         }
+        
+        if ($item[hot jelly].available_amount() > 0 && in_ronin())
+            resource_entries.listAppend(ChecklistEntryMake("__item hot jelly", "", ChecklistSubentryMake(pluralise($item[hot jelly]), "", "Chew for free run/banish.")).ChecklistEntryTagEntry("banish"));
         
         
         

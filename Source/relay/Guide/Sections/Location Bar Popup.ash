@@ -672,7 +672,7 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
     string [monster] monsters_that_we_cannot_encounter;
     if ($effect[Ancient Annoying Serpent Poison].have_effect() == 0)
     {
-        foreach m in $monsters[the frattlesnake,Batsnake,Frozen Solid Snake,Burning Snake of Fire,The Snake With Like Ten Heads,Snakeleton]
+        foreach m in $monsters[The Frattlesnake,Batsnake,Frozen Solid Snake,Burning Snake of Fire,The Snake With Like Ten Heads,Snakeleton]
         {
             monsters_that_we_cannot_encounter[m] = "not on copperhead quest";
         }
@@ -681,7 +681,7 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
     {
         if (l.delayRemainingInLocation() > 0)
         {
-            monsters_that_we_cannot_encounter[$monster[boss bat]] = "on delay";
+            monsters_that_we_cannot_encounter[$monster[Boss Bat]] = "on delay";
         }
     }
     else if (l == $location[the defiled niche])

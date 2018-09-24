@@ -18,7 +18,7 @@ void IOTMNewYouGenerateResource(ChecklistEntry [int] resource_entries)
             affirmation_effects[lookupItem("Daily Affirmation: Work For Hours a Week")] = "15 HP regen";
         
         
-        affirmation_combat_uses[lookupItem("Daily Affirmation: Adapt to Change Eventually")] = ""; //monster change
+        affirmation_combat_uses[lookupItem("Daily Affirmation: Adapt to Change Eventually")] = "reroll monster"; //monster change
         affirmation_combat_uses[lookupItem("Daily Affirmation: Always be Collecting")] = "duplicate item drops";
         affirmation_combat_uses[lookupItem("Daily Affirmation: Be a Mind Master")] = "banish for 80 turns";
         if (!__misc_state["have reusable olfaction equivalent"])
@@ -39,7 +39,17 @@ void IOTMNewYouGenerateResource(ChecklistEntry [int] resource_entries)
             string combat_text = "";
             if (affirmation_combat_uses[it] != "")
                 combat_text = "Or throw in combat to " + affirmation_combat_uses[it] + ".";
-            entry.subentries.listAppend(ChecklistSubentryMake(pluralise(it), "100 turns, " + affirmation_effects[it], combat_text));
+            ChecklistSubentry subentry = ChecklistSubentryMake(pluralise(it), "100 turns, " + affirmation_effects[it], combat_text);
+            if (it == lookupItem("Daily Affirmation: Think Win-Lose"))
+            {
+            	resource_entries.listAppend(ChecklistEntryMake("__item " + it, "", subentry).ChecklistEntryTagEntry("free instakill"));
+            }
+            else if (it == lookupItem("Daily Affirmation: Be a Mind Master"))
+            {
+                resource_entries.listAppend(ChecklistEntryMake("__item " + it, "", subentry).ChecklistEntryTagEntry("banish"));
+            }
+            else
+	            entry.subentries.listAppend(subentry);
         }
         if (entry.subentries.count() > 0)
         {

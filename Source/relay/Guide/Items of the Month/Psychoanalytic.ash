@@ -132,7 +132,7 @@ void IOTMPOldManGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
     description.listAppend("Choose +crew non-combat options, add monsters if you can.");
     
     
-    monster olfacted_monster = get_property("olfactedMonster").to_monster();
+    monster olfacted_monster = get_property_monster("olfactedMonster");
     if ($effect[on the trail].have_effect() == 0)
         olfacted_monster = $monster[none];
     boolean olfacted_relevant_monster = ($monsters[ferocious roc,giant man-eating shark,Bristled Man-O-War,The Cray-Kin,Deadly Hydra] contains olfacted_monster);

@@ -240,3 +240,23 @@ boolean craftableUsingOnlyActiveNPCStores(item it)
     boolean [item] crafts_seen;
     return craftableUsingOnlyActiveNPCStoresPrivate(it, crafts_seen);
 }
+
+
+int CatBurglarChargesLeftToday()
+{
+    //FIXME this is totally wrong I think, fix this mafia
+    int charge = get_property_int("_catBurglarCharge");
+    
+    int heists_gained_today = 0;
+    int limit = 10;
+    int c = charge;
+    while (c > limit)
+    {
+        heists_gained_today += 1;
+        c -= limit;
+        limit *= 2;
+    }
+    int heists_complete = get_property_int("_catBurglarHeistsComplete");
+    //print_html("heists_gained_today = " + heists_gained_today + ", heists_complete = " + heists_complete); 
+    return get_property_int("catBurglarBankHeists") + heists_gained_today - heists_complete;
+}

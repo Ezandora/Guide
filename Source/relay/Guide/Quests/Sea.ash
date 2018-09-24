@@ -513,16 +513,16 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
                 else if ($item[Mer-kin stashbox].available_amount() == 0)
                 {
                     string nc_details = "";
-                    monster lockkey_monster = get_property("merkinLockkeyMonster").to_monster();
-                    if (lockkey_monster == $monster[mer-kin burglar])
+                    monster lockkey_monster = get_property_monster("merkinLockkeyMonster");
+                    if (lockkey_monster == $monster[Mer-kin burglar])
                     {
                         nc_details = "Stashbox is in the camouflaged tent.";
                     }
-                    else if (lockkey_monster == $monster[mer-kin raider])
+                    else if (lockkey_monster == $monster[Mer-kin raider])
                     {
                         nc_details = "Stashbox is in the skull-bedecked tent.";
                     }
-                    else if (lockkey_monster == $monster[mer-kin healer])
+                    else if (lockkey_monster == $monster[Mer-kin healer])
                     {
                         nc_details = "Stashbox is in the glyphed tent.";
                     }

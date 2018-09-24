@@ -282,6 +282,10 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                     //FIXME should this be a reminder too, if adventuring there? hmm...
                     subentry.entries.listAppend(HTMLGenerateSpanFont("Change your thrall - Vampieroghi will remove curses.", "red"));
                 }
+                if ($effect[Ancient Fortitude].have_effect() > 0 && $effect[thrice-cursed].have_effect() == 0)
+                {
+                	subentry.entries.listAppend(HTMLGenerateSpanFont("Remove Ancient Fortitude effect - you will not be cursed while that effect is up.", "red"));
+                }
                 
                 if ($effect[thrice-cursed].have_effect() > 0)
                 {

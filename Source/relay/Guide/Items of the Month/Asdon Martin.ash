@@ -119,7 +119,11 @@ void IOTMAsdonMartinGenerateResource(ChecklistEntry [int] resource_entries)
             entry.image_lookup_name = "__skill asdon martin: missile launcher";
         if (entry.url == "")
             entry.url = "campground.php?action=workshed";
-        entry.subentries.listAppend(ChecklistSubentryMake("Asdon Missile", "", "Costs 100 fuel, instakill + YR-equivalent."));
+        string fuel_costs = "Costs 100 fuel";
+        if (get_fuel() < 100)
+        	fuel_costs = HTMLGenerateSpanFont(fuel_costs, "red");
+		resource_entries.listAppend(ChecklistEntryMake("__item Asdon Martin keyfob", "campground.php?action=workshed", ChecklistSubentryMake("Asdon Missile", "", fuel_costs + ", instakill + YR-equivalent.")).ChecklistEntryTagEntry("free instakill"));
+        //entry.subentries.listAppend(ChecklistSubentryMake("Asdon Missile", "", fuel_costs + ", instakill + YR-equivalent."));
     }
     if (BanishIsActive("Spring-Loaded Front Bumper"))
     {

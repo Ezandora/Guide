@@ -106,6 +106,8 @@ record ChecklistEntry
 	int importance_level; //Entries will be resorted by importance level before output, ascending order. Default importance is 0. Convention is to vary it from [-11, 11] for reasons that are clear and well supported in the narrative.
     boolean only_show_as_extra_important_pop_up; //only valid if -11 importance or lower - only shows up as a pop-up, meant to inform the user they can scroll up to see something else (semi-rares)
     ChecklistSubentry [int] subentries_on_mouse_over; //replaces subentries
+    
+    string combination_tag; //Entries with identical combination tags will be combined into one, with the "first" taking precedence.
 };
 
 
@@ -168,6 +170,13 @@ ChecklistEntry ChecklistEntryMake(string image_lookup_name, string target_locati
 	ChecklistSubentry [int] subentries;
 	subentries[subentries.count()] = subentry;
 	return ChecklistEntryMake(image_lookup_name, target_location, subentries, CHECKLIST_DEFAULT_IMPORTANCE, highlight_if_last_adventured);
+}
+
+//Secondary level of making checklist entries; setting properties and returning them.
+ChecklistEntry ChecklistEntryTagEntry(ChecklistEntry e, string tag)
+{
+    e.combination_tag = tag;
+    return e;
 }
 
 
@@ -506,6 +515,33 @@ buffer ChecklistGenerateEntryHTML(ChecklistEntry entry, ChecklistSubentry [int] 
 buffer ChecklistGenerate(Checklist cl, boolean output_borders)
 {
 	ChecklistEntry [int] entries = cl.entries;
+	
+	//Combine entries with identical combination tags:
+	ChecklistEntry [string] combination_tag_entries;
+	foreach key, entry in entries
+	{
+		if (entry.combination_tag == "") continue;
+        if (entry.only_show_as_extra_important_pop_up) continue; //do not support this feature with this
+        if (entry.subentries_on_mouse_over.count() > 0) continue;
+        if (entry.container_div_attributes.count() > 0) continue;
+        
+        if (!(combination_tag_entries contains entry.combination_tag))
+        {
+        	entry.importance_level -= 1; //combined entries gain a hack; a level above everything else
+        	combination_tag_entries[entry.combination_tag] = entry;
+            continue;
+        }
+        ChecklistEntry master_entry = combination_tag_entries[entry.combination_tag];
+        
+        if (entry.should_highlight)
+        	master_entry.should_highlight = true;
+        master_entry.importance_level = min(master_entry.importance_level, entry.importance_level - 1);
+        foreach key, subentry in entry.subentries
+        { 
+        	master_entry.subentries.listAppend(subentry);
+        }
+        remove entries[key];
+	}
 	
 	//Sort by importance:
 	sort entries by value.importance_level;

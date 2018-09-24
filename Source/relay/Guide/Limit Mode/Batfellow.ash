@@ -381,7 +381,7 @@ void BatfellowGenerateResource(ChecklistEntry [int] resource_entries)
     {
         int remaining = clampi(3 - get_property_int("_usedReplicaBatoomerang"), 0, 3);
         if (remaining > 0)
-            resource_entries.listAppend(ChecklistEntryMake("__item replica bat-oomerang", "", ChecklistSubentryMake(pluralise(remaining, "replica bat-oomerang use", "replica bat-oomerang uses"), "", "Free instakill."), 5));
+            resource_entries.listAppend(ChecklistEntryMake("__item replica bat-oomerang", "", ChecklistSubentryMake(pluralise(remaining, "replica bat-oomerang use", "replica bat-oomerang uses"), "", "Free instakill."), 5).ChecklistEntryTagEntry("free instakill"));
     }
     if ($item[The Jokester's Gun].available_amount() > 0 && mafiaIsPastRevision(16986) && !get_property_boolean("_firedJokestersGun"))
     {
@@ -402,6 +402,6 @@ void BatfellowGenerateResource(ChecklistEntry [int] resource_entries)
         }
         else
             description.listAppend("Fire the Jokester's Gun skill in combat.");
-        resource_entries.listAppend(ChecklistEntryMake("__item The Jokester's Gun", "", ChecklistSubentryMake("The Jokester's Gun firing", "", description), importance));
+        resource_entries.listAppend(ChecklistEntryMake("__item The Jokester's Gun", "", ChecklistSubentryMake("The Jokester's Gun firing", "", description), importance).ChecklistEntryTagEntry("free instakill"));
     }
 }

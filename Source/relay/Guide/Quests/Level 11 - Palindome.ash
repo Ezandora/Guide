@@ -51,7 +51,14 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
         if (__quest_state["Pirate Quest"].state_boolean["valid"])
         	subentry.entries.listAppend("Find the palindome. The pirates will know the way.");
         else
-            subentry.entries.listAppend("Find the palindome by completing the copperhead/zeppelin quest.");
+        {
+        	string [int] quests;
+            if (!__quest_state["Level 11 Shen"].finished)
+            	quests.listAppend("copperhead");
+            if (!__quest_state["Level 11 Ron"].finished)
+                quests.listAppend("zeppelin");
+            subentry.entries.listAppend("Find the palindome by completing the " + quests.listJoinComponents("/") + " quest.");
+        }
         
         if (!is_wearing_outfit("Swashbuckling Getup") && $item[pirate fledges].equipped_amount() == 0 && $item[pirate fledges].available_amount() > 0)
         {
@@ -106,7 +113,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                     else if (my_primestat() == $stat[moxie])
                         coordinates = "(5, 39)";
                     if (coordinates != "")
-                        subentry.entries.listAppend("If you encounter the wheel/O Cap'm adventure, take the helm, and sail to " + coordinates + ".");
+                        subentry.entries.listAppend("If you encounter the wheel/O Cap'm adventure, take the helm, and sail to " + coordinates + ". (costs a turn for stats)");
                 }
             }
         }
@@ -291,9 +298,9 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                     url = $location[the haunted bedroom].getClickableURLForLocation();
                     single_entry_mode = "Adventure in the haunted bedroom for a disposable instant camera.";
                     int monsters_in_zone = 0;
-                    foreach s in $strings[animated mahogany nightstand,animated ornate nightstand,animated rustic nightstand,elegant animated nightstand,Wardr&ouml;b nightstand]
+                    foreach m in $monsters[animated mahogany nightstand,animated ornate nightstand,animated rustic nightstand,elegant animated nightstand,Wardr&ouml;b nightstand]
                     {
-                        monster m = s.to_monster();
+                        //monster m = s.to_monster();
                         if (!m.is_banished() || m == $monster[none])
                             monsters_in_zone += 1;
                     }

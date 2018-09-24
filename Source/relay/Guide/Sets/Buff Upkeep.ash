@@ -39,6 +39,8 @@ void SBuffUpkeepGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         if (s.to_effect().have_effect() > 0)
             have_facial_expression = true;
     }
+    if (lookupSkill("Inscrutable Gaze").to_effect().have_effect() > 0)
+        have_facial_expression = true;
     
     if (__misc_state["need to level"] && !have_facial_expression)
     {
@@ -61,7 +63,7 @@ void SBuffUpkeepGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         skills_want_running.listAppend($skill[Bounty of Renenutet]);
     skills_want_running.listAppend($skill[Power of Heka]);
     skills_want_running.listAppend($skill[Wisdom of Thoth]);
-    if (my_primestat() == $stat[mysticality])
+    if (my_primestat() == $stat[mysticality] && my_level() < 13)
 	    skills_want_running.listAppend(lookupSkill("Inscrutable Gaze"));
     
     
