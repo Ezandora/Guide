@@ -201,9 +201,27 @@ void SDiscoBanditGenerateResource(ChecklistEntry [int] resource_entries)
     }
 }
 
+void SPastamancerGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    if (my_class() != $class[pastamancer])
+        return;
+    if (__quest_state["Nemesis"].finished && !$skill[Canticle of Carboloading].have_skill())
+    {
+        if ($item[black hymnal].available_amount() == 0)
+        {
+            optional_task_entries.listAppend(ChecklistEntryMake("__skill Canticle of Carboloading", "volcanoisland.php", ChecklistSubentryMake("Collect the black hymnal from the Nemesis Temple", "", "Unlocks Carboloading.")));
+        }
+        else
+        {
+            optional_task_entries.listAppend(ChecklistEntryMake("__skill Canticle of Carboloading", "inventory.php?which=3&ftext=black+hymnal", ChecklistSubentryMake("Use the black hymnal", "", "Unlocks Carboloading.")));
+        }
+    }
+}
+
 void SClassesGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     STurtleTamerGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+    SPastamancerGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 }
 
 void SClassesGenerateResource(ChecklistEntry [int] resource_entries)

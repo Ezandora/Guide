@@ -293,12 +293,20 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] resource_entries)
         if (my_familiar() != $familiar[nanorhino])
             url = "familiar.php";
 		
-        if (get_property("_nanorhinoBanishedMonster") != "")
-            description_banish.listAppend(get_property("_nanorhinoBanishedMonster").HTMLEscapeString().capitaliseFirstLetter() + " currently banished.");
-        else
-            description_banish.listAppend("All day. Cast muscle combat skill.");
+        boolean tag_with_banish_tag = false;
+        if (get_property("_nanorhinoBanishedMonster") != "") description_banish.listAppend(get_property("_nanorhinoBanishedMonster").HTMLEscapeString().capitaliseFirstLetter() + " currently banished.");
+        if (get_property_int("_nanorhinoCharge") >= 100)
+        {
+        	tag_with_banish_tag = true;
+            description_banish.listAppend("All day. Cast muscle combat skill" + (my_familiar() == $familiar[nanorhino] ? "" : " with nanorhino as your familiar") + ".");
+        }
 		if (__misc_state["have muscle class combat skill"])
-			subentries.listAppend(ChecklistSubentryMake("Nanorhino Banish", "", description_banish));
+        {
+        	if (tag_with_banish_tag)
+            	resource_entries.listAppend(ChecklistEntryMake("__familiar nanorhino", "", ChecklistSubentryMake("Nanorhino Banish", "", description_banish)).ChecklistEntryTagEntry("banish"));
+            else
+				subentries.listAppend(ChecklistSubentryMake("Nanorhino Banish", "", description_banish));
+        }
 		if (__misc_state["need to level"] && __misc_state["have mysticality class combat skill"])
 			subentries.listAppend(ChecklistSubentryMake("Nanorhino Gray Goo", "", "130? mainstat, fire against non-item monster with >90 attack. Cast mysticality combat skill."));
 		if (!$familiar[he-boulder].familiar_is_usable() && __misc_state["have moxie class combat skill"] && __misc_state["in run"])

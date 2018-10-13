@@ -535,6 +535,8 @@ buffer ChecklistGenerate(Checklist cl, boolean output_borders)
         
         if (entry.should_highlight)
         	master_entry.should_highlight = true;
+        if (master_entry.url == "" && entry.url != "")
+        	master_entry.url = entry.url;
         master_entry.importance_level = min(master_entry.importance_level, entry.importance_level - 1);
         foreach key, subentry in entry.subentries
         { 

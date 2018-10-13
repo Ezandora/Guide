@@ -44,4 +44,6 @@ import "relay/Guide/Items of the Month/God Lobster.ash";
 import "relay/Guide/Items of the Month/BoomBox.ash";
 import "relay/Guide/Items of the Month/Cat Burglar.ash";
 import "relay/Guide/Items of the Month/Bastille Battalion.ash";
+import "relay/Guide/Items of the Month/Latte.ash";
+
 

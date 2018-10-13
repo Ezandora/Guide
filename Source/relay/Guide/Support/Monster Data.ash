@@ -114,6 +114,10 @@ float expectedDamageFromGhostAfterCastingShootGhost(monster m)
         	float resistance = numeric_modifier(e + " resistance");
             if (m == $monster[The ghost of Jim Unfortunato]) //this is a guess
             	resistance -= 2.0;
+            if (m == $monster[The ghost of Waldo the Carpathian]) //this is a guess
+                resistance -= 1.0;
+            if (m == $monster[The ghost of Lord Montague Spookyraven]) //this is wrong, but I don't know what's correct
+            	resistance -= 1.0;
             //FIXME suspect others are the same
             resistance = MAX(0, resistance);
             

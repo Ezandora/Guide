@@ -29,7 +29,7 @@ static
 {
     int [string] __banish_source_length;
     //FIXME request this be exposed in ASH?
-    //all of these must be lowercase. because, okay?
+    //all of these must be lowercase. because.
     __banish_source_length["banishing shout"] = -1;
     __banish_source_length["batter up!"] = -1;
     __banish_source_length["chatterboxing"] = 20;
@@ -46,7 +46,7 @@ static
     __banish_source_length["nanorhino"] = -1;
     __banish_source_length["pantsgiving"] = 30;
     __banish_source_length["peel out"] = -1;
-    __banish_source_length["pulled indigo taffy"] = 20;
+    __banish_source_length["pulled indigo taffy"] = 40;
     __banish_source_length["smoke grenade"] = 20;
     __banish_source_length["spooky music box mechanism"] = -1;
     __banish_source_length["staff of the standalone cheese"] = -1;
@@ -63,6 +63,7 @@ static
     __banish_source_length["kgb tranquilizer dart"] = 20;
     __banish_source_length["spring-loaded front bumper"] = 30;
     __banish_source_length["mafia middle finger ring"] = 60;
+    __banish_source_length["throw latte on opponent"] = 30; //Throw Latte on Opponent
     
     int [string] __banish_simultaneous_limit;
     __banish_simultaneous_limit["beancannon"] = 5;

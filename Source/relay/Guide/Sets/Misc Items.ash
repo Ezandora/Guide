@@ -176,7 +176,11 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
 		if (banishes_available > 0)
         {
         	//subentry.entries.listAppend(pluralise(banishes_available, "banish", "banishes") + " available.");
-            resource_entries.listAppend(ChecklistEntryMake("__item pantsgiving", "", ChecklistSubentryMake(pluralise(banishes_available, "Pantsgiving banish", "Pantsgiving banishes"), "", "Cast Talk About Politics.")).ChecklistEntryTagEntry("banish"));
+            string [int] tasks;
+            if ($item[pantsgiving].equipped_amount() == 0)
+            	tasks.listAppend("equip pantsgiving");
+            tasks.listAppend("cast talk about politics");
+            resource_entries.listAppend(ChecklistEntryMake("__item pantsgiving", url, ChecklistSubentryMake(pluralise(banishes_available, "Pantsgiving banish", "Pantsgiving banishes"), "", tasks.listJoinComponents(", ").capitaliseFirstLetter() + ".")).ChecklistEntryTagEntry("banish"));
             
         }
         
@@ -1276,7 +1280,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
     }
     if ($item[mafia middle finger ring].available_amount() > 0 && !get_property_boolean("_mafiaMiddleFingerRingUsed"))
     {
-        resource_entries.listAppend(ChecklistEntryMake("__item mafia middle finger ring", "inventory.php?which=2", ChecklistSubentryMake("Mafia middle finger ring banish/free run", "", "Once/day, 60 turn duration."), 10).ChecklistEntryTagEntry("banish")); //&ftext=mafia+middle+finger+ring
+        resource_entries.listAppend(ChecklistEntryMake("__item mafia middle finger ring", ($item[mafia middle finger ring].equipped_amount() == 0 ? "inventory.php?which=2" : ""), ChecklistSubentryMake("Mafia middle finger ring banish/free run", "", "Once/day, 60 turn duration." + ($item[mafia middle finger ring].equipped_amount() == 0 ? " Equip first." : "")), 10).ChecklistEntryTagEntry("banish")); //&ftext=mafia+middle+finger+ring
     	
     }
 }

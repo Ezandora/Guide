@@ -340,6 +340,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     {
         if (my_path_id() == PATH_COMMUNITY_SERVICE && __last_adventure_location != $location[the haunted kitchen])
             return;
+        if (!__misc_state["in run"] && __last_adventure_location != $location[the haunted kitchen]) return;
         subentry.header = "Adventure in the Haunted Kitchen";
         url = $location[the haunted kitchen].getClickableURLForLocation();
         image_name = "__item tiny knife and fork";

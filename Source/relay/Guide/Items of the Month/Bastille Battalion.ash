@@ -51,7 +51,12 @@ void IOTMBastilleBattalionGenerateTasks(ChecklistEntry [int] task_entries, Check
     buffs.listAppend(HTMLGenerateSpanOfClass("Gesture", "r_bold") + ": +25 moxie, +25% init, +25% meat.");
     description.listAppend(buffs.listJoinComponents("|*"));
     
-    if (my_primestat() == $stat[muscle])
+    if (!in_ronin())
+    {
+    	//+adventures in aftercore
+        suggested_configuration.listAppend("Draftsman");
+    }
+    else if (my_primestat() == $stat[muscle])
     {
     	suggested_configuration.listAppend("Brutalist");
     }
@@ -64,7 +69,10 @@ void IOTMBastilleBattalionGenerateTasks(ChecklistEntry [int] task_entries, Check
         suggested_configuration.listAppend("Art Nouveau");
     }
     
-    suggested_configuration.listAppend("Catapult");
+    if (!in_ronin())
+        suggested_configuration.listAppend("Gesture");
+    else
+    	suggested_configuration.listAppend("Catapult");
     
     description.listAppend("Suggested configuration: " + HTMLGenerateSpanOfClass(suggested_configuration.listJoinComponents(" / "), "r_bold") + ".");
 	

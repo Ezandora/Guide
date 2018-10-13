@@ -385,7 +385,7 @@ void BatfellowGenerateResource(ChecklistEntry [int] resource_entries)
     }
     if ($item[The Jokester's Gun].available_amount() > 0 && mafiaIsPastRevision(16986) && !get_property_boolean("_firedJokestersGun"))
     {
-        int importance = 5;
+        int importance = 0;
         string [int] description;
         description.listAppend("Free instakill.");
         if ($item[The Jokester's Gun].equipped_amount() == 0)

@@ -97,7 +97,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
             subentry.entries.listAppend("Run -combat on the Poop Deck to unlock belowdecks.");
             subentry.entries.listAppend(generateTurnsToSeeNoncombat(80, 1, "unlock belowdecks"));
             
-            if (__misc_state["need to level"] && $location[the poop deck].noncombat_queue.contains_text("O Cap'm"))
+            if (__misc_state["need to level"])// && $location[the poop deck].noncombat_queue.contains_text("O Cap'm"))
             {
                 if (my_meat() < 977)
                 {

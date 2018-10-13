@@ -231,7 +231,7 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                         if (use_fast_route)
                             line = "Alternatively, scavenger hunt! (likely much slower)|*";
                         //line += "Go search for:|*" + places.listJoinComponents("<hr>|*");
-                        line += "Go search in the Haunted " + places.listJoinComponents(", ", "and");
+                        line += "Go search in the Haunted " + places.listJoinComponents(", ", "and") + ".";
                         subentry.entries.listAppend(line);
                         /*if (!recipe_was_autoread)
                             subentry.entries.listAppend("Read the recipe.");*/

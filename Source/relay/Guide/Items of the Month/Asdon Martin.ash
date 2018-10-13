@@ -34,7 +34,7 @@ void IOTMAsdonMartinGenerateResource(ChecklistEntry [int] resource_entries)
         return;
     ChecklistEntry entry;
     entry.importance_level = 0;
-    if (__misc_state["in run"])
+    if (__misc_state["in run"] && in_ronin())
     {
         item [int] fuelables = asdonMartinGenerateListOfFuelables();
         if (fuelables.count() > 0)

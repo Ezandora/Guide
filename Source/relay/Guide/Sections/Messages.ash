@@ -447,6 +447,8 @@ string generateRandomMessage()
         case PATH_G_LOVER:
             random_messages.listAppend("get going, guuuurl");
             break;
+        case PATH_DEMIGUISE:
+            random_messages.listAppend("who are you?"); break;
         /*case PATH_CLASS_ACT_3:
             random_messages.listAppend("buttons for the people"); break;
         case PATH_AVATAR_OF_THE_NAUGHTY_SORCERESS:
@@ -461,7 +463,7 @@ string generateRandomMessage()
     string lowercase_player_name = my_name().to_lower_case().HTMLEscapeString();
         
     random_messages.listAppend(HTMLGenerateTagWrap("a", "check the wiki", mapMake("class", "r_a_undecorated", "href", "http://kol.coldfront.net/thekolwiki/index.php/Main_Page", "target", "_blank")));
-    random_messages.listAppend("the RNG is only trying to " + ((random(1000) == 0) ? "hurt" : "help"));
+    random_messages.listAppend("the RNG is only trying to " + ((random(100) == 0) ? "hurt" : "help"));
     if (__misc_state["in run"])
     {
         int choice = gameday_to_int() & 3;
@@ -563,6 +565,7 @@ string generateRandomMessage()
     else if (current_hour == 6)
         random_messages.listAppend("the dawn is your enemy");
     
+    random_messages.listAppend("take chances, be courages, go exploring!");
     switch (my_class())
     {
         case $class[disco bandit]:
@@ -667,7 +670,7 @@ string generateRandomMessage()
     monster_messages[$monster[sk8 gnome]] = "he was a sk8 gnome she said see u l8 gnome";
     monster_messages[$monster[The Inquisitor]] = "nothing is up";
     monster_messages[$monster[Doc Clock]] = "your defeat will happen at " + (current_hour > 12 ? current_hour - 12 : current_hour) + ":" + current_minute + " precisely"; // + (current_hour >= 12 ? " PM" : " AM")
-    monster_messages[lookupMonster("God Lobster")] = "what a grand and intoxicating innocence";
+    monster_messages[lookupMonster("God Lobster")] = "what a grand and intoxicating innocence"; //how can you kill a god? equip the heart of the volcano?
     
     string day_cycle;
     if (current_hour >= 5 && current_hour <= 11)
@@ -841,8 +844,6 @@ string generateRandomMessage()
                 random_messages.listAppend(lowercase_player_name + "! now is not the time to use that!"); break;
             case PATH_G_LOVER:
                 random_messages.listAppend("the Gs will continue until morale improves"); break;
-            case PATH_DEMIGUISE:
-                random_messages.listAppend("who are you?"); break;
             default:
                 random_messages.listAppend("ow"); break;
         }
