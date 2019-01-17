@@ -289,6 +289,16 @@ void QLevel11ShenGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     ChecklistSubentry subentry;
     subentry.header = base_quest_state.quest_name;
     
+    item quest_item = get_property_item("shenQuestItem");
+    
+    location [item] quest_items_to_locations = {$item[Murphy's Rancid Black Flag]:$location[The Castle in the Clouds in the Sky (Top Floor)],
+    	$item[The Stankara Stone]:$location[The Batrat and Ratbat Burrow],
+        $item[The First Pizza]:$location[Lair of the Ninja Snowmen],
+        $item[The Eye of the Stars]:$location[The Hole in the Sky],
+        $item[The Lacrosse Stick of Lacoronado]:$location[The Smut Orc Logging Camp],
+        $item[The Shield of Brook]:$location[The VERY Unquiet Garves]};
+    location quest_location = quest_items_to_locations[quest_item]; 
+    
 	if (base_quest_state.finished)
 		return;
     string url = $location[the copperhead club].getClickableURLForLocation();
@@ -301,7 +311,10 @@ void QLevel11ShenGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     }
     else if (base_quest_state.mafia_internal_step == 2)
     {
-        subentry.entries.listAppend("Fight the first monster wherever Shen told you to go.");
+    	if (quest_location != $location[none])
+            subentry.entries.listAppend("Adventure in " + quest_location + ".");
+        else
+	        subentry.entries.listAppend("Fight the first monster wherever Shen told you to go.");
         url = "";
     }
     else if (base_quest_state.mafia_internal_step == 3)
@@ -310,7 +323,10 @@ void QLevel11ShenGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     }
     else if (base_quest_state.mafia_internal_step == 4)
     {
-        subentry.entries.listAppend("Fight the second monster wherever Shen told you to go.");
+        if (quest_location != $location[none])
+            subentry.entries.listAppend("Adventure in " + quest_location + ".");
+        else
+        	subentry.entries.listAppend("Fight the second monster wherever Shen told you to go.");
         url = "";
     }
     else if (base_quest_state.mafia_internal_step == 5)
@@ -319,7 +335,10 @@ void QLevel11ShenGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     }
     else if (base_quest_state.mafia_internal_step == 6)
     {
-        subentry.entries.listAppend("Fight the third monster wherever Shen told you to go.");
+        if (quest_location != $location[none])
+            subentry.entries.listAppend("Adventure in " + quest_location + ".");
+        else
+        	subentry.entries.listAppend("Fight the third monster wherever Shen told you to go.");
         url = "";
     }
     else if (base_quest_state.mafia_internal_step == 7)

@@ -131,7 +131,7 @@ boolean generateTowerFamiliarWeightMethod(string [int] how, string [int] immedia
     //empathy of the newt
     weight_modifiers.listAppend(TFWMInternalModifierMake($skill[empathy of the newt]));
     //knob goblin pet-buffing spray
-    if ($item[knob goblin pet-buffing spray].available_amount() > 0 || dispensary_available() || $effect[heavy petting].have_effect() > 0)
+    if ($item[knob goblin pet-buffing spray].available_amount() > 0 || dispensary_available() || $effect[heavy petting].have_effect() > 0 && false)
     {
         weight_modifiers.listAppend(TFWMInternalModifierMake("knob goblin pet-buffing spray", true, true, true, 5.0));
     }
@@ -1043,6 +1043,13 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                     if (monster_level_adjustment() > 0)
                         subentry.modifiers.listAppend("-ML");
                 }
+            }
+            if ($skill[splattersmash].skill_is_usable() && my_id() == 1557284)
+            {
+            	//(30-40 damage + (muscle - monster defence)) * 100 / 4
+                //Two jam band bootlegs make that 1000 defence 250. If you have funksling, that's 487 buffed muscle needed.
+                //
+                subentry.entries.listAppend(HTMLGenerateSpanFont("Write splattersmash + jam band bootleg code.", "red"));
             }
         }
     }

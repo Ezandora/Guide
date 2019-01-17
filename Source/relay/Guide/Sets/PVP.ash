@@ -122,7 +122,7 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
         {
             description.listAppend("Eat key lime pies.");
         }
-        else if (mini == "Most Murderous")
+        else if (mini == "Most Murderous" || mini == "Icy Revenge")
         {
         	//FIXME list
             description.listAppend("Defeat once/ascension bosses.");

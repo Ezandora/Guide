@@ -145,7 +145,7 @@ void IOTMTelegraphOfficeGenerateTasks(ChecklistEntry [int] task_entries, Checkli
                 }
                 else if (lookupItems("meteorb,metal meteoroid").available_amount() > 0)
                 {
-                    tasks.listAppend("equip meteor orb");
+                    tasks.listAppend("equip meteorb");
                 }
                 else if ($item[snow mobile].is_unrestricted())
                 {

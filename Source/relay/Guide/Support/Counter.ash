@@ -479,7 +479,7 @@ void CountersReparse()
 
 
 //Bee is wrong, mafia does not track properly.
-boolean [string] __wandering_monster_counter_names = $strings[Romantic Monster,Rain Monster,Holiday Monster,Nemesis Assassin,WoL Monster,Digitize Monster,Enamorang Monster];
+boolean [string] __wandering_monster_counter_names = $strings[Romantic Monster,Rain Monster,Holiday Monster,Nemesis Assassin,WoL Monster,Digitize Monster,Enamorang Monster,portscan.edu];
 string [string] __wandering_monster_property_lookups {"Romantic Monster":"romanticTarget", "Digitize Monster": "_sourceTerminalDigitizeMonster", "Enamorang Monster":"enamorangMonster"};
 
 //This is for ascension automation scripts. Call this immediately before adventuring in an adventure.php zone.

@@ -541,7 +541,7 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
         case $location[The dungeons of doom]:
             return my_basestat(my_primestat()) >= 45 && get_property_ascension("lastPlusSignUnlock");
         case $location[The "Fun" House]:
-            return questPropertyPastInternalStepNumber("questG04Nemesis", 2); //FIXME is 2 correct?
+            return questPropertyPastInternalStepNumber("questG04Nemesis", 6); //FIXME 6 is wrong, but I don't know the right value
         case $location[The Dark Neck of the Woods]:
         case $location[The Dark Heart of the Woods]:
         case $location[The Dark Elbow of the Woods]:
@@ -756,35 +756,6 @@ void locationAvailableResetCache()
     __la_commons_were_inited = false;
 }
 
-
-void locationAvailableRunDiagnostics()
-{
-	location [string][int] unknown_locations_by_zone;
-	
-	foreach loc in $locations[]
-	{
-		Error able_to_find;
-		locationAvailable(loc, able_to_find);
-		if (!able_to_find.was_error)
-			continue;
-		if (!(unknown_locations_by_zone contains (loc.zone)))
-			unknown_locations_by_zone[loc.zone] = listMakeBlankLocation();
-		unknown_locations_by_zone[loc.zone].listAppend(loc);
-	}
-	if (unknown_locations_by_zone.count() > 0)
-	{
-		print_html("Unknown locations in location availability tester:");
-		foreach zone in unknown_locations_by_zone
-		{
-			print(zone + ":");
-			foreach key in unknown_locations_by_zone[zone]
-			{
-				location loc = unknown_locations_by_zone[zone][key];
-				print_html("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + loc);
-			}
-		}
-	}
-}
 
 
 string [location] LAConvertLocationLookupToLocations(string [string] lookup_map)
@@ -1104,6 +1075,7 @@ static
         lookup_map["The Fungal Nethers"] = "place.php?whichplace=nemesiscave";
         lookup_map["Thugnderdome"] = "gnomes.php";
         lookup_map["The Overgrown Lot"] = "place.php?whichplace=town_wrong";
+        lookup_map["The Canadian Wildlife Preserve"] = "place.php?whichplace=mountains";
         foreach s in $strings[The Hallowed Halls,Shop Class,Chemistry Class,Art Class]
             lookup_map[s] = "place.php?whichplace=KOLHS";
         foreach s in $strings[The Edge of the Swamp,The Dark and Spooky Swamp,The Corpse Bog,The Ruined Wizard Tower,The Wildlife Sanctuarrrrrgh,Swamp Beaver Territory,The Weird Swamp Village]
@@ -1151,7 +1123,7 @@ static
         foreach s in $strings[The Bandit Crossroads,The Putrid Swamp,Near the Witch's House,The Troll Fortress,The Sprawling Cemetery,The Cursed Village,The Foreboding Cave,The Faerie Cyrkle,The Evil Cathedral,The Towering Mountains,The Mystic Wood,The Druidic Campsite,The Old Rubee Mine]
         	lookup_map[s] = "place.php?whichplace=realm_fantasy";
         lookup_map["An Eldritch Horror"] = "place.php?whichplace=town";
-        
+        lookup_map["The Neverending Party"] = "place.php?whichplace=town_wrong";
         lookup_map["Through the Spacegate"] = "place.php?whichplace=spacegate";
         __constant_clickable_urls = LAConvertLocationLookupToLocations(lookup_map);
     }
@@ -1219,6 +1191,44 @@ string getClickableURLForLocationIfAvailable(location l)
         return l.getClickableURLForLocation();
     else
         return "";
+}
+
+
+
+void locationAvailableRunDiagnostics()
+{
+    location [string][int] unknown_locations_by_zone;
+    
+    foreach loc in $locations[]
+    {
+        Error able_to_find;
+        locationAvailable(loc, able_to_find);
+        if (!able_to_find.was_error)
+            continue;
+        if (!(unknown_locations_by_zone contains (loc.zone)))
+            unknown_locations_by_zone[loc.zone] = listMakeBlankLocation();
+        unknown_locations_by_zone[loc.zone].listAppend(loc);
+    }
+    if (unknown_locations_by_zone.count() > 0)
+    {
+        print_html("Unknown locations in location availability tester:");
+        foreach zone in unknown_locations_by_zone
+        {
+            print(zone + ":");
+            foreach key in unknown_locations_by_zone[zone]
+            {
+                location loc = unknown_locations_by_zone[zone][key];
+                print_html("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + loc);
+            }
+        }
+    }
+    /*print_html("<strong>Missing URLs:</strong>");
+    foreach loc in $locations[]
+    {
+    	if (loc.parent == "Removed") continue;
+    	if (loc.getClickableURLForLocation() == "")
+        	print_html(loc.parent + ": " + loc.zone + ": " + loc);
+    }*/
 }
 
 /*void main()

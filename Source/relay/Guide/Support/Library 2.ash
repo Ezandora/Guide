@@ -250,7 +250,7 @@ int CatBurglarChargesLeftToday()
     int heists_gained_today = 0;
     int limit = 10;
     int c = charge;
-    while (c > limit)
+    while (c >= limit)
     {
         heists_gained_today += 1;
         c -= limit;

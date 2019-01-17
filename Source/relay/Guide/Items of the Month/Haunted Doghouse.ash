@@ -9,3 +9,6 @@ void IOTMHauntedDoghouseGenerateResource(ChecklistEntry [int] resource_entries)
     }
     //I, um, hmm. I guess there's not much to say. Poor lonely file, nearly empty.
 }
+
+
+

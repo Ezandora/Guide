@@ -3,6 +3,9 @@ void SDispensaryGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
 	//Not sure how I feel about this. The dispensary is very useful, but not necessary to complete an ascension.
 	if (dispensary_available())
 		return;
+    //It's even less useful now that they've changed the buffs. Sorry, dispensary.
+    if (true)
+    	return;
 	if (!__misc_state["can equip just about any weapon"]) //need to wear KGE to learn the password
 		return;
 	

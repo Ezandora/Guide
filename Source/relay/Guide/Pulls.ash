@@ -382,7 +382,7 @@ void generatePullList(Checklist [int] checklists)
 	{
 		int boxes_needed = MIN(__quest_state["Level 9"].state_int["bridge fasteners needed"], __quest_state["Level 9"].state_int["bridge lumber needed"]) / 5;
 		
-		boxes_needed = MIN(3, boxes_needed); //bridge! farming?
+		boxes_needed = MIN(6, boxes_needed); //bridge! farming?
 		
 		if (boxes_needed > 0 && my_path_id() != PATH_G_LOVER)
 			pullable_item_list.listAppend(GPItemMake($item[smut orc keepsake box], "Skip level 9 bridge building.", boxes_needed));

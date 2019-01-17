@@ -663,6 +663,8 @@ string generateRandomMessage()
     beaten_up_monster_messages[$monster[Lavalos]] = "but... the future refused to change";
     if ($item[protonic accelerator pack].equipped_amount() > 0 && last_monster().monsterIsGhost())
         beaten_up_monster_messages[last_monster()] = "venkman makes it look easy";
+    if ($effect[beaten up].have_effect() > 0 && $items[rainbow pearl earring,rainbow pearl necklace,rainbow pearl ring,vampire pearl earring,vampire pearl ring,vampire pearl necklace,freshwater pearl necklace,pearl diver's ring,pearl diver's necklace,pearl necklace].equipped_amount() > 0)
+    	beaten_up_monster_messages[last_monster()] = "WHY WON'T YOU LET ME DO THIS FOR YOU, ROSE?";
     if (current_hour >= 5 && current_hour <= 11)
         monster_messages[$monster[Lavalos]] = "good morning, " + lowercase_player_name + "!";
     else

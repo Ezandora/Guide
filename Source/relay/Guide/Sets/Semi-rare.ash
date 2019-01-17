@@ -54,7 +54,7 @@ void SemirareGenerateDescription(string [int] description)
 				string [int] reasons;
 				if (!__quest_state["Level 8"].finished)
 					reasons.listAppend("Cobb's Knob quest");
-                if (!dispensary_available())
+                if (!dispensary_available() && false)
                 {
                     if (__misc_state["familiars temporarily blocked"])
                         reasons.listAppend("dispensary access (+item, cheapish MP)");

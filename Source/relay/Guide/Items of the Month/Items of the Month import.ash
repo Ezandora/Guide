@@ -45,5 +45,7 @@ import "relay/Guide/Items of the Month/BoomBox.ash";
 import "relay/Guide/Items of the Month/Cat Burglar.ash";
 import "relay/Guide/Items of the Month/Bastille Battalion.ash";
 import "relay/Guide/Items of the Month/Latte.ash";
+import "relay/Guide/Items of the Month/Voting Booth.ash";
+import "relay/Guide/Items of the Month/Boxing Daycare.ash";
 
 

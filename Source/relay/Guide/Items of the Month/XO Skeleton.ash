@@ -64,7 +64,13 @@ void IOTMXOSkeletonGenerateResource(ChecklistEntry [int] resource_entries)
         
         options["pair of candy glasses: +50% item (10 turns)"] = (os >= 2);
         if (!__quest_state["Level 9"].state_boolean["bridge complete"] && my_path_id() != PATH_COMMUNITY_SERVICE)
-	        options["bridge truss: half a bridge, takes forever to get"] = (xes >= 23);
+        {
+        	int turns_left = (23 - xes) * 9 - get_property_int("xoSkeleltonXProgress");
+            string line = "bridge truss: half a bridge"; 
+            if (turns_left > 0)
+            	line += ", " + pluralise(turns_left, "combat", "combats") + " to get";
+	        options[line] = (xes >= 23);
+        }
         if (!__quest_state["Level 13"].state_boolean["Stat race completed"])
         {
         	stat stat_race_type = __quest_state["Level 13"].state_string["Stat race type"].to_stat();

@@ -172,6 +172,14 @@ buffer generateLocationBar(boolean displaying_navbar)
             custom_location_information = likelyhood_of_dudes.round() + "% dudes";
         }
     }
+    else if (l == $location[the hidden bowling alley])
+    {
+    	int pygmy_banishes_left = clampi(11 - get_property_int("_drunkPygmyBanishes"), 0, 11);
+    	if ($item[bowl of scorpions].item_amount() > 0 && !$monster[drunk pygmy].is_banished() && pygmy_banishes_left > 0)
+        {
+        	custom_location_information = pluralise(pygmy_banishes_left, "drunk pygmy", "drunk pygmies") + " left";
+        }   
+    }
     /*else if (l == $location[twin peak]) //disabled, not very useful
     {
         string [int] entries;

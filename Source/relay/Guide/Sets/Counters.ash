@@ -1,6 +1,23 @@
 import "relay/Guide/Support/Counter.ash"
 import "relay/Guide/Support/Holiday.ash"
 
+
+                
+location [int] generatePossibleLocationsToBurnDelay()
+{
+	location [int] possible_locations;
+    foreach l in __place_delays
+    {
+        if (l == $location[the hidden park] && __dense_liana_machete_items.available_amount() > 0)
+        {
+            continue;
+        }
+        if (l == $location[the oasis]) continue;
+        if (l.delayRemainingInLocation() > 0 && l.locationAvailable())
+            possible_locations.listAppend(l);
+    }
+    return possible_locations;
+}
 void SCountersInit()
 {
     CountersInit();
@@ -135,12 +152,13 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
     window_image_names["Digitize Monster"] = "__item source essence";
     window_image_names["Romantic Monster"] = "__familiar " + __misc_state_string["obtuse angel name"];
     window_image_names["Enamorang Monster"] = "__item lov enamorang";
+    window_image_names["portscan.edu"] = "__item gyroscope";
     //window_image_names["Event Monster"] = ""; //no idea
     
     
     
     boolean [string] counter_blacklist = $strings[Semi-rare]; //Romantic Monster,
-    boolean [string] non_range_whitelist = $strings[Digitize Monster,Enamorang Monster];
+    boolean [string] non_range_whitelist = $strings[Digitize Monster,Enamorang Monster,portscan.edu];
     
     string [int] all_counter_names = CounterGetAllNames(true);
     
@@ -257,17 +275,12 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
         {
             if (my_path_id() != PATH_COMMUNITY_SERVICE && __misc_state["in run"])
             {
-                location [int] possible_locations;
-                foreach l in __place_delays
+                if (window_name == "portscan.edu" && $skill[macrometeorite].skill_is_usable() && get_property_int("_macrometeoriteUses") < 10 && !__quest_state["Level 12"].finished && !__quest_state["Level 12"].state_boolean["Lighthouse Finished"] && $item[barrel of gunpowder].available_amount() < 5)
                 {
-                    if (l == $location[the hidden park] && __dense_liana_machete_items.available_amount() > 0)
-                    {
-                        continue;
-                    }
-                    if (l == $location[the oasis]) continue;
-                    if (l.delayRemainingInLocation() > 0 && l.locationAvailable())
-                        possible_locations.listAppend(l);
+                    subentry.entries.listAppend("Adventure in sonofa beach, macrometeorite the government agent to gain a LFM.");
+                    url = $location[sonofa beach].getClickableURLForLocation();
                 }
+                location [int] possible_locations = generatePossibleLocationsToBurnDelay();
                 if (possible_locations.count() > 0)
                 {
                     subentry.entries.listAppend("Adventure in " + possible_locations.listJoinComponents(", ", "or") + " to burn delay.");

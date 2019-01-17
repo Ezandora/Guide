@@ -44,7 +44,7 @@ void QPirateInit()
         QuestStateParseMafiaQuestPropertyValue(state, "finished");
 	__quest_state["Pirate Quest"] = state;
 	
-	if (my_path_id() == PATH_POCKET_FAMILIARS || my_path_id() == PATH_G_LOVER)
+	if (my_path_id() == PATH_POCKET_FAMILIARS || my_path_id() == PATH_G_LOVER || true)
 	{
 		state.state_boolean["valid"] = false;
         state.state_boolean["hot wings relevant"] = false;
