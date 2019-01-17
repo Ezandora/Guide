@@ -39260,7 +39260,7 @@ buffer generateLocationBar(boolean displaying_navbar)
     }
     else if (l == $location[the hidden bowling alley])
     {
-    	int pygmy_banishes_left = clamp(11 - get_property_int("_drunkPygmyBanishes"), 0, 11);
+    	int pygmy_banishes_left = clampi(11 - get_property_int("_drunkPygmyBanishes"), 0, 11);
     	if ($item[bowl of scorpions].item_amount() > 0 && !$monster[drunk pygmy].is_banished() && pygmy_banishes_left > 0)
         {
         	custom_location_information = pluralise(pygmy_banishes_left, "drunk pygmy", "drunk pygmies") + " left";
