@@ -47,5 +47,7 @@ import "relay/Guide/Items of the Month/Bastille Battalion.ash";
 import "relay/Guide/Items of the Month/Latte.ash";
 import "relay/Guide/Items of the Month/Voting Booth.ash";
 import "relay/Guide/Items of the Month/Boxing Daycare.ash";
+import "relay/Guide/Items of the Month/Kramco Sausage-o-Matic.ash";
+import "relay/Guide/Items of the Month/Lil Doctor Bag.ash";
 
 

@@ -56,6 +56,7 @@ void QManorInit()
     {
 		QuestStateParseMafiaQuestPropertyValue(state, "started");
     }
+    if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
 	state.quest_name = "Spookyraven Manor Unlock";
 	state.image_name = "Spookyraven Manor";
     
@@ -476,7 +477,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
             int desired_drunkenness = MIN(inebriety_limit(), 10);
             if (my_inebriety() < desired_drunkenness)
             {
-                int more_drunkenness = MIN(missing_pool_skill, desired_drunkenness - my_inebriety());
+                int more_drunkenness = MIN(availableDrunkenness(), MIN(missing_pool_skill, desired_drunkenness - my_inebriety()));
                 if (more_drunkenness > 0)
                     subentry.entries.listAppend("Consider drinking " + more_drunkenness + " more drunkenness.");
             }

@@ -309,6 +309,7 @@ void QLevel13Init()
     
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL13Final");
+    if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
     if (my_path_id() == PATH_BUGBEAR_INVASION || __misc_state["in aftercore"] || (!state.in_progress && my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING) || my_path_id() == PATH_COMMUNITY_SERVICE) //FIXME mafia may track the ed L13 quest under this variable
         QuestStateParseMafiaQuestPropertyValue(state, "finished"); //never will start
 	if (__misc_state["Example mode"])
@@ -1057,9 +1058,21 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     {
         //stare into the looking glass, or break it
         subentry.header = "Face the looking glass";
-        subentry.entries.listAppend("Two options here.");
-        subentry.entries.listAppend("Gazing upon the looking glass will cost a turn, but makes the naughty sorceress much easier.");
-        subentry.entries.listAppend("Breaking the mirror will save a turn, but makes the NS fight much more difficult.");
+        if (my_path_id() == PATH_VAMPIRE)
+        {
+            subentry.entries.listAppend("Gaze upon... nothing.");
+        }
+        else
+        {
+            subentry.entries.listAppend("Two options here.");
+            subentry.entries.listAppend("Gazing upon the looking glass will cost a turn, but makes the naughty sorceress much easier.");
+            subentry.entries.listAppend("Breaking the mirror will save a turn, but makes the NS fight much more difficult.");
+        }
+    }
+    else if (!base_quest_state.state_boolean["past tower level 5"] && my_path_id() == PATH_VAMPIRE)
+    {
+        subentry.header = "Fight the mirror";
+        subentry.entries.listAppend("It has, like, 3000 HP. You can handle it, right?");
     }
     else if (!base_quest_state.state_boolean["past tower level 5"])
     {

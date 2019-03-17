@@ -10,6 +10,7 @@ void QLevel11HiddenTempleInit()
     }
     else
         QuestStateParseMafiaQuestPropertyValue(state, "unstarted");
+    if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
     state.quest_name = "Hidden Temple Unlock";
     state.image_name = "spooky forest";
 
@@ -88,12 +89,12 @@ void QLevel11HiddenTempleGenerateTasks(ChecklistEntry [int] task_entries, Checkl
             subentry.entries.listAppend("how did we get here?");
         }
     }
-    if ($item[spooky-gro fertilizer].available_amount() == 0)
+    if ($item[spooky-gro fertilizer].item_amount() == 0)
     {
         subentry.entries.listAppend("Acquire spooky-gro fertilizer.|*Brave the dark thicket" + __html_right_arrow_character + "Investigate the dense foliage" + (in_hardcore() ? "" : "|*Or pull."));
         ncs_remaining += 1;
     }
-    if ($item[spooky temple map].available_amount() > 0 && $item[spooky-gro fertilizer].available_amount() > 0 && $item[spooky sapling].available_amount() > 0)
+    if ($item[spooky temple map].available_amount() > 0 && $item[spooky-gro fertilizer].item_amount() > 0 && $item[spooky sapling].available_amount() > 0)
     {
         subentry.modifiers.listClear();
         subentry.entries.listClear();

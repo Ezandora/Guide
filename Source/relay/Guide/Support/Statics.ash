@@ -40,6 +40,9 @@ static
     int PATH_G_LOVER = 33;
     int PATH_DISGUISES_DELIMIT = 34;
     int PATH_DEMIGUISE = 34;
+    int PATH_DARK_GYFFTE = 35;
+    int PATH_DARK_GIFT = 35;
+    int PATH_VAMPIRE = 35;
 }
 
 int __my_path_id_cached = -11;
@@ -113,6 +116,8 @@ int my_path_id()
         __my_path_id_cached = PATH_G_LOVER;
     else if (path_name == "Disguises Delimit" || path_name == 34)
     	__my_path_id_cached = PATH_DISGUISES_DELIMIT;
+    else if (path_name == "Dark Gyffte")
+    	__my_path_id_cached = PATH_DARK_GYFFTE;
     else
         __my_path_id_cached = PATH_UNKNOWN;
     return __my_path_id_cached;

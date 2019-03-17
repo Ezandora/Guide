@@ -260,3 +260,142 @@ int CatBurglarChargesLeftToday()
     //print_html("heists_gained_today = " + heists_gained_today + ", heists_complete = " + heists_complete); 
     return get_property_int("catBurglarBankHeists") + heists_gained_today - heists_complete;
 }
+
+
+int PathCommunityServiceEstimateTurnsTakenForTask(string service_name)
+{
+    int turns = 60;
+    if (service_name == "Donate Blood")
+    {
+        turns = 60 - (my_maxhp() - (my_buffedstat($stat[muscle]) + 3)) / 30;
+    }
+    else if (service_name == "Coil Wire")
+    {
+        turns = 60;
+    }
+    else if (service_name == "Make Margaritas")
+    {
+        turns = 60 - (floor(numeric_modifier("Item Drop") / 30) + floor(numeric_modifier("Booze Drop") / 15));
+    }
+    else if (service_name == "Feed The Children (But Not Too Much)" || service_name == "Build Playground Mazes" || service_name == "Feed Conspirators")
+    {
+        stat using_stat;
+        if (service_name == "Feed The Children (But Not Too Much)")
+        {
+            using_stat = $stat[muscle];
+        }
+        else if (service_name == "Build Playground Mazes")
+        {
+            using_stat = $stat[mysticality];
+        }
+        else if (service_name == "Feed Conspirators")
+        {
+            using_stat = $stat[moxie];
+        }
+        int basestat = my_basestat(using_stat);
+        boolean relevant_thrall_active = false;
+        if (my_thrall() == $thrall[Elbow Macaroni] && using_stat == $stat[muscle])
+        {
+            basestat = my_basestat($stat[mysticality]);
+            relevant_thrall_active = true;
+        }
+        if (my_thrall() == $thrall[Penne Dreadful] && using_stat == $stat[moxie])
+        {
+            basestat = my_basestat($stat[mysticality]);
+            relevant_thrall_active = true;
+        }
+        
+        turns = 60 - (my_buffedstat(using_stat) - basestat) / 30;
+    }
+    else if (service_name == "Reduce Gazelle Population")
+    {
+        float modifier_1 = numeric_modifier("Weapon Damage");
+        float modifier_2 = numeric_modifier("Weapon Damage Percent");
+        
+        foreach s in $slots[hat,weapon,off-hand,back,shirt,pants,acc1,acc2,acc3,familiar]
+        {
+        	item it = s.equipped_item();
+            if (it.to_slot() != $slot[weapon]) continue;
+            int power = it.get_power();
+            float addition = to_float(power) * 0.15;
+            
+            modifier_1 -= addition;
+        }
+        if ($effect[bow-legged swagger].have_effect() > 0)
+        {
+            modifier_1 *= 2;
+            modifier_2 *= 2;
+        }
+        turns = 60 - (floor(modifier_1 / 50) + floor(modifier_2 / 50));
+    }
+    else if (service_name == "Make Sausage")
+    {
+        turns = 60 - (floor(numeric_modifier("Spell Damage") / 50) + floor(numeric_modifier("Spell Damage Percent") / 50));
+    }
+    else if (service_name == "Clean Steam Tunnels")
+    {
+        turns = 60 - numeric_modifier("Hot Resistance");
+    }
+    else if (service_name == "Breed More Collies")
+    {
+        int current_familiar_weight = my_familiar().effective_familiar_weight() + numeric_modifier("familiar weight");
+        turns = 60 - floor(current_familiar_weight / 5);
+    }
+    else if (service_name == "Be a Living Statue")
+    {
+        float combat_rate_raw = numeric_modifier("Combat Rate");
+        int combat_rate_inverse = 0;
+        if (combat_rate_raw < 0) combat_rate_inverse = -combat_rate_raw;
+        if (combat_rate_inverse > 25) combat_rate_inverse = (combat_rate_inverse - 25) * 5 + 25;
+        turns = 60 - floor(combat_rate_inverse / 5) * 3;
+    }
+    
+    turns = clampi(turns, 1, 60);
+    
+    return turns;
+}
+
+
+
+Record KramcoSausageFightInformation 
+{
+    boolean goblin_will_appear;
+    int turns_to_next_guaranteed_fight;
+    float probability_of_sausage_fight;
+};
+
+KramcoSausageFightInformation KramcoCalculateSausageFightInformation()
+{
+    KramcoSausageFightInformation information;
+    int last_sausage_turn = get_property_int("_lastSausageMonsterTurn"); //FIXME
+    int sausage_fights = get_property_int("_sausageFights");
+    
+    
+    
+    //These ceilings are not correct; they are merely what I have spaded so far. The actual values are higher.
+    int [int] observed_ceilings = {0, 7, 10, 13, 16, 19, 23, 33, 50, 85, 149, 157, 157, 157, 181, 189, 189, 189, 189, 209};
+    
+    int turn_will_always_see_goblin = observed_ceilings[sausage_fights];
+    
+    int delta = total_turns_played() - last_sausage_turn;
+    
+    
+    information.turns_to_next_guaranteed_fight = MAX(0, turn_will_always_see_goblin - delta);
+    //Goblins do not appear on the same turn as semi-rares.
+    if (information.turns_to_next_guaranteed_fight == 0 && CounterLookup("Semi-rare").CounterGetNextExactTurn() == 0)
+    	information.turns_to_next_guaranteed_fight += 1;
+    
+    if (!(observed_ceilings contains sausage_fights))
+         information.turns_to_next_guaranteed_fight = -1;
+      
+    if (turn_will_always_see_goblin > 1)
+    {
+        //This is probably wrong?
+        float probability_each_incorrect = 1.0 / to_float(turn_will_always_see_goblin - 1);
+        information.probability_of_sausage_fight = clampf((delta + 1) * probability_each_incorrect, 0.0, 1.0);
+    }
+    information.goblin_will_appear = information.turns_to_next_guaranteed_fight == 0;
+    
+    
+    return information;
+}

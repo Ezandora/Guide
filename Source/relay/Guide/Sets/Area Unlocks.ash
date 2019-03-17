@@ -76,7 +76,11 @@ void SAreaUnlocksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
 	{
 		ChecklistSubentry subentry;
 		subentry.header = "Unlock mysterious island";
-		
+		if (my_path_id() == PATH_COMMUNITY_SERVICE)
+        {
+        	subentry.header += "?";
+            subentry.entries.listAppend("Or not...?");
+        }
         
         string url;
         boolean suggest_hippy_alternative = false;
@@ -166,6 +170,13 @@ void SAreaUnlocksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         
         if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE && get_property("peteMotorbikeGasTank").length() == 0)
             subentry.entries.listAppend("Possibly upgrade your motorcycle's gas tank. (extra-buoyant)");
-		task_entries.listAppend(ChecklistEntryMake("__item dingy dinghy", url, subentry, $locations[the shore\, inc. travel agency]));
+        
+        
+		ChecklistEntry entry = ChecklistEntryMake("__item dingy dinghy", url, subentry, $locations[the shore\, inc. travel agency]);
+        if (my_path_id() == PATH_COMMUNITY_SERVICE)
+        	optional_task_entries.listAppend(entry);
+        else
+        	task_entries.listAppend(entry);
+        
 	}
 }

@@ -12,6 +12,7 @@ void QLevel12Init()
 	//state_boolean["Orchard Finished"]
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL12War");
+    if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
 	state.quest_name = "Island War Quest";
 	state.image_name = "island war";
 	state.council_quest = true;
@@ -449,9 +450,28 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
             }
             
             details.listAppend("~" + roundForOutput(turns_to_complete, 1) + " turns to complete quest at " + combat_rate_modifier().floor() + "% combat.|~" + roundForOutput(turns_per_lobster, 1) + " turns per lobster.");
+            
+            if ($skill[meteor lore].have_skill() && get_property_int("_macrometeoriteUses") < 10)
+            {
+            	details.listAppend("Could use macrometeorite on a wandering monster (portscan, voting) to guarantee an LFM.");
+                if (lookupItem("&quot;I Voted!&quot; sticker").available_amount() > 0 && get_property_int("_voteFreeFights") >= 3)
+                {
+                	if (total_turns_played() % 11 == 1 && get_property_int("lastVoteMonsterTurn") < total_turns_played())
+                    {
+                        details.listAppend("Voting monster now!");
+                    }
+                    else
+                    {
+                    	int turns_to_next_voting_monster = 11 - (((total_turns_played() % 11) - 1 + 11) % 11);
+                        details.listAppend("Voting monster will appear in " + pluralise(turns_to_next_voting_monster, "more turn", "more turns") + ".");
+                    }
+                    
+                }
+            }
         }
         else
             details.listAppend("Talk to the lighthouse keeper to finish quest.");
+        
 	
 		optional_task_entries.listAppend(ChecklistEntryMake("Island War Lighthouse", "bigisland.php?place=lighthouse", ChecklistSubentryMake("Island War Lighthouse Quest", modifiers, details), $locations[sonofa beach]));
 	}
@@ -672,7 +692,7 @@ void QLevel12GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             //need 70 moxie, 70 myst
             
         }
-        if ($item[talisman o' namsilat].available_amount() == 0 && !__quest_state["Level 11 Palindome"].finished && my_path_id() != PATH_G_LOVER)
+        if (false && $item[talisman o' namsilat].available_amount() == 0 && !__quest_state["Level 11 Palindome"].finished && my_path_id() != PATH_G_LOVER)
         {
             subentry.entries.listAppend("May want to " + HTMLGenerateSpanFont("acquire the Talisman o' Nam", "red") + " first.");
         }

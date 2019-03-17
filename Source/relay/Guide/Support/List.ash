@@ -359,6 +359,12 @@ familiar [int] listMakeBlankFamiliar()
 	return result;
 }
 
+int [int] listMakeBlankInt()
+{
+    int [int] result;
+    return result;
+}
+
 
 
 
@@ -645,7 +651,6 @@ string listJoinComponents(string [int] list, string joining_string)
 {
 	return listJoinComponents(list, joining_string, "");
 }
-
 
 string listJoinComponents(item [int] list, string joining_string, string and_string)
 {

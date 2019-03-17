@@ -1,6 +1,7 @@
 import "relay/Guide/Support/List.ash"
 import "relay/Guide/Support/Math.ash"
 import "relay/Guide/Support/Library.ash"
+import "relay/Guide/Support/AdventurePHP Locations.ash"
 
 Record Counter
 {
@@ -515,12 +516,14 @@ boolean CounterWanderingMonsterMayHitNextTurn()
     if (my_turncount() == __last_turn_definitely_visited_adventure_php && __last_turn_definitely_visited_adventure_php != -1) //that adventure didn't advance the counter; no wandering monsters. also, does lights out override wanderers? but, what if there are TWO wandering monsters? the plot thickens
     {
         string last_encounter = get_property("lastEncounter");
-        if (!($strings[Lights Out,Wooof! Wooooooof!,Playing Fetch*,Your Dog Found Something Again,Gunbowwowder,Seeing-Eyes Dog] contains last_encounter))
+        location last_location = get_property_location("lastAdventure");
+        if (!($strings[Lights Out,Wooof! Wooooooof!,Playing Fetch*,Your Dog Found Something Again,Gunbowwowder,Seeing-Eyes Dog] contains last_encounter) && !(last_location != $location[none] && !last_location.locationAllowsWanderingMonsters()))
             return false;
     }
     //FIXME use CounterWanderingMonsterMayHitInXTurns to implement this once we're sure it works
     foreach s in __wandering_monster_counter_names
     {
+    	if (s == "WoL Monster" && my_path_id() != PATH_AVATAR_OF_WEST_OF_LOATHING) continue; //mafia bug
         if (s == "Romantic Monster" && get_property_int("_romanticFightsLeft") == 0) //If mafia's tracking doesn't recognise the monster, then we can override by decrementing the romantic fights left. Added because of the machine elf tunnels.
             continue;
         Counter c = CounterLookup(s);

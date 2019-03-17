@@ -6,7 +6,7 @@ void IOTMGarbageToteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
 	boolean [item] relevant_items;
 	if (get_property_int("garbageTreeCharge") > 0)
 		relevant_items[lookupItem("deceased crimbo tree")] = true;
-    if (get_property_int("garbageShirtCharge") > 0)
+    if (get_property_int("garbageShirtCharge") > 0 && __misc_state["Torso aware"])
         relevant_items[lookupItem("makeshift garbage shirt")] = true;
     if (get_property_int("garbageChampagneCharge") > 0)
         relevant_items[lookupItem("broken champagne bottle")] = true;
@@ -15,7 +15,7 @@ void IOTMGarbageToteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
 	if (relevant_items.available_amount() == 0)
 	{
 		string [int] description;
-        if (my_level() < 13 && get_property_int("garbageShirtCharge") > 0)
+        if (my_level() < 13 && get_property_int("garbageShirtCharge") > 0 && __misc_state["Torso aware"])
         {
             description.listAppend("Makeshift garbage shirt (double statgain for " + pluralise(get_property_int("garbageShirtCharge"), "more turn", "more turns") + ".)");
         }
@@ -42,12 +42,14 @@ void IOTMGarbageToteGenerateResource(ChecklistEntry [int] resource_entries)
 	string [item] item_effect_description;
 	string [item] item_charge_property;
 	
-	item_charge_property[lookupItem("makeshift garbage shirt")] = "garbageShirtCharge";
+	if (__misc_state["Torso aware"])
+		item_charge_property[lookupItem("makeshift garbage shirt")] = "garbageShirtCharge";
     item_charge_property[lookupItem("broken champagne bottle")] = "garbageChampagneCharge";
     item_charge_property[lookupItem("deceased crimbo tree")] = "garbageTreeCharge";
     
     
-    item_effect_description[lookupItem("makeshift garbage shirt")] = "Doubles statgain";
+    if (__misc_state["Torso aware"])
+	    item_effect_description[lookupItem("makeshift garbage shirt")] = "Doubles statgain";
     item_effect_description[lookupItem("broken champagne bottle")] = "Doubles +item";
     item_effect_description[lookupItem("deceased crimbo tree")] = "Absorbs damage";
 	

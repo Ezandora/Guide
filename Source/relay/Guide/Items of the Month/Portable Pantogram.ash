@@ -20,7 +20,14 @@ void IOTMPortablePantogramGenerateTasks(ChecklistEntry [int] task_entries, Check
     	slot_options[1].listAppend("muscle");
 	//Slot 2: Resistance. Cold? Spooky?
 	if (__misc_state["in run"])
-    	slot_options[2].listAppend("spooky resistance"); //a-boo peak, and slightly more useful than cold resistance
+	{
+		if (my_path_id() == PATH_COMMUNITY_SERVICE)
+            slot_options[2].listAppend("hot resistance");
+        else if (!__quest_state["Level 9"].state_boolean["bridge complete"])
+            slot_options[2].listAppend("sleaze resistance"); //bridge building
+        else
+	    	slot_options[2].listAppend("spooky resistance"); //a-boo peak, and slightly more useful than cold resistance
+    }
 	//Slot 3: drops of blood (+40 HP). -3 MP to use skills is nice, I guess? but it takes a baconstone
 	if (__misc_state["in run"])
 		slot_options[3].listAppend("drops of blood (+40 HP)");
@@ -31,6 +38,11 @@ void IOTMPortablePantogramGenerateTasks(ChecklistEntry [int] task_entries, Check
 		slot_options[4].listAppend("taco shell (+30% meat)");
     if (($item[porquoise].npc_price() > 0 && __misc_state["in run"]) || can_interact())
         slot_options[4].listAppend("porquoise (+60% meat)");
+    if (my_path_id() == PATH_COMMUNITY_SERVICE)
+    {
+        slot_options[4].listAppend("your hopes (+20 weapon damage)");
+        slot_options[4].listAppend("your dreams (+20% spell damage)");
+    }
 	if (__misc_state["in run"])
 	{
 	}
@@ -41,7 +53,8 @@ void IOTMPortablePantogramGenerateTasks(ChecklistEntry [int] task_entries, Check
 	//slot_options[4].listAppend("???");
 	//Slot 5:
     slot_options[5].listAppend("some self-respect (-combat)");
-    slot_options[5].listAppend("some self-control (+combat)");
+    if (my_path_id() != PATH_COMMUNITY_SERVICE)
+    	slot_options[5].listAppend("some self-control (+combat)");
     if (!__misc_state["in run"])
     	slot_options[5].listAppend("ten-leaf clover (hilarious items)");
     if ($item[bar skin].available_amount() > 0 && __misc_state["in run"])

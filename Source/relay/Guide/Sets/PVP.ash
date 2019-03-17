@@ -96,7 +96,7 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 	            description.listAppend("Collect a Pan-Dimensional Gargle Blaster from Fernswarthy's basement. " + pluraliseWordy(floors_remaining, "floor", "floors") + " to go.");
             }
         }
-        else if (mini == "Frostily Ephemeral" || mini == "Newest Born")
+        else if (mini == "Frostily Ephemeral" || mini == "Newest Born" || mini == "SELECT asc_time FROM zzz_players WHERE player_id=%playerid%")
         {
             description.listAppend("Ascend to reset timer.");
         }
@@ -121,6 +121,38 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
         else if (mini == "I Like Pi")
         {
             description.listAppend("Eat key lime pies.");
+        }
+        else if (mini == "HTTP 301 Moved Permanently")
+        {
+            description.listAppend("Adventure in as many different locations as you can.");
+        }
+        else if (mini == "Quality Assurance")
+        {
+            description.listAppend("Defeat bug-phylum monsters.");
+        }
+        else if (mini == "Free.Willy.1993.1080p.BRRip.x265.torrent")
+        {
+            description.listAppend("Fight dolphins.|Farm sand dollars, turn them into dolphin whistles, and use them.");
+        }
+        else if (mini == "Installation Wizard")
+        {
+            modifiers.listAppend("+item");
+            if (!canadia_available())
+            {
+                description.listAppend("Farm dilapidated wizard hats from copied swamp owls.|Or ascend canadia moon sign.");
+            }
+            else
+            {
+            	description.listAppend("Farm dilapidated wizard hats from swamp owls in The Weird Swamp Village.");
+            }
+        }
+        else if (mini == "Illegal Operation")
+        {
+            description.listAppend("Buy goofballs from the suspicious-looking guy. If they're too expensive, ascend to reset the price.");
+        }
+        else if (mini == "Fotoshop.CS11.Keygen.exe [legit]")
+        {
+            description.listAppend("Eat digital key lime pies.");
         }
         else if (mini == "Most Murderous" || mini == "Icy Revenge")
         {
@@ -250,7 +282,7 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
         {
         	description.listAppend("Don't drink booze.");
         }
-        else if (mini == "Visiting the Cousins")
+        else if (mini == "Visiting the Cousins" || mini == "Visiting The Co@^&$`~")
         {
         	if (knoll_available())
                 description.listAppend("Adventure in the bugbear pens.");
@@ -304,12 +336,23 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
             else
                 description.listAppend("Ascend canadia moon sign.");
         }
+        else if (mini == "ERR_VOLUME_FULL")
+        {
+            description.listAppend("Don't eat anything.");
+        }
         else if (mini == "Really Bloody")
         {
         	if (inebriety_limit() == 0)
     	        description.listAppend("Ascend to drink Bloody Mary.");
             else
 	            description.listAppend("Drink Bloody Mary.");
+        }
+        else if (mini == "System Clock Reset: It's 2006 again!")
+        {
+            if (inebriety_limit() == 0)
+                description.listAppend("Ascend to drink White Canadians.");
+            else
+                description.listAppend("Drink White Canadians.");
         }
         else if (mini == "Liver of the Damned")
         {
@@ -328,6 +371,11 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
         else if (mini == "Letter of the Moment")
         {
             attacking_modifiers.listAppend("letter of the moment");
+            continue;
+        }
+        else if (mini == "ASCII-7 of the moment")
+        {
+            attacking_modifiers.listAppend("letter <strong>a</strong> in equipment");
             continue;
         }
         else if (mini == "Barely Dressed")
@@ -369,6 +417,21 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
             if (get_campground()[$item[portable mayo clinic]] > 0 && availableDrunkenness() > 0)
                 line += "|Also use mayodiol.";
             description.listAppend(line);
+        }
+        else if (mini == "Beta Tester")
+        {
+            if (__quest_state["Level 12"].finished)
+            {
+                description.listAppend("Ascend to fight in war.");
+            }
+            else if (!__quest_state["Level 12"].started)
+            {
+                description.listAppend("Start the war.");
+            }
+            else
+            {
+                description.listAppend("Finish the war for the frat side, with five sidequests completed. (iron beta of industry reward)");
+            }
         }
         else if (mini == "Snow Patrol")
         {

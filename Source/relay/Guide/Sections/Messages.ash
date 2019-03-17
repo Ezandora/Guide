@@ -449,6 +449,8 @@ string generateRandomMessage()
             break;
         case PATH_DEMIGUISE:
             random_messages.listAppend("who are you?"); break;
+        case PATH_VAMPIRE:
+            random_messages.listAppend("die monster! you don't belong in this world!"); break;
         /*case PATH_CLASS_ACT_3:
             random_messages.listAppend("buttons for the people"); break;
         case PATH_AVATAR_OF_THE_NAUGHTY_SORCERESS:

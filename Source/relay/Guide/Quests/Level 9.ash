@@ -7,6 +7,7 @@ void QLevel9Init()
 	//booPeakProgress
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL09Topping");
+    if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
 	state.quest_name = "Highland Lord Quest";
 	state.image_name = "orc chasm";
 	state.council_quest = true;
@@ -527,9 +528,17 @@ void QLevel9GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         url = "place.php?whichplace=orc_chasm";
 		//build bridge:
 		subentry.modifiers.listAppend("+item");
+  
+  		subentry.modifiers.listAppend("-ML");
+        subentry.modifiers.listAppend("+moxie");
+        subentry.modifiers.listAppend(HTMLGenerateSpanOfClass("+sleaze resistance", "r_element_sleaze_desaturated"));
         //if (__misc_state["have olfaction equivalent"]) //don't remember what you'd olfact here
             //subentry.modifiers.listAppend("olfaction");
 		subentry.entries.listAppend("Build a bridge.");
+        //FIXME show how effective you are at the moment.
+        subentry.entries.listAppend("Run as little monster level as possible.|Overkill the orcs with as much cold damage as you can.|Buff +moxie/sleaze resistance and choose the third option at the NC.");
+        subentry.entries.listAppend("Or +myst/spell damage/spell damage percent for the second NC option.");
+        subentry.entries.listAppend("Or +muscle/weapon damage/weapon damage percent for the first NC option. Once that works.");
         
         if (get_property("questM15Lol") != "finished" && ($item[bridge].available_amount() > 0 || $item[dictionary].available_amount() == 0) && false) //it's gone!
         {

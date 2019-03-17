@@ -78,7 +78,7 @@ void initialiseIOTMsUsable()
     {
         if (!it.is_unrestricted() || it == $item[none])
             remove __iotms_usable[it];
-    }
+    } 
 }
 
 initialiseIOTMsUsable();

@@ -229,7 +229,7 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
             if (next_exact_turn <= 0)
                 subentry.header += HTMLGenerateSpanFont(" now", "red");
             else
-                subentry.header += " after " + pluralise(next_exact_turn, "more turn", "more turns");
+                subentry.header += " after " + pluralise(next_exact_turn, "More Turn", "more turns");
         }
         else if (turn_range.y <= 0)
             subentry.header += " now or soon";
