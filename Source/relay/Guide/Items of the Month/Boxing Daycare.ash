@@ -39,7 +39,7 @@ void IOTMBoxingDaycareGenerateResource(ChecklistEntry [int] resource_entries)
         }
         else
             description.listAppend("+200% myst, +25% item");
-		resource_entries.listAppend(ChecklistEntryMake("__item orange boxing gloves", "place.php?whichplace=town_wrong&action=townwrong_boxingdaycare", ChecklistSubentryMake("Boxing daycare buff (100 turns)", description), 5));
+		resource_entries.listAppend(ChecklistEntryMake("__item orange boxing gloves", "place.php?whichplace=town_wrong&action=townwrong_boxingdaycare", ChecklistSubentryMake("Boxing daycare buff (100 turns)", description), 5).ChecklistEntryTagEntry("boxing daycare"));
 	}
 	if (hippy_stone_broken() && !get_property_boolean("_daycareFights") && !__misc_state["in run"])
 	{
@@ -47,7 +47,7 @@ void IOTMBoxingDaycareGenerateResource(ChecklistEntry [int] resource_entries)
         description.listAppend("Costs one adventure. Spar.");
         if (get_property_int("daycareToddlers") <= 2)
         	description.listAppend("Should recruit first.");
-        resource_entries.listAppend(ChecklistEntryMake("__item orange boxing gloves", "place.php?whichplace=town_wrong&action=townwrong_boxingdaycare", ChecklistSubentryMake("Boxing daycare PVP fights", description), 5));
+        resource_entries.listAppend(ChecklistEntryMake("__item orange boxing gloves", "place.php?whichplace=town_wrong&action=townwrong_boxingdaycare", ChecklistSubentryMake("Boxing daycare PVP fights", description), 5).ChecklistEntryTagEntry("boxing daycare"));
 		
 	}
 }

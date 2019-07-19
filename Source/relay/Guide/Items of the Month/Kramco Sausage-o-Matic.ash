@@ -49,7 +49,7 @@ void IOTMKramcoSausageOMaticGenerateResource(ChecklistEntry [int] resource_entri
     ChecklistEntry entry;
     entry.image_lookup_name = "__item Kramco Sausage-o-Matic&trade;";
     entry.url = "inventory.php?action=grind";
-    entry.importance_level = 3;
+    entry.importance_level = 1;
     
     
     string [int] main_description;

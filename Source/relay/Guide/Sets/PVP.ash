@@ -28,10 +28,10 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
             attacking_modifiers.listAppend("weapon damage");
             continue;
         }
-        else if (mini == "15 Minutes of Fame" || mini == "Beary Famous" || mini == "Upward Mobility Contest")
+        else if (mini == "15 Minutes of Fame" || mini == "Beary Famous" || mini == "Upward Mobility Contest" || mini == "Optimal PvP")
         {
-            //attacking_description.listAppend("maximise fightgen and hit for fame");
-            attacking_description.listAppend("hit for fame");
+            //attacking_description.listAppend("hit for fame");
+            attacking_description.listAppend("maximise fightgen and hit for fame");
             continue;
         }
         else if (mini == "80 Days and Counting")
@@ -70,6 +70,27 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
                 description.listAppend(tasks.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".");
             }
         }
+        else if (mini == "Totally Optimal")
+        {
+        	if (__quest_state["Level 11 Ron"].state_int["protestors remaining"] > 0)
+                description.listAppend("Fight zeppelin protestors, and don't try to speed them up.");
+            else
+        		description.listAppend("Ascend to fight more Zeppelin Protestors.");
+        }
+        else if (mini == "Optimal Drinking")
+        {
+        	if (inebriety_limit() == 0)
+            	description.listAppend("Ascend a path you can drink on.");
+            else
+	        	description.listAppend("When drinking, prefer drinks that have effects.");
+        }
+        else if (mini == "Familiar Rotation")
+        {
+        	if (in_ronin())
+	        	description.listAppend("Pick a different familiar than your last ascensions this season.");
+            else
+                description.listAppend("Ascend to rotate your familiar.");
+        }
         else if (mini == "Foreigner Reference")
         {
             description.listAppend("Drink ice-cold Sir Schlitzs or ice-cold Willers." + (in_ronin() ? "|The Orcish Frat House has them. Run +400% item" + (my_level() >= 9 ? " and +15% combat." : "") : ""));
@@ -78,7 +99,7 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
         {
             description.listAppend("Attack the same target repeatedly. Ideally, lose.");
         }
-        else if (mini == "Burrowing Deep")
+        else if (mini == "Burrowing Deep" || mini == "Obviously Optimal")
         {
         	if (__misc_state_int["Basement Floor"] > 400)
             {
@@ -96,7 +117,7 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 	            description.listAppend("Collect a Pan-Dimensional Gargle Blaster from Fernswarthy's basement. " + pluraliseWordy(floors_remaining, "floor", "floors") + " to go.");
             }
         }
-        else if (mini == "Frostily Ephemeral" || mini == "Newest Born" || mini == "SELECT asc_time FROM zzz_players WHERE player_id=%playerid%")
+        else if (mini == "Frostily Ephemeral" || mini == "Newest Born" || mini == "SELECT asc_time FROM zzz_players WHERE player_id=%playerid%" || mini == "Optimal Ascension")
         {
             description.listAppend("Ascend to reset timer.");
         }
@@ -106,7 +127,7 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
         }
         else if (mini == "Back to Square One")
         {
-            description.listAppend("Ascend for new wand.");
+            description.listAppend("Ascend.");
         }
         else if (mini == "Baker's Dozen")
         {
@@ -262,6 +283,11 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
             attacking_description.listAppend("run zero effects with R in their name");
             continue;
         }
+        else if (mini == "The Optimal Stat")
+        {
+            attacking_modifiers.listAppend("+item drop");
+            continue;
+        }
         else if (mini == "A Nice Cold One" || mini == "Thirrrsty forrr Booze")
         {
             attacking_modifiers.listAppend("+booze drop");
@@ -288,6 +314,13 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
                 description.listAppend("Adventure in the bugbear pens.");
             else
 				description.listAppend("Ascend knoll moon sign.");
+        }
+        else if (mini == "Craft Brew is Optimal")
+        {
+            if (gnomads_available())
+                description.listAppend("Drink from the Gnomish Microbrewery.");
+            else
+                description.listAppend("Ascend Gnomish moon sign.");
         }
         else if (mini == "Who Runs Bordertown?")
         {
@@ -383,7 +416,22 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
             attacking_description.listAppend("do not equip equipment");
             continue;
         }
-        else if (mini == "Dressed in Rrrags")
+        else if (mini == "DEFACE")
+        {
+            attacking_description.listAppend("wear equipment with A/B/C/D/E/F/numbers in them");
+            continue;
+        }
+        else if (mini == "Dressed to the 9s")
+        {
+            attacking_description.listAppend("wear equipment with numbers in them");
+            continue;
+        }
+        else if (mini == "Optimal Dresser")
+        {
+            attacking_description.listAppend("wear low-power shirt/hat/pants");
+            continue;
+        }
+        else if (mini == "Dressed in Rrrags" || mini == "Outfit Compression")
         {
             attacking_description.listAppend("wear short-named equipment");
             continue;
@@ -393,7 +441,7 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
             attacking_modifiers.listAppend("cold resistance");
             continue;
         }
-        else if (mini == "Loot Hunter")
+        else if (mini == "Loot Hunter" || mini == "The Optimal Stat")
         {
             attacking_modifiers.listAppend("+item");
             continue;
@@ -401,6 +449,11 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
         else if (mini == "Safari Chic")
         {
             attacking_modifiers.listAppend("equipment autosell value");
+            continue;
+        }
+        else if (mini == "Checking It Twice")
+        {
+            attacking_description.listAppend("target players you haven't fought twice");
             continue;
         }
         else if (mini == "Ice Hunter")
@@ -418,7 +471,7 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
                 line += "|Also use mayodiol.";
             description.listAppend(line);
         }
-        else if (mini == "Beta Tester")
+        else if (mini == "Beta Tester" || mini == "Optimal War")
         {
             if (__quest_state["Level 12"].finished)
             {
@@ -473,7 +526,7 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
     	attacking_description.listAppend("maximise " + attacking_modifiers.listJoinComponents(" / "));
     if (attacking_description.count() > 0)
     {
-        entry.subentries.listAppend(ChecklistSubentryMake("When attacking", "", attacking_description.listJoinComponents(", ", "and ").capitaliseFirstLetter() + "."));
+        entry.subentries.listAppend(ChecklistSubentryMake("When attacking", attacking_modifiers, attacking_description.listJoinComponents(", ", "and ").capitaliseFirstLetter() + "."));
     }
     
     if (entry.subentries.count() > 0)

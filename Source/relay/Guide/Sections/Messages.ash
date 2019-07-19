@@ -181,6 +181,7 @@ void generateRandomMessageFamiliar(string [int] random_messages)
         case $familiar[pet rock]:
             message = "what if the rock's eyebrow froze that way. would anyone notice?"; break;
         case $familiar[space jellyfish]:
+            message = "deer force";
             if (__quest_state["Level 13"].state_boolean["king waiting to be freed"])
             {
                 int obtained = 0;
@@ -289,7 +290,7 @@ string generateRandomMessage()
 	random_messages.listAppend("consider your mistakes creative spading");
     
     if (hippy_stone_broken())
-        random_messages.listAppend("it's not easy having yourself a good time");
+        random_messages.listAppend(HTMLGenerateTagWrap("a", "it's not easy having yourself a good time", generateMainLinkMap("peevpee.php")));
     
     string [item] equipment_messages;
     equipment_messages[$item[whatsian ionic pliers]] = "ionic pliers untinker to a screwdriver and a sonar-in-a-biscuit";
@@ -347,7 +348,7 @@ string generateRandomMessage()
     effect_messages[$effect[All Revved Up]] = "vroom";
     if (my_path_id() != PATH_WAY_OF_THE_SURPRISING_FIST)
         effect_messages[$effect[Expert Timing]] = "martial arts and crafts";
-    effect_messages[$effect[apathy]] = "";
+    effect_messages[$effect[apathy]] = ""; //
     effect_messages[$effect[silent running]] = "an awful lot of running";
     effect_messages[$effect[Neuromancy]] = "the silver paths";
     effect_messages[$effect[Teleportitis]] = "everywhere and nowhere";
@@ -356,6 +357,7 @@ string generateRandomMessage()
     effect_messages[$effect[hopped up on goofballs]] = "a massive drug deficiency";
     foreach s in $strings[Warlock\, Warstock\, and Warbarrel,Barrel of Laughs,Barrel Chested,Pork Barrel,Double-Barreled,Beer Barrel Polka]
         effect_messages[s.to_effect()] = "just let me throw a barrel at it";
+    effect_messages[$effect[Meteor Showered]] = "すきだ";
     foreach e in effect_messages
     {
         if (e.have_effect() > 0 && e != $effect[none])
@@ -583,7 +585,7 @@ string generateRandomMessage()
     }
     
     if (numeric_modifier("hot damage") <= 0.0 && gameday_to_int() % 4 == 0)
-    	random_messages.listAppend("have you tried fire");
+    	random_messages.listAppend("have you tried " + HTMLGenerateSpanFont("fire", "red"));
     
     
     if (__misc_state["Chateau Mantegna available"] && get_property_monster("chateauMonster").phylum == $phylum[fish] && !get_property_boolean("_chateauMonsterFought"))
@@ -675,6 +677,7 @@ string generateRandomMessage()
     monster_messages[$monster[The Inquisitor]] = "nothing is up";
     monster_messages[$monster[Doc Clock]] = "your defeat will happen at " + (current_hour > 12 ? current_hour - 12 : current_hour) + ":" + current_minute + " precisely"; // + (current_hour >= 12 ? " PM" : " AM")
     monster_messages[lookupMonster("God Lobster")] = "what a grand and intoxicating innocence"; //how can you kill a god? equip the heart of the volcano?
+    monster_messages[lookupMonster("cockroach")] = "are bug exterminators professional assassins?"; 
     
     string day_cycle;
     if (current_hour >= 5 && current_hour <= 11)

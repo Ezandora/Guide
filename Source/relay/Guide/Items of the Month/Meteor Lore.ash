@@ -20,14 +20,14 @@ void IOTMMeteorLoreGenerateResource(ChecklistEntry [int] resource_entries)
         description.listAppend("Reroll a monster to another in the area.");
         
         string [int] useful_places;
-        if (!__quest_state["Pirate Quest"].finished && $item[talisman o' namsilat].available_amount() == 0)
+        /*if (!__quest_state["Pirate Quest"].finished && $item[talisman o' namsilat].available_amount() == 0)
         {
             if (__quest_state["Pirate Quest"].state_int["insult count"] < 6 && __quest_state["Pirate Quest"].mafia_internal_step < 6)
                 useful_places.listAppend("pirate insults (unless NC)");
             if (__quest_state["Pirate Quest"].mafia_internal_step < 7)
                 useful_places.listAppend("the f'c'le");
             useful_places.listAppend("belowdecks");
-        }
+        }*/
         if (spleen_limit() > 0 && lookupFamiliar("space jellyfish").familiar_is_usable() && get_property_int("_spaceJellyfishDrops") < 4 && my_path_id() != PATH_LIVE_ASCEND_REPEAT)
         {
             string line = "stench monster area";

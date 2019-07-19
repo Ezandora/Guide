@@ -1122,6 +1122,8 @@ static
         	lookup_map[s] = "place.php?whichplace=crimbo17_silentnight";
         foreach s in $strings[The Bandit Crossroads,The Putrid Swamp,Near the Witch's House,The Troll Fortress,The Sprawling Cemetery,The Cursed Village,The Foreboding Cave,The Faerie Cyrkle,The Evil Cathedral,The Towering Mountains,The Mystic Wood,The Druidic Campsite,The Old Rubee Mine]
         	lookup_map[s] = "place.php?whichplace=realm_fantasy";
+        foreach s in $strings[PirateRealm Island,Sailing the PirateRealm Seas]
+            lookup_map[s] = "place.php?whichplace=realm_pirate";
         lookup_map["An Eldritch Horror"] = "place.php?whichplace=town";
         lookup_map["The Neverending Party"] = "place.php?whichplace=town_wrong";
         lookup_map["Through the Spacegate"] = "place.php?whichplace=spacegate";

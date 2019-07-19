@@ -578,7 +578,10 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
             {
                 //Octopus's garden, obtain wriggling flytrap pellet
                 if ($item[wriggling flytrap pellet].available_amount() == 0)
-                    subentry.entries.listAppend("Adventure in octopus's garden, find a wriggling flytrap pellet.");
+                {
+                    subentry.entries.listAppend("Adventure in octopus's garden, find a wriggling flytrap pellet from a Neptune flytrap.");
+                    subentry.modifiers.listAppend("olfact Neptune flytrap");
+                }
                 else
                 {
                     url = "inventory.php?which=3";

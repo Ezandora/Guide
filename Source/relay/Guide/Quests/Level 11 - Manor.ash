@@ -263,6 +263,10 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                     {
                         subentry.entries.listAppend("Talk to Lord Spookyraven.");
                     }
+                    else if (my_path_id() == PATH_VAMPIRE)
+                    {
+                        subentry.entries.listAppend("Fight the path-specific boss.");
+                    }
                     else
                     {
                         subentry.modifiers.listAppend("elemental resistance");

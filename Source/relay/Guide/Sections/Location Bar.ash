@@ -95,12 +95,15 @@ buffer generateLocationBar(boolean displaying_navbar)
                     plant_data.listAppend("Unknown");
             }
         }
-        if (plant_data.count() == 0 && l.environment != "unknown" && l.environment != "none" && l.environment != "")
+        string environment_display = l.environment.capitaliseFirstLetter();
+        if (l.environment == "unknown" || l.environment == "none" || l.environment == "")
+        	environment_display = "Unknown";
+        if (plant_data.count() == 0)// && l.environment != "unknown" && l.environment != "none" && l.environment != "")
         {
             if (l == $location[The Valley of Rof L'm Fao])
                 plant_data.listAppend(l.environment.replace_string("o", "0"));
             else if (!($locations[The Prince's Restroom,The Prince's Dance Floor,The Prince's Kitchen,The Prince's Balcony,The Prince's Lounge,The Prince's Canapes table,the shore\, inc. travel agency] contains l))
-                plant_data.listAppend(l.environment.capitaliseFirstLetter());
+                plant_data.listAppend(environment_display);
         }
     }
     

@@ -147,7 +147,7 @@ void PathCommunityServiceGenerateTasks(ChecklistEntry [int] task_entries, Checkl
                 else if (using_stat != $stat[mysticality] && my_primestat() == $stat[mysticality] && $item[oil of expertise].to_effect().have_effect() == 0)
                 {
                 	description.listAppend("Possibly use oil of expertise to equalise basestats." + ($items[cherry,oil of expertise].available_amount() == 0 ? "|Can get a cherry from novelty tropical skeleton in the skeleton store. Run +234% item." : ""));
-                    if (my_class() == $class[pastamancer]) description.listAppend("or do pastamancer thralls");
+                    if (my_class() == $class[pastamancer]) description.listAppend("Or use pastamancer thralls.");
                 }
             }
         }

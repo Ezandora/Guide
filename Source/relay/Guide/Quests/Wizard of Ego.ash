@@ -1,8 +1,8 @@
 
 void QWizardOfEgoInit()
 {
-    if (!__misc_state["in aftercore"]) //not yet
-        return;
+    //if (!__misc_state["in aftercore"]) //not yet
+        //return;
     if ($items[Manual of Dexterity,Manual of Labor,Manual of Transmission].available_amount() > 0) //finished already
         return;
         

@@ -408,7 +408,7 @@ KOLImage KOLImageLookup(string lookup_name)
 		}
         else if (e != $effect[none] && e.image != "" && e.to_string().to_lower_case() == secondary_lookup_name)
         {
-            __kol_images[lookup_name] = KOLImageMake(e.image, Vec2iMake(30,30));
+            __kol_images[lookup_name] = KOLImageMake("images/itemimages/" + e.image, Vec2iMake(30,30));
         }
         else if (m != $monster[none] && m.image != "" && m.to_string().to_lower_case() == secondary_lookup_name)
         {

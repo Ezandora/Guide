@@ -58,7 +58,7 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 	}
     //When we're down to two potential skeleton keys, mention they shouldn't use them in the door.
     int skeleton_key_amount = $item[skeleton key].available_amount() + $item[skeleton key].creatable_amount();
-    boolean avoid_using_skeleton_key = ($item[pick-o-matic lockpicks].available_amount() == 0 && (skeleton_key_amount) <= 2 && skeleton_key_amount > 0 && !__quest_state["Level 13"].state_boolean["Past keys"] && in_ronin());
+    boolean avoid_using_skeleton_key = ($item[Platinum Yendorian Express Card].available_amount() == 0 && $item[pick-o-matic lockpicks].available_amount() == 0 && (skeleton_key_amount) <= 2 && skeleton_key_amount > 0 && !__quest_state["Level 13"].state_boolean["Past keys"] && in_ronin());
 	
 	boolean delay_daily_dungeon = false;
 	string delay_daily_dungeon_reason = "";
@@ -99,7 +99,7 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 			//So suggest doing that:
 			boolean can_make_skeleton_key = ($items[loose teeth,skeleton bone].items_missing().count() == 0);
 			
-			if (!avoid_using_skeleton_key && ($item[pick-o-matic lockpicks].available_amount() == 0 && $item[skeleton key].available_amount() == 0 && (!__quest_state["Level 7"].state_boolean["nook finished"] || can_make_skeleton_key))) //they don't have lockpicks or a key, and they can reasonably acquire a key
+			if (!avoid_using_skeleton_key && ($item[pick-o-matic lockpicks].available_amount() == 0 && $item[Platinum Yendorian Express Card].available_amount() == 0 && $item[skeleton key].available_amount() == 0 && (!__quest_state["Level 7"].state_boolean["nook finished"] || can_make_skeleton_key))) //they don't have lockpicks or a key, and they can reasonably acquire a key
 			{
 				delay_daily_dungeon = true;
 				if (can_make_skeleton_key)

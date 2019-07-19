@@ -929,6 +929,29 @@ string [string] mapCopy(string [string] map)
     return result;
 }
 
+boolean mapsAreEqual(string [string] map1, string [string] map2)
+{
+	if (map1.count() != map2.count())
+	{
+        //print_html("map1.c = " + map1.count() + " which is not " + map2.count());
+		return false;
+    }
+	foreach key1, v in map1
+	{
+		if (!(map2 contains key1))
+        {
+        	//print_html("map2 lacks " + key1);
+        	return false;
+        }
+        if (map2[key1] != v)
+        {
+            //print_html("map2 v(" + map2[key1] + " does not equal " + key1 + " (" + v + ")");
+        	return false;
+        }
+	}
+	return true;
+}
+
 boolean [string] listInvert(string [int] list)
 {
 	boolean [string] result;
@@ -1074,6 +1097,18 @@ int listKeyForIndex(monster [int] list, int index)
 	return -1;
 }
 
+int listKeyForIndex(int [int] list, int index)
+{
+    int i = 0;
+    foreach key in list
+    {
+        if (i == index)
+            return key;
+        i += 1;
+    }
+    return -1;
+}
+
 int llistKeyForIndex(string [int][int] list, int index)
 {
 	int i = 0;
@@ -1128,6 +1163,15 @@ monster listGetRandomObject(monster [int] list)
         return $monster[none];
     if (list.count() == 1)
     	return list[listKeyForIndex(list, 0)];
+    return list[listKeyForIndex(list, random(list.count()))];
+}
+
+int listGetRandomObject(int [int] list)
+{
+    if (list.count() == 0)
+        return -1;
+    if (list.count() == 1)
+        return list[listKeyForIndex(list, 0)];
     return list[listKeyForIndex(list, random(list.count()))];
 }
 

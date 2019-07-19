@@ -527,18 +527,78 @@ void QLevel9GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
     {
         url = "place.php?whichplace=orc_chasm";
 		//build bridge:
-		subentry.modifiers.listAppend("+item");
   
-  		subentry.modifiers.listAppend("-ML");
-        subentry.modifiers.listAppend("+moxie");
-        subentry.modifiers.listAppend(HTMLGenerateSpanOfClass("+sleaze resistance", "r_element_sleaze_desaturated"));
         //if (__misc_state["have olfaction equivalent"]) //don't remember what you'd olfact here
             //subentry.modifiers.listAppend("olfaction");
 		subentry.entries.listAppend("Build a bridge.");
-        //FIXME show how effective you are at the moment.
-        subentry.entries.listAppend("Run as little monster level as possible.|Overkill the orcs with as much cold damage as you can.|Buff +moxie/sleaze resistance and choose the third option at the NC.");
-        subentry.entries.listAppend("Or +myst/spell damage/spell damage percent for the second NC option.");
-        subentry.entries.listAppend("Or +muscle/weapon damage/weapon damage percent for the first NC option. Once that works.");
+  
+        string smut_orc_noncombat_progress_string = get_property("smutOrcNoncombatProgress");
+        boolean orc_tracking_supported = false;
+        if (smut_orc_noncombat_progress_string != "")
+        {
+            orc_tracking_supported = true;
+        }
+        float weapon_damage_actual = numeric_modifier("Weapon Damage");
+        //correct numeric_modifier's response to actual:
+        foreach s in $slots[hat,weapon,off-hand,back,shirt,pants,acc1,acc2,acc3,familiar]
+        {
+        	item it = s.equipped_item();
+            if (it == $item[none]) continue;
+            if (it.to_slot() != $slot[weapon]) continue;
+            weapon_damage_actual -= it.get_power().to_float() * 0.15;
+        }
+        
+        int choice_1_pieces_gained = MAX(3, MIN(14, sqrt((my_buffedstat($stat[muscle]) + weapon_damage_actual) / 15.0 * (numeric_modifier("Weapon Damage Percent") / 100.0 + 1.0))));
+        int choice_2_pieces_gained = MAX(3, MIN(14, sqrt((my_buffedstat($stat[mysticality]) + numeric_modifier("Spell Damage")) / 15.0 * (numeric_modifier("Spell Damage Percent") / 100.0 + 1.0))));
+        int choice_3_pieces_gained = MAX(3, MIN(14, sqrt((my_buffedstat($stat[moxie]) / 30.0 * (numeric_modifier("Sleaze Resistance") * 0.69 + 1.0)))));
+        
+        if (orc_tracking_supported)
+        {
+            int smut_orc_noncombat_progress = smut_orc_noncombat_progress_string.to_int_silent();
+            if (smut_orc_noncombat_progress < 15)
+            {
+                subentry.modifiers.listAppend("+item");
+            	subentry.modifiers.listAppend("-ML");
+                int percent_to_nc = smut_orc_noncombat_progress.to_float() / 15.0 * 100; 
+            	subentry.entries.listAppend("Run as little monster level as possible.|Overkill the orcs with as much " + HTMLGenerateSpanOfClass("cold damage", "r_element_cold") + " as you can.|" + percent_to_nc + "% to NC.");
+            }
+            else
+            {
+            	int best_choice_pieces = choice_1_pieces_gained;
+            	string best_choice = "the first choice";
+                if (choice_2_pieces_gained > best_choice_pieces)
+                {
+	                best_choice = "the second choice";
+                	best_choice_pieces = choice_2_pieces_gained;
+                }
+                if (choice_3_pieces_gained > best_choice_pieces)
+                {
+                    best_choice = "the third choice";
+                    best_choice_pieces = choice_3_pieces_gained;
+                }
+                
+            	subentry.entries.listAppend("Next encounter will be the non-combat.|Choose <strong>" + best_choice + "</strong>. (<strong>" + best_choice_pieces + "</strong> pieces gained)");
+                string line;
+            	line += "Your buffing options are:";
+                line += "|*Buff <strong>+muscle</strong>/<strong>weapon damage percent</strong>/<small>weapon damage</small> for the first NC option. (at <strong>" + choice_1_pieces_gained + "</strong> pieces)";
+                line += "|*Or <strong>+myst</strong>/<strong>spell damage percent</strong>/<small>spell damage</small> for the second NC option. (at <strong>" + choice_2_pieces_gained + "</strong> pieces)";
+                line += "|*Or <strong>+moxie</strong>/<strong>sleaze resistance</strong> and choose the third option at the NC. (at <strong>" + choice_3_pieces_gained + "</strong> pieces)";
+                subentry.entries.listAppend(line);
+            }
+        }
+        else
+        {
+            subentry.modifiers.listAppend("+item");
+            subentry.modifiers.listAppend("-ML");
+            subentry.modifiers.listAppend("+moxie");
+            subentry.modifiers.listAppend(HTMLGenerateSpanOfClass("+sleaze resistance", "r_element_sleaze_desaturated"));
+            //FIXME show how effective you are at the moment.
+            subentry.entries.listAppend("Run as little monster level as possible.|Overkill the orcs with as much cold damage as you can.");
+            subentry.entries.listAppend("Then:");
+            subentry.entries.listAppend("|*Buff +muscle/weapon damage/weapon damage percent for the first NC option.");
+            subentry.entries.listAppend("|*Or +myst/spell damage/spell damage percent for the second NC option.");
+            subentry.entries.listAppend("|*Or +moxie/sleaze resistance and choose the third option at the NC.");
+        }
         
         if (get_property("questM15Lol") != "finished" && ($item[bridge].available_amount() > 0 || $item[dictionary].available_amount() == 0) && false) //it's gone!
         {

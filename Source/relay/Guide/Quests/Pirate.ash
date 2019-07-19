@@ -86,6 +86,9 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	
     boolean delay_for_future = false;
     boolean can_acquire_cocktail_napkins = false;
+    
+    if (in_ronin() && $item[Talisman o' Namsilat].available_amount() == 0)
+    	subentry.entries.listAppend(HTMLGenerateSpanFont("Pirates won't help you in-run anymore.", "red"));
 	
 	if (!have_outfit)
 	{

@@ -43,13 +43,14 @@ static
     int PATH_DARK_GYFFTE = 35;
     int PATH_DARK_GIFT = 35;
     int PATH_VAMPIRE = 35;
+    int PATH_2CRS = 36;
 }
 
+
 int __my_path_id_cached = -11;
-int my_path_id()
+
+int initialiseMyPathID()
 {
-    if (__my_path_id_cached != -11)
-        return __my_path_id_cached;
     string path_name = my_path();
     
     if (path_name == "" || path_name == "None")
@@ -115,11 +116,19 @@ int my_path_id()
     else if (path_name == "G-Lover" || path_name == "33")
         __my_path_id_cached = PATH_G_LOVER;
     else if (path_name == "Disguises Delimit" || path_name == 34)
-    	__my_path_id_cached = PATH_DISGUISES_DELIMIT;
+        __my_path_id_cached = PATH_DISGUISES_DELIMIT;
     else if (path_name == "Dark Gyffte")
-    	__my_path_id_cached = PATH_DARK_GYFFTE;
+        __my_path_id_cached = PATH_DARK_GYFFTE;
+    else if (path_name == "36" || path_name == "Two Crazy Random Summer")
+        __my_path_id_cached = PATH_2CRS;
     else
         __my_path_id_cached = PATH_UNKNOWN;
+    return __my_path_id_cached;
+}
+initialiseMyPathID();
+
+int my_path_id()
+{
     return __my_path_id_cached;
 }
 
@@ -221,7 +230,7 @@ static
             }
             
             //Equipment:
-            if (it.to_slot() != $slot[none])
+            if ($slots[hat,weapon,off-hand,back,shirt,pants,acc1,acc2,acc3,familiar] contains it.to_slot())
             {
                 __equipment[it] = true;
                 if (it.numeric_modifier("combat rate") < 0)
@@ -339,4 +348,24 @@ item lookupAWOLOilForMonster(monster m)
 static
 {
     monster [location] __protonic_monster_for_location {$location[Cobb's Knob Treasury]:$monster[The ghost of Ebenoozer Screege], $location[The Haunted Conservatory]:$monster[The ghost of Lord Montague Spookyraven], $location[The Haunted Gallery]:$monster[The ghost of Waldo the Carpathian], $location[The Haunted Kitchen]:$monster[The Icewoman], $location[The Haunted Wine Cellar]:$monster[The ghost of Jim Unfortunato], $location[The Icy Peak]:$monster[The ghost of Sam McGee], $location[Inside the Palindome]:$monster[Emily Koops, a spooky lime], $location[Madness Bakery]:$monster[the ghost of Monsieur Baguelle], $location[The Old Landfill]:$monster[The ghost of Vanillica "Trashblossom" Gorton], $location[The Overgrown Lot]:$monster[the ghost of Oily McBindle], $location[The Skeleton Store]:$monster[boneless blobghost], $location[The Smut Orc Logging Camp]:$monster[The ghost of Richard Cockingham], $location[The Spooky Forest]:$monster[The Headless Horseman]};
+}
+
+
+
+static
+{
+	boolean [monster][location] __monsters_natural_habitats;
+}
+boolean [location] getPossibleLocationsMonsterCanAppearInNaturally(monster m)
+{
+	if (__monsters_natural_habitats.count() == 0)
+	{
+		//initialise:
+        foreach l in $locations[]
+        {
+        	foreach key, m in l.get_monsters()
+            	__monsters_natural_habitats[m][l] = true;
+        }
+	}
+	return __monsters_natural_habitats[m];
 }

@@ -126,7 +126,7 @@ void SMiscTasksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         }
         else
             description.listAppend("Possibly wait until level 9, to unlock NCs in the area.");
-		optional_task_entries.listAppend(ChecklistEntryMake("__item homoerotic frat-paddle", "island.php", ChecklistSubentryMake("Acquire a frat boy ensemble?", modifiers, description), $locations[frat house]));
+		optional_task_entries.listAppend(ChecklistEntryMake("__item orcish frat-paddle", "island.php", ChecklistSubentryMake("Acquire a frat boy ensemble?", modifiers, description), $locations[frat house]));
     }
 		
 	if ($item[strange leaflet].available_amount() > 0 && __misc_state["in run"])

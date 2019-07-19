@@ -25,6 +25,9 @@ string [int] SEquipmentGenerateXiblaxianHoloWristPuterDescription()
     }
     description.listAppend(HTMLGenerateSimpleTableLines(table));
     
+    if (!get_property_boolean("_holoWristCrystal"))
+    	description.listAppend("Can acquire a crystal by mining. (once/day)");
+    
     string [int] items_owned;
     foreach it in $items[Xiblaxian alloy,Xiblaxian circuitry,Xiblaxian polymer,Xiblaxian crystal]
     {

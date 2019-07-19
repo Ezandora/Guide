@@ -66,6 +66,8 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
 	property_summons_to_skills["_summonAnnoyanceUsed"] = listMake($skill[summon annoyance]);
     property_summons_to_skills["_perfectFreezeUsed"] = listMake($skill[Perfect Freeze]);
     property_summons_to_skills["_communismUsed"] = listMake($skill[Communism!]);
+    property_summons_to_skills["_preventScurvy"] = listMake(lookupSkill("Prevent Scurvy and Sobriety"));
+    
     skills_to_title_notes[$skill[summon annoyance]] = get_property_int("summonAnnoyanceCost") + " swagger";
     
     

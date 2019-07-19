@@ -120,12 +120,18 @@ string capitaliseFirstLetter(string v)
 	return buf.to_string();
 }
 
+//shadowing; this may override ints
 string pluralise(float value, string non_plural, string plural)
 {
+	string value_out = "";
+	if (value.to_int() == value)
+		value_out = value.to_int();
+    else
+    	value_out = value;
 	if (value == 1.0)
-		return value + " " + non_plural;
+		return value_out + " " + non_plural;
 	else
-		return value + " " + plural;
+		return value_out + " " + plural;
 }
 
 string pluralise(int value, string non_plural, string plural)

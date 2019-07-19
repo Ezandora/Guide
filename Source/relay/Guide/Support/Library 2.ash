@@ -3,6 +3,7 @@ import "relay/Guide/Support/Equipment Requirement.ash"
 import "relay/Guide/Support/HTML.ash"
 import "relay/Guide/Support/Statics 2.ash"
 import "relay/Guide/Support/Ingredients.ash"
+import "relay/Guide/Support/Counter.ash"
 
 
 
@@ -275,7 +276,17 @@ int PathCommunityServiceEstimateTurnsTakenForTask(string service_name)
     }
     else if (service_name == "Make Margaritas")
     {
-        turns = 60 - (floor(numeric_modifier("Item Drop") / 30) + floor(numeric_modifier("Booze Drop") / 15));
+    	float item_drop = numeric_modifier("Item Drop");
+        //Mafia adds item drop modifiers depending on our location.
+        //set_location() is slow, we want to avoid it.
+        //Manually correct:
+        if ($skill[Speluck].have_skill() && my_location().environment == "underground")
+        {
+        	item_drop -= 5.0;
+            if ($effect[Steely-Eyed Squint].have_effect() > 0)
+            	item_drop -= 5.0;
+        }
+        turns = 60 - (floor(item_drop / 30) + floor(numeric_modifier("Booze Drop") / 15));
     }
     else if (service_name == "Feed The Children (But Not Too Much)" || service_name == "Build Playground Mazes" || service_name == "Feed Conspirators")
     {
@@ -373,7 +384,7 @@ KramcoSausageFightInformation KramcoCalculateSausageFightInformation()
     
     
     //These ceilings are not correct; they are merely what I have spaded so far. The actual values are higher.
-    int [int] observed_ceilings = {0, 7, 10, 13, 16, 19, 23, 33, 50, 85, 149, 157, 157, 157, 181, 189, 189, 189, 189, 209};
+    int [int] observed_ceilings = {0, 7, 10, 13, 16, 19, 23, 33, 54, 93, 154, 219, 220, 220, 220, 220, 220, 220, 220, 220, 220, 220, 220, 220, 220, 220, 220, 220, 220, 220};
     
     int turn_will_always_see_goblin = observed_ceilings[sausage_fights];
     

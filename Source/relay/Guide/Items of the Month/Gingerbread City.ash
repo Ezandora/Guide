@@ -9,7 +9,7 @@ void IOTMGingerbreadCityGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__skill Ceci N'Est Pas Un Chapeau", "skillz.php", ChecklistSubentryMake("Ceci N'Est Pas Un Chapeau", "", "Random enchantment hat, 300MP."), 10));
     }
     
-    if ($skill[Gingerbread Mob Hit].have_skill() && mafiaIsPastRevision(17566))
+    if ($skill[Gingerbread Mob Hit].skill_is_usable() && mafiaIsPastRevision(17566))
     {
         if (!get_property_boolean("_gingerbreadMobHitUsed"))
         {

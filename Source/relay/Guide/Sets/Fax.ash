@@ -81,7 +81,7 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes, boo
         }
         
         int missing_ore = MAX(0, 3 - __quest_state["Level 8"].state_string["ore needed"].to_item().available_amount());
-        if (!__quest_state["Level 8"].state_boolean["Past mine"] && missing_ore > 0 && !$skill[unaccompanied miner].skill_is_usable())
+        if (!__quest_state["Level 8"].state_boolean["Past mine"] && missing_ore > 0)// && !$skill[unaccompanied miner].skill_is_usable())
         {
             string fax = "";			
             fax += ChecklistGenerateModifierSpan("+150% item or ideally YR");
@@ -186,7 +186,7 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes, boo
                 potential_faxes.listAppend(line);
             }
             //gaudy pirate (use for insults!)
-            if (!__quest_state["Level 11 Palindome"].finished && $item[talisman o' namsilat].available_amount() == 0 && $items[snakehead charrrm,gaudy key].available_amount() < 2 && $items[Copperhead Charm,Copperhead Charm (rampant)].available_amount() < 2 && my_path_id() != PATH_G_LOVER && __quest_state["Pirate Quest"].state_boolean["valid"])
+            /*if (!__quest_state["Level 11 Palindome"].finished && $item[talisman o' namsilat].available_amount() == 0 && $items[snakehead charrrm,gaudy key].available_amount() < 2 && $items[Copperhead Charm,Copperhead Charm (rampant)].available_amount() < 2 && my_path_id() != PATH_G_LOVER && __quest_state["Pirate Quest"].state_boolean["valid"])
             {
                 string description = "Gaudy pirate - two fights for talisman o' nam. (copy once)";
                 if ($items[snakehead charrrm,gaudy key].available_amount() == 1)
@@ -200,7 +200,7 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes, boo
                     description += HTMLGenerateIndentedText(l);
                 }
                 potential_faxes.listAppend(description);
-            }
+            }*/
             
             //screambat for sonar replacement
             if ((3 - __quest_state["Level 4"].state_int["areas unlocked"]) > $item[sonar-in-a-biscuit].available_amount())

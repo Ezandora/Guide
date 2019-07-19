@@ -64,6 +64,7 @@ static
     __banish_source_length["spring-loaded front bumper"] = 30;
     __banish_source_length["mafia middle finger ring"] = 60;
     __banish_source_length["throw latte on opponent"] = 30; //Throw Latte on Opponent
+    __banish_source_length["use the force"] = 30;
     
     int [string] __banish_simultaneous_limit;
     __banish_simultaneous_limit["beancannon"] = 5;

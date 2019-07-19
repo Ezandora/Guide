@@ -555,6 +555,7 @@ boolean CounterWanderingMonsterMayHitInXTurns(int turns, boolean only_detect_by_
         return true;
     foreach s in __wandering_monster_counter_names
     {
+        if (s == "WoL Monster" && my_path_id() != PATH_AVATAR_OF_WEST_OF_LOATHING) continue; //mafia bug
         if (CounterLookup(s).CounterExists() && CounterLookup(s).CounterMayHitInXTurns(turns))
             return true;
     }
@@ -572,6 +573,7 @@ boolean CounterWanderingMonsterWillHitInXTurns(int turns)
     //CounterWillHitExactlyInTurnRange
     foreach s in __wandering_monster_counter_names
     {
+        if (s == "WoL Monster" && my_path_id() != PATH_AVATAR_OF_WEST_OF_LOATHING) continue; //mafia bug
         if (CounterLookup(s).CounterExists() && CounterLookup(s).CounterWillHitExactlyInTurnRange(0, turns))
             return true;
     }
@@ -583,6 +585,7 @@ Counter [int] CounterWanderingMonsterWindowsActiveInXTurns(int turns)
     Counter [int] result;
     foreach s in __wandering_monster_counter_names
     {
+        if (s == "WoL Monster" && my_path_id() != PATH_AVATAR_OF_WEST_OF_LOATHING) continue; //mafia bug
         Counter c = CounterLookup(s);
         if (c.CounterExists() && c.CounterMayHitInXTurns(turns))
             result[result.count()] = c;
@@ -597,6 +600,7 @@ Counter [int] CounterWanderingMonsterWindowsActiveNextTurn()
         return result;
     foreach s in __wandering_monster_counter_names
     {
+        if (s == "WoL Monster" && my_path_id() != PATH_AVATAR_OF_WEST_OF_LOATHING) continue; //mafia bug
         Counter c = CounterLookup(s);
         if (c.CounterExists() && c.CounterMayHitNextTurn())
             result[result.count()] = c;
@@ -634,6 +638,7 @@ boolean CounterWanderingMonsterCountersHaveRange()
 {
     foreach s in __wandering_monster_counter_names
     {
+        if (s == "WoL Monster" && my_path_id() != PATH_AVATAR_OF_WEST_OF_LOATHING) continue; //mafia bug
         Counter c = CounterLookup(s);
         if (!c.CounterExists())
             continue;
@@ -651,7 +656,9 @@ boolean CounterWanderingMonsterWillHitNextTurn()
     foreach key, c in CounterWanderingMonsterWindowsActiveNextTurn()
     {
         if (c.CounterWillHitNextTurn())
+        {
             return true;
+        }
     }
     return false;
 }

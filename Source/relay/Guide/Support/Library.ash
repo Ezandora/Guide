@@ -73,6 +73,16 @@ boolean a_skill_is_usable(boolean [skill] skills)
 	return false;
 }
 
+boolean skill_is_currently_castable(skill s)
+{
+	//FIXME accordion thief songs, MP, a lot of things
+    if (s == $skill[Utensil Twist] && $slot[weapon].equipped_item().item_type() != "utensil")
+    {
+        return false;
+    }
+    return true;
+}
+
 boolean item_is_usable(item it)
 {
     if (!it.is_unrestricted())
@@ -1259,7 +1269,7 @@ float averageAdventuresForConsumable(item it, boolean assume_monday)
             adventures = 9; //saved across lifetimes
     }
 	
-	if ($skill[saucemaven].have_skill() && ($items[hot hi mein,cold hi mein,sleazy hi mein,spooky hi mein,stinky hi mein,Hell ramen,fettucini Inconnu,gnocchetti di Nietzsche,spaghetti with Skullheads,spaghetti con calaveras] contains it || lookupItems("haunted hell ramen") contains it))
+	if ($skill[saucemaven].have_skill() && ($items[hot hi mein,cold hi mein,sleazy hi mein,spooky hi mein,stinky hi mein,Hell ramen,fettucini Inconnu,gnocchetti di Nietzsche,spaghetti with Skullheads,spaghetti con calaveras,Fleetwood mac 'n' cheese,haunted hell ramen] contains it))
 	{
 		if ($classes[sauceror,pastamancer] contains my_class())
 			adventures += 5;
@@ -1610,6 +1620,11 @@ void printSilent(string line)
     print_html(line.processStringForPrinting());
 }
 
+//have_equipped() exists
+boolean equipped(item it)
+{
+	return it.equipped_amount() > 0;
+}
 
 
 

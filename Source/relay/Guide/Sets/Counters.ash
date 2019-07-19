@@ -221,6 +221,8 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
             //someone reported they saw this window after going past the relevant quest step; safety ignore
             continue;
         }
+        if (window_name == "WoL Monster" && my_path_id() != PATH_AVATAR_OF_WEST_OF_LOATHING)
+        	continue;
         subentry.header = window_display_name;
         
         
