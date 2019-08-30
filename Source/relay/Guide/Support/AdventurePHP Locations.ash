@@ -63,6 +63,8 @@ boolean locationAllowsWanderingMonsters(location l)
 {
     if ($locations[The Shore\, Inc. Travel Agency,Noob Cave,The Dire Warren] contains l)
         return false;
+    if ($locations[The Daily Dungeon,An Overgrown Shrine (Northwest),An Overgrown Shrine (Southwest),An Overgrown Shrine (Northeast),An Overgrown Shrine (Southeast),A Massive Ziggurat] contains l) //warning: I have not personally verified these
+    	return false;
     if (l == $location[The X-32-F Combat Training Snowman])
         return false;
     if ($locations[Gingerbread Industrial Zone,Gingerbread Train Station,Gingerbread Sewers,Gingerbread Upscale Retail District] contains l && l != $location[none])

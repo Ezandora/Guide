@@ -31,7 +31,7 @@ void QLevel11Init()
 		state.image_name = "MacGuffin";
 		state.council_quest = true;
         
-		if (my_level() >= 11)
+		if (my_level() >= 11 || my_path_id() == PATH_EXPLOSIONS)
 			state.startable = true;
         
 		__quest_state["Level 11"] = state;

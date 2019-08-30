@@ -1,7 +1,7 @@
 RegisterTaskGenerationFunction("SPowerlevelGenerateTasks");
 void SPowerlevelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (__misc_state["need to level"])
+	if (__misc_state["need to level"] && my_path_id() != PATH_EXPLOSION)
 	{
         string url = "";
 		int mcd_max_limit = 10;

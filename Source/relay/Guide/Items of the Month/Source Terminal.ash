@@ -1,9 +1,6 @@
 void IOTMSourceTerminalGenerateDigitiseTargets(string [int] description)
 {
     string [int] potential_targets;
-    int desks_remaining = clampi(5 - get_property_int("writingDesksDefeated"), 0, 5);
-    if (desks_remaining > 1 && !get_property_ascension("lastSecondFloorUnlock") && $item[Lady Spookyraven's necklace].available_amount() == 0 && get_property("questM20Necklace") != "finished" && mafiaIsPastRevision(15244))
-        potential_targets.listAppend("writing desk");
     if (!__quest_state["Level 12"].state_boolean["Lighthouse Finished"] && $item[barrel of gunpowder].available_amount() < 5)
         potential_targets.listAppend("lobsterfrogman");
     if (__quest_state["Level 7"].state_int["alcove evilness"] > 31)

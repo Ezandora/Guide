@@ -50,5 +50,9 @@ import "relay/Guide/Items of the Month/Boxing Daycare.ash";
 import "relay/Guide/Items of the Month/Kramco Sausage-o-Matic.ash";
 import "relay/Guide/Items of the Month/Lil Doctor Bag.ash";
 import "relay/Guide/Items of the Month/May Saber.ash";
+import "relay/Guide/Items of the Month/Vampire Cloak.ash";
+import "relay/Guide/Items of the Month/Beach Comb.ash";
+import "relay/Guide/Items of the Month/Getaway Campsite.ash";
+import "relay/Guide/Items of the Month/Rune Spoon.ash";
 
 

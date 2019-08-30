@@ -8,6 +8,8 @@ int pullable_amount(item it, int maximum_total_wanted)
 	boolean buyable_in_run = false;
 	if (__pulls_reasonable_to_buy_in_run contains it)
 		buyable_in_run = true;
+    if (it.tradeable && it.historical_price() > 0 && it.historical_price() < 50000)
+    	buyable_in_run = true;
 	if (maximum_total_wanted == 0)
 		maximum_total_wanted = __misc_state_int["pulls available"] + it.available_amount();
 	if (__misc_state["Example mode"]) //simulate pulls
@@ -496,7 +498,7 @@ void generatePullList(Checklist [int] checklists)
 		scrip_needed += 1;
 		scrip_reasons.listAppend($item[uv-resistant compass].to_string());
 	}
-	if (scrip_needed > 0 && my_path_id() != PATH_COMMUNITY_SERVICE)
+	if (scrip_needed > 0 && my_path_id() != PATH_COMMUNITY_SERVICE && my_path_id() != PATH_EXPLOSIONS)
 	{
 		pullable_item_list.listAppend(GPItemMake($item[Shore Inc. Ship Trip Scrip], "Saves three turns each.|" + scrip_reasons.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".", scrip_needed));
 	}
@@ -524,6 +526,19 @@ void generatePullList(Checklist [int] checklists)
         if (!__quest_state["Level 11 Desert"].state_boolean["Black Paint Given"] && my_path_id() == PATH_NUCLEAR_AUTUMN)
             pullable_item_list.listAppend(GPItemMake($item[can of black paint], "15% desert exploration.", 1));
     }
+    if (__quest_state["Level 11 Ron"].mafia_internal_step <= 2 && __quest_state["Level 11 Ron"].state_int["protestors remaining"] > 1)
+    {
+        item [int] missing_freebird_components = items_missing($items[lynyrdskin cap,lynyrdskin tunic,lynyrdskin breeches,lynyrd musk]);
+        if (missing_freebird_components.count() > 0)
+        {
+            string description = missing_freebird_components.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".";
+            description += "|Plus four clovers. Skips the entire protestor zone in like four turns?";
+            pullable_item_list.listAppend(GPItemMake("Weird copperhead NC strategy", "__item " + missing_freebird_components[0], description));
+        }
+        if (my_path_id() != PATH_GELATINOUS_NOOB)
+	        pullable_item_list.listAppend(GPItemMake($item[deck of lewd playing cards], "+138 sleaze damage equip for copperhead NC.", 1));
+        
+    }
     
     if (__misc_state["need to level"] && __misc_state["Chateau Mantegna available"] && __misc_state_int["free rests remaining"] > 0 && false)
     {
@@ -544,6 +559,11 @@ void generatePullList(Checklist [int] checklists)
     }
     if ($item[Mr. Cheeng's spectacles] != $item[none])
         pullable_item_list.listAppend(GPItemMake($item[Mr. Cheeng's spectacles], "+15% item, +30% spell damage, acquire random potions in-combat.|Not particularly optimal, but fun."));
+    if (availableSpleen() > 0 && my_path_id() != PATH_LIVE_ASCEND_REPEAT)
+	    pullable_item_list.listAppend(GPItemMake($item[stench jelly], "Skips ahead to an NC, saves 2.5? turns each.", 20));
+     
+    if ($item[pocket wish].item_is_usable())
+	    pullable_item_list.listAppend(GPItemMake($item[pocket wish], "Saves turns?", 20));   
     
     //int pills_pullable = clampi(20 - (get_property_int("_powerPillUses") + $item[power pill].available_amount()), 0, 20);
     int pills_pullable = clampi(20 - get_property_int("_powerPillUses"), 0, 20);
@@ -563,8 +583,12 @@ void generatePullList(Checklist [int] checklists)
     {
         pullable_item_list.listAppend(GPItemMake($item[filthy lucre], "Turn into odor extractors for olfaction.", 6));
     }
-    pullable_item_list.listAppend(GPItemMake($item[mafia thumb ring], "lazy turngen", 1));
-    
+    if (my_path_id() != PATH_SLOW_AND_STEADY)
+    {
+    	//unify these... later...
+        foreach it in $items[mafia thumb ring,License to Chill,etched hourglass]
+            pullable_item_list.listAppend(GPItemMake(it, "lazy turngen", 1));
+    }
     
 	
 	boolean currently_trendy = (my_path_id() == PATH_TRENDY);

@@ -597,6 +597,14 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
             return QuestState("questM25Armorer").started;
         case $location[sonofa beach]:
             return QuestState("questL12War").mafia_internal_step >= 2;
+        case $location[the spooky gravy burrow]:
+        	return QuestState("questM03Bugbear").mafia_internal_step >= 3;
+        case $location[The Copperhead Club]:
+            return QuestState("questL11MacGuffin").mafia_internal_step >= 3; //FIXME no idea, diary?
+        case $location[A mob of zeppelin protesters]:
+            return QuestState("questL11MacGuffin").mafia_internal_step >= 3; //FIXME no idea, diary?
+        case $location[The Red Zeppelin]:
+            return QuestState("questL11MacGuffin").mafia_internal_step >= 3 && get_property_int("zeppelinProtestors") >= 80; //FIXME not quite right, diary?; also NC needs to be visited first
 		default:
 			break;
 	}
@@ -656,6 +664,11 @@ void locationAvailablePrivateInit()
 	//locations_unlocked_by_item[$location[The Haunted Gallery]] = $item[spookyraven gallery key];
 	locations_unlocked_by_item[$location[The Castle in the Clouds in the Sky (Basement)]] = $item[S.O.C.K.];
 	locations_unlocked_by_item[$location[the hole in the sky]] = $item[steam-powered model rocketship];
+    if (my_path_id() == PATH_EXPLOSION)
+    {
+        locations_unlocked_by_item[$location[The Castle in the Clouds in the Sky (Basement)]] = $item[none];
+        locations_unlocked_by_item[$location[the hole in the sky]] = $item[none];
+    }
 	
 	locations_unlocked_by_item[$location[Vanya's Castle Foyer]] = $item[map to Vanya's Castle];
 	
@@ -689,7 +702,7 @@ void locationAvailablePrivateInit()
 	
 	foreach loc in locations_unlocked_by_item
 	{
-		if (locations_unlocked_by_item[loc].available_amount() > 0)
+		if (locations_unlocked_by_item[loc].available_amount() > 0 || locations_unlocked_by_item[loc] == $item[none])
 			__la_location_is_available[loc] = true;
 		else
 			__la_location_is_available[loc] = false;
@@ -1127,6 +1140,7 @@ static
         lookup_map["An Eldritch Horror"] = "place.php?whichplace=town";
         lookup_map["The Neverending Party"] = "place.php?whichplace=town_wrong";
         lookup_map["Through the Spacegate"] = "place.php?whichplace=spacegate";
+        lookup_map["The Exploaded Battlefield"] = "place.php?whichplace=exploathing";
         __constant_clickable_urls = LAConvertLocationLookupToLocations(lookup_map);
     }
     initialiseConstantClickableURLs();

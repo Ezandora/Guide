@@ -453,6 +453,10 @@ string generateRandomMessage()
             random_messages.listAppend("who are you?"); break;
         case PATH_VAMPIRE:
             random_messages.listAppend("die monster! you don't belong in this world!"); break;
+        case PATH_2CRS:
+            random_messages.listAppend("what happened to my inventory?"); break;
+        case PATH_EXPLOSIONS:
+            random_messages.listAppend("kaboooooom"); break;
         /*case PATH_CLASS_ACT_3:
             random_messages.listAppend("buttons for the people"); break;
         case PATH_AVATAR_OF_THE_NAUGHTY_SORCERESS:
@@ -669,6 +673,8 @@ string generateRandomMessage()
         beaten_up_monster_messages[last_monster()] = "venkman makes it look easy";
     if ($effect[beaten up].have_effect() > 0 && $items[rainbow pearl earring,rainbow pearl necklace,rainbow pearl ring,vampire pearl earring,vampire pearl ring,vampire pearl necklace,freshwater pearl necklace,pearl diver's ring,pearl diver's necklace,pearl necklace].equipped_amount() > 0)
     	beaten_up_monster_messages[last_monster()] = "WHY WON'T YOU LET ME DO THIS FOR YOU, ROSE?";
+    if (last_monster().phylum == $phylum[demon])
+	    beaten_up_monster_messages[last_monster()] = "he made the devil so much stronger than a man!";
     if (current_hour >= 5 && current_hour <= 11)
         monster_messages[$monster[Lavalos]] = "good morning, " + lowercase_player_name + "!";
     else
@@ -819,7 +825,7 @@ string generateRandomMessage()
             break;
         }
     }
-    if (mmg_my_bets().count() > 0)
+    if (false)//mmg_my_bets().count() > 0)
     {
 		random_messages.listClear();
 		random_messages.listAppend("win some, lose some");

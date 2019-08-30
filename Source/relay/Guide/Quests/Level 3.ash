@@ -11,7 +11,7 @@ void QLevel3Init()
 	state.image_name = "Typical Tavern";
 	state.council_quest = true;
 	
-	if (my_level() >= 3 && __quest_state["Level 2"].finished)
+	if ((my_path_id() == PATH_EXPLOSIONS || my_level() >= 3) && __quest_state["Level 2"].finished)
 		state.startable = true;
 	
 	__quest_state["Level 3"] = state;

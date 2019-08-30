@@ -32,7 +32,7 @@ void QLevel4Init()
 		state.state_int["areas unlocked"] = 3;
 	}
 	
-	if (my_level() >= 4)
+	if (my_level() >= 4 || my_path_id() == PATH_EXPLOSIONS)
 		state.startable = true;
 		
 	__quest_state["Level 4"] = state;

@@ -9,7 +9,7 @@ void QLevel6Init()
 	state.image_name = "forest friars";
 	state.council_quest = true;
 	
-	if (my_level() >= 6)
+	if (my_level() >= 6 || my_path_id() == PATH_EXPLOSIONS)
 		state.startable = true;
 	
 	__quest_state["Level 6"] = state;

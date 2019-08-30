@@ -138,7 +138,6 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
             additional_turns_after_that = 0;
             
             boolean delay_for_semirare = CounterLookup("Semi-rare").CounterWillHitExactlyInTurnRange(0, 6);
-            
             if (delay_for_semirare)
             {
                 task = HTMLGenerateSpanFont("Avoid fighting Ed the Undying, semi-rare coming up ", "red");
@@ -207,6 +206,12 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
                 subentry.entries.listPrepend(tasks.listJoinComponents(", ", "then").capitaliseFirstLetter() + ".");
             else
                 subentry.entries.listAppend("Spin the control room, search the lower chambers! Then fight Ed.");
+                
+            if (ed_chamber_open && my_path_id() == PATH_EXPLOSIONS && lookupItem("low-pressure oxygen tank").equipped_amount() == 0)
+            {
+            	subentry.modifiers.listAppend("+hp regen");
+                subentry.entries.listAppend("Keep +hp regen up, so you survive the multi-round fight without the oxygen tank?");
+            }
         }
         
         if (!done_with_wheel_turning)

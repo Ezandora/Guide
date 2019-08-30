@@ -20,7 +20,7 @@ void QWhiteCitadelInit()
 
 void QWhiteCitadelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-    if (!__misc_state["in aftercore"] && !in_bad_moon()) //not yet
+    if (!__misc_state["in aftercore"] && !in_bad_moon() && my_location() != $location[the road to the white citadel] && __last_adventure_location != $location[the road to the white citadel]) //not yet
         return;
     if (!__misc_state["guild open"]) //bugged
         return;

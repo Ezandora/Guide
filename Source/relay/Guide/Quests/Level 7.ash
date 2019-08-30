@@ -9,7 +9,7 @@ void QLevel7Init()
 	state.image_name = "cyrpt";
 	state.council_quest = true;
 	
-	if (my_level() >= 7)
+	if (my_level() >= 7 || my_path_id() == PATH_EXPLOSIONS)
 		state.startable = true;
 	
     if (state.started)
@@ -132,6 +132,8 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
                 //haunted doghouse adventures are a percentage chance, and the NC is skippable. more NCs, more chances, less turns spent
                 subentry.modifiers.listAppend("-combat");
             }
+            if (my_path_id() == PATH_EXPLOSIONS)
+            	subentry.entries.listAppend("Ignore this area until the end of the run; wandering astronauts drop evil eyes. Lure them to delay-burning areas; keep signal jammer equipped otherwise.");
 		
 			float evilness_remaining = evilness - 25;
 			evilness_remaining -= $item[evil eye].available_amount() * 3;

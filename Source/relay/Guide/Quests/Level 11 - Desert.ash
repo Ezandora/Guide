@@ -204,7 +204,7 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         }
         else
         {
-            if ($item[uv-resistant compass].available_amount() == 0 && !(my_path_id() == PATH_LICENSE_TO_ADVENTURE && get_property_boolean("bondDesert")))
+            if ($item[uv-resistant compass].available_amount() == 0 && !(my_path_id() == PATH_LICENSE_TO_ADVENTURE && get_property_boolean("bondDesert")) && my_path_id() != PATH_EXPLOSIONS)
             {
                 line = "Acquire";
                 if (have_blacklight_bulb)

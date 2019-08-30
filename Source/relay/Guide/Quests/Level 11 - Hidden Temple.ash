@@ -11,6 +11,7 @@ void QLevel11HiddenTempleInit()
     else
         QuestStateParseMafiaQuestPropertyValue(state, "unstarted");
     if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path_id() == PATH_EXPLOSIONS) QuestStateParseMafiaQuestPropertyValue(state, "finished");
     state.quest_name = "Hidden Temple Unlock";
     state.image_name = "spooky forest";
 

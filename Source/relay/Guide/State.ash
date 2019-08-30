@@ -547,6 +547,8 @@ void setUpState()
         mysterious_island_unlocked = true;
     if (get_property_ascension("lastIslandUnlock"))
         mysterious_island_unlocked = true;
+    if (my_path_id() == PATH_EXPLOSION)
+    	mysterious_island_unlocked = true; //kinda
             
     
         
@@ -563,6 +565,8 @@ void setUpState()
 		__misc_state["desert beach available"] = true;
 	if ($locations[The Shore\, Inc. Travel Agency,the arid\, extra-dry desert,the oasis, south of the border].turnsAttemptedInLocation() > 0) //weird issues with detecting the beach. check if we've ever adventured there as a back-up
 		__misc_state["desert beach available"] = true;
+    if (my_path_id() == PATH_EXPLOSION)
+        __misc_state["desert beach available"] = true;
 	
 	string ballroom_song = "";
 	if (get_property_ascension("lastQuartetAscension"))
@@ -710,7 +714,7 @@ void setUpState()
     if (my_path_id() == PATH_LIVE_ASCEND_REPEAT)
         __misc_state["can reasonably reach -25% combat"] = true;
     
-    if (!in_bad_moon())
+    if (!in_bad_moon() && $item[hand turkey outline].is_unrestricted())
     {
         foreach s in $strings[spooky,sleaze,hot,cold,stench]
         {
@@ -784,7 +788,7 @@ void setUpState()
     else if (dispensary_available())
         soda_cost = $item[knob goblin seltzer].npc_price();
     else if (!in_ronin()) //can't buy from NPC, so have to use mall price:
-        soda_cost = $item[knob goblin seltzer].mall_price();
+        soda_cost = 100; //$item[knob goblin seltzer].mall_price(); //don't issue a mall search, we don't need it
     
     if (soda_cost > 0.0)
     {
@@ -801,7 +805,7 @@ void setUpState()
     }
     
     //FIXME all avatar paths:
-    if (my_path_id() == PATH_GELATINOUS_NOOB || my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_KOLHS || my_path_id() == PATH_CLASS_ACT_2 || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_THE_SOURCE)
+    if (my_path_id() == PATH_GELATINOUS_NOOB || my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_KOLHS || my_path_id() == PATH_CLASS_ACT_2 || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_THE_SOURCE || my_path_id() == PATH_EXPLOSIONS)
         __misc_state["sea access blocked"] = true;
 
 }

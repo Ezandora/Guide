@@ -309,8 +309,8 @@ void QNemesisGenerateClownTasks(ChecklistSubentry subentry)
     
     subentry.modifiers.listAppend("-combat");
     subentry.entries.listAppend("Search in the Fun House.");
-    int clownosity = numeric_modifier("Clownosity").floor();
-    int clownosity_needed = MAX(4 - clownosity, 0);
+    int clownosity = numeric_modifier("Clowniness").floor();
+    int clownosity_needed = MAX(100 - clownosity, 0);
     
     if (clownosity_needed > 0)
     {
@@ -320,12 +320,12 @@ void QNemesisGenerateClownTasks(ChecklistSubentry subentry)
         item [slot] possible_outfit;
         foreach it in $items[clown wig,clown whip,clownskin buckler,clownskin belt,clownskin harness,polka-dot bow tie,balloon sword,balloon helmet,foolscap fool's cap,bloody clown pants,clown shoes,big red clown nose]
         {
-            int clownosity = numeric_modifier(it, "clownosity").floor();
+            int clownosity = numeric_modifier(it, "Clowniness").floor();
             string description = it + " (" + clownosity + ")";
             if (it.available_amount() + it.creatable_amount() > 0 && it.equipped_amount() == 0 && it.can_equip())
             {
                 available_clown_sources.listAppend(description);
-                if (possible_outfit[it.to_slot()].numeric_modifier("clownosity").floor() < clownosity)
+                if (possible_outfit[it.to_slot()].numeric_modifier("Clowniness").floor() < clownosity)
                     possible_outfit[it.to_slot()] = it;
             }
             if (it.available_amount() == 0)
@@ -336,7 +336,7 @@ void QNemesisGenerateClownTasks(ChecklistSubentry subentry)
         int clownosity_possible = 0;
         foreach key in possible_outfit
         {
-            clownosity_possible += possible_outfit[key].numeric_modifier("clownosity").floor();
+            clownosity_possible += possible_outfit[key].numeric_modifier("Clowniness").floor();
             suggested_outfit.listAppend(possible_outfit[key]);
             if (clownosity_possible >= clownosity_needed)
                 break;
@@ -344,7 +344,7 @@ void QNemesisGenerateClownTasks(ChecklistSubentry subentry)
         //Remove extraneous pieces:
         foreach key in suggested_outfit
         {
-            int clownosity = suggested_outfit[key].numeric_modifier("clownosity").floor();
+            int clownosity = suggested_outfit[key].numeric_modifier("Clowniness").floor();
             if (clownosity_possible - clownosity >= clownosity_needed)
             {
                 clownosity_possible -= clownosity;
@@ -352,7 +352,7 @@ void QNemesisGenerateClownTasks(ChecklistSubentry subentry)
             }
             
         }
-        string line = "Need " + clownosity_needed + " more clownosity.";
+        string line = "Need " + clownosity_needed + " more clowniness.";
         
         if (available_clown_sources.count() > 0)
         {

@@ -55,7 +55,7 @@ void SMiscTasksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     
     }
 	
-	if (!have_outfit_components("Filthy Hippy Disguise") && __misc_state["mysterious island available"] && __misc_state["in run"] && !__quest_state["Level 12"].finished && !__quest_state["Level 12"].state_boolean["War started"] && !have_outfit_components("Frat Warrior Fatigues"))
+	if (!have_outfit_components("Filthy Hippy Disguise") && __misc_state["mysterious island available"] && __misc_state["in run"] && !__quest_state["Level 12"].finished && !__quest_state["Level 12"].state_boolean["War started"] && !have_outfit_components("Frat Warrior Fatigues") && my_path_id() != PATH_EXPLOSION)
 	{
 		item [int] missing_pieces = missing_outfit_components("Filthy Hippy Disguise");
         

@@ -19,7 +19,8 @@ void QUntinkerGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [i
 	QuestState base_quest_state = __quest_state["Untinker"];
 	if (base_quest_state.finished || !base_quest_state.startable)
 		return;
-		
+    
+    if (my_path_id() == PATH_EXPLOSION) return;
 	ChecklistSubentry subentry;
 	
 	subentry.header = base_quest_state.quest_name;

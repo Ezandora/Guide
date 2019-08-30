@@ -33,8 +33,6 @@ void QLevel11CopperheadInit()
 
 boolean QLevel11ShouldOutputCopperheadRoute(string which_route)
 {
-    if (my_level() < 11) return false;
-    
     if (__quest_state["Level 11"].mafia_internal_step < 3) //need diary
         return false;
     
@@ -52,7 +50,6 @@ boolean QLevel11ShouldOutputCopperheadRoute(string which_route)
     //want: output this in aftercore if they're adventuring there
     //want: output this in paths that do not allow the pirates (if such paths exist)
     //want: output this in-run if they're adventuring there
-    
     //soooo...
     
     if (which_route == "ron" && $location[the red zeppelin].turns_spent > 0)
@@ -64,6 +61,8 @@ boolean QLevel11ShouldOutputCopperheadRoute(string which_route)
     
     if (__misc_state["in run"] && ($location[a mob of zeppelin protesters].turns_spent + $location[the red zeppelin].turns_spent + $location[the copperhead club].turns_spent) > 0)
         return true;
+    
+    if (!$item[Talisman o' Namsilat].have()) return true;
     
     return false;
 }
@@ -91,10 +90,10 @@ void QLevel11RonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
 	if (base_quest_state.finished)
 		return;
     
-    
+     
     if (base_quest_state.mafia_internal_step <= 2 && base_quest_state.state_int["protestors remaining"] <= 1)
     {
-            subentry.entries.listAppend("Adventure in the mob of protestors.");
+        subentry.entries.listAppend("Adventure in the mob of protestors.");
     }
     else if (base_quest_state.mafia_internal_step <= 2)
     {
@@ -139,6 +138,20 @@ void QLevel11RonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
             what_not_not_to_wear.listAppend(it.to_string().replace_string("lynyrdskin ", ""));
         }
         
+        if ($item[pocket wish].have() || ($item[genie bottle].have() && get_property_int("_genieWishesUsed") < 3))
+        {
+            int current_sleaze_damage = numeric_modifier("sleaze damage") + numeric_modifier("sleaze spell damage");
+            string [int] options;
+            if ($effect[Fifty Ways to Bereave Your Lover].have_effect() == 0)
+            	options.listAppend("Fifty Ways to Bereave Your Lover for +100 sleaze damage");
+            if ($effect[Dirty Pear].have_effect() == 0)
+                options.listAppend("Dirty Pear for 2x sleaze damage; currently +" + current_sleaze_damage + " total damage");
+            string line = "Could wish for sleaze damage";
+            if (options.count() > 0)
+            	line += ", like " + options.listJoinComponents(", ", "or");
+            line += ".";
+        	subentry.entries.listAppend(line);
+        }
         float sleaze_protestors_cleared = MAX(3.0, sqrt(numeric_modifier("sleaze damage") + numeric_modifier("sleaze spell damage")));
         if (sleaze_protestors_cleared > 3)
             subentry.entries.listAppend(HTMLGenerateSpanOfClass("Sleaze", "r_element_sleaze") + " damage will clear " + sleaze_protestors_cleared.roundForOutput(1) + " protestors."); //FIXME do we want to list the amount they'll need to increase that?
@@ -310,14 +323,21 @@ void QLevel11ShenGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     {
         subentry.entries.listAppend("Adventure in the Copperhead Club and meet Shen.");
         subentry.entries.listAppend("This will give you unremovable -5 stat poison.");
+        if (my_daycount() == 1 && my_path_id() != PATH_EXPLOSIONS)
+        	subentry.entries.listAppend("Perhaps wait until tomorrow before starting this; day 2's shen bosses are more favourable.");
     }
     else if (base_quest_state.mafia_internal_step == 2)
     {
     	if (quest_location != $location[none])
+        {
             subentry.entries.listAppend("Adventure in " + quest_location + ".");
+            url = quest_location.getClickableURLForLocation();
+        }
         else
+        {
 	        subentry.entries.listAppend("Fight the first monster wherever Shen told you to go.");
-        url = "";
+        	url = "";
+        }
     }
     else if (base_quest_state.mafia_internal_step == 3)
     {
@@ -326,10 +346,15 @@ void QLevel11ShenGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     else if (base_quest_state.mafia_internal_step == 4)
     {
         if (quest_location != $location[none])
+        {
             subentry.entries.listAppend("Adventure in " + quest_location + ".");
+            url = quest_location.getClickableURLForLocation();
+        }
         else
+        {
         	subentry.entries.listAppend("Fight the second monster wherever Shen told you to go.");
-        url = "";
+        	url = "";
+        }
     }
     else if (base_quest_state.mafia_internal_step == 5)
     {
@@ -338,10 +363,15 @@ void QLevel11ShenGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     else if (base_quest_state.mafia_internal_step == 6)
     {
         if (quest_location != $location[none])
+        {
             subentry.entries.listAppend("Adventure in " + quest_location + ".");
+            url = quest_location.getClickableURLForLocation();
+        }
         else
+        {
         	subentry.entries.listAppend("Fight the third monster wherever Shen told you to go.");
-        url = "";
+        	url = "";
+        }
     }
     else if (base_quest_state.mafia_internal_step == 7)
     {

@@ -7,7 +7,7 @@ boolean HITSStillRelevant()
 		return false;
 	if (__quest_state["Level 13"].state_boolean["Richard's star key used"])
 		return false;
-	if (!__quest_state["Level 10"].finished)
+	if (!__quest_state["Level 10"].finished && my_path_id() != PATH_EXPLOSIONS)
 		return false;
         
 	return true;
@@ -146,7 +146,7 @@ void QHitsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] 
 		return;
 		
 	
-	if ($item[steam-powered model rocketship].available_amount() == 0)
+	if (!$location[the hole in the sky].locationAvailable())
 	{
 		//find a way to space:
 		subentry.modifiers.listAppend("-combat");

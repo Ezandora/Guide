@@ -10,7 +10,7 @@ void QLevel5Init()
 	state.council_quest = true;
 	
 	
-	if (my_level() >= 5)
+	if (my_level() >= 5 || my_path_id() == PATH_EXPLOSIONS)
 		state.startable = true;
 		
 	if (get_property("questL05Goblin") == "unstarted" && $item[knob goblin encryption key].available_amount() == 0 && my_path_id() != PATH_COMMUNITY_SERVICE)

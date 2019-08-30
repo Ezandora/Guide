@@ -35,6 +35,8 @@ void initialiseIOTMsUsable()
         __iotms_usable[lookupItem("heart-shaped crate")] = true;
     if (get_property_boolean("spacegateAlways") || get_property_boolean("_spacegateToday"))
         __iotms_usable[lookupItem("Spacegate access badge")] = true;
+    if (my_path_id() == PATH_EXPLOSIONS)
+    	__iotms_usable[lookupItem("Spacegate access badge")] = false;
     if (get_property_boolean("gingerbreadCityAvailable") || get_property_boolean("_gingerbreadCityToday"))
         __iotms_usable[$item[Build-a-City Gingerbread kit]] = true;
     if (lookupItem("kremlin's greatest briefcase").available_amount() > 0)
@@ -67,6 +69,8 @@ void initialiseIOTMsUsable()
     	__iotms_usable[$item[Order of the Green Thumb Order Form]] = true;
     if (get_property_boolean("daycareOpen"))
     	__iotms_usable[lookupItem("Boxing Day care package")] = true;
+    if (get_property_boolean("getawayCampsiteUnlocked"))
+        __iotms_usable[lookupItem("Distant Woods Getaway Brochure")] = true;
     if ($item[clan vip lounge key].item_amount() > 0)
     {
     	//FIXME all

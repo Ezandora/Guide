@@ -191,7 +191,7 @@ void IOTMDeckOfEveryCardGenerateResource(ChecklistEntry [int] resource_entries)
     summons.listAppend(DOECSummonMake("1952 Mickey Mantle", "Autosells for 10k."));
     
     
-    if (in_run)
+    if (in_run && my_path_id() != PATH_COMMUNITY_SERVICE)
     {
         int wool_needed = 0;
         if (!$location[the hidden park].locationAvailable())

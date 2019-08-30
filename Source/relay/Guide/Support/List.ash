@@ -1290,6 +1290,7 @@ int [int] stringToIntIntList(string input, string delimiter)
 		return out;
 	foreach key, v in input.split_string(delimiter)
 	{
+		if (v == "") continue;
 		out.listAppend(v.to_int());
 	}
 	return out;

@@ -422,7 +422,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
 		resource_entries.listAppend(ChecklistEntryMake("__item wand of pigification", "", ChecklistSubentryMake("Wand of pigification", "", "Use twice a day on monsters for good-level food."), 6));
     }
 		
-	int clovers_available = $items[disassembled clover,ten-leaf clover].available_amount();
+	int clovers_available = $items[disassembled clover,ten-leaf clover].available_amount() + $item[disassembled clover].closet_amount() + $item[ten-leaf clover].closet_amount();
 	if (my_path_id() == PATH_BEES_HATE_YOU || my_path_id() == PATH_G_LOVER)
 		clovers_available = $item[ten-leaf clover].item_amount() + $item[ten-leaf clover].closet_amount();
 	if (clovers_available > 0 && in_run)
@@ -440,6 +440,9 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
 		boolean have_all_gum = $item[pack of chewing gum].available_amount() > 0 || ($item[jaba&ntilde;ero-flavored chewing gum].available_amount() > 0 && $item[lime-and-chile-flavored chewing gum].available_amount() > 0 && $item[pickle-flavored chewing gum].available_amount() > 0 && $item[tamarind-flavored chewing gum].available_amount() > 0);
 		if (__quest_state["Level 4"].state_int["areas unlocked"] + $item[sonar-in-a-biscuit].available_amount() < 2)
 			subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("2 sonar-in-a-biscuit (Guano Junction)", $location[guano junction]));
+   
+   		if (__quest_state["Level 11 Ron"].mafia_internal_step <= 2 && __quest_state["Level 11 Ron"].state_int["protestors remaining"] > 1)
+            subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Mob of zeppelin protestors NC", $location[A Mob of Zeppelin Protesters]));         
 		if (!__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && !(get_property_boolean("lovebugsUnlocked") && $item[bottle of lovebug pheromones].is_unrestricted())) //taking a gamble here - I'm assuming you'd never clover for ultrahydrated if you have lovebugs. even if you run out of ultrahydrated, you'll likely get it again in a hurry
         {
 			subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Ultrahydrated (Oasis)", $location[the oasis]));
@@ -465,7 +468,13 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         }
 		//put relevant tower items here
 		
-		resource_entries.listAppend(ChecklistEntryMake("clover", "", subentry, 7));
+		resource_entries.listAppend(ChecklistEntryMake("clover", "", subentry, 7).ChecklistEntryTagEntry("clovers"));
+	}
+	if (in_run && $item[lucky pill].have() && availableSpleen() > 0)
+	{
+		string [int] description;
+        description.listAppend("Chew for clovers.");
+        resource_entries.listAppend(ChecklistEntryMake("__item lucky pill", "inventory.php?which=3&ftext=lucky+pill", ChecklistSubentryMake(pluralise($item[lucky pill]), "", description), importance_level_unimportant_item).ChecklistEntryTagEntry("clovers"));
 	}
 	if (in_run)
 	{
@@ -1092,7 +1101,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__item tonic djinn", "inventory.php?which=3&ftext=tonic+djinn", ChecklistSubentryMake("Tonic djinn", "", description), importance_level_unimportant_item));
     }
     
-    if ($item[V for Vivala mask].available_amount() > 0 && $item[V for Vivala mask].is_unrestricted() && !get_property_boolean("_vmaskBanisherUsed") && in_run)
+    if ($item[V for Vivala mask].have() && $item[V for Vivala mask].is_unrestricted() && !get_property_boolean("_vmaskBanisherUsed"))
     {
         string url;
         string [int] description;
@@ -1283,7 +1292,12 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
     }
     if (lookupItem("license to chill").available_amount() > 0 && !get_property_boolean("_licenseToChillUsed") && mafiaIsPastRevision(18122))
     {
-        resource_entries.listAppend(ChecklistEntryMake("__item License to Chill", "inventory.php?which=3&ftext=license+to+chill", ChecklistSubentryMake("License to Chill", "", "+5 adventures, extend effects by one turn, HP/MP restore, statgain"), 10));
+        resource_entries.listAppend(ChecklistEntryMake("__item License to Chill", "inventory.php?which=3&ftext=license+to+chill", ChecklistSubentryMake("License to Chill", "", "+5 adventures, extend effects by one turn, HP/MP restore, statgain."), 10));
+        
+    }
+    if (lookupItem("etched hourglass").available_amount() > 0 && !get_property_boolean("_etchedHourglassUsed"))
+    {
+        resource_entries.listAppend(ChecklistEntryMake("__item etched hourglass", "inventory.php?which=3&ftext=etched+hourglass", ChecklistSubentryMake("Etched Hourglass", "", "+5 adventures."), 10));
         
     }
     if ($item[mafia middle finger ring].available_amount() > 0 && !get_property_boolean("_mafiaMiddleFingerRingUsed"))

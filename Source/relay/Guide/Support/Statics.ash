@@ -44,6 +44,11 @@ static
     int PATH_DARK_GIFT = 35;
     int PATH_VAMPIRE = 35;
     int PATH_2CRS = 36;
+    int PATH_KINGDOM_OF_EXPLOATHING = 37;
+    int PATH_EXPLOSION = 37;
+    int PATH_EXPLOSIONS = 37;
+    int PATH_EXPLODING = 37;
+    int PATH_EXPLODED = 37;
 }
 
 
@@ -121,6 +126,8 @@ int initialiseMyPathID()
         __my_path_id_cached = PATH_DARK_GYFFTE;
     else if (path_name == "36" || path_name == "Two Crazy Random Summer")
         __my_path_id_cached = PATH_2CRS;
+    else if (path_name == "37" || path_name == "Kingdom of Exploathing")
+    	__my_path_id_cached = PATH_EXPLOSION;
     else
         __my_path_id_cached = PATH_UNKNOWN;
     return __my_path_id_cached;

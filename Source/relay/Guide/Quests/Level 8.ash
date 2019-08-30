@@ -25,7 +25,7 @@ void QLevel8Init()
 	
 	state.state_string["ore needed"] = get_property("trapperOre").HTMLEscapeString();
 	
-	if (my_level() >= 8)
+	if (my_level() >= 8 || my_path_id() == PATH_EXPLOSIONS)
 		state.startable = true;
 	
 	__quest_state["Level 8"] = state;

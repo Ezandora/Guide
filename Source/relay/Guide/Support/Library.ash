@@ -380,18 +380,39 @@ int substatsForLevel(int level)
 
 int availableFullness()
 {
-	return fullness_limit() - my_fullness();
+	int limit = fullness_limit();
+    if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING && limit == 0 && $skill[Replacement Stomach].have_skill())
+    {
+        limit += 5;
+    }
+	return limit - my_fullness();
 }
 
 int availableDrunkenness()
 {
-    if (inebriety_limit() == 0) return 0; //certain edge cases
-	return inebriety_limit() - my_inebriety();
+    int limit = inebriety_limit();
+    if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING && limit == 0 && $skill[Replacement Liver].have_skill())
+    {
+    	limit += 5;
+    }
+    if (limit == 0) return 0; //certain edge cases
+	return limit - my_inebriety();
 }
 
 int availableSpleen()
 {
-	return spleen_limit() - my_spleen_use();
+	int limit = spleen_limit();
+	if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING && limit == 0)
+	{
+        limit += 5; //always true
+		//mafia resets the limits to zero in the underworld because it does, so anti-mafia:
+        foreach s in $skills[Extra Spleen,Another Extra Spleen,Yet Another Extra Spleen,Still Another Extra Spleen,Just One More Extra Spleen,Okay Seriously\, This is the Last Spleen]
+        {
+        	if (s.have_skill())
+         		limit += 5;
+        }
+	} 
+	return limit - my_spleen_use();
 }
 
 item [int] missingComponentsToMakeItemPrivateImplementation(item it, int it_amounted_needed, int recursion_limit_remaining)
@@ -1626,5 +1647,15 @@ boolean equipped(item it)
 	return it.equipped_amount() > 0;
 }
 
+boolean have(item it)
+{
+	return it.available_amount() > 0;
+}
 
-
+boolean canAccessMall()
+{
+	if (!can_interact()) return false;
+	if (!get_property_boolean("autoSatisfyWithMall")) return false;
+	if (my_ascensions() == 0 && !get_property_ascension("lastDesertUnlock")) return false;
+	return true;
+}

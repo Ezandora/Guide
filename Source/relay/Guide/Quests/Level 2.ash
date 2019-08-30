@@ -11,7 +11,7 @@ void QLevel2Init()
 	state.image_name = "Spooky Forest";
 	state.council_quest = true;
 	
-	if (my_level() >= 2)
+	if (my_level() >= 2 || my_path_id() == PATH_EXPLOSIONS)
 		state.startable = true;
 	
 	if (state.in_progress)

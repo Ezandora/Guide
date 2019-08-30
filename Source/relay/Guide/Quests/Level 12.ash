@@ -38,6 +38,8 @@ void QLevel12Init()
 		state.state_boolean["Nuns Finished"] = true;
 		state.state_boolean["Orchard Finished"] = true;
 	}
+	if (my_path_id() == PATH_EXPLOSIONS)
+		state.state_boolean["Lighthouse Finished"] = true;
     int quests_completed_hippy = 0;
     int quests_completed_frat = 0;
     
@@ -84,7 +86,7 @@ void QLevel12Init()
 		state.state_boolean["Orchard Finished"] = false;
 	}
 	
-	if (my_level() >= 12)
+	if (my_level() >= 12 && my_path_id() != PATH_EXPLOSIONS)
 		state.startable = true;
     
 	__quest_state["Level 12"] = state;
@@ -213,6 +215,10 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 		if (brigand_meat_drop_range.x != 0 && brigand_meat_drop_range.y != 0)
 			turn_range = vec2iMake(ceil(to_float(meat_remaining) / to_float(brigand_meat_drop_range.y)),
 			ceil(to_float(meat_remaining) / to_float(brigand_meat_drop_range.x)));
+        if (my_path_id() == PATH_2CRS)
+        	turn_range = Vec2iMake(MAX(100, turn_range.x), MAX(100, turn_range.y));
+        
+            
 		
   		string turns_extra = ".";
       	string [int] extra_details;
@@ -642,9 +648,98 @@ void QLevel12GenerateBattlefieldDescription(ChecklistSubentry subentry, string s
     }
 }
 
+void QLevel12ExplosionsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    if (my_path_id() != PATH_EXPLOSIONS) return;
+	if (QuestState("questL12HippyFrat").finished) return;
+	
+	string [int] description;
+	string url = "place.php?whichplace=exploathing";
+	
+	int fratboys_defeated = get_property_int("fratboysDefeated");
+    int hippies_defeated = get_property_int("hippiesDefeated");
+    int fratboys_left = clampi(333 - fratboys_defeated, 0, 333);
+    int hippies_left = clampi(333 - hippies_defeated, 0, 333);
+    
+    if (!have_outfit_components("War Hippy Fatigues") && !have_outfit_components("Frat Warrior Fatigues"))
+    	description.listAppend("Find a uniform. Either calculate the universe 151st + YR, wish + YR?, pull, or yellow-ray a battlefield enemy with the outfit?");
+    else if (!is_wearing_outfit("War Hippy Fatigues") && !is_wearing_outfit("Frat Warrior Fatigues"))
+    {
+    	description.listAppend("Equip a war outfit first.");
+    	url = "inventory.php?which=2";
+    }
+    if ($items[jacob's rung,haunted paddle-ball].available_amount() == 0)
+    {
+        description.listAppend((!in_hardcore() ? "Pull/" : "") + "YR a jacob's rung or haunted paddle-ball, from the top floor of spookyraven manor.|Jacob's adder in the Haunted Laboratory or possessed toy chest in the The Haunted Nursery have them.");
+    }
+    else if ($items[jacob's rung,haunted paddle-ball].equipped_amount() == 0)
+    {
+        if ($item[haunted paddle-ball].have())
+        {
+            description.listAppend("Equip haunted paddle-ball first.");
+            url = "inventory.php?which=2";
+        }
+        else if ($item[jacob's rung].have())
+        {
+            description.listAppend("Equip jacob's rung first.");
+            url = "inventory.php?which=2";
+        }
+    }
+    boolean likely_fighting_frats = false;
+    if (fratboys_defeated > 0 && fratboys_defeated > hippies_defeated)
+    {
+    	likely_fighting_frats = true;
+    	if (fratboys_left <= 0)
+     	   	description.listAppend("Fight the Man!");
+        else
+            description.listAppend("Defeat " + pluralise(fratboys_left, "more fratboy", "more fratboys") + ".");
+    }
+    else
+    {
+        if (hippies_left <= 0)
+            description.listAppend("Fight the Big Wisniewski!");
+        else
+            description.listAppend("Defeat " + pluralise(hippies_left, "more hippy", "more hippies") + ".");
+    }
+    
+    
+    int battlefield_turns = lookupLocation("The Exploaded Battlefield").turns_spent;
+    int turns_until_next_war_nc = -1;
+    if (battlefield_turns < 7)
+        turns_until_next_war_nc = 7 - battlefield_turns;
+    else
+    {
+        turns_until_next_war_nc = (battlefield_turns + 7) % 7;
+        if (turns_until_next_war_nc != 0)
+        	turns_until_next_war_nc = 7 - turns_until_next_war_nc;
+    }
+    
+    if (turns_until_next_war_nc == 0)
+    {
+        description.listAppend("Non-combat now. Throw high-adventure consumable to speed up war.");
+    }
+    else
+    	description.listAppend(pluraliseWordy(turns_until_next_war_nc, "More Turn", "more turns").capitaliseFirstLetter() + " until war NC.");
+    
+    
+    if (likely_fighting_frats)
+    {
+        if (lookupItems("space wine").available_amount() == 0)
+            description.listAppend("Buy some space wine for the non-combat.");
+    }
+    else
+    {
+    	if (lookupItems("pie man was not meant to eat,space chowder").available_amount() == 0)
+            description.listAppend("Buy some space chowder for the non-combat.");
+    }
+	
+	task_entries.listAppend(ChecklistEntryMake("island war", url, ChecklistSubentryMake("War!", "", description), 0));
+}
 
 void QLevel12GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
+	if (my_path_id() == PATH_EXPLOSIONS)
+		QLevel12ExplosionsGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	if (!__quest_state["Level 12"].in_progress)
 		return;
 	

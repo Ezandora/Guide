@@ -57,9 +57,6 @@ void PathSneakyPeteGenerateResource(ChecklistEntry [int] resource_entries)
         
         string [int] targets;
         //√banshee, √a batrat for sonar, √harem girl (contested), √burly sidekick, √quiet healer, √filthworms, √f'c'le without natural dancer, √a-boo clues
-        if (!$skill[Natural Dancer].skill_is_usable() && !__quest_state["Pirate Quest"].finished && $item[talisman o' namsilat].available_amount() == 0)
-            targets.listAppend("Three times in the F'c'le, if you can't acquire Natural Dancer/+234% items.");
-            
         if (!__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && !__quest_state["Level 11 Desert"].state_boolean["Killing Jar Given"] && $item[killing jar].available_amount() == 0)
             targets.listAppend("Haunted Library - Banshee - Killing Jar to speed up desert exploration.");
         if (__quest_state["Level 4"].state_int["areas unlocked"] + $item[sonar-in-a-biscuit].available_amount() < 3)

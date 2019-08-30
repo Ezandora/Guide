@@ -88,6 +88,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 {
 	if (!__quest_state["Manor Unlock"].in_progress && __misc_state["in run"])
 		return;
+    if (my_level() < 5 && my_ascensions() == 0 && !QuestState("questM21Dance").in_progress) return; //not yet possible
     
     boolean should_output_optionally = false;
     boolean should_output_futurally = false;
@@ -334,7 +335,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     {
         //telegram is removed on using it, even on old copies of mafia
         subentry.header = "Read telegram from Lady Spookyraven";
-        url = "inventory.php?which=3";
+        url = "inventory.php?which=3&ftext=telegram+from+Lady+Spookyraven";
         image_name = "__item telegram from Lady Spookyraven";
     }
     else if (to_item("7301").available_amount() == 0) //Spookyraven billiards room key

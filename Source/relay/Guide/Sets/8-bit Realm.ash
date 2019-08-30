@@ -66,6 +66,7 @@ void S8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         optional_task_entries.listAppend(ChecklistEntryMake("__item digital key", active_url, ChecklistSubentryMake(title, modifiers, description), $locations[fear man's level]));
         need_route_output = false;
     }
+    if (my_path_id() == PATH_EXPLOSIONS) need_route_output = false;
     if (need_route_output)
     {
         if (in_hardcore() || !$item[jar of psychoses (The Crackpot Mystic)].is_unrestricted())

@@ -82,6 +82,8 @@ void SemirareGenerateDescription(string [int] description)
 			semirares.listAppend(LocationChoiceMake($location[the limerick dungeon], "|*+100% items eyedrops (10 turns), for tomb rats and low drops.", 0));
         if (in_bad_moon() && $item[bram's choker].available_amount() == 0)
 			semirares.listAppend(LocationChoiceMake($location[The Haunted Boiler Room], "|*-5% combat accessory.", 0));
+        if (__quest_state["Level 11 Ron"].mafia_internal_step <= 2 && __quest_state["Level 11 Ron"].state_int["protestors remaining"] > 1 && my_path_id() != PATH_COMMUNITY_SERVICE)
+            semirares.listAppend(LocationChoiceMake($location[A Mob of Zeppelin Protesters], "|*Instant choice non-combat.", 0));
 		//three turn generation SRs go here
 		if (my_path_id() != PATH_SLOW_AND_STEADY)
 		{
@@ -109,7 +111,7 @@ void SemirareGenerateDescription(string [int] description)
             if (!can_create_golem)
                 semirares.listAppend(LocationChoiceMake($location[Ye Olde Medievale Villagee], "Small golem (towerkilling)", 0));
         }*/
-        if (in_bad_moon() && __quest_state["Level 13"].state_boolean["shadow will need to be defeated"] && $item[scented massage oil].available_amount() + $item[scented massage oil].closet_amount() == 0 && !$skill[Ambidextrous Funkslinging].have_skill())
+        if ((in_bad_moon() || my_path_id() == PATH_EXPLOSIONS) && __quest_state["Level 13"].state_boolean["shadow will need to be defeated"] && $item[scented massage oil].available_amount() + $item[scented massage oil].closet_amount() == 0 && !$skill[Ambidextrous Funkslinging].have_skill())
             semirares.listAppend(LocationChoiceMake($location[Cobb's Knob Harem], "|*Scented massage oil for shadow.", 0)); //theoretically, we could ignore this for DBs that aren't in a black cat run
 	}
 		

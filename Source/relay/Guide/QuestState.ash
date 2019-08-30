@@ -121,3 +121,10 @@ QuestState QuestState(string property_name)
     QuestStateParseMafiaQuestProperty(state, property_name);
     return state;
 }
+
+QuestState QuestStateFromManualStep(string manual_value)
+{
+    QuestState state;
+    state.QuestStateParseMafiaQuestPropertyValue(manual_value);
+    return state;
+}

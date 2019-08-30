@@ -41,7 +41,7 @@ void QLevel9Init()
 		state.state_int["bridge lumber needed"] = lumber_needed;
 	}
 	
-	if (my_level() >= 9)
+	if (my_level() >= 9 || my_path_id() == PATH_EXPLOSIONS)
 		state.startable = true;
 		
 	

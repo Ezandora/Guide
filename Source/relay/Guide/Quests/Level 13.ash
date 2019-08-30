@@ -443,7 +443,7 @@ void QLevel13Init()
             other_quests_completed = false;
         }
     }
-    if (other_quests_completed && my_level() >= 13)
+    if (other_quests_completed && (my_level() >= 13 || my_path_id() == PATH_EXPLOSIONS))
         state.startable = true;
     
 	
@@ -772,10 +772,119 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         {
             subentry.entries.listAppend("Either find the beehive in the black forest (-combat), or towerkill.");
             subentry.entries.listAppend("Lots of passive damage sources.");
-            subentry.entries.listAppend("This will be suggested in a future version, sorry...|Good luck!");
-            //FIXME REST
-            //adding passive damage sources, calculating their effect
-            //possibly do it externally, such that we can reuse it for the sea and removing it for level three?
+            if (my_path_id() == PATH_BIG)
+            	subentry.entries.listAppend("Towerkilling is likely impractical in BIG?");
+            //Originally I wanted this to properly calculate the exact amount of damage you can do against the wall of skin.
+            //But, I feel like that would be super complicated and prone to error.
+            //So, we'll just give suggestions and hope it works out.
+            boolean have_prismatic_damage = true;
+            string [int] prismatic_damage_needed;
+            foreach e in $elements[hot,cold,sleaze,stench,spooky]
+            {
+            	if (numeric_modifier(e + " damage") > 0) continue;
+                have_prismatic_damage = false;
+                prismatic_damage_needed.listAppend(e);
+            }
+            string [int] methods;
+            string [int] skills_to_cast;
+            foreach s in $skills[spiky shell,Jalape&ntilde;o Saucesphere,The Psalm of Pointiness,Scarysauce]
+            {
+                if (s.to_effect().have_effect() > 0)
+                    continue;
+                if (!s.have_skill())
+                    continue;
+                if (!s.is_unrestricted())
+                    continue;
+                skills_to_cast.listAppend(s);
+            }
+            if (skills_to_cast.count() > 0)
+            {
+                methods.listAppend("Cast " + skills_to_cast.listJoinComponents(", ", "and") + ".");
+            }
+            if ($item[colorful toad].have() && $item[colorful toad].item_is_usable() && $item[colorful toad].to_effect().have_effect() == 0 && !have_prismatic_damage && my_path_id() != PATH_2CRS)	
+                methods.listAppend("Use colorful toad for +prismatic damage.");
+            familiar desired_familiar = $familiar[none];
+            if ($familiar[mu].familiar_is_usable())
+            {
+            	methods.listAppend("Run extra +familiar weight for your mu; it will attack more often.");
+            	desired_familiar = $familiar[mu];
+            }
+            else if ($familiar[Imitation Crab].familiar_is_usable())
+                desired_familiar = $familiar[Imitation Crab];
+            else if ($familiar[Sludgepuppy].familiar_is_usable())
+                desired_familiar = $familiar[Sludgepuppy];
+            else if ($familiar[mini-crimbot].familiar_is_usable())
+            {
+                desired_familiar = $familiar[mini-crimbot];
+                //(crimbotArm - "STAL-1 UltraFist" or "Frostronic Hypercoil"/crimbotChassis - "Music Box Box"/crimbotPropulsion - "X-1 Hover Rocket")
+                string [int] configure_options;
+                if (get_property("crimbotChassis") == "")
+                    configure_options.listAppend("Music Box Box");
+                if (get_property("crimbotArm") == "")
+                	configure_options.listAppend("STAL-1 UltraFist");
+                if (get_property("crimbotPropulsion") == "")
+                    configure_options.listAppend("X-1 Hover Rocket");
+                if (configure_options.count() > 0)
+	                methods.listAppend("Configure mini-crimbot for " + configure_options.listJoinComponents(" / ") + ".");
+            }
+            
+            if (!__misc_state["familiars temporarily blocked"] && desired_familiar != $familiar[none] && my_familiar() != desired_familiar)
+            {
+            	methods.listAppend("Switch to familiar " + desired_familiar + ".");
+            }
+            item [int] items_to_equip;
+            foreach it in $items[hand in glove,bottle opener belt buckle,buddy bjorn,smirking shrunken head,kremlin's greatest briefcase]
+            {
+            	if (!it.have()) continue;
+                if (it.equipped()) continue;
+            	items_to_equip.listAppend(it);
+            }
+            if (items_to_equip.count() > 0)
+            {
+            	methods.listAppend("Equip " + items_to_equip.listJoinComponents(", ", "and") + "?");
+            }
+            if ($item[buddy bjorn].equipped() && $familiar[misshapen animal skeleton].familiar_is_usable() && my_bjorned_familiar() != $familiar[misshapen animal skeleton])
+            	methods.listAppend("Put misshapen animal skeleton in the buddy bjorn.");
+            	
+            if (!have_prismatic_damage)
+            {
+            	methods.listAppend("Gain prismatic damage. Need " + prismatic_damage_needed.listJoinComponents(", ", "and") + ".");
+            }
+            
+            if (monster_level_adjustment() > 0)
+                methods.listAppend("Reduce monster level.");
+            	
+            
+            string [int] attack_methods;
+            if ($skill[shieldbutt].skill_is_usable())
+            	attack_methods.listAppend("shieldbutt if you can hit" + ($slot[off-hand].equipped_item().item_type() != "shield" ? " but equip a shield first" : ""));
+            if ($skill[headbutt].skill_is_usable())
+                attack_methods.listAppend("headbutt if you can hit" + ($slot[hat].equipped_item() == $item[none] ? " but equip a hat first" : ""));
+            if ($skill[belch the rainbow].skill_is_usable())
+                attack_methods.listAppend("belch the rainbow");
+            if ($skill[clobber].skill_is_usable())
+                attack_methods.listAppend("clobber");
+            attack_methods.listAppend("regular attack(?)");
+            if (attack_methods.count() > 0)
+            {
+                methods.listAppend("Attack using " + attack_methods.listJoinComponents(", ", "or") + ".");
+            }
+            
+            /*
+            
+                item best_shield = $item[none];
+                foreach it in __items_shields
+                {
+                    if (it.to_slot() != $slot[off-hand]) continue;
+                    if (it.item_type() != "shield") continue;
+                    if (!it.can_equip()) continue;
+                    if (it.available_amount() == 0) continue;
+                    if (it.get_power() > best_shield.get_power() || best_shield == $item[none])
+                        best_shield = it;
+                }
+            */
+            if (methods.count() > 0)
+            	subentry.entries.listAppend("Towerkilling ideas:|*" + methods.listJoinComponents("<hr>"));
             if (my_hp() < my_maxhp())
             {
                 //FIXME only output this if we won't make it.
@@ -930,10 +1039,13 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 boolean need_modifier_output = true;
                 if (my_familiar() != $familiar[magic dragonfish] && $familiar[magic dragonfish].familiar_is_usable() && !__misc_state["familiars temporarily blocked"])
                     subentry.entries.listAppend("Potentially switch to the magic dragonfish.");
-                    
+                if ($item[meteorb].have() && !$item[meteorb].equipped())
+                	subentry.entries.listAppend("Potentially equip meteorb.");
                 //Calculate saucegeyser damage:
                 float expected_saucegeyser_damage = skillExpectedDamageRangeAlternate($monster[wall of bones], $skill[saucegeyser]).x;
-                
+                if ($item[meteorb].equipped())
+                	expected_saucegeyser_damage *= 2.0;
+                    
                 subentry.entries.listAppend("Expected saucegeyser minimum damage: " + expected_saucegeyser_damage.roundForOutput(0));
                 if (expected_saucegeyser_damage >= 5000.0)
                 {

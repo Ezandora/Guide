@@ -48,8 +48,8 @@ void SOlfactionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         }
         if (!have_outfit_components("Knob Goblin Harem Girl Disguise"))
             location_wanted_monster[$location[cobb's knob harem]] = $monster[Knob Goblin Harem Girl];
-        if (in_hardcore())
-            location_wanted_monster[$location[The Dark Neck of the Woods]] = $monster[Hellion];
+        //if (in_hardcore())
+            //location_wanted_monster[$location[The Dark Neck of the Woods]] = $monster[Hellion];
         if ($skill[summon smithsness].skill_is_usable() && $item[dirty hobo gloves].available_amount() == 0 && $item[hand in glove].available_amount() == 0 && __misc_state["need to level"])
         {
             location_wanted_monster[$location[The Sleazy Back Alley]] = $monster[drunken half-orc hobo];
