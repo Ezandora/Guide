@@ -1201,7 +1201,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         }
         
         string [int] healing_items_available;
-        foreach it in $items[filthy poultice,gauze garter,red pixel potion,Dreadsylvanian seed pod,soggy used band-aid,Mer-kin healscroll,scented massage oil,extra-strength red potion,red potion]
+        foreach it in $items[filthy poultice,gauze garter,sew-on bandage,red pixel potion,Dreadsylvanian seed pod,soggy used band-aid,Mer-kin healscroll,scented massage oil,extra-strength red potion,red potion]
         {
             if (it.item_amount() == 0)
                 continue;
