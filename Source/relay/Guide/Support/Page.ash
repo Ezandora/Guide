@@ -296,8 +296,13 @@ void PageInit()
 	PageAddCSSClass("", "r_centre", "margin-left:auto; margin-right:auto;text-align:center;");
 	PageAddCSSClass("", "r_bold", "font-weight:bold;");
 	PageAddCSSClass("", "r_end_floating_elements", "clear:both;");
+
+	PageAddCSSClass("", "r_element_important", "color: red;");
 	
-	
+	PageAddCSSClass("", "r_element_good", "color: rgb(0, 128, 0);");
+	PageAddCSSClass("", "r_element_awesome", "color: rgb(0, 0, 255);");
+	PageAddCSSClass("", "r_element_epic", "color: rgb(138, 43, 226);");
+
 	PageAddCSSClass("", "r_element_stench", "color:green;");
 	PageAddCSSClass("", "r_element_hot", "color:red;");
 	PageAddCSSClass("", "r_element_cold", "color:blue;");

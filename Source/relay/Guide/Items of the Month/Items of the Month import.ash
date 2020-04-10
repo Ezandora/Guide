@@ -47,12 +47,17 @@ import "relay/Guide/Items of the Month/Bastille Battalion.ash";
 import "relay/Guide/Items of the Month/Latte.ash";
 import "relay/Guide/Items of the Month/Voting Booth.ash";
 import "relay/Guide/Items of the Month/Boxing Daycare.ash";
+
+// 2019
 import "relay/Guide/Items of the Month/Kramco Sausage-o-Matic.ash";
 import "relay/Guide/Items of the Month/Lil Doctor Bag.ash";
-import "relay/Guide/Items of the Month/May Saber.ash";
 import "relay/Guide/Items of the Month/Vampire Cloak.ash";
+// PirateRealm
+import "relay/Guide/Items of the Month/May Saber.ash";
+import "relay/Guide/Items of the Month/Rune Spoon.ash";
 import "relay/Guide/Items of the Month/Beach Comb.ash";
 import "relay/Guide/Items of the Month/Getaway Campsite.ash";
-import "relay/Guide/Items of the Month/Rune Spoon.ash";
-
-
+import "relay/Guide/Items of the Month/Pocket Professor.ash";
+import "relay/Guide/Items of the Month/Eight Days a week Pills.ash";
+import "relay/Guide/Items of the Month/Pizza Cube.ash";
+import "relay/Guide/Items of the Month/Red Nosed Snapper.ash";
