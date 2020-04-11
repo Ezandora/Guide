@@ -11,7 +11,7 @@ svn checkout https://github.com/cdrock/TourGuide/branches/Release/
 
 Once it's installed, look in the relay browser. In the upper-right, there will be a "-run script-" menu:
 
-![Instructions](https://raw.github.com/Ezandora/Guide/master/Images/Instructions.png)
+![Instructions](https://imgur.com/JqFqsBm)
 
 Select Guide. Guide will install itself into the window, and will automatically update as you go along.
 
