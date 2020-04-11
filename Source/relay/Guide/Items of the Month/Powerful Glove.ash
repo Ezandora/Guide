@@ -44,17 +44,19 @@ void IOTMPowerfulGloveGenerateResource(ChecklistEntry [int] resource_entries)
 RegisterTaskGenerationFunction("IOTMPowerfulGloveTask");
 void IOTMPowerfulGloveTask(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-    ChecklistSubentry getExtraCoins() {
+    ChecklistSubentry getExtraPixels() {
         // Title
-        string main_title = "Get extra coins";
+        string main_title = "Get extra pixels";
+        if (my_path_id() == PATH_OF_THE_PLUMBER) {
+            main_title = main_title + " and coins";
+        }
 
         // Subtitle
         string subtitle = "";
 
         // Entries
         string [int] description;
-        print(my_path_id());
-        if (my_path_id() == PATH_OF_THE_PLUMBER && !have_equipped($item[Powerful Glove])) {
+        if (!have_equipped($item[Powerful Glove])) {
             description.listAppend("Equip Powerful Glove");
         }
 
@@ -64,13 +66,16 @@ void IOTMPowerfulGloveTask(ChecklistEntry [int] task_entries, ChecklistEntry [in
 	if (!lookupItem("Powerful Glove").have()) return;
 	
     ChecklistEntry entry;
-    entry.image_lookup_name = "__item coin";
-    entry.url = "skillz.php";
-    entry.importance_level = -10;
+    entry.image_lookup_name = "__item white pixel";
+    entry.url = "/place.php?whichplace=forestvillage&action=fv_mystic";
 
-    ChecklistSubentry extraCoins = getExtraCoins();
-    if (extraCoins.entries.count() > 0) {
-        entry.subentries.listAppend(extraCoins);
+    if (my_path_id() == PATH_OF_THE_PLUMBER) {
+        entry.importance_level = -10;
+    }
+
+    ChecklistSubentry extraPixels = getExtraPixels();
+    if (extraPixels.entries.count() > 0) {
+        entry.subentries.listAppend(extraPixels);
     }
     
     if (entry.subentries.count() > 0) {
