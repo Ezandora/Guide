@@ -149,7 +149,7 @@ void PathAvatarOfWestOfLoathingGenerateTasks(ChecklistEntry [int] task_entries, 
     tale_for_class[$class[Snake Oiler]] = $item[Tales of the West: Snake Oiling];
     
     boolean [class] have_advanced_skills_for_class;
-    if ($skill[Unleash Cowrruption].have_skill() || $skill[Hard Drinker].have_skill() || $skill[Walk: Cautious Prowl].have_skill())
+    if ($skill[Unleash Cowrruption].have_skill() || $skill[[18008]Hard Drinker].have_skill() || $skill[Walk: Cautious Prowl].have_skill())
         have_advanced_skills_for_class[$class[Cow Puncher]] = true;
     if ($skill[Beancannon].have_skill() || $skill[Prodigious Appetite].have_skill() || $skill[Walk: Prideful Strut].have_skill())
         have_advanced_skills_for_class[$class[Beanslinger]] = true;
