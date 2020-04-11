@@ -61,3 +61,6 @@ import "relay/Guide/Items of the Month/Pocket Professor.ash";
 import "relay/Guide/Items of the Month/Eight Days a week Pills.ash";
 import "relay/Guide/Items of the Month/Pizza Cube.ash";
 import "relay/Guide/Items of the Month/Red Nosed Snapper.ash";
+
+// 2020
+import "relay/Guide/Items of the Month/Bird-a-Day Calendar.ash";
