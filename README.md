@@ -1,21 +1,12 @@
 Guide
 =====
 
-Quick note on updating
-----------------------
-The "svn update" command formerly had a bug which will, on occasion, prevent Guide from updating correctly and not print a warning about it. As such, to update, you may need to run these commands:
-
-<pre>
-svn delete Ezandora-Guide-branches-Release
-svn checkout https://github.com/cdrock/Guide/branches/Release/
-</pre>
-
 How do I use it?
 ----------------
 First, install it by running this command in KoLmafia's graphical CLI:
 
 <pre>
-svn checkout https://github.com/cdrock/Guide/branches/Release/
+svn checkout https://github.com/cdrock/TourGuide/branches/Release/
 </pre>
 
 Once it's installed, look in the relay browser. In the upper-right, there will be a "-run script-" menu:
@@ -32,9 +23,9 @@ svn update
 
 What does it do?
 ----------------
-Guide.ash is a relay script which will give advice on playing the web game [Kingdom of Loathing](http://www.kingdomofloathing.com) within [KoLmafia, a third-party tool](http://kolmafia.sourceforge.net). It details how to complete quests you're on, and what resources you have available.
+TourGuide is a relay script which will give advice on playing the web game [Kingdom of Loathing](http://www.kingdomofloathing.com) within [KoLmafia, a third-party tool](http://kolmafia.sourceforge.net). It details how to complete quests you're on, and what resources you have available.
 
-During an ascension, it will inform you what you need to know to complete your ascension as quickly as possible. Faxing, the daily dungeon, acquiring a wand, where to go next.
+During an ascension, it will inform you what you need to know to complete your ascension as quickly as possible.
 
 The script runs side-by-side with KOL. Leave the window open, and it'll update as you go along.
 
@@ -50,7 +41,6 @@ Reminders:
 ![Reminders 3](https://raw.github.com/Ezandora/Guide/master/Images/Reminders 3.png)
 
 The script will inform you of many resources you have - free runaways, hipster fights, semi-rares, etc. - and ideas on what to use them on.
-There is preliminary support for the florist friar and what to pull. It also works in aftercore.
 
 Screenshots:
 
@@ -63,10 +53,11 @@ Quests supported: All council quests, azazel, pretentious artist, untinker, lege
 
 Development guidelines
 ---------------------
-The release above is a compiled version of the development version, which can be found by checking out https://github.com/cdrock/Guide/trunk/Source/ instead. If you wish to edit the script easily, start there.
-The release is compiled via Compile ASH script.rb, which collects the seventy or so scripts into one for ease of release.
+The release above is a compiled version of the development version, which can be found by checking out https://github.com/cdrock/TourGuide/trunk/Source/ instead. If you wish to edit the script easily, start there.
+The release is compiled via Compile ASH script.rb, which collects many scripts into one for ease of release.
 Currently, the only guidelines are avoid visit_url(), as well as any connection to KOL's servers. This is meant to be a local application.
 
 This script, as well as its support scripts, are in the public domain.
 
 Contact me in-game: cdrock (#2912644)
+Or in discord: cdrock7#1898
