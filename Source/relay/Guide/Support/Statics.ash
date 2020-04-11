@@ -49,6 +49,7 @@ static
     int PATH_EXPLOSIONS = 37;
     int PATH_EXPLODING = 37;
     int PATH_EXPLODED = 37;
+    int PATH_OF_THE_PLUMBER = 38;
 }
 
 
@@ -128,6 +129,8 @@ int initialiseMyPathID()
         __my_path_id_cached = PATH_2CRS;
     else if (path_name == "37" || path_name == "Kingdom of Exploathing")
     	__my_path_id_cached = PATH_EXPLOSION;
+    else if (path_name == "38" || path_name == "Path of the Plumber")
+    	__my_path_id_cached = PATH_OF_THE_PLUMBER;
     else
         __my_path_id_cached = PATH_UNKNOWN;
     return __my_path_id_cached;

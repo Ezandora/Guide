@@ -64,3 +64,4 @@ import "relay/Guide/Items of the Month/Red Nosed Snapper.ash";
 
 // 2020
 import "relay/Guide/Items of the Month/Bird-a-Day Calendar.ash";
+import "relay/Guide/Items of the Month/Powerful Glove.ash";
