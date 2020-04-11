@@ -37,13 +37,17 @@ import "relay/Guide/Items of the Month/GenieBottle.ash";
 import "relay/Guide/Items of the Month/Horsery.ash";
 import "relay/Guide/Items of the Month/XO Skeleton.ash";
 import "relay/Guide/Items of the Month/Portable Pantogram.ash";
+
+// 2018
 import "relay/Guide/Items of the Month/Garbage Tote.ash";
 import "relay/Guide/Items of the Month/Zutara.ash";
-import "relay/Guide/Items of the Month/Neverending Party.ash";
+// Missing: Pokefam
+// Missing: FantasyRealm
 import "relay/Guide/Items of the Month/God Lobster.ash";
 import "relay/Guide/Items of the Month/BoomBox.ash";
 import "relay/Guide/Items of the Month/Cat Burglar.ash";
 import "relay/Guide/Items of the Month/Bastille Battalion.ash";
+import "relay/Guide/Items of the Month/Neverending Party.ash";
 import "relay/Guide/Items of the Month/Latte.ash";
 import "relay/Guide/Items of the Month/Voting Booth.ash";
 import "relay/Guide/Items of the Month/Boxing Daycare.ash";
@@ -52,7 +56,7 @@ import "relay/Guide/Items of the Month/Boxing Daycare.ash";
 import "relay/Guide/Items of the Month/Kramco Sausage-o-Matic.ash";
 import "relay/Guide/Items of the Month/Lil Doctor Bag.ash";
 import "relay/Guide/Items of the Month/Vampire Cloak.ash";
-// PirateRealm
+// Missing: PirateRealm
 import "relay/Guide/Items of the Month/May Saber.ash";
 import "relay/Guide/Items of the Month/Rune Spoon.ash";
 import "relay/Guide/Items of the Month/Beach Comb.ash";
@@ -65,3 +69,5 @@ import "relay/Guide/Items of the Month/Red Nosed Snapper.ash";
 // 2020
 import "relay/Guide/Items of the Month/Bird-a-Day Calendar.ash";
 import "relay/Guide/Items of the Month/Powerful Glove.ash";
+import "relay/Guide/Items of the Month/Better Shrooms and Gardens.ash";
+// Missing: Left-Hand Man
