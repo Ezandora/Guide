@@ -19,17 +19,16 @@ void QLevel6Init()
 float QLevel6TurnsToCompleteArea(location place)
 {
     //FIXME not sure how accurate these calculations are.
-    //First NC will always happen at 6, second at 11, third at 16.
     int turns_spent_in_zone = turnsAttemptedInLocation(place); //not always accurate
     int ncs_found = noncombatTurnsAttemptedInLocation(place);
     
     boolean [string] area_known_ncs;
     if (place == $location[the dark neck of the woods])
-        area_known_ncs = $strings[How Do We Do It? Quaint and Curious Volume!,Strike One!,Dodecahedrariffic!];
+        area_known_ncs = $strings[How Do We Do It? Quaint and Curious Volume!,Strike One!,Olive My Love To You\, Oh.,Dodecahedrariffic!];
     if (place == $location[The Dark Heart of the Woods])
-        area_known_ncs = $strings[Moon Over the Dark Heart,Running the Lode,Imp Be Nimble\, Imp Be Quick];
+        area_known_ncs = $strings[Moon Over the Dark Heart,Running the Lode,I\, Martin,Imp Be Nimble\, Imp Be Quick];
     if (place == $location[The Dark Elbow of the Woods])
-        area_known_ncs = $strings[Deep Imp Act,Imp Art\, Some Wisdom,Butter Knife? I'll Take the Knife];
+        area_known_ncs = $strings[Deep Imp Act,Imp Art\, Some Wisdom,A Secret\, But Not the Secret You're Looking For,Butter Knife? I'll Take the Knife];
     
     if (area_known_ncs.count() > 0)
     {
@@ -41,13 +40,13 @@ float QLevel6TurnsToCompleteArea(location place)
                 ncs_found += 1;
         }
     }
-    if (ncs_found == 3)
+    if (ncs_found == 4)
         return 0.0;
     
     float turns_remaining = 0.0;
     int ncs_remaining = MAX(0, 3 - ncs_found);
     
-    float combat_rate = 0.9 + combat_rate_modifier() / 100.0;
+    float combat_rate = 0.95 + combat_rate_modifier() / 100.0;
     float noncombat_rate = 1.0 - combat_rate;
     
     if (noncombat_rate != 0.0)
