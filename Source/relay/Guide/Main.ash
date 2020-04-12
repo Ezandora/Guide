@@ -262,7 +262,7 @@ void runMain(string relay_filename)
         PageWrite(HTMLGenerateTagWrap("div", "", mapMake("class", "r_vertical_fill", "style", "z-index:-1;background-color:" + __setting_page_background_colour + ";max-width:" + __setting_horizontal_width + "px;"))); //Color fill
         PageWrite(HTMLGenerateTagWrap("div", "", mapMake("class", "r_vertical_fill", "style", "z-index:-11;border-left:1px solid;border-right:1px solid;border-color:" + __setting_line_colour + ";width:" + (__setting_horizontal_width) + "px;"))); //Vertical border lines, empty background
     }
-    PageWriteHead("<script type=\"text/javascript\" src=\"relay_Guide.js\"></script>");
+    PageWriteHead("<script type=\"text/javascript\" src=\"relay_TourGuide.js\"></script>");
     
     if (matrix_enabled)
     {
