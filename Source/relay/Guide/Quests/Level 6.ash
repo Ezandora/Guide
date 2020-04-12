@@ -12,19 +12,21 @@ void QLevel6Init()
 	if (my_level() >= 6 || my_path_id() == PATH_EXPLOSIONS)
 		state.startable = true;
 	
+    state.state_int["dark neck turns on last nc"] = 0;
+    state.state_int["dark heart turns on last nc"] = 0;
+    state.state_int["dark elbow turns on last nc"] = 0;
+
 	__quest_state["Level 6"] = state;
 	__quest_state["Friars"] = state;
 }
-
-int __quest_level_6_dark_neck_of_the_woods_total_turns_on_last_nc = 0;
-int __quest_level_6_dark_heart_of_the_woods_total_turns_on_last_nc = 0;
-int __quest_level_6_dark_elbow_of_the_woods_total_turns_on_last_nc = 0;
 
 float QLevel6TurnsToCompleteArea(location place)
 {
     //FIXME not sure how accurate these calculations are.
     int turns_spent_in_zone = turnsAttemptedInLocation(place); //not always accurate
     int ncs_found = noncombatTurnsAttemptedInLocation(place);
+
+	QuestState base_quest_state = __quest_state["Level 6"];
     
     boolean [string] area_known_ncs;
     if (place == $location[the dark neck of the woods])
@@ -42,11 +44,11 @@ float QLevel6TurnsToCompleteArea(location place)
         {
             if (area_known_ncs contains s)
                 if (place == $location[the dark neck of the woods])
-                    __quest_level_6_dark_neck_of_the_woods_total_turns_on_last_nc = turns_spent_in_zone;
+                    base_quest_state.state_int["dark neck turns on last nc"] = turns_spent_in_zone;
                 if (place == $location[the dark heart of the woods])
-                    __quest_level_6_dark_heart_of_the_woods_total_turns_on_last_nc = turns_spent_in_zone;
+                    base_quest_state.state_int["dark heart turns on last nc"] = turns_spent_in_zone;
                 if (place == $location[the dark elbow of the woods])
-                    __quest_level_6_dark_elbow_of_the_woods_total_turns_on_last_nc = turns_spent_in_zone;
+                    base_quest_state.state_int["dark elbow turns on last nc"] = turns_spent_in_zone;
                 ncs_found += 1;
         }
     }
@@ -66,11 +68,11 @@ float QLevel6TurnsToCompleteArea(location place)
 
     int max_turns_remaining = ncs_remaining * 5;
     if (place == $location[the dark neck of the woods])
-        max_turns_remaining += __quest_level_6_dark_neck_of_the_woods_total_turns_on_last_nc;
+        max_turns_remaining += base_quest_state.state_int["dark neck turns on last nc"];
     if (place == $location[the dark heart of the woods])
-        max_turns_remaining += __quest_level_6_dark_heart_of_the_woods_total_turns_on_last_nc;
+        max_turns_remaining += base_quest_state.state_int["dark heart turns on last nc"];
     if (place == $location[the dark elbow of the woods])
-        max_turns_remaining += __quest_level_6_dark_elbow_of_the_woods_total_turns_on_last_nc;
+        max_turns_remaining += base_quest_state.state_int["dark elbow turns on last nc"];
     return MIN(turns_remaining, max_turns_remaining);
 }
 
