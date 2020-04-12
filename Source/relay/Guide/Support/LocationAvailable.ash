@@ -72,6 +72,11 @@ float [monster] appearance_rates_adjusted(location l)
             source_altered[m] = v / minimum_monster_appearance;
     }
     
+    // @todo Update this once mafia is fixed.
+    if (($locations[The Dark Elbow of the Woods,The Dark Heart of the Woods,The Dark Neck of the Woods] contains l)) {
+        source_altered[$monster[none]] = 0.05;
+    }
+
     boolean lawyers_relocated = get_property_ascension("relocatePygmyLawyer");
     boolean janitors_relocated = get_property_ascension("relocatePygmyJanitor");
     if (l == $location[the hidden park])

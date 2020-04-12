@@ -16,6 +16,10 @@ void QLevel6Init()
 	__quest_state["Friars"] = state;
 }
 
+int __quest_level_6_dark_neck_of_the_woods_total_turns_on_last_nc = 0;
+int __quest_level_6_dark_heart_of_the_woods_total_turns_on_last_nc = 0;
+int __quest_level_6_dark_elbow_of_the_woods_total_turns_on_last_nc = 0;
+
 float QLevel6TurnsToCompleteArea(location place)
 {
     //FIXME not sure how accurate these calculations are.
@@ -37,6 +41,12 @@ float QLevel6TurnsToCompleteArea(location place)
         foreach key, s in location_ncs
         {
             if (area_known_ncs contains s)
+                if (place == $location[the dark neck of the woods])
+                    __quest_level_6_dark_neck_of_the_woods_total_turns_on_last_nc = turns_spent_in_zone;
+                if (place == $location[the dark heart of the woods])
+                    __quest_level_6_dark_heart_of_the_woods_total_turns_on_last_nc = turns_spent_in_zone;
+                if (place == $location[the dark elbow of the woods])
+                    __quest_level_6_dark_elbow_of_the_woods_total_turns_on_last_nc = turns_spent_in_zone;
                 ncs_found += 1;
         }
     }
@@ -44,7 +54,7 @@ float QLevel6TurnsToCompleteArea(location place)
         return 0.0;
     
     float turns_remaining = 0.0;
-    int ncs_remaining = MAX(0, 3 - ncs_found);
+    int ncs_remaining = MAX(0, 4 - ncs_found);
     
     float combat_rate = 0.95 + combat_rate_modifier() / 100.0;
     float noncombat_rate = 1.0 - combat_rate;
@@ -53,8 +63,15 @@ float QLevel6TurnsToCompleteArea(location place)
         turns_remaining = ncs_remaining / noncombat_rate;
     else
         turns_remaining = 10000.0; //how do you refer to infinity in this language?
-    
-    return MIN(turns_remaining, MAX(0.0, 16.0 - turns_spent_in_zone.to_float()));
+
+    int max_turns_remaining = ncs_remaining * 5;
+    if (place == $location[the dark neck of the woods])
+        max_turns_remaining += __quest_level_6_dark_neck_of_the_woods_total_turns_on_last_nc;
+    if (place == $location[the dark heart of the woods])
+        max_turns_remaining += __quest_level_6_dark_heart_of_the_woods_total_turns_on_last_nc;
+    if (place == $location[the dark elbow of the woods])
+        max_turns_remaining += __quest_level_6_dark_elbow_of_the_woods_total_turns_on_last_nc;
+    return MIN(turns_remaining, max_turns_remaining);
 }
 
 

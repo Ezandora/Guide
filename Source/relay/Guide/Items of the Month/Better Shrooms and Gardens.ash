@@ -19,7 +19,7 @@ void IOTMBetterShroomsAndGardensGenerateResource(ChecklistEntry [int] resource_e
         // Entries
         string [int] description;
         if (freeFightsLeft > 0) {
-            description.listAppend("Free a piranha plant");
+            description.listAppend("Fight a piranha plant");
             if (my_path_id() == PATH_OF_THE_PLUMBER) {
                 description.listAppend("Drops extra coins and mushrooms");
             }
