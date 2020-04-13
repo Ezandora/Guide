@@ -1,4 +1,4 @@
-Guide
+TourGuide
 =====
 
 How do I use it?
@@ -11,7 +11,7 @@ svn checkout https://github.com/cdrock/TourGuide/branches/Release/
 
 Once it's installed, look in the relay browser. In the upper-right, there will be a "-run script-" menu:
 
-![Instructions](https://imgur.com/JqFqsBm)
+![Instructions](/Images/Instructions.png)
 
 Select Guide. Guide will install itself into the window, and will automatically update as you go along.
 
@@ -29,25 +29,25 @@ During an ascension, it will inform you what you need to know to complete your a
 
 The script runs side-by-side with KOL. Leave the window open, and it'll update as you go along.
 
-Quest advice:
+#### Quest advice:
 
-![Quest Example 1](https://raw.github.com/Ezandora/Guide/master/Images/Quest%20Example%201.png)
-![Quest Example 2](https://raw.github.com/Ezandora/Guide/master/Images/Quest%20Example%202.png)
+![Quest Example 1](/Images/Quest_Example_1.png)
+![Quest Example 2](/Images/Quest_Example_2.png)
 
-Reminders:
+#### Reminders:
 
-![Reminders](https://raw.github.com/Ezandora/Guide/master/Images/Reminders.png)
-![Reminders 2](https://raw.github.com/Ezandora/Guide/master/Images/Reminders 2.png)
-![Reminders 3](https://raw.github.com/Ezandora/Guide/master/Images/Reminders 3.png)
+![Reminders](/Images/Reminders.png)
+![Reminders 2](/Images/Reminders_2.png)
+![Reminders 3](/Images/Reminders_3.png)
 
 The script will inform you of many resources you have - free runaways, hipster fights, semi-rares, etc. - and ideas on what to use them on.
 
-Screenshots:
+#### Screenshots:
 
-[![Window picture](https://raw.github.com/Ezandora/Guide/master/Images/Window%20picture%20Small.png)](https://raw.github.com/Ezandora/Guide/master/Images/Window%20picture.png)
-[![Aftercore](https://raw.github.com/Ezandora/Guide/master/Images/Aftercore%20Small.png)](https://raw.github.com/Ezandora/Guide/master/Images/Aftercore.png)
-[![No IOTM character](https://raw.github.com/Ezandora/Guide/master/Images/No%20IOTM%20character%20Small.png)](https://raw.github.com/Ezandora/Guide/master/Images/No%20IOTM%20character.png)
-[![BIG Day 2 end](https://raw.github.com/Ezandora/Guide/master/Images/BIG%20Day%202%20End%20Small.png)](https://raw.github.com/Ezandora/Guide/master/Images/BIG%20Day%202%20End.png)
+[![Window picture](https://raw.github.com/Ezandora/Guide/master/Images/Window%20picture%20Small.png)](/Images/Window_Picture.png)
+[![Aftercore](https://raw.github.com/Ezandora/Guide/master/Images/Aftercore%20Small.png)](/Images/Aftercore.png)
+[![No IOTM character](https://raw.github.com/Ezandora/Guide/master/Images/No%20IOTM%20character%20Small.png)](/Images/No_IOTM_character.png)
+[![BIG Day 2 end](https://raw.github.com/Ezandora/Guide/master/Images/BIG%20Day%202%20End%20Small.png)](/Images/BIG_Day_2_End.png)
 
 Quests supported: All council quests, azazel, pretentious artist, untinker, legendary beat, most of the sea, unlocking the manor, the nemesis quest, pirate quest, repairing the shield generator in outer space, white citadel, the old level 9 quest, jung man's psychoses jars, and the wizard of ego.
 
