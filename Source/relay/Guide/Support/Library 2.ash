@@ -402,7 +402,7 @@ KramcoSausageFightInformation KramcoCalculateSausageFightInformation()
     if (turn_will_always_see_goblin > 1)
     {
         //This is probably wrong?
-        float probability_each_incorrect = 1.0 / to_float(turn_will_always_see_goblin - 1);
+        float probability_each_incorrect = 1.0 / to_float(turn_will_always_see_goblin + 1);
         information.probability_of_sausage_fight = clampf((delta + 1) * probability_each_incorrect, 0.0, 1.0);
     }
     information.goblin_will_appear = information.turns_to_next_guaranteed_fight == 0;
