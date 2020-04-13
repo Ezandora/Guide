@@ -2,23 +2,23 @@ RegisterResourceGenerationFunction("IOTMPocketProfessorResource");
 void IOTMPocketProfessorResource(ChecklistEntry [int] resource_entries)
 {
     ChecklistSubentry getLecture() {
-        int calculateMaxLectures() {
-            int [int] WEIGHT_REQUIREMENTS = { 1, 2, 5, 10, 17, 26, 37, 50, 65, 82, 101, 122, 145, 170, 197 };
-            int currentWeight = familiar_weight($familiar[Pocket Professor]);
+        int [int] WEIGHT_REQUIREMENTS = { 1, 2, 5, 10, 17, 26, 37, 50, 65, 82, 101, 122, 145, 170, 197 };
 
-            foreach weightRequirement in WEIGHT_REQUIREMENTS {
+        int calculateMaxLectures() {
+            int currentWeight = familiar_weight($familiar[Pocket Professor]) + numeric_modifier("familiar weight");
+
+            foreach index, weightRequirement in WEIGHT_REQUIREMENTS {
                 if (currentWeight < weightRequirement) {
-                    return weightRequirement;
+                    return index;
                 }
             }
 
-            return 5;
+            return 0;
         }
 
         // Title
-        int maxLectures = calculateMaxLectures();
         int lecturesUsed = get_property_int("_pocketProfessorLectures");
-        int numOfLectures = maxLectures - lecturesUsed;
+        int numOfLectures = calculateMaxLectures() - lecturesUsed;
 
         string main_title = numOfLectures + " lectures";
 
@@ -32,7 +32,7 @@ void IOTMPocketProfessorResource(ChecklistEntry [int] resource_entries)
             description.listAppend(HTMLGenerateSpanOfClass("Mass:", "r_bold") + " 3 chances for item drops");
             description.listAppend(HTMLGenerateSpanOfClass("Velocity:", "r_bold") + " Delevel");
         } else {
-            description.listAppend("Increase weight for more lectures");
+            description.listAppend("Next lecture at " + WEIGHT_REQUIREMENTS[lecturesUsed] + " pounds");
         }
 
         return ChecklistSubentryMake(main_title, subtitle, description);
