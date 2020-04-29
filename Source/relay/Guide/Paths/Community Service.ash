@@ -138,7 +138,7 @@ void PathCommunityServiceGenerateTasks(ChecklistEntry [int] task_entries, Checkl
                 //60 = (buffed - base) / 30
                 //1800 = buffed - base
                 //buffed = 1800 + base
-                int needed_buffed_stat = 1800 + basestat;
+                int needed_buffed_stat = 1770 + basestat;
                 float percentage = to_float(needed_buffed_stat - my_buffedstat(using_stat)) / to_float(basestat) * 100.0;
                 description.listAppend("Need to buff " + using_stat + " to " + needed_buffed_stat + " (+" + (needed_buffed_stat - my_buffedstat(using_stat)) + " / +" + percentage.round() + "% from here)");
                 if (relevant_thrall_active)
