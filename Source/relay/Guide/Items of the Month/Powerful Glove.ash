@@ -14,6 +14,7 @@ void IOTMPowerfulGloveGenerateResource(ChecklistEntry [int] resource_entries)
             url = "inventory.php?which=2";
 
         description.listAppend("10% charge: Replace a monster with another from the same zone.");
+        description.listAppend("5% charge: Delevel monster by 50%.");
         description.listAppend("5% charge: -10% combat for 10 turns.");
         description.listAppend("5% charge: +200% stats for 20 turns.");
 
