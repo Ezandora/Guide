@@ -54,5 +54,5 @@ import "relay/Guide/Items of the Month/Vampire Cloak.ash";
 import "relay/Guide/Items of the Month/Beach Comb.ash";
 import "relay/Guide/Items of the Month/Getaway Campsite.ash";
 import "relay/Guide/Items of the Month/Rune Spoon.ash";
-
+import "relay/Guide/Items of the Month/Powerful Glove.ash";
 
