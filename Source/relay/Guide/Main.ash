@@ -198,7 +198,7 @@ void runMain(string relay_filename)
         //Gray text at the bottom:
         string line;
         line = HTMLGenerateTagWrap("span", "<br>Automatic refreshing disabled.", mapMake("id", "refresh_status"));
-        line += HTMLGenerateTagWrap("a", "<br>Written by Ezandora.", generateMainLinkMap("showplayer.php?who=1557284"));
+        line += HTMLGenerateTagWrap("a", "<br>Created by Ezandora and cdrock", generateMainLinkMap("showplayer.php?who=1557284"));
         line += "<br>" + __version;
         
         PageWrite(HTMLGenerateDivOfStyle(line, "font-size:0.777em;color:gray;"));

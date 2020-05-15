@@ -39,6 +39,9 @@ void IOTMPocketProfessorResource(ChecklistEntry [int] resource_entries)
     }
 
     ChecklistSubentry getDeliverYourThesis() {
+        int experience = $familiar[Pocket Professor].experience;
+        int experienceLeft = 400 - experience;
+
         // Title
         string main_title = "Deliver thesis";
 
@@ -48,7 +51,11 @@ void IOTMPocketProfessorResource(ChecklistEntry [int] resource_entries)
         // Entries
         string [int] description;
         if (!get_property_boolean("_thesisDelivered")) {
-            description.listAppend(HTMLGenerateSpanOfClass("1 instakill", "r_bold") + " but lose 200 familiar xp");
+            if (experience >= 400) {
+                description.listAppend(HTMLGenerateSpanOfClass("1 instakill", "r_bold") + " but lose 200 familiar xp");
+            } else {
+                description.listAppend("Need " + experienceLeft + " more experience");
+            }
         }
 
         return ChecklistSubentryMake(main_title, subtitle, description);

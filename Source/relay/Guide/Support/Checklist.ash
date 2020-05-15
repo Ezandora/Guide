@@ -262,8 +262,6 @@ string ChecklistGenerateModifierSpan(string modifier)
 void ChecklistInit()
 {
 	PageAddCSSClass("a", "r_cl_internal_anchor", "");
-	//PageAddCSSClass("", "r_cl_modifier_inline", "font-size:0.80em; color:" + __setting_modifier_colour + ";");
-	//PageAddCSSClass("", "r_cl_modifier", "font-size:0.80em; color:" + __setting_modifier_colour + "; display:block;");
     PageAddCSSClass("", "r_cl_modifier_inline", "font-size:0.85em; color:" + __setting_modifier_colour + ";");
     PageAddCSSClass("", "r_cl_modifier", "font-size:0.85em; color:" + __setting_modifier_colour + "; display:block;");
 	
@@ -274,7 +272,6 @@ void ChecklistInit()
     
     string gradient = "background: #ffffff;background: -moz-linear-gradient(left, #ffffff 50%, #F0F0F0 75%, #F0F0F0 100%);background: -webkit-gradient(linear, left top, right top, color-stop(50%,#ffffff), color-stop(75%,#F0F0F0), color-stop(100%,#F0F0F0));background: -webkit-linear-gradient(left, #ffffff 50%,#F0F0F0 75%,#F0F0F0 100%);background: -o-linear-gradient(left, #ffffff 50%,#F0F0F0 75%,#F0F0F0 100%);background: -ms-linear-gradient(left, #ffffff 50%,#F0F0F0 75%,#F0F0F0 100%);background: linear-gradient(to right, #ffffff 50%,#F0F0F0 75%,#F0F0F0 100%);filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#F0F0F0',GradientType=1 );"; //help
 	PageAddCSSClass("div", "r_cl_l_container_highlighted", gradient + "padding-top:5px;padding-bottom:5px;");
-    
     
 	PageAddCSSClass("div", "r_cl_l_left", "float:left;width:" + __setting_image_width_large + "px;margin-left:20px;overflow:hidden;");
 	PageAddCSSClass("div", "r_cl_l_right_container", "width:100%;margin-left:" + (-__setting_image_width_large - 20) + "px;float:right;text-align:left;vertical-align:top;");
@@ -345,7 +342,6 @@ void ChecklistInit()
         {
             PageAddCSSClass("div", "r_cl_l_right_content", "margin-left:10px;margin-right:3px;min-width:80%;", 0, __setting_media_query_small_size);
             PageAddCSSClass("", "r_cl_image_container_small", "display:block;float:left;", 0, __setting_media_query_small_size);
-            //PageAddCSSClass("", "r_small_float_indention", "display:inline;width:0.5em;height:" + (__setting_image_width_small - 10) + "px;float:left;", 0, __setting_media_query_small_size);
             PageAddCSSClass("", "r_small_float_indention", "display:inline;width:0.5em;float:left;", 0, __setting_media_query_small_size);
             PageAddCSSClass("", "r_indention_not_small", "margin-left:0.75em;", 0, __setting_media_query_small_size);
             PageAddCSSClass("", "r_indention_not_small", "margin-left:0.75em;", 0, __setting_media_query_tiny_size);
@@ -373,29 +369,23 @@ Checklist lookupChecklist(Checklist [int] checklists, string title)
 	return cl;
 }
 
-void ChecklistFormatSubentry(ChecklistSubentry subentry)
-{
-    foreach i in subentry.entries
-    {
+void ChecklistFormatSubentry(ChecklistSubentry subentry) {
+    foreach i in subentry.entries {
         string [int] line_split = split_string_alternate(subentry.entries[i], "\\|");
-        foreach l in line_split
-        {
-            if (stringHasPrefix(line_split[l], "*"))
-            {
-                //remove prefix:
-                //indent:
+        foreach l in line_split {
+            if (stringHasPrefix(line_split[l], "*")) {
+                // Indent
                 line_split[l] = HTMLGenerateIndentedText(substring(line_split[l], 1));
             }
         }
-        //Recombine:
+
+        // Recombine
         buffer building_line;
         boolean first = true;
         boolean last_was_indention = false;
-        foreach key in line_split
-        {
+        foreach key in line_split {
             string line = line_split[key];
-            if (!contains_text(line, "class=\"r_indention\"") && !first && !last_was_indention) //hack way of testing for indention
-            {
+            if (!contains_text(line, "class=\"r_indention\"") && !first && !last_was_indention) {
                 building_line.append("<br>");
             }
             last_was_indention = contains_text(line, "class=\"r_indention\"");
@@ -406,54 +396,48 @@ void ChecklistFormatSubentry(ChecklistSubentry subentry)
     }
 }
 
-buffer ChecklistGenerateEntryHTML(ChecklistEntry entry, ChecklistSubentry [int] subentries, boolean outputting_anchor, buffer anchor_prefix_html, buffer anchor_suffix_html, boolean setting_use_holding_containers_per_subentry)
-{
+buffer ChecklistGenerateEntryHTML(ChecklistEntry entry, ChecklistSubentry [int] subentries, boolean outputting_anchor, buffer anchor_prefix_html, buffer anchor_suffix_html, boolean setting_use_holding_containers_per_subentry) {
     Vec2i max_image_dimensions_large = Vec2iMake(__setting_image_width_large, 75);
     Vec2i max_image_dimensions_medium = Vec2iMake(__setting_image_width_medium, 50);
     Vec2i max_image_dimensions_small = Vec2iMake(__setting_image_width_small, 50);
-    if (__setting_small_size_uses_full_width)
+    if (__setting_small_size_uses_full_width) {
         max_image_dimensions_small = Vec2iMake(__setting_image_width_small,__setting_image_width_small);
-    buffer result;
-    if (true)
-    {
-        
-        buffer image_container;
-        
-        if (outputting_anchor && !__setting_entire_area_clickable)
-            image_container.append(anchor_prefix_html);
-        
-        image_container.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_large, "r_cl_image_container_large"));
-        image_container.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_medium, "r_cl_image_container_medium"));
-        if (!__setting_small_size_uses_full_width)
-            image_container.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_small, "r_cl_image_container_small"));
-        
-        if (outputting_anchor && !__setting_entire_area_clickable)
-            image_container.append(anchor_suffix_html);
-        
-        result.append(HTMLGenerateDivOfClass(image_container, "r_cl_l_left"));
-        
     }
-    else
-        result.append(HTMLGenerateDivOfClass(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_large), "r_cl_l_left"));
+
+    buffer result;
+    buffer image_container;
     
+    if (outputting_anchor && !__setting_entire_area_clickable) {
+        image_container.append(anchor_prefix_html);
+    }
     
+    image_container.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_large, "r_cl_image_container_large"));
+    image_container.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_medium, "r_cl_image_container_medium"));
+
+    if (!__setting_small_size_uses_full_width) {
+        image_container.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_small, "r_cl_image_container_small"));
+    }
+    
+    if (outputting_anchor && !__setting_entire_area_clickable) {
+        image_container.append(anchor_suffix_html);
+    }
+    
+    result.append(HTMLGenerateDivOfClass(image_container, "r_cl_l_left"));
     result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_cl_l_right_container")));
     
-    if (outputting_anchor && !__setting_entire_area_clickable)
+    if (outputting_anchor && !__setting_entire_area_clickable) {
         result.append(anchor_prefix_html);
+    }
+
     result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_cl_l_right_content")));
     
-    if (__setting_small_size_uses_full_width)
-    {
+    if (__setting_small_size_uses_full_width) {
         result.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_small, "r_cl_image_container_small"));
-        
         result.append(HTMLGenerateTagWrap("div", "", mapMake("class", "r_small_float_indention", "style", "height: " + __kol_image_generate_image_html_return_final_size.y + "px;")));
-        //result.append(HTMLGenerateDivOfClass("", "r_small_float_indention")); //&nbsp; to have it display. hack
     }
     
     boolean first = true;
-    foreach j in subentries
-    {
+    foreach j in subentries {
         ChecklistSubentry subentry = subentries[j];
         if (subentry.header == "")
             continue;
@@ -512,74 +496,71 @@ buffer ChecklistGenerateEntryHTML(ChecklistEntry entry, ChecklistSubentry [int] 
     return result;
 }
 
-buffer ChecklistGenerate(Checklist cl, boolean output_borders)
-{
+/**
+Generates HTML for a checklist and appends it to the DOM
+@param cl The checklist being appended to the DOM
+@param output_borders Whether or not to add borders
+*/
+buffer ChecklistGenerate(Checklist cl, boolean output_borders) {
 	ChecklistEntry [int] entries = cl.entries;
 	
 	//Combine entries with identical combination tags:
 	ChecklistEntry [string] combination_tag_entries;
-	foreach key, entry in entries
-	{
+	foreach key, entry in entries {
 		if (entry.combination_tag == "") continue;
         if (entry.only_show_as_extra_important_pop_up) continue; //do not support this feature with this
         if (entry.subentries_on_mouse_over.count() > 0) continue;
         if (entry.container_div_attributes.count() > 0) continue;
         
-        if (!(combination_tag_entries contains entry.combination_tag))
-        {
+        if (!(combination_tag_entries contains entry.combination_tag)) {
         	entry.importance_level -= 1; //combined entries gain a hack; a level above everything else
         	combination_tag_entries[entry.combination_tag] = entry;
             continue;
         }
+
         ChecklistEntry master_entry = combination_tag_entries[entry.combination_tag];
         
-        if (entry.should_highlight)
+        if (entry.should_highlight) {
         	master_entry.should_highlight = true;
-        if (master_entry.url == "" && entry.url != "")
+        }
+
+        if (master_entry.url == "" && entry.url != "") {
         	master_entry.url = entry.url;
+        }
+
         master_entry.importance_level = min(master_entry.importance_level, entry.importance_level - 1);
-        foreach key, subentry in entry.subentries
-        { 
+        
+        foreach key, subentry in entry.subentries { 
         	master_entry.subentries.listAppend(subentry);
         }
+
         remove entries[key];
 	}
 	
 	//Sort by importance:
 	sort entries by value.importance_level;
-    
 	
-	if (true)
-	{
-		//Format subentries:
-		foreach i in entries
-		{
-			ChecklistEntry entry = entries[i];
-			foreach j in entry.subentries
-			{
-                ChecklistFormatSubentry(entry.subentries[j]);
-			}
-			foreach j in entry.subentries_on_mouse_over
-			{
-                ChecklistFormatSubentry(entry.subentries_on_mouse_over[j]);
-			}
-		}
-	}
+    //Format subentries:
+    foreach index in entries {
+        ChecklistEntry entry = entries[index];
+        foreach subentryIndex in entry.subentries {
+            ChecklistFormatSubentry(entry.subentries[subentryIndex]);
+        }
+        foreach subentryIndex in entry.subentries_on_mouse_over {
+            ChecklistFormatSubentry(entry.subentries_on_mouse_over[subentryIndex]);
+        }
+    }
 
 	boolean skip_first_entry = false;
 	string special_subheader = "";
-	if (entries.count() > 0)
-	{
-		if (entries[0].image_lookup_name == "special subheader")
-		{
-			if (entries[0].subentries.count() > 0)
-			{
+	if (entries.count() > 0) {
+		if (entries[0].image_lookup_name == "special subheader") {
+			if (entries[0].subentries.count() > 0) {
 				special_subheader = entries[0].subentries[0].header;
 				skip_first_entry = true;
 			}
 		}
 	}
-	
 	
 	buffer result;
     if (output_borders)
@@ -752,8 +733,6 @@ buffer ChecklistGenerate(Checklist cl, boolean output_borders)
 		}
 		else
 		{
-			//div-based layout:
-            //result.append(ChecklistGenerateEntryHTML(entry, entry.subentries, outputting_anchor, anchor_prefix_html, anchor_suffix_html, setting_use_holding_containers_per_subentry));
             result.append(generated_subentry_html);
 		}
         result.append("</div>");
@@ -773,10 +752,12 @@ buffer ChecklistGenerate(Checklist cl, boolean output_borders)
 	return result;
 }
 
-
-buffer ChecklistGenerate(Checklist cl)
-{
-    return ChecklistGenerate(cl, true);
+/**
+Attaches checklist to DOM.
+@param checklist The checklist being appended.
+*/
+buffer ChecklistGenerate(Checklist checklist) {
+    return ChecklistGenerate(checklist, true);
 }
 
 

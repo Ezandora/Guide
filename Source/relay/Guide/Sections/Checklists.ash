@@ -14,9 +14,9 @@ void generateMisc(Checklist [int] checklists)
 		checklists.listAppend(ChecklistMake("Unimportant Tasks", unimportant_task_entries));
 	}
 	
-	if (availableDrunkenness() < 0 && ($item[drunkula's wineglass].equipped_amount() == 0 || my_adventures() == 0))
+	if (availableDrunkenness() < 0 && ($item[drunkula\'s wineglass].equipped_amount() == 0 || my_adventures() == 0))
 	{
-        //They're drunk, so tasks aren't as relevant. Re-arrange everything:
+        //They arere drunk, so tasks are not as relevant. Re-arrange everything:
         string url;
         
         //Give them something to mindlessly click on:
@@ -35,7 +35,7 @@ void generateMisc(Checklist [int] checklists)
 		lookupChecklist(checklists, "Optional Tasks").entries.listClear();
 		lookupChecklist(checklists, "Unimportant Tasks").entries.listClear();
         
-        //Remove extra-important popups, because they won't work anymore:
+        //Remove extra-important popups, because they will not work anymore:
         Checklist future_checklist = lookupChecklist(checklists, "Future Tasks");
         foreach key, c in future_checklist.entries
         {
@@ -253,15 +253,12 @@ void generateChecklists(Checklist [int] ordered_output_checklists)
 	
 	//Go through desired output order:
 	string [int] setting_desired_output_order = split_string_alternate("Tasks,Optional Tasks,Unimportant Tasks,Future Tasks,Resources,Future Unimportant Tasks,Required Items,Suggested Pulls,Florist Friar,Strategy", ",");
-	foreach key in setting_desired_output_order
-	{
+	foreach key in setting_desired_output_order {
 		string title = setting_desired_output_order[key];
 		//Find title in checklists:
-		foreach key2 in checklists
-		{
+		foreach key2 in checklists {
 			Checklist cl = checklists[key2];
-			if (cl.title == title)
-			{
+			if (cl.title == title) {
 				ordered_output_checklists.listAppend(cl);
 				keys_to_remove.listAppend(key2);
 				break;
@@ -272,73 +269,70 @@ void generateChecklists(Checklist [int] ordered_output_checklists)
 	listClear(keys_to_remove);
 	
 	//Add remainder:
-	foreach key in checklists
-	{
+	foreach key in checklists {
 		Checklist cl = checklists[key];
 		ordered_output_checklists.listAppend(cl);
 	}
 }
 
-
-
-void outputChecklists(Checklist [int] ordered_output_checklists)
-{
-    if (__misc_state["in run"] && playerIsLoggedIn())
+/**
+Adds the checklists to the DOM.
+@param ordered_output_checklists Checklists to output.
+*/
+void outputChecklists(Checklist [int] ordered_output_checklists) {
+    // Turn Count
+    if (__misc_state["in run"] && playerIsLoggedIn()) {
         PageWrite(HTMLGenerateDivOfClass("Day " + my_daycount() + ". " + pluralise(my_turncount(), "turn", "turns") + " played.", "r_bold"));
-	if (my_path() != "" && my_path() != "None" && playerIsLoggedIn())
-	{
+    }
+
+    // Path
+	if (my_path() != "" && my_path() != "None" && playerIsLoggedIn()) {
 		PageWrite(HTMLGenerateDivOfClass(my_path(), "r_bold"));
 	}
     
-    
-    string chosen_message = generateRandomMessage();
-    if (chosen_message != "")
-        PageWrite(HTMLGenerateDivOfStyle(chosen_message, "padding-left:20px;padding-right:20px;"));
+    // Random Message
+    PageWrite(HTMLGenerateDivOfStyle(generateRandomMessage(), "padding-left:20px;padding-right:20px;"));
+
     PageWrite(HTMLGenerateTagWrap("div", "", mapMake("id", "extra_words_at_top")));
 	
-	
-	if (__misc_state["Example mode"])
-	{
+    // Example mode
+	if (__misc_state["Example mode"]) {
 		PageWrite("<br>");
 		PageWrite(HTMLGenerateDivOfStyle("Example ascension", "text-align:center; font-weight:bold;"));
 	}
     
     Checklist extra_important_tasks;
     
-	//And output:
-	foreach i in ordered_output_checklists
-	{
+	// Checklists:
+	foreach i in ordered_output_checklists {
 		Checklist cl = ordered_output_checklists[i];
         
-        if (__show_importance_bar && cl.title == "Tasks")
-        {
-            foreach key in cl.entries
-            {
+        // Check for Pin
+        if (__show_importance_bar && cl.title == "Tasks") {
+            foreach key in cl.entries {
                 ChecklistEntry entry = cl.entries[key];
-                if (entry.importance_level <= -11)
-                {
+                if (entry.importance_level <= -11) {
                     extra_important_tasks.entries.listAppend(entry);
-                    if (entry.only_show_as_extra_important_pop_up)
+                    if (entry.only_show_as_extra_important_pop_up) {
                         remove cl.entries[key];
-                }
-                    
+                    }
+                }  
             }
         }
+
+        // Output
 		PageWrite(ChecklistGenerate(cl));
 	}
     
-    if (__show_importance_bar && extra_important_tasks.entries.count() > 0)
-    {
+    if (__show_importance_bar && extra_important_tasks.entries.count() > 0) {
         extra_important_tasks.title = "Tasks";
         extra_important_tasks.disable_generating_id = true;
         PageWrite(HTMLGenerateTagPrefix("div", mapMake("id", "importance_bar", "style", "z-index:3;position:fixed; top:0;width:100%;max-width:" + __setting_horizontal_width + "px;visibility:hidden;")));
 		PageWrite(ChecklistGenerate(extra_important_tasks, false));
         
-        //string background = "background: -moz-linear-gradient(top, rgba(100,100,100,1) 0%, rgba(255,255,255,0) 100%);background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(100,100,100,1)), color-stop(100%,rgba(255,255,255,0)));background: -webkit-linear-gradient(top, rgba(100,100,100,1) 0%,rgba(255,255,255,0) 100%);background: -o-linear-gradient(top, rgba(100,100,100,1) 0%,rgba(255,255,255,0) 100%);background: -ms-linear-gradient(top, rgba(100,100,100,1) 0%,rgba(255,255,255,0) 100%);background: linear-gradient(to bottom, rgba(100,100,100,1) 0%,rgba(255,255,255,0) 100%);filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#646464', endColorstr='#00ffffff',GradientType=0 );"; //this looks correct in safari, but not others
         string background = "background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAUCAYAAABMDlehAAAAb0lEQVR42gFkAJv/AFFRUf8AVlZW+ABcXFzvAGRjY+QAa2xr2AB1dHXLAH5+fr0AiIiIrgCTk5KfAJ2dnZAAqKiofwCzs7JwAL69vmAAyMjIUQDS0tJBANzb3DMA5eXlJwDt7e0bAPT09BAA+vr6B861MNMaArkVAAAAAElFTkSuQmCC);background-repeat:repeat-x;"; //use this gradient image, because alpha gradients are not consistent across browsers (compare black to white, 100% to zero opacity, on safari versus firefox)
 
         PageWrite(HTMLGenerateTagWrap("div", "", mapMake("id", "importance_bar_gradient", "style", "height:20px;transition:opacity 0.25s;opacity:0;" + background)));
         PageWrite(HTMLGenerateTagSuffix("div"));
-        
     }
 }

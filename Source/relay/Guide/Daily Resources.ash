@@ -346,7 +346,7 @@ void generateDailyResources(Checklist [int] checklists)
 		resource_entries.listAppend(ChecklistEntryMake("Superhuman Cocktailcrafting", "shop.php?whichshop=still", ChecklistSubentryMake(pluralise(stills_available(), "still use", "still uses"), "", description), 10));
     }
     
-    if (__last_adventure_location == $location[The Red Queen's Garden])
+    if (__last_adventure_location == $location[The Red Queen\'s Garden])
     {
         string will_need_effect = "";
         if ($effect[down the rabbit hole].have_effect() == 0)

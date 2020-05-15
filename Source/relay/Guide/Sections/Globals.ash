@@ -20,12 +20,10 @@ void RegisterChecklistGenerationFunction(string function_name)
     __checklist_generation_function_names.listAppend(function_name);
 }
 
-
 string [string][int] __specific_checklist_1_generation_function_names;
 void RegisterSpecificChecklistGenerationFunction1(string function_name, string checklist_name_1)
 {
-    if (!(__specific_checklist_1_generation_function_names contains checklist_name_1))
-    {
+    if (!(__specific_checklist_1_generation_function_names contains checklist_name_1)) {
         __specific_checklist_1_generation_function_names[checklist_name_1] = listMakeBlankString();
     }
     __specific_checklist_1_generation_function_names[checklist_name_1].listAppend(function_name);
@@ -58,12 +56,14 @@ void RegisterSpecificChecklistGenerationFunction3(string function_name, string c
     __specific_checklist_generation_requests.listAppend(request);
 }
 
-void RegisterResourceGenerationFunction(string function_name)
-{
+void RegisterTaskGenerationFunction(string function_name) {
+    RegisterSpecificChecklistGenerationFunction3(function_name, "Tasks", "Optional Tasks", "Future Tasks");
+}
+
+void RegisterResourceGenerationFunction(string function_name) {
     RegisterSpecificChecklistGenerationFunction1(function_name, "Resources");
 }
 
-void RegisterTaskGenerationFunction(string function_name)
-{
-    RegisterSpecificChecklistGenerationFunction3(function_name, "Tasks", "Optional Tasks", "Future Tasks");
+void RegisterBannishGenerationFunction(string function_name) {
+    RegisterSpecificChecklistGenerationFunction1(function_name, "Banishes");
 }

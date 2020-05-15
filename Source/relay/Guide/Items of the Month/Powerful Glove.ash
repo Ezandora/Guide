@@ -17,9 +17,9 @@ void IOTMPowerfulGloveGenerateResource(ChecklistEntry [int] resource_entries)
             description.listAppend(HTMLGenerateSpanOfClass("Invisible Avatar:", "r_bold") + " -10% Combat");
             description.listAppend(HTMLGenerateSpanOfClass("Triple Size:", "r_bold") + " +200% all attributes");
             if (chargeLeft > 5) {
-                description.listAppend(HTMLGenerateSpanOfClass("Wednesday:", "r_bold") + " Swap Monster");
+                description.listAppend(HTMLGenerateSpanOfClass("Replace Enemy:", "r_bold") + " Swap Monster");
             }
-            description.listAppend(HTMLGenerateSpanOfClass("Thursday:", "r_bold") + " Delevel");
+            description.listAppend(HTMLGenerateSpanOfClass("Shrink Enemy:", "r_bold") + " Delevel");
         }
 
         return ChecklistSubentryMake(main_title, subtitle, description);
