@@ -48,6 +48,7 @@ static
     int PATH_EXPLODING = 37;
     int PATH_EXPLODED = 37;
     int PATH_OF_THE_PLUMBER = 38;
+    int PATH_LOW_KEY_SUMMER = 39;
 }
 
 int __my_path_id_cached = -11;
