@@ -10,10 +10,17 @@ void IOTMPizzaCube(ChecklistEntry [int] resource_entries)
 
         // Entries
         string [int] description;
+        
+        boolean need_cheese = $item[goat cheese].available_amount() <3; // Obviously incomplete
 
-        description.listAppend(HTMLGenerateSpanOfClass("cheese/milk:", "r_bold") + " 3 goat cheese");
-        description.listAppend(HTMLGenerateSpanOfClass("lucky:", "r_bold") + " clover");
-        description.listAppend(HTMLGenerateSpanOfClass("warlike:", "r_bold") + " 3 of sonar-in-a-biscuit, Duskwalker syringe, cocktail napkin, unnamed cocktail, cigarette lighter, glark cable, short writ of habeas corpus");
+        if (need_cheese)
+        {
+            description.listAppend(HTMLGenerateSpanOfClass("\"cheese\"/\"milk\":", "r_bold") + " 3 goat cheese");
+        }
+        description.listAppend(HTMLGenerateSpanOfClass("\"luck\"/\"green\":", "r_bold") + " clover");
+        description.listAppend(HTMLGenerateSpanOfClass("familiar equipment/hatchling:", "r_bold") + " equipment + xp for your familiar");
+        description.listAppend(HTMLGenerateSpanOfClass("\"cloak\":", "r_bold") + " dead mimic");
+        description.listAppend(HTMLGenerateSpanOfClass("combat item:", "r_bold") + " 3 of sonar-in-a-biscuit, Duskwalker syringe, cocktail napkin, unnamed cocktail, cigarette lighter, glark cable, short writ of habeas corpus");
 
         return ChecklistSubentryMake(main_title, subtitle, description);
     }
