@@ -30,7 +30,7 @@ void IOTMPizzaCube(ChecklistEntry [int] resource_entries)
         // Entries
         string [int] description;
 
-        if (fullness_limit() - my_fullness() > 3) {
+        if (fullness_limit() - my_fullness() >= 3) {
             description.listAppend("Get any wishable buff");
         }
 
