@@ -11,7 +11,7 @@ void IOTMPizzaCube(ChecklistEntry [int] resource_entries)
         // Entries
         string [int] description;
 
-        if (fullness_limit() - my_fullness() > 3) {
+        if (fullness_limit() - my_fullness() >= 3) {
             description.listAppend(HTMLGenerateSpanOfClass("cheese/milk:", "r_bold") + " 3 goat cheese");
             description.listAppend(HTMLGenerateSpanOfClass("lucky:", "r_bold") + " clover");
             description.listAppend(HTMLGenerateSpanOfClass("warlike:", "r_bold") + " 3 of sonar-in-a-biscuit, Duskwalker syringe, cocktail napkin, unnamed cocktail, cigarette lighter, glark cable, short writ of habeas corpus");
