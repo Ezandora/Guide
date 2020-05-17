@@ -307,7 +307,6 @@ void QNemesisGenerateClownTasks(ChecklistSubentry subentry)
     legendary_epic_weapon_craftable_source[$class[disco bandit]] = $item[vial of mojo];
     legendary_epic_weapon_craftable_source[$class[accordion thief]] = $item[golden reeds];
     
-    subentry.modifiers.listAppend("-combat");
     subentry.entries.listAppend("Search in the Fun House.");
     int clownosity = numeric_modifier("Clowniness").floor();
     int clownosity_needed = MAX(100 - clownosity, 0);
