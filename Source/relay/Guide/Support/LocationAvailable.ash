@@ -305,7 +305,6 @@ float [monster] appearance_rates_adjusted_cancel_nc(location l)
     return base_rates;
 }
 
-
 //Do not call - internal implementation detail.
 boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
 {
@@ -394,30 +393,30 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
             return get_property("questL07Cyrptic") == "finished";
         case $location[The Wreck of the Edgar Fitzsimmons]:
             return questPropertyPastInternalStepNumber("questS02Monkees", 2);
-        case $location[the boss bat's lair]:
+        case $location[the boss bat\'s lair]:
         	if (get_property("questL04Bat") == "finished") return false; //area closes
-            if ($location[the boss bat's lair].combatTurnsAttemptedInLocation() > 0)
+            if ($location[the boss bat\'s lair].combatTurnsAttemptedInLocation() > 0)
                 return true;
             return questPropertyPastInternalStepNumber("questL04Bat", 4);
-		case $location[cobb's knob barracks]:
-		case $location[cobb's knob kitchens]:
-		case $location[cobb's knob harem]:
-		case $location[cobb's knob treasury]:
+		case $location[cobb\'s knob barracks]:
+		case $location[cobb\'s knob kitchens]:
+		case $location[cobb\'s knob harem]:
+		case $location[cobb\'s knob treasury]:
 			string quest_value = get_property("questL05Goblin");
 			if (quest_value == "finished")
 				return true;
 			else if (questPropertyPastInternalStepNumber("questL05Goblin", 1))
 			{
 				//Inference - quest is started. If map is missing, area must be unlocked
-				if ($item[cobb's knob map].available_amount() > 0)
+				if ($item[cobb\'s knob map].available_amount() > 0)
 					return false;
 				else //no map, must be available
 					return true;
 			}
 			//unstarted, impossible
             return false;
-		case $location[Vanya's Castle Chapel]:
-			if ($item[map to Vanya's Castle].available_amount() > 0)
+		case $location[Vanya\'s Castle Chapel]:
+			if ($item[map to Vanya\'s Castle].available_amount() > 0)
 				return true;
 			return false;
 		case $location[lair of the ninja snowmen]:
@@ -439,9 +438,9 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
 		case $location[itznotyerzitz mine]:
 			return questPropertyPastInternalStepNumber("questL08Trapper", 2);
         case $location[the arid, extra-dry desert]:
-			return (questPropertyPastInternalStepNumber("questL11MacGuffin", 3) || $item[your father's MacGuffin diary].available_amount() > 0);
+			return (questPropertyPastInternalStepNumber("questL11MacGuffin", 3) || $item[your father\'s MacGuffin diary].available_amount() > 0);
         case $location[the oasis]:
-			return (get_property_int("desertExploration") > 0) && (questPropertyPastInternalStepNumber("questL11MacGuffin", 3) || $item[your father's MacGuffin diary].available_amount() > 0);
+			return (get_property_int("desertExploration") > 0) && (questPropertyPastInternalStepNumber("questL11MacGuffin", 3) || $item[your father\'s MacGuffin diary].available_amount() > 0);
         case $location[the defiled alcove]:
 			return questPropertyPastInternalStepNumber("questL07Cyrptic", 1) && get_property_int("cyrptAlcoveEvilness") > 0;
         case $location[the defiled cranny]:
@@ -454,7 +453,7 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
         case $location[The Shore\, Inc. Travel Agency]:
 			return get_property_ascension("lastDesertUnlock");
         case $location[Portal to Terrible Parents]:
-        case $location[Rumpelstiltskin's Workshop]:
+        case $location[Rumpelstiltskin\'s Workshop]:
         case $location[Ye Olde Medievale Villagee]:
             return (get_property("grimstoneMaskPath") == "gnome");
         case $location[the mansion of dr. weirdeaux]:
@@ -468,12 +467,12 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
         case $location[Pirates of the Garbage Barges]:
         case $location[Barf Mountain]:
         case $location[The Toxic Teacups]:
-        case $location[Uncle Gator's Country Fun-Time Liquid Waste Sluice]:
+        case $location[Uncle Gator\'s Country Fun-Time Liquid Waste Sluice]:
             return $item[airplane charter: Dinseylandfill].is_unrestricted() && (get_property_boolean("_stenchAirportToday") || get_property_boolean("stenchAirportAlways"));
         case $location[The SMOOCH Army HQ]:
         case $location[The Velvet / Gold Mine]:
         case $location[LavaCo&trade; Lamp Factory]:
-        case $location[The Bubblin' Caldera]:
+        case $location[The Bubblin\' Caldera]:
             return $item[airplane charter: That 70s Volcano].is_unrestricted() && (get_property_boolean("_hotAirportToday") || get_property_boolean("hotAirportAlways"));
         case $location[The Ice Hotel]:
         case $location[VYKEA]:
@@ -555,10 +554,10 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
             return questPropertyPastInternalStepNumber("questL08Trapper", 1);
         case $location[The Penultimate Fantasy Airship]:
             return questPropertyPastInternalStepNumber("questL10Garbage", 2);
-        case $location[anger man's level]:
-        case $location[fear man's level]:
-        case $location[doubt man's level]:
-        case $location[regret man's level]:
+        case $location[anger man\'s level]:
+        case $location[fear man\'s level]:
+        case $location[doubt man\'s level]:
+        case $location[regret man\'s level]:
             return get_campground()[$item[jar of psychoses (The Crackpot Mystic)]] > 0;
         case $location[the gourd!]:
             return get_campground()[$item[jar of psychoses (The Captain of the Gourd)]] > 0;
@@ -576,13 +575,13 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
         //case $location[3rd Floor, Shiawase-Mitsuhama Building]:
         case $location[Chinatown Tenement]:
             return $item[test site key].available_amount() > 0 && get_campground()[$item[jar of psychoses (The Suspicious-Looking Guy)]] > 0;
-        case $location[whitey's grove]:
+        case $location[whitey\'s grove]:
             return questPropertyPastInternalStepNumber("questG02Whitecastle", 1) || questPropertyPastInternalStepNumber("questL11Palindome", 4); //FIXME what step for questL11Palindome?
-        case $location[the Obligatory pirate's cove]:
+        case $location[the Obligatory pirate\'s cove]:
             return get_property_ascension("lastIslandUnlock") && !(QuestState("questL12War").mafia_internal_step >= 2 && !QuestState("questL12War").finished);
         case $location[Inside the Palindome]:
-            return $item[talisman o' namsilat].equipped_amount() > 0; //technically
-        case $location[The Valley of Rof L'm Fao]:
+            return $item[talisman o\' namsilat].equipped_amount() > 0; //technically
+        case $location[The Valley of Rof L\'m Fao]:
             return QuestState("questL09Topping").finished;
         case $location[Swamp Beaver Territory]:
             return get_property_boolean("maraisBeaverUnlock");
@@ -659,14 +658,12 @@ void locationAvailablePrivateInit()
 	item [string] zones_unlocked_by_item;
 	effect [string] zones_unlocked_by_effect;
 	
-	locations_unlocked_by_item[$location[Cobb's Knob Laboratory]] = $item[Cobb's Knob lab key];
-	locations_unlocked_by_item[$location[Cobb's Knob Menagerie\, Level 1]] = $item[Cobb's Knob Menagerie key];
-	locations_unlocked_by_item[$location[Cobb's Knob Menagerie\, Level 2]] = $item[Cobb's Knob Menagerie key];
-	locations_unlocked_by_item[$location[Cobb's Knob Menagerie\, Level 3]] = $item[Cobb's Knob Menagerie key];
+	locations_unlocked_by_item[$location[Cobb\'s Knob Laboratory]] = $item[Cobb\'s Knob lab key];
+	locations_unlocked_by_item[$location[Cobb\'s Knob Menagerie\, Level 1]] = $item[Cobb\'s Knob Menagerie key];
+	locations_unlocked_by_item[$location[Cobb\'s Knob Menagerie\, Level 2]] = $item[Cobb\'s Knob Menagerie key];
+	locations_unlocked_by_item[$location[Cobb\'s Knob Menagerie\, Level 3]] = $item[Cobb\'s Knob Menagerie key];
 	
-	//locations_unlocked_by_item[$location[the haunted ballroom]] = $item[spookyraven ballroom key];
 	locations_unlocked_by_item[$location[The Haunted Library]] = $item[7302]; //library key
-	//locations_unlocked_by_item[$location[The Haunted Gallery]] = $item[spookyraven gallery key];
 	locations_unlocked_by_item[$location[The Castle in the Clouds in the Sky (Basement)]] = $item[S.O.C.K.];
 	locations_unlocked_by_item[$location[the hole in the sky]] = $item[steam-powered model rocketship];
     if (my_path_id() == PATH_EXPLOSION)
@@ -675,13 +672,12 @@ void locationAvailablePrivateInit()
         locations_unlocked_by_item[$location[the hole in the sky]] = $item[none];
     }
 	
-	locations_unlocked_by_item[$location[Vanya's Castle Foyer]] = $item[map to Vanya's Castle];
-	
+	locations_unlocked_by_item[$location[Vanya\'s Castle Foyer]] = $item[map to Vanya\'s Castle];
 	
 	zones_unlocked_by_item["Magic Commune"] = $item[map to the Magic Commune];
-	zones_unlocked_by_item["Landscaper"] = $item[Map to The Landscaper's Lair];
+	zones_unlocked_by_item["Landscaper"] = $item[Map to The Landscaper\'s Lair];
 	zones_unlocked_by_item["Kegger"] = $item[map to the Kegger in the Woods];
-	zones_unlocked_by_item["Ellsbury's Claim"] = $item[Map to Ellsbury's Claim];
+	zones_unlocked_by_item["Ellsbury's Claim"] = $item[Map to Ellsbury\'s Claim];
 	zones_unlocked_by_item["Memories"] = $item[empty agua de vida bottle];
 	zones_unlocked_by_item["Casino"] = $item[casino pass];
 	
@@ -1168,7 +1164,7 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         string [string] lookup_map;
             
         //Conditionals only:
-        if ($location[cobb's knob barracks].locationAvailable())
+        if ($location[cobb\'s knob barracks].locationAvailable())
             lookup_map["The Outskirts of Cobb's Knob"] = "cobbsknob.php";
         else
             lookup_map["The Outskirts of Cobb's Knob"] = "place.php?whichplace=plains";
@@ -1178,7 +1174,7 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         else
             lookup_map["Post-Quest Bugbear Pens"] =  "place.php?whichplace=knoll_hostile";
             
-        if ($item[talisman o' namsilat].equipped_amount() > 0)
+        if ($item[talisman o\' namsilat].equipped_amount() > 0)
             lookup_map["Palindome"] = "place.php?whichplace=palindome";
         else
             lookup_map["Palindome"] = "inventory.php?which=2";

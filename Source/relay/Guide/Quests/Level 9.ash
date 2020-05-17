@@ -343,7 +343,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
 			if ($item[jar of oil].available_amount() == 0 && !jar_completed)
             {
                 string line = HTMLGenerateSpanFont("Jar of oil required", "red") + ".";
-                if ($item[bubblin' crude].available_amount() >= 12)
+                if ($item[bubblin\' crude].available_amount() >= 12)
                     line += " Can make by multi-using 12 bubblin' crude.";
                 else
                     line += " Visit oil peak for bubblin' crude.";
@@ -386,7 +386,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
 		task_entries.listAppend(ChecklistEntryMake("twin peak", url, ChecklistSubentryMake("Twin Peak", modifiers, details), $locations[twin peak]));
 	}
     boolean need_jar_of_oil = false;
-    if ($item[jar of oil].available_amount() == 0 && $item[bubblin' crude].available_amount() < 12 && !base_quest_state.state_boolean["Peak Jar Completed"] && base_quest_state.state_boolean["can complete twin peaks quest quickly"])
+    if ($item[jar of oil].available_amount() == 0 && $item[bubblin\' crude].available_amount() < 12 && !base_quest_state.state_boolean["Peak Jar Completed"] && base_quest_state.state_boolean["can complete twin peaks quest quickly"])
         need_jar_of_oil = true;
         
 	if (base_quest_state.state_float["oil peak pressure"] > 0.0 || need_jar_of_oil)

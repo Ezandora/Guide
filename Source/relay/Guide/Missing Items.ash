@@ -65,7 +65,7 @@ void generateMissingItems(Checklist [int] checklists)
             source.component = $item[lowercase n];
             source.drop_rate = 30;
             source.monster_dropped_from = $monster[XXX pr0n];
-            source.location_dropped_from = $location[The Valley of Rof L'm Fao];
+            source.location_dropped_from = $location[The Valley of Rof L\'m Fao];
             component_sources.listAppend(source);
         }
         
@@ -110,12 +110,9 @@ void generateMissingItems(Checklist [int] checklists)
 		items_needed_entries.listAppend(entry);
 	}
 	
-	if (!__quest_state["Level 13"].state_boolean["past keys"])
-	{
-		//Key items:
-		
-		if ($item[skeleton key].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["skeleton key used"])
-		{
+	if (!__quest_state["Level 13"].state_boolean["past keys"] && my_path_id() != PATH_LOW_KEY_SUMMER)
+	{		
+		if ($item[skeleton key].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["skeleton key used"]) {
 			string line = "loose teeth";
 			if ($item[loose teeth].available_amount() == 0)
 				line += " (need)";
@@ -129,11 +126,9 @@ void generateMissingItems(Checklist [int] checklists)
 			items_needed_entries.listAppend(ChecklistEntryMake("__item skeleton key", $location[the defiled nook].getClickableURLForLocation(), ChecklistSubentryMake("Skeleton key", "", line)));
 		}
 		
-		if ($item[digital key].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["digital key used"])
-		{
+		if ($item[digital key].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["digital key used"]) {
 			string [int] options;
-            if ($item[digital key].creatable_amount() > 0)
-            {
+            if ($item[digital key].creatable_amount() > 0) {
                 options.listAppend("Have enough pixels, make it.");
             }
             else
@@ -155,15 +150,15 @@ void generateMissingItems(Checklist [int] checklists)
 		string from_daily_dungeon_string = "From daily dungeon";
 		if ($item[fat loot token].available_amount() > 0)
 			from_daily_dungeon_string += "|" + pluralise($item[fat loot token]) + " available";
-		if ($item[sneaky pete's key].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["Sneaky Pete's key used"])
+		if ($item[sneaky pete\'s key].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["Sneaky Pete\'s key used"])
 		{
 			string [int] options;
 			options.listAppend(from_daily_dungeon_string);
 			if (__misc_state_int["pulls available"] > 0 && __misc_state["can eat just about anything"])
 				options.listAppend("From key lime pie");
-			items_needed_entries.listAppend(ChecklistEntryMake("__item Sneaky Pete's key", "da.php", ChecklistSubentryMake("Sneaky Pete's key", "", options)));
+			items_needed_entries.listAppend(ChecklistEntryMake("__item Sneaky Pete\'s key", "da.php", ChecklistSubentryMake("Sneaky Pete\'s key", "", options)));
 		}
-		if ($item[jarlsberg's key].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["Jarlsberg's key used"])
+		if ($item[jarlsberg\'s key].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["Jarlsberg\'s key used"])
 		{
 			string [int] options;
 			options.listAppend(from_daily_dungeon_string);
@@ -171,7 +166,7 @@ void generateMissingItems(Checklist [int] checklists)
 				options.listAppend("From key lime pie");
 			items_needed_entries.listAppend(ChecklistEntryMake("__item jarlsberg's key", "da.php", ChecklistSubentryMake("Jarlsberg's key", "", options)));
 		}
-		if ($item[Boris's key].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["Boris's key used"])
+		if ($item[Boris\'s key].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["Boris\'s key used"])
 		{
 			string [int] options;
 			options.listAppend(from_daily_dungeon_string);
@@ -181,7 +176,7 @@ void generateMissingItems(Checklist [int] checklists)
 		}
 	}
 	
-	if ($item[lord spookyraven's spectacles].available_amount() == 0 && __quest_state["Level 11 Manor"].state_boolean["Can use fast route"] && !__quest_state["Level 11 Manor"].finished)
+	if ($item[lord spookyraven\'s spectacles].available_amount() == 0 && __quest_state["Level 11 Manor"].state_boolean["Can use fast route"] && !__quest_state["Level 11 Manor"].finished)
 		items_needed_entries.listAppend(ChecklistEntryMake("__item lord spookyraven's spectacles", $location[the haunted bedroom].getClickableURLForLocation(), ChecklistSubentryMake("Lord Spookyraven's spectacles", "", "Found in Haunted Bedroom")));
     
     if ($item[enchanted bean].available_amount() == 0 && !__quest_state["Level 10"].state_boolean["beanstalk grown"])

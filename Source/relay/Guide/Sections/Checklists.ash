@@ -52,7 +52,7 @@ void generateMisc(Checklist [int] checklists)
             url = "peevpee.php";
             
         description.listAppend(line);
-        if ($item[drunkula's wineglass].available_amount() > 0 && $item[drunkula's wineglass].can_equip() && my_adventures() > 0)
+        if ($item[drunkula\'s wineglass].available_amount() > 0 && $item[drunkula\'s wineglass].can_equip() && my_adventures() > 0)
         {
             description.listAppend("Or equip your wineglass.");
         }
@@ -252,7 +252,7 @@ void generateChecklists(Checklist [int] ordered_output_checklists)
 	listClear(keys_to_remove);
 	
 	//Go through desired output order:
-	string [int] setting_desired_output_order = split_string_alternate("Tasks,Optional Tasks,Unimportant Tasks,Future Tasks,Resources,Future Unimportant Tasks,Required Items,Suggested Pulls,Florist Friar,Strategy", ",");
+	string [int] setting_desired_output_order = split_string_alternate("Tasks,Keys,Optional Tasks,Unimportant Tasks,Future Tasks,Resources,Future Unimportant Tasks,Required Items,Suggested Pulls,Florist Friar,Strategy", ",");
 	foreach key in setting_desired_output_order {
 		string title = setting_desired_output_order[key];
 		//Find title in checklists:

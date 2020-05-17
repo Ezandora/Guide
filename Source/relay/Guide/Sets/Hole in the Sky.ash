@@ -26,7 +26,7 @@ void QHitsInit()
     int stars_want = 0;
     int lines_want = 0;
     
-	if ($item[richard's star key].available_amount() == 0)
+	if ($item[richard\'s star key].available_amount() == 0)
     {
 		charts_want += 1;
 		stars_want += 8;
@@ -64,12 +64,12 @@ void QHitsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] 
     
     string [int] item_names_needed;
     
-	if ($item[richard's star key].available_amount() == 0)
+	if ($item[richard\'s star key].available_amount() == 0)
 	{
 		star_charts_needed += 1;
 		stars_needed_base += 8;
 		lines_needed_base += 7;
-		item_names_needed.listAppend($item[richard's star key]);
+		item_names_needed.listAppend($item[richard\'s star key]);
 	}
     int [int] stars_needed_options;
     int [int] lines_needed_options;
@@ -283,21 +283,20 @@ void QHitsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] 
 
 void QHitsGenerateMissingItems(ChecklistEntry [int] items_needed_entries)
 {
-	if (!__misc_state["in run"] && !__misc_state["Example mode"])
+	if (!__misc_state["in run"] && !__misc_state["Example mode"] && my_path_id() != PATH_LOW_KEY_SUMMER)
 		return;
-	if (__quest_state["Level 13"].state_boolean["Richard's star key used"])
+	if (__quest_state["Level 13"].state_boolean["Richard\'s star key used"])
 		return;
-	//is this the best way to convey this information?
-	//maybe all together instead? complicated...
+
     string url = $location[the hole in the sky].getClickableURLForLocation();
     if (!$location[the hole in the sky].locationAvailable())
         url = $location[The Castle in the Clouds in the Sky (basement)].getClickableURLForLocation();
-	if ($item[richard's star key].available_amount() == 0)
+	if ($item[richard\'s star key].available_amount() == 0)
 	{
 		string [int] oh_my_stars_and_gauze_garters;
 		oh_my_stars_and_gauze_garters.listAppend(MIN(1, $item[star chart].available_amount()) + "/1 star chart");
 		oh_my_stars_and_gauze_garters.listAppend(MIN(8, $item[star].available_amount()) + "/8 stars");
 		oh_my_stars_and_gauze_garters.listAppend(MIN(7, $item[line].available_amount()) + "/7 lines");
-		items_needed_entries.listAppend(ChecklistEntryMake("__item richard's star key", url, ChecklistSubentryMake("Richard's star key", "", oh_my_stars_and_gauze_garters.listJoinComponents(", ", "and"))));
+		items_needed_entries.listAppend(ChecklistEntryMake("__item richard\'s star key", url, ChecklistSubentryMake("Richard\'s star key", "", oh_my_stars_and_gauze_garters.listJoinComponents(", ", "and"))));
 	}
 }

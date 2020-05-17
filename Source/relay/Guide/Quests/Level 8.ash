@@ -70,7 +70,7 @@ void QLevel8GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 			
 				
 			if ($skill[Advanced Saucecrafting].skill_is_usable() && fullness_limit() > 0 && __misc_state["can eat just about anything"] && my_path_id() != PATH_SLOW_AND_STEADY)
-				cheese_lines.listAppend("Have " + pluralise($item[glass of goat's milk]) + " for magnesium (20% drop)");
+				cheese_lines.listAppend("Have " + pluralise($item[glass of goat\'s milk]) + " for magnesium (20% drop)");
 		}
 		
 		subentry.entries.listAppend(cheese_header + HTMLGenerateIndentedText(cheese_lines));

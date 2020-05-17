@@ -375,38 +375,24 @@ Record KramcoSausageFightInformation
     float probability_of_sausage_fight;
 };
 
-KramcoSausageFightInformation KramcoCalculateSausageFightInformation()
-{
+KramcoSausageFightInformation KramcoCalculateSausageFightInformation() {
     KramcoSausageFightInformation information;
-    int last_sausage_turn = get_property_int("_lastSausageMonsterTurn"); //FIXME
-    int sausage_fights = get_property_int("_sausageFights");
+    int goblinsFought = get_property_int("_sausageFights");    
+    int turnsSinceLastGoblin = total_turns_played() - get_property_int("_lastSausageMonsterTurn");
+
+    int nextGuaranteedGoblin = 4 + goblinsFought * 3 + MAX(0, goblinsFought - 5) * MAX(0, goblinsFought - 5) * MAX(0, goblinsFought - 5);
+    int turnsToNextGuaranteedFight = MAX(0, nextGuaranteedGoblin - turnsSinceLastGoblin);
     
-    
-    
-    //These ceilings are not correct; they are merely what I have spaded so far. The actual values are higher.
-    int [int] observed_ceilings = {0, 7, 10, 13, 16, 19, 23, 33, 54, 93, 154, 219, 220, 220, 220, 220, 220, 220, 220, 220, 220, 220, 220, 220, 220, 220, 220, 220, 220, 220};
-    
-    int turn_will_always_see_goblin = observed_ceilings[sausage_fights];
-    
-    int delta = total_turns_played() - last_sausage_turn;
-    
-    
-    information.turns_to_next_guaranteed_fight = MAX(0, turn_will_always_see_goblin - delta);
-    //Goblins do not appear on the same turn as semi-rares.
-    if (information.turns_to_next_guaranteed_fight == 0 && CounterLookup("Semi-rare").CounterGetNextExactTurn() == 0)
-    	information.turns_to_next_guaranteed_fight += 1;
-    
-    if (!(observed_ceilings contains sausage_fights))
-         information.turns_to_next_guaranteed_fight = -1;
-      
-    if (turn_will_always_see_goblin > 1)
-    {
-        //This is probably wrong?
-        float probability_each_incorrect = 1.0 / to_float(turn_will_always_see_goblin + 1);
-        information.probability_of_sausage_fight = clampf((delta + 1) * probability_each_incorrect, 0.0, 1.0);
+    if (goblinsFought == 0) {
+        turnsToNextGuaranteedFight = 0;
     }
-    information.goblin_will_appear = information.turns_to_next_guaranteed_fight == 0;
-    
+
+    int goblinMultiplier = MAX(0, goblinsFought - 5);
+    float probabilityOfFight = to_float(turnsSinceLastGoblin + 1) / (5.0 + to_float(goblinsFought) * 3.0 + to_float(goblinMultiplier) * to_float(goblinMultiplier) * to_float(goblinMultiplier));
+
+    information.turns_to_next_guaranteed_fight = MAX(0, nextGuaranteedGoblin - turnsSinceLastGoblin);
+    information.probability_of_sausage_fight = clampf(probabilityOfFight, 0.0, 1.0);
+    information.goblin_will_appear = (turnsToNextGuaranteedFight == 0);
     
     return information;
 }

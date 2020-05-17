@@ -71,3 +71,4 @@ import "relay/Guide/Items of the Month/Bird-a-Day Calendar.ash";
 import "relay/Guide/Items of the Month/Powerful Glove.ash";
 import "relay/Guide/Items of the Month/Better Shrooms and Gardens.ash";
 // Missing: Left-Hand Man
+// Missing: Guzzlr
