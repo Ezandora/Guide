@@ -13,8 +13,7 @@ void IOTMPizzaCube(ChecklistEntry [int] resource_entries)
         
         boolean need_cheese = $item[goat cheese].available_amount() <3; // Obviously incomplete
 
-        if (need_cheese)
-        {
+        if (need_cheese) {
             description.listAppend(HTMLGenerateSpanOfClass("\"cheese\"/\"milk\":", "r_bold") + " 3 goat cheese");
         }
         description.listAppend(HTMLGenerateSpanOfClass("\"luck\"/\"green\":", "r_bold") + " clover");
