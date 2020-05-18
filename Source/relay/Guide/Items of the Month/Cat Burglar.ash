@@ -63,8 +63,6 @@ void IOTMCatBurglarGenerateResource(ChecklistEntry [int] resource_entries)
             	options.listAppend("Killing jar, from the haunted library.");
             if (!have_outfit_components("Knob Goblin Elite Guard Uniform") && !have_outfit_components("Knob Goblin Harem Girl Disguise") && !__quest_state["Level 5"].finished)
             	options.listAppend("Harem girl outfit, if you can't reach +400% item.");
-            if (__quest_state["Level 9"].state_int["a-boo peak hauntedness"] > 0 && $item[a-boo clue].available_amount() < 3)
-                options.listAppend("A-boo clues, from the A-Boo peak?");
         }
         if (options.count() > 0)
         	description.listAppend("Could steal:|*-" + options.listJoinComponents("|*-"));
