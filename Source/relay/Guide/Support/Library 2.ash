@@ -337,32 +337,32 @@ int PathCommunityServiceEstimateTurnsTakenForTask(string service_name)
             modifier_1 *= 2;
             modifier_2 *= 2;
         }
-        turns = 60 - (floor(modifier_1 / 50) + floor(modifier_2 / 50));
+        turns = 60 - (floor(modifier_1 / 50 + 0.001) + floor(modifier_2 / 50 + 0.001));
     }
     else if (service_name == "Make Sausage")
     {
-        turns = 60 - (floor(numeric_modifier("Spell Damage") / 50) + floor(numeric_modifier("Spell Damage Percent") / 50));
+        turns = 60 - (floor(numeric_modifier("Spell Damage") / 50 + 0.001) + floor(numeric_modifier("Spell Damage Percent") / 50 + 0.001));
     }
     else if (service_name == "Clean Steam Tunnels")
     {
-        turns = 60 - numeric_modifier("Hot Resistance");
+        turns = 60 - round(numeric_modifier("Hot Resistance"));
     }
     else if (service_name == "Breed More Collies")
     {
-        int current_familiar_weight = my_familiar().effective_familiar_weight() + numeric_modifier("familiar weight");
+        int current_familiar_weight = my_familiar().effective_familiar_weight() + round(numeric_modifier("familiar weight"));
         turns = 60 - floor(current_familiar_weight / 5);
     }
     else if (service_name == "Be a Living Statue")
     {
-        float combat_rate_raw = numeric_modifier("Combat Rate");
+        int combat_rate_raw = round(numeric_modifier("Combat Rate"));
         int combat_rate_inverse = 0;
         if (combat_rate_raw < 0) combat_rate_inverse = -combat_rate_raw;
         if (combat_rate_inverse > 25) combat_rate_inverse = (combat_rate_inverse - 25) * 5 + 25;
-        turns = 60 - floor(combat_rate_inverse / 5) * 3;
+        turns = 60 - (combat_rate_inverse / 5) * 3;
     }
-    
+
     turns = clampi(turns, 1, 60);
-    
+
     return turns;
 }
 
