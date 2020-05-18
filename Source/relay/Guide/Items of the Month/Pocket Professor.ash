@@ -18,7 +18,7 @@ void IOTMPocketProfessorResource(ChecklistEntry [int] resource_entries)
 
         // Title
         int lecturesUsed = get_property_int("_pocketProfessorLectures");
-        int numOfLectures = calculateMaxLectures() - lecturesUsed;
+        int numOfLectures = MAX(0,calculateMaxLectures() - lecturesUsed);
 
         string main_title = numOfLectures + " lectures";
 

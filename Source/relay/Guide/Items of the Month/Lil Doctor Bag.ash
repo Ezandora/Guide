@@ -51,18 +51,11 @@ void IOTMLilDoctorBagGenerateResource(ChecklistEntry [int] resource_entries)
     {
         string url;
         string [int] description;
-        description.listAppend("Free run/banish.");
-        Banish banish_entry = BanishByName("Reflex Hammer");
-        int turns_left_of_banish = banish_entry.BanishTurnsLeft();
-        if (turns_left_of_banish > 0)
-        {
-            //is this relevant? we don't describe this for pantsgiving
-            description.listAppend("Currently used on " + banish_entry.banished_monster + " for " + pluralise(turns_left_of_banish, "more turn", "more turns") + ".");
-        }
-        if (lookupItem("Lil' Doctor&trade; bag").equipped_amount() == 0)
-        {
-            description.listAppend("Equip the Lil'l Doctor™ bag first.");
+        if (lookupItem("Lil' Doctor&trade; bag").equipped_amount() == 0) {
+            description.listAppend(HTMLGenerateSpanFont("Equip the Lil'l Doctor™ bag first", "red"));
             url = "inventory.php?which=3";
+        } else {
+            description.listAppend("Free run/banish");
         }
         resource_entries.listAppend(ChecklistEntryMake("__item Lil' Doctor&trade; bag", url, ChecklistSubentryMake(pluralise(banishes_left, "reflex hammer", "reflex hammers"), "", description), 0).ChecklistEntryTagEntry("banish"));
     }

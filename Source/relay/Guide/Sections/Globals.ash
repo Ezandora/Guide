@@ -64,10 +64,6 @@ void RegisterResourceGenerationFunction(string function_name) {
     RegisterSpecificChecklistGenerationFunction1(function_name, "Resources");
 }
 
-void RegisterBannishGenerationFunction(string function_name) {
-    RegisterSpecificChecklistGenerationFunction1(function_name, "Banishes");
-}
-
 void RegisterLowKeyGenerationFunction(string function_name) {
     RegisterSpecificChecklistGenerationFunction1(function_name, "Keys");
 }

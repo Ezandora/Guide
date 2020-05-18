@@ -39,8 +39,7 @@ RegisterResourceGenerationFunction("IOTMMaySaberGenerateResource");
 void IOTMMaySaberGenerateResource(ChecklistEntry [int] resource_entries)
 {
 	if (lookupItem("Fourth of May Cosplay Saber").available_amount() == 0) return;
-	if (get_property_int("_saberForceUses") < 5)
-	{
+	if (get_property_int("_saberForceUses") < 5) {
 		int uses_remaining = clampi(5 - get_property_int("_saberForceUses"), 0, 5);
 		string url = "";
         if (!lookupItem("Fourth of May Cosplay Saber").equipped())
@@ -56,7 +55,48 @@ void IOTMMaySaberGenerateResource(ChecklistEntry [int] resource_entries)
         }
         //description.listAppend("Choose one of:|*" + options.listJoinComponents("|*"));
         resource_entries.listAppend(ChecklistEntryMake("__item Fourth of May Cosplay Saber", url, ChecklistSubentryMake(pluralise(uses_remaining, "force use", "forces uses"), "", description), 0));
-		
-	}
+	}	
+}
+
+RegisterResourceGenerationFunction("IOTMMaySaberBanishResource");
+void IOTMMaySaberBanishResource(ChecklistEntry [int] resource_entries) {
+
+    int banishesAvailable = clampi(5 - get_property_int("_saberForceUses"), 0, 5);
+
+    ChecklistSubentry getBanishes() {
+        // Title
+        string main_title = banishesAvailable + " force uses";
+
+        // Subtitle
+        string subtitle = "";
+
+        // Entries
+        string [int] description;
+
+        if (banishesAvailable > 0) {
+            if (!have_equipped(lookupItem("Fourth of May Cosplay Saber"))) {
+                description.listAppend(HTMLGenerateSpanFont("Equip the Fourth of May saber first", "red"));
+            } else {
+                description.listAppend("Free run/banish");
+            }
+        }
+
+        return ChecklistSubentryMake(main_title, subtitle, description);
+    }
+
+	if (lookupItem("Fourth of May Cosplay Saber").available_amount() == 0) return;
 	
+    ChecklistEntry entry;
+    entry.ChecklistEntryTagEntry("banish");
+    entry.image_lookup_name = "__item Fourth of May Cosplay Saber";
+    entry.url = "inventory.php?which=2";
+
+    if (banishesAvailable > 0) {
+        ChecklistSubentry banishes = getBanishes();
+        entry.subentries.listAppend(banishes);
+    }
+    
+    if (entry.subentries.count() > 0) {
+        resource_entries.listAppend(entry);
+    }
 }
