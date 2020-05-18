@@ -23,7 +23,7 @@ void QLevel4Init()
             state.state_int["areas unlocked"] = 1;
         if ($location[the beanbat chamber].locationAvailable())
             state.state_int["areas unlocked"] = 2;
-        if ($location[the boss bat's lair].locationAvailable())
+        if ($location[the boss bat\'s lair].locationAvailable())
             state.state_int["areas unlocked"] = 3;
             
 	}
@@ -55,13 +55,13 @@ void QLevel4GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         subentry.entries.listAppend("Quest finished, speak to the council of loathing.");
         url = "place.php?whichplace=town";
     }
-    else if ($location[the boss bat's lair].locationAvailable())
+    else if ($location[the boss bat\'s lair].locationAvailable())
     {
         subentry.entries.listAppend("Possibly run +meat in the boss bat's lair. (250 meat drop)");
         subentry.modifiers.listAppend("+meat");
-		if (delayRemainingInLocation($location[the boss bat's lair]) > 0)
+		if (delayRemainingInLocation($location[the boss bat\'s lair]) > 0)
 		{
-			string line = "Delay for " + pluralise(delayRemainingInLocation($location[the boss bat's lair]), "turn", "turns") + " before boss bat shows up.";
+			string line = "Delay for " + pluralise(delayRemainingInLocation($location[the boss bat\'s lair]), "turn", "turns") + " before boss bat shows up.";
             subentry.entries.listAppend(line);
 		}
     }

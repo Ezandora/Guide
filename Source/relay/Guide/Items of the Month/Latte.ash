@@ -23,13 +23,17 @@ void IOTMLatteGenerateResource(ChecklistEntry [int] resource_entries)
     {
     	string banish_url = url;
     	string [int] description;
-     	description.listAppend("Free run/banish." + (latte_needs_equipping ? " Equip latte first." : "") + "|Throw Latte on Opponent in combat.");
-         
-        if (banish_used)
-        {
-        	banish_url = "main.php?latte=1";
-        	description.listAppend(HTMLGenerateSpanFont("Must refill latte first.", "red"));
+
+        if (banish_used) {
+            banish_url = "main.php?latte=1";
+            description.listAppend(HTMLGenerateSpanFont("Must refill latte first.", "red"));
+        } else if (latte_needs_equipping) {
+            banish_url = "inventory.php?which=3";
+            description.listAppend(HTMLGenerateSpanFont("Equip the latte first", "red"));
+        } else {
+            description.listAppend("Free run/banish");
         }
+
         resource_entries.listAppend(ChecklistEntryMake("__item latte lovers member's mug", banish_url, ChecklistSubentryMake(pluralise(banishes_available, "latte banish", "latte banishes"), "", description), 0).ChecklistEntryTagEntry("banish"));
     }
     

@@ -1,8 +1,7 @@
 import "relay/Guide/Support/List.ash";
 import "relay/Guide/Support/Ingredients.ash"
 
-static
-{
+static {
     int PATH_UNKNOWN = -1;
     int PATH_NONE = 0;
     int PATH_BOOZETAFARIAN = 1;
@@ -53,8 +52,7 @@ static
 
 int __my_path_id_cached = -11;
 
-int initialiseMyPathID()
-{
+int initialiseMyPathID() {
     string path_name = my_path();
     
     if (path_name == "" || path_name == "None")
@@ -119,7 +117,7 @@ int initialiseMyPathID()
         __my_path_id_cached = PATH_POCKET_FAMILIARS;
     else if (path_name == "G-Lover" || path_name == "33")
         __my_path_id_cached = PATH_G_LOVER;
-    else if (path_name == "Disguises Delimit" || path_name == 34)
+    else if (path_name == "Disguises Delimit" || path_name == "34")
         __my_path_id_cached = PATH_DISGUISES_DELIMIT;
     else if (path_name == "Dark Gyffte")
         __my_path_id_cached = PATH_DARK_GYFFTE;
@@ -129,19 +127,19 @@ int initialiseMyPathID()
     	__my_path_id_cached = PATH_EXPLOSION;
     else if (path_name == "38" || path_name == "Path of the Plumber")
     	__my_path_id_cached = PATH_OF_THE_PLUMBER;
+    else if (path_name == "39" || path_name == "Low Key Summer")
+    	__my_path_id_cached = PATH_LOW_KEY_SUMMER;
     else
         __my_path_id_cached = PATH_UNKNOWN;
     return __my_path_id_cached;
 }
 initialiseMyPathID();
 
-int my_path_id()
-{
+int my_path_id() {
     return __my_path_id_cached;
 }
 
-float numeric_modifier_replacement(item it, string modifier)
-{
+float numeric_modifier_replacement(item it, string modifier) {
     string modifier_lowercase = modifier.to_lower_case();
     float additional = 0;
     if (my_path_id() == PATH_G_LOVER && !it.contains_text("g") && !it.contains_text("G"))
@@ -176,19 +174,14 @@ float numeric_modifier_replacement(item it, string modifier)
 }
 
 
-static
-{
+static {
     skill [class][int] __skills_by_class;
     
-    void initialiseSkillsByClass()
-    {
+    void initialiseSkillsByClass() {
         if (__skills_by_class.count() > 0) return;
-        foreach s in $skills[]
-        {
-            if (s.class != $class[none])
-            {
-                if (!(__skills_by_class contains s.class))
-                {
+        foreach s in $skills[] {
+            if (s.class != $class[none]) {
+                if (!(__skills_by_class contains s.class)) {
                     skill [int] blank;
                     __skills_by_class[s.class] = blank;
                 }
@@ -200,14 +193,11 @@ static
 }
 
 
-static
-{
+static {
     boolean [skill] __libram_skills;
     
-    void initialiseLibramSkills()
-    {
-        foreach s in $skills[]
-        {
+    void initialiseLibramSkills() {
+        foreach s in $skills[] {
             if (s.libram)
                 __libram_skills[s] = true;
         }
@@ -216,37 +206,31 @@ static
 }
 
 
-static
-{
+static {
     boolean [item] __items_that_craft_food;
     boolean [item] __minus_combat_equipment;
     boolean [item] __equipment;
     boolean [item] __items_in_outfits;
     boolean [string][item] __equipment_by_numeric_modifier;
-    void initialiseItems()
-    {
-        foreach it in $items[]
-        {
+    void initialiseItems() {
+        foreach it in $items[] {
             //Crafting:
             string craft_type = it.craft_type();
-            if (craft_type.contains_text("Cooking"))
-            {
-                foreach ingredient in it.get_ingredients_fast()
-                {
+            if (craft_type.contains_text("Cooking")) {
+                foreach ingredient in it.get_ingredients_fast() {
                     __items_that_craft_food[ingredient] = true;
                 }
             }
             
             //Equipment:
-            if ($slots[hat,weapon,off-hand,back,shirt,pants,acc1,acc2,acc3,familiar] contains it.to_slot())
-            {
+            if ($slots[hat,weapon,off-hand,back,shirt,pants,acc1,acc2,acc3,familiar] contains it.to_slot()) {
                 __equipment[it] = true;
-                if (it.numeric_modifier("combat rate") < 0)
+                if (it.numeric_modifier("combat rate") < 0) {
                     __minus_combat_equipment[it] = true;
+                }
             }
         }
-        foreach key, outfit_name in all_normal_outfits()
-        {
+        foreach key, outfit_name in all_normal_outfits() {
             foreach key, it in outfit_pieces(outfit_name)
                 __items_in_outfits[it] = true;
         }
@@ -355,7 +339,7 @@ item lookupAWOLOilForMonster(monster m)
 
 static
 {
-    monster [location] __protonic_monster_for_location {$location[Cobb's Knob Treasury]:$monster[The ghost of Ebenoozer Screege], $location[The Haunted Conservatory]:$monster[The ghost of Lord Montague Spookyraven], $location[The Haunted Gallery]:$monster[The ghost of Waldo the Carpathian], $location[The Haunted Kitchen]:$monster[The Icewoman], $location[The Haunted Wine Cellar]:$monster[The ghost of Jim Unfortunato], $location[The Icy Peak]:$monster[The ghost of Sam McGee], $location[Inside the Palindome]:$monster[Emily Koops, a spooky lime], $location[Madness Bakery]:$monster[the ghost of Monsieur Baguelle], $location[The Old Landfill]:$monster[The ghost of Vanillica "Trashblossom" Gorton], $location[The Overgrown Lot]:$monster[the ghost of Oily McBindle], $location[The Skeleton Store]:$monster[boneless blobghost], $location[The Smut Orc Logging Camp]:$monster[The ghost of Richard Cockingham], $location[The Spooky Forest]:$monster[The Headless Horseman]};
+    monster [location] __protonic_monster_for_location {$location[Cobb\'s Knob Treasury]:$monster[The ghost of Ebenoozer Screege], $location[The Haunted Conservatory]:$monster[The ghost of Lord Montague Spookyraven], $location[The Haunted Gallery]:$monster[The ghost of Waldo the Carpathian], $location[The Haunted Kitchen]:$monster[The Icewoman], $location[The Haunted Wine Cellar]:$monster[The ghost of Jim Unfortunato], $location[The Icy Peak]:$monster[The ghost of Sam McGee], $location[Inside the Palindome]:$monster[Emily Koops, a spooky lime], $location[Madness Bakery]:$monster[the ghost of Monsieur Baguelle], $location[The Old Landfill]:$monster[The ghost of Vanillica "Trashblossom" Gorton], $location[The Overgrown Lot]:$monster[the ghost of Oily McBindle], $location[The Skeleton Store]:$monster[boneless blobghost], $location[The Smut Orc Logging Camp]:$monster[The ghost of Richard Cockingham], $location[The Spooky Forest]:$monster[The Headless Horseman]};
 }
 
 

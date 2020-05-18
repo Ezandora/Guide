@@ -13,11 +13,7 @@ void setUpExampleState()
 	foreach quest_name in __quest_state
 	{
 		QuestState state = __quest_state[quest_name];
-		
-		
 		QuestStateParseMafiaQuestPropertyValue(state, "started");
-		
-		
 		__quest_state[quest_name] = state;
 	}
 	
@@ -35,11 +31,11 @@ void computeFatLootTokens()
     boolean need_jarlsberg_key = true;
     boolean need_sneaky_pete_key = true;
     
-    if ($item[boris's key].available_amount() > 0)
+    if ($item[boris\'s key].available_amount() > 0)
         need_boris_key = false;
-    if ($item[jarlsberg's key].available_amount() > 0)
+    if ($item[jarlsberg\'s key].available_amount() > 0)
         need_jarlsberg_key = false;
-    if ($item[sneaky pete's key].available_amount() > 0)
+    if ($item[sneaky pete\'s key].available_amount() > 0)
         need_sneaky_pete_key = false;
         
     if (__quest_state["Level 13"].state_boolean["Sneaky Pete's key used"])
@@ -61,13 +57,12 @@ void computeFatLootTokens()
     tokens_needed = MAX(0, tokens_needed);
     
     dd_tokens_and_keys_available += $item[fat loot token].available_amount();
-    dd_tokens_and_keys_available += $item[boris's key].available_amount();
-    dd_tokens_and_keys_available += $item[jarlsberg's key].available_amount();
-    dd_tokens_and_keys_available += $item[sneaky pete's key].available_amount();
+    dd_tokens_and_keys_available += $item[boris\'s key].available_amount();
+    dd_tokens_and_keys_available += $item[jarlsberg\'s key].available_amount();
+    dd_tokens_and_keys_available += $item[sneaky pete\'s key].available_amount();
 
     __misc_state_int["fat loot tokens needed"] = MAX(0, tokens_needed);
     __misc_state_int["hero keys missing"] = keys_missing;
-    
     __misc_state_int["DD Tokens and keys available"] = dd_tokens_and_keys_available;
 }
 
@@ -549,13 +544,9 @@ void setUpState()
         mysterious_island_unlocked = true;
     if (my_path_id() == PATH_EXPLOSION)
     	mysterious_island_unlocked = true; //kinda
-            
-    
         
     __misc_state["mysterious island available"] = mysterious_island_unlocked;
     
-    
-	
 	__misc_state["desert beach available"] = false;
     if (get_property("peteMotorbikeGasTank") == "Large Capacity Tank")
         __misc_state["desert beach available"] = true;

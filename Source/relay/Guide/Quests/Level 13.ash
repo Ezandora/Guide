@@ -729,36 +729,37 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         url = "place.php?whichplace=nstower_door";
         subentry.header = "Open the tower door";
         
-        string [int] keys_to_use;
+        boolean [string] known_key_names;
+        if (my_path_id() == PATH_LOW_KEY_SUMMER) {
+            known_key_names = $strings[Boris\'s key,Jarlsberg\'s key,Sneaky Pete\'s key,Richard\'s star key,skeleton key,digital key,Actual skeleton key,Anchovy can key,Aquí,Batting cage key,Black rose key,Cactus key,Clown car key,Deep-fried key,Demonic key,Discarded bike lock key,F'c'le sh'c'le k'y,Ice key,Kekekey,Key sausage,Knob labinet key,Knob shaft skate key,Knob treasury key,Music Box Key,Peg key,Rabbit\'s foot key,Scrap metal key,Treasure chest key,Weremoose key];
+        } else {
+            known_key_names = $strings[Boris\'s key,Jarlsberg\'s key,Sneaky Pete\'s key,Richard\'s star key,skeleton key,digital key];
+        }
+
         item [int] missing_keys;
-        boolean [string] known_key_names = $strings[Boris's key,Jarlsberg's key,Sneaky Pete's key,Richard's star key,skeleton key,digital key];
-        foreach key_name in known_key_names
-        {
-            if (!base_quest_state.state_boolean[key_name + " used"])
-            {
+        foreach key_name in known_key_names {
+            if (!base_quest_state.state_boolean[key_name + " used"]) {
                 item key_item = key_name.to_item();
                 string key_name_output = key_name.replace_string(" key", "");
-                if (key_item.available_amount() == 0)
-                {
+                if (key_item.available_amount() == 0) {
                     key_name_output = HTMLGenerateSpanFont(key_name_output, "grey");
                     missing_keys.listAppend(key_item);
                 }
-                keys_to_use.listAppend(key_name_output);
             }
         }
         
-        if (keys_to_use.count() == 0)
-        {
+        if (missing_keys.count() == 0) {
             subentry.entries.listAppend("Open the doorknob.");
+        } else {
+            subentry.entries.listAppend("Find " + pluraliseWordy(missing_keys.count(), "more key", "more keys") + " for the door");
         }
-        else
-        {
-            subentry.entries.listAppend("Use " + pluraliseWordy(keys_to_use.count(), "more key", "more keys") + " on the perplexing door: " + keys_to_use.listJoinComponents(", ", "and") + ".");
+
+        if (my_path_id() != PATH_LOW_KEY_SUMMER) {
+            foreach keyIndex, key in missing_keys {
+                subentry.entries.listAppend(key);
+            }
         }
-        if (missing_keys.count() > 0)
-        {
-            subentry.entries.listAppend("Find the " + missing_keys.listJoinComponents(", ", "and") + ".");
-        }
+    
     }
     else if (!base_quest_state.state_boolean["past tower level 1"])
     {

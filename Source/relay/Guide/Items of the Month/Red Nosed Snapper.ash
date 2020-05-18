@@ -74,3 +74,39 @@ void IOTMRedNosedSnapperTask(ChecklistEntry [int] task_entries, ChecklistEntry [
         task_entries.listAppend(entry);
     }
 }
+
+RegisterResourceGenerationFunction("IOTMHumanMuskBanish");
+void IOTMHumanMuskBanish(ChecklistEntry [int] resource_entries) {
+    ChecklistSubentry gerResource() {
+        int humanMuskUses = get_property_int("_humanMuskUses");
+        int humanMuskUsesLeft = MAX(0, 3 - humanMuskUses);
+        int availableHumanMusks = MIN(humanMuskUsesLeft, $item[human musk].available_amount());
+
+        // Title
+        string main_title = availableHumanMusks + " human musks";
+
+        // Subtitle
+        string subtitle = "";
+
+        // Entries
+        string [int] description;
+        if (availableHumanMusks > 0) {
+            description.listAppend("Free run/banish");
+        }
+
+        return ChecklistSubentryMake(main_title, subtitle, description);
+    }
+
+    ChecklistEntry entry;
+    entry.ChecklistEntryTagEntry("banish");
+    entry.image_lookup_name = "__item human musk";
+
+    ChecklistSubentry resource = gerResource();
+    if (resource.entries.count() > 0) {
+        entry.subentries.listAppend(resource);
+    }
+
+    if (entry.subentries.count() > 0) {
+        resource_entries.listAppend(entry);
+    }
+}
