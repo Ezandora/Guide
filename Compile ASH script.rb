@@ -10,14 +10,6 @@
 # And it won't understand certain aspects of KoLMafia's internal import mechanics.
 # Sorry!
 
-def readFileContentsAtPath(file_path)
-	begin
-		return File.read(file_path)
-	rescue
-		return ''
-	end
-end
-
 def writeFileContentsAtPath(file_path, contents)
 	File.write(file_path, contents)
 end
@@ -43,7 +35,7 @@ def compileFile(file_path, seen_file_paths, root_directory)
 	end
 	seen_file_paths << file_path
 	file_dir = File.dirname(file_path)
-	file_contents = readFileContentsAtPath(file_path)
+	file_contents = File.read(file_path)
 	if file_contents == ''
 		return ''
 	end
