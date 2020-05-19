@@ -35,7 +35,7 @@ def findPathOfSuperdirectory(file_path, directory_name)
 	end
 end
 
-def compileFile(file_path, seen_file_paths, mafia_directory)
+def compileFile(file_path, seen_file_paths, root_directory)
 	file_path = File.absolute_path(file_path) # Eliminate ../ from paths, for our already-imported check
 	
 	if seen_file_paths.include?(file_path) # already imported.
@@ -58,15 +58,15 @@ def compileFile(file_path, seen_file_paths, mafia_directory)
 			if (matches != nil)
 				importing_file = matches[1]
 				if (importing_file.start_with?('relay/') or importing_file.start_with?('scripts/')) #assume absolute paths
-					if (mafia_directory.empty?)
+					if (root_directory.empty?)
 						puts "Absolute path found, halting compilation."
 						exit(1)
 					end
-					importing_path = File.join(mafia_directory, importing_file)
+					importing_path = File.join(root_directory, importing_file)
 				else
 					importing_path = File.join(file_dir, importing_file)
 				end
-				result_lines << compileFile(importing_path, seen_file_paths, mafia_directory)
+				result_lines << compileFile(importing_path, seen_file_paths, root_directory)
 			end
 		end
 	end
@@ -86,11 +86,8 @@ def main(arguments)
 	else
 		output_file_path = 'Compiled ' + File.basename(input_file_path)
 	end
-	mafia_directory = findPathOfSuperdirectory(input_file_path, 'KoLmafia')
-	if mafia_directory.empty?
-		puts 'Warning: KoLmafia directory not found. Absolute paths not supported.'
-	end
-	compilation = compileFile(input_file_path, [], mafia_directory)
+	root_directory = File.join(__dir__, 'Source')
+	compilation = compileFile(input_file_path, [], root_directory)
 	if (not compilation.empty?)
 		puts 'Writing compiled "' + input_file_path + '" to "' + output_file_path + '"'
 		writeFileContentsAtPath(output_file_path, compilation)
