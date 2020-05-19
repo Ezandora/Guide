@@ -27,16 +27,53 @@ void IOTMBetterShroomsAndGardensGenerateResource(ChecklistEntry [int] resource_e
 
         return ChecklistSubentryMake(main_title, subtitle, description);
     }
+	
+	ChecklistSubentry getMushroomState() {
+		int mushroomLevel = get_property_int("mushroomGardenCropLevel");
+		
+		// Title
+		string main_title = "Upkeep your Mushroom";
+		
+		// Subtitle
+		string subtitle = "";
+		
+		// Entries
+		string [int] description;
+		
+		if (!get_property_boolean("_mushroomGardenVisited")) {
+			description.listAppend("Mushroom is at tier " + mushroomLevel);
+			description.listAppend("Will give:");
+			description.listAppend((MIN(3, mushroomLevel)*3) + " filets");
+			if (mushroomLevel > 3) {
+				description.listAppend(MIN(2, mushroomLevel - 3) + " slab");
+			} else {
+				description.listAppend("+1 Slab at tier 4 & 5");
+			}
+			if (mushroomLevel > 10) {
+				description.listAppend("A mushroom house");
+				description.listAppend("No reason to wait any longer");
+			} else {
+				description.listAppend("House at tier 11");
+			}
+		}
+		
+		return ChecklistSubentryMake(main_title, subtitle, description);
+	}
 
 	if (!__iotms_usable[lookupItem("packet of mushroom spores")]) return;
 	
     ChecklistEntry entry;
     entry.image_lookup_name = "__item Better Shrooms and Gardens catalog";
-    entry.url = "adventure.php?snarfblat=543";
+    entry.url = "campground.php";
 
-    ChecklistSubentry pills = getFreeFights();
-    if (pills.entries.count() > 0) {
-        entry.subentries.listAppend(pills);
+    ChecklistSubentry piranhas = getFreeFights();
+    if (piranhas.entries.count() > 0) {
+        entry.subentries.listAppend(piranhas);
+    }
+	
+    ChecklistSubentry shroom = getMushroomState();
+    if (shroom.entries.count() > 0) {
+        entry.subentries.listAppend(shroom);
     }
     
     if (entry.subentries.count() > 0) {
