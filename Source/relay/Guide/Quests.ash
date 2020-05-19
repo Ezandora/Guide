@@ -36,9 +36,7 @@ void QuestsInit()
     QGalaktikInit();
     QOldLandfillInit();
     QMadnessBakeryInit();
-    
-    //has to happen after level 13 init... or not?
-	QManorInit();
+    QManorInit();
 }
 
 

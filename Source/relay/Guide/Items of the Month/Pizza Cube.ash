@@ -11,7 +11,7 @@ void IOTMPizzaCube(ChecklistEntry [int] resource_entries)
         // Entries
         string [int] description;
         
-        boolean need_cheese = (!__quest_state["Trapper"].state_boolean["Past mine"] && $item[goat cheese].available_amount() <3); // Property comes from relay/Guide/Quests/Level 8.ash
+        boolean need_cheese = !__quest_state["Trapper"].state_boolean["Past mine"] && $item[goat cheese].available_amount() < 3;
 
         if (need_cheese) {
             description.listAppend(HTMLGenerateSpanOfClass("\"cheese\"/\"milk\":", "r_bold") + " 3 goat cheese");

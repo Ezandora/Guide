@@ -44,56 +44,46 @@ void IOTMPowerfulGloveGenerateResource(ChecklistEntry [int] resource_entries)
 RegisterTaskGenerationFunction("IOTMPowerfulGloveTask");
 void IOTMPowerfulGloveTask(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (!__misc_state["in run"])
-	{
-		return;
-	}
+	if (!__misc_state["in run"]) return;
 	
-	if ((!__quest_state["Level 13"].state_boolean["digital key used"] && ($item[digital key].available_amount() + creatable_amount($item[digital key])) == 0) || my_path_id() == PATH_OF_THE_PLUMBER)
-	{
-	
-		ChecklistSubentry getExtraPixels() {
-			// Title
-			string main_title = "Get extra"
-			if (!__quest_state["Level 13"].state_boolean["digital key used"] && ($item[digital key].available_amount() + creatable_amount($item[digital key])) == 0 && my_path_id() == PATH_OF_THE_PLUMBER) {
-				main_title = main_title + " pixels and coins";
-			}
-			else if (my_path_id() == PATH_OF_THE_PLUMBER) {
-				main_title = main_title + " coins";
-			}
-			else {
-				main_title = main_title + " pixels";
-			}
+	if ((!__quest_state["Level 13"].state_boolean["digital key used"] && ($item[digital key].available_amount() + creatable_amount($item[digital key])) == 0)
+		|| my_path_id() == PATH_OF_THE_PLUMBER) {
+			ChecklistSubentry getExtraPixels() {
+				// Title
+				string main_title = "Get extra pixels";
+				if (my_path_id() == PATH_OF_THE_PLUMBER) {
+					main_title = main_title + " and coins";
+				}
 
-			// Subtitle
-			string subtitle = "";
+				// Subtitle
+				string subtitle = "";
 
-			// Entries
-			string [int] description;
-			if (!have_equipped($item[Powerful Glove])) {
-				description.listAppend("Equip Powerful Glove");
+				// Entries
+				string [int] description;
+				if (!have_equipped($item[Powerful Glove])) {
+					description.listAppend("Equip Powerful Glove");
+				}
+
+				return ChecklistSubentryMake(main_title, subtitle, description);
 			}
 
-			return ChecklistSubentryMake(main_title, subtitle, description);
-		}
+			if (!lookupItem("Powerful Glove").have()) return;
+			
+			ChecklistEntry entry;
+			entry.image_lookup_name = "__item white pixel";
+			entry.url = "/place.php?whichplace=forestvillage&action=fv_mystic";
 
-		if (!lookupItem("Powerful Glove").have()) return;
-		
-		ChecklistEntry entry;
-		entry.image_lookup_name = "__item white pixel";
-		entry.url = "/place.php?whichplace=forestvillage&action=fv_mystic";
+			if (my_path_id() == PATH_OF_THE_PLUMBER) {
+				entry.importance_level = -10;
+			}
 
-		if (my_path_id() == PATH_OF_THE_PLUMBER) {
-			entry.importance_level = -10;
+			ChecklistSubentry extraPixels = getExtraPixels();
+			if (extraPixels.entries.count() > 0) {
+				entry.subentries.listAppend(extraPixels);
+			}
+			
+			if (entry.subentries.count() > 0) {
+				optional_task_entries.listAppend(entry);
+			}
 		}
-
-		ChecklistSubentry extraPixels = getExtraPixels();
-		if (extraPixels.entries.count() > 0) {
-			entry.subentries.listAppend(extraPixels);
-		}
-		
-		if (entry.subentries.count() > 0) {
-			optional_task_entries.listAppend(entry);
-		}
-	}
 }

@@ -408,25 +408,25 @@ void QLevel13Init()
 	state.state_boolean["king waiting to be freed"] = (state.mafia_internal_step >= 14 && !state.finished);
     
     
-    boolean [string] known_key_names = $strings[Boris's key,Jarlsberg's key,Sneaky Pete's key,Richard's star key,skeleton key,digital key];
-    foreach key_name in known_key_names
-    {
+    boolean [string] known_key_names;
+    if (my_path_id() == PATH_LOW_KEY_SUMMER) {
+        known_key_names = $strings[Boris\'s key,Jarlsberg\'s key,Sneaky Pete\'s key,Richard\'s star key,skeleton key,digital key,Actual skeleton key,Anchovy can key,Aquí,Batting cage key,Black rose key,Cactus key,Clown car key,Deep-fried key,Demonic key,Discarded bike lock key,F'c'le sh'c'le k'y,Ice key,Kekekey,Key sausage,Knob labinet key,Knob shaft skate key,Knob treasury key,Music Box Key,Peg key,Rabbit\'s foot key,Scrap metal key,Treasure chest key,Weremoose key];
+    } else {
+        known_key_names = $strings[Boris\'s key,Jarlsberg\'s key,Sneaky Pete\'s key,Richard\'s star key,skeleton key,digital key];
+    }
+
+    foreach key_name in known_key_names {
         state.state_boolean[key_name + " used"] = state.state_boolean["past keys"];
     }
     
-    if (!state.state_boolean["past keys"])
-    {
-        //nsTowerDoorKeysUsed
-        //nsTowerDoorKeysUsed(user, now 'Boris's key,Jarlsberg's key,Sneaky Pete's key,Richard's star key,digital key,skeleton key', default )
-        
+    if (!state.state_boolean["past keys"]) {   
         string [int] keys_used = split_string_alternate(get_property("nsTowerDoorKeysUsed"), ",");
         
         foreach index, key_name in keys_used
         {
             //FIXME implement this
             //Boris's, Jarlsberg's, Sneaky Pete's, star, skeleton key, and digital
-            if (!(known_key_names contains key_name))
-            {
+            if (!(known_key_names contains key_name)) {
                 continue;
             }
             state.state_boolean[key_name + " used"] = true;

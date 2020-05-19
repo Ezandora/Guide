@@ -65,7 +65,6 @@ void IOTMPocketProfessorResource(ChecklistEntry [int] resource_entries)
 
     ChecklistEntry entry;
     entry.image_lookup_name = "__familiar pocket professor";
-    entry.url = "main.php?eowkeeper=1";
 
     ChecklistSubentry lectures = getLecture();
     if (lectures.entries.count() > 0) {

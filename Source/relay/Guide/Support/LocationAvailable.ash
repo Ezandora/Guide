@@ -659,6 +659,7 @@ void locationAvailablePrivateInit()
 	effect [string] zones_unlocked_by_effect;
 	
 	locations_unlocked_by_item[$location[Cobb\'s Knob Laboratory]] = $item[Cobb\'s Knob lab key];
+    locations_unlocked_by_item[$location[The Knob Shaft]] = $item[Cobb\'s Knob lab key];
 	locations_unlocked_by_item[$location[Cobb\'s Knob Menagerie\, Level 1]] = $item[Cobb\'s Knob Menagerie key];
 	locations_unlocked_by_item[$location[Cobb\'s Knob Menagerie\, Level 2]] = $item[Cobb\'s Knob Menagerie key];
 	locations_unlocked_by_item[$location[Cobb\'s Knob Menagerie\, Level 3]] = $item[Cobb\'s Knob Menagerie key];
