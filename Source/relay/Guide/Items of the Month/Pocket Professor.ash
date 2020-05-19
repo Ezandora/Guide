@@ -12,9 +12,10 @@ void IOTMPocketProfessorResource(ChecklistEntry [int] resource_entries)
         boolean chipEquipped = lookupItem("pocket professor memory chip").have_equipped();
 
         int availableLectures = lecturesAtWeight(potentialWeight, chipEquipped) - lecturesUsed;
-        int nextLectureWeight = (lecturesUsed - (chipEquipped ? 2 : 0)) ** 2 + 1;
+        int nextLectureWeight = lecturesUsed ** 2 + 1;
+        int nextLectureWeightChip = (lecturesUsed - 2) ** 2 + 1;
 
-        string main_title = (availableLectures > 0 ? "" + availableLectures : "No") + " lectures available";
+        string main_title = (availableLectures > 0 ? pluralise(availableLectures, "lecture", "lectures") : "No lectures") + " available";
 
         // Subtitle
         string subtitle = "";
@@ -26,7 +27,13 @@ void IOTMPocketProfessorResource(ChecklistEntry [int] resource_entries)
             description.listAppend(HTMLGenerateSpanOfClass("Mass:", "r_bold") + " 3 chances for item drops.");
             description.listAppend(HTMLGenerateSpanOfClass("Velocity:", "r_bold") + " Delevel and substats.");
         } else {
-            description.listAppend("Next lecture at " + nextLectureWeight + " lbs (+" + (nextLectureWeight - potentialWeight) + " lbs).");
+            string noChipMessage = nextLectureWeight + " lbs (+" + (nextLectureWeight - potentialWeight) + " lbs)";
+            string chipMessage = nextLectureWeightChip + " lbs (+" + (nextLectureWeightChip - potentialWeight) + " lbs)";
+            if (!chipEquipped) {
+                description.listAppend("Next lecture at " + noChipMessage + ", " + chipMessage + " with chip.");
+            } else {
+                description.listAppend("Next lecture at " + chipMessage + ".");
+            }
         }
 
         return ChecklistSubentryMake(main_title, subtitle, description);
