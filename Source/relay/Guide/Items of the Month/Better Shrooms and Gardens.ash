@@ -11,7 +11,7 @@ void IOTMBetterShroomsAndGardensGenerateResource(ChecklistEntry [int] resource_e
         int freeFightsLeft = totalFreeFights - freeFightsUsed;
 
         // Title
-        string main_title = freeFightsLeft + " free fight";
+        string main_title = pluralise(freeFightsLeft,"free fight","free fights");
 
         // Subtitle
         string subtitle = "";
@@ -30,6 +30,8 @@ void IOTMBetterShroomsAndGardensGenerateResource(ChecklistEntry [int] resource_e
 	
 	ChecklistSubentry getMushroomState() {
 		int mushroomLevel = get_property_int("mushroomGardenCropLevel");
+		int expectedFilets = MIN(3, mushroomLevel)*3;
+		int expectedSlabs = MIN(2, mushroomLevel - 3);
 		
 		// Title
 		string main_title = "Upkeep your Mushroom";
@@ -40,21 +42,23 @@ void IOTMBetterShroomsAndGardensGenerateResource(ChecklistEntry [int] resource_e
 		// Entries
 		string [int] description;
 		
+		string [int] shroomYield;
 		if (!get_property_boolean("_mushroomGardenVisited")) {
 			description.listAppend("Mushroom is at tier " + mushroomLevel);
-			description.listAppend("Will give:");
-			description.listAppend((MIN(3, mushroomLevel)*3) + " filets");
+			shroomYield.listAppend(expectedFilets + " filets");
 			if (mushroomLevel > 3) {
-				description.listAppend(MIN(2, mushroomLevel - 3) + " slab");
+				shroomYield.listAppend( pluralise(expectedSlabs,"slab","slabs") );
 			} else {
-				description.listAppend("+1 Slab at tier 4 & 5");
+				shroomYield.listAppend("+1 Slab at tier 4 & 5");
 			}
 			if (mushroomLevel > 10) {
-				description.listAppend("A mushroom house");
-				description.listAppend("No reason to wait any longer");
+				shroomYield.listAppend("A mushroom house");
+				description.listAppend(HTMLGenerateSpanOfClass("No reason to wait any longer", "r_bold"));
 			} else {
-				description.listAppend("House at tier 11");
+				shroomYield.listAppend("House at tier 11");
 			}
+			
+			description.listAppend("Will give:" + HTMLGenerateIndentedText(shroomYield));
 		}
 		
 		return ChecklistSubentryMake(main_title, subtitle, description);
