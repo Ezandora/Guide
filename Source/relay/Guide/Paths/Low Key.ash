@@ -52,8 +52,6 @@ void PathLowKeyGenerateKeys(ChecklistEntry [int] low_key_entries) {
         string [int] description;
         int turnsSpent = key.zone.turns_spent;
 
-        print(__quest_state["Level 13"].state_boolean["Actual skeleton key used"]);
-
         // Set unlock messages
         switch(key.name) {
             case "Actual skeleton key":
