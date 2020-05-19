@@ -2,40 +2,55 @@ RegisterResourceGenerationFunction("IOTMPocketProfessorResource");
 void IOTMPocketProfessorResource(ChecklistEntry [int] resource_entries)
 {
     ChecklistSubentry getLecture() {
-        int [int] WEIGHT_REQUIREMENTS = { 1, 2, 5, 10, 17, 26, 37, 50, 65, 82, 101, 122, 145, 170, 197 };
-
-        int calculateMaxLectures() {
-            int currentWeight = familiar_weight($familiar[Pocket Professor]) + numeric_modifier("familiar weight");
-
-            foreach index, weightRequirement in WEIGHT_REQUIREMENTS {
-                if (currentWeight < weightRequirement) {
-                    return index;
-                }
-            }
-
-            return 0;
+        int lecturesAtWeight(int weight, boolean chipEquipped) {
+            return floor(sqrt(weight - 1)) + 1 + (chipEquipped ? 2 : 0);
         }
 
         // Title
         int lecturesUsed = get_property_int("_pocketProfessorLectures");
-        int numOfLectures = MAX(0,calculateMaxLectures() - lecturesUsed);
+        int potentialWeight = familiar_weight($familiar[Pocket Professor]) + weight_adjustment();
+        boolean chipEquipped = lookupItem("pocket professor memory chip").have_equipped();
 
-        string main_title = numOfLectures + " lectures";
+        int availableLectures = lecturesAtWeight(potentialWeight, chipEquipped) - lecturesUsed;
+        int nextLectureWeight = (lecturesUsed - (chipEquipped ? 2 : 0)) ** 2 + 1;
+
+        string main_title = (availableLectures > 0 ? "" + availableLectures : "No") + " lectures available";
 
         // Subtitle
         string subtitle = "";
 
         // Entries
         string [int] description;
-        if (numOfLectures > 0) {
-            description.listAppend(HTMLGenerateSpanOfClass("Relativity:", "r_bold") + " Instant copy");
-            description.listAppend(HTMLGenerateSpanOfClass("Mass:", "r_bold") + " 3 chances for item drops");
-            description.listAppend(HTMLGenerateSpanOfClass("Velocity:", "r_bold") + " Delevel");
+        if (availableLectures > 0) {
+            description.listAppend(HTMLGenerateSpanOfClass("Relativity:", "r_bold") + " Fight monster again.");
+            description.listAppend(HTMLGenerateSpanOfClass("Mass:", "r_bold") + " 3 chances for item drops.");
+            description.listAppend(HTMLGenerateSpanOfClass("Velocity:", "r_bold") + " Delevel and substats.");
         } else {
-            description.listAppend("Next lecture at " + WEIGHT_REQUIREMENTS[lecturesUsed] + " pounds");
+            description.listAppend("Next lecture at " + nextLectureWeight + " lbs (+" + (nextLectureWeight - potentialWeight) + " lbs).");
         }
 
         return ChecklistSubentryMake(main_title, subtitle, description);
+    }
+
+    string scalerMessage(string name, int add, int cap) {
+        int thesisAdventures(int hp) {
+            return clampi(2 * floor(hp ** .25), 0, 11);
+        }
+
+        int ml = numeric_modifier('monster level');
+        int muscle = my_buffedstat($stat[muscle]);
+        int defense = clampi(muscle + add, 0, cap) + ml;
+        int hp = floor(0.75 * defense);
+        int adventures = thesisAdventures(hp);
+        string description = name + " (" + adventures + " advs";
+        if (adventures < 11 && cap + ml >= 1296 / .75) {
+            int nextAdventures = adventures + 2;
+            int nextThreshhold = (nextAdventures / 2) ** 4;
+            int muscleToCap = ceil(nextThreshhold / .75 - ml - add);
+            description += ", +" + (muscleToCap - muscle) + " mus for " + clampi(nextAdventures, 0, 11) + " advs";
+        }
+        description += ")";
+        return description;
     }
 
     ChecklistSubentry getDeliverYourThesis() {
@@ -52,16 +67,29 @@ void IOTMPocketProfessorResource(ChecklistEntry [int] resource_entries)
         string [int] description;
         if (!get_property_boolean("_thesisDelivered")) {
             if (experience >= 400) {
-                description.listAppend(HTMLGenerateSpanOfClass("1 instakill", "r_bold") + " but lose 200 familiar xp");
+                description.listAppend(HTMLGenerateSpanOfClass("1 instakill", "r_bold") + " but lose 200 familiar xp.");
             } else {
-                description.listAppend("Need " + experienceLeft + " more experience");
+                description.listAppend("Need " + experienceLeft + " more experience.");
             }
+        }
+
+        string [int] potential_targets;
+        if (lookupItem("kramco sausage-o-matic").available_amount() > 0)
+        {
+            potential_targets.listAppend(scalerMessage("Sausage goblin", 11, 10000));
+        }
+        if (get_property_boolean("neverendingPartyAlways") || get_property_boolean("_neverendingPartyToday"))
+        {
+            potential_targets.listAppend(scalerMessage("Neverending Party monster", 0, 20000));
+        }
+        if (potential_targets.count() > 0) {
+            description.listAppend("Could use it on a:" + HTMLGenerateIndentedText(potential_targets));
         }
 
         return ChecklistSubentryMake(main_title, subtitle, description);
     }
 
-	if (!lookupFamiliar("Pocket Professor").familiar_is_usable()) return;
+    if (!lookupFamiliar("Pocket Professor").familiar_is_usable()) return;
 
     ChecklistEntry entry;
     entry.image_lookup_name = "__familiar pocket professor";
