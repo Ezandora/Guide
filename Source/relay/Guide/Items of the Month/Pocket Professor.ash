@@ -78,19 +78,19 @@ void IOTMPocketProfessorResource(ChecklistEntry [int] resource_entries)
             } else {
                 description.listAppend("Need " + experienceLeft + " more experience.");
             }
-        }
 
-        string [int] potential_targets;
-        if (lookupItem("kramco sausage-o-matic").available_amount() > 0)
-        {
-            potential_targets.listAppend(scalerMessage("Sausage goblin", 11, 10000));
-        }
-        if (get_property_boolean("neverendingPartyAlways") || get_property_boolean("_neverendingPartyToday"))
-        {
-            potential_targets.listAppend(scalerMessage("Neverending Party monster", 0, 20000));
-        }
-        if (potential_targets.count() > 0) {
-            description.listAppend("Could use it on a:" + HTMLGenerateIndentedText(potential_targets));
+            string [int] potential_targets;
+            if (lookupItem("kramco sausage-o-matic").available_amount() > 0)
+            {
+                potential_targets.listAppend(scalerMessage("Sausage goblin", 11, 10000));
+            }
+            if (get_property_boolean("neverendingPartyAlways") || get_property_boolean("_neverendingPartyToday"))
+            {
+                potential_targets.listAppend(scalerMessage("Neverending Party monster", 0, 20000));
+            }
+            if (potential_targets.count() > 0) {
+                description.listAppend("Could use it on a:" + HTMLGenerateIndentedText(potential_targets));
+            }
         }
 
         return ChecklistSubentryMake(main_title, subtitle, description);
