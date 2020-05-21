@@ -6,7 +6,7 @@ void IOTMPowerfulGloveGenerateResource(ChecklistEntry [int] resource_entries)
         int chargeLeft = 100 - charge;
 
         // Title
-        string main_title = chargeLeft + "% Charge";
+        string main_title = chargeLeft + "% battery charge";
 
         // Subtitle
         string subtitle = "";
@@ -14,12 +14,12 @@ void IOTMPowerfulGloveGenerateResource(ChecklistEntry [int] resource_entries)
         // Entries
         string [int] description;
         if (chargeLeft > 0) {
-            description.listAppend(HTMLGenerateSpanOfClass("Invisible Avatar:", "r_bold") + " -10% Combat");
-            description.listAppend(HTMLGenerateSpanOfClass("Triple Size:", "r_bold") + " +200% all attributes");
+            description.listAppend(HTMLGenerateSpanOfClass("Invisible Avatar (5% charge):", "r_bold") + " -10% combat.");
+            description.listAppend(HTMLGenerateSpanOfClass("Triple Size (5% charge):", "r_bold") + " +200% all attributes.");
             if (chargeLeft > 5) {
-                description.listAppend(HTMLGenerateSpanOfClass("Replace Enemy:", "r_bold") + " Swap Monster");
+                description.listAppend(HTMLGenerateSpanOfClass("Replace Enemy (10% charge):", "r_bold") + " Swap monster.");
             }
-            description.listAppend(HTMLGenerateSpanOfClass("Shrink Enemy:", "r_bold") + " Delevel");
+            description.listAppend(HTMLGenerateSpanOfClass("Shrink Enemy (5% charge):", "r_bold") + " Delevel.");
         }
 
         return ChecklistSubentryMake(main_title, subtitle, description);
