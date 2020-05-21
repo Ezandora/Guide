@@ -31,7 +31,7 @@ void IOTMBetterShroomsAndGardensGenerateResource(ChecklistEntry [int] resource_e
 	ChecklistSubentry getMushroomState() {
 		int mushroomLevel = get_property_int("mushroomGardenCropLevel");
 		int expectedFilets = MIN(3, mushroomLevel)*3;
-		int expectedSlabs = MIN(2, mushroomLevel - 3);
+		int expectedSlabs = clampi(mushroomLevel - 3, 0, 2);
 		
 		// Title
 		string main_title = "Upkeep your Mushroom";
