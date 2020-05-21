@@ -26,6 +26,7 @@ void IOTMEightDaysAWeekPillsGenerateResource(ChecklistEntry [int] resource_entri
     }
 
 	if (!lookupItem("Eight Days a Week Pill Keeper").have()) return;
+    if (spleen_limit() - my_spleen_use() < 3) return; 
 	
     ChecklistEntry entry;
     entry.image_lookup_name = "__item Eight Days a Week Pill Keeper";

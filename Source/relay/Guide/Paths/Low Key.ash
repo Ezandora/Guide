@@ -182,7 +182,7 @@ void PathLowKeyGenerateKeys(ChecklistEntry [int] low_key_entries) {
         int delayLeft = 11 - turnsSpent;
         if (description.count() == 0) {
             if (turnsSpent < 11) {
-                description.listAppend("Delay for  " + pluralise(delayForNextNoncombat, "turn", "turns") + " in " + key.zone + " to find key.");
+                description.listAppend("Delay for  " + pluralise(delayLeft, "turn", "turns") + " in " + key.zone + " to find key.");
             } else {
                 description.listAppend("Find key on next turn in " + key.zone);
             }
