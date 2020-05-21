@@ -3,7 +3,7 @@ void PathLowKeyGenerateKeys(ChecklistEntry [int] low_key_entries) {
 
     if (my_path_id() != PATH_LOW_KEY_SUMMER) return;
     if (!__misc_state["in run"]) return;
-    if (QuestState("Lair").state_boolean["past keys"]) return;	
+    if (__quest_state["Lair"].state_boolean["past keys"]) return;	
 
     record Key {
         string name;
@@ -38,6 +38,8 @@ void PathLowKeyGenerateKeys(ChecklistEntry [int] low_key_entries) {
     keys[22] = new Key("Weremoose key", $location[Cobb\'s Knob Menagerie, Level 2], "cobbsknob.php?action=tomenagerie", "+3 Spooky Res, +15 Spooky Damage, +30 Spooky Spell Damage");
 
     foreach index, key in keys {
+        if (__quest_state["Lair"].state_boolean[key.name + " used"]) return;	
+
         ChecklistEntry entry;
         entry.image_lookup_name = "__item " + key.name;
         entry.url = key.url;
@@ -177,11 +179,12 @@ void PathLowKeyGenerateKeys(ChecklistEntry [int] low_key_entries) {
         }
 
         // Set delay messages
+        int delayLeft = 11 - turnsSpent;
         if (description.count() == 0) {
             if (turnsSpent < 11) {
-                description.listAppend((11 - turnsSpent) + " more delay in " + key.zone);
+                description.listAppend("Delay for  " + pluralise(delayForNextNoncombat, "turn", "turns") + " in " + key.zone + " to find key.");
             } else {
-                description.listAppend("Next turn in " + key.zone);
+                description.listAppend("Find key on next turn in " + key.zone);
             }
         }
 
