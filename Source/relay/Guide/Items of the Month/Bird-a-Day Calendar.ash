@@ -42,6 +42,12 @@ void IOTMBirdADayCalendar(ChecklistEntry [int] resource_entries)
 
                 description.listAppend(HTMLGenerateSpanOfClass(name, "r_bold") + modValue);
             }
+        } else {
+            main_title = "Discover your daily Bird";
+            subtitle = "";
+            description.listAppend("Use your calendar to get a new skill for the day");
+            if (have_effect($effect[Blessing of the Bird]) > 0)
+                description.listAppend(HTMLGenerateSpanFont("Still have an old blessing", "red") + "|Using the calendar will replace the old buff's modifiers with the new ones.");
         }
         
         return ChecklistSubentryMake(main_title, subtitle, description);
@@ -50,6 +56,7 @@ void IOTMBirdADayCalendar(ChecklistEntry [int] resource_entries)
     ChecklistSubentry getFavoriteBird() {
 
         string favoriteBirdMods = get_property("yourFavoriteBirdMods");
+        boolean canSeekFavBird = have_skill($skill[Visit your Favorite Bird]);
 
         // Title
         string main_title = "Favorite";
@@ -60,7 +67,7 @@ void IOTMBirdADayCalendar(ChecklistEntry [int] resource_entries)
         // Entries
         string [int] description;
 
-        if (favoriteBirdMods != "" && get_property_boolean("_canSeekBirds") && !get_property_boolean("_favoriteBirdVisited")) {
+        if (favoriteBirdMods != "" && canSeekFavBird && !get_property_boolean("_favoriteBirdVisited")) {
             string [int] modStrings = favoriteBirdMods.split_string(", ");
             foreach index, modString in modStrings {
                 string [int] modProperties = modString.split_string(": ");
@@ -98,7 +105,7 @@ void IOTMBirdADayCalendar(ChecklistEntry [int] resource_entries)
 
     ChecklistEntry entry;
     entry.image_lookup_name = "__effect Blessing of the Bird";
-    entry.url = "";
+    entry.url = get_property_boolean("_canSeekBirds") ? "skillz.php" : "inv_use.php?pwd=" + my_hash() + "&whichitem=10434";
 
     ChecklistSubentry birdMods = getBirdMods();
     if (birdMods.entries.count() > 0) {
