@@ -22,11 +22,13 @@ It keeps track of your quests and resources and helps you complete ascensions as
 #### Quest advice:
 
 ![Quest Example 1](/Images/Quest_1.JPG)
+
 ![Quest Example 2](/Images/Quest_2.JPG)
 
 #### Resources:
 
 ![Resource 1](/Images/Resource_1.png)
+
 ![Resource 2](/Images/Resource_2.png)
 
 The script will inform you of many resources you have - free runaways, banishes, semi-rares, etc. - and ideas on what to use them on.
