@@ -26,12 +26,12 @@ void PathLowKeyGenerateKeys(ChecklistEntry [int] low_key_entries) {
     keys[10] = new Key("F'c'le sh'c'le k'y", $location[The F\'c\'le], "place.php?whichplace=cove", "+20 ML");
     keys[11] = new Key("Ice key", $location[The Icy Peak], "place.php?whichplace=mclargehuge", "+3 Cold Res, +15 Cold Damage, +30 Cold Spell Damage");
     keys[12] = new Key("Kekekey", $location[The Valley of Rof L\'m Fao], "place.php?whichplace=mountains", "+50% Meat");
-    keys[13] = new Key("Key sausage", $location[Cobb\'s Knob Kitchens], "place.php?whichplace=cobbsknob", "-10% Combat");
+    keys[13] = new Key("Key sausage", $location[Cobb\'s Knob Kitchens], "cobbsknob.php", "-10% Combat");
     keys[14] = new Key("Knob labinet key", $location[Cobb\'s Knob Laboratory], "cobbsknob.php?action=tolabs", "+20% Muscle Gains, Muscle +5, -1 MP Skills");
     keys[15] = new Key("Knob shaft skate key", $location[The Knob Shaft], "cobbsknob.php?action=tolabs", "Regen HP/MP, +3 Adventures");
-    keys[16] = new Key("Knob treasury key", $location[Cobb\'s Knob Treasury], "place.php?whichplace=cobbsknob", "+50% Meat, +20% Pickpocket");
+    keys[16] = new Key("Knob treasury key", $location[Cobb\'s Knob Treasury], "cobbsknob.php", "+50% Meat, +20% Pickpocket");
     keys[17] = new Key("Music Box Key", $location[The Haunted Nursery], "place.php?whichplace=manor3", "+10% Combat");
-    keys[18] = new Key("Peg key", $location[The Obligatory Pirate\'s Cove], "place.php?whichplace=island", "+5 Stats");
+    keys[18] = new Key("Peg key", $location[The Obligatory Pirate\'s Cove], "island.php", "+5 Stats");
     keys[19] = new Key("Rabbit\'s foot key", $location[The Dire Warren], "tutorial.php", "All Attributes +10");
     keys[20] = new Key("Scrap metal key", $location[The Old Landfill], "place.php?whichplace=woods", "+20% Moxie Gains, Moxie +5, -1MP Skills");
     keys[21] = new Key("Treasure chest key", $location[Belowdecks], "place.php?whichplace=cove", "+30% Item, +30% Meat");
