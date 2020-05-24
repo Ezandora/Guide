@@ -3,7 +3,7 @@ void IOTMEightDaysAWeekPillsGenerateResource(ChecklistEntry [int] resource_entri
 {
     ChecklistSubentry getPills() {
         // Title
-        string main_title = "Take a Pill";
+        string main_title = "Take a pill";
 
         // Subtitle
         string subtitle = "First is Free!";

@@ -3,7 +3,7 @@ void IOTMPizzaCube(ChecklistEntry [int] resource_entries)
 {
     ChecklistSubentry getQuestItems() {
         // Title
-        string main_title = "Make Pizza";
+        string main_title = "Make pizza";
 
         // Subtitle
         string subtitle = "Some ingredients give useful items";
