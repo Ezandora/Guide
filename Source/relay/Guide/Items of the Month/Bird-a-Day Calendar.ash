@@ -1,3 +1,18 @@
+RegisterTaskGenerationFunction("IOTMBirdADayGenerateTasks");
+void IOTMBirdADayGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    if (!lookupItem("Bird-a-Day calendar").have()) return;
+    if (!get_property_boolean("_canSeekBirds")) {
+        string [int] description;
+
+        description.listAppend("Use your calendar to get a new skill for the day");
+        if (have_effect($effect[Blessing of the Bird]) > 0)
+            description.listAppend(HTMLGenerateSpanFont("Still have an old blessing", "red") + "|Using the calendar will replace the old buff's modifiers with the new ones.");
+
+        optional_task_entries.listAppend(ChecklistEntryMake("__effect Blessing of the Bird", "inv_use.php?pwd=" + my_hash() + "&whichitem=10434", ChecklistSubentryMake("Discover your daily Bird", "", description), 8));
+    }
+}
+
 RegisterResourceGenerationFunction("IOTMBirdADayCalendar");
 void IOTMBirdADayCalendar(ChecklistEntry [int] resource_entries)
 {
@@ -42,12 +57,6 @@ void IOTMBirdADayCalendar(ChecklistEntry [int] resource_entries)
 
                 description.listAppend(HTMLGenerateSpanOfClass(name, "r_bold") + modValue);
             }
-        } else {
-            main_title = "Discover your daily Bird";
-            subtitle = "";
-            description.listAppend("Use your calendar to get a new skill for the day");
-            if (have_effect($effect[Blessing of the Bird]) > 0)
-                description.listAppend(HTMLGenerateSpanFont("Still have an old blessing", "red") + "|Using the calendar will replace the old buff's modifiers with the new ones.");
         }
         
         return ChecklistSubentryMake(main_title, subtitle, description);
@@ -105,7 +114,7 @@ void IOTMBirdADayCalendar(ChecklistEntry [int] resource_entries)
 
     ChecklistEntry entry;
     entry.image_lookup_name = "__effect Blessing of the Bird";
-    entry.url = get_property_boolean("_canSeekBirds") ? "skillz.php" : "inv_use.php?pwd=" + my_hash() + "&whichitem=10434";
+    entry.url = "skillz.php";
 
     ChecklistSubentry birdMods = getBirdMods();
     if (birdMods.entries.count() > 0) {
