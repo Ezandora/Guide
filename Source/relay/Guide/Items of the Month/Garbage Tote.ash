@@ -37,25 +37,22 @@ void IOTMGarbageToteGenerateResource(ChecklistEntry [int] resource_entries)
 	//_garbageChampagneCharge from 11 to 0
 	//_garbageTreeCharge from 1000 to 0
 	
+    string [item] item_charge_property;
 	string [item] item_effect_description;
-	string [item] item_charge_property;
     int [item] item_charge_default;
 	
-	if (__misc_state["Torso aware"])
+	if (__misc_state["Torso aware"]) {
 		item_charge_property[lookupItem("makeshift garbage shirt")] = "garbageShirtCharge";
+        item_effect_description[lookupItem("makeshift garbage shirt")] = "Doubles statgain";
+        item_charge_default[lookupItem("makeshift garbage shirt")] = 37;
+    }
+
     item_charge_property[lookupItem("broken champagne bottle")] = "garbageChampagneCharge";
-    item_charge_property[lookupItem("deceased crimbo tree")] = "garbageTreeCharge";
-    
-    
-    if (__misc_state["Torso aware"])
-	    item_effect_description[lookupItem("makeshift garbage shirt")] = "Doubles statgain";
     item_effect_description[lookupItem("broken champagne bottle")] = "Doubles +item";
-    item_effect_description[lookupItem("deceased crimbo tree")] = "Absorbs damage";
-	
-    
-    if (__misc_state["Torso aware"])
-		item_charge_default[lookupItem("makeshift garbage shirt")] = 37;
     item_charge_default[lookupItem("broken champagne bottle")] = 11;
+
+    item_charge_property[lookupItem("deceased crimbo tree")] = "garbageTreeCharge";
+    item_effect_description[lookupItem("deceased crimbo tree")] = "Absorbs damage";
     item_charge_default[lookupItem("deceased crimbo tree")] = 1000;
 	
 	ChecklistEntry entry;
