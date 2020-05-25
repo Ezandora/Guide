@@ -3,7 +3,7 @@ void PathLowKeyGenerateKeys(ChecklistEntry [int] low_key_entries) {
 
     if (my_path_id() != PATH_LOW_KEY_SUMMER) return;
     if (!__misc_state["in run"]) return;
-    if (QuestState("Lair").state_boolean["past keys"]) return;	
+    if (__quest_state["Lair"].state_boolean["past keys"]) return;	
 
     record Key {
         string name;
@@ -26,18 +26,20 @@ void PathLowKeyGenerateKeys(ChecklistEntry [int] low_key_entries) {
     keys[10] = new Key("F'c'le sh'c'le k'y", $location[The F\'c\'le], "place.php?whichplace=cove", "+20 ML");
     keys[11] = new Key("Ice key", $location[The Icy Peak], "place.php?whichplace=mclargehuge", "+3 Cold Res, +15 Cold Damage, +30 Cold Spell Damage");
     keys[12] = new Key("Kekekey", $location[The Valley of Rof L\'m Fao], "place.php?whichplace=mountains", "+50% Meat");
-    keys[13] = new Key("Key sausage", $location[Cobb\'s Knob Kitchens], "place.php?whichplace=cobbsknob", "-10% Combat");
+    keys[13] = new Key("Key sausage", $location[Cobb\'s Knob Kitchens], "cobbsknob.php", "-10% Combat");
     keys[14] = new Key("Knob labinet key", $location[Cobb\'s Knob Laboratory], "cobbsknob.php?action=tolabs", "+20% Muscle Gains, Muscle +5, -1 MP Skills");
     keys[15] = new Key("Knob shaft skate key", $location[The Knob Shaft], "cobbsknob.php?action=tolabs", "Regen HP/MP, +3 Adventures");
-    keys[16] = new Key("Knob treasury key", $location[Cobb\'s Knob Treasury], "place.php?whichplace=cobbsknob", "+50% Meat, +20% Pickpocket");
+    keys[16] = new Key("Knob treasury key", $location[Cobb\'s Knob Treasury], "cobbsknob.php", "+50% Meat, +20% Pickpocket");
     keys[17] = new Key("Music Box Key", $location[The Haunted Nursery], "place.php?whichplace=manor3", "+10% Combat");
-    keys[18] = new Key("Peg key", $location[The Obligatory Pirate\'s Cove], "place.php?whichplace=island", "+5 Stats");
+    keys[18] = new Key("Peg key", $location[The Obligatory Pirate\'s Cove], "island.php", "+5 Stats");
     keys[19] = new Key("Rabbit\'s foot key", $location[The Dire Warren], "tutorial.php", "All Attributes +10");
     keys[20] = new Key("Scrap metal key", $location[The Old Landfill], "place.php?whichplace=woods", "+20% Moxie Gains, Moxie +5, -1MP Skills");
     keys[21] = new Key("Treasure chest key", $location[Belowdecks], "place.php?whichplace=cove", "+30% Item, +30% Meat");
     keys[22] = new Key("Weremoose key", $location[Cobb\'s Knob Menagerie, Level 2], "cobbsknob.php?action=tomenagerie", "+3 Spooky Res, +15 Spooky Damage, +30 Spooky Spell Damage");
 
     foreach index, key in keys {
+        if (__quest_state["Lair"].state_boolean[key.name + " used"]) return;	
+
         ChecklistEntry entry;
         entry.image_lookup_name = "__item " + key.name;
         entry.url = key.url;
@@ -177,11 +179,12 @@ void PathLowKeyGenerateKeys(ChecklistEntry [int] low_key_entries) {
         }
 
         // Set delay messages
+        int delayLeft = 11 - turnsSpent;
         if (description.count() == 0) {
             if (turnsSpent < 11) {
-                description.listAppend((11 - turnsSpent) + " more delay in " + key.zone);
+                description.listAppend("Delay for  " + pluralise(delayLeft, "turn", "turns") + " in " + key.zone + " to find key.");
             } else {
-                description.listAppend("Next turn in " + key.zone);
+                description.listAppend("Find key on next turn in " + key.zone);
             }
         }
 

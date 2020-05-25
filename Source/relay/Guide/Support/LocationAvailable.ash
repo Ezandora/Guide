@@ -609,11 +609,13 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
             return QuestState("questL11MacGuffin").mafia_internal_step >= 3; //FIXME no idea, diary?
         case $location[The Red Zeppelin]:
             return QuestState("questL11MacGuffin").mafia_internal_step >= 3 && get_property_int("zeppelinProtestors") >= 80; //FIXME not quite right, diary?; also NC needs to be visited first
-		default:
+		case $location[The F\'c\'le]:
+            return QuestState("questM12Pirate").mafia_internal_step >= 6;
+        case $location[Belowdecks]:
+            return QuestState("questM12Pirate").finished;
+        default:
 			break;
 	}
-    //if (loc.turnsAttemptedInLocation() > 0) //FIXME make this finer-grained, this is hacky
-        //return true;
 	
 	ErrorSet(able_to_find, "");
 	return false;
@@ -1146,7 +1148,6 @@ static
         __constant_clickable_urls = LAConvertLocationLookupToLocations(lookup_map);
     }
     initialiseConstantClickableURLs();
-    
 }
 
 string [location] __variable_clickable_urls;

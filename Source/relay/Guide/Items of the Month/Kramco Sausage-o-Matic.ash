@@ -55,12 +55,13 @@ void IOTMKramcoSausageOMaticGenerateResource(ChecklistEntry [int] resource_entri
     string main_title = "Kramco Sausage-o-Matic&trade; fights";
     
     KramcoSausageFightInformation fight_information = KramcoCalculateSausageFightInformation();
-    // print(fight_information.turns_to_next_guaranteed_fight);
-    // print(fight_information.probability_of_sausage_fight);
-    // print(fight_information.goblin_will_appear);
 
     if (fight_information.turns_to_next_guaranteed_fight == 0) {
-	    main_title = "Sausage goblin fight now?";
+	    main_title = "Sausage goblin fight available";
+        if (lookupItem("Kramco Sausage-o-Matic&trade;").equipped_amount() == 0) {
+            main_description.listAppend(HTMLGenerateSpanFont("Equip the Kramco Sausage-o-Matic&trade; first.", "red"));
+            entry.url = "inventory.php?which=2";
+        }
     } else {
     	main_title = pluralise(fight_information.turns_to_next_guaranteed_fight, "turn", "turns") + " until next sausage goblin fight";
     }
@@ -69,7 +70,7 @@ void IOTMKramcoSausageOMaticGenerateResource(ChecklistEntry [int] resource_entri
 	    main_description.listAppend(round(fight_information.probability_of_sausage_fight * 100.0) + "% chance of goblin fight this turn.");
     }
 
-    main_description.listAppend("Does not cost a turn, burns delay.");
+    main_description.listAppend("Does not cost a turn; burns delay.");
        
     int fights_so_far = get_property_int("_sausageFights");
     if (fights_so_far > 0) {
