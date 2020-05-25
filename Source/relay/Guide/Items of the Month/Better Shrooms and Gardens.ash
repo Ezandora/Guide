@@ -37,28 +37,35 @@ void IOTMBetterShroomsAndGardensGenerateResource(ChecklistEntry [int] resource_e
 		string main_title = "Upkeep your Mushroom";
 		
 		// Subtitle
-		string subtitle = "";
+		string subtitle = "One action per day";
 		
 		// Entries
 		string [int] description;
 		
 		string [int] shroomYield;
+        string [int] futureYield;
 		if (!get_property_boolean("_mushroomGardenVisited")) {
 			description.listAppend("Mushroom is at tier " + mushroomLevel);
 			shroomYield.listAppend(expectedFilets + " filets / 9");
-			if (mushroomLevel > 3) {
+			if (mushroomLevel > 3)
 				shroomYield.listAppend( pluralise(expectedSlabs,"slab","slabs") + " / 2" );
-			} else {
-				shroomYield.listAppend("+1 Slab at tier 4 & 5");
-			}
-			if (mushroomLevel > 10) {
+
+            if (mushroomLevel < 2)
+                futureYield.listAppend("+3 filets at tier 2");
+            if (mushroomLevel < 3)
+                futureYield.listAppend("+3 filets at tier 3");
+            if (mushroomLevel < 4)
+                futureYield.listAppend("+1 slab at tier 4");
+            if (mushroomLevel < 5)
+                futureYield.listAppend("+1 slab at tier 5");   
+
+			if (mushroomLevel > 10)
 				shroomYield.listAppend("A mushroom house");
-				description.listAppend(HTMLGenerateSpanOfClass("No reason to wait any longer", "r_bold"));
-			} else {
-				shroomYield.listAppend("House at tier 11");
-			}
+			else
+				futureYield.listAppend("+1 mushroom house at tier 11");
 			
-			description.listAppend("Will give:" + HTMLGenerateIndentedText(shroomYield));
+			description.listAppend("Harvesting now will give:" + HTMLGenerateIndentedText(shroomYield));
+            description.listAppend( mushroomLevel > 10 ? HTMLGenerateSpanOfClass("No reason to fertilize any longer", "r_bold") : to_buffer("Otherwise, fertilize it, incrementing its size:" + HTMLGenerateIndentedText(futureYield)) );
 		}
 		
 		return ChecklistSubentryMake(main_title, subtitle, description);
