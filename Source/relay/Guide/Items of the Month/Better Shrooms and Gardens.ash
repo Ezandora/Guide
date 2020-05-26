@@ -80,6 +80,8 @@ void IOTMBetterShroomsAndGardensGenerateResource(ChecklistEntry [int] resource_e
     ChecklistSubentry piranhas = getFreeFights();
     if (piranhas.entries.count() > 0) {
         entry.subentries.listAppend(piranhas);
+		// Want this part to appear both in the garden's tile, and the free fights tile, so making a new entry
+		resource_entries.listAppend(ChecklistEntryMake("__item Better Shrooms and Gardens catalog", "campground.php", piranhas).ChecklistEntryTagEntry("daily free fight"));
     }
 	
     ChecklistSubentry shroom = getMushroomState();
