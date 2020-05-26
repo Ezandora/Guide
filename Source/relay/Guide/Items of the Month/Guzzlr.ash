@@ -1,9 +1,10 @@
 RegisterTaskGenerationFunction("IOTMGuzzlrGenerateTask");
 void IOTMGuzzlrGenerateTask(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) {
+    boolean startedQuest = get_property("questGuzzlr") != "unstarted";
+    location questLocation = get_property("guzzlrQuestLocation").to_location();
+    
     ChecklistSubentry getLecture() {
-        boolean startedQuest = get_property("questGuzzlr") != "unstarted";
         item questBooze = get_property("guzzlrQuestBooze").to_item();
-        location questLocation = get_property("guzzlrQuestLocation").to_location();
         string questTier = get_property("guzzlrQuestTier");
         int platinumDeliveriesLeft = 1 - get_property_int("_guzzlrPlatinumDeliveries");
         int goldDeliveriesLeft = 3 - get_property_int("_guzzlrGoldDeliveries");
@@ -84,7 +85,11 @@ void IOTMGuzzlrGenerateTask(ChecklistEntry [int] task_entries, ChecklistEntry [i
 
     ChecklistEntry entry;
     entry.image_lookup_name = "__item Guzzlr tablet";
-    entry.url = "inventory.php?tap=guzzlr";
+    if (startedQuest) {
+        entry.url = questLocation.getClickableURLForLocation();
+    } else {
+        entry.url = "inventory.php?tap=guzzlr";
+    }
 
     ChecklistSubentry lectures = getLecture();
     if (lectures.entries.count() > 0) {
