@@ -11,7 +11,7 @@ void IOTMBetterShroomsAndGardensGenerateResource(ChecklistEntry [int] resource_e
         int freeFightsLeft = totalFreeFights - freeFightsUsed;
 
         // Title
-        string main_title = pluralise(freeFightsLeft,"free fight","free fights");
+        string main_title = pluralise(freeFightsLeft,"Pihrana Plant fight","Pihrana Plant fights");
 
         // Subtitle
         string subtitle = "";
@@ -19,9 +19,9 @@ void IOTMBetterShroomsAndGardensGenerateResource(ChecklistEntry [int] resource_e
         // Entries
         string [int] description;
         if (freeFightsLeft > 0) {
-            description.listAppend("Fight a piranha plant");
+            description.listAppend("Free fight.");
             if (my_path_id() == PATH_OF_THE_PLUMBER) {
-                description.listAppend("Drops extra coins and mushrooms");
+                description.listAppend("Drops extra coins and mushrooms.");
             }
         }
 
@@ -34,7 +34,7 @@ void IOTMBetterShroomsAndGardensGenerateResource(ChecklistEntry [int] resource_e
 		int expectedSlabs = clampi(mushroomLevel - 3, 0, 2);
 		
 		// Title
-		string main_title = "Upkeep your Mushroom";
+		string main_title = "Upkeep your mushroom";
 		
 		// Subtitle
 		string subtitle = "One action per day";
