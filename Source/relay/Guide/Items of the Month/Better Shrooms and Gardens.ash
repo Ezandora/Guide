@@ -46,9 +46,9 @@ void IOTMBetterShroomsAndGardensGenerateResource(ChecklistEntry [int] resource_e
         string [int] futureYield;
 		if (!get_property_boolean("_mushroomGardenVisited")) {
 			description.listAppend("Mushroom is at tier " + mushroomLevel);
-			shroomYield.listAppend(expectedFilets + " filets / 9");
+			shroomYield.listAppend(expectedFilets + " filets");
 			if (mushroomLevel > 3)
-				shroomYield.listAppend( pluralise(expectedSlabs,"slab","slabs") + " / 2" );
+				shroomYield.listAppend( pluralise(expectedSlabs,"slab","slabs") );
 
             if (mushroomLevel < 2)
                 futureYield.listAppend("+3 filets at tier 2");
