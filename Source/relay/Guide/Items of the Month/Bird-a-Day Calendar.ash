@@ -1,3 +1,18 @@
+RegisterTaskGenerationFunction("IOTMBirdADayGenerateTasks");
+void IOTMBirdADayGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    if (!lookupItem("Bird-a-Day calendar").have()) return;
+    if (!get_property_boolean("_canSeekBirds")) {
+        string [int] description;
+
+        description.listAppend("Use your calendar to get a new skill for the day");
+        if (have_effect($effect[Blessing of the Bird]) > 0)
+            description.listAppend(HTMLGenerateSpanFont("Still have an old blessing", "red") + "|Using the calendar will replace the old buff's modifiers with the new ones.");
+
+        optional_task_entries.listAppend(ChecklistEntryMake("__effect Blessing of the Bird", "inv_use.php?pwd=" + my_hash() + "&whichitem=10434", ChecklistSubentryMake("Discover your daily Bird", "", description), 8));
+    }
+}
+
 RegisterResourceGenerationFunction("IOTMBirdADayCalendar");
 void IOTMBirdADayCalendar(ChecklistEntry [int] resource_entries)
 {
@@ -50,6 +65,7 @@ void IOTMBirdADayCalendar(ChecklistEntry [int] resource_entries)
     ChecklistSubentry getFavoriteBird() {
 
         string favoriteBirdMods = get_property("yourFavoriteBirdMods");
+        boolean canSeekFavBird = have_skill($skill[Visit your Favorite Bird]);
 
         // Title
         string main_title = "Favorite";
@@ -60,7 +76,7 @@ void IOTMBirdADayCalendar(ChecklistEntry [int] resource_entries)
         // Entries
         string [int] description;
 
-        if (favoriteBirdMods != "" && get_property_boolean("_canSeekBirds") && !get_property_boolean("_favoriteBirdVisited")) {
+        if (favoriteBirdMods != "" && canSeekFavBird && !get_property_boolean("_favoriteBirdVisited")) {
             string [int] modStrings = favoriteBirdMods.split_string(", ");
             foreach index, modString in modStrings {
                 string [int] modProperties = modString.split_string(": ");
@@ -98,7 +114,7 @@ void IOTMBirdADayCalendar(ChecklistEntry [int] resource_entries)
 
     ChecklistEntry entry;
     entry.image_lookup_name = "__effect Blessing of the Bird";
-    entry.url = "";
+    entry.url = "skillz.php";
 
     ChecklistSubentry birdMods = getBirdMods();
     if (birdMods.entries.count() > 0) {
