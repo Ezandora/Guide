@@ -42,7 +42,7 @@ void IOTMKramcoSausageOMaticGenerateResource(ChecklistEntry [int] resource_entri
     entry.importance_level = -2;
     
     string [int] main_description;
-    string main_title = "Kramco Sausage-o-Matic&trade; fights";
+    string main_title;
     
     KramcoSausageFightInformation fight_information = KramcoCalculateSausageFightInformation();
 
@@ -53,11 +53,8 @@ void IOTMKramcoSausageOMaticGenerateResource(ChecklistEntry [int] resource_entri
             entry.url = "inventory.php?which=2";
         }
     } else {
-    	main_title = pluralise(fight_information.turns_to_next_guaranteed_fight, "turn", "turns") + " until next sausage goblin fight";
-    }
-
-    if (fight_information.turns_to_next_guaranteed_fight > 0) {
-	    main_description.listAppend(round(fight_information.probability_of_sausage_fight * 100.0) + "% chance of goblin fight this turn.");
+        main_title = round(fight_information.probability_of_sausage_fight * 100.0) + "% chance of sausage goblin this turn.";
+	    main_description.listAppend(pluralise(fight_information.turns_to_next_guaranteed_fight, "turn", "turns") + " until next guaranteed goblin fight.");
     }
 
     main_description.listAppend("Does not cost a turn; burns delay.");
