@@ -3,7 +3,7 @@ void IOTMGuzzlrGenerateTask(ChecklistEntry [int] task_entries, ChecklistEntry [i
     boolean startedQuest = get_property("questGuzzlr") != "unstarted";
     location questLocation = get_property("guzzlrQuestLocation").to_location();
     
-    ChecklistSubentry getLecture() {
+    ChecklistSubentry getGuzzling() {
         item questBooze = get_property("guzzlrQuestBooze").to_item();
         string questTier = get_property("guzzlrQuestTier");
         int platinumDeliveriesLeft = 1 - get_property_int("_guzzlrPlatinumDeliveries");
@@ -91,7 +91,7 @@ void IOTMGuzzlrGenerateTask(ChecklistEntry [int] task_entries, ChecklistEntry [i
         entry.url = "inventory.php?tap=guzzlr";
     }
 
-    ChecklistSubentry lectures = getLecture();
+    ChecklistSubentry lectures = getGuzzling();
     if (lectures.entries.count() > 0) {
         entry.subentries.listAppend(lectures);
     }
