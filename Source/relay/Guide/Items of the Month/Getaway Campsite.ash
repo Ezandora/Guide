@@ -12,7 +12,7 @@ void IOTMGetawayCampsiteGenerateResource(ChecklistEntry [int] resource_entries)
     	string [int] description;
         description.listAppend("Large +stat buff. Gaze at the stars.");
         if (firewood.have() || lookupItem("campfire smoke").have())
-        	description.listAppend("If you don't see it, you could make and use campfire smoke, first.");
+        	description.listAppend("If you don't see it, you could make and use campfire smoke first.");
         resource_entries.listAppend(ChecklistEntryMake("__item Newbiesport&trade; tent", "place.php?whichplace=campaway", ChecklistSubentryMake("Cloud-talk buff obtainable", "", description), 0).ChecklistEntryTagEntry("getaway campsite"));
     }
     if (smile_buffs_left > 0) { // && lookupEffect("That's Just Cloud-Talk, Man").have_effect() == 0)
