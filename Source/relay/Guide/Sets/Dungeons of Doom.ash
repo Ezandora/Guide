@@ -33,7 +33,7 @@ void SDungeonsOfDoomGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
             //Read plus sign:
             title = "Read plus sign";
             image_name = "__item plus sign";
-            url = "inventory.php?which=3";
+            url = "inventory.php?which=3&ftext=plus+sign";
         }
     }
     else

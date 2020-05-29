@@ -85,7 +85,7 @@ void QLevel4GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         {
             int amount = MIN(areas_locked, $item[sonar-in-a-biscuit].available_amount());
             subentry.entries.listAppend("Use " + pluralise(amount, $item[sonar-in-a-biscuit]));
-            url = "inventory.php?which=3";
+            url = "inventory.php?which=3&ftext=sonar-in-a-biscuit";
         }
         
         boolean have_stench_resistance = (numeric_modifier("stench resistance") > 0.0);

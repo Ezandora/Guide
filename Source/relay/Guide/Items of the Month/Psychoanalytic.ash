@@ -378,7 +378,7 @@ void IOTMPCrackpotGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
         description.listAppend(bosses_remaining.listJoinComponents(", ", "and").capitaliseFirstLetter() + await);
     else if ($item[flickering pixel].available_amount() == 8)
     {
-        url = "inventory.php?which=3";
+        url = "inventory.php?which=3&ftext=flickering+pixel";
         image_name = "__item flickering pixel";
     }
     

@@ -469,7 +469,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
             if ($effect[chalky hand].have_effect() == 0& $item[handful of hand chalk].available_amount() > 0)
             {
                 subentry.entries.listAppend(HTMLGenerateSpanFont("Use handful of hand chalk", "red") + " for +pool skill and faster pool skill training.");
-                url = "inventory.php?which=3";
+                url = "inventory.php?which=3&ftext=handful+of+hand+chalk";
             }
         }
         
