@@ -45,7 +45,7 @@ void IOTMIntergnatGenerateResource(ChecklistEntry [int] resource_entries)
     if ($item[infinite BACON machine].available_amount() > 0 && !get_property_boolean("_baconMachineUsed") && mafiaIsPastRevision(16926))
     {
         //suggest using it:
-        resource_entries.listAppend(ChecklistEntryMake("__item infinite BACON machine", "inventory.php?which=3", ChecklistSubentryMake("Infinite BACON machine", "", "100 BACON/day."), 7));
+        resource_entries.listAppend(ChecklistEntryMake("__item infinite BACON machine", "inventory.php?which=3?ftext=infinite+bacon+machine", ChecklistSubentryMake("Infinite BACON machine", "", "100 BACON/day."), 7));
     }
     if ($item[daily dungeon malware].available_amount() > 0 && __misc_state_int["fat loot tokens needed"] > 0)
     {

@@ -322,7 +322,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
             {
                 can_complete_using_trimmers = true;
                 if (have_at_least_one_usable_option)
-                    url = "inventory.php?which=3";
+                    url = "inventory.php?which=3&ftext=rusty+hedge+trimmers";
             }
 			if (numeric_modifier("stench resistance") < 4.0 && !stench_completed)
             {

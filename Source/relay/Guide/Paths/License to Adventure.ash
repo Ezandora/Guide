@@ -5,7 +5,7 @@ void PathLicenseToAdventureGenerateTasks(ChecklistEntry [int] task_entries, Chec
         return;
     if (lookupItem("Victor's Spoils").available_amount() > 0 && !get_property_boolean("_victorSpoilsUsed"))
     {
-        task_entries.listAppend(ChecklistEntryMake("__item victor's spoils", "inventory.php?which=3", ChecklistSubentryMake("Use Victor's Spoils", "", "Gives eleven adventures."), 3));
+        task_entries.listAppend(ChecklistEntryMake("__item victor's spoils", "inventory.php?which=3&ftext=victor's+spoils", ChecklistSubentryMake("Use Victor's Spoils", "", "Gives eleven adventures."), 3));
     }
     
     int lair_progress = get_property_int("_villainLairProgress");

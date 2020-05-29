@@ -21,7 +21,7 @@ void IOTMLilDoctorBagGenerateResource(ChecklistEntry [int] resource_entries)
         if (lookupItem("Lil' Doctor&trade; bag").equipped_amount() == 0)
         {
             description.listAppend("Equip the Lil'l Doctor™ bag first.");
-            url = "inventory.php?which=3";
+            url = "inventory.php?which=3&ftext=lil'+doctor";
         }
         //if (snojo_skill_entry.image_lookup_name == "")
             //snojo_skill_entry.image_lookup_name = "__skill shattering punch";

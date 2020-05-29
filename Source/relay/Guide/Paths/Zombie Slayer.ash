@@ -19,7 +19,7 @@ void PathZombieSlayerGenerateTasks(ChecklistEntry [int] task_entries, ChecklistE
         if (zombie_skills_have < 30)
         {
             //probably should suggest eat X hunter brains but
-            optional_task_entries.listAppend(ChecklistEntryMake("__item hunter brain", "inventory.php?which=1", ChecklistSubentryMake("Eat a hunter brain", "", "Gain a skill point."), -1));
+            optional_task_entries.listAppend(ChecklistEntryMake("__item hunter brain", "inventory.php?which=1&ftext=hunter+brain", ChecklistSubentryMake("Eat a hunter brain", "", "Gain a skill point."), -1));
         }
     }
     

@@ -129,7 +129,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         
         string url = "";
         if ($item[navel ring of navel gazing].equipped_amount() == 0)
-            url = "inventory.php?which=2"; //&ftext=navel+ring+of+navel+gazing
+            url = "inventory.php?which=2&ftext=navel+ring+of+navel+gazing";
 		
 		string [int] description;
 		description.listAppend(navel_percent_chance_of_runaway + "% chance of free runaway.");
@@ -142,7 +142,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
 		
         string url = "";
         if ($item[greatest american pants].equipped_amount() == 0)
-            url = "inventory.php?which=2"; //&ftext=greatest+american+pants
+            url = "inventory.php?which=2&ftext=greatest+american+pants";
         
 		string [int] description;
 		description.listAppend(navel_percent_chance_of_runaway + "% chance of free runaway.");
@@ -169,7 +169,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         string url = "";
         
         if ($item[pantsgiving].equipped_amount() == 0)
-            url = "inventory.php?which=2"; //&ftext=pantsgiving
+            url = "inventory.php?which=2&ftext=pantsgiving";
 		
 		
 		int banishes_available = 5 - get_property_int("_pantsgivingBanish");
@@ -1113,7 +1113,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         if ($item[V for Vivala mask].equipped_amount() == 0)
         {
             description.listAppend("Equip V for Vivala mask first.");
-            url = "inventory.php?which=2"; //&ftext=v+for+vivala
+            url = "inventory.php?which=2&ftext=v+for+vivala";
         }
         string line = "Costs ";
         if (my_mp() < 30)
@@ -1128,7 +1128,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
     if ($item[moveable feast].available_amount() > 0 && $item[moveable feast].is_unrestricted() && get_property_int("_feastUsed") < 5)
     {
         string [int] description;
-        string url = "inventory.php?which=2"; //&ftext=moveable+feast
+        string url = "inventory.php?which=2&ftext=moveable+feast";
         int feastings_left = clampi(5 - get_property_int("_feastUsed"), 0, 5);
         
         description.listAppend("Gives +10 familiar weight for twenty turns to a specific familiar.");
@@ -1194,7 +1194,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         }
         string [int] description;
         description.listAppend(HTMLGenerateSimpleTableLines(table));
-        resource_entries.listAppend(ChecklistEntryMake("__item cosmic calorie", "inventory.php?which=3", ChecklistSubentryMake(pluralise($item[cosmic calorie]), "", description), importance_level_item));
+        resource_entries.listAppend(ChecklistEntryMake("__item cosmic calorie", "inventory.php?which=3&ftext=cosmic+calorie", ChecklistSubentryMake(pluralise($item[cosmic calorie]), "", description), importance_level_item));
         
     }
     

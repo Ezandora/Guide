@@ -16,7 +16,7 @@ void IOTMKramcoSausageOMaticGenerateTasks(ChecklistEntry [int] task_entries, Che
         if (lookupItem("Kramco Sausage-o-Matic&trade;").equipped_amount() == 0)
         {
             description.listAppend(HTMLGenerateSpanFont("Equip the Kramco Sausage-o-Matic&trade; first.", "red"));
-            url = "inventory.php?which=2";
+            url = "inventory.php?which=2&ftext=kramco+sausage-o-matic";
         }
         description.listAppend("Free fight that burns delay.");
         location [int] possible_locations = generatePossibleLocationsToBurnDelay();
@@ -50,7 +50,7 @@ void IOTMKramcoSausageOMaticGenerateResource(ChecklistEntry [int] resource_entri
 	    main_title = "Sausage goblin fight available";
         if (lookupItem("Kramco Sausage-o-Matic&trade;").equipped_amount() == 0) {
             main_description.listAppend(HTMLGenerateSpanFont("Equip the Kramco Sausage-o-Matic&trade; first.", "red"));
-            entry.url = "inventory.php?which=2";
+            entry.url = "inventory.php?which=2&ftext=kramco+sausage-o-matic";
         }
     } else {
         main_title = round(fight_information.probability_of_sausage_fight * 100.0) + "% chance of sausage goblin this turn";

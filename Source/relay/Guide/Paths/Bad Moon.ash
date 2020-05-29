@@ -202,7 +202,7 @@ void PathBadMoonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
             if ($item[blood-faced volleyball].available_amount() > 0)
             {
                 tasks.listAppend("use blood-faced volleyball");
-                url = "inventory.php?which=3";
+                url = "inventory.php?which=3&ftext=blood-faced+volleyball";
             }
             else
             {
@@ -230,7 +230,7 @@ void PathBadMoonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
                     }
                     tasks.listAppend("use seal tooth to acquire a bloody hand (ow!)");
                     if (url != "" && $item[seal tooth].available_amount() > 0)
-                        url = "inventory.php?which=3";
+                        url = "inventory.php?which=3&ftext=seal+tooth";
                 }
                 int trinkets_missing = MAX(0, trinkets_needed - $items[worthless trinket,worthless gewgaw,worthless knick-knack].available_amount());
                 if (trinkets_missing > 0)
@@ -239,7 +239,7 @@ void PathBadMoonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
                     if ($item[chewing gum on a string].available_amount() == 0)
                         url = "shop.php?whichshop=generalstore";
                     else
-                        url = "inventory.php?which=3";
+                        url = "inventory.php?which=3&ftext=chewing+gum+on+a+string";
                     if ($item[hermit permit].available_amount() == 0)
                     {
                         tasks.listPrepend("buy hermit permit");
@@ -249,7 +249,7 @@ void PathBadMoonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
                 
                 tasks.listAppend("use volleyball");
                 if (url != "" && $item[volleyball].available_amount() > 0 && $effect[bloody hand].have_effect() > 0)
-                    url = "inventory.php?which=3";
+                    url = "inventory.php?which=3&ftext=volleyball";
                         
                 tasks.listAppend("use blood-faced volleyball");
             }
@@ -263,7 +263,7 @@ void PathBadMoonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
             if ($item[leprechaun hatchling].available_amount() > 0)
             {
                 description.listAppend("Use a leprechaun hatchling.");
-                url = "inventory.php?which=3";
+                url = "inventory.php?which=3&ftext=leprechaun+hatchling";
             }
             else if (!haveSeenBadMoonEncounter(46) && $location[a barroom brawl].locationAvailable())
             {
@@ -282,7 +282,7 @@ void PathBadMoonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
             if ($item[pregnant mushroom].available_amount() > 0)
             {
                 description.listAppend("Use a pregnant mushroom.");
-                url = "inventory.php?which=3";
+                url = "inventory.php?which=3&ftext=pregnant+mushroom";
             }
             else if ($item[pregnant mushroom].creatable_amount() > 0)
             {
@@ -323,7 +323,7 @@ void PathBadMoonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
             else
             {
                 description.listAppend("Use a cocoa egg.");
-                //url = "inventory.php?which=3";
+                url = "inventory.php?which=3&ftext=cocoa+egg";
             }
             optional_task_entries.listAppend(ChecklistEntryMake("__familiar cocoabo", url, ChecklistSubentryMake("Adopt a cocoabo", "", description)));
             
