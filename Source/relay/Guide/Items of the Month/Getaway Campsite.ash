@@ -39,7 +39,7 @@ void IOTMGetawayCampsiteGenerateResource(ChecklistEntry [int] resource_entries)
 
         int getPathID() { // until an option to get this is implemented into mafia, made by @Rinn
             int path = -1;
-            buffer page = visit_url("api.php?what=status&for=mafiaScriptTest");
+            buffer page = visit_url("api.php?what=status&for=campsiteGetpath");
             matcher m = create_matcher('"path"\:"(.*?)"', page);
             if (find(m)) {
                 path = group(m, 1).to_int();
