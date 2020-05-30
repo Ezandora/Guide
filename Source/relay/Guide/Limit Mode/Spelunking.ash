@@ -809,7 +809,7 @@ void LimitModeSpelunkingGenerateChecklists(Checklist [int] checklists)
         if ($item[the joke book of the dead].equipped_amount() == 0)
         {
             tasks.listAppend("after equipping " + $item[the joke book of the dead]);
-            url = "inventory.php?which=2&ftext=joke+book+of+the+dead";
+            url = "inventory.php?ftext=joke+book+of+the+dead";
         }
         tasks.listAppend("click on the ghost");
         description.listAppend(tasks.listJoinComponents(", ").capitaliseFirstLetter() + ".");

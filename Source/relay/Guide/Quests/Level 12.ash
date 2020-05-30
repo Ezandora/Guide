@@ -118,7 +118,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 		{
 			if ($effect[Filthworm Guard Stench].have_effect() == 0)
             {
-                url = "inventory.php?which=3&ftext=filthworm+royal+guard+scent+gland";
+                url = "inventory.php?ftext=filthworm+royal+guard+scent+gland";
 				details.listAppend("Use filthworm royal guard scent gland.");
             }
 			modifiers.listClear();
@@ -130,7 +130,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 		{
 			if ($effect[Filthworm Drone Stench].have_effect() == 0)
             {
-                url = "inventory.php?which=3&ftext=filthworm+drone+scent+gland";
+                url = "inventory.php?ftext=filthworm+drone+scent+gland";
 				details.listAppend("Use filthworm drone scent gland");
             }
 			details.listAppend("Adventure with +item in the guards' chamber.");
@@ -142,7 +142,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 		{
 			if ($effect[Filthworm Larva Stench].have_effect() == 0)
             {
-                url = "inventory.php?which=3&ftext=filthworm+hatchling+scent+gland";
+                url = "inventory.php?ftext=filthworm+hatchling+scent+gland";
 				details.listAppend("Use filthworm hatchling scent gland");
             }
 			details.listAppend("Adventure with +item in the feeding chamber.");
@@ -677,12 +677,12 @@ void QLevel12ExplosionsGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         if ($item[haunted paddle-ball].have())
         {
             description.listAppend("Equip haunted paddle-ball first.");
-            url = "inventory.php?which=2&ftext=haunted+paddle-ball";
+            url = "inventory.php?ftext=haunted+paddle-ball";
         }
         else if ($item[jacob's rung].have())
         {
             description.listAppend("Equip jacob's rung first.");
-            url = "inventory.php?which=2&ftext=jacob's+rung";
+            url = "inventory.php?ftext=jacob's+rung";
         }
     }
     boolean likely_fighting_frats = false;

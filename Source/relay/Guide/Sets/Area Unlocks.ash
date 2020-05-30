@@ -101,7 +101,7 @@ void SAreaUnlocksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
             {
                 if ($item[dingy planks].available_amount() > 0)
                 {
-                    url = "inventory.php?which=3&ftext=dinghy+plans";
+                    url = "inventory.php?ftext=dinghy+plans";
                     subentry.entries.listAppend("Use dinghy plans.");
                 }
                 else

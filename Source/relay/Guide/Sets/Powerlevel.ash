@@ -16,7 +16,7 @@ void SPowerlevelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         else if (knoll_available())
         {
             if ($item[detuned radio].available_amount() > 0)
-                url = "inventory.php?which=3&ftext=detuned+radio";
+                url = "inventory.php?ftext=detuned+radio";
             else
                 url = "shop.php?whichshop=gnoll";
         }

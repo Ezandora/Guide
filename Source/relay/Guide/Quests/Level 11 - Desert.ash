@@ -200,7 +200,7 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         if ($item[ornate dowsing rod].available_amount() > 0)
         {
             line = "Equip the ornate dowsing rod.";
-            url = "inventory.php?which=2&ftext=ornate+dowsing+rod";
+            url = "inventory.php?ftext=ornate+dowsing+rod";
         }
         else
         {
@@ -226,7 +226,7 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
             else if ($item[uv-resistant compass].available_amount() > 0)
             {
                 line = "Equip the UV-resistant compass.";
-                url = "inventory.php?which=2&ftext=uv-resistant+compass";
+                url = "inventory.php?ftext=uv-resistant+compass";
             }
         }
         if (line != "")

@@ -10,12 +10,12 @@ void IOTMPlasticVampireFangsGenerateResource(ChecklistEntry [int] resource_entri
     string separator = " " + __html_right_arrow_character + " ";
     if ($item[plastic vampire fangs].available_amount() == 0) {
         fang_source = $item[Interview With You (a Vampire)];
-            url = "inventory.php?which=3&ftext=interview+with+you";
+            url = "inventory.php?ftext=interview+with+you";
     }
     else {
         url = "place.php?whichplace=town";
         if ($item[plastic vampire fangs].equipped_amount() == 0) {
-            url = "inventory.php?which=2&ftext=plastic+vampire+fangs";
+            url = "inventory.php?ftext=plastic+vampire+fangs";
         }
     }
     

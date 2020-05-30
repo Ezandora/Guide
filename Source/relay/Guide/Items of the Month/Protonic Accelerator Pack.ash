@@ -81,7 +81,7 @@ void IOTMProtonicAcceleratorPackGenerateTasks(ChecklistEntry [int] task_entries,
             {
                 if ($item[bone with a price tag on it].available_amount() > 0)
                 {
-                    url = "inventory.php?which=3&ftext=bone+with+a+price+tag+on+it";
+                    url = "inventory.php?ftext=bone+with+a+price+tag+on+it";
                     description.listAppend("Use the bone with a price tag on it to unlock the store.");
                 }
             }
@@ -98,7 +98,7 @@ void IOTMProtonicAcceleratorPackGenerateTasks(ChecklistEntry [int] task_entries,
             {
                 if ($item[map to a hidden booze cache].available_amount() > 0)
                 {
-                    url = "inventory.php?which=3&ftext=map+to+a+hidden+booze+cache";
+                    url = "inventory.php?ftext=map+to+a+hidden+booze+cache";
                     description.listAppend("Use the map to a hidden booze cache to unlock the store.");
                 }
             }
@@ -115,7 +115,7 @@ void IOTMProtonicAcceleratorPackGenerateTasks(ChecklistEntry [int] task_entries,
             {
                 if ($item[hypnotic breadcrumbs].available_amount() > 0)
                 {
-                    url = "inventory.php?which=3&ftext=hypnotic+breadcrumbs";
+                    url = "inventory.php?ftext=hypnotic+breadcrumbs";
                     description.listAppend("Use the hypnotic breadcrumbs to unlock the store.");
                 }
             }
@@ -166,7 +166,7 @@ void IOTMProtonicAcceleratorPackGenerateResource(ChecklistEntry [int] resource_e
         description.listAppend("+20% stats for 10 turns.");
         if ($item[protonic accelerator pack].equipped_amount() == 0)
         {
-            url = "inventory.php?which=2&ftext=protonic+accelerator+pack";
+            url = "inventory.php?ftext=protonic+accelerator+pack";
             description.listAppend("Equip the protonic accelerator pack first.");
         }
         resource_entries.listAppend(ChecklistEntryMake("__item protonic accelerator pack", url, ChecklistSubentryMake("Stream crossing", "", description), 8));
