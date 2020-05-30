@@ -213,7 +213,7 @@ void SPastamancerGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         }
         else
         {
-            optional_task_entries.listAppend(ChecklistEntryMake("__skill Canticle of Carboloading", "inventory.php?which=3&ftext=black+hymnal", ChecklistSubentryMake("Use the black hymnal", "", "Unlocks Carboloading.")));
+            optional_task_entries.listAppend(ChecklistEntryMake("__skill Canticle of Carboloading", "inventory.php?ftext=black+hymnal", ChecklistSubentryMake("Use the black hymnal", "", "Unlocks Carboloading.")));
         }
     }
 }

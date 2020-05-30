@@ -151,7 +151,7 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 			//caronch gave you a map
 			if ($item[Cap'm Caronch's nasty booty].available_amount() == 0 && $item[Cap'm Caronch's Map].available_amount() > 0)
 			{
-                url = "inventory.php?which=3&ftext=cap'm+caronch's+map";
+                url = "inventory.php?ftext=cap'm+caronch's+map";
 				subentry.entries.listAppend("Use Cap'm Caronch's Map, fight a booty crab.");
 				subentry.entries.listAppend("Possibly run +meat. (300 base drop)");
                 subentry.modifiers.listAppend("+meat");

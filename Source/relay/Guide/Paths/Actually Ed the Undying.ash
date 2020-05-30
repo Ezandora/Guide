@@ -120,7 +120,7 @@ void PathActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, Ch
             {
                 description.listClear();
                 description.listAppend("Use warehouse inventory page.");
-                url = "inventory.php?which=3&ftext=warehouse+inventory+page";
+                url = "inventory.php?ftext=warehouse+inventory+page";
             }
             else if (progress_remaining > 0)
             {

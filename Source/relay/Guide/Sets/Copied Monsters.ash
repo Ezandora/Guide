@@ -285,7 +285,7 @@ void SCopiedMonstersGenerateResourceForCopyType(ChecklistEntry [int] resource_en
 	if (shaking_object.available_amount() == 0 && shaking_object != $item[none])
 		return;
     
-    string url = "inventory.php?which=3&ftext=" + shaking_object;
+    string url = "inventory.php?ftext=" + shaking_object;
 	
 	string [int] monster_description;
 	string monster_name = get_property(monster_name_property_name).HTMLEscapeString();

@@ -73,7 +73,7 @@ void QLevel5GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		}
 		else if ($item[cobb's knob map].available_amount() > 0 && $item[knob goblin encryption key].available_amount() > 0)
 		{
-            url = "inventory.php?which=3&ftext=cobb's+knob+map";
+            url = "inventory.php?ftext=cobb's+knob+map";
 			subentry.entries.listAppend("Use cobb's knob map to unlock area.");
 		}
 		else if ($item[cobb's knob map].available_amount() == 0 && $item[knob goblin encryption key].available_amount() > 0)

@@ -113,7 +113,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         if ($item[stone wool].available_amount() > 0 && my_path_id() != PATH_G_LOVER)
         {
             if ($effect[Stone-Faced].have_effect() == 0)
-                entry.url = "inventory.php?which=3&ftext=stone+wool";
+                entry.url = "inventory.php?ftext=stone+wool";
             subentry.entries.listAppend(pluralise($item[stone wool]) + " available.");
         }
         if (my_path_id() == PATH_G_LOVER)

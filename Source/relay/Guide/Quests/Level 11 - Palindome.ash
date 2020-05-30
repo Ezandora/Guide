@@ -128,7 +128,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
     {
         url = "place.php?whichplace=palindome";
         if ($item[talisman o' namsilat].equipped_amount() == 0)
-            url = "inventory.php?which=2&ftext=talisman+o'+namsilat";
+            url = "inventory.php?ftext=talisman+o'+namsilat";
         
         
         /*
@@ -258,7 +258,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
             //talk to mr. alarm to unlock whitey's grove
             if (7270.to_item().available_amount() > 0)
             {
-                url = "inventory.php?which=3&ftext=2+love+me";
+                url = "inventory.php?ftext=2+love+me";
                 tasks.listAppend("use 2 Love Me, Vol. 2");
             }
             if ($item[wet stunt nut stew].available_amount() > 0)
@@ -367,7 +367,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
             {
                 if (!need_to_adventure_in_palindome)
                 {
-                    url = "inventory.php?which=3&ftext=I+love+me";
+                    url = "inventory.php?ftext=I+love+me";
                     subentry.entries.listAppend("Use I Love Me, Vol. I. Then place the photographs in Dr. Awkward's Office.");
                 }
                 else

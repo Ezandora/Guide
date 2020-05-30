@@ -23,7 +23,7 @@ void IOTMVotingBootGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         string [int] description;
         if (lookupItem("&quot;I Voted!&quot; sticker").equipped_amount() == 0) {
         	description.listAppend(HTMLGenerateSpanFont("Equip the I Voted! sticker first.", "red"));
-            url = "inventory.php?which=2&ftext=i+voted!";
+            url = "inventory.php?ftext=i+voted!";
         }
         description.listAppend("Free fight that burns delay.");
         location [int] possible_locations = generatePossibleLocationsToBurnDelay();
@@ -50,7 +50,7 @@ void IOTMVotingBootGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         monster fighting_monster = get_property_monster("_voteMonster");
         if (lookupItem("&quot;I Voted!&quot; sticker").equipped_amount() == 0) {
             description.listAppend(HTMLGenerateSpanFont("Equip the I Voted! sticker first.", "red"));
-            url = "inventory.php?which=2&ftext=i+voted!";
+            url = "inventory.php?ftext=i+voted!";
         }
         description.listAppend("Adventure in the sonofa beach, macrometeorite the " + (fighting_monster == $monster[none] ? "voting monster" : fighting_monster.to_string()) + ", and you'll get a lobsterfrogman.");
         task_entries.listAppend(ChecklistEntryMake("__item &quot;I Voted!&quot; sticker", url, ChecklistSubentryMake(title, "", description), -11));

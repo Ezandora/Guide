@@ -17,7 +17,7 @@ void SOldLevel9GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     if ($item[64735 scroll].item_amount() > 0)
     {
         description.listAppend("Use the 64735 scroll.");
-        url = "inventory.php?which=3&ftext=64735+scroll";
+        url = "inventory.php?ftext=64735+scroll";
     }
     else
     {

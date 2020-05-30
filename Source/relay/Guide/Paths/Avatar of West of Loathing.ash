@@ -199,6 +199,6 @@ void PathAvatarOfWestOfLoathingGenerateTasks(ChecklistEntry [int] task_entries, 
     
     if (my_class() == $class[Cow Puncher] && $item[corrupted marrow].available_amount() > 0 && $item[corrupted marrow].to_effect().have_effect() < 100 && in_ronin())
     {
-        task_entries.listAppend(ChecklistEntryMake("__effect Cowrruption", "inventory.php?which=3&ftext=corrupted+marrow", ChecklistSubentryMake("Use corrupted marrow", "", "+200% weapon damage/spell damage"), -11));
+        task_entries.listAppend(ChecklistEntryMake("__effect Cowrruption", "inventory.php?ftext=corrupted+marrow", ChecklistSubentryMake("Use corrupted marrow", "", "+200% weapon damage/spell damage"), -11));
     }
 }

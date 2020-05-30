@@ -5,7 +5,7 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 	{
 		if ($item[ring of detect boring doors].equipped_amount() == 0 && $item[ring of detect boring doors].available_amount() > 0 && !get_property_boolean("dailyDungeonDone") && get_property_int("_lastDailyDungeonRoom") < 13)
 		{
-			task_entries.listAppend(ChecklistEntryMake("__item ring of detect boring doors", "inventory.php?which=2&ftext=ring+of+detect+boring+doors", ChecklistSubentryMake("Wear ring of detect boring doors", "", "Speeds up daily dungeon"), -11));
+			task_entries.listAppend(ChecklistEntryMake("__item ring of detect boring doors", "inventory.php?ftext=ring+of+detect+boring+doors", ChecklistSubentryMake("Wear ring of detect boring doors", "", "Speeds up daily dungeon"), -11));
 		}
 		if (familiar_is_usable($familiar[gelatinous cubeling]) && ($item[pick-o-matic lockpicks].available_amount() == 0 || $item[eleven-foot pole].available_amount() == 0 || $item[Ring of Detect Boring Doors].available_amount() == 0)) //have familiar, but not the drops
 		{
@@ -200,7 +200,7 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 			{
 				if ($item[ring of detect boring doors].equipped_amount() == 0)
                 {
-                    url = "inventory.php?which=2&ftext=ring+of+detect+boring+doors";
+                    url = "inventory.php?ftext=ring+of+detect+boring+doors";
 					description.listAppend("Wear the ring of detect boring doors.");
                 }
 				else

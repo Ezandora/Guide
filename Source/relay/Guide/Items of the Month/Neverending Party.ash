@@ -30,7 +30,7 @@ void IOTMNeverendingPartyGenerateTasks(ChecklistEntry [int] task_entries, Checkl
         if (party_hard && lookupItem("PARTY HARD T-shirt").equipped_amount() == 0)
         {
             description.listAppend(HTMLGenerateSpanFont("Equip the PARTY HARD T-shirt.", "red"));
-            url = "inventory.php?which=2&ftext=party+hard+t-shirt";
+            url = "inventory.php?ftext=party+hard+t-shirt";
         }
         //partiers - progress starts at 50 in not-hard
         if (quest_name == "partiers")
@@ -45,7 +45,7 @@ void IOTMNeverendingPartyGenerateTasks(ChecklistEntry [int] task_entries, Checkl
                 else if (lookupItem("intimidating chainsaw").equipped_amount() == 0)
                 {
                 	description.listAppend(HTMLGenerateSpanFont("Equip the intimidating chainsaw.", "red"));
-                    url = "inventory.php?which=2&ftext=intimidating+chainsaw";
+                    url = "inventory.php?ftext=intimidating+chainsaw";
                 }
                 if (lookupItem("jam band bootleg").item_amount() > 0)
                 {
@@ -157,7 +157,7 @@ void IOTMNeverendingPartyGenerateTasks(ChecklistEntry [int] task_entries, Checkl
                 if (lookupItem("cosmetic football").available_amount() > 0 && lookupItem("cosmetic football").equipped_amount() == 0)
                 {
                     description.listAppend(HTMLGenerateSpanFont("Equip the cosmetic football.", "red"));
-                    url = "inventory.php?which=2&ftext=cosmetic+football";
+                    url = "inventory.php?ftext=cosmetic+football";
                 }
                 //very small red dress
                 if (lookupItem("very small red dress").item_amount() > 0)

@@ -1179,7 +1179,7 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         if ($item[talisman o\' namsilat].equipped_amount() > 0)
             lookup_map["Palindome"] = "place.php?whichplace=palindome";
         else
-            lookup_map["Palindome"] = "inventory.php?which=2&ftext=talisman+o\'+namsilat";
+            lookup_map["Palindome"] = "inventory.php?ftext=talisman+o\'+namsilat";
         //antique maps are weird:
         lookup_map["The Electric Lemonade Acid Parade"] = "inv_use.php?pwd=" + my_hash() + "&whichitem=4613";
         foreach s in $strings[Professor Jacking's Small-O-Fier,Professor Jacking's Huge-A-Ma-tron]

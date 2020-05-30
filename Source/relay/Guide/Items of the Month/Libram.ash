@@ -109,7 +109,7 @@ void IOTMLibramGenerateResource(ChecklistEntry [int] resource_entries)
 			if (creatable.count() > 0)
 				subentry.entries.listAppend("Creatable: (" + $item[bricko brick].available_amount() + " bricks available)" + HTMLGenerateIndentedText(creatable));
 				
-			resource_entries.listAppend(ChecklistEntryMake("__item bricko brick", "inventory.php?which=3&ftext=bricko", subentry, 7));
+			resource_entries.listAppend(ChecklistEntryMake("__item bricko brick", "inventory.php?ftext=bricko", subentry, 7));
 		}
 	}
 }

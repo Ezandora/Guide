@@ -171,7 +171,7 @@ void PathHeavyRainsGenerateResource(ChecklistEntry [int] resource_entries)
 	if (my_path_id() != PATH_HEAVY_RAINS)
 		return;
     
-    //resource_entries.listAppend(ChecklistEntryMake("__item gym membership card", "inventory.php?which=3&ftext=gym+membership+card", ChecklistSubentryMake(pluralise($item[gym membership card]), "", description), importance_level_item));
+    //resource_entries.listAppend(ChecklistEntryMake("__item gym membership card", "inventory.php?ftext=gym+membership+card", ChecklistSubentryMake(pluralise($item[gym membership card]), "", description), importance_level_item));
     
     
     int fishbone_amount = $item[freshwater fishbone].available_amount();
@@ -229,6 +229,6 @@ void PathHeavyRainsGenerateResource(ChecklistEntry [int] resource_entries)
     if ($item[catfish whiskers].available_amount() > 0)
     {
         //should we add in area suggestions?
-        resource_entries.listAppend(ChecklistEntryMake("__item catfish whiskers", "inventory.php?which=3&ftext=catfish+whiskers", ChecklistSubentryMake(pluralise($item[catfish whiskers]), "", "40 turns of -washaway"), 7));
+        resource_entries.listAppend(ChecklistEntryMake("__item catfish whiskers", "inventory.php?ftext=catfish+whiskers", ChecklistSubentryMake(pluralise($item[catfish whiskers]), "", "40 turns of -washaway"), 7));
     }
 }

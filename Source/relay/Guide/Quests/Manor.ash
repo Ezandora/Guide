@@ -335,7 +335,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     {
         //telegram is removed on using it, even on old copies of mafia
         subentry.header = "Read telegram from Lady Spookyraven";
-        url = "inventory.php?which=3&ftext=telegram+from+Lady+Spookyraven";
+        url = "inventory.php?ftext=telegram+from+Lady+Spookyraven";
         image_name = "__item telegram from Lady Spookyraven";
     }
     else if (to_item("7301").available_amount() == 0) //Spookyraven billiards room key
@@ -469,7 +469,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
             if ($effect[chalky hand].have_effect() == 0& $item[handful of hand chalk].available_amount() > 0)
             {
                 subentry.entries.listAppend(HTMLGenerateSpanFont("Use handful of hand chalk", "red") + " for +pool skill and faster pool skill training.");
-                url = "inventory.php?which=3&ftext=handful+of+hand+chalk";
+                url = "inventory.php?ftext=handful+of+hand+chalk";
             }
         }
         
