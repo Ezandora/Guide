@@ -216,13 +216,18 @@ void QLevel11RonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
             else
                 subentry.entries.listAppend("No ticket.");
         }
-            
-        if (get_property_int("_glarkCableUses") < 5 && my_path_id() != PATH_POCKET_FAMILIARS) {
-            if ($skill[Transcendent Olfaction].skill_is_usable() && !($effect[on the trail].have_effect() > 0 && get_property_monster("olfactedMonster") == $monster[red butler]))
-                subentry.entries.listAppend("Olfact red butlers for glark cables.");
-            
-            if ($item[glark cable].available_amount() > 0) {
-                subentry.entries.listAppend(HTMLGenerateSpanFont("Use glark cable in-combat.", "red"));
+        
+        if (my_path_id() != PATH_POCKET_FAMILIARS) {
+            if (get_property_int("_glarkCableUses") < 5) {
+                if ($skill[Transcendent Olfaction].skill_is_usable() && !($effect[on the trail].have_effect() > 0 && get_property_monster("olfactedMonster") == $monster[red butler]))
+                    subentry.entries.listAppend("Olfact red butlers for glark cables.");
+                
+                if ($item[glark cable].available_amount() > 0) {
+                    subentry.entries.listAppend(HTMLGenerateSpanFont("Use glark cable in-combat.", "red"));
+                }
+                subentry.entries.listAppend(get_property_int("_glarkCableUses") + " / 5 glark cables used today (free kills).");
+            } else {
+                subentry.entries.listAppend("Already used all 5 glark cables for the day.");
             }
         }
             
