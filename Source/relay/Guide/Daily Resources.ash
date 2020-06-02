@@ -407,6 +407,12 @@ void generateDailyResources(Checklist [int] checklists)
         string image_name = "__item fancy calligraphy pen";
         resource_entries.listAppend(ChecklistEntryMake(image_name, "place.php?whichplace=chateau", ChecklistSubentryMake("Chateau desk openable", "", "Daily collectable."), 8));
     }
+
+    if (!get_property_boolean("_lyleFavored")) {
+        string image_name = "__effect favored by lyle";
+        string description = $effect[Favored by Lyle].have_effect() > 0 ? "Increases duration of Favored by Lyle." : "+10% all attributes.";
+        resource_entries.listAppend(ChecklistEntryMake(image_name, "place.php?whichplace=monorail", ChecklistSubentryMake("Visit Lyle", "10 turns", description), 8));
+    }
 	
 	checklists.listAppend(ChecklistMake("Resources", resource_entries));
 }
