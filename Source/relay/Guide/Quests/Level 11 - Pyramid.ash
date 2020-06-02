@@ -32,6 +32,7 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
     {
         //Staff of ed.
         //subentry.entries.listAppend("Find the Staff of Ed.");
+        future_task_entries.listAppend(ChecklistEntryMake("Pyramid", "", ChecklistSubentryMake("Head down the pyramid", "", "Find the Staff of Ed.")));
         return;
     }
     else if (!base_quest_state.in_progress && $location[the upper chamber].turnsAttemptedInLocation() == 0)
