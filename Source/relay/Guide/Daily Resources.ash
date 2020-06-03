@@ -135,40 +135,54 @@ void generateDailyResources(Checklist [int] checklists)
 		resource_entries.listAppend(ChecklistEntryMake("__item insane tophat", "", ChecklistSubentryMake("Mad tea party", "30 turns", description), 5));
 	}
 	
-	if (true)
-	{
+	if (true) {
         string image_name = "__item hell ramen";
 		ChecklistSubentry [int] subentries;
-		if (availableFullness() > 0)
-		{
+        int importance = 11;
+		if (availableFullness() > 0) {
             string [int] description;
             if ($effect[Got Milk].have_effect() > 0)
-                description.listAppend(pluralise($effect[Got Milk]) + " available.");
+                description.listAppend(pluralise($effect[Got Milk]) + " available (woah).");
+            if (!get_property_boolean("_milkOfMagnesiumUsed") && lookupItem("milk of magnesium").available_amount() > 0)
+                description.listAppend("Use Milk of Magnesium for +5 adv.");
 			subentries.listAppend(ChecklistSubentryMake(availableFullness() + " fullness", "", description));
 		}
-		if (availableDrunkenness() >= 0 && inebriety_limit() > 0)
-        {
+        if (inebriety_limit() > 0) {
+            boolean stooperIsEquipped = my_familiar() == lookupFamiliar("Stooper");
+            boolean couldEquipStooper = lookupFamiliar("Stooper").familiar_is_usable() && !stooperIsEquipped;
             string title = "";
             string [int] description;
-            if (subentries.count() == 0)
-                image_name = "__item gibson";
-            if ($effect[ode to booze].have_effect() > 0)
-                description.listAppend(pluralise($effect[ode to booze]) + " available.");
-            
-            if (availableDrunkenness() > 0)
-                title = availableDrunkenness() + " drunkenness";
-            else
-                title = "Can overdrink";
-			subentries.listAppend(ChecklistSubentryMake(title, "", description));
+            if (availableDrunkenness() >= 0) {
+                boolean shotglassDrinkAvailable = !get_property_boolean("_mimeArmyShotglassUsed") && lookupItem("mime army shotglass").is_unrestricted() && lookupItem("mime army shotglass").available_amount() > 0;
+                if (subentries.count() == 0)
+                    image_name = "__item gibson";
+                if ($effect[ode to booze].have_effect() > 0)
+                    description.listAppend(pluralise($effect[ode to booze]) + " available.");
+                
+                if (availableDrunkenness() > 0)
+                    title = availableDrunkenness() + " drunkenness" + (couldEquipStooper ? " + Stooper" : "");
+                else {
+                    title = "Can overdrink";
+                    if (couldEquipStooper)
+                        description.listAppend("Could equip Stooper for +1 drunkenness.");
+                }
+                if (shotglassDrinkAvailable)
+                    description.listAppend("1 free 1-drunkenness booze available.");
+            } else if (availableDrunkenness() == -1 && couldEquipStooper) {
+                importance = -11;
+                title = HTMLGenerateSpanFont("Equip the Stooper", "red");
+                image_name = "__familiar stooper";
+                description.listAppend("Can keep adventuring/overdrink further as long as it's equipped.");
+            }
+            subentries.listAppend(ChecklistSubentryMake(title, "", description));
         }
-		if (availableSpleen() > 0)
-		{
+		if (availableSpleen() > 0) {
             if (subentries.count() == 0)
                 image_name = "__item agua de vida";
 			subentries.listAppend(ChecklistSubentryMake(availableSpleen() + " spleen", "", ""));
 		}
 		if (subentries.count() > 0)
-			resource_entries.listAppend(ChecklistEntryMake(image_name, "inventory.php?which=1", subentries, 11));
+			resource_entries.listAppend(ChecklistEntryMake(image_name, "inventory.php?which=1", subentries, importance));
 	}
 	
 	if (__quest_state["Level 13"].state_boolean["king waiting to be freed"])
