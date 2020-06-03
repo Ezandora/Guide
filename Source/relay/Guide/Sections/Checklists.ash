@@ -16,7 +16,7 @@ void generateMisc(Checklist [int] checklists)
 	
 	if (availableDrunkenness() < 0 && ($item[drunkula\'s wineglass].equipped_amount() == 0 || my_adventures() == 0))
 	{
-        //They arere drunk, so tasks are not as relevant. Re-arrange everything:
+        //They are drunk, so tasks are not as relevant. Re-arrange everything:
         string url;
         
         //Give them something to mindlessly click on:
