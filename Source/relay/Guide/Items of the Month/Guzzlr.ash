@@ -3,7 +3,7 @@ void IOTMGuzzlrQuestGenerateTask(ChecklistEntry [int] task_entries, ChecklistEnt
     if (get_property("questGuzzlr") == "unstarted") return;
     location questLocation = get_property("guzzlrQuestLocation").to_location();
 
-    //todo: tell if the area accepts wanderers; tell how much more +combat would be needed to guarantee only combats; use _guzzlrDeliveries to tell the user how long the quest will take
+    //todo: use _guzzlrDeliveries to tell the user how long the quest will take
     
     ChecklistSubentry gigEconomy() {
         item questBooze = get_property("guzzlrQuestBooze").to_item();
@@ -29,7 +29,17 @@ void IOTMGuzzlrQuestGenerateTask(ChecklistEntry [int] task_entries, ChecklistEnt
         string main_title = "Deliver booze";
 
         // Subtitle
-        string subtitle = "+combat";
+        string subtitle = "free fights";
+        initialiseLocationCombatRates(); //not done anywhere else in this script
+        if (__location_combat_rates contains questLocation) {
+            int rate = __location_combat_rates [questLocation];
+
+            if (rate == -1) //unknown
+                subtitle += ", +combat";
+            else if (rate != 100 && rate != 0)
+                subtitle += ", +" + (100 - rate) + "% combat";
+        } else //unlisted
+            subtitle += ", +combat";
 
         // Entries
         string [int] description;
