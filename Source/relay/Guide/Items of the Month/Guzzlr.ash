@@ -2,8 +2,17 @@ RegisterTaskGenerationFunction("IOTMGuzzlrQuestGenerateTask");
 void IOTMGuzzlrQuestGenerateTask(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) {
     if (get_property("questGuzzlr") == "unstarted") return;
     location questLocation = get_property("guzzlrQuestLocation").to_location();
+    int guzzlrQuestNumber = min(8, get_property_int("_guzzlrDeliveries") + 1);
 
-    //todo: use _guzzlrDeliveries to tell the user how long the quest will take
+    int [int] [boolean] guzzlrDeliveryTurnRange; //int= value of _guzzlrDeliveries +1; boolean= using shoes
+        guzzlrDeliveryTurnRange [1] [false] = 10; guzzlrDeliveryTurnRange [1] [true] = 7;
+        guzzlrDeliveryTurnRange [2] [false] = 12; guzzlrDeliveryTurnRange [2] [true] = 8;
+        guzzlrDeliveryTurnRange [3] [false] = 13; guzzlrDeliveryTurnRange [3] [true] = 9;
+        guzzlrDeliveryTurnRange [4] [false] = 15; guzzlrDeliveryTurnRange [4] [true] = 10;
+        guzzlrDeliveryTurnRange [5] [false] = 17; guzzlrDeliveryTurnRange [5] [true] = 12;
+        guzzlrDeliveryTurnRange [6] [false] = 20; guzzlrDeliveryTurnRange [6] [true] = 15;
+        guzzlrDeliveryTurnRange [7] [false] = 25; guzzlrDeliveryTurnRange [7] [true] = 17;
+        guzzlrDeliveryTurnRange [8] [false] = 34; guzzlrDeliveryTurnRange [8] [true] = 25;
     
     ChecklistSubentry gigEconomy() {
         item questBooze = get_property("guzzlrQuestBooze").to_item();
@@ -57,6 +66,12 @@ void IOTMGuzzlrQuestGenerateTask(ChecklistEntry [int] task_entries, ChecklistEnt
                 description.listAppend("Obtain a " + questBooze + ".");
             }
         }
+
+        if (hasShoes) {
+            description.listAppend("Takes " + guzzlrDeliveryTurnRange [guzzlrQuestNumber] [true] + " fights if you always wear the shoes.");
+            description.listAppend("Takes " + guzzlrDeliveryTurnRange [guzzlrQuestNumber] [false] + " fights if you never wear the shoes.");
+        } else
+            description.listAppend("Takes " + guzzlrDeliveryTurnRange [guzzlrQuestNumber] [false] + " fights.");
 
         if (hasShoes && !hasShoesEquipped) {
             description.listAppend(HTMLGenerateSpanFont("Equip your Guzzlr shoes for quicker deliveries.", "red"));
