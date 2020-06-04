@@ -2,21 +2,21 @@ RegisterTaskGenerationFunction("IOTMGuzzlrQuestGenerateTask");
 void IOTMGuzzlrQuestGenerateTask(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) {
     if (get_property("questGuzzlr") == "unstarted") return;
     location questLocation = get_property("guzzlrQuestLocation").to_location();
-    int guzzlrQuestNumber = min(8, get_property_int("_guzzlrDeliveries") + 1);
-
-    int [int] [boolean] guzzlrDeliveryTurnRange; //int= value of _guzzlrDeliveries +1; boolean= using shoes
-        guzzlrDeliveryTurnRange [1] [false] = 10; guzzlrDeliveryTurnRange [1] [true] = 7;
-        guzzlrDeliveryTurnRange [2] [false] = 12; guzzlrDeliveryTurnRange [2] [true] = 8;
-        guzzlrDeliveryTurnRange [3] [false] = 13; guzzlrDeliveryTurnRange [3] [true] = 9;
-        guzzlrDeliveryTurnRange [4] [false] = 15; guzzlrDeliveryTurnRange [4] [true] = 10;
-        guzzlrDeliveryTurnRange [5] [false] = 17; guzzlrDeliveryTurnRange [5] [true] = 12;
-        guzzlrDeliveryTurnRange [6] [false] = 20; guzzlrDeliveryTurnRange [6] [true] = 15;
-        guzzlrDeliveryTurnRange [7] [false] = 25; guzzlrDeliveryTurnRange [7] [true] = 17;
-        guzzlrDeliveryTurnRange [8] [false] = 34; guzzlrDeliveryTurnRange [8] [true] = 25;
     
     ChecklistSubentry gigEconomy() {
         item questBooze = get_property("guzzlrQuestBooze").to_item();
         string questTier = get_property("guzzlrQuestTier");
+        int guzzlrQuestNumber = min(8, get_property_int("_guzzlrDeliveries") + 1);
+
+        int [int] [boolean] guzzlrDeliveryTurnRange; //int= value of guzzlrQuestNumber; boolean= using shoes
+            guzzlrDeliveryTurnRange [1] [false] = 10; guzzlrDeliveryTurnRange [1] [true] = 7;
+            guzzlrDeliveryTurnRange [2] [false] = 12; guzzlrDeliveryTurnRange [2] [true] = 8;
+            guzzlrDeliveryTurnRange [3] [false] = 13; guzzlrDeliveryTurnRange [3] [true] = 9;
+            guzzlrDeliveryTurnRange [4] [false] = 15; guzzlrDeliveryTurnRange [4] [true] = 10;
+            guzzlrDeliveryTurnRange [5] [false] = 17; guzzlrDeliveryTurnRange [5] [true] = 12;
+            guzzlrDeliveryTurnRange [6] [false] = 20; guzzlrDeliveryTurnRange [6] [true] = 15;
+            guzzlrDeliveryTurnRange [7] [false] = 25; guzzlrDeliveryTurnRange [7] [true] = 17;
+            guzzlrDeliveryTurnRange [8] [false] = 34; guzzlrDeliveryTurnRange [8] [true] = 25;
 
         boolean hasBooze = questBooze.available_amount() > 0;
 
@@ -43,11 +43,11 @@ void IOTMGuzzlrQuestGenerateTask(ChecklistEntry [int] task_entries, ChecklistEnt
         if (__location_combat_rates contains questLocation) {
             int rate = __location_combat_rates [questLocation];
 
-            if (rate == -1) //unknown
+            if (rate == -1) //if unknown
                 subtitle += ", +combat";
             else if (rate != 100 && rate != 0)
                 subtitle += ", +" + (100 - rate) + "% combat";
-        } else //unlisted
+        } else //if unlisted
             subtitle += ", +combat";
 
         // Entries
@@ -119,6 +119,18 @@ void IOTMGuzzlrTabletGenerateTask(ChecklistEntry [int] task_entries, ChecklistEn
         int goldDeliveriesLeft = 3 - get_property_int("_guzzlrGoldDeliveries");
         boolean canAcceptPlatinum = get_property_int("guzzlrGoldDeliveries") >= 5;
         boolean canAcceptGold = get_property_int("guzzlrBronzeDeliveries") >= 5;
+        boolean hasShoes = lookupItem("Guzzlr shoes").available_amount() > 0;
+        int guzzlrQuestNumber = min(8, get_property_int("_guzzlrDeliveries") + 1);
+
+        string [int] guzzlrDeliveryTurnRange; //int= value of guzzlrQuestNumber
+            guzzlrDeliveryTurnRange [1] = hasShoes ? "7-10" : "10";
+            guzzlrDeliveryTurnRange [2] = hasShoes ? "8-12" : "12";
+            guzzlrDeliveryTurnRange [3] = hasShoes ? "9-13" : "13";
+            guzzlrDeliveryTurnRange [4] = hasShoes ? "10-15" : "15";
+            guzzlrDeliveryTurnRange [5] = hasShoes ? "12-17" : "17";
+            guzzlrDeliveryTurnRange [6] = hasShoes ? "15-20" : "20";
+            guzzlrDeliveryTurnRange [7] = hasShoes ? "17-25" : "25";
+            guzzlrDeliveryTurnRange [8] = hasShoes ? "25-34" : "34";
 
         // Title
         string main_title;
@@ -152,8 +164,9 @@ void IOTMGuzzlrTabletGenerateTask(ChecklistEntry [int] task_entries, ChecklistEn
                     chooseDeliveryMessage += HTMLGenerateIndentedText("| • Platinum " + HTMLGenerateSpanFont("(" + platinumDeliveriesLeft + " available)", "grey") + (canAbandonQuest ? " (Abandon for free cocktail set?)" : ""));
                 }
                 description.listAppend(chooseDeliveryMessage);
+                description.listAppend("Will take " + guzzlrDeliveryTurnRange [guzzlrQuestNumber] + " fights.");
                 if (canAbandonQuest) {
-                    description.listAppend("Can abandon 1 quest today.");
+                    description.listAppend("Can abandon 1 more quest today.");
                 }
             }
         }
