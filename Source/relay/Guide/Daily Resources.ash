@@ -174,7 +174,8 @@ void generateDailyResources(Checklist [int] checklists)
                 image_name = "__familiar stooper";
                 description.listAppend("Can keep adventuring/overdrink further as long as it's equipped.");
             }
-            subentries.listAppend(ChecklistSubentryMake(title, "", description));
+            if (description.count() > 0)
+                subentries.listAppend(ChecklistSubentryMake(title, "", description));
         }
 		if (availableSpleen() > 0) {
             if (subentries.count() == 0)
