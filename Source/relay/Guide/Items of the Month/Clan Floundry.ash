@@ -6,7 +6,7 @@ void IOTMClanFloundryGenerateResource(ChecklistEntry [int] resource_entries)
         return;
     if (!__misc_state["in run"])
         return;
-    if (my_path_id() == PATH_G_LOVER)
+    if (myPathId() == PATH_G_LOVER)
     	return;
     
     //if (get_property_boolean("_floundryFabricated") || !mafiaIsPastRevision(18000))

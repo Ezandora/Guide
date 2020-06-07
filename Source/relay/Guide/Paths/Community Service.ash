@@ -1,7 +1,7 @@
 RegisterTaskGenerationFunction("PathCommunityServiceGenerateTasks");
 void PathCommunityServiceGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-    if (my_path_id() != PATH_COMMUNITY_SERVICE)
+    if (myPathId() != PATH_COMMUNITY_SERVICE)
         return;
     if (!__misc_state["in run"])
         return;

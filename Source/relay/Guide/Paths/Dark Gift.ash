@@ -2,7 +2,7 @@
 RegisterResourceGenerationFunction("PathDarkGiftGenerateResource");
 void PathDarkGiftGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (my_path_id() != PATH_VAMPIRE)
+    if (myPathId() != PATH_VAMPIRE)
         return;
 
     int banishes_left = clampi(10 - get_property_int("_balefulHowlUses"), 0, 10);

@@ -12,7 +12,7 @@ void QLevel12Init()
 	//state_boolean["Orchard Finished"]
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL12War");
-    if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (myPathId() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
 	state.quest_name = "Island War Quest";
 	state.image_name = "island war";
 	state.council_quest = true;
@@ -38,7 +38,7 @@ void QLevel12Init()
 		state.state_boolean["Nuns Finished"] = true;
 		state.state_boolean["Orchard Finished"] = true;
 	}
-	if (my_path_id() == PATH_EXPLOSIONS)
+	if (myPathId() == PATH_EXPLOSIONS)
 		state.state_boolean["Lighthouse Finished"] = true;
     int quests_completed_hippy = 0;
     int quests_completed_frat = 0;
@@ -86,7 +86,7 @@ void QLevel12Init()
 		state.state_boolean["Orchard Finished"] = false;
 	}
 	
-	if (my_level() >= 12 && my_path_id() != PATH_EXPLOSIONS)
+	if (my_level() >= 12 && myPathId() != PATH_EXPLOSIONS)
 		state.startable = true;
     
 	__quest_state["Level 12"] = state;
@@ -215,7 +215,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 		if (brigand_meat_drop_range.x != 0 && brigand_meat_drop_range.y != 0)
 			turn_range = vec2iMake(ceil(to_float(meat_remaining) / to_float(brigand_meat_drop_range.y)),
 			ceil(to_float(meat_remaining) / to_float(brigand_meat_drop_range.x)));
-        if (my_path_id() == PATH_2CRS)
+        if (myPathId() == PATH_2CRS)
         	turn_range = Vec2iMake(MAX(100, turn_range.x), MAX(100, turn_range.y));
         
             
@@ -265,7 +265,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
             details.listAppend("Potentially use stone wool and visit the hidden temple to extend Sinuses for Miles for 3 turns.");
         
         
-        if (my_path_id() == PATH_HEAVY_RAINS && $skill[Make it Rain].skill_is_usable() && turn_range.y > 1)
+        if (myPathId() == PATH_HEAVY_RAINS && $skill[Make it Rain].skill_is_usable() && turn_range.y > 1)
             details.listAppend("Cast Make it Rain each fight. (+300%? meat)");
         if ($item[Sneaky Pete's leather jacket (collar popped)].equipped_amount() > 0 && turn_range.y > 1)
             details.listAppend("Could unpop your collar. (+20% meat)");
@@ -275,7 +275,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
             int limit = 100;
             if (meat_drop_modifier() < 800.0)
                 limit = 50;
-            if (my_path_id() == PATH_G_LOVER)
+            if (myPathId() == PATH_G_LOVER)
             	limit = 25;
             limit = 0; //show them all - we'll go based off of turns saved
             boolean [item] blacklist = $items[uncle greenspan's bathroom finance guide,black snowcone];
@@ -481,7 +481,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 	
 		optional_task_entries.listAppend(ChecklistEntryMake("Island War Lighthouse", "bigisland.php?place=lighthouse", ChecklistSubentryMake("Island War Lighthouse Quest", modifiers, details), $locations[sonofa beach]));
 	}
-	if (!base_quest_state.state_boolean["Arena Finished"] && my_path_id() != PATH_G_LOVER && my_path_id() != PATH_POCKET_FAMILIARS)
+	if (!base_quest_state.state_boolean["Arena Finished"] && myPathId() != PATH_G_LOVER && myPathId() != PATH_POCKET_FAMILIARS)
 	{
 		string [int] modifiers;
 		modifiers.listAppend("+ML");
@@ -529,9 +529,9 @@ void QLevel12GenerateBattlefieldDescription(ChecklistSubentry subentry, string s
     else
     {
         line += "Fight " + boss_name + "!";
-        if (my_path_id() == PATH_DEMIGUISE && $effect[Flared Nostrils].have_effect() > 0)
+        if (myPathId() == PATH_DEMIGUISE && $effect[Flared Nostrils].have_effect() > 0)
         	line += "|" + HTMLGenerateSpanFont("Remove Flared Nostrils", "red") + " or you will die.";
-        if (my_path_id() == PATH_DEMIGUISE)
+        if (myPathId() == PATH_DEMIGUISE)
         {
         	int damage_taken = 0;
             damage_taken += ceil(my_maxhp() * 2.0 * (1.0 - elemental_resistance($element[stench]) / 100.0));
@@ -575,7 +575,7 @@ void QLevel12GenerateBattlefieldDescription(ChecklistSubentry subentry, string s
     string [int] areas_unlocked_but_not_completed;
     
     boolean [string] areas_blocked;
-    if (my_path_id() == PATH_G_LOVER || my_path_id() == PATH_POCKET_FAMILIARS)
+    if (myPathId() == PATH_G_LOVER || myPathId() == PATH_POCKET_FAMILIARS)
         areas_blocked["Arena"] = true;
     
     foreach key, sidequest in base_sidequest_list
@@ -588,7 +588,7 @@ void QLevel12GenerateBattlefieldDescription(ChecklistSubentry subentry, string s
         }
     }
     
-    if (my_path_id() != PATH_BUGBEAR_INVASION) //FIXME test against trendy bugbear chef being needed
+    if (myPathId() != PATH_BUGBEAR_INVASION) //FIXME test against trendy bugbear chef being needed
     {
         if (side == "frat boy" && __misc_state["free runs usable"])
             subentry.modifiers.listAppend("possibly olfact Green Ops Soldier");
@@ -650,7 +650,7 @@ void QLevel12GenerateBattlefieldDescription(ChecklistSubentry subentry, string s
 
 void QLevel12ExplosionsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-    if (my_path_id() != PATH_EXPLOSIONS) return;
+    if (myPathId() != PATH_EXPLOSIONS) return;
 	if (QuestState("questL12HippyFrat").finished) return;
 	
 	string [int] description;
@@ -738,7 +738,7 @@ void QLevel12ExplosionsGenerateTasks(ChecklistEntry [int] task_entries, Checklis
 
 void QLevel12GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (my_path_id() == PATH_EXPLOSIONS)
+	if (myPathId() == PATH_EXPLOSIONS)
 		QLevel12ExplosionsGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	if (!__quest_state["Level 12"].in_progress)
 		return;
@@ -787,7 +787,7 @@ void QLevel12GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             //need 70 moxie, 70 myst
             
         }
-        if (false && $item[talisman o' namsilat].available_amount() == 0 && !__quest_state["Level 11 Palindome"].finished && my_path_id() != PATH_G_LOVER)
+        if (false && $item[talisman o' namsilat].available_amount() == 0 && !__quest_state["Level 11 Palindome"].finished && myPathId() != PATH_G_LOVER)
         {
             subentry.entries.listAppend("May want to " + HTMLGenerateSpanFont("acquire the Talisman o' Nam", "red") + " first.");
         }
@@ -805,12 +805,12 @@ void QLevel12GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 		int frat_boys_defeated_per_combat = powi(2, sides_completed_hippy);
 		int hippies_defeated_per_combat = powi(2, sides_completed_frat);
         
-        if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE && get_property("peteMotorbikeCowling") == "Rocket Launcher")
+        if (myPathId() == PATH_AVATAR_OF_SNEAKY_PETE && get_property("peteMotorbikeCowling") == "Rocket Launcher")
         {
             frat_boys_defeated_per_combat += 3;
             hippies_defeated_per_combat += 3;
         }
-        if (my_path_id() == PATH_LICENSE_TO_ADVENTURE && get_property_boolean("bondWar"))
+        if (myPathId() == PATH_LICENSE_TO_ADVENTURE && get_property_boolean("bondWar"))
         {
             frat_boys_defeated_per_combat += 3;
             hippies_defeated_per_combat += 3;

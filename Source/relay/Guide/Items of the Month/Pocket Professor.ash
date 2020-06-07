@@ -8,7 +8,7 @@ void IOTMPocketProfessorResource(ChecklistEntry [int] resource_entries)
 
         // Title
         int lecturesUsed = get_property_int("_pocketProfessorLectures");
-        int potentialWeight = familiar_weight($familiar[Pocket Professor]) + weight_adjustment();
+        int potentialWeight = effective_familiar_weight($familiar[Pocket Professor]) + weight_adjustment();
         int potentialWeightChip = potentialWeight - round(equipped_item($slot[familiar]).numeric_modifier('familiar weight'));
         boolean chipEquipped = lookupItem("pocket professor memory chip").have_equipped();
 
@@ -39,6 +39,9 @@ void IOTMPocketProfessorResource(ChecklistEntry [int] resource_entries)
             } else {
                 description.listAppend("Next lecture at " + chipMessage + ".");
             }
+        }
+        if (get_property("_feastedFamiliars").contains_text("Pocket Professor")) {
+            description.listAppend(HTMLGenerateSpanFont("Warning: Numbers may not be correct if Moveable Feast has expired.", "red"));
         }
 
         return ChecklistSubentryMake(main_title, subtitle, description);
