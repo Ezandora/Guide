@@ -134,8 +134,9 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
             subentry.header = base_quest_state.quest_name;
             entry.subentries.listAppend(subentry);
         }
-        //Not sure exactly how these work.
-        //8 appears to be finished.
+        //8 appears to be "finished"--"got stone triangle"
+        //7 appears to be "defeated the protector spirit"--"have stone sphere"
+        //2-6 appears to be "number of bowling balls used + 1" (only for bowling alley)
         //1 appears to be "area unlocked"
         boolean hidden_tavern_unlocked = get_property_ascension("hiddenTavernUnlock");
         boolean janitors_relocated_to_park = get_property_ascension("relocatePygmyJanitor");
