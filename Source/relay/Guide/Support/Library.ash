@@ -559,6 +559,7 @@ static
     __place_delays[$location[the outskirts of cobb's knob]] = 10;
     __place_delays[$location[the hidden apartment building]] = 8;
     __place_delays[$location[the hidden office building]] = 10;
+    __place_delays[$location[the copperhead club]] = 15;
     __place_delays[$location[the upper chamber]] = 5;
 }
 
