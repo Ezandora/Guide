@@ -3,7 +3,7 @@ void QGuildInit()
 {
     if (!($classes[seal clubber,turtle tamer,pastamancer,sauceror,disco bandit,accordion thief] contains my_class()))
         return;
-    if (my_path_id() == PATH_POCKET_FAMILIARS)
+    if (myPathId() == PATH_POCKET_FAMILIARS)
         return;
 	//questM02Artist
 	QuestState state;
@@ -49,9 +49,9 @@ void QGuildGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 {
     if (!($classes[seal clubber,turtle tamer,pastamancer,sauceror,disco bandit,accordion thief] contains my_class()))
         return;
-    if (my_path_id() == PATH_POCKET_FAMILIARS)
+    if (myPathId() == PATH_POCKET_FAMILIARS)
         return;
-    if (my_path_id() == PATH_NUCLEAR_AUTUMN)
+    if (myPathId() == PATH_NUCLEAR_AUTUMN)
         return;
 	QuestState base_quest_state = __quest_state["Guild"];
 	if (base_quest_state.finished)
@@ -63,7 +63,7 @@ void QGuildGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 	
 	string active_url = "";
     
-    if (__misc_state["in run"] && my_path_id() != PATH_PICKY && !in_bad_moon())
+    if (__misc_state["in run"] && myPathId() != PATH_PICKY && !in_bad_moon())
     {
         if ($classes[pastamancer,sauceror] contains my_class() && $location[the haunted pantry].turnsAttemptedInLocation() == 0)
             return;

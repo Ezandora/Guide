@@ -50,99 +50,99 @@ static {
     int PATH_LOW_KEY_SUMMER = 39;
 }
 
-int __my_path_id_cached = -11;
+int __myPathIdCached = -11;
 
 int initialiseMyPathID() {
     string path_name = my_path();
     
     if (path_name == "" || path_name == "None")
-        __my_path_id_cached = PATH_NONE;
+        __myPathIdCached = PATH_NONE;
     else if (path_name == "Teetotaler")
-        __my_path_id_cached = PATH_TEETOTALER;
+        __myPathIdCached = PATH_TEETOTALER;
     else if (path_name == "Boozetafarian")
-        __my_path_id_cached = PATH_BOOZETAFARIAN;
+        __myPathIdCached = PATH_BOOZETAFARIAN;
     else if (path_name == "Oxygenarian")
-        __my_path_id_cached = PATH_OXYGENARIAN;
+        __myPathIdCached = PATH_OXYGENARIAN;
     else if (path_name == "Bees Hate You")
-        __my_path_id_cached = PATH_BEES_HATE_YOU;
+        __myPathIdCached = PATH_BEES_HATE_YOU;
     else if (path_name == "Way of the Surprising Fist")
-        __my_path_id_cached = PATH_WAY_OF_THE_SURPRISING_FIST;
+        __myPathIdCached = PATH_WAY_OF_THE_SURPRISING_FIST;
     else if (path_name == "Trendy")
-        __my_path_id_cached = PATH_TRENDY;
+        __myPathIdCached = PATH_TRENDY;
     else if (path_name == "Avatar of Boris")
-        __my_path_id_cached = PATH_AVATAR_OF_BORIS;
+        __myPathIdCached = PATH_AVATAR_OF_BORIS;
     else if (path_name == "Bugbear Invasion")
-        __my_path_id_cached = PATH_BUGBEAR_INVASION;
+        __myPathIdCached = PATH_BUGBEAR_INVASION;
     else if (path_name == "Zombie Slayer")
-        __my_path_id_cached = PATH_ZOMBIE_SLAYER;
+        __myPathIdCached = PATH_ZOMBIE_SLAYER;
     else if (path_name == "Class Act")
-        __my_path_id_cached = PATH_CLASS_ACT;
+        __myPathIdCached = PATH_CLASS_ACT;
     else if (path_name == "Avatar of Jarlsberg")
-        __my_path_id_cached = PATH_AVATAR_OF_JARLSBERG;
+        __myPathIdCached = PATH_AVATAR_OF_JARLSBERG;
     else if (path_name == "BIG!")
-        __my_path_id_cached = PATH_BIG;
+        __myPathIdCached = PATH_BIG;
     else if (path_name == "KOLHS")
-        __my_path_id_cached = PATH_KOLHS;
+        __myPathIdCached = PATH_KOLHS;
     else if (path_name == "Class Act II: A Class For Pigs")
-        __my_path_id_cached = PATH_CLASS_ACT_2;
+        __myPathIdCached = PATH_CLASS_ACT_2;
     else if (path_name == "Avatar of Sneaky Pete")
-        __my_path_id_cached = PATH_AVATAR_OF_SNEAKY_PETE;
+        __myPathIdCached = PATH_AVATAR_OF_SNEAKY_PETE;
     else if (path_name == "Slow and Steady")
-        __my_path_id_cached = PATH_SLOW_AND_STEADY;
+        __myPathIdCached = PATH_SLOW_AND_STEADY;
     else if (path_name == "Heavy Rains")
-        __my_path_id_cached = PATH_HEAVY_RAINS;
+        __myPathIdCached = PATH_HEAVY_RAINS;
     else if (path_name == "Picky")
-        __my_path_id_cached = PATH_PICKY;
+        __myPathIdCached = PATH_PICKY;
     else if (path_name == "Standard")
-        __my_path_id_cached = PATH_STANDARD;
+        __myPathIdCached = PATH_STANDARD;
     else if (path_name == "Actually Ed the Undying")
-        __my_path_id_cached = PATH_ACTUALLY_ED_THE_UNDYING;
+        __myPathIdCached = PATH_ACTUALLY_ED_THE_UNDYING;
     else if (path_name == "One Crazy Random Summer")
-        __my_path_id_cached = PATH_ONE_CRAZY_RANDOM_SUMMER;
+        __myPathIdCached = PATH_ONE_CRAZY_RANDOM_SUMMER;
     else if (path_name == "Community Service" || path_name == "25")
-        __my_path_id_cached = PATH_COMMUNITY_SERVICE;
+        __myPathIdCached = PATH_COMMUNITY_SERVICE;
     else if (path_name == "Avatar of West of Loathing")
-        __my_path_id_cached = PATH_AVATAR_OF_WEST_OF_LOATHING;
+        __myPathIdCached = PATH_AVATAR_OF_WEST_OF_LOATHING;
     else if (path_name == "The Source")
-        __my_path_id_cached = PATH_THE_SOURCE;
+        __myPathIdCached = PATH_THE_SOURCE;
     else if (path_name == "Nuclear Autumn" || path_name == "28")
-        __my_path_id_cached = PATH_NUCLEAR_AUTUMN;
+        __myPathIdCached = PATH_NUCLEAR_AUTUMN;
     else if (path_name == "Gelatinous Noob")
-        __my_path_id_cached = PATH_GELATINOUS_NOOB;
+        __myPathIdCached = PATH_GELATINOUS_NOOB;
     else if (path_name == "License to Adventure")
-        __my_path_id_cached = PATH_LICENSE_TO_ADVENTURE;
+        __myPathIdCached = PATH_LICENSE_TO_ADVENTURE;
     else if (path_name == "Live. Ascend. Repeat.")
-        __my_path_id_cached = PATH_LIVE_ASCEND_REPEAT;
+        __myPathIdCached = PATH_LIVE_ASCEND_REPEAT;
     else if (path_name == "Pocket Familiars" || path_name == "32")
-        __my_path_id_cached = PATH_POCKET_FAMILIARS;
+        __myPathIdCached = PATH_POCKET_FAMILIARS;
     else if (path_name == "G-Lover" || path_name == "33")
-        __my_path_id_cached = PATH_G_LOVER;
+        __myPathIdCached = PATH_G_LOVER;
     else if (path_name == "Disguises Delimit" || path_name == "34")
-        __my_path_id_cached = PATH_DISGUISES_DELIMIT;
+        __myPathIdCached = PATH_DISGUISES_DELIMIT;
     else if (path_name == "Dark Gyffte")
-        __my_path_id_cached = PATH_DARK_GYFFTE;
+        __myPathIdCached = PATH_DARK_GYFFTE;
     else if (path_name == "36" || path_name == "Two Crazy Random Summer")
-        __my_path_id_cached = PATH_2CRS;
+        __myPathIdCached = PATH_2CRS;
     else if (path_name == "37" || path_name == "Kingdom of Exploathing")
-    	__my_path_id_cached = PATH_EXPLOSION;
+    	__myPathIdCached = PATH_EXPLOSION;
     else if (path_name == "38" || path_name == "Path of the Plumber")
-    	__my_path_id_cached = PATH_OF_THE_PLUMBER;
+    	__myPathIdCached = PATH_OF_THE_PLUMBER;
     else if (path_name == "39" || path_name == "Low Key Summer")
-    	__my_path_id_cached = PATH_LOW_KEY_SUMMER;
+    	__myPathIdCached = PATH_LOW_KEY_SUMMER;
     else
-        __my_path_id_cached = PATH_UNKNOWN;
-    return __my_path_id_cached;
+        __myPathIdCached = PATH_UNKNOWN;
+    return __myPathIdCached;
 }
 initialiseMyPathID();
 
-int my_path_id() {
-    return __my_path_id_cached;
+int myPathId() {
+    return __myPathIdCached;
 }
 
 float numeric_modifier_replacement(item it, string modifier) {
     string modifier_lowercase = modifier.to_lower_case();
     float additional = 0;
-    if (my_path_id() == PATH_G_LOVER && !it.contains_text("g") && !it.contains_text("G"))
+    if (myPathId() == PATH_G_LOVER && !it.contains_text("g") && !it.contains_text("G"))
     	return 0.0;
     if (it == $item[your cowboy boots])
     {

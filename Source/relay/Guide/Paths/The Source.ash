@@ -1,7 +1,7 @@
 RegisterTaskGenerationFunction("PathTheSourceGenerateTasks");
 void PathTheSourceGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (my_path_id() != PATH_THE_SOURCE)
+	if (myPathId() != PATH_THE_SOURCE)
 		return;
     if (!mafiaIsPastRevision(16944))
         return;
@@ -149,6 +149,6 @@ void PathTheSourceGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 RegisterResourceGenerationFunction("PathTheSourceGenerateResource");
 void PathTheSourceGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (my_path_id() != PATH_THE_SOURCE)
+	if (myPathId() != PATH_THE_SOURCE)
 		return;
 }

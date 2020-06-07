@@ -74,7 +74,7 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
     
     
     
-    if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE)
+    if (myPathId() == PATH_AVATAR_OF_SNEAKY_PETE)
     {
 		property_summons_to_skills["_petePartyThrown"] = listMake($skill[Throw Party]);
 		property_summons_to_skills["_peteRiotIncited"] = listMake($skill[Incite Riot]);
@@ -98,7 +98,7 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
             skills_to_details[$skill[Incite Riot]] = "This fire is out of control";
     }
 	//Jarlsberg:
-	if (my_path_id() == PATH_AVATAR_OF_JARLSBERG)
+	if (myPathId() == PATH_AVATAR_OF_JARLSBERG)
 	{
 		property_summons_to_skills["_jarlsCreamSummoned"] = listMake($skill[Conjure Cream]);
 		property_summons_to_skills["_jarlsEggsSummoned"] = listMake($skill[Conjure Eggs]);
@@ -109,7 +109,7 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
 		property_summons_to_skills["_jarlsMeatSummoned"] = listMake($skill[Conjure Meat Product]);
 		property_summons_to_skills["_jarlsFruitSummoned"] = listMake($skill[Conjure Fruit]);
 	}
-	if (my_path_id() == PATH_AVATAR_OF_BORIS)
+	if (myPathId() == PATH_AVATAR_OF_BORIS)
 	{
 		property_summons_to_skills["_demandSandwich"] = listMake($skill[Demand Sandwich]);
 		property_summon_limits["_demandSandwich"] = 3;
@@ -210,7 +210,7 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
     {
         resource_entries.listAppend(ChecklistEntryMake("__skill Evoke Eldritch Horror", "skillz.php", ChecklistSubentryMake("Evoke Eldritch Horror", "", "Free fight."), 5).ChecklistEntryTagEntry("daily free fight"));
     }
-    if (!get_property_boolean("_eldritchTentacleFought") && my_path_id() != PATH_EXPLOSIONS)
+    if (!get_property_boolean("_eldritchTentacleFought") && myPathId() != PATH_EXPLOSIONS)
     {
         resource_entries.listAppend(ChecklistEntryMake("__skill Evoke Eldritch Horror", "place.php?whichplace=forestvillage", ChecklistSubentryMake("Science Tent Tentacle", "", "Free fight."), 5).ChecklistEntryTagEntry("daily free fight"));
     }

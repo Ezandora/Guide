@@ -111,7 +111,7 @@ void setUpState()
 		__misc_state["fax accessible"] = true;
 	}
 	
-	if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_TRENDY)
+	if (myPathId() == PATH_AVATAR_OF_BORIS || myPathId() == PATH_AVATAR_OF_JARLSBERG || myPathId() == PATH_AVATAR_OF_SNEAKY_PETE || myPathId() == PATH_TRENDY)
 	{
 		__misc_state["fax accessible"] = false;
 	}
@@ -123,7 +123,7 @@ void setUpState()
 	__misc_state["fax available"] = fax_available;
     
     __misc_state["fax equivalent accessible"] = __misc_state["fax available"];
-    if (my_path_id() == PATH_HEAVY_RAINS && $skill[rain man].skill_is_usable())
+    if (myPathId() == PATH_HEAVY_RAINS && $skill[rain man].skill_is_usable())
         __misc_state["fax equivalent accessible"] = true;
 	
     if (__misc_state["VIP available"])
@@ -133,20 +133,20 @@ void setUpState()
     }
 	
 	__misc_state["can eat just about anything"] = true;
-	if (my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_ZOMBIE_SLAYER || fullness_limit() == 0 || my_path_id() == PATH_VAMPIRE)
+	if (myPathId() == PATH_AVATAR_OF_JARLSBERG || myPathId() == PATH_ZOMBIE_SLAYER || fullness_limit() == 0 || myPathId() == PATH_VAMPIRE)
 	{
 		__misc_state["can eat just about anything"] = false;
 	}
 	
 	__misc_state["can drink just about anything"] = true;
-	if (my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_KOLHS || my_path_id() == PATH_LICENSE_TO_ADVENTURE || inebriety_limit() == 0 || my_path_id() == PATH_VAMPIRE)
+	if (myPathId() == PATH_AVATAR_OF_JARLSBERG || myPathId() == PATH_KOLHS || myPathId() == PATH_LICENSE_TO_ADVENTURE || inebriety_limit() == 0 || myPathId() == PATH_VAMPIRE)
 	{
 		__misc_state["can drink just about anything"] = false;
 	}
 	
 	
 	__misc_state["can equip just about any weapon"] = true;
-	if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_WAY_OF_THE_SURPRISING_FIST)
+	if (myPathId() == PATH_AVATAR_OF_BORIS || myPathId() == PATH_WAY_OF_THE_SURPRISING_FIST)
 	{
 		__misc_state["can equip just about any weapon"] = false;
 	}
@@ -222,13 +222,13 @@ void setUpState()
 		yellow_ray_image_name = "nanorhino";
 		
 	}
-    if ($skill[Ball Lightning].skill_is_usable() && my_path_id() == PATH_HEAVY_RAINS && my_lightning() >= 5)
+    if ($skill[Ball Lightning].skill_is_usable() && myPathId() == PATH_HEAVY_RAINS && my_lightning() >= 5)
     {
         yellow_ray_available = true;
         yellow_ray_source = "Ball Lightning";
         yellow_ray_image_name = "__skill Ball Lightning";
     }
-    if ($skill[wrath of ra].skill_is_usable() && my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
+    if ($skill[wrath of ra].skill_is_usable() && myPathId() == PATH_ACTUALLY_ED_THE_UNDYING)
     {
         yellow_ray_available = true;
         yellow_ray_source = "Wrath of Ra";
@@ -240,7 +240,7 @@ void setUpState()
 		yellow_ray_source = "He-Boulder";
 		yellow_ray_image_name = "he-boulder";
 	}
-    if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE && $skill[Flash Headlight].skill_is_usable() && get_property("peteMotorbikeHeadlight") == "Ultrabright Yellow Bulb")
+    if (myPathId() == PATH_AVATAR_OF_SNEAKY_PETE && $skill[Flash Headlight].skill_is_usable() && get_property("peteMotorbikeHeadlight") == "Ultrabright Yellow Bulb")
     {
 		yellow_ray_available = true;
 		yellow_ray_source = "Flash Headlight";
@@ -256,7 +256,7 @@ void setUpState()
 	if (yellow_ray_available)
 		yellow_ray_potentially_available = true;
 	
-	if (my_path_id() == PATH_KOLHS)
+	if (myPathId() == PATH_KOLHS)
 		yellow_ray_potentially_available = true;
 		
 	
@@ -297,12 +297,12 @@ void setUpState()
     }
 	
 	boolean free_runs_usable = true;
-	if (my_path_id() == PATH_BIG || my_path_id() == PATH_POCKET_FAMILIARS) //more like "combat items not usable" but
+	if (myPathId() == PATH_BIG || myPathId() == PATH_POCKET_FAMILIARS) //more like "combat items not usable" but
 		free_runs_usable = false;
 	__misc_state["free runs usable"] = free_runs_usable;
 	
 	boolean blank_outs_usable = true;
-	if (my_path_id() == PATH_AVATAR_OF_JARLSBERG)
+	if (myPathId() == PATH_AVATAR_OF_JARLSBERG)
 		blank_outs_usable = false;
 	if (!free_runs_usable)
 		blank_outs_usable = false;
@@ -325,7 +325,7 @@ void setUpState()
 		if ($item[bottle of Blank-Out].available_amount() > 0 || get_property_int("blankOutUsed") > 0)
 			free_runs_available = true;
 	}
-    if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE && $skill[Peel Out].skill_is_usable())
+    if (myPathId() == PATH_AVATAR_OF_SNEAKY_PETE && $skill[Peel Out].skill_is_usable())
     {
         
         int total_free_peel_outs_available = 10;
@@ -335,7 +335,7 @@ void setUpState()
         if (free_peel_outs_available > 0)
             free_runs_available = true;
     }
-    if (my_path_id() == PATH_HEAVY_RAINS && $skill[Lightning Strike].skill_is_usable())
+    if (myPathId() == PATH_HEAVY_RAINS && $skill[Lightning Strike].skill_is_usable())
         free_runs_available = true;
 	if (!free_runs_usable)
 		free_runs_available = false;
@@ -360,7 +360,7 @@ void setUpState()
     {
         some_olfact_available = true;
     }
-    if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
+    if (myPathId() == PATH_AVATAR_OF_BORIS || myPathId() == PATH_AVATAR_OF_JARLSBERG || myPathId() == PATH_AVATAR_OF_SNEAKY_PETE || myPathId() == PATH_ZOMBIE_SLAYER || myPathId() == PATH_ACTUALLY_ED_THE_UNDYING)
     {
         some_olfact_available = true;
         some_reusable_olfact_available = true;
@@ -369,7 +369,7 @@ void setUpState()
     __misc_state_string["olfaction equivalent monster"] = olfacted_monster;
 	__misc_state["have reusable olfaction equivalent"] = some_reusable_olfact_available;
 	
-    if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_NUCLEAR_AUTUMN)
+    if (myPathId() == PATH_ACTUALLY_ED_THE_UNDYING || myPathId() == PATH_NUCLEAR_AUTUMN)
         __misc_state["campground unavailable"] = true;
 	
 	boolean skills_temporarily_missing = false;
@@ -380,32 +380,32 @@ void setUpState()
 		skills_temporarily_missing = true;
 		familiars_temporarily_missing = true;
 	}
-	if (my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_VAMPIRE)
+	if (myPathId() == PATH_AVATAR_OF_JARLSBERG || myPathId() == PATH_AVATAR_OF_BORIS || myPathId() == PATH_AVATAR_OF_SNEAKY_PETE || myPathId() == PATH_ACTUALLY_ED_THE_UNDYING || myPathId() == PATH_VAMPIRE)
 	{
 		skills_temporarily_missing = true;
 		familiars_temporarily_missing = true;
 		familiars_temporarily_blocked = true;
 	}
-	if (my_path_id() == PATH_ZOMBIE_SLAYER)
+	if (myPathId() == PATH_ZOMBIE_SLAYER)
 	{
 		skills_temporarily_missing = true;
 	}
-	if (my_path_id() == PATH_CLASS_ACT || my_path_id() == PATH_CLASS_ACT_2)
+	if (myPathId() == PATH_CLASS_ACT || myPathId() == PATH_CLASS_ACT_2)
 	{
 		//not sure how mafia interprets "have_skill" under class act
 		skills_temporarily_missing = true;
 	}
-	if (my_path_id() == PATH_TRENDY)
+	if (myPathId() == PATH_TRENDY)
 	{
 		//not sure if this is correct
 		//skills_temporarily_missing = true;
 		//familiars_temporarily_missing = true;
 	}
-    if (my_path_id() == PATH_AVATAR_OF_WEST_OF_LOATHING || my_path_id() == PATH_NUCLEAR_AUTUMN || my_path_id() == PATH_GELATINOUS_NOOB || my_path_id() == PATH_G_LOVER)
+    if (myPathId() == PATH_AVATAR_OF_WEST_OF_LOATHING || myPathId() == PATH_NUCLEAR_AUTUMN || myPathId() == PATH_GELATINOUS_NOOB || myPathId() == PATH_G_LOVER)
     {
         skills_temporarily_missing = true;
     }
-    if (my_path_id() == PATH_LICENSE_TO_ADVENTURE || my_path_id() == PATH_POCKET_FAMILIARS)
+    if (myPathId() == PATH_LICENSE_TO_ADVENTURE || myPathId() == PATH_POCKET_FAMILIARS)
         familiars_temporarily_blocked = true;
 	__misc_state["skills temporarily missing"] = skills_temporarily_missing;
 	__misc_state["familiars temporarily missing"] = familiars_temporarily_missing;
@@ -413,13 +413,13 @@ void setUpState()
 	
 	
 	__misc_state["AT skills available"] = true;
-	if (my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_ZOMBIE_SLAYER || ((my_path_id() == PATH_CLASS_ACT || my_path_id() == PATH_CLASS_ACT_2) && my_class() != $class[accordion thief]))
+	if (myPathId() == PATH_AVATAR_OF_JARLSBERG || myPathId() == PATH_AVATAR_OF_BORIS || myPathId() == PATH_AVATAR_OF_SNEAKY_PETE || myPathId() == PATH_ZOMBIE_SLAYER || ((myPathId() == PATH_CLASS_ACT || myPathId() == PATH_CLASS_ACT_2) && my_class() != $class[accordion thief]))
 		__misc_state["AT skills available"] = false;
 	
 	
     __misc_state_float["Non-combat statgain multiplier"] = 1.0;
 	__misc_state_float["ML to mainstat multiplier"] = 1.0 / (2.0 * 3.0);
-	/*if (my_path_id() == PATH_CLASS_ACT_2)
+	/*if (myPathId() == PATH_CLASS_ACT_2)
 	{
 		__misc_state_float["ML to mainstat multiplier"] = 1.0 / (2.0 * 2.0);
 	}*/
@@ -483,7 +483,7 @@ void setUpState()
 	//wand
 	
 	boolean wand_of_nagamar_needed = true;
-	if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_BUGBEAR_INVASION || my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_KOLHS || my_path_id() == PATH_HEAVY_RAINS || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_THE_SOURCE || my_path_id() == PATH_LICENSE_TO_ADVENTURE || my_path_id() == PATH_POCKET_FAMILIARS || my_path_id() == PATH_VAMPIRE)
+	if (myPathId() == PATH_AVATAR_OF_BORIS || myPathId() == PATH_AVATAR_OF_JARLSBERG || myPathId() == PATH_AVATAR_OF_SNEAKY_PETE || myPathId() == PATH_BUGBEAR_INVASION || myPathId() == PATH_ZOMBIE_SLAYER || myPathId() == PATH_KOLHS || myPathId() == PATH_HEAVY_RAINS || myPathId() == PATH_ACTUALLY_ED_THE_UNDYING || myPathId() == PATH_COMMUNITY_SERVICE || myPathId() == PATH_THE_SOURCE || myPathId() == PATH_LICENSE_TO_ADVENTURE || myPathId() == PATH_POCKET_FAMILIARS || myPathId() == PATH_VAMPIRE)
 		wand_of_nagamar_needed = false;
 		
 	int ruby_w_needed = 1;
@@ -542,7 +542,7 @@ void setUpState()
         mysterious_island_unlocked = true;
     if (get_property_ascension("lastIslandUnlock"))
         mysterious_island_unlocked = true;
-    if (my_path_id() == PATH_EXPLOSION)
+    if (myPathId() == PATH_EXPLOSION)
     	mysterious_island_unlocked = true; //kinda
         
     __misc_state["mysterious island available"] = mysterious_island_unlocked;
@@ -556,7 +556,7 @@ void setUpState()
 		__misc_state["desert beach available"] = true;
 	if ($locations[The Shore\, Inc. Travel Agency,the arid\, extra-dry desert,the oasis, south of the border].turnsAttemptedInLocation() > 0) //weird issues with detecting the beach. check if we've ever adventured there as a back-up
 		__misc_state["desert beach available"] = true;
-    if (my_path_id() == PATH_EXPLOSION)
+    if (myPathId() == PATH_EXPLOSION)
         __misc_state["desert beach available"] = true;
 	
 	string ballroom_song = "";
@@ -615,12 +615,12 @@ void setUpState()
 		
 		
 	__misc_state["bookshelf accessible"] = true;
-	if (my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE)
+	if (myPathId() == PATH_ZOMBIE_SLAYER || myPathId() == PATH_AVATAR_OF_BORIS || myPathId() == PATH_AVATAR_OF_SNEAKY_PETE)
 		__misc_state["bookshelf accessible"] = false;
         
     
 	__misc_state["can pickpocket"] = false;
-    if (my_class() == $class[disco bandit] || my_class() == $class[accordion thief] || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || $item[tiny black hole].equipped_amount() > 0 || $effect[Form of...Bird!].have_effect() > 0)
+    if (my_class() == $class[disco bandit] || my_class() == $class[accordion thief] || myPathId() == PATH_AVATAR_OF_SNEAKY_PETE || $item[tiny black hole].equipped_amount() > 0 || $effect[Form of...Bird!].have_effect() > 0)
         __misc_state["can pickpocket"] = true;
     
     if (CounterLookup("Romantic Monster").CounterExists() || get_property_int("_romanticFightsLeft") > 0)
@@ -679,22 +679,22 @@ void setUpState()
             minus_combat_source_count += 5;
         if ($items[crown of thrones,buddy bjorn].available_amount() > 0 && $familiar[grimstone golem].have_familiar() && !__misc_state["familiars temporarily blocked"])
             minus_combat_source_count += 5;
-        if (my_path_id() == PATH_AVATAR_OF_BORIS && $skill[song of solitude].skill_is_usable())
+        if (myPathId() == PATH_AVATAR_OF_BORIS && $skill[song of solitude].skill_is_usable())
             minus_combat_source_count += 5 * 4;
-        if (my_path_id() == PATH_ZOMBIE_SLAYER && $skill[disquiet riot].skill_is_usable())
+        if (myPathId() == PATH_ZOMBIE_SLAYER && $skill[disquiet riot].skill_is_usable())
             minus_combat_source_count += 5 * 4;
-        if (my_path_id() == PATH_AVATAR_OF_JARLSBERG && $skill[chocolatesphere].skill_is_usable())
+        if (myPathId() == PATH_AVATAR_OF_JARLSBERG && $skill[chocolatesphere].skill_is_usable())
             minus_combat_source_count += 5 * 3;
         if (__iotms_usable[lookupItem("Asdon Martin keyfob")])
             minus_combat_source_count += 10;
-        if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE)
+        if (myPathId() == PATH_AVATAR_OF_SNEAKY_PETE)
         {
             if ($skill[Brood].skill_is_usable())
                 minus_combat_source_count += 5 * 2;
             if (get_property("peteMotorbikeMuffler") == "Extra-Quiet Muffler" && $skill[Rev Engine].skill_is_usable())
                 minus_combat_source_count += 5 * 3;
         }
-        if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
+        if (myPathId() == PATH_ACTUALLY_ED_THE_UNDYING)
         {
             if ($skill[Shelter of Shed].have_skill())
                 minus_combat_source_count += 5 * 4;
@@ -702,7 +702,7 @@ void setUpState()
         if (minus_combat_source_count >= 25)
             __misc_state["can reasonably reach -25% combat"] = true;
     }
-    if (my_path_id() == PATH_LIVE_ASCEND_REPEAT)
+    if (myPathId() == PATH_LIVE_ASCEND_REPEAT)
         __misc_state["can reasonably reach -25% combat"] = true;
     
     if (!in_bad_moon() && $item[hand turkey outline].is_unrestricted())
@@ -765,7 +765,7 @@ void setUpState()
     if (__misc_state["can purchase magical mystery juice"] || black_market_available() || dispensary_available() || true)
         __misc_state["have some reasonable way of restoring MP"] = true;
     
-    if (my_path_id() == PATH_ONE_CRAZY_RANDOM_SUMMER)
+    if (myPathId() == PATH_ONE_CRAZY_RANDOM_SUMMER)
         __misc_state["monsters can be nearly impossible to kill"] = true;
     
     int tonic_price = $item[Doc Galaktik's Invigorating Tonic].npc_price();
@@ -796,7 +796,7 @@ void setUpState()
     }
     
     //FIXME all avatar paths:
-    if (my_path_id() == PATH_GELATINOUS_NOOB || my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_KOLHS || my_path_id() == PATH_CLASS_ACT_2 || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_THE_SOURCE || my_path_id() == PATH_EXPLOSIONS)
+    if (myPathId() == PATH_GELATINOUS_NOOB || myPathId() == PATH_ZOMBIE_SLAYER || myPathId() == PATH_AVATAR_OF_BORIS || myPathId() == PATH_AVATAR_OF_JARLSBERG || myPathId() == PATH_KOLHS || myPathId() == PATH_CLASS_ACT_2 || myPathId() == PATH_ACTUALLY_ED_THE_UNDYING || myPathId() == PATH_COMMUNITY_SERVICE || myPathId() == PATH_THE_SOURCE || myPathId() == PATH_EXPLOSIONS)
         __misc_state["sea access blocked"] = true;
 
 }

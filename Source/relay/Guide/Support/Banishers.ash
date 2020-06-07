@@ -186,7 +186,7 @@ int [string] activeBanishNameCountsForLocation(location l)
     {
         if (names contains m)
             banish_name_counts[names[m]] += 1;
-        if (my_path_id() == PATH_ONE_CRAZY_RANDOM_SUMMER)
+        if (myPathId() == PATH_ONE_CRAZY_RANDOM_SUMMER)
         {
             foreach m2 in names
             {

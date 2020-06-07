@@ -149,7 +149,7 @@ void finaliseSetUpFloristState()
 	//War Lily - indoor, +ML:
     if (__misc_state["need to level"])
     {
-        if ((my_path_id() != PATH_PICKY || my_primestat() == $stat[moxie]) && $location[The Castle in the Clouds in the Sky (Ground Floor)].turnsAttemptedInLocation() < 11) //nightmare in picky
+        if ((myPathId() != PATH_PICKY || my_primestat() == $stat[moxie]) && $location[The Castle in the Clouds in the Sky (Ground Floor)].turnsAttemptedInLocation() < 11) //nightmare in picky
             __plants_suggested_locations.listAppend(PlantSuggestionMake($location[The castle in the clouds in the sky (ground floor)], "War Lily", ""));
         //Haunted bedroom?
     }

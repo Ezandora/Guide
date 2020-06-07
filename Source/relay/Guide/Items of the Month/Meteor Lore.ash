@@ -8,7 +8,7 @@ void IOTMMeteorLoreGenerateResource(ChecklistEntry [int] resource_entries)
         return;
     if (!__misc_state["in run"]) return;
     if (!mafiaIsPastRevision(18174)) return;
-    if (my_path_id() == PATH_G_LOVER) return;
+    if (myPathId() == PATH_G_LOVER) return;
     
     ChecklistEntry entry;
     entry.image_lookup_name = "__skill Meteor Lore";
@@ -20,7 +20,7 @@ void IOTMMeteorLoreGenerateResource(ChecklistEntry [int] resource_entries)
         description.listAppend("Reroll a monster to another in the area.");
         
         string [int] useful_places;
-        if (spleen_limit() > 0 && lookupFamiliar("space jellyfish").familiar_is_usable() && get_property_int("_spaceJellyfishDrops") < 4 && my_path_id() != PATH_LIVE_ASCEND_REPEAT)
+        if (spleen_limit() > 0 && lookupFamiliar("space jellyfish").familiar_is_usable() && get_property_int("_spaceJellyfishDrops") < 4 && myPathId() != PATH_LIVE_ASCEND_REPEAT)
         {
             string line = "stench monster area";
             if ($location[Pirates of the Garbage Barges].locationAvailable())
@@ -34,7 +34,7 @@ void IOTMMeteorLoreGenerateResource(ChecklistEntry [int] resource_entries)
             useful_places.listAppend("haunted laundry room / haunted wine cellar");
         useful_places.listAppend("anywhere you olfact and get the wrong monster" + (($item[time-spinner].available_amount() > 0) ? ", unless time-spinning" : ""));
         
-        if (useful_places.count() > 0 && my_path_id() != PATH_COMMUNITY_SERVICE)
+        if (useful_places.count() > 0 && myPathId() != PATH_COMMUNITY_SERVICE)
             description.listAppend("Reroll:|*-" + useful_places.listJoinComponents("|*-"));
         
         entry.subentries.listAppend(ChecklistSubentryMake(pluralise(macrometeorite_uses_remaining, "macrometeorite", "macrometeorites"), "", description));

@@ -1487,7 +1487,7 @@ void QHotAirportGenerateResource(ChecklistEntry [int] resource_entries)
             else
                 floors.listAppend(DiscoFloorMake(4, "-1 drunkenness."));
         }
-        if (my_path_id() != PATH_SLOW_AND_STEADY)
+        if (myPathId() != PATH_SLOW_AND_STEADY)
             floors.listAppend(DiscoFloorMake(5, "+5 adventures, extend effects."));
         floors.listAppend(DiscoFloorMake(6, "Gain a volcoino."));
         

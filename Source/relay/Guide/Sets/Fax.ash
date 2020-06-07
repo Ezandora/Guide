@@ -146,7 +146,7 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes, boo
             }
         }*/
         
-        if (!__misc_state["can reasonably reach -25% combat"] && in_hardcore() && $item[Bram's choker].available_amount() == 0 && combat_rate_modifier() > -25.0 && !(__quest_state["Level 13"].in_progress || (__quest_state["Level 13"].finished && my_path_id() != PATH_BUGBEAR_INVASION)))
+        if (!__misc_state["can reasonably reach -25% combat"] && in_hardcore() && $item[Bram's choker].available_amount() == 0 && combat_rate_modifier() > -25.0 && !(__quest_state["Level 13"].in_progress || (__quest_state["Level 13"].finished && myPathId() != PATH_BUGBEAR_INVASION)))
         {
             string line = "Bram the Stoker - drops a -5% combat accessory.";
             if (my_basestat($stat[mysticality]) < 50)
@@ -157,7 +157,7 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes, boo
         if (!in_hardcore() && $item[richard's star key].available_amount() + $item[richard's star key].creatable_amount() == 0 && !__quest_state["Level 13"].state_boolean["Richard's star key used"] && !($item[star].available_amount() >= 8 && $item[line].available_amount() >= 7))
         {
             string copy_type = "arrow";
-            if (my_path_id() == PATH_HEAVY_RAINS) //arrows mean washaway in flooded areas
+            if (myPathId() == PATH_HEAVY_RAINS) //arrows mean washaway in flooded areas
                 copy_type = "copy";
             potential_faxes.listAppend("Skinflute - +234% item, fight 4 times (" + copy_type + ") to skip HITS with pulls.");
         }
@@ -186,7 +186,7 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes, boo
                 potential_faxes.listAppend(line);
             }
             //gaudy pirate (use for insults!)
-            /*if (!__quest_state["Level 11 Palindome"].finished && $item[talisman o' namsilat].available_amount() == 0 && $items[snakehead charrrm,gaudy key].available_amount() < 2 && $items[Copperhead Charm,Copperhead Charm (rampant)].available_amount() < 2 && my_path_id() != PATH_G_LOVER && __quest_state["Pirate Quest"].state_boolean["valid"])
+            /*if (!__quest_state["Level 11 Palindome"].finished && $item[talisman o' namsilat].available_amount() == 0 && $items[snakehead charrrm,gaudy key].available_amount() < 2 && $items[Copperhead Charm,Copperhead Charm (rampant)].available_amount() < 2 && myPathId() != PATH_G_LOVER && __quest_state["Pirate Quest"].state_boolean["valid"])
             {
                 string description = "Gaudy pirate - two fights for talisman o' nam. (copy once)";
                 if ($items[snakehead charrrm,gaudy key].available_amount() == 1)
