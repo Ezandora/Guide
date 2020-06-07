@@ -85,7 +85,7 @@ void QSpaceElvesGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
 			subentry.entries.listAppend("Look for the spooky little girl on Grimacia or Ronaldus.");
         //else if ($items[map to safety shelter ronald prime, map to safety shelter grimace prime].available_amount() > 0)
         else if ((ronald_map_entries.count() > 0 && $item[map to safety shelter ronald prime].available_amount() > 0) || (grimace_map_entries.count() > 0 && $item[map to safety shelter grimace prime].available_amount() > 0))
-            url = "inventory.php?which=3";
+            url = "inventory.php?ftext=map+to+safety+shelter";
 	}
 	else if (base_quest_state.mafia_internal_step == 3)
 	{
@@ -112,7 +112,7 @@ void QSpaceElvesGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         subentry.entries.listAppend("Gives 200 lunar isotopes and Elvish Paradise access.");
 		subentry.entries.listAppend("Use transporter transponder to reach spaaace.");
         if ($item[transporter transponder].available_amount() > 0)
-            url = "inventory.php?which=3";
+            url = "inventory.php?ftext=transporter+transponder";
         else
             url = "mall.php";
 	}

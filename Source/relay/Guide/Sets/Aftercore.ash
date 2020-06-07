@@ -64,7 +64,7 @@ void SAftercoreThingsToDoGenerateTasks(ChecklistEntry [int] task_entries, Checkl
         string first_task;
         if ($item[transporter transponder].available_amount() > 0)
         {
-            url = "inventory.php?which=3";
+            url = "inventory.php?ftext=transporter+transponder";
             first_task = "use transporter transponder";
         }
         else
@@ -292,7 +292,7 @@ void SAftercoreGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         if ($item[ketchup hound].item_amount() > 0 && $item[hey deze nuts].item_amount() > 0 && $item[pagoda plans].item_amount() > 0)
         {
             if (url.length() == 0)
-                url = "inventory.php?which=3";
+                url = "inventory.php?ftext=ketchup+hound";
             details.listAppend("Use a ketchup hound to install pagoda.");
         }
         optional_task_entries.listAppend(ChecklistEntryMake("__item pagoda plans", url, ChecklistSubentryMake("Install a pagoda", "", details)));

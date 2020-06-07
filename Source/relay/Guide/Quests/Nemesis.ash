@@ -776,7 +776,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     {
         //	Now that you've dealt with your Nemesis' assassins and found a map to the secret tropical island volcano lair, it's time to take the fight to your foe. Booyah
         //find island
-        url = "inventory.php?which=3";
+        url = "inventory.php?ftext=secret+tropical+island+volcano+lair+map";
         subentry.entries.listAppend("Use the secret tropical island volcano lair map.");
     }
     else if (base_quest_state.mafia_internal_step == 27 || base_quest_state.mafia_internal_step == 26) //mafia bug(?) - doesn't advance properly

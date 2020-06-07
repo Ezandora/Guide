@@ -564,7 +564,7 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
             {
                 if ($item[wriggling flytrap pellet].available_amount() > 0)
                 {
-                    url = "inventory.php?which=3";
+                    url = "inventory.php?ftext=wriggling+flytrap+pellet";
                     subentry.entries.listAppend("Open a wriggling flytrap pellet, talk to little brother.");
                 }
                 else
@@ -584,7 +584,7 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
                 }
                 else
                 {
-                    url = "inventory.php?which=3";
+                    url = "inventory.php?ftext=wriggling+flytrap+pellet";
                     subentry.entries.listAppend("Open a wriggling flytrap pellet, talk to little brother.");
                 }
             }

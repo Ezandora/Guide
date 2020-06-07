@@ -79,7 +79,7 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                 }
                 else if (use_fast_route && $item[lord spookyraven's spectacles].equipped_amount() == 0)
                 {
-                    url = "inventory.php?which=2";
+                    url = "inventory.php?ftext=lord+spookyraven's+spectacles";
                     subentry.entries.listAppend("Equip Lord Spookyraven's Spectacles, click on the suspicious masonry in the basement, then read the recipe.");
                     image_name = "__item Lord Spookyraven's spectacles";
                 }
@@ -106,7 +106,7 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                         string [int] tasks;
                         if ($item[unstable fulminate].equipped_amount() == 0)
                         {
-                            url = "inventory.php?which=2";
+                            url = "inventory.php?ftext=unstable+fulminate";
                             tasks.listAppend(HTMLGenerateSpanFont("Equip unstable fulminate", "red"));
                         }
                         image_name = "monstrous boiler";

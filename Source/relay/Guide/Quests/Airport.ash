@@ -1438,7 +1438,7 @@ void QHotAirportGenerateResource(ChecklistEntry [int] resource_entries)
         string [int] description;
         string url = "place.php?whichplace=airport_hot&action=airport4_zone1";
         if (current_disco_style_level == 0)
-            url = "inventory.php?which=2";
+            url = "inventory.php?ftext=smooth+velvet";
         /*
         Requires... disco style? (velvet gear)
         Floor 1: Gain 100 points in each stat!
@@ -1618,7 +1618,7 @@ void QColdAirportGenerateTasks(ChecklistEntry [int] task_entries)
             tasks.listClear();
             if ($item[Walford's bucket].equipped_amount() == 0)
             {
-                url = "inventory.php?which=2";
+                url = "inventory.php?ftext=walford's+bucket";
                 tasks.listAppend("equip walford's bucket");
             }
             tasks.listAppend("adventure on the glacier");

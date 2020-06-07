@@ -113,7 +113,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         if ($item[stone wool].available_amount() > 0 && myPathId() != PATH_G_LOVER)
         {
             if ($effect[Stone-Faced].have_effect() == 0)
-                entry.url = "inventory.php?which=3";
+                entry.url = "inventory.php?ftext=stone+wool";
             subentry.entries.listAppend(pluralise($item[stone wool]) + " available.");
         }
         if (myPathId() == PATH_G_LOVER)
@@ -239,10 +239,10 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
 
                 int delayForNextNoncombat;
 
-                if (totalTurnsSpent < 6) {
+                if (totalTurnsSpent < 9) {
                     delayForNextNoncombat = 8 - totalTurnsSpent;
                 } else {
-                    delayForNextNoncombat = 6 - (totalTurnsSpent - 9) % 8;
+                    delayForNextNoncombat = 7 - (totalTurnsSpent - 9) % 8;
                 }
                 
                 string [int] curseSources;
@@ -263,7 +263,11 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                     subentry.entries.listAppend("Need 3 more curses. Get cursed by:" + HTMLGenerateIndentedText(curseSources));
                 }
 
-                subentry.entries.listAppend("Delay for " + pluralise(delayForNextNoncombat, "turn", "turns") + " to fight spirit.");
+                if (delayForNextNoncombat > 0) {
+                    subentry.entries.listAppend("Delay for " + pluralise(delayForNextNoncombat, "turn", "turns") + " to fight spirit.");
+                } else {
+                    subentry.entries.listAppend("Fight spirit next turn by choosing " + HTMLGenerateSpanOfClass("[Go to the Thrice-Cursed Penthouse]", "r_bold"));
+                }
                 
                 // Warnings
                 if (my_class() == $class[pastamancer] && my_thrall() == $thrall[Vampieroghi] && my_thrall().level >= 5) {
@@ -305,7 +309,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 if (totalTurnsSpent < 6) {
                     delayForNextNoncombat = 5 - totalTurnsSpent;
                 } else {
-                    delayForNextNoncombat = 4 - (totalTurnsSpent - 6) % 5;
+                    delayForNextNoncombat = 4 - (totalTurnsSpent - 5) % 5;
                 }
 
                 if (!hasMcCluskyFile) {

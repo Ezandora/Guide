@@ -3,7 +3,7 @@ void IOTMGuzzlrGenerateTask(ChecklistEntry [int] task_entries, ChecklistEntry [i
     boolean startedQuest = get_property("questGuzzlr") != "unstarted";
     location questLocation = get_property("guzzlrQuestLocation").to_location();
     
-    ChecklistSubentry getLecture() {
+    ChecklistSubentry getGuzzling() {
         item questBooze = get_property("guzzlrQuestBooze").to_item();
         string questTier = get_property("guzzlrQuestTier");
         int platinumDeliveriesLeft = 1 - get_property_int("_guzzlrPlatinumDeliveries");
@@ -12,18 +12,18 @@ void IOTMGuzzlrGenerateTask(ChecklistEntry [int] task_entries, ChecklistEntry [i
         boolean hasBooze = questBooze.available_amount() > 0;
 
         if (questTier == "platinum") {
-            hasBooze = $item[Steamboat].available_amount() > 0
-                || $item[Ghiaccio Colada].available_amount() > 0
-                || $item[Nog-on-the-Cob].available_amount() > 0
-                || $item[Sourfinger].available_amount() > 0
-                || $item[Buttery Boy].available_amount() > 0;
+            hasBooze = lookupItem("Steamboat").available_amount() > 0
+                || lookupItem("Ghiaccio Colada").available_amount() > 0
+                || lookupItem("Nog-on-the-Cob").available_amount() > 0
+                || lookupItem("Sourfinger").available_amount() > 0
+                || lookupItem("Buttery Boy").available_amount() > 0;
         }
 
-        boolean hasShoes = $item[Guzzlr shoes].available_amount() > 0;
-        boolean hasPants = $item[Guzzlr pants].available_amount() > 0;
+        boolean hasShoes = lookupItem("Guzzlr shoes").available_amount() > 0;
+        boolean hasPants = lookupItem("Guzzlr pants").available_amount() > 0;
 
-        boolean hasShoesEquipped = $item[Guzzlr shoes].equipped_amount() > 0;
-        boolean hasPantsEquipped = $item[Guzzlr pants].equipped_amount() > 0;
+        boolean hasShoesEquipped = lookupItem("Guzzlr shoes").equipped_amount() > 0;
+        boolean hasPantsEquipped = lookupItem("Guzzlr pants").equipped_amount() > 0;
 
         // Title
         string main_title = "Deliver booze";
@@ -91,7 +91,7 @@ void IOTMGuzzlrGenerateTask(ChecklistEntry [int] task_entries, ChecklistEntry [i
         entry.url = "inventory.php?tap=guzzlr";
     }
 
-    ChecklistSubentry lectures = getLecture();
+    ChecklistSubentry lectures = getGuzzling();
     if (lectures.entries.count() > 0) {
         entry.subentries.listAppend(lectures);
     }

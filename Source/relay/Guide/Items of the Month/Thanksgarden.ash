@@ -22,7 +22,7 @@ void IOTMThanksgardenGenerateResource(ChecklistEntry [int] resource_entries)
         if (image_name == "")
             image_name = "__item cornucopia";
         if (url == "")
-            url = "inventory.php?which=3";
+            url = "inventory.php?ftext=cornucopia";
         subentries.listAppend(ChecklistSubentryMake(pluralise(cornucopia), "", description));
     }
     int cashew_amount = cashew.available_amount();
@@ -91,7 +91,7 @@ void IOTMThanksgardenGenerateResource(ChecklistEntry [int] resource_entries)
         if (image_name == "")
             image_name = "__item turkey blaster";
         if (url == "")
-            url = "inventory.php?which=1";
+            url = "inventory.php?ftext=turkey+blaster";
         subentries.listAppend(ChecklistSubentryMake(pluralise(turkey_blaster), "", description));
     }
     if (!__quest_state["Level 12"].finished && __quest_state["Level 12"].state_int["frat boys left on battlefield"] > 0 && __quest_state["Level 12"].state_int["hippies left on battlefield"] > 0 && stuffing_fluffer.available_amount() > 0)
@@ -102,7 +102,7 @@ void IOTMThanksgardenGenerateResource(ChecklistEntry [int] resource_entries)
         if (image_name == "")
             image_name = "__item stuffing fluffer";
         if (url == "")
-            url = "inventory.php?which=3";
+            url = "inventory.php?ftext=stuffing+fluffer";
         subentries.listAppend(ChecklistSubentryMake(pluralise(stuffing_fluffer), "", description));
     }
     
@@ -122,7 +122,7 @@ void IOTMThanksgardenGenerateTasks(ChecklistEntry [int] task_entries, ChecklistE
     {
         string url = "";
         if ($item[turkey blaster].available_amount() > 0)
-            url = "inventory.php?which=1";
+            url = "inventory.php?ftext=turkey+blaster";
         else
             url = "shop.php?whichshop=thankshop";
         location last_location = get_property_location("lastAdventure");

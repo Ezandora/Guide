@@ -47,7 +47,7 @@ void S8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         }
         else if ($item[jar of psychoses (The Crackpot Mystic)].available_amount() > 0)
         {
-            active_url = "inventory.php?which=3";
+            active_url = "inventory.php?ftext=jar+of+psychoses";
             title = "Open the " + $item[jar of psychoses (The Crackpot Mystic)];
             description.listAppend("Fear Man's level access, for digital key.");
             if (myPathId() == PATH_ONE_CRAZY_RANDOM_SUMMER)
@@ -85,7 +85,7 @@ void S8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
                 description.listAppend("Or wait for pixellated monsters.");
             if ($item[continuum transfunctioner].equipped_amount() == 0)
             {
-                url = "inventory.php?which=2";
+                url = "inventory.php?ftext=continuum+transfunctioner";
                 description.listAppend("Equip the continuum transfunctioner.");
             }
             //No other choice. 8-bit realm.

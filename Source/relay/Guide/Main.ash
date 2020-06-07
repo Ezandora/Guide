@@ -60,7 +60,7 @@ void runMain(string relay_filename)
 	Checklist [int] ordered_output_checklists;
 	generateChecklists(ordered_output_checklists);
 	
-    string guide_title = "Guide";
+    string guide_title = "TourGuide";
     if (limit_mode() == "batman")
         guide_title = "Bat-Guide";
 	

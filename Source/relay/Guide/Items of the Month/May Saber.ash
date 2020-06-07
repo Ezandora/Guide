@@ -43,7 +43,7 @@ void IOTMMaySaberGenerateResource(ChecklistEntry [int] resource_entries)
 		int uses_remaining = clampi(5 - get_property_int("_saberForceUses"), 0, 5);
 		string url = "";
         if (!lookupItem("Fourth of May Cosplay Saber").equipped())
-        	url = "inventory.php?which=2";
+        	url = "inventory.php?ftext=fourth+of+may+cosplay+saber";
         string [int] description;
         description.listAppend("Use the force skill in combat, which lets you:");
         description.listAppend("Banish a monster for thirty turns.");

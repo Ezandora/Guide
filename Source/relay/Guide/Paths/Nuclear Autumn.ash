@@ -14,7 +14,7 @@ void PathNuclearAutumnGenerateTasks(ChecklistEntry [int] task_entries, Checklist
         {
             url = "shop.php?whichshop=vault1";
             if ($item[Rad-Pro (1 oz.)].available_amount() > 0)
-                url = "inventory.php?which=1"; //FIXME
+                url = "inventory.php?ftext=rad-pro"; //FIXME
             subentries.listAppend(ChecklistSubentryMake("Use rad-pro", "", "Protect from radiation."));
         }
     }
