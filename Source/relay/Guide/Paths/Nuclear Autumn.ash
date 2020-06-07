@@ -2,7 +2,7 @@
 RegisterTaskGenerationFunction("PathNuclearAutumnGenerateTasks");
 void PathNuclearAutumnGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (my_path_id() != PATH_NUCLEAR_AUTUMN)
+	if (myPathId() != PATH_NUCLEAR_AUTUMN)
 		return;
     string url = "place.php?whichplace=falloutshelter";
     
@@ -40,7 +40,7 @@ void PathNuclearAutumnGenerateTasks(ChecklistEntry [int] task_entries, Checklist
 RegisterResourceGenerationFunction("PathNuclearAutumnGenerateResource");
 void PathNuclearAutumnGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (my_path_id() != PATH_NUCLEAR_AUTUMN)
+	if (myPathId() != PATH_NUCLEAR_AUTUMN)
 		return;
     
     item rad = $item[rad];

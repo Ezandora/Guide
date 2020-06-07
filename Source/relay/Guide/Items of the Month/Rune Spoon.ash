@@ -61,8 +61,8 @@ void IOTMRuneSpoonGenerateResource(ChecklistEntry [int] resource_entries)
         	if (my_sign() == sign) continue;
             if (!signs_to_output_as_ideas[sign]) continue;
             if (sign == "Platypus" && __misc_state["familiars temporarily blocked"]) continue;
-            if (sign == "Opossum" && (!__misc_state["can eat just about anything"] || my_path_id() == PATH_SLOW_AND_STEADY)) continue;
-            if (sign == "Blender" && (!__misc_state["can drink just about anything"] || my_path_id() == PATH_SLOW_AND_STEADY)) continue;
+            if (sign == "Opossum" && (!__misc_state["can eat just about anything"] || myPathId() == PATH_SLOW_AND_STEADY)) continue;
+            if (sign == "Blender" && (!__misc_state["can drink just about anything"] || myPathId() == PATH_SLOW_AND_STEADY)) continue;
         	boolean this_sign_is_good_for_mainstat_gain = stat_for_sign[sign] == my_primestat();
             string line = "<strong>" + sign + "</strong>: " + desc + ".";
             if (!this_sign_is_good_for_mainstat_gain && __misc_state["need to level"] && __misc_state["in run"])

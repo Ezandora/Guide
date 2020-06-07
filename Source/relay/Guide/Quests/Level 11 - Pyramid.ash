@@ -3,7 +3,7 @@ void QLevel11PyramidInit()
 {
     QuestState state;
     QuestStateParseMafiaQuestProperty(state, "questL11Pyramid");
-    if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (myPathId() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
     state.quest_name = "Pyramid Quest";
     state.image_name = "Pyramid";
     __quest_state["Level 11 Pyramid"] = state;
@@ -97,7 +97,7 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
             }
             if ($item[tangle of rat tails].available_amount() > 0)
                 subentry.entries.listAppend("Use tangle of rat tails against tomb rats for more tomb ratchets.");
-            if (my_path_id() == PATH_HEAVY_RAINS && $item[catfish whiskers].available_amount() > 0 && $effect[Fishy Whiskers].have_effect() == 0 && $item[tangle of rat tails].available_amount() > 0)
+            if (myPathId() == PATH_HEAVY_RAINS && $item[catfish whiskers].available_amount() > 0 && $effect[Fishy Whiskers].have_effect() == 0 && $item[tangle of rat tails].available_amount() > 0)
                 subentry.entries.listAppend("Possibly use catfish whiskers to find more tomb ratchets.");
         }
         else
@@ -207,7 +207,7 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
             else
                 subentry.entries.listAppend("Spin the control room, search the lower chambers! Then fight Ed.");
                 
-            if (ed_chamber_open && my_path_id() == PATH_EXPLOSIONS && lookupItem("low-pressure oxygen tank").equipped_amount() == 0)
+            if (ed_chamber_open && myPathId() == PATH_EXPLOSIONS && lookupItem("low-pressure oxygen tank").equipped_amount() == 0)
             {
             	subentry.modifiers.listAppend("+hp regen");
                 subentry.entries.listAppend("Keep +hp regen up, so you survive the multi-round fight without the oxygen tank?");

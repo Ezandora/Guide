@@ -179,7 +179,7 @@ void IOTMSnojoGenerateResource(ChecklistEntry [int] resource_entries)
                 item consumable = consumable_reward_for_stat[s];
                 
                 string [int] acquirable_descriptions;
-                if (training_equipment.available_amount() == 0 && my_path_id() != PATH_GELATINOUS_NOOB)
+                if (training_equipment.available_amount() == 0 && myPathId() != PATH_GELATINOUS_NOOB)
                 {
                     acquirable_descriptions.listAppend("a " + reward_descriptions[training_equipment]);
                 }

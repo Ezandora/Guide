@@ -14,7 +14,7 @@ boolean mafiaIsPastRevision(int revision_number)
 boolean have_familiar_replacement(familiar f)
 {
     //have_familiar bugs in avatar of sneaky pete for now, so:
-    if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE)
+    if (myPathId() == PATH_AVATAR_OF_BORIS || myPathId() == PATH_AVATAR_OF_JARLSBERG || myPathId() == PATH_AVATAR_OF_SNEAKY_PETE)
         return false;
     return f.have_familiar();
 }
@@ -23,11 +23,11 @@ boolean have_familiar_replacement(familiar f)
 boolean familiar_is_usable(familiar f)
 {
     //r13998 has most of these
-    if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_LICENSE_TO_ADVENTURE || my_path_id() == PATH_POCKET_FAMILIARS || my_path_id() == PATH_VAMPIRE)
+    if (myPathId() == PATH_AVATAR_OF_BORIS || myPathId() == PATH_AVATAR_OF_JARLSBERG || myPathId() == PATH_AVATAR_OF_SNEAKY_PETE || myPathId() == PATH_ACTUALLY_ED_THE_UNDYING || myPathId() == PATH_LICENSE_TO_ADVENTURE || myPathId() == PATH_POCKET_FAMILIARS || myPathId() == PATH_VAMPIRE)
         return false;
     if (!is_unrestricted(f))
         return false;
-    if (my_path_id() == PATH_G_LOVER && !f.contains_text("g") && !f.contains_text("G"))
+    if (myPathId() == PATH_G_LOVER && !f.contains_text("g") && !f.contains_text("G"))
         return false;
     //On second thought, this is terrible:
 	/*int single_familiar_run = get_property_int("singleFamiliarRun");
@@ -37,12 +37,12 @@ boolean familiar_is_usable(familiar f)
 			return true;
 		return false;
 	}*/
-	if (my_path_id() == PATH_TRENDY)
+	if (myPathId() == PATH_TRENDY)
 	{
 		if (!is_trendy(f))
 			return false;
 	}
-	else if (my_path_id() == PATH_BEES_HATE_YOU)
+	else if (myPathId() == PATH_BEES_HATE_YOU)
 	{
 		if (f.to_string().contains_text("b") || f.to_string().contains_text("B")) //bzzzz!
 			return false; //so not green
@@ -57,7 +57,7 @@ boolean skill_is_usable(skill s)
         return false;
     if (!s.is_unrestricted())
         return false;
-    if (my_path_id() == PATH_G_LOVER && (!s.passive || s == $skill[meteor lore]) && !s.contains_text("g") && !s.contains_text("G"))
+    if (myPathId() == PATH_G_LOVER && (!s.passive || s == $skill[meteor lore]) && !s.contains_text("g") && !s.contains_text("G"))
     	return false;
     if ($skills[rapid prototyping] contains s)
         return $item[hand turkey outline].is_unrestricted();
@@ -87,9 +87,9 @@ boolean item_is_usable(item it)
 {
     if (!it.is_unrestricted())
         return false;
-    if (my_path_id() == PATH_G_LOVER && !it.contains_text("g") && !it.contains_text("G"))
+    if (myPathId() == PATH_G_LOVER && !it.contains_text("g") && !it.contains_text("G"))
         return false;
-    if (my_path_id() == PATH_BEES_HATE_YOU && (it.contains_text("b") || it.contains_text("B")))
+    if (myPathId() == PATH_BEES_HATE_YOU && (it.contains_text("b") || it.contains_text("B")))
     	return false;
 	return true;
 }
@@ -103,7 +103,7 @@ int usable_amount(item it)
 
 boolean effect_is_usable(effect e)
 {
-    if (my_path_id() == PATH_G_LOVER && !e.contains_text("g") && !e.contains_text("G"))
+    if (myPathId() == PATH_G_LOVER && !e.contains_text("g") && !e.contains_text("G"))
         return false;
     return true;
 }
@@ -381,7 +381,7 @@ int substatsForLevel(int level)
 int availableFullness()
 {
 	int limit = fullness_limit();
-    if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING && limit == 0 && $skill[Replacement Stomach].have_skill())
+    if (myPathId() == PATH_ACTUALLY_ED_THE_UNDYING && limit == 0 && $skill[Replacement Stomach].have_skill())
     {
         limit += 5;
     }
@@ -391,7 +391,7 @@ int availableFullness()
 int availableDrunkenness()
 {
     int limit = inebriety_limit();
-    if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING && limit == 0 && $skill[Replacement Liver].have_skill())
+    if (myPathId() == PATH_ACTUALLY_ED_THE_UNDYING && limit == 0 && $skill[Replacement Liver].have_skill())
     {
     	limit += 5;
     }
@@ -402,7 +402,7 @@ int availableDrunkenness()
 int availableSpleen()
 {
 	int limit = spleen_limit();
-	if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING && limit == 0)
+	if (myPathId() == PATH_ACTUALLY_ED_THE_UNDYING && limit == 0)
 	{
         limit += 5; //always true
 		//mafia resets the limits to zero in the underworld because it does, so anti-mafia:
@@ -959,7 +959,7 @@ int monster_level_adjustment_for_location(location l)
         ml += 30;
     }
     
-    if (my_path_id() == PATH_HEAVY_RAINS)
+    if (myPathId() == PATH_HEAVY_RAINS)
     {
         //complicated:
         //First, cancel out the my_location() rain:

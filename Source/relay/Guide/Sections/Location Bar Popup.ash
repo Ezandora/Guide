@@ -291,7 +291,7 @@ buffer generateItemInformationMethod2(location l, monster m, boolean try_for_min
             //FIXME pickpocketting...?
             //FIXME black cat
             
-            if (my_path_id() == PATH_LIVE_ASCEND_REPEAT && !item_rate_is_fixed && !item_is_pickpockable_only && !item_is_avatar_potion && effective_drop_rate > 0.0)
+            if (myPathId() == PATH_LIVE_ASCEND_REPEAT && !item_rate_is_fixed && !item_is_pickpockable_only && !item_is_avatar_potion && effective_drop_rate > 0.0)
             {
                 //It's either 0.0 or not.
                 float needed_rate = 1.0 / (2.0 * effective_drop_rate / 100.0);
@@ -306,7 +306,7 @@ buffer generateItemInformationMethod2(location l, monster m, boolean try_for_min
             }
             else
                 effective_drop_rate *= 1.0 + item_modifier / 100.0;
-            if (my_path_id() == PATH_HEAVY_RAINS)
+            if (myPathId() == PATH_HEAVY_RAINS)
             {
                 effective_drop_rate = clampf(floor(effective_drop_rate), 0.0, 100.0);
                 float washaway_rate = l.washaway_rate_of_location();
@@ -747,7 +747,7 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
     boolean banishes_are_possible = true;
     if ($locations[the secret government laboratory,sloppy seconds diner] contains l)
         banishes_are_possible = false;
-    if (my_path_id() == PATH_LIVE_ASCEND_REPEAT)
+    if (myPathId() == PATH_LIVE_ASCEND_REPEAT)
         banishes_are_possible = false;
     
     foreach m in appearance_rates_next_turn
@@ -1166,7 +1166,7 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
                 }
             }
             
-            if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
+            if (myPathId() == PATH_ACTUALLY_ED_THE_UNDYING)
             {
                 int ka_dropped = m.ka_dropped();
                 if (ka_dropped > 0)

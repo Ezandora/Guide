@@ -5,13 +5,13 @@ void QLevel3Init()
 	//lastTavernSquare
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL03Rat");
-    if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (myPathId() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
 	
 	state.quest_name = "Typical Tavern Quest";
 	state.image_name = "Typical Tavern";
 	state.council_quest = true;
 	
-	if ((my_path_id() == PATH_EXPLOSIONS || my_level() >= 3) && __quest_state["Level 2"].finished)
+	if ((myPathId() == PATH_EXPLOSIONS || my_level() >= 3) && __quest_state["Level 2"].finished)
 		state.startable = true;
 	
 	__quest_state["Level 3"] = state;
@@ -46,7 +46,7 @@ void QLevel3GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
     boolean need_to_complete_pyramid = true;
     
     //FIXME test properly
-    if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
+    if (myPathId() == PATH_ACTUALLY_ED_THE_UNDYING)
         need_to_complete_pyramid = false;
     if (__quest_state["Level 11"].finished)
         need_to_complete_pyramid = false;
