@@ -59,7 +59,7 @@ void IOTMSpeakeasyGenerateResource(ChecklistEntry [int] resource_entries)
     if (!__quest_state["Level 13"].state_boolean["Elemental damage race completed"])
         reasons_to_sockdollager.listAppend("Elemental damage race");
     
-    if (myPathId() == PATH_HEAVY_RAINS && !__quest_state["Level 13"].finished)
+    if (my_path_id() == PATH_HEAVY_RAINS && !__quest_state["Level 13"].finished)
         reasons_to_sockdollager.listAppend("fighting rain king");
     
     if (reasons_to_sockdollager.count() > 0)
@@ -88,7 +88,7 @@ void IOTMSpeakeasyGenerateResource(ChecklistEntry [int] resource_entries)
         {
             float mainstat_gain = 87.5 * (1.0 + numeric_modifier(my_primestat().to_string() + " Experience Percent") / 100.0);
             string description = mainstat_gain.roundForOutput(0) + " mainstat";
-            //if (myPathId() != PATH_SLOW_AND_STEADY)
+            //if (my_path_id() != PATH_SLOW_AND_STEADY)
                 //description += "";
             options.listAppend(listMake(drink_name, "1", description));
         }
@@ -100,7 +100,7 @@ void IOTMSpeakeasyGenerateResource(ChecklistEntry [int] resource_entries)
         options.listAppend(listMake("Phonus Balonus", "3", "+fights/+adventures"));
     }
     
-    if (myPathId() == PATH_NUCLEAR_AUTUMN)
+    if (my_path_id() == PATH_NUCLEAR_AUTUMN)
     {
         foreach key in options
         {

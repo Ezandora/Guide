@@ -244,10 +244,10 @@ void QAzazelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         entry.subentries.listAppend(subentry);
     }
     
-    if ((myPathId() == PATH_TEETOTALER || myPathId() == PATH_AVATAR_OF_BORIS || myPathId() == PATH_ZOMBIE_SLAYER) && availableFullness() < 5)
+    if ((my_path_id() == PATH_TEETOTALER || my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_ZOMBIE_SLAYER) && availableFullness() < 5)
         entry.subentries.listAppend(ChecklistSubentryMake(HTMLGenerateSpanFont("Won't work, need five fullness to eat lasagna.", "red"), "", ""));
         
-    if (myPathId() == PATH_OXYGENARIAN && availableSpleen() < 5)
+    if (my_path_id() == PATH_OXYGENARIAN && availableSpleen() < 5)
         entry.subentries.listAppend(ChecklistSubentryMake(HTMLGenerateSpanFont("Won't work, need five spleen to consume steel-scented air freshener.", "red"), "", ""));
 	
 	optional_task_entries.listAppend(entry);

@@ -147,7 +147,7 @@ item [int] asdonMartinGenerateListOfFuelables()
     blacklist[$item[white pixel]] = true; //no!
     blacklist[$item[cashew]] = true;
     
-    if (myPathId() != PATH_LICENSE_TO_ADVENTURE && inebriety_limit() > 0) //FIXME the test for can drink just about
+    if (my_path_id() != PATH_LICENSE_TO_ADVENTURE && inebriety_limit() > 0) //FIXME the test for can drink just about
     {
         foreach it in $items[bottle of gin,bottle of rum,bottle of vodka,bottle of whiskey,bottle of tequila] //too useful for crafting?
             blacklist[it] = true;
@@ -168,7 +168,7 @@ item [int] asdonMartinGenerateListOfFuelables()
                 continue;
             }
         }
-        if (myPathId() == PATH_LICENSE_TO_ADVENTURE && false)
+        if (my_path_id() == PATH_LICENSE_TO_ADVENTURE && false)
         {
             if (it.inebriety > 0 && it.image == "martini.gif")
                 continue;

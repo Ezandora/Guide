@@ -6,7 +6,7 @@ void QManorInit()
     
     state.state_boolean["need ballroom song set"] = false;
     
-    if (myPathId() == PATH_GELATINOUS_NOOB || in_bad_moon())
+    if (my_path_id() == PATH_GELATINOUS_NOOB || in_bad_moon())
         state.state_boolean["need ballroom song set"] = true;
     
     //Trace every quest where it's worth setting the song:
@@ -42,7 +42,7 @@ void QManorInit()
     state.state_boolean["ballroom song effectively set"] = !state.state_boolean["need ballroom song set"];
     if (combat_rate_modifier() <= -25.0)
         state.state_boolean["ballroom song effectively set"] = true;
-    if (__quest_state["Level 13"].in_progress || (__quest_state["Level 13"].finished && myPathId() != PATH_BUGBEAR_INVASION) || questPropertyPastInternalStepNumber("questL13Final", 1))
+    if (__quest_state["Level 13"].in_progress || (__quest_state["Level 13"].finished && my_path_id() != PATH_BUGBEAR_INVASION) || questPropertyPastInternalStepNumber("questL13Final", 1))
         state.state_boolean["ballroom song effectively set"] = true;
     
     if (state.state_boolean["ballroom song effectively set"])
@@ -56,7 +56,7 @@ void QManorInit()
     {
 		QuestStateParseMafiaQuestPropertyValue(state, "started");
     }
-    if (myPathId() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
 	state.quest_name = "Spookyraven Manor Unlock";
 	state.image_name = "Spookyraven Manor";
     
@@ -340,7 +340,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     }
     else if (to_item("7301").available_amount() == 0) //Spookyraven billiards room key
     {
-        if (myPathId() == PATH_COMMUNITY_SERVICE && __last_adventure_location != $location[the haunted kitchen])
+        if (my_path_id() == PATH_COMMUNITY_SERVICE && __last_adventure_location != $location[the haunted kitchen])
             return;
         if (!__misc_state["in run"] && __last_adventure_location != $location[the haunted kitchen]) return;
         subentry.header = "Adventure in the Haunted Kitchen";
@@ -457,7 +457,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
                 {
                     subentry.entries.listAppend("Find pool cue.");
                 }
-                else if (myPathId() == PATH_GELATINOUS_NOOB)
+                else if (my_path_id() == PATH_GELATINOUS_NOOB)
                 {
                     subentry.entries.listAppend("Absorb pool cue for +pool skill?");
                 }

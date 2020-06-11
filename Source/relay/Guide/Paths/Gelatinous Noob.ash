@@ -48,7 +48,7 @@ void initialiseGelatinousStatics()
 RegisterTaskGenerationFunction("PathGelatinousNoobGenerateTasks");
 void PathGelatinousNoobGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (myPathId() != PATH_GELATINOUS_NOOB)
+	if (my_path_id() != PATH_GELATINOUS_NOOB)
 		return;
     
     int total_absorptions = 2 + MIN(13, my_level());

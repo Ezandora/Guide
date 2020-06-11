@@ -195,7 +195,7 @@ void IOTMDNAInit()
     }
     
     
-    if (myPathId() == PATH_COMMUNITY_SERVICE)
+    if (my_path_id() == PATH_COMMUNITY_SERVICE)
     {
         __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[fish], "", "+10 familiar weight for statgain, parrot"));
         __phylum_potion_suggestions.listAppend(DNASuggestionMake($phylum[elemental], "", "saves three turns on resistance test"));
@@ -293,7 +293,7 @@ void IOTMDNAInit()
     {
         if (!__misc_state["familiars temporarily blocked"])
         {
-            if (!__misc_state["in run"] || myPathId() == PATH_HEAVY_RAINS)
+            if (!__misc_state["in run"] || my_path_id() == PATH_HEAVY_RAINS)
                 __dna_intrinsic_ideas.listAppend(DNABoldPhylumIfCurrentMonster($phylum[fish]) + " (+10 familiar weight)");
             else if ($item[grimstone mask].available_amount() > 0)
             {

@@ -2,7 +2,7 @@
 RegisterResourceGenerationFunction("PathExplosionsGenerateResource");
 void PathExplosionsGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (myPathId() != PATH_EXPLOSIONS)
+    if (my_path_id() != PATH_EXPLOSIONS)
         return;
     item isotopes = lookupItem("rare Meat isotope");
     if (isotopes.have())

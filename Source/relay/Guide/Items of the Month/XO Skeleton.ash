@@ -19,7 +19,7 @@ void IOTMXOSkeletonGenerateResource(ChecklistEntry [int] resource_entries)
 	{
 		string [int] description;
   		description.listAppend("Instantly v-pocket an item.");
-    	if (__misc_state["in run"] && myPathId() != PATH_COMMUNITY_SERVICE)
+    	if (__misc_state["in run"] && my_path_id() != PATH_COMMUNITY_SERVICE)
      	{
       		string [int] options;
         	if (!__quest_state["Level 12"].finished && get_property("sidequestOrchardCompleted") == "none" && !($effect[Filthworm Guard Stench].have_effect() > 0 || $item[Filthworm royal guard scent gland].available_amount() > 0))      
@@ -63,7 +63,7 @@ void IOTMXOSkeletonGenerateResource(ChecklistEntry [int] resource_entries)
         boolean [string] options;
         
         options["pair of candy glasses: +50% item (10 turns)"] = (os >= 2);
-        if (!__quest_state["Level 9"].state_boolean["bridge complete"] && myPathId() != PATH_COMMUNITY_SERVICE)
+        if (!__quest_state["Level 9"].state_boolean["bridge complete"] && my_path_id() != PATH_COMMUNITY_SERVICE)
         {
         	int turns_left = (23 - xes) * 9 - get_property_int("xoSkeleltonXProgress");
             string line = "bridge truss: half a bridge"; 
