@@ -9,7 +9,7 @@ void IOTMBirdADayGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         if (have_effect($effect[Blessing of the Bird]) > 0)
             description.listAppend(HTMLGenerateSpanFont("Still have an old blessing", "red") + "|Using the calendar will replace the old buff's modifiers with the new ones.");
 
-        optional_task_entries.listAppend(ChecklistEntryMake("__effect Blessing of the Bird", "inv_use.php?pwd=" + my_hash() + "&whichitem=10434", ChecklistSubentryMake("Discover your daily Bird", "", description), 8));
+        optional_task_entries.listAppend(ChecklistEntryMake("__effect Blessing of the Bird", "inventory.php?ftext=bird-a-day+calendar", ChecklistSubentryMake("Discover your daily Bird", "", description), 8));
     }
 }
 
@@ -22,13 +22,17 @@ void IOTMBirdADayCalendar(ChecklistEntry [int] resource_entries)
         int birdsSought = get_property_int("_birdsSoughtToday");
 
         // Title
-        string main_title = "Seek Bird";
+        string main_title = "Seek birds! " + birdsSought + " birds sought today";
 
         // Subtitle
         string subtitle = "10 Turn Buff";
 
         // Entries
         string [int] description;
+        int mp_cost = 5 * 2**(birdsSought);
+			description.listAppend("Currently costs " + mp_cost + " MP to watch.");
+			description.listAppend("Seek up to 6 times and still keep your old favorite.");
+			description.listAppend("Must make it your new favorite to watch 7 or more times.");
         if (get_property_boolean("_canSeekBirds")) {
             string [int] modStrings = birdMods.split_string(", ");
             foreach index, modString in modStrings {
