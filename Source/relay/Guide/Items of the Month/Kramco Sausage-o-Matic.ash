@@ -1,5 +1,3 @@
-
-
 RegisterTaskGenerationFunction("IOTMKramcoSausageOMaticGenerateTasks");
 void IOTMKramcoSausageOMaticGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
@@ -16,7 +14,7 @@ void IOTMKramcoSausageOMaticGenerateTasks(ChecklistEntry [int] task_entries, Che
         if (lookupItem("Kramco Sausage-o-Matic&trade;").equipped_amount() == 0)
         {
             description.listAppend(HTMLGenerateSpanFont("Equip the Kramco Sausage-o-Matic&trade; first.", "red"));
-            url = "inventory.php?ftext=kramco+sausage-o-matic";
+            url = "inventory.php?action=grind";
         }
         description.listAppend("Free fight that burns delay.");
         location [int] possible_locations = generatePossibleLocationsToBurnDelay();
@@ -42,7 +40,7 @@ void IOTMKramcoSausageOMaticGenerateResource(ChecklistEntry [int] resource_entri
     entry.importance_level = -2;
     
     string [int] main_description;
-    string main_title;
+    string main_title = "Kramco Sausage-o-Matic&trade; fights";
     
     KramcoSausageFightInformation fight_information = KramcoCalculateSausageFightInformation();
 
@@ -50,7 +48,7 @@ void IOTMKramcoSausageOMaticGenerateResource(ChecklistEntry [int] resource_entri
 	    main_title = "Sausage goblin fight available";
         if (lookupItem("Kramco Sausage-o-Matic&trade;").equipped_amount() == 0) {
             main_description.listAppend(HTMLGenerateSpanFont("Equip the Kramco Sausage-o-Matic&trade; first.", "red"));
-            entry.url = "inventory.php?ftext=kramco+sausage-o-matic";
+            entry.url = "inventory.php?action=grind";
         }
     } else {
         main_title = round(fight_information.probability_of_sausage_fight * 100.0) + "% chance of sausage goblin this turn";
@@ -75,13 +73,12 @@ void IOTMKramcoSausageOMaticGenerateResource(ChecklistEntry [int] resource_entri
         string [int] sausage_description;
         int sausages_made = get_property_int("_sausagesMade");
         int meat_cost = 111 * (sausages_made + 1);
-        title = sausages_available + " magical sausages edible.";
-        sausage_description.listAppend("+1 adventure and +999 MP each.");
-		int sausage_casings = lookupItem("magical sausage casing").available_amount();
-		sausage_description.listAppend(HTMLGenerateSpanOfClass(sausages_eaten + "/23 magical sausages eaten today.", "r_bold") + "");
-		sausage_description.listAppend(HTMLGenerateSpanOfClass(sausage_casings + " magical sausage casings available.", "r_bold") + "");
+        title = pluralise(MIN(sausages_available, 23 - sausages_eaten), "magical sausage edible", "magical sausages edible");
+        int sausage_casings = lookupItem("magical sausage casing").available_amount();
+		sausage_description.listAppend(HTMLGenerateSpanOfClass(sausage_casings, "r_bold") + " casings available, " + (HTMLGenerateSpanOfClass(sausages_eaten + "/23", "r_bold") + " eaten today."));
 		sausage_description.listAppend(pluralise(sausages_made, "sausage", "sausages") + " made; next costs " + meat_cost + " meat.");
-        entry.subentries.listAppend(ChecklistSubentryMake(title, "", sausage_description));
+        sausage_description.listAppend("+1 adventure and +999 MP each.");
+		entry.subentries.listAppend(ChecklistSubentryMake(title, "", sausage_description));
     }
 	
 	resource_entries.listAppend(entry);
