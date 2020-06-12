@@ -39,7 +39,7 @@ boolean QLevel11ShouldOutputCopperheadRoute(string which_route)
         if (get_property_boolean("lastPirateInsult" + i))
             pirate_insult_count += 1;
     }
-    if ($item[pirate fledges].available_amount() == 0 && pirate_insult_count == 0) //they haven't started the pirate quest... hm... {
+    if ($item[pirate fledges].available_amount() == 0 && pirate_insult_count == 0) { //they haven't started the pirate quest... hm...
         return true;
     }
     
