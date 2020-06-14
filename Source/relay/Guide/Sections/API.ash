@@ -172,7 +172,7 @@ string [string] generateAPIResponse()
         }
         result["logged in"] = playerIsLoggedIn();
     }
-    if (myPathId() == PATH_AVATAR_OF_WEST_OF_LOATHING || myPathId() == PATH_AVATAR_OF_SNEAKY_PETE || myPathId() == PATH_THE_SOURCE || myPathId() == PATH_GELATINOUS_NOOB)
+    if (my_path_id() == PATH_AVATAR_OF_WEST_OF_LOATHING || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_THE_SOURCE || my_path_id() == PATH_GELATINOUS_NOOB)
     {
         int skill_count = 0;
         foreach s in $skills[]

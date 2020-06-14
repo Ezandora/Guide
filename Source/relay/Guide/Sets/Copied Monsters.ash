@@ -38,7 +38,7 @@ string generateNinjaSafetyGuide(boolean show_colour)
 		result += "need";
 	result += " HP above " + min_safe_damage + ".";
     
-    if (myPathId() == PATH_CLASS_ACT_2 && monster_level_adjustment() > 50)
+    if (my_path_id() == PATH_CLASS_ACT_2 && monster_level_adjustment() > 50)
     {
         result += " Reduce ML to +50 to prevent elemental damage.";
         can_survive = false;
@@ -335,7 +335,7 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
             potential_copies.listAppend("Modern zmobies.");
         if (!__quest_state["Level 8"].state_boolean["Mountain climbed"] && $items[ninja rope,ninja carabiner,ninja crampons].available_amount() == 0 && !have_outfit_components("eXtreme Cold-Weather Gear"))
             potential_copies.listAppend("Ninja assassin.");
-        //if (!__quest_state["Level 11"].finished && !__quest_state["Level 11 Palindome"].finished && $item[talisman o' namsilat].available_amount() == 0 && $items[gaudy key,snakehead charrrm].available_amount() < 2 && myPathId() != PATH_G_LOVER)
+        //if (!__quest_state["Level 11"].finished && !__quest_state["Level 11 Palindome"].finished && $item[talisman o' namsilat].available_amount() == 0 && $items[gaudy key,snakehead charrrm].available_amount() < 2 && my_path_id() != PATH_G_LOVER)
             //potential_copies.listAppend("Gaudy pirate - copy once for extra key.");
         //√baa'baa. astronomer? √nuns trick brigand
         //FIXME astronomer when we can calculate that

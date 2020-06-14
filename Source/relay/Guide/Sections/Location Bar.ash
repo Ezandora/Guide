@@ -363,7 +363,7 @@ buffer generateLocationBar(boolean displaying_navbar)
     //ashq foreach l in $locations[] if (l.appearance_rates().count() == 1 && l.appearance_rates()[$monster[none]] == 100.0) print(l);
     boolean [location] nc_blacklist = $locations[Pump Up Muscle,Pump Up Mysticality,Pump Up Moxie,The Shore\, Inc. Travel Agency,Goat Party,Pirate Party,Lemon Party,The Roulette Tables,The Poker Room,Anemone Mine (Mining),The Knob Shaft (Mining),Friar Ceremony Location,Itznotyerzitz Mine (in Disguise),The Prince's Restroom,The Prince's Dance Floor,The Prince's Kitchen,The Prince's Balcony,The Prince's Lounge,The Prince's Canapes table,Portal to Terrible Parents,fernswarthy's basement];
     
-    if ((my_buffedstat($stat[moxie]) < average_ml || myPathId() == PATH_AVATAR_OF_SNEAKY_PETE) && sample_count > 0 && __misc_state["in run"] && monster_level_adjustment() < 100)
+    if ((my_buffedstat($stat[moxie]) < average_ml || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE) && sample_count > 0 && __misc_state["in run"] && monster_level_adjustment() < 100)
     {
         //Init:
         //We only show this if the monsters out-moxie the player in-run. It feels as though it can easily be information overload otherwise.
@@ -407,7 +407,7 @@ buffer generateLocationBar(boolean displaying_navbar)
             location_urls[location_data.count() - 1] = custom_location_url;
     }
     
-    if (myPathId() == PATH_HEAVY_RAINS)
+    if (my_path_id() == PATH_HEAVY_RAINS)
     {
         boolean has_items_that_will_wash_away = false;
         
@@ -457,7 +457,7 @@ buffer generateLocationBar(boolean displaying_navbar)
     {
         location_data.listAppend(pluralise(monster_data.count(), "monster", "monsters"));
     }
-    if (myPathId() == PATH_ACTUALLY_ED_THE_UNDYING)
+    if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
     {
         float average_coins_gained = 0.0;
         foreach m, rate in monster_appearance_rates

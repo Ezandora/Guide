@@ -43,7 +43,7 @@ void IOTMMayoClinicGenerateResource(ChecklistEntry [int] resource_entries)
         lance_description += HTMLGenerateDivOfClass("Uses up blood mayo.", "r_word_wrap_group");
         choices.listAppend(listMake("Mayo lance", lance_description));
         
-        if (!get_property_boolean("mayoWhipRented") && !get_property_boolean("itemBoughtPerAscension8266") &&  myPathId() != PATH_GELATINOUS_NOOB)
+        if (!get_property_boolean("mayoWhipRented") && !get_property_boolean("itemBoughtPerAscension8266") &&  my_path_id() != PATH_GELATINOUS_NOOB)
         {
             choices.listAppend(listMake("Miracle whip", "Weapon, usable " + HTMLGenerateSpanFont("once", "red") + " per run.|+50% item, +100% meat, +50% init."));
         }
@@ -54,7 +54,7 @@ void IOTMMayoClinicGenerateResource(ChecklistEntry [int] resource_entries)
     {
         string [int] description;
         string [int] benefits;
-        if (myPathId() != PATH_ACTUALLY_ED_THE_UNDYING)
+        if (my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING)
             benefits.listAppend("HP restore");
         benefits.listAppend("+2 all resistance");
         description.listAppend("Gives " + benefits.listJoinComponents(", ", "and") + ".");

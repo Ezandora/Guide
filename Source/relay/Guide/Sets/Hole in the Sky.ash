@@ -7,7 +7,7 @@ boolean HITSStillRelevant()
 		return false;
 	if (__quest_state["Level 13"].state_boolean["Richard's star key used"])
 		return false;
-	if (!__quest_state["Level 10"].finished && myPathId() != PATH_EXPLOSIONS)
+	if (!__quest_state["Level 10"].finished && my_path_id() != PATH_EXPLOSIONS)
 		return false;
         
 	return true;
@@ -283,7 +283,7 @@ void QHitsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] 
 
 void QHitsGenerateMissingItems(ChecklistEntry [int] items_needed_entries)
 {
-	if (!__misc_state["in run"] && !__misc_state["Example mode"] && myPathId() != PATH_LOW_KEY_SUMMER)
+	if (!__misc_state["in run"] && !__misc_state["Example mode"] && my_path_id() != PATH_LOW_KEY_SUMMER)
 		return;
 	if (__quest_state["Level 13"].state_boolean["Richard\'s star key used"])
 		return;

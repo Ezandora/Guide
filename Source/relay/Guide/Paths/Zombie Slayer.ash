@@ -2,7 +2,7 @@
 RegisterTaskGenerationFunction("PathZombieSlayerGenerateTasks");
 void PathZombieSlayerGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (myPathId() != PATH_ZOMBIE_SLAYER)
+	if (my_path_id() != PATH_ZOMBIE_SLAYER)
 		return;
     //zombiePoints is the number of points "permed" on the character, not how many they have at the moment
     //Let's see.. I think this means we can infer how many points they have to spend, right? You start with zombiePoints + 1, then gain one for each level you have, minus how many hunter brains you have, minus whether you've fought the right hunter yet... but, we can't know that information. Hmm. So, no, no reminder. Alas.
@@ -28,7 +28,7 @@ void PathZombieSlayerGenerateTasks(ChecklistEntry [int] task_entries, ChecklistE
 RegisterResourceGenerationFunction("PathZombieSlayerGenerateResource");
 void PathZombieSlayerGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (myPathId() != PATH_ZOMBIE_SLAYER)
+	if (my_path_id() != PATH_ZOMBIE_SLAYER)
 		return;
     
     if ($item[right bear arm].available_amount() > 0 && $item[left bear arm].available_amount() > 0)

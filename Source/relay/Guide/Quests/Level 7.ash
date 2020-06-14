@@ -4,12 +4,12 @@ void QLevel7Init()
 	//questL07Cyrptic
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL07Cyrptic");
-    if (myPathId() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
 	state.quest_name = "Cyrpt Quest";
 	state.image_name = "cyrpt";
 	state.council_quest = true;
 	
-	if (my_level() >= 7 || myPathId() == PATH_EXPLOSIONS)
+	if (my_level() >= 7 || my_path_id() == PATH_EXPLOSIONS)
 		state.startable = true;
 	
     if (state.started)
@@ -106,7 +106,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		
 		subentry.entries.listAppend(evilness_text["cyrptNookEvilness"]);
 		
-		if (evilness > 26 && myPathId() != PATH_G_LOVER)
+		if (evilness > 26 && my_path_id() != PATH_G_LOVER)
 		{
             subentry.modifiers.listAppend("+400% item");
 			subentry.modifiers.listAppend("banish party skelteon");
@@ -139,7 +139,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
                 //haunted doghouse adventures are a percentage chance, and the NC is skippable. more NCs, more chances, less turns spent
                 subentry.modifiers.listAppend("-combat");
             }
-            if (myPathId() == PATH_EXPLOSIONS)
+            if (my_path_id() == PATH_EXPLOSIONS)
             	subentry.entries.listAppend("Ignore this area until the end of the run; wandering astronauts drop evil eyes. Lure them to delay-burning areas; keep signal jammer equipped otherwise.");
 		
 			float evilness_remaining = evilness - 25;
@@ -271,7 +271,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         float bonerdagon_attack = (90 + monster_level_adjustment());
         
         string line = "Fight bonerdagon!";
-        if (myPathId() == PATH_HEAVY_RAINS)
+        if (my_path_id() == PATH_HEAVY_RAINS)
             line = "Fight auqadargon!";
         if (my_basestat($stat[moxie]) < bonerdagon_attack)
             line += " (attack: " + bonerdagon_attack.round() + ")";

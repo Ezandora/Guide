@@ -1,7 +1,7 @@
 RegisterLowKeyGenerationFunction("PathLowKeyGenerateKeys");
 void PathLowKeyGenerateKeys(ChecklistEntry [int] low_key_entries) {
 
-    if (myPathId() != PATH_LOW_KEY_SUMMER) return;
+    if (my_path_id() != PATH_LOW_KEY_SUMMER) return;
     if (!__misc_state["in run"]) return;
     if (__quest_state["Lair"].state_boolean["past keys"]) return;	
 
@@ -228,7 +228,7 @@ void PathLowKeyGenerateStandardKeys(ChecklistEntry [int] low_key_entries) {
                 if (__misc_state["fax equivalent accessible"] && in_hardcore()) //not suggesting this in SC
                     options.listAppend("Fax/copy a ghost");
                 options.listAppend("8-bit realm (olfact blooper, slow)");
-                if (myPathId() == PATH_ONE_CRAZY_RANDOM_SUMMER)
+                if (my_path_id() == PATH_ONE_CRAZY_RANDOM_SUMMER)
                     options.listAppend("Wait for pixellated monsters");
                 
                 int total_white_pixels = $item[white pixel].available_amount() + $item[white pixel].creatable_amount();

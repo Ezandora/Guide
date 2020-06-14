@@ -170,7 +170,7 @@ void STurtleTamerGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     if (my_class() != $class[turtle tamer])
         return;
     
-    if (__misc_state["in run"] && guild_store_available() && myPathId() != PATH_WAY_OF_THE_SURPRISING_FIST && $effect[Eau de Tortue].have_effect() == 0 && my_meat() >= 200)
+    if (__misc_state["in run"] && guild_store_available() && my_path_id() != PATH_WAY_OF_THE_SURPRISING_FIST && $effect[Eau de Tortue].have_effect() == 0 && my_meat() >= 200)
     {
         optional_task_entries.listAppend(ChecklistEntryMake("__item helmet turtle", "shop.php?whichshop=guildstore3", ChecklistSubentryMake("Buy and use turtle pheromones", "", "Lets you encounter more turtles.")));
     }
