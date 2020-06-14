@@ -60,7 +60,7 @@ void runMain(string relay_filename)
 	Checklist [int] ordered_output_checklists;
 	generateChecklists(ordered_output_checklists);
 	
-    string guide_title = "Guide";
+    string guide_title = "TourGuide";
     if (limit_mode() == "batman")
         guide_title = "Bat-Guide";
 	
@@ -220,7 +220,7 @@ void runMain(string relay_filename)
         }
     }
     boolean matrix_enabled = false;
-    if (my_path_id() == PATH_THE_SOURCE || $familiars[dataspider,Baby Bugged Bugbear] contains my_familiar())
+    if (myPathId() == PATH_THE_SOURCE || $familiars[dataspider,Baby Bugged Bugbear] contains my_familiar())
     {
         matrix_enabled = !PreferenceGetBoolean("matrix disabled");
         if (true)

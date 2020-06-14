@@ -1,20 +1,20 @@
 RegisterTaskGenerationFunction("SAreaUnlocksGenerateTasks");
 void SAreaUnlocksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (!__misc_state["desert beach available"] && __misc_state["in run"] && my_path_id() != PATH_NUCLEAR_AUTUMN)
+	if (!__misc_state["desert beach available"] && __misc_state["in run"] && myPathId() != PATH_NUCLEAR_AUTUMN)
 	{
         string url;
 		ChecklistSubentry subentry;
         boolean optional = false;
 		subentry.header = "Unlock desert beach";
         boolean [location] relevant_locations;
-        if (my_path_id() == PATH_COMMUNITY_SERVICE)
+        if (myPathId() == PATH_COMMUNITY_SERVICE)
         {
             subentry.header = "Optionally unlock desert beach";
             subentry.entries.listAppend("Not needed to finish path.");
             optional = true;
         }
-        if (my_path_id() == PATH_NUCLEAR_AUTUMN)
+        if (myPathId() == PATH_NUCLEAR_AUTUMN)
         {
             subentry.entries.listAppend("Wait until level eleven, which will unlock it autumnaically.");
         }
@@ -51,7 +51,7 @@ void SAreaUnlocksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
 			}
 			subentry.entries.listAppend(meatcar_line);
 			
-            if (my_path_id() != PATH_WAY_OF_THE_SURPRISING_FIST)
+            if (myPathId() != PATH_WAY_OF_THE_SURPRISING_FIST)
                 subentry.entries.listAppend("Or buy a desert bus pass. (5000 meat)");
 			if ($item[pumpkin].available_amount() > 0)
 				subentry.entries.listAppend("Or build a pumpkin carriage.");
@@ -76,7 +76,7 @@ void SAreaUnlocksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
 	{
 		ChecklistSubentry subentry;
 		subentry.header = "Unlock mysterious island";
-		if (my_path_id() == PATH_COMMUNITY_SERVICE)
+		if (myPathId() == PATH_COMMUNITY_SERVICE)
         {
         	subentry.header += "?";
             subentry.entries.listAppend("Or not...?");
@@ -84,13 +84,13 @@ void SAreaUnlocksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         
         string url;
         boolean suggest_hippy_alternative = false;
-        if (my_path_id() == PATH_NUCLEAR_AUTUMN)
+        if (myPathId() == PATH_NUCLEAR_AUTUMN)
         {
             suggest_hippy_alternative = true;
         }
         
         
-        if (!(my_path_id() == PATH_NUCLEAR_AUTUMN && in_hardcore()))
+        if (!(myPathId() == PATH_NUCLEAR_AUTUMN && in_hardcore()))
         {
             if (__misc_state["desert beach available"])
                 url = "place.php?whichplace=desertbeach";
@@ -101,12 +101,12 @@ void SAreaUnlocksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
             {
                 if ($item[dingy planks].available_amount() > 0)
                 {
-                    url = "inventory.php?which=3";
+                    url = "inventory.php?ftext=dinghy+plans";
                     subentry.entries.listAppend("Use dinghy plans.");
                 }
                 else
                 {
-                    if (my_path_id() == PATH_NUCLEAR_AUTUMN)
+                    if (myPathId() == PATH_NUCLEAR_AUTUMN)
                     {
                         subentry.entries.listAppend("Pull dingy planks, then build dinghy dinghy.");
                     }
@@ -122,7 +122,7 @@ void SAreaUnlocksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
             {
                 int trip_adventure_cost = 3;
                 int trip_meat_cost = 500;
-                if (my_path_id() == PATH_WAY_OF_THE_SURPRISING_FIST)
+                if (myPathId() == PATH_WAY_OF_THE_SURPRISING_FIST)
                 {
                     trip_adventure_cost = 5;
                     trip_meat_cost = 5;
@@ -147,7 +147,7 @@ void SAreaUnlocksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         if (suggest_hippy_alternative)
         {
             string line_string = "Or try";
-            if (my_path_id() == PATH_NUCLEAR_AUTUMN && in_hardcore())
+            if (myPathId() == PATH_NUCLEAR_AUTUMN && in_hardcore())
                 line_string = "Try";
             line_string += " the hippy quest in the woods";
             if (my_basestat(my_primestat()) < 25)
@@ -155,11 +155,11 @@ void SAreaUnlocksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
             else if (url == "")
                 url = "place.php?whichplace=woods";
             line_string += ".";
-            if (my_path_id() != PATH_NUCLEAR_AUTUMN)
+            if (myPathId() != PATH_NUCLEAR_AUTUMN)
                 line_string += " (probably slower?)";
             subentry.entries.listAppend(line_string);
         }
-        if (my_path_id() == PATH_NUCLEAR_AUTUMN && ($familiar[ms. puck man].familiar_is_usable() || $familiar[puck man].familiar_is_usable()))
+        if (myPathId() == PATH_NUCLEAR_AUTUMN && ($familiar[ms. puck man].familiar_is_usable() || $familiar[puck man].familiar_is_usable()))
         {
             string line = "Or build a yellow submarine.";
             string [int] missing_components = $item[yellow submarine].missingComponentsToMakeItemInHumanReadableFormat();
@@ -168,12 +168,12 @@ void SAreaUnlocksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
             subentry.entries.listAppend(line);
         }
         
-        if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE && get_property("peteMotorbikeGasTank").length() == 0)
+        if (myPathId() == PATH_AVATAR_OF_SNEAKY_PETE && get_property("peteMotorbikeGasTank").length() == 0)
             subentry.entries.listAppend("Possibly upgrade your motorcycle's gas tank. (extra-buoyant)");
         
         
 		ChecklistEntry entry = ChecklistEntryMake("__item dingy dinghy", url, subentry, $locations[the shore\, inc. travel agency]);
-        if (my_path_id() == PATH_COMMUNITY_SERVICE)
+        if (myPathId() == PATH_COMMUNITY_SERVICE)
         	optional_task_entries.listAppend(entry);
         else
         	task_entries.listAppend(entry);

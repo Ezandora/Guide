@@ -77,11 +77,11 @@ void IOTMProtonicAcceleratorPackGenerateTasks(ChecklistEntry [int] task_entries,
         if (ghost_location == $location[the skeleton store] && !ghost_location.locationAvailable())
         {
             //bone with a price tag on it
-            if (my_path_id() == PATH_NUCLEAR_AUTUMN)
+            if (myPathId() == PATH_NUCLEAR_AUTUMN)
             {
                 if ($item[bone with a price tag on it].available_amount() > 0)
                 {
-                    url = "inventory.php?which=3"; //FIXME guess
+                    url = "inventory.php?ftext=bone+with+a+price+tag+on+it";
                     description.listAppend("Use the bone with a price tag on it to unlock the store.");
                 }
             }
@@ -94,11 +94,11 @@ void IOTMProtonicAcceleratorPackGenerateTasks(ChecklistEntry [int] task_entries,
         if (ghost_location == $location[The Overgrown Lot] && !ghost_location.locationAvailable())
         {
             //bone with a price tag on it
-            if (my_path_id() == PATH_NUCLEAR_AUTUMN)
+            if (myPathId() == PATH_NUCLEAR_AUTUMN)
             {
                 if ($item[map to a hidden booze cache].available_amount() > 0)
                 {
-                    url = "inventory.php?which=3"; //FIXME guess
+                    url = "inventory.php?ftext=map+to+a+hidden+booze+cache";
                     description.listAppend("Use the map to a hidden booze cache to unlock the store.");
                 }
             }
@@ -111,11 +111,11 @@ void IOTMProtonicAcceleratorPackGenerateTasks(ChecklistEntry [int] task_entries,
         if (ghost_location == $location[Madness Bakery] && !ghost_location.locationAvailable())
         {
             //bone with a price tag on it
-            if (my_path_id() == PATH_NUCLEAR_AUTUMN)
+            if (myPathId() == PATH_NUCLEAR_AUTUMN)
             {
                 if ($item[hypnotic breadcrumbs].available_amount() > 0)
                 {
-                    url = "inventory.php?which=3"; //FIXME guess
+                    url = "inventory.php?ftext=hypnotic+breadcrumbs";
                     description.listAppend("Use the hypnotic breadcrumbs to unlock the store.");
                 }
             }
@@ -159,14 +159,14 @@ void IOTMProtonicAcceleratorPackGenerateResource(ChecklistEntry [int] resource_e
     if ($item[protonic accelerator pack].available_amount() == 0)
         return;
     
-    if (!get_property_boolean("_streamsCrossed") &&__misc_state["in run"] && mafiaIsPastRevision(17085) && my_path_id() != PATH_G_LOVER)
+    if (!get_property_boolean("_streamsCrossed") &&__misc_state["in run"] && mafiaIsPastRevision(17085) && myPathId() != PATH_G_LOVER)
     {
         string [int] description;
         string url = "showplayer.php?who=2807390"; //ProtonicBot is a real bot that will steal your turtle mechs at the first sign of defiance.
         description.listAppend("+20% stats for 10 turns.");
         if ($item[protonic accelerator pack].equipped_amount() == 0)
         {
-            url = "inventory.php?which=2";
+            url = "inventory.php?ftext=protonic+accelerator+pack";
             description.listAppend("Equip the protonic accelerator pack first.");
         }
         resource_entries.listAppend(ChecklistEntryMake("__item protonic accelerator pack", url, ChecklistSubentryMake("Stream crossing", "", description), 8));

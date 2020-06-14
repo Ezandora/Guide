@@ -2,18 +2,18 @@ void QLevel11ManorInit()
 {
     QuestState state;
     QuestStateParseMafiaQuestProperty(state, "questL11Manor");
-    if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (myPathId() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
     state.quest_name = "Lord Spookyraven Quest";
     state.image_name = "Spookyraven manor";
     
-    if (($items[2286,Headpiece of the Staff of Ed].available_amount() > 0 || to_item("2325").available_amount() > 0) && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING) //eye of ed
+    if (($items[2286,Headpiece of the Staff of Ed].available_amount() > 0 || to_item("2325").available_amount() > 0) && myPathId() != PATH_ACTUALLY_ED_THE_UNDYING) //eye of ed
         QuestStateParseMafiaQuestPropertyValue(state, "finished");
     
     
     boolean use_fast_route = true;
     if (!__misc_state["can equip just about any weapon"])
         use_fast_route = false;
-    if (my_path_id() == PATH_NUCLEAR_AUTUMN && in_hardcore())
+    if (myPathId() == PATH_NUCLEAR_AUTUMN && in_hardcore())
         use_fast_route = false;
     if (in_bad_moon()) //This is possible, but certainly not plausible.
         use_fast_route = false;
@@ -79,7 +79,7 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                 }
                 else if (use_fast_route && $item[lord spookyraven's spectacles].equipped_amount() == 0)
                 {
-                    url = "inventory.php?which=2";
+                    url = "inventory.php?ftext=lord+spookyraven's+spectacles";
                     subentry.entries.listAppend("Equip Lord Spookyraven's Spectacles, click on the suspicious masonry in the basement, then read the recipe.");
                     image_name = "__item Lord Spookyraven's spectacles";
                 }
@@ -106,14 +106,14 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                         string [int] tasks;
                         if ($item[unstable fulminate].equipped_amount() == 0)
                         {
-                            url = "inventory.php?which=2";
+                            url = "inventory.php?ftext=unstable+fulminate";
                             tasks.listAppend(HTMLGenerateSpanFont("Equip unstable fulminate", "red"));
                         }
                         image_name = "monstrous boiler";
                         
                         int ml_needed = 82;
                         int inherent_ml_modifier = 0;
-                        //if (my_path_id() == PATH_HEAVY_RAINS) //need to test this
+                        //if (myPathId() == PATH_HEAVY_RAINS) //need to test this
                             //inherent_ml_modifier = 82 - 40; //maybe?
                         ml_needed -= inherent_ml_modifier;
                         tasks.listAppend("adventure in the haunted boiler room with +" + ml_needed + " ML");
@@ -259,11 +259,11 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                 if (output_final_fight_info)
                 {
                     image_name = "Demon Summon";
-                    if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
+                    if (myPathId() == PATH_ACTUALLY_ED_THE_UNDYING)
                     {
                         subentry.entries.listAppend("Talk to Lord Spookyraven.");
                     }
-                    else if (my_path_id() == PATH_VAMPIRE)
+                    else if (myPathId() == PATH_VAMPIRE)
                     {
                         subentry.entries.listAppend("Fight the path-specific boss.");
                     }
@@ -272,7 +272,7 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                         subentry.modifiers.listAppend("elemental resistance");
                         subentry.entries.listAppend("Fight Lord Spookyraven.");
                         
-                        if ($effect[Red Door Syndrome].have_effect() == 0 && my_meat() > 1000 && black_market_available() && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING && my_path_id() != PATH_POCKET_FAMILIARS && $item[can of black paint].item_is_usable())
+                        if ($effect[Red Door Syndrome].have_effect() == 0 && my_meat() > 1000 && black_market_available() && myPathId() != PATH_ACTUALLY_ED_THE_UNDYING && myPathId() != PATH_POCKET_FAMILIARS && $item[can of black paint].item_is_usable())
                         {
                             subentry.entries.listAppend("A can of black paint can help with fighting him." + (my_meat() < 20000 ? " Bit pricy. (1k meat)" : ""));
                         }

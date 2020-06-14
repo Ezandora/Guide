@@ -2,7 +2,7 @@ RegisterTaskGenerationFunction("IOTMIntergnatGenerateTasks");
 void IOTMIntergnatGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     
-    if (!get_property_boolean("demonSummoned") && __misc_state["in run"] && !__quest_state["Level 13"].state_boolean["king waiting to be freed"] && $familiar[intergnat].familiar_is_usable() && my_path_id() != PATH_AVATAR_OF_SNEAKY_PETE)
+    if (!get_property_boolean("demonSummoned") && __misc_state["in run"] && !__quest_state["Level 13"].state_boolean["king waiting to be freed"] && $familiar[intergnat].familiar_is_usable() && myPathId() != PATH_AVATAR_OF_SNEAKY_PETE)
     {
         //Should we show this if they aren't using the intergnat? ... Yes?
         //demonName12, thin black candle, scroll of ancient forbidden unspeakable evil
@@ -45,7 +45,7 @@ void IOTMIntergnatGenerateResource(ChecklistEntry [int] resource_entries)
     if ($item[infinite BACON machine].available_amount() > 0 && !get_property_boolean("_baconMachineUsed") && mafiaIsPastRevision(16926))
     {
         //suggest using it:
-        resource_entries.listAppend(ChecklistEntryMake("__item infinite BACON machine", "inventory.php?which=3", ChecklistSubentryMake("Infinite BACON machine", "", "100 BACON/day."), 7));
+        resource_entries.listAppend(ChecklistEntryMake("__item infinite BACON machine", "inventory.php?which=3?ftext=infinite+bacon+machine", ChecklistSubentryMake("Infinite BACON machine", "", "100 BACON/day."), 7));
     }
     if ($item[daily dungeon malware].available_amount() > 0 && __misc_state_int["fat loot tokens needed"] > 0)
     {
@@ -65,9 +65,9 @@ void IOTMIntergnatGenerateResource(ChecklistEntry [int] resource_entries)
         if (meme_shop != $coinmaster[none])
         {
             string [item] bacon_description;
-            if (!__misc_state["yellow ray available"] & $effect[everything looks yellow].have_effect() == 0 && my_path_id() != PATH_G_LOVER)
+            if (!__misc_state["yellow ray available"] & $effect[everything looks yellow].have_effect() == 0 && myPathId() != PATH_G_LOVER)
                 bacon_description[$item[Viral video]] = "yellow ray";
-            if (my_path_id() != PATH_G_LOVER)
+            if (myPathId() != PATH_G_LOVER)
 	            bacon_description[$item[print screen button]] = "copies a monster";
             if (__misc_state_int["fat loot tokens needed"] > 0)
                 bacon_description[$item[daily dungeon malware]] = "expensive DD token source";

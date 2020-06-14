@@ -130,7 +130,7 @@ void generateDailyResources(Checklist [int] checklists)
 	{
         string [int] description;
         string line = "Various effects.";
-        if (__misc_state["in run"] && my_path_id() != PATH_ZOMBIE_SLAYER && $item[pail].available_amount() > 0)
+        if (__misc_state["in run"] && myPathId() != PATH_ZOMBIE_SLAYER && $item[pail].available_amount() > 0)
         {
             line = "+20ML";
             line += "|Or various effects.";
@@ -214,7 +214,7 @@ void generateDailyResources(Checklist [int] checklists)
     }
     
     //Not sure how I feel about this. It's kind of extraneous?
-    if (get_property_int("telescopeUpgrades") > 0 && !get_property_boolean("telescopeLookedHigh") && __misc_state["in run"] && availableDrunkenness() < 0 && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING && !in_bad_moon() && my_path_id() != PATH_NUCLEAR_AUTUMN)
+    if (get_property_int("telescopeUpgrades") > 0 && !get_property_boolean("telescopeLookedHigh") && __misc_state["in run"] && availableDrunkenness() < 0 && myPathId() != PATH_ACTUALLY_ED_THE_UNDYING && !in_bad_moon() && myPathId() != PATH_NUCLEAR_AUTUMN)
     {
         string [int] description;
         int percentage = 5 * get_property_int("telescopeUpgrades");
@@ -287,11 +287,11 @@ void generateDailyResources(Checklist [int] checklists)
         else if (__misc_state_string["resting description"] == "Chateau Mantegna")
         {
             //FIXME what goes here
-            if (my_path_id() == PATH_THE_SOURCE)
+            if (myPathId() == PATH_THE_SOURCE)
                 description.listAppend("HP/MP.");
             else
                 description.listAppend("HP/MP/stats.");
-            if (my_level() < 9 && my_path_id() != PATH_THE_SOURCE)
+            if (my_level() < 9 && myPathId() != PATH_THE_SOURCE)
                 description.listAppend("May want to wait until level 9(?) for more stats from resting.");
             
             stat desired_stat = $stat[none];
@@ -313,7 +313,7 @@ void generateDailyResources(Checklist [int] checklists)
     
     //FIXME skate park?
     
-    if (my_path_id() != PATH_BEES_HATE_YOU && !get_property_boolean("guyMadeOfBeesDefeated") && get_property_int("guyMadeOfBeesCount") > 0 && (__misc_state["in aftercore"] || !__quest_state["Level 12"].state_boolean["Arena Finished"]))
+    if (myPathId() != PATH_BEES_HATE_YOU && !get_property_boolean("guyMadeOfBeesDefeated") && get_property_int("guyMadeOfBeesCount") > 0 && (__misc_state["in aftercore"] || !__quest_state["Level 12"].state_boolean["Arena Finished"]))
     {
         //Not really worthwhile? But I suppose we can track it if they've started it, and are either in aftercore or haven't flyered yet.
         //For flyering, it's 20 turns at -25%, 25 turns at -15%. 33 turns at -5%. Not worthwhile?
@@ -335,7 +335,7 @@ void generateDailyResources(Checklist [int] checklists)
     {
         string [int] description;
         string [int] mixables;
-        if (__misc_state["can drink just about anything"] && my_path_id() != PATH_SLOW_AND_STEADY)
+        if (__misc_state["can drink just about anything"] && myPathId() != PATH_SLOW_AND_STEADY)
         {
             mixables.listAppend("neuromancer-level drinks");
         }
@@ -355,7 +355,7 @@ void generateDailyResources(Checklist [int] checklists)
             resource_entries.listAppend(ChecklistEntryMake("__item reflection of a map", "place.php?whichplace=rabbithole", ChecklistSubentryMake(pluralise(get_property_int("pendingMapReflections"), "pending reflection of a map", "pending reflections of a map"), "+900% item", "Adventure in the Red Queen's garden to acquire." + will_need_effect), 0));
         if ($items[reflection of a map].available_amount() > 0)
         {
-            resource_entries.listAppend(ChecklistEntryMake("__item reflection of a map", "inventory.php?which=3", ChecklistSubentryMake(pluralise($item[reflection of a map]), "", "Queen cookies." + will_need_effect), 0));
+            resource_entries.listAppend(ChecklistEntryMake("__item reflection of a map", "inventory.php?ftext=reflection+of+a+map", ChecklistSubentryMake(pluralise($item[reflection of a map]), "", "Queen cookies." + will_need_effect), 0));
         }
     }
     
@@ -368,7 +368,7 @@ void generateDailyResources(Checklist [int] checklists)
         //_deluxeKlawSummons?
         //_crimboTree?
         int soaks_remaining = __misc_state_int["hot tub soaks remaining"];
-        if (__misc_state["in run"] && soaks_remaining > 0 && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING && my_path_id() != PATH_VAMPIRE)
+        if (__misc_state["in run"] && soaks_remaining > 0 && myPathId() != PATH_ACTUALLY_ED_THE_UNDYING && myPathId() != PATH_VAMPIRE)
         {
             string description = "Restore all HP, removes most bad effects.";
             resource_entries.listAppend(ChecklistEntryMake("__effect blessing of squirtlcthulli", "clan_viplounge.php", ChecklistSubentryMake(pluralise(soaks_remaining, "hot tub soak", "hot tub soaks"), "", description), 8));
@@ -384,7 +384,7 @@ void generateDailyResources(Checklist [int] checklists)
     
     if ($item[can of rain-doh].available_amount() > 0 && $item[empty rain-doh can].available_amount() == 0 && __misc_state["in run"])
     {
-        resource_entries.listAppend(ChecklistEntryMake("__item can of rain-doh", "inventory.php?which=3", ChecklistSubentryMake("Can of Rain-Doh", "", "Open it!"), 0));
+        resource_entries.listAppend(ChecklistEntryMake("__item can of rain-doh", "inventory.php?ftext=can+of+rain-doh", ChecklistSubentryMake("Can of Rain-Doh", "", "Open it!"), 0));
     }
     
     

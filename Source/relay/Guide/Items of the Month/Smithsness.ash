@@ -80,12 +80,12 @@ void smithsnessGenerateSmithereensSuggestions(string [int] smithereen_suggestion
 {
 	smithereen_suggestions.listAppend(7014.to_item().to_string() + ": " + (__misc_state["free runs usable"] ? "free run/" : "") + "banish for 20 turns");
 	
-	if (__misc_state["can eat just about anything"] && availableFullness() >= 2 && my_path_id() != PATH_SLOW_AND_STEADY)
+	if (__misc_state["can eat just about anything"] && availableFullness() >= 2 && myPathId() != PATH_SLOW_AND_STEADY)
 	{
 		smithereen_suggestions.listAppend("Charming Flan: 2 fullness epic food<br>Miserable Pie: 2 fullness awesome food, 50 turns of +10 smithsness");
 	}
 		
-	if (__misc_state["can drink just about anything"] && availableDrunkenness() >= 2 && my_path_id() != PATH_SLOW_AND_STEADY)
+	if (__misc_state["can drink just about anything"] && availableDrunkenness() >= 2 && myPathId() != PATH_SLOW_AND_STEADY)
 	{
 		smithereen_suggestions.listAppend("Vulgar Pitcher: 2 drunkenness epic drink<br>Bigmouth: 2 drunkenness awesome drink, 50 turns of +10 smithsness");
 	}
@@ -124,6 +124,6 @@ void IOTMSmithsnessGenerateResource(ChecklistEntry [int] resource_entries)
 		details.listAppend(pluralise((turns_left + 150 * $item[flaskfull of hollow].available_amount()), "turn", "turns") + " of +25 smithsness");
 		if (turns_left > 0)
 			details.listAppend("Effect will run out in " + pluralise(turns_left, "turn", "turns"));
-		resource_entries.listAppend(ChecklistEntryMake("__item flaskfull of hollow", "inventory.php?which=3", ChecklistSubentryMake(pluralise($item[flaskfull of hollow]), "", details), 10));
+		resource_entries.listAppend(ChecklistEntryMake("__item flaskfull of hollow", "inventory.php?ftext=flaskfull+of+hollow", ChecklistSubentryMake(pluralise($item[flaskfull of hollow]), "", details), 10));
 	}
 }

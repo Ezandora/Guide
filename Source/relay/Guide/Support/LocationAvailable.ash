@@ -312,13 +312,13 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
 	
 	if (zone == "KOL High School")
 	{
-		if (my_path_id() == PATH_KOLHS)
+		if (myPathId() == PATH_KOLHS)
 			return true;
 		return false;
 	}
 	if (zone == "Mothership")
 	{
-		if (my_path_id() == PATH_BUGBEAR_INVASION)
+		if (myPathId() == PATH_BUGBEAR_INVASION)
 			return true;
 		return false;
 	}
@@ -669,7 +669,7 @@ void locationAvailablePrivateInit()
 	locations_unlocked_by_item[$location[The Haunted Library]] = $item[7302]; //library key
 	locations_unlocked_by_item[$location[The Castle in the Clouds in the Sky (Basement)]] = $item[S.O.C.K.];
 	locations_unlocked_by_item[$location[the hole in the sky]] = $item[steam-powered model rocketship];
-    if (my_path_id() == PATH_EXPLOSION)
+    if (myPathId() == PATH_EXPLOSION)
     {
         locations_unlocked_by_item[$location[The Castle in the Clouds in the Sky (Basement)]] = $item[none];
         locations_unlocked_by_item[$location[the hole in the sky]] = $item[none];
@@ -1179,7 +1179,7 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
         if ($item[talisman o\' namsilat].equipped_amount() > 0)
             lookup_map["Palindome"] = "place.php?whichplace=palindome";
         else
-            lookup_map["Palindome"] = "inventory.php?which=2";
+            lookup_map["Palindome"] = "inventory.php?ftext=talisman+o\'+namsilat";
         //antique maps are weird:
         lookup_map["The Electric Lemonade Acid Parade"] = "inv_use.php?pwd=" + my_hash() + "&whichitem=4613";
         foreach s in $strings[Professor Jacking's Small-O-Fier,Professor Jacking's Huge-A-Ma-tron]

@@ -67,7 +67,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
                 break;
             }
         }
-        if (have_poison != $effect[none] && my_path_id() != PATH_G_LOVER)
+        if (have_poison != $effect[none] && myPathId() != PATH_G_LOVER)
         {
             string url = "";
             string [int] methods;
@@ -83,7 +83,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
                 url = "shop.php?whichshop=doc";
                 methods.listAppend("Use Doc Galaktik's anti-anti-antidote.");
                 if ($item[anti-anti-antidote].available_amount() > 0)
-                    url = "inventory.php?which=1";
+                    url = "inventory.php?ftext=anti-anti-antidote";
             }
             
             task_entries.listAppend(ChecklistEntryMake("__effect " + have_poison, url, ChecklistSubentryMake("Remove " + have_poison, "", methods), -11));
@@ -101,7 +101,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         string url = "mall.php";
         
         if ($item[&quot;DRINK ME&quot; potion].available_amount() > 0)
-            url = "inventory.php?which=3";
+            url = "inventory.php?ftext=drink+me";
         
         task_entries.listAppend(ChecklistEntryMake("__item &quot;DRINK ME&quot; potion", url, ChecklistSubentryMake("Drink " + $item[&quot;DRINK ME&quot; potion], "+madness", "Otherwise, no reflections of a map will drop."), -11));
     }
@@ -117,7 +117,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         string url = "mall.php";
         
         if ($item[flaskfull of hollow].available_amount() > 0)
-            url = "inventory.php?which=3";
+            url = "inventory.php?ftext=flaskfull+of+hollow";
         
         task_entries.listAppend(ChecklistEntryMake("__item flaskfull of hollow", url, ChecklistSubentryMake("Drink " + $item[flaskfull of hollow], "", "Gives +25 smithsness"), -11));
     }
@@ -270,9 +270,9 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         }
     }
     
-    if ($item[evil eye].available_amount() > 0 && __quest_state["Level 7"].state_int["nook evilness"] > 25 && my_path_id() != PATH_G_LOVER)
+    if ($item[evil eye].available_amount() > 0 && __quest_state["Level 7"].state_int["nook evilness"] > 25 && myPathId() != PATH_G_LOVER)
     {
-        task_entries.listAppend(ChecklistEntryMake("__item " + $item[evil eye], "inventory.php?which=3", ChecklistSubentryMake("Use " + $item[evil eye], "", "Three cyrpt nook beeps."), -11));
+        task_entries.listAppend(ChecklistEntryMake("__item " + $item[evil eye], "inventory.php?ftext=evil+eye", ChecklistSubentryMake("Use " + $item[evil eye], "", "Three cyrpt nook beeps."), -11));
     }
     
     if ($familiars[mini-hipster, artistic goth kid] contains my_familiar() && __misc_state["need to level"] && __misc_state_int["hipster fights available"] > 0 && !__misc_state["single familiar run"])
@@ -280,11 +280,11 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         task_entries.listAppend(ChecklistEntryMake("__familiar " + my_familiar(), "", ChecklistSubentryMake("Buff " + my_primestat(), "", "Extra stats from " + my_familiar() + " fights."), -11));
     }
     
-    boolean have_blacklight_bulb = (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE && get_property("peteMotorbikeHeadlight") == "Blacklight Bulb");
+    boolean have_blacklight_bulb = (myPathId() == PATH_AVATAR_OF_SNEAKY_PETE && get_property("peteMotorbikeHeadlight") == "Blacklight Bulb");
     boolean have_alternate_uv_source = false;
     if (have_blacklight_bulb)
         have_alternate_uv_source = true;
-    if (my_path_id() == PATH_LICENSE_TO_ADVENTURE && get_property_boolean("bondDesert"))
+    if (myPathId() == PATH_LICENSE_TO_ADVENTURE && get_property_boolean("bondDesert"))
         have_alternate_uv_source = true;
     if (__last_adventure_location == $location[the arid\, extra-dry desert] && !__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && __misc_state["in run"] && !have_alternate_uv_source && __quest_state["Level 11 Desert"].state_int["Desert Exploration"] < 99)
     {
@@ -306,7 +306,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     }
     if ($item[bottle of blank-out].available_amount() > 0 && $item[glob of blank-out].available_amount() == 0 && __misc_state["in run"] && __misc_state["free runs usable"] && !get_property_boolean("_blankoutUsed") && in_ronin())
     {
-        task_entries.listAppend(ChecklistEntryMake("__item " + $item[bottle of blank-out], "inventory.php?which=3", ChecklistSubentryMake("Use " + $item[bottle of blank-out], "", "Acquire glob to run away with."), -11));
+        task_entries.listAppend(ChecklistEntryMake("__item " + $item[bottle of blank-out], "inventory.php?ftext=bottle+of+blank-out", ChecklistSubentryMake("Use " + $item[bottle of blank-out], "", "Acquire glob to run away with."), -11));
     
     }
     if (__last_adventure_location == $location[the haunted ballroom] && $item[dance card].available_amount() > 0 && __misc_state["need to level"] && my_primestat() == $stat[moxie] && CounterLookup("Dance Card").CounterGetNextExactTurn() == -1)
@@ -321,10 +321,10 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             description.listAppend("Gives ~" + __misc_state_float["dance card average stats"].round() + " mainstat in four turns.");
             if ($item[dance card].available_amount() > 1)
                 description.listAppend("Have " + $item[dance card].pluraliseWordy() + ".");
-            task_entries.listAppend(ChecklistEntryMake("__item " + $item[dance card], "inventory.php?which=3", ChecklistSubentryMake("Use " + $item[dance card], "", description), -11));
+            task_entries.listAppend(ChecklistEntryMake("__item " + $item[dance card], "inventory.php?ftext=dance+card", ChecklistSubentryMake("Use " + $item[dance card], "", description), -11));
         }
     }
-    if (!__quest_state["Level 11 Hidden City"].finished && (__quest_state["Level 11 Hidden City"].state_boolean["Apartment finished"] || get_property_int("hiddenApartmentProgress") >= 7) && $effect[thrice-cursed].have_effect() > 0 && my_path_id() != PATH_G_LOVER)
+    if (!__quest_state["Level 11 Hidden City"].finished && (__quest_state["Level 11 Hidden City"].state_boolean["Apartment finished"] || get_property_int("hiddenApartmentProgress") >= 7) && $effect[thrice-cursed].have_effect() > 0 && myPathId() != PATH_G_LOVER)
     {
         string curse_removal_method;
         string url;
@@ -346,7 +346,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         }
     }
     
-    if (my_path_id() == PATH_HEAVY_RAINS && my_familiar() != $familiar[none] && $slot[familiar].equipped_item() == $item[none])
+    if (myPathId() == PATH_HEAVY_RAINS && my_familiar() != $familiar[none] && $slot[familiar].equipped_item() == $item[none])
     {
         boolean [familiar] safely_underwater_familiars = $familiars[black cat,Barrrnacle,Emo Squid,Cuddlefish,Imitation Crab,Magic Dragonfish,Midget Clownfish,Rock Lobster,Urchin Urchin,Grouper Groupie,Squamous Gibberer,Dancing Frog,Adorable Space Buddy]; //cat can swim!
         
@@ -376,7 +376,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         description.listAppend("Window starts after " + pluraliseWordy(upcoming_in, "turn", "turns") + ".");
         
         string [int] options;
-        if (__misc_state["can eat just about anything"] && my_path_id() != PATH_NUCLEAR_AUTUMN && my_path_id() != PATH_G_LOVER)
+        if (__misc_state["can eat just about anything"] && myPathId() != PATH_NUCLEAR_AUTUMN && myPathId() != PATH_G_LOVER)
         {
             options.listAppend("eat a fortune cookie");
         }
@@ -393,7 +393,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     
     if (__last_adventure_location == $location[a maze of sewer tunnels] && $item[hobo code binder].equipped_amount() == 0 && haveAtLeastXOfItemEverywhere($item[hobo code binder], 1))
     {
-        task_entries.listAppend(ChecklistEntryMake("__item hobo code binder", "inventory.php?which=2", ChecklistSubentryMake(HTMLGenerateSpanFont("Equip hobo code binder", "red"), "", "Speeds up sewer tunnel exploration."), -11));
+        task_entries.listAppend(ChecklistEntryMake("__item hobo code binder", "inventory.php?ftext=hobo+code+binder", ChecklistSubentryMake(HTMLGenerateSpanFont("Equip hobo code binder", "red"), "", "Speeds up sewer tunnel exploration."), -11));
     }
     
 }

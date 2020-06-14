@@ -47,11 +47,11 @@ void IOTMPowerfulGloveTask(ChecklistEntry [int] task_entries, ChecklistEntry [in
 	if (!__misc_state["in run"]) return;
 	
 	if ((!__quest_state["Level 13"].state_boolean["digital key used"] && ($item[digital key].available_amount() + creatable_amount($item[digital key])) == 0)
-		|| my_path_id() == PATH_OF_THE_PLUMBER) {
+		|| myPathId() == PATH_OF_THE_PLUMBER) {
 			ChecklistSubentry getExtraPixels() {
 				// Title
 				string main_title = "Get extra pixels";
-				if (my_path_id() == PATH_OF_THE_PLUMBER) {
+				if (myPathId() == PATH_OF_THE_PLUMBER) {
 					main_title = main_title + " and coins";
 				}
 
@@ -73,7 +73,7 @@ void IOTMPowerfulGloveTask(ChecklistEntry [int] task_entries, ChecklistEntry [in
 			entry.image_lookup_name = "__item white pixel";
 			entry.url = "/place.php?whichplace=forestvillage&action=fv_mystic";
 
-			if (my_path_id() == PATH_OF_THE_PLUMBER) {
+			if (myPathId() == PATH_OF_THE_PLUMBER) {
 				entry.importance_level = -10;
 			}
 

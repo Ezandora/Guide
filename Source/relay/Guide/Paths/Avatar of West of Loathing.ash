@@ -2,7 +2,7 @@
 RegisterResourceGenerationFunction("PathAvatarOfWestOfLoathingGenerateResource");
 void PathAvatarOfWestOfLoathingGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (my_path_id() != PATH_AVATAR_OF_WEST_OF_LOATHING && !($classes[snake oiler,beanslinger,cow puncher] contains my_class()))
+	if (myPathId() != PATH_AVATAR_OF_WEST_OF_LOATHING && !($classes[snake oiler,beanslinger,cow puncher] contains my_class()))
 		return;
     
     //Oils:
@@ -132,7 +132,7 @@ void PathAvatarOfWestOfLoathingGenerateResource(ChecklistEntry [int] resource_en
 RegisterTaskGenerationFunction("PathAvatarOfWestOfLoathingGenerateTasks");
 void PathAvatarOfWestOfLoathingGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (my_path_id() != PATH_AVATAR_OF_WEST_OF_LOATHING)
+	if (myPathId() != PATH_AVATAR_OF_WEST_OF_LOATHING)
 		return;
     string skill_url;
     ChecklistSubentry [int] skill_subentries;
@@ -199,6 +199,6 @@ void PathAvatarOfWestOfLoathingGenerateTasks(ChecklistEntry [int] task_entries, 
     
     if (my_class() == $class[Cow Puncher] && $item[corrupted marrow].available_amount() > 0 && $item[corrupted marrow].to_effect().have_effect() < 100 && in_ronin())
     {
-        task_entries.listAppend(ChecklistEntryMake("__effect Cowrruption", "inventory.php?which=3", ChecklistSubentryMake("Use corrupted marrow", "", "+200% weapon damage/spell damage"), -11));
+        task_entries.listAppend(ChecklistEntryMake("__effect Cowrruption", "inventory.php?ftext=corrupted+marrow", ChecklistSubentryMake("Use corrupted marrow", "", "+200% weapon damage/spell damage"), -11));
     }
 }

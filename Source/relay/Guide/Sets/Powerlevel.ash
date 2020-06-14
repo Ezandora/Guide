@@ -1,7 +1,7 @@
 RegisterTaskGenerationFunction("SPowerlevelGenerateTasks");
 void SPowerlevelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (__misc_state["need to level"] && my_path_id() != PATH_EXPLOSION)
+	if (__misc_state["need to level"] && myPathId() != PATH_EXPLOSION)
 	{
         string url = "";
 		int mcd_max_limit = 10;
@@ -16,20 +16,20 @@ void SPowerlevelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         else if (knoll_available())
         {
             if ($item[detuned radio].available_amount() > 0)
-                url = "inventory.php?which=3";
+                url = "inventory.php?ftext=detuned+radio";
             else
                 url = "shop.php?whichshop=gnoll";
         }
         else if (gnomads_available())
             url = "gnomes.php?place=machine";
         //FIXME URLs for the other ones
-		if (current_mcd() < mcd_max_limit && have_mcd && monster_level_adjustment() < 150 && !in_bad_moon() && !(my_path_id() == PATH_G_LOVER && knoll_available()))
+		if (current_mcd() < mcd_max_limit && have_mcd && monster_level_adjustment() < 150 && !in_bad_moon() && !(myPathId() == PATH_G_LOVER && knoll_available()))
 		{
 			optional_task_entries.listAppend(ChecklistEntryMake("__item detuned radio", url, ChecklistSubentryMake("Set monster control device to " + mcd_max_limit, "", roundForOutput(mcd_max_limit * __misc_state_float["ML to mainstat multiplier"], 2) + " mainstats/turn")));
 		}
 	}
     
-	if (__misc_state["need to level"] && my_path_id() != PATH_COMMUNITY_SERVICE)
+	if (__misc_state["need to level"] && myPathId() != PATH_COMMUNITY_SERVICE)
 	{
 		ChecklistSubentry subentry;
 		
@@ -80,13 +80,13 @@ void SPowerlevelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
                 if (cost_to_donate_for_level < 2000 || cost_to_donate_for_level < my_meat() * 0.2)
                     url = "da.php?place=gate1";
             }
-            else if (my_primestat() == $stat[mysticality] && $item[jarlsberg's key].available_amount() > 0 && my_path_id() != PATH_AVATAR_OF_JARLSBERG)
+            else if (my_primestat() == $stat[mysticality] && $item[jarlsberg's key].available_amount() > 0 && myPathId() != PATH_AVATAR_OF_JARLSBERG)
             {
                 statue_name = "Jarlsberg";
                 if (cost_to_donate_for_level < 2000 || cost_to_donate_for_level < my_meat() * 0.2)
                     url = "da.php?place=gate2";
             }
-            else if (my_primestat() == $stat[moxie] && $item[sneaky pete's key].available_amount() > 0 && my_path_id() != PATH_AVATAR_OF_SNEAKY_PETE)
+            else if (my_primestat() == $stat[moxie] && $item[sneaky pete's key].available_amount() > 0 && myPathId() != PATH_AVATAR_OF_SNEAKY_PETE)
             {
                 statue_name = "Sneaky Pete";
                 if (cost_to_donate_for_level < 2000 || cost_to_donate_for_level < my_meat() * 0.2)

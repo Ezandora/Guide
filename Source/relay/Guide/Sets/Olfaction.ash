@@ -108,7 +108,7 @@ void SOlfactionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         
         
         //Suggestion time!
-        task_entries.listAppend(ChecklistEntryMake("__item " + $item[soft green echo eyedrop antidote], "inventory.php?which=1", ChecklistSubentryMake("Remove " + $effect[on the trail], "", description), -11));
+        task_entries.listAppend(ChecklistEntryMake("__item " + $item[soft green echo eyedrop antidote], "inventory.php?ftext=soft+green+echo+eyedrop+antidote", ChecklistSubentryMake("Remove " + $effect[on the trail], "", description), -11));
         
         break;
     }

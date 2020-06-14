@@ -29,7 +29,7 @@ void SMiscTasksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
 				potential_targets.listAppend("A bat. (sonar-in-a-biscuit)");
 		}
         
-        if (__misc_state["stench airport available"] && $item[filthy child leash].available_amount() == 0 && !__misc_state["familiars temporarily blocked"] && $items[ittah bittah hookah,astral pet sweater,snow suit,lead necklace].available_amount() == 0 && in_ronin() && my_path_id() != PATH_HEAVY_RAINS && my_path_id() != PATH_GELATINOUS_NOOB && my_path_id() != PATH_G_LOVER)
+        if (__misc_state["stench airport available"] && $item[filthy child leash].available_amount() == 0 && !__misc_state["familiars temporarily blocked"] && $items[ittah bittah hookah,astral pet sweater,snow suit,lead necklace].available_amount() == 0 && in_ronin() && myPathId() != PATH_HEAVY_RAINS && myPathId() != PATH_GELATINOUS_NOOB && myPathId() != PATH_G_LOVER)
         {
             potential_targets.listAppend("Horrible tourist family (barf mountain) - +5 familiar weight leash.");
         }
@@ -47,7 +47,7 @@ void SMiscTasksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
 		optional_task_entries.listAppend(ChecklistEntryMake(__misc_state_string["yellow ray image name"], "", ChecklistSubentryMake("Fire yellow ray", "", potential_targets), 5));
 	}
     
-    if (__misc_state["in run"] && !have_mushroom_plot() && knoll_available() && __misc_state["can eat just about anything"] && fullness_limit() >= 4 && $item[spooky mushroom].available_amount() == 0 && my_path_id() != PATH_WAY_OF_THE_SURPRISING_FIST && my_meat() >= 5000 && my_path_id() != PATH_SLOW_AND_STEADY && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING)
+    if (__misc_state["in run"] && !have_mushroom_plot() && knoll_available() && __misc_state["can eat just about anything"] && fullness_limit() >= 4 && $item[spooky mushroom].available_amount() == 0 && myPathId() != PATH_WAY_OF_THE_SURPRISING_FIST && my_meat() >= 5000 && myPathId() != PATH_SLOW_AND_STEADY && myPathId() != PATH_ACTUALLY_ED_THE_UNDYING)
     {
         string [int] description;
         description.listAppend("For spooky mushrooms, to cook a grue egg omelette. (epic food)|Will " + ((my_meat() < 5000) ? "need" : "cost") + " 5k meat. Plant a spooky spore.");
@@ -55,7 +55,7 @@ void SMiscTasksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     
     }
 	
-	if (!have_outfit_components("Filthy Hippy Disguise") && __misc_state["mysterious island available"] && __misc_state["in run"] && !__quest_state["Level 12"].finished && !__quest_state["Level 12"].state_boolean["War started"] && !have_outfit_components("Frat Warrior Fatigues") && my_path_id() != PATH_EXPLOSION)
+	if (!have_outfit_components("Filthy Hippy Disguise") && __misc_state["mysterious island available"] && __misc_state["in run"] && !__quest_state["Level 12"].finished && !__quest_state["Level 12"].state_boolean["War started"] && !have_outfit_components("Frat Warrior Fatigues") && myPathId() != PATH_EXPLOSION)
 	{
 		item [int] missing_pieces = missing_outfit_components("Filthy Hippy Disguise");
         
@@ -92,7 +92,7 @@ void SMiscTasksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             optional_task_entries.listAppend(entry);
 	}
     
-    if (__misc_state["in run"] && (inebriety_limit() == 0 || my_path_id() == PATH_SLOW_AND_STEADY) && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING)
+    if (__misc_state["in run"] && (inebriety_limit() == 0 || myPathId() == PATH_SLOW_AND_STEADY) && myPathId() != PATH_ACTUALLY_ED_THE_UNDYING)
     {
         string url = "";
         string [int] modifiers;
@@ -189,7 +189,7 @@ void SMiscTasksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
 
     
     boolean have_spaghetti_breakfast = (($skill[spaghetti breakfast].skill_is_usable() && !get_property_boolean("_spaghettiBreakfast")) || $item[spaghetti breakfast].available_amount() > 0);
-    if (__misc_state["in run"] && __misc_state["can eat just about anything"] && !get_property_boolean("_spaghettiBreakfastEaten") && my_fullness() == 0 && have_spaghetti_breakfast && my_path_id() != PATH_SLOW_AND_STEADY)
+    if (__misc_state["in run"] && __misc_state["can eat just about anything"] && !get_property_boolean("_spaghettiBreakfastEaten") && my_fullness() == 0 && have_spaghetti_breakfast && myPathId() != PATH_SLOW_AND_STEADY)
     {
     
         string [int] adventure_gain;
@@ -221,15 +221,15 @@ void SMiscTasksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         optional_task_entries.listAppend(ChecklistEntryMake("__item spaghetti breakfast", url, ChecklistSubentryMake("Eat " + $item[spaghetti breakfast] + " first", "", description), 8));
     }
     
-    if (my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING && my_path_id() != PATH_NUCLEAR_AUTUMN)
+    if (myPathId() != PATH_ACTUALLY_ED_THE_UNDYING && myPathId() != PATH_NUCLEAR_AUTUMN)
     {
         item dwelling = get_dwelling();
         item upgraded_dwelling = $item[none];
-        if ($item[Frobozz Real-Estate Company Instant House (TM)].available_amount() > 0 && (dwelling == $item[big rock] || dwelling == $item[Newbiesport&trade; tent] || get_dwelling() == $item[cottage]) && my_path_id() != PATH_G_LOVER)
+        if ($item[Frobozz Real-Estate Company Instant House (TM)].available_amount() > 0 && (dwelling == $item[big rock] || dwelling == $item[Newbiesport&trade; tent] || get_dwelling() == $item[cottage]) && myPathId() != PATH_G_LOVER)
         {
             upgraded_dwelling = $item[Frobozz Real-Estate Company Instant House (TM)];
         }
-        else if ($item[Newbiesport&trade; tent].available_amount() > 0 && dwelling == $item[big rock] && my_path_id() != PATH_G_LOVER)
+        else if ($item[Newbiesport&trade; tent].available_amount() > 0 && dwelling == $item[big rock] && myPathId() != PATH_G_LOVER)
         {
             upgraded_dwelling = $item[Newbiesport&trade; tent];
         }
@@ -258,7 +258,7 @@ void SMiscTasksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             receipt_item = $item[moustache sock];
         if (receipt_item != $item[none] && receipt_item.available_amount() == 0)
         {
-            optional_task_entries.listAppend(ChecklistEntryMake("__item " + $item[dry cleaning receipt], "inventory.php?which=3", ChecklistSubentryMake("Use " + $item[dry cleaning receipt], "", "For " + receipt_item + " accessory."), 8));
+            optional_task_entries.listAppend(ChecklistEntryMake("__item " + $item[dry cleaning receipt], "inventory.php?ftext=dry+cleaning+receipt", ChecklistSubentryMake("Use " + $item[dry cleaning receipt], "", "For " + receipt_item + " accessory."), 8));
         }
     }
 }

@@ -2,7 +2,7 @@
 RegisterTaskGenerationFunction("PathBugbearInvasionGenerateTasks");
 void PathBugbearInvasionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (my_path_id() != PATH_BUGBEAR_INVASION)
+	if (myPathId() != PATH_BUGBEAR_INVASION)
 		return;
     if (!__misc_state["in run"])
         return;
@@ -348,7 +348,7 @@ void PathBugbearInvasionGenerateTasks(ChecklistEntry [int] task_entries, Checkli
                     description.listAppend("Acquire and use handfuls of juicy garbage.");
                     if ($item[handful of juicy garbage].available_amount() > 0)
                     {
-                        task_entries.listAppend(ChecklistEntryMake("__item handful of juicy garbage", "inventory.php?which=3", ChecklistSubentryMake("Use handful of juicy garbage", "", "Might find a bugbear communicator badge."), -11));
+                        task_entries.listAppend(ChecklistEntryMake("__item handful of juicy garbage", "inventory.php?ftext=handful+of+juicy+garbage", ChecklistSubentryMake("Use handful of juicy garbage", "", "Might find a bugbear communicator badge."), -11));
                     }
                 }
             }
@@ -484,7 +484,7 @@ void PathBugbearInvasionGenerateTasks(ChecklistEntry [int] task_entries, Checkli
 RegisterResourceGenerationFunction("PathBugbearInvasionGenerateResource");
 void PathBugbearInvasionGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (my_path_id() != PATH_BUGBEAR_INVASION)
+	if (myPathId() != PATH_BUGBEAR_INVASION)
 		return;
     if (!__misc_state["in run"])
         return;

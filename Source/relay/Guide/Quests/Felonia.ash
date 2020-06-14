@@ -118,7 +118,7 @@ void QFeloniaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 if ($item[spooky glove].equipped_amount() == 0)
                 {
                     tasks.listAppend("equip the spooky glove");
-                    url = "inventory.php?which=2";
+                    url = "inventory.php?ftext=spooky+glove";
                 }
                 tasks.listAppend("defeat Felonia");
                 

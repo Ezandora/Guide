@@ -53,7 +53,7 @@ void IOTMNewYouGenerateResource(ChecklistEntry [int] resource_entries)
         }
         if (entry.subentries.count() > 0)
         {
-            entry.url = "inventory.php?which=3";
+            entry.url = "inventory.php?ftext=daily+affirmation";
             entry.importance_level = 6;
             resource_entries.listAppend(entry);
         }

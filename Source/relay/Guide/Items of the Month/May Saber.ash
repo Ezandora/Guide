@@ -43,13 +43,13 @@ void IOTMMaySaberGenerateResource(ChecklistEntry [int] resource_entries)
 		int uses_remaining = clampi(5 - get_property_int("_saberForceUses"), 0, 5);
 		string url = "";
         if (!lookupItem("Fourth of May Cosplay Saber").equipped())
-        	url = "inventory.php?which=2";
+        	url = "inventory.php?ftext=fourth+of+may+cosplay+saber";
         string [int] description;
         description.listAppend("Use the force skill in combat, which lets you:");
         description.listAppend("Banish a monster for thirty turns.");
         description.listAppend("Make the monster appear 3x times in the zone.");
         description.listAppend("Or collect all* their items.");
-        if (my_path_id() == PATH_COMMUNITY_SERVICE && $skill[Meteor Lore].have_skill())
+        if (myPathId() == PATH_COMMUNITY_SERVICE && $skill[Meteor Lore].have_skill())
         {
         	description.listAppend("Bonus! Use Meteor Shower + lightsaber skill to save a bunch of turns on weapon damage/spell damage/familiar weight tests.");
         }

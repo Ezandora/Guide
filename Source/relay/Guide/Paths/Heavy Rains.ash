@@ -2,7 +2,7 @@
 RegisterTaskGenerationFunction("PathHeavyRainsGenerateTasks");
 void PathHeavyRainsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (my_path_id() != PATH_HEAVY_RAINS)
+	if (myPathId() != PATH_HEAVY_RAINS)
 		return;
     
     item thunder_item = $item[thunder thigh];
@@ -168,10 +168,10 @@ void PathHeavyRainsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 RegisterResourceGenerationFunction("PathHeavyRainsGenerateResource");
 void PathHeavyRainsGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (my_path_id() != PATH_HEAVY_RAINS)
+	if (myPathId() != PATH_HEAVY_RAINS)
 		return;
     
-    //resource_entries.listAppend(ChecklistEntryMake("__item gym membership card", "inventory.php?which=3", ChecklistSubentryMake(pluralise($item[gym membership card]), "", description), importance_level_item));
+    //resource_entries.listAppend(ChecklistEntryMake("__item gym membership card", "inventory.php?ftext=gym+membership+card", ChecklistSubentryMake(pluralise($item[gym membership card]), "", description), importance_level_item));
     
     
     int fishbone_amount = $item[freshwater fishbone].available_amount();
@@ -229,6 +229,6 @@ void PathHeavyRainsGenerateResource(ChecklistEntry [int] resource_entries)
     if ($item[catfish whiskers].available_amount() > 0)
     {
         //should we add in area suggestions?
-        resource_entries.listAppend(ChecklistEntryMake("__item catfish whiskers", "inventory.php?which=3", ChecklistSubentryMake(pluralise($item[catfish whiskers]), "", "40 turns of -washaway"), 7));
+        resource_entries.listAppend(ChecklistEntryMake("__item catfish whiskers", "inventory.php?ftext=catfish+whiskers", ChecklistSubentryMake(pluralise($item[catfish whiskers]), "", "40 turns of -washaway"), 7));
     }
 }

@@ -168,7 +168,7 @@ void IOTMTelegraphOfficeGenerateTasks(ChecklistEntry [int] task_entries, Checkli
             description.listAppend(s + " = " + get_property(s));
     }
     
-    ChecklistEntry entry = ChecklistEntryMake("__item sea cowboy hat", "inventory.php?which=3", ChecklistSubentryMake(quest_name, modifiers, description), $locations[Investigating a Plaintive Telegram]);
+    ChecklistEntry entry = ChecklistEntryMake("__item sea cowboy hat", "inventory.php?ftext=plaintive+telegram", ChecklistSubentryMake(quest_name, modifiers, description), $locations[Investigating a Plaintive Telegram]);
     if (__misc_state["in run"])
         future_task_entries.listAppend(entry);
     else
@@ -203,7 +203,7 @@ void IOTMTelegraphOfficeGenerateResource(ChecklistEntry [int] resource_entries)
             options.listAppend(LocationChoiceMake($location[the spooky forest], "unlocking the hidden temple"));
         }
         
-        if (my_path_id() == PATH_COMMUNITY_SERVICE)
+        if (myPathId() == PATH_COMMUNITY_SERVICE)
         {
             foreach key in options
                 remove options[key];
@@ -215,7 +215,7 @@ void IOTMTelegraphOfficeGenerateResource(ChecklistEntry [int] resource_entries)
         }
         
         
-        resource_entries.listAppend(ChecklistEntryMake("__item clara's bell", "inventory.php?which=3", ChecklistSubentryMake("Clara's Bell", "", description), 5));
+        resource_entries.listAppend(ChecklistEntryMake("__item clara's bell", "inventory.php?ftext=clara's+bell", ChecklistSubentryMake("Clara's Bell", "", description), 5));
     }
     
     //skills:

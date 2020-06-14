@@ -2,7 +2,7 @@
 RegisterTaskGenerationFunction("PathActuallyEdtheUndyingGenerateTasks");
 void PathActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-    if (my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING) return;
+    if (myPathId() != PATH_ACTUALLY_ED_THE_UNDYING) return;
     
     int skills_available = MIN(15, my_level()) - MIN(15, my_level()) / 3 + get_property_int("edPoints"); //assumption
     
@@ -120,7 +120,7 @@ void PathActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, Ch
             {
                 description.listClear();
                 description.listAppend("Use warehouse inventory page.");
-                url = "inventory.php?which=3";
+                url = "inventory.php?ftext=warehouse+inventory+page";
             }
             else if (progress_remaining > 0)
             {
@@ -193,7 +193,7 @@ void PathActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, Ch
 RegisterResourceGenerationFunction("PathActuallyEdtheUndyingGenerateResource");
 void PathActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING) return;
+    if (myPathId() != PATH_ACTUALLY_ED_THE_UNDYING) return;
     item ka = $item[Ka coin];
     if (ka.available_amount() > 0)
     {

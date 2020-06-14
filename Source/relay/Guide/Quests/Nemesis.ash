@@ -243,7 +243,7 @@ void QNemesisGenerateIslandTasks(ChecklistSubentry subentry)
         {
             int seal_screeches = get_property_int("_sealScreeches");
             string screech_name = "screech";
-            if (my_path_id() == PATH_KOLHS) //KOLHS support
+            if (myPathId() == PATH_KOLHS) //KOLHS support
                 screech_name = "samuel powers";
             if ($item[seal tooth].available_amount() == 0)
             {
@@ -776,7 +776,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     {
         //	Now that you've dealt with your Nemesis' assassins and found a map to the secret tropical island volcano lair, it's time to take the fight to your foe. Booyah
         //find island
-        url = "inventory.php?which=3";
+        url = "inventory.php?ftext=secret+tropical+island+volcano+lair+map";
         subentry.entries.listAppend("Use the secret tropical island volcano lair map.");
     }
     else if (base_quest_state.mafia_internal_step == 27 || base_quest_state.mafia_internal_step == 26) //mafia bug(?) - doesn't advance properly

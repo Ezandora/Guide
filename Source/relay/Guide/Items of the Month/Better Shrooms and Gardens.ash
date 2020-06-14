@@ -5,7 +5,7 @@ void IOTMBetterShroomsAndGardensGenerateResource(ChecklistEntry [int] resource_e
         int freeFightsUsed = get_property_int("_mushroomGardenFights");
         int totalFreeFights = 1;
 
-        if (my_path_id() == PATH_OF_THE_PLUMBER) {
+        if (myPathId() == PATH_OF_THE_PLUMBER) {
             totalFreeFights = 5;
         }
         int freeFightsLeft = totalFreeFights - freeFightsUsed;
@@ -20,7 +20,7 @@ void IOTMBetterShroomsAndGardensGenerateResource(ChecklistEntry [int] resource_e
         string [int] description;
         if (freeFightsLeft > 0) {
             description.listAppend("Free fight.");
-            if (my_path_id() == PATH_OF_THE_PLUMBER) {
+            if (myPathId() == PATH_OF_THE_PLUMBER) {
                 description.listAppend("Drops extra coins and mushrooms.");
             }
         }

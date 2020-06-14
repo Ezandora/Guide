@@ -1,6 +1,6 @@
 void SFamiliarsGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, boolean from_task)
 {
-	if (get_property_int("_badlyRomanticArrows") == 0 && (familiar_is_usable($familiar[obtuse angel]) || familiar_is_usable($familiar[reanimated reanimator])) && my_path_id() != PATH_LIVE_ASCEND_REPEAT)
+	if (get_property_int("_badlyRomanticArrows") == 0 && (familiar_is_usable($familiar[obtuse angel]) || familiar_is_usable($familiar[reanimated reanimator])) && myPathId() != PATH_LIVE_ASCEND_REPEAT)
 	{
         if (!__misc_state["in aftercore"] && !from_task)
             return;
@@ -226,7 +226,7 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] resource_entries)
         if (!($familiars[Frumious Bandersnatch, pair of stomping boots] contains my_familiar()))
             url = "familiar.php";
         
-        if (my_path_id() != PATH_HEAVY_RAINS)
+        if (myPathId() != PATH_HEAVY_RAINS)
         {
             int snow_suit_runs = floor(numeric_modifier($item[snow suit], "familiar weight") / 5.0);
             
@@ -246,7 +246,7 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] resource_entries)
 	{
 		int hipster_fights_available = __misc_state_int["hipster fights available"];
 			
-		if (($familiar[artistic goth kid].familiar_is_usable() || $familiar[Mini-Hipster].familiar_is_usable()) && hipster_fights_available > 0 && my_path_id() != PATH_LIVE_ASCEND_REPEAT)
+		if (($familiar[artistic goth kid].familiar_is_usable() || $familiar[Mini-Hipster].familiar_is_usable()) && hipster_fights_available > 0 && myPathId() != PATH_LIVE_ASCEND_REPEAT)
 		{
 			string name = "";
 			string [int] description;
@@ -481,7 +481,7 @@ void SFamiliarsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             else
                 configuration_idea.listAppend("Popcorn Strands");
             
-            if (!__misc_state["yellow ray potentially available"] && my_path_id() != PATH_WAY_OF_THE_SURPRISING_FIST) //you really want the meat one in WOTSF (this works!)
+            if (!__misc_state["yellow ray potentially available"] && myPathId() != PATH_WAY_OF_THE_SURPRISING_FIST) //you really want the meat one in WOTSF (this works!)
                 configuration_idea.listAppend("Big Yellow-Wrapped Presents");
             else
                 configuration_idea.listAppend("Big Red-Wrapped Presents");
