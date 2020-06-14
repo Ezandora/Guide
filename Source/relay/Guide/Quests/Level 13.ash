@@ -309,8 +309,8 @@ void QLevel13Init()
     
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL13Final");
-    if (myPathId() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
-    if (myPathId() == PATH_BUGBEAR_INVASION || __misc_state["in aftercore"] || (!state.in_progress && myPathId() == PATH_ACTUALLY_ED_THE_UNDYING) || myPathId() == PATH_COMMUNITY_SERVICE) //FIXME mafia may track the ed L13 quest under this variable
+    if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path_id() == PATH_BUGBEAR_INVASION || __misc_state["in aftercore"] || (!state.in_progress && my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING) || my_path_id() == PATH_COMMUNITY_SERVICE) //FIXME mafia may track the ed L13 quest under this variable
         QuestStateParseMafiaQuestPropertyValue(state, "finished"); //never will start
 	if (__misc_state["Example mode"])
         QuestStateParseMafiaQuestPropertyValue(state, "step6");
@@ -408,7 +408,7 @@ void QLevel13Init()
 	state.state_boolean["king waiting to be freed"] = (state.mafia_internal_step >= 14 && !state.finished);
     
     boolean [string] known_key_names;
-    if (myPathId() == PATH_LOW_KEY_SUMMER) {
+    if (my_path_id() == PATH_LOW_KEY_SUMMER) {
         known_key_names = $strings[Boris\'s key,Jarlsberg\'s key,Sneaky Pete\'s key,Richard\'s star key,skeleton key,digital key,Actual skeleton key,Anchovy can key,Aquí,Batting cage key,Black rose key,Cactus key,Clown car key,Deep-fried key,Demonic key,Discarded bike lock key,F'c'le sh'c'le k'y,Ice key,Kekekey,Key sausage,Knob labinet key,Knob shaft skate key,Knob treasury key,Music Box Key,Peg key,Rabbit\'s foot key,Scrap metal key,Treasure chest key,Weremoose key];
     } else {
         known_key_names = $strings[Boris\'s key,Jarlsberg\'s key,Sneaky Pete\'s key,Richard\'s star key,skeleton key,digital key];
@@ -436,7 +436,7 @@ void QLevel13Init()
             other_quests_completed = false;
         }
     }
-    if (other_quests_completed && (my_level() >= 13 || myPathId() == PATH_EXPLOSIONS))
+    if (other_quests_completed && (my_level() >= 13 || my_path_id() == PATH_EXPLOSIONS))
         state.startable = true;
     
 	
@@ -723,7 +723,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         subentry.header = "Open the tower door";
         
         boolean [string] known_key_names;
-        if (myPathId() == PATH_LOW_KEY_SUMMER) {
+        if (my_path_id() == PATH_LOW_KEY_SUMMER) {
             known_key_names = $strings[Boris\'s key,Jarlsberg\'s key,Sneaky Pete\'s key,Richard\'s star key,skeleton key,digital key,Actual skeleton key,Anchovy can key,Aquí,Batting cage key,Black rose key,Cactus key,Clown car key,Deep-fried key,Demonic key,Discarded bike lock key,F'c'le sh'c'le k'y,Ice key,Kekekey,Key sausage,Knob labinet key,Knob shaft skate key,Knob treasury key,Music Box Key,Peg key,Rabbit\'s foot key,Scrap metal key,Treasure chest key,Weremoose key];
         } else {
             known_key_names = $strings[Boris\'s key,Jarlsberg\'s key,Sneaky Pete\'s key,Richard\'s star key,skeleton key,digital key];
@@ -747,7 +747,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             subentry.entries.listAppend("Find " + pluraliseWordy(missing_keys.count(), "more key", "more keys") + " for the door");
         }
 
-        if (myPathId() != PATH_LOW_KEY_SUMMER) {
+        if (my_path_id() != PATH_LOW_KEY_SUMMER) {
             foreach keyIndex, key in missing_keys {
                 subentry.entries.listAppend(key);
             }
@@ -766,7 +766,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         {
             subentry.entries.listAppend("Either find the beehive in the black forest (-combat), or towerkill.");
             subentry.entries.listAppend("Lots of passive damage sources.");
-            if (myPathId() == PATH_BIG)
+            if (my_path_id() == PATH_BIG)
             	subentry.entries.listAppend("Towerkilling is likely impractical in BIG?");
             //Originally I wanted this to properly calculate the exact amount of damage you can do against the wall of skin.
             //But, I feel like that would be super complicated and prone to error.
@@ -795,7 +795,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             {
                 methods.listAppend("Cast " + skills_to_cast.listJoinComponents(", ", "and") + ".");
             }
-            if ($item[colorful toad].have() && $item[colorful toad].item_is_usable() && $item[colorful toad].to_effect().have_effect() == 0 && !have_prismatic_damage && myPathId() != PATH_2CRS)	
+            if ($item[colorful toad].have() && $item[colorful toad].item_is_usable() && $item[colorful toad].to_effect().have_effect() == 0 && !have_prismatic_damage && my_path_id() != PATH_2CRS)	
                 methods.listAppend("Use colorful toad for +prismatic damage.");
             familiar desired_familiar = $familiar[none];
             if ($familiar[mu].familiar_is_usable())
@@ -1164,7 +1164,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     {
         //stare into the looking glass, or break it
         subentry.header = "Face the looking glass";
-        if (myPathId() == PATH_VAMPIRE)
+        if (my_path_id() == PATH_VAMPIRE)
         {
             subentry.entries.listAppend("Gaze upon... nothing.");
         }
@@ -1175,7 +1175,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             subentry.entries.listAppend("Breaking the mirror will save a turn, but makes the NS fight much more difficult.");
         }
     }
-    else if (!base_quest_state.state_boolean["past tower level 5"] && myPathId() == PATH_VAMPIRE)
+    else if (!base_quest_state.state_boolean["past tower level 5"] && my_path_id() == PATH_VAMPIRE)
     {
         subentry.header = "Fight the mirror";
         subentry.entries.listAppend("It has, like, 3000 HP. You can handle it, right?");
@@ -1223,7 +1223,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     else if (!base_quest_state.state_boolean["king waiting to be freed"])
 	{
 		//At NS. Good luck, we're all counting on you.
-        if (myPathId() != PATH_HEAVY_RAINS)
+        if (my_path_id() != PATH_HEAVY_RAINS)
         {
             subentry.modifiers.listAppend("+moxie, DA equipment");
             subentry.modifiers.listAppend("no buffs");
@@ -1232,18 +1232,18 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         }
 		image_name = "naughty sorceress";
 		subentry.header = "She awaits";
-        if (myPathId() == PATH_ACTUALLY_ED_THE_UNDYING)
+        if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
         {
             subentry.header = "You await";
             image_name = "Disco Bandit";
         }
-        if (myPathId() == PATH_LICENSE_TO_ADVENTURE)
+        if (my_path_id() == PATH_LICENSE_TO_ADVENTURE)
         {
             subentry.header = "\"Blofeld\" awaits";
             image_name = "__monster \"Blofeld\"";
         }
         //don't think blocking works anymore? not sure
-        /*if (!__misc_state["familiars temporarily blocked"] && myPathId() != PATH_HEAVY_RAINS)
+        /*if (!__misc_state["familiars temporarily blocked"] && my_path_id() != PATH_HEAVY_RAINS)
         {
             string potato_suggestion = generatePotatoSuggestion();
             
@@ -1260,7 +1260,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             subentry.entries.listAppend("Potentially equip the lot's engagement ring for an alternate ending.|<small>(sigh... if only)<small>");
         }*/
         
-        if (myPathId() == PATH_HEAVY_RAINS)
+        if (my_path_id() == PATH_HEAVY_RAINS)
         {
             subentry.modifiers.listAppend("many buffs");
             if ($familiar[warbear drone].have_familiar())
@@ -1274,7 +1274,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             if ($skill[frigidalmatian].skill_is_usable() && my_maxmp() >= 300 && $effect[Frigidalmatian].have_effect() == 0)
                 subentry.entries.listAppend("Try casting Frigidalmatian.");
         }
-        if (my_hp() < my_maxhp() && !get_property("lastEncounter").contains_text("The Naughty Sorceress") && __last_adventure_location != $location[The Naughty Sorceress' Chamber] && myPathId() != PATH_ACTUALLY_ED_THE_UNDYING)
+        if (my_hp() < my_maxhp() && !get_property("lastEncounter").contains_text("The Naughty Sorceress") && __last_adventure_location != $location[The Naughty Sorceress' Chamber] && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING)
         {
             subentry.entries.listAppend(HTMLGenerateSpanFont("Restore your HP first.", "red"));
         }
@@ -1295,7 +1295,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 		should_output_main_entry = false;
         
         
-        if (myPathId() == PATH_AVATAR_OF_SNEAKY_PETE)
+        if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE)
         {
             if (availableDrunkenness() > 0)
             {
@@ -1303,7 +1303,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             }
         }
         
-        if (myPathId() == PATH_HEAVY_RAINS)
+        if (my_path_id() == PATH_HEAVY_RAINS)
         {
             if ($skill[rain dance].skill_is_usable() && my_rain() >= 10)
             {
@@ -1364,7 +1364,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         {
             string [int] tower_killing_ideas;
             
-            if (myPathId() == PATH_HEAVY_RAINS && $skill[thunder bird].skill_is_usable() && my_thunder() >= 5 && $skill[curse of weaksauce].skill_is_usable())
+            if (my_path_id() == PATH_HEAVY_RAINS && $skill[thunder bird].skill_is_usable() && my_thunder() >= 5 && $skill[curse of weaksauce].skill_is_usable())
             {
                 string [int] line;
                 if ($skill[itchy curse finger].skill_is_usable())
@@ -1560,7 +1560,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             if (monster_level_adjustment() > 0)
                 tower_killing_ideas.listAppend(HTMLGenerateSpanFont("Try to reduce your ML", "red") + ", as it reduces damage done to them.");
                 
-            if ((myPathId() == PATH_HEAVY_RAINS || $item[water wings for babies].available_amount() >= 3) && $item[water wings for babies].equipped_amount() <3)
+            if ((my_path_id() == PATH_HEAVY_RAINS || $item[water wings for babies].available_amount() >= 3) && $item[water wings for babies].equipped_amount() <3)
                 tower_killing_ideas.listAppend("Equip three water wings for babies to reduce ML. (increased damage)");
             
             if (tower_killing_ideas.count() > 0)

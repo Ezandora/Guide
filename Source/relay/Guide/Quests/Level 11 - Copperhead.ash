@@ -5,7 +5,7 @@ void QLevel11CopperheadInit()
 	if (true) {
 		QuestState state;
 		QuestStateParseMafiaQuestProperty(state, "questL11Ron");
-    	if (myPathId() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    	if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
 		state.quest_name = "Zeppelin Quest"; //"Merry-Go-Ron";
 		state.image_name = "__item copperhead charm (rampant)"; //__item bitchin ford anglia
         
@@ -22,7 +22,7 @@ void QLevel11CopperheadInit()
 	if (true) {
 		QuestState state;
 		QuestStateParseMafiaQuestProperty(state, "questL11Shen");
-    	if (myPathId() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    	if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
 		state.quest_name = "Copperhead Club Quest"; //"Of Mice and Shen";
 		state.image_name = "__item copperhead charm"; //"__effect Ancient Annoying Serpent Poison";
 		__quest_state["Level 11 Shen"] = state;
@@ -109,11 +109,11 @@ void QLevel11RonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         if (__misc_state["Torso aware"])
             relevant_lynyrdskin_items[$item[lynyrdskin tunic]] = true;
         
-        if ($item[lynyrd musk].available_amount() > 0 && $effect[Musky].have_effect() == 0 && myPathId() != PATH_G_LOVER) {
+        if ($item[lynyrd musk].available_amount() > 0 && $effect[Musky].have_effect() == 0 && my_path_id() != PATH_G_LOVER) {
             subentry.entries.listAppend(HTMLGenerateSpanFont("Use lynyrd musk.", "red"));
             url = "inventory.php?ftext=lynyrd+musk";
         }
-        if ($item[cigarette lighter].available_amount() > 0 && base_quest_state.state_boolean["need protestor speed tricks"] && myPathId() != PATH_POCKET_FAMILIARS) {
+        if ($item[cigarette lighter].available_amount() > 0 && base_quest_state.state_boolean["need protestor speed tricks"] && my_path_id() != PATH_POCKET_FAMILIARS) {
             subentry.entries.listAppend(HTMLGenerateSpanFont("Use cigarette lighter in-combat.", "red"));
         }
         if ($item[lynyrd snare].available_amount() > 0 && $items[lynyrdskin cap,lynyrdskin tunic,lynyrdskin breeches].items_missing().count() > 0 && $item[lynyrd snare].item_is_usable()) //FIXME daily tracking {
@@ -195,7 +195,7 @@ void QLevel11RonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         subentry.entries.listAppend("Search for Ron in the zeppelin.");
         //possibly 50% chance of no progress without a ticket (unconfirmed chat rumour)
         
-        if (myPathId() != PATH_POCKET_FAMILIARS) {
+        if (my_path_id() != PATH_POCKET_FAMILIARS) {
             subentry.modifiers.listAppend("+234% item");
             foreach m in $monsters[Red Herring,Red Snapper] {
                 if (!m.is_banished())
@@ -216,18 +216,13 @@ void QLevel11RonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
             else
                 subentry.entries.listAppend("No ticket.");
         }
-        
-        if (myPathId() != PATH_POCKET_FAMILIARS) {
-            if (get_property_int("_glarkCableUses") < 5) {
-                if ($skill[Transcendent Olfaction].skill_is_usable() && !($effect[on the trail].have_effect() > 0 && get_property_monster("olfactedMonster") == $monster[red butler]))
-                    subentry.entries.listAppend("Olfact red butlers for glark cables.");
-                
-                if ($item[glark cable].available_amount() > 0) {
-                    subentry.entries.listAppend(HTMLGenerateSpanFont("Use glark cable in-combat.", "red"));
-                }
-                subentry.entries.listAppend(get_property_int("_glarkCableUses") + " / 5 glark cables used today (free kills).");
-            } else {
-                subentry.entries.listAppend("Already used all 5 glark cables for the day.");
+            
+        if (get_property_int("_glarkCableUses") < 5 && my_path_id() != PATH_POCKET_FAMILIARS) {
+            if ($skill[Transcendent Olfaction].skill_is_usable() && !($effect[on the trail].have_effect() > 0 && get_property_monster("olfactedMonster") == $monster[red butler]))
+                subentry.entries.listAppend("Olfact red butlers for glark cables.");
+            
+            if ($item[glark cable].available_amount() > 0) {
+                subentry.entries.listAppend(HTMLGenerateSpanFont("Use glark cable in-combat.", "red"));
             }
         }
             
@@ -302,7 +297,7 @@ void QLevel11ShenGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     if (base_quest_state.mafia_internal_step <= 1) {
         subentry.entries.listAppend("Adventure in the Copperhead Club and meet Shen.");
         subentry.entries.listAppend("This will give you unremovable -5 stat poison.");
-        if (my_daycount() == 1 && myPathId() != PATH_EXPLOSIONS)
+        if (my_daycount() == 1 && my_path_id() != PATH_EXPLOSIONS)
         	subentry.entries.listAppend("Perhaps wait until tomorrow before starting this; day 2's shen bosses are more favourable.");
     }
     else if (base_quest_state.mafia_internal_step == 2) {

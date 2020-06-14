@@ -5,7 +5,7 @@ void IOTMPortablePantogramGenerateTasks(ChecklistEntry [int] task_entries, Check
 	if (!__iotms_usable[lookupItem("portable pantogram")]) return;
 	if (lookupItem("pantogram pants").available_amount() > 0) return;
 	
-    if (myPathId() == PATH_BEES_HATE_YOU) return;
+    if (my_path_id() == PATH_BEES_HATE_YOU) return;
 	string [int] description;
 	
 	
@@ -21,7 +21,7 @@ void IOTMPortablePantogramGenerateTasks(ChecklistEntry [int] task_entries, Check
 	//Slot 2: Resistance. Cold? Spooky?
 	if (__misc_state["in run"])
 	{
-		if (myPathId() == PATH_COMMUNITY_SERVICE)
+		if (my_path_id() == PATH_COMMUNITY_SERVICE)
             slot_options[2].listAppend("hot resistance");
         else if (!__quest_state["Level 9"].state_boolean["bridge complete"])
             slot_options[2].listAppend("sleaze resistance"); //bridge building
@@ -38,7 +38,7 @@ void IOTMPortablePantogramGenerateTasks(ChecklistEntry [int] task_entries, Check
 		slot_options[4].listAppend("taco shell (+30% meat)");
     if (($item[porquoise].npc_price() > 0 && __misc_state["in run"]) || can_interact())
         slot_options[4].listAppend("porquoise (+60% meat)");
-    if (myPathId() == PATH_COMMUNITY_SERVICE)
+    if (my_path_id() == PATH_COMMUNITY_SERVICE)
     {
         slot_options[4].listAppend("your hopes (+20 weapon damage)");
         slot_options[4].listAppend("your dreams (+20% spell damage)");
@@ -53,7 +53,7 @@ void IOTMPortablePantogramGenerateTasks(ChecklistEntry [int] task_entries, Check
 	//slot_options[4].listAppend("???");
 	//Slot 5:
     slot_options[5].listAppend("some self-respect (-combat)");
-    if (myPathId() != PATH_COMMUNITY_SERVICE)
+    if (my_path_id() != PATH_COMMUNITY_SERVICE)
     	slot_options[5].listAppend("some self-control (+combat)");
     if (!__misc_state["in run"])
     	slot_options[5].listAppend("ten-leaf clover (hilarious items)");

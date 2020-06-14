@@ -2,7 +2,7 @@
 RegisterResourceGenerationFunction("PathGLoverGenerateResource");
 void PathGLoverGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (myPathId() != PATH_G_LOVER)
+    if (my_path_id() != PATH_G_LOVER)
         return;
 	
 	item g = lookupItem("9909");

@@ -7,7 +7,7 @@ void QLevel9Init()
 	//booPeakProgress
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL09Topping");
-    if (myPathId() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
 	state.quest_name = "Highland Lord Quest";
 	state.image_name = "orc chasm";
 	state.council_quest = true;
@@ -28,7 +28,7 @@ void QLevel9Init()
 		int bridge_progress = get_property_int("chasmBridgeProgress");
 		int fasteners_have = bridge_progress + $item[thick caulk].available_amount() + $item[long hard screw].available_amount() + $item[messy butt joint].available_amount() + 5 * $item[smut orc keepsake box].usable_amount() + 5 * $item[snow boards].usable_amount();
 		int lumber_have = bridge_progress + $item[morningwood plank].available_amount() + $item[raging hardwood plank].available_amount() + $item[weirdwood plank].available_amount() + 5 * $item[smut orc keepsake box].usable_amount() + 5 * $item[snow boards].usable_amount();
-        if (myPathId() == PATH_LICENSE_TO_ADVENTURE && get_property_boolean("bondBridge"))
+        if (my_path_id() == PATH_LICENSE_TO_ADVENTURE && get_property_boolean("bondBridge"))
         {
             fasteners_have += 15;
             lumber_have += 15;
@@ -41,13 +41,13 @@ void QLevel9Init()
 		state.state_int["bridge lumber needed"] = lumber_needed;
 	}
 	
-	if (my_level() >= 9 || myPathId() == PATH_EXPLOSIONS)
+	if (my_level() >= 9 || my_path_id() == PATH_EXPLOSIONS)
 		state.startable = true;
 		
 	
 	state.state_boolean["can complete twin peaks quest quickly"] = true;
 	
-	if (myPathId() == PATH_BEES_HATE_YOU)
+	if (my_path_id() == PATH_BEES_HATE_YOU)
 		state.state_boolean["can complete twin peaks quest quickly"] = false;
 	
 	state.state_float["oil peak pressure"] = get_property_float("oilPeakProgress");
@@ -200,7 +200,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
             details.listAppend(line);
         }
         
-        if (!black_market_available() && myPathId() != PATH_WAY_OF_THE_SURPRISING_FIST && myPathId() != PATH_NUCLEAR_AUTUMN)
+        if (!black_market_available() && my_path_id() != PATH_WAY_OF_THE_SURPRISING_FIST && my_path_id() != PATH_NUCLEAR_AUTUMN)
         {
             details.listAppend("Possibly unlock the black market first, for cans of black paint. (+2 " + HTMLGenerateSpanOfClass("spooky", "r_element_spooky") + "/" + HTMLGenerateSpanOfClass("cold", "r_element_cold") + " res buff, 1k meat)");
         }
@@ -396,7 +396,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
         
         int oil_ml = monster_level_adjustment_for_location($location[oil peak]);
         
-        if (myPathId() == PATH_HEAVY_RAINS)
+        if (my_path_id() == PATH_HEAVY_RAINS)
         {
             //heavy rains ML doesn't affect which oil monster you get; cancel out the rain effect:
             //int inherent_ml_reduction = monster_level_adjustment() - numeric_modifier("Monster Level");

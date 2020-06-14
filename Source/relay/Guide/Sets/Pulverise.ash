@@ -181,7 +181,7 @@ void SPulveriseGenerateResource(ChecklistEntry [int] resource_entries)
     string [int] details;
     
     //not relevant for adventures anymore:
-    /*if (availableSpleen() > 0 && myPathId() != PATH_SLOW_AND_STEADY)
+    /*if (availableSpleen() > 0 && my_path_id() != PATH_SLOW_AND_STEADY)
     {
         pulveriseAppendOutputListForProducts(details, "spleen wads", $items[cold wad,hot wad,sleaze wad,spooky wad,stench wad,twinkly wad], blacklist);
     }*/

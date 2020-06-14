@@ -65,13 +65,13 @@ void generateMisc(Checklist [int] checklists)
         if (true)
         {
             int adventures_after_rollover = my_adventures() + 40;
-            if (myPathId() != PATH_SLOW_AND_STEADY)
+            if (my_path_id() != PATH_SLOW_AND_STEADY)
                 adventures_after_rollover += numeric_modifier("adventures");
             //if (get_property_boolean("_borrowedTimeUsed"))
                 //adventures_after_rollover -= 20;
             adventures_after_rollover += get_property_int("extraRolloverAdventures");
             
-            if (getHolidaysTomorrow()["Labór Day"] && myPathId() != PATH_SLOW_AND_STEADY)
+            if (getHolidaysTomorrow()["Labór Day"] && my_path_id() != PATH_SLOW_AND_STEADY)
                 adventures_after_rollover += 10;
             
             adventures_after_rollover = clampi(adventures_after_rollover, 0, 200);
@@ -93,7 +93,7 @@ void generateMisc(Checklist [int] checklists)
         if (get_property_boolean("_borrowedTimeUsed"))
             rollover_adventures_gained -= 20;
         int adventures_lost = (my_adventures() + rollover_adventures_gained) - 200;
-        if (rollover_adventures_from_equipment == 0.0 && adventures_lost == 0 && myPathId() != PATH_SLOW_AND_STEADY)
+        if (rollover_adventures_from_equipment == 0.0 && adventures_lost == 0 && my_path_id() != PATH_SLOW_AND_STEADY)
         {
             description.listAppend("Possibly wear +adventures gear.");
         }
@@ -117,7 +117,7 @@ void generateMisc(Checklist [int] checklists)
         }
         
         //this could be better (i.e. checking against current shirt and looking in inventory, etc.)
-        if (myPathId() != PATH_SLOW_AND_STEADY)
+        if (my_path_id() != PATH_SLOW_AND_STEADY)
         {
             if ($item[Sneaky Pete's leather jacket (collar popped)].equipped_amount() > 0 && adventures_lost <= 0)
                 description.listAppend("Could unpop your collar. (+4 adventures)");

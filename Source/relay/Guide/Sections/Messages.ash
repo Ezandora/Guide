@@ -243,7 +243,7 @@ string generateRandomMessage()
             random_messages.listAppend("you are ascending too slowly, ascend faster!");
         
         string what_does_the_spreadsheet_say = "saves a turn";
-        if (myPathId() == PATH_ONE_CRAZY_RANDOM_SUMMER)
+        if (my_path_id() == PATH_ONE_CRAZY_RANDOM_SUMMER)
             what_does_the_spreadsheet_say = "gives +fun";
         if ($item[optimal spreadsheet].equipped_amount() > 0)
             random_messages.listAppend("every spreadsheet you wear " + what_does_the_spreadsheet_say); //sure, why not?
@@ -346,7 +346,7 @@ string generateRandomMessage()
     effect_messages[$effect[consumed by anger]] = "don't ascend angry";
     effect_messages[$effect[consumed by regret]] = "wasted potential";
     effect_messages[$effect[All Revved Up]] = "vroom";
-    if (myPathId() != PATH_WAY_OF_THE_SURPRISING_FIST)
+    if (my_path_id() != PATH_WAY_OF_THE_SURPRISING_FIST)
         effect_messages[$effect[Expert Timing]] = "martial arts and crafts";
     effect_messages[$effect[apathy]] = ""; //
     effect_messages[$effect[silent running]] = "an awful lot of running";
@@ -373,7 +373,7 @@ string generateRandomMessage()
     
     random_messages.listAppend("click click click");
     
-    switch (myPathId())
+    switch (my_path_id())
     {
         case PATH_OXYGENARIAN:
             random_messages.listAppend("the slow path"); break;
@@ -640,7 +640,7 @@ string generateRandomMessage()
     else
         monster_messages[$monster[Claybender Sorcerer Ghost]] = "leaderboardus totalus";
     monster_messages[$monster[Whatsian Commando Ghost]] = "captain jack hotness";
-    if (myPathId() == PATH_ACTUALLY_ED_THE_UNDYING)
+    if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
         monster_messages[$monster[Whatsian Commando Ghost]] = "are you my mummy?";
     monster_messages[$monster[Space Tourist Explorer Ghost]] = "oh my";
     monster_messages[$monster[Battlie Knight Ghost]] = "boring conversation anyway";
@@ -657,7 +657,7 @@ string generateRandomMessage()
     monster_messages[$monster[giant sandworm]] = "walk without rhythm";
     monster_messages[$monster[bookbat]] = "tattered scrap of dignity";
     monster_messages[$monster[Urge to Stare at Your Hands]] = ".&#x20dd;.&#x20dd;"; //.⃝.⃝
-    if (myPathId() == PATH_HEAVY_RAINS)
+    if (my_path_id() == PATH_HEAVY_RAINS)
         monster_messages[$monster[pygmy bowler]] = "right into the gutter"; //come back!
     monster_messages[$monster[Ron "The Weasel" Copperhead]] = "RONALD WEASLEY! HOW DARE YOU STEAL THAT ZEPPELIN<br>" + ChecklistGenerateModifierSpan("your father's now facing an inquiry at work and it's entirely YOUR FAULT");
     monster_messages[$monster[Mr. Loathing]] = HTMLGenerateTagWrap("a", "ruuun! go! get to the towah!", generateMainLinkMap("place.php?whichplace=nstower"));
@@ -696,7 +696,7 @@ string generateRandomMessage()
         day_cycle = "night";
     monster_messages[$monster[Travoltron]] = now_to_string("EEEE").to_lower_case() + " " + day_cycle + " fever";
     
-    if (my_daycount() == 2 && (my_adventures() == 0 || availableDrunkenness() < 0) && availableFullness() == 0 && availableDrunkenness() <= 0 && myPathId() != PATH_OXYGENARIAN && __quest_state["Level 12"].started && !__quest_state["Level 13"].state_boolean["king waiting to be freed"] && myPathId() != PATH_NUCLEAR_AUTUMN && myPathId() != PATH_SLOW_AND_STEADY && !__quest_state["Level 13"].finished)
+    if (my_daycount() == 2 && (my_adventures() == 0 || availableDrunkenness() < 0) && availableFullness() == 0 && availableDrunkenness() <= 0 && my_path_id() != PATH_OXYGENARIAN && __quest_state["Level 12"].started && !__quest_state["Level 13"].state_boolean["king waiting to be freed"] && my_path_id() != PATH_NUCLEAR_AUTUMN && my_path_id() != PATH_SLOW_AND_STEADY && !__quest_state["Level 13"].finished)
     {
         //detect failed two-day runs, and provide psychological support:
         random_messages.listClear();
@@ -722,7 +722,7 @@ string generateRandomMessage()
     
     if (__quest_state["Level 13"].state_boolean["king waiting to be freed"])
     {
-        if (myPathId() == PATH_ONE_CRAZY_RANDOM_SUMMER)
+        if (my_path_id() == PATH_ONE_CRAZY_RANDOM_SUMMER)
         {
             random_messages.listClear();
             random_messages.listAppend(HTMLGenerateTagWrap("a", "roll the dice", generateMainLinkMap("place.php?whichplace=nstower")));
@@ -835,7 +835,7 @@ string generateRandomMessage()
 		random_messages.listClear();
         
         
-        switch (myPathId())
+        switch (my_path_id())
         {
             case PATH_BEES_HATE_YOU:
                 random_messages.listAppend("BZZZZZZ"); break;
@@ -864,9 +864,9 @@ string generateRandomMessage()
 	if (my_turncount() <= 0)
 	{
 		random_messages.listClear();
-        if (myPathId() == PATH_LIVE_ASCEND_REPEAT)
+        if (my_path_id() == PATH_LIVE_ASCEND_REPEAT)
             random_messages.listAppend("I got you babe");
-        else if (myPathId() == PATH_POCKET_FAMILIARS)
+        else if (my_path_id() == PATH_POCKET_FAMILIARS)
             random_messages.listAppend("pika pika!");
         else
             random_messages.listAppend("find yourself<br>starting back");

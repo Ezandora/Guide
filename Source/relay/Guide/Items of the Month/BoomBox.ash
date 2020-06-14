@@ -10,7 +10,7 @@ void IOTMBoomBoxGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
 	if (song == "" && changes_left > 0)
 	{
         string [int] description;
-        if (!__quest_state["Level 7"].finished && myPathId() != PATH_COMMUNITY_SERVICE)
+        if (!__quest_state["Level 7"].finished && my_path_id() != PATH_COMMUNITY_SERVICE)
         	description.listAppend("Eye of the Giger: Nightmare Fuel for the cyrpt.");
         if (fullness_limit() > 0)
 	        description.listAppend("Food Vibrations: extra adventures from food" + (__misc_state["in run"] ? ", +30% food drop" : "") + ".");

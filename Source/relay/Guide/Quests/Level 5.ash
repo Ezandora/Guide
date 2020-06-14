@@ -4,16 +4,16 @@ void QLevel5Init()
 	//questL05Goblin
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL05Goblin");
-    if (myPathId() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
 	state.quest_name = "Knob Goblin Quest";
 	state.image_name = "cobb's knob";
 	state.council_quest = true;
 	
 	
-	if (my_level() >= 5 || myPathId() == PATH_EXPLOSIONS)
+	if (my_level() >= 5 || my_path_id() == PATH_EXPLOSIONS)
 		state.startable = true;
 		
-	if (get_property("questL05Goblin") == "unstarted" && $item[knob goblin encryption key].available_amount() == 0 && myPathId() != PATH_COMMUNITY_SERVICE)
+	if (get_property("questL05Goblin") == "unstarted" && $item[knob goblin encryption key].available_amount() == 0 && my_path_id() != PATH_COMMUNITY_SERVICE)
 	{
 		//start the quest anyways, because they need to acquire the encryption key:
         //there's also an edge case here in BIG!, where you want to avoid visiting the council for a while to yellow ray an outfit
@@ -30,7 +30,7 @@ void QLevel5GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 {
 	if (!__quest_state["Level 5"].in_progress)
 		return;
-    if (myPathId() == PATH_COMMUNITY_SERVICE || __misc_state["in aftercore"])
+    if (my_path_id() == PATH_COMMUNITY_SERVICE || __misc_state["in aftercore"])
         return;
     string url = "place.php?whichplace=plains";
 	//if the quest isn't started and we have unlocked the barracks, wait until it's started:
@@ -65,7 +65,7 @@ void QLevel5GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             }
             else
                 subentry.entries.listAppend("Delay for ten turns in cobb's knob to unlock area.");
-            if ($classes[seal clubber, turtle tamer] contains my_class() && !__misc_state["guild open"] && !QuestState("questG09Muscle").started && myPathId() != PATH_NUCLEAR_AUTUMN)
+            if ($classes[seal clubber, turtle tamer] contains my_class() && !__misc_state["guild open"] && !QuestState("questG09Muscle").started && my_path_id() != PATH_NUCLEAR_AUTUMN)
             {
                 url = "guild.php";
                 subentry.entries.listAppend("Start your guild quest first.");
@@ -218,7 +218,7 @@ void QLevel5GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             stat stat_race_type = __quest_state["Level 13"].state_string["Stat race type"].to_stat();
             
             int change_mcd_to = -1;
-            if (stat_race_type == $stat[muscle] && (current_mcd() == 3 || current_mcd() == 7) && myPathId() != PATH_AVATAR_OF_WEST_OF_LOATHING)
+            if (stat_race_type == $stat[muscle] && (current_mcd() == 3 || current_mcd() == 7) && my_path_id() != PATH_AVATAR_OF_WEST_OF_LOATHING)
                 change_mcd_to = -2;
             else if (stat_race_type == $stat[mysticality])
                 change_mcd_to = 3;

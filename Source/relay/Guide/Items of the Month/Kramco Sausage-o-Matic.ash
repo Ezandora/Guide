@@ -7,7 +7,7 @@ void IOTMKramcoSausageOMaticGenerateTasks(ChecklistEntry [int] task_entries, Che
     
     //If goblin is up, display reminder:
     KramcoSausageFightInformation fight_information = KramcoCalculateSausageFightInformation();
-    if (fight_information.turns_to_next_guaranteed_fight == 0 && myPathId() != PATH_LIVE_ASCEND_REPEAT && __misc_state["in run"])
+    if (fight_information.turns_to_next_guaranteed_fight == 0 && my_path_id() != PATH_LIVE_ASCEND_REPEAT && __misc_state["in run"])
     {
         
         string url = "";
@@ -34,7 +34,7 @@ RegisterResourceGenerationFunction("IOTMKramcoSausageOMaticGenerateResource");
 void IOTMKramcoSausageOMaticGenerateResource(ChecklistEntry [int] resource_entries)
 {
 	if (!lookupItem("Kramco Sausage-o-Matic&trade;").have()) return;
-	if (myPathId() == PATH_LIVE_ASCEND_REPEAT) return;
+	if (my_path_id() == PATH_LIVE_ASCEND_REPEAT) return;
 
     ChecklistEntry entry;
     entry.image_lookup_name = "__item Kramco Sausage-o-Matic&trade;";

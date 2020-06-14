@@ -2,7 +2,7 @@
 RegisterTaskGenerationFunction("PathKOLHSGenerateTasks");
 void PathKOLHSGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (myPathId() != PATH_KOLHS)
+	if (my_path_id() != PATH_KOLHS)
 		return;
     
     item [string][int] items_wanted_in_classes;

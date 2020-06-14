@@ -70,7 +70,7 @@ void IOTMGetawayCampsiteGenerateResource(ChecklistEntry [int] resource_entries)
         string [int] various_options;
         if (__misc_state["can eat just about anything"])
         	various_options.listAppend("food");
-        if (firewood.available_amount() >= 5 && myPathId() != PATH_GELATINOUS_NOOB) {
+        if (firewood.available_amount() >= 5 && my_path_id() != PATH_GELATINOUS_NOOB) {
             if (!lookupItem("whittled tiara").have())
             	various_options.listAppend("whittled tiara for +elemental damage");
             if (!lookupItem("whittled shorts").have())
