@@ -31,7 +31,7 @@ void IOTMGuzzlrQuestGenerateTask(ChecklistEntry [int] task_entries, ChecklistEnt
             hasBoozeSomewhere = questBoozePlatinum.available_amount() + questBoozePlatinum.display_amount() > 0;
         } else {
             hasBooze = questBooze.item_amount() > 0;
-            hasBoozeSomewhere = questBooze.available_amount() + questBoozePlatinum.display_amount() > 0;
+            hasBoozeSomewhere = questBooze.available_amount() + questBooze.display_amount() > 0;
         }
 
         boolean hasShoes = lookupItem("Guzzlr shoes").available_amount() > 0;
