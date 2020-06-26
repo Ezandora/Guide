@@ -116,7 +116,7 @@ void QLevel11RonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         if ($item[cigarette lighter].available_amount() > 0 && base_quest_state.state_boolean["need protestor speed tricks"] && my_path_id() != PATH_POCKET_FAMILIARS) {
             subentry.entries.listAppend(HTMLGenerateSpanFont("Use cigarette lighter in-combat.", "red"));
         }
-        if ($item[lynyrd snare].available_amount() > 0 && $items[lynyrdskin cap,lynyrdskin tunic,lynyrdskin breeches].items_missing().count() > 0 && $item[lynyrd snare].item_is_usable()) //FIXME daily tracking {
+        if ($item[lynyrd snare].available_amount() > 0 && $items[lynyrdskin cap,lynyrdskin tunic,lynyrdskin breeches].items_missing().count() > 0 && $item[lynyrd snare].item_is_usable()) { //FIXME daily tracking
             subentry.entries.listAppend("Possibly use the lynyrd snare. (free combat)");
         }
         string [int] what_not_not_to_wear;
