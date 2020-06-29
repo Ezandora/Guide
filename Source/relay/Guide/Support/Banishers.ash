@@ -12,10 +12,10 @@ Record Banish
 
 void listAppend(Banish [int] list, Banish entry)
 {
-	int position = list.count();
-	while (list contains position)
-		position += 1;
-	list[position] = entry;
+    int position = list.count();
+    while (list contains position)
+        position += 1;
+    list[position] = entry;
 }
 
 int BanishTurnsLeft(Banish b)
@@ -60,12 +60,19 @@ static
     __banish_source_length["bundle of &quot;fragrant&quot; herbs"] = -1;
     __banish_source_length["snokebomb"] = 30;
     __banish_source_length["beancannon"] = -1;
+    __banish_source_length["licorice rope"] = -1;
     __banish_source_length["kgb tranquilizer dart"] = 20;
+    //__banish_source_length["breathe out"] = 20; // is it listed as hot jelly, breathe out or space jellyfish ?
+    //__banish_source_length["daily affirmation: be a mind master"] = 80; // how long does it last, exactly? is it still unknown?
     __banish_source_length["spring-loaded front bumper"] = 30;
     __banish_source_length["mafia middle finger ring"] = 60;
     __banish_source_length["throw latte on opponent"] = 30;
+    __banish_source_length["tryptophan dart"] = -1;
+    __banish_source_length["baleful howl"] = -1;
+    __banish_source_length["reflex hammer"] = 30;
     __banish_source_length["saber force"] = 30;
     __banish_source_length["human musk"] = -1;
+    __banish_source_length["ultra smash"] = -1; // is it the right name?
     
     int [string] __banish_simultaneous_limit;
     __banish_simultaneous_limit["beancannon"] = 5;
@@ -92,8 +99,7 @@ Banish [int] BanishesActive()
     
     string [int] banished_monsters_string_split = banished_monsters_string.split_string(":");
 
-    foreach key, s in banished_monsters_string_split
-    {
+    foreach key, s in banished_monsters_string_split {
         if (s.length() == 0)
             continue;
         if (key % 3 != 0)
@@ -133,8 +139,7 @@ Banish [int] BanishesActiveInLocation(location l)
         location_monsters[m] = true;
     Banish [int] banishes_active = BanishesActive();
     Banish [int] result;
-    foreach key, b in banishes_active
-    {
+    foreach key, b in banishes_active {
         if (location_monsters contains b.banished_monster)
             result.listAppend(b);
     }
@@ -145,8 +150,7 @@ int BanishShortestBanishForLocation(location l)
 {
     Banish [int] active_banishes = BanishesActiveInLocation(l);
     int minimum = 2147483647;
-    foreach key, b in active_banishes
-    {
+    foreach key, b in active_banishes {
         minimum = MIN(minimum, b.BanishTurnsLeft());
     }
     return minimum;
@@ -154,8 +158,7 @@ int BanishShortestBanishForLocation(location l)
 
 Banish BanishForMonster(monster m)
 {
-    foreach key, b in BanishesActive()
-    {
+    foreach key, b in BanishesActive() {
         if (b.banished_monster == m)
             return b;
     }
@@ -173,23 +176,18 @@ int [string] activeBanishNameCountsForLocation(location l)
     Banish [int] banishes_active = BanishesActive();
     
     string [monster] names;
-    foreach key, banish in banishes_active
-    {
-        if (banish.banished_monster.is_banished()) //zuko wrote this code
-        {
+    foreach key, banish in banishes_active {
+        if (banish.banished_monster.is_banished()) { //zuko wrote this code
             names[banish.banished_monster] = banish.banish_source;
         }
     }
     
     int [string] banish_name_counts;
-    foreach key, m in l.get_monsters()
-    {
+    foreach key, m in l.get_monsters() {
         if (names contains m)
             banish_name_counts[names[m]] += 1;
-        if (my_path_id() == PATH_ONE_CRAZY_RANDOM_SUMMER)
-        {
-            foreach m2 in names
-            {
+        if (my_path_id() == PATH_ONE_CRAZY_RANDOM_SUMMER) {
+            foreach m2 in names {
                 if (m2.to_string().to_lower_case().contains_text(m.to_string().to_lower_case())) //FIXME complete hack, wrong, substrings, 1337, etc
                     banish_name_counts[names[m2]] += 1;
             }
@@ -209,8 +207,7 @@ boolean [string] activeBanishNamesForLocation(location l)
 
 Banish BanishByName(string name)
 {
-    foreach key, banish in BanishesActive()
-    {
+    foreach key, banish in BanishesActive() {
         if (banish.banish_source == name)
             return banish;
     }
@@ -228,8 +225,7 @@ int BanishLength(string banish_name)
 
 boolean BanishIsActive(string name)
 {
-    foreach key, banish in BanishesActive()
-    {
+    foreach key, banish in BanishesActive() {
         if (banish.banish_source == name)
             return true;
     }
