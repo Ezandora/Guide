@@ -85,32 +85,24 @@ void IOTMCOTGenerateSuggestions(string [int] description)
     //+10ML
     suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+10 ML and +MP regen", $familiar[el vibrato megadrone])));
     //+15% item drops, or +10%
-    if (true)
-    {
+    if (true) {
         COTSuggestion [int] suggestions;
         suggestions.listAppend(COTSuggestionMake("+15% items", $familiars[li'l xenomorph, feral kobold]));
         suggestions.listAppend(COTSuggestionMake("+10% items", $familiars[Reassembled Blackbird,Reconstituted Crow,Oily Woim]));
         suggestion_sets.listAppend(COTSuggestionSetMake(suggestions));
     }
     //+2 moxie/muscle/mysticality stats/fight
-    if (__misc_state["need to level"])
-    {
-        if (my_primestat() == $stat[moxie])
-        {
+    if (__misc_state["need to level"]) {
+        if (my_primestat() == $stat[moxie]) {
             suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+2 mainstat/fight", $familiars[blood-faced volleyball,jill-o-lantern, nervous tick,mariachi chihuahua, cymbal-playing monkey,hovering skull])));
-        }
-        else if (my_primestat() == $stat[mysticality])
-        {
+        } else if (my_primestat() == $stat[mysticality]) {
             suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+2 mainstat/fight", $familiars[reanimated reanimator,dramatic hedgehog,cheshire bat,pygmy bugbear shaman,hovering sombrero,sugar fruit fairy, uniclops])));
-        }
-        else if (my_primestat() == $stat[muscle])
-        {
+        } else if (my_primestat() == $stat[muscle]) {
             suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+2 mainstat/fight", $familiars[hunchbacked minion, killer bee, grinning turtle,chauvinist pig, baby mutant rattlesnake])));
         }
     }
     //+25% / +20% meat from monsters
-    if (true)
-    {
+    if (true) {
         COTSuggestion [int] suggestions;
         suggestions.listAppend(COTSuggestionMake("+25% meat", $familiars[Knob Goblin Organ Grinder,Happy Medium,Hobo Monkey]));
         suggestions.listAppend(COTSuggestionMake("+20% meat", $familiars[Dancing Frog,Psychedelic Bear,Hippo Ballerina,Attention-Deficit Demon,Piano Cat,Coffee Pixie,Obtuse Angel,Hand Turkey,Leprechaun,Grouper Groupie,Mutant Cactus Bud,Jitterbug,Casagnova Gnome]));
@@ -122,28 +114,22 @@ void IOTMCOTGenerateSuggestions(string [int] description)
     if (__misc_state["in run"])
         suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+20% init", $familiars[Teddy Bear,Emo Squid,Evil Teddy Bear,Syncopated Turtle,Untamed Turtle,Mini-Skulldozer,Cotton Candy Carnie,Origami Towel Crane,Feather Boa Constrictor,Levitating Potato,Temporal Riftlet,Squamous Gibberer,Cuddlefish,Teddy Borg])));
     //+15% to moxie/muscle/mysticality
-    if (__misc_state["in run"])
-    {
-        if (true)
-        {
+    if (__misc_state["in run"]) {
+        if (true) {
             //Either scaling monster levelling, or the NS
             suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+15% moxie", $familiars[Ninja Snowflake,Nosy Nose,Clockwork Grapefruit,Sabre-Toothed Lime])));
         }
-        if (my_primestat() == $stat[mysticality] && __misc_state["need to level"])
-        {
+        if (my_primestat() == $stat[mysticality] && __misc_state["need to level"]) {
             //Scaling monster levelling
             suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+15% mysticality", $familiars[Ragamuffin Imp,Inflatable Dodecapede,Scary Death Orb,Snowy Owl,grue])));
-        }
-        else if (my_primestat() == $stat[muscle] && __misc_state["need to level"])
-        {
+        } else if (my_primestat() == $stat[muscle] && __misc_state["need to level"]) {
             //Scaling monster levelling
             suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("+15% muscle", $familiars[MagiMechTech MicroMechaMech,Angry Goat,Wereturtle,Stab Bat,Wind-up Chattering Teeth,Imitation Crab])));
         }
     }
     //+20%/+15%/+10% to spell damage
     //Too marginal?
-    /*if (__misc_state["in run"])
-    {
+    /*if (__misc_state["in run"]) {
         COTSuggestion [int] suggestions;
         suggestions.listAppend(COTSuggestionMake("+20% spell damage", $familiar[mechanical songbird]));
         suggestions.listAppend(COTSuggestionMake("+15% spell damage", $familiars[Magic Dragonfish,Pet Cheezling,Rock Lobster]));
@@ -151,8 +137,7 @@ void IOTMCOTGenerateSuggestions(string [int] description)
         suggestion_sets.listAppend(COTSuggestionSetMake(suggestions));
     }*/
     //hot wings from reanimator
-    if (true)
-    {
+    if (true) {
         string [int] reanimator_reasons;
         
         if (__quest_state["Pirate Quest"].state_boolean["need more hot wings"])
@@ -199,37 +184,29 @@ void IOTMCOTGenerateSuggestions(string [int] description)
     if ($item[blackberry].available_amount() < 3 && $item[blackberry galoshes].available_amount() == 0 && __quest_state["Level 11"].mafia_internal_step < 2)
         suggestion_sets.listAppend(COTSuggestionSetMake(COTSuggestionMake("Blackberries for galoshes", $familiars[reassembled blackbird,reconstituted crow])));
     string [int][int] familiar_options;
-    foreach key in suggestion_sets
-    {
+    foreach key in suggestion_sets {
         boolean found_relevant = false;
         COTSuggestionSet suggestion_set = suggestion_sets[key];
-        foreach key2 in suggestion_set.suggestions
-        {
+        foreach key2 in suggestion_set.suggestions {
             //Suggest the familiar with the highest weight, under the assumption they're using it more.
             COTSuggestion suggestion = suggestion_set.suggestions[key2];
             familiar best_familiar_by_weight = $familiar[none];
             familiar second_best_familiar_by_weight = $familiar[none];
-            foreach key3 in suggestion.familiars
-            {
+            foreach key3 in suggestion.familiars {
                 familiar f = suggestion.familiars[key3];
                 if (f == $familiar[none]) //didn't find it
                     continue;
-                if (f.have_familiar_replacement())
-                {
-                    if ((best_familiar_by_weight != enthroned_familiar || enthroned_familiar == $familiar[none]) && (best_familiar_by_weight == $familiar[none] || f.familiar_weight() > best_familiar_by_weight.familiar_weight() || f == enthroned_familiar))
-                    {
+                if (f.have_familiar_replacement()) {
+                    if ((best_familiar_by_weight != enthroned_familiar || enthroned_familiar == $familiar[none]) && (best_familiar_by_weight == $familiar[none] || f.familiar_weight() > best_familiar_by_weight.familiar_weight() || f == enthroned_familiar)) {
                         second_best_familiar_by_weight = best_familiar_by_weight;
                         best_familiar_by_weight = f;
-                    }
-                    else if (second_best_familiar_by_weight == $familiar[none] || f.familiar_weight() > second_best_familiar_by_weight.familiar_weight())
-                    {
+                    } else if (second_best_familiar_by_weight == $familiar[none] || f.familiar_weight() > second_best_familiar_by_weight.familiar_weight()) {
                         if (best_familiar_by_weight != f)
                             second_best_familiar_by_weight = f;
                     }
                 }
             }
-            if (best_familiar_by_weight != $familiar[none])
-            {
+            if (best_familiar_by_weight != $familiar[none]) {
                 string familiar_string;
                 
                 familiar_string = best_familiar_by_weight;
@@ -250,11 +227,11 @@ void IOTMCOTGenerateSuggestions(string [int] description)
 RegisterResourceGenerationFunction("IOTMCOTGenerateResource");
 void IOTMCOTGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if ($item[crown of thrones].available_amount() == 0 && $item[Buddy Bjorn].available_amount() == 0)
-		return;
+    if ($item[crown of thrones].available_amount() == 0 && $item[Buddy Bjorn].available_amount() == 0)
+        return;
     if (__misc_state["familiars temporarily blocked"]) //avatar paths
         return;
-	string [int] description;
+    string [int] description;
     
     item crown_item = $item[crown of thrones];
     if (crown_item.equipped_amount() == 0 && $item[Buddy Bjorn].available_amount() > 0)
@@ -264,18 +241,16 @@ void IOTMCOTGenerateResource(ChecklistEntry [int] resource_entries)
     familiar enthroned_familiar = my_enthroned_familiar();
     familiar bjorned_familiar = my_bjorned_familiar();
     
-    if (($item[crown of thrones].equipped_amount() > 0 || $item[Buddy Bjorn].equipped_amount() > 0) || __misc_state["in run"])
-    {
+    if (($item[crown of thrones].equipped_amount() > 0 || $item[Buddy Bjorn].equipped_amount() > 0) || __misc_state["in run"]) {
         IOTMCOTGenerateSuggestions(description);
     }
     
-	if (enthroned_familiar != $familiar[none])
-    {
-		description.listAppend(enthroned_familiar + " enthroned.");
+    if (enthroned_familiar != $familiar[none]) {
+        description.listAppend(enthroned_familiar + " enthroned.");
         //image_name = "__familiar " + enthroned_familiar.to_string();
     }
     if (bjorned_familiar != $familiar[none])
-		description.listAppend(bjorned_familiar + " bjorned.");
+        description.listAppend(bjorned_familiar + " bjorned.");
     //FIXME my_bjorned_familiar() when 16.3
     
     string url = "familiar.php";
