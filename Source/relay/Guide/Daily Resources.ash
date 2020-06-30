@@ -18,19 +18,19 @@ string [int] generateHotDogLine(string hotdog, string description, int fullness)
 
 void generateDailyResources(Checklist [int] checklists)
 {
-	ChecklistEntry [int] resource_entries;
-		
-	SetsGenerateResources(resource_entries);
+    ChecklistEntry [int] resource_entries;
+        
+    SetsGenerateResources(resource_entries);
     QuestsGenerateResources(resource_entries);
-	
-	if (!get_property_boolean("_fancyHotDogEaten") && availableFullness() > 0 && __misc_state["VIP available"] && __misc_state["can eat just about anything"] && $item[Clan hot dog stand].is_unrestricted()) { //too expensive to use outside a run? well, more that it's information overload
-		
-		string name = "Fancy hot dog edible";
-		string [int] description;
-		string image_name = "basic hot dog";
-		
+    
+    if (!get_property_boolean("_fancyHotDogEaten") && availableFullness() > 0 && __misc_state["VIP available"] && __misc_state["can eat just about anything"] && $item[Clan hot dog stand].is_unrestricted()) { //too expensive to use outside a run? well, more that it's information overload
+        
+        string name = "Fancy hot dog edible";
+        string [int] description;
+        string image_name = "basic hot dog";
+        
         string [int][int] options;
-		options.listAppend(generateHotDogLine("Optimal Dog", "Semi-rare next adventure.", 1));
+        options.listAppend(generateHotDogLine("Optimal Dog", "Semi-rare next adventure.", 1));
         
         if (__misc_state["in run"]) {
             options.listAppend(generateHotDogLine("Ghost Dog", "-combat, 30 turns.", 3));
@@ -49,20 +49,20 @@ void generateDailyResources(Checklist [int] checklists)
             if (__misc_state["need to level"] && __misc_state["Chateau Mantegna available"] && !$skill[Dog Tired].have_skill())
                 options.listAppend(generateHotDogLine("Sleeping dog", "5 free rests/day (stats at chateau)", 2));
         }
-			
+            
         description.listAppend(HTMLGenerateSimpleTableLines(options));
-		resource_entries.listAppend(ChecklistEntryMake(image_name, "clan_viplounge.php?action=hotdogstand", ChecklistSubentryMake(name, "", description), 5));
-	}
-	
-		
-	if (!get_property_boolean("_olympicSwimmingPoolItemFound") && __misc_state["VIP available"] && $item[Olympic-sized Clan crate].is_unrestricted())
-		resource_entries.listAppend(ChecklistEntryMake("__item inflatable duck", "", ChecklistSubentryMake("Dive for swimming pool item", "", "\"swim item\" in GCLI"), 5));
-	if (!get_property_boolean("_olympicSwimmingPool") && __misc_state["VIP available"] && $item[Olympic-sized Clan crate].is_unrestricted())
-		resource_entries.listAppend(ChecklistEntryMake("__item inflatable duck", "clan_viplounge.php?action=swimmingpool", ChecklistSubentryMake("Swim in VIP pool", "50 turns", listMake("+20 ML, +30% init", "Or -combat")), 5));
-	if (!get_property_boolean("_aprilShower") && __misc_state["VIP available"] && $item[Clan shower].is_unrestricted()) {
-		string [int] description;
-		if (__misc_state["need to level"])
-			description.listAppend("+mainstat gains. (50 turns)");
+        resource_entries.listAppend(ChecklistEntryMake(image_name, "clan_viplounge.php?action=hotdogstand", ChecklistSubentryMake(name, "", description), 5));
+    }
+    
+        
+    if (!get_property_boolean("_olympicSwimmingPoolItemFound") && __misc_state["VIP available"] && $item[Olympic-sized Clan crate].is_unrestricted())
+        resource_entries.listAppend(ChecklistEntryMake("__item inflatable duck", "", ChecklistSubentryMake("Dive for swimming pool item", "", "\"swim item\" in GCLI"), 5));
+    if (!get_property_boolean("_olympicSwimmingPool") && __misc_state["VIP available"] && $item[Olympic-sized Clan crate].is_unrestricted())
+        resource_entries.listAppend(ChecklistEntryMake("__item inflatable duck", "clan_viplounge.php?action=swimmingpool", ChecklistSubentryMake("Swim in VIP pool", "50 turns", listMake("+20 ML, +30% init", "Or -combat")), 5));
+    if (!get_property_boolean("_aprilShower") && __misc_state["VIP available"] && $item[Clan shower].is_unrestricted()) {
+        string [int] description;
+        if (__misc_state["need to level"])
+            description.listAppend("+mainstat gains. (50 turns)");
         
         string [int] reasons;
         if ($item[double-ice cap].available_amount() == 0)
@@ -76,9 +76,9 @@ void generateDailyResources(Checklist [int] checklists)
             description.listAppend("Double-ice. (" + reasons.listJoinComponents(", ", "and") + ")");
         else
             description.listAppend("Double-ice.");
-		
-		resource_entries.listAppend(ChecklistEntryMake("__item shard of double-ice", "clan_viplounge.php?action=shower", ChecklistSubentryMake("Take a shower", description), 5));
-	}
+        
+        resource_entries.listAppend(ChecklistEntryMake("__item shard of double-ice", "clan_viplounge.php?action=shower", ChecklistSubentryMake("Take a shower", description), 5));
+    }
     if (__misc_state["VIP available"] && get_property_int("_poolGames") <3 && $item[Clan pool table].is_unrestricted()) {
         int games_available = 3 - get_property_int("_poolGames");
         string [int] description;
@@ -88,7 +88,7 @@ void generateDailyResources(Checklist [int] checklists)
             description.listAppend("+5 familiar weight, +50% weapon damage. (aggressively)");
         description.listAppend("Or +50% spell damage, +10 MP regeneration. (strategically)");
         description.listAppend("Or +10% item, +50% init. (stylishly)");
-		resource_entries.listAppend(ChecklistEntryMake("__item pool cue", "clan_viplounge.php?action=pooltable", ChecklistSubentryMake(pluralise(games_available, "pool table game", "pool table games"), "10 turns", description), 5));
+        resource_entries.listAppend(ChecklistEntryMake("__item pool cue", "clan_viplounge.php?action=pooltable", ChecklistSubentryMake(pluralise(games_available, "pool table game", "pool table games"), "10 turns", description), 5));
     }
     if (__quest_state["Level 6"].finished && !get_property_boolean("friarsBlessingReceived")) {
         string [int] description;
@@ -111,13 +111,13 @@ void generateDailyResources(Checklist [int] checklists)
         if (should_output)
             resource_entries.listAppend(ChecklistEntryMake("Monk", "friars.php", ChecklistSubentryMake("Forest Friars buff", "20 turns", description), 10));
     }
-	
-	
-	
-	
-	
-	
-	if (!get_property_boolean("_madTeaParty") && __misc_state["VIP available"] && $item[Clan looking glass].is_unrestricted()) {
+    
+    
+    
+    
+    
+    
+    if (!get_property_boolean("_madTeaParty") && __misc_state["VIP available"] && $item[Clan looking glass].is_unrestricted()) {
         string [int] description;
         string line = "Various effects.";
         if (__misc_state["in run"] && my_path_id() != PATH_ZOMBIE_SLAYER && $item[pail].available_amount() > 0) {
@@ -125,21 +125,21 @@ void generateDailyResources(Checklist [int] checklists)
             line += "|Or various effects.";
         }
         description.listAppend(line);
-		resource_entries.listAppend(ChecklistEntryMake("__item insane tophat", "", ChecklistSubentryMake("Mad tea party", "30 turns", description), 5));
-	}
-	
-	if (true) {
+        resource_entries.listAppend(ChecklistEntryMake("__item insane tophat", "", ChecklistSubentryMake("Mad tea party", "30 turns", description), 5));
+    }
+    
+    if (true) {
         string image_name = "__item hell ramen";
-		ChecklistSubentry [int] subentries;
+        ChecklistSubentry [int] subentries;
         int importance = 11;
-		if (availableFullness() > 0) {
+        if (availableFullness() > 0) {
             string [int] description;
             if ($effect[Got Milk].have_effect() > 0)
                 description.listAppend(pluralise($effect[Got Milk]) + " available (woah).");
             if (!get_property_boolean("_milkOfMagnesiumUsed") && lookupItem("milk of magnesium").available_amount() > 0)
                 description.listAppend("Use Milk of Magnesium for +5 adv.");
-			subentries.listAppend(ChecklistSubentryMake(availableFullness() + " fullness", "", description));
-		}
+            subentries.listAppend(ChecklistSubentryMake(availableFullness() + " fullness", "", description));
+        }
         if (inebriety_limit() > 0) {
             boolean stooperIsEquipped = my_familiar() == lookupFamiliar("Stooper");
             boolean couldEquipStooper = lookupFamiliar("Stooper").familiar_is_usable() && !stooperIsEquipped;
@@ -170,26 +170,26 @@ void generateDailyResources(Checklist [int] checklists)
             if (description.count() > 0)
                 subentries.listAppend(ChecklistSubentryMake(title, "", description));
         }
-		if (availableSpleen() > 0) {
+        if (availableSpleen() > 0) {
             if (subentries.count() == 0)
                 image_name = "__item agua de vida";
-			subentries.listAppend(ChecklistSubentryMake(availableSpleen() + " spleen", "", ""));
-		}
-		if (subentries.count() > 0)
-			resource_entries.listAppend(ChecklistEntryMake(image_name, "inventory.php?which=1", subentries, importance));
-	}
-	
-	if (__quest_state["Level 13"].state_boolean["king waiting to be freed"]) {
-		string [int] description;
-		description.listAppend("Contains one (1) monarch.");
+            subentries.listAppend(ChecklistSubentryMake(availableSpleen() + " spleen", "", ""));
+        }
+        if (subentries.count() > 0)
+            resource_entries.listAppend(ChecklistEntryMake(image_name, "inventory.php?which=1", subentries, importance));
+    }
+    
+    if (__quest_state["Level 13"].state_boolean["king waiting to be freed"]) {
+        string [int] description;
+        description.listAppend("Contains one (1) monarch.");
         description.listAppend(pluralise(my_ascensions(), "king", "kings") + " freed." + (my_ascensions() > 250 ? " Collect them all!" : ""));
         string image_name;
         image_name = "__effect sleepy";
-		resource_entries.listAppend(ChecklistEntryMake(image_name, "place.php?whichplace=nstower", ChecklistSubentryMake("1 Prism", "", description), 10));
-	}
+        resource_entries.listAppend(ChecklistEntryMake(image_name, "place.php?whichplace=nstower", ChecklistSubentryMake("1 Prism", "", description), 10));
+    }
     
     if ((get_property("sidequestOrchardCompleted") == "hippy" || get_property("sidequestOrchardCompleted") == "fratboy") && !get_property_boolean("_hippyMeatCollected")) {
-		resource_entries.listAppend(ChecklistEntryMake("__item herbs", "island.php", ChecklistSubentryMake("Meat from the hippy store", "", "~4500 free meat."), 5)); //FIXME consider shop.php?whichshop=hippy
+        resource_entries.listAppend(ChecklistEntryMake("__item herbs", "island.php", ChecklistSubentryMake("Meat from the hippy store", "", "~4500 free meat."), 5)); //FIXME consider shop.php?whichshop=hippy
     }
     if ((get_property("sidequestArenaCompleted") == "hippy" || get_property("sidequestArenaCompleted") == "fratboy") && !get_property_boolean("concertVisited")) {
         string [int] description;
@@ -208,7 +208,7 @@ void generateDailyResources(Checklist [int] checklists)
         string url = "bigisland.php?place=concert";
         if (__quest_state["Level 12"].finished)
             url = "postwarisland.php?place=concert";
-		resource_entries.listAppend(ChecklistEntryMake("__item the legendary beat", url, ChecklistSubentryMake("Arena concert", "20 turns", description), 5));
+        resource_entries.listAppend(ChecklistEntryMake("__item the legendary beat", url, ChecklistSubentryMake("Arena concert", "20 turns", description), 5));
     }
     
     //Not sure how I feel about this. It's kind of extraneous?
@@ -216,7 +216,7 @@ void generateDailyResources(Checklist [int] checklists)
         string [int] description;
         int percentage = 5 * get_property_int("telescopeUpgrades");
         description.listAppend("+" + (percentage == 25 ? "35% or +25" : percentage) + "% to all attributes. (10 turns)");
-		resource_entries.listAppend(ChecklistEntryMake("__effect Starry-Eyed", "campground.php?action=telescope", ChecklistSubentryMake("Telescope buff", "", description), 10));
+        resource_entries.listAppend(ChecklistEntryMake("__effect Starry-Eyed", "campground.php?action=telescope", ChecklistSubentryMake("Telescope buff", "", description), 10));
     }
     
     
@@ -296,7 +296,7 @@ void generateDailyResources(Checklist [int] checklists)
                 description.listAppend("Could equip " + items_equipping.listJoinComponents(", ", "or") + " for more stats.");
         }
         
-		resource_entries.listAppend(ChecklistEntryMake("__effect sleepy", __misc_state_string["resting url"], ChecklistSubentryMake(pluraliseWordy(__misc_state_int["free rests remaining"], "free rest", "free rests").capitaliseFirstLetter(), "", description), 10));
+        resource_entries.listAppend(ChecklistEntryMake("__effect sleepy", __misc_state_string["resting url"], ChecklistSubentryMake(pluraliseWordy(__misc_state_int["free rests remaining"], "free rest", "free rests").capitaliseFirstLetter(), "", description), 10));
     }
     
     //FIXME skate park?
@@ -315,7 +315,7 @@ void generateDailyResources(Checklist [int] checklists)
         description.listAppend("Speak his name " + times);
         if ($item[antique hand mirror].available_amount() == 0)
             description.listAppend("Need antique hand mirror to win. Or towerkill.");
-		resource_entries.listAppend(ChecklistEntryMake("__item guy made of bee pollen", $location[the haunted bathroom].getClickableURLForLocation(), ChecklistSubentryMake("The Guy Made Of Bees", "", description), 10));
+        resource_entries.listAppend(ChecklistEntryMake("__item guy made of bee pollen", $location[the haunted bathroom].getClickableURLForLocation(), ChecklistSubentryMake("The Guy Made Of Bees", "", description), 10));
     }
     
     if (stills_available() > 0) {
@@ -328,7 +328,7 @@ void generateDailyResources(Checklist [int] checklists)
         
         description.listAppend(mixables.listJoinComponents(", ", "or").capitaliseFirstLetter() + ".");
         
-		resource_entries.listAppend(ChecklistEntryMake("Superhuman Cocktailcrafting", "shop.php?whichshop=still", ChecklistSubentryMake(pluralise(stills_available(), "still use", "still uses"), "", description), 10));
+        resource_entries.listAppend(ChecklistEntryMake("Superhuman Cocktailcrafting", "shop.php?whichshop=still", ChecklistSubentryMake(pluralise(stills_available(), "still use", "still uses"), "", description), 10));
     }
     
     if (__last_adventure_location == $location[The Red Queen\'s Garden]) {
@@ -393,6 +393,6 @@ void generateDailyResources(Checklist [int] checklists)
         string description = $effect[Favored by Lyle].have_effect() > 0 ? "Increases duration of Favored by Lyle." : "+10% all attributes.";
         resource_entries.listAppend(ChecklistEntryMake(image_name, "place.php?whichplace=monorail", ChecklistSubentryMake("Visit Lyle", "10 turns", description), 10));
     }
-	
-	checklists.listAppend(ChecklistMake("Resources", resource_entries));
+    
+    checklists.listAppend(ChecklistMake("Resources", resource_entries));
 }
