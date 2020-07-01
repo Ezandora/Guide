@@ -47,7 +47,7 @@ void IOTMGetawayCampsiteGenerateResource(ChecklistEntry [int] resource_entries)
         int getOffset(int year) { // made by @Skaazi
             int offset = 5; // for 2020
             for ( int i = year; i > 2020; i-- ) {
-                if ( isLeapYear( i - 1 ) ) { offset += 1; }
+                if ( year_is_leap_year( i - 1 ) ) { offset += 1; }
                 offset += 365;
             }
             return offset % 9;
