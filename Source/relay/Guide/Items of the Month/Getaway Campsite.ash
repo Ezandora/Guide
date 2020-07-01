@@ -16,7 +16,7 @@ void IOTMGetawayCampsiteGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__item Newbiesport&trade; tent", "place.php?whichplace=campaway", ChecklistSubentryMake("Cloud-talk buff obtainable", "", description), 0).ChecklistEntryTagEntry("getaway campsite"));
     }
     if (smile_buffs_left > 0) { // && lookupEffect("That's Just Cloud-Talk, Man").have_effect() == 0)
-        // Implementation of campSmile.ash by fredg1
+        // Implementation of campSmile.ash by @fredg1
         string [int] [string] buffCycle;
             buffCycle [0] ["effect"] = my_sign() == "Blender" ? "+50% booze drop" : "+25% booze drop" ;
             buffCycle [0] ["name"] = "Blender";
@@ -37,16 +37,6 @@ void IOTMGetawayCampsiteGenerateResource(ChecklistEntry [int] resource_entries)
             buffCycle [8] ["effect"] = my_sign() == "Wombat" ? "Damage Absorption +100" : "Damage Absorption +50" ;
             buffCycle [8] ["name"] = "Wombat";
 
-        int getPathID() { // until an option to get this is implemented into mafia, made by @Rinn
-            int path = -1;
-            buffer page = visit_url("api.php?what=status&for=campsiteGetpath");
-            matcher m = create_matcher('"path"\:"(.*?)"', page);
-            if (find(m)) {
-                path = group(m, 1).to_int();
-            }
-            return(path);
-        }
-
         int getOffset(int year) { // made by @Skaazi
             int offset = 5; // for 2020
             for ( int i = year; i > 2020; i-- ) {
@@ -59,17 +49,11 @@ void IOTMGetawayCampsiteGenerateResource(ChecklistEntry [int] resource_entries)
         string [int] description;
         description.listAppend("Gaze at the stars.");
 
-        int pathID = getPathID();
+        int offset = getOffset(format_date_time("yyyyMMdd", today_to_string(), "yyyy").to_int());
+        int todaysArbitraryNumber = format_date_time("yyyyMMdd", today_to_string(), "D").to_int() + my_path_id() + offset;
+        int todaysCycleNumber = todaysArbitraryNumber % 9;
         
-        if (pathID < 0) {
-            description.listAppend(HTMLGenerateSpanFont("An error happened when fetching your path.", "gray"));
-        } else {
-            int offset = getOffset(format_date_time("yyyyMMdd", today_to_string(), "yyyy").to_int());
-            int todaysArbitraryNumber = format_date_time("yyyyMMdd", today_to_string(), "D").to_int() + pathID + offset;
-            int todaysCycleNumber = todaysArbitraryNumber % 9;
-            
-            description.listAppend("Will get: " + (my_sign() == buffCycle [todaysCycleNumber] ["name"] ? "Big " : "") + "Smile of the " + buffCycle [todaysCycleNumber] ["name"] + " (" + buffCycle [todaysCycleNumber] ["effect"] + ")");
-        }
+        description.listAppend("Will get: " + (my_sign() == buffCycle [todaysCycleNumber] ["name"] ? "Big " : "") + "Smile of the " + buffCycle [todaysCycleNumber] ["name"] + " (" + buffCycle [todaysCycleNumber] ["effect"] + ")");
 
         resource_entries.listAppend(ChecklistEntryMake("__item Newbiesport&trade; tent", "place.php?whichplace=campaway", ChecklistSubentryMake(pluralise(smile_buffs_left, "smile buff", "smile buffs") + " obtainable", "20 turns", description), 5).ChecklistEntryTagEntry("getaway campsite"));
     }
