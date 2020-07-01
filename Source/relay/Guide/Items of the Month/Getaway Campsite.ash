@@ -37,13 +37,6 @@ void IOTMGetawayCampsiteGenerateResource(ChecklistEntry [int] resource_entries)
             buffCycle [8] ["effect"] = my_sign() == "Wombat" ? "Damage Absorption +100" : "Damage Absorption +50" ;
             buffCycle [8] ["name"] = "Wombat";
 
-        boolean isLeapYear(int year) {
-            if (year % 400 == 0) return true;
-            else if (year % 100 == 0) return false;
-            else if (year % 4 == 0) return true;
-            else return false;
-        }
-
         int getOffset(int year) { // made by @Skaazi
             int offset = 5; // for 2020
             for ( int i = year; i > 2020; i-- ) {
