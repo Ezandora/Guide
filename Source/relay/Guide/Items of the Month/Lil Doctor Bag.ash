@@ -3,7 +3,38 @@ void IOTMLilDoctorBagGenerateTasks(ChecklistEntry [int] task_entries, ChecklistE
 {
     if (lookupItem("Lil' Doctor&trade; bag").available_amount() == 0) return;
     //Quest:
+    int doctor_bag_upgrades = get_property_int("doctorBagUpgrades");
+    int doctor_bag_lights = get_property_int("doctorBagQuestLights");
+    string doctor_bag_quest_state = get_property("questDoctorBag");
+
+    if (doctor_bag_quest_state == "unstarted" && (doctor_bag_upgrades > 6 || __misc_state["in run"])) return;
+
+    string title;
+    string [int] description;
+    string url;
+
+    if (doctor_bag_quest_state != "unstarted") {
+        location doctor_bag_quest_location = get_property_location("doctorBagQuestLocation");
+        item doctor_bag_quest_item = get_property_item("doctorBagQuestItem");
+        title = "Medic! Medic!!";
+        url = doctor_bag_quest_location.getClickableURLForLocation();
+        
+        if (doctor_bag_quest_item.item_amount() == 0)
+            description.listAppend("Acquire a " + (doctor_bag_quest_item != $item[none] ? doctor_bag_quest_item + "." : "something..?"));
+        description.listAppend("Adventure in " + doctor_bag_quest_location + ".");
+
+        description.listAppend("Will give " + (doctor_bag_upgrades < 7 ? "progress towards upgrading the bag and " : "") + "meat."); // There is no "n° of quests completed this ascension" property, so can't predict how much you'll get
+    }
+
+    if (doctor_bag_upgrades < 7) {
+        if (title == "") {
+            title = "Upgrade your Lil' doctor bag";
+            description.listAppend("Adventure with your doctor bag equipped to get a delivery quest."); // no way to know if they "turned off" their bag
+        }
+        description.listAppend(pluralise(35 - doctor_bag_lights - doctor_bag_upgrades * 5, "quest", "quests") + " until bag is fully upgraded.");
+    }
     
+    optional_task_entries.listAppend(ChecklistEntryMake("__item Lil' Doctor&trade; bag", url, ChecklistSubentryMake(title, "", description), 9));
 }
 
 RegisterResourceGenerationFunction("IOTMLilDoctorBagGenerateResource");
