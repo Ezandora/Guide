@@ -1,6 +1,6 @@
 RegisterTaskGenerationFunction("IOTMGuzzlrQuestGenerateTask");
 void IOTMGuzzlrQuestGenerateTask(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) {
-    if (get_property("questGuzzlr") == "unstarted") return;
+    if (get_property("questGuzzlr") == "unstarted" || !lookupItem("Guzzlr tablet").have()) return;
     location questLocation = get_property("guzzlrQuestLocation").to_location();
     
     ChecklistSubentry gigEconomy() {
@@ -126,8 +126,6 @@ void IOTMGuzzlrQuestGenerateTask(ChecklistEntry [int] task_entries, ChecklistEnt
         return ChecklistSubentryMake(main_title, subtitle, description);
     }
 
-	if (!lookupItem("Guzzlr tablet").have()) return;
-
     ChecklistEntry entry;
     entry.image_lookup_name = "__item Guzzlrbuck";
     entry.url = questLocation.getClickableURLForLocation();
@@ -144,6 +142,8 @@ void IOTMGuzzlrQuestGenerateTask(ChecklistEntry [int] task_entries, ChecklistEnt
 
 RegisterTaskGenerationFunction("IOTMGuzzlrTabletGenerateTask");
 void IOTMGuzzlrTabletGenerateTask(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) {
+
+    if (!lookupItem("Guzzlr tablet").have()) return;
 
     ChecklistSubentry getGuzzling() { // for either telling the player to accept a quest, or reminding them if they can abandon it
         boolean startedQuest = get_property("questGuzzlr") != "unstarted";
