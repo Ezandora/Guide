@@ -18,7 +18,7 @@ void IOTMNeverendingPartyGenerateTasks(ChecklistEntry [int] task_entries, Checkl
         int [int] progress_split;
         foreach key, v in get_property("_questPartyFairProgress").split_string(" ")
         {
-        	if (v == "") continue;
+            if (v == "") continue;
             progress_split.listAppend(v.to_int());
         }
         int progress = progress_split[0];
@@ -37,14 +37,14 @@ void IOTMNeverendingPartyGenerateTasks(ChecklistEntry [int] task_entries, Checkl
         {
             if (progress > 0)
             {
-            	description.listAppend(pluralise(progress, "partier", "partiers") + " remain.");
+                description.listAppend(pluralise(progress, "partier", "partiers") + " remain.");
                 if (lookupItem("intimidating chainsaw").available_amount() == 0)
                 {
-                	description.listAppend("Collect the intimidating chainsaw.|" + listMake("Investigate the basement", "Grab the chainsaw").listJoinComponents(__html_right_arrow_character));
+                    description.listAppend("Collect the intimidating chainsaw.|" + listMake("Investigate the basement", "Grab the chainsaw").listJoinComponents(__html_right_arrow_character));
                 }
                 else if (lookupItem("intimidating chainsaw").equipped_amount() == 0)
                 {
-                	description.listAppend(HTMLGenerateSpanFont("Equip the intimidating chainsaw.", "red"));
+                    description.listAppend(HTMLGenerateSpanFont("Equip the intimidating chainsaw.", "red"));
                     url = "inventory.php?ftext=intimidating+chainsaw";
                 }
                 if (lookupItem("jam band bootleg").item_amount() > 0)
@@ -66,7 +66,7 @@ void IOTMNeverendingPartyGenerateTasks(ChecklistEntry [int] task_entries, Checkl
             }
             else
             {
-            	finished = true;
+                finished = true;
             }
         }
         else if (quest_name == "booze")
@@ -79,15 +79,15 @@ void IOTMNeverendingPartyGenerateTasks(ChecklistEntry [int] task_entries, Checkl
             }
             else
             {
-            	int amount_needed = progress_split[0];
+                int amount_needed = progress_split[0];
                 item item_needed = progress_split[1].to_item();
                 if (item_needed == $item[none])
                 {
-                	description.listAppend("Unknown item needed.");
+                    description.listAppend("Unknown item needed.");
                 }
                 else if (item_needed.item_amount() < amount_needed)
                 {
-                	description.listAppend("Need to collect " + amount_needed + " " + item_needed + ".");
+                    description.listAppend("Need to collect " + amount_needed + " " + item_needed + ".");
                     description.listAppend("Can collect from unremarkable duffel bags, from the jock.");
                     modifiers.listAppend("olfact jock");
                 }
@@ -119,14 +119,14 @@ void IOTMNeverendingPartyGenerateTasks(ChecklistEntry [int] task_entries, Checkl
                     modifiers.listAppend("olfact burnout");
                 }
                 else
-                	description.listAppend("Talk to Geraldine again.|" + listMake("Check out the kitchen", "Give Geraldine the snacks").listJoinComponents(__html_right_arrow_character));
+                    description.listAppend("Talk to Geraldine again.|" + listMake("Check out the kitchen", "Give Geraldine the snacks").listJoinComponents(__html_right_arrow_character));
             }
         }
         else if (quest_name == "trash")
         {
             if (true)
             {
-            	modifiers.listAppend("+200% item");
+                modifiers.listAppend("+200% item");
                 //Progress on this quest seems to be bugged - starts at zero, doesn't change unless we look at the quest log.
                 //description.listAppend("Progress: " + progress);
                 description.listAppend("Run +200% item.");
@@ -141,7 +141,7 @@ void IOTMNeverendingPartyGenerateTasks(ChecklistEntry [int] task_entries, Checkl
             }
             else
             {
-            	finished = true;
+                finished = true;
             }
         }
         else if (quest_name == "woots")
@@ -179,7 +179,7 @@ void IOTMNeverendingPartyGenerateTasks(ChecklistEntry [int] task_entries, Checkl
                 }
             }
             else
-            	finished = true;
+                finished = true;
         }
         else if (quest_name == "dj")
         {
@@ -196,12 +196,12 @@ void IOTMNeverendingPartyGenerateTasks(ChecklistEntry [int] task_entries, Checkl
                 }
                 else
                 {
-                	description.listAppend("Possibly buff to 300 moxie?");
+                    description.listAppend("Possibly buff to 300 moxie?");
                     modifiers.listAppend("300 moxie");
                 }
             }
             else
-            	finished = true;
+                finished = true;
         }
         else if (quest_name == "")
         {
@@ -210,7 +210,7 @@ void IOTMNeverendingPartyGenerateTasks(ChecklistEntry [int] task_entries, Checkl
             description.listAppend("Unhandled quest \"" + quest_name + "\"");
         if (finished)
         {
-        	description.listAppend("Visit the party one last time to finish the quest.");
+            description.listAppend("Visit the party one last time to finish the quest.");
         }
         optional_task_entries.listAppend(ChecklistEntryMake("__item party hat", url, ChecklistSubentryMake("Neverending Party Quest", modifiers, description), 8, lookupLocations("The Neverending Party")));
     }
@@ -226,7 +226,7 @@ void IOTMNeverendingPartyGenerateResource(ChecklistEntry [int] resource_entries)
     
     int free_fights_left = clampi(10 - get_property_int("_neverendingPartyFreeTurns"), 0, 10);
     if (QuestState("_questPartyFair").finished)
-    	free_fights_left = 0;
+        free_fights_left = 0;
     string [int] modifiers;
     string [int] description;
     modifiers.listAppend("+meat");
@@ -257,6 +257,6 @@ void IOTMNeverendingPartyGenerateResource(ChecklistEntry [int] resource_entries)
             description.listAppend("ML buff: " + listMake("Backyard", "Candle wax").listJoinComponents(__html_right_arrow_character));
     }
     if (free_fights_left > 0)
-	    resource_entries.listAppend(ChecklistEntryMake("__item party hat", "place.php?whichplace=town_wrong", ChecklistSubentryMake(pluralise(free_fights_left, "free party fight", "free party fights"), modifiers, description), lookupLocations("The Neverending Party")).ChecklistEntryTagEntry("daily free fight"));
+        resource_entries.listAppend(ChecklistEntryMake("__item party hat", "place.php?whichplace=town_wrong", ChecklistSubentryMake(pluralise(free_fights_left, "free party fight", "free party fights"), modifiers, description), lookupLocations("The Neverending Party")).ChecklistEntryTagEntry("daily free fight"));
     
 }
