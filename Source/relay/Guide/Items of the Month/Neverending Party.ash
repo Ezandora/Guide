@@ -160,11 +160,15 @@ void IOTMNeverendingPartyGenerateResource(ChecklistEntry [int] resource_entries)
         return;
     
     int free_fights_left = clampi(10 - get_property_int("_neverendingPartyFreeTurns"), 0, 10);
-    if (QuestState("_questPartyFair").finished)
+    string party_fair_state = get_property("_questPartyFair");
+    if (party_fair_state == "finished")
         free_fights_left = 0;
     string [int] modifiers;
     string [int] description;
     modifiers.listAppend("+meat");
+
+    if (party_fair_state == "unstarted") // need to do it that way because Guide's QuestState logic confuses "unstarted" and ""
+        description.listAppend("Need to accept or reject daily quest first.");
     
     if (free_fights_left >= 2) {
         if (__misc_state["need to level"]) {
