@@ -62,9 +62,16 @@ void IOTMGuzzlrQuestGenerateTask(ChecklistEntry [int] task_entries, ChecklistEnt
         if (hasBooze) {
             description.listAppend("Deliver " + (questTier == "platinum" ? "platinum booze" : questBooze) + " by adventuring in " + questLocation + ".");
         } else {
+            string color_of_reminder_to_get_drink = __last_adventure_location == questLocation ? "red" : "dark";
+
             if (questTier == "platinum") {
                 int [item] creatablePlatinumDrinks = questBoozePlatinum.creatable_items();
-                description.listAppend("Obtain one of the following:| • Steamboat" + (creatablePlatinumDrinks contains lookupItem("Steamboat") ? " (can make with a miniature boiler)" : "") + " | • Ghiaccio Colada" + (creatablePlatinumDrinks contains lookupItem("Ghiaccio Colada") ? " (can make with a cold wad)" : "") + " | • Nog-on-the-Cob" + (creatablePlatinumDrinks contains lookupItem("Nog-on-the-Cob") ? " (can make with a robin's egg)" : "") + " | • Sourfinger" + (creatablePlatinumDrinks contains lookupItem("Sourfinger") ? " (can make with a mangled finger)" : "") + " | • Buttery Boy" + (creatablePlatinumDrinks contains lookupItem("Buttery Boy") ? " (can make with a Dish of Clarified Butter)" : ""));
+                buffer message;
+
+                message.append(HTMLGenerateSpanFont("Obtain one of the following:", color_of_reminder_to_get_drink));
+                message.append(to_buffer("| • Steamboat" + (creatablePlatinumDrinks contains lookupItem("Steamboat") ? " (can make with a miniature boiler)" : "") + " | • Ghiaccio Colada" + (creatablePlatinumDrinks contains lookupItem("Ghiaccio Colada") ? " (can make with a cold wad)" : "") + " | • Nog-on-the-Cob" + (creatablePlatinumDrinks contains lookupItem("Nog-on-the-Cob") ? " (can make with a robin's egg)" : "") + " | • Sourfinger" + (creatablePlatinumDrinks contains lookupItem("Sourfinger") ? " (can make with a mangled finger)" : "") + " | • Buttery Boy" + (creatablePlatinumDrinks contains lookupItem("Buttery Boy") ? " (can make with a Dish of Clarified Butter)" : "") ) );
+                description.listAppend(message);
+
                 if (hasBoozeSomewhere) {
                     string [int] goLookThere;
 
@@ -80,7 +87,7 @@ void IOTMGuzzlrQuestGenerateTask(ChecklistEntry [int] task_entries, ChecklistEnt
                     description.listAppend("Go look " + (goLookThere.count() > 0 ? goLookThere.listJoinComponents(", ", "or") + "." : "...somewhere?"));
                 }
             } else {
-                description.listAppend("Obtain a " + questBooze + ".");
+                description.listAppend(HTMLGenerateSpanFont("Obtain a " + questBooze + ".", color_of_reminder_to_get_drink));
                 if (hasBoozeSomewhere) {
                     string [int] goLookThere;
 
