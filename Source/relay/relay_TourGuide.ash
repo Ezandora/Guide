@@ -1,6 +1,6 @@
 //This script and its support scripts are in the public domain.
 
-since r20152; //the earliest hourly build that supports "path" functions.
+since 20.6; //the earliest main release that supports the changes to the terrarium that came with the release of the Melodramedary
 import "relay/Guide/Main.ash"
 
 void main()
