@@ -1199,4 +1199,23 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__item mafia middle finger ring", ($item[mafia middle finger ring].equipped_amount() == 0 ? "inventory.php?which=2" : ""), ChecklistSubentryMake("Mafia middle finger ring banish/free run", "", "Once/day, 60 turn duration." + ($item[mafia middle finger ring].equipped_amount() == 0 ? " Equip first." : "")), 10).ChecklistEntryTagEntry("banish")); //&ftext=mafia+middle+finger+ring
         
     }
+
+    if (get_property_int("_glitchMonsterFights") == 0 && lookupItem("[glitch season reward name]").item_amount() > 0) {
+        string [int] description;
+        int glitch_amount = lookupItem("[glitch season reward name]").item_amount();
+        int glitch_monster_powah = 5 * glitch_amount * get_property_int("glitchItemImplementationCount");
+
+        description.listAppend("Has " + (glitch_monster_powah > 0 ? glitch_monster_powah : 1) + " HP/ATK/DEF. Gives " + (glitch_monster_powah > 0 ? glitch_monster_powah.to_string() : "no") + " HP/MP/meat."); //Has 0 defense if at 1 HP/ATK, but who cares...
+
+        description.listAppend("Try to eat one (with chat macro) to fight it (not consumed).");
+
+        if (glitch_amount >= 2)
+            description.listAppend("Closet " + (glitch_amount > 2 ? "some" : "one") + " of them to decrease its power (...and reward).");
+
+        int glitch_in_closet = (get_property_boolean("autoSatisfyWithCloset") ? lookupItem("[glitch season reward name]").closet_amount() : 0);
+        if (glitch_in_closet >= 1)
+            description.listAppend("Uncloset " + (glitch_in_closet > 1 ? "some" : "one") + " to " + (glitch_amount > 1 ? "increase" : "multiply") + " its power and reward.");
+
+        resource_entries.listAppend(ChecklistEntryMake("__item [glitch season reward name]", "", ChecklistSubentryMake("[glitch season reward name] free fight", "", description), 5).ChecklistEntryTagEntry("daily free fight"));
+    }
 }
