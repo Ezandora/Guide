@@ -211,6 +211,101 @@ void generateDailyResources(Checklist [int] checklists)
         resource_entries.listAppend(ChecklistEntryMake("__item the legendary beat", url, ChecklistSubentryMake("Arena concert", "20 turns", description), 5));
     }
     
+    if (skill_is_usable($skill[Unaccompanied Miner])) {
+        int free_digs_available = 5 - get_property_int("_unaccompaniedMinerUsed");
+        if (free_digs_available > 0) {
+            string [int] description;
+            string url;
+
+            if (__misc_state["hot airport available"]) {
+                //volcano mining
+                string [int] unmet_requirements;
+                int heat_resistance = numeric_modifier("Hot Resistance");
+
+                if (lookupItem("High-temperature mining drill").equipped_amount() == 0) {
+                    if (lookupItem("High-temperature mining drill").available_amount() > 0) {
+                        unmet_requirements.listAppend("to equip high-temperature mining drill");
+                        if (url == "")  url = "inventory.php?ftext=high-temperature+mining+drill";
+                    } else {
+                        unmet_requirements.listAppend("to acquire a high-temperature mining drill");
+                        if (url == "")  url = "inventory.php?ftext=broken+high-temperature+mining+drill"; // won't bother looking at if they have the broken drill, they can figure it out
+                    }
+                }
+
+                if (heat_resistance < 15)
+                    unmet_requirements.listAppend("15 hot resist (have " + heat_resistance + ")");
+                
+                if (url == "")  url = "mining.php?mine=6";
+
+                description.listAppend("Can mine in the velvet/gold mine" + (unmet_requirements.count() > 0 ? " (Need " + listJoinComponents(unmet_requirements, ", ", "and") + ")" : "" ) + ".");
+            }
+
+            if (get_property_boolean("mapToAnemoneMinePurchased")) { //name is misleading; they are set to true even if this is the zone you automatically get access to based on your class
+                if (lookupItem("Mer-kin digpick").equipped_amount() > 0) {
+                    if (url == "")  url = "mining.php?mine=3";
+                    description.listAppend("Anemone Mine (free even without fishy).");
+                } else if (lookupItem("Mer-kin digpick").available_amount() > 0) {
+                    description.listAppend("Equip a Mer-kin digpick to mine in Anemone Mine (won't need fishy).");
+                    if (url == "")  url = "inventory.php?ftext=Mer-kin+digpick";
+                } else {
+                    description.listAppend("Buy and equip a Mer-kin digpick from the mall to mine in Anemone Mine.");
+                    if (url == "")  url = "mall.php?justitems=0&pudnuggler=%22Mer-kin+digpick%22";
+                }
+            } else if (!get_property_boolean("bigBrotherRescued")) {
+                if (!(__misc_state["in run"] && get_property("questS02Monkees") == "unstarted"))
+                    description.listAppend("Could progress sea quest" + (my_primestat() != $stat[muscle] ? " (+ pay 50 sand dollars)" : "") + " to unlock Anemone Mine.");
+            } else {
+                if (my_primestat() == $stat[muscle]) {
+                    description.listAppend("Talk to little brother to unlock Anemone Mine.");
+                    if (url == "")  url = "seafloor.php";
+                } else {
+                    description.listAppend("Unlock Anemone Mine by buying the map from big brother (50 sand dollars, have " + $item[sand dollar].available_amount() + ").");
+                    if (url == "")  url = "seafloor.php";
+                }
+            }
+
+
+            string [int] available_basic_mines_message;
+            string available_basic_mines_url;
+
+            if (get_property("questL08Trapper") != "unstarted") { // is it the only way/a sure way to know?
+                available_basic_mines_message.listAppend("Itznotyerzitz Mine");
+                if (get_property("questL08Trapper") == "started") {
+                    available_basic_mines_message.listAppend(" (Talk to Trapper first)");
+                    if (url == "")  url = "place.php?whichplace=mclargehuge";
+                }
+                if (available_basic_mines_url == "")    available_basic_mines_url = "mining.php?mine=1";
+            }
+            if (lookupItem("Cobb's Knob lab key").available_amount() > 0) {
+                available_basic_mines_message.listAppend("The Knob Shaft (last resort)");
+                if (available_basic_mines_url == "")    available_basic_mines_url = "mining.php?mine=2";
+            }
+
+            if (available_basic_mines_message.count() > 0) { // Have access to either, or both
+                string help_message;
+                if (lookupEffect("Earthen Fist").have_effect() == 0 && !is_wearing_outfit("Mining Gear") && !is_wearing_outfit("Dwarvish War Uniform")) {
+                    if (lookupSkill("Worldpunch").have_skill()) {
+                        help_message += " (cast Worldpunch)"; // this is from an avatar path, so you'll never get both Unaccompanied miner AND worldpunch, right? Eh, whatever, you can still get the fist effect from hookah-like...
+                        if (url == "")  url = "skillz.php";
+                    } else if (can_equip_outfit("Mining Gear")) {
+                        help_message += " (equip mining gear)";
+                        if (url == "")  url = "inventory.php?which=2";
+                    } else if (can_equip_outfit("Dwarvish War Uniform")) {
+                        help_message += " (equip Dwarvish War Uniform)";
+                        if (url == "")  url = "inventory.php?which=2";
+                    } else
+                        help_message += " (need proper equipment)";
+                } else
+                    if (url == "")  url = available_basic_mines_url;
+
+                description.listAppend("Can mine in " + listJoinComponents(available_basic_mines_message, " ", "or") + "." + HTMLGenerateIndentedText(help_message));
+            }
+
+
+            resource_entries.listAppend(ChecklistEntryMake("__item 7-Foot Dwarven mattock", url, ChecklistSubentryMake( free_digs_available + " free minings", "", description), 5));
+        }
+    }
+
     //Not sure how I feel about this. It's kind of extraneous?
     if (get_property_int("telescopeUpgrades") > 0 && !get_property_boolean("telescopeLookedHigh") && __misc_state["in run"] && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING && !in_bad_moon() && my_path_id() != PATH_NUCLEAR_AUTUMN) {
         string [int] description;
