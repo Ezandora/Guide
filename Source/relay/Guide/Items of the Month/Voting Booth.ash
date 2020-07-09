@@ -19,7 +19,7 @@ void IOTMVotingBootGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
     }
     
     int turns_before_vote_fight = 11 - (((total_turns_played() % 11) - 1 + 11) % 11);
-    boolean vote_fight_now = turns_before_vote_fight == 0 && get_property_int("lastVoteMonsterTurn") < total_turns_played();
+    boolean vote_fight_now = total_turns_played() % 11 == 1 && get_property_int("lastVoteMonsterTurn") < total_turns_played();
     int vote_free_fights_left = 3 - get_property_int("_voteFreeFights");
 
     if (vote_free_fights_left > 0) {
