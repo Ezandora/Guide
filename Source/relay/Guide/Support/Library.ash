@@ -194,6 +194,36 @@ int storage_amount(boolean [item] items)
     return count;
 }
 
+int closet_amount(boolean [item] items)
+{
+    int count = 0;
+    foreach it in items
+    {
+        count += it.closet_amount();
+    }
+    return count;
+}
+
+int display_amount(boolean [item] items)
+{
+    int count = 0;
+    foreach it in items
+    {
+        count += it.display_amount();
+    }
+    return count;
+}
+
+int stash_amount(boolean [item] items)
+{
+    int count = 0;
+    foreach it in items
+    {
+        count += it.stash_amount();
+    }
+    return count;
+}
+
 int available_amount(boolean [item] items)
 {
     //Usage:
@@ -559,6 +589,7 @@ static
     __place_delays[$location[the outskirts of cobb's knob]] = 10;
     __place_delays[$location[the hidden apartment building]] = 8;
     __place_delays[$location[the hidden office building]] = 10;
+    __place_delays[$location[the copperhead club]] = 15;
     __place_delays[$location[the upper chamber]] = 5;
 }
 

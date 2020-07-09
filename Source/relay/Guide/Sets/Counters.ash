@@ -8,11 +8,11 @@ location [int] generatePossibleLocationsToBurnDelay()
 	location [int] possible_locations;
     foreach l in __place_delays
     {
-        if (l == $location[the hidden park] && __dense_liana_machete_items.available_amount() > 0)
-        {
-            continue;
-        }
-        if (l == $location[the oasis]) continue;
+        if (l == $location[the hidden park] && __dense_liana_machete_items.available_amount() > 0) continue;
+        if (l == $location[the oasis] && $effect[ultrahydrated].have_effect() == 0) continue;
+        if (l == $location[the hidden apartment building] && get_property_int("hiddenApartmentProgress") >= 7) continue;
+        if (l == $location[the hidden office building] && get_property_int("hiddenOfficeProgress") >= 7) continue;
+
         if (l.delayRemainingInLocation() > 0 && l.locationAvailable())
             possible_locations.listAppend(l);
     }

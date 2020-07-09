@@ -125,6 +125,8 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         string url = "";
         if ($item[greatest american pants].equipped_amount() == 0)
             url = "inventory.php?ftext=greatest+american+pants";
+        else
+            url = "inventory.php?action=activatesuperpants";
         
         string [int] description;
         description.listAppend(navel_percent_chance_of_runaway + "% chance of free runaway.");

@@ -361,7 +361,7 @@ void IOTMPCrackpotGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
             int damage = numeric_modifier(e + " damage").floor();
             if (damage < 50)
                 missing_second_test.listAppend(HTMLGenerateSpanOfClass((50 - damage) + " more " + e, element_html_id));
-            if (damage < 60)
+            if (damage < 60 && need_byte_sword)
                 missing_second_pixel_test.listAppend(HTMLGenerateSpanOfClass((60 - damage) + " more " + e, element_html_id));
             
         }

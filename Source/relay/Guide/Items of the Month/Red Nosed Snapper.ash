@@ -91,7 +91,7 @@ void IOTMHumanMuskBanish(ChecklistEntry [int] resource_entries) {
         // Entries
         string [int] description;
         if (availableHumanMusks > 0) {
-            description.listAppend("Free run/banish");
+            description.listAppend("Free run/banish. Consumes item.");
         }
 
         return ChecklistSubentryMake(main_title, subtitle, description);

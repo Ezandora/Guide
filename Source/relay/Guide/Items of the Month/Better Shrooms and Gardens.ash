@@ -11,7 +11,7 @@ void IOTMBetterShroomsAndGardensGenerateResource(ChecklistEntry [int] resource_e
         int freeFightsLeft = totalFreeFights - freeFightsUsed;
 
         // Title
-        string main_title = pluralise(freeFightsLeft,"Pihrana Plant fight","Pihrana Plant fights");
+        string main_title = pluralise(freeFightsLeft,"Piranha Plant fight","Piranha Plant fights");
 
         // Subtitle
         string subtitle = "";
