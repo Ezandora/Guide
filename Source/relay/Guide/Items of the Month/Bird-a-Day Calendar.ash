@@ -22,13 +22,17 @@ void IOTMBirdADayCalendar(ChecklistEntry [int] resource_entries)
         int birdsSought = get_property_int("_birdsSoughtToday");
 
         // Title
-        string main_title = "Seek Bird";
+        string main_title = "Seek birds! " + birdsSought + " birds sought today";
 
         // Subtitle
         string subtitle = "10 Turn Buff";
 
         // Entries
         string [int] description;
+        int mp_cost = 5 * 2**(birdsSought);
+			description.listAppend("Currently costs " + mp_cost + " MP to watch.");
+			description.listAppend("Seek up to 6 times and still keep your old favorite.");
+			description.listAppend("Must make it your new favorite to watch 7 or more times.");
         if (get_property_boolean("_canSeekBirds")) {
             string [int] modStrings = birdMods.split_string(", ");
             foreach index, modString in modStrings {
