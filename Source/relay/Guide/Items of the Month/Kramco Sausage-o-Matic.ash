@@ -65,20 +65,19 @@ void IOTMKramcoSausageOMaticGenerateResource(ChecklistEntry [int] resource_entri
 
     entry.subentries.listAppend(ChecklistSubentryMake(main_title, "", main_description));
 
+    int sausage_casings = lookupItem("magical sausage casing").available_amount();
     int sausages_eaten = get_property_int("_sausagesEaten");
     int sausages_available = lookupItem("magical sausage").available_amount();
-    int possible_sausages = sausages_available + lookupItem("magical sausage casing").available_amount();
+    int possible_sausages = sausages_available + sausage_casings;
     if (possible_sausages > 0 && sausages_eaten < 23) {
-    	string title;
         string [int] sausage_description;
         int sausages_made = get_property_int("_sausagesMade");
         int meat_cost = 111 * (sausages_made + 1);
-        title = pluralise(MIN(sausages_available, 23 - sausages_eaten), "magical sausage edible", "magical sausages edible");
-        int sausage_casings = lookupItem("magical sausage casing").available_amount();
-        sausage_description.listAppend(HTMLGenerateSpanOfClass(sausage_casings, "r_bold") + " casings available, " + (HTMLGenerateSpanOfClass(sausages_eaten + "/23", "r_bold") + " eaten today."));
-        sausage_description.listAppend(pluralise(sausages_made, "sausage", "sausages") + " made; next costs " + meat_cost + " meat.");
         sausage_description.listAppend("+1 adventure and +999 MP each.");
-        entry.subentries.listAppend(ChecklistSubentryMake(title, "", sausage_description));
+        sausage_description.listAppend(HTMLGenerateSpanOfClass(sausage_casings, "r_bold") + " casings available, " + HTMLGenerateSpanOfClass(sausages_eaten + "/23", "r_bold") + " eaten today.");
+        sausage_description.listAppend(pluralise(sausages_made, "sausage", "sausages") + " made; next costs " + meat_cost + " meat.");
+        
+        entry.subentries.listAppend(ChecklistSubentryMake(pluralise(MIN(sausages_available, 23 - sausages_eaten), "magical sausage edible", "magical sausages edible"), "", sausage_description));
     }
     
     resource_entries.listAppend(entry);
