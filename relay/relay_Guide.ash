@@ -2,7 +2,7 @@
 
 since 17.12; //the earliest main release that supports get_fuel()
 //These settings are for development. Don't worry about editing them.
-string __version = "1.4.41";
+string __version = "1.4.42";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -6618,9 +6618,9 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
             lookup_map["Post-Quest Bugbear Pens"] =  "place.php?whichplace=knoll_hostile";
             
         if ($item[talisman o' namsilat].equipped_amount() > 0)
-            lookup_map["Palindome"] = "place.php?whichplace=palindome";
+            lookup_map["Inside the Palindome"] = "place.php?whichplace=palindome";
         else
-            lookup_map["Palindome"] = "inventory.php?which=2";
+            lookup_map["Inside the Palindome"] = "inventory.php?which=2";
         //antique maps are weird:
         lookup_map["The Electric Lemonade Acid Parade"] = "inv_use.php?pwd=" + my_hash() + "&whichitem=4613";
         foreach s in $strings[Professor Jacking's Small-O-Fier,Professor Jacking's Huge-A-Ma-tron]
