@@ -1084,14 +1084,7 @@ int XiblaxianHoloWristPuterTurnsUntilNextItem()
     int progress = get_property_int("_holoWristProgress");
     
     //_holoWristProgress resets when drop happens
-    if (!mafiaIsPastRevision(15148))
-        return -1;
     int next_turn_hit = 5 * (drops + 1) + 6;
-    if (!mafiaIsPastRevision(15493)) //old behaviour
-    {
-        if (drops != 0)
-            next_turn_hit += 1;
-    }
     return MAX(0, next_turn_hit - progress);
 }
 
@@ -1181,6 +1174,16 @@ int nextLibramSummonMPCost()
     return libram_mp_cost;
 }
 
+int maximumSimultaneous1hWeaponsEquippable()
+{
+    int weapon_maximum = 1;
+    if ($skill[double-fisted skull smashing].skill_is_usable())
+        weapon_maximum += 1;
+    if (my_familiar() == $familiar[disembodied hand])
+        weapon_maximum += 1;
+    return weapon_maximum;
+}
+
 int equippable_amount(item it)
 {
     if (!it.can_equip()) return it.equipped_amount();
@@ -1189,12 +1192,7 @@ int equippable_amount(item it)
         return MIN(3, it.available_amount());
     if (it.to_slot() == $slot[weapon] && it.weapon_hands() == 1)
     {
-        int weapon_maximum = 1;
-        if ($skill[double-fisted skull smashing].skill_is_usable())
-            weapon_maximum += 1;
-        if (my_familiar() == $familiar[disembodied hand])
-            weapon_maximum += 1;
-        return MIN(weapon_maximum, it.available_amount());
+        return MIN(maximumSimultaneous1hWeaponsEquippable(), it.available_amount());
     }
     return 1;
 }
@@ -1238,7 +1236,7 @@ item [int] generateEquipmentForExtraExperienceOnStat(stat desired_stat, boolean 
     foreach it in equipmentWithNumericModifier(numeric_modifier_string)
     {
     	slot s = it.to_slot();
-        if (s == $slot[shirt] && !($skill[Torso Awaregness].have_skill() || $skill[Best Dressed].have_skill()))
+        if (s == $slot[shirt] && !(lookupSkill("Torso Awareness").have_skill() || $skill[Best Dressed].have_skill()))
         	continue;
         if (it.available_amount() > 0 && (!require_can_equip_currently || it.can_equip()) && item_slots[it.to_slot()].numeric_modifier(numeric_modifier_string) < it.numeric_modifier(numeric_modifier_string))
         {
@@ -1280,7 +1278,7 @@ float averageAdventuresForConsumable(item it, boolean assume_monday)
 			continue;
 		adventures += a * (1.0 / to_float(adventures_string.count()));
 	}
-    if (it == lookupItem("affirmation cookie"))
+    if (it == $item[affirmation cookie])
         adventures += 3;
     if (it == $item[White Citadel burger])
     {
@@ -1344,7 +1342,7 @@ boolean monsterIsGhost(monster m)
         return true;
     if ($monsters[boneless blobghost,the ghost of Vanillica \"Trashblossom\" Gorton,restless ghost,The Icewoman,the ghost of Monsieur Baguelle,The ghost of Lord Montague Spookyraven,The Headless Horseman,The ghost of Ebenoozer Screege,The ghost of Sam McGee,The ghost of Richard Cockingham,The ghost of Jim Unfortunato,The ghost of Waldo the Carpathian,the ghost of Oily McBindle] contains m)
         return true;
-    if (lookupMonster("Emily Koops, a spooky lime") == m)
+    if ($monster[Emily Koops, a spooky lime] == m)
         return true;*/
     return false;
 }
@@ -1421,8 +1419,8 @@ boolean monster_has_zero_turn_cost(monster m)
 {
     if (m.attributes.contains_text("FREE"))
         return true;
-    if (m == lookupMonster("sausage goblin") && m != $monster[none]) return true;
-    if (lookupMonsters("LOV Engineer,LOV Enforcer,LOV Equivocator") contains m) return true;
+    if (m == $monster[sausage goblin] && m != $monster[none]) return true;
+    if ($monsters[LOV Engineer,LOV Enforcer,LOV Equivocator] contains m) return true;
         
     if ($monsters[lynyrd] contains m) return true; //not marked as FREE in attributes
     //if ($monsters[Black Crayon Beast,Black Crayon Beetle,Black Crayon Constellation,Black Crayon Golem,Black Crayon Demon,Black Crayon Man,Black Crayon Elemental,Black Crayon Crimbo Elf,Black Crayon Fish,Black Crayon Goblin,Black Crayon Hippy,Black Crayon Hobo,Black Crayon Shambling Monstrosity,Black Crayon Manloid,Black Crayon Mer-kin,Black Crayon Frat Orc,Black Crayon Penguin,Black Crayon Pirate,Black Crayon Flower,Black Crayon Slime,Black Crayon Undead Thing,Black Crayon Spiraling Shape,broodling seal,Centurion of Sparky,heat seal,hermetic seal,navy seal,Servant of Grodstank,shadow of Black Bubbles,Spawn of Wally,watertight seal,wet seal,lynyrd,BRICKO airship,BRICKO bat,BRICKO cathedral,BRICKO elephant,BRICKO gargantuchicken,BRICKO octopus,BRICKO ooze,BRICKO oyster,BRICKO python,BRICKO turtle,BRICKO vacuum cleaner,Witchess Bishop,Witchess King,Witchess Knight,Witchess Ox,Witchess Pawn,Witchess Queen,Witchess Rook,Witchess Witch,The ghost of Ebenoozer Screege,The ghost of Lord Montague Spookyraven,The ghost of Waldo the Carpathian,The Icewoman,The ghost of Jim Unfortunato,the ghost of Sam McGee,the ghost of Monsieur Baguelle,the ghost of Vanillica "Trashblossom" Gorton,the ghost of Oily McBindle,boneless blobghost,The ghost of Richard Cockingham,The Headless Horseman,Emily Koops\, a spooky lime,time-spinner prank,random scenester,angry bassist,blue-haired girl,evil ex-girlfriend,peeved roommate] contains m)
@@ -1431,7 +1429,9 @@ boolean monster_has_zero_turn_cost(monster m)
         return true;
     if (my_familiar() == $familiar[machine elf] && my_location() == $location[the deep machine tunnels] && get_property_int("_machineTunnelsAdv") < 5)
         return true;
-    if (lookupMonsters("terrible mutant,slime blob,government bureaucrat,angry ghost,annoyed snake") contains m && get_property_int("_voteFreeFights") < 3)
+    if ($monsters[terrible mutant,slime blob,government bureaucrat,angry ghost,annoyed snake] contains m && get_property_int("_voteFreeFights") < 3)
+    	return true;
+    if ($monsters[biker,burnout,jock,party girl,"plain" girl] contains m && get_property_int("_neverendingPartyFreeTurns") < 10)
     	return true;
     return false;
 }
@@ -1659,3 +1659,103 @@ boolean canAccessMall()
 	if (my_ascensions() == 0 && !get_property_ascension("lastDesertUnlock")) return false;
 	return true;
 }
+
+string generateEquipmentLink(item equipment)
+{
+	if (!equipment.have()) return "";
+	if (equipment.equipped()) return "inventory.php?which=2";
+	
+	string ftext_value = equipment.replace_string(" ", "+").entity_encode();
+	if (equipment.item_amount() == 0 && can_interact() && equipment.storage_amount() > 0) return "storage.php?which=2&ftext=" + ftext_value;
+	return "inventory.php?which=2&ftext=" + ftext_value;
+}
+
+//it says "next NC will be" but it means, extremely specifically, a certain class of non-combats. I don't know how this skill interacts with superlikelies or those intro adventures and such
+boolean locationNextNCWillBeCartography(location l)
+{
+    if (!lookupSkill("Comprehensive Cartography").skill_is_usable()) return false;
+    
+    //We use the following method to determine if cartography will fire:
+    //We look for "relevant" NC names in recent noncombats in the zone. If any of the relevant NCs are there, then it won't happen.
+    //The relevant NCs are the cartography NC, and the NCs it "replaces"
+    //This can fail, if there is five outside-zone data points in noncombat_queue - which I think can happen sometimes?
+    boolean [string] relevant_nc_names;
+ 
+	//manually handle every NC:
+    if (l == $location[Guano Junction]) //100%
+    {
+        relevant_nc_names = $strings[The Hidden Junction];
+    }
+    else if (l == $location[A-boo Peak]) //...unknown? 100%?
+    {
+        relevant_nc_names = $strings[Ghostly Memories];
+    }
+    else if (l == $location[the haunted billiards room]) //not 100%
+    {
+        relevant_nc_names = $strings[Billiards Room Options,That's your cue,Welcome To Our ool Table];
+    }
+    else if (l == $location[The Dark Neck of the Woods]) //not 100%
+    {
+        relevant_nc_names = $strings[Your Neck of the Woods,How Do We Do It? Quaint and Curious Volume!,Strike One!,Olive My Love To You\, Oh.,Dodecahedrariffic!];
+    }
+    else if (l == $location[The Defiled Nook]) //not 100%
+    {
+        relevant_nc_names = $strings[No Nook Unknown,Skull\, Skull\, Skull];
+    }
+    else if (l == $location[The Castle in the Clouds in the Sky (Top Floor)]) //not 100%
+    {
+        relevant_nc_names = $strings[Here There Be Giants,Copper Feel,Melon Collie and the Infinite Lameness,Yeah\, You're for Me\, Punk Rock Giant,Flavor of a Raver];
+    }
+    else if (l == $location[A Mob of Zeppelin Protesters]) //not 100%
+    {
+        relevant_nc_names = $strings[Mob Maptality,Bench Warrant,Fire Up Above,This Looks Like a Good Bush for an Ambush];
+    }
+    else if (l == $location[Frat House]) //not 100%. FIXME correct zone?
+    {
+        relevant_nc_names = $strings[Oh Yeah!,Purple Hazers,From Stoked to Smoked,Murder by Death,Sing This Explosion to Me]; //is this correct...?
+    }
+    else if (l == $location[Wartime Frat House (Hippy Disguise)]) //not 100%. FIXME correct zone?
+    {
+        relevant_nc_names = $strings[Sneaky\, Sneaky,Catching Some Zetas,Fratacombs,One Less Room Than In That Movie];
+    }
+    else if (l == $location[Wartime Hippy Camp (Frat Disguise)]) //not 100%. FIXME correct zone?
+    {
+        relevant_nc_names = $strings[Sneaky\, Sneaky,Bait and Switch,Blockin' Out the Scenery,The Thin Tie-Dyed Line];
+    }
+    
+    if (relevant_nc_names.count() == 0) return false;
+    
+    
+    foreach key, noncombat_name in l.locationSeenNoncombats()
+    {
+        if (relevant_nc_names[noncombat_name]) return false;
+    }
+    return true;
+}
+
+string getBasicItemDescription(item it)
+{
+	buffer out;
+	
+	string item_type = it.item_type();
+	
+	//if (item_type == "accessory") item_type = "acc";
+	if (item_type == "container") item_type = "back";
+	int weapon_hands = it.weapon_hands();
+	
+	if (weapon_hands != 0)
+	{
+        stat weapon_type = it.weapon_type();
+        
+		out.append(weapon_hands);
+        out.append("h ");
+        if (weapon_type == $stat[moxie])
+        	out.append("ranged ");
+        else
+        	out.append("melee ");
+	}
+	
+	out.append(item_type);
+	return out.to_string();
+}
+

@@ -356,7 +356,7 @@ void PathActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] resource_entr
             resource_entries.listAppend(ChecklistEntryMake(image_name, "", subentries, 6));
     }
     
-    if ($skill[Lash of the cobra].have_skill() && mafiaIsPastRevision(15553))
+    if ($skill[Lash of the cobra].have_skill())
     {
         int lashes_remaining = 30 - get_property_int("_edLashCount");
         if (lashes_remaining > 0)

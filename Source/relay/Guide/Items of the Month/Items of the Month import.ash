@@ -54,5 +54,18 @@ import "relay/Guide/Items of the Month/Vampire Cloak.ash";
 import "relay/Guide/Items of the Month/Beach Comb.ash";
 import "relay/Guide/Items of the Month/Getaway Campsite.ash";
 import "relay/Guide/Items of the Month/Rune Spoon.ash";
-
+import "relay/Guide/Items of the Month/Pocket Professor.ash";
+import "relay/Guide/Items of the Month/Eight Days a Week Pill Keeper.ash";
+import "relay/Guide/Items of the Month/Red-Nosed Snapper.ash";
+import "relay/Guide/Items of the Month/Bird-a-Day calendar.ash";
+import "relay/Guide/Items of the Month/Powerful Glove.ash";
+import "relay/Guide/Items of the Month/Better Shrooms and Gardens catalog.ash";
+import "relay/Guide/Items of the Month/Guzzlr tablet.ash";
+import "relay/Guide/Items of the Month/Emotion Chip.ash";
+import "relay/Guide/Items of the Month/Miniature Crystal Ball.ash";
+import "relay/Guide/Items of the Month/Melodramedary.ash";
+import "relay/Guide/Items of the Month/Comprehensive Cartography.ash";
+import "relay/Guide/Items of the Month/Retro Superhero Cape.ash";
+import "relay/Guide/Items of the Month/Spinmaster Lathe.ash";
+import "relay/Guide/Items of the Month/Cargo Cultist Shorts.ash";
 

@@ -2,14 +2,14 @@
 RegisterResourceGenerationFunction("IOTMCatBurglarGenerateResource");
 void IOTMCatBurglarGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (!lookupFamiliar("cat burglar").familiar_is_usable()) return;
+	if (!$familiar[cat burglar].familiar_is_usable()) return;
 	
 	int charges_left = CatBurglarChargesLeftToday();
 	if (charges_left > 0)
 	{
 		string [int] description;
   		string url = "familiar.php";
-        if (my_familiar() == lookupFamiliar("cat burglar"))
+        if (my_familiar() == $familiar[cat burglar])
         	url = "main.php?heist=1";
   		//√rusty hedge trimmers
         //√bowling ball
@@ -34,7 +34,7 @@ void IOTMCatBurglarGenerateResource(ChecklistEntry [int] resource_entries)
             if (!__quest_state["Level 12"].finished && get_property("sidequestOrchardCompleted") == "none")
             {
             	options.listAppend("Green smoke bomb, from the war.");
-            	if (!lookupFamiliar("XO Skeleton").familiar_is_usable())
+            	if (!$familiar[XO Skeleton].familiar_is_usable())
                 	options.listAppend("Scent glands, from the filthworms quest.");
             }
             if ($location[A Mob of Zeppelin Protesters].turns_spent > 0 && get_property_int("zeppelinProtestors") < 80 && $item[talisman o' namsilat].available_amount() == 0 && QuestState("questL11Ron").mafia_internal_step < 3)
@@ -63,8 +63,8 @@ void IOTMCatBurglarGenerateResource(ChecklistEntry [int] resource_entries)
             	options.listAppend("Killing jar, from the haunted library.");
             if (!have_outfit_components("Knob Goblin Elite Guard Uniform") && !have_outfit_components("Knob Goblin Harem Girl Disguise") && !__quest_state["Level 5"].finished)
             	options.listAppend("Harem girl outfit, if you can't reach +400% item.");
-            if (__quest_state["Level 9"].state_int["a-boo peak hauntedness"] > 0 && $item[a-boo clue].available_amount() < 3)
-                options.listAppend("A-boo clues, from the A-Boo peak?");
+            //if (__quest_state["Level 9"].state_int["a-boo peak hauntedness"] > 0 && $item[a-boo clue].available_amount() < 3)
+                //options.listAppend("A-boo clues, from the A-Boo peak?");
         }
         if (options.count() > 0)
         	description.listAppend("Could steal:|*-" + options.listJoinComponents("|*-"));

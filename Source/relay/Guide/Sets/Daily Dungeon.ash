@@ -5,11 +5,11 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 	{
 		if ($item[ring of detect boring doors].equipped_amount() == 0 && $item[ring of detect boring doors].available_amount() > 0 && !get_property_boolean("dailyDungeonDone") && get_property_int("_lastDailyDungeonRoom") < 13)
 		{
-			task_entries.listAppend(ChecklistEntryMake("__item ring of detect boring doors", "inventory.php?which=2", ChecklistSubentryMake("Wear ring of detect boring doors", "", "Speeds up daily dungeon"), -11));
+			task_entries.listAppend(ChecklistEntryMake("__item ring of detect boring doors", generateEquipmentLink($item[ring of detect boring doors]), ChecklistSubentryMake("Wear ring of detect boring doors", "", "Speeds up daily dungeon"), -11));
 		}
 		if (familiar_is_usable($familiar[gelatinous cubeling]) && ($item[pick-o-matic lockpicks].available_amount() == 0 || $item[eleven-foot pole].available_amount() == 0 || $item[Ring of Detect Boring Doors].available_amount() == 0)) //have familiar, but not the drops
 		{
-			task_entries.listAppend(ChecklistEntryMake("__familiar gelatinous cubeling", "", ChecklistSubentryMake("Use a gelatinous cubeling first", "", "You're adventuring in the daily dungeon without cubeling drops."), -11));
+			task_entries.listAppend(ChecklistEntryMake("__familiar gelatinous cubeling", "", ChecklistSubentryMake("Use a gelatinous cubeling first.", "", "You're adventuring in the daily dungeon without cubeling drops."), -11));
 		}
 	}
 	
@@ -73,7 +73,7 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 			if (missing_items.count() > 0)
 			{
 				delay_daily_dungeon = true;
-				delay_daily_dungeon_reason = "Bring along the gelatinous cubeling first";
+				delay_daily_dungeon_reason = "Use your gelatinous cubeling in other areas, first.";
 				ChecklistSubentry subentry;
 			
                 string url = "";
@@ -200,7 +200,7 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 			{
 				if ($item[ring of detect boring doors].equipped_amount() == 0)
                 {
-                    url = "inventory.php?which=2";
+                    url = generateEquipmentLink($item[ring of detect boring doors]);
 					description.listAppend("Wear the ring of detect boring doors.");
                 }
 				else
@@ -217,5 +217,4 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 			optional_task_entries.listAppend(ChecklistEntryMake("daily dungeon", url, ChecklistSubentryMake("Daily Dungeon", "", description), $locations[the daily dungeon]));
 		}
 	}
-
 }

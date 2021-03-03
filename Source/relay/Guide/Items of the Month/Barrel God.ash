@@ -6,7 +6,7 @@ void IOTMBarrelGodGenerateResource(ChecklistEntry [int] resource_entries)
         return;
     
     
-    if (!get_property_boolean("_barrelPrayer") && mafiaIsPastRevision(16316))
+    if (!get_property_boolean("_barrelPrayer"))
     {
         string [int] description;
         string [int][int] gear;
@@ -37,31 +37,33 @@ void IOTMBarrelGodGenerateResource(ChecklistEntry [int] resource_entries)
         if (buff_description != "")
             description.listAppend(buff_description.capitaliseFirstLetter() + " buff for 50 turns." + ($item[map to the Biggest Barrel].available_amount() == 0 && (my_daycount() >= 7 || !in_ronin()) ? "|Might give the map to the Biggest Barrel." : ""));
         
-        resource_entries.listAppend(ChecklistEntryMake("barrel god", "da.php?barrelshrine=1", ChecklistSubentryMake("Barrel worship", "", description), 8));
+        resource_entries.listAppend(ChecklistEntryMake("barrel god", "da.php?barrelshrine=1", ChecklistSubentryMake("Barrel worship", "", description), 8).ChecklistEntrySetCategory("equipment"));
     }
     
-    item [int] barrels_around;
-    foreach it in $items[little firkin,normal barrel,big tun,weathered barrel,dusty barrel,disintegrating barrel,moist barrel,rotting barrel,mouldering barrel,barnacled barrel]
+    if (in_ronin())
     {
-        if (it.item_amount() > 0)
-            barrels_around.listAppend(it);
-    }
-    if (barrels_around.count() > 0)
-    {
-        string [int] plurals;
-        foreach key, it in barrels_around
+        item [int] barrels_around;
+        foreach it in $items[little firkin,normal barrel,big tun,weathered barrel,dusty barrel,disintegrating barrel,moist barrel,rotting barrel,mouldering barrel,barnacled barrel]
         {
-            plurals.listAppend(pluralise(it.item_amount(), it));
+            if (it.item_amount() > 0)
+                barrels_around.listAppend(it);
         }
-        string url = "inv_use.php?pwd=" + my_hash() + "&whichitem=" + barrels_around[0].to_int() + "&choice=1";
-        string [int] description;
-        description.listAppend(plurals.listJoinComponents(", ", "and") + ".");
-        resource_entries.listAppend(ChecklistEntryMake("__item " + barrels_around[0], url, ChecklistSubentryMake("Smashable barrels", "", description), 8));
-        
+        if (barrels_around.count() > 0)
+        {
+            string [int] plurals;
+            foreach key, it in barrels_around
+            {
+                plurals.listAppend(pluralise(it.item_amount(), it));
+            }
+            string url = "inv_use.php?pwd=" + my_hash() + "&whichitem=" + barrels_around[0].to_int() + "&choice=1";
+            string [int] description;
+            description.listAppend(plurals.listJoinComponents(", ", "and") + ".");
+            resource_entries.listAppend(ChecklistEntryMake("__item " + barrels_around[0], url, ChecklistSubentryMake("Smashable barrels", "", description), 8));
+        }
     }
 }
-RegisterTaskGenerationFunction("IOTMBarrelGodGenerateTasks");
-void IOTMBarrelGodGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+RegisterGenerationFunction("IOTMBarrelGodGenerate");
+void IOTMBarrelGodGenerate(ChecklistCollection checklists)
 {
     //we could suggest they defeat the barrelmech if they have the map anyways... hmm
     if ($item[map to the Biggest Barrel].available_amount() > 0 && (!$item[chest barrel].haveAtLeastXOfItemEverywhere(1) || !$item[barrelhead].haveAtLeastXOfItemEverywhere(1) || !$item[bottoms of the barrel].haveAtLeastXOfItemEverywhere(1)))
@@ -79,6 +81,6 @@ void IOTMBarrelGodGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
             description.listAppend(line);
         }
         description.listAppend("Can only be fought once a day, until defeated.");
-        optional_task_entries.listAppend(ChecklistEntryMake("barrel god", "inventory.php?ftext=map+to+the+Biggest+Barrel", ChecklistSubentryMake("Defeat the Barrelmech", "", description), 8));
+        checklists.add(C_AFTERCORE_TASKS, ChecklistEntryMake("barrel god", "inventory.php?ftext=map+to+the+Biggest+Barrel", ChecklistSubentryMake("Defeat the Barrelmech", "", description), 8));
     }
 }

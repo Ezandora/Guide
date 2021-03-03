@@ -69,6 +69,7 @@ boolean PreferenceGetBoolean(string name)
 
 void PreferenceSet(string name, string value)
 {
+	//print_html("PreferenceSet(" + name + ", " + value + ")");
     if (!__read_user_preferences_initially)
         readUserPreferences();
     __user_preferences_private[name] = value;

@@ -136,7 +136,7 @@ BadMoonAdventure [int] AllBadMoonAdventures()
     adventures.listAppend(BadMoonAdventureMake(42, $location[whitey's grove], "meat", "5000 meat, -20% stats debuff", "finish white citadel quest? (this needs spading)", !(!white_citadel_quest.started || white_citadel_quest.finished)));
     //adventures.listAppend(BadMoonAdventureMake(45, $location[The Arid, Extra-Dry Desert], "ITEMS", "anticheese", "need to not have ultrahydrated", $effect[ultrahydrated].have_effect() == 0)); //is this still here?
     
-    adventures.listAppend(BadMoonAdventureMake(44, $location[the spooky forest], "SKILLS", "torso awaregness, -50% muscle debuff", "unlock hidden temple", !get_property_ascension("lastTempleUnlock")));
+    adventures.listAppend(BadMoonAdventureMake(44, $location[the spooky forest], "SKILLS", "Torso Awareness, -50% muscle debuff", "unlock hidden temple", !get_property_ascension("lastTempleUnlock")));
     
     __all_bad_moon_adventures_cache = adventures;
     __all_bad_moon_adventures_cache_on_turn = my_turncount();
@@ -489,7 +489,7 @@ void PathBadMoonGenerateChecklists(ChecklistCollection checklist_collection)
     √+resistance all elements, all attributes -%
     √+20 mainstat, -5 other stats
     √+40 mainstat, -50% familiar weight (black cat!)
-    √items, -something (√black kitten and terrarium, √torso awaregness, anticheese (irrelevant), √leprechaun, loaded dice (irrelevant), √potato sprout (irrelevant?)
+    √items, -something (√black kitten and terrarium, √Torso Awareness, anticheese (irrelevant), √leprechaun, loaded dice (irrelevant), √potato sprout (irrelevant?)
     
     Maybe:
     √+50% stat, -50% other stat
@@ -515,7 +515,7 @@ void PathBadMoonGenerateChecklists(ChecklistCollection checklist_collection)
     PathBadMoonGenerateCategoryChecklistEntry(adventures_by_category, bad_moon_adventures_entries, listMake("STAT2", "STAT1", "STAT3"), "__effect Phorcefullness", "Stat buffs");
     PathBadMoonGenerateCategoryChecklistEntry(adventures_by_category, bad_moon_adventures_entries, elemental_damage_ordering, "__item oversized snowflake", "Elemental damage buffs", listMake("For defeating ghosts."));
     
-    if (!$skill[torso awaregness].have_skill() && !haveSeenBadMoonEncounter(44) && $location[the hidden temple].locationAvailable())
+    if (!lookupSkill("Torso Awareness").have_skill() && !haveSeenBadMoonEncounter(44) && $location[the hidden temple].locationAvailable())
     {
         string [int] description;
         description.listAppend("Spooky forest.");
@@ -527,7 +527,7 @@ void PathBadMoonGenerateChecklists(ChecklistCollection checklist_collection)
         else
             description.listAppend("Farm spices (for spicy burritos) while you're there: " + listMake("Brave the dark thicket", "Follow the even darker path", "Take the scorched path", "Investigate the moist crater").listJoinComponents(__html_right_arrow_character));
         
-        bad_moon_adventures_entries.listAppend(ChecklistEntryMake("__item &quot;Humorous&quot; T-shirt", $location[the spooky forest].getClickableURLForLocation(), ChecklistSubentryMake("Torso Awaregness", "", description), $locations[the spooky forest]));
+        bad_moon_adventures_entries.listAppend(ChecklistEntryMake("__item &quot;Humorous&quot; T-shirt", $location[the spooky forest].getClickableURLForLocation(), ChecklistSubentryMake("Torso Awareness", "", description), $locations[the spooky forest]));
     }
     
     /*

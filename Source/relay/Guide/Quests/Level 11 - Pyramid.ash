@@ -3,7 +3,7 @@ void QLevel11PyramidInit()
 {
     QuestState state;
     QuestStateParseMafiaQuestProperty(state, "questL11Pyramid");
-    if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
     state.quest_name = "Pyramid Quest";
     state.image_name = "Pyramid";
     __quest_state["Level 11 Pyramid"] = state;
@@ -207,7 +207,7 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
             else
                 subentry.entries.listAppend("Spin the control room, search the lower chambers! Then fight Ed.");
                 
-            if (ed_chamber_open && my_path_id() == PATH_EXPLOSIONS && lookupItem("low-pressure oxygen tank").equipped_amount() == 0)
+            if (ed_chamber_open && my_path_id() == PATH_EXPLOSIONS && $item[low-pressure oxygen tank].equipped_amount() == 0)
             {
             	subentry.modifiers.listAppend("+hp regen");
                 subentry.entries.listAppend("Keep +hp regen up, so you survive the multi-round fight without the oxygen tank?");

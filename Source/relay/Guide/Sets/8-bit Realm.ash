@@ -85,7 +85,7 @@ void S8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
                 description.listAppend("Or wait for pixellated monsters.");
             if ($item[continuum transfunctioner].equipped_amount() == 0)
             {
-                url = "inventory.php?which=2";
+                url = generateEquipmentLink($item[continuum transfunctioner]);
                 description.listAppend("Equip the continuum transfunctioner.");
             }
             //No other choice. 8-bit realm.

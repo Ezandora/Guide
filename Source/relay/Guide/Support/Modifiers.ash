@@ -6,6 +6,8 @@ static
 	boolean [effect][string] __modifiers_for_effect;
 	boolean [string][effect] __effects_for_modifiers;
 	boolean [effect] __effect_contains_non_constant_modifiers; //meaning, numeric_modifier() cannot be cached
+	boolean [effect][item] __items_for_effect;
+	boolean [effect][skill] __skills_for_effect;
 }
 void initialiseModifiers()
 {
@@ -95,6 +97,18 @@ void initialiseModifiers()
             //modifier_values[modifier_value] = true;
         }
         //return;
+	}
+	foreach it in $items[]
+	{
+		effect e = it.effect_modifier("effect");
+		if (e == $effect[none]) continue;
+		__items_for_effect[e][it] = true;
+	}
+	foreach s in $skills[]
+	{
+		effect e = s.to_effect();
+		if (e == $effect[none]) continue;
+		__skills_for_effect[e][s] = true;
 	}
 	/*print_html("Types:");
 	foreach type in modifier_types

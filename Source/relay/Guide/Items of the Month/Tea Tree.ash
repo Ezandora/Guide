@@ -97,7 +97,7 @@ void IOTMTeaTreeGenerateResource(ChecklistEntry [int] resource_entries)
         
         if (tea_options.count() > 0)
             options.listAppend(HTMLGenerateSimpleTableLines(tea_options));
-        resource_entries.listAppend(ChecklistEntryMake("__item potted tea tree", "campground.php?action=teatree", ChecklistSubentryMake("Tea Tree Tea", "", options), 4));
+        resource_entries.listAppend(ChecklistEntryMake("__item potted tea tree", "campground.php?action=teatree", ChecklistSubentryMake("Tea Tree Tea", "", options), 4).ChecklistEntrySetCategory("iotm"));
     }
     
     if (__misc_state["in run"] && in_ronin())

@@ -40,7 +40,7 @@ void IOTMLibramGenerateResource(ChecklistEntry [int] resource_entries)
                 //_taffyYellowSummons
             }
             
-			resource_entries.listAppend(ChecklistEntryMake("__item libram of divine favors", "campground.php?action=bookshelf", subentry, 7));
+			resource_entries.listAppend(ChecklistEntryMake("__item libram of divine favors", "campground.php?action=bookshelf", subentry, 7).ChecklistEntrySetCategory("iotm").ChecklistEntrySetShortDescription(libram_mp_cost + "mp"));
 		}
 		
 		
@@ -107,9 +107,23 @@ void IOTMLibramGenerateResource(ChecklistEntry [int] resource_entries)
 			}
 			
 			if (creatable.count() > 0)
-				subentry.entries.listAppend("Creatable: (" + $item[bricko brick].available_amount() + " bricks available)" + HTMLGenerateIndentedText(creatable));
+            {
+				//subentry.entries.listAppend("Creatable: (" + $item[bricko brick].available_amount() + " bricks available)" + HTMLGenerateIndentedText(creatable));
+    			string creations_line = "(" + $item[bricko brick].available_amount() + " bricks available)" + HTMLGenerateIndentedText(creatable.listJoinComponents("<hr>"));
+                
+    			if (creatable.count() < 4)
+                {
+                	creations_line = "(" + $item[bricko brick].available_amount() + " bricks available)" + HTMLGenerateIndentedText(creatable.listJoinComponents("<hr>"));
+                	subentry.entries.listAppend("Creatable: " + creations_line);
+                }
+                else
+                {
+                	creations_line = $item[bricko brick].available_amount() + " bricks available.<br><br>" + creatable.listJoinComponents("<hr>");
+	                subentry.entries.listAppend(HTMLGenerateTooltip("Mouse over for all potential Bricko creations.", creations_line));
+                }
+            }
 				
-			resource_entries.listAppend(ChecklistEntryMake("__item bricko brick", "inventory.php?which=3", subentry, 7));
+			resource_entries.listAppend(ChecklistEntryMake("__item bricko brick", "inventory.php?which=3", subentry, 7)).ChecklistEntryTag("daily free fight");
 		}
 	}
 }

@@ -1,17 +1,17 @@
 
-RegisterTaskGenerationFunction("IOTMGarbageToteGenerateTasks");
-void IOTMGarbageToteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+RegisterGenerationFunction("IOTMGarbageToteGenerate");
+void IOTMGarbageToteGenerate(ChecklistCollection checklists)
 {
-	if (lookupItem("January's Garbage Tote").available_amount() == 0) return;
+	if (!$item[January's Garbage Tote].have()) return;
 	boolean [item] relevant_items;
 	if (get_property_int("garbageTreeCharge") > 0)
-		relevant_items[lookupItem("deceased crimbo tree")] = true;
+		relevant_items[$item[deceased crimbo tree]] = true;
     if (get_property_int("garbageShirtCharge") > 0 && __misc_state["Torso aware"])
-        relevant_items[lookupItem("makeshift garbage shirt")] = true;
+        relevant_items[$item[makeshift garbage shirt]] = true;
     if (get_property_int("garbageChampagneCharge") > 0)
-        relevant_items[lookupItem("broken champagne bottle")] = true;
-    relevant_items[lookupItem("tinsel tights")] = true;
-    relevant_items[lookupItem("wad of used tape")] = true;
+        relevant_items[$item[broken champagne bottle]] = true;
+    relevant_items[$item[tinsel tights]] = true;
+    relevant_items[$item[wad of used tape]] = true;
 	if (relevant_items.available_amount() == 0)
 	{
 		string [int] description;
@@ -26,46 +26,35 @@ void IOTMGarbageToteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
         	description.listAppend("Broken champagne bottle (double +item for " + pluralise(get_property_int("garbageChampagneCharge"), "more turn", "more turns") + ".)");
         
         
-        optional_task_entries.listAppend(ChecklistEntryMake("__item January's Garbage Tote", "inv_use.php?pwd=" + my_hash() + "&whichitem=9690", ChecklistSubentryMake("Collect a garbage tote item", "", description), 1));
+        checklists.add(C_OPTIONAL_TASKS, ChecklistEntryMake("__item January's Garbage Tote", "inv_use.php?pwd=" + my_hash() + "&whichitem=9690", ChecklistSubentryMake("Collect a garbage tote item", "", description), 1));
 	}
-}
-
-
-RegisterResourceGenerationFunction("IOTMGarbageToteGenerateResource");
-void IOTMGarbageToteGenerateResource(ChecklistEntry [int] resource_entries)
-{
-    if (lookupItem("January's Garbage Tote").available_amount() == 0) return;
-	//_garbageShirtCharge from 37 to 0
-	//_garbageChampagneCharge from 11 to 0
-	//_garbageTreeCharge from 1000 to 0
+	
+	
+	//resources:
 	
 	string [item] item_effect_description;
 	string [item] item_charge_property;
 	
 	if (__misc_state["Torso aware"])
-		item_charge_property[lookupItem("makeshift garbage shirt")] = "garbageShirtCharge";
-    item_charge_property[lookupItem("broken champagne bottle")] = "garbageChampagneCharge";
-    item_charge_property[lookupItem("deceased crimbo tree")] = "garbageTreeCharge";
+		item_charge_property[$item[makeshift garbage shirt]] = "garbageShirtCharge";
+    item_charge_property[$item[broken champagne bottle]] = "garbageChampagneCharge";
+    item_charge_property[$item[deceased crimbo tree]] = "garbageTreeCharge";
     
     
     if (__misc_state["Torso aware"])
-	    item_effect_description[lookupItem("makeshift garbage shirt")] = "Doubles statgain";
-    item_effect_description[lookupItem("broken champagne bottle")] = "Doubles +item";
-    item_effect_description[lookupItem("deceased crimbo tree")] = "Absorbs damage";
-	
-	ChecklistEntry entry;
-	entry.url = "inv_use.php?pwd=" + my_hash() + "&whichitem=9690";
-	entry.importance_level = 8;
+	    item_effect_description[$item[makeshift garbage shirt]] = "Doubles statgain";
+    item_effect_description[$item[broken champagne bottle]] = "Doubles +item";
+    item_effect_description[$item[deceased crimbo tree]] = "Absorbs damage";
 	
 	foreach it, property_name in item_charge_property
 	{
         int charge = get_property_int(property_name);
         boolean have = it.available_amount() > 0;
         if (!have && charge == 0) continue;
-        if (!have && !(lookupItems("makeshift garbage shirt,broken champagne bottle") contains it)) continue;
+        if (!have && !($items[makeshift garbage shirt,broken champagne bottle] contains it)) continue;
         string title;
         string [int] description;
-        string url = "inventory.php?which=2";
+        string url = generateEquipmentLink(it);
         if (charge > 0)
         {
             title = pluralise(charge, "charge", "charges") + " of " + it;
@@ -76,12 +65,7 @@ void IOTMGarbageToteGenerateResource(ChecklistEntry [int] resource_entries)
         	title = HTMLGenerateSpanFont("No charges of " + it, "red");
             description.listAppend("Switch out for something else.");
             url = "inv_use.php?pwd=" + my_hash() + "&whichitem=9690";
-        }
-        if (entry.image_lookup_name == "")
-	        entry.image_lookup_name = "__item " + it;
-		entry.subentries.listAppend(ChecklistSubentryMake(title, "", description));   
-        //resource_entries.listAppend(ChecklistEntryMake("__item " + it, url, ChecklistSubentryMake(title, "", description), 8));
+        }   
+        checklists.add(C_RESOURCES, ChecklistEntryMake("__item " + it, url, ChecklistSubentryMake(title, "", description), 8).ChecklistEntryTag("garbage tote"));
 	}
-	if (entry.subentries.count() > 0)
-		resource_entries.listAppend(entry);
 }

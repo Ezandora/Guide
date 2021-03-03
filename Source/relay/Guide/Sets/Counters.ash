@@ -72,7 +72,7 @@ string [int] SCountersGenerateDescriptionForRainMonster()
     monster_descriptions["aquaconda"] = "rain skill";
     monster_descriptions["storm cow"] = "lightning skill";
     
-    if (__iotms_usable[$item[Little Geneticist DNA-Splicing Lab]] && mafiaIsPastRevision(13918) && !get_property_boolean("_dnaHybrid") && $effect[Human-Fish Hybrid].have_effect() == 0 && !__misc_state["familiars temporarily blocked"])
+    if (__iotms_usable[$item[Little Geneticist DNA-Splicing Lab]] && !get_property_boolean("_dnaHybrid") && $effect[Human-Fish Hybrid].have_effect() == 0 && !__misc_state["familiars temporarily blocked"])
     {
         //FIXME all once spaded
         //NOT giant isopod
@@ -157,8 +157,8 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
     
     
     
-    boolean [string] counter_blacklist = $strings[Semi-rare]; //Romantic Monster,
-    boolean [string] non_range_whitelist = $strings[Digitize Monster,Enamorang Monster,portscan.edu];
+    boolean [string] counter_blocklist = $strings[Semi-rare]; //Romantic Monster,
+    boolean [string] non_range_allowlist = $strings[Digitize Monster,Enamorang Monster,portscan.edu];
     
     string [int] all_counter_names = CounterGetAllNames(true);
     
@@ -167,11 +167,11 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
         string window_name = all_counter_names[key];
         if (window_name == "")
             continue;
-        if (counter_blacklist contains window_name)
+        if (counter_blocklist contains window_name)
             continue;
         
         Counter c = CounterLookup(window_name, ErrorMake(), true);
-        if (!c.CounterIsRange() && !(non_range_whitelist contains window_name))
+        if (!c.CounterIsRange() && !(non_range_allowlist contains window_name))
             continue;
         boolean counter_is_range = c.CounterIsRange();
         Vec2i turn_range = c.CounterGetWindowRange();
@@ -226,19 +226,35 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
         subentry.header = window_display_name;
         
         
+        string short_description;
         if (!counter_is_range)
         {
             if (next_exact_turn <= 0)
+            {
                 subentry.header += HTMLGenerateSpanFont(" now", "red");
+                short_description = "now";
+            }
             else
+            {
                 subentry.header += " after " + pluralise(next_exact_turn, "More Turn", "more turns");
+                short_description = next_exact_turn;
+            }
         }
         else if (turn_range.y <= 0)
+        {
             subentry.header += " now or soon";
+            short_description = "now?";
+        }
         else if (turn_range.x <= 0)
+        {
             subentry.header += " between now and " + turn_range.y + " turns.";
+            short_description = "0-" + turn_range.y;
+        }
         else
+        {
             subentry.header += " in [" + turn_range.x + " to " + turn_range.y + "] turns.";
+            short_description = turn_range.x + "-" + turn_range.y;
+        }
         
         
         if (window_name == "Digitize Monster")
@@ -305,11 +321,13 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
         string image_name = "__item Pok&euml;mann figurine: Frank"; //default - some person
         if (window_image_names contains window_name)
             image_name = window_image_names[window_name];
+        if (fighting_monster != $monster[none])
+        	image_name = "__itemsize __monster " + fighting_monster;
         
         int importance = 10;
         if (very_important)
             importance = -11;
-        ChecklistEntry entry = ChecklistEntryMake(image_name, url, subentry, importance);
+        ChecklistEntry entry = ChecklistEntryMake(image_name, url, subentry, importance).ChecklistEntrySetShortDescription(short_description);
         
         if (very_important)
             task_entries.listAppend(entry);

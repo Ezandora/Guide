@@ -31,3 +31,4 @@ import "relay/Guide/Sets/Florist.ash";
 import "relay/Guide/Sets/Misc Tasks.ash";
 import "relay/Guide/Sets/Sweet Synthesis.ash";
 import "relay/Guide/Sets/Buff Upkeep.ash";
+import "relay/Guide/Sets/Bugs.ash";

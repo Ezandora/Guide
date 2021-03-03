@@ -14,8 +14,6 @@ void IOTMTelegraphOfficeGenerateTasks(ChecklistEntry [int] task_entries, Checkli
     }
     
     
-    if (!mafiaIsPastRevision(16674))
-        return;
     
     QuestState ltt_quest = QuestState("questLTTQuestByWire");
     
@@ -143,7 +141,7 @@ void IOTMTelegraphOfficeGenerateTasks(ChecklistEntry [int] task_entries, Checkli
                 {
                     tasks.listAppend("equip rain-doh green lantern");
                 }
-                else if (lookupItems("meteorb,metal meteoroid").available_amount() > 0)
+                else if ($items[meteorb,metal meteoroid].available_amount() > 0)
                 {
                     tasks.listAppend("equip meteorb");
                 }
@@ -215,7 +213,7 @@ void IOTMTelegraphOfficeGenerateResource(ChecklistEntry [int] resource_entries)
         }
         
         
-        resource_entries.listAppend(ChecklistEntryMake("__item clara's bell", "inventory.php?which=3", ChecklistSubentryMake("Clara's Bell", "", description), 5));
+        resource_entries.listAppend(ChecklistEntryMake("__item clara's bell", "inventory.php?which=3", ChecklistSubentryMake("Clara's Bell", "", description), 2));
     }
     
     //skills:
@@ -238,20 +236,26 @@ void IOTMTelegraphOfficeGenerateResource(ChecklistEntry [int] resource_entries)
         telegraph_skill_descriptions[$skill[Bend Hell]] = "Double elemental damage/elemental spell damage. Once/day.";
         telegraph_skill_descriptions[$skill[Steely-Eyed Squint]] = "Double +item. Once/day.";
         
-        string image_name;
-        ChecklistSubentry [int] subentries;
+        string [skill] telegraph_short_descriptions = {
+        $skill[bow-legged swagger]:"+init",
+        $skill[Bend Hell]:"+ele",
+        $skill[Steely-Eyed Squint]:"+item"};
+        
+        //ChecklistSubentry [int] subentries;
         foreach s, property in telegraph_skill_properties
         {
+            string image_name;
             if (!s.skill_is_usable())
                 continue;
             if (get_property_boolean(property))
                 continue;
             
-            if (image_name == "")
+            //if (image_name == "")
                 image_name = "__skill " + s;
-            subentries.listAppend(ChecklistSubentryMake(s + " castable", "", telegraph_skill_descriptions[s]));
+            //subentries.listAppend(ChecklistSubentryMake(s + " castable", "", telegraph_skill_descriptions[s]));
+            resource_entries.listAppend(ChecklistEntryMake(image_name, "skillz.php", ChecklistSubentryMake(s + " castable", "", telegraph_skill_descriptions[s]), 9).ChecklistEntryTag("telegraph skill").ChecklistEntrySetCategory("buff").ChecklistEntrySetShortDescription(telegraph_short_descriptions[s]));
         }
-        if (subentries.count() > 0)
-            resource_entries.listAppend(ChecklistEntryMake(image_name, "skillz.php", subentries, 9));
+        //if (subentries.count() > 0)
+            //resource_entries.listAppend(ChecklistEntryMake(image_name, "skillz.php", subentries, 9));
     }
 }

@@ -1,8 +1,14 @@
 buffer generateNavbar(Checklist [int] ordered_output_checklists)
 {
     buffer navbar;
-    navbar.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_bottom_outer_container", "style", "bottom:0px;")));
-    navbar.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_bottom_inner_container", "style", "background:" + __setting_navbar_background_colour + ";")));
+    
+    string outer_style;
+    if (!__setting_newstyle_navbars)
+    	outer_style = "bottom:0px;";
+    else
+    	outer_style += "position:relative;z-index:6;";
+    navbar.HTMLAppendTagPrefix("div", mapMake("id", "navigation_bar_outer_container", "class", "r_bottom_outer_container", "style", outer_style));
+    navbar.HTMLAppendTagPrefix("div", "class", "r_bottom_inner_container", "style", "background:" + __setting_navbar_background_colour + ";");
     
     string [int] titles;
     foreach key in ordered_output_checklists
@@ -55,14 +61,14 @@ buffer generateNavbar(Checklist [int] ordered_output_checklists)
             //Cancel our usual link:
             onclick_javascript += "navbarClick(event,'" + HTMLConvertStringToAnchorID(title + " checklist container") + "')";
             
-            navbar.append(HTMLGenerateTagPrefix("a", mapMake("class", "r_a_undecorated", "href", "#" + HTMLConvertStringToAnchorID(title), "onclick", onclick_javascript)));
-            navbar.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_navbar_button_container", "style", "width:" + each_width[i] + "%;")));
+            navbar.HTMLAppendTagPrefix("a", mapMake("class", "r_a_undecorated", "href", "#" + HTMLConvertStringToAnchorID(title), "onclick", onclick_javascript));
+            navbar.HTMLAppendTagPrefix("div", "class", "r_navbar_button_container", "style", "width:" + each_width[i] + "%;");
             
             //Vertical separator:
             if (first)
                 first = false;
             else if (!__setting_gray_navbar)
-                navbar.append(HTMLGenerateDivOfClass("", "r_navbar_line_separator"));
+                navbar.HTMLAppendDivOfClass("", "r_navbar_line_separator");
             
             string text_div = HTMLGenerateDivOfClass(title, "r_navbar_text");
             if (__use_table_based_layouts)
@@ -77,8 +83,8 @@ buffer generateNavbar(Checklist [int] ordered_output_checklists)
                 //Vertical centring with divs:
                 //Which is to... tell the browser to act like a table.
                 //Sorry.
-                navbar.append(HTMLGenerateTagPrefix("div", mapMake("style", "padding-left:1px;padding-right:1px;margin-left:auto;margin-right:auto;display:table;height:100%;")));
-                navbar.append(HTMLGenerateTagPrefix("div", mapMake("style", "display:table-cell;vertical-align:middle;")));
+                navbar.HTMLAppendTagPrefix("div", "style", "padding-left:1px;padding-right:1px;margin-left:auto;margin-right:auto;display:table;height:100%;min-height:" + __setting_navbar_height_in_em + "em;");
+                navbar.HTMLAppendTagPrefix("div", "style", "display:table-cell;vertical-align:middle;");
                 navbar.append(text_div);
                 navbar.append("</div>");
                 navbar.append("</div>");

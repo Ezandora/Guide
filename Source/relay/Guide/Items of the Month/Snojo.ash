@@ -2,7 +2,7 @@ RegisterResourceGenerationFunction("IOTMSnojoGenerateResource");
 void IOTMSnojoGenerateResource(ChecklistEntry [int] resource_entries)
 {
     ChecklistEntry snojo_skill_entry;
-    if ($skill[Shattering Punch].skill_is_usable() && mafiaIsPastRevision(16617))
+    if ($skill[Shattering Punch].skill_is_usable())
     {
         int punches_left = clampi(3 - get_property_int("_shatteringPunchUsed"), 0, 3);
         if (punches_left > 0)
@@ -13,11 +13,11 @@ void IOTMSnojoGenerateResource(ChecklistEntry [int] resource_entries)
             
             //if (snojo_skill_entry.image_lookup_name == "")
                 //snojo_skill_entry.image_lookup_name = "__skill shattering punch";
-            resource_entries.listAppend(ChecklistEntryMake("__skill shattering punch", "", ChecklistSubentryMake(pluralise(punches_left, "shattering punch", "shattering punches"), "", description), 0).ChecklistEntryTagEntry("free instakill"));
+            resource_entries.listAppend(ChecklistEntryMake("__skill shattering punch", "", ChecklistSubentryMake(pluralise(punches_left, "shattering punch", "shattering punches"), "", description), 0).ChecklistEntryTag("free instakill"));
             
         }
     }
-    if ($skill[Snokebomb].skill_is_usable() && mafiaIsPastRevision(16599))
+    if ($skill[Snokebomb].skill_is_usable())
     {
         int snokes_left = clampi(3 - get_property_int("_snokebombUsed"), 0, 3);
         if (snokes_left > 0)
@@ -34,7 +34,7 @@ void IOTMSnojoGenerateResource(ChecklistEntry [int] resource_entries)
                 description.listAppend("Currently used on " + snoke_banish.banished_monster + " for " + pluralise(turns_left_of_banish, "more turn", "more turns") + ".");
             }
             //snojo_skill_entry.subentries.listAppend(ChecklistSubentryMake(pluralise(snokes_left, "snokebomb", "snokebombs"), "", description));
-            resource_entries.listAppend(ChecklistEntryMake("__skill snokebomb", "", ChecklistSubentryMake(pluralise(snokes_left, "snokebomb", "snokebombs"), "", description), 0).ChecklistEntryTagEntry("banish"));
+            resource_entries.listAppend(ChecklistEntryMake("__skill snokebomb", "", ChecklistSubentryMake(pluralise(snokes_left, "snokebomb", "snokebombs"), "", description), 0).ChecklistEntryTag("free banish"));
         }
     }
     
@@ -52,8 +52,6 @@ void IOTMSnojoGenerateResource(ChecklistEntry [int] resource_entries)
         return;
     
     int fights_remaining = clampi(10 - get_property_int("_snojoFreeFights"), 0, 10);
-    if (!mafiaIsPastRevision(16598))
-        fights_remaining = 0;
     if (fights_remaining > 0)
     {
         item [stat] training_equipment_for_stat;
@@ -200,6 +198,6 @@ void IOTMSnojoGenerateResource(ChecklistEntry [int] resource_entries)
             importance = 0;
         ChecklistSubentry [int] subentries;
         subentries.listAppend(ChecklistSubentryMake(pluralise(fights_remaining, "free Snojo fight", "free Snojo fights"), "", description));
-        resource_entries.listAppend(ChecklistEntryMake("__item snow suit", "place.php?whichplace=snojo", subentries, importance, $locations[the x-32-f combat training snowman]).ChecklistEntryTagEntry("daily free fight"));
+        resource_entries.listAppend(ChecklistEntryMake("__item snow suit", "place.php?whichplace=snojo", subentries, importance, $locations[the x-32-f combat training snowman]).ChecklistEntryTag("daily free fight"));
     }
 }

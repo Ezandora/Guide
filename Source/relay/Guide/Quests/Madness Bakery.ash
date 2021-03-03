@@ -13,7 +13,8 @@ void QMadnessBakeryInit()
 }
 
 
-void QMadnessBakeryGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+RegisterGenerationFunction("QMadnessBakeryGenerate");
+void QMadnessBakeryGenerate(ChecklistCollection checklists)
 {
 	QuestState base_quest_state = __quest_state["Madness Bakery"];
 	if (!base_quest_state.in_progress)
@@ -40,5 +41,5 @@ void QMadnessBakeryGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         subentry.entries.listAppend("Adventure in the Madness Bakery|Choose the first option in the non-combat repeatedly.");
     }
 		
-	optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[Madness Bakery]));
+	checklists.add(C_AFTERCORE_TASKS, ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[Madness Bakery]));
 }

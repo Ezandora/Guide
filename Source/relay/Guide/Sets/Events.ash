@@ -10,7 +10,7 @@ void SCrimbo2015GenerateResource(ChecklistEntry [int] resource_entries)
     string year_and_month = format_today_to_string("yyyyMM");
     if (year_and_month != "201512")
         return;
-    if (mafiaIsPastRevision(16544) && !in_ronin())
+    if (!in_ronin())
     {
         int herb_uses_left = clampi(10 - get_property_int("_fragrantHerbsUsed"), 0, 10);
         if ($item[bundle of &quot;fragrant&quot; herbs].available_amount() > 0 && herb_uses_left > 0)

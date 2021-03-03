@@ -4,7 +4,7 @@ void QLevel7Init()
 	//questL07Cyrptic
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL07Cyrptic");
-    if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
 	state.quest_name = "Cyrpt Quest";
 	state.image_name = "cyrpt";
 	state.council_quest = true;
@@ -74,7 +74,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		return;
 	QuestState base_quest_state = __quest_state["Level 7"];
 	
-	ChecklistEntry entry;
+	ChecklistEntry entry = ChecklistEntryMake();
 	entry.url = "crypt.php";
 	entry.image_lookup_name = base_quest_state.image_name;
 	entry.should_indent_after_first_subentry = true;
@@ -84,6 +84,47 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	string [int] evilness_properties = split_string_alternate("cyrptAlcoveEvilness,cyrptCrannyEvilness,cyrptNicheEvilness,cyrptNookEvilness", ",");
 	string [string] evilness_text;
 	
+	float universal_evilness_removed_per_adventure = 0.0;
+	string superhero_cape_suggestions;
+	boolean superhero_cape_active = false;
+	if (lookupItem("unwrapped knock-off retro superhero cape").have())
+	{
+		string [int] tasks;
+        if (!lookupItem("unwrapped knock-off retro superhero cape").equipped())
+        {
+        	tasks.listAppend("equip the retro superhero cape");
+            entry.url = "inventory.php?which=2&ftext=unwrapped+knock-off+retro+superhero+cape";
+        }
+        if ($slot[weapon].equipped_item().item_type() != "sword")
+        {
+        	tasks.listAppend("equip a sword in mainhand");
+        }
+        if ($effect[Iron Palms].have_effect() != 0)
+        {
+        	tasks.listAppend("cast iron palm technique");
+        }
+		if (!(get_property("retroCapeSuperhero") == "vampire" && get_property("retroCapeWashingInstructions") == "kill"))
+        {
+        	string line = "switch";
+            if (tasks.count() == 0)
+            {
+            	line += " the retro superhero cape";
+                entry.url = "inventory.php?action=hmtmkmkm";
+            }
+            line += " to Vampire Slicer/Kill Me";
+        	tasks.listAppend(line);
+        }
+        if (tasks.count() > 0)
+        {
+        	superhero_cape_suggestions = HTMLGenerateSpanFont(tasks.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".", "red");
+        }
+        else
+        {
+        	superhero_cape_active = true;
+            superhero_cape_suggestions = "Cast Slay the Dead every combat.";
+            universal_evilness_removed_per_adventure += 1.0;
+        }
+	}
 	foreach key in evilness_properties
 	{
 		string property = evilness_properties[key];
@@ -118,6 +159,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 			float evilness_per_adventure = 1.0;
             if ($item[gravy boat].equipped_amount() > 0)
                 evilness_per_adventure += 1.0;
+            evilness_per_adventure += universal_evilness_removed_per_adventure;
             evilness_per_adventure = MAX(evilness_per_adventure, evilness_per_adventure + eyes_per_adventure * eyes_value);
 			
 			if ($item[evil eye].available_amount() > 0)
@@ -146,6 +188,8 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		
 				subentry.entries.listAppend(roundForOutput(eyes_per_adventure * 100.0, 0) + "% chance of evil eyes.");
 				subentry.entries.listAppend("~" + roundForOutput(average_turns_remaining, 1) + " turns remain to boss. (theoretical best: " + theoretical_best_turns_remaining + ")");
+                if (superhero_cape_suggestions.length() > 0)
+                	subentry.entries.listAppend(superhero_cape_suggestions);
 			}
 		}
 		
@@ -165,6 +209,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         evilness_removed_per_adventure += 1.0 * appearance_rates[$monster[slick lihc]] / 100.0;
         evilness_removed_per_adventure += 1.0 * appearance_rates[$monster[senile lihc]] / 100.0;
         evilness_removed_per_adventure += 3.0 * appearance_rates[$monster[dirty old lihc]] / 100.0;
+        evilness_removed_per_adventure += universal_evilness_removed_per_adventure;
         
         float turns_remaining = MAX(0, evilness - 25);
         
@@ -182,6 +227,8 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         }
 		if (evilness > 25)
             subentry.entries.listAppend("~" + turns_remaining.roundForOutput(1) + " turns remaining to boss.");
+        if (evilness > 26 && superhero_cape_suggestions.length() > 0)
+            subentry.entries.listAppend(superhero_cape_suggestions);
 		
 		
 		entry.subentries.listAppend(subentry);
@@ -207,11 +254,15 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             float area_nc_rate = 1.0 - area_combat_rate;
             
             float average_beeps_per_turn = cranny_beep_beep_beep * area_nc_rate + 1.0 * area_combat_rate;
+            average_beeps_per_turn += universal_evilness_removed_per_adventure;
             float average_turns_remaining = ((base_quest_state.state_int["cranny evilness"] - 25) / average_beeps_per_turn);
             
             average_turns_remaining = MAX(1, average_turns_remaining);
 			
 			subentry.entries.listAppend("~" + cranny_beep_beep_beep.roundForOutput(1) + " beeps per ghuol swarm. ~" + average_turns_remaining.roundForOutput(1) + " turns remain to boss.");
+   
+   			if (superhero_cape_suggestions.length() > 0)
+                	subentry.entries.listAppend(superhero_cape_suggestions);
 		}
         else if (base_quest_state.state_int["cranny evilness"] <= 25)
             subentry.modifiers.listAppend("+meat");
@@ -238,7 +289,8 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		{
             subentry.modifiers.listAppend("+850% init");
             subentry.modifiers.listAppend("-combat");
-			int zmobies_needed = ceil((evilness.to_float() - 26.0) / 5.0);
+            
+			int zmobies_needed = ceil((evilness.to_float() - 26.0) / (5.0 + universal_evilness_removed_per_adventure));
 			float zmobie_chance = min(100.0, 15.0 + initiative_modifier_for_location($location[the defiled alcove]) / 10.0);
 			
 			subentry.entries.listAppend(pluralise(zmobies_needed, "modern zmobie", "modern zmobies") + " needed (" + roundForOutput(zmobie_chance, 0) + "% chance of appearing)");
@@ -251,7 +303,8 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
                 if (!(my_familiar() == $familiar[Xiblaxian Holo-Companion] && my_familiar() != $familiar[none]))
                     subentry.entries.listAppend("Run " + $familiar[oily woim] + ($familiar[happy medium].familiar_is_usable() ? "/medium" : "") + ($familiar[Xiblaxian Holo-Companion].familiar_is_usable() ? "/holo-companion" : "") + " for +init.");
             }
-			
+			if (superhero_cape_suggestions.length() > 0)
+                	subentry.entries.listAppend(superhero_cape_suggestions);
             
 		}
         else if (evilness <= 25)

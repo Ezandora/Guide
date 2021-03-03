@@ -1,8 +1,6 @@
 RegisterResourceGenerationFunction("IOTMTimeSpinnerGenerateResource");
 void IOTMTimeSpinnerGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (!mafiaIsPastRevision(17209))
-        return;
     //Warn about eating if they're low on turns - you can't use the time spinner when you're out of adventures.
     if ($item[Time-Spinner].available_amount() == 0)
         return;
@@ -38,7 +36,7 @@ void IOTMTimeSpinnerGenerateResource(ChecklistEntry [int] resource_entries)
                 options.listAppend("drink");
             if (!in_ronin())
                 options.listAppend("something to sell");
-            if (my_path_id() == PATH_GELATINOUS_NOOB && !lookupSkill("Pathological Greed").have_skill() && $item[shot of Kardashian Gin].available_amount() == 0)
+            if (my_path_id() == PATH_GELATINOUS_NOOB && !$skill[Pathological Greed].have_skill() && $item[shot of Kardashian Gin].available_amount() == 0)
             {
                 options.listAppend("Kardashian Gin for +meat skill");
             }
@@ -49,5 +47,5 @@ void IOTMTimeSpinnerGenerateResource(ChecklistEntry [int] resource_entries)
     }
     //Play a time prank - 1 minute, heart
     
-    resource_entries.listAppend(ChecklistEntryMake("Hourglass", "inv_use.php?whichitem=9104&pwd=" + my_hash(), ChecklistSubentryMake(pluralise(minutes_left, "Time-Spinner minute", "Time-Spinner minutes"), "", description), 5));
+    resource_entries.listAppend(ChecklistEntryMake("Hourglass", "inv_use.php?whichitem=9104&pwd=" + my_hash(), ChecklistSubentryMake(pluralise(minutes_left, "Time-Spinner minute", "Time-Spinner minutes"), "", description), 4).ChecklistEntrySetCategory("equipment"));
 }

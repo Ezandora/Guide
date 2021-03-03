@@ -3,8 +3,6 @@ void IOTMWitchessGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (!__iotms_usable[$item[Witchess Set]])
         return;
-    if (!mafiaIsPastRevision(16813))
-        return;
     
     string image_name = "";
     ChecklistSubentry [int] subentries;
@@ -61,14 +59,15 @@ void IOTMWitchessGenerateResource(ChecklistEntry [int] resource_entries)
         
         image_name = "__itemsize __monster Witchess Pawn";
         //subentries.listAppend(ChecklistSubentryMake(pluralise(fights_remaining, "witchess fight", "witchess fights"), "", description));
-        resource_entries.listAppend(ChecklistEntryMake(image_name, "campground.php?action=witchess", ChecklistSubentryMake(pluralise(fights_remaining, "witchess fight", "witchess fights"), "", description)).ChecklistEntryTagEntry("daily free fight"));
+        resource_entries.listAppend(ChecklistEntryMake(image_name, "campground.php?action=witchess", ChecklistSubentryMake(pluralise(fights_remaining, "witchess fight", "witchess fights"), "", description)).ChecklistEntryTag("daily free fight"));
     }
-    if (!get_property_boolean("_witchessBuff") && mafiaIsPastRevision(16879) && !__misc_state["familiars temporarily blocked"] && $effect[puzzle champ].effect_is_usable())
+    if (!get_property_boolean("_witchessBuff") && !__misc_state["familiars temporarily blocked"] && $effect[puzzle champ].effect_is_usable())
     {
         int familiar_weight_modifier = MAX(5, get_property_int("puzzleChampBonus"));
         if (image_name == "")
             image_name = "__effect Puzzle Champ";
-        subentries.listAppend(ChecklistSubentryMake("Witchess buff", "", "+" + familiar_weight_modifier + " familiar weight. (25 turns)"));
+        //subentries.listAppend(ChecklistSubentryMake("Witchess buff", "", "+" + familiar_weight_modifier + " familiar weight. (25 turns)"));
+        resource_entries.listAppend(ChecklistEntryMake(image_name, "campground.php?action=witchess", ChecklistSubentryMake("Witchess buff", "", "+" + familiar_weight_modifier + " familiar weight. (25 turns)"), 4).ChecklistEntrySetCategory("buff"));
         //resource_entries.listAppend(ChecklistEntryMake("__effect Puzzle Champ", "campground.php?action=witchess", ChecklistSubentryMake("Witchess buff", "", "+" + familiar_weight_modifier + " familiar weight. (25 turns)"), 4));
     }
     if (subentries.count() > 0)

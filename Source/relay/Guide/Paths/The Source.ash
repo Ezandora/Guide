@@ -3,8 +3,6 @@ void PathTheSourceGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 {
 	if (my_path_id() != PATH_THE_SOURCE)
 		return;
-    if (!mafiaIsPastRevision(16944))
-        return;
     
     /*
     questM26Oracle
@@ -16,7 +14,7 @@ void PathTheSourceGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
     
     int enlightenment = get_property_int("sourceEnlightenment");
     int learned_skill_count = 0;
-    foreach s in lookupSkills("Overclocked,Bullet Time,True Disbeliever,Code Block,Disarmament,Big Guns,Humiliating Hack,Source Kick,Reboot,Restore,Data Siphon")
+    foreach s in $skills[Overclocked,Bullet Time,True Disbeliever,Code Block,Disarmament,Big Guns,Humiliating Hack,Source Kick,Reboot,Restore,Data Siphon]
     {
         if (s.have_skill())
             learned_skill_count += 1;

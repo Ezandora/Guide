@@ -2,7 +2,9 @@ import "relay/Guide/Support/Checklist.ash";
 import "relay/Guide/QuestState.ash";
 import "relay/Guide/Sets.ash";
 
-void generateMissingItems(Checklist [int] checklists)
+RegisterGenerationFunction("MissingItemsGenerate");
+//void generateMissingItems(Checklist [int] checklists)
+void MissingItemsGenerate(ChecklistCollection checklists)
 {
 	ChecklistEntry [int] items_needed_entries;
 	
@@ -138,7 +140,8 @@ void generateMissingItems(Checklist [int] checklists)
             }
             else
             {
-                options.listAppend("Fear man's level (jar)");
+            	if ($item[jar of psychoses (The Crackpot Mystic)].is_unrestricted() && (!in_hardcore() || $familiar[angry jung man].have_familiar()))
+	                options.listAppend("Fear man's level (jar)");
                 if (__misc_state["fax equivalent accessible"] && in_hardcore()) //not suggesting this in SC
                     options.listAppend("Fax/copy a ghost");
                 options.listAppend("8-bit realm (olfact blooper, slow)");
@@ -179,6 +182,7 @@ void generateMissingItems(Checklist [int] checklists)
 				options.listAppend("From key lime pie");
 			items_needed_entries.listAppend(ChecklistEntryMake("__item Boris's key", "da.php", ChecklistSubentryMake("Boris's key", "", options)));
 		}
+        
 	}
 	
 	if ($item[lord spookyraven's spectacles].available_amount() == 0 && __quest_state["Level 11 Manor"].state_boolean["Can use fast route"] && !__quest_state["Level 11 Manor"].finished)
@@ -287,5 +291,6 @@ void generateMissingItems(Checklist [int] checklists)
                                
     SetsGenerateMissingItems(items_needed_entries);
 	
-	checklists.listAppend(ChecklistMake("Required Items", items_needed_entries));
+	foreach key, entry in items_needed_entries
+		checklists.add(C_REQUIRED_ITEMS, entry);
 }

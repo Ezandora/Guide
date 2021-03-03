@@ -78,7 +78,7 @@ void QAzazelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		return;
     
         
-	ChecklistEntry entry;
+	ChecklistEntry entry = ChecklistEntryMake();
 	entry.url = "pandamonium.php";
 	entry.image_lookup_name = base_quest_state.image_name;
 	entry.should_indent_after_first_subentry = true;

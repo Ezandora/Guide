@@ -44,6 +44,7 @@ void QuestsInit()
 
 void QuestsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
+	//ideally, remove this entirely:
 	QLevel2GenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	QLevel3GenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	QLevel4GenerateTasks(task_entries, optional_task_entries, future_task_entries);
@@ -59,7 +60,6 @@ void QuestsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 	
 	QManorGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	QPirateGenerateTasks(task_entries, optional_task_entries, future_task_entries);
-	QNemesisGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	QSeaGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	QSpaceElvesGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	QAzazelGenerateTasks(task_entries, optional_task_entries, future_task_entries);
@@ -74,17 +74,11 @@ void QuestsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 	QSpookyravenLightsOutGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	QFeloniaGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     
-    QAirportGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     QSubject37GenerateTasks(task_entries, optional_task_entries, future_task_entries);
     QMartyGenerateTasks(task_entries, optional_task_entries, future_task_entries);
-    QMeatsmithGenerateTasks(task_entries, optional_task_entries, future_task_entries);
-    QGalaktikGenerateTasks(task_entries, optional_task_entries, future_task_entries);
-    QOldLandfillGenerateTasks(task_entries, optional_task_entries, future_task_entries);
-    QMadnessBakeryGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 }
 
 void QuestsGenerateResources(ChecklistEntry [int] resource_entries)
 {
     QSpookyravenLightsOutGenerateResource(resource_entries);
-    QAirportGenerateResource(resource_entries);
 }

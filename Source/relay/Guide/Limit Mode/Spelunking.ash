@@ -109,7 +109,7 @@ SpelunkingStatus SpelunkingParseStatus()
 void SpelunkingGenerateNCInformation(SpelunkingStatus spelunking_status, ChecklistEntry [int] task_entries, ChecklistEntry [int] future_task_entries)
 {
     
-    ChecklistEntry entry;
+    ChecklistEntry entry = ChecklistEntryMake();
     entry.image_lookup_name = "__item sunken chest";
     entry.should_indent_after_first_subentry = true;
     
@@ -587,7 +587,7 @@ void SpelunkingGenerateEquipmentEntries(Checklist [int] checklists, SpelunkingSt
         
         string slot_name = s.slot_to_plural_string().capitaliseFirstLetter();
         
-        /*ChecklistEntry entry;
+        /*ChecklistEntry entry = ChecklistEntryMake();
         entry.subentries.listAppend(ChecklistSubentryMake(slot_name, "", ""));
         entry.should_indent_after_first_subentry = true;
         boolean have_something_to_unequip = false;*/
@@ -655,6 +655,7 @@ void LimitModeSpelunkingGenerateChecklists(Checklist [int] checklists)
     ChecklistEntry [int] task_entries;
     ChecklistEntry [int] optional_task_entries;
     ChecklistEntry [int] future_task_entries;
+    ChecklistEntry [int] aftercore_task_entries;
     ChecklistEntry [int] resource_entries;
 
     if (true)
@@ -671,6 +672,10 @@ void LimitModeSpelunkingGenerateChecklists(Checklist [int] checklists)
         Checklist future_task_checklist;
         future_task_checklist = ChecklistMake("Future Tasks", future_task_entries);
         checklists.listAppend(future_task_checklist);
+        
+        Checklist aftercore_task_checklist;
+        aftercore_task_checklist = ChecklistMake("Aftercore Tasks", aftercore_task_entries);
+        checklists.listAppend(aftercore_task_checklist);
         
         Checklist resources_checklist;
         resources_checklist = ChecklistMake("Resources", resource_entries);

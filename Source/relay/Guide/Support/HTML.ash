@@ -6,30 +6,109 @@ string __setting_indention_width = __setting_indention_width_in_em + "em";
 
 string __html_right_arrow_character = "&#9658;";
 
-buffer HTMLGenerateTagPrefix(string tag, string [string] attributes)
+//Design note: try to prefer HTMLAppend to HTMLGenerate due to lack of temporary objects.
+
+
+buffer HTMLAppendTagPrefix(buffer out, string tag, string attribute_1, string value_1, string attribute_2, string value_2)
 {
-	buffer result;
-	result.append("<");
-	result.append(tag);
+	out.append("<");
+	out.append(tag);
+	
+    out.append(" ");
+    out.append(attribute_1);
+    if (value_1 != "")
+    {
+        boolean is_integer = value_1.is_integer(); //don't put quotes around integer attributes (i.e. width, height)
+        
+        out.append("=");
+        if (!is_integer)
+            out.append("\"");
+        out.append(value_1);
+        if (!is_integer)
+            out.append("\"");
+    }
+    
+    out.append(" ");
+    out.append(attribute_2);
+    if (value_2 != "")
+    {
+        boolean is_integer = value_2.is_integer(); //don't put quotes around integer attributes (i.e. width, height)
+        
+        out.append("=");
+        if (!is_integer)
+            out.append("\"");
+        out.append(value_2);
+        if (!is_integer)
+            out.append("\"");
+    }
+    
+    
+    
+	out.append(">");
+	return out;
+}
+
+buffer HTMLAppendTagPrefix(buffer out, string tag, string attribute_1, string value_1)
+{
+	out.append("<");
+	out.append(tag);
+	
+    out.append(" ");
+    out.append(attribute_1);
+    if (value_1 != "")
+    {
+        boolean is_integer = value_1.is_integer(); //don't put quotes around integer attributes (i.e. width, height)
+        
+        out.append("=");
+        if (!is_integer)
+            out.append("\"");
+        out.append(value_1);
+        if (!is_integer)
+            out.append("\"");
+    }
+    
+    
+	out.append(">");
+	return out;
+}
+
+buffer HTMLAppendTagPrefix(buffer out, string tag, string [string] attributes)
+{
+	out.append("<");
+	out.append(tag);
 	foreach attribute_name, attribute_value in attributes
 	{
 		//string attribute_value = attributes[attribute_name];
-		result.append(" ");
-		result.append(attribute_name);
+		out.append(" ");
+		out.append(attribute_name);
 		if (attribute_value != "")
 		{
 			boolean is_integer = attribute_value.is_integer(); //don't put quotes around integer attributes (i.e. width, height)
 			
-			result.append("=");
+			out.append("=");
 			if (!is_integer)
-				result.append("\"");
-			result.append(attribute_value);
+				out.append("\"");
+			out.append(attribute_value);
 			if (!is_integer)
-				result.append("\"");
+				out.append("\"");
 		}
 	}
-	result.append(">");
-	return result;
+	out.append(">");
+	return out;
+}
+
+buffer HTMLGenerateTagPrefix(string tag, string [string] attributes)
+{
+	buffer result;
+	return HTMLAppendTagPrefix(result, tag, attributes);
+}
+
+buffer HTMLAppendTagPrefix(buffer out, string tag)
+{
+    out.append("<");
+    out.append(tag);
+    out.append(">");
+    return out;
 }
 
 buffer HTMLGenerateTagPrefix(string tag)
@@ -41,42 +120,72 @@ buffer HTMLGenerateTagPrefix(string tag)
     return result;
 }
 
+
+buffer HTMLAppendTagSuffix(buffer out, string tag)
+{
+    out.append("</");
+    out.append(tag);
+    out.append(">");
+    return out;
+}
+
 buffer HTMLGenerateTagSuffix(string tag)
 {
     buffer result;
-    result.append("</");
-    result.append(tag);
-    result.append(">");
-    return result;
+    return result.HTMLAppendTagSuffix(tag);
+}
+
+buffer HTMLAppendTagWrap(buffer out, string tag, string source, string [string] attributes)
+{
+    out.HTMLAppendTagPrefix(tag, attributes);
+    out.append(source);
+    out.HTMLAppendTagSuffix(tag);
+	return out;
 }
 
 buffer HTMLGenerateTagWrap(string tag, string source, string [string] attributes)
 {
     buffer result;
-    result.append(HTMLGenerateTagPrefix(tag, attributes));
-    result.append(source);
-    result.append(HTMLGenerateTagSuffix(tag));
-	return result;
+    return result.HTMLAppendTagWrap(tag, source, attributes);
 }
 
 buffer HTMLGenerateTagWrap(string tag, string source)
 {
     buffer result;
-    result.append(HTMLGenerateTagPrefix(tag));
+    result.HTMLAppendTagPrefix(tag);
     result.append(source);
-    result.append(HTMLGenerateTagSuffix(tag));
+    result.HTMLAppendTagSuffix(tag);
 	return result;
+}
+
+buffer HTMLAppendDivOfClass(buffer out, string source, string class_name)
+{
+	if (class_name == "")
+	{
+		out.append("<div>");
+		//return HTMLGenerateTagWrap("div", source);
+    }
+	else
+	{
+		out.append("<div class=\"");
+        out.append(class_name);
+        out.append("\">");
+		//return HTMLGenerateTagWrap("div", source, mapMake("class", class_name));
+    }
+    out.append(source);
+    out.append("</div>");
+    
+    return out;
 }
 
 buffer HTMLGenerateDivOfClass(string source, string class_name)
 {
-	if (class_name == "")
-		return HTMLGenerateTagWrap("div", source);
-	else
-		return HTMLGenerateTagWrap("div", source, mapMake("class", class_name));
+	buffer out;
+	out.HTMLAppendDivOfClass(source, class_name);
+	return out;
 }
 
-buffer HTMLGenerateDivOfClass(string source, string class_name, string extra_style)
+buffer HTMLGenerateDivOfClassAndStyle(string source, string class_name, string extra_style)
 {
 	return HTMLGenerateTagWrap("div", source, mapMake("class", class_name, "style", extra_style));
 }
@@ -187,4 +296,10 @@ string HTMLGreyOutTextUnlessTrue(string text, boolean conditional)
     if (conditional)
         return text;
     return HTMLGenerateSpanFont(text, "gray");
+}
+
+//Should this be here...? Might be "Guide" instead of this.
+string HTMLGenerateTooltip(string underline_text, string inner_html)
+{
+	return HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(inner_html, "r_tooltip_inner_class") + underline_text, "r_tooltip_outer_class");
 }

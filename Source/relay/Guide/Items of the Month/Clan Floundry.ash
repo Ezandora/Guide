@@ -9,7 +9,7 @@ void IOTMClanFloundryGenerateResource(ChecklistEntry [int] resource_entries)
     if (my_path_id() == PATH_G_LOVER)
     	return;
     
-    //if (get_property_boolean("_floundryFabricated") || !mafiaIsPastRevision(18000))
+    //if (get_property_boolean("_floundryFabricated"))
         //return;
     foreach it in $items[bass clarinet,fish hatchet,carpe,codpiece,troutsers,tunac]
     {

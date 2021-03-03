@@ -58,7 +58,7 @@ void IOTMProtonicAcceleratorPackGenerateTasks(ChecklistEntry [int] task_entries,
         if ($item[protonic accelerator pack].equipped_amount() == 0 && $item[protonic accelerator pack].available_amount() > 0)
         {
             //Strictly speaking, they don't need the pack equipped to fight the monster, but they won't be able to trap it and get the item.
-            url = "inventory.php?which=2";
+            url = generateEquipmentLink($item[protonic accelerator pack]);
             items_to_equip.listAppend($item[protonic accelerator pack]);
         }
         if (ghost_location == $location[inside the palindome] && $item[Talisman o' Namsilat].equipped_amount() == 0)
@@ -70,7 +70,7 @@ void IOTMProtonicAcceleratorPackGenerateTasks(ChecklistEntry [int] task_entries,
             }
             else
             {
-                url = "inventory.php?which=2";
+                url = generateEquipmentLink($item[talisman o' namsilat]);
                 items_to_equip.listAppend($item[talisman o' namsilat]);
             }
         }
@@ -159,16 +159,16 @@ void IOTMProtonicAcceleratorPackGenerateResource(ChecklistEntry [int] resource_e
     if ($item[protonic accelerator pack].available_amount() == 0)
         return;
     
-    if (!get_property_boolean("_streamsCrossed") &&__misc_state["in run"] && mafiaIsPastRevision(17085) && my_path_id() != PATH_G_LOVER)
+    if (!get_property_boolean("_streamsCrossed") &&__misc_state["in run"] && my_path_id() != PATH_G_LOVER)
     {
         string [int] description;
         string url = "showplayer.php?who=2807390"; //ProtonicBot is a real bot that will steal your turtle mechs at the first sign of defiance.
         description.listAppend("+20% stats for 10 turns.");
         if ($item[protonic accelerator pack].equipped_amount() == 0)
         {
-            url = "inventory.php?which=2";
+            url = generateEquipmentLink($item[protonic accelerator pack]);
             description.listAppend("Equip the protonic accelerator pack first.");
         }
-        resource_entries.listAppend(ChecklistEntryMake("__item protonic accelerator pack", url, ChecklistSubentryMake("Stream crossing", "", description), 8));
+        resource_entries.listAppend(ChecklistEntryMake("__item protonic accelerator pack", url, ChecklistSubentryMake("Stream crossing", "", description), 8).ChecklistEntrySetCategory("buff"));
     }
 }

@@ -2,7 +2,7 @@
 RegisterResourceGenerationFunction("IOTMLatteGenerateResource");
 void IOTMLatteGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (lookupItem("latte lovers member's mug").available_amount() == 0) return;
+	if ($item[latte lovers member's mug].available_amount() == 0) return;
 	
 	int refills_remaining = clampi(3 - get_property_int("_latteRefillsUsed"), 0, 3);
 	boolean banish_used = get_property_boolean("_latteBanishUsed");
@@ -14,9 +14,9 @@ void IOTMLatteGenerateResource(ChecklistEntry [int] resource_entries)
     
     string url;
     boolean latte_needs_equipping = false;
-    if (lookupItem("latte lovers member's mug").equipped_amount() == 0)
+    if ($item[latte lovers member's mug].equipped_amount() == 0)
     {
-    	url = "inventory.php?which=2";
+    	url = generateEquipmentLink($item[latte lovers member's mug]);
         latte_needs_equipping = true;
     }
     if (banishes_available > 0)
@@ -30,10 +30,10 @@ void IOTMLatteGenerateResource(ChecklistEntry [int] resource_entries)
         	banish_url = "main.php?latte=1";
         	description.listAppend(HTMLGenerateSpanFont("Must refill latte first.", "red"));
         }
-        resource_entries.listAppend(ChecklistEntryMake("__item latte lovers member's mug", banish_url, ChecklistSubentryMake(pluralise(banishes_available, "latte banish", "latte banishes"), "", description), 0).ChecklistEntryTagEntry("banish"));
+        resource_entries.listAppend(ChecklistEntryMake("__item latte lovers member's mug", banish_url, ChecklistSubentryMake(pluralise(banishes_available, "latte banish", "latte banishes"), "", description), 0).ChecklistEntryTag("free banish").ChecklistEntrySetSpecificImage("__skill Throw Latte on Opponent"));
     }
     
-    ChecklistEntry entry;
+    ChecklistEntry entry = ChecklistEntryMake();
     entry.image_lookup_name = "__item latte lovers member's mug";
     entry.url = "main.php?latte=1";
     
@@ -60,6 +60,7 @@ void IOTMLatteGenerateResource(ChecklistEntry [int] resource_entries)
     {
         entry.subentries.listAppend(ChecklistSubentryMake("Gulp Latte available", "", "Restores half your HP and MP. Cast in combat."));
     }
+    entry.ChecklistEntrySetAbridgedHeader("Latte lovers member's mug");
     if (entry.subentries.count() > 0)
     	resource_entries.listAppend(entry);
 }

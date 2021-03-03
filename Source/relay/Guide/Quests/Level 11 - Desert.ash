@@ -2,7 +2,7 @@ void QLevel11DesertInit()
 {
     QuestState state;
     QuestStateParseMafiaQuestProperty(state, "questL11Desert");
-    if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
     state.quest_name = "Desert Quest";
     state.image_name = "Pyramid"; //"__item instant karma";
     
@@ -60,6 +60,9 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         exploration_per_turn += 2.0; //FIXME make completely accurate for first turn? not enough information available
     else if ($item[uv-resistant compass].available_amount() > 0)
         exploration_per_turn += 1.0;
+    //if (my_familiar() == lookupFamiliar("Melodramedary") && my_familiar() != $familiar[none])
+    if (lookupFamiliar("Melodramedary").familiar_is_usable() && !__misc_state["familiars temporarily blocked"]) //fixme should this be always...?
+    	exploration_per_turn += 1.0;
     if (my_path_id() == PATH_LICENSE_TO_ADVENTURE && get_property_boolean("bondDesert"))
         exploration_per_turn += 2.0;
     
@@ -192,6 +195,10 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         else
             subentry.entries.listAppend("Use your desert sightseeing pamphlets. (+15% exploration)");
     }
+    if (lookupFamiliar("Melodramedary").familiar_is_usable() && my_familiar() != lookupFamiliar("Melodramedary") && !__misc_state["familiars temporarily blocked"])
+    {
+    	subentry.entries.listAppend(HTMLGenerateSpanFont("Bring along your Melodramedary for extra exploration.", "red"));
+    }
     if (!base_quest_state.state_boolean["Have UV-Compass eqipped"] && __quest_state["Level 11 Desert"].state_int["Desert Exploration"] < 99)
     {
         boolean should_output_compass_in_red = true;
@@ -200,7 +207,7 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         if ($item[ornate dowsing rod].available_amount() > 0)
         {
             line = "Equip the ornate dowsing rod.";
-            url = "inventory.php?which=2";
+            url = generateEquipmentLink($item[ornate dowsing rod]);
         }
         else
         {
@@ -226,7 +233,7 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
             else if ($item[uv-resistant compass].available_amount() > 0)
             {
                 line = "Equip the UV-resistant compass.";
-                url = "inventory.php?which=2";
+                url = generateEquipmentLink($item[uv-resistant compass]);
             }
         }
         if (line != "")

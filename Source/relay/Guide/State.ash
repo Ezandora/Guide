@@ -99,7 +99,7 @@ void setUpState()
     //if (get_property_ascension("lastKingLiberation") && my_ascensions() != 0)
         //__misc_state["in aftercore"] = true;
 	__misc_state["in run"] = !__misc_state["in aftercore"];
-    if (__misc_state["Example mode"])
+    if (__misc_state["Example mode"] || debug)
         __misc_state["in run"] = true;
     __misc_state["In valhalla"] = (my_class().to_string() == "Astral Spirit");
     
@@ -151,9 +151,11 @@ void setUpState()
 	
 	
 	__misc_state["can equip just about any weapon"] = true;
+	__misc_state["can equip just about any off-hand"] = true;
 	if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_WAY_OF_THE_SURPRISING_FIST)
 	{
 		__misc_state["can equip just about any weapon"] = false;
+        __misc_state["can equip just about any off-hand"] = false;
 	}
 	
 	
@@ -200,6 +202,12 @@ void setUpState()
 		yellow_ray_available = true;
 		yellow_ray_source = "viral video";
 		yellow_ray_image_name = "__item viral video";
+    }
+    if (lookupItem("micronova").available_amount() > 0)
+    {
+		yellow_ray_available = true;
+		yellow_ray_source = "micronova";
+		yellow_ray_image_name = "__item micronova";
     }
     
     if ($item[mayo lance].available_amount() > 0 && get_property_int("mayoLevel") > 0)
@@ -251,7 +259,7 @@ void setUpState()
 		yellow_ray_source = "Flash Headlight";
 		yellow_ray_image_name = "__skill Easy Riding";
     }
-    if (lookupSkill("disintegrate").have_skill() && my_maxmp() >= 150)
+    if ($skill[disintegrate].have_skill() && my_maxmp() >= 150)
     {
 		yellow_ray_available = true;
 		yellow_ray_source = "Disintegrate";
@@ -295,7 +303,7 @@ void setUpState()
         __misc_state["can cook for free"] = true;
         __misc_state["can bartend for free"] = true;
     }
-    if (lookupSkill("Expert Corner-Cutter").skill_is_usable() && get_property_int("_expertCornerCutterUsed") < 5)
+    if ($skill[Expert Corner-Cutter].skill_is_usable() && get_property_int("_expertCornerCutterUsed") < 5)
     {
         __misc_state["can cook for free"] = true;
         __misc_state["can bartend for free"] = true;
@@ -488,7 +496,7 @@ void setUpState()
 	//wand
 	
 	boolean wand_of_nagamar_needed = true;
-	if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_BUGBEAR_INVASION || my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_KOLHS || my_path_id() == PATH_HEAVY_RAINS || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_THE_SOURCE || my_path_id() == PATH_LICENSE_TO_ADVENTURE || my_path_id() == PATH_POCKET_FAMILIARS || my_path_id() == PATH_VAMPIRE)
+	if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_BUGBEAR_INVASION || my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_KOLHS || my_path_id() == PATH_HEAVY_RAINS || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_THE_SOURCE || my_path_id() == PATH_LICENSE_TO_ADVENTURE || my_path_id() == PATH_POCKET_FAMILIARS || my_path_id() == PATH_VAMPIRE || my_path_id() == PATH_LUIGI || my_path_id() == PATH_GREY_GOO)
 		wand_of_nagamar_needed = false;
 		
 	int ruby_w_needed = 1;
@@ -588,7 +596,7 @@ void setUpState()
 	__misc_state_string["ballroom song"] = ballroom_song;
 	
 	__misc_state["Torso aware"] = false;
-    if ($skill[Torso Awaregness].skill_is_usable() || $skill[Best Dressed].skill_is_usable())
+    if (lookupSkill("Torso Awareness").skill_is_usable() || $skill[Best Dressed].skill_is_usable())
         __misc_state["Torso aware"] = true;
 	
 	int hipster_fights_used = get_property_int("_hipsterAdv");
@@ -694,7 +702,7 @@ void setUpState()
             minus_combat_source_count += 5 * 4;
         if (my_path_id() == PATH_AVATAR_OF_JARLSBERG && $skill[chocolatesphere].skill_is_usable())
             minus_combat_source_count += 5 * 3;
-        if (__iotms_usable[lookupItem("Asdon Martin keyfob")])
+        if (__iotms_usable[$item[Asdon Martin keyfob]])
             minus_combat_source_count += 10;
         if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE)
         {

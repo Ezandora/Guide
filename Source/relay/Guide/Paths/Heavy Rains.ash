@@ -43,7 +43,7 @@ void PathHeavyRainsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         skills_for_item[lightning_item].listAppend($skill[Clean-Hair Lightning]);
         skills_for_item[lightning_item].listAppend($skill[Ball Lightning]);
         skills_for_item[lightning_item].listAppend($skill[Sheet Lightning]);
-        skills_for_item[lightning_item].listAppend($skill[Lightning Bolt]);
+        skills_for_item[lightning_item].listAppend($skill[[16025]Lightning Bolt]);
         skills_for_item[lightning_item].listAppend($skill[Lightning Rod]);
         skills_for_item[lightning_item].listAppend($skill[Riding the Lightning]);
         

@@ -483,7 +483,7 @@ void generatePullList(Checklist [int] checklists)
 	if (my_path_id() != PATH_COMMUNITY_SERVICE)
 		pullable_item_list.listAppend(GPItemMake($item[ten-leaf clover], "Various turn saving.|Generic pull.", 20));
     
-    if (!get_property_ascension("lastTempleUnlock") && $item[spooky-gro fertilizer].item_amount() == 0 && my_path_id() != PATH_G_LOVER)
+    if (!get_property_ascension("lastTempleUnlock") && $item[spooky-gro fertilizer].item_amount() == 0 && my_path_id() != PATH_G_LOVER && !__quest_state["Level 11"].finished)
         pullable_item_list.listAppend(GPItemMake($item[spooky-gro fertilizer], "Saves 2.5 turns while unlocking temple."));
 	
 	string [int] scrip_reasons;
@@ -628,10 +628,10 @@ void generatePullList(Checklist [int] checklists)
         if (my_path_id() == PATH_GELATINOUS_NOOB)
         {
             boolean allowed = false;
-            boolean [item] whitelist = $items[gravy boat,blackberry galoshes,machetito,muculent machete,antique machete,Mr. Cheeng's spectacles,buddy bjorn,crown of thrones,navel ring of navel gazing,greatest american pants,plastic vampire fangs,the jokester's gun];
+            boolean [item] allowlist = $items[gravy boat,blackberry galoshes,machetito,muculent machete,antique machete,Mr. Cheeng's spectacles,buddy bjorn,crown of thrones,navel ring of navel gazing,greatest american pants,plastic vampire fangs,the jokester's gun];
             foreach key, it in items
             {
-                if ($slots[hat,weapon,off-hand,back,shirt,pants,acc1,acc2,acc3] contains it.to_slot() && !(whitelist contains it) && !it.discardable && !__items_in_outfits[it])
+                if ($slots[hat,weapon,off-hand,back,shirt,pants,acc1,acc2,acc3] contains it.to_slot() && !(allowlist contains it) && !it.discardable && !__items_in_outfits[it])
                 {
                 }
                 else

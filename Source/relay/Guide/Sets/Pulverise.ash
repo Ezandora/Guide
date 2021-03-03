@@ -64,7 +64,7 @@ void pulveriseAlterOutputList(string [int] output_list)
     }
 }
 
-string [int] pulveriseGenerateOutputListForProducts(boolean [item] products_wanted, boolean [item] blacklist)
+string [int] pulveriseGenerateOutputListForProducts(boolean [item] products_wanted, boolean [item] blocklist)
 {
     int [item] smashables_found;
     foreach product in products_wanted
@@ -73,7 +73,7 @@ string [int] pulveriseGenerateOutputListForProducts(boolean [item] products_want
         {
             if (smashable.available_amount() == 0)
                 continue;
-            if (blacklist[smashable])
+            if (blocklist[smashable])
                 continue;
             int value = __inverse_pulverisation[product][smashable];
             smashables_found[smashable] += value;
@@ -108,9 +108,9 @@ string [int] pulveriseGenerateOutputListForProducts(boolean [item] products_want
     return result;
 }
 
-void pulveriseAppendOutputListForProducts(string [int] description, string category, boolean [item] products_wanted, boolean [item] blacklist)
+void pulveriseAppendOutputListForProducts(string [int] description, string category, boolean [item] products_wanted, boolean [item] blocklist)
 {
-    string [int] output_list = pulveriseGenerateOutputListForProducts(products_wanted, blacklist);
+    string [int] output_list = pulveriseGenerateOutputListForProducts(products_wanted, blocklist);
 
     if (output_list.count() > 0)
     {
@@ -170,29 +170,29 @@ void SPulveriseGenerateResource(ChecklistEntry [int] resource_entries)
      */
     
     
-    boolean [item] blacklist;
-    blacklist.listAppendList($items[fireman's helmet,fire axe,enchanted fire extinguisher,fire hose,rainbow pearl earring,rainbow pearl necklace,rainbow pearl ring,steaming evil,ring of detect boring doors,giant discarded torn-up glove,giant discarded plastic fork,giant discarded bottlecap,toy ray gun,toy space helmet,toy jet pack,MagiMechTech NanoMechaMech,astronaut pants,ancient hot dog wrapper,bram's choker]);
+    boolean [item] blocklist;
+    blocklist.listAppendList($items[fireman's helmet,fire axe,enchanted fire extinguisher,fire hose,rainbow pearl earring,rainbow pearl necklace,rainbow pearl ring,steaming evil,ring of detect boring doors,giant discarded torn-up glove,giant discarded plastic fork,giant discarded bottlecap,toy ray gun,toy space helmet,toy jet pack,MagiMechTech NanoMechaMech,astronaut pants,ancient hot dog wrapper,bram's choker]);
     
     if (!__quest_state["Level 12"].finished)
-        blacklist.listAppendList($items[reinforced beaded headband,bullet-proof corduroys,round purple sunglasses,beer helmet,distressed denim pants,bejeweled pledge pin]);
+        blocklist.listAppendList($items[reinforced beaded headband,bullet-proof corduroys,round purple sunglasses,beer helmet,distressed denim pants,bejeweled pledge pin]);
     if (!__quest_state["Level 11 Hidden City"].state_boolean["Hospital finished"])
-        blacklist.listAppendList($items[head mirror,surgical apron,bloodied surgical dungarees,surgical mask,half-size scalpel]);
+        blocklist.listAppendList($items[head mirror,surgical apron,bloodied surgical dungarees,surgical mask,half-size scalpel]);
     
     string [int] details;
     
     //not relevant for adventures anymore:
     /*if (availableSpleen() > 0 && my_path_id() != PATH_SLOW_AND_STEADY)
     {
-        pulveriseAppendOutputListForProducts(details, "spleen wads", $items[cold wad,hot wad,sleaze wad,spooky wad,stench wad,twinkly wad], blacklist);
+        pulveriseAppendOutputListForProducts(details, "spleen wads", $items[cold wad,hot wad,sleaze wad,spooky wad,stench wad,twinkly wad], blocklist);
     }*/
     
     /*if (__misc_state["mysticality guild store available"] && $skill[Transcendental Noodlecraft].skill_is_usable() && $skill[The Way of Sauce].skill_is_usable()) //can make hi mein?
     {
-        pulveriseAppendOutputListForProducts(details, "hi mein elemental nuggets", $items[cold nuggets,hot nuggets,sleaze nuggets,spooky nuggets,stench nuggets], blacklist);
+        pulveriseAppendOutputListForProducts(details, "hi mein elemental nuggets", $items[cold nuggets,hot nuggets,sleaze nuggets,spooky nuggets,stench nuggets], blocklist);
     }*/
     
     
-    pulveriseAppendOutputListForProducts(details, "handful of smithereens", $items[handful of smithereens], blacklist);
+    pulveriseAppendOutputListForProducts(details, "handful of smithereens", $items[handful of smithereens], blocklist);
     
     //Elemental powder, for +1 resistances?
     //Elemental nuggets, for +3 tower test? (very marginal)

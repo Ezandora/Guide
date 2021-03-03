@@ -2,9 +2,7 @@ RegisterTaskGenerationFunction("IOTMTunnelOfLoveGenerateTasks");
 void IOTMTunnelOfLoveGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     //FIXME whatever these end up being named:
-    if (!mafiaIsPastRevision(17805))
-        return;
-    if (!__iotms_usable[lookupItem("heart-shaped crate")])
+    if (!__iotms_usable[$item[heart-shaped crate]])
         return;
     if (get_property_boolean("_loveTunnelUsed"))
         return;
@@ -60,7 +58,7 @@ void IOTMTunnelOfLoveGenerateResource(ChecklistEntry [int] resource_entries)
             resource_entries.listAppend(ChecklistEntryMake("__item LOV Enamorang", "", ChecklistSubentryMake(pluralise(enamorang), "", "Copies the monster once as an arrow."), 5));
             
         }*/
-        item chocolate = lookupItem("LOV Extraterrestrial Chocolate");
+        item chocolate = $item[LOV Extraterrestrial Chocolate];
         if (chocolate.available_amount() > 0 && my_path_id() != PATH_SLOW_AND_STEADY)
         {
             //FIXME list other chocolates?

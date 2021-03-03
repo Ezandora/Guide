@@ -1,14 +1,10 @@
 
 
-RegisterResourceGenerationFunction("IOTMZutaraGenerateResource");
-void IOTMZutaraGenerateResource(ChecklistEntry [int] resource_entries)
+RegisterGenerationFunction("IOTMZutaraGenerate");
+void IOTMZutaraGenerate(ChecklistCollection checklists)
 {
-    if (!__misc_state["VIP available"] || !lookupItem("Clan Carnival Game").is_unrestricted())
+    if (!__misc_state["VIP available"] || !$item[Clan Carnival Game].is_unrestricted())
         return;
-    ChecklistEntry entry;
-    entry.importance_level = 8;
-    entry.image_lookup_name = "__item genie's turbane";
-    entry.url = "clan_viplounge.php?preaction=lovetester";
     if (!get_property_boolean("_clanFortuneBuffUsed"))
     {
     	string [int] description;
@@ -29,13 +25,11 @@ void IOTMZutaraGenerateResource(ChecklistEntry [int] resource_entries)
             if (my_path_id() != PATH_G_LOVER)
 	            description.listAppend(HTMLGenerateSpanOfClass("Shifty:", "r_bold") + " +5 moxie stats/fight, +100% moxie, +50% init.");
         }
-    	entry.subentries.listAppend(ChecklistSubentryMake("Fortune buff (100 turns)", "", description));
+        checklists.add(C_RESOURCES, ChecklistEntryMake("__item genie's turbane", "clan_viplounge.php?preaction=lovetester", ChecklistSubentryMake("Fortune buff (100 turns)", "", description), 8).ChecklistEntryTag("zutara").ChecklistEntrySetCategory("buff").ChecklistEntrySetShortDescription("blank"));
     }
     if (get_property_int("_clanFortuneConsultUses") < 3)
     {
         string [int] description;
-        entry.subentries.listAppend(ChecklistSubentryMake(pluralise(3 - get_property_int("_clanFortuneConsultUses"), "fortune clan consult", "fortune clan consults"), "", description));
+        checklists.add(C_RESOURCES, ChecklistEntryMake("__item genie's turbane", "clan_viplounge.php?preaction=lovetester", ChecklistSubentryMake(pluralise(3 - get_property_int("_clanFortuneConsultUses"), "fortune clan consult", "fortune clan consults"), "", description), 8).ChecklistEntryTag("zutara"));
     }
-    if (entry.subentries.count() > 0)
-	    resource_entries.listAppend(entry);
 }

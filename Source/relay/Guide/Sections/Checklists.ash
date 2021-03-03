@@ -189,7 +189,7 @@ void generateChecklists(Checklist [int] ordered_output_checklists)
         generateTasks(checklists);
         if (__misc_state["Example mode"] || !__misc_state["in aftercore"])
         {
-            generateMissingItems(checklists);
+            //generateMissingItems(checklists);
             generatePullList(checklists);
         }
         if (__setting_debug_show_all_internal_states && __setting_debug_mode)
@@ -231,6 +231,10 @@ void generateChecklists(Checklist [int] ordered_output_checklists)
             {
                 call function_name(checklist_collection.lookup(request.checklist_names[0]).entries);
             }
+        }
+        foreach key, function_name in __generation_function_names
+        {
+        	call function_name(checklist_collection);
         }
     }
     
@@ -295,6 +299,9 @@ void outputChecklists(Checklist [int] ordered_output_checklists)
     if (chosen_message != "")
         PageWrite(HTMLGenerateDivOfStyle(chosen_message, "padding-left:20px;padding-right:20px;"));
     PageWrite(HTMLGenerateTagWrap("div", "", mapMake("id", "extra_words_at_top")));
+    
+
+	
 	
 	
 	if (__misc_state["Example mode"])
@@ -331,11 +338,11 @@ void outputChecklists(Checklist [int] ordered_output_checklists)
     {
         extra_important_tasks.title = "Tasks";
         extra_important_tasks.disable_generating_id = true;
-        PageWrite(HTMLGenerateTagPrefix("div", mapMake("id", "importance_bar", "style", "z-index:3;position:fixed; top:0;width:100%;max-width:" + __setting_horizontal_width + "px;visibility:hidden;")));
+        PageWrite(HTMLGenerateTagPrefix("div", mapMake("id", "importance_bar", "style", "z-index:3;position:fixed; top:0;width:100%;visibility:hidden;"))); //max-width:" + __setting_horizontal_width + "px;
 		PageWrite(ChecklistGenerate(extra_important_tasks, false));
         
         //string background = "background: -moz-linear-gradient(top, rgba(100,100,100,1) 0%, rgba(255,255,255,0) 100%);background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(100,100,100,1)), color-stop(100%,rgba(255,255,255,0)));background: -webkit-linear-gradient(top, rgba(100,100,100,1) 0%,rgba(255,255,255,0) 100%);background: -o-linear-gradient(top, rgba(100,100,100,1) 0%,rgba(255,255,255,0) 100%);background: -ms-linear-gradient(top, rgba(100,100,100,1) 0%,rgba(255,255,255,0) 100%);background: linear-gradient(to bottom, rgba(100,100,100,1) 0%,rgba(255,255,255,0) 100%);filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#646464', endColorstr='#00ffffff',GradientType=0 );"; //this looks correct in safari, but not others
-        string background = "background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAUCAYAAABMDlehAAAAb0lEQVR42gFkAJv/AFFRUf8AVlZW+ABcXFzvAGRjY+QAa2xr2AB1dHXLAH5+fr0AiIiIrgCTk5KfAJ2dnZAAqKiofwCzs7JwAL69vmAAyMjIUQDS0tJBANzb3DMA5eXlJwDt7e0bAPT09BAA+vr6B861MNMaArkVAAAAAElFTkSuQmCC);background-repeat:repeat-x;"; //use this gradient image, because alpha gradients are not consistent across browsers (compare black to white, 100% to zero opacity, on safari versus firefox)
+        string background = "background-image:url(" + __importance_bar_gradient + ");background-repeat:repeat-x;"; //use this gradient image, because alpha gradients are not consistent across browsers (compare black to white, 100% to zero opacity, on safari versus firefox)
 
         PageWrite(HTMLGenerateTagWrap("div", "", mapMake("id", "importance_bar_gradient", "style", "height:20px;transition:opacity 0.25s;opacity:0;" + background)));
         PageWrite(HTMLGenerateTagSuffix("div"));

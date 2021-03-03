@@ -4,7 +4,7 @@ void QLevel10Init()
 	//questL10Garbage
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL10Garbage");
-    if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
 	state.quest_name = "Castle Quest";
 	state.image_name = "castle";
 	state.council_quest = true;

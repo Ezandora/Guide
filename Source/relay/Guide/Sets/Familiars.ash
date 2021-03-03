@@ -6,7 +6,7 @@ void SFamiliarsGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [
             return;
         if (__misc_state["in aftercore"] && from_task)
             return;
-		string familiar_image = __misc_state_string["obtuse angel name"];
+		string familiar_image = "__familiar " + __misc_state_string["obtuse angel name"];
         string [int] description;
         string title = "Arrow monster";
         if (familiar_image == "reanimated reanimator")
@@ -76,7 +76,7 @@ void SFamiliarsGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [
                 else
                     description = "Switch to Crimbo Shrub first.|" + description;
             }
-            optional_task_entries.listAppend(ChecklistEntryMake("__item dense meat stack", url, ChecklistSubentryMake(title, "", description), 6));
+            optional_task_entries.listAppend(ChecklistEntryMake("__item dense meat stack", url, ChecklistSubentryMake(title, "", description), 6).ChecklistEntrySetShortDescription("2.5k"));
         }
     }
 }
@@ -102,7 +102,7 @@ void SFamiliarsPuckGenerateResource(ChecklistEntry [int] resource_entries)
             else
                 header += " (" + power_pill_uses_left + " usable today)";
         }
-        resource_entries.listAppend(ChecklistEntryMake("__item power pill", "", ChecklistSubentryMake(header, "", "Use in combat to instakill without costing a turn.")).ChecklistEntryTagEntry("free instakill"));
+        resource_entries.listAppend(ChecklistEntryMake("__item power pill", "", ChecklistSubentryMake(header, "", "Use in combat to instakill without costing a turn.")).ChecklistEntryTag("free instakill").ChecklistEntrySetShortDescription(power_pill_uses_left));
     }
     if ($familiar[Ms. Puck Man].familiar_is_usable() || $familiar[Puck Man].familiar_is_usable())
     {
@@ -216,11 +216,11 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] resource_entries)
 		
 		if ($familiar[Frumious Bandersnatch].familiar_is_usable() && $skill[the ode to booze].skill_is_usable())
 		{
-			image_name = "Frumious Bandersnatch";
+			image_name = "__familiar Frumious Bandersnatch";
 		}
 		else if ($familiar[pair of stomping boots].familiar_is_usable())
 		{
-			image_name = "pair of stomping boots";
+			image_name = "__familiar pair of stomping boots";
 		}
         
         if (!($familiars[Frumious Bandersnatch, pair of stomping boots] contains my_familiar()))
@@ -303,7 +303,7 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] resource_entries)
 		if (__misc_state["have muscle class combat skill"])
         {
         	if (tag_with_banish_tag)
-            	resource_entries.listAppend(ChecklistEntryMake("__familiar nanorhino", "", ChecklistSubentryMake("Nanorhino Banish", "", description_banish)).ChecklistEntryTagEntry("banish"));
+            	resource_entries.listAppend(ChecklistEntryMake("__familiar nanorhino", "", ChecklistSubentryMake("Nanorhino Banish", "", description_banish), 2).ChecklistEntryTag("banish"));
             else
 				subentries.listAppend(ChecklistSubentryMake("Nanorhino Banish", "", description_banish));
         }
@@ -317,11 +317,11 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] resource_entries)
                 subentries.listAppend(ChecklistSubentryMake("Nanorhino Yellow Ray", "", "Cast moxie combat skill."));
         }
 		if (subentries.count() > 0)
-			resource_entries.listAppend(ChecklistEntryMake("__familiar nanorhino", url, subentries, 5));
+			resource_entries.listAppend(ChecklistEntryMake("__familiar nanorhino", url, subentries, 5).ChecklistEntrySetCategory("blank"));
 	}
 	if (__misc_state["yellow ray available"] && !__misc_state["in run"])
     {
-        resource_entries.listAppend(ChecklistEntryMake(__misc_state_string["yellow ray image name"], "", ChecklistSubentryMake("Yellow ray available", "", "From " + __misc_state_string["yellow ray source"] + "."), 6));
+        resource_entries.listAppend(ChecklistEntryMake(__misc_state_string["yellow ray image name"], "", ChecklistSubentryMake("Yellow ray available", "", "From " + __misc_state_string["yellow ray source"] + "."), 6).ChecklistEntrySetShortDescription("YR"));
     }
     
     if (my_familiar() == $familiar[happy medium] || $familiar[happy medium].charges > 0 && $familiar[happy medium].familiar_is_usable()) //|| stuff
@@ -439,7 +439,7 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] resource_entries)
         
         description.listAppend("30 turns of +20% init or +HP/MP or +damage.");
         int importance = 9;
-        resource_entries.listAppend(ChecklistEntryMake("__familiar grim brother", url, ChecklistSubentryMake(title, "", description), importance));
+        resource_entries.listAppend(ChecklistEntryMake("__familiar grim brother", url, ChecklistSubentryMake(title, "", description), importance).ChecklistEntrySetCategory("buff"));
     }
     
     

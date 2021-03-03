@@ -69,10 +69,25 @@ void generateRandomMessageLocation(string [int] random_messages)
         case $location[The Crimbonium Mine]:
         case $location[The Velvet / Gold Mine (Mining)]:
             message = "street sneaky pete don't you call me cause I can't go"; break;
-        case lookupLocation("Through the Spacegate"):
+        case $location[Through the Spacegate]:
             message = "oh look! rocks!";
+        case $location[noob cave]:
+        	if ($location[noob cave].turns_spent >= 1000)
+         		message = "find anything yet";
+            else
+            	message = "time to crate is zero";
+        case $location[The Haunted Kitchen]:
+        	if (my_level() >= 5 && my_maxhp() >= 36)
+            {
+            	message = HTMLGenerateSpanFont("where are the knives", "red");
+            }
+         	break;
+    	case $location[Cobb's Knob Laboratory]:
+            message = "deedee! get out of my laboratory!"; break;
         case $location[hell]:
             message = "that's a clean burning hell, I'll tell you what"; break;
+        case $location[the goatlet]:
+            message = "my child you are breaking my " + HTMLGenerateSpanFont("heart", "red"); break;
     }
     if (message != "")
         random_messages.listAppend(message);
@@ -211,6 +226,12 @@ void generateRandomMessageFamiliar(string [int] random_messages)
         random_messages.listAppend(message);
 }
 
+
+static
+{
+	int __message_incremental;
+}
+
 string generateRandomMessage()
 {
 	string [int] random_messages;
@@ -218,6 +239,13 @@ string generateRandomMessage()
 	int current_minute = now_to_string("mm").to_int_silent();
 	int minute_of_day = current_hour * 60 + current_minute;
     
+    
+    if (false)
+    {
+    	//for testing with continuous refresh mode; updates messages
+    	__message_incremental += 1;
+        return __message_incremental.to_string();
+    }
     if (!playerIsLoggedIn())
         return "the kingdom awaits";
         
@@ -314,13 +342,14 @@ string generateRandomMessage()
     foreach it in $items[twisted-up wet towel,sommelier's towel,time bandit time towel]
         equipment_messages[it] = "don't panic";
     equipment_messages[$item[pirate fledges]] = "<img src=\"images/otherimages/12x12skull.gif\" style=\"mix-blend-mode:multiply;\"><strong> oh, better far to live and die, under the brave black flag I fly! </strong><img src=\"images/otherimages/12x12skull.gif\" style=\"mix-blend-mode:multiply;\">";
+    equipment_messages[lookupItem("unwrapped knock-off retro superhero cape")] = "you needed worthy opponents";
     
     foreach it in equipment_messages
     {
         if (it.equipped_amount() > 0)
         {
             random_messages.listAppend(equipment_messages[it]);
-            break;
+            //break;
         }
     }
 	
@@ -457,6 +486,12 @@ string generateRandomMessage()
             random_messages.listAppend("what happened to my inventory?"); break;
         case PATH_EXPLOSIONS:
             random_messages.listAppend("kaboooooom"); break;
+        case PATH_LOKI:
+            random_messages.listAppend("more lochs than scotland"); break;
+        case PATH_LUIGI:
+            random_messages.listAppend("look at that pale skin! he's been living in his brother's shadow too long"); break;
+        case PATH_GREY_GOO:
+            random_messages.listAppend("avatar of pet rock"); break;
         /*case PATH_CLASS_ACT_3:
             random_messages.listAppend("buttons for the people"); break;
         case PATH_AVATAR_OF_THE_NAUGHTY_SORCERESS:
@@ -533,7 +568,7 @@ string generateRandomMessage()
         
     if (__quest_state["Level 11"].in_progress)
         random_messages.listAppend("try not to lose your sanity");
-    if (__quest_state["Level 13"].in_progress)
+    if (__quest_state["Level 13"].in_progress && my_path_id() != PATH_LOKI)
     {
         if (my_daycount() == 1)
             random_messages.listAppend("all the world's work in a day");
@@ -672,7 +707,7 @@ string generateRandomMessage()
     if ($item[protonic accelerator pack].equipped_amount() > 0 && last_monster().monsterIsGhost())
         beaten_up_monster_messages[last_monster()] = "venkman makes it look easy";
     if ($effect[beaten up].have_effect() > 0 && $items[rainbow pearl earring,rainbow pearl necklace,rainbow pearl ring,vampire pearl earring,vampire pearl ring,vampire pearl necklace,freshwater pearl necklace,pearl diver's ring,pearl diver's necklace,pearl necklace].equipped_amount() > 0)
-    	beaten_up_monster_messages[last_monster()] = "WHY WON'T YOU LET ME DO THIS FOR YOU, ROSE?";
+    	beaten_up_monster_messages[last_monster()] = "WHY WON'T YOU JUST LET ME DO THIS FOR YOU, ROSE?";
     if (last_monster().phylum == $phylum[demon])
 	    beaten_up_monster_messages[last_monster()] = "he made the devil so much stronger than a man!";
     if (current_hour >= 5 && current_hour <= 11)
@@ -682,8 +717,8 @@ string generateRandomMessage()
     monster_messages[$monster[sk8 gnome]] = "he was a sk8 gnome she said see u l8 gnome";
     monster_messages[$monster[The Inquisitor]] = "nothing is up";
     monster_messages[$monster[Doc Clock]] = "your defeat will happen at " + (current_hour > 12 ? current_hour - 12 : current_hour) + ":" + current_minute + " precisely"; // + (current_hour >= 12 ? " PM" : " AM")
-    monster_messages[lookupMonster("God Lobster")] = "what a grand and intoxicating innocence"; //how can you kill a god? equip the heart of the volcano?
-    monster_messages[lookupMonster("cockroach")] = "are bug exterminators professional assassins?"; 
+    monster_messages[$monster[God Lobster]] = "what a grand and intoxicating innocence"; //how can you kill a god? equip the heart of the volcano?
+    monster_messages[$monster[cockroach]] = "are bug exterminators professional assassins?"; 
     
     string day_cycle;
     if (current_hour >= 5 && current_hour <= 11)

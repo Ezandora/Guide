@@ -14,8 +14,9 @@ void IOTMVampireCloakGenerateResource(ChecklistEntry [int] resource_entries)
         skills.listAppend("Mist: +2 all res");
         skills.listAppend("Bat: +50% item");
         
+        string url = generateEquipmentLink($item[vampyric cloake]);
 		string [int] description;
         description.listAppend("In-combat cast one of the Become skills, to gain a buff for that fight:|*" + skills.listJoinComponents("|*"));
-        resource_entries.listAppend(ChecklistEntryMake("__item vampyric cloake", "", ChecklistSubentryMake(pluralise(uses_left, "vampyric skill use", "vampyric skill uses"), "", description), 5));
+        resource_entries.listAppend(ChecklistEntryMake("__item vampyric cloake", url, ChecklistSubentryMake(pluralise(uses_left, "vampyric skill use", "vampyric skill uses"), "", description), 5));
     }
 }

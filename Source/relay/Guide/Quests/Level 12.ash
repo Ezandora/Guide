@@ -278,8 +278,8 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
             if (my_path_id() == PATH_G_LOVER)
             	limit = 25;
             limit = 0; //show them all - we'll go based off of turns saved
-            boolean [item] blacklist = $items[uncle greenspan's bathroom finance guide,black snowcone];
-            item [int] relevant_potions = ItemFilterGetPotionsCouldPullToAddToNumericModifier("Meat Drop", limit, blacklist);
+            boolean [item] blocklist = $items[uncle greenspan's bathroom finance guide,black snowcone];
+            item [int] relevant_potions = ItemFilterGetPotionsCouldPullToAddToNumericModifier("Meat Drop", limit, blocklist);
             string [int] relevant_potions_output;
             float average_turns_currently = meat_remaining / ((meat_drop_modifier() / 100.0 + 1.0) * 1000.0);
             foreach key, it in relevant_potions
@@ -460,7 +460,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
             if ($skill[meteor lore].have_skill() && get_property_int("_macrometeoriteUses") < 10)
             {
             	details.listAppend("Could use macrometeorite on a wandering monster (portscan, voting) to guarantee an LFM.");
-                if (lookupItem("&quot;I Voted!&quot; sticker").available_amount() > 0 && get_property_int("_voteFreeFights") >= 3)
+                if ($item[&quot;I Voted!&quot; sticker].available_amount() > 0 && get_property_int("_voteFreeFights") >= 3)
                 {
                 	if (total_turns_played() % 11 == 1 && get_property_int("lastVoteMonsterTurn") < total_turns_played())
                     {
@@ -677,12 +677,12 @@ void QLevel12ExplosionsGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         if ($item[haunted paddle-ball].have())
         {
             description.listAppend("Equip haunted paddle-ball first.");
-            url = "inventory.php?which=2";
+            url = generateEquipmentLink($item[haunted paddle-ball]);
         }
         else if ($item[jacob's rung].have())
         {
             description.listAppend("Equip jacob's rung first.");
-            url = "inventory.php?which=2";
+            url = generateEquipmentLink($item[jacob's rung]);
         }
     }
     boolean likely_fighting_frats = false;
@@ -703,7 +703,7 @@ void QLevel12ExplosionsGenerateTasks(ChecklistEntry [int] task_entries, Checklis
     }
     
     
-    int battlefield_turns = lookupLocation("The Exploaded Battlefield").turns_spent;
+    int battlefield_turns = $location[The Exploaded Battlefield].turns_spent;
     int turns_until_next_war_nc = -1;
     if (battlefield_turns < 7)
         turns_until_next_war_nc = 7 - battlefield_turns;
@@ -724,12 +724,12 @@ void QLevel12ExplosionsGenerateTasks(ChecklistEntry [int] task_entries, Checklis
     
     if (likely_fighting_frats)
     {
-        if (lookupItems("space wine").available_amount() == 0)
+        if ($item[space wine].available_amount() == 0)
             description.listAppend("Buy some space wine for the non-combat.");
     }
     else
     {
-    	if (lookupItems("pie man was not meant to eat,space chowder").available_amount() == 0)
+    	if ($items[pie man was not meant to eat,space chowder].available_amount() == 0)
             description.listAppend("Buy some space chowder for the non-combat.");
     }
 	

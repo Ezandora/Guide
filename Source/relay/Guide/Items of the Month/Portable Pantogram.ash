@@ -2,8 +2,8 @@
 RegisterTaskGenerationFunction("IOTMPortablePantogramGenerateTasks");
 void IOTMPortablePantogramGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (!__iotms_usable[lookupItem("portable pantogram")]) return;
-	if (lookupItem("pantogram pants").available_amount() > 0) return;
+	if (!__iotms_usable[$item[portable pantogram]]) return;
+	if ($item[pantogram pants].available_amount() > 0) return;
 	
     if (my_path_id() == PATH_BEES_HATE_YOU) return;
 	string [int] description;

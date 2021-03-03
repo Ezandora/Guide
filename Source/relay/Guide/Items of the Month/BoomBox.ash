@@ -2,7 +2,7 @@
 RegisterTaskGenerationFunction("IOTMBoomBoxGenerateTasks");
 void IOTMBoomBoxGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (lookupItem("SongBoom&trade; BoomBox").available_amount() == 0) return;
+	if (!$item[SongBoom&trade; BoomBox].have()) return;
 	
 	string song = get_property("boomBoxSong");
 	int changes_left = get_property_int("_boomBoxSongsLeft"); //the boys are back in town, eleven times. everyone will love it

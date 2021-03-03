@@ -1,7 +1,7 @@
 RegisterTaskGenerationFunction("IOTMMaySaberPartyGenerateTasks");
 void IOTMMaySaberPartyGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-    if (lookupItem("Fourth of May Cosplay Saber").available_amount() == 0) return;
+    if ($item[Fourth of May Cosplay Saber].available_amount() == 0) return;
     if (get_property_int("_saberMod") == 0)
     {
     	string [int] options;
@@ -38,13 +38,11 @@ void IOTMMaySaberPartyGenerateTasks(ChecklistEntry [int] task_entries, Checklist
 RegisterResourceGenerationFunction("IOTMMaySaberGenerateResource");
 void IOTMMaySaberGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (lookupItem("Fourth of May Cosplay Saber").available_amount() == 0) return;
+	if ($item[Fourth of May Cosplay Saber].available_amount() == 0) return;
 	if (get_property_int("_saberForceUses") < 5)
 	{
 		int uses_remaining = clampi(5 - get_property_int("_saberForceUses"), 0, 5);
-		string url = "";
-        if (!lookupItem("Fourth of May Cosplay Saber").equipped())
-        	url = "inventory.php?which=2";
+		string url = generateEquipmentLink($item[Fourth of May Cosplay Saber]);
         string [int] description;
         description.listAppend("Use the force skill in combat, which lets you:");
         description.listAppend("Banish a monster for thirty turns.");

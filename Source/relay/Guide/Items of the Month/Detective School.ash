@@ -1,8 +1,6 @@
 RegisterTaskGenerationFunction("IOTMDetectiveSchoolGenerateTasks");
 void IOTMDetectiveSchoolGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-    if (!mafiaIsPastRevision(17048))
-        return;
     if (!__iotms_usable[$item[detective school application]])
         return;
     
@@ -23,8 +21,6 @@ void IOTMDetectiveSchoolGenerateTasks(ChecklistEntry [int] task_entries, Checkli
 RegisterResourceGenerationFunction("IOTMDetectiveSchoolGenerateResource");
 void IOTMDetectiveSchoolGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (!mafiaIsPastRevision(17048))
-        return;
     if (!__iotms_usable[$item[detective school application]])
         return;
     

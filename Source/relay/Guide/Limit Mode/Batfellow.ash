@@ -57,7 +57,7 @@ void LimitModeBatfellowGenerateResources(ChecklistEntry [int] resource_entries, 
     boolean [item] seen_items;
     foreach key in item_groupings
     {
-        ChecklistEntry entry;
+        ChecklistEntry entry = ChecklistEntryMake();
         foreach key2, it in item_groupings[key]
         {
             if (seen_items[it])
@@ -185,9 +185,9 @@ void LimitModeBatfellowBatCavernGenerateTaskResources(ChecklistEntry [int] task_
     if (state.funds_available > 0)
     {
         string [string][string] suggested_upgrades;
-        suggested_upgrades["Suit"] = mapMake();
-        suggested_upgrades["Sedan"] = mapMake();
-        suggested_upgrades["Cavern"] = mapMake();
+        suggested_upgrades["Suit"] = {};
+        suggested_upgrades["Sedan"] = {};
+        suggested_upgrades["Cavern"] = {};
         //orphans,evidence,chemicals bat-sedan
         //lower combat time
         //two that decrease searching
@@ -377,15 +377,16 @@ void LimitModeBatfellowGenerateChecklists(Checklist [int] checklists)
 RegisterResourceGenerationFunction("BatfellowGenerateResource");
 void BatfellowGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if ($item[replica bat-oomerang].available_amount() > 0 && mafiaIsPastRevision(16927))
+    if ($item[replica bat-oomerang].available_amount() > 0)
     {
         int remaining = clampi(3 - get_property_int("_usedReplicaBatoomerang"), 0, 3);
         if (remaining > 0)
-            resource_entries.listAppend(ChecklistEntryMake("__item replica bat-oomerang", "", ChecklistSubentryMake(pluralise(remaining, "replica bat-oomerang use", "replica bat-oomerang uses"), "", "Free instakill."), 5).ChecklistEntryTagEntry("free instakill"));
+            resource_entries.listAppend(ChecklistEntryMake("__item replica bat-oomerang", "", ChecklistSubentryMake(pluralise(remaining, "replica bat-oomerang use", "replica bat-oomerang uses"), "", "Free instakill."), 5).ChecklistEntryTag("free instakill"));
     }
-    if ($item[The Jokester's Gun].available_amount() > 0 && mafiaIsPastRevision(16986) && !get_property_boolean("_firedJokestersGun"))
+    if ($item[The Jokester's Gun].available_amount() > 0 && !get_property_boolean("_firedJokestersGun"))
     {
         int importance = 0;
+        string url;
         string [int] description;
         description.listAppend("Free instakill.");
         if ($item[The Jokester's Gun].equipped_amount() == 0)
@@ -397,11 +398,14 @@ void BatfellowGenerateResource(ChecklistEntry [int] resource_entries)
                 importance = 8;
             }
             else
+            {
                 line += " first.";
+                url = generateEquipmentLink($item[the jokester's gun]);
+            }
             description.listAppend(line);
         }
         else
             description.listAppend("Fire the Jokester's Gun skill in combat.");
-        resource_entries.listAppend(ChecklistEntryMake("__item The Jokester's Gun", "", ChecklistSubentryMake("The Jokester's Gun firing", "", description), importance).ChecklistEntryTagEntry("free instakill"));
+        resource_entries.listAppend(ChecklistEntryMake("__item The Jokester's Gun", url, ChecklistSubentryMake("The Jokester's Gun firing", "", description), importance).ChecklistEntryTag("free instakill"));
     }
 }

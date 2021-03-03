@@ -298,7 +298,7 @@ void PathBugbearInvasionGenerateTasks(ChecklistEntry [int] task_entries, Checkli
     
     if (true)
     {
-        ChecklistEntry entry;
+        ChecklistEntry entry = ChecklistEntryMake();
         entry.url = "place.php?whichplace=bugbearship";
         entry.image_lookup_name = "bugbear";
         foreach key, l in location_evaluation_order

@@ -1,3 +1,17 @@
+string SPVPGenerateTooltipForConsumables(string underline_text, boolean [item] consumables, string tooltip_extra_text)
+{
+    string tooltip_text = consumables.listInvert().listJoinComponents("<hr>");
+    tooltip_text += tooltip_extra_text;
+
+    return HTMLGenerateTooltip(underline_text, tooltip_text);
+}
+
+string SPVPGenerateTooltipForConsumables(string underline_text, boolean [item] consumables)
+{
+	return SPVPGenerateTooltipForConsumables(underline_text, consumables, "");
+}
+
+
 void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     if (!hippy_stone_broken())
@@ -9,7 +23,7 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
     
     int [string] mini_names = current_pvp_stances();
     
-    ChecklistEntry entry;
+    ChecklistEntry entry = ChecklistEntryMake();
     
     
     string [int] attacking_description;
@@ -84,6 +98,45 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
             else
 	        	description.listAppend("When drinking, prefer drinks that have effects.");
         }
+        else if (mini == "Nog Lover" || mini == "Nog Lover ") //it has a space at the end?
+        {
+        	if (inebriety_limit() == 0)
+            	description.listAppend("Ascend a path you can drink on.");
+            else
+            {
+                boolean [item] consumables = $items[eggnog, spooky eggnog, nanite-infested eggnog, gamma nog, green eggnog, oozenog, robin nog, haunted eggnog];
+
+	        	description.listAppend(SPVPGenerateTooltipForConsumables("Drink eggnog.", consumables));
+            }
+        }
+        else if (mini == "What's in the Basket?")
+        {
+        	if (fullness_limit() == 0)
+            	description.listAppend("Ascend a path you can eat on.");
+            else
+            {
+                boolean [item] consumables = $items[Boris's key lime pie,Jarlsberg's key lime pie,Sneaky Pete's key lime pie,digital key lime,star key lime,digital key lime pie,star key lime pie];
+
+	        	description.listAppend(SPVPGenerateTooltipForConsumables("Eat key lime pie.", consumables));
+            }
+        }
+        else if (mini == "Briniest Liver")
+        {
+        	if (inebriety_limit() == 0)
+            	description.listAppend("Ascend a path you can drink on.");
+            else
+            {
+                boolean [item] consumables = $items[Alewife&trade; Ale, dew yoana lei, dew yoana salacious lei, lychee chuhai, salacious lychee chuhai, salacious screwdiver, salinated mint julep, screwdiver, slug of vodka, slug of rum, slug of shochu];
+
+	        	description.listAppend(SPVPGenerateTooltipForConsumables("Drink drinks that give the Brined Liver effect.", consumables));
+                description.listAppend("Possibly use mayozapine if you have that IOTM.");
+            }
+        }
+        else if (mini == "Hibernation Preparation")
+        {
+        	modifiers.listAppend("+familiar experience");
+        	description.listAppend("Gain as much familiar experience as possible.|Ideally, run +familiar experience against free fights.");
+        }
         else if (mini == "Familiar Rotation")
         {
         	if (in_ronin())
@@ -99,7 +152,7 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
         {
             description.listAppend("Attack the same target repeatedly. Ideally, lose.");
         }
-        else if (mini == "Burrowing Deep" || mini == "Obviously Optimal")
+        else if (mini == "Burrowing Deep" || mini == "Obviously Optimal" || mini == "Gargle Blaster Collector" || mini == "Holiday Shopping")
         {
         	if (__misc_state_int["Basement Floor"] > 400)
             {
@@ -117,11 +170,11 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 	            description.listAppend("Collect a Pan-Dimensional Gargle Blaster from Fernswarthy's basement. " + pluraliseWordy(floors_remaining, "floor", "floors") + " to go.");
             }
         }
-        else if (mini == "Frostily Ephemeral" || mini == "Newest Born" || mini == "SELECT asc_time FROM zzz_players WHERE player_id=%playerid%" || mini == "Optimal Ascension")
+        else if (mini == "Frostily Ephemeral" || mini == "Newest Born" || mini == "SELECT asc_time FROM zzz_players WHERE player_id=%playerid%" || mini == "Optimal Ascension" || mini  == "Freshman Rule!")
         {
             description.listAppend("Ascend to reset timer.");
         }
-        else if (mini == "Karrrmic Battle" || mini == "Karmic Battle")
+        else if (mini == "Karrrmic Battle" || mini == "Karmic Battle" || mini == "On the Nice List" || mini == "Lifelong Learning")
         {
             description.listAppend("Ascend to gain more karma.");
         }
@@ -133,7 +186,7 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
         {
             description.listAppend("Adventure as often as possible in Madness Bakery.");
         }
-        else if (mini == "Fahrenheit 451")
+        else if (mini == "Fahrenheit 451" || mini == "Hot for Teacher")
         {
             attacking_modifiers.listAppend("hot damage");
             attacking_modifiers.listAppend("hot spell damage");
@@ -142,6 +195,10 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
         else if (mini == "I Like Pi")
         {
             description.listAppend("Eat key lime pies.");
+        }
+        else if (mini == "School Lunch")
+        {
+            description.listAppend("Eat pizza.");
         }
         else if (mini == "HTTP 301 Moved Permanently")
         {
@@ -165,6 +222,25 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
             else
             {
             	description.listAppend("Farm dilapidated wizard hats from swamp owls in The Weird Swamp Village.");
+            }
+        }
+        else if (mini == "Who's the Boss?")
+        {
+            description.listAppend("Fight school of wizardfish in the Briny Deeps, repeatedly.|Or school of many in the The Caliginous Abyss.|Or the school of gummi piranhas in the Sweet-Ade Lake. (best)");
+        }
+        else if (mini == "The Chalk Dust Fiasco")
+        {
+            description.listAppend("Fight chalkdust wraiths in the Haunted Billiards Room, repeatedly.");
+        }
+        else if (mini == "Conservational Yule")
+        {
+            if (!canadia_available())
+            {
+                description.listAppend("Fight copied lumberjacks.|Or ascend canadia moon sign.");
+            }
+            else
+            {
+            	description.listAppend("Fight lumberjacks in Camp Logging Camp.");
             }
         }
         else if (mini == "Illegal Operation")
@@ -213,25 +289,15 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
         }
         else if (mini == "Tea for 2, 3, 4 or More")
         {
-        	boolean [item] tea = $items[Corpse Island iced tea,cup of lukewarm tea,cup of &quot;tea&quot;,hippy herbal tea,Ice Island Long Tea,New Zealand iced tea];
-            //description.listAppend("Drink tea.|" + );
+        	boolean [item] consumables = $items[Corpse Island iced tea,cup of lukewarm tea,cup of &quot;tea&quot;,hippy herbal tea,Ice Island Long Tea,New Zealand iced tea];
             
-            string tooltip_text = tea.listInvert().listJoinComponents(", ", "or").capitaliseFirstLetter() + ".";
-            tooltip_text += "<hr>Cheapest is cup of lukewarm tea.<hr>Hippy herbal tea is guano coffee cup (bat guano, batrat, batrat burrow) + herbs (hippy store).";
-            
-            string title = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip_text, "r_tooltip_inner_class") + "Drink tea.", "r_tooltip_outer_class");
-            description.listAppend(title);
+            description.listAppend(SPVPGenerateTooltipForConsumables("Drink tea.", consumables, "<hr>Cheapest is cup of lukewarm tea.<hr>Hippy herbal tea is guano coffee cup (bat guano, batrat, batrat burrow) + herbs (hippy store)."));
         }
         else if (mini == "Scurvy Challenge")
         {
-            boolean [item] fruit = $items[grapefruit,kumquat,lemon,lime,orange,pixel lemon,sea tangelo,tangerine,vinegar-soaked lemon slice];
-            //description.listAppend("Drink tea.|" + );
+            boolean [item] consumables = $items[grapefruit,kumquat,lemon,lime,orange,pixel lemon,sea tangelo,tangerine,vinegar-soaked lemon slice];
             
-            string tooltip_text = fruit.listInvert().listJoinComponents(", ", "or").capitaliseFirstLetter() + ".";
-            tooltip_text += "<hr>Check the hippy store, on the island.";
-            
-            string title = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip_text, "r_tooltip_inner_class") + "Eat fruit.", "r_tooltip_outer_class");
-            description.listAppend(title);
+            description.listAppend(SPVPGenerateTooltipForConsumables("Eat fruit.", consumables, "<hr>Check the hippy store, on the island."));
         }
         else if (mini == "Raw Carnivorery")
         {
@@ -248,10 +314,9 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
                 entries.listAppend(entry);
             }
             
-            string tooltip_text = entries.listJoinComponents(", ", "or") + ".";
+            string tooltip_text = entries.listJoinComponents("<hr>");
             
-            string title = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip_text, "r_tooltip_inner_class") + "Eat meat.", "r_tooltip_outer_class");
-            description.listAppend(title);
+            description.listAppend(HTMLGenerateTooltip("Eat meat.", tooltip_text));
         }
         else if (mini == "That Britney Spears Number")
         {
@@ -273,7 +338,7 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
                 description.listAppend(tasks.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".");
             }
         }
-        else if (mini == "The Purity is Right" || mini == "Polar Envy" || mini == "Purity")
+        else if (mini == "The Purity is Right" || mini == "Polar Envy" || mini == "Purity" || mini == "An Open Mind")
         {
             attacking_description.listAppend("run zero effects");
             continue;
@@ -288,12 +353,12 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
             attacking_modifiers.listAppend("+item drop");
             continue;
         }
-        else if (mini == "A Nice Cold One" || mini == "Thirrrsty forrr Booze")
+        else if (mini == "A Nice Cold One" || mini == "Thirrrsty forrr Booze" || mini == "Holiday Spirit(s)!")
         {
             attacking_modifiers.listAppend("+booze drop");
             continue;
         }
-        else if (mini == "Smellin' Like a Stinkin' Rose")
+        else if (mini == "Smellin' Like a Stinkin' Rose" || mini == "Peace on Earth")
         {
             attacking_modifiers.listAppend("-combat");
             continue;
@@ -307,6 +372,10 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
         else if (mini == "Zero Tolerance")
         {
         	description.listAppend("Don't drink booze.");
+        }
+        else if (mini == "Biggest Fruitcake")
+        {
+        	description.listAppend("Eat cake and fruit.");
         }
         else if (mini == "Visiting the Cousins" || mini == "Visiting The Co@^&$`~")
         {
@@ -322,7 +391,7 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
             else
                 description.listAppend("Ascend Gnomish moon sign.");
         }
-        else if (mini == "Who Runs Bordertown?")
+        else if (mini == "Who Runs Bordertown?" || mini == "Spirit of Gnoel")
         {
         	if (gnomads_available())
                 description.listAppend("Adventure in the Thugnderdome.");
@@ -358,6 +427,10 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
         else if (mini == "With Your Bare Hands")
         {
             description.listAppend("Fight beast-type monsters without a weapon equipped.|The icy peak (olfact yeti) or the dire warren?");
+        }
+        else if (mini == "Daily Optimizer")
+        {
+            description.listAppend("Run +adventures gear at rollover.");
         }
         else if (mini == "Northern Digestion" || mini == "Frozen Dinners")
         {
@@ -401,7 +474,7 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
             attacking_modifiers.listAppend("familiar weight");
             continue;
         }
-        else if (mini == "Letter of the Moment")
+        else if (mini == "Letter of the Moment" || mini == "Spirit Day")
         {
             attacking_modifiers.listAppend("letter of the moment");
             continue;
@@ -409,6 +482,11 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
         else if (mini == "ASCII-7 of the moment")
         {
             attacking_modifiers.listAppend("letter <strong>a</strong> in equipment");
+            continue;
+        }
+        else if (mini == "Spirit of Noel")
+        {
+            attacking_modifiers.listAppend("letter <strong>L</strong> in equipment");
             continue;
         }
         else if (mini == "Barely Dressed")
@@ -426,7 +504,22 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
             attacking_description.listAppend("wear equipment with numbers in them");
             continue;
         }
-        else if (mini == "Optimal Dresser")
+        else if (mini == "Most Unbalanced")
+        {
+            attacking_description.listAppend("maximise mainstat, minimise off-stats");
+            continue;
+        }
+        else if (mini == "Well-Rounded")
+        {
+            attacking_description.listAppend("maximise off-stats");
+            continue;
+        }
+        else if (mini == "School Pride")
+        {
+            attacking_description.listAppend("wear high-power shirt/hat/pants");
+            continue;
+        }
+        else if (mini == "Optimal Dresser" || mini == "Lightest Load")
         {
             attacking_description.listAppend("wear low-power shirt/hat/pants");
             continue;
@@ -434,6 +527,11 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
         else if (mini == "Dressed in Rrrags" || mini == "Outfit Compression")
         {
             attacking_description.listAppend("wear short-named equipment");
+            continue;
+        }
+        else if (mini == "Verbosity Demonstration")
+        {
+            attacking_description.listAppend("wear long-named equipment");
             continue;
         }
         else if (mini == "Hibernation Ready" || mini == "All Bundled Up")
@@ -460,6 +558,11 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
         {
             description.listAppend("Fight ice skates. Either fax/wish/copy them, or olfact them in the The Skate Park underwater.");
         }
+        else if (mini == "Bearly Legal")
+        {
+        	modifiers.listAppend("+meat");
+            description.listAppend("Fight Mer-kin Miners with +meat. Either fax/wish/copy them, or olfact them in the Anemone Mine underwater.");
+        }
         else if (mini == "Bear Hugs All Around" || mini == "Sharing the Love (to stay warm)" || mini == "Fair Game")
         {
             description.listAppend("Maximise fightgen, attack as many unique opponents as possible.");
@@ -471,7 +574,15 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
                 line += "|Also use mayodiol.";
             description.listAppend(line);
         }
-        else if (mini == "Beta Tester" || mini == "Optimal War")
+        else if (mini == "Creative Holiday Feasting")
+        {
+            description.listAppend("Eat as many unique foods as possible, ideally 1-fullness.");
+        }   
+    	else if (mini == "Getting in the Holiday Spirits")
+        {
+            description.listAppend("Drink as many one-inebriety drinks as possible.");
+        }   
+        else if (mini == "What is it Good For?" || mini == "Beta Tester" || mini == "Optimal War" || mini == "Decisions, decisions?")
         {
             if (__quest_state["Level 12"].finished)
             {
@@ -483,35 +594,28 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
             }
             else
             {
-                description.listAppend("Finish the war for the frat side, with five sidequests completed. (iron beta of industry reward)");
-            }
-        }
-        else if (mini == "Snow Patrol")
-        {
-        	if (__quest_state["Level 12"].finished)
-            {
-                description.listAppend("Ascend to fight in war.");
-            }
-            else if (!__quest_state["Level 12"].started)
-            {
-                description.listAppend("Start the war.");
-            }
-            else
-            {
-            	modifiers.listAppend("+4 cold res");
-                string line = "Fight on the battlefield";
-                if (numeric_modifier("cold resistance") < 4)
-                	line += HTMLGenerateSpanFont(" with +4 cold resistance", "red");
-                line += ".";
-                description.listAppend(line);
+            	if (mini == "Beta Tester" || mini == "Optimal War")
+                {
+                	description.listAppend("Finish the war for the frat side, with five sidequests completed. (iron beta of industry reward)");
+                }
+                else if (mini == "Snow Patrol")
+                {
+                    modifiers.listAppend("+4 cold res");
+                    string line = "Fight on the battlefield";
+                    if (numeric_modifier("cold resistance") < 4)
+                        line += HTMLGenerateSpanFont(" with +4 cold resistance", "red");
+                    line += ".";
+                    description.listAppend(line);
+                }
+                else if (mini == "What is it Good For?" || mini == "Decisions, decisions?")
+                {
+                	description.listAppend("Spend as many turns in the war as possible.");
+                }
             }
         }
         else
         {
-        	if (my_id() == 1557284)
-	        	description.listAppend(HTMLGenerateSpanFont("Unhandled mini \"" + mini + "\".", "red"));
-            else
-        		continue;
+            description.listAppend(HTMLGenerateSpanFont("Unknown mini \"" + mini + "\".", "red"));
         }
         overall_modifiers.listAppendList(modifiers);
         if (description.count() > 0)
@@ -533,7 +637,8 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
     {
         entry.image_lookup_name = "__effect Swordholder";
         entry.url = "peevpee.php";
-        entry.importance_level = 6;
+        entry.importance_level = 10;
+        entry.ChecklistEntrySetAbridgedHeader(pluralise(pvp_attacks_left(), "PVP fight", "PVP fights"));
         optional_task_entries.listAppend(entry);
     }
 }

@@ -125,7 +125,7 @@ void CopiedMonstersGenerateDescriptionForMonster(string monster_name, string [in
         /*if ($item[telegram from Lady Spookyraven].available_amount() > 0)
             description.listAppend(HTMLGenerateSpanFont("Read the telegram from Lady Spookyraven first.", "red"));
         int desks_remaining = clampi(5 - get_property_int("writingDesksDefeated"), 0, 5);
-        if (desks_remaining > 0 && !get_property_ascension("lastSecondFloorUnlock") && $item[Lady Spookyraven's necklace].available_amount() == 0 && get_property("questM20Necklace") != "finished" && mafiaIsPastRevision(15244))
+        if (desks_remaining > 0 && !get_property_ascension("lastSecondFloorUnlock") && $item[Lady Spookyraven's necklace].available_amount() == 0 && get_property("questM20Necklace") != "finished")
             description.listAppend(pluraliseWordy(desks_remaining, "desk", "desks").capitaliseFirstLetter() + " remaining.");*/
         description.listAppend("This doesn't work anymore.");
 
@@ -350,9 +350,9 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
         //if (__misc_state["bookshelf accessible"] && $skill[summon brickos].skill_is_usable())
             //potential_copies.listAppend("Bricko bats...?");
     }
-    ChecklistEntry copy_source_entry;
+    ChecklistEntry copy_source_entry = ChecklistEntryMake();
     
-    if (__misc_state["Chateau Mantegna available"] && !get_property_boolean("_chateauMonsterFought") && mafiaIsPastRevision(15115))
+    if (__misc_state["Chateau Mantegna available"] && !get_property_boolean("_chateauMonsterFought"))
     {
         string url = "place.php?whichplace=chateau";
         string header = "Chateau painting copy";
@@ -483,6 +483,7 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
         }
         else
             last_subentry.entries.listAppendList(potential_copies);
+        copy_source_entry.ChecklistEntrySetAbridgedHeader("Monster copy sources");
         resource_entries.listAppend(copy_source_entry);
     }
     
@@ -504,7 +505,7 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
 		SCopiedMonstersGenerateResourceForCopyType(resource_entries, $item[ice sculpture], "ice sculpture", "iceSculptureMonster");
     SCopiedMonstersGenerateResourceForCopyType(resource_entries, $item[screencapped monster], "screencapped", "screencappedMonster");
         
-	//if (__misc_state["Chateau Mantegna available"] && !get_property_boolean("_chateauMonsterFought") && mafiaIsPastRevision(15115))
+	//if (__misc_state["Chateau Mantegna available"] && !get_property_boolean("_chateauMonsterFought"))
 		//SCopiedMonstersGenerateResourceForCopyType(resource_entries, $item[none], "chateau painting", "chateauMonster");
     
     SCopiedMonstersGenerateResourceForCopyType(resource_entries, $item[wax bugbear], "wax bugbear", "waxMonster");

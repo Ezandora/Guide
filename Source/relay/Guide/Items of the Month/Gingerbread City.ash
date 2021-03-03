@@ -9,14 +9,14 @@ void IOTMGingerbreadCityGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__skill Ceci N'Est Pas Un Chapeau", "skillz.php", ChecklistSubentryMake("Ceci N'Est Pas Un Chapeau", "", "Random enchantment hat, 300MP."), 10));
     }
     
-    if ($skill[Gingerbread Mob Hit].skill_is_usable() && mafiaIsPastRevision(17566))
+    if ($skill[Gingerbread Mob Hit].skill_is_usable())
     {
         if (!get_property_boolean("_gingerbreadMobHitUsed"))
         {
             string [int] description;
             description.listAppend("Combat skill, win a fight without taking a turn.");
             //FIXME replace with a better image
-            resource_entries.listAppend(ChecklistEntryMake("__familiar Penguin Goodfella", "", ChecklistSubentryMake("Gingerbread mob hit", "", description), 0).ChecklistEntryTagEntry("free instakill"));
+            resource_entries.listAppend(ChecklistEntryMake("__familiar Penguin Goodfella", "", ChecklistSubentryMake("Gingerbread mob hit", "", description), 0).ChecklistEntryTag("free instakill"));
             
         }
     }

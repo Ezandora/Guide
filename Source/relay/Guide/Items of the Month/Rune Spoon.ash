@@ -3,7 +3,7 @@
 RegisterResourceGenerationFunction("IOTMRuneSpoonGenerateResource");
 void IOTMRuneSpoonGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	item spoon = lookupItem("hewn moon-rune spoon");
+	item spoon = $item[hewn moon-rune spoon];
 	if (!spoon.have() && spoon.closet_amount() == 0) return;
 	
 	if (!get_property_boolean("moonTuned"))

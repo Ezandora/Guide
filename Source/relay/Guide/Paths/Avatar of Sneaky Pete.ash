@@ -3,11 +3,11 @@
 RegisterResourceGenerationFunction("PathSneakyPeteGenerateResource");
 void PathSneakyPeteGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (my_path_id() != PATH_AVATAR_OF_SNEAKY_PETE || !mafiaIsPastRevision(13785))
+	if (my_path_id() != PATH_AVATAR_OF_SNEAKY_PETE)
 		return;
     
     
-	ChecklistEntry entry;
+	ChecklistEntry entry = ChecklistEntryMake();
 	entry.url = "";
 	entry.image_lookup_name = "";
     entry.importance_level = 1;
@@ -38,7 +38,7 @@ void PathSneakyPeteGenerateResource(ChecklistEntry [int] resource_entries)
         
         	ChecklistSubentry subentry = ChecklistSubentryMake(pluralise(free_peel_outs_available, "peel out", "peel outs"), "10 MP/cast", description);
             if (is_banish)
-            	resource_entries.listAppend(ChecklistEntryMake("__skill Easy Riding", "", subentry).ChecklistEntryTagEntry("banish"));
+            	resource_entries.listAppend(ChecklistEntryMake("__skill Easy Riding", "", subentry).ChecklistEntryTag("free banish"));
             else
 	            entry.subentries.listAppend(subentry);
         }
@@ -102,7 +102,7 @@ void PathSneakyPeteGenerateResource(ChecklistEntry [int] resource_entries)
 RegisterTaskGenerationFunction("PathSneakyPeteGenerateTasks");
 void PathSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (my_path_id() != PATH_AVATAR_OF_SNEAKY_PETE || !mafiaIsPastRevision(13785))
+	if (my_path_id() != PATH_AVATAR_OF_SNEAKY_PETE)
 		return;
     
     
@@ -277,7 +277,7 @@ void PathSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
     int skills_available = MIN(30, MIN(15, my_level()) + get_property_int("sneakyPetePoints"));
     
     int skills_have = 0;
-    //foreach s in lookupSkills("Catchphrase,Mixologist,Throw Party,Fix Jukebox,Snap Fingers,Shake It Off,Check Hair,Cocktail Magic,Make Friends,Natural Dancer,Rev Engine,Born Showman,Pop Wheelie,Rowdy Drinker,Peel Out,Easy Riding,Check Mirror,Riding Tall,Biker Swagger,Flash Headlight,Insult,Live Fast,Incite Riot,Jump Shark,Animal Magnetism,Smoke Break,Hard Drinker,Unrepentant Thief,Brood,Walk Away From Explosion")
+    //foreach s in $skills[Catchphrase,Mixologist,Throw Party,Fix Jukebox,Snap Fingers,Shake It Off,Check Hair,Cocktail Magic,Make Friends,Natural Dancer,Rev Engine,Born Showman,Pop Wheelie,Rowdy Drinker,Peel Out,Easy Riding,Check Mirror,Riding Tall,Biker Swagger,Flash Headlight,Insult,Live Fast,Incite Riot,Jump Shark,Animal Magnetism,Smoke Break,Hard Drinker,Unrepentant Thief,Brood,Walk Away From Explosion]
     foreach s in lookupSkillsInt($ints[15027,15019,15012,15028,15001,15007,15017,15008,15016,15004,15020,15025,15031,15021,15024,15023,15009,15002,15010,15015,15013,15011,15018,15014,15006,15026,15005,15003,15032,15030])
     {
         if (s.skill_is_usable())

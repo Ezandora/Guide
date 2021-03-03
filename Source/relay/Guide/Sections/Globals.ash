@@ -67,3 +67,10 @@ void RegisterTaskGenerationFunction(string function_name)
 {
     RegisterSpecificChecklistGenerationFunction3(function_name, "Tasks", "Optional Tasks", "Future Tasks");
 }
+
+
+string [int] __generation_function_names;
+void RegisterGenerationFunction(string function_name)
+{
+	__generation_function_names.listAppend(function_name);
+}

@@ -365,7 +365,7 @@ buffer generateLocationBar(boolean displaying_navbar)
     //easy list:
     //FIXME just use that test instead?
     //ashq foreach l in $locations[] if (l.appearance_rates().count() == 1 && l.appearance_rates()[$monster[none]] == 100.0) print(l);
-    boolean [location] nc_blacklist = $locations[Pump Up Muscle,Pump Up Mysticality,Pump Up Moxie,The Shore\, Inc. Travel Agency,Goat Party,Pirate Party,Lemon Party,The Roulette Tables,The Poker Room,Anemone Mine (Mining),The Knob Shaft (Mining),Friar Ceremony Location,Itznotyerzitz Mine (in Disguise),The Prince's Restroom,The Prince's Dance Floor,The Prince's Kitchen,The Prince's Balcony,The Prince's Lounge,The Prince's Canapes table,Portal to Terrible Parents,fernswarthy's basement];
+    boolean [location] nc_blocklist = $locations[Pump Up Muscle,Pump Up Mysticality,Pump Up Moxie,The Shore\, Inc. Travel Agency,Goat Party,Pirate Party,Lemon Party,The Roulette Tables,The Poker Room,Anemone Mine (Mining),The Knob Shaft (Mining),Friar Ceremony Location,Itznotyerzitz Mine (in Disguise),The Prince's Restroom,The Prince's Dance Floor,The Prince's Kitchen,The Prince's Balcony,The Prince's Lounge,The Prince's Canapes table,Portal to Terrible Parents,fernswarthy's basement];
     
     if ((my_buffedstat($stat[moxie]) < average_ml || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE) && sample_count > 0 && __misc_state["in run"] && monster_level_adjustment() < 100)
     {
@@ -402,7 +402,7 @@ buffer generateLocationBar(boolean displaying_navbar)
                 location_data.listAppend((chance_of_jump * 100.0).round() + "% jump");
         }
     }
-    if (nc_rate > 0.0 && !(nc_blacklist contains l))
+    if (nc_rate > 0.0 && !(nc_blocklist contains l))
         location_data.listAppend(nc_rate + "% NCs");
     if (custom_location_information != "")
     {
@@ -534,11 +534,17 @@ buffer generateLocationBar(boolean displaying_navbar)
     {
         //Holding containers:
         string style;
-        if (displaying_navbar)
-            style += "bottom:" + __setting_navbar_height + ";";
+        if (!__setting_newstyle_navbars)
+        {
+            if (displaying_navbar)
+                style += "bottom:" + __setting_navbar_height + ";";
+            else
+                style += "bottom:0px;";
+        }
         else
-            style += "bottom:0px;";
-        
+        {
+        	style += "position:relative;z-index:6;";
+        }
         string onmouseenter_code;
         string onmouseleave_code;
         
@@ -548,15 +554,15 @@ buffer generateLocationBar(boolean displaying_navbar)
             onmouseleave_code = "alterLocationPopupBarVisibility(event, false);";
         }
             
-        string [string] outer_containiner_map = mapMake("class", "r_bottom_outer_container", "style", style);
-        bar.append(HTMLGenerateTagPrefix("div", outer_containiner_map));
+        string [string] outer_containiner_map = mapMake("id", "location_bar_outer_container", "class", "r_bottom_outer_container", "style", style);
+        bar.HTMLAppendTagPrefix("div", outer_containiner_map);
         
         string [string] inner_containiner_map = mapMake("id", "location_bar_inner_container", "class", "r_bottom_inner_container", "style", "background:white;");
         if (onmouseenter_code != "")
             inner_containiner_map["onmouseenter"] = onmouseenter_code;
         if (onmouseleave_code != "")
             inner_containiner_map["onmouseleave"] = onmouseleave_code;
-        bar.append(HTMLGenerateTagPrefix("div", inner_containiner_map));
+        bar.HTMLAppendTagPrefix("div", inner_containiner_map);
     }
     
     

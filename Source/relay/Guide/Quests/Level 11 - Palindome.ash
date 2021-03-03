@@ -2,7 +2,7 @@ void QLevel11PalindomeInit()
 {
     QuestState state;
     QuestStateParseMafiaQuestProperty(state, "questL11Palindome");
-    if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
     state.quest_name = "Palindome Quest";
     state.image_name = "Palindome";
     
@@ -61,13 +61,16 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
             subentry.entries.listAppend("Find the palindome by completing the " + quests.listJoinComponents("/") + " quest.");
         }
         
-        if (!is_wearing_outfit("Swashbuckling Getup") && $item[pirate fledges].equipped_amount() == 0 && $item[pirate fledges].available_amount() > 0)
+        if (!is_wearing_outfit("Swashbuckling Getup") && $item[pirate fledges].equipped_amount() == 0 && $item[pirate fledges].available_amount() > 0 && false)
         {
+            url = "inventory.php?which=2";
             if ($item[pirate fledges].available_amount() > 0 && $item[pirate fledges].can_equip())
+            {
                 subentry.entries.listAppend("Equip the pirate fledges first.");
+                url = generateEquipmentLink($item[pirate fledges]);
+            }
             else
                 subentry.entries.listAppend("Equip the Swashbuckling Getup first.");
-            url = "inventory.php?which=2";
         }
         
         if (!__quest_state["Pirate Quest"].state_boolean["valid"])
@@ -128,7 +131,9 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
     {
         url = "place.php?whichplace=palindome";
         if ($item[talisman o' namsilat].equipped_amount() == 0)
-            url = "inventory.php?which=2";
+        {
+            url = generateEquipmentLink($item[pirate fledges]);
+        }
         
         
         /*

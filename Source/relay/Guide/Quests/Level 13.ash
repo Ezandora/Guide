@@ -309,7 +309,7 @@ void QLevel13Init()
     
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL13Final");
-    if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
     if (my_path_id() == PATH_BUGBEAR_INVASION || __misc_state["in aftercore"] || (!state.in_progress && my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING) || my_path_id() == PATH_COMMUNITY_SERVICE) //FIXME mafia may track the ed L13 quest under this variable
         QuestStateParseMafiaQuestPropertyValue(state, "finished"); //never will start
 	if (__misc_state["Example mode"])
@@ -409,6 +409,10 @@ void QLevel13Init()
     
     
     boolean [string] known_key_names = $strings[Boris's key,Jarlsberg's key,Sneaky Pete's key,Richard's star key,skeleton key,digital key];
+    
+        
+    if (my_path_id() == PATH_LOKI)
+        known_key_names = $strings[clown car key,batting cage key,aqu&iacute;,knob labinet key,weremoose key,peg key,kekekey,rabbit's foot key,knob shaft skate key,ice key,anchovy can key,cactus key,f'c'le sh'c'le k'y,treasure chest key,demonic key,key sausage,knob treasury key,scrap metal key,black rose key,music box key,actual skeleton key,deep-fried key,discarded bike lock key,Boris's key,Jarlsberg's key,Sneaky Pete's key,Richard's star key,skeleton key,digital key];
     foreach key_name in known_key_names
     {
         state.state_boolean[key_name + " used"] = state.state_boolean["past keys"];
@@ -433,6 +437,28 @@ void QLevel13Init()
         }
     }
     
+    foreach key_name in known_key_names
+    {
+    	boolean need = true;
+        if (state.state_boolean["past keys"])
+        	need = false;
+        else if (state.state_boolean[key_name + " used"])
+        	need = false;
+        else
+        {
+        	item it = key_name.to_item();
+            if (it.have())
+            	need = false;
+        }
+        
+        state.state_boolean["need to find " + key_name] = need;
+        state.state_boolean["need to find " + key_name.to_lower_case()] = need;
+    }
+    //to use:
+    //__quest_state["Level 13"].state_boolean["need to find Boris's key", "need to find digital key", "need to find Jarlsberg's key", "need to find Richard's star key", "need to find skeleton key", "need to find Sneaky Pete's key"]
+    //or that, lowercase
+    //print_html("state.state_boolean = " + state.state_boolean.to_json());
+    
     //Silent, Shell Up, Sauceshell
     
     boolean other_quests_completed = true;
@@ -445,7 +471,6 @@ void QLevel13Init()
     }
     if (other_quests_completed && (my_level() >= 13 || my_path_id() == PATH_EXPLOSIONS))
         state.startable = true;
-    
 	
 	__quest_state["Level 13"] = state;
 	__quest_state["Lair"] = state;
@@ -511,8 +536,8 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 }
                 if (__misc_state_int["pulls available"] > 0)
                 {
-                    boolean [item] blacklist;// = $items[hare brush,freddie's blessing of mercury,ruby on canes];
-                    item [int] relevant_potions = ItemFilterGetPotionsCouldPullToAddToNumericModifier("Initiative", 30, blacklist);
+                    boolean [item] blocklist;// = $items[hare brush,freddie's blessing of mercury,ruby on canes];
+                    item [int] relevant_potions = ItemFilterGetPotionsCouldPullToAddToNumericModifier("Initiative", 30, blocklist);
                     string [int] relevant_potions_output;
                     foreach key, it in relevant_potions
                     {
@@ -554,9 +579,9 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                     float base_stat = MAX(1.0, my_basestat(stat_type));
                     
                     //R&uuml;mpelstiltz,gummi snake,handful of laughing willow bark,dennis's blessing of minerva,smart watch,mer-kin smartjuice,lump of saccharine maple sap,burt's blessing of bacchus,augmented-reality shades,mer-kin cooljuice,lobos mints,mariachi toothpaste,disco horoscope (virgo),pressurized potion of pulchritude,pressurized potion of perspicacity,pressurized potion of puissance,handful of crotchety pine needles,bruno's blessing of mars,fitness wristband,gummi salamander,bottle of fire,banana smoothie,banana supersucker,ennui-flavored potato chips,moonds,ultrasoldier serum,kumquat supersucker,mer-kin strongjuice,
-                    boolean [item] blacklist = $items[snake,M-242,sparkler]; //limited/expensive/unusable content
-                    item [int] relevant_potions = ItemFilterGetPotionsCouldPullToAddToNumericModifier(stat_type, MIN(600 - current_value, 25), blacklist);
-                    item [int] relevant_potions_source_2 = ItemFilterGetPotionsCouldPullToAddToNumericModifier(stat_type + " percent", 25.0 / base_stat * 100.0, blacklist);
+                    boolean [item] blocklist = $items[snake,M-242,sparkler]; //limited/expensive/unusable content
+                    item [int] relevant_potions = ItemFilterGetPotionsCouldPullToAddToNumericModifier(stat_type, MIN(600 - current_value, 25), blocklist);
+                    item [int] relevant_potions_source_2 = ItemFilterGetPotionsCouldPullToAddToNumericModifier(stat_type + " percent", 25.0 / base_stat * 100.0, blocklist);
                     
                     relevant_potions.listAppendList(relevant_potions_source_2);
                     
@@ -568,7 +593,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                     {
                         float total = (it.to_effect().numeric_modifier(stat_type) + (it.to_effect().numeric_modifier(stat_type + " percent") / 100.0 * my_basestat(stat_type)));
                         string line = it + " (" + total.roundForOutput(1) + ")";
-                        //if (it.mall_price() >= 15000) //for internal use, to fill out the blacklist
+                        //if (it.mall_price() >= 15000) //for internal use, to fill out the blocklist
                             //line = HTMLGenerateSpanFont(line, "red", "");
                         relevant_potions_output.listAppend(line);
                     }
@@ -597,8 +622,8 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 
                 if (__misc_state_int["pulls available"] > 0)
                 {
-                    boolean [item] blacklist = $items[witch's brew,boiling seal blood];
-                    item [int] relevant_potions = ItemFilterGetPotionsCouldPullToAddToNumericModifier(listMake(element_type + " damage", element_type + " spell damage"), 30, blacklist);
+                    boolean [item] blocklist = $items[witch's brew,boiling seal blood];
+                    item [int] relevant_potions = ItemFilterGetPotionsCouldPullToAddToNumericModifier(listMake(element_type + " damage", element_type + " spell damage"), 30, blocklist);
                     string [int] relevant_potions_output;
                     foreach key, it in relevant_potions
                     {
@@ -732,6 +757,9 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         string [int] keys_to_use;
         item [int] missing_keys;
         boolean [string] known_key_names = $strings[Boris's key,Jarlsberg's key,Sneaky Pete's key,Richard's star key,skeleton key,digital key];
+        
+        if (my_path_id() == PATH_LOKI)
+        	known_key_names = $strings[clown car key,batting cage key,aqu&iacute;,knob labinet key,weremoose key,peg key,kekekey,rabbit's foot key,knob shaft skate key,ice key,anchovy can key,cactus key,f'c'le sh'c'le k'y,treasure chest key,demonic key,key sausage,knob treasury key,scrap metal key,black rose key,music box key,actual skeleton key,deep-fried key,discarded bike lock key,Boris's key,Jarlsberg's key,Sneaky Pete's key,Richard's star key,skeleton key,digital key];
         foreach key_name in known_key_names
         {
             if (!base_quest_state.state_boolean[key_name + " used"])
@@ -751,13 +779,13 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         {
             subentry.entries.listAppend("Open the doorknob.");
         }
+        else if (missing_keys.count() > 0)
+        {
+            subentry.entries.listAppend("Find the " + missing_keys.listJoinComponents(", ", "and") + ".");
+        }
         else
         {
             subentry.entries.listAppend("Use " + pluraliseWordy(keys_to_use.count(), "more key", "more keys") + " on the perplexing door: " + keys_to_use.listJoinComponents(", ", "and") + ".");
-        }
-        if (missing_keys.count() > 0)
-        {
-            subentry.entries.listAppend("Find the " + missing_keys.listJoinComponents(", ", "and") + ".");
         }
     }
     else if (!base_quest_state.state_boolean["past tower level 1"])
@@ -860,6 +888,8 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             	attack_methods.listAppend("shieldbutt if you can hit" + ($slot[off-hand].equipped_item().item_type() != "shield" ? " but equip a shield first" : ""));
             if ($skill[headbutt].skill_is_usable())
                 attack_methods.listAppend("headbutt if you can hit" + ($slot[hat].equipped_item() == $item[none] ? " but equip a hat first" : ""));
+            if ($skill[kneebutt].skill_is_usable())
+                attack_methods.listAppend("kneebutt if you can hit" + ($slot[pants].equipped_item() == $item[none] ? " but equip some pants first (or don't, live free)" : ""));
             if ($skill[belch the rainbow].skill_is_usable())
                 attack_methods.listAppend("belch the rainbow");
             if ($skill[clobber].skill_is_usable())
@@ -869,6 +899,14 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             {
                 methods.listAppend("Attack using " + attack_methods.listJoinComponents(", ", "or") + ".");
             }
+            string [int] shell_up_methods;
+            foreach s in $skills[sauceshell,shell up]
+            {
+            	if (!s.skill_is_usable()) continue;
+                shell_up_methods.listAppend(s);
+            }
+            if (shell_up_methods.count() > 0)
+                methods.listAppend("After three rounds, cast " + shell_up_methods.listJoinComponents(" and then ") + ".");
             
             /*
             
@@ -915,8 +953,8 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         if (__misc_state_int["pulls available"] > 0 && current_value < 526.0)
         {
             float delta = 526.0 - current_value;
-            boolean [item] blacklist = $items[uncle greenspan's bathroom finance guide,black snowcone,sorority brain,blue grass,salt wages,perl necklace];
-            item [int] relevant_potions = ItemFilterGetPotionsCouldPullToAddToNumericModifier("Meat Drop", MIN(25, delta), blacklist);
+            boolean [item] blocklist = $items[uncle greenspan's bathroom finance guide,black snowcone,sorority brain,blue grass,salt wages,perl necklace];
+            item [int] relevant_potions = ItemFilterGetPotionsCouldPullToAddToNumericModifier("Meat Drop", MIN(25, delta), blocklist);
             string [int] relevant_potions_output;
             foreach key, it in relevant_potions
             {
@@ -1162,7 +1200,80 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             	//(30-40 damage + (muscle - monster defence)) * 100 / 4
                 //Two jam band bootlegs make that 1000 defence 250. If you have funksling, that's 487 buffed muscle needed.
                 //
-                subentry.entries.listAppend(HTMLGenerateSpanFont("Write splattersmash + jam band bootleg code.", "red"));
+                int combat_items_per_round = 1;
+                if ($skill[Ambidextrous Funkslinging].skill_is_usable())
+                	combat_items_per_round = 2;
+                int jam_band_bootlegs_left = $item[jam band bootleg].item_amount();
+                
+                int [item] items_thrown_operating;
+                int monster_base_defence = $monster[wall of bones].base_defense;
+                
+                int [int][item] items_throw_after_round;
+                int [int] monster_defence_after_round;
+                monster_defence_after_round[0] = monster_base_defence; 
+                int operating_defence = monster_base_defence;
+                for round from 1 to 3
+                {
+                    float v = operating_defence;
+                    if (jam_band_bootlegs_left > 0)
+                    {
+                    	v *= 0.5;
+                     	jam_band_bootlegs_left -= 1;
+                        items_thrown_operating[$item[jam band bootleg]] += 1;
+                        if (combat_items_per_round > 1 && jam_band_bootlegs_left > 0)
+                        {
+                			v *= 0.5;
+                            jam_band_bootlegs_left -= 1;
+                            items_thrown_operating[$item[jam band bootleg]] += 1;
+                        }
+                    }
+                    monster_defence_after_round[round] = v;
+                    items_throw_after_round[round] = items_thrown_operating.listCopy();
+                    operating_defence = v;
+                }
+                float ml_damage_multiplier = MLDamageMultiplier();
+                boolean found_one = false;
+                for round from 1 to 4
+                {
+                	int bones_defence = monster_defence_after_round[round - 1];
+                    if (!(monster_defence_after_round contains (round - 1)))
+                    	bones_defence = operating_defence;
+                    int [item] items_thrown = items_throw_after_round[round - 1];
+                    float splattersmash_damage = 30 + MAX(0, my_buffedstat($stat[muscle]) - bones_defence) * 100 * 0.25;
+                    splattersmash_damage *= ml_damage_multiplier;
+                    int total_damage_done = -1;
+                    int times = 1;
+                    if (round == 1)
+                    	times = 4;
+                    else if (round == 2)
+                    	times = 3;
+                    else if (round == 3)
+                        times = 2;
+                    else if (round == 4)
+                        times = 1;
+                    total_damage_done = splattersmash_damage * times;
+                    if (total_damage_done >= $monster[wall of bones].base_hp)
+                    {
+                    	string [int] tasks;
+                        if (items_thrown.count() > 0)
+                        {
+                        	string [int] throwing_items;
+                            foreach it, amount in items_thrown
+                            	throwing_items.listAppend(pluralise(amount, it));
+                        	tasks.listAppend("throw " + throwing_items.listJoinComponents(", ", "and"));
+                        }
+                        tasks.listAppend("cast splattersmash " + times + " times for " + total_damage_done + " total damage");
+                    	subentry.entries.listAppend(tasks.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".");
+                        found_one = true;
+                    }
+                    if (found_one)
+                    	break;
+                    //subentry.entries.listAppend("Total splattersmash damage at round " + round + " would be " + total_damage_done + " for " + splattersmash_damage + " damage/round" + ", " + items_thrown.to_json()); 
+                }
+                if (!found_one)
+                {
+                    subentry.entries.listAppend("Run +muscle to use splattersmash?");
+                }
             }
         }
     }
@@ -1201,7 +1312,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         }
         
         string [int] healing_items_available;
-        foreach it in $items[filthy poultice,gauze garter,red pixel potion,Dreadsylvanian seed pod,soggy used band-aid,Mer-kin healscroll,scented massage oil,extra-strength red potion,red potion]
+        foreach it in $items[filthy poultice,gauze garter,red pixel potion,Dreadsylvanian seed pod,soggy used band-aid,Mer-kin healscroll,scented massage oil,extra-strength red potion,red potion,sew-on bandage]
         {
             if (it.item_amount() == 0)
                 continue;
@@ -1320,7 +1431,8 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         
         if ($item[Yearbook Club Camera].available_amount() > 0 && $item[Yearbook Club Camera].equipped_amount() == 0)
         {
-            task_entries.listAppend(ChecklistEntryMake("__item yearbook club camera", "inventory.php?which=2", ChecklistSubentryMake("Equip the yearbook club camera", "", "Before prism break. Otherwise, it'll disappear.")));
+            task_entries.listAppend(ChecklistEntryMake("__item yearbook club camera", 
+                generateEquipmentLink($item[yearbook club camera]), ChecklistSubentryMake("Equip the yearbook club camera", "", "Before prism break. Otherwise, it'll disappear.")));
         }
 		
 	}

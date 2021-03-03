@@ -2,7 +2,7 @@
 RegisterResourceGenerationFunction("IOTMBeachCombGenerateResource");
 void IOTMBeachCombGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (lookupItem("beach comb").available_amount() == 0) return;
+	if ($item[beach comb].available_amount() == 0) return;
 	int free_walks_left = clampi(11 - get_property_int("_freeBeachWalksUsed"), 0, 11);
 	if (free_walks_left > 0)
 	{
@@ -44,6 +44,6 @@ void IOTMBeachCombGenerateResource(ChecklistEntry [int] resource_entries)
         if (free_walks_left >= 10)
         	description.listAppend((description.count() > 0 ? "Or collect" : "Collect") + " a bunch of items? (10 walks)");
         description.listAppend("Or farm the beach.");
-        resource_entries.listAppend(ChecklistEntryMake("__item beach comb", "main.php?comb=1", ChecklistSubentryMake(pluralise(free_walks_left, "beach comb", "beach combs"), "", description), 3));
+        resource_entries.listAppend(ChecklistEntryMake("__item beach comb", "main.php?comb=1", ChecklistSubentryMake(pluralise(free_walks_left, "beach comb", "beach combs"), "", description), 3).ChecklistEntrySetCategory("buff")); //moving it over to buff from equipment. we thought about doing the same to powerful glove, but no
     }
 }

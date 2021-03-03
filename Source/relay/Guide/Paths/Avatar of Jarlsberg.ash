@@ -43,7 +43,7 @@ void PathJarlsbergGenerateResource(ChecklistEntry [int] resource_entries)
 	if (my_path_id() != PATH_AVATAR_OF_JARLSBERG)
 		return;
     
-	ChecklistEntry entry;
+	ChecklistEntry entry = ChecklistEntryMake();
 	entry.url = "";
 	entry.image_lookup_name = "";
     
@@ -80,7 +80,7 @@ void PathJarlsbergGenerateResource(ChecklistEntry [int] resource_entries)
         
     	ChecklistEntry entry2;
         boolean should_add = PathJarlsbergGenerateStaff(entry2, $item[Staff of the Standalone Cheese], "_jiggleCheese", cheese_line, always_output);
-        entry2.ChecklistEntryTagEntry("banish");
+        entry2.ChecklistEntryTag("banish");
         if (should_add)
 	        resource_entries.listAppend(entry2);
     }

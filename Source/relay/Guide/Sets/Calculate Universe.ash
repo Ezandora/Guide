@@ -4,9 +4,9 @@ void SCalculateUniverseGenerateResource(ChecklistEntry [int] resource_entries)
     if (!$skill[Calculate the Universe].skill_is_usable())
         return;
     int uses_remaining = 1;
-    if (get_property_boolean("_universeCalculated") && !mafiaIsPastRevision(17039))
+    if (get_property_boolean("_universeCalculated"))
         return;
-    if (mafiaIsPastRevision(17039))
+    if (true)
     {
         int universe_calculated = get_property_int("_universeCalculated");
         int limit = 1;
@@ -117,7 +117,7 @@ void SCalculateUniverseGenerateResource(ChecklistEntry [int] resource_entries)
         
         
         buffer tooltip_text;
-        tooltip_text.append(HTMLGenerateTagWrap("div", "Values to input for " + __html_right_arrow_character + " output", mapMake("class", "r_bold r_centre", "style", "padding-bottom:0.25em;")));
+        tooltip_text.HTMLAppendTagWrap("div", "Values to input for " + __html_right_arrow_character + " output", mapMake("class", "r_bold r_centre", "style", "padding-bottom:0.25em;"));
         tooltip_text.append(HTMLGenerateSimpleTableLines(mappings_final));
         
         string line = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip_text, "r_tooltip_inner_class") + "Full table", "r_tooltip_outer_class");

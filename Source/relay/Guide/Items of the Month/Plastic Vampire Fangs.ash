@@ -18,7 +18,7 @@ void IOTMPlasticVampireFangsGenerateResource(ChecklistEntry [int] resource_entri
         url = "place.php?whichplace=town";
         if ($item[plastic vampire fangs].equipped_amount() == 0)
         {
-            url = "inventory.php?which=2";
+            url = generateEquipmentLink($item[plastic vampire fangs]);
         }
     }
     

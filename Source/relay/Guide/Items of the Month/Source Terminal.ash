@@ -30,8 +30,12 @@ void IOTMSourceTerminalGenerateTasks(ChecklistEntry [int] task_entries, Checklis
 {
     if (in_bad_moon() || get_campground()[$item[Source Terminal]] == 0 || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
         return;
-    if (!mafiaIsPastRevision(17011))
-        return;
+        
+    string url = "campground.php?action=terminal";
+    if (my_path_id() == PATH_NUCLEAR_AUTUMN)
+        url = "place.php?whichplace=falloutshelter&action=vault_term";
+    string image_name = "__item source essence";
+        
     ChecklistSubentry [int] subentries;
     
     boolean [string] chips = getInstalledSourceTerminalSingleChips();
@@ -94,22 +98,30 @@ void IOTMSourceTerminalGenerateTasks(ChecklistEntry [int] task_entries, Checklis
     //Maybe suggest the first use, and always list in resources for the rest.
     //"Upgrade your source terminal" suggestions? Chips, essentially.
     
-    string url = "campground.php?action=terminal";
-    if (my_path_id() == PATH_NUCLEAR_AUTUMN)
-        url = "place.php?whichplace=falloutshelter&action=vault_term";
     if (subentries.count() > 0)
-        optional_task_entries.listAppend(ChecklistEntryMake("__item source essence", url, subentries, 5));
+        optional_task_entries.listAppend(ChecklistEntryMake(image_name, url, subentries, 5));
 }
 
-RegisterResourceGenerationFunction("IOTMSourceTerminalGenerateResource");
-void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
+
+
+
+
+
+RegisterGenerationFunction("IOTMSourceTerminalGenerate");
+void IOTMSourceTerminalGenerate(ChecklistCollection checklists)
 {
     if (in_bad_moon() || get_campground()[$item[Source Terminal]] == 0 || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
         return;
     
+    string url = "campground.php?action=terminal";
+    if (my_path_id() == PATH_NUCLEAR_AUTUMN)
+        url = "place.php?whichplace=falloutshelter&action=vault_term";
+    string image_name = "__item source terminal";
+    int importance = 5;
+    
     boolean [string] chips = getInstalledSourceTerminalSingleChips();
     //sourceTerminalChips, sourceTerminalPram, sourceTerminalGram, sourceTerminalSpam
-    ChecklistSubentry [int] subentries;
+    //ChecklistSubentry [int] subentries;
     //Enhancement buffs:
     int enhancement_limit = 1;
     if (chips["CRAM"]) //CRAM chip installed
@@ -117,7 +129,7 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
     if (chips["SCRAM"]) //SCRAM chip installed
         enhancement_limit += 1;
     int enhancements_remaining = clampi(enhancement_limit - get_property_int("_sourceTerminalEnhanceUses"), 0, enhancement_limit);
-    if (enhancements_remaining > 0 && mafiaIsPastRevision(17011))
+    if (enhancements_remaining > 0)
     {
         int turn_duration = 25; //up to 100
         if (chips["INGRAM"])
@@ -138,22 +150,16 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
         //+critical hit? niche
         //+all elemental damage? useful in two places, but still niche enough to not be put here
         //substats.enh is probably less than 150 mainstat. that's not a lot... +item is much more useful
-        subentries.listAppend(ChecklistSubentryMake(pluralise(enhancements_remaining, "source enhancement", "source enhancements") + " remaining", "", description));
+        checklists.add(C_RESOURCES, ChecklistEntryMake(image_name, url, ChecklistSubentryMake(pluralise(enhancements_remaining, "source enhancement", "source enhancements") + " remaining", "", description), importance).ChecklistEntryTag("source terminal").ChecklistEntrySetSpecificImage("__item Fitspiration&trade; poster").ChecklistEntrySetCategory("buff"));
     }
     
 	int total_duplicate_uses_available = 1;
 	if (my_path_id() == PATH_THE_SOURCE)
 		total_duplicate_uses_available = 5;
 	int duplicate_uses_remaining = clampi(total_duplicate_uses_available - get_property_int("_sourceTerminalDuplicateUses"), 0, total_duplicate_uses_available);
-    if (!mafiaIsPastRevision(17062))
-    {
-        duplicate_uses_remaining = 1;
-        if (get_property_boolean("_sourceTerminalDuplicateUsed"))
-            duplicate_uses_remaining = 0;
-    }
     if (my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_POCKET_FAMILIARS)
         duplicate_uses_remaining = 0;
-    if (mafiaIsPastRevision(17031) && duplicate_uses_remaining > 0 && __misc_state["in run"] && my_path_id() != PATH_G_LOVER)
+    if (duplicate_uses_remaining > 0 && __misc_state["in run"] && my_path_id() != PATH_G_LOVER)
     {
         //Duplication of a monster:
         string [int] description;
@@ -197,7 +203,7 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
         }
         if (potential_targets.count() > 0)
             description.listAppend("Could use on a " + potential_targets.listJoinComponents(", ", "or") + ".");
-        if (lookupItem("exploding cigar").item_amount() > 0)
+        if ($item[exploding cigar].item_amount() > 0)
             description.listAppend("Use exploding cigar immediately after to win the fight.");
         string title = "Duplication castable";
         if (total_duplicate_uses_available > 1)
@@ -205,11 +211,11 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
             title = pluralise(duplicate_uses_remaining, "duplication", "duplications");
         }
         
-        subentries.listAppend(ChecklistSubentryMake(title, "", description));
+        checklists.add(C_RESOURCES, ChecklistEntryMake(image_name, url, ChecklistSubentryMake(title, "", description), importance).ChecklistEntryTag("source terminal").ChecklistEntrySetSpecificImage("__item Glenn's golden dice").ChecklistEntrySetCategory("combat skill"));
     }
     //Portscans: (the source)
     int portscans_remaining = clampi(3 - get_property_int("_sourceTerminalPortscanUses"), 0, 3);
-    if (mafiaIsPastRevision(17031) && portscans_remaining > 0 && my_path_id() == PATH_THE_SOURCE)
+    if (portscans_remaining > 0 && my_path_id() == PATH_THE_SOURCE)
     {
         //Should we suggest portscan outside of the source?
         //It's three scaling monsters a day, that can make one government potion/run, if optimally used in delay-burning areas. Otherwise, they're +turncount for no reason.
@@ -222,13 +228,13 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
         if (get_property_int("sourceInterval") != 0 && my_path_id() == PATH_THE_SOURCE)
             description.listAppend("Wait a bit, this is better after an agent had just appeared.");
         
-        subentries.listAppend(ChecklistSubentryMake(pluralise(portscans_remaining, "portscan", "portscans") + " remaining", "", description));
+        checklists.add(C_RESOURCES, ChecklistEntryMake(image_name, url, ChecklistSubentryMake(pluralise(portscans_remaining, "portscan", "portscans") + " remaining", "", description), importance).ChecklistEntryTag("source terminal").ChecklistEntrySetSpecificImage("__effect Jacked In").ChecklistEntrySetCategory("skill"));
         
     }
     //Extrudes:
     int extrudes_remaining = clampi(3 - get_property_int("_sourceTerminalExtrudes"), 0, 3);
     
-    if (extrudes_remaining > 0 && mafiaIsPastRevision(16992) && my_path_id() != PATH_ZOMBIE_SLAYER && my_path_id() != PATH_POCKET_FAMILIARS && my_path_id() != PATH_G_LOVER)
+    if (extrudes_remaining > 0 && my_path_id() != PATH_ZOMBIE_SLAYER && my_path_id() != PATH_POCKET_FAMILIARS && my_path_id() != PATH_G_LOVER)
     {
         int essence = $item[source essence].available_amount();
         string [int] description;
@@ -279,7 +285,7 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
                 description.listAppend("Use the extract skill in combat for more essence.");
         }
         
-        subentries.listAppend(ChecklistSubentryMake(pluralise(extrudes_remaining, "source extrude", "source extrudes") + " remaining", "", description));
+        checklists.add(C_RESOURCES, ChecklistEntryMake(image_name, url, ChecklistSubentryMake(pluralise(extrudes_remaining, "source extrude", "source extrudes") + " remaining", "", description), importance).ChecklistEntryTag("source terminal").ChecklistEntrySetSpecificImage("__item browser cookie"));
     }
     //Digitise?
     int digitisations = get_property_int("_sourceTerminalDigitizeUses");
@@ -299,11 +305,8 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
             description.listAppend("Currently set to " + monster_name + ".");
         IOTMSourceTerminalGenerateDigitiseTargets(description);
         
-        subentries.listAppend(ChecklistSubentryMake(pluralise(digitisations_left, "digitisation", "digitisations") + " remaining", "", description));
+        checklists.add(C_RESOURCES, ChecklistEntryMake(image_name, url, ChecklistSubentryMake(pluralise(digitisations_left, "digitisation", "digitisations") + " remaining", "", description), importance).ChecklistEntryTag("source terminal").ChecklistEntrySetSpecificImage("__item source essence").ChecklistEntrySetCategory("combat skill"));
     }
-    string url = "campground.php?action=terminal";
-    if (my_path_id() == PATH_NUCLEAR_AUTUMN)
-        url = "place.php?whichplace=falloutshelter&action=vault_term";
-    if (subentries.count() > 0)
-        resource_entries.listAppend(ChecklistEntryMake("__item source essence", url, subentries, 5));
+    //if (subentries.count() > 0)
+        //resource_entries.listAppend(ChecklistEntryMake(image_name, url, subentries, 5));
 }

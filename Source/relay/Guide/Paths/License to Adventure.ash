@@ -3,13 +3,13 @@ void PathLicenseToAdventureGenerateTasks(ChecklistEntry [int] task_entries, Chec
 {
     if (my_path_id() != PATH_LICENSE_TO_ADVENTURE)
         return;
-    if (lookupItem("Victor's Spoils").available_amount() > 0 && !get_property_boolean("_victorSpoilsUsed"))
+    if ($item[Victor's Spoils].available_amount() > 0 && !get_property_boolean("_victorSpoilsUsed"))
     {
         task_entries.listAppend(ChecklistEntryMake("__item victor's spoils", "inventory.php?which=3", ChecklistSubentryMake("Use Victor's Spoils", "", "Gives eleven adventures."), 3));
     }
     
     int lair_progress = get_property_int("_villainLairProgress");
-    if (lair_progress < 999 && mafiaIsPastRevision(18065)) //revision is a guess
+    if (lair_progress < 999) //revision is a guess
     {
         //_villainLairColorChoiceUsed, _villainLairDoorChoiceUsed, _villainLairSymbologyChoiceUsed
         //_villainLairCanLidUsed, _villainLairFirecrackerUsed, _villainLairWebUsed
@@ -33,8 +33,8 @@ void PathLicenseToAdventureGenerateTasks(ChecklistEntry [int] task_entries, Chec
         }
         if (!get_property_boolean("_villainLairWebUsed") && $item[spider web].item_amount() > 0)
             items_to_throw.listAppend($item[spider web]);
-        if (lookupItem("can of Minions-Be-Gone").item_amount() > 0)
-            description.listAppend("Use " + pluralise(lookupItem("can of Minions-Be-Gone")) + ".");
+        if ($item[can of Minions-Be-Gone].item_amount() > 0)
+            description.listAppend("Use " + pluralise($item[can of Minions-Be-Gone]) + ".");
         
         if (items_to_throw.count() > 0)
             description.listAppend("Use " + items_to_throw.listJoinComponents(", ", "and") + " in combat at the lair.");
@@ -45,7 +45,7 @@ void PathLicenseToAdventureGenerateTasks(ChecklistEntry [int] task_entries, Chec
             modifiers.listAppend("-combat");
             description.listAppend("Run -combat to speed up acquiring choices.");
         }
-        task_entries.listAppend(ChecklistEntryMake("__item victor's spoils", "", ChecklistSubentryMake("Adventure in the Villain's Lair", modifiers, description), 3, lookupLocations("Super Villain's Lair")));
+        task_entries.listAppend(ChecklistEntryMake("__item victor's spoils", "", ChecklistSubentryMake("Adventure in the Villain's Lair", modifiers, description), 3, $locations[Super Villain's Lair]));
     }
     
     int social_capital_available = licenseToAdventureSocialCapitalAvailable();

@@ -6,7 +6,7 @@ void QLevel11CopperheadInit()
 	{
 		QuestState state;
 		QuestStateParseMafiaQuestProperty(state, "questL11Ron");
-    	if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    	if (my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
 		state.quest_name = "Zeppelin Quest"; //"Merry-Go-Ron";
 		state.image_name = "__item copperhead charm (rampant)"; //__item bitchin ford anglia
         
@@ -24,7 +24,7 @@ void QLevel11CopperheadInit()
 	{
 		QuestState state;
 		QuestStateParseMafiaQuestProperty(state, "questL11Shen");
-    	if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    	if (my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
 		state.quest_name = "Copperhead Club Quest"; //"Of Mice and Shen";
 		state.image_name = "__item copperhead charm"; //"__effect Ancient Annoying Serpent Poison";
 		__quest_state["Level 11 Shen"] = state;
@@ -319,6 +319,7 @@ void QLevel11ShenGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     string url = $location[the copperhead club].getClickableURLForLocation();
     
     boolean want_club_details = false;
+    boolean want_hunting_details = false;
     if (base_quest_state.mafia_internal_step <= 1)
     {
         subentry.entries.listAppend("Adventure in the Copperhead Club and meet Shen.");
@@ -328,16 +329,7 @@ void QLevel11ShenGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     }
     else if (base_quest_state.mafia_internal_step == 2)
     {
-    	if (quest_location != $location[none])
-        {
-            subentry.entries.listAppend("Adventure in " + quest_location + ".");
-            url = quest_location.getClickableURLForLocation();
-        }
-        else
-        {
-	        subentry.entries.listAppend("Fight the first monster wherever Shen told you to go.");
-        	url = "";
-        }
+    	want_hunting_details = true;
     }
     else if (base_quest_state.mafia_internal_step == 3)
     {
@@ -345,16 +337,7 @@ void QLevel11ShenGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     }
     else if (base_quest_state.mafia_internal_step == 4)
     {
-        if (quest_location != $location[none])
-        {
-            subentry.entries.listAppend("Adventure in " + quest_location + ".");
-            url = quest_location.getClickableURLForLocation();
-        }
-        else
-        {
-        	subentry.entries.listAppend("Fight the second monster wherever Shen told you to go.");
-        	url = "";
-        }
+        want_hunting_details = true;
     }
     else if (base_quest_state.mafia_internal_step == 5)
     {
@@ -362,20 +345,27 @@ void QLevel11ShenGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     }
     else if (base_quest_state.mafia_internal_step == 6)
     {
-        if (quest_location != $location[none])
-        {
-            subentry.entries.listAppend("Adventure in " + quest_location + ".");
-            url = quest_location.getClickableURLForLocation();
-        }
-        else
-        {
-        	subentry.entries.listAppend("Fight the third monster wherever Shen told you to go.");
-        	url = "";
-        }
+        want_hunting_details = true;
     }
     else if (base_quest_state.mafia_internal_step == 7)
     {
         want_club_details = true;
+    }
+    //step hacks:
+    if (want_club_details && quest_location != $location[none] && !quest_item.have())
+    {
+        want_club_details = false;
+    }
+    if (!want_club_details && quest_item != $item[none] && quest_item.have())
+    {
+    	want_club_details = true;
+        want_hunting_details = false;
+    }
+    
+    if (want_hunting_details)
+    {
+        subentry.entries.listAppend("Adventure in " + quest_location + ".");
+        url = quest_location.getClickableURLForLocation();
     }
     //FIXME is shen scheduled?
     if (want_club_details)

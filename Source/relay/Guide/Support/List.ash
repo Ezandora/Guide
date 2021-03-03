@@ -805,6 +805,15 @@ int [int] listCopy(int [int] l)
     return result;
 }
 
+item [int] listCopy(item [int] l)
+{
+    item [int] result;
+    foreach key in l
+        result[key] = l[key];
+    return result;
+}
+
+
 monster [int] listCopy(monster [int] l)
 {
     monster [int] result;
@@ -832,6 +841,14 @@ skill [int] listCopy(skill [int] l)
 boolean [monster] listCopy(boolean [monster] l)
 {
     boolean [monster] result;
+    foreach key in l
+        result[key] = l[key];
+    return result;
+}
+
+int [item] listCopy(int [item] l)
+{
+    int [item] result;
     foreach key in l
         result[key] = l[key];
     return result;
@@ -1299,4 +1316,11 @@ int [int] stringToIntIntList(string input, string delimiter)
 int [int] stringToIntIntList(string input)
 {
 	return stringToIntIntList(input, ",");
+}
+
+boolean [location] locationToLocationMap(location l)
+{
+	boolean [location] map;
+	map[l] = true;
+	return map;
 }

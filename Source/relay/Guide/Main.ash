@@ -21,15 +21,23 @@ import "relay/Guide/Sections/Checklists.ash"
 import "relay/Guide/Sections/Location Bar.ash"
 import "relay/Guide/Sections/API.ash"
 import "relay/Guide/Sections/Navigation Bar.ash"
+import "relay/Guide/Sections/Resource Bar.ash"
 import "relay/Guide/Sections/Tests.ash"
 import "relay/Guide/Sections/CSS.ash"
 import "relay/Guide/Items of the Month/Items of the Month import.ash"
 import "relay/Guide/Paths/Paths import.ash"
 
 
-void runMain(string relay_filename)
+void runMain()
 {
+	if (false)
+	{
+		//Minimal mode, for testing performance.
+		write("you are ascending too slowly, ascend faster!"); return;
+    }
+    write(" "); //mafia will return a 404 if we write nothing (i.e. when setting user preferences). I suppose we should always write an API response or something
 	string [string] form_fields = form_fields();
+	//print_html("relay_Guide.ash, form_fields = " + form_fields.to_json()); 
 	if (form_fields["API status"] != "")
 	{
         string [string] api_response = generateAPIResponse();
@@ -44,11 +52,13 @@ void runMain(string relay_filename)
 	}
     else if (form_fields["set user preferences"] != "")
     {
+    	//In this case, every other key=value is set in our own preference tracking.
+        //this design is kind of wonky, don't like it - the implicit "everything else"
         processSetUserPreferences(form_fields);
         return;
     }
-    else if (form_fields.count() > 0)
-        print_html("Form fields: " + form_fields.to_json());
+    //else if (form_fields.count() > 0)
+        //print_html("Form fields: " + form_fields.to_json());
 	
     
     locationCompatibilityInit();
@@ -72,16 +82,23 @@ void runMain(string relay_filename)
     PageWriteHead(HTMLGenerateTagPrefix("meta", mapMake("name", "viewport", "content", "width=device-width")));
 	
 	
-    if (relay_filename.to_lower_case() == "relay_guide.ash")
-        PageSetBodyAttribute("onload", "GuideInit('relay_Guide.ash'," + __setting_horizontal_width + ");");
-    else
-        PageSetBodyAttribute("onload", "GuideInit('" + relay_filename + "'," + __setting_horizontal_width + ");"); //not escaped
+	
+	
+	
+	boolean resource_bar_open = PreferenceGetBoolean("resource bar open");
+	string using_relay_filename = __relay_filename;
+    if (__relay_filename.to_lower_case() == "relay_guide.ash")
+    	using_relay_filename = __relay_filename;
+	
+	string guide_init_code = "GuideInit('" + using_relay_filename + "'," + __setting_horizontal_width + "," + resource_bar_open + ", '" + __version + "');";
+	
+    PageSetBodyAttribute("onload", guide_init_code); //not escaped
     
     boolean drunk = $item[beer goggles].equipped_amount() > 0;
     
     if (drunk)
         PageWrite(HTMLGenerateTagPrefix("div", mapMake("style", "-webkit-filter:blur(4.0px) brightness(1.01);"))); //FIXME make this animated
-    
+        
     boolean buggy = (my_familiar() == $familiar[software bug] || $item[iShield].equipped_amount() > 0);
     if (buggy)
     {
@@ -95,29 +112,30 @@ void runMain(string relay_filename)
         //
     }
     
+    buffer various_bar_buffer;
     boolean displaying_navbar = false;
 	if (__setting_show_navbar)
 	{
 		if (ordered_output_checklists.count() > 1)
 			displaying_navbar = true;
 	}
-	if (displaying_navbar)
-	{
-        buffer navbar = generateNavbar(ordered_output_checklists);
-        PageWrite(navbar);
-	}
-    
+	
+    if (true)
+    {
+        buffer resource_bar = generateResourceBar(ordered_output_checklists);
+        various_bar_buffer.append(resource_bar);
+    }
     if (__setting_show_location_bar)
     {
         buffer location_bar = generateLocationBar(displaying_navbar);
-        PageWrite(location_bar);
+        various_bar_buffer.append(location_bar);
     }
-	
-
-	int max_width_setting = __setting_horizontal_width;
-	
-	PageWrite(HTMLGenerateTagPrefix("div", mapMake("class", "r_centre", "style", "max-width:" + max_width_setting + "px;"))); //centre holding container
-	
+	if (displaying_navbar)
+	{
+        buffer navbar = generateNavbar(ordered_output_checklists);
+        various_bar_buffer.append(navbar);
+	}
+    
     
     
     
@@ -125,13 +143,17 @@ void runMain(string relay_filename)
     {
         //Buttons.
         //position:absolute holding container, so we can absolutely position these, absolutely:
-        PageWrite(HTMLGenerateTagPrefix("div", mapMake("style", "position:absolute;" + "width:100%;max-width:" + max_width_setting + "px;")));
+        PageWrite(HTMLGenerateTagPrefix("div", mapMake("style", "position:absolute;" + "width:100%;"))); //max-width:" + max_width_setting + "px;"
         
+        int button_size = 16;
+        int vertical_button_spacing = button_size / 2;
         string [string] base_image_map;
-        base_image_map["width"] = "12";
-        base_image_map["height"] = "12";
+        base_image_map["width"] = button_size;
+        base_image_map["height"] = button_size;
         base_image_map["class"] = "r_button";
         
+        
+        //Left side:
         string [string] image_map = mapCopy(base_image_map);
         image_map["src"] = __close_image_data;
         image_map["onclick"] = "buttonCloseClicked(event)";
@@ -141,21 +163,32 @@ void runMain(string relay_filename)
         image_map["title"] = image_map["alt"];
         PageWrite(HTMLGenerateTagPrefix("img", image_map));
         
+        PageWrite("</div>");
+        
+        
+        string spacing_div = "<span style=\"width:1em;height:1px;\"> </span>";
+        
+        
+        //Right side:
+        PageWrite(HTMLGenerateTagPrefix("div", mapMake("style", "position:absolute;" + "right:20px;top:3px;z-index:5;")));
         
         image_map = mapCopy(base_image_map);
         image_map["src"] = __new_window_image_data;
         image_map["id"] = "button_new_window";
         image_map["onclick"] = "buttonNewWindowClicked(event)";
-        image_map["style"] = "right:5px;top:5px;";
+        //image_map["style"] = "right:5px;top:5px;";
+        //image_map["style"] = "top:5px;right:" + (button_size * 2 + vertical_button_spacing * 1) + "px;";
         image_map["alt"] = "Open in new window";
         image_map["title"] = image_map["alt"];
         PageWrite(HTMLGenerateTagPrefix("img", image_map));
         
+        PageWrite(spacing_div);
         image_map = mapCopy(base_image_map);
         image_map["src"] = __left_arrow_image_data;
         image_map["id"] = "button_arrow_right_left";
         image_map["onclick"] = "buttonRightLeftClicked(event)";
-        image_map["style"] = "right:5px;top:30px;";
+        //image_map["style"] = "right:5px;top:30px;";
+        //image_map["style"] = "top:5px;right:" + (button_size * 3 + vertical_button_spacing * 2) + "px;";
         image_map["alt"] = "Show chat pane";
         image_map["title"] = image_map["alt"];
         PageWrite(HTMLGenerateTagPrefix("img", image_map));
@@ -164,19 +197,60 @@ void runMain(string relay_filename)
         image_map["src"] = __right_arrow_image_data;
         image_map["id"] = "button_arrow_right_right";
         image_map["onclick"] = "buttonRightRightClicked(event)";
-        image_map["style"] = "right:5px;top:30px;";
+        //image_map["style"] = "right:5px;top:30px;";
+        //image_map["style"] = "top:5px;right:" + (button_size * 3 + vertical_button_spacing * 2) + "px;";
         image_map["alt"] = "Hide chat pane";
         image_map["title"] = image_map["alt"];
         PageWrite(HTMLGenerateTagPrefix("img", image_map));
         
+        
+        
+        if (true)
+        {
+        	PageWrite(spacing_div);
+            image_map = mapCopy(base_image_map);
+            image_map["src"] = __refresh_image_data;
+            image_map["id"] = "button_refresh";
+            image_map["onclick"] = "document.location.reload(true)";
+            //image_map["style"] = "right:5px;top:5px;";
+            //image_map["style"] = "top:5px;right:" + (button_size * 1 + vertical_button_spacing * 1) + "px;";
+            image_map["alt"] = "Refresh";
+            image_map["title"] = image_map["alt"];
+            PageWrite(HTMLGenerateTagPrefix("img", image_map));
+        }
         PageWrite("</div>");
     }
     
+    
+    if (__setting_newstyle_navbars)
+    	__setting_fill_vertical = false;
+    
+    
+    
+    if (__setting_newstyle_navbars)
+    {
+        PageWrite(HTMLGenerateTagPrefix("div", mapMake("class", "r_centre", "style", "display:flex;flex-direction:column;height:100vh;")));
+    }
+    if (!__setting_newstyle_navbars)
+    	PageWrite(various_bar_buffer);
+	
+
+	int max_width_setting = __setting_horizontal_width;
+	string main_holder_extra_style;
+	if (__setting_newstyle_navbars)
+		main_holder_extra_style = "flex-grow:1;flex-shrink:1;overflow-x:hidden;overflow-y:auto;";
+    main_holder_extra_style += "width:100%;";
+	
+	
+    
+    
+    
+	PageWrite(HTMLGenerateTagPrefix("div", mapMake("id", "main_content_holder", "class", "r_centre", "style", main_holder_extra_style))); //centre holding container //"max-width:" + max_width_setting + "px;"
     if (true)
     {
         //Holding container:
         string style = "";
-        style += "max-width:" + max_width_setting + "px;padding-top:5px;padding-bottom:0.25em;";
+        style += "padding-top:5px;padding-bottom:0.25em;"; //max-width:" + max_width_setting + "px;
         if (!__setting_fill_vertical)
             style += "background-color:" + __setting_page_background_colour + ";";
         if (!__setting_side_negative_space_is_dark && !__setting_fill_vertical)
@@ -187,6 +261,13 @@ void runMain(string relay_filename)
         PageWrite(HTMLGenerateTagPrefix("div", mapMake("style", style)));
     }
     
+    if (true)
+    {
+    	//showhide mouseover popup:
+        PageWrite(HTMLGenerateTagPrefix("div", mapMake("style", "position:relative;")));
+        PageWrite(HTMLGenerateTagWrap("div", "", mapMake("id", "showhide_mouseover_popup", "class", "showhide_mouseover_popup_class" )));
+        PageWrite("</div>"); //showhide_mouseover_popup container
+    }
     
 	PageWrite(HTMLGenerateSpanOfStyle(guide_title, "font-weight:bold; font-size:1.5em"));
 	
@@ -203,21 +284,33 @@ void runMain(string relay_filename)
         
         PageWrite(HTMLGenerateDivOfStyle(line, "font-size:0.777em;color:gray;"));
         
-        if (true)
+        /*if (false)
         {
+        	boolean method_1_enabled = false;
             //Hacky layout, sorry:
             string [string] image_map;
-            image_map["width"] = "12";
-            image_map["height"] = "12";
+            int size = 12;
+            if (!method_1_enabled)
+            {
+            	size = 16;
+            }
+            image_map["width"] = size;
+            image_map["height"] = size;
             image_map["class"] = "r_button";
             image_map["src"] = __refresh_image_data;
             image_map["id"] = "button_refresh";
             image_map["onclick"] = "document.location.reload(true)";
-            image_map["style"] = "position:relative;top:-12px;right:3px;visibility:visible;";
+            if (method_1_enabled)
+	            image_map["style"] = "position:relative;top:-12px;right:3px;visibility:visible;";
+            else
+	            image_map["style"] = "position:relative;visibility:visible;";
             image_map["alt"] = "Refresh";
             image_map["title"] = image_map["alt"];
-            PageWrite(HTMLGenerateDivOfStyle(HTMLGenerateTagPrefix("img", image_map), "max-height:0px;width:100%;text-align:right;"));
-        }
+            if (method_1_enabled)
+	            PageWrite(HTMLGenerateDivOfStyle(HTMLGenerateTagPrefix("img", image_map), "width:100%;text-align:right;height:0px;")); //max-height:0px;
+            else
+            	PageWrite(HTMLGenerateDivOfStyle(HTMLGenerateTagPrefix("img", image_map), "position:fixed;right:" + (16) + "px;top:5px;z-index:1000;"));
+        }*/
     }
     boolean matrix_enabled = false;
     if (my_path_id() == PATH_THE_SOURCE || $familiars[dataspider,Baby Bugged Bugbear] contains my_familiar())
@@ -246,23 +339,26 @@ void runMain(string relay_filename)
                 image_map["alt"] = "Matrix disabled";
             }
             image_map["title"] = image_map["alt"];
-            PageWrite(HTMLGenerateDivOfStyle(HTMLGenerateTagPrefix("img", image_map), "max-height:0px;width:100%;text-align:left;"));
+            PageWrite(HTMLGenerateDivOfStyle(HTMLGenerateTagPrefix("img", image_map), "width:100%;text-align:left;")); //max-height:0px;
         }
     }
     
 	PageWrite("</div>");
 	PageWrite("</div>");
-	if (displaying_navbar) //in-div spacing at bottom for navbar
-		PageWrite(HTMLGenerateDivOfStyle("", "height:" + (__setting_navbar_height_in_em - 0.05) + "em;"));
-    if (__setting_show_location_bar) //in-div spacing at bottom for location bar
-		PageWrite(HTMLGenerateDivOfStyle("", "height:" + (__setting_navbar_height_in_em - 0.05) + "em;"));
-    
+	
+	if (!__setting_newstyle_navbars)
+	{
+        if (displaying_navbar) //in-div spacing at bottom for navbar
+            PageWrite(HTMLGenerateDivOfStyle("", "min-height:" + (__setting_navbar_height_in_em - 0.05) + "em;"));
+        if (__setting_show_location_bar) //in-div spacing at bottom for location bar
+            PageWrite(HTMLGenerateDivOfStyle("", "min-height:" + (__setting_navbar_height_in_em - 0.05) + "em;"));
+    }
     if (__setting_fill_vertical)
     {
-        PageWrite(HTMLGenerateTagWrap("div", "", mapMake("class", "r_vertical_fill", "style", "z-index:-1;background-color:" + __setting_page_background_colour + ";max-width:" + __setting_horizontal_width + "px;"))); //Color fill
+        PageWrite(HTMLGenerateTagWrap("div", "", mapMake("class", "r_vertical_fill", "style", "z-index:-1;background-color:" + __setting_page_background_colour + ";"))); //Color fill //max-width:" + __setting_horizontal_width + "px;"
         PageWrite(HTMLGenerateTagWrap("div", "", mapMake("class", "r_vertical_fill", "style", "z-index:-11;border-left:1px solid;border-right:1px solid;border-color:" + __setting_line_colour + ";width:" + (__setting_horizontal_width) + "px;"))); //Vertical border lines, empty background
     }
-    PageWriteHead("<script type=\"text/javascript\" src=\"relay_Guide.js\"></script>");
+    PageWriteHead("<script type=\"text/javascript\" src=\"GuideBrowserSide.js\"></script>");
     
     if (matrix_enabled)
     {
@@ -276,6 +372,15 @@ void runMain(string relay_filename)
         PageWrite("</div>");
     if (buggy)
         PageWrite("</div>");
+        
+        
+    if (__setting_newstyle_navbars)
+    {
+        PageWrite(HTMLGenerateTagPrefix("div", mapMake("style", "")));
+    	PageWrite(various_bar_buffer);
+        PageWrite("</div>");
+        PageWrite("</div>"); //main flexbox container
+    }
     
     if (output_body_tag_only)
     	write(PageGenerateBodyContents());

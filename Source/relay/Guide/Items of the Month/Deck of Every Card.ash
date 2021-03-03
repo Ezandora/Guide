@@ -33,9 +33,6 @@ void IOTMDeckOfEveryCardGenerateResource(ChecklistEntry [int] resource_entries)
     if ($item[Deck of Every Card].available_amount() == 0 || !$item[Deck of Every Card].is_unrestricted())
         return;
     
-    if (!mafiaIsPastRevision(16018))
-        return;
-    
     int card_summons_left = clampi(15 - get_property_int("_deckCardsDrawn"), 0, 15);
     
     /*
@@ -243,7 +240,7 @@ void IOTMDeckOfEveryCardGenerateResource(ChecklistEntry [int] resource_entries)
         tooltip_table.listAppend(listMake("Hunky Fireman Card", "Humanoid"));
 
         buffer tooltip_text;
-        tooltip_text.append(HTMLGenerateTagWrap("div", "Monster Cards", mapMake("class", "r_bold r_centre", "style", "padding-bottom:0.25em;")));
+        tooltip_text.HTMLAppendTagWrap("div", "Monster Cards", mapMake("class", "r_bold r_centre", "style", "padding-bottom:0.25em;"));
         tooltip_text.append(HTMLGenerateSimpleTableLines(tooltip_table));
         
         string title = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip_text, "r_tooltip_inner_class r_tooltip_inner_class_margin") + "Monster card", "r_tooltip_outer_class");
@@ -319,6 +316,6 @@ void IOTMDeckOfEveryCardGenerateResource(ChecklistEntry [int] resource_entries)
         
         if (card_table.count() > 0)
             description.listAppend(HTMLGenerateSimpleTableLines(card_table));
-		resource_entries.listAppend(ChecklistEntryMake("__item deck of every card", "inv_use.php?cheat=1&pwd=" + my_hash() + "&whichitem=8382", ChecklistSubentryMake(title, "", description), 1));
+		resource_entries.listAppend(ChecklistEntryMake("__item deck of every card", "inv_use.php?cheat=1&pwd=" + my_hash() + "&whichitem=8382", ChecklistSubentryMake(title, "", description), 1).ChecklistEntrySetCategory("iotm"));
     }
 }

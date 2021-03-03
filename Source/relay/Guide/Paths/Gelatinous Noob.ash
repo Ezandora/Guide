@@ -13,7 +13,7 @@ void initialiseGelatinousStatics()
         return;
     foreach it in $items[]
     {
-        if (!it.item_is_pvp_stealable() && !(it.gift && it.discardable) && !(lookupItems("interesting clod of dirt,dirty bottlecap,discarded button") contains it)) continue;
+        if (!it.item_is_pvp_stealable() && !(it.gift && it.discardable) && !($items[interesting clod of dirt,dirty bottlecap,discarded button] contains it)) continue;
         
 		if ($slots[hat,weapon,off-hand,back,shirt,pants,acc1,acc2,acc3] contains it.to_slot()) //familiar equipment fine
 			continue;
@@ -55,8 +55,6 @@ void PathGelatinousNoobGenerateTasks(ChecklistEntry [int] task_entries, Checklis
     int absorptions_used = get_property_int("_noobSkillCount");
     //int absorptions_used = my_absorbs(); //FIXME next point release, 17.7
     int absorptions_left = total_absorptions - absorptions_used;
-    if (!mafiaIsPastRevision(17821)) //tracking
-        absorptions_left = 0;
     if (absorptions_left > 0)
     {
         initialiseGelatinousStatics();
@@ -194,25 +192,25 @@ void PathGelatinousNoobGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 
                 //description.listAppend(relevant_items_skill + ": " + __gelatinous_skill_ids_to_descriptions[relevant_items_skill.to_int()]);
                 string extra_data;
-                if (lookupFamiliar("robortender").familiar_is_usable())
+                if ($familiar[robortender].familiar_is_usable())
                 {
                     phylum [int] phylums_to_run_against;
                     if (grouping_index == 23301)
                     {
-                        if (!lookupSkill("bendable knees").have_skill() && lookupItem("bottle of gregnadigne").available_amount() == 0)
+                        if (!$skill[bendable knees].have_skill() && $item[bottle of gregnadigne].available_amount() == 0)
                             phylums_to_run_against.listAppend($phylum[humanoid]);
-                        if (!lookupSkill("retractable toes").have_skill() && lookupItem("cocktail mushroom").available_amount() == 0)
+                        if (!$skill[retractable toes].have_skill() && $item[cocktail mushroom].available_amount() == 0)
                             phylums_to_run_against.listAppend($phylum[goblin]);
-                        if (!lookupSkill("ink gland").have_skill() && lookupItem("shot of granola liqueur").available_amount() == 0)
+                        if (!$skill[ink gland].have_skill() && $item[shot of granola liqueur].available_amount() == 0)
                             phylums_to_run_against.listAppend($phylum[hippy]);
                     }
                     if (grouping_index == 23304)
                     {
-                        if (!lookupSkill("frown muscles").have_skill() && lookupItem("bottle of novelty hot sauce").available_amount() == 0)
+                        if (!$skill[frown muscles].have_skill() && $item[bottle of novelty hot sauce].available_amount() == 0)
                             phylums_to_run_against.listAppend($phylum[demon]);
-                        if (!lookupSkill("anger glands").have_skill() && lookupItem("limepatch").available_amount() == 0)
+                        if (!$skill[anger glands].have_skill() && $item[limepatch].available_amount() == 0)
                             phylums_to_run_against.listAppend($phylum[pirate]);
-                        if (!lookupSkill("powerful vocal chords").have_skill() && lookupItem("baby oil shooter").available_amount() == 0)
+                        if (!$skill[powerful vocal chords].have_skill() && $item[baby oil shooter].available_amount() == 0)
                             phylums_to_run_against.listAppend($phylum[orc]);
                     }
                     if (phylums_to_run_against.count() > 0)
@@ -234,7 +232,7 @@ void PathGelatinousNoobGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 
             }
             description.listAppend("Or equipment, for their buffs." + (combat_rate_modifier() > -25 ? "|*Bram's choker, ring of conflict, duonoculars, rusted shootin' iron, or red shoe especially." : ""));
-            if (lookupSkill("Large Intestine").have_skill())
+            if ($skill[Large Intestine].have_skill())
                 description.listAppend("Or potted cactus, for +5 adventures.");
             //foreach s in __gelatinous_items_that_give_skill
             /*foreach key, s_id in __gelatinous_evaluation_order
@@ -279,54 +277,54 @@ void PathGelatinousNoobGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         optional_task_entries.listAppend(ChecklistEntryMake("__familiar Gelatinous Cubeling", "inventory.php", ChecklistSubentryMake("Absorb " + pluralise(absorptions_left, "item", "items"), "", description), -1));
     }
     
-    if (lookupFamiliar("Robortender").have_familiar())
+    if ($familiar[Robortender].have_familiar())
     {
     
         string url = "";
         
-        if (my_familiar() != lookupFamiliar("Robortender"))
+        if (my_familiar() != $familiar[Robortender])
             url = "familiar.php";
         phylum [int] phylums_to_run_against;
         location [int] suggested_locations;
         string [int] matchup_type;
         boolean have_minus = false;
         boolean have_plus = false;
-        if (!lookupSkill("bendable knees").have_skill() && lookupItem("bottle of gregnadigne").available_amount() == 0)
+        if (!$skill[bendable knees].have_skill() && $item[bottle of gregnadigne].available_amount() == 0)
         {
             phylums_to_run_against.listAppend($phylum[humanoid]);
             suggested_locations.listAppend($location[the old landfill]);
             matchup_type.listAppend("-");
             have_minus = true;
         }
-        if (!lookupSkill("retractable toes").have_skill() && lookupItem("cocktail mushroom").available_amount() == 0)
+        if (!$skill[retractable toes].have_skill() && $item[cocktail mushroom].available_amount() == 0)
         {
             phylums_to_run_against.listAppend($phylum[goblin]);
             suggested_locations.listAppend($location[the outskirts of cobb's knob]);
             matchup_type.listAppend("-");
             have_minus = true;
         }
-        if (!lookupSkill("ink gland").have_skill() && lookupItem("shot of granola liqueur").available_amount() == 0)
+        if (!$skill[ink gland].have_skill() && $item[shot of granola liqueur].available_amount() == 0)
         {
             phylums_to_run_against.listAppend($phylum[hippy]);
             suggested_locations.listAppend($location[hippy camp]);
             matchup_type.listAppend("-");
             have_minus = true;
         }
-        if (!lookupSkill("frown muscles").have_skill() && lookupItem("bottle of novelty hot sauce").available_amount() == 0)
+        if (!$skill[frown muscles].have_skill() && $item[bottle of novelty hot sauce].available_amount() == 0)
         {
             phylums_to_run_against.listAppend($phylum[demon]);
             suggested_locations.listAppend($location[the dark heart of the woods]);
             matchup_type.listAppend("+");
             have_plus = true;
         }
-        if (!lookupSkill("anger glands").have_skill() && lookupItem("limepatch").available_amount() == 0)
+        if (!$skill[anger glands].have_skill() && $item[limepatch].available_amount() == 0)
         {
             phylums_to_run_against.listAppend($phylum[pirate]);
             suggested_locations.listAppend($location[the obligatory pirate's cove]);
             matchup_type.listAppend("+");
             have_plus = true;
         }
-        if (!lookupSkill("powerful vocal chords").have_skill() && lookupItem("baby oil shooter").available_amount() == 0)
+        if (!$skill[powerful vocal chords].have_skill() && $item[baby oil shooter].available_amount() == 0)
         {
             phylums_to_run_against.listAppend($phylum[orc]);
             suggested_locations.listAppend($location[frat house]);

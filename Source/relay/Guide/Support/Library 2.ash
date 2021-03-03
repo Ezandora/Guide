@@ -85,7 +85,7 @@ boolean can_equip_outfit(string outfit_name)
 
 
 //Probably not a good place for it:
-boolean asdonMartinFailsFuelableTestsPrivate(item craft, boolean [item] ingredients_blacklisted, boolean [item] crafts_seen)
+boolean asdonMartinFailsFuelableTestsPrivate(item craft, boolean [item] ingredients_blocklisted, boolean [item] crafts_seen)
 {
     //if ($items[wad of dough,flat dough] contains craft) return false;
     if (craft.craft_type().contains_text("(fancy)"))
@@ -95,7 +95,7 @@ boolean asdonMartinFailsFuelableTestsPrivate(item craft, boolean [item] ingredie
     foreach it, amount in craft.get_ingredients_fast()
     {
         //print_html(craft + ": " + it);
-        if (ingredients_blacklisted[it]) return true;
+        if (ingredients_blocklisted[it]) return true;
         if (!it.is_npc_item())
             all_npc = false;
         
@@ -104,7 +104,7 @@ boolean asdonMartinFailsFuelableTestsPrivate(item craft, boolean [item] ingredie
         {
             continue;
         }
-        if (it.asdonMartinFailsFuelableTestsPrivate(ingredients_blacklisted, crafts_seen))
+        if (it.asdonMartinFailsFuelableTestsPrivate(ingredients_blocklisted, crafts_seen))
             return true;
     }
     if (craft.get_ingredients_fast().count() == 0)
@@ -116,54 +116,54 @@ boolean asdonMartinFailsFuelableTestsPrivate(item craft, boolean [item] ingredie
     return false;
 }
 
-boolean asdonMartinFailsFuelableTests(item craft, boolean [item] ingredients_blacklisted)
+boolean asdonMartinFailsFuelableTests(item craft, boolean [item] ingredients_blocklisted)
 {
     boolean [item] crafts_seen; //slower than a "last item" test, but necessary (spooky wads)
-    return asdonMartinFailsFuelableTestsPrivate(craft, ingredients_blacklisted, crafts_seen);
+    return asdonMartinFailsFuelableTestsPrivate(craft, ingredients_blocklisted, crafts_seen);
 }
 
 item [int] asdonMartinGenerateListOfFuelables()
 {
     item [int] fuelables;
-    boolean [item] blacklist;
+    boolean [item] blocklist;
     if (!QuestState("questL11Black").finished) //FIXME no
-        blacklist[$item[blackberry]] = true; //FIXME test properly?
-    blacklist[$item[stunt nuts]] = true;
-    blacklist[$item[wet stew]] = true; //FIXME I guess maybe not after
-    blacklist[$item[goat cheese]] = true;
-    blacklist[$item[turkey blaster]] = true;
-    blacklist[$item[hot wing]] = true;
-    blacklist[$item[glass of goat's milk]] = true;
-    blacklist[$item[soft green echo eyedrop antidote martini]] = true; //if it's not created, FIXME
-    blacklist[$item[warm gravy]] = true; //don't steal my boat
+        blocklist[$item[blackberry]] = true; //FIXME test properly?
+    blocklist[$item[stunt nuts]] = true;
+    blocklist[$item[wet stew]] = true; //FIXME I guess maybe not after
+    blocklist[$item[goat cheese]] = true;
+    blocklist[$item[turkey blaster]] = true;
+    blocklist[$item[hot wing]] = true;
+    blocklist[$item[glass of goat's milk]] = true;
+    blocklist[$item[soft green echo eyedrop antidote martini]] = true; //if it's not created, FIXME
+    blocklist[$item[warm gravy]] = true; //don't steal my boat
     foreach it in $items[Falcon&trade; Maltese Liquor, hardboiled egg]
-        blacklist[it] = true; //don't steal my -combat
-    blacklist[$item[loaf of soda bread]] = true; //elsewhere
+        blocklist[it] = true; //don't steal my -combat
+    blocklist[$item[loaf of soda bread]] = true; //elsewhere
     foreach it in $items[hot buttered roll,ketchup,catsup]
-        blacklist[it] = true; //hermit
+        blocklist[it] = true; //hermit
         
     //These aren't directly feedable, but indirectly make things:
-    blacklist[$item[source essence]] = true; //that's silly
-    blacklist[$item[white pixel]] = true; //no!
-    blacklist[$item[cashew]] = true;
+    blocklist[$item[source essence]] = true; //that's silly
+    blocklist[$item[white pixel]] = true; //no!
+    blocklist[$item[cashew]] = true;
     
     if (my_path_id() != PATH_LICENSE_TO_ADVENTURE && inebriety_limit() > 0) //FIXME the test for can drink just about
     {
         foreach it in $items[bottle of gin,bottle of rum,bottle of vodka,bottle of whiskey,bottle of tequila] //too useful for crafting?
-            blacklist[it] = true;
+            blocklist[it] = true;
     }
     foreach it in $items[bottle of Calcutta Emerald,bottle of Lieutenant Freeman,bottle of Jorge Sinsonte,bottle of Definit,bottle of Domesticated Turkey,boxed champagne,bottle of Ooze-O,bottle of Pete's Sake,tangerine,kiwi,cocktail onion,kumquat,tonic water,raspberry] //nash crosby's still's results isn't feedable
-        blacklist[it] = true;
+        blocklist[it] = true;
     foreach it in __pvpable_food_and_drinks
     {
-        if (blacklist[it]) continue;
+        if (blocklist[it]) continue;
         if (it.is_npc_item()) continue;
         if (it.historical_price() >= 20000) continue;
         if (it.item_amount() == 0)
         {
             if (it.creatable_amount() == 0)
                 continue;
-            if (it.asdonMartinFailsFuelableTests(blacklist))
+            if (it.asdonMartinFailsFuelableTests(blocklist))
             {
                 continue;
             }
@@ -183,7 +183,7 @@ item [int] asdonMartinGenerateListOfFuelables()
         {
             boolean reject = false;
             //Various things count as being from a "store":
-            foreach it in lookupItems("yellow pixel,handful of barley,spacegate research")
+            foreach it in $items[yellow pixel,handful of barley,spacegate research]
             {
                 if (ingredients[it] > 0)
                 {
@@ -200,13 +200,13 @@ item [int] asdonMartinGenerateListOfFuelables()
             
         float soda_bread_efficiency = to_float($item[wad of dough].npc_price() + $item[soda water].npc_price()) / 6.0;
         if (soda_bread_efficiency < 1.0) soda_bread_efficiency = 100000.0;
-        if (it.autosell_price() > 0 && it.autosell_price().to_float() / average_adventures > soda_bread_efficiency)
+        if (it.autosell_price() > 0 && it.autosell_price().to_float() / average_adventures > soda_bread_efficiency && my_path_id() != PATH_EXPLOSIONS)
         {
             continue;
         }
         fuelables.listAppend(it);
     }
-    sort fuelables by -value.averageAdventuresForConsumable() * ((value.asdonMartinFailsFuelableTests(blacklist) ? 0 : value.creatable_amount()) + value.item_amount());
+    sort fuelables by -value.averageAdventuresForConsumable() * ((value.asdonMartinFailsFuelableTests(blocklist) ? 0 : value.creatable_amount()) + value.item_amount());
     return fuelables;
 }
 
@@ -373,40 +373,133 @@ Record KramcoSausageFightInformation
     boolean goblin_will_appear;
     int turns_to_next_guaranteed_fight;
     float probability_of_sausage_fight;
+    float average_turns_to_next_sausage_fight_if_continually_equipped;
 };
+
+int KramcoCalculateTurnWillAlwaysSeeGoblin(int sausage_fights)
+{
+    if (sausage_fights <= 0)
+    	return 0;
+	int turn_will_always_see_goblin = 5 + sausage_fights * 3 + powi(max(0, sausage_fights - 5), 3) - 1;
+    return turn_will_always_see_goblin;
+}
 
 KramcoSausageFightInformation KramcoCalculateSausageFightInformation()
 {
     KramcoSausageFightInformation information;
+    information.average_turns_to_next_sausage_fight_if_continually_equipped = -1.0;
     int last_sausage_turn = get_property_int("_lastSausageMonsterTurn"); //FIXME
     int sausage_fights = get_property_int("_sausageFights");
     
     
     
     //These ceilings are not correct; they are merely what I have spaded so far. The actual values are higher.
-    int [int] observed_ceilings = {0, 7, 10, 13, 16, 19, 23, 33, 54, 93, 154, 219, 220, 220, 220, 220, 220, 220, 220, 220, 220, 220, 220, 220, 220, 220, 220, 220, 220, 220};
-    
-    int turn_will_always_see_goblin = observed_ceilings[sausage_fights];
-    
     int delta = total_turns_played() - last_sausage_turn;
+    
+    int turn_will_always_see_goblin = -1;
+    
+    
+    boolean use_formula = true;
+    if (use_formula)
+    {
+    	//use formula, spaded by unknown:
+        //seems to match the ceiling data I have
+        //this line is fun - can you find the character gremlin that causes script parsing to break?
+        //turn_will_always_see_goblin = 5 + sausage_fights * 3 + powi(max(0, sausage_fights − 5), 3) - 1; //-1 for our system
+        turn_will_always_see_goblin = KramcoCalculateTurnWillAlwaysSeeGoblin(sausage_fights);
+    }
+    else
+    {
+        int [int] observed_ceilings = {0, 7, 10, 13, 16, 19, 23, 33, 54, 93, 154, 219, 220, 220, 220, 220, 220, 220, 220, 220, 220, 220, 220, 220, 220, 220, 220, 220, 220, 220};
+        //0,7,10,13,16,19,23,33,55,94,155,222,222,222,222,222,222,222,222,222,222,222,222,222,222,222,222,222,222,222
+        
+        turn_will_always_see_goblin = observed_ceilings[sausage_fights];
+    	if (!(observed_ceilings contains sausage_fights))
+     	   turn_will_always_see_goblin = -1;
+    }
+    
     
     
     information.turns_to_next_guaranteed_fight = MAX(0, turn_will_always_see_goblin - delta);
-    //Goblins do not appear on the same turn as semi-rares.
+    //Goblins do not appear on the same turn as semi-rares, anywhere.
     if (information.turns_to_next_guaranteed_fight == 0 && CounterLookup("Semi-rare").CounterGetNextExactTurn() == 0)
     	information.turns_to_next_guaranteed_fight += 1;
     
-    if (!(observed_ceilings contains sausage_fights))
+    if (turn_will_always_see_goblin == -1)
          information.turns_to_next_guaranteed_fight = -1;
-      
+    
     if (turn_will_always_see_goblin > 1)
     {
-        //This is probably wrong?
-        float probability_each_incorrect = 1.0 / to_float(turn_will_always_see_goblin - 1);
-        information.probability_of_sausage_fight = clampf((delta + 1) * probability_each_incorrect, 0.0, 1.0);
+    	if (use_formula)
+        {
+        	information.probability_of_sausage_fight = clampf(to_float(delta + 1) / to_float(turn_will_always_see_goblin + 1), 0.0, 1.0);
+        }
+        else
+        {
+            //This is probably wrong?
+            float probability_each_incorrect = 1.0 / to_float(turn_will_always_see_goblin - 1);
+            information.probability_of_sausage_fight = clampf((delta + 1) * probability_each_incorrect, 0.0, 1.0);
+        }
     }
-    information.goblin_will_appear = information.turns_to_next_guaranteed_fight == 0;
+    information.goblin_will_appear = (information.turns_to_next_guaranteed_fight == 0);
     
+    //calculate average_turns_to_next_sausage_fight_if_continually_equipped:
+    if (true)
+    {
+        /*if (debug)
+        {
+        	print_html("Calculating average turns...");
+        }*/
+    	//Calculate average turns to next sausage fight if continually equipped:
+    	//Method:
+    	//Start at current turn
+        //Calculate probability of not encountering a goblin this turn. Multiply by previous value. If value is <= 0.5, stop. Otherwise, increment turn and loop.
+        //Then linerally interpret the result vs 0.5.
+        float failure_likelyhood_so_far = 1.0;
+        int calculation_delta_turn = 0;
+        int breakout = 500;
+        while (breakout > 0)
+        {
+            /*if (debug)
+            {
+                print_html("calculation_delta_turn = " + calculation_delta_turn + ", failure_likelyhood_so_far = " + failure_likelyhood_so_far);
+            }*/
+        	breakout -= 1;
+            float previous_failure_likelyhood = failure_likelyhood_so_far;
+        	float probability_of_sausage_fight = clampf(to_float((calculation_delta_turn + delta) + 1) / to_float(turn_will_always_see_goblin + 1), 0.0, 1.0);
+            failure_likelyhood_so_far *= (1.0 - probability_of_sausage_fight);
+            if (failure_likelyhood_so_far <= 0.5)
+            {
+            	//At critical point.
+                //Linear interpolation that is probably wrong, I never paid attention to statistics:
+                float average_turns = calculation_delta_turn;
+                float to_half = (previous_failure_likelyhood - 0.5);
+                float total_delta = previous_failure_likelyhood - failure_likelyhood_so_far;
+                
+                
+                /*if (debug)
+                {
+                    print_html("vfailure_likelyhood_so_far = " + failure_likelyhood_so_far + ", average_turns before changing = " + average_turns);
+                }*/
+                if (total_delta != 0.0)
+	                average_turns += clampf(to_half / total_delta, 0.0, 1.0);
+                 
+                 information.average_turns_to_next_sausage_fight_if_continually_equipped = average_turns;
+                 break;
+            }
+            else
+            {
+            	calculation_delta_turn += 1;
+            }
+        }
+    }
     
+    /*if (debug)
+    {
+        print_html("sausage_fights = " + sausage_fights + " delta = " + delta + " turn_will_always_see_goblin = " + turn_will_always_see_goblin);
+        print_html("information.turns_to_next_guaranteed_fight = " + information.turns_to_next_guaranteed_fight);
+        print_html("information.probability_of_sausage_fight = " + information.probability_of_sausage_fight);
+        print_html("information.average_turns_to_next_sausage_fight_if_continually_equipped = " + information.average_turns_to_next_sausage_fight_if_continually_equipped);
+    }*/
     return information;
 }

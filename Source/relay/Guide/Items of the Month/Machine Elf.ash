@@ -27,7 +27,7 @@ void IOTMMachineElfFamiliarGenerateResource(ChecklistEntry [int] resource_entrie
     if (!__misc_state["in run"] || !__misc_state["need to level"])
         importance = 6;
     
-    ChecklistEntry entry;
+    ChecklistEntry entry = ChecklistEntryMake();
     entry.image_lookup_name = "__familiar machine elf";
     entry.url = url;
     entry.importance_level = importance;
@@ -74,7 +74,7 @@ void IOTMMachineElfFamiliarGenerateResource(ChecklistEntry [int] resource_entrie
     
     
     int free_fights_remaining = clampi(5 - get_property_int("_machineTunnelsAdv"), 0, 5);
-    if (free_fights_remaining > 0 && mafiaIsPastRevision(16550))
+    if (free_fights_remaining > 0)
     {
         string [int] description;
         string [int] modifiers;
@@ -139,7 +139,7 @@ void IOTMMachineElfFamiliarGenerateResource(ChecklistEntry [int] resource_entrie
                 description.listAppend("Possibly run the machine elf elsewhere first, for transmutable potions.");
         }
         //entry.subentries.listAppend(ChecklistSubentryMake(pluralise(free_fights_remaining, "free elf fight", "free elf fights"), modifiers, description));
-        resource_entries.listAppend(ChecklistEntryMake(entry.image_lookup_name, entry.url, ChecklistSubentryMake(pluralise(free_fights_remaining, "free elf fight", "free elf fights"), modifiers, description)).ChecklistEntryTagEntry("daily free fight"));
+        resource_entries.listAppend(ChecklistEntryMake(entry.image_lookup_name, entry.url, ChecklistSubentryMake(pluralise(free_fights_remaining, "free elf fight", "free elf fights"), modifiers, description)).ChecklistEntryTag("daily free fight"));
     }
     if (entry.subentries.count() > 0)
     {

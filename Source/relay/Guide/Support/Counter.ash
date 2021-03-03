@@ -54,7 +54,7 @@ int CounterGetNextExactTurn(Counter c)
 
 boolean CounterIsExact(Counter c)
 {
-	return c.CounterGetNextExactTurn() > 0;
+	return c.CounterGetNextExactTurn() >= 0;
 }
 
 boolean CounterMayHitNextTurn(Counter c)

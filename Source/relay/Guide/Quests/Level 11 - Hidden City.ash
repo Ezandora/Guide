@@ -17,7 +17,7 @@ void QLevel11HiddenCityInit()
 {
     QuestState state;
     QuestStateParseMafiaQuestProperty(state, "questL11Worship");
-    if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
     state.quest_name = "Hidden City Quest";
     state.image_name = "Hidden City";
     
@@ -99,7 +99,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         return;
         
     QuestState base_quest_state = __quest_state["Level 11 Hidden City"];
-    ChecklistEntry entry;
+    ChecklistEntry entry = ChecklistEntryMake();
     entry.url = "place.php?whichplace=hiddencity";
     entry.image_lookup_name = base_quest_state.image_name;
     entry.should_indent_after_first_subentry = true;
@@ -127,7 +127,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         if (my_path_id() == PATH_G_LOVER)
         {
         	subentry.modifiers.listAppend("-combat");
-            if (__iotms_usable[lookupItem("genie bottle")])
+            if (__iotms_usable[$item[genie bottle]])
             {
             	subentry.entries.listAppend("Genie wish for the \"stone-faced\" effect, then adventure in the temple.");
             }

@@ -14,7 +14,8 @@ void QGalaktikInit()
 }
 
 
-void QGalaktikGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+RegisterGenerationFunction("QGalaktikGenerate");
+void QGalaktikGenerate(ChecklistCollection checklists)
 {
 	QuestState base_quest_state = __quest_state["Galaktik"];
 	if (!base_quest_state.in_progress)
@@ -41,8 +42,8 @@ void QGalaktikGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [i
         if ($item[brown paper bag mask].available_amount() > 0 && $item[brown paper bag mask].equipped_amount() == 0)
             subentry.entries.listAppend("Could equip the brown paper bag mask to meet the Lot's wife, if you haven't already.");
         
-        if (__misc_state["in run"] && __last_adventure_location != $location[the overgrown lot] && !in_bad_moon())
-            return;
+        //if (__misc_state["in run"] && __last_adventure_location != $location[the overgrown lot] && !in_bad_moon())
+            //return;
     }
     else
     {
@@ -52,5 +53,5 @@ void QGalaktikGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [i
         //image_name = "__familiar o.a.f.";
     }
 	
-	optional_task_entries.listAppend(ChecklistEntryMake(image_name, active_url, subentry, $locations[the overgrown lot]));
+	checklists.add(C_AFTERCORE_TASKS, ChecklistEntryMake(image_name, active_url, subentry, $locations[the overgrown lot]));
 }

@@ -16,8 +16,6 @@ void QNemesisInit()
 	
 	if (my_basestat(my_primestat()) >= 12)
 		state.startable = true;
-    if (!mafiaIsPastRevision(15935) && state.mafia_internal_step > 1)
-        state.mafia_internal_step += 4; //hack to support old versions, probably won't work
 	
 	__quest_state["Nemesis"] = state;
 }
@@ -397,7 +395,8 @@ void QNemesisGenerateCaveTasks(ChecklistSubentry subentry, item legendary_epic_w
     subentry.modifiers.listAppend("+item");
 }
 
-void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+RegisterGenerationFunction("QNemesisGenerate");
+void QNemesisGenerate(ChecklistCollection checklists)
 {
 
     
@@ -481,7 +480,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     if (legendary_epic_weapon.available_amount_ignoring_storage() > 0)
         have_legendary_epic_weapon = true;
         
-	if (!__misc_state["in aftercore"] && !have_legendary_epic_weapon && $location[the unquiet garves].turns_spent == 0)
+	if (!__misc_state["in aftercore"] && !have_legendary_epic_weapon && $location[the unquiet garves].turns_spent == 0 && false)
 		return;
         
         
@@ -495,9 +494,10 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     
     if (!base_quest_state.started)
     {
-        subentry.entries.listAppend("Speak to your guild to start the quest.|Then adventure in the Unquiet Garves until you unlock the tomb of the unknown, and solve the puzzle.");
-        url = "guild.php";
-        return;
+    	//don't beckon them to start it
+        return;   
+        /*subentry.entries.listAppend("Speak to your guild to start the quest.|Then adventure in the Unquiet Garves until you unlock the tomb of the unknown, and solve the puzzle.");
+        url = "guild.php";*/
     }
     else if (base_quest_state.mafia_internal_step <= 4)
     {
@@ -675,7 +675,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         string assassin_up_next = "";
         int assassins_left = -1;
         
-        if (mafiaIsPastRevision(14330))
+        if (true)
         {
             if (base_quest_state.mafia_internal_step < 20)
             {
@@ -834,5 +834,5 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     foreach l in $locations[the unquiet garves,the "fun" house, the nemesis' lair, the broodling grounds, the outer compound, the temple portico, convention hall lobby, outside the club, the island barracks, the poop deck]
         relevant_locations[l] = true;
     relevant_locations[$location[the fungal nethers]] = true;
-	optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, relevant_locations));
+	checklists.add(C_AFTERCORE_TASKS, ChecklistEntryMake(base_quest_state.image_name, url, subentry, relevant_locations));
 }

@@ -14,15 +14,15 @@ void QMeatsmithInit()
 	__quest_state["Meatsmith"] = state;
 }
 
-
-void QMeatsmithGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+RegisterGenerationFunction("QMeatsmithGenerate");
+void QMeatsmithGenerate(ChecklistCollection checklists)
 {
 	QuestState base_quest_state = __quest_state["Meatsmith"];
     if (base_quest_state.finished)
         return;
     
-    if (__last_adventure_location != $location[the skeleton store] || __last_adventure_location == $location[none])
-        return;
+    //if (__last_adventure_location != $location[the skeleton store] || __last_adventure_location == $location[none])
+        //return;
 		
 	ChecklistSubentry subentry;
 	
@@ -74,9 +74,6 @@ void QMeatsmithGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     if (!done)
         subentry.entries.listAppend("Non-combat appears every fourth adventure."); //except the first time for some reason? needs spading
     
-    boolean [location] relevant_locations;
-    relevant_locations[$location[the skeleton store]] = true;
-    
     if (have_reason_to_add)
-        optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, active_url, subentry, relevant_locations));
+        checklists.add(C_AFTERCORE_TASKS, ChecklistEntryMake(base_quest_state.image_name, active_url, subentry, locationToLocationMap($location[the skeleton store])));
 }

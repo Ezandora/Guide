@@ -42,7 +42,7 @@ void IOTMIntergnatGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 RegisterResourceGenerationFunction("IOTMIntergnatGenerateResource");
 void IOTMIntergnatGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if ($item[infinite BACON machine].available_amount() > 0 && !get_property_boolean("_baconMachineUsed") && mafiaIsPastRevision(16926))
+    if ($item[infinite BACON machine].available_amount() > 0 && !get_property_boolean("_baconMachineUsed"))
     {
         //suggest using it:
         resource_entries.listAppend(ChecklistEntryMake("__item infinite BACON machine", "inventory.php?which=3", ChecklistSubentryMake("Infinite BACON machine", "", "100 BACON/day."), 7));

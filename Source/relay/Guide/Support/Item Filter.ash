@@ -78,7 +78,7 @@ item [int] ItemFilterGetPotionsWithNumericModifiers(string [int] modifiers)
     return potions;
 }
 
-item [int] ItemFilterGetPotionsCouldPullToAddToNumericModifier(string [int] modifiers, float minimum_modifier, boolean [item] blacklist)
+item [int] ItemFilterGetPotionsCouldPullToAddToNumericModifier(string [int] modifiers, float minimum_modifier, boolean [item] blocklist)
 {
     item [int] relevant_potions_first_layer = ItemFilterGetPotionsWithNumericModifiers(modifiers);
     
@@ -94,7 +94,7 @@ item [int] ItemFilterGetPotionsCouldPullToAddToNumericModifier(string [int] modi
         float v = 0;
         foreach key, modifier in modifiers
             v += e.numeric_modifier(modifier);
-        if (v != 0.0 && v >= minimum_modifier && !(blacklist contains it))
+        if (v != 0.0 && v >= minimum_modifier && !(blocklist contains it))
         {
             relevant_potions.listAppend(it);
         }
@@ -108,7 +108,7 @@ item [int] ItemFilterGetPotionsCouldPullToAddToNumericModifier(string [int] modi
 }
 
 
-item [int] ItemFilterGetPotionsCouldPullToAddToNumericModifier(string modifier, float minimum_modifier, boolean [item] blacklist)
+item [int] ItemFilterGetPotionsCouldPullToAddToNumericModifier(string modifier, float minimum_modifier, boolean [item] blocklist)
 {
-    return ItemFilterGetPotionsCouldPullToAddToNumericModifier(listMake(modifier), minimum_modifier, blacklist);
+    return ItemFilterGetPotionsCouldPullToAddToNumericModifier(listMake(modifier), minimum_modifier, blocklist);
 }

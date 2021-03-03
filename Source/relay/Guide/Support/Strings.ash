@@ -33,6 +33,12 @@ string [int] split_string_alternate(string source, string delimiter)
         return listMakeBlankString();
     return split_string_mutable(source, delimiter);
 }
+string [int] split_string_alternate_immutable(string source, string delimiter)
+{
+    if (source.length() == 0)
+        return listMakeBlankString();
+    return split_string(source, delimiter);
+}
 
 string slot_to_string(slot s)
 {

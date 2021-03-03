@@ -5,7 +5,7 @@ void PathCommunityServiceGenerateTasks(ChecklistEntry [int] task_entries, Checkl
         return;
     if (!__misc_state["in run"])
         return;
-    boolean [item] blacklist;
+    boolean [item] blocklist;
     
     /*string [int] service_display_order = {0:"Coil Wire",
     1:"",
@@ -206,11 +206,11 @@ void PathCommunityServiceGenerateTasks(ChecklistEntry [int] task_entries, Checkl
     //equaliser potions
     /*if (true)
     {
-        item [int] hp_potions = ItemFilterGetPotionsCouldPullToAddToNumericModifier("Buffed HP Maximum", 150.0, blacklist); //what a strange lookup name
-        item [int] hp_potions_2 = ItemFilterGetPotionsCouldPullToAddToNumericModifier("Maximum HP", 150.0, blacklist); //something else?
+        item [int] hp_potions = ItemFilterGetPotionsCouldPullToAddToNumericModifier("Buffed HP Maximum", 150.0, blocklist); //what a strange lookup name
+        item [int] hp_potions_2 = ItemFilterGetPotionsCouldPullToAddToNumericModifier("Maximum HP", 150.0, blocklist); //something else?
         
-        item [int] muscle_potions = ItemFilterGetPotionsCouldPullToAddToNumericModifier("Muscle", 0.0, blacklist);
-        item [int] muscle_percent_potions = ItemFilterGetPotionsCouldPullToAddToNumericModifier("Muscle Percent", 0.0, blacklist);
+        item [int] muscle_potions = ItemFilterGetPotionsCouldPullToAddToNumericModifier("Muscle", 0.0, blocklist);
+        item [int] muscle_percent_potions = ItemFilterGetPotionsCouldPullToAddToNumericModifier("Muscle Percent", 0.0, blocklist);
         
         
         string [int] relevant_potions_output;
@@ -225,7 +225,7 @@ void PathCommunityServiceGenerateTasks(ChecklistEntry [int] task_entries, Checkl
     
     foreach s in $strings[Buffed HP Maximum,Muscle,Muscle Percent,Moxie,Moxie Percent,Mysticality,Mysticality Percent,Weapon Damage,Weapon Damage Percent,spell damage, spell damage percent,Combat Rate,hot resistance]
     {
-        item [int] relevant_potions = ItemFilterGetPotionsCouldPullToAddToNumericModifier(s, -100000.0, blacklist); //what a strange lookup name
+        item [int] relevant_potions = ItemFilterGetPotionsCouldPullToAddToNumericModifier(s, -100000.0, blocklist); //what a strange lookup name
         string [int] relevant_potions_output;
         foreach key, it in relevant_potions
         {

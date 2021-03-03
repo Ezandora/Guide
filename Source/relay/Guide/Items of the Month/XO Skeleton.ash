@@ -2,20 +2,20 @@
 RegisterResourceGenerationFunction("IOTMXOSkeletonGenerateResource");
 void IOTMXOSkeletonGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (!lookupFamiliar("XO Skeleton").familiar_is_usable()) return;
+	if (!$familiar[XO Skeleton].familiar_is_usable()) return;
 	
 	
 	
 	int hugs_remaining = clampi(11 - get_property_int("_xoHugsUsed"), 0, 11);
 	
-	ChecklistEntry entry;
+	ChecklistEntry entry = ChecklistEntryMake();
 	entry.image_lookup_name = "__familiar xo skeleton";
 	entry.importance_level = 3;
-	if (my_familiar() != lookupFamiliar("XO Skeleton"))
+	if (my_familiar() != $familiar[XO Skeleton])
 		entry.url = "familiar.php";
 	
 	
-	if ((my_familiar() == lookupFamiliar("XO Skeleton") || __misc_state["in run"]) && hugs_remaining > 0)
+	if ((my_familiar() == $familiar[XO Skeleton] || __misc_state["in run"]) && hugs_remaining > 0)
 	{
 		string [int] description;
   		description.listAppend("Instantly v-pocket an item.");
@@ -40,8 +40,8 @@ void IOTMXOSkeletonGenerateResource(ChecklistEntry [int] resource_entries)
 	
 	if (__misc_state["in run"] && in_ronin())
 	{
-        int xes = lookupItem("9543").available_amount();
-        int os = lookupItem("9544").available_amount();
+        int xes = $item[9543].available_amount();
+        int os = $item[9544].available_amount();
         
         //two Os: pair of candy glasses (10 adventures of +50% item)
         //Hide-rox™ cookie: 3 os, 1-size food, myst tower test

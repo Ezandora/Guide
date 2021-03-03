@@ -56,13 +56,15 @@ step8	You've done a good turn, and helped Subject 37 make his escape from the Co
     }
     else
     {
+    	boolean [item] items_needed;
+     
         item [int] items_to_buy_in_mall;
         if (need_to_return_goto && $item[goto].available_amount() == 0)
         {
             //234% item from BASIC elemental
             if (!in_ronin())
             {
-                items_to_buy_in_mall.listAppend($item[goto]);
+            	items_needed[$item[goto]] = true;
             }
             else
             {
@@ -75,7 +77,7 @@ step8	You've done a good turn, and helped Subject 37 make his escape from the Co
             //+item? from weremoose
             if (!in_ronin())
             {
-                items_to_buy_in_mall.listAppend($item[weremoose spit]);
+                items_needed[$item[weremoose spit]] = true;
             }
             else
             {
@@ -89,7 +91,7 @@ step8	You've done a good turn, and helped Subject 37 make his escape from the Co
             //234% item from Portly Abomination
             if (!in_ronin())
             {
-                items_to_buy_in_mall.listAppend($item[abominable blubber]);
+                items_needed[$item[abominable blubber]] = true;
             }
             else
             {
@@ -97,6 +99,13 @@ step8	You've done a good turn, and helped Subject 37 make his escape from the Co
                     subentry.modifiers.listAppend("+234% item");
                 subentry.entries.listAppend("Collect abominable blubber from a Portly Abomination in Menagerie Level 3.");
             }
+        }
+        foreach it in items_needed
+        {
+        	if (it.available_amount() == 0)
+                items_to_buy_in_mall.listAppend(it);
+            else
+                subentry.entries.listAppend("Acquire " + it + ", from storage(?).");
         }
         if (items_to_buy_in_mall.count() > 0)
         {

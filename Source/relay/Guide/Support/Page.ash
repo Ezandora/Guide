@@ -94,6 +94,13 @@ Page Page()
 	return __global_page;
 }
 
+Page PageResetGlobalPage()
+{
+	Page new_page;
+	__global_page = new_page;
+	return __global_page;
+}
+
 buffer PageGenerateBodyContents(Page page_in)
 {
     return page_in.body_contents;
@@ -113,7 +120,7 @@ buffer PageGenerateStyle(Page page_in)
         if (true)
         {
             result.append("\t\t");
-            result.append(HTMLGenerateTagPrefix("style", mapMake("type", "text/css")));
+            result.HTMLAppendTagPrefix("style", "type", "text/css");
             result.append("\n");
         }
         result.append(page_in.defined_css_blocks[""].CSSBlockGenerate()); //write first
@@ -161,7 +168,7 @@ buffer PageGenerate(Page page_in)
 	
 	//Body:
 	result.append("\t");
-	result.append(HTMLGenerateTagPrefix("body", page_in.body_attributes));
+	result.HTMLAppendTagPrefix("body", page_in.body_attributes);
 	result.append("\n\t\t");
 	result.append(page_in.body_contents);
 	result.append("\n");
@@ -177,6 +184,22 @@ buffer PageGenerate(Page page_in)
 void PageGenerateAndWriteOut(Page page_in)
 {
 	write(PageGenerate(page_in));
+}
+
+buffer PageGenerateAsElementInBody(Page page_in)
+{
+	//In this mode, we don't generate an entire page - just one node in the body tag.
+	//Includes style.
+	
+    buffer result;
+    result.append(PageGenerateStyle(page_in));
+    result.append(page_in.body_contents);
+    return result;
+}
+
+buffer PageGenerateAsElementInBody()
+{
+	return Page().PageGenerateAsElementInBody();
 }
 
 void PageSetTitle(Page page_in, string title)
@@ -315,19 +338,23 @@ void PageInit()
 	
 	//Simple table lines:
 	PageAddCSSClass("div", "r_stl_container", "display:table;");
-	PageAddCSSClass("div", "r_stl_container_row", "display:table-row;");
-    PageAddCSSClass("div", "r_stl_entry", "padding:0px;margin:0px;display:table-cell;");
-    PageAddCSSClass("div", "r_stl_spacer", "width:1em;");
+	PageAddCSSClass("div", "r_stl_row", "display:table-row;");
+    PageAddCSSClass("div", "r_stl_entry", "padding:0px;margin:0px;display:table-cell;padding-top:1px;padding-right:1em;border-bottom:1px solid " + __setting_line_colour + ";padding-bottom:1px;");
+    PageAddCSSClass("div", "r_stl_entry_last_column", "padding-right:0em;");
+    PageAddCSSClass("div", "r_stl_entry_last_row", "border-bottom:initial;padding-bottom:0px;");
+    
+    //PageAddCSSClass("div", "r_stl_spacer", "width:1em;");
 }
 
 
 
 string HTMLGenerateIndentedText(string text, string width)
 {
-	if (__use_table_based_layouts) //table-based layout
+	/*if (__use_table_based_layouts) //table-based layout
 		return "<table cellpadding=0 cellspacing=0 width=100%><tr>" + HTMLGenerateTagWrap("td", "", mapMake("style", "width:" + width + ";")) + "<td>" + text + "</td></tr></table>";
-	else //div-based layout:
-		return HTMLGenerateDivOfClass(text, "r_indention");
+	else //div-based layout:*/
+	
+    return HTMLGenerateDivOfClass(text, "r_indention");
 }
 
 string HTMLGenerateIndentedText(string [int] text)
@@ -359,7 +386,7 @@ string HTMLGenerateSimpleTableLines(string [int][int] lines, boolean dividers_ar
 		max_columns = max(max_columns, lines[i].count());
 	}
 	
-	if (__use_table_based_layouts)
+	/*if (__use_table_based_layouts)
 	{
 		//table-based layout:
 		result.append("<table style=\"margin-right: 10px; width:100%;\" cellpadding=0 cellspacing=0>");
@@ -401,17 +428,18 @@ string HTMLGenerateSimpleTableLines(string [int][int] lines, boolean dividers_ar
 	
 		result.append("</table>");
 	}
-	else
+	else*/
+	if (true)
 	{
 		//div-based layout:
-        int intra_i = 0;
-        int last_cell_count = 0;
-        result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_stl_container")));
+        //int intra_i = 0;
+        //int last_cell_count = 0;
+        result.HTMLAppendTagPrefix("div", "class", "r_stl_container");
 		foreach i in lines
 		{
-            if (intra_i > 0)
+            /*if (intra_i > 0)
             {
-                result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_stl_container_row")));
+                result.HTMLAppendTagPrefix("div", "class", "r_stl_row");
                 for i from 1 to last_cell_count //no colspan with display:table, generate extra (zero-padding, zero-margin) cells:
                 {
                     string separator = "";
@@ -419,29 +447,34 @@ string HTMLGenerateSimpleTableLines(string [int][int] lines, boolean dividers_ar
                         separator = "<hr>";
                     else
                         separator = "<hr style=\"opacity:0\">"; //laziness - generate an invisible HR, so there's still spacing
-                    result.append(HTMLGenerateDivOfClass(separator, "r_stl_entry"));
+                    result.HTMLAppendDivOfClass(separator, "r_stl_entry");
                 }
                 result.append("</div>");
                 last_cell_count = 0;
-            }
-            result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_stl_container_row")));
-            int intra_j = 0;
+            }*/
+            result.HTMLAppendTagPrefix("div", "class", "r_stl_row");
+            //int intra_j = 0;
 			foreach j in lines[i]
 			{
 				string entry = lines[i][j];
-                if (intra_j > 0)
+                /*if (intra_j > 0)
                 {
-                    result.append(HTMLGenerateDivOfClass("", "r_stl_entry r_stl_spacer"));
-                    last_cell_count += 1;
-                }
-				result.append(HTMLGenerateDivOfClass(entry, "r_stl_entry"));
-                last_cell_count += 1;
+                    //result.HTMLAppendDivOfClass("", "r_stl_entry r_stl_spacer");
+                    //last_cell_count += 1;
+                }*/
+                string class_name = "r_stl_entry";
+                if (j == lines[i].count() - 1)
+                	class_name += " r_stl_entry_last_column";
+                if (i == lines.count() - 1)
+                	class_name += " r_stl_entry_last_row";
+				result.HTMLAppendDivOfClass(entry, class_name);
+                //last_cell_count += 1;
                 
-                intra_j += 1;
+                //intra_j += 1;
 			}
 			
             result.append("</div>");
-            intra_i += 1;
+            //intra_i += 1;
 		}
         result.append("</div>");
 	}

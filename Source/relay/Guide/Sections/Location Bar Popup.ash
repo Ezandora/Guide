@@ -31,7 +31,7 @@ buffer createItemInformationTableMethod2(int columns, LBPItemInformation [int] i
         table_map["style"] += table_style;
     if (table_class != "")
         table_map["class"] = table_class;
-    output_buffer.append(HTMLGenerateTagPrefix("div", table_map));
+    output_buffer.HTMLAppendTagPrefix("div", table_map);
     
     
     foreach key, info in items_presenting
@@ -42,7 +42,7 @@ buffer createItemInformationTableMethod2(int columns, LBPItemInformation [int] i
             {
                 output_buffer.append("</div>");
             }
-            output_buffer.append(HTMLGenerateTagPrefix("div", mapMake("style", "display:table-row;")));
+            output_buffer.HTMLAppendTagPrefix("div", "style", "display:table-row;");
         }
         int image_size = 30;
         if (want_item_minimal_display)
@@ -75,7 +75,7 @@ buffer createItemInformationTableMethod2(int columns, LBPItemInformation [int] i
         {
             int using_size = image_sizes[key];
             string image_class = image_classes[key];
-            output_buffer.append(HTMLGenerateTagPrefix("div", mapMake("style", "display:table-cell;max-width:" + using_size + ";max-height:" + using_size + ";min-width:" + using_size + ";min-height:" + using_size + ";padding-left:3px;padding-right:3px;vertical-align:middle;", "class", image_class)));
+            output_buffer.HTMLAppendTagPrefix("div", mapMake("style", "display:table-cell;max-width:" + using_size + ";max-height:" + using_size + ";min-width:" + using_size + ";min-height:" + using_size + ";padding-left:3px;padding-right:3px;vertical-align:middle;", "class", image_class));
             
             //Generate image:
             string [string] image_map = mapMake("src", image_url, "width", using_size, "height", using_size);
@@ -84,7 +84,7 @@ buffer createItemInformationTableMethod2(int columns, LBPItemInformation [int] i
             if (info.greyed_out)
                 image_map["style"] += "opacity:0.5;";
             image_map["alt"] = info.item_name;
-            output_buffer.append(HTMLGenerateTagPrefix("img", image_map));
+            output_buffer.HTMLAppendTagPrefix("img", image_map);
             output_buffer.append("</div>");
         }
         
@@ -94,11 +94,11 @@ buffer createItemInformationTableMethod2(int columns, LBPItemInformation [int] i
             main_tag_style += "color:gray;";
         if (want_item_minimal_display)
             main_tag_style += "font-size:0.9em;";
-        output_buffer.append(HTMLGenerateTagPrefix("div", mapMake("style", main_tag_style)));
+        output_buffer.HTMLAppendTagPrefix("div", "style", main_tag_style);
         if (want_item_minimal_display)
-            output_buffer.append(HTMLGenerateTagPrefix("span", mapMake("class", "r_location_bar_background_blur_small")));
+            output_buffer.HTMLAppendTagPrefix("span", "class", "r_location_bar_background_blur_small");
         else
-            output_buffer.append(HTMLGenerateTagPrefix("span", mapMake("class", "r_location_bar_background_blur")));
+            output_buffer.HTMLAppendTagPrefix("span", "class", "r_location_bar_background_blur");
         
         if (info.should_display_drop_current)
         {
@@ -124,9 +124,9 @@ buffer createItemInformationTableMethod2(int columns, LBPItemInformation [int] i
             else
                 tag_map["style"] += "display:block;";
             
-            output_buffer.append(HTMLGenerateTagPrefix(wrap_type, tag_map));
+            output_buffer.HTMLAppendTagPrefix(wrap_type, tag_map);
             if (!want_item_minimal_display)
-                output_buffer.append(HTMLGenerateTagPrefix("span", mapMake("class", "r_location_bar_background_blur")));
+                output_buffer.HTMLAppendTagPrefix("span", "class", "r_location_bar_background_blur");
             if (want_item_minimal_display)
                 output_buffer.append(" (");
             output_buffer.append(secondary_line.listJoinComponents(", "));
@@ -134,7 +134,7 @@ buffer createItemInformationTableMethod2(int columns, LBPItemInformation [int] i
                 output_buffer.append(")");
             if (!want_item_minimal_display)
                 output_buffer.append("</span>");
-            output_buffer.append(HTMLGenerateTagSuffix(wrap_type));
+            output_buffer.HTMLAppendTagSuffix(wrap_type);
         }
         
         output_buffer.append("</span>");
@@ -410,7 +410,7 @@ buffer generateItemInformationMethod2(location l, monster m, boolean try_for_min
     boolean display_alternate_for_smaller_sizes = (columns == 3);
     
     buffer output_buffer;
-    output_buffer.append(HTMLGenerateTagPrefix("div", mapMake("style", "padding-left:" + (__setting_indention_width_in_em * 0.5) + "em;")));
+    output_buffer.HTMLAppendTagPrefix("div", "style", "padding-left:" + (__setting_indention_width_in_em * 0.5) + "em;");
     string table_class = "";
     if (display_alternate_for_smaller_sizes)
         table_class = "r_only_display_if_not_tiny r_only_display_if_not_small";
@@ -592,10 +592,10 @@ buffer generateLocationBarTable(string [int] table_entries, string [int] table_e
     if (true)
     {
         buffer table_style;
-        table_style.append("display:table;width:100%;height:100%;text-align:center;");
+        table_style.append("display:table;width:100%;height:100%;text-align:center;height:" + __setting_navbar_height_in_em + "em;"); //min-height is less than ideal but works
         if (__setting_location_bar_fixed_layout)
             table_style.append("table-layout:fixed;");
-        bar.append(HTMLGenerateTagPrefix("div", mapMake("style", table_style))); //
+        bar.HTMLAppendTagPrefix("div", "style", table_style); //
     }
     
     foreach key in table_entries
@@ -619,14 +619,14 @@ buffer generateLocationBarTable(string [int] table_entries, string [int] table_e
             map["style"] += "width:" + table_entry_widths[key] + "%;";
         
         if (entry_url.length() != 0)
-            bar.append(HTMLGenerateTagPrefix("a", map));
+            bar.HTMLAppendTagPrefix("a", map);
         else
-            bar.append(HTMLGenerateTagPrefix("div", map));
+            bar.HTMLAppendTagPrefix("div", map);
         
         if (table_entry_classes contains key)
             bar.append(s);
         else
-            bar.append(HTMLGenerateTagWrap("div", s, mapMake("class", "r_cl_modifier_inline", "style", "color:black;"))); //r_cl_modifier_inline needs its own div due to CSS class order precedence
+            bar.HTMLAppendTagWrap("div", s, mapMake("class", "r_cl_modifier_inline", "style", "color:black;")); //r_cl_modifier_inline needs its own div due to CSS class order precedence
         if (entry_url.length() != 0)
         {
             bar.append("</a>");
@@ -636,7 +636,7 @@ buffer generateLocationBarTable(string [int] table_entries, string [int] table_e
     }
     
     
-    bar.append(HTMLGenerateTagSuffix("div"));
+    bar.HTMLAppendTagSuffix("div");
     
     
     
@@ -660,11 +660,11 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
         return buf;
     
     string transition_time = "0.5s";
-    buf.append(HTMLGenerateTagWrap("div", "", mapMake("id", "r_location_popup_blackout", "style", "position:fixed;z-index:5;width:100%;height:100%;background:rgba(0,0,0,0.5);opacity:0;pointer-events:none;visibility:hidden;")));
+    buf.HTMLAppendTagWrap("div", "", mapMake("id", "r_location_popup_blackout", "class", "r_popup_blackout_class", "style", "z-index:4;"));
+    PageAddCSSClass("", "r_popup_blackout_class", "position:fixed;top:0px;width:100%;height:100%;background:rgba(0,0,0,0.5);opacity:0;pointer-events:none;visibility:hidden;");
     
-    
-    buf.append(HTMLGenerateTagPrefix("div", mapMake("id", "r_location_popup_box", "style", "height:auto;transition:bottom " + transition_time + ";z-index:5;opacity:0;pointer-events:none;bottom:-10000px", "class", "r_bottom_outer_container")));
-    buf.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_bottom_inner_container", "style", "background:white;height:auto;")));
+    buf.HTMLAppendTagPrefix("div", mapMake("id", "r_location_popup_box", "style", "height:auto;transition:bottom " + transition_time + ";z-index:5;opacity:0;pointer-events:none;bottom:-10000px;position:fixed;", "class", "r_bottom_outer_container"));
+    buf.HTMLAppendTagPrefix("div", "class", "r_bottom_inner_container", "style", "background:white;height:auto;padding-right:20px;");
     
     float [monster] appearance_rates_adjusted = l.appearance_rates_adjusted();
     float [monster] appearance_rates_next_turn = l.appearance_rates(true);
@@ -897,7 +897,7 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
         float rate = appearance_rates_adjusted[m] * rate_nc_cancel_multiplier;
         float next_rate = appearance_rates_next_turn[m]; //already normalised for monsters
         if (entries_displayed > 0)
-            buf.append(HTMLGenerateTagPrefix("hr", mapMake("style", "margin:0px;")));
+            buf.HTMLAppendTagPrefix("hr", "style", "margin:0px;");
         entries_displayed += 1;
         monsters_displayed += 1;
             
@@ -930,7 +930,7 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
                 style += "color:grey;";
             if (monster_image_stats.height > 100 && false) //those tall monsters like to impress
                 style += "min-height:100px;";
-            buf.append(HTMLGenerateTagPrefix("div", mapMake("style", style)));
+            buf.HTMLAppendTagPrefix("div", "style", style);
         }
         if (!monster_image_url.contains_text("nopic.gif") && monster_image_url != "")
         {
@@ -988,7 +988,7 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
                 if (location_of_first_top_pixel > 0)
                     image_style += "margin-top:-" + location_of_first_top_pixel + "px;";
             }
-            buf.append(HTMLGenerateTagPrefix("img", mapMake("src", monster_image_url, "style", image_style, "alt", m)));
+            buf.HTMLAppendTagPrefix("img", mapMake("src", monster_image_url, "style", image_style, "alt", m));
         }
         
         if (true)
@@ -1244,8 +1244,8 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
             buf.append(generateItemInformationMethod2(l, m, try_for_minimal_display,monsters_to_display_items_minimally));
         }
         
-        //buf.append(HTMLGenerateTagSuffix("div"));
-        buf.append(HTMLGenerateTagSuffix("div"));
+        //buf.HTMLAppendTagSuffix("div");
+        buf.HTMLAppendTagSuffix("div");
         //break;
     }
     
@@ -1280,7 +1280,7 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
                     fl_entries.listAppend("Need to " + adventure.conditions_to_finish);
                 
                 
-                buf.append(HTMLGenerateTagPrefix("hr", mapMake("style", "margin:0px;")));
+                buf.HTMLAppendTagPrefix("hr", "style", "margin:0px;");
                 buf.append(generateLocationBarTable(fl_entries, fl_entry_urls, fl_entry_styles, fl_entry_classes, fl_entry_width_weight, fl_entry_fixed_width_percentage, ""));
             }
         }
@@ -1300,19 +1300,19 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
         if (lines.count() + lines_offscreen.count() > 0)
         {
             if (entries_displayed >= 1)
-                buf.append(HTMLGenerateTagPrefix("hr", mapMake("style", "margin:0px;")));
+                buf.HTMLAppendTagPrefix("hr", "style", "margin:0px;");
             string div_class = "r_cl_modifier_inline";
             string div_style = "height:1.1em;padding-top:1px;padding-bottom:1px;";
             if (location_bar_location_name_is_centre_aligned)
                 div_class += " r_centre";
             else
                 div_style += "padding-left:" + __setting_indention_width + ";";
-            buf.append(HTMLGenerateTagPrefix("div", mapMake("class", div_class, "style", div_style)));
+            buf.HTMLAppendTagPrefix("div", "class", div_class, "style", div_style);
             buf.append(lines.listJoinComponents(" - "));
             buf.append("</div>");
             if (lines_offscreen.count() > 0)
             {
-                buf.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_cl_modifier_inline", "style", "position:absolute;right:0px;top:0px;")));
+                buf.HTMLAppendTagPrefix("div", "class", "r_cl_modifier_inline", "style", "position:absolute;right:0px;top:0px;");
                 buf.append(lines_offscreen.listJoinComponents(" - "));
                 buf.append("</div>");
             }
@@ -1350,7 +1350,7 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
         if (fl_entries.count() > 0 && !all_entries_blank)
         {
             if (entries_displayed >= 1)
-                buf.append(HTMLGenerateTagPrefix("hr", mapMake("style", "margin:0px;")));
+                buf.HTMLAppendTagPrefix("hr", "style", "margin:0px;");
             /*if (fl_entries.count() == 2)
             {
                 fl_entry_styles[1] += "text-align:right;";
@@ -1377,10 +1377,10 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
     
     if (entries_displayed == 0)
         return "".to_buffer();
-    buf.append(HTMLGenerateTagSuffix("div"));
+    buf.HTMLAppendTagSuffix("div");
     //if (output_hr_override)
             //buf.append("<div style=\"position:absolute;bottom:-1px;min-height:2px;width:100%;z-index:10000;background:blue;\"></div>");
-    buf.append(HTMLGenerateTagSuffix("div"));
+    buf.HTMLAppendTagSuffix("div");
     
     return buf;
 }

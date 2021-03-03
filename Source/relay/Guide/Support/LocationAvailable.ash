@@ -37,9 +37,10 @@ int __la_turncount_initialised_on = -1;
 //There's an appearance_rates() function that takes into account queue effects, which we may consider using in the future?
 float [monster] appearance_rates_adjusted(location l)
 {
-    boolean appearance_rates_has_changed = mafiaIsPastRevision(14740); //not sure on the revision, but after a certain revision, appearance_rates() takes into account olfaction
+    boolean appearance_rates_has_changed = true; //not sure on the revision, but after a certain revision, appearance_rates() takes into account olfaction
     //FIXME domed city of ronald/grimacia doesn't take into account alien appearance rate
     float [monster] source = l.appearance_rates();
+    //Bug in appearance_rates(): if you banish all three monsters, it says they are -3 rate. In realiy, they are equal. 
     
     if (l == $location[the sleazy back alley]) //FIXME is mafia's data files incorrect, or the wiki's?
         source[$monster[none]] = MIN(MAX(0, 20 - combat_rate_modifier()), 100);
@@ -366,7 +367,7 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
 		case $location[The Haunted Bedroom]:
 		case $location[The Haunted Bathroom]:
         case $location[the haunted gallery]:
-			return get_property_ascension("lastSecondFloorUnlock") && QuestState("questM21Dance").started;
+			return get_property_ascension("lastSecondFloorUnlock") && QuestState("questM21Dance").mafia_internal_step >= 2;
         case $location[the haunted ballroom]:
             return questPropertyPastInternalStepNumber("questM21Dance", 4);
         case $location[The Haunted Laboratory]:
@@ -655,6 +656,7 @@ void locationAvailablePrivateInit()
 	effect [string] zones_unlocked_by_effect;
 	
 	locations_unlocked_by_item[$location[Cobb's Knob Laboratory]] = $item[Cobb's Knob lab key];
+	locations_unlocked_by_item[$location[The Knob Shaft]] = $item[Cobb's Knob lab key];
 	locations_unlocked_by_item[$location[Cobb's Knob Menagerie\, Level 1]] = $item[Cobb's Knob Menagerie key];
 	locations_unlocked_by_item[$location[Cobb's Knob Menagerie\, Level 2]] = $item[Cobb's Knob Menagerie key];
 	locations_unlocked_by_item[$location[Cobb's Knob Menagerie\, Level 3]] = $item[Cobb's Knob Menagerie key];
@@ -1174,9 +1176,9 @@ string getClickableURLForLocation(location l, Error unable_to_find_url)
             lookup_map["Post-Quest Bugbear Pens"] =  "place.php?whichplace=knoll_hostile";
             
         if ($item[talisman o' namsilat].equipped_amount() > 0)
-            lookup_map["Palindome"] = "place.php?whichplace=palindome";
+            lookup_map["Inside the Palindome"] = "place.php?whichplace=palindome";
         else
-            lookup_map["Palindome"] = "inventory.php?which=2";
+            lookup_map["Inside the Palindome"] = generateEquipmentLink($item[talisman o' namsilat]);
         //antique maps are weird:
         lookup_map["The Electric Lemonade Acid Parade"] = "inv_use.php?pwd=" + my_hash() + "&whichitem=4613";
         foreach s in $strings[Professor Jacking's Small-O-Fier,Professor Jacking's Huge-A-Ma-tron]

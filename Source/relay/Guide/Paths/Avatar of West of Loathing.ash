@@ -9,7 +9,7 @@ void PathAvatarOfWestOfLoathingGenerateResource(ChecklistEntry [int] resource_en
     string image_name = "";
     ChecklistSubentry [int] subentries;
     
-    if (mafiaIsPastRevision(16881) && $skill[Extract Oil].have_skill())
+    if ($skill[Extract Oil].have_skill())
     {
         int oils_extracted = get_property_int("_oilExtracted");
         int oils_remaining = clampi(15 - oils_extracted, 0, 15);
@@ -114,11 +114,11 @@ void PathAvatarOfWestOfLoathingGenerateResource(ChecklistEntry [int] resource_en
             string title = pluralise(banish_count, "beancannon banish", "beancannon banishes");
             if (!in_ronin())
                 title = "Beancannon banishes";
-            resource_entries.listAppend(ChecklistEntryMake("__skill beancannon", url, ChecklistSubentryMake(title, "", description), 8).ChecklistEntryTagEntry("banish"));
+            resource_entries.listAppend(ChecklistEntryMake("__skill beancannon", url, ChecklistSubentryMake(title, "", description), 8).ChecklistEntryTag("banish"));
         }
     }
     
-    if ($skill[Long Con].have_skill() && mafiaIsPastRevision(16812) && get_property_int("_longConUsed") < 5)
+    if ($skill[Long Con].have_skill() && get_property_int("_longConUsed") < 5)
     {
         int uses_remaining = clampi(5 - get_property_int("_longConUsed"), 0, 5);
         string [int] description;
@@ -149,7 +149,7 @@ void PathAvatarOfWestOfLoathingGenerateTasks(ChecklistEntry [int] task_entries, 
     tale_for_class[$class[Snake Oiler]] = $item[Tales of the West: Snake Oiling];
     
     boolean [class] have_advanced_skills_for_class;
-    if ($skill[Unleash Cowrruption].have_skill() || $skill[Hard Drinker].have_skill() || $skill[Walk: Cautious Prowl].have_skill())
+    if ($skill[Unleash Cowrruption].have_skill() || $skill[[18008]Hard Drinker].have_skill() || $skill[Walk: Cautious Prowl].have_skill())
         have_advanced_skills_for_class[$class[Cow Puncher]] = true;
     if ($skill[Beancannon].have_skill() || $skill[Prodigious Appetite].have_skill() || $skill[Walk: Prideful Strut].have_skill())
         have_advanced_skills_for_class[$class[Beanslinger]] = true;

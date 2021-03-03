@@ -94,9 +94,7 @@ ChecklistEntry QSleazeAirportGenerateQuestFramework(ChecklistEntry [int] task_en
     }
     
     
-    boolean [location] target_locations;
-    target_locations[target_location] = true;
-    ChecklistEntry output_entry = ChecklistEntryMake(state.image_name, url, subentry, target_locations);
+    ChecklistEntry output_entry = ChecklistEntryMake(state.image_name, url, subentry, locationToLocationMap(target_location));
     
     task_entries.listAppend(output_entry);
     
@@ -162,6 +160,7 @@ void QSleazeAirportCocktailGenerateTasks(ChecklistEntry [int] task_entries)
     if (__QSleazeAirportGenerateQuestFramework_return_quest_nearly_finished)
         return;
     entry.subentries[0].modifiers.listAppend("olfact Cocktails");
+    entry.subentries[0].entries.listAppend("Or don't; the equipment is useful for PVP.");
 }
 
 void QSleazeAirportSprinklesGenerateTasks(ChecklistEntry [int] task_entries)
@@ -266,7 +265,7 @@ void QSleazeAirportGenerateTasks(ChecklistEntry [int] task_entries)
     }
 }
 
-void QSleazeAirportGenerateResource(ChecklistEntry [int] resource_entries)
+void QSleazeAirportGenerate(ChecklistCollection checklists)
 {
     if (!__misc_state["sleaze airport available"])
         return;
@@ -308,7 +307,7 @@ void QSleazeAirportGenerateResource(ChecklistEntry [int] resource_entries)
                 description.listAppend("Use clara's bell to instantly acquire. Won't need fishy.");
             ChecklistEntry entry = ChecklistEntryMake("__item ultimate mind destroyer", $location[The Sunken Party Yacht].getClickableURLForLocation(), ChecklistSubentryMake("Ultimate Mind Destroyer collectable", "free runs", description), $locations[The Sunken Party Yacht]);
             entry.importance_level = 8;
-            resource_entries.listAppend(entry);
+            checklists.add(C_AFTERCORE_TASKS, entry);
         }
     }
 }
@@ -1416,12 +1415,12 @@ void QHotAirportGenerateTasks(ChecklistEntry [int] task_entries)
     QHotAirportLavaCoLampGenerateTasks(task_entries);
 }
 
-void QHotAirportGenerateResource(ChecklistEntry [int] resource_entries)
+void QHotAirportGenerate(ChecklistCollection checklists)
 {
     if (!__misc_state["hot airport available"])
         return;
     //Elevator:
-    if (mafiaIsPastRevision(16434) && !get_property_boolean("_infernoDiscoVisited")) //FIXME replace with what this is named
+    if (!get_property_boolean("_infernoDiscoVisited")) //FIXME replace with what this is named
     {
         int potential_disco_style_level = 0;
         int current_disco_style_level = 0;
@@ -1511,7 +1510,7 @@ void QHotAirportGenerateResource(ChecklistEntry [int] resource_entries)
         
         //fancy tophat, insane tophat, brown felt tophat, isotophat, tiny top hat and cane
         if (potential_disco_style_level > 0)
-            resource_entries.listAppend(ChecklistEntryMake("__item disco ball", url, ChecklistSubentryMake("One elevator ride", "", description), 5));
+            checklists.add(C_RESOURCES, ChecklistEntryMake("__item disco ball", url, ChecklistSubentryMake("One elevator ride", "", description), 5));
     }
 }
 
@@ -1618,7 +1617,7 @@ void QColdAirportGenerateTasks(ChecklistEntry [int] task_entries)
             tasks.listClear();
             if ($item[Walford's bucket].equipped_amount() == 0)
             {
-                url = "inventory.php?which=2";
+                url = generateEquipmentLink($item[walford's bucket]);
                 tasks.listAppend("equip walford's bucket");
             }
             tasks.listAppend("adventure on the glacier");
@@ -1631,21 +1630,18 @@ void QColdAirportGenerateTasks(ChecklistEntry [int] task_entries)
     }
 }
 
-void QAirportGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+RegisterGenerationFunction("QAirportGenerate");
+void QAirportGenerate(ChecklistCollection checklists)
 {
-    ChecklistEntry [int] chosen_entries = optional_task_entries;
-    if (__misc_state["in run"])
-        chosen_entries = future_task_entries;
+	//trying to port this file over to the new system would be a nightmare; do it this way
+    ChecklistEntry [int] chosen_entries = checklists.lookup(C_AFTERCORE_TASKS).entries;
     
     QSleazeAirportGenerateTasks(chosen_entries);
     QSpookyAirportGenerateTasks(chosen_entries);
     QStenchAirportGenerateTasks(chosen_entries);
     QHotAirportGenerateTasks(chosen_entries);
     QColdAirportGenerateTasks(chosen_entries);
-}
-
-void QAirportGenerateResource(ChecklistEntry [int] resource_entries)
-{
-    QSleazeAirportGenerateResource(resource_entries);
-    QHotAirportGenerateResource(resource_entries);
+    
+    QSleazeAirportGenerate(checklists);
+    QHotAirportGenerate(checklists);
 }

@@ -3,15 +3,15 @@
 RegisterTaskGenerationFunction("IOTMBastilleBattalionGenerateTasks");
 void IOTMBastilleBattalionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (lookupItem("Bastille Battalion control rig").available_amount() == 0) return;
+	if ($item[Bastille Battalion control rig].available_amount() == 0) return;
 	
-	if (lookupItem("Draftsman's driving gloves").available_amount() > 0 || lookupItem("Nouveau nosering").available_amount() > 0 || lookupItem("Brutal brogues").available_amount() > 0) return;
+	if ($item[Draftsman's driving gloves].available_amount() > 0 || $item[Nouveau nosering].available_amount() > 0 || $item[Brutal brogues].available_amount() > 0) return;
 	
 	string [int] description;
 	string url = "inv_use.php?pwd=" + my_hash() + "&whichitem=9928";
 	
 	//FIXME suggest the right configuration
-	if (lookupItem("Bastille Battalion control rig").storage_amount() > 0)
+	if ($item[Bastille Battalion control rig].storage_amount() > 0)
 	{
         url = "storage.php?which=3";
         description.listAppend("Free pull from Hagnk's.");

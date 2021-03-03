@@ -45,6 +45,22 @@ void SemirareGenerateDescription(string [int] description)
 	
     LocationChoice [int] semirares;
 	//Generate things to do:
+	
+	if (my_path_id() == PATH_GREY_GOO)
+	{
+		//The Haunted Library - black eyedrops, spooky resistance
+        //FIXME calculate amount needed
+        string description_library = "|*+9 spooky resistance potion, for collecting grey goo.";
+        if ($item[black eyedrops].have())
+        	description_library += " (have " + $item[black eyedrops].available_amount() + ")"; 
+        string description_border = "|*+9 sleaze resistance potion, for collecting grey goo.";
+        if ($item[donkey flipbook].have())
+        	description_border += " (have " + $item[donkey flipbook].available_amount() + ")";
+        semirares.listAppend(LocationChoiceMake($location[The Haunted Library], description_library, 0));
+        semirares.listAppend(LocationChoiceMake($location[South of The Border], description_border, 0));
+        
+	}
+	//The Copperhead Club/zeppelin goes here
 	if (__misc_state["in run"])
 	{
 		if (__misc_state["can equip just about any weapon"])
@@ -52,7 +68,7 @@ void SemirareGenerateDescription(string [int] description)
 			if (!have_outfit_components("Knob Goblin Elite Guard Uniform"))
 			{
 				string [int] reasons;
-				if (!__quest_state["Level 8"].finished)
+				if (!__quest_state["Level 5"].finished)
 					reasons.listAppend("Cobb's Knob quest");
                 if (!dispensary_available() && false)
                 {
@@ -70,7 +86,7 @@ void SemirareGenerateDescription(string [int] description)
         int wool_needed = 1;
         if ($item[the nostril of the serpent].available_amount() == 0)
             wool_needed += 1;
-		if ($item[stone wool].available_amount() < wool_needed && !locationAvailable($location[the hidden park]))
+		if ($item[stone wool].available_amount() < wool_needed && !locationAvailable($location[the hidden park]) && !__quest_state["Level 11 Hidden City"].finished)
 		{
 			semirares.listAppend(LocationChoiceMake($location[The Hidden Temple], "|*Acquire stone wool for unlocking hidden city.|*Run +100% item. (or up to +400% item for +3 adventures)", 0));
 		}

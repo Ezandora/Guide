@@ -14,7 +14,8 @@ void QOldLandfillInit()
 }
 
 
-void QOldLandfillGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+RegisterGenerationFunction("QOldLandfillGenerate");
+void QOldLandfillGenerate(ChecklistCollection collection)
 {
 	QuestState base_quest_state = __quest_state["Old Landfill"];
 	//if (!base_quest_state.in_progress) //this isn't actively tracked, so the best we can do is checking the last adventure location
@@ -70,5 +71,5 @@ void QOldLandfillGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     }
 	
     
-	optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, active_url, subentry, $locations[the old landfill]));
+	collection.add(C_OPTIONAL_TASKS, ChecklistEntryMake(base_quest_state.image_name, active_url, subentry, $locations[the old landfill]));
 }
