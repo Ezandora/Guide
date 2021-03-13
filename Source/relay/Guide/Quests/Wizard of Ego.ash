@@ -134,5 +134,5 @@ void QWizardOfEgoGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     relevant_locations[$location[The VERY Unquiet Garves]] = true;
     relevant_locations[$location[Tower Ruins]] = true;
     
-	optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, relevant_locations));
+	optional_task_entries.listAppend(ChecklistEntryMake(96, base_quest_state.image_name, url, subentry, relevant_locations));
 }

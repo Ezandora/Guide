@@ -95,6 +95,6 @@ void SBuffUpkeepGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
     }
     if (final_skills.count() > 0)
     {
-        optional_task_entries.listAppend(ChecklistEntryMake("__skill " + final_skills[0], "skillz.php", ChecklistSubentryMake("Upkeep buffs", "", "Cast " + final_skills.listJoinComponents(", ", "and") + ".")));
+        optional_task_entries.listAppend(ChecklistEntryMake(281, "__skill " + final_skills[0], "skillz.php", ChecklistSubentryMake("Upkeep buffs", "", "Cast " + final_skills.listJoinComponents(", ", "and") + ".")));
     }
 }

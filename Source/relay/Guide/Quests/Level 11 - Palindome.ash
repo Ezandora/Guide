@@ -406,5 +406,5 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
     boolean [location] relevant_locations = makeConstantLocationArrayMutable($locations[the poop deck, belowdecks,cobb's knob laboratory,whitey's grove]);
     relevant_locations[$location[Inside the Palindome]] = true;
 
-    task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, relevant_locations));
+    task_entries.listAppend(ChecklistEntryMake(33, base_quest_state.image_name, url, subentry, relevant_locations));
 }

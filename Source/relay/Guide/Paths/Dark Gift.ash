@@ -19,5 +19,5 @@ void PathDarkGiftGenerateResource(ChecklistEntry [int] resource_entries)
             //is this relevant? we don't describe this for pantsgiving
             description.listAppend("Currently used on " + banish_entry.banished_monster + " for " + pluralise(turns_left_of_banish, "more turn", "more turns") + ".");
         }
-        resource_entries.listAppend(ChecklistEntryMake("__skill Baleful Howl", url, ChecklistSubentryMake(pluralise(banishes_left, "baleful howl", "baleful howls"), "", description), 0).ChecklistEntryTag("free banish"));
+        resource_entries.listAppend(ChecklistEntryMake(140, "__skill Baleful Howl", url, ChecklistSubentryMake(pluralise(banishes_left, "baleful howl", "baleful howls"), "", description), 0).ChecklistEntryTag("free banish"));
     }

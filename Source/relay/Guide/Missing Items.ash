@@ -106,7 +106,7 @@ void MissingItemsGenerate(ChecklistCollection checklists)
         else if (!__misc_state["can use clovers"])
             subentries[0].entries.listAppend("Either meatpaste together, or find after losing to the naughty sorceress. (" + (in_bad_moon() ? "probably faster" : "usually slower") + ")");
 			
-		ChecklistEntry entry = ChecklistEntryMake("__item wand of nagamar", $location[the castle in the clouds in the sky (basement)].getClickableURLForLocation(), subentries);
+		ChecklistEntry entry = ChecklistEntryMake(206, "__item wand of nagamar", $location[the castle in the clouds in the sky (basement)].getClickableURLForLocation(), subentries);
 		entry.should_indent_after_first_subentry = true;
 		
 		items_needed_entries.listAppend(entry);
@@ -128,7 +128,7 @@ void MissingItemsGenerate(ChecklistCollection checklists)
 				line += " (need)";
 			else
 				line += " (have)";
-			items_needed_entries.listAppend(ChecklistEntryMake("__item skeleton key", $location[the defiled nook].getClickableURLForLocation(), ChecklistSubentryMake("Skeleton key", "", line)));
+			items_needed_entries.listAppend(ChecklistEntryMake(207, "__item skeleton key", $location[the defiled nook].getClickableURLForLocation(), ChecklistSubentryMake("Skeleton key", "", line)));
 		}
 		
 		if ($item[digital key].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["digital key used"])
@@ -153,7 +153,7 @@ void MissingItemsGenerate(ChecklistCollection checklists)
                     options.listAppend(total_white_pixels + "/30 white pixels found.");
             }
             //FIXME URL?
-			items_needed_entries.listAppend(ChecklistEntryMake("__item digital key", "", ChecklistSubentryMake("Digital key", "", options)));
+			items_needed_entries.listAppend(ChecklistEntryMake(208, "__item digital key", "", ChecklistSubentryMake("Digital key", "", options)));
 		}
 		string from_daily_dungeon_string = "From daily dungeon";
 		if ($item[fat loot token].available_amount() > 0)
@@ -164,7 +164,7 @@ void MissingItemsGenerate(ChecklistCollection checklists)
 			options.listAppend(from_daily_dungeon_string);
 			if (__misc_state_int["pulls available"] > 0 && __misc_state["can eat just about anything"])
 				options.listAppend("From key lime pie");
-			items_needed_entries.listAppend(ChecklistEntryMake("__item Sneaky Pete's key", "da.php", ChecklistSubentryMake("Sneaky Pete's key", "", options)));
+			items_needed_entries.listAppend(ChecklistEntryMake(209, "__item Sneaky Pete's key", "da.php", ChecklistSubentryMake("Sneaky Pete's key", "", options)));
 		}
 		if ($item[jarlsberg's key].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["Jarlsberg's key used"])
 		{
@@ -172,7 +172,7 @@ void MissingItemsGenerate(ChecklistCollection checklists)
 			options.listAppend(from_daily_dungeon_string);
 			if (__misc_state_int["pulls available"] > 0 && __misc_state["can eat just about anything"])
 				options.listAppend("From key lime pie");
-			items_needed_entries.listAppend(ChecklistEntryMake("__item jarlsberg's key", "da.php", ChecklistSubentryMake("Jarlsberg's key", "", options)));
+			items_needed_entries.listAppend(ChecklistEntryMake(210, "__item jarlsberg's key", "da.php", ChecklistSubentryMake("Jarlsberg's key", "", options)));
 		}
 		if ($item[Boris's key].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["Boris's key used"])
 		{
@@ -180,17 +180,17 @@ void MissingItemsGenerate(ChecklistCollection checklists)
 			options.listAppend(from_daily_dungeon_string);
 			if (__misc_state_int["pulls available"] > 0 && __misc_state["can eat just about anything"])
 				options.listAppend("From key lime pie");
-			items_needed_entries.listAppend(ChecklistEntryMake("__item Boris's key", "da.php", ChecklistSubentryMake("Boris's key", "", options)));
+			items_needed_entries.listAppend(ChecklistEntryMake(211, "__item Boris's key", "da.php", ChecklistSubentryMake("Boris's key", "", options)));
 		}
         
 	}
 	
 	if ($item[lord spookyraven's spectacles].available_amount() == 0 && __quest_state["Level 11 Manor"].state_boolean["Can use fast route"] && !__quest_state["Level 11 Manor"].finished)
-		items_needed_entries.listAppend(ChecklistEntryMake("__item lord spookyraven's spectacles", $location[the haunted bedroom].getClickableURLForLocation(), ChecklistSubentryMake("Lord Spookyraven's spectacles", "", "Found in Haunted Bedroom")));
+		items_needed_entries.listAppend(ChecklistEntryMake(212, "__item lord spookyraven's spectacles", $location[the haunted bedroom].getClickableURLForLocation(), ChecklistSubentryMake("Lord Spookyraven's spectacles", "", "Found in Haunted Bedroom")));
     
     if ($item[enchanted bean].available_amount() == 0 && !__quest_state["Level 10"].state_boolean["beanstalk grown"])
     {
-		items_needed_entries.listAppend(ChecklistEntryMake("__item enchanted bean", $location[The Beanbat Chamber].getClickableURLForLocation(), ChecklistSubentryMake("Enchanted bean", "", "Found in the beanbat chamber.")));
+		items_needed_entries.listAppend(ChecklistEntryMake(213, "__item enchanted bean", $location[The Beanbat Chamber].getClickableURLForLocation(), ChecklistSubentryMake("Enchanted bean", "", "Found in the beanbat chamber.")));
     }
     
     if (__quest_state["Level 13"].state_boolean["shadow will need to be defeated"])
@@ -208,7 +208,7 @@ void MissingItemsGenerate(ChecklistCollection checklists)
         item camera = 7266.to_item();
         if (camera != $item[none])
         {
-            items_needed_entries.listAppend(ChecklistEntryMake("__item " + camera, $location[the haunted bedroom].getClickableURLForLocation(), ChecklistSubentryMake("Disposable instant camera", "", "Found in the Haunted Bedroom.")));
+            items_needed_entries.listAppend(ChecklistEntryMake(214, "__item " + camera, $location[the haunted bedroom].getClickableURLForLocation(), ChecklistSubentryMake("Disposable instant camera", "", "Found in the Haunted Bedroom.")));
         }
     }
     
@@ -226,7 +226,7 @@ void MissingItemsGenerate(ChecklistCollection checklists)
             description.listAppend("Or towerkill.");
         if (!can_towerkill && !__quest_state["Level 13"].state_boolean["past tower level 2"] && $location[the castle in the clouds in the sky (top floor)].locationAvailable())
             description.listAppend("Don't collect this right now; wait until you're at the wall of bones.|(probability of appearing increases)");
-        items_needed_entries.listAppend(ChecklistEntryMake("__item electric boning knife", $location[the castle in the clouds in the sky (ground floor)].getClickableURLForLocation(), ChecklistSubentryMake("Electric boning knife", "-combat", description)));
+        items_needed_entries.listAppend(ChecklistEntryMake(215, "__item electric boning knife", $location[the castle in the clouds in the sky (ground floor)].getClickableURLForLocation(), ChecklistSubentryMake("Electric boning knife", "-combat", description)));
     }
     if ($item[beehive].available_amount() == 0 && __quest_state["Level 13"].state_boolean["wall of skin will need to be defeated"] && my_path_id() != PATH_POCKET_FAMILIARS)
     {
@@ -241,7 +241,7 @@ void MissingItemsGenerate(ChecklistCollection checklists)
         if (!in_bad_moon())
             description.listAppend("Or towerkill.");
         
-        items_needed_entries.listAppend(ChecklistEntryMake("__item beehive", $location[the black forest].getClickableURLForLocation(), ChecklistSubentryMake("Beehive", "-combat", description)));
+        items_needed_entries.listAppend(ChecklistEntryMake(216, "__item beehive", $location[the black forest].getClickableURLForLocation(), ChecklistSubentryMake("Beehive", "-combat", description)));
     }
     
     if (!__quest_state["Level 13"].state_boolean["Init race completed"])
@@ -286,7 +286,7 @@ void MissingItemsGenerate(ChecklistCollection checklists)
         
         subentry.header = sources.listJoinComponents(", ", "and").capitaliseFirstLetter() + " sources";
         if (subentry.modifiers.count() > 0)
-            items_needed_entries.listAppend(ChecklistEntryMake("__item vial of patchouli oil", "", subentry));
+            items_needed_entries.listAppend(ChecklistEntryMake(217, "__item vial of patchouli oil", "", subentry));
     }
                                
     SetsGenerateMissingItems(items_needed_entries);

@@ -129,7 +129,7 @@ void QSpookyravenLightsOutGenerateEntry(ChecklistEntry [int] task_entries, Check
             available_questlines.listAppend("Elizabeth");
         if (available_questlines.count() > 0)
         {
-            optional_task_entries.listAppend(ChecklistEntryMake("__half Lights Out", "", ChecklistSubentryMake("Lights Out in " + pluralise(turns_until_next_lights_out, "adventure", "adventures"), "", available_questlines.listJoinComponents(",", "and") + " quest " + (available_questlines.count() > 1 ? "lines" : "line") + "."), (from_task ? 5 : 8)));
+            optional_task_entries.listAppend(ChecklistEntryMake(30, "__half Lights Out", "", ChecklistSubentryMake("Lights Out in " + pluralise(turns_until_next_lights_out, "adventure", "adventures"), "", available_questlines.listJoinComponents(",", "and") + " quest " + (available_questlines.count() > 1 ? "lines" : "line") + "."), (from_task ? 5 : 8)));
         }
     }
     
@@ -137,7 +137,7 @@ void QSpookyravenLightsOutGenerateEntry(ChecklistEntry [int] task_entries, Check
     {
         if (url == "place.php?whichplace=manor2" && !get_property_ascension("lastSecondFloorUnlock"))
             url = "";
-        task_entries.listAppend(ChecklistEntryMake("__half Lights Out", url, important_subentries, -11));
+        task_entries.listAppend(ChecklistEntryMake(31, "__half Lights Out", url, important_subentries, -11));
     }
 }
 
@@ -202,7 +202,7 @@ void QSpookyravenLightsOutGenerateTasks(ChecklistEntry [int] task_entries, Check
             }
         }
         if (exploit_description.count() > 0)
-            task_entries.listAppend(ChecklistEntryMake("__half Lights Out", url, ChecklistSubentryMake("Lights Out Exploit", "", exploit_description), -11));
+            task_entries.listAppend(ChecklistEntryMake(32, "__half Lights Out", url, ChecklistSubentryMake("Lights Out Exploit", "", exploit_description), -11));
     }
 }
 

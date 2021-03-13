@@ -197,5 +197,5 @@ void QLegendaryBeatGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         }
     }
     
-	task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, "", subentry, $locations[professor jacking's small-o-fier, professor jacking's huge-a-ma-tron]));
+	task_entries.listAppend(ChecklistEntryMake(92, base_quest_state.image_name, "", subentry, $locations[professor jacking's small-o-fier, professor jacking's huge-a-ma-tron]));
 }

@@ -33,6 +33,6 @@ void IOTMEightDaysAweekPillKeeperGenerateResource(ChecklistEntry [int] resource_
          	short_desc = "3spn";
         }
          
-        resource_entries.listAppend(ChecklistEntryMake("__item eight days a week pill keeper", "main.php?eowkeeper=1", ChecklistSubentryMake("Pill keeper", "", description), 4).ChecklistEntrySetShortDescription(short_desc));   
+        resource_entries.listAppend(ChecklistEntryMake(547, "__item eight days a week pill keeper", "main.php?eowkeeper=1", ChecklistSubentryMake("Pill keeper", "", description), 4).ChecklistEntrySetShortDescription(short_desc));   
 	}
 }

@@ -13,6 +13,7 @@ int IOTMEmotionChipCastsLeft(string [skill] skill_property_names, skill s)
 RegisterGenerationFunction("IOTMEmotionChipGenerate");
 void IOTMEmotionChipGenerate(ChecklistCollection checklists)
 {
+	if (my_path_id() == PATH_AVATAR_OF_BORIS) return; //probably a lot of these
 	if (!lookupSkill("Emotionally Chipped").have_skill())
 	{
 		if (lookupItem("spinal-fluid-covered emotion chip").have())
@@ -21,7 +22,7 @@ void IOTMEmotionChipGenerate(ChecklistCollection checklists)
             description.listAppend("Use spinal-fluid-covered emotion chip.");
             if (my_path_id() != PATH_NONE)
 	            description.listAppend("Unless that's impossible this path. (needs spading?)");
-        	checklists.add(C_OPTIONAL_TASKS, ChecklistEntryMake("__item spinal-fluid-covered emotion chip", "inventory.php?which=3", ChecklistSubentryMake("Acquire Emotionally Chipped skill", "", description), 9));
+        	checklists.add(C_OPTIONAL_TASKS, ChecklistEntryMake(452, "__item spinal-fluid-covered emotion chip", "inventory.php?which=3", ChecklistSubentryMake("Acquire Emotionally Chipped skill", "", description), 9));
         }
 		return;
     }
@@ -138,7 +139,7 @@ void IOTMEmotionChipGenerate(ChecklistCollection checklists)
         if (s == lookupSkill("Feel Hatred"))
         	priority = 0;
         
-        ChecklistEntry entry = ChecklistEntryMake("__skill " + s, url, ChecklistSubentryMake(pluralise(casts_left, "cast", "casts") + " of " + s, "", description), priority);
+        ChecklistEntry entry = ChecklistEntryMake(453, "__skill " + s, url, ChecklistSubentryMake(pluralise(casts_left, "cast", "casts") + " of " + s, "", description), priority);
         if (skills_that_are_buffs[s])
         {
         	entry.ChecklistEntrySetCategory("buff");

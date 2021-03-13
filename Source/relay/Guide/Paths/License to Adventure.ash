@@ -5,7 +5,7 @@ void PathLicenseToAdventureGenerateTasks(ChecklistEntry [int] task_entries, Chec
         return;
     if ($item[Victor's Spoils].available_amount() > 0 && !get_property_boolean("_victorSpoilsUsed"))
     {
-        task_entries.listAppend(ChecklistEntryMake("__item victor's spoils", "inventory.php?which=3", ChecklistSubentryMake("Use Victor's Spoils", "", "Gives eleven adventures."), 3));
+        task_entries.listAppend(ChecklistEntryMake(155, "__item victor's spoils", "inventory.php?which=3", ChecklistSubentryMake("Use Victor's Spoils", "", "Gives eleven adventures."), 3));
     }
     
     int lair_progress = get_property_int("_villainLairProgress");
@@ -45,7 +45,7 @@ void PathLicenseToAdventureGenerateTasks(ChecklistEntry [int] task_entries, Chec
             modifiers.listAppend("-combat");
             description.listAppend("Run -combat to speed up acquiring choices.");
         }
-        task_entries.listAppend(ChecklistEntryMake("__item victor's spoils", "", ChecklistSubentryMake("Adventure in the Villain's Lair", modifiers, description), 3, $locations[Super Villain's Lair]));
+        task_entries.listAppend(ChecklistEntryMake(156, "__item victor's spoils", "", ChecklistSubentryMake("Adventure in the Villain's Lair", modifiers, description), 3, $locations[Super Villain's Lair]));
     }
     
     int social_capital_available = licenseToAdventureSocialCapitalAvailable();
@@ -109,6 +109,6 @@ void PathLicenseToAdventureGenerateTasks(ChecklistEntry [int] task_entries, Chec
         }
             
             
-        optional_task_entries.listAppend(ChecklistEntryMake("__item briefcase", "place.php?whichplace=town_right&action=town_bondhq", ChecklistSubentryMake("Spend " + social_capital_available + " social capital", "", description), 3));
+        optional_task_entries.listAppend(ChecklistEntryMake(157, "__item briefcase", "place.php?whichplace=town_right&action=town_bondhq", ChecklistSubentryMake("Spend " + social_capital_available + " social capital", "", description), 3));
     }
 }

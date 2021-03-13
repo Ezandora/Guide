@@ -28,7 +28,7 @@ void generateGardenEntry(ChecklistEntry [int] resource_entries, boolean [item] g
         {
             subentry.entries.listAppend("Can create " + output_list.listJoinComponents(", ", "or") + ".");
         }
-        resource_entries.listAppend(ChecklistEntryMake(image_name, "", subentries, 8));
+        resource_entries.listAppend(ChecklistEntryMake(541, image_name, "", subentries, 8));
     }
 }
 

@@ -3,7 +3,7 @@ void IOTMBoxingDaycareGenerateTasks(ChecklistEntry [int] task_entries, Checklist
 {
     if (!__iotms_usable[$item[Boxing Day care package]]) return;
 	//collect nap consumable
-    ChecklistEntry entry = ChecklistEntryMake();
+    ChecklistEntry entry = ChecklistEntryMake(607);
     entry.url = "place.php?whichplace=town_wrong&action=townwrong_boxingdaycare";
     entry.image_lookup_name = "__item orange boxing gloves";
     entry.importance_level = 8;
@@ -43,7 +43,7 @@ void IOTMBoxingDaycareGenerateResource(ChecklistEntry [int] resource_entries)
         }
         else
             description.listAppend("+200% myst, +25% item");
-		resource_entries.listAppend(ChecklistEntryMake("__item orange boxing gloves", "place.php?whichplace=town_wrong&action=townwrong_boxingdaycare", ChecklistSubentryMake("Boxing daycare buff (100 turns)", description), 5).ChecklistEntryTag("boxing daycare").ChecklistEntrySetShortDescription("blank").ChecklistEntrySetCategory("buff"));
+		resource_entries.listAppend(ChecklistEntryMake(608, "__item orange boxing gloves", "place.php?whichplace=town_wrong&action=townwrong_boxingdaycare", ChecklistSubentryMake("Boxing daycare buff (100 turns)", description), 5).ChecklistEntryTag("boxing daycare").ChecklistEntrySetShortDescription("blank").ChecklistEntrySetCategory("buff"));
 	}
 	if (hippy_stone_broken() && !get_property_boolean("_daycareFights") && !__misc_state["in run"])
 	{
@@ -55,7 +55,7 @@ void IOTMBoxingDaycareGenerateResource(ChecklistEntry [int] resource_entries)
         	description.listAppend("Should recruit first.");
         int fights_gained = clampi(2 * toddler_number.to_string().length(), 2, 11); //log/ln not available in mafia, use strings
         //description.listAppend("+" + fights_gained + " fights.");
-        resource_entries.listAppend(ChecklistEntryMake("__item orange boxing gloves", "place.php?whichplace=town_wrong&action=townwrong_boxingdaycare", ChecklistSubentryMake("+" + fights_gained + " Boxing daycare PVP fights", description), 5).ChecklistEntryTag("boxing daycare").ChecklistEntrySetShortDescription("+" + fights_gained));
+        resource_entries.listAppend(ChecklistEntryMake(609, "__item orange boxing gloves", "place.php?whichplace=town_wrong&action=townwrong_boxingdaycare", ChecklistSubentryMake("+" + fights_gained + " Boxing daycare PVP fights", description), 5).ChecklistEntryTag("boxing daycare").ChecklistEntrySetShortDescription("+" + fights_gained));
 		
 	}
 	if (__misc_state["in run"] && $skill[Army of Toddlers].skill_is_usable() && !get_property_boolean("_armyToddlerCast") && __misc_state["need to level"])
@@ -77,7 +77,7 @@ void IOTMBoxingDaycareGenerateResource(ChecklistEntry [int] resource_entries)
         description.listAppend("50 MP, gain " + stats_out.listJoinComponents(" / ") + " stats.");
         if (split_statgain[my_primestat()] < 3.0 || get_property_int("daycareToddlers") <= 2)
         	description.listAppend("Might want to recruit first.");
-        resource_entries.listAppend(ChecklistEntryMake("__skill Army of Toddlers", "", ChecklistSubentryMake("Army of Toddlers castable", description), 5).ChecklistEntryTag("boxing daycare"));
+        resource_entries.listAppend(ChecklistEntryMake(610, "__skill Army of Toddlers", "", ChecklistSubentryMake("Army of Toddlers castable", description), 5).ChecklistEntryTag("boxing daycare"));
 		
 	}
 }

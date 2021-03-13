@@ -319,10 +319,10 @@ void SFaxGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
     }
     
 	if (__misc_state["fax available"] && $item[photocopied monster].available_amount() == 0)
-        optional_task_entries.listAppend(ChecklistEntryMake("fax machine", url, ChecklistSubentryMake("Fax", "", listJoinComponents(SFaxGeneratePotentialFaxes(true), "|<hr>"))));
+        optional_task_entries.listAppend(ChecklistEntryMake(390, "fax machine", url, ChecklistSubentryMake("Fax", "", listJoinComponents(SFaxGeneratePotentialFaxes(true), "|<hr>"))));
     if ($skill[Rain Man].skill_is_usable() && my_rain() >= 50)
     {
-        ChecklistEntry entry = ChecklistEntryMake("__skill rain man", "skills.php", ChecklistSubentryMake("Rain man copy", "50 rain drops", listJoinComponents(SFaxGeneratePotentialFaxes(true), "<hr>")));
+        ChecklistEntry entry = ChecklistEntryMake(391, "__skill rain man", "skills.php", ChecklistSubentryMake("Rain man copy", "50 rain drops", listJoinComponents(SFaxGeneratePotentialFaxes(true), "<hr>")));
         
         if (my_rain() > 93)
         {

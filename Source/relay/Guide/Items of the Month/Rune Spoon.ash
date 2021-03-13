@@ -79,6 +79,6 @@ void IOTMRuneSpoonGenerateResource(ChecklistEntry [int] resource_entries)
         string url = "inv_use.php?whichitem=10254&pwd=" + my_hash();
         if (!spoon.have() && spoon.closet_amount() > 0)
         	url = "closet.php?which=2";
-		resource_entries.listAppend(ChecklistEntryMake("__item " + spoon, url, ChecklistSubentryMake("Moon sign tunable", "", description), 10));
+		resource_entries.listAppend(ChecklistEntryMake(461, "__item " + spoon, url, ChecklistSubentryMake("Moon sign tunable", "", description), 10));
 	}
 }

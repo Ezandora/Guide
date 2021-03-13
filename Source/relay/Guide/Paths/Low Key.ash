@@ -146,6 +146,6 @@ void PathLowKeyGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         
         
         
-        task_entries.listAppend(ChecklistEntryMake("__item Asdon Martin keyfob", l.getClickableURLForLocation(), subentry, 8).ChecklistEntryTag("low key summer path"));
+        task_entries.listAppend(ChecklistEntryMake(205, "__item Asdon Martin keyfob", l.getClickableURLForLocation(), subentry, 8).ChecklistEntryTag("low key summer path"));
     }      
 }

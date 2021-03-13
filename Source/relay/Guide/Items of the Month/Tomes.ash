@@ -186,7 +186,7 @@ void IOTMTomesGenerateResource(ChecklistEntry [int] resource_entries)
 		}
 		
         
-        ChecklistEntry entry = ChecklistEntryMake("__item tome of clip art", "campground.php?action=bookshelf", subentries);
+        ChecklistEntry entry = ChecklistEntryMake(460, "__item tome of clip art", "campground.php?action=bookshelf", subentries);
         if (in_ronin())
             entry.should_indent_after_first_subentry = true;
         entry.ChecklistEntrySetCategory("iotm");

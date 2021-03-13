@@ -120,8 +120,9 @@ record ChecklistEntry
     string category; //similar to combination_tags, except they aren't combined - just "grouped" next to each other
     string specific_image;
     string abridged_header; //custom
+    int universal_id;
     
-    string internal_generation_identifier;
+    //string internal_generation_identifier;
     string [string] internal_processing_data; //when combined via tags, the data is += to each other with a | separator
     
     int [int] internal_processing_data_subentry_content_id; //key is subentry index, value is content id. stored this "high" instead of internal_processing_data because this is simpler than a generic system
@@ -129,7 +130,7 @@ record ChecklistEntry
 
 //In retrospect, making all these ChecklistEntryMake overloads was a mistake
 //may want to consider removing some? but they're *all* used
-ChecklistEntry ChecklistEntryMakeInternal(string image_lookup_name, string url, ChecklistSubentry [int] subentries, int importance, boolean should_highlight)
+ChecklistEntry ChecklistEntryMakeInternal(int universal_id, string image_lookup_name, string url, ChecklistSubentry [int] subentries, int importance, boolean should_highlight)
 {
 	ChecklistEntry result;
 	result.image_lookup_name = image_lookup_name;
@@ -137,10 +138,10 @@ ChecklistEntry ChecklistEntryMakeInternal(string image_lookup_name, string url, 
 	result.subentries = subentries;
 	result.importance_level = importance;
     result.should_highlight = should_highlight;
-    
+    result.universal_id = universal_id;
     //This generation process adds about nine milliseconds to load time: (6.6% load cost)
     //This is the only way I can think of it make checklist entries have a "unique" identifier. There are a lot of "vague" identifiers - image name, url, first entry title - but those change.
-    if (true)
+    if (false)
     {
     	/*
         Example:
@@ -160,75 +161,57 @@ ChecklistEntry ChecklistEntryMakeInternal(string image_lookup_name, string url, 
         }*/
         //Note that there can be non-unique entries with the same file, function, and line; doctor bag and emotion chip, as an example, because they're in a loop.
         //But, those are often grouped together anyways, so...
-        buffer generation_identifier; //Considered making this part of the record to prevent an alloc, but
+        //Switched to universal_id
+        /*buffer generation_identifier; //Considered making this part of the record to prevent an alloc, but
         generation_identifier.append(get_stack_trace()[1].file);
         generation_identifier.append(get_stack_trace()[2].name);
         generation_identifier.append(get_stack_trace()[1].line);
-        result.internal_generation_identifier = generation_identifier.to_string();
+        result.internal_generation_identifier = generation_identifier.to_string();*/
     }
 	return result;
 }
 
-ChecklistEntry ChecklistEntryMake(string image_lookup_name, string url, ChecklistSubentry [int] subentries, int importance, boolean should_highlight)
+ChecklistEntry ChecklistEntryMake(int universal_id, string image_lookup_name, string url, ChecklistSubentry [int] subentries, int importance, boolean should_highlight)
 {
-	return ChecklistEntryMakeInternal(image_lookup_name, url, subentries, importance, should_highlight);
+	return ChecklistEntryMakeInternal(universal_id, image_lookup_name, url, subentries, importance, should_highlight);
 }
 
-ChecklistEntry ChecklistEntryMake(string image_lookup_name, string url, ChecklistSubentry [int] subentries, int importance)
+ChecklistEntry ChecklistEntryMake(int universal_id, string image_lookup_name, string url, ChecklistSubentry [int] subentries, int importance)
 {
-    return ChecklistEntryMakeInternal(image_lookup_name, url, subentries, importance, false);
+    return ChecklistEntryMakeInternal(universal_id, image_lookup_name, url, subentries, importance, false);
 }
 
-ChecklistEntry ChecklistEntryMake(string image_lookup_name, string url, ChecklistSubentry [int] subentries, int importance, boolean [location] highlight_if_last_adventured)
-{
-    boolean should_highlight = false;
-    
-    if (highlight_if_last_adventured contains __last_adventure_location)
-        should_highlight = true;
-    return ChecklistEntryMakeInternal(image_lookup_name, url, subentries, importance, should_highlight);
-}
-
-ChecklistEntry ChecklistEntryMake(string image_lookup_name, string url, ChecklistSubentry [int] subentries)
-{
-	return ChecklistEntryMakeInternal(image_lookup_name, url, subentries, CHECKLIST_DEFAULT_IMPORTANCE, false);
-}
-
-ChecklistEntry ChecklistEntryMake(string image_lookup_name, string url, ChecklistSubentry [int] subentries, boolean [location] highlight_if_last_adventured)
+ChecklistEntry ChecklistEntryMake(int universal_id, string image_lookup_name, string url, ChecklistSubentry [int] subentries, int importance, boolean [location] highlight_if_last_adventured)
 {
     boolean should_highlight = false;
     
     if (highlight_if_last_adventured contains __last_adventure_location)
         should_highlight = true;
-	return ChecklistEntryMakeInternal(image_lookup_name, url, subentries, CHECKLIST_DEFAULT_IMPORTANCE, should_highlight);
+    return ChecklistEntryMakeInternal(universal_id, image_lookup_name, url, subentries, importance, should_highlight);
 }
 
-ChecklistEntry ChecklistEntryMake(string image_lookup_name, string url, ChecklistSubentry subentry, int importance)
+ChecklistEntry ChecklistEntryMake(int universal_id, string image_lookup_name, string url, ChecklistSubentry [int] subentries)
 {
-	ChecklistSubentry [int] subentries;
-	subentries[subentries.count()] = subentry;
-	return ChecklistEntryMakeInternal(image_lookup_name, url, subentries, importance, false);
+	return ChecklistEntryMakeInternal(universal_id, image_lookup_name, url, subentries, CHECKLIST_DEFAULT_IMPORTANCE, false);
 }
 
-ChecklistEntry ChecklistEntryMake(string image_lookup_name, string url, ChecklistSubentry subentry, int importance, boolean [location] highlight_if_last_adventured)
+ChecklistEntry ChecklistEntryMake(int universal_id, string image_lookup_name, string url, ChecklistSubentry [int] subentries, boolean [location] highlight_if_last_adventured)
 {
     boolean should_highlight = false;
     
     if (highlight_if_last_adventured contains __last_adventure_location)
         should_highlight = true;
-        
-	ChecklistSubentry [int] subentries;
-	subentries[subentries.count()] = subentry;
-	return ChecklistEntryMakeInternal(image_lookup_name, url, subentries, importance, should_highlight);
+	return ChecklistEntryMakeInternal(universal_id, image_lookup_name, url, subentries, CHECKLIST_DEFAULT_IMPORTANCE, should_highlight);
 }
 
-ChecklistEntry ChecklistEntryMake(string image_lookup_name, string url, ChecklistSubentry subentry)
+ChecklistEntry ChecklistEntryMake(int universal_id, string image_lookup_name, string url, ChecklistSubentry subentry, int importance)
 {
 	ChecklistSubentry [int] subentries;
 	subentries[subentries.count()] = subentry;
-	return ChecklistEntryMakeInternal(image_lookup_name, url, subentries, CHECKLIST_DEFAULT_IMPORTANCE, false);
+	return ChecklistEntryMakeInternal(universal_id, image_lookup_name, url, subentries, importance, false);
 }
 
-ChecklistEntry ChecklistEntryMake(string image_lookup_name, string url, ChecklistSubentry subentry, boolean [location] highlight_if_last_adventured)
+ChecklistEntry ChecklistEntryMake(int universal_id, string image_lookup_name, string url, ChecklistSubentry subentry, int importance, boolean [location] highlight_if_last_adventured)
 {
     boolean should_highlight = false;
     
@@ -237,13 +220,32 @@ ChecklistEntry ChecklistEntryMake(string image_lookup_name, string url, Checklis
         
 	ChecklistSubentry [int] subentries;
 	subentries[subentries.count()] = subentry;
-	return ChecklistEntryMakeInternal(image_lookup_name, url, subentries, CHECKLIST_DEFAULT_IMPORTANCE, should_highlight);
+	return ChecklistEntryMakeInternal(universal_id, image_lookup_name, url, subentries, importance, should_highlight);
 }
 
-ChecklistEntry ChecklistEntryMake()
+ChecklistEntry ChecklistEntryMake(int universal_id, string image_lookup_name, string url, ChecklistSubentry subentry)
+{
+	ChecklistSubentry [int] subentries;
+	subentries[subentries.count()] = subentry;
+	return ChecklistEntryMakeInternal(universal_id, image_lookup_name, url, subentries, CHECKLIST_DEFAULT_IMPORTANCE, false);
+}
+
+ChecklistEntry ChecklistEntryMake(int universal_id, string image_lookup_name, string url, ChecklistSubentry subentry, boolean [location] highlight_if_last_adventured)
+{
+    boolean should_highlight = false;
+    
+    if (highlight_if_last_adventured contains __last_adventure_location)
+        should_highlight = true;
+        
+	ChecklistSubentry [int] subentries;
+	subentries[subentries.count()] = subentry;
+	return ChecklistEntryMakeInternal(universal_id, image_lookup_name, url, subentries, CHECKLIST_DEFAULT_IMPORTANCE, should_highlight);
+}
+
+ChecklistEntry ChecklistEntryMake(int universal_id)
 {
 	ChecklistSubentry [int] blank_subentries;
-	return ChecklistEntryMakeInternal("", "", blank_subentries, 0, false);
+	return ChecklistEntryMakeInternal(universal_id, "", "", blank_subentries, 0, false);
 }
 
 
@@ -988,7 +990,8 @@ buffer ChecklistGenerate(Checklist cl, boolean output_borders)
         
         entry.container_div_attributes["class"] += (entry.container_div_attributes contains "class" ? " " : "") + container_class;
         
-        string entry_stable_id = entry.internal_generation_identifier;
+        //string entry_stable_id = entry.internal_generation_identifier;
+        string entry_stable_id = entry.universal_id;
         if (entry.combination_tag != "")
         	entry_stable_id = entry.combination_tag;
         
@@ -997,8 +1000,8 @@ buffer ChecklistGenerate(Checklist cl, boolean output_borders)
         else if (my_id() == 1557284)
         	print_html("warning: no stable id for " + entry.subentries[0].header); //usually caused by a lack of checklistentrymake
          
-        if (generated_entry.abridged_header_text != "")
-			entry.container_div_attributes["data-abridged-text"] = generated_entry.abridged_header_text;
+        //if (generated_entry.abridged_header_text != "")
+			//entry.container_div_attributes["data-abridged-text"] = generated_entry.abridged_header_text;
         
         if (entry.internal_processing_data contains "content_id")
             entry.container_div_attributes["data-content-ids"] = entry.internal_processing_data["content_id"]; 
@@ -1195,10 +1198,10 @@ ChecklistEntry add(ChecklistCollection checklists, string collection_name, Check
 	return c.entries.listAppend(entry);
 }
 
-
-ChecklistEntry add(ChecklistCollection checklists, string collection_name)
+//if resupported, needs unique_id
+/*ChecklistEntry add(ChecklistCollection checklists, string collection_name)
 {
 	ChecklistEntry entry = ChecklistEntryMake();
 	Checklist c = checklists.lookup(collection_name);
 	return c.entries.listAppend(entry);
-}
+}*/

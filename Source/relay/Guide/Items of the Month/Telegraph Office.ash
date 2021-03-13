@@ -9,7 +9,7 @@ void IOTMTelegraphOfficeGenerateTasks(ChecklistEntry [int] task_entries, Checkli
     
     if ($item[your cowboy boots].available_amount() == 0)
     {
-        optional_task_entries.listAppend(ChecklistEntryMake("__item your cowboy boots", "place.php?whichplace=town_right", ChecklistSubentryMake("Acquire your cowboy boots", "", "Visit the LT&T office."), 0));
+        optional_task_entries.listAppend(ChecklistEntryMake(594, "__item your cowboy boots", "place.php?whichplace=town_right", ChecklistSubentryMake("Acquire your cowboy boots", "", "Visit the LT&T office."), 0));
         
     }
     
@@ -166,7 +166,7 @@ void IOTMTelegraphOfficeGenerateTasks(ChecklistEntry [int] task_entries, Checkli
             description.listAppend(s + " = " + get_property(s));
     }
     
-    ChecklistEntry entry = ChecklistEntryMake("__item sea cowboy hat", "inventory.php?which=3", ChecklistSubentryMake(quest_name, modifiers, description), $locations[Investigating a Plaintive Telegram]);
+    ChecklistEntry entry = ChecklistEntryMake(595, "__item sea cowboy hat", "inventory.php?which=3", ChecklistSubentryMake(quest_name, modifiers, description), $locations[Investigating a Plaintive Telegram]);
     if (__misc_state["in run"])
         future_task_entries.listAppend(entry);
     else
@@ -213,7 +213,7 @@ void IOTMTelegraphOfficeGenerateResource(ChecklistEntry [int] resource_entries)
         }
         
         
-        resource_entries.listAppend(ChecklistEntryMake("__item clara's bell", "inventory.php?which=3", ChecklistSubentryMake("Clara's Bell", "", description), 2));
+        resource_entries.listAppend(ChecklistEntryMake(596, "__item clara's bell", "inventory.php?which=3", ChecklistSubentryMake("Clara's Bell", "", description), 2));
     }
     
     //skills:
@@ -253,9 +253,9 @@ void IOTMTelegraphOfficeGenerateResource(ChecklistEntry [int] resource_entries)
             //if (image_name == "")
                 image_name = "__skill " + s;
             //subentries.listAppend(ChecklistSubentryMake(s + " castable", "", telegraph_skill_descriptions[s]));
-            resource_entries.listAppend(ChecklistEntryMake(image_name, "skillz.php", ChecklistSubentryMake(s + " castable", "", telegraph_skill_descriptions[s]), 9).ChecklistEntryTag("telegraph skill").ChecklistEntrySetCategory("buff").ChecklistEntrySetShortDescription(telegraph_short_descriptions[s]));
+            resource_entries.listAppend(ChecklistEntryMake(597, image_name, "skillz.php", ChecklistSubentryMake(s + " castable", "", telegraph_skill_descriptions[s]), 9).ChecklistEntryTag("telegraph skill").ChecklistEntrySetCategory("buff").ChecklistEntrySetShortDescription(telegraph_short_descriptions[s]));
         }
         //if (subentries.count() > 0)
-            //resource_entries.listAppend(ChecklistEntryMake(image_name, "skillz.php", subentries, 9));
+            //resource_entries.listAppend(ChecklistEntryMake(598, image_name, "skillz.php", subentries, 9));
     }
 }

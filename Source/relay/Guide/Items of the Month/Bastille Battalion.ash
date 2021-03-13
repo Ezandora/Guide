@@ -76,5 +76,5 @@ void IOTMBastilleBattalionGenerateTasks(ChecklistEntry [int] task_entries, Check
     
     description.listAppend("Suggested configuration: " + HTMLGenerateSpanOfClass(suggested_configuration.listJoinComponents(" / "), "r_bold") + ".");
 	
-	optional_task_entries.listAppend(ChecklistEntryMake("__item Bastille Battalion control rig", url, ChecklistSubentryMake("Collect Bastille rewards", "", description), 8));
+	optional_task_entries.listAppend(ChecklistEntryMake(545, "__item Bastille Battalion control rig", url, ChecklistSubentryMake("Collect Bastille rewards", "", description), 8));
 }

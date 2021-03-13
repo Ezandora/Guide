@@ -201,7 +201,7 @@ void PathCommunityServiceGenerateTasks(ChecklistEntry [int] task_entries, Checkl
         
         
         description.listAppend(pluralise(turns, "turn", "turns") + ".");
-        task_entries.listAppend(ChecklistEntryMake(image_name, "council.php", ChecklistSubentryMake(service_name, modifiers, description)));
+        task_entries.listAppend(ChecklistEntryMake(173, image_name, "council.php", ChecklistSubentryMake(service_name, modifiers, description)));
     }
     //equaliser potions
     /*if (true)
@@ -219,7 +219,7 @@ void PathCommunityServiceGenerateTasks(ChecklistEntry [int] task_entries, Checkl
             relevant_potions_output.listAppend(it + " (+" + it.to_effect().numeric_modifier("Buffed HP Maximum").roundForOutput(0) + ")");
         }
         
-        task_entries.listAppend(ChecklistEntryMake("__item helmet turtle", "council.php", ChecklistSubentryMake("Perform HP service", "+hp", relevant_potions_output.listJoinComponents(", ", "and"))));
+        task_entries.listAppend(ChecklistEntryMake(174, "__item helmet turtle", "council.php", ChecklistSubentryMake("Perform HP service", "+hp", relevant_potions_output.listJoinComponents(", ", "and"))));
     }
     
     
@@ -231,6 +231,6 @@ void PathCommunityServiceGenerateTasks(ChecklistEntry [int] task_entries, Checkl
         {
             relevant_potions_output.listAppend(it + " (+" + it.to_effect().numeric_modifier(s).roundForOutput(0) + ")");
         }
-        task_entries.listAppend(ChecklistEntryMake("__item helmet turtle", "council.php", ChecklistSubentryMake("Perform " + s + " service", "", relevant_potions_output.listJoinComponents(", ", "and"))));
+        task_entries.listAppend(ChecklistEntryMake(175, "__item helmet turtle", "council.php", ChecklistSubentryMake("Perform " + s + " service", "", relevant_potions_output.listJoinComponents(", ", "and"))));
     }*/
 }

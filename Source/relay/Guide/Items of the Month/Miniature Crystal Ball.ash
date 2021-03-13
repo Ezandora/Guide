@@ -63,9 +63,9 @@ void IOTMMiniatureCrystalBallGenerate(ChecklistCollection checklists)
   		string popup_header = next_monster.capitaliseFirstLetter();
         string popup_description = "Next adventure in " + next_location + ".";
         popup_description += warning;
-  		checklists.add(C_TASKS, ChecklistEntryMake(popup_image_name, url, ChecklistSubentryMake(popup_header, "", popup_description), -11));
+  		checklists.add(C_TASKS, ChecklistEntryMake(513, popup_image_name, url, ChecklistSubentryMake(popup_header, "", popup_description), -11));
     }
 	
 	//tried inventory.php?which=2&ftext=miniature+crystal+ball but mafia's tracking with familiar equipment in inventory.php is wonky?
-	checklists.add(C_RESOURCES, ChecklistEntryMake(image_name, url, ChecklistSubentryMake("Minature crystal ball", "", description), 1));
+	checklists.add(C_RESOURCES, ChecklistEntryMake(514, image_name, url, ChecklistSubentryMake("Minature crystal ball", "", description), 1));
 }

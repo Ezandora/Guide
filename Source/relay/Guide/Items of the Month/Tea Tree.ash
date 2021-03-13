@@ -97,7 +97,7 @@ void IOTMTeaTreeGenerateResource(ChecklistEntry [int] resource_entries)
         
         if (tea_options.count() > 0)
             options.listAppend(HTMLGenerateSimpleTableLines(tea_options));
-        resource_entries.listAppend(ChecklistEntryMake("__item potted tea tree", "campground.php?action=teatree", ChecklistSubentryMake("Tea Tree Tea", "", options), 4).ChecklistEntrySetCategory("iotm"));
+        resource_entries.listAppend(ChecklistEntryMake(478, "__item potted tea tree", "campground.php?action=teatree", ChecklistSubentryMake("Tea Tree Tea", "", options), 4).ChecklistEntrySetCategory("iotm"));
     }
     
     if (__misc_state["in run"] && in_ronin())
@@ -129,7 +129,7 @@ void IOTMTeaTreeGenerateResource(ChecklistEntry [int] resource_entries)
         }
         if (teas_found.count() > 0)
         {
-            resource_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(teas_found.listJoinComponents(", ", "and").capitaliseFirstLetter() + " tea", "", reasons_found.listJoinComponents(", ", "and").capitaliseFirstLetter() + (one_tea_gives_effect ? " (30 turns)" : "")), 8));
+            resource_entries.listAppend(ChecklistEntryMake(479, image_name, url, ChecklistSubentryMake(teas_found.listJoinComponents(", ", "and").capitaliseFirstLetter() + " tea", "", reasons_found.listJoinComponents(", ", "and").capitaliseFirstLetter() + (one_tea_gives_effect ? " (30 turns)" : "")), 8));
         }
     }
 }

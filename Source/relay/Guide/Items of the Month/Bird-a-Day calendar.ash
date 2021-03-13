@@ -58,7 +58,7 @@ void IOTMBirdADayCalendarGenerateResource(ChecklistEntry [int] resource_entries)
         string url = "skillz.php";
         if (modifiers.count() == 0)
         	modifiers.listAppend("Unknown");
-        description.listAppend(modifiers.listJoinComponents(", ") + " buff. (20 turns, " + skill_mp_cost + " mp)");
+        description.listAppend(modifiers.listJoinComponents(", ") + " buff. (10 turns, " + skill_mp_cost + " mp)");
         if (!get_property_boolean("_canSeekBirds"))
         {
         	description.listAppend("Use your bird-a-day calendar first.");
@@ -70,7 +70,7 @@ void IOTMBirdADayCalendarGenerateResource(ChecklistEntry [int] resource_entries)
         	description.listAppend(HTMLGenerateSpanFont("Warning: casting this skill again will make it your favourite bird, which stays across ascension.", "red"));
         }
         	
-        resource_entries.listAppend(ChecklistEntryMake("__skill " + $skill[Seek out a bird], url, ChecklistSubentryMake("Seek out a Bird", "", description), 5).ChecklistEntryTag("bird-a-day calendar").ChecklistEntrySetCategory("buff").ChecklistEntrySetShortDescription(skill_mp_cost + "mp"));
+        resource_entries.listAppend(ChecklistEntryMake(539, "__skill " + $skill[Seek out a bird], url, ChecklistSubentryMake("Seek out a Bird", "", description), 5).ChecklistEntryTag("bird-a-day calendar").ChecklistEntrySetCategory("buff").ChecklistEntrySetShortDescription(skill_mp_cost + "mp"));
 	}
 	//_favoriteBirdVisited: boolean
 	//yourFavoriteBird: string, name
@@ -82,7 +82,7 @@ void IOTMBirdADayCalendarGenerateResource(ChecklistEntry [int] resource_entries)
     	string [int] modifiers = convertMafiaModifierStringToOurStyle(get_property("yourFavoriteBirdMods"));
     	string [int] description;
         description.listAppend(modifiers.listJoinComponents(", ") + " buff. (20 turns)");
-        resource_entries.listAppend(ChecklistEntryMake("__skill Visit your Favorite Bird", "skillz.php", ChecklistSubentryMake("Visit your favourite bird", "", description), 5).ChecklistEntryTag("bird-a-day calendar").ChecklistEntrySetCategory("buff"));
+        resource_entries.listAppend(ChecklistEntryMake(540, "__skill Visit your Favorite Bird", "skillz.php", ChecklistSubentryMake("Visit your favourite bird", "", description), 5).ChecklistEntryTag("bird-a-day calendar").ChecklistEntrySetCategory("buff"));
     }
 }
 	

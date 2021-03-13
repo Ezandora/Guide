@@ -66,7 +66,7 @@ void IOTMMelodramedaryGenerate(ChecklistCollection checklists)
         description.listAppend(melodramedary.name + ", spit on them: doubles all items dropped from combat. " + target_text);
     }
 	if (!avoid_adding_main)
-		checklists.add(C_RESOURCES, ChecklistEntryMake("__familiar Melodramedary", url_main, ChecklistSubentryMake(title, "", description), 1)).ChecklistEntryTag("Melodramedary").ChecklistEntrySetCategory("familiar").ChecklistEntrySetShortDescription(short_desc);
+		checklists.add(C_RESOURCES, ChecklistEntryMake(458, "__familiar Melodramedary", url_main, ChecklistSubentryMake(title, "", description), 1)).ChecklistEntryTag("Melodramedary").ChecklistEntrySetCategory("familiar").ChecklistEntrySetShortDescription(short_desc);
 	
 	//There might not be any tracking for this?
 	if (lookupItem("Fourth of May Cosplay Saber").have() && !get_property_boolean("_tauntaunTaunted") && false)
@@ -89,6 +89,6 @@ void IOTMMelodramedaryGenerate(ChecklistCollection checklists)
         }
         if (tasks.count() > 0)
         	tauntaun_description.listAppend(tasks.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".");
-        checklists.add(C_RESOURCES, ChecklistEntryMake("__familiar Melodramedary", url, ChecklistSubentryMake("Melodramedary buff", "", tauntaun_description), 1)).ChecklistEntryTag("Melodramedary");
+        checklists.add(C_RESOURCES, ChecklistEntryMake(459, "__familiar Melodramedary", url, ChecklistSubentryMake("Melodramedary buff", "", tauntaun_description), 1)).ChecklistEntryTag("Melodramedary");
 	}
 }

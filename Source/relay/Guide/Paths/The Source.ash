@@ -49,7 +49,7 @@ void PathTheSourceGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
             }
         }
         
-        task_entries.listAppend(ChecklistEntryMake("ringing phone", "place.php?whichplace=manor1&action=manor1_sourcephone_ring", ChecklistSubentryMake("Learn source skill", "", description), -11));
+        task_entries.listAppend(ChecklistEntryMake(158, "ringing phone", "place.php?whichplace=manor1&action=manor1_sourcephone_ring", ChecklistSubentryMake("Learn source skill", "", description), -11));
     }
     
     if (enlightenment + learned_skill_count < 11)
@@ -114,7 +114,7 @@ void PathTheSourceGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
         
         if (title != "")
         {
-            ChecklistEntry entry = ChecklistEntryMake("__item cookie cookie", url, ChecklistSubentryMake(title, "", description), -1);
+            ChecklistEntry entry = ChecklistEntryMake(159, "__item cookie cookie", url, ChecklistSubentryMake(title, "", description), -1);
             if (target_location != $location[none] && target_location == __last_adventure_location)
                 entry.should_highlight = true;
             if (later)
@@ -130,7 +130,7 @@ void PathTheSourceGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
         string [int] description;
         CopiedMonstersGenerateDescriptionForMonster("source agent", description, true, false);
         
-        task_entries.listAppend(ChecklistEntryMake("__item software glitch", "", ChecklistSubentryMake("Source agent now or soon", "", description), -11));
+        task_entries.listAppend(ChecklistEntryMake(160, "__item software glitch", "", ChecklistSubentryMake("Source agent now or soon", "", description), -11));
     }
     else if (source_interval > 0)
     {
@@ -140,7 +140,7 @@ void PathTheSourceGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
             description.listAppend(pluralise(get_property_int("sourceAgentsDefeated"), "agent", "agents") + " defeated so far.");
         if (QuestState("questM26Oracle").in_progress)
             description.listAppend("Oracle quests won't advance the counter.");
-        optional_task_entries.listAppend(ChecklistEntryMake("__item software glitch", "", ChecklistSubentryMake("Source agent after ~" + pluralise(turns, "won combat", "won combats"), "", description)));
+        optional_task_entries.listAppend(ChecklistEntryMake(161, "__item software glitch", "", ChecklistSubentryMake("Source agent after ~" + pluralise(turns, "won combat", "won combats"), "", description)));
     }
 }
 

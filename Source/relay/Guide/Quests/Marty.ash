@@ -115,7 +115,7 @@ void QMartyGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     relevant_locations[$location[Swamp Beaver Territory]] = true;
     relevant_locations[$location[The Weird Swamp Village]] = true;
 	
-	optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, relevant_locations));
+	optional_task_entries.listAppend(ChecklistEntryMake(81, base_quest_state.image_name, url, subentry, relevant_locations));
     
     
 }

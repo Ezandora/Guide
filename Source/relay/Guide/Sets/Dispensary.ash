@@ -45,5 +45,5 @@ void SDispensaryGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
 		else
 			subentry.entries.listAppend("Acquire KGE outfit");
 	}
-	optional_task_entries.listAppend(ChecklistEntryMake("Dispensary", "cobbsknob.php", subentry, 10));
+	optional_task_entries.listAppend(ChecklistEntryMake(218, "Dispensary", "cobbsknob.php", subentry, 10));
 }

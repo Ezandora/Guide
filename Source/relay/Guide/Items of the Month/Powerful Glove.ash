@@ -32,6 +32,6 @@ void IOTMPowerfulGloveGenerateResource(ChecklistEntry [int] resource_entries)
         	url = generateEquipmentLink($item[powerful glove]);
             description.listAppend("Equip first to use.");
         }
-        resource_entries.listAppend(ChecklistEntryMake("__item powerful glove", url, ChecklistSubentryMake(battery_left + " Powerful Glove energy", "", description), 2));
+        resource_entries.listAppend(ChecklistEntryMake(480, "__item powerful glove", url, ChecklistSubentryMake(battery_left + " Powerful Glove energy", "", description), 2));
 	}
 }

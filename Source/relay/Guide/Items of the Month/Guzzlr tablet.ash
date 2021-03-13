@@ -54,12 +54,12 @@ void IOTMGuzzlrTabletGenerate(ChecklistCollection checklists)
         
         if (items_to_equip.count() > 0)
         	description.listAppend(HTMLGenerateSpanFont("Equip " + items_to_equip.listInvert().listJoinComponents(", ", "and") + " first.", "red"));
-        checklists.add(C_AFTERCORE_TASKS, ChecklistEntryMake("__item guzzlr tablet", target_location.getClickableURLForLocation(), ChecklistSubentryMake("Guzzlr quest", "", description), 8, locationToLocationMap(target_location)));
+        checklists.add(C_AFTERCORE_TASKS, ChecklistEntryMake(456, "__item guzzlr tablet", target_location.getClickableURLForLocation(), ChecklistSubentryMake("Guzzlr quest", "", description), 8, locationToLocationMap(target_location)));
 	}
 	//I think "_guzzlrPlatinumDeliveries" will tell you how many deliveries you started today
 	//did a platinum from the previous day, _guzzlrPlatinumDeliveries was zero, started a new one today, went up to one 
 	if (!guzzlr_quest_state.started && get_property_int("_guzzlrPlatinumDeliveries") == 0 && get_property_int("guzzlrGoldDeliveries") >= 5)
 	{
-        checklists.add(C_OPTIONAL_TASKS, ChecklistEntryMake("__item guzzlr tablet", "inventory.php?tap=guzzlr", ChecklistSubentryMake("Start platinum guzzlr quest", "", "Daily collectable."), 8));
+        checklists.add(C_OPTIONAL_TASKS, ChecklistEntryMake(457, "__item guzzlr tablet", "inventory.php?tap=guzzlr", ChecklistSubentryMake("Start platinum guzzlr quest", "", "Daily collectable."), 8));
 	}
 }

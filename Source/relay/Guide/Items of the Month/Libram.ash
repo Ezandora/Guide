@@ -40,7 +40,7 @@ void IOTMLibramGenerateResource(ChecklistEntry [int] resource_entries)
                 //_taffyYellowSummons
             }
             
-			resource_entries.listAppend(ChecklistEntryMake("__item libram of divine favors", "campground.php?action=bookshelf", subentry, 7).ChecklistEntrySetCategory("iotm").ChecklistEntrySetShortDescription(libram_mp_cost + "mp"));
+			resource_entries.listAppend(ChecklistEntryMake(481, "__item libram of divine favors", "campground.php?action=bookshelf", subentry, 7).ChecklistEntrySetCategory("iotm").ChecklistEntrySetShortDescription(libram_mp_cost + "mp"));
 		}
 		
 		
@@ -51,7 +51,7 @@ void IOTMLibramGenerateResource(ChecklistEntry [int] resource_entries)
 				ChecklistSubentry subentry;
 				subentry.header =  (3 - get_property_int("_brickoEyeSummons")) + " BRICKO&trade; eye bricks obtainable";
 				subentry.entries.listAppend("Cast Summon BRICKOs libram. (" + libram_mp_cost + " mp)");
-				resource_entries.listAppend(ChecklistEntryMake("__item bricko eye brick", "campground.php?action=bookshelf", subentry, 9));
+				resource_entries.listAppend(ChecklistEntryMake(482, "__item bricko eye brick", "campground.php?action=bookshelf", subentry, 9));
 				
 			}
 		}
@@ -123,7 +123,7 @@ void IOTMLibramGenerateResource(ChecklistEntry [int] resource_entries)
                 }
             }
 				
-			resource_entries.listAppend(ChecklistEntryMake("__item bricko brick", "inventory.php?which=3", subentry, 7)).ChecklistEntryTag("daily free fight");
+			resource_entries.listAppend(ChecklistEntryMake(483, "__item bricko brick", "inventory.php?which=3", subentry, 7)).ChecklistEntryTag("daily free fight");
 		}
 	}
 }

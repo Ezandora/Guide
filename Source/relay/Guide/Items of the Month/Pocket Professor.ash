@@ -145,7 +145,7 @@ void IOTMPocketProfessorGenerate(ChecklistCollection checklists)
 	{
 		description.listAppend(HTMLGenerateSpanFont("Equip the Pocket Professor memory chip.", "red"));
 	}
-	checklists.add(C_RESOURCES, ChecklistEntryMake("__familiar Pocket Professor", url, ChecklistSubentryMake(lecture_title, "", description), -1).ChecklistEntryTag("Pocket Professor").ChecklistEntrySetShortDescription(shortdesc));
+	checklists.add(C_RESOURCES, ChecklistEntryMake(511, "__familiar Pocket Professor", url, ChecklistSubentryMake(lecture_title, "", description), -1).ChecklistEntryTag("Pocket Professor").ChecklistEntrySetShortDescription(shortdesc));
 	
 	if (!get_property_boolean("_thesisDelivered") && $familiar[Pocket Professor].experience >= 400)
 	{
@@ -159,6 +159,6 @@ void IOTMPocketProfessorGenerate(ChecklistCollection checklists)
             adventure_detail = "|*Maybe ~" + v.round() + " adventures.";
         }
         description.listAppend("Gives extra adventures from monster attack, and reduces the professor's experience by 200. (-6lb)" + adventure_detail);
-        checklists.add(C_RESOURCES, ChecklistEntryMake("__familiar Pocket Professor", url, ChecklistSubentryMake("Thesis delivery", "", description), -1).ChecklistEntryTag("Pocket Professor").ChecklistEntrySetShortDescription("thesis"));
+        checklists.add(C_RESOURCES, ChecklistEntryMake(512, "__familiar Pocket Professor", url, ChecklistSubentryMake("Thesis delivery", "", description), -1).ChecklistEntryTag("Pocket Professor").ChecklistEntrySetShortDescription("thesis"));
 	}
 }

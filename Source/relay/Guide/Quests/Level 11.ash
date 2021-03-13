@@ -204,9 +204,9 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         }
     }
     if (make_entry_future)
-        future_task_entries.listAppend(ChecklistEntryMake(image_name, url, subentry, $locations[the black forest]));
+        future_task_entries.listAppend(ChecklistEntryMake(12, image_name, url, subentry, $locations[the black forest]));
     else
-        task_entries.listAppend(ChecklistEntryMake(image_name, url, subentry, $locations[the black forest]));
+        task_entries.listAppend(ChecklistEntryMake(13, image_name, url, subentry, $locations[the black forest]));
 }
 
 void QLevel11GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)

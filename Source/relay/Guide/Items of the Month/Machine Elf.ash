@@ -27,7 +27,7 @@ void IOTMMachineElfFamiliarGenerateResource(ChecklistEntry [int] resource_entrie
     if (!__misc_state["in run"] || !__misc_state["need to level"])
         importance = 6;
     
-    ChecklistEntry entry = ChecklistEntryMake();
+    ChecklistEntry entry = ChecklistEntryMake(490);
     entry.image_lookup_name = "__familiar machine elf";
     entry.url = url;
     entry.importance_level = importance;
@@ -139,7 +139,7 @@ void IOTMMachineElfFamiliarGenerateResource(ChecklistEntry [int] resource_entrie
                 description.listAppend("Possibly run the machine elf elsewhere first, for transmutable potions.");
         }
         //entry.subentries.listAppend(ChecklistSubentryMake(pluralise(free_fights_remaining, "free elf fight", "free elf fights"), modifiers, description));
-        resource_entries.listAppend(ChecklistEntryMake(entry.image_lookup_name, entry.url, ChecklistSubentryMake(pluralise(free_fights_remaining, "free elf fight", "free elf fights"), modifiers, description)).ChecklistEntryTag("daily free fight"));
+        resource_entries.listAppend(ChecklistEntryMake(491, entry.image_lookup_name, entry.url, ChecklistSubentryMake(pluralise(free_fights_remaining, "free elf fight", "free elf fights"), modifiers, description)).ChecklistEntryTag("daily free fight"));
     }
     if (entry.subentries.count() > 0)
     {
@@ -180,6 +180,6 @@ void IOTMMachineElfGenerateResource(ChecklistEntry [int] resource_entries)
 			abstraction_lines.listAppend(ChecklistSubentryMake(pluralise(it), "",  description));
 		}
 		if (abstraction_lines.count() > 0)
-			resource_entries.listAppend(ChecklistEntryMake(image_name, "inventory.php?which=1", abstraction_lines, 7));
+			resource_entries.listAppend(ChecklistEntryMake(492, image_name, "inventory.php?which=1", abstraction_lines, 7));
     }
 }

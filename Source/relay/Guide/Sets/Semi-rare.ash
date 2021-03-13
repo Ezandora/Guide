@@ -272,7 +272,7 @@ void SSemirareGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
             else
                 importance = -11;
         }
-		ChecklistEntry entry = ChecklistEntryMake("__item fortune cookie", "", ChecklistSubentryMake(title, "", description), importance);
+		ChecklistEntry entry = ChecklistEntryMake(234, "__item fortune cookie", "", ChecklistSubentryMake(title, "", description), importance);
 		if (very_important)
         {
 			task_entries.listAppend(entry);
@@ -283,7 +283,7 @@ void SSemirareGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
                 string secondary_description = "[...]";
                 if (!setting_use_mouse_over_technique)
                     secondary_description = "Scroll up for full description.";
-                ChecklistEntry pop_up_reminder_entry = ChecklistEntryMake("__item fortune cookie", "", ChecklistSubentryMake(title, "", secondary_description), -11);
+                ChecklistEntry pop_up_reminder_entry = ChecklistEntryMake(235, "__item fortune cookie", "", ChecklistSubentryMake(title, "", secondary_description), -11);
                 pop_up_reminder_entry.only_show_as_extra_important_pop_up = true;
                 pop_up_reminder_entry.container_div_attributes["onclick"] = "navbarClick(0, 'Tasks_checklist_container')";
                 pop_up_reminder_entry.container_div_attributes["class"] = "r_clickable";

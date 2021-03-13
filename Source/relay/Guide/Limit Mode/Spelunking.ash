@@ -109,7 +109,7 @@ SpelunkingStatus SpelunkingParseStatus()
 void SpelunkingGenerateNCInformation(SpelunkingStatus spelunking_status, ChecklistEntry [int] task_entries, ChecklistEntry [int] future_task_entries)
 {
     
-    ChecklistEntry entry = ChecklistEntryMake();
+    ChecklistEntry entry = ChecklistEntryMake(417);
     entry.image_lookup_name = "__item sunken chest";
     entry.should_indent_after_first_subentry = true;
     
@@ -455,7 +455,7 @@ void SpelunkingGenerateNCInformation(SpelunkingStatus spelunking_status, Checkli
     {
         task_entries.listAppend(entry);
         string secondary_description = "Scroll up for full description.";
-        ChecklistEntry pop_up_reminder_entry = ChecklistEntryMake(entry.image_lookup_name, "", ChecklistSubentryMake(entry.subentries[0].header, "", secondary_description), -11);
+        ChecklistEntry pop_up_reminder_entry = ChecklistEntryMake(418, entry.image_lookup_name, "", ChecklistSubentryMake(entry.subentries[0].header, "", secondary_description), -11);
         pop_up_reminder_entry.only_show_as_extra_important_pop_up = true;
         pop_up_reminder_entry.container_div_attributes["onclick"] = "navbarClick(0, 'Tasks_checklist_container')";
         pop_up_reminder_entry.container_div_attributes["class"] = "r_clickable";
@@ -587,7 +587,7 @@ void SpelunkingGenerateEquipmentEntries(Checklist [int] checklists, SpelunkingSt
         
         string slot_name = s.slot_to_plural_string().capitaliseFirstLetter();
         
-        /*ChecklistEntry entry = ChecklistEntryMake();
+        /*ChecklistEntry entry = ChecklistEntryMake(419);
         entry.subentries.listAppend(ChecklistSubentryMake(slot_name, "", ""));
         entry.should_indent_after_first_subentry = true;
         boolean have_something_to_unequip = false;*/
@@ -611,7 +611,7 @@ void SpelunkingGenerateEquipmentEntries(Checklist [int] checklists, SpelunkingSt
                 entry.image_lookup_name = "__item " + it;
             
             entry.subentries.listAppend(ChecklistSubentryMake(header, "", description));*/
-            ChecklistEntry entry = ChecklistEntryMake("__item " + it, "", ChecklistSubentryMake(header, "", description));
+            ChecklistEntry entry = ChecklistEntryMake(420, "__item " + it, "", ChecklistSubentryMake(header, "", description));
             if (it.equipped_amount() > 0)
             {
                 entry.should_highlight = true;
@@ -700,7 +700,7 @@ void LimitModeSpelunkingGenerateChecklists(Checklist [int] checklists)
         if (accomplishments.count() > 0)
             description.listAppend("You " + accomplishments.listJoinComponents(", ", "and") + ".");
         
-        task_entries.listAppend(ChecklistEntryMake("__item spelunking fedora", "place.php?whichplace=spelunky&action=spelunky_quit", ChecklistSubentryMake("Ride off into the sunset", "", description)));
+        task_entries.listAppend(ChecklistEntryMake(421, "__item spelunking fedora", "place.php?whichplace=spelunky&action=spelunky_quit", ChecklistSubentryMake("Ride off into the sunset", "", description)));
         return;
     }
     
@@ -709,12 +709,12 @@ void LimitModeSpelunkingGenerateChecklists(Checklist [int] checklists)
     
     if (my_hp() == 0)
     {
-        task_entries.listAppend(ChecklistEntryMake("__effect beaten up", spelunking_url, ChecklistSubentryMake("Heal", "", "Probably at your tent. (costs a turn)"), -11));
+        task_entries.listAppend(ChecklistEntryMake(422, "__effect beaten up", spelunking_url, ChecklistSubentryMake("Heal", "", "Probably at your tent. (costs a turn)"), -11));
     }
     
     if ($item[jetpack].available_amount() > 0 && $item[yellow cape].equipped_amount() > 0 && !spelunking_status.noncombat_due_next_adventure)
     {
-        task_entries.listAppend(ChecklistEntryMake("__item jetpack", "inv_equip.php?pwd=" + my_hash() + "&which=2&action=equip&whichitem=" + $item[jetpack].to_int(), ChecklistSubentryMake("Equip jetpack", "", "More efficient than the yellow cape."), -11));
+        task_entries.listAppend(ChecklistEntryMake(423, "__item jetpack", "inv_equip.php?pwd=" + my_hash() + "&which=2&action=equip&whichitem=" + $item[jetpack].to_int(), ChecklistSubentryMake("Equip jetpack", "", "More efficient than the yellow cape."), -11));
     }
     
     if (get_property("spelunkyUpgrades").contains_text("N"))
@@ -732,7 +732,7 @@ void LimitModeSpelunkingGenerateChecklists(Checklist [int] checklists)
         int after_this_remaining = MAX(0, unlocks_remaining - 1);
         
         if (after_this_remaining > 0)
-            future_task_entries.listAppend(ChecklistEntryMake("__item heavy pickaxe", "", ChecklistSubentryMake("Spelunk " + pluraliseWordy(after_this_remaining, "more time", "more times") + " after this", "", "Unlock all the starting bonuses.")));
+            future_task_entries.listAppend(ChecklistEntryMake(424, "__item heavy pickaxe", "", ChecklistSubentryMake("Spelunk " + pluraliseWordy(after_this_remaining, "more time", "more times") + " after this", "", "Unlock all the starting bonuses.")));
     }
     
     if (spelunking_status.altar_unlocked && spelunking_status.buddy != "")
@@ -798,7 +798,7 @@ void LimitModeSpelunkingGenerateChecklists(Checklist [int] checklists)
         
         if (spelunking_status.sacrifices > 0)
             description.listAppend(pluraliseWordy(spelunking_status.sacrifices, "sacrifice", "sacrifices").capitaliseFirstLetter() + " so far.");
-        optional_task_entries.listAppend(ChecklistEntryMake("__item Cloaca-Cola-issue combat knife", spelunking_url, ChecklistSubentryMake("Possibly sacrifice " + spelunking_status.buddy.to_lower_case() + " at the altar", "", description)));
+        optional_task_entries.listAppend(ChecklistEntryMake(425, "__item Cloaca-Cola-issue combat knife", spelunking_url, ChecklistSubentryMake("Possibly sacrifice " + spelunking_status.buddy.to_lower_case() + " at the altar", "", description)));
         //place.php?whichplace=spelunky&action=spelunky_side6
     }
     
@@ -835,7 +835,7 @@ void LimitModeSpelunkingGenerateChecklists(Checklist [int] checklists)
             
         description.listAppend("Defeating it involves... " + ideas.listJoinComponents(", ") + "?");
         
-        optional_task_entries.listAppend(ChecklistEntryMake("__item ghost trap", url, ChecklistSubentryMake("Possibly attack the ghost", "", description)));
+        optional_task_entries.listAppend(ChecklistEntryMake(426, "__item ghost trap", url, ChecklistSubentryMake("Possibly attack the ghost", "", description)));
     }
     
     if (spelunking_status.areas_unlocked[$location[the city of Goooold]] && $item[Bananubis's Staff].available_amount() == 0)
@@ -858,7 +858,7 @@ void LimitModeSpelunkingGenerateChecklists(Checklist [int] checklists)
             description.listAppend("Or acquire sticky bombs.");
         }
         description.listAppend("Appears after defeating five mummies in the area.");
-        optional_task_entries.listAppend(ChecklistEntryMake("__item Bananubis's Staff", spelunking_url, ChecklistSubentryMake("Defeat Bananubis", "", description)));
+        optional_task_entries.listAppend(ChecklistEntryMake(427, "__item Bananubis's Staff", spelunking_url, ChecklistSubentryMake("Defeat Bananubis", "", description)));
     }
     
     if (spelunking_status.areas_unlocked[$location[LOLmec's lair]] && !spelunking_status.areas_unlocked[$location[Hell]])
@@ -894,7 +894,7 @@ void LimitModeSpelunkingGenerateChecklists(Checklist [int] checklists)
                 description.listAppend("Umm... " + ideas.listJoinComponents(", ") + "?");
             }
         }
-        optional_task_entries.listAppend(ChecklistEntryMake("__item LOLmec statuette", spelunking_url, ChecklistSubentryMake("Defeat LOLmec", "", description)));
+        optional_task_entries.listAppend(ChecklistEntryMake(428, "__item LOLmec statuette", spelunking_url, ChecklistSubentryMake("Defeat LOLmec", "", description)));
     }
     
     if (spelunking_status.areas_unlocked[$location[Yomama's Throne]])
@@ -902,7 +902,7 @@ void LimitModeSpelunkingGenerateChecklists(Checklist [int] checklists)
         string [int] description;
         description.listAppend("If you haven't already.");
         description.listAppend("Umm... throw a bomb, throw a torch, stagger with ropes? Spring boots? Fedora?|Or defeat him another way. Skeleton buddy might help.");
-        optional_task_entries.listAppend(ChecklistEntryMake("__item huge gold coin", spelunking_url, ChecklistSubentryMake("Defeat Yomama", "", description)));
+        optional_task_entries.listAppend(ChecklistEntryMake(429, "__item huge gold coin", spelunking_url, ChecklistSubentryMake("Defeat Yomama", "", description)));
     }
     
     if (!spelunking_status.areas_unlocked[$location[the temple ruins]])
@@ -912,7 +912,7 @@ void LimitModeSpelunkingGenerateChecklists(Checklist [int] checklists)
     {
         if (spelunking_status.keys == 0)
         {
-            optional_task_entries.listAppend(ChecklistEntryMake("__item Clan VIP Lounge key", "", ChecklistSubentryMake("Acquire a key", "", "For unlocking Hell.")));
+            optional_task_entries.listAppend(ChecklistEntryMake(430, "__item Clan VIP Lounge key", "", ChecklistSubentryMake("Acquire a key", "", "For unlocking Hell.")));
         }
         else
         {
@@ -933,7 +933,7 @@ void LimitModeSpelunkingGenerateChecklists(Checklist [int] checklists)
             if (tasks.count() > 0)
                 description.listAppend(tasks.listJoinComponents(", ", "then").capitaliseFirstLetter() + ".");
             description.listAppend(HTMLGenerateSpanFont("Only do this if you've defeated LOLmec already.", "red"));
-            optional_task_entries.listAppend(ChecklistEntryMake("__item Clan VIP Lounge key", url, ChecklistSubentryMake("Unlock Hell", "", description)));
+            optional_task_entries.listAppend(ChecklistEntryMake(431, "__item Clan VIP Lounge key", url, ChecklistSubentryMake("Unlock Hell", "", description)));
         }
     }
     else if (!spelunking_status.areas_unlocked[$location[Hell]] && !(spelunking_status.areas_unlocked[$location[the crashed u. f. o.]]))
@@ -963,7 +963,7 @@ void LimitModeSpelunkingGenerateChecklists(Checklist [int] checklists)
             tasks.listAppend("acquire a key");
         
         description.listAppend(tasks.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".");
-        optional_task_entries.listAppend(ChecklistEntryMake("__item handful of fire", "", ChecklistSubentryMake("Unlock Hell", "", description)));
+        optional_task_entries.listAppend(ChecklistEntryMake(432, "__item handful of fire", "", ChecklistSubentryMake("Unlock Hell", "", description)));
     }
     
     if (true)
@@ -1008,7 +1008,7 @@ void LimitModeSpelunkingGenerateChecklists(Checklist [int] checklists)
             description.listAppend("Adventure in:|*" + areas_to_adventure_in.listJoinComponents("|*<hr>"));
             
         //description.listAppend("Usual combat strategy:|*Throw a bomb or rope if they're powerful (and you can afford it), then attack. Try to avoid taking damage, or heal it with a cursed coffee cup.");
-        task_entries.listAppend(ChecklistEntryMake("__item heavy pickaxe", spelunking_url, ChecklistSubentryMake("Spelunk!", "", description)));
+        task_entries.listAppend(ChecklistEntryMake(433, "__item heavy pickaxe", spelunking_url, ChecklistSubentryMake("Spelunk!", "", description)));
     }
     
     SpelunkingGenerateEquipmentEntries(checklists, spelunking_status);

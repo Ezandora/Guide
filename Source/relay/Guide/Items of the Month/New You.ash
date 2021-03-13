@@ -28,7 +28,7 @@ void IOTMNewYouGenerateResource(ChecklistEntry [int] resource_entries)
         affirmation_combat_uses[$item[Daily Affirmation: Think Win-Lose]] = "instakill";
         affirmation_combat_uses[$item[Daily Affirmation: Work For Hours a Week]] = "earn some meat";
         
-        ChecklistEntry entry = ChecklistEntryMake();
+        ChecklistEntry entry = ChecklistEntryMake(496);
         foreach it in affirmation_effects
         {
             if (it.item_amount() == 0) continue;
@@ -42,11 +42,11 @@ void IOTMNewYouGenerateResource(ChecklistEntry [int] resource_entries)
             ChecklistSubentry subentry = ChecklistSubentryMake(pluralise(it), "100 turns, " + affirmation_effects[it], combat_text);
             if (it == $item[Daily Affirmation: Think Win-Lose])
             {
-            	resource_entries.listAppend(ChecklistEntryMake("__item " + it, "", subentry).ChecklistEntryTag("free instakill"));
+            	resource_entries.listAppend(ChecklistEntryMake(497, "__item " + it, "", subentry).ChecklistEntryTag("free instakill"));
             }
             else if (it == $item[Daily Affirmation: Be a Mind Master])
             {
-                resource_entries.listAppend(ChecklistEntryMake("__item " + it, "", subentry).ChecklistEntryTag("free banish"));
+                resource_entries.listAppend(ChecklistEntryMake(498, "__item " + it, "", subentry).ChecklistEntryTag("free banish"));
             }
             else
 	            entry.subentries.listAppend(subentry);

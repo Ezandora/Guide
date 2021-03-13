@@ -32,5 +32,5 @@ void SCouncilGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         description.listAppend(HTMLGenerateSpanFont("May want to wait", "red") + " until you've acquired a filthy hippy disguise for acquiring a war outfit?");
 	if (my_path_id() == PATH_EXPLOSIONS)
 		description.listAppend("You might need to visit your quest log afterwards, to update mafia's tracking.");
-	task_entries.listAppend(ChecklistEntryMake("council", "place.php?whichplace=town", ChecklistSubentryMake("Visit the Council of Loathing", "", description)));
+	task_entries.listAppend(ChecklistEntryMake(384, "council", "place.php?whichplace=town", ChecklistSubentryMake("Visit the Council of Loathing", "", description)));
 }

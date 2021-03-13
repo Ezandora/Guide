@@ -148,7 +148,7 @@ void IOTMProtonicAcceleratorPackGenerateTasks(ChecklistEntry [int] task_entries,
             modifiers.listAppend(HTMLGenerateSpanOfClass("+" + elements_to_resist[ghost_location] + " resist", "r_element_" + elements_to_resist[ghost_location]));
             
         if (ghost_location != $location[none])
-            optional_task_entries.listAppend(ChecklistEntryMake("__item protonic accelerator pack", url, ChecklistSubentryMake(title, modifiers, description), priority));
+            optional_task_entries.listAppend(ChecklistEntryMake(558, "__item protonic accelerator pack", url, ChecklistSubentryMake(title, modifiers, description), priority));
     }
 }
 
@@ -169,6 +169,6 @@ void IOTMProtonicAcceleratorPackGenerateResource(ChecklistEntry [int] resource_e
             url = generateEquipmentLink($item[protonic accelerator pack]);
             description.listAppend("Equip the protonic accelerator pack first.");
         }
-        resource_entries.listAppend(ChecklistEntryMake("__item protonic accelerator pack", url, ChecklistSubentryMake("Stream crossing", "", description), 8).ChecklistEntrySetCategory("buff"));
+        resource_entries.listAppend(ChecklistEntryMake(559, "__item protonic accelerator pack", url, ChecklistSubentryMake("Stream crossing", "", description), 8).ChecklistEntrySetCategory("buff"));
     }
 }

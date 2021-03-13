@@ -280,14 +280,14 @@ void generateFloristFriar(Checklist [int] checklists)
 		if (subentry.entries.count() > 0)
         {
             if (false)
-                florist_entries.listAppend(ChecklistEntryMake(image_name, "place.php?whichplace=forestvillage&amp;action=fv_friar", subentry));
+                florist_entries.listAppend(ChecklistEntryMake(138, image_name, "place.php?whichplace=forestvillage&amp;action=fv_friar", subentry));
             else
                 subentries.listAppend(subentry);
         }
 	}
     if (subentries.count() > 0)
     {
-        florist_entries.listAppend(ChecklistEntryMake("plant up sea daisy", "place.php?whichplace=forestvillage&amp;action=fv_friar", subentries));
+        florist_entries.listAppend(ChecklistEntryMake(139, "plant up sea daisy", "place.php?whichplace=forestvillage&amp;action=fv_friar", subentries));
     }
 	
 	checklists.listAppend(ChecklistMake("Florist Friar", florist_entries));

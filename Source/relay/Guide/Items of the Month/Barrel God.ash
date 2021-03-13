@@ -37,7 +37,7 @@ void IOTMBarrelGodGenerateResource(ChecklistEntry [int] resource_entries)
         if (buff_description != "")
             description.listAppend(buff_description.capitaliseFirstLetter() + " buff for 50 turns." + ($item[map to the Biggest Barrel].available_amount() == 0 && (my_daycount() >= 7 || !in_ronin()) ? "|Might give the map to the Biggest Barrel." : ""));
         
-        resource_entries.listAppend(ChecklistEntryMake("barrel god", "da.php?barrelshrine=1", ChecklistSubentryMake("Barrel worship", "", description), 8).ChecklistEntrySetCategory("equipment"));
+        resource_entries.listAppend(ChecklistEntryMake(487, "barrel god", "da.php?barrelshrine=1", ChecklistSubentryMake("Barrel worship", "", description), 8).ChecklistEntrySetCategory("equipment"));
     }
     
     if (in_ronin())
@@ -58,7 +58,7 @@ void IOTMBarrelGodGenerateResource(ChecklistEntry [int] resource_entries)
             string url = "inv_use.php?pwd=" + my_hash() + "&whichitem=" + barrels_around[0].to_int() + "&choice=1";
             string [int] description;
             description.listAppend(plurals.listJoinComponents(", ", "and") + ".");
-            resource_entries.listAppend(ChecklistEntryMake("__item " + barrels_around[0], url, ChecklistSubentryMake("Smashable barrels", "", description), 8));
+            resource_entries.listAppend(ChecklistEntryMake(488, "__item " + barrels_around[0], url, ChecklistSubentryMake("Smashable barrels", "", description), 8));
         }
     }
 }
@@ -81,6 +81,6 @@ void IOTMBarrelGodGenerate(ChecklistCollection checklists)
             description.listAppend(line);
         }
         description.listAppend("Can only be fought once a day, until defeated.");
-        checklists.add(C_AFTERCORE_TASKS, ChecklistEntryMake("barrel god", "inventory.php?ftext=map+to+the+Biggest+Barrel", ChecklistSubentryMake("Defeat the Barrelmech", "", description), 8));
+        checklists.add(C_AFTERCORE_TASKS, ChecklistEntryMake(489, "barrel god", "inventory.php?ftext=map+to+the+Biggest+Barrel", ChecklistSubentryMake("Defeat the Barrelmech", "", description), 8));
     }
 }

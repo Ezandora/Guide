@@ -14,6 +14,6 @@ void PathGLoverGenerateResource(ChecklistEntry [int] resource_entries)
 		if (!__quest_state["Level 9"].state_boolean["Peak Jar Completed"] && !__quest_state["Level 9"].finished && $item[jar of oil].available_amount() == 0 && g.available_amount() >= 3)
 	        description.listAppend("Crude oil congealer: lets you create a jar of oil.");
         description.listAppend("Food, drink, +100% spleen item for fifty turns.");
-		resource_entries.listAppend(ChecklistEntryMake("__item g", "shop.php?whichshop=glover", ChecklistSubentryMake(pluralise(g) + " available", "", description), 3));
+		resource_entries.listAppend(ChecklistEntryMake(196, "__item g", "shop.php?whichshop=glover", ChecklistSubentryMake(pluralise(g) + " available", "", description), 3));
 	}
 }

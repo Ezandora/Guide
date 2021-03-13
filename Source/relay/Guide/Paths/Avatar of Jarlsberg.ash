@@ -43,7 +43,7 @@ void PathJarlsbergGenerateResource(ChecklistEntry [int] resource_entries)
 	if (my_path_id() != PATH_AVATAR_OF_JARLSBERG)
 		return;
     
-	ChecklistEntry entry = ChecklistEntryMake();
+	ChecklistEntry entry = ChecklistEntryMake(183);
 	entry.url = "";
 	entry.image_lookup_name = "";
     

@@ -65,5 +65,5 @@ void IOTMPortablePantogramGenerateTasks(ChecklistEntry [int] task_entries, Check
 		if (slot_options[slot_id].count() == 0) continue;
 		description.listAppend(slot_options[slot_id].listJoinComponents(", ", "or").capitaliseFirstLetter() + ".");
 	}
-    optional_task_entries.listAppend(ChecklistEntryMake("__item portable pantogram", "inv_use.php?pwd=" + my_hash() + "&whichitem=9573", ChecklistSubentryMake("Summon pants", "", description), 1));
+    optional_task_entries.listAppend(ChecklistEntryMake(573, "__item portable pantogram", "inv_use.php?pwd=" + my_hash() + "&whichitem=9573", ChecklistSubentryMake("Summon pants", "", description), 1));
 }

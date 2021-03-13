@@ -41,5 +41,5 @@ void QMadnessBakeryGenerate(ChecklistCollection checklists)
         subentry.entries.listAppend("Adventure in the Madness Bakery|Choose the first option in the non-combat repeatedly.");
     }
 		
-	checklists.add(C_AFTERCORE_TASKS, ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[Madness Bakery]));
+	checklists.add(C_AFTERCORE_TASKS, ChecklistEntryMake(1, base_quest_state.image_name, url, subentry, $locations[Madness Bakery]));
 }

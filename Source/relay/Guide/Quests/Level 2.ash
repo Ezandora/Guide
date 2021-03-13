@@ -86,5 +86,5 @@ void QLevel2GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		subentry.modifiers = modifiers;
 	}
 	
-	task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the spooky forest]));
+	task_entries.listAppend(ChecklistEntryMake(80, base_quest_state.image_name, url, subentry, $locations[the spooky forest]));
 }

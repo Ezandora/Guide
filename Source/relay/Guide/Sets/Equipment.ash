@@ -47,7 +47,7 @@ void SEquipmentGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         if (turns_left == 1 || turns_left == 0)
         {
             string [int] description = SEquipmentGenerateXiblaxianHoloWristPuterDescription();
-            task_entries.listAppend(ChecklistEntryMake("__item Xiblaxian holo-wrist-puter", "", ChecklistSubentryMake("Xiblaxian item next combat", "", description), -11));
+            task_entries.listAppend(ChecklistEntryMake(385, "__item Xiblaxian holo-wrist-puter", "", ChecklistSubentryMake("Xiblaxian item next combat", "", description), -11));
         }
     }
 }
@@ -66,7 +66,7 @@ void SEquipmentGenerateResource(ChecklistEntry [int] resource_entries)
             string header = turns_left + " combats to Xiblaxian item";
             if (turns_left <= 1)
                 header = "Xiblaxian next turn";
-            resource_entries.listAppend(ChecklistEntryMake("__item Xiblaxian holo-wrist-puter", "", ChecklistSubentryMake(header, "", description), 8));
+            resource_entries.listAppend(ChecklistEntryMake(386, "__item Xiblaxian holo-wrist-puter", "", ChecklistSubentryMake(header, "", description), 8));
         }
     }
 }

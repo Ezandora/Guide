@@ -3,6 +3,7 @@ RegisterResourceGenerationFunction("IOTMLatteGenerateResource");
 void IOTMLatteGenerateResource(ChecklistEntry [int] resource_entries)
 {
 	if ($item[latte lovers member's mug].available_amount() == 0) return;
+	if (!__misc_state["can equip just about any off-hand"]) return;
 	
 	int refills_remaining = clampi(3 - get_property_int("_latteRefillsUsed"), 0, 3);
 	boolean banish_used = get_property_boolean("_latteBanishUsed");
@@ -30,10 +31,10 @@ void IOTMLatteGenerateResource(ChecklistEntry [int] resource_entries)
         	banish_url = "main.php?latte=1";
         	description.listAppend(HTMLGenerateSpanFont("Must refill latte first.", "red"));
         }
-        resource_entries.listAppend(ChecklistEntryMake("__item latte lovers member's mug", banish_url, ChecklistSubentryMake(pluralise(banishes_available, "latte banish", "latte banishes"), "", description), 0).ChecklistEntryTag("free banish").ChecklistEntrySetSpecificImage("__skill Throw Latte on Opponent"));
+        resource_entries.listAppend(ChecklistEntryMake(533, "__item latte lovers member's mug", banish_url, ChecklistSubentryMake(pluralise(banishes_available, "latte banish", "latte banishes"), "", description), 0).ChecklistEntryTag("free banish").ChecklistEntrySetSpecificImage("__skill Throw Latte on Opponent"));
     }
     
-    ChecklistEntry entry = ChecklistEntryMake();
+    ChecklistEntry entry = ChecklistEntryMake(534);
     entry.image_lookup_name = "__item latte lovers member's mug";
     entry.url = "main.php?latte=1";
     

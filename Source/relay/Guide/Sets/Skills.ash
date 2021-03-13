@@ -26,7 +26,7 @@ void SSkillsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         if (__quest_state["Level 13"].state_boolean["need to find Sneaky Pete's key"])
         	missing_items[$item[Sneaky Pete's key]] = true;
         
-        optional_task_entries.listAppend(ChecklistEntryMake("__skill Lock Picking", "skillz.php", ChecklistSubentryMake("Cast Lock Picking", "", "Collect " + (missing_items.count() > 1 ? "either " : " ") + missing_items.listInvert().listJoinComponents(", ", "or") + "."), 5));
+        optional_task_entries.listAppend(ChecklistEntryMake(220, "__skill Lock Picking", "skillz.php", ChecklistSubentryMake("Cast Lock Picking", "", "Collect " + (missing_items.count() > 1 ? "either " : " ") + missing_items.listInvert().listJoinComponents(", ", "or") + "."), 5));
     }
 }
 
@@ -38,7 +38,7 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
 		int inigos_casts_remaining = 5 - get_property_int("_inigosCasts");
 		string description = SSkillsPotentialCraftingOptions().listJoinComponents(", ").capitaliseFirstLetter();
 		if (inigos_casts_remaining > 0)
-			resource_entries.listAppend(ChecklistEntryMake("__effect Inigo's Incantation of Inspiration", "skills.php", ChecklistSubentryMake(pluralise(inigos_casts_remaining, "Inigo's cast", "Inigo's casts") + " remaining", "", description), 10).ChecklistEntrySetCategory("buff"));
+			resource_entries.listAppend(ChecklistEntryMake(221, "__effect Inigo's Incantation of Inspiration", "skills.php", ChecklistSubentryMake(pluralise(inigos_casts_remaining, "Inigo's cast", "Inigo's casts") + " remaining", "", description), 10).ChecklistEntrySetCategory("buff"));
 	}
 	int free_crafts_left = 0;
 	if ($effect[Inigo's Incantation of Inspiration].have_effect() >= 5)
@@ -56,7 +56,7 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
     if (free_crafts_left > 0)
     {
         string description = SSkillsPotentialCraftingOptions().listJoinComponents(", ").capitaliseFirstLetter();
-        resource_entries.listAppend(ChecklistEntryMake("__item tenderizing hammer", "", ChecklistSubentryMake(pluralise(free_crafts_left, "free craft", "free crafts") + " remaining", "", description), 10));
+        resource_entries.listAppend(ChecklistEntryMake(222, "__item tenderizing hammer", "", ChecklistSubentryMake(pluralise(free_crafts_left, "free craft", "free crafts") + " remaining", "", description), 10));
     }
 	ChecklistSubentry [int] subentries;
 	int importance = 11;
@@ -215,7 +215,7 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
 	if (subentries.count() > 0)
 	{
 		subentries.listPrepend(ChecklistSubentryMake("Skill summons:"));
-		ChecklistEntry entry = ChecklistEntryMake("__item Knob Goblin love potion", url, subentries, importance);
+		ChecklistEntry entry = ChecklistEntryMake(223, "__item Knob Goblin love potion", url, subentries, importance);
 		entry.should_indent_after_first_subentry = true;
 		resource_entries.listAppend(entry);
 	}
@@ -223,10 +223,10 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
     
     if ($skill[Evoke Eldritch Horror].skill_is_usable() && !get_property_boolean("_eldritchHorrorEvoked"))
     {
-        resource_entries.listAppend(ChecklistEntryMake("__skill Evoke Eldritch Horror", "skillz.php", ChecklistSubentryMake("Evoke Eldritch Horror", "", "Free fight."), 5).ChecklistEntryTag("daily free fight"));
+        resource_entries.listAppend(ChecklistEntryMake(224, "__skill Evoke Eldritch Horror", "skillz.php", ChecklistSubentryMake("Evoke Eldritch Horror", "", "Free fight."), 5).ChecklistEntryTag("daily free fight"));
     }
     if (!get_property_boolean("_eldritchTentacleFought") && my_path_id() != PATH_EXPLOSIONS)
     {
-        resource_entries.listAppend(ChecklistEntryMake("__skill Evoke Eldritch Horror", "place.php?whichplace=forestvillage", ChecklistSubentryMake("Free Science Tent Tentacle fight", "", ""), 5).ChecklistEntryTag("daily free fight"));
+        resource_entries.listAppend(ChecklistEntryMake(225, "__skill Evoke Eldritch Horror", "place.php?whichplace=forestvillage", ChecklistSubentryMake("Free Science Tent Tentacle fight", "", ""), 5).ChecklistEntryTag("daily free fight"));
     }
 }

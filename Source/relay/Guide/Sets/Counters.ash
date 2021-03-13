@@ -327,7 +327,7 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
         int importance = 10;
         if (very_important)
             importance = -11;
-        ChecklistEntry entry = ChecklistEntryMake(image_name, url, subentry, importance).ChecklistEntrySetShortDescription(short_description);
+        ChecklistEntry entry = ChecklistEntryMake(378, image_name, url, subentry, importance).ChecklistEntrySetShortDescription(short_description);
         
         if (very_important)
             task_entries.listAppend(entry);
@@ -354,11 +354,11 @@ void SCountersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [i
             stats += ".";
             if (turns_until_dance_card == 0)
             {
-                task_entries.listAppend(ChecklistEntryMake("__item dance card", $location[the haunted ballroom].getClickableURLForLocation(), ChecklistSubentryMake("Dance card up now.", "", "Adventure in haunted ballroom. " + stats), -11));
+                task_entries.listAppend(ChecklistEntryMake(379, "__item dance card", $location[the haunted ballroom].getClickableURLForLocation(), ChecklistSubentryMake("Dance card up now.", "", "Adventure in haunted ballroom. " + stats), -11));
             }
             else
             {
-                optional_task_entries.listAppend(ChecklistEntryMake("__item dance card", "", ChecklistSubentryMake("Dance card up after " + pluralise(turns_until_dance_card, "adventure", "adventures") + ".", "", "Haunted ballroom. " + stats)));
+                optional_task_entries.listAppend(ChecklistEntryMake(380, "__item dance card", "", ChecklistSubentryMake("Dance card up after " + pluralise(turns_until_dance_card, "adventure", "adventures") + ".", "", "Haunted ballroom. " + stats)));
             }
         }
     }

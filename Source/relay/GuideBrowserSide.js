@@ -1043,6 +1043,7 @@ function GuideInit(ash_url, default_window_size, resource_bar_visible, guide_ver
     //var __active_timer_event = setInterval(function() {checkForUpdate()}, 2000);
     checkForUpdate(); //starts off the timer
     writePageExtras();
+    return true;
 }
 
 function navbarClick(event, checklist_div_id)
@@ -1340,7 +1341,7 @@ function cancelResourceBarPopup()
 var __showhide_full_dataset = {};
 //string checklist name:boolean on_off_state
 var __showhide_checklist_on_off_dataset = {};
-var __showhide_stable_id_to_abridged_text_dataset = {}; //used for preserving across versions
+//var __showhide_stable_id_to_abridged_text_dataset = {}; //used for preserving across versions
 
 
 function writeAsJSONToLocalStorage(key, value)
@@ -1374,10 +1375,10 @@ function showhideDatasetWriteChecklistOnly()
 	writeAsJSONToLocalStorage("guide showhide checklist on off", __showhide_checklist_on_off_dataset);
 }
 
-function showhideDatasetWriteStableIdKnowledge()
+/*function showhideDatasetWriteStableIdKnowledge()
 {
-	writeAsJSONToLocalStorage("guide showhide stable id mappings", __showhide_stable_id_to_abridged_text_dataset);
-}
+	//writeAsJSONToLocalStorage("guide showhide stable id mappings", __showhide_stable_id_to_abridged_text_dataset);
+}*/
 
 function showhideDatasetWriteMost()
 {
@@ -1395,21 +1396,30 @@ function showhideDatasetReadFromLocalStorage()
         __showhide_full_dataset = loadJSONFromLocalStorage("guide showhide dataset");
         __showhide_checklist_on_off_dataset = loadJSONFromLocalStorage("guide showhide checklist on off");
         
-        __showhide_stable_id_to_abridged_text_dataset = loadJSONFromLocalStorage("guide showhide stable id mappings");
+        //__showhide_stable_id_to_abridged_text_dataset = loadJSONFromLocalStorage("guide showhide stable id mappings");
 
          
-        var previous_stored_version = localStorage.getItem("guide showhide last version");
+        /*var previous_stored_version = localStorage.getItem("guide showhide last version");
         
         if (previous_stored_version !== __guide_version)
-        {
-        	console.log("Guide version changed from " + previous_stored_version + " to " + __guide_version + ", attempting migration.");
+        {*/
+        	//console.log("Guide version changed from " + previous_stored_version + " to " + __guide_version + ", attempting migration.");
             
-            //For now, just clear them all. This will mean version upgrades won't preserve individually clicked entries.
-            __showhide_full_dataset = {};
-            showhideDatasetWriteMost();
             
-        	localStorage.setItem("guide showhide last version", __guide_version);
-        }
+            /*
+            Possible methods:
+            -Simply migrate anything currently on the page. This isn't realistic.
+            -Generate version-to-version translations.
+            -Store the old header dataset in another dataset; try to translate that on page load. That could be quite an overhead, especially if we're doing a lot of page scans.
+            -Intrinsic IDs. Replace all ChecklistEntryMake(0) calls to accept an integer id as the first argument; have an external script automatically generate new IDs. This will always be consistent and will never require migration. May be the best approach? Using this one.
+            	It adds a small "cost" to developer time but the script should be able to compensate for that?
+             */
+            //Went with intrinsic ids, no migration necessary.
+            //__showhide_full_dataset = {};
+            //showhideDatasetWriteMost();
+            
+        /*	localStorage.setItem("guide showhide last version", __guide_version);
+        }*/
 	}
 	catch (exception)
 	{
@@ -1616,8 +1626,8 @@ function showhideButtonSetState(event, showhide_button_element, new_hidden_state
 		var checklist_element = container_element.parentElement;
 		showhideDatasetSet(checklist_element.dataset.title, container_element.dataset.stableId, new_hidden_state);
         
-        __showhide_stable_id_to_abridged_text_dataset[container_element.dataset.stableId] = container_element.dataset.abridgedText; //switch to data property?
-        showhideDatasetWriteStableIdKnowledge();
+        //__showhide_stable_id_to_abridged_text_dataset[container_element.dataset.stableId] = container_element.dataset.abridgedText; //switch to data property?
+        //showhideDatasetWriteStableIdKnowledge();
         if (checklist_element.dataset.title === "Tasks")
         {
 	        showhideSetStateAllEntriesWithStableId(null, container_element.dataset.stableId, new_hidden_state, false, false, false); //last one is inaccurate but

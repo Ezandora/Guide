@@ -48,7 +48,7 @@ void IOTMMayoClinicGenerateResource(ChecklistEntry [int] resource_entries)
             choices.listAppend(listMake("Miracle whip", "Weapon, usable " + HTMLGenerateSpanFont("once", "red") + " per run.|+50% item, +100% meat, +50% init."));
         }
         description.listAppend(HTMLGenerateSimpleTableLines(choices));
-        resource_entries.listAppend(ChecklistEntryMake("__item sphygmayomanometer", "campground.php?action=workshed", ChecklistSubentryMake("Mayo Device Rental", "", description), 8));
+        resource_entries.listAppend(ChecklistEntryMake(563, "__item sphygmayomanometer", "campground.php?action=workshed", ChecklistSubentryMake("Mayo Device Rental", "", description), 8));
     }
     if (!get_property_boolean("_mayoTankSoaked") && __misc_state["in run"])
     {
@@ -58,7 +58,7 @@ void IOTMMayoClinicGenerateResource(ChecklistEntry [int] resource_entries)
             benefits.listAppend("HP restore");
         benefits.listAppend("+2 all resistance");
         description.listAppend("Gives " + benefits.listJoinComponents(", ", "and") + ".");
-        resource_entries.listAppend(ChecklistEntryMake("__item bubblin' chemistry solution", "campground.php?action=workshed", ChecklistSubentryMake("Mayo Tank Soak", "", description), 8));
+        resource_entries.listAppend(ChecklistEntryMake(564, "__item bubblin' chemistry solution", "campground.php?action=workshed", ChecklistSubentryMake("Mayo Tank Soak", "", description), 8));
     }
     if ($item[mayo lance].available_amount() > 0)
     {
@@ -85,7 +85,7 @@ void IOTMMayoClinicGenerateResource(ChecklistEntry [int] resource_entries)
             line += ". Affected by mayo level.";
             description.listAppend(line);
         }
-        resource_entries.listAppend(ChecklistEntryMake("__item mayo lance", url, ChecklistSubentryMake("Mayo lance", "", description), 8));
+        resource_entries.listAppend(ChecklistEntryMake(565, "__item mayo lance", url, ChecklistSubentryMake("Mayo lance", "", description), 8));
         
     }
 }

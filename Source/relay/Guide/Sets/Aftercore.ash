@@ -219,7 +219,7 @@ void SAftercoreThingsToDoGenerateTasks(ChecklistEntry [int] task_entries, Checkl
                 url = option.url;
             description.listAppend(option.header + HTMLGenerateIndentedText(option.description.listJoinComponents("<br>")));
         }
-        optional_task_entries.listAppend(ChecklistEntryMake("__effect confused", url, ChecklistSubentryMake("Try an optional quest", "", description), 8));
+        optional_task_entries.listAppend(ChecklistEntryMake(288, "__effect confused", url, ChecklistSubentryMake("Try an optional quest", "", description), 8));
     }
 }
 
@@ -232,7 +232,7 @@ void SAftercoreGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     
     if (campground_items[$item[clockwork maid]] == 0)
     {
-        optional_task_entries.listAppend(ChecklistEntryMake("__item sprocket", "", ChecklistSubentryMake("Install a clockwork maid", "", listMake("+8 adventures/day.", "Buy from mall."))));
+        optional_task_entries.listAppend(ChecklistEntryMake(289, "__item sprocket", "", ChecklistSubentryMake("Install a clockwork maid", "", listMake("+8 adventures/day.", "Buy from mall."))));
     }
     if (campground_items[$item[pagoda plans]] == 0 && $location[Pandamonium Slums].locationAvailable())
     {
@@ -295,13 +295,13 @@ void SAftercoreGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
                 url = "inventory.php?which=3";
             details.listAppend("Use a ketchup hound to install pagoda.");
         }
-        optional_task_entries.listAppend(ChecklistEntryMake("__item pagoda plans", url, ChecklistSubentryMake("Install a pagoda", "", details)));
+        optional_task_entries.listAppend(ChecklistEntryMake(290, "__item pagoda plans", url, ChecklistSubentryMake("Install a pagoda", "", details)));
     }
     
     if (knoll_available() && !have_mushroom_plot() && get_property("plantingScript") != "")
     {
         //They can plant a mushroom plot, and they have a planting script. But they haven't yet, so let's suggest it:
-        optional_task_entries.listAppend(ChecklistEntryMake("__item knob mushroom", "knoll_mushrooms.php", ChecklistSubentryMake("Plant a mushroom plot", "", "Degrassi Knoll")));
+        optional_task_entries.listAppend(ChecklistEntryMake(291, "__item knob mushroom", "knoll_mushrooms.php", ChecklistSubentryMake("Plant a mushroom plot", "", "Degrassi Knoll")));
     }
     
     

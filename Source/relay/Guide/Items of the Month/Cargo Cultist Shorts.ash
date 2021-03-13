@@ -10,6 +10,6 @@ void IOTMCargoCultistShortsGenerate(ChecklistCollection checklists)
 		string [int] description;
         
         
-        checklists.add(C_RESOURCES, ChecklistEntryMake("__item Cargo Cultist Shorts", "inventory.php?action=pocket", ChecklistSubentryMake("Cargo Cultist Shorts pocket", "", description), 1));
+        checklists.add(C_RESOURCES, ChecklistEntryMake(546, "__item Cargo Cultist Shorts", "inventory.php?action=pocket", ChecklistSubentryMake("Cargo Cultist Shorts pocket", "", description), 1));
 	}
 }

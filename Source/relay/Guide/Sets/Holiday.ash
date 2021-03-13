@@ -17,18 +17,18 @@ void SHolidayGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 if (missing_components.count() > 0)
                     description.listAppend("If you need an outfit, buy a " + missing_components.listJoinComponents(", ", "and") + " from the knoll.");
             }
-            optional_task_entries.listAppend(ChecklistEntryMake("__item plastic pumpkin bucket", "place.php?whichplace=town&action=town_trickortreat", ChecklistSubentryMake("Trick or treat for one block", "+" + my_primestat().to_lower_case(), description), $locations[trick-or-treating]));
+            optional_task_entries.listAppend(ChecklistEntryMake(228, "__item plastic pumpkin bucket", "place.php?whichplace=town&action=town_trickortreat", ChecklistSubentryMake("Trick or treat for one block", "+" + my_primestat().to_lower_case(), description), $locations[trick-or-treating]));
         }
         else
         {
             string [int] description;
             description.listAppend("Wear an outfit, go from house to house.");
             description.listAppend("Remember you can trick-or-treat while drunk.");
-            optional_task_entries.listAppend(ChecklistEntryMake("__item plastic pumpkin bucket", "place.php?whichplace=town&action=town_trickortreat", ChecklistSubentryMake("Trick or treat", "", description), $locations[trick-or-treating]));
+            optional_task_entries.listAppend(ChecklistEntryMake(229, "__item plastic pumpkin bucket", "place.php?whichplace=town&action=town_trickortreat", ChecklistSubentryMake("Trick or treat", "", description), $locations[trick-or-treating]));
         }
     }
     if (all_tomorrows_parties["Halloween"] && !__misc_state["in run"])
-        optional_task_entries.listAppend(ChecklistEntryMake("__item plastic pumpkin bucket", "", ChecklistSubentryMake("Save turns for Halloween tomorrow", "", ""), 8));
+        optional_task_entries.listAppend(ChecklistEntryMake(230, "__item plastic pumpkin bucket", "", ChecklistSubentryMake("Save turns for Halloween tomorrow", "", ""), 8));
     
     if (todays_holidays["Arrrbor Day"])
     {
@@ -77,6 +77,6 @@ void SHolidayGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 description.listAppend("Adventure for at least two adventures to collect the potion reward next holiday.");
             }
         }
-        optional_task_entries.listAppend(ChecklistEntryMake("__item spooky sapling", "place.php?whichplace=woods", ChecklistSubentryMake("Plant trees", "", description), 8, $locations[The Arrrboretum]));
+        optional_task_entries.listAppend(ChecklistEntryMake(231, "__item spooky sapling", "place.php?whichplace=woods", ChecklistSubentryMake("Plant trees", "", description), 8, $locations[The Arrrboretum]));
     }
 }

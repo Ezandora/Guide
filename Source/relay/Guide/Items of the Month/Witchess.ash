@@ -24,10 +24,10 @@ void IOTMWitchessGenerateResource(ChecklistEntry [int] resource_entries)
             if (my_path_id() != PATH_G_LOVER)
 	            fight_descriptions.listAppend(listMake("Rook", "+25 ML/+statgain potion. (25 turns)"));
             //ox - shield
-            if ($item[ox-head shield].available_amount() == 0 && my_path_id() != PATH_G_LOVER)
+            if ($item[ox-head shield].available_amount() == 0 && my_path_id() != PATH_G_LOVER && __misc_state["can equip just about any off-hand"])
                 fight_descriptions.listAppend(listMake("Ox", "+100HP, +2 all res, +8 PVP fights shield."));
             //king - club
-            if ((my_path_id() == PATH_COMMUNITY_SERVICE || my_primestat() == $stat[muscle]) && $item[dented scepter].available_amount() == 0 && my_path_id() != PATH_G_LOVER)
+            if ((my_path_id() == PATH_COMMUNITY_SERVICE || my_primestat() == $stat[muscle]) && $item[dented scepter].available_amount() == 0 && my_path_id() != PATH_G_LOVER && __misc_state["can equip just about any weapon"])
                 fight_descriptions.listAppend(listMake("King", "+5 muscle stats/fight, +50% muscle, +50% weapon damage club."));
             //queen - -combat hat
             if ($item[very pointy crown].available_amount() == 0 && my_path_id() != PATH_G_LOVER)
@@ -59,7 +59,7 @@ void IOTMWitchessGenerateResource(ChecklistEntry [int] resource_entries)
         
         image_name = "__itemsize __monster Witchess Pawn";
         //subentries.listAppend(ChecklistSubentryMake(pluralise(fights_remaining, "witchess fight", "witchess fights"), "", description));
-        resource_entries.listAppend(ChecklistEntryMake(image_name, "campground.php?action=witchess", ChecklistSubentryMake(pluralise(fights_remaining, "witchess fight", "witchess fights"), "", description)).ChecklistEntryTag("daily free fight"));
+        resource_entries.listAppend(ChecklistEntryMake(524, image_name, "campground.php?action=witchess", ChecklistSubentryMake(pluralise(fights_remaining, "witchess fight", "witchess fights"), "", description)).ChecklistEntryTag("daily free fight"));
     }
     if (!get_property_boolean("_witchessBuff") && !__misc_state["familiars temporarily blocked"] && $effect[puzzle champ].effect_is_usable())
     {
@@ -67,9 +67,9 @@ void IOTMWitchessGenerateResource(ChecklistEntry [int] resource_entries)
         if (image_name == "")
             image_name = "__effect Puzzle Champ";
         //subentries.listAppend(ChecklistSubentryMake("Witchess buff", "", "+" + familiar_weight_modifier + " familiar weight. (25 turns)"));
-        resource_entries.listAppend(ChecklistEntryMake(image_name, "campground.php?action=witchess", ChecklistSubentryMake("Witchess buff", "", "+" + familiar_weight_modifier + " familiar weight. (25 turns)"), 4).ChecklistEntrySetCategory("buff"));
-        //resource_entries.listAppend(ChecklistEntryMake("__effect Puzzle Champ", "campground.php?action=witchess", ChecklistSubentryMake("Witchess buff", "", "+" + familiar_weight_modifier + " familiar weight. (25 turns)"), 4));
+        resource_entries.listAppend(ChecklistEntryMake(525, image_name, "campground.php?action=witchess", ChecklistSubentryMake("Witchess buff", "", "+" + familiar_weight_modifier + " familiar weight. (25 turns)"), 4).ChecklistEntrySetCategory("buff"));
+        //resource_entries.listAppend(ChecklistEntryMake(526, "__effect Puzzle Champ", "campground.php?action=witchess", ChecklistSubentryMake("Witchess buff", "", "+" + familiar_weight_modifier + " familiar weight. (25 turns)"), 4));
     }
     if (subentries.count() > 0)
-        resource_entries.listAppend(ChecklistEntryMake(image_name, "campground.php?action=witchess", subentries, 4));
+        resource_entries.listAppend(ChecklistEntryMake(527, image_name, "campground.php?action=witchess", subentries, 4));
 }

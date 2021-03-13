@@ -34,7 +34,7 @@ void PathNuclearAutumnGenerateTasks(ChecklistEntry [int] task_entries, Checklist
     }
     
     if (subentries.count() > 0)
-        task_entries.listAppend(ChecklistEntryMake("__item rad", url, subentries, 0));
+        task_entries.listAppend(ChecklistEntryMake(203, "__item rad", url, subentries, 0));
 }
 
 RegisterResourceGenerationFunction("PathNuclearAutumnGenerateResource");
@@ -151,7 +151,7 @@ void PathNuclearAutumnGenerateResource(ChecklistEntry [int] resource_entries)
             description.listAppend(line);
         }
         
-		resource_entries.listAppend(ChecklistEntryMake("__item rad", "shop.php?whichshop=mutate", ChecklistSubentryMake(pluralise(rad) + " available", "", description), 8));
+		resource_entries.listAppend(ChecklistEntryMake(204, "__item rad", "shop.php?whichshop=mutate", ChecklistSubentryMake(pluralise(rad) + " available", "", description), 8));
     }
     if (get_property_int("falloutShelterLevel") >= 3 && !get_property_boolean("_falloutShelterSpaUsed"))
     {

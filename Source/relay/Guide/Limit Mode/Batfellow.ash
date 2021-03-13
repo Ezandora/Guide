@@ -12,9 +12,9 @@ void LimitModeBatfellowGenerateResources(ChecklistEntry [int] resource_entries, 
             description.listAppend(s + " = " + get_property(s));
         }
         description.listAppend("Dwayne Manor");
-        resource_entries.listAppend(ChecklistEntryMake("__item batarang", "", ChecklistSubentryMake("Bat-Properties", "", description), 8));
+        resource_entries.listAppend(ChecklistEntryMake(434, "__item batarang", "", ChecklistSubentryMake("Bat-Properties", "", description), 8));
         
-        resource_entries.listAppend(ChecklistEntryMake("__item batarang", "", ChecklistSubentryMake("Bat-State", "", state.to_json()), 8));
+        resource_entries.listAppend(ChecklistEntryMake(435, "__item batarang", "", ChecklistSubentryMake("Bat-State", "", state.to_json()), 8));
     }
     
     string [item] item_descriptions;
@@ -57,7 +57,7 @@ void LimitModeBatfellowGenerateResources(ChecklistEntry [int] resource_entries, 
     boolean [item] seen_items;
     foreach key in item_groupings
     {
-        ChecklistEntry entry = ChecklistEntryMake();
+        ChecklistEntry entry = ChecklistEntryMake(436);
         foreach key2, it in item_groupings[key]
         {
             if (seen_items[it])
@@ -71,7 +71,7 @@ void LimitModeBatfellowGenerateResources(ChecklistEntry [int] resource_entries, 
                 entry.subentries.listAppend(ChecklistSubentryMake(pluralise(it), "", description));
                 if (entry.image_lookup_name == "")
                     entry.image_lookup_name = "__item " + it;
-                //resource_entries.listAppend(ChecklistEntryMake("__item " + it, "", ChecklistSubentryMake(pluralise(it), "", description), 8));
+                //resource_entries.listAppend(ChecklistEntryMake(437, "__item " + it, "", ChecklistSubentryMake(pluralise(it), "", description), 8));
             }
         }
         if (entry.subentries.count() > 0)
@@ -93,7 +93,7 @@ void LimitModeBatfellowGeneralGenerateTasks(ChecklistEntry [int] task_entries, B
         else if (my_hp() != my_maxhp())
             description.listAppend("Visit the hospital?");
         if (description.count() > 0)
-            task_entries.listAppend(ChecklistEntryMake("__item bubblegum heart", "main.php", ChecklistSubentryMake("Heal", "", description), -11));
+            task_entries.listAppend(ChecklistEntryMake(438, "__item bubblegum heart", "main.php", ChecklistSubentryMake("Heal", "", description), -11));
     }
     
 }
@@ -163,11 +163,11 @@ void LimitModeBatfellowBossesGenerateTasks(ChecklistEntry [int] task_entries, Ba
                     description.listAppend("NC reward option gives " + rewards.listJoinComponents(", ", "and") + ".");
                 }
             }
-            task_entries.listAppend(ChecklistEntryMake(area.image_name, "main.php", ChecklistSubentryMake("Fight in the " + area.short_name, "", description), 8));
+            task_entries.listAppend(ChecklistEntryMake(439, area.image_name, "main.php", ChecklistSubentryMake("Fight in the " + area.short_name, "", description), 8));
         }
         else
         {
-            task_entries.listAppend(ChecklistEntryMake("__monster " + area.boss, "main.php", ChecklistSubentryMake("Defeat " + area.boss, "", ""), 8));
+            task_entries.listAppend(ChecklistEntryMake(440, "__monster " + area.boss, "main.php", ChecklistSubentryMake("Defeat " + area.boss, "", ""), 8));
         }
         
     }
@@ -233,7 +233,7 @@ void LimitModeBatfellowBatCavernGenerateTaskResources(ChecklistEntry [int] task_
             url = "place.php?whichplace=batman_cave&action=batman_cave_rnd";
         else
             description.listAppend("Travel to the Bat-Cavern first.");
-        ChecklistEntry entry = ChecklistEntryMake("__item fat stacks of cash", url, ChecklistSubentryMake(pluralise(state.funds_available, "Bat-Research", "Bat-Researches"), "", description), 8);
+        ChecklistEntry entry = ChecklistEntryMake(441, "__item fat stacks of cash", url, ChecklistSubentryMake(pluralise(state.funds_available, "Bat-Research", "Bat-Researches"), "", description), 8);
         if (state.zone != "Bat-Cavern")
             resource_entries.listAppend(entry);
         else
@@ -266,14 +266,14 @@ void LimitModeBatfellowBatCavernGenerateTaskResources(ChecklistEntry [int] task_
             description.listAppend("Can make " + craftables.listJoinComponents(", ", "and") + ".");
         if (description.count() > 0)
         {
-            task_entries.listAppend(ChecklistEntryMake("__item high-grade explosives", "shop.php?whichshop=batman_cave", ChecklistSubentryMake("Bat-Fabricate", "", description), 8));
+            task_entries.listAppend(ChecklistEntryMake(442, "__item high-grade explosives", "shop.php?whichshop=batman_cave", ChecklistSubentryMake("Bat-Fabricate", "", description), 8));
             found_tasks = true;
         }
     }
     if (!found_tasks && state.zone == "Bat-Cavern")
     {
         string [int] description;
-        task_entries.listAppend(ChecklistEntryMake("__item bitchin' meatcar", "place.php?whichplace=batman_cave&action=batman_cave_car", ChecklistSubentryMake("Travel somewhere", "", description), 8));
+        task_entries.listAppend(ChecklistEntryMake(443, "__item bitchin' meatcar", "place.php?whichplace=batman_cave&action=batman_cave_car", ChecklistSubentryMake("Travel somewhere", "", description), 8));
     }
     
 }
@@ -294,7 +294,7 @@ void LimitModeBatfellowDowntownGenerateTasks(ChecklistEntry [int] task_entries, 
             options.listAppend("+1 damage upgrades");
         options.listAppend("freekill kickballs");
         description.listAppend(options.listJoinComponents(" / ").capitaliseFirstLetter() + ".");
-        task_entries.listAppend(ChecklistEntryMake("__item kidnapped orphan", "shop.php?whichshop=batman_orphanage", ChecklistSubentryMake("Turn in orphans", "", description), 8));
+        task_entries.listAppend(ChecklistEntryMake(444, "__item kidnapped orphan", "shop.php?whichshop=batman_orphanage", ChecklistSubentryMake("Turn in orphans", "", description), 8));
         found_tasks = true;
     }
     if (chemicals.available_amount() > 0)
@@ -306,7 +306,7 @@ void LimitModeBatfellowDowntownGenerateTasks(ChecklistEntry [int] task_entries, 
             options.listAppend("+10 HP upgrades");
         options.listAppend("HP-restoring ultracoagulators");
         description.listAppend(options.listJoinComponents(" / ").capitaliseFirstLetter() + ".");
-        task_entries.listAppend(ChecklistEntryMake("__item " + chemicals, "shop.php?whichshop=batman_chemicorp", ChecklistSubentryMake("Turn in chemicals", "", description), 8));
+        task_entries.listAppend(ChecklistEntryMake(445, "__item " + chemicals, "shop.php?whichshop=batman_chemicorp", ChecklistSubentryMake("Turn in chemicals", "", description), 8));
         found_tasks = true;
     }
     if (evidence.available_amount() > 0)
@@ -318,13 +318,13 @@ void LimitModeBatfellowDowntownGenerateTasks(ChecklistEntry [int] task_entries, 
             options.listAppend("+armour upgrades");
         options.listAppend("progress-increasing fingerprint dusting kits");
         description.listAppend(options.listJoinComponents(" / ").capitaliseFirstLetter() + ".");
-        task_entries.listAppend(ChecklistEntryMake("__item " + evidence, "shop.php?whichshop=batman_pd", ChecklistSubentryMake("Turn in evidence", "", description), 8));
+        task_entries.listAppend(ChecklistEntryMake(446, "__item " + evidence, "shop.php?whichshop=batman_pd", ChecklistSubentryMake("Turn in evidence", "", description), 8));
         found_tasks = true;
     }
     if (!found_tasks && my_hp() == my_maxhp())
     {
         string [int] description;
-        task_entries.listAppend(ChecklistEntryMake("__item bitchin' meatcar", "place.php?whichplace=batman_downtown&action=batman_downtown_car", ChecklistSubentryMake("Travel somewhere", "", description), 8));
+        task_entries.listAppend(ChecklistEntryMake(447, "__item bitchin' meatcar", "place.php?whichplace=batman_downtown&action=batman_downtown_car", ChecklistSubentryMake("Travel somewhere", "", description), 8));
     }
 }
 
@@ -361,7 +361,7 @@ void LimitModeBatfellowGenerateChecklists(Checklist [int] checklists)
     BatState bat_state = BatStateMake();
     
     
-    //task_entries.listAppend(ChecklistEntryMake("__item batarang", "", ChecklistSubentryMake("Stop the Jokester", "", "Better living through violence?"), 8));
+    //task_entries.listAppend(ChecklistEntryMake(448, "__item batarang", "", ChecklistSubentryMake("Stop the Jokester", "", "Better living through violence?"), 8));
     
     LimitModeBatfellowGenerateResources(resource_entries, bat_state);
     LimitModeBatfellowGeneralGenerateTasks(task_entries, bat_state);
@@ -381,7 +381,7 @@ void BatfellowGenerateResource(ChecklistEntry [int] resource_entries)
     {
         int remaining = clampi(3 - get_property_int("_usedReplicaBatoomerang"), 0, 3);
         if (remaining > 0)
-            resource_entries.listAppend(ChecklistEntryMake("__item replica bat-oomerang", "", ChecklistSubentryMake(pluralise(remaining, "replica bat-oomerang use", "replica bat-oomerang uses"), "", "Free instakill."), 5).ChecklistEntryTag("free instakill"));
+            resource_entries.listAppend(ChecklistEntryMake(449, "__item replica bat-oomerang", "", ChecklistSubentryMake(pluralise(remaining, "replica bat-oomerang use", "replica bat-oomerang uses"), "", "Free instakill."), 5).ChecklistEntryTag("free instakill"));
     }
     if ($item[The Jokester's Gun].available_amount() > 0 && !get_property_boolean("_firedJokestersGun"))
     {
@@ -406,6 +406,6 @@ void BatfellowGenerateResource(ChecklistEntry [int] resource_entries)
         }
         else
             description.listAppend("Fire the Jokester's Gun skill in combat.");
-        resource_entries.listAppend(ChecklistEntryMake("__item The Jokester's Gun", url, ChecklistSubentryMake("The Jokester's Gun firing", "", description), importance).ChecklistEntryTag("free instakill"));
+        resource_entries.listAppend(ChecklistEntryMake(450, "__item The Jokester's Gun", url, ChecklistSubentryMake("The Jokester's Gun firing", "", description), importance).ChecklistEntryTag("free instakill"));
     }
 }

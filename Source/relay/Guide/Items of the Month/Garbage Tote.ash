@@ -26,7 +26,7 @@ void IOTMGarbageToteGenerate(ChecklistCollection checklists)
         	description.listAppend("Broken champagne bottle (double +item for " + pluralise(get_property_int("garbageChampagneCharge"), "more turn", "more turns") + ".)");
         
         
-        checklists.add(C_OPTIONAL_TASKS, ChecklistEntryMake("__item January's Garbage Tote", "inv_use.php?pwd=" + my_hash() + "&whichitem=9690", ChecklistSubentryMake("Collect a garbage tote item", "", description), 1));
+        checklists.add(C_OPTIONAL_TASKS, ChecklistEntryMake(552, "__item January's Garbage Tote", "inv_use.php?pwd=" + my_hash() + "&whichitem=9690", ChecklistSubentryMake("Collect a garbage tote item", "", description), 1));
 	}
 	
 	
@@ -66,6 +66,6 @@ void IOTMGarbageToteGenerate(ChecklistCollection checklists)
             description.listAppend("Switch out for something else.");
             url = "inv_use.php?pwd=" + my_hash() + "&whichitem=9690";
         }   
-        checklists.add(C_RESOURCES, ChecklistEntryMake("__item " + it, url, ChecklistSubentryMake(title, "", description), 8).ChecklistEntryTag("garbage tote"));
+        checklists.add(C_RESOURCES, ChecklistEntryMake(553, "__item " + it, url, ChecklistSubentryMake(title, "", description), 8).ChecklistEntryTag("garbage tote"));
 	}
 }

@@ -312,5 +312,5 @@ void SSweetSynthesisGenerateResource(ChecklistEntry [int] resource_entries)
     
     
     if (table.count() > 0)
-        resource_entries.listAppend(ChecklistEntryMake("__skill Sweet Synthesis", "runskillz.php?action=Skillz&whichskill=166&targetplayer=" + my_id() + "&pwd=" + my_hash() + "&quantity=1", ChecklistSubentryMake("Sweet Synthesis Buff", "30 turns", description), 10).ChecklistEntrySetCategory("buff"));
+        resource_entries.listAppend(ChecklistEntryMake(232, "__skill Sweet Synthesis", "runskillz.php?action=Skillz&whichskill=166&targetplayer=" + my_id() + "&pwd=" + my_hash() + "&quantity=1", ChecklistSubentryMake("Sweet Synthesis Buff", "30 turns", description), 10).ChecklistEntrySetCategory("buff"));
 }

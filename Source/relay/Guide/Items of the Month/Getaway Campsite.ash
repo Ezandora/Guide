@@ -14,11 +14,11 @@ void IOTMGetawayCampsiteGenerateResource(ChecklistEntry [int] resource_entries)
         description.listAppend("Large +stat buff. Gaze at the stars.");
         if (firewood.have() || $item[campfire smoke].have())
         	description.listAppend("If you don't see it, you could make and use campfire smoke, first.");
-        resource_entries.listAppend(ChecklistEntryMake("__item Newbiesport&trade; tent", "place.php?whichplace=campaway", ChecklistSubentryMake("Cloud-talk buff obtainable", "", description), 0).ChecklistEntryTag("getaway campsite").ChecklistEntrySetCategory("buff").ChecklistEntrySetSpecificImage("__effect That's Just Cloud-Talk, Man"));
+        resource_entries.listAppend(ChecklistEntryMake(535, "__item Newbiesport&trade; tent", "place.php?whichplace=campaway", ChecklistSubentryMake("Cloud-talk buff obtainable", "", description), 0).ChecklistEntryTag("getaway campsite").ChecklistEntrySetCategory("buff").ChecklistEntrySetSpecificImage("__effect That's Just Cloud-Talk, Man"));
     }
     if (smile_buffs_left > 0)// && $effect[That's Just Cloud-Talk, Man].have_effect() == 0)
     {
-        resource_entries.listAppend(ChecklistEntryMake("__item Newbiesport&trade; tent", "place.php?whichplace=campaway", ChecklistSubentryMake(pluralise(smile_buffs_left, "smile buff", "smile buffs") + " obtainable", "", "Various minor effects. Gaze at the stars."), 5).ChecklistEntryTag("getaway campsite").ChecklistEntrySetCategory("buff").ChecklistEntrySetSpecificImage("__effect Smile of the " + my_sign()));
+        resource_entries.listAppend(ChecklistEntryMake(536, "__item Newbiesport&trade; tent", "place.php?whichplace=campaway", ChecklistSubentryMake(pluralise(smile_buffs_left, "smile buff", "smile buffs") + " obtainable", "", "Various minor effects. Gaze at the stars."), 5).ChecklistEntryTag("getaway campsite").ChecklistEntrySetCategory("buff").ChecklistEntrySetSpecificImage("__effect Smile of the " + my_sign()));
     }
     if (firewood.have() && __misc_state["in run"])
     {
@@ -49,6 +49,6 @@ void IOTMGetawayCampsiteGenerateResource(ChecklistEntry [int] resource_entries)
         }
         if (various_options.count() > 0)
         	description.listAppend(various_options.listJoinComponents(", ", "or").capitaliseFirstLetter() + ".");
-        resource_entries.listAppend(ChecklistEntryMake("__item Newbiesport&trade; tent", "shop.php?whichshop=campfire", ChecklistSubentryMake(pluralise(firewood), "", description), 5).ChecklistEntryTag("getaway campsite").ChecklistEntrySetSpecificImage("__item " + firewood));
+        resource_entries.listAppend(ChecklistEntryMake(537, "__item Newbiesport&trade; tent", "shop.php?whichshop=campfire", ChecklistSubentryMake(pluralise(firewood), "", description), 5).ChecklistEntryTag("getaway campsite").ChecklistEntrySetSpecificImage("__item " + firewood));
     }
 }

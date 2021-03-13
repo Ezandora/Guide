@@ -6,7 +6,7 @@ void IOTMGingerbreadCityGenerateResource(ChecklistEntry [int] resource_entries)
         //Umm... I guess?
         //It doesn't seem amazing in aftercore, so we're not displaying it? Is that the right decision?
         //Almost all of its enchantments are better on other hats. And you can't choose which one you get, so it'd just be annoying the user.
-        resource_entries.listAppend(ChecklistEntryMake("__skill Ceci N'Est Pas Un Chapeau", "skillz.php", ChecklistSubentryMake("Ceci N'Est Pas Un Chapeau", "", "Random enchantment hat, 300MP."), 10));
+        resource_entries.listAppend(ChecklistEntryMake(570, "__skill Ceci N'Est Pas Un Chapeau", "skillz.php", ChecklistSubentryMake("Ceci N'Est Pas Un Chapeau", "", "Random enchantment hat, 300MP."), 10));
     }
     
     if ($skill[Gingerbread Mob Hit].skill_is_usable())
@@ -16,7 +16,7 @@ void IOTMGingerbreadCityGenerateResource(ChecklistEntry [int] resource_entries)
             string [int] description;
             description.listAppend("Combat skill, win a fight without taking a turn.");
             //FIXME replace with a better image
-            resource_entries.listAppend(ChecklistEntryMake("__familiar Penguin Goodfella", "", ChecklistSubentryMake("Gingerbread mob hit", "", description), 0).ChecklistEntryTag("free instakill"));
+            resource_entries.listAppend(ChecklistEntryMake(571, "__familiar Penguin Goodfella", "", ChecklistSubentryMake("Gingerbread mob hit", "", description), 0).ChecklistEntryTag("free instakill"));
             
         }
     }

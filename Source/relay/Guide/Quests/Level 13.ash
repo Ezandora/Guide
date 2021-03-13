@@ -1408,7 +1408,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             //trophies_are_possible = true; //Gourdcore, Golden Meat Stack
         
         if (trophies_are_possible)
-            task_entries.listAppend(ChecklistEntryMake("__item puzzling trophy", "trophy.php", ChecklistSubentryMake("Check for trophies", "10k meat, trophy requirements", "Certain trophies are missable after freeing the king")));
+            task_entries.listAppend(ChecklistEntryMake(14, "__item puzzling trophy", "trophy.php", ChecklistSubentryMake("Check for trophies", "10k meat, trophy requirements", "Certain trophies are missable after freeing the king")));
 		should_output_main_entry = false;
         
         
@@ -1416,7 +1416,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         {
             if (availableDrunkenness() > 0)
             {
-                task_entries.listAppend(ChecklistEntryMake("__item gibson", "inventory.php?which=1", ChecklistSubentryMake("Drink " + availableDrunkenness() + " drunkenness", "", "Freeing the king reduces your liver capacity.")));
+                task_entries.listAppend(ChecklistEntryMake(15, "__item gibson", "inventory.php?which=1", ChecklistSubentryMake("Drink " + availableDrunkenness() + " drunkenness", "", "Freeing the king reduces your liver capacity.")));
             }
         }
         
@@ -1425,13 +1425,13 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             if ($skill[rain dance].skill_is_usable() && my_rain() >= 10)
             {
                 int times = floor(my_rain().to_float() / 10.0);
-                task_entries.listAppend(ChecklistEntryMake("__effect Rain Dancin'", "skills.php", ChecklistSubentryMake("Cast Rain Dance " + pluraliseWordy(times, "time", "times"), "", "+20% item buff for aftercore.")));
+                task_entries.listAppend(ChecklistEntryMake(16, "__effect Rain Dancin'", "skills.php", ChecklistSubentryMake("Cast Rain Dance " + pluraliseWordy(times, "time", "times"), "", "+20% item buff for aftercore.")));
             }
         }
         
         if ($item[Yearbook Club Camera].available_amount() > 0 && $item[Yearbook Club Camera].equipped_amount() == 0)
         {
-            task_entries.listAppend(ChecklistEntryMake("__item yearbook club camera", 
+            task_entries.listAppend(ChecklistEntryMake(17, "__item yearbook club camera", 
                 generateEquipmentLink($item[yearbook club camera]), ChecklistSubentryMake("Equip the yearbook club camera", "", "Before prism break. Otherwise, it'll disappear.")));
         }
 		
@@ -1697,5 +1697,5 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 	}*/
 
 	if (should_output_main_entry)
-		task_entries.listAppend(ChecklistEntryMake(image_name, url, subentries));
+		task_entries.listAppend(ChecklistEntryMake(18, image_name, url, subentries));
 }

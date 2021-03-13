@@ -71,5 +71,5 @@ void QOldLandfillGenerate(ChecklistCollection collection)
     }
 	
     
-	collection.add(C_OPTIONAL_TASKS, ChecklistEntryMake(base_quest_state.image_name, active_url, subentry, $locations[the old landfill]));
+	collection.add(C_OPTIONAL_TASKS, ChecklistEntryMake(93, base_quest_state.image_name, active_url, subentry, $locations[the old landfill]));
 }

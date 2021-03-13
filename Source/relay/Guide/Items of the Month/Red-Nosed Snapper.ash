@@ -182,7 +182,7 @@ void IOTMRedNosedSnapperGenerate(ChecklistCollection checklists)
 	description.listAppend(HTMLGenerateTooltip("Mouse over for all dropped items.", item_table_description.to_string()));
 	
 	
-    checklists.add(C_RESOURCES, ChecklistEntryMake("__familiar Red-Nosed Snapper", url, ChecklistSubentryMake(title, "", description), 1)).ChecklistEntryTag("Red-Nosed Snapper").ChecklistEntrySetCategory("familiar").ChecklistEntrySetShortDescription(remaining);
+    checklists.add(C_RESOURCES, ChecklistEntryMake(548, "__familiar Red-Nosed Snapper", url, ChecklistSubentryMake(title, "", description), 1)).ChecklistEntryTag("Red-Nosed Snapper").ChecklistEntrySetCategory("familiar").ChecklistEntrySetShortDescription(remaining);
     
     
     //boolean display_everything = in_ronin();
@@ -193,7 +193,7 @@ void IOTMRedNosedSnapperGenerate(ChecklistCollection checklists)
         	if (blocked_phylums_for_inventory_display[p]) continue;
         	if (reward_item.available_amount() == 0) continue;
             //if (!display_everything && !allowed_phylums_for_always_inventory_display[p]) continue;
-            checklists.add(C_RESOURCES, ChecklistEntryMake("__item " + reward_item, "", ChecklistSubentryMake(pluralise(reward_item), "", phylum_reward_description[p]), 1)).ChecklistEntryTag("Red-Nosed Snapper").ChecklistEntrySetCategory("familiar");
+            checklists.add(C_RESOURCES, ChecklistEntryMake(549, "__item " + reward_item, "", ChecklistSubentryMake(pluralise(reward_item), "", phylum_reward_description[p]), 1)).ChecklistEntryTag("Red-Nosed Snapper").ChecklistEntrySetCategory("familiar");
             
         }
     }

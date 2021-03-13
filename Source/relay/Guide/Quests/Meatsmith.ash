@@ -75,5 +75,5 @@ void QMeatsmithGenerate(ChecklistCollection checklists)
         subentry.entries.listAppend("Non-combat appears every fourth adventure."); //except the first time for some reason? needs spading
     
     if (have_reason_to_add)
-        checklists.add(C_AFTERCORE_TASKS, ChecklistEntryMake(base_quest_state.image_name, active_url, subentry, locationToLocationMap($location[the skeleton store])));
+        checklists.add(C_AFTERCORE_TASKS, ChecklistEntryMake(11, base_quest_state.image_name, active_url, subentry, locationToLocationMap($location[the skeleton store])));
 }

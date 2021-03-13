@@ -76,5 +76,5 @@ void QArtistGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         active_url = "place.php?whichplace=town_wrong";
 	}
 	
-	optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, active_url, subentry, $locations[the sleazy back alley, the outskirts of cobb's knob, the haunted pantry]));
+	optional_task_entries.listAppend(ChecklistEntryMake(71, base_quest_state.image_name, active_url, subentry, $locations[the sleazy back alley, the outskirts of cobb's knob, the haunted pantry]));
 }

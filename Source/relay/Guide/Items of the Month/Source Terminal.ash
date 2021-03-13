@@ -28,7 +28,7 @@ void IOTMSourceTerminalGenerateDigitiseTargets(string [int] description)
 RegisterTaskGenerationFunction("IOTMSourceTerminalGenerateTasks");
 void IOTMSourceTerminalGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-    if (in_bad_moon() || get_campground()[$item[Source Terminal]] == 0 || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
+    if (in_bad_moon() || get_campground()[$item[Source Terminal]] == 0 || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_ZOMBIE_SLAYER)
         return;
         
     string url = "campground.php?action=terminal";
@@ -99,7 +99,7 @@ void IOTMSourceTerminalGenerateTasks(ChecklistEntry [int] task_entries, Checklis
     //"Upgrade your source terminal" suggestions? Chips, essentially.
     
     if (subentries.count() > 0)
-        optional_task_entries.listAppend(ChecklistEntryMake(image_name, url, subentries, 5));
+        optional_task_entries.listAppend(ChecklistEntryMake(463, image_name, url, subentries, 5));
 }
 
 
@@ -110,8 +110,9 @@ void IOTMSourceTerminalGenerateTasks(ChecklistEntry [int] task_entries, Checklis
 RegisterGenerationFunction("IOTMSourceTerminalGenerate");
 void IOTMSourceTerminalGenerate(ChecklistCollection checklists)
 {
-    if (in_bad_moon() || get_campground()[$item[Source Terminal]] == 0 || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
+    if (in_bad_moon() || get_campground()[$item[Source Terminal]] == 0 || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_ZOMBIE_SLAYER)
         return;
+        
     
     string url = "campground.php?action=terminal";
     if (my_path_id() == PATH_NUCLEAR_AUTUMN)
@@ -150,7 +151,7 @@ void IOTMSourceTerminalGenerate(ChecklistCollection checklists)
         //+critical hit? niche
         //+all elemental damage? useful in two places, but still niche enough to not be put here
         //substats.enh is probably less than 150 mainstat. that's not a lot... +item is much more useful
-        checklists.add(C_RESOURCES, ChecklistEntryMake(image_name, url, ChecklistSubentryMake(pluralise(enhancements_remaining, "source enhancement", "source enhancements") + " remaining", "", description), importance).ChecklistEntryTag("source terminal").ChecklistEntrySetSpecificImage("__item Fitspiration&trade; poster").ChecklistEntrySetCategory("buff"));
+        checklists.add(C_RESOURCES, ChecklistEntryMake(464, image_name, url, ChecklistSubentryMake(pluralise(enhancements_remaining, "source enhancement", "source enhancements") + " remaining", "", description), importance).ChecklistEntryTag("source terminal").ChecklistEntrySetSpecificImage("__item Fitspiration&trade; poster").ChecklistEntrySetCategory("buff"));
     }
     
 	int total_duplicate_uses_available = 1;
@@ -211,7 +212,7 @@ void IOTMSourceTerminalGenerate(ChecklistCollection checklists)
             title = pluralise(duplicate_uses_remaining, "duplication", "duplications");
         }
         
-        checklists.add(C_RESOURCES, ChecklistEntryMake(image_name, url, ChecklistSubentryMake(title, "", description), importance).ChecklistEntryTag("source terminal").ChecklistEntrySetSpecificImage("__item Glenn's golden dice").ChecklistEntrySetCategory("combat skill"));
+        checklists.add(C_RESOURCES, ChecklistEntryMake(465, image_name, url, ChecklistSubentryMake(title, "", description), importance).ChecklistEntryTag("source terminal").ChecklistEntrySetSpecificImage("__item Glenn's golden dice").ChecklistEntrySetCategory("combat skill"));
     }
     //Portscans: (the source)
     int portscans_remaining = clampi(3 - get_property_int("_sourceTerminalPortscanUses"), 0, 3);
@@ -228,7 +229,7 @@ void IOTMSourceTerminalGenerate(ChecklistCollection checklists)
         if (get_property_int("sourceInterval") != 0 && my_path_id() == PATH_THE_SOURCE)
             description.listAppend("Wait a bit, this is better after an agent had just appeared.");
         
-        checklists.add(C_RESOURCES, ChecklistEntryMake(image_name, url, ChecklistSubentryMake(pluralise(portscans_remaining, "portscan", "portscans") + " remaining", "", description), importance).ChecklistEntryTag("source terminal").ChecklistEntrySetSpecificImage("__effect Jacked In").ChecklistEntrySetCategory("skill"));
+        checklists.add(C_RESOURCES, ChecklistEntryMake(466, image_name, url, ChecklistSubentryMake(pluralise(portscans_remaining, "portscan", "portscans") + " remaining", "", description), importance).ChecklistEntryTag("source terminal").ChecklistEntrySetSpecificImage("__effect Jacked In").ChecklistEntrySetCategory("skill"));
         
     }
     //Extrudes:
@@ -285,7 +286,7 @@ void IOTMSourceTerminalGenerate(ChecklistCollection checklists)
                 description.listAppend("Use the extract skill in combat for more essence.");
         }
         
-        checklists.add(C_RESOURCES, ChecklistEntryMake(image_name, url, ChecklistSubentryMake(pluralise(extrudes_remaining, "source extrude", "source extrudes") + " remaining", "", description), importance).ChecklistEntryTag("source terminal").ChecklistEntrySetSpecificImage("__item browser cookie"));
+        checklists.add(C_RESOURCES, ChecklistEntryMake(467, image_name, url, ChecklistSubentryMake(pluralise(extrudes_remaining, "source extrude", "source extrudes") + " remaining", "", description), importance).ChecklistEntryTag("source terminal").ChecklistEntrySetSpecificImage("__item browser cookie"));
     }
     //Digitise?
     int digitisations = get_property_int("_sourceTerminalDigitizeUses");
@@ -305,8 +306,8 @@ void IOTMSourceTerminalGenerate(ChecklistCollection checklists)
             description.listAppend("Currently set to " + monster_name + ".");
         IOTMSourceTerminalGenerateDigitiseTargets(description);
         
-        checklists.add(C_RESOURCES, ChecklistEntryMake(image_name, url, ChecklistSubentryMake(pluralise(digitisations_left, "digitisation", "digitisations") + " remaining", "", description), importance).ChecklistEntryTag("source terminal").ChecklistEntrySetSpecificImage("__item source essence").ChecklistEntrySetCategory("combat skill"));
+        checklists.add(C_RESOURCES, ChecklistEntryMake(468, image_name, url, ChecklistSubentryMake(pluralise(digitisations_left, "digitisation", "digitisations") + " remaining", "", description), importance).ChecklistEntryTag("source terminal").ChecklistEntrySetSpecificImage("__item source essence").ChecklistEntrySetCategory("combat skill"));
     }
     //if (subentries.count() > 0)
-        //resource_entries.listAppend(ChecklistEntryMake(image_name, url, subentries, 5));
+        //resource_entries.listAppend(ChecklistEntryMake(469, image_name, url, subentries, 5));
 }

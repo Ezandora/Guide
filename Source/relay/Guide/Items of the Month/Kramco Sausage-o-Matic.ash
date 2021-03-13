@@ -26,16 +26,16 @@ void IOTMKramcoSausageOMaticGenerateTasks(ChecklistEntry [int] task_entries, Che
             if (url == "")
                 url = possible_locations[0].getClickableURLForLocation();
         }
-        task_entries.listAppend(ChecklistEntryMake("__item Kramco Sausage-o-Matic&trade;", url, ChecklistSubentryMake(title, "", description), -11));
+        task_entries.listAppend(ChecklistEntryMake(566, "__item Kramco Sausage-o-Matic&trade;", url, ChecklistSubentryMake(title, "", description), -11));
     }
     int sausages_eaten = get_property_int("_sausagesEaten");
-    if ($item[magical sausage].have() && sausages_eaten < 23)
+    if ($item[magical sausage].have() && sausages_eaten < 23 && __misc_state["can eat just about anything"])
     {
     	string title;
         string description;
         title = "Eat " + pluralise(MIN($item[magical sausage].available_amount(), 23 - sausages_eaten), "magical sausage", "magical sausages");
         description = "+1 adventure each.";
-        optional_task_entries.listAppend(ChecklistEntryMake("__item magical sausage", "inventory.php?which=1", ChecklistSubentryMake(title, "", description), 8));
+        optional_task_entries.listAppend(ChecklistEntryMake(567, "__item magical sausage", "inventory.php?which=1", ChecklistSubentryMake(title, "", description), 8));
     }
 }
 
@@ -46,7 +46,7 @@ void IOTMKramcoSausageOMaticGenerateResource(ChecklistEntry [int] resource_entri
     if (!__misc_state["can equip just about any off-hand"]) return;
 	
 	if (my_path_id() == PATH_LIVE_ASCEND_REPEAT) return;
-    ChecklistEntry entry = ChecklistEntryMake();
+    ChecklistEntry entry = ChecklistEntryMake(568);
     entry.image_lookup_name = "__item Kramco Sausage-o-Matic&trade;";
     entry.url = "inventory.php?action=grind";
     entry.url = generateEquipmentLink($item[Kramco Sausage-o-Matic&trade;]);
@@ -108,5 +108,5 @@ void IOTMKramcoSausageOMaticGenerateResource(ChecklistEntry [int] resource_entri
 	resource_entries.listAppend(entry);
 	
 	
-    //resource_entries.listAppend(ChecklistEntryMake("__item Kramco Sausage-o-Matic&trade;", "", ChecklistSubentryMake(title, "", "Free run/banish."), 6));
+    //resource_entries.listAppend(ChecklistEntryMake(569, "__item Kramco Sausage-o-Matic&trade;", "", ChecklistSubentryMake(title, "", "Free run/banish."), 6));
 }

@@ -66,7 +66,7 @@ void SAreaUnlocksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
 			subentry.entries.listAppend("Build a bitchin' meatcar. (" + meatcar_price + " meat)");
 		}
 		
-        ChecklistEntry entry = ChecklistEntryMake("__item bitchin' meatcar", url, subentry, relevant_locations);
+        ChecklistEntry entry = ChecklistEntryMake(266, "__item bitchin' meatcar", url, subentry, relevant_locations);
         if (optional)
             optional_task_entries.listAppend(entry);
         else
@@ -172,7 +172,7 @@ void SAreaUnlocksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
             subentry.entries.listAppend("Possibly upgrade your motorcycle's gas tank. (extra-buoyant)");
         
         
-		ChecklistEntry entry = ChecklistEntryMake("__item dingy dinghy", url, subentry, $locations[the shore\, inc. travel agency]);
+		ChecklistEntry entry = ChecklistEntryMake(267, "__item dingy dinghy", url, subentry, $locations[the shore\, inc. travel agency]);
         if (my_path_id() == PATH_COMMUNITY_SERVICE)
         	optional_task_entries.listAppend(entry);
         else

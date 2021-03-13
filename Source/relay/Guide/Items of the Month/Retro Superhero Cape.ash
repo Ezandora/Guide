@@ -168,6 +168,6 @@ void IOTMRetroSuperheroCapeGenerate(ChecklistCollection checklists)
     
     
     
-    checklists.add(C_RESOURCES, ChecklistEntryMake(image_name, url, ChecklistSubentryMake(title, "", description), 1)).ChecklistEntrySetCategory("equipment").ChecklistEntrySetAbridgedHeader("Superhero cape");
+    checklists.add(C_RESOURCES, ChecklistEntryMake(572, image_name, url, ChecklistSubentryMake(title, "", description), 1)).ChecklistEntrySetCategory("equipment").ChecklistEntrySetAbridgedHeader("Superhero cape");
     
 }

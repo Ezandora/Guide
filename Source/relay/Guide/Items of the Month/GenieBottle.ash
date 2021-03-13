@@ -19,6 +19,6 @@ void IOTMGenieBottleGenerateResource(ChecklistEntry [int] resource_entries)
         string potential_monsters = SFaxGeneratePotentialFaxes(true, $monsters[ninja snowman assassin,modern zmobie,giant swarm of ghuol whelps, screambat]).listJoinComponents("|<hr>");
         if (potential_monsters != "")
 	        description.listAppend("Could fight a monster:<br>" + potential_monsters);
-        resource_entries.listAppend(ChecklistEntryMake("__item genie bottle", url, ChecklistSubentryMake(pluralise(wishes_left, "wish", "wishes"), "", description), 1));
+        resource_entries.listAppend(ChecklistEntryMake(462, "__item genie bottle", url, ChecklistSubentryMake(pluralise(wishes_left, "wish", "wishes"), "", description), 1));
     }
 }

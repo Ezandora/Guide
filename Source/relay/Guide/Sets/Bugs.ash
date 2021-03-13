@@ -17,7 +17,7 @@ void SBugsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] 
 	bugs.listAppend("camel needs targets for spit.");
 	bugs.listAppend("camel needs buff when that is trackable.");
 	bugs.listAppend("make turn-costing banishes be vaguely near the free ones");
-	bugs.listAppend("ZS changes?");
+	//bugs.listAppend("ZS changes?");
 	bugs.listAppend("robot path");
 	bugs.listAppend("grey goo? (do absolutely nothing)");
 	//bugs.listAppend("implement showhide");
@@ -154,6 +154,6 @@ void SBugsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] 
 	
 	if (bugs.count() > 0)
 	{
-        task_entries.listAppend(ChecklistEntryMake("__item software bug", "", ChecklistSubentryMake(HTMLGenerateSpanFont("Fix " + pluralise(bugs.count(), "bug", "bugs"), "red"), "", bugs), -10));
+        task_entries.listAppend(ChecklistEntryMake(401, "__item software bug", "", ChecklistSubentryMake(HTMLGenerateSpanFont("Fix " + pluralise(bugs.count(), "bug", "bugs"), "red"), "", bugs), -10));
 	}
 }

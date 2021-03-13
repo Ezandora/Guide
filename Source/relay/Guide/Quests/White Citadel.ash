@@ -238,7 +238,7 @@ void QWhiteCitadelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
         image_name = "__familiar black cat";
         
         
-    ChecklistEntry entry = ChecklistEntryMake(image_name, active_url, subentry, relevant_locations);
+    ChecklistEntry entry = ChecklistEntryMake(75, image_name, active_url, subentry, relevant_locations);
     if (add_as_future_task)
         future_task_entries.listAppend(entry);
     else

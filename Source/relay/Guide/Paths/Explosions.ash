@@ -27,6 +27,6 @@ void PathExplosionsGenerateResource(ChecklistEntry [int] resource_entries)
         //if (isotope_amount >= 10 && !$item[low-pressure oxygen tank].have())
             //description.listAppend("<strong>low-pressure oxygen tank</strong> - prevents HP damage at end of fight, but you probably want to ignore this.");
             
-        resource_entries.listAppend(ChecklistEntryMake("__item rare Meat isotope", "shop.php?whichshop=exploathing", ChecklistSubentryMake(pluralise(isotopes), "", description), 5));
+        resource_entries.listAppend(ChecklistEntryMake(141, "__item rare Meat isotope", "shop.php?whichshop=exploathing", ChecklistSubentryMake(pluralise(isotopes), "", description), 5));
     }
 }

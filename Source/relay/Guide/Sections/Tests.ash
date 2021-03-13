@@ -7,7 +7,7 @@ void generateImageTest(Checklist [int] checklists)
 	foreach i in __kol_images
 	{
 		KOLImage image = __kol_images[i];
-		image_test_entries.listAppend(ChecklistEntryMake(i, "", ChecklistSubentryMake(i)));
+		image_test_entries.listAppend(ChecklistEntryMake(106, i, "", ChecklistSubentryMake(i)));
 		
 	}
 	checklists.listAppend(ChecklistMake("All images", image_test_entries));
@@ -35,9 +35,9 @@ void generateStateTest(Checklist [int] checklists)
         int_description.listAppend(key + " = " + __misc_state_int[key]);
 	}
 	
-    misc_state_entries.listAppend(ChecklistEntryMake("__item milky potion", "", ChecklistSubentryMake("Boolean", "", state_description.listJoinComponents("|"))));
-    misc_state_entries.listAppend(ChecklistEntryMake("__item ghost thread", "", ChecklistSubentryMake("String", "", string_description.listJoinComponents("|"))));
-    misc_state_entries.listAppend(ChecklistEntryMake("__item handful of numbers", "", ChecklistSubentryMake("Int", "", int_description.listJoinComponents("|"))));
+    misc_state_entries.listAppend(ChecklistEntryMake(107, "__item milky potion", "", ChecklistSubentryMake("Boolean", "", state_description.listJoinComponents("|"))));
+    misc_state_entries.listAppend(ChecklistEntryMake(108, "__item ghost thread", "", ChecklistSubentryMake("String", "", string_description.listJoinComponents("|"))));
+    misc_state_entries.listAppend(ChecklistEntryMake(109, "__item handful of numbers", "", ChecklistSubentryMake("Int", "", int_description.listJoinComponents("|"))));
 	
 	boolean [string] names_already_seen;
 	
@@ -91,7 +91,7 @@ void generateStateTest(Checklist [int] checklists)
 			subentry.entries.listAppend(key2 + ": " + quest_state.state_int[key2]);
 		}
 		
-		quest_state_entries.listAppend(ChecklistEntryMake(quest_state.image_name, "", subentry));
+		quest_state_entries.listAppend(ChecklistEntryMake(110, quest_state.image_name, "", subentry));
 	}
 	
 	
@@ -174,14 +174,14 @@ void generateSelfDataTest(Checklist [int] checklists)
     if (missing_available_locations.count() > 0)
     {
         buffer description = generateMajorMinorText(missing_available_locations);
-        checklist_entries.listAppend(ChecklistEntryMake("__item cobb's knob map", "", ChecklistSubentryMake("Missing locationAvailable() locations", "", description)));
+        checklist_entries.listAppend(ChecklistEntryMake(111, "__item cobb's knob map", "", ChecklistSubentryMake("Missing locationAvailable() locations", "", description)));
     }
     
     
     if (missing_location_links_description.count() > 0)
     {
         buffer description = generateMajorMinorText(missing_location_links_description);
-        checklist_entries.listAppend(ChecklistEntryMake("__item reflection of a map", "", ChecklistSubentryMake("Missing getClickableURLForLocation() locations", "", description)));
+        checklist_entries.listAppend(ChecklistEntryMake(112, "__item reflection of a map", "", ChecklistSubentryMake("Missing getClickableURLForLocation() locations", "", description)));
     }
 	checklists.listAppend(ChecklistMake("Self data tests", checklist_entries));
 }
@@ -199,7 +199,7 @@ void generateBanishTest(Checklist [int] checklists)
     }
     if (banish_table.count() > 1)
     {
-        checklist_entries.listAppend(ChecklistEntryMake("__item ice house", "", ChecklistSubentryMake("Banishes", "", HTMLGenerateSimpleTableLines(banish_table))));
+        checklist_entries.listAppend(ChecklistEntryMake(113, "__item ice house", "", ChecklistSubentryMake("Banishes", "", HTMLGenerateSimpleTableLines(banish_table))));
     }
     
 	checklists.listAppend(ChecklistMake("Banishes", checklist_entries));

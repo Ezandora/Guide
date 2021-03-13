@@ -119,7 +119,7 @@ void IOTMGrimstoneHareGenerateTasks(ChecklistEntry [int] task_entries, Checklist
     
     
     //$location[A Deserted Stretch of I-911]
-	optional_task_entries.listAppend(ChecklistEntryMake("__effect hare-brained", "place.php?whichplace=ioty2014_hare", ChecklistSubentryMake("Hare Race", modifiers, description)));
+	optional_task_entries.listAppend(ChecklistEntryMake(560, "__effect hare-brained", "place.php?whichplace=ioty2014_hare", ChecklistSubentryMake("Hare Race", modifiers, description)));
 }
 
 void IOTMGrimstoneStepmotherGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -247,7 +247,7 @@ void IOTMGrimstoneStepmotherGenerateTasks(ChecklistEntry [int] task_entries, Che
     }
     
     //FIXME add suggestions for other two trophies (partners in crime, ending party early)
-	optional_task_entries.listAppend(ChecklistEntryMake("__item long-stemmed rose", "place.php?whichplace=ioty2014_cindy", ChecklistSubentryMake("The Prince's Ball", modifiers, description)));
+	optional_task_entries.listAppend(ChecklistEntryMake(561, "__item long-stemmed rose", "place.php?whichplace=ioty2014_cindy", ChecklistSubentryMake("The Prince's Ball", modifiers, description)));
 }
 
 void IOTMGrimstoneWolfGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -288,5 +288,5 @@ void IOTMGrimstoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
     if (mask_path == "gnome")
         IOTMGrimstoneGnomeGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     if (mask_path == "tuxedo")
-        task_entries.listAppend(ChecklistEntryMake("__item long-stemmed rose", "place.php?whichplace=arcade", ChecklistSubentryMake("Believe in yourself", "", ""), -11));
+        task_entries.listAppend(ChecklistEntryMake(562, "__item long-stemmed rose", "place.php?whichplace=arcade", ChecklistSubentryMake("Believe in yourself", "", ""), -11));
 }

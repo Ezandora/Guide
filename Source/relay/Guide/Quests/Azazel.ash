@@ -58,7 +58,7 @@ void QAzazelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             line += " once you have enough space";
         line += ".";
         subentry.entries.listAppend(line);
-        optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, "", subentry));
+        optional_task_entries.listAppend(ChecklistEntryMake(5, base_quest_state.image_name, "", subentry));
         return;
     }
     
@@ -78,7 +78,7 @@ void QAzazelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		return;
     
         
-	ChecklistEntry entry = ChecklistEntryMake();
+	ChecklistEntry entry = ChecklistEntryMake(6);
 	entry.url = "pandamonium.php";
 	entry.image_lookup_name = base_quest_state.image_name;
 	entry.should_indent_after_first_subentry = true;

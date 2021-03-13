@@ -77,6 +77,6 @@ void SFloristGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 			subentry.entries.listAppend(line);
 		}
 		if (subentry.entries.count() > 0)
-			task_entries.listAppend(ChecklistEntryMake(image_name, "place.php?whichplace=forestvillage&amp;action=fv_friar", subentry, -11));
+			task_entries.listAppend(ChecklistEntryMake(402, image_name, "place.php?whichplace=forestvillage&amp;action=fv_friar", subentry, -11));
 	}
 }

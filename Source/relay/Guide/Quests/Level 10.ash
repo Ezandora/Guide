@@ -361,7 +361,7 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 		}
 	}
     
-	ChecklistEntry entry = ChecklistEntryMake(image_name, url, subentry, $locations[the penultimate fantasy airship, the castle in the clouds in the sky (basement), the castle in the clouds in the sky (ground floor), the castle in the clouds in the sky (top floor)]);
+	ChecklistEntry entry = ChecklistEntryMake(7, image_name, url, subentry, $locations[the penultimate fantasy airship, the castle in the clouds in the sky (basement), the castle in the clouds in the sky (ground floor), the castle in the clouds in the sky (top floor)]);
     if (add_as_future_task)
         future_task_entries.listAppend(entry);
     else

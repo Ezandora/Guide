@@ -4,7 +4,7 @@ void IOTMHorseryGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
     if (!__iotms_usable[$item[Horsery contract]]) return;
     if (get_property("_horsery") == "" && my_meat() >= 500)
     {
-        optional_task_entries.listAppend(ChecklistEntryMake("__item magical pony: Spectrum Dash", "place.php?whichplace=town_right&action=town_horsery", ChecklistSubentryMake("Bring along a horse!", "", "Probably the dark horse.")));
+        optional_task_entries.listAppend(ChecklistEntryMake(451, "__item magical pony: Spectrum Dash", "place.php?whichplace=town_right&action=town_horsery", ChecklistSubentryMake("Bring along a horse!", "", "Probably the dark horse.")));
         
     }
 }

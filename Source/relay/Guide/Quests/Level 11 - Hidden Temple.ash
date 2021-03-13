@@ -125,10 +125,10 @@ void QLevel11HiddenTempleGenerateTasks(ChecklistEntry [int] task_entries, Checkl
     if (!__quest_state["Manor Unlock"].state_boolean["ballroom song effectively set"])
     {
         subentry.entries.listAppend(HTMLGenerateSpanOfClass("Wait until -combat ballroom song set.", "r_bold"));
-        future_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, "place.php?whichplace=woods", subentry, $locations[the spooky forest]));
+        future_task_entries.listAppend(ChecklistEntryMake(87, base_quest_state.image_name, "place.php?whichplace=woods", subentry, $locations[the spooky forest]));
     }
     else
     {
-        task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, "place.php?whichplace=woods", subentry, , $locations[the spooky forest]));
+        task_entries.listAppend(ChecklistEntryMake(88, base_quest_state.image_name, "place.php?whichplace=woods", subentry, , $locations[the spooky forest]));
     }
 }

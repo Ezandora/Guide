@@ -93,7 +93,7 @@ void generatePullList(Checklist [int] checklists)
 	if (pulls_available <= 0)
 		return;
 	if (pulls_available > 0)
-		pulls_entries.listAppend(ChecklistEntryMake("special subheader", "", ChecklistSubentryMake(pluralise(pulls_available, "pull", "pulls") + " remaining")));
+		pulls_entries.listAppend(ChecklistEntryMake(97, "special subheader", "", ChecklistSubentryMake(pluralise(pulls_available, "pull", "pulls") + " remaining")));
 	
 	item [int] pullable_list_item;
 	int [int] pullable_list_max_wanted;
@@ -600,7 +600,7 @@ void generatePullList(Checklist [int] checklists)
 		
 		if (gp_item.alternate_name != "")
 		{
-			pulls_entries.listAppend(ChecklistEntryMake(gp_item.alternate_image_name, "storage.php", ChecklistSubentryMake(gp_item.alternate_name, "", reason_list)));
+			pulls_entries.listAppend(ChecklistEntryMake(98, gp_item.alternate_image_name, "storage.php", ChecklistSubentryMake(gp_item.alternate_name, "", reason_list)));
 			continue;
 		}
 		
@@ -651,6 +651,9 @@ void generatePullList(Checklist [int] checklists)
 				continue;
             if (!is_unrestricted(it))
                 continue;
+            slot item_slot = it.to_slot();
+            if (item_slot == $slot[off-hand] && !__misc_state["can equip just about any off-hand"]) continue;
+            if (item_slot == $slot[weapon] && !__misc_state["can equip just about any weapon"]) continue;
             //if (!it.is_unrestricted()) continue; //FIXME uncomment next point release
 			int actual_amount = pullable_amount(it, max_wanted);
 			if (actual_amount > 0)
@@ -668,9 +671,9 @@ void generatePullList(Checklist [int] checklists)
                     url = "mall.php";
               
 				if (max_wanted == 1)
-					pulls_entries.listAppend(ChecklistEntryMake(it, url, ChecklistSubentryMake(it, "", reason_list)));
+					pulls_entries.listAppend(ChecklistEntryMake(99, it, url, ChecklistSubentryMake(it, "", reason_list)));
 				else
-					pulls_entries.listAppend(ChecklistEntryMake(it, url, ChecklistSubentryMake(pluralise(actual_amount, it), "", reason_list)));
+					pulls_entries.listAppend(ChecklistEntryMake(100, it, url, ChecklistSubentryMake(pluralise(actual_amount, it), "", reason_list)));
 				break;
 			}
 		}

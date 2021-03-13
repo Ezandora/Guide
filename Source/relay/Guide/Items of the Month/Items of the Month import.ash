@@ -68,4 +68,5 @@ import "relay/Guide/Items of the Month/Comprehensive Cartography.ash";
 import "relay/Guide/Items of the Month/Retro Superhero Cape.ash";
 import "relay/Guide/Items of the Month/Spinmaster Lathe.ash";
 import "relay/Guide/Items of the Month/Cargo Cultist Shorts.ash";
+import "relay/Guide/Items of the Month/Potted Power Plant.ash";
 

@@ -207,6 +207,6 @@ void SPulveriseGenerateResource(ChecklistEntry [int] resource_entries)
             url = "shop.php?whichshop=meatsmith";
             details.listAppend("Acquire a tenderizing hammer.");
         }
-        resource_entries.listAppend(ChecklistEntryMake("__skill pulverize", url, ChecklistSubentryMake(title, "", details), 10));
+        resource_entries.listAppend(ChecklistEntryMake(387, "__skill pulverize", url, ChecklistSubentryMake(title, "", details), 10));
     }
 }

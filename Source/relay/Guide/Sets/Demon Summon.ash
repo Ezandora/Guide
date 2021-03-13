@@ -74,6 +74,6 @@ void SDemonSummonGenerateResource(ChecklistEntry [int] resource_entries)
         if (john.count() > 0)
             description.listAppend(HTMLGenerateSimpleTableLines(john));
         
-        resource_entries.listAppend(ChecklistEntryMake("__item thin black candle", url, ChecklistSubentryMake("Demon summonable", "", description), 7));
+        resource_entries.listAppend(ChecklistEntryMake(219, "__item thin black candle", url, ChecklistSubentryMake("Demon summonable", "", description), 7));
     }
 }

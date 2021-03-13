@@ -80,7 +80,7 @@ void PathAvatarOfWestOfLoathingGenerateResource(ChecklistEntry [int] resource_en
     }
     sort subentries by subentries_sort_value[index];
     if (subentries.count() > 0)
-        resource_entries.listAppend(ChecklistEntryMake(image_name, "", subentries, 2));
+        resource_entries.listAppend(ChecklistEntryMake(176, image_name, "", subentries, 2));
     
     
     //Should we display beancannon in aftercore? I guess we could suggest a cheap source of it...? Maybe another time.
@@ -114,7 +114,7 @@ void PathAvatarOfWestOfLoathingGenerateResource(ChecklistEntry [int] resource_en
             string title = pluralise(banish_count, "beancannon banish", "beancannon banishes");
             if (!in_ronin())
                 title = "Beancannon banishes";
-            resource_entries.listAppend(ChecklistEntryMake("__skill beancannon", url, ChecklistSubentryMake(title, "", description), 8).ChecklistEntryTag("banish"));
+            resource_entries.listAppend(ChecklistEntryMake(177, "__skill beancannon", url, ChecklistSubentryMake(title, "", description), 8).ChecklistEntryTag("banish"));
         }
     }
     
@@ -124,7 +124,7 @@ void PathAvatarOfWestOfLoathingGenerateResource(ChecklistEntry [int] resource_en
         string [int] description;
         string line = "Olfaction.";
         description.listAppend(line);
-        resource_entries.listAppend(ChecklistEntryMake("__effect Greaser Lightnin'", "", ChecklistSubentryMake(pluralise(uses_remaining, "long con", "long cons") + " remaining", "", description), 8));
+        resource_entries.listAppend(ChecklistEntryMake(178, "__effect Greaser Lightnin'", "", ChecklistSubentryMake(pluralise(uses_remaining, "long con", "long cons") + " remaining", "", description), 8));
     }
 }
 
@@ -194,11 +194,11 @@ void PathAvatarOfWestOfLoathingGenerateTasks(ChecklistEntry [int] task_entries, 
     
     if (skill_subentries.count() > 0)
     {
-        task_entries.listAppend(ChecklistEntryMake("__item tales of the west: beanslinging", skill_url, skill_subentries, priority));
+        task_entries.listAppend(ChecklistEntryMake(179, "__item tales of the west: beanslinging", skill_url, skill_subentries, priority));
     }
     
     if (my_class() == $class[Cow Puncher] && $item[corrupted marrow].available_amount() > 0 && $item[corrupted marrow].to_effect().have_effect() < 100 && in_ronin())
     {
-        task_entries.listAppend(ChecklistEntryMake("__effect Cowrruption", "inventory.php?which=3", ChecklistSubentryMake("Use corrupted marrow", "", "+200% weapon damage/spell damage"), -11));
+        task_entries.listAppend(ChecklistEntryMake(180, "__effect Cowrruption", "inventory.php?which=3", ChecklistSubentryMake("Use corrupted marrow", "", "+200% weapon damage/spell damage"), -11));
     }
 }

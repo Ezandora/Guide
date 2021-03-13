@@ -834,5 +834,5 @@ void QNemesisGenerate(ChecklistCollection checklists)
     foreach l in $locations[the unquiet garves,the "fun" house, the nemesis' lair, the broodling grounds, the outer compound, the temple portico, convention hall lobby, outside the club, the island barracks, the poop deck]
         relevant_locations[l] = true;
     relevant_locations[$location[the fungal nethers]] = true;
-	checklists.add(C_AFTERCORE_TASKS, ChecklistEntryMake(base_quest_state.image_name, url, subentry, relevant_locations));
+	checklists.add(C_AFTERCORE_TASKS, ChecklistEntryMake(94, base_quest_state.image_name, url, subentry, relevant_locations));
 }

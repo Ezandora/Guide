@@ -41,7 +41,7 @@ void IOTMTunnelOfLoveGenerateTasks(ChecklistEntry [int] task_entries, ChecklistE
         usable_items.listAppend("toast");
     description.listAppend("Item choice:|*" + usable_items.listJoinComponents(", ", "or").capitaliseFirstLetter() + ".");
     
-    optional_task_entries.listAppend(ChecklistEntryMake("__item pink candy heart", "place.php?whichplace=town_wrong", ChecklistSubentryMake("Take a love trip", "", description)));
+    optional_task_entries.listAppend(ChecklistEntryMake(580, "__item pink candy heart", "place.php?whichplace=town_wrong", ChecklistSubentryMake("Take a love trip", "", description)));
 }
 
 RegisterResourceGenerationFunction("IOTMTunnelOfLoveGenerateResource");
@@ -55,14 +55,14 @@ void IOTMTunnelOfLoveGenerateResource(ChecklistEntry [int] resource_entries)
         /*item enamorang = $item[LOV Enamorang];
         if (enamorang.available_amount() > 0)
         {
-            resource_entries.listAppend(ChecklistEntryMake("__item LOV Enamorang", "", ChecklistSubentryMake(pluralise(enamorang), "", "Copies the monster once as an arrow."), 5));
+            resource_entries.listAppend(ChecklistEntryMake(581, "__item LOV Enamorang", "", ChecklistSubentryMake(pluralise(enamorang), "", "Copies the monster once as an arrow."), 5));
             
         }*/
         item chocolate = $item[LOV Extraterrestrial Chocolate];
         if (chocolate.available_amount() > 0 && my_path_id() != PATH_SLOW_AND_STEADY)
         {
             //FIXME list other chocolates?
-            resource_entries.listAppend(ChecklistEntryMake("__item LOV Extraterrestrial Chocolate", "", ChecklistSubentryMake(pluralise(chocolate), "", "Adventures!"), 5));
+            resource_entries.listAppend(ChecklistEntryMake(582, "__item LOV Extraterrestrial Chocolate", "", ChecklistSubentryMake(pluralise(chocolate), "", "Adventures!"), 5));
             
         }
     }

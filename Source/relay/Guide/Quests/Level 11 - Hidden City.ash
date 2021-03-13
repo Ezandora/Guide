@@ -99,7 +99,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         return;
         
     QuestState base_quest_state = __quest_state["Level 11 Hidden City"];
-    ChecklistEntry entry = ChecklistEntryMake();
+    ChecklistEntry entry = ChecklistEntryMake(36);
     entry.url = "place.php?whichplace=hiddencity";
     entry.image_lookup_name = base_quest_state.image_name;
     entry.should_indent_after_first_subentry = true;

@@ -46,6 +46,6 @@ void IOTMSugarGenerateResource(ChecklistEntry [int] resource_entries)
     }
     if (subentries.count() > 0)
     {
-        resource_entries.listAppend(ChecklistEntryMake(image_name, "", subentries, 10));
+        resource_entries.listAppend(ChecklistEntryMake(605, image_name, "", subentries, 10));
     }
 }

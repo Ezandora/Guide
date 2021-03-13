@@ -53,5 +53,5 @@ void QGalaktikGenerate(ChecklistCollection checklists)
         //image_name = "__familiar o.a.f.";
     }
 	
-	checklists.add(C_AFTERCORE_TASKS, ChecklistEntryMake(image_name, active_url, subentry, $locations[the overgrown lot]));
+	checklists.add(C_AFTERCORE_TASKS, ChecklistEntryMake(35, image_name, active_url, subentry, $locations[the overgrown lot]));
 }

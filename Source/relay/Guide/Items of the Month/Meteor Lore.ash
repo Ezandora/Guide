@@ -31,7 +31,7 @@ void IOTMMeteorLoreGenerateResource(ChecklistEntry [int] resource_entries)
     if (!__misc_state["in run"]) return;
     if (my_path_id() == PATH_G_LOVER) return;
     
-    ChecklistEntry entry = ChecklistEntryMake();
+    ChecklistEntry entry = ChecklistEntryMake(518);
     entry.image_lookup_name = "__skill Meteor Lore";
     entry.importance_level = 3;
     if (get_property_int("_macrometeoriteUses") < 10)

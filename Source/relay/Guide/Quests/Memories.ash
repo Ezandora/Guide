@@ -52,7 +52,7 @@ void QMemoriesPrimordialFearGenerateTasks(ChecklistEntry [int] task_entries, Che
 	subentry.header = base_quest_state.quest_name;
     //FIXME implement this
     
-	optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, active_url, subentry, $locations[the primordial soup]));
+	optional_task_entries.listAppend(ChecklistEntryMake(8, base_quest_state.image_name, active_url, subentry, $locations[the primordial soup]));
 }
 
 void QMemoriesHyboriaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -68,7 +68,7 @@ void QMemoriesHyboriaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistE
     //FIXME implement this
     
     
-	optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, active_url, subentry, $locations[the jungles of ancient loathing]));
+	optional_task_entries.listAppend(ChecklistEntryMake(9, base_quest_state.image_name, active_url, subentry, $locations[the jungles of ancient loathing]));
 }
 
 void QMemoriesFutureGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -84,7 +84,7 @@ void QMemoriesFutureGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
     //FIXME implement this
     
     
-	optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, active_url, subentry, $locations[seaside megalopolis]));
+	optional_task_entries.listAppend(ChecklistEntryMake(10, base_quest_state.image_name, active_url, subentry, $locations[seaside megalopolis]));
 }
 
 void QMemoriesGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)

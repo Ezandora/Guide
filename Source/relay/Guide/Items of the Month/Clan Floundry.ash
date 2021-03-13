@@ -49,5 +49,5 @@ void IOTMClanFloundryGenerateResource(ChecklistEntry [int] resource_entries)
     description.listAppend(HTMLGenerateSimpleTableLines(equipment));
     
     
-    resource_entries.listAppend(ChecklistEntryMake("__item fishy fish", "clan_viplounge.php?action=floundry", ChecklistSubentryMake("Rentable floundry equipment", "", description), 8));
+    resource_entries.listAppend(ChecklistEntryMake(499, "__item fishy fish", "clan_viplounge.php?action=floundry", ChecklistSubentryMake("Rentable floundry equipment", "", description), 8));
 }

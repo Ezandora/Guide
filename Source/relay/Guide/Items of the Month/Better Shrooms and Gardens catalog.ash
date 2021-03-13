@@ -22,7 +22,7 @@ void IOTMBetterShroomsAndGardensGenerateTasks(ChecklistEntry [int] task_entries,
         if (!__misc_state["in run"]) //rewards do not seem practical in-run
         	description.listAppend("Or fertilise it for long-term rewards.");
         
-        optional_task_entries.listAppend(ChecklistEntryMake("__item colossal free-range mushroom", "campground.php", ChecklistSubentryMake(title, "", description), 8));
+        optional_task_entries.listAppend(ChecklistEntryMake(611, "__item colossal free-range mushroom", "campground.php", ChecklistSubentryMake(title, "", description), 8));
     }
 }*/
 
@@ -42,13 +42,13 @@ void IOTMBetterShroomsAndGardensGenerate(ChecklistCollection checklists)
         	title = pluralise(fights_left, "mushroom fight", "mushroom fights");
         string description;
         
-        checklists.add(C_RESOURCES, ChecklistEntryMake("__item immense free-range mushroom", "campground.php", ChecklistSubentryMake(title, "", description), 4).ChecklistEntryTag("daily free fight"));
+        checklists.add(C_RESOURCES, ChecklistEntryMake(612, "__item immense free-range mushroom", "campground.php", ChecklistSubentryMake(title, "", description), 4).ChecklistEntryTag("daily free fight"));
     }
     if (!get_property_boolean("_mushroomGardenVisited") && fights_left <= 0)
     {
     	string title = "Pick mushroom garden";
         string description = "Or fertilise it for long-term rewards";
-        checklists.add(C_OPTIONAL_TASKS, ChecklistEntryMake("__item immense free-range mushroom", "campground.php", ChecklistSubentryMake(title, "", description), 4));
+        checklists.add(C_OPTIONAL_TASKS, ChecklistEntryMake(613, "__item immense free-range mushroom", "campground.php", ChecklistSubentryMake(title, "", description), 4));
     	
     }
 }
@@ -77,9 +77,9 @@ void IOTMBetterShroomsAndGardensGenerateResource(ChecklistEntry [int] resource_e
             if (key == mushrooms.count() - 1)
             	description.listAppend("Use for mushroom filets.");
             subentries.listAppend(ChecklistSubentryMake(pluralise(it), "", description));
-        	//resource_entries.listAppend(ChecklistEntryMake("__item " + it, "campground.php", ChecklistSubentryMake(pluralise(it), "", description), 8).ChecklistEntryTag("using shroom and garden item"));
+        	//resource_entries.listAppend(ChecklistEntryMake(614, "__item " + it, "campground.php", ChecklistSubentryMake(pluralise(it), "", description), 8).ChecklistEntryTag("using shroom and garden item"));
         }
         if (subentries.count() > 0)
-        	resource_entries.listAppend(ChecklistEntryMake(image_name, "inventory.php?which=3&ftext=mushroom", subentries, 8));
+        	resource_entries.listAppend(ChecklistEntryMake(615, image_name, "inventory.php?which=3&ftext=mushroom", subentries, 8));
     }
 }

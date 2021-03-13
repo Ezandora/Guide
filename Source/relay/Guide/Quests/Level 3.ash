@@ -134,7 +134,7 @@ void QLevel3GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         url = "cellar.php";
 	
 	if (wait_until_level_eleven && false) //Ehhh... no? It's like, a 5% difference?
-		optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the typical tavern cellar]));
+		optional_task_entries.listAppend(ChecklistEntryMake(82, base_quest_state.image_name, url, subentry, $locations[the typical tavern cellar]));
 	else
-		task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the typical tavern cellar]));
+		task_entries.listAppend(ChecklistEntryMake(83, base_quest_state.image_name, url, subentry, $locations[the typical tavern cellar]));
 }

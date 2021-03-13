@@ -134,5 +134,5 @@ void QGuildGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         active_url = "guild.php";
     }
 	
-	optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, active_url, subentry, relevant_location));
+	optional_task_entries.listAppend(ChecklistEntryMake(4, base_quest_state.image_name, active_url, subentry, relevant_location));
 }

@@ -114,6 +114,6 @@ void IOTMSpeakeasyGenerateResource(ChecklistEntry [int] resource_entries)
         description.listAppend(HTMLGenerateSimpleTableLines(options));
     
     if (__misc_state["in run"] || drinks_remaining > 0)
-        resource_entries.listAppend(ChecklistEntryMake("__item observational glasses", "clan_viplounge.php?action=speakeasy", ChecklistSubentryMake(pluralise(drinks_remaining, "speakeasy drink", "speakeasy drinks"), "", description), 8)); //the eyes of T.J. Eckleburg
+        resource_entries.listAppend(ChecklistEntryMake(593, "__item observational glasses", "clan_viplounge.php?action=speakeasy", ChecklistSubentryMake(pluralise(drinks_remaining, "speakeasy drink", "speakeasy drinks"), "", description), 8)); //the eyes of T.J. Eckleburg
     
 }

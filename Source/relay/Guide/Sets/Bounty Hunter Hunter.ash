@@ -254,6 +254,6 @@ void SBountyHunterHunterGenerateTasks(ChecklistEntry [int] task_entries, Checkli
     boolean [location] highlight_locations = listInvert(relevant_locations);
     if (subentries.count() > 0)
     {
-        optional_task_entries.listAppend(ChecklistEntryMake("__item bounty-hunting helmet", url_handle.s, subentries, highlight_locations));
+        optional_task_entries.listAppend(ChecklistEntryMake(227, "__item bounty-hunting helmet", url_handle.s, subentries, highlight_locations));
     }
 }

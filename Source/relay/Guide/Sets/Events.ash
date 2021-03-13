@@ -27,14 +27,14 @@ void SCrimbo2015GenerateResource(ChecklistEntry [int] resource_entries)
             }
             if (banished_monsters.count() > 0)
                 description.listAppend("Have " + banished_monsters.listJoinComponents(", ", "and") + " banished.");
-            resource_entries.listAppend(ChecklistEntryMake("__item bundle of &quot;fragrant&quot; herbs", "", ChecklistSubentryMake(pluralise(herb_uses_left, "fragrant herb banish", "fragrant herb banishes"), "", description), 3));
+            resource_entries.listAppend(ChecklistEntryMake(381, "__item bundle of &quot;fragrant&quot; herbs", "", ChecklistSubentryMake(pluralise(herb_uses_left, "fragrant herb banish", "fragrant herb banishes"), "", description), 3));
         }
         int stockpile_uses_left = clampi(10 - get_property_int("_nuclearStockpileUsed"), 0, 10);
         if ($item[nuclear stockpile].available_amount() > 0 && stockpile_uses_left > 0)
         {
             string [int] description;
             description.listAppend("Does not cost a turn.");
-            resource_entries.listAppend(ChecklistEntryMake("__item nuclear stockpile", "", ChecklistSubentryMake(pluralise(stockpile_uses_left, "nuclear stockpile instakill", "nuclear stockpile instakills"), "", description), 3));
+            resource_entries.listAppend(ChecklistEntryMake(382, "__item nuclear stockpile", "", ChecklistSubentryMake(pluralise(stockpile_uses_left, "nuclear stockpile instakill", "nuclear stockpile instakills"), "", description), 3));
         }
     }
 }

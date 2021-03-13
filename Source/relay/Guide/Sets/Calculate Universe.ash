@@ -140,5 +140,5 @@ void SCalculateUniverseGenerateResource(ChecklistEntry [int] resource_entries)
     string title = "Calculate the Universe";
     if (uses_remaining > 1)
         title = pluralise(uses_remaining, "Calculate the Universe", "Calculate the Universes");
-    resource_entries.listAppend(ChecklistEntryMake("__skill Calculate the Universe", "skillz.php", ChecklistSubentryMake(title, "", description), 0));
+    resource_entries.listAppend(ChecklistEntryMake(233, "__skill Calculate the Universe", "skillz.php", ChecklistSubentryMake(title, "", description), 0));
 }

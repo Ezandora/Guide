@@ -94,7 +94,7 @@ ChecklistEntry QSleazeAirportGenerateQuestFramework(ChecklistEntry [int] task_en
     }
     
     
-    ChecklistEntry output_entry = ChecklistEntryMake(state.image_name, url, subentry, locationToLocationMap(target_location));
+    ChecklistEntry output_entry = ChecklistEntryMake(37, state.image_name, url, subentry, locationToLocationMap(target_location));
     
     task_entries.listAppend(output_entry);
     
@@ -305,7 +305,7 @@ void QSleazeAirportGenerate(ChecklistCollection checklists)
                 description.listAppend("Possibly acquire fishy effect first.");
             if ($item[clara's bell].available_amount() > 0 && !get_property_boolean("_claraBellUsed"))
                 description.listAppend("Use clara's bell to instantly acquire. Won't need fishy.");
-            ChecklistEntry entry = ChecklistEntryMake("__item ultimate mind destroyer", $location[The Sunken Party Yacht].getClickableURLForLocation(), ChecklistSubentryMake("Ultimate Mind Destroyer collectable", "free runs", description), $locations[The Sunken Party Yacht]);
+            ChecklistEntry entry = ChecklistEntryMake(38, "__item ultimate mind destroyer", $location[The Sunken Party Yacht].getClickableURLForLocation(), ChecklistSubentryMake("Ultimate Mind Destroyer collectable", "free runs", description), $locations[The Sunken Party Yacht]);
             entry.importance_level = 8;
             checklists.add(C_AFTERCORE_TASKS, entry);
         }
@@ -359,7 +359,7 @@ void QSpookyAirportJunglePunGenerateTasks(ChecklistEntry [int] task_entries)
         subentry.entries.listAppend("Return to the radio and reply.");
     }
     
-	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, $locations[The Deep Dark Jungle]));
+	task_entries.listAppend(ChecklistEntryMake(39, state.image_name, url, subentry, $locations[The Deep Dark Jungle]));
 }
 
 void QSpookyAirportFakeMediumGenerateTasks(ChecklistEntry [int] task_entries)
@@ -416,7 +416,7 @@ void QSpookyAirportFakeMediumGenerateTasks(ChecklistEntry [int] task_entries)
         subentry.entries.listAppend("Return to the radio and reply.");
     }
     
-	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, $locations[The Secret Government Laboratory]));
+	task_entries.listAppend(ChecklistEntryMake(40, state.image_name, url, subentry, $locations[The Secret Government Laboratory]));
 }
 
 
@@ -455,7 +455,7 @@ void QSpookyAirportClipperGenerateTasks(ChecklistEntry [int] task_entries)
         subentry.entries.listAppend("Return to the radio and reply.");
     }
     
-	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, $locations[The Mansion of Dr. Weirdeaux]));
+	task_entries.listAppend(ChecklistEntryMake(41, state.image_name, url, subentry, $locations[The Mansion of Dr. Weirdeaux]));
 }
 
 void QSpookyAirportEveGenerateTasks(ChecklistEntry [int] task_entries)
@@ -497,7 +497,7 @@ void QSpookyAirportEveGenerateTasks(ChecklistEntry [int] task_entries)
         url = "place.php?whichplace=airport_spooky&action=airport2_radio";
         subentry.entries.listAppend("Return to the radio and reply.");
     }
-	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, $locations[The Secret Government Laboratory]));
+	task_entries.listAppend(ChecklistEntryMake(42, state.image_name, url, subentry, $locations[The Secret Government Laboratory]));
 }
 
 
@@ -534,7 +534,7 @@ void QSpookyAirportSmokesGenerateTasks(ChecklistEntry [int] task_entries)
         url = "place.php?whichplace=airport_spooky&action=airport2_radio";
         subentry.entries.listAppend("Return to the radio and reply.");
     }
-	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, $locations[The Deep Dark Jungle]));
+	task_entries.listAppend(ChecklistEntryMake(43, state.image_name, url, subentry, $locations[The Deep Dark Jungle]));
 }
 
 
@@ -584,7 +584,7 @@ void QSpookyAirportGoreGenerateTasks(ChecklistEntry [int] task_entries)
         url = "place.php?whichplace=airport_spooky&action=airport2_radio";
         subentry.entries.listAppend("Return to the radio and reply.");
     }
-	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, $locations[The Secret Government Laboratory]));
+	task_entries.listAppend(ChecklistEntryMake(44, state.image_name, url, subentry, $locations[The Secret Government Laboratory]));
 }
 
 
@@ -631,7 +631,7 @@ void QSpookyAirportOutOfOrderGenerateTasks(ChecklistEntry [int] task_entries)
         subentry.entries.listAppend("Return to the radio and reply.");
     }
     
-	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, $locations[The Deep Dark Jungle]));
+	task_entries.listAppend(ChecklistEntryMake(45, state.image_name, url, subentry, $locations[The Deep Dark Jungle]));
 }
 
 
@@ -674,7 +674,7 @@ void QSpookyAirportSerumGenerateTasks(ChecklistEntry [int] task_entries)
         subentry.entries.listAppend("Return to the radio and reply.");
     }
     
-	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, $locations[The Mansion of Dr. Weirdeaux]));
+	task_entries.listAppend(ChecklistEntryMake(46, state.image_name, url, subentry, $locations[The Mansion of Dr. Weirdeaux]));
 }
 
 void QSpookyAirportWeirdeauxGenerateTasks(ChecklistEntry [int] task_entries)
@@ -784,7 +784,7 @@ void QSpookyAirportWeirdeauxGenerateTasks(ChecklistEntry [int] task_entries)
     
     //description.listAppend("Or use " + pluralise(clampi(256 - my_level(), 0, 256), "ultimate wad", "ultimate wads") + "."); //reasonable
     
-	task_entries.listAppend(ChecklistEntryMake("__effect Incredibly Hulking", url, ChecklistSubentryMake("Gain " + pluralise(clampi(256 - my_level(), 0, 256), "level", "levels"), modifiers, description), $locations[The Mansion of Dr. Weirdeaux]));
+	task_entries.listAppend(ChecklistEntryMake(47, "__effect Incredibly Hulking", url, ChecklistSubentryMake("Gain " + pluralise(clampi(256 - my_level(), 0, 256), "level", "levels"), modifiers, description), $locations[The Mansion of Dr. Weirdeaux]));
 }
 
 void QSpookyAirportGenerateTasks(ChecklistEntry [int] task_entries)
@@ -850,7 +850,7 @@ void QStenchAirportFishTrashGenerateTasks(ChecklistEntry [int] task_entries)
         url = "place.php?whichplace=airport_stench&action=airport3_kiosk";
     }
         
-	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, $locations[pirates of the garbage barges]));
+	task_entries.listAppend(ChecklistEntryMake(48, state.image_name, url, subentry, $locations[pirates of the garbage barges]));
 }
 
 void QStenchAirportNastyBearsGenerateTasks(ChecklistEntry [int] task_entries)
@@ -884,7 +884,7 @@ void QStenchAirportNastyBearsGenerateTasks(ChecklistEntry [int] task_entries)
         url = "place.php?whichplace=airport_stench&action=airport3_kiosk";
     }
     
-	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, $locations[Uncle Gator's Country Fun-Time Liquid Waste Sluice]));
+	task_entries.listAppend(ChecklistEntryMake(49, state.image_name, url, subentry, $locations[Uncle Gator's Country Fun-Time Liquid Waste Sluice]));
 }
 
 void QStenchAirportSocialJusticeIGenerateTasks(ChecklistEntry [int] task_entries)
@@ -915,7 +915,7 @@ void QStenchAirportSocialJusticeIGenerateTasks(ChecklistEntry [int] task_entries
         url = "place.php?whichplace=airport_stench&action=airport3_kiosk";
     }
     
-	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, $locations[Pirates of the Garbage Barges]));
+	task_entries.listAppend(ChecklistEntryMake(50, state.image_name, url, subentry, $locations[Pirates of the Garbage Barges]));
 }
 
 void QStenchAirportSocialJusticeIIGenerateTasks(ChecklistEntry [int] task_entries)
@@ -946,7 +946,7 @@ void QStenchAirportSocialJusticeIIGenerateTasks(ChecklistEntry [int] task_entrie
         url = "place.php?whichplace=airport_stench&action=airport3_kiosk";
     }
     
-	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, $locations[Uncle Gator's Country Fun-Time Liquid Waste Sluice]));
+	task_entries.listAppend(ChecklistEntryMake(51, state.image_name, url, subentry, $locations[Uncle Gator's Country Fun-Time Liquid Waste Sluice]));
 }
 
 void QStenchAirportSuperLuberGenerateTasks(ChecklistEntry [int] task_entries)
@@ -997,7 +997,7 @@ void QStenchAirportSuperLuberGenerateTasks(ChecklistEntry [int] task_entries)
         url = "place.php?whichplace=airport_stench&action=airport3_kiosk";
     }
         
-	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, $locations[barf mountain]));
+	task_entries.listAppend(ChecklistEntryMake(52, state.image_name, url, subentry, $locations[barf mountain]));
 }
 
 void QStenchAirportZippityDooDahGenerateTasks(ChecklistEntry [int] task_entries)
@@ -1045,7 +1045,7 @@ void QStenchAirportZippityDooDahGenerateTasks(ChecklistEntry [int] task_entries)
         url = "place.php?whichplace=airport_stench&action=airport3_kiosk";
     }
         
-	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, $locations[the toxic teacups]));
+	task_entries.listAppend(ChecklistEntryMake(53, state.image_name, url, subentry, $locations[the toxic teacups]));
 }
 
 void QStenchAirportWillWorkForFoodGenerateTasks(ChecklistEntry [int] task_entries)
@@ -1083,7 +1083,7 @@ void QStenchAirportWillWorkForFoodGenerateTasks(ChecklistEntry [int] task_entrie
         url = "place.php?whichplace=airport_stench&action=airport3_kiosk";
     }
         
-	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, $locations[barf mountain]));
+	task_entries.listAppend(ChecklistEntryMake(54, state.image_name, url, subentry, $locations[barf mountain]));
 }
 
 void QStenchAirportGiveMeFuelGenerateTasks(ChecklistEntry [int] task_entries)
@@ -1130,7 +1130,7 @@ void QStenchAirportGiveMeFuelGenerateTasks(ChecklistEntry [int] task_entries)
         }
     }
     
-	task_entries.listAppend(ChecklistEntryMake(state.image_name, url, subentry, $locations[the toxic teacups]));
+	task_entries.listAppend(ChecklistEntryMake(55, state.image_name, url, subentry, $locations[the toxic teacups]));
 }
 
 void QStenchAirportGarbageGenerateTasks(ChecklistEntry [int] task_entries)
@@ -1140,7 +1140,7 @@ void QStenchAirportGarbageGenerateTasks(ChecklistEntry [int] task_entries)
     ChecklistSubentry subentry;
     /*subentry.header = "Turn in garbage";
     subentry.entries.listAppend("Maintenance Tunnels Access" + __html_right_arrow_character + "Waste Disposal.");
-    task_entries.listAppend(ChecklistEntryMake("__item bag of park garbage", "place.php?whichplace=airport_stench&action=airport3_tunnels", subentry));*/
+    task_entries.listAppend(ChecklistEntryMake(56, "__item bag of park garbage", "place.php?whichplace=airport_stench&action=airport3_tunnels", subentry));*/
     if ($item[bag of park garbage].item_amount() > 0)
     {
     }
@@ -1223,7 +1223,7 @@ void QStenchAirportWartDinseyGenerateTasks(ChecklistEntry [int] task_entries)
     }
     description.listAppend("Will acquire a " + dinsey_item + ".");
     
-	task_entries.listAppend(ChecklistEntryMake("__item " + dinsey_item, url, ChecklistSubentryMake("Defeat Wart Dinsey", modifiers, description)));
+	task_entries.listAppend(ChecklistEntryMake(57, "__item " + dinsey_item, url, ChecklistSubentryMake("Defeat Wart Dinsey", modifiers, description)));
 }
 
 void QStenchAirportGenerateTasks(ChecklistEntry [int] task_entries)
@@ -1404,7 +1404,7 @@ void QHotAirportLavaCoLampGenerateTasks(ChecklistEntry [int] task_entries)
     }
     
     
-	task_entries.listAppend(ChecklistEntryMake("__item " + missing_lamps[0], url, ChecklistSubentryMake("Make a " + colours_missing.listJoinComponents(", ", "and") + " LavaCo Lamp&trade;", modifiers, description), $locations[LavaCo&trade; Lamp Factory]));
+	task_entries.listAppend(ChecklistEntryMake(58, "__item " + missing_lamps[0], url, ChecklistSubentryMake("Make a " + colours_missing.listJoinComponents(", ", "and") + " LavaCo Lamp&trade;", modifiers, description), $locations[LavaCo&trade; Lamp Factory]));
 }
 
 void QHotAirportGenerateTasks(ChecklistEntry [int] task_entries)
@@ -1510,7 +1510,7 @@ void QHotAirportGenerate(ChecklistCollection checklists)
         
         //fancy tophat, insane tophat, brown felt tophat, isotophat, tiny top hat and cane
         if (potential_disco_style_level > 0)
-            checklists.add(C_RESOURCES, ChecklistEntryMake("__item disco ball", url, ChecklistSubentryMake("One elevator ride", "", description), 5));
+            checklists.add(C_RESOURCES, ChecklistEntryMake(59, "__item disco ball", url, ChecklistSubentryMake("One elevator ride", "", description), 5));
     }
 }
 
@@ -1626,7 +1626,7 @@ void QColdAirportGenerateTasks(ChecklistEntry [int] task_entries)
             
             description.listAppend(progress + "% done collecting " + desired_walford_item + ".");
         }
-        task_entries.listAppend(ChecklistEntryMake("__item Walford's bucket", url, ChecklistSubentryMake(title, modifiers, description), $locations[The Ice Hotel,VYKEA,The Ice Hole]));
+        task_entries.listAppend(ChecklistEntryMake(60, "__item Walford's bucket", url, ChecklistSubentryMake(title, modifiers, description), $locations[The Ice Hotel,VYKEA,The Ice Hole]));
     }
 }
 

@@ -2,9 +2,10 @@
 RegisterGenerationFunction("IOTMSpinmasterLatheGenerate");
 void IOTMSpinmasterLatheGenerate(ChecklistCollection checklists)
 {
-	if (!get_property_boolean("_spinmasterLatheVisited") && lookupItem("SpinMaster&trade; lathe").have())
+	if (!lookupItem("SpinMaster&trade; lathe").have()) return;
+	if (!get_property_boolean("_spinmasterLatheVisited"))
 	{
-        checklists.add(C_OPTIONAL_TASKS, ChecklistEntryMake("__item SpinMaster&trade; lathe", "inventory.php?which=3&ftext=SpinMaster&amp;trade;+lathe", ChecklistSubentryMake("Collect SpinMaster&trade; hardwood", "", "Use your SpinMaster&trade; lathe."), 1));
+        checklists.add(C_OPTIONAL_TASKS, ChecklistEntryMake(542, "__item SpinMaster&trade; lathe", "inventory.php?which=3&ftext=SpinMaster&amp;trade;+lathe", ChecklistSubentryMake("Collect SpinMaster&trade; hardwood", "", "Use your SpinMaster&trade; lathe."), 1));
 	}
 	
 	item hardwood = lookupItem("flimsy hardwood scraps");
@@ -101,7 +102,7 @@ void IOTMSpinmasterLatheGenerate(ChecklistCollection checklists)
         }
         if (description.count() > 0)
         {
-        	checklists.add(C_RESOURCES, ChecklistEntryMake("__item " + hardwood, "shop.php?whichshop=lathe", ChecklistSubentryMake(pluralise(hardwood), "", description), 5));
+        	checklists.add(C_RESOURCES, ChecklistEntryMake(543, "__item " + hardwood, "shop.php?whichshop=lathe", ChecklistSubentryMake(pluralise(hardwood), "", description), 5));
         }
 	}
 }

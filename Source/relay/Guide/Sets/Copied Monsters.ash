@@ -271,7 +271,7 @@ void generateCopiedMonstersEntry(ChecklistEntry [int] task_entries, ChecklistEnt
 		int importance = 4;
 		if (very_important)
 			importance = -11;
-		ChecklistEntry entry = ChecklistEntryMake(__misc_state_string["obtuse angel name"], url, ChecklistSubentryMake(title, "", description), importance);
+		ChecklistEntry entry = ChecklistEntryMake(255, __misc_state_string["obtuse angel name"], url, ChecklistSubentryMake(title, "", description), importance);
 		if (very_important)
 			task_entries.listAppend(entry);
 		else
@@ -310,7 +310,7 @@ void SCopiedMonstersGenerateResourceForCopyType(ChecklistEntry [int] resource_en
         url = "place.php?whichplace=chateau";
     }
 	
-	resource_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(shaking_shorthand_name.capitaliseFirstLetter() + " monster trapped!", "", line)));
+	resource_entries.listAppend(ChecklistEntryMake(256, image_name, url, ChecklistSubentryMake(shaking_shorthand_name.capitaliseFirstLetter() + " monster trapped!", "", line)));
 }
 
 void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
@@ -350,7 +350,7 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
         //if (__misc_state["bookshelf accessible"] && $skill[summon brickos].skill_is_usable())
             //potential_copies.listAppend("Bricko bats...?");
     }
-    ChecklistEntry copy_source_entry = ChecklistEntryMake();
+    ChecklistEntry copy_source_entry = ChecklistEntryMake(257);
     
     if (__misc_state["Chateau Mantegna available"] && !get_property_boolean("_chateauMonsterFought"))
     {
@@ -397,7 +397,7 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
                 line += "|*" + monster_description.listJoinComponents("|*");
             description.listPrepend(line);
         }
-		//resource_entries.listAppend(ChecklistEntryMake("__item fancy oil painting", url, ChecklistSubentryMake(header, "", description)));
+		//resource_entries.listAppend(ChecklistEntryMake(258, "__item fancy oil painting", url, ChecklistSubentryMake(header, "", description)));
         
         
         copy_source_entry.subentries.listAppend(ChecklistSubentryMake(header, "", description));
@@ -420,7 +420,7 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
 		name = pluralise(copies_left, copy_sources + " copy", copy_sources + " copies") + " left";
 		string [int] description;// = potential_copies;
         
-		//resource_entries.listAppend(ChecklistEntryMake(copy_source_list[0], "", ChecklistSubentryMake(name, "", description)));
+		//resource_entries.listAppend(ChecklistEntryMake(259, copy_source_list[0], "", ChecklistSubentryMake(name, "", description)));
         
         copy_source_entry.subentries.listAppend(ChecklistSubentryMake(name, "", description));
         if (copy_source_entry.image_lookup_name == "")
@@ -429,7 +429,7 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
     
     if (!get_property_boolean("_cameraUsed") && $item[4-d camera].available_amount() > 0)
     {
-		//resource_entries.listAppend(ChecklistEntryMake("__item 4-d camera", "", ChecklistSubentryMake("4-d camera copy available", "", potential_copies)));
+		//resource_entries.listAppend(ChecklistEntryMake(260, "__item 4-d camera", "", ChecklistSubentryMake("4-d camera copy available", "", potential_copies)));
         
         copy_source_entry.subentries.listAppend(ChecklistSubentryMake("4-d camera copy available", "", ""));
         if (copy_source_entry.image_lookup_name == "")
@@ -437,7 +437,7 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
     }
     if (!get_property_boolean("_iceSculptureUsed") && $item[unfinished ice sculpture].available_amount() > 0)
     {
-		//resource_entries.listAppend(ChecklistEntryMake("__item unfinished ice sculpture", "", ChecklistSubentryMake("Ice sculpture copy available", "", potential_copies)));
+		//resource_entries.listAppend(ChecklistEntryMake(261, "__item unfinished ice sculpture", "", ChecklistSubentryMake("Ice sculpture copy available", "", potential_copies)));
         
         copy_source_entry.subentries.listAppend(ChecklistSubentryMake("Ice sculpture copy available", "", ""));
         if (copy_source_entry.image_lookup_name == "")
@@ -445,7 +445,7 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
     }
     if ($item[sticky clay homunculus].available_amount() > 0)
     {
-		//resource_entries.listAppend(ChecklistEntryMake("__item sticky clay homunculus", "", ChecklistSubentryMake(pluralise($item[sticky clay homunculus].available_amount(), "sticky clay copy", "sticky clay copies") + " available", "", "Unlimited/day.")));
+		//resource_entries.listAppend(ChecklistEntryMake(262, "__item sticky clay homunculus", "", ChecklistSubentryMake(pluralise($item[sticky clay homunculus].available_amount(), "sticky clay copy", "sticky clay copies") + " available", "", "Unlimited/day.")));
         
         copy_source_entry.subentries.listAppend(ChecklistSubentryMake(pluralise($item[sticky clay homunculus].available_amount(), "sticky clay copy", "sticky clay copies") + " available", "", "Unlimited/day."));
         if (copy_source_entry.image_lookup_name == "")
@@ -467,7 +467,7 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
     {
         string [int] description;// = listCopy(potential_copies);
         description.listPrepend("50% success rate");
-		//resource_entries.listAppend(ChecklistEntryMake("__item crappy camera", "", ChecklistSubentryMake("Crappy camera copy available", "", description)));
+		//resource_entries.listAppend(ChecklistEntryMake(263, "__item crappy camera", "", ChecklistSubentryMake("Crappy camera copy available", "", description)));
         
         
         copy_source_entry.subentries.listAppend(ChecklistSubentryMake("Crappy camera copy available", "", description));

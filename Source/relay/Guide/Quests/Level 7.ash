@@ -74,7 +74,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		return;
 	QuestState base_quest_state = __quest_state["Level 7"];
 	
-	ChecklistEntry entry = ChecklistEntryMake();
+	ChecklistEntry entry = ChecklistEntryMake(72);
 	entry.url = "crypt.php";
 	entry.image_lookup_name = base_quest_state.image_name;
 	entry.should_indent_after_first_subentry = true;

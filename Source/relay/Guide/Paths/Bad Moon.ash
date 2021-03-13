@@ -186,7 +186,7 @@ void PathBadMoonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         description.listAppend("For a black cat run. So cute!");
         description.listAppend("Adventure in the noob cave " + HTMLGenerateSpanFont("once", "red") + ".");
         description.listAppend(HTMLGenerateSpanFont("Will cost 14 drunkenness.", "red"));
-        optional_task_entries.listAppend(ChecklistEntryMake("__familiar black cat", "", ChecklistSubentryMake("Possibly adopt a black kitten", "", description)));
+        optional_task_entries.listAppend(ChecklistEntryMake(162, "__familiar black cat", "", ChecklistSubentryMake("Possibly adopt a black kitten", "", description)));
     }
     
     //Finding familiars - +item, +meat, +stats
@@ -254,7 +254,7 @@ void PathBadMoonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
                 tasks.listAppend("use blood-faced volleyball");
             }
             description.listAppend(tasks.listJoinComponents(", ").capitaliseFirstLetter() + ".");
-            optional_task_entries.listAppend(ChecklistEntryMake("__familiar blood-faced volleyball", url, ChecklistSubentryMake("Adopt a blood-faced volleyball", "", description)));
+            optional_task_entries.listAppend(ChecklistEntryMake(163, "__familiar blood-faced volleyball", url, ChecklistSubentryMake("Adopt a blood-faced volleyball", "", description)));
         }
         if (!$familiar[Leprechaun].have_familiar())
         {
@@ -271,7 +271,7 @@ void PathBadMoonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
                 url = $location[a barroom brawl].getClickableURLForLocation();
             }
             if (description.count() > 0)
-                optional_task_entries.listAppend(ChecklistEntryMake("__familiar Leprechaun", url, ChecklistSubentryMake("Adopt a leprechaun", "", description), $locations[a barroom brawl]));
+                optional_task_entries.listAppend(ChecklistEntryMake(164, "__familiar Leprechaun", url, ChecklistSubentryMake("Adopt a leprechaun", "", description), $locations[a barroom brawl]));
         }
         if (!$familiar[baby gravy fairy].have_familiar())
         {
@@ -308,7 +308,7 @@ void PathBadMoonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
                     modifiers.listAppend("-combat");
             }
             
-            optional_task_entries.listAppend(ChecklistEntryMake("__familiar baby gravy fairy", url, ChecklistSubentryMake("Adopt a baby gravy fairy", modifiers, description)));
+            optional_task_entries.listAppend(ChecklistEntryMake(165, "__familiar baby gravy fairy", url, ChecklistSubentryMake("Adopt a baby gravy fairy", modifiers, description)));
         }
         if (!$familiar[cocoabo].have_familiar() && $item[cocoa egg].available_amount() + $item[cocoa egg].creatable_amount() > 0)
         {
@@ -325,7 +325,7 @@ void PathBadMoonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
                 description.listAppend("Use a cocoa egg.");
                 //url = "inventory.php?which=3";
             }
-            optional_task_entries.listAppend(ChecklistEntryMake("__familiar cocoabo", url, ChecklistSubentryMake("Adopt a cocoabo", "", description)));
+            optional_task_entries.listAppend(ChecklistEntryMake(166, "__familiar cocoabo", url, ChecklistSubentryMake("Adopt a cocoabo", "", description)));
             
         }
     }
@@ -344,7 +344,7 @@ void PathBadMoonGenerateResource(ChecklistEntry [int] resource_entries)
         description.listAppend("Rubdown: +25% muscle, +5 DR, +10 damage.");
         description.listAppend("Mind: +25% mysticality, +10-15 mp regen, +15 spell damage.");
         description.listAppend("Colonge: +20% items, +25% moxie, +40% meat.");
-		resource_entries.listAppend(ChecklistEntryMake("__effect Hella Smooth", "heydeze.php?place=styx", ChecklistSubentryMake("Styx pixie buff", "", description), 10));
+		resource_entries.listAppend(ChecklistEntryMake(167, "__effect Hella Smooth", "heydeze.php?place=styx", ChecklistSubentryMake("Styx pixie buff", "", description), 10));
     }
     
     if ($item[ghost key].available_amount() > 0 && __misc_state["in run"])
@@ -367,7 +367,7 @@ void PathBadMoonGenerateResource(ChecklistEntry [int] resource_entries)
             description.listAppend("? mainstat from a " + target_nightstand + " nightstand."); //wiki says 200, but I saw 87 at level nine in bad moon
         }
         description.listAppend("1000 meat from a mahogany nightstand.");
-		resource_entries.listAppend(ChecklistEntryMake("__item ghost key", url, ChecklistSubentryMake(pluralise($item[ghost key]), "", description), 10));
+		resource_entries.listAppend(ChecklistEntryMake(168, "__item ghost key", url, ChecklistSubentryMake(pluralise($item[ghost key]), "", description), 10));
         
     }
 }
@@ -456,7 +456,7 @@ void PathBadMoonGenerateCategoryChecklistEntry(BadMoonAdventure [string][int] ad
     if (description_active.count() + description.count() > 0)
     {
         description.listAppend(HTMLGenerateSimpleTableLines(description_active));
-        bad_moon_adventures_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(header, "", description), relevant_locations));
+        bad_moon_adventures_entries.listAppend(ChecklistEntryMake(169, image_name, url, ChecklistSubentryMake(header, "", description), relevant_locations));
     }
 }
 
@@ -527,7 +527,7 @@ void PathBadMoonGenerateChecklists(ChecklistCollection checklist_collection)
         else
             description.listAppend("Farm spices (for spicy burritos) while you're there: " + listMake("Brave the dark thicket", "Follow the even darker path", "Take the scorched path", "Investigate the moist crater").listJoinComponents(__html_right_arrow_character));
         
-        bad_moon_adventures_entries.listAppend(ChecklistEntryMake("__item &quot;Humorous&quot; T-shirt", $location[the spooky forest].getClickableURLForLocation(), ChecklistSubentryMake("Torso Awareness", "", description), $locations[the spooky forest]));
+        bad_moon_adventures_entries.listAppend(ChecklistEntryMake(170, "__item &quot;Humorous&quot; T-shirt", $location[the spooky forest].getClickableURLForLocation(), ChecklistSubentryMake("Torso Awareness", "", description), $locations[the spooky forest]));
     }
     
     /*

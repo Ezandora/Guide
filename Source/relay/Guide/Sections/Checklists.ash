@@ -9,7 +9,7 @@ void generateMisc(Checklist [int] checklists)
 		string [int] king_messages;
 		king_messages.listAppend("You know, whenever.");
 		king_messages.listAppend("Or become the new naughty sorceress?");
-		unimportant_task_entries.listAppend(ChecklistEntryMake("king imprismed", "place.php?whichplace=nstower", ChecklistSubentryMake("Free the King", "", king_messages)));
+		unimportant_task_entries.listAppend(ChecklistEntryMake(101, "king imprismed", "place.php?whichplace=nstower", ChecklistSubentryMake("Free the King", "", king_messages)));
 		
 		checklists.listAppend(ChecklistMake("Unimportant Tasks", unimportant_task_entries));
 	}
@@ -134,13 +134,13 @@ void generateMisc(Checklist [int] checklists)
         }
         //FIXME resolution be more adventurous goes here
         
-		task_entries.entries.listAppend(ChecklistEntryMake("__item counterclockwise watch", url, ChecklistSubentryMake("Wait for rollover", "", description), -11));
+		task_entries.entries.listAppend(ChecklistEntryMake(102, "__item counterclockwise watch", url, ChecklistSubentryMake("Wait for rollover", "", description), -11));
         if (stills_available() > 0 && __misc_state["in run"])
         {
             string url = "shop.php?whichshop=still";
             if ($item[soda water].available_amount() == 0)
                 url = "shop.php?whichshop=generalstore";
-            task_entries.entries.listAppend(ChecklistEntryMake("__item tonic water", url, ChecklistSubentryMake("Make " + pluralise(stills_available(), $item[tonic water]), "", listMake("Tonic water is a ~40MP restore, improved from soda water.", "Or improve drinks.")), -11));
+            task_entries.entries.listAppend(ChecklistEntryMake(103, "__item tonic water", url, ChecklistSubentryMake("Make " + pluralise(stills_available(), $item[tonic water]), "", listMake("Tonic water is a ~40MP restore, improved from soda water.", "Or improve drinks.")), -11));
         }
 	}
 }
@@ -174,13 +174,13 @@ void generateChecklists(Checklist [int] ordered_output_checklists)
         
         string image_name;
         image_name = "disco bandit";
-		task_entries.entries.listAppend(ChecklistEntryMake(image_name, "", ChecklistSubentryMake("Log in", "+internet", "An Adventurer is You!"), -11));
+		task_entries.entries.listAppend(ChecklistEntryMake(104, image_name, "", ChecklistSubentryMake("Log in", "+internet", "An Adventurer is You!"), -11));
     }
     else if (__misc_state["In valhalla"])
     {
         //Valhalla:
 		Checklist task_entries = lookupChecklist(checklists, "Tasks");
-        task_entries.entries.listAppend(ChecklistEntryMake("astral spirit", "", ChecklistSubentryMake("Start a new life", "", listMake("Perm skills.", "Buy consumables.", "Bring along a pet."))));
+        task_entries.entries.listAppend(ChecklistEntryMake(105, "astral spirit", "", ChecklistSubentryMake("Start a new life", "", listMake("Perm skills.", "Buy consumables.", "Bring along a pet."))));
     }
     else
     {

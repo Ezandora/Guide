@@ -34,7 +34,7 @@ void IOTMIntergnatGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                 title = "Possibly run Intergnat for demon summon";
             }
             //Don't use the intergnat icon, because animation is distracting:
-            optional_task_entries.listAppend(ChecklistEntryMake("__item thin black candle", url, ChecklistSubentryMake(title, "", description)));
+            optional_task_entries.listAppend(ChecklistEntryMake(505, "__item thin black candle", url, ChecklistSubentryMake(title, "", description)));
         }
     }
 }
@@ -45,11 +45,11 @@ void IOTMIntergnatGenerateResource(ChecklistEntry [int] resource_entries)
     if ($item[infinite BACON machine].available_amount() > 0 && !get_property_boolean("_baconMachineUsed"))
     {
         //suggest using it:
-        resource_entries.listAppend(ChecklistEntryMake("__item infinite BACON machine", "inventory.php?which=3", ChecklistSubentryMake("Infinite BACON machine", "", "100 BACON/day."), 7));
+        resource_entries.listAppend(ChecklistEntryMake(506, "__item infinite BACON machine", "inventory.php?which=3", ChecklistSubentryMake("Infinite BACON machine", "", "100 BACON/day."), 7));
     }
     if ($item[daily dungeon malware].available_amount() > 0 && __misc_state_int["fat loot tokens needed"] > 0)
     {
-        resource_entries.listAppend(ChecklistEntryMake("__item daily dungeon malware", "da.php", ChecklistSubentryMake("Daily dungeon malware", "", "Use on a daily dungeon monster to gain a fat loot token."), 7));
+        resource_entries.listAppend(ChecklistEntryMake(507, "__item daily dungeon malware", "da.php", ChecklistSubentryMake("Daily dungeon malware", "", "Use on a daily dungeon monster to gain a fat loot token."), 7));
     }
     int bacon_amount = $item[BACON].available_amount();
     if (__misc_state["in run"] && bacon_amount > 0 && in_ronin())
@@ -96,7 +96,7 @@ void IOTMIntergnatGenerateResource(ChecklistEntry [int] resource_entries)
                 string [int] description;
                 description.listAppend(HTMLGenerateSimpleTableLines(table));
                 
-                resource_entries.listAppend(ChecklistEntryMake("__item BACON", "shop.php?whichshop=bacon", ChecklistSubentryMake(pluralise($item[BACON]), "", description), 7));
+                resource_entries.listAppend(ChecklistEntryMake(508, "__item BACON", "shop.php?whichshop=bacon", ChecklistSubentryMake(pluralise($item[BACON]), "", description), 7));
             }
         }
     }

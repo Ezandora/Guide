@@ -25,11 +25,11 @@ void IOTMZutaraGenerate(ChecklistCollection checklists)
             if (my_path_id() != PATH_G_LOVER)
 	            description.listAppend(HTMLGenerateSpanOfClass("Shifty:", "r_bold") + " +5 moxie stats/fight, +100% moxie, +50% init.");
         }
-        checklists.add(C_RESOURCES, ChecklistEntryMake("__item genie's turbane", "clan_viplounge.php?preaction=lovetester", ChecklistSubentryMake("Fortune buff (100 turns)", "", description), 8).ChecklistEntryTag("zutara").ChecklistEntrySetCategory("buff").ChecklistEntrySetShortDescription("blank"));
+        checklists.add(C_RESOURCES, ChecklistEntryMake(587, "__item genie's turbane", "clan_viplounge.php?preaction=lovetester", ChecklistSubentryMake("Fortune buff (100 turns)", "", description), 8).ChecklistEntryTag("zutara").ChecklistEntrySetCategory("buff").ChecklistEntrySetShortDescription("blank"));
     }
     if (get_property_int("_clanFortuneConsultUses") < 3)
     {
         string [int] description;
-        checklists.add(C_RESOURCES, ChecklistEntryMake("__item genie's turbane", "clan_viplounge.php?preaction=lovetester", ChecklistSubentryMake(pluralise(3 - get_property_int("_clanFortuneConsultUses"), "fortune clan consult", "fortune clan consults"), "", description), 8).ChecklistEntryTag("zutara"));
+        checklists.add(C_RESOURCES, ChecklistEntryMake(588, "__item genie's turbane", "clan_viplounge.php?preaction=lovetester", ChecklistSubentryMake(pluralise(3 - get_property_int("_clanFortuneConsultUses"), "fortune clan consult", "fortune clan consults"), "", description), 8).ChecklistEntryTag("zutara"));
     }
 }

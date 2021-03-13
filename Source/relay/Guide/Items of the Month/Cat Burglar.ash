@@ -69,6 +69,6 @@ void IOTMCatBurglarGenerateResource(ChecklistEntry [int] resource_entries)
         if (options.count() > 0)
         	description.listAppend("Could steal:|*-" + options.listJoinComponents("|*-"));
           
-        resource_entries.listAppend(ChecklistEntryMake("__familiar Cat Burglar", url, ChecklistSubentryMake(pluralise(charges_left, "heist", "heists"), "", description), 1));      
+        resource_entries.listAppend(ChecklistEntryMake(477, "__familiar Cat Burglar", url, ChecklistSubentryMake(pluralise(charges_left, "heist", "heists"), "", description), 1));      
 	}
 }

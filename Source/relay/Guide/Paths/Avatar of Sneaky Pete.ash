@@ -7,7 +7,7 @@ void PathSneakyPeteGenerateResource(ChecklistEntry [int] resource_entries)
 		return;
     
     
-	ChecklistEntry entry = ChecklistEntryMake();
+	ChecklistEntry entry = ChecklistEntryMake(148);
 	entry.url = "";
 	entry.image_lookup_name = "";
     entry.importance_level = 1;
@@ -38,7 +38,7 @@ void PathSneakyPeteGenerateResource(ChecklistEntry [int] resource_entries)
         
         	ChecklistSubentry subentry = ChecklistSubentryMake(pluralise(free_peel_outs_available, "peel out", "peel outs"), "10 MP/cast", description);
             if (is_banish)
-            	resource_entries.listAppend(ChecklistEntryMake("__skill Easy Riding", "", subentry).ChecklistEntryTag("free banish"));
+            	resource_entries.listAppend(ChecklistEntryMake(149, "__skill Easy Riding", "", subentry).ChecklistEntryTag("free banish"));
             else
 	            entry.subentries.listAppend(subentry);
         }
@@ -222,7 +222,7 @@ void PathSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
             description.listAppendList(upgrades);
 
 
-            optional_task_entries.listAppend(ChecklistEntryMake("__skill Easy Riding", "main.php?action=motorcycle", ChecklistSubentryMake("Upgrade your bike", "", description), 11));
+            optional_task_entries.listAppend(ChecklistEntryMake(150, "__skill Easy Riding", "main.php?action=motorcycle", ChecklistSubentryMake("Upgrade your bike", "", description), 11));
             
         }
     }
@@ -260,7 +260,7 @@ void PathSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
                 
             //description.listAppend("Potential options:|*|*|*+|*");
             description.listAppend("Potential options:|*" + options.listJoinComponents("|*"));
-            optional_task_entries.listAppend(ChecklistEntryMake("__skill Check Mirror", "skills.php", ChecklistSubentryMake("Check mirror", "", description), 11));
+            optional_task_entries.listAppend(ChecklistEntryMake(151, "__skill Check Mirror", "skills.php", ChecklistSubentryMake("Check mirror", "", description), 11));
         }
     }
     int audience_max = 30;
@@ -269,9 +269,9 @@ void PathSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         audience_max = 50;
     }
     if ($skill[Throw Party].skill_is_usable() && my_audience() == audience_max && !get_property_boolean("_petePartyThrown"))
-        task_entries.listAppend(ChecklistEntryMake("__item party hat", "skills.php", ChecklistSubentryMake("Throw a party!", "", "Drinks."), -11));
+        task_entries.listAppend(ChecklistEntryMake(152, "__item party hat", "skills.php", ChecklistSubentryMake("Throw a party!", "", "Drinks."), -11));
     if ($skill[Incite Riot].skill_is_usable() && my_audience() == -audience_max && !get_property_boolean("_peteRiotIncited"))
-        task_entries.listAppend(ChecklistEntryMake("__item fire", "skills.php", ChecklistSubentryMake("Incite a riot", "", "Breaking the law, breaking the law."), -11));
+        task_entries.listAppend(ChecklistEntryMake(153, "__item fire", "skills.php", ChecklistSubentryMake("Incite a riot", "", "Breaking the law, breaking the law."), -11));
     
     //sneakyPetePoints first
     int skills_available = MIN(30, MIN(15, my_level()) + get_property_int("sneakyPetePoints"));
@@ -288,6 +288,6 @@ void PathSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
     {
         string [int] description;
         description.listAppend("At least " + pluraliseWordy(skills_available - skills_have, "skill", "skills") + " available.");
-        optional_task_entries.listAppend(ChecklistEntryMake("__skill Natural Dancer", "da.php?place=gate3", ChecklistSubentryMake("Buy Sneaky Pete skills", "", description), 11));
+        optional_task_entries.listAppend(ChecklistEntryMake(154, "__skill Natural Dancer", "da.php?place=gate3", ChecklistSubentryMake("Buy Sneaky Pete skills", "", description), 11));
     }
 }

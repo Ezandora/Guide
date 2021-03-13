@@ -492,10 +492,10 @@ string generateRandomMessage()
             random_messages.listAppend("look at that pale skin! he's been living in his brother's shadow too long"); break;
         case PATH_GREY_GOO:
             random_messages.listAppend("avatar of pet rock"); break;
+        case PATH_ROBOT:
+            random_messages.listAppend("weren't you already a robot? is this double robot?"); break;
         /*case PATH_CLASS_ACT_3:
-            random_messages.listAppend("buttons for the people"); break;
-        case PATH_AVATAR_OF_THE_NAUGHTY_SORCERESS:
-            random_messages.listAppend("go forth to your lair! have some tea"); break;*/
+            random_messages.listAppend("buttons for the people"); break;*/
     }
     
     if (in_ronin() && my_adventures() <= 3)

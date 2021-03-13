@@ -8,7 +8,7 @@ void IOTMXOSkeletonGenerateResource(ChecklistEntry [int] resource_entries)
 	
 	int hugs_remaining = clampi(11 - get_property_int("_xoHugsUsed"), 0, 11);
 	
-	ChecklistEntry entry = ChecklistEntryMake();
+	ChecklistEntry entry = ChecklistEntryMake(538);
 	entry.image_lookup_name = "__familiar xo skeleton";
 	entry.importance_level = 3;
 	if (my_familiar() != $familiar[XO Skeleton])
