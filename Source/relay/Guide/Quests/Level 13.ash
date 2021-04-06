@@ -1177,7 +1177,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                     }
                     else if ($item[hand turkey outline].is_unrestricted()) //FIXME test if we have an airport skill
                     {
-                        subentry.entries.listAppend("Cast saucegeyser three times, then an airport skill?");
+                        subentry.entries.listAppend("Cast saucegeyser three times, then an airport skill? (perm garbage nova)");
                     }
                 }
                 if (my_hp() < my_maxhp())
