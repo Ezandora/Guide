@@ -2,7 +2,7 @@
 
 since 20.6;
 //These settings are for development. Don't worry about editing them.
-string __version = "2.0.1";
+string __version = "2.0.2";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -18325,7 +18325,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                     }
                     else if ($item[hand turkey outline].is_unrestricted()) //FIXME test if we have an airport skill
                     {
-                        subentry.entries.listAppend("Cast saucegeyser three times, then an airport skill?");
+                        subentry.entries.listAppend("Cast saucegeyser three times, then an airport skill? (perm garbage nova)");
                     }
                 }
                 if (my_hp() < my_maxhp())
@@ -42092,7 +42092,7 @@ string [string] generateAPIResponse()
     else if (true)*/
     if (true)
     {
-        boolean [string] relevant_mafia_properties = $strings[merkinQuestPath,questF01Primordial,questF02Hyboria,questF03Future,questF04Elves,questF05Clancy,questG01Meatcar,questG02Whitecastle,questG03Ego,questG04Nemesis,questG05Dark,questG06Delivery,questI01Scapegoat,questI02Beat,questL02Larva,questL03Rat,questL04Bat,questL05Goblin,questL06Friar,questL07Cyrptic,questL08Trapper,questL09Topping,questL10Garbage,questL11MacGuffin,questL11Manor,questL11Palindome,questL11Pyramid,questL11Worship,questL12War,questL13Final,questM01Untinker,questM02Artist,questM03Bugbear,questM04Galaktic,questM05Toot,questM06Gourd,questM07Hammer,questM08Baker,questM09Rocks,questM10Azazel,questM11Postal,questM12Pirate,questM13Escape,questM14Bounty,questM15Lol,questS01OldGuy,questS02Monkees,sidequestArenaCompleted,sidequestFarmCompleted,sidequestJunkyardCompleted,sidequestLighthouseCompleted,sidequestNunsCompleted,sidequestOrchardCompleted,cyrptAlcoveEvilness,cyrptCrannyEvilness,cyrptNicheEvilness,cyrptNookEvilness,desertExploration,gnasirProgress,relayCounters,timesRested,currentEasyBountyItem,currentHardBountyItem,currentSpecialBountyItem,volcanoMaze1,_lastDailyDungeonRoom,seahorseName,chasmBridgeProgress,_aprilShower,lastAdventure,lastEncounter,_floristPlantsUsed,_fireStartingKitUsed,_psychoJarUsed,hiddenHospitalProgress,hiddenBowlingAlleyProgress,hiddenApartmentProgress,hiddenOfficeProgress,pyramidPosition,parasolUsed,_discoKnife,lastPlusSignUnlock,olfactedMonster,photocopyMonster,lastTempleUnlock,volcanoMaze1,blankOutUsed,peteMotorbikeCowling,peteMotorbikeGasTank,peteMotorbikeHeadlight,peteMotorbikeMuffler,peteMotorbikeSeat,peteMotorbikeTires,_petePeeledOut,_navelRunaways,_peteRiotIncited,_petePartyThrown,hiddenTavernUnlock,_dnaPotionsMade,_psychokineticHugUsed,dnaSyringe,_warbearGyrocopterUsed,questM20Necklace,questM21Dance,grimstoneMaskPath,cinderellaMinutesToMidnight,merkinVocabularyMastery,_pirateBellowUsed,questM21Dance,_defectiveTokenChecked,questG07Myst,questG08Moxie,questESpClipper,questESpGore,questESpJunglePun,questESpFakeMedium,questESlMushStash,questESlAudit,questESlBacteria,questESlCheeseburger,questESlCocktail,questESlSprinkles,questESlSalt,questESlFish,questESlDebt,_pickyTweezersUsed,_bittycar,questESpSerum,questESpOutOfOrder,_shrubDecorated,questESpEVE,questESpSmokes,questG09Muscle,_rapidPrototypingUsed,nsTowerDoorKeysUsed,_chateauDeskHarvested,lastGoofballBuy,nsChallenge1,nsChallenge2,nsContestants1,nsContestants2,nsContestants3,lastDesertUnlock,questM18Swamp,edPiece,warehouseProgress,questEStFishTrash,questEStNastyBears,questEStSocialJusticeI,questEStSocialJusticeII,questEStSuperLuber,questEStZippityDooDah,_summonAnnoyanceUsed,questEStWorkWithFood,questM24Doc,questEStGiveMeFuel,_mayoTankSoaked,_feastUsed,spelunkyNextNoncombat,spelunkySacrifices,spelunkyStatus,spelunkyUpgrades,spelunkyWinCount,_deckCardsDrawn,_glarkCableUses,_banderRunaways,questM25Armorer,pyramidBombUsed,_powerPillUses,nextAdventure,_barrelPrayer,questECoBucket,_machineTunnelsAdv,_snojoFreeFights,snojoSetting,_lastCombatStarted,batmanZone,batmanUpgrades,batmanTimeLeft,batmanStats,questLTTQuestByWire,questM26Oracle,sourceTerminalEducate1,sourceTerminalEducate2,sourceTerminalEnquiry,_sourceTerminalDigitizeUses,_sourceTerminalEnhanceUses,_sourceTerminalExtrudes,_detectiveCasesCompleted,_pottedTeaTreeUsed,lastIslandUnlock,falloutShelterChronoUsed,_timeSpinnerMinutesUsed,_lynyrdSnareUses,_noobSkillCount,_universeCalculated,_expertCornerCutterUsed,boomBoxSong,_questPartyFair,_questPartyFairQuest,_neverendingPartyFreeTurns,_latteRefillsUsed,_latteBanishUsed,_latteCopyUsed,_latteDrinkUsed,_kgbTranquilizerDartUses,banishedMonsters,lastLightsOutTurn,lastVoteMonsterTurn,_lastCombatStarted,_sausageFights,_saberMod,_saberForceMonster,_daycareRecruits,_daycareGymScavenges,_campAwayCloudBuffs,_campAwaySmileBuffs,moonTuned,zeppelinProtestors,questL11Ron,questL11Shen,questGuzzlr,_canSeekBirds,_birdOfTheDayMods,_pocketProfessorLectures,_thesisDelivered,crystalBallMonster,_feelLonelyUsed,_feelExcitementUsed,_feelPeacefulUsed,_feelEnvyUsed,_feelHatredUsed,_feelNostalgicUsed,_feelPrideUsed,_feelSuperiorUsed,_monstersMapped,mappingMonsters,retroCapeSuperhero,retroCapeWashingInstructions,shockingLickCharges,_pottedPowerPlant];
+        boolean [string] relevant_mafia_properties = $strings[merkinQuestPath,questF01Primordial,questF02Hyboria,questF03Future,questF04Elves,questF05Clancy,questG01Meatcar,questG02Whitecastle,questG03Ego,questG04Nemesis,questG05Dark,questG06Delivery,questI01Scapegoat,questI02Beat,questL02Larva,questL03Rat,questL04Bat,questL05Goblin,questL06Friar,questL07Cyrptic,questL08Trapper,questL09Topping,questL10Garbage,questL11MacGuffin,questL11Manor,questL11Palindome,questL11Pyramid,questL11Worship,questL12War,questL13Final,questM01Untinker,questM02Artist,questM03Bugbear,questM04Galaktic,questM05Toot,questM06Gourd,questM07Hammer,questM08Baker,questM09Rocks,questM10Azazel,questM11Postal,questM12Pirate,questM13Escape,questM14Bounty,questM15Lol,questS01OldGuy,questS02Monkees,sidequestArenaCompleted,sidequestFarmCompleted,sidequestJunkyardCompleted,sidequestLighthouseCompleted,sidequestNunsCompleted,sidequestOrchardCompleted,cyrptAlcoveEvilness,cyrptCrannyEvilness,cyrptNicheEvilness,cyrptNookEvilness,desertExploration,gnasirProgress,relayCounters,timesRested,currentEasyBountyItem,currentHardBountyItem,currentSpecialBountyItem,volcanoMaze1,_lastDailyDungeonRoom,seahorseName,chasmBridgeProgress,_aprilShower,lastAdventure,lastEncounter,_floristPlantsUsed,_fireStartingKitUsed,_psychoJarUsed,hiddenHospitalProgress,hiddenBowlingAlleyProgress,hiddenApartmentProgress,hiddenOfficeProgress,pyramidPosition,parasolUsed,_discoKnife,lastPlusSignUnlock,olfactedMonster,photocopyMonster,lastTempleUnlock,volcanoMaze1,blankOutUsed,peteMotorbikeCowling,peteMotorbikeGasTank,peteMotorbikeHeadlight,peteMotorbikeMuffler,peteMotorbikeSeat,peteMotorbikeTires,_petePeeledOut,_navelRunaways,_peteRiotIncited,_petePartyThrown,hiddenTavernUnlock,_dnaPotionsMade,_psychokineticHugUsed,dnaSyringe,_warbearGyrocopterUsed,questM20Necklace,questM21Dance,grimstoneMaskPath,cinderellaMinutesToMidnight,merkinVocabularyMastery,_pirateBellowUsed,questM21Dance,_defectiveTokenChecked,questG07Myst,questG08Moxie,questESpClipper,questESpGore,questESpJunglePun,questESpFakeMedium,questESlMushStash,questESlAudit,questESlBacteria,questESlCheeseburger,questESlCocktail,questESlSprinkles,questESlSalt,questESlFish,questESlDebt,_pickyTweezersUsed,_bittycar,questESpSerum,questESpOutOfOrder,_shrubDecorated,questESpEVE,questESpSmokes,questG09Muscle,_rapidPrototypingUsed,nsTowerDoorKeysUsed,_chateauDeskHarvested,lastGoofballBuy,nsChallenge1,nsChallenge2,nsContestants1,nsContestants2,nsContestants3,lastDesertUnlock,questM18Swamp,edPiece,warehouseProgress,questEStFishTrash,questEStNastyBears,questEStSocialJusticeI,questEStSocialJusticeII,questEStSuperLuber,questEStZippityDooDah,_summonAnnoyanceUsed,questEStWorkWithFood,questM24Doc,questEStGiveMeFuel,_mayoTankSoaked,_feastUsed,spelunkyNextNoncombat,spelunkySacrifices,spelunkyStatus,spelunkyUpgrades,spelunkyWinCount,_deckCardsDrawn,_glarkCableUses,_banderRunaways,questM25Armorer,pyramidBombUsed,_powerPillUses,nextAdventure,_barrelPrayer,questECoBucket,_machineTunnelsAdv,_snojoFreeFights,snojoSetting,_lastCombatStarted,batmanZone,batmanUpgrades,batmanTimeLeft,batmanStats,questLTTQuestByWire,questM26Oracle,sourceTerminalEducate1,sourceTerminalEducate2,sourceTerminalEnquiry,_sourceTerminalDigitizeUses,_sourceTerminalEnhanceUses,_sourceTerminalExtrudes,_detectiveCasesCompleted,_pottedTeaTreeUsed,lastIslandUnlock,falloutShelterChronoUsed,_timeSpinnerMinutesUsed,_lynyrdSnareUses,_noobSkillCount,_universeCalculated,_expertCornerCutterUsed,boomBoxSong,_questPartyFair,_questPartyFairQuest,_neverendingPartyFreeTurns,_latteRefillsUsed,_latteBanishUsed,_latteCopyUsed,_latteDrinkUsed,_kgbTranquilizerDartUses,banishedMonsters,lastLightsOutTurn,lastVoteMonsterTurn,_lastCombatStarted,_sausageFights,_saberMod,_saberForceMonster,_daycareRecruits,_daycareGymScavenges,_campAwayCloudBuffs,_campAwaySmileBuffs,moonTuned,zeppelinProtestors,questL11Ron,questL11Shen,questGuzzlr,_canSeekBirds,_birdOfTheDayMods,_pocketProfessorLectures,_thesisDelivered,crystalBallMonster,_feelLonelyUsed,_feelExcitementUsed,_feelPeacefulUsed,_feelEnvyUsed,_feelHatredUsed,_feelNostalgicUsed,_feelPrideUsed,_feelSuperiorUsed,_monstersMapped,mappingMonsters,retroCapeSuperhero,retroCapeWashingInstructions,shockingLickCharges,_pottedPowerPlant,backupCameraMode,_backUpUses,backupCameraReverserEnabled];
         
         if (false)
         {
@@ -51483,6 +51483,80 @@ void IOTMPottedPowerPlantGenerate(ChecklistCollection checklists)
 	{
         checklists.add(C_RESOURCES, ChecklistEntryMake(522, "__skill Shocking Lick", "", ChecklistSubentryMake(pluralise(shocking_lick_charges, "Shocking Lick", "Shocking Licks"), "", "Free instakill."), 1).ChecklistEntryTag("free instakill"));
 	}
+}
+
+RegisterGenerationFunction("IOTMBackupCameraGenerate");
+void IOTMBackupCameraGenerate(ChecklistCollection checklists)
+{
+	item camera = lookupItem("backup camera");
+	if (!camera.have()) return;
+	
+    
+    int times_backed_up = get_property_int("_backUpUses");
+    int backup_limit = 11;
+    if (my_path_id() == PATH_ROBOT) //from reports
+    	backup_limit = 16;
+    int backups_left = MAX(0, backup_limit - times_backed_up);
+    if (backups_left > 0)
+    {
+		string [int] description;
+        string url = "";
+        
+        monster lm = last_monster();
+        string last_monster_description = lm;
+        if (lm == $monster[none])
+        	last_monster_description = "a monster";
+        
+        
+        description.listAppend("Fight " + last_monster_description + " in another zone.|Burns delay.");
+        description.listAppend("In combat, cast Back-Up to your Last Enemy.");
+        
+        
+        if (!camera.equipped())
+        {
+            url = "inventory.php?which=2&ftext=backup+camera";
+            description.listAppend("Equip the backup camera first.");
+        }
+        string title = pluralise(backups_left, "camera backup", "camera backups");
+    	checklists.add(C_RESOURCES, ChecklistEntryMake(616, "__item backup camera", url, ChecklistSubentryMake(title, "", description), 1)).ChecklistEntryTag("backup camera").ChecklistEntrySetAbridgedHeader(title);
+    }
+	
+	if (true)
+	{
+		string [int] description;
+        string url = "";
+        if (!camera.equipped())
+            url = "inventory.php?which=2&ftext=backup+camera";
+        else
+        	url = "inventory.php?which=2";
+            
+        string camera_mode = get_property("backupCameraMode"); //meat,
+        
+        string [string] camera_mode_descriptions =
+        {
+        	"meat":"+50% meat",
+            "init":"+100% init",
+            "ml":"+" + min(50, my_level() * 3) + " ML",
+        };
+        
+        
+        if (camera_mode_descriptions contains camera_mode)
+        	description.listAppend(camera_mode_descriptions[camera_mode] + " enchantment.");
+         
+        string [int] other_options;
+        foreach mode_name, mode_description in camera_mode_descriptions
+        {
+        	if (mode_name == camera_mode) continue;
+            other_options.listAppend(mode_description);
+        }
+        description.listAppend("Could switch to " + other_options.listJoinComponents(", ", "or") + ".");
+        
+        if (!get_property_boolean("backupCameraReverserEnabled"))
+        	description.listAppend("You may want to enable the reverser in the mode settings.");
+        
+        checklists.add(C_RESOURCES, ChecklistEntryMake(617, "__item backup camera", url, ChecklistSubentryMake("Backup Camera", "", description), 1)).ChecklistEntryTag("backup camera");
+    }
+    
 }
 
 RegisterTaskGenerationFunction("PathActuallyEdtheUndyingGenerateTasks");
