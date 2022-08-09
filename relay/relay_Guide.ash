@@ -2,7 +2,7 @@
 
 since 20.6;
 //These settings are for development. Don't worry about editing them.
-string __version = "2.0.2";
+string __version = "2.0.3";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -37,12 +37,27 @@ float __setting_location_bar_max_width_per_entry = 0.35;
 boolean __setting_small_size_uses_full_width = false; //implemented, but disabled - doesn't look amazing. reduced indention width instead to compensate
 boolean __setting_enable_outputting_all_numberology_options = true;
 
-string __setting_unavailable_colour = "#7F7F7F";
-string __setting_line_colour = "#B2B2B2";
-string __setting_dark_colour = "#C0C0C0";
-string __setting_modifier_colour = "#404040";
-string __setting_navbar_background_colour = "#FFFFFF";
-string __setting_page_background_colour = "#F7F7F7";
+//Do not use directly; use var() calls
+string __setting_unavailable_colour = "#7F7F7F"; //var(--unavailable_colour)
+string __setting_line_colour = "#B2B2B2"; //var(--line_colour)
+string __setting_dark_colour = "#C0C0C0"; //var(--dark_colour)
+string __setting_modifier_colour = "#404040"; //var(--modifier_colour)
+string __setting_navbar_background_colour = "#FFFFFF"; //var(--navbar_background_colour)
+string __setting_page_background_colour = "#F7F7F7"; //var(--page_background_colour)
+string __setting_main_content_background_colour = "#FFFFFF"; //var(--main_content_background_colour)
+string __setting_main_content_text_colour = "#000000"; //var(--main_content_text_colour)
+string __setting_hover_alternate_colour = "#CCCCCC"; //var(--hover_alternate_colour)
+
+//Inverted, dark mode versions of above:
+string __setting_unavailable_colour_dark = "#7F7F7F"; //var(--unavailable_colour)
+string __setting_line_colour_dark = "#4D4D4D"; //var(--line_colour)
+string __setting_dark_colour_dark = "#3F3F3F"; //var(--dark_colour)
+string __setting_modifier_colour_dark = "#BFBFBF"; //var(--modifier_colour)
+string __setting_navbar_background_colour_dark = "#000000"; //var(--navbar_background_colour)
+string __setting_page_background_colour_dark = "#3F3F3F"; //var(--page_background_colour)
+string __setting_main_content_background_colour_dark = "#000000"; //var(--main_content_background_colour)
+string __setting_main_content_text_colour_dark = "#FFFFFF"; //var(--main_content_text_colour)
+string __setting_hover_alternate_colour_dark = "#333333"; //var(--hover_alternate_colour)
 
 string __setting_media_query_large_size = "@media (min-width: 500px)";
 string __setting_media_query_medium_size = "@media (min-width: 350px) and (max-width: 500px)";
@@ -1882,10 +1897,17 @@ string slot_to_plural_string(slot s)
     return s.slot_to_string();
 }
 
-
 string format_today_to_string(string desired_format)
 {
     return format_date_time("yyyyMMdd", today_to_string(), desired_format);
+    //We tried this, and instead at 7:51AM local time, it claimed the day was yesterday. I don't get it either.
+    //return format_date_time("yyyyMMdd hh:mm:ss z", today_to_string() + " " + time_to_string(), desired_format);
+}
+//this messes with your timezone, because why wouldn't it?
+string format_intraday_time_to_string(string desired_format)
+{
+    //return format_date_time("hh:mm:ss z", time_to_string(), desired_format);
+    return format_date_time("hh:mm:ss", time_to_string(), desired_format); //omit time zone, because give it a time zone and suddenly it decides to be Difficult.
 }
 
 
@@ -2381,12 +2403,14 @@ static
     int PATH_OF_THE_PLUMBER = 38;
     int PATH_PLUMBER = 38;
     int PATH_LUIGI = 38;
-    int PATH_MAMA_LUIGI = 38;
     int PATH_MARIO = 38;
     int PATH_LOW_KEY_SUMMER = 39;
     int PATH_LOKI = 39;
     int PATH_GREY_GOO = 40;
     int PATH_ROBOT = 41;
+    int PATH_QUANTUM_TERRARIUM = 42;
+    int PATH_QUANTUM = 42;
+    int PATH_WILDFIRE = 43;
 }
 
 float numeric_modifier_replacement(item it, string modifier)
@@ -2420,6 +2444,18 @@ float numeric_modifier_replacement(item it, string modifier)
     {
     	if (it.equipped_amount() == 0)
      	   additional += 5;
+    }
+    if (it == $item[backup camera])
+    {
+    	string camera_mode = get_property("backupCameraMode");
+        if (modifier_lowercase == "monster level" && camera_mode == "ml")
+        {
+        	return clampi(my_level() * 3, 3, 50);
+        }
+        else if (modifier_lowercase == "meat drop" && camera_mode == "meat")
+        	return 50;
+        else if (modifier_lowercase == "initiative" && camera_mode == "init")
+        	return 100;
     }
     return numeric_modifier(it, modifier) + additional;
 }
@@ -2473,6 +2509,7 @@ static
     boolean [string][item] __equipment_by_numeric_modifier;
     void initialiseItems()
     {
+    	int maximum_item_id = 0;
         foreach it in $items[]
         {
             //Crafting:
@@ -2485,8 +2522,24 @@ static
                     __items_that_craft_food[ingredient] = true;
                 }
             }*/
-            
+            maximum_item_id = MAX(maximum_item_id, it.to_int());
             //Equipment:
+            if ($slots[hat,weapon,off-hand,back,shirt,pants,acc1,acc2,acc3,familiar] contains it.to_slot())
+            {
+                __equipment[it] = true;
+                if (it.numeric_modifier("combat rate") < 0)
+                    __minus_combat_equipment[it] = true;
+            }
+        }
+        //mafia does not add new items to $items, so, support some new items:
+        for i from maximum_item_id + 1 to maximum_item_id + 100
+        {
+        	item it = i.to_item();
+            if (it == $item[none])
+            {
+            	continue;
+            }
+            
             if ($slots[hat,weapon,off-hand,back,shirt,pants,acc1,acc2,acc3,familiar] contains it.to_slot())
             {
                 __equipment[it] = true;
@@ -2506,8 +2559,11 @@ static
 boolean [item] equipmentWithNumericModifier(string modifier)
 {
 	modifier = modifier.to_lower_case();
+	//dynamic items here
     boolean [item] dynamic_items;
-    dynamic_items[to_item("kremlin's greatest briefcase")] = true;
+    dynamic_items[to_item("backup camera")] = true;
+    dynamic_items[to_item("unwrapped knock-off retro superhero cape")] = true;
+    dynamic_items[$item[kremlin's greatest briefcase]] = true;
     dynamic_items[$item[your cowboy boots]] = true;
     dynamic_items[$item[a light that never goes out]] = true; //FIXME all smithsness items
     if (!(__equipment_by_numeric_modifier contains modifier))
@@ -3673,6 +3729,14 @@ boolean weapon_is_club(item it)
     return false;
 }
 
+boolean weapon_is_sword(item it)
+{
+    if (it.to_slot() != $slot[weapon]) return false;
+    if (it.item_type() == "sword" && $effect[Iron Palms].have_effect() == 0)
+        return true;
+    return false;
+}
+
 buffer prepend(buffer in_buffer, buffer value)
 {
     buffer result;
@@ -3862,9 +3926,15 @@ item [int] generateEquipmentForExtraExperienceOnStat(stat desired_stat, boolean 
     	slot s = it.to_slot();
         if (s == $slot[shirt] && !(lookupSkill("Torso Awareness").have_skill() || $skill[Best Dressed].have_skill()))
         	continue;
+        if (s == $slot[weapon] && it.weapon_hands() > 1 && item_slots[$slot[off-hand]] != $item[none]) //can't equip an off-hand and a two-handed weapon
+        	continue;
         if (it.available_amount() > 0 && (!require_can_equip_currently || it.can_equip()) && item_slots[it.to_slot()].numeric_modifier(numeric_modifier_string) < it.numeric_modifier(numeric_modifier_string))
         {
             item_slots[it.to_slot()] = it;
+            if (s == $slot[weapon] && it.weapon_hands() > 1)
+            {
+                item_slots[$slot[off-hand]] = it;
+            }
         }
     }
     
@@ -4055,7 +4125,11 @@ boolean monster_has_zero_turn_cost(monster m)
         return true;
     if ($monsters[terrible mutant,slime blob,government bureaucrat,angry ghost,annoyed snake] contains m && get_property_int("_voteFreeFights") < 3)
     	return true;
+    if ($monsters[void guy,void slab,void spider] contains m && get_property_int("_voidFreeFights") < 5)
+    	return true;
     if ($monsters[biker,burnout,jock,party girl,"plain" girl] contains m && get_property_int("_neverendingPartyFreeTurns") < 10)
+    	return true;
+    if (m == $monster[piranha plant]) //may or may not be location-specific?
     	return true;
     return false;
 }
@@ -4381,6 +4455,27 @@ string getBasicItemDescription(item it)
 	
 	out.append(item_type);
 	return out.to_string();
+}
+
+boolean monsterCanBeCopied(monster m)
+{
+	if (!m.copyable) return false;
+	if (m.boss) return false;
+	if ($monsters[writing desk,dirty thieving brigand] contains m) return false; //manual override list
+	return true;
+}
+
+boolean locationIsGoneFromTheGame(location l)
+{
+	if (l.parent == "Removed") return true;
+	
+	return false;
+}
+boolean locationIsEventSpecific(location l)
+{
+	if (l.zone == "Twitch" || l.zone == "Events") return true;
+	
+	return false;
 }
 boolean [item] __iotms_usable;
 
@@ -5966,9 +6061,11 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
         case $location[the beanbat chamber]:
             return questPropertyPastInternalStepNumber("questL04Bat", 3);
         case $location[The Unquiet Garves]:
-            return true;
+            return get_property("questL07Cyrptic") != "unstarted"; //not quite accurate, visit council first?
         case $location[The VERY Unquiet Garves]:
             return get_property("questL07Cyrptic") == "finished";
+        case $location[Tower Ruins]:
+            return questPropertyPastInternalStepNumber("questG03Ego", 3); //is 3 correct?
         case $location[The Wreck of the Edgar Fitzsimmons]:
             return questPropertyPastInternalStepNumber("questS02Monkees", 2);
         case $location[the boss bat's lair]:
@@ -6510,17 +6607,17 @@ static
         lookup_map["The Defiled Niche"] = "crypt.php";
         lookup_map["Haert of the Cyrpt"] = "crypt.php";
         lookup_map["Frat House"] = "island.php";
-        lookup_map["Frat House In Disguise"] = "island.php";
+        lookup_map["Frat House (Frat Disguise)"] = "island.php";
         lookup_map["The Frat House (Bombed Back to the Stone Age)"] = "island.php";
         lookup_map["Hippy Camp"] = "island.php";
-        lookup_map["Hippy Camp In Disguise"] = "island.php";
+        lookup_map["Hippy Camp (Hippy Disguise)"] = "island.php";
         lookup_map["The Hippy Camp (Bombed Back to the Stone Age)"] = "island.php";
         lookup_map["The Obligatory Pirate's Cove"] = "island.php";
         lookup_map["Barrrney's Barrr"] = "place.php?whichplace=cove";
         lookup_map["The F'c'le"] = "place.php?whichplace=cove";
         lookup_map["The Poop Deck"] = "place.php?whichplace=cove";
         lookup_map["Belowdecks"] = "place.php?whichplace=cove";
-        lookup_map["Post-War Junkyard"] = "island.php";
+        lookup_map["The Junkyard"] = "island.php";
         lookup_map["McMillicancuddy's Farm"] = "island.php";
         lookup_map["The Battlefield (Frat Uniform)"] = "bigisland.php";
         lookup_map["The Battlefield (Hippy Uniform)"] = "bigisland.php";
@@ -7716,32 +7813,34 @@ record CSSEntry
     string class_name;
     string definition;
     int importance;
+    string block_identifier;
 };
 
-CSSEntry CSSEntryMake(string tag, string class_name, string definition, int importance)
+CSSEntry CSSEntryMake(string tag, string class_name, string definition, int importance, string block_identifier)
 {
     CSSEntry entry;
     entry.tag = tag;
     entry.class_name = class_name;
     entry.definition = definition;
     entry.importance = importance;
+    entry.block_identifier = block_identifier;
     return entry;
 }
 
-record CSSBlock
+record CSSBlock //no longer used; kept for backwards compatibility
 {
     CSSEntry [int] defined_css_classes;
     string identifier;
 };
 
-CSSBlock CSSBlockMake(string identifier)
+CSSBlock CSSBlockMake(string identifier) //no longer used; kept for backwards compatibility
 {
     CSSBlock result;
     result.identifier = identifier;
     return result;
 }
 
-buffer CSSBlockGenerate(CSSBlock block)
+buffer CSSBlockGenerate(CSSBlock block) //no longer used; kept for backwards compatibility
 {
     buffer result;
     
@@ -7790,7 +7889,8 @@ record Page
 	buffer body_contents;
 	string [string] body_attributes; //[attribute_name] -> attribute_value
 	
-    CSSBlock [string] defined_css_blocks; //There is always an implicit "" block.
+    CSSBlock [string] defined_css_blocks; //There is always an implicit "" block. Deprecated.
+    CSSEntry [int] defined_css_classes; //new approach
 };
 
 
@@ -7824,7 +7924,7 @@ buffer PageGenerateStyle(Page page_in)
 {
     buffer result;
     
-    if (page_in.defined_css_blocks.count() > 0)
+    if (page_in.defined_css_blocks.count() > 0) //no longer used; kept for backwards compatibility
     {
         if (true)
         {
@@ -7845,6 +7945,62 @@ buffer PageGenerateStyle(Page page_in)
             result.append("\t\t</style>\n");
         }
     }
+    
+    if (page_in.defined_css_classes.count() > 0)
+    {
+    	sort page_in.defined_css_classes by value.block_identifier;
+    	sort page_in.defined_css_classes by value.importance;
+        
+        if (true)
+        {
+            result.append("\t\t");
+            result.HTMLAppendTagPrefix("style", "type", "text/css");
+            result.append("\n");
+        }
+        
+        
+        string active_block_identifier = "";
+        foreach key, entry in page_in.defined_css_classes
+        {
+            boolean has_identifier = (entry.block_identifier != "");
+            
+            if (entry.block_identifier != active_block_identifier)
+            {
+                if (active_block_identifier.length() > 0)
+                    result.append("\n\t\t\t}\n");
+                if (has_identifier)
+                {
+                    result.append("\t\t\t");
+                    result.append(entry.block_identifier);
+                    result.append(" {\n");
+                }
+                active_block_identifier = entry.block_identifier;
+            }
+            
+            result.append("\t\t\t");
+            if (active_block_identifier.length() > 0)
+                result.append("\t");
+        
+            if (entry.class_name == "")
+                result.append(entry.tag + " { " + entry.definition + " }");
+            else
+                result.append(entry.tag + "." + entry.class_name + " { " + entry.definition + " }");
+            result.append("\n");
+                
+        }
+        if (active_block_identifier.length() > 0)
+        {
+        	active_block_identifier = "";
+            result.append("\n\t\t\t}\n");
+        }
+        
+        if (true)
+        {
+            result.append("\t\t</style>\n");
+        }
+    }
+    
+    
     return result;
 }
 
@@ -7919,9 +8075,14 @@ void PageSetTitle(Page page_in, string title)
 void PageAddCSSClass(Page page_in, string tag, string class_name, string definition, int importance, string block_identifier)
 {
     //print_html("Adding block_identifier \"" + block_identifier + "\"");
-    if (!(page_in.defined_css_blocks contains block_identifier))
-        page_in.defined_css_blocks[block_identifier] = CSSBlockMake(block_identifier);
-    page_in.defined_css_blocks[block_identifier].defined_css_classes.listAppend(CSSEntryMake(tag, class_name, definition, importance));
+    if (false) //deprecated
+    {
+        if (!(page_in.defined_css_blocks contains block_identifier))
+            page_in.defined_css_blocks[block_identifier] = CSSBlockMake(block_identifier);
+        page_in.defined_css_blocks[block_identifier].defined_css_classes.listAppend(CSSEntryMake(tag, class_name, definition, importance, block_identifier));
+	}
+    
+    page_in.defined_css_classes.listAppend(CSSEntryMake(tag, class_name, definition, importance, block_identifier));
 }
 
 void PageAddCSSClass(Page page_in, string tag, string class_name, string definition, int importance)
@@ -8048,7 +8209,7 @@ void PageInit()
 	//Simple table lines:
 	PageAddCSSClass("div", "r_stl_container", "display:table;");
 	PageAddCSSClass("div", "r_stl_row", "display:table-row;");
-    PageAddCSSClass("div", "r_stl_entry", "padding:0px;margin:0px;display:table-cell;padding-top:1px;padding-right:1em;border-bottom:1px solid " + __setting_line_colour + ";padding-bottom:1px;");
+    PageAddCSSClass("div", "r_stl_entry", "padding:0px;margin:0px;display:table-cell;padding-top:1px;padding-right:1em;border-bottom:1px solid var(--line_colour);padding-bottom:1px;");
     PageAddCSSClass("div", "r_stl_entry_last_column", "padding-right:0em;");
     PageAddCSSClass("div", "r_stl_entry_last_row", "border-bottom:initial;padding-bottom:0px;");
     
@@ -8946,7 +9107,7 @@ buffer KOLImageGenerateImageHTML(string lookup_name, boolean should_centre, Vec2
 			if (__setting_show_alignment_guides)
 				style.append("background:pink;");
 			else
-				style.append("background:#FFFFFF;");
+				style.append("background:var(--main_content_background_colour);");
 			
             style.append("z-index:2;position:absolute;top:");
             style.append(top);
@@ -9339,13 +9500,15 @@ string ChecklistGenerateModifierSpan(string modifier)
 void ChecklistInit()
 {
 	PageAddCSSClass("a", "r_cl_internal_anchor", "");
-	//PageAddCSSClass("", "r_cl_modifier_inline", "font-size:0.80em; color:" + __setting_modifier_colour + ";");
-	//PageAddCSSClass("", "r_cl_modifier", "font-size:0.80em; color:" + __setting_modifier_colour + "; display:block;");
-    PageAddCSSClass("", "r_cl_modifier_inline", "font-size:0.85em; color:" + __setting_modifier_colour + ";");
-    PageAddCSSClass("", "r_cl_modifier", "font-size:0.85em; color:" + __setting_modifier_colour + "; display:block;");
+	//PageAddCSSClass("", "r_cl_modifier_inline", "font-size:0.80em; color:var(--modifier_colour);");
+	//PageAddCSSClass("", "r_cl_modifier", "font-size:0.80em; color:var(--modifier_colour); display:block;");
+    PageAddCSSClass("", "r_cl_modifier_inline", "font-size:0.85em; color:var(--modifier_colour);");
+    PageAddCSSClass("", "r_cl_modifier", "font-size:0.85em; color:var(--modifier_colour); display:block;");
 	
-	PageAddCSSClass("", "r_cl_header", "text-align:center; font-size:1.15em; font-weight:bold;width:100%;padding-bottom:5px;border-bottom:1px solid " + __setting_line_colour + ";padding-top:5px;");
-	PageAddCSSClass("", "r_cl_header_clicked", "background-color:" + __setting_line_colour + ";"); //__setting_line_colour is too light
+	//PageAddCSSClass("", "r_cl_header", "text-align:center; font-size:1.15em; font-weight:bold;width:100%;padding-bottom:5px;border-bottom:1px solid var(--line_colour);padding-top:5px;");
+	PageAddCSSClass("", "r_cl_header", "text-align:center;width:100%;padding-bottom:5px;border-bottom:1px solid var(--line_colour);padding-top:5px;");
+	PageAddCSSClass("", "r_cl_header_text", "font-size:1.15em; font-weight:bold;");
+	PageAddCSSClass("", "r_cl_header_clicked", "background-color:var(--line_colour);"); //__setting_line_colour is too light
 	//Thought about making subheaders for abridged mode bigger - 1.5em fits fine within the vertical space - but it looks weird, like shouting.
 	PageAddCSSClass("", "r_cl_subheader", "font-size:1.07em; font-weight:bold;");
 	PageAddCSSClass("", "r_cl_subheader_abridged", "font-size:1.07em; font-weight:bold;");
@@ -9380,11 +9543,11 @@ void ChecklistInit()
 	{
 		string div_style = "";
 		div_style = "margin:0px;";
-        /*div_style += "border-style: solid; border-color:" + __setting_line_colour + ";";
+        /*div_style += "border-style: solid; border-color:var(--line_colour);";
         div_style += "border:1px;";
         div_style += "border-left:0px; border-right:0px;border-bottom:0px;";*/
-        div_style += "border-top:1px solid " + __setting_line_colour + ";";
-        div_style += "background-color:#FFFFFF; width:100%;";// padding-top:5px;";
+        div_style += "border-top:1px solid var(--line_colour);";
+        div_style += "background-color:var(--main_content_background_colour); width:100%;";// padding-top:5px;";
         if (__use_flexbox_on_checklists)
         	div_style += "display:flex;flex-wrap:wrap;align-items:stretch;";
 		PageAddCSSClass("div", "r_cl_checklist_container", div_style);
@@ -9462,7 +9625,7 @@ void ChecklistInit()
     if (__use_flexbox_on_checklists)
     {
     	//padding-top:5px;padding-bottom:5px;
-        PageAddCSSClass("div", "r_cl_l_container", "display:flex;flex-direction:row;flex-wrap:nowrap;justify-content:flex-start;align-items:stretch;border-bottom:1px solid " + __setting_line_colour + ";flex-grow:1;width:100%;width:100%;"); //width:600px;
+        PageAddCSSClass("div", "r_cl_l_container", "display:flex;flex-direction:row;flex-wrap:nowrap;justify-content:flex-start;align-items:stretch;border-bottom:1px solid var(--line_colour);flex-grow:1;width:100%;width:100%;"); //width:600px;
         PageAddCSSClass("div", "r_cl_l_container_highlighted", container_gradient);
         PageAddCSSClass("div", "r_cl_l_container_minimised", "width:200px;");
         PageAddCSSClass("div", "r_cl_l_container_always_minimised", "width:200px;");
@@ -9482,22 +9645,22 @@ void ChecklistInit()
         if (false)
         {
         	//solid background:
-            //PageAddCSSClass("div", "r_cl_l_left_showhide", "cursor:pointer;background:" + __setting_line_colour + ";width:20px;flex-shrink:0;");
+            //PageAddCSSClass("div", "r_cl_l_left_showhide", "cursor:pointer;background:var(--line_colour);width:20px;flex-shrink:0;");
         }
         else
         {
-            //PageAddCSSClass("div", "r_cl_l_left_showhide:hover", "background:" + __setting_line_colour + ";");
+            //PageAddCSSClass("div", "r_cl_l_left_showhide:hover", "background:var(--line_colour);");
         }
         //PageAddCSSClass("div", "r_cl_l_left_showhide_blank", "width:21px;max-width:21px;min-width:21px;flex-shrink:0;");
         
         //art design student
         
-        PageAddCSSClass("div", "r_cl_l_left_showhide_clicked", "background-color:" + __setting_page_background_colour + ";"); //this looks nicer, but line matches header clicked
-        //PageAddCSSClass("div", "r_cl_l_left_showhide_clicked", "background-color:" + __setting_line_colour + ";");
+        PageAddCSSClass("div", "r_cl_l_left_showhide_clicked", "background-color:var(--page_background_colour);"); //this looks nicer, but line matches header clicked
+        //PageAddCSSClass("div", "r_cl_l_left_showhide_clicked", "background-color:var(--line_colour);");
         
-        PageAddCSSClass("div", "r_cl_l_left_showhide", "border-right:1px solid " + __setting_line_colour + ";border-left:1px solid " + __setting_line_colour + ";width:15px;max-width:15px;min-width:15px;flex-shrink:0;flex-grow:0;flex-basis:0;margin-left:-1px;"); //-1 px to hide the left border
-        PageAddCSSClass("div", "r_cl_l_container_minimised:hover", "background-color:" + "#CCCCCC" + ";mix-blend-mode:multiply;");
-        //PageAddCSSClass("div", "r_cl_l_left_showhide:hover", "background-color:" + "#CCCCCC" + ";");
+        PageAddCSSClass("div", "r_cl_l_left_showhide", "border-right:1px solid var(--line_colour);border-left:1px solid var(--line_colour);width:15px;max-width:15px;min-width:15px;flex-shrink:0;flex-grow:0;flex-basis:0;margin-left:-1px;"); //-1 px to hide the left border
+        PageAddCSSClass("div", "r_cl_l_container_minimised:hover", "background-color:var(--hover_alternate_colour);mix-blend-mode:multiply;");
+        //PageAddCSSClass("div", "r_cl_l_left_showhide:hover", "background-color:var(--hover_alternate_colour);");
         PageAddCSSClass("div", "r_cl_l_left_showhide", "width:20px;max-width:20px;min-width:15px;", 0, __setting_media_query_medium_size);
         PageAddCSSClass("div", "r_cl_l_left_showhide", "width:15px;max-width:15px;min-width:15px;", 0, __setting_media_query_small_size);
         PageAddCSSClass("div", "r_cl_l_left_showhide", "width:10px;max-width:10px;min-width:10px;", 0, __setting_media_query_tiny_size);
@@ -9505,7 +9668,7 @@ void ChecklistInit()
         PageAddCSSClass("div", "r_cl_l_left_showhide_blank", "border-right:1px solid transparent;border-left:1px solid transparent;");
         PageAddCSSClass("div", "r_cl_l_left_showhide_blank:hover", "cursor:auto;background:transparent;");
         
-        PageAddCSSClass("div", "showhide_mouseover_popup_class", "position:absolute;background:white;width:100%;z-index:5;border-bottom:1px solid " + __setting_line_colour + ";border-right:1px solid " + __setting_line_colour + ";pointer-events:none;box-shadow:0px 0px 30px 0px black;display:none;");
+        PageAddCSSClass("div", "showhide_mouseover_popup_class", "position:absolute;background:var(--main_content_background_colour);width:100%;z-index:5;border-bottom:1px solid var(--line_colour);border-right:1px solid var(--line_colour);pointer-events:none;box-shadow:0px 0px 30px 0px black;display:none;");
          //transition:opacity 0.25s; box-shadow:0px 0px 0px 10000px rgba(0,0,0,0.5); opacity:0;
         
     }
@@ -9886,10 +10049,23 @@ buffer ChecklistGenerate(Checklist cl, boolean output_borders)
     result.HTMLAppendTagPrefix("div", main_container_map);
 	
 	
-	result.HTMLAppendTagWrap("div", cl.title, mapMake("class", "r_cl_header r_clickable", "onmousedown", "checklistHeaderButtonClicked(window.event)"));
-	
+	/*string main_header_style_overrides;
 	if (special_subheader != "")
-		result.append(ChecklistGenerateModifierSpan(special_subheader));
+		main_header_style_overrides = "border:0px;";*/
+  
+  	string main_header_text = HTMLGenerateDivOfClass(cl.title, "r_cl_header_text");
+    if (special_subheader != "")
+    {
+    	main_header_text += HTMLGenerateDivOfClassAndStyle(special_subheader, "r_centre r_cl_modifier", "");
+    }
+      
+	result.HTMLAppendTagWrap("div", main_header_text, mapMake("class", "r_cl_header r_clickable", "onmousedown", "checklistHeaderButtonClicked(window.event)"));
+	
+	/*if (special_subheader != "" && false)
+	{
+		result.HTMLAppendTagWrap("div", HTMLGenerateSpanOfClass(special_subheader, "r_centre"), mapMake("class", "r_cl_l_container r_cl_modifier", "style", "padding-bottom:3px;"));
+		//result.append(ChecklistGenerateModifierSpan(special_subheader));
+    }*/
 	
 	int starting_intra_i = 0;
 	if (skip_first_entry)
@@ -19396,14 +19572,14 @@ void QPirateInit()
 	state.image_name = "pirate quest";
 	
 	state.state_boolean["valid"] = true;
-	if (__misc_state["mysterious island available"] && !(my_path_id() == PATH_COMMUNITY_SERVICE || __misc_state["in aftercore"]))
+	/*if (__misc_state["mysterious island available"] && !(my_path_id() == PATH_COMMUNITY_SERVICE || __misc_state["in aftercore"]))
 	{
 		state.startable = true;
 		if (!state.in_progress && !state.finished)
 		{
 			QuestStateParseMafiaQuestPropertyValue(state, "started");
 		}
-	}
+	}*/
     
     
 	boolean hot_wings_relevant = knoll_available() || $item[frilly skirt].available_amount() > 0 || !in_hardcore();
@@ -19444,8 +19620,8 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 {
 	if (!__quest_state["Pirate Quest"].in_progress)
 		return;
-    if (!__quest_state["Pirate Quest"].state_boolean["valid"] && !(get_property_boolean("kingLiberated") && $locations[Barrrney's Barrr,The F'c'le,The Poop Deck,Belowdecks] contains __last_adventure_location))
-        return;
+    /*if (!__quest_state["Pirate Quest"].state_boolean["valid"] && !(get_property_boolean("kingLiberated") && $locations[Barrrney's Barrr,The F'c'le,The Poop Deck,Belowdecks] contains __last_adventure_location))
+        return;*/
         
 	QuestState base_quest_state = __quest_state["Pirate Quest"];
 	ChecklistSubentry subentry;
@@ -19740,7 +19916,7 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
     if (delay_for_future)
         future_task_entries.listAppend(ChecklistEntryMake(89, base_quest_state.image_name, url, subentry, $locations[the obligatory pirate's cove, barrrney's barrr, the f'c'le]));
     else
-        task_entries.listAppend(ChecklistEntryMake(90, base_quest_state.image_name, url, subentry, $locations[the obligatory pirate's cove, barrrney's barrr, the f'c'le]));
+        optional_task_entries.listAppend(ChecklistEntryMake(90, base_quest_state.image_name, url, subentry, $locations[the obligatory pirate's cove, barrrney's barrr, the f'c'le]));
 }
 
 //"started", "finished" observed for questG04Nemesis
@@ -21660,7 +21836,7 @@ void QUntinkerGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [i
 		}
 	}
 	
-	optional_task_entries.listAppend(ChecklistEntryMake(29, base_quest_state.image_name, url, subentry, $locations[the degrassi knoll garage]));
+	optional_task_entries.listAppend(ChecklistEntryMake(29, base_quest_state.image_name, url, subentry, 8, $locations[the degrassi knoll garage]));
 }
 
 void QArtistInit()
@@ -22071,8 +22247,8 @@ void QWhiteCitadelInit()
 
 void QWhiteCitadelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-    if (!__misc_state["in aftercore"] && !in_bad_moon() && my_location() != $location[the road to the white citadel] && __last_adventure_location != $location[the road to the white citadel]) //not yet
-        return;
+    //if (!__misc_state["in aftercore"] && !in_bad_moon() && my_location() != $location[the road to the white citadel] && __last_adventure_location != $location[the road to the white citadel]) //not yet
+        //return;
     if (!__misc_state["guild open"]) //bugged
         return;
 	QuestState base_quest_state = __quest_state["White Citadel"];
@@ -22081,8 +22257,8 @@ void QWhiteCitadelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
     
     boolean using_black_cat_equivalent = ($familiars[O.A.F.,black cat] contains my_familiar());
     
-    if (__misc_state["in run"] && $location[The Road to the White Citadel].turnsAttemptedInLocation() == 0 && !in_bad_moon()) //not until they're sure
-        return;
+    //if (__misc_state["in run"] && $location[The Road to the White Citadel].turnsAttemptedInLocation() == 0 && !in_bad_moon()) //not until they're sure
+        //return;
     
     boolean add_as_future_task = false;
     
@@ -24317,7 +24493,7 @@ void QHotAirportLavaCoLampGenerateTasks(ChecklistEntry [int] task_entries)
             }
             else
             {
-                description.listAppend("Acquire glowing New Age crystal. (mall, or healing crystal golem in the mine))");
+                description.listAppend("Acquire glowing New Age crystal. (mall, or healing crystal golem in the mine)");
             }
         }
         if ($item[heat-resistant sheet metal].item_amount() == 0)
@@ -27141,12 +27317,12 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
 		
 		resource_entries.listAppend(ChecklistEntryMake(316, "clover", "", subentry, 7).ChecklistEntryTag("clovers"));
 	}
-	if (in_run && $item[lucky pill].have() && availableSpleen() > 0)
+	/*if (in_run && $item[lucky-ish pill].have() && availableSpleen() > 0)
 	{
 		string [int] description;
         description.listAppend("Chew for clovers.");
-        resource_entries.listAppend(ChecklistEntryMake(317, "__item lucky pill", "inventory.php?which=3&ftext=lucky+pill", ChecklistSubentryMake(pluralise($item[lucky pill]), "", description), importance_level_unimportant_item).ChecklistEntryTag("clovers"));
-	}
+        resource_entries.listAppend(ChecklistEntryMake(317, "__item lucky-ish pill", "inventory.php?which=3&ftext=lucky+pill", ChecklistSubentryMake(pluralise($item[lucky-ish pill]), "", description), importance_level_unimportant_item).ChecklistEntryTag("clovers"));
+	}*/
 	if (in_run)
 	{
 		if ($item[gameinformpowerdailypro magazine].available_amount() > 0)
@@ -27349,7 +27525,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
     }
     if (__misc_state["in run"] && $item[tryptophan dart].available_amount() > 0 && in_ronin() && $item[tryptophan dart].item_is_usable())
     {
-        resource_entries.listAppend(ChecklistEntryMake(339, "__item tryptophan dart", "", ChecklistSubentryMake(pluralise($item[tryptophan dart]), "", "Free run/banish."), 6).ChecklistEntryTag("banish"));
+        resource_entries.listAppend(ChecklistEntryMake(339, "__item tryptophan dart", "", ChecklistSubentryMake(pluralise($item[tryptophan dart]), "", "Banish. Costs a turn."), 6).ChecklistEntryTag("banish"));
     }
     
     if ($item[drum machine].available_amount() > 0 && in_run && (my_adventures() <= 1 || (availableDrunkenness() < 0 && availableDrunkenness() > -4 && my_adventures() >= 1)) && __quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && $item[drum machine].item_is_usable())
@@ -27369,31 +27545,31 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
     
     if (in_run)
     {
-		if ($item[tattered scrap of paper].available_amount() > 0 && __misc_state["free runs usable"] && $item[tattered scrap of paper].item_is_usable())
+		if ($item[tattered scrap of paper].have() && __misc_state["free runs usable"] && $item[tattered scrap of paper].item_is_usable())
 		{
 			string [int] description;
 			description.listAppend(($item[tattered scrap of paper].available_amount() / 2.0).roundForOutput(1) + " free runs.");
             if (in_bad_moon())
                 description.listAppend("Or save for demon summoning.");
-			resource_entries.listAppend(ChecklistEntryMake(342, "__item tattered scrap of paper", "", ChecklistSubentryMake(pluralise($item[tattered scrap of paper]), "", description), importance_level_unimportant_item));
+			resource_entries.listAppend(ChecklistEntryMake(342, "__item tattered scrap of paper", "", ChecklistSubentryMake(pluralise($item[tattered scrap of paper]), "", description), importance_level_unimportant_item).ChecklistEntryTag("free runaway"));
 		}
-		if (2371.to_item().available_amount() > 0 && __misc_state["free runs usable"])
+		if (2371.to_item().have() && __misc_state["free runs usable"])
 		{
             item it = 2371.to_item();
 			string [int] description;
 			description.listAppend((it.available_amount() * 0.9).roundForOutput(1) + " free runs.");
 			resource_entries.listAppend(ChecklistEntryMake(343, "__item " + it, "", ChecklistSubentryMake(pluralise(it), "", description), importance_level_unimportant_item));
 		}
-		if ($item[dungeoneering kit].available_amount() > 0)
+		if ($item[dungeoneering kit].have())
 		{
 			string line = "Open it.";
 			if ($item[dungeoneering kit].available_amount() > 1)
 				line = "Open them.";
 			resource_entries.listAppend(ChecklistEntryMake(344, "__item dungeoneering kit", "inventory.php?which=3&ftext=dungeoneering+kit", ChecklistSubentryMake(pluralise($item[dungeoneering kit]), "", line), importance_level_unimportant_item));
 		}
-        if ($item[Box of familiar jacks].available_amount() > 0)
+        if ($item[Box of familiar jacks].have())
             resource_entries.listAppend(ChecklistEntryMake(345, "__item box of familiar jacks", "", ChecklistSubentryMake(pluralise($item[Box of familiar jacks]), "", "Gives current familiar equipment."), importance_level_unimportant_item));
-        if ($item[csa fire-starting kit].available_amount() > 0 && !get_property_boolean("_fireStartingKitUsed"))
+        if ($item[csa fire-starting kit].have() && !get_property_boolean("_fireStartingKitUsed"))
         {
             string [int] description;
             description.listAppend("All-day 4 HP/MP regeneration.");
@@ -27402,7 +27578,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
             resource_entries.listAppend(ChecklistEntryMake(346, "__item csa fire-starting kit", "inventory.php?which=3&ftext=csa+fire-starting+kit", ChecklistSubentryMake($item[csa fire-starting kit], "", description), importance_level_unimportant_item));
         }
         
-        if ($item[transporter transponder].available_amount() > 0)
+        if ($item[transporter transponder].have())
         {
             string [int] options;
             if (__misc_state["need to level"])
@@ -27417,7 +27593,20 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         }
     }
     
-    foreach it in $items[carton of astral energy drinks,astral hot dog dinner,astral six-pack]
+    if ($item[fish-oil smoke bomb].have())
+    {
+        string [int] description;
+        description.listAppend("Free runs.");
+        resource_entries.listAppend(ChecklistEntryMake(0, "__item fish-oil smoke bomb", "", ChecklistSubentryMake(pluralise($item[fish-oil smoke bomb]), "", description), importance_level_unimportant_item).ChecklistEntryTag("free runaway"));
+    }
+    if ($item[fisherman's sack].have())
+    {
+        string [int] description;
+        description.listAppend("Three free runs.");
+        resource_entries.listAppend(ChecklistEntryMake(0, "__item fisherman's sack", "", ChecklistSubentryMake(pluralise($item[fisherman's sack]), "", description), importance_level_unimportant_item).ChecklistEntryTag("free runaway"));
+    }
+    
+    foreach it in $items[[10882]carton of astral energy drinks,astral hot dog dinner,astral six-pack]
     {
         if (it.available_amount() == 0)
             continue;
@@ -28645,7 +28834,8 @@ void S8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             description.listAppend("To make digital key.");
             if (my_path_id() == PATH_ONE_CRAZY_RANDOM_SUMMER)
                 description.listAppend("Or wait for pixellated monsters.");
-            optional_task_entries.listAppend(ChecklistEntryMake(272, "__item psychoanalytic jar", "", ChecklistSubentryMake("Pull a jar of psychoses (The Crackpot Mystic)", "", description)));
+            if (!$item[powerful glove].have())
+	            optional_task_entries.listAppend(ChecklistEntryMake(272, "__item psychoanalytic jar", "", ChecklistSubentryMake("Pull a jar of psychoses (The Crackpot Mystic)", "", description)));
         }
     }
 }
@@ -29605,7 +29795,7 @@ void SBountyHunterHunterGenerateTasks(ChecklistEntry [int] task_entries, Checkli
     
     //Load bounty.txt, not sure how else to acquire this data:
     BountyFileEntry [string] bounty_file;
-    file_to_map("bounty.txt", bounty_file);
+    file_to_map("data/bounty.txt", bounty_file);
     
     location [int] relevant_locations;
     foreach bounty_name in bounty_properties
@@ -29859,7 +30049,7 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes, boo
             potential_faxes.listAppend(line);
         }
         
-        if (!in_hardcore() && $item[richard's star key].available_amount() + $item[richard's star key].creatable_amount() == 0 && !__quest_state["Level 13"].state_boolean["Richard's star key used"] && !($item[star].available_amount() >= 8 && $item[line].available_amount() >= 7))
+        if ($item[richard's star key].available_amount() + $item[richard's star key].creatable_amount() == 0 && !__quest_state["Level 13"].state_boolean["Richard's star key used"] && !($item[star].available_amount() >= 8 && $item[line].available_amount() >= 7))
         {
             string copy_type = "arrow";
             if (my_path_id() == PATH_HEAVY_RAINS) //arrows mean washaway in flooded areas
@@ -30717,6 +30907,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
 
 
 
+//maybe rename this to ActiveBanish?
 Record Banish
 {
     monster banished_monster;
@@ -30949,6 +31140,177 @@ boolean BanishIsActive(string name)
             return true;
     }
     return false;
+}
+
+
+
+
+
+//Banish sources, used for writing active banish code:
+
+int BANISH_SOURCE_TYPE_UNKNOWN = 0;
+int BANISH_SOURCE_TYPE_COMBAT_ITEM = 1;
+int BANISH_SOURCE_TYPE_SKILL = 2;
+
+Record BanishSource
+{
+	//private:
+	item required_equipment_equipped;
+	item combat_item_source;
+	skill combat_skill;
+	string name;
+	
+	//reflex hammer does not support .dailylimit, so we will not use that approach:
+	string daily_limit_property_name;
+	int daily_limit_property_limit;
+};
+
+BanishSource [int] __banish_sources;
+
+
+void add(BanishSource [int] list, BanishSource entry)
+{
+	int position = list.count();
+	while (list contains position)
+		position += 1;
+	list[position] = entry;
+}
+
+
+void initialiseBanishSources()
+{
+	if (true)
+	{
+		BanishSource source;
+        source.combat_skill = $skill[Feel Hatred];
+        source.daily_limit_property_name = "_feelHatredUsed";
+        source.daily_limit_property_limit = 3;
+        __banish_sources.add(source);
+	}
+	if (true)
+	{
+		BanishSource source;
+        source.combat_skill = $skill[reflex hammer];
+        source.required_equipment_equipped = $item[Lil' Doctor&trade; bag];
+        source.daily_limit_property_name = "_reflexHammerUsed";
+        source.daily_limit_property_limit = 3;
+        __banish_sources.add(source);
+	}
+	//Throw Latte on Opponent
+	//KGB tranquilizer dart
+	//snokebomb
+	//use the force, but no?
+}
+
+initialiseBanishSources();
+
+
+
+int BanishSourceReplenishableBanishesLeft(BanishSource source)
+{
+	int amount = 0;
+	if (source.daily_limit_property_name != "")
+	{
+		int value = get_property_int(source.daily_limit_property_name);
+        amount += clampi(source.daily_limit_property_limit - value, 0, source.daily_limit_property_limit);
+	}
+	return amount;
+}
+
+int BanishSourceLimitedBanishesLeft(BanishSource source)
+{
+	if (source.combat_item_source != $item[none])
+		return source.combat_item_source.item_amount();
+	return 0;
+}
+
+int BanishSourceAllBanishesLeft(BanishSource source)
+{
+	return source.BanishSourceReplenishableBanishesLeft() + source.BanishSourceLimitedBanishesLeft();
+}
+
+boolean BanishSourceIsLimited(BanishSource source)
+{
+	//more?
+	if (source.combat_item_source != $item[none]) return true;
+	return false;
+}
+
+boolean BanishSourceCanBanishRightNow(BanishSource source)
+{
+	if (source.required_equipment_equipped != $item[none] && !source.required_equipment_equipped.equipped())
+		return false;
+    if (source.combat_item_source != $item[none] && source.combat_item_source.item_amount() == 0)
+    	return false;
+    //if (my_mp() < combat_skill
+    if (source.combat_skill != $skill[none])
+    {
+    	if (!source.combat_skill.skill_is_usable()) return false;
+        if (my_mp() < source.combat_skill.mp_cost()) return false; //FIXME I can't remember if combat_mana_cost_modifier() needs manually tinkering here
+    }
+    
+    if (source.BanishSourceAllBanishesLeft() == 0) return false;
+    
+	return true;
+}
+
+boolean BanishSourceCouldBanish(BanishSource source)
+{
+	if (source.required_equipment_equipped != $item[none] && !source.required_equipment_equipped.have()) return false;
+	if (source.combat_item_source != $item[none] && source.combat_item_source.item_amount() == 0) return false;
+	if (source.combat_skill != $skill[none] && !source.combat_skill.skill_is_usable())
+	{
+		return false;
+    }
+	
+	if (source.BanishSourceAllBanishesLeft() == 0) return false;
+	return true;
+}
+
+int BanishSourceGetType(BanishSource source)
+{
+	if (source.combat_skill != $skill[none]) return BANISH_SOURCE_TYPE_SKILL;
+	if (source.combat_item_source != $item[none]) return BANISH_SOURCE_TYPE_COMBAT_ITEM;
+	
+	return BANISH_SOURCE_TYPE_UNKNOWN;
+}
+
+skill BanishSourceGetSkill(BanishSource source)
+{
+	return source.combat_skill;
+}
+
+item BanishSourceGetCombatItem(BanishSource source)
+{
+	return source.combat_item_source;
+}
+
+item BanishSourceGetEquipmentRequiredEquipped(BanishSource source)
+{
+	return source.required_equipment_equipped;
+}
+
+string BanishSourceGetName(BanishSource source)
+{
+	if (source.name != "")
+		return source.name;
+    else if (source.combat_skill != $skill[none])
+    	return source.combat_skill;
+    else if (source.combat_item_source != $item[none])
+    	return source.combat_item_source;
+    return "";
+}
+
+
+BanishSource GetBanishSourceByName(string name)
+{
+	foreach key, source in __banish_sources
+	{
+		if (source.BanishSourceGetName() ≈ name)
+        	return source;
+	}
+	BanishSource blank;
+	return blank;
 }
 
 void SEventsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -31693,7 +32055,7 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
                 description.listAppend("Possibly use mayozapine if you have that IOTM.");
             }
         }
-        else if (mini == "Hibernation Preparation")
+        else if (mini == "Hibernation Preparation" || mini == "Freshman Fifteen")
         {
         	modifiers.listAppend("+familiar experience");
         	description.listAppend("Gain as much familiar experience as possible.|Ideally, run +familiar experience against free fights.");
@@ -32138,7 +32500,11 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
         else if (mini == "Creative Holiday Feasting")
         {
             description.listAppend("Eat as many unique foods as possible, ideally 1-fullness.");
-        }   
+        }
+        else if (mini == "Horizon Broadening")
+        {
+            description.listAppend("Drink as many unique drinks as possible, ideally 1-inebriety.");
+        }
     	else if (mini == "Getting in the Holiday Spirits")
         {
             description.listAppend("Drink as many one-inebriety drinks as possible.");
@@ -33760,6 +34126,7 @@ void SBugsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] 
 	bugs.listAppend("make turn-costing banishes be vaguely near the free ones");
 	//bugs.listAppend("ZS changes?");
 	bugs.listAppend("robot path");
+	bugs.listAppend("in the defiled nook, run -combat until you meet the map adventure. also, anywhere else this is true?");
 	bugs.listAppend("grey goo? (do absolutely nothing)");
 	//bugs.listAppend("implement showhide");
 	//bugs.listAppend("emotion chip - if we don't have the skill but we can acquire it via the item, do that");
@@ -33789,6 +34156,9 @@ void SBugsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] 
 	//bugs.listAppend("resource bar does not interact with hidden entries");
 	//bugs.listAppend("if all entries are on the last line, and the scroll bar is all the way at the bottom, the popup causes problems in chromium, because chromium is constantly jumping down and up. don't know how to fix this - appear above instead of below if we're near the end...?"); //fixed via constant position testing
 	bugs.listAppend("requested movable entries. major project");
+	bugs.listAppend("mention superhero cape as YR");
+	bugs.listAppend("muffin collection reminder");
+	bugs.listAppend("whatever that one suggestion was with -combat?");
 	//bugs.listAppend("superhero cape in L7 code");
 	
 	
@@ -34437,7 +34807,7 @@ void generatePullList(Checklist [int] checklists)
     }
 	
 	if (my_path_id() != PATH_COMMUNITY_SERVICE)
-		pullable_item_list.listAppend(GPItemMake($item[ten-leaf clover], "Various turn saving.|Generic pull.", 20));
+		pullable_item_list.listAppend(GPItemMake(lookupItem("11-leaf clover"), "Various turn saving.|Generic pull.", 20));
     
     if (!get_property_ascension("lastTempleUnlock") && $item[spooky-gro fertilizer].item_amount() == 0 && my_path_id() != PATH_G_LOVER && !__quest_state["Level 11"].finished)
         pullable_item_list.listAppend(GPItemMake($item[spooky-gro fertilizer], "Saves 2.5 turns while unlocking temple."));
@@ -34545,6 +34915,7 @@ void generatePullList(Checklist [int] checklists)
         foreach it in $items[mafia thumb ring,License to Chill,etched hourglass]
             pullable_item_list.listAppend(GPItemMake(it, "lazy turngen", 1));
     }
+    boolean [item] already_pulled_today = get_property("_roninStoragePulls").split_string(",").listConvertToItem().listInvert();
     
 	
 	boolean currently_trendy = (my_path_id() == PATH_TRENDY);
@@ -34603,6 +34974,7 @@ void generatePullList(Checklist [int] checklists)
 		foreach key in items
 		{
 			item it = items[key];
+            if (already_pulled_today[it]) continue;
 			if (currently_trendy && !is_trendy(it))
 				continue;
             if (!is_unrestricted(it))
@@ -34623,10 +34995,10 @@ void generatePullList(Checklist [int] checklists)
                         url = "storage.php?which=2";
                 }
               
-                if (it.storage_amount() == 0 && (__pulls_reasonable_to_buy_in_run contains it) && it != $item[ten-leaf clover] && it != $item[none])
+                if (it.storage_amount() == 0 && (__pulls_reasonable_to_buy_in_run contains it) && it != lookupItem("11-leaf clover") && it != $item[none])
                     url = "mall.php";
               
-				if (max_wanted == 1)
+				if (max_wanted == 1 || true)
 					pulls_entries.listAppend(ChecklistEntryMake(99, it, url, ChecklistSubentryMake(it, "", reason_list)));
 				else
 					pulls_entries.listAppend(ChecklistEntryMake(100, it, url, ChecklistSubentryMake(pluralise(actual_amount, it), "", reason_list)));
@@ -35137,7 +35509,7 @@ void setUpState()
 	//wand
 	
 	boolean wand_of_nagamar_needed = true;
-	if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_BUGBEAR_INVASION || my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_KOLHS || my_path_id() == PATH_HEAVY_RAINS || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_THE_SOURCE || my_path_id() == PATH_LICENSE_TO_ADVENTURE || my_path_id() == PATH_POCKET_FAMILIARS || my_path_id() == PATH_VAMPIRE || my_path_id() == PATH_LUIGI || my_path_id() == PATH_GREY_GOO)
+	if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_BUGBEAR_INVASION || my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_KOLHS || my_path_id() == PATH_HEAVY_RAINS || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_THE_SOURCE || my_path_id() == PATH_LICENSE_TO_ADVENTURE || my_path_id() == PATH_POCKET_FAMILIARS || my_path_id() == PATH_VAMPIRE || my_path_id() == PATH_LUIGI || my_path_id() == PATH_GREY_GOO || my_path_id() == PATH_WILDFIRE)
 		wand_of_nagamar_needed = false;
 		
 	int ruby_w_needed = 1;
@@ -37612,7 +37984,7 @@ string generateRandomMessage()
         equipment_messages[$item[sneaky pete's breath spray]] = "every class a moxie class";
     foreach it in $items[twisted-up wet towel,sommelier's towel,time bandit time towel]
         equipment_messages[it] = "don't panic";
-    equipment_messages[$item[pirate fledges]] = "<img src=\"images/otherimages/12x12skull.gif\" style=\"mix-blend-mode:multiply;\"><strong> oh, better far to live and die, under the brave black flag I fly! </strong><img src=\"images/otherimages/12x12skull.gif\" style=\"mix-blend-mode:multiply;\">";
+    equipment_messages[$item[pirate fledges]] = "<img src=\"images/otherimages/12x12skull.gif\"><strong> oh, better far to live and die, under the brave black flag I fly! </strong><img src=\"images/otherimages/12x12skull.gif\">";
     equipment_messages[lookupItem("unwrapped knock-off retro superhero cape")] = "you needed worthy opponents";
     
     foreach it in equipment_messages
@@ -37765,6 +38137,10 @@ string generateRandomMessage()
             random_messages.listAppend("avatar of pet rock"); break;
         case PATH_ROBOT:
             random_messages.listAppend("weren't you already a robot? is this double robot?"); break;
+        case PATH_QUANTUM:
+            random_messages.listAppend("doldrums in the quantums"); break;
+        case PATH_WILDFIRE:
+            random_messages.listAppend("I challenge you to an agni kai!"); break;
         /*case PATH_CLASS_ACT_3:
             random_messages.listAppend("buttons for the people"); break;*/
     }
@@ -39466,9 +39842,9 @@ static
         __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(5, $location[Cobb's Knob Kitchens], "STAT2", "+40 myst, -50% familiar weight", "", false));
         __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(6, $location[Cobb's Knob Harem], "STAT2", "+40 moxie, -50% familiar weight", "", false));
         __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(7, $location[Frat House], "STAT3", "+50% muscle, -50% myst", "", false));
-        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(8, $location[Frat House In Disguise], "STAT3", "+50% muscle, -50% moxie", "", false));
+        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(8, lookupLocation("Frat House (Frat Disguise)"), "STAT3", "+50% muscle, -50% moxie", "", false));
         __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(9, $location[Hippy Camp], "STAT3", "+50% myst, -50% moxie", "", false));
-        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(10, $location[Hippy Camp In Disguise], "STAT3", "+50% myst, -50% muscle", "", false));
+        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(10, lookupLocation("Hippy Camp (Hippy Disguise)"), "STAT3", "+50% myst, -50% muscle", "", false));
         __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(11, $location[The Obligatory Pirate's Cove], "STAT3", "+50% moxie, -50% muscle", "", false));
         //12 is gone?
         __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(15, $location[The Haunted Kitchen], "ELEMENTALDAMAGE1", "+10 " + HTMLGenerateElementSpanDesaturated($element[hot]) + " damage, -2 DR", "", false));
@@ -39929,9 +40305,9 @@ void PathBadMoonGenerateChecklists(ChecklistCollection checklist_collection)
     FIXME
     "Tower Ruins" unknown to locationAvailable
     "Frat House" unknown to locationAvailable
-    "Frat House In Disguise" unknown to locationAvailable
+    "Frat House (Frat Disguise)" unknown to locationAvailable
     "Hippy Camp" unknown to locationAvailable
-    "Hippy Camp In Disguise" unknown to locationAvailable
+    "Hippy Camp (Hippy Disguise)" unknown to locationAvailable
     */
 }
 
@@ -40560,7 +40936,7 @@ buffer generateLocationBarTable(string [int] table_entries, string [int] table_e
         if (table_entry_classes contains key)
             bar.append(s);
         else
-            bar.HTMLAppendTagWrap("div", s, mapMake("class", "r_cl_modifier_inline", "style", "color:black;")); //r_cl_modifier_inline needs its own div due to CSS class order precedence
+            bar.HTMLAppendTagWrap("div", s, mapMake("class", "r_cl_modifier_inline", "style", "color:var(--main_content_text_colour);")); //r_cl_modifier_inline needs its own div due to CSS class order precedence
         if (entry_url.length() != 0)
         {
             bar.append("</a>");
@@ -40598,7 +40974,7 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
     PageAddCSSClass("", "r_popup_blackout_class", "position:fixed;top:0px;width:100%;height:100%;background:rgba(0,0,0,0.5);opacity:0;pointer-events:none;visibility:hidden;");
     
     buf.HTMLAppendTagPrefix("div", mapMake("id", "r_location_popup_box", "style", "height:auto;transition:bottom " + transition_time + ";z-index:5;opacity:0;pointer-events:none;bottom:-10000px;position:fixed;", "class", "r_bottom_outer_container"));
-    buf.HTMLAppendTagPrefix("div", "class", "r_bottom_inner_container", "style", "background:white;height:auto;padding-right:20px;");
+    buf.HTMLAppendTagPrefix("div", "class", "r_bottom_inner_container", "style", "background:var(--main_content_background_colour);height:auto;padding-right:20px;");
     
     float [monster] appearance_rates_adjusted = l.appearance_rates_adjusted();
     float [monster] appearance_rates_next_turn = l.appearance_rates(true);
@@ -41876,7 +42252,7 @@ buffer generateLocationBar(boolean displaying_navbar)
         string [string] outer_containiner_map = mapMake("id", "location_bar_outer_container", "class", "r_bottom_outer_container", "style", style);
         bar.HTMLAppendTagPrefix("div", outer_containiner_map);
         
-        string [string] inner_containiner_map = mapMake("id", "location_bar_inner_container", "class", "r_bottom_inner_container", "style", "background:white;");
+        string [string] inner_containiner_map = mapMake("id", "location_bar_inner_container", "class", "r_bottom_inner_container", "style", "background:var(--main_content_background_colour);");
         if (onmouseenter_code != "")
             inner_containiner_map["onmouseenter"] = onmouseenter_code;
         if (onmouseleave_code != "")
@@ -42092,7 +42468,7 @@ string [string] generateAPIResponse()
     else if (true)*/
     if (true)
     {
-        boolean [string] relevant_mafia_properties = $strings[merkinQuestPath,questF01Primordial,questF02Hyboria,questF03Future,questF04Elves,questF05Clancy,questG01Meatcar,questG02Whitecastle,questG03Ego,questG04Nemesis,questG05Dark,questG06Delivery,questI01Scapegoat,questI02Beat,questL02Larva,questL03Rat,questL04Bat,questL05Goblin,questL06Friar,questL07Cyrptic,questL08Trapper,questL09Topping,questL10Garbage,questL11MacGuffin,questL11Manor,questL11Palindome,questL11Pyramid,questL11Worship,questL12War,questL13Final,questM01Untinker,questM02Artist,questM03Bugbear,questM04Galaktic,questM05Toot,questM06Gourd,questM07Hammer,questM08Baker,questM09Rocks,questM10Azazel,questM11Postal,questM12Pirate,questM13Escape,questM14Bounty,questM15Lol,questS01OldGuy,questS02Monkees,sidequestArenaCompleted,sidequestFarmCompleted,sidequestJunkyardCompleted,sidequestLighthouseCompleted,sidequestNunsCompleted,sidequestOrchardCompleted,cyrptAlcoveEvilness,cyrptCrannyEvilness,cyrptNicheEvilness,cyrptNookEvilness,desertExploration,gnasirProgress,relayCounters,timesRested,currentEasyBountyItem,currentHardBountyItem,currentSpecialBountyItem,volcanoMaze1,_lastDailyDungeonRoom,seahorseName,chasmBridgeProgress,_aprilShower,lastAdventure,lastEncounter,_floristPlantsUsed,_fireStartingKitUsed,_psychoJarUsed,hiddenHospitalProgress,hiddenBowlingAlleyProgress,hiddenApartmentProgress,hiddenOfficeProgress,pyramidPosition,parasolUsed,_discoKnife,lastPlusSignUnlock,olfactedMonster,photocopyMonster,lastTempleUnlock,volcanoMaze1,blankOutUsed,peteMotorbikeCowling,peteMotorbikeGasTank,peteMotorbikeHeadlight,peteMotorbikeMuffler,peteMotorbikeSeat,peteMotorbikeTires,_petePeeledOut,_navelRunaways,_peteRiotIncited,_petePartyThrown,hiddenTavernUnlock,_dnaPotionsMade,_psychokineticHugUsed,dnaSyringe,_warbearGyrocopterUsed,questM20Necklace,questM21Dance,grimstoneMaskPath,cinderellaMinutesToMidnight,merkinVocabularyMastery,_pirateBellowUsed,questM21Dance,_defectiveTokenChecked,questG07Myst,questG08Moxie,questESpClipper,questESpGore,questESpJunglePun,questESpFakeMedium,questESlMushStash,questESlAudit,questESlBacteria,questESlCheeseburger,questESlCocktail,questESlSprinkles,questESlSalt,questESlFish,questESlDebt,_pickyTweezersUsed,_bittycar,questESpSerum,questESpOutOfOrder,_shrubDecorated,questESpEVE,questESpSmokes,questG09Muscle,_rapidPrototypingUsed,nsTowerDoorKeysUsed,_chateauDeskHarvested,lastGoofballBuy,nsChallenge1,nsChallenge2,nsContestants1,nsContestants2,nsContestants3,lastDesertUnlock,questM18Swamp,edPiece,warehouseProgress,questEStFishTrash,questEStNastyBears,questEStSocialJusticeI,questEStSocialJusticeII,questEStSuperLuber,questEStZippityDooDah,_summonAnnoyanceUsed,questEStWorkWithFood,questM24Doc,questEStGiveMeFuel,_mayoTankSoaked,_feastUsed,spelunkyNextNoncombat,spelunkySacrifices,spelunkyStatus,spelunkyUpgrades,spelunkyWinCount,_deckCardsDrawn,_glarkCableUses,_banderRunaways,questM25Armorer,pyramidBombUsed,_powerPillUses,nextAdventure,_barrelPrayer,questECoBucket,_machineTunnelsAdv,_snojoFreeFights,snojoSetting,_lastCombatStarted,batmanZone,batmanUpgrades,batmanTimeLeft,batmanStats,questLTTQuestByWire,questM26Oracle,sourceTerminalEducate1,sourceTerminalEducate2,sourceTerminalEnquiry,_sourceTerminalDigitizeUses,_sourceTerminalEnhanceUses,_sourceTerminalExtrudes,_detectiveCasesCompleted,_pottedTeaTreeUsed,lastIslandUnlock,falloutShelterChronoUsed,_timeSpinnerMinutesUsed,_lynyrdSnareUses,_noobSkillCount,_universeCalculated,_expertCornerCutterUsed,boomBoxSong,_questPartyFair,_questPartyFairQuest,_neverendingPartyFreeTurns,_latteRefillsUsed,_latteBanishUsed,_latteCopyUsed,_latteDrinkUsed,_kgbTranquilizerDartUses,banishedMonsters,lastLightsOutTurn,lastVoteMonsterTurn,_lastCombatStarted,_sausageFights,_saberMod,_saberForceMonster,_daycareRecruits,_daycareGymScavenges,_campAwayCloudBuffs,_campAwaySmileBuffs,moonTuned,zeppelinProtestors,questL11Ron,questL11Shen,questGuzzlr,_canSeekBirds,_birdOfTheDayMods,_pocketProfessorLectures,_thesisDelivered,crystalBallMonster,_feelLonelyUsed,_feelExcitementUsed,_feelPeacefulUsed,_feelEnvyUsed,_feelHatredUsed,_feelNostalgicUsed,_feelPrideUsed,_feelSuperiorUsed,_monstersMapped,mappingMonsters,retroCapeSuperhero,retroCapeWashingInstructions,shockingLickCharges,_pottedPowerPlant,backupCameraMode,_backUpUses,backupCameraReverserEnabled];
+        boolean [string] relevant_mafia_properties = $strings[merkinQuestPath,questF01Primordial,questF02Hyboria,questF03Future,questF04Elves,questF05Clancy,questG01Meatcar,questG02Whitecastle,questG03Ego,questG04Nemesis,questG05Dark,questG06Delivery,questI01Scapegoat,questI02Beat,questL02Larva,questL03Rat,questL04Bat,questL05Goblin,questL06Friar,questL07Cyrptic,questL08Trapper,questL09Topping,questL10Garbage,questL11MacGuffin,questL11Manor,questL11Palindome,questL11Pyramid,questL11Worship,questL12War,questL13Final,questM01Untinker,questM02Artist,questM03Bugbear,questM04Galaktic,questM05Toot,questM06Gourd,questM07Hammer,questM08Baker,questM09Rocks,questM10Azazel,questM11Postal,questM12Pirate,questM13Escape,questM14Bounty,questM15Lol,questS01OldGuy,questS02Monkees,sidequestArenaCompleted,sidequestFarmCompleted,sidequestJunkyardCompleted,sidequestLighthouseCompleted,sidequestNunsCompleted,sidequestOrchardCompleted,cyrptAlcoveEvilness,cyrptCrannyEvilness,cyrptNicheEvilness,cyrptNookEvilness,desertExploration,gnasirProgress,relayCounters,timesRested,currentEasyBountyItem,currentHardBountyItem,currentSpecialBountyItem,volcanoMaze1,_lastDailyDungeonRoom,seahorseName,chasmBridgeProgress,_aprilShower,lastAdventure,lastEncounter,_floristPlantsUsed,_fireStartingKitUsed,_psychoJarUsed,hiddenHospitalProgress,hiddenBowlingAlleyProgress,hiddenApartmentProgress,hiddenOfficeProgress,pyramidPosition,parasolUsed,_discoKnife,lastPlusSignUnlock,olfactedMonster,photocopyMonster,lastTempleUnlock,volcanoMaze1,blankOutUsed,peteMotorbikeCowling,peteMotorbikeGasTank,peteMotorbikeHeadlight,peteMotorbikeMuffler,peteMotorbikeSeat,peteMotorbikeTires,_petePeeledOut,_navelRunaways,_peteRiotIncited,_petePartyThrown,hiddenTavernUnlock,_dnaPotionsMade,_psychokineticHugUsed,dnaSyringe,_warbearGyrocopterUsed,questM20Necklace,questM21Dance,grimstoneMaskPath,cinderellaMinutesToMidnight,merkinVocabularyMastery,_pirateBellowUsed,questM21Dance,_defectiveTokenChecked,questG07Myst,questG08Moxie,questESpClipper,questESpGore,questESpJunglePun,questESpFakeMedium,questESlMushStash,questESlAudit,questESlBacteria,questESlCheeseburger,questESlCocktail,questESlSprinkles,questESlSalt,questESlFish,questESlDebt,_pickyTweezersUsed,_bittycar,questESpSerum,questESpOutOfOrder,_shrubDecorated,questESpEVE,questESpSmokes,questG09Muscle,_rapidPrototypingUsed,nsTowerDoorKeysUsed,_chateauDeskHarvested,lastGoofballBuy,nsChallenge1,nsChallenge2,nsContestants1,nsContestants2,nsContestants3,lastDesertUnlock,questM18Swamp,edPiece,warehouseProgress,questEStFishTrash,questEStNastyBears,questEStSocialJusticeI,questEStSocialJusticeII,questEStSuperLuber,questEStZippityDooDah,_summonAnnoyanceUsed,questEStWorkWithFood,questM24Doc,questEStGiveMeFuel,_mayoTankSoaked,_feastUsed,spelunkyNextNoncombat,spelunkySacrifices,spelunkyStatus,spelunkyUpgrades,spelunkyWinCount,_deckCardsDrawn,_glarkCableUses,_banderRunaways,questM25Armorer,pyramidBombUsed,_powerPillUses,nextAdventure,_barrelPrayer,questECoBucket,_machineTunnelsAdv,_snojoFreeFights,snojoSetting,_lastCombatStarted,batmanZone,batmanUpgrades,batmanTimeLeft,batmanStats,questLTTQuestByWire,questM26Oracle,sourceTerminalEducate1,sourceTerminalEducate2,sourceTerminalEnquiry,_sourceTerminalDigitizeUses,_sourceTerminalEnhanceUses,_sourceTerminalExtrudes,_detectiveCasesCompleted,_pottedTeaTreeUsed,lastIslandUnlock,falloutShelterChronoUsed,_timeSpinnerMinutesUsed,_lynyrdSnareUses,_noobSkillCount,_universeCalculated,_expertCornerCutterUsed,boomBoxSong,_questPartyFair,_questPartyFairQuest,_neverendingPartyFreeTurns,_latteRefillsUsed,_latteBanishUsed,_latteCopyUsed,_latteDrinkUsed,_kgbTranquilizerDartUses,banishedMonsters,lastLightsOutTurn,lastVoteMonsterTurn,_lastCombatStarted,_sausageFights,_saberMod,_saberForceMonster,_daycareRecruits,_daycareGymScavenges,_campAwayCloudBuffs,_campAwaySmileBuffs,moonTuned,zeppelinProtestors,questL11Ron,questL11Shen,questGuzzlr,_canSeekBirds,_birdOfTheDayMods,_pocketProfessorLectures,_thesisDelivered,crystalBallMonster,_feelLonelyUsed,_feelExcitementUsed,_feelPeacefulUsed,_feelEnvyUsed,_feelHatredUsed,_feelNostalgicUsed,_feelPrideUsed,_feelSuperiorUsed,_monstersMapped,mappingMonsters,retroCapeSuperhero,retroCapeWashingInstructions,shockingLickCharges,_pottedPowerPlant,backupCameraMode,_backUpUses,backupCameraReverserEnabled,_nextQuantumAlignment,_cargoPocketEmptied,_roninStoragePulls];
         
         if (false)
         {
@@ -42159,7 +42535,7 @@ buffer generateNavbar(Checklist [int] ordered_output_checklists)
     else
     	outer_style += "position:relative;z-index:6;";
     navbar.HTMLAppendTagPrefix("div", mapMake("id", "navigation_bar_outer_container", "class", "r_bottom_outer_container", "style", outer_style));
-    navbar.HTMLAppendTagPrefix("div", "class", "r_bottom_inner_container", "style", "background:" + __setting_navbar_background_colour + ";");
+    navbar.HTMLAppendTagPrefix("div", "class", "r_bottom_inner_container", "style", "background:var(--navbar_background_colour);");
     
     string [int] titles;
     foreach key in ordered_output_checklists
@@ -42275,7 +42651,7 @@ buffer generateResourceBar(Checklist [int] ordered_output_checklists)
     
     bar.HTMLAppendTagWrap("div", "", mapMake("id", "r_location_popup_blackout_info_container", "class", "r_popup_blackout_class", "style", "z-index:1;"));
     
-bar.append("<div style=\"background:white;width:100%;text-align:left;z-index:2;position:relative;display:flex;\" id=\"resource_bar_info_container\"></div>"); //display:none; //position:relative may break things?
+bar.append("<div style=\"background:var(--main_content_background_colour);width:100%;text-align:left;z-index:2;position:relative;display:flex;\" id=\"resource_bar_info_container\"></div>"); //display:none; //position:relative may break things?
     bar.append("</div>");
     bar.append("</div>");
     
@@ -42283,7 +42659,7 @@ bar.append("<div style=\"background:white;width:100%;text-align:left;z-index:2;p
     if (true)
     {
     	int size = 20; //30
-    	bar.append("<div style=\"overflow:hidden;cursor:pointer;position:absolute;width:" + size + "px;height:" + size + "px;margin-top:-" + size + "px;font-size:" + (size - 2) + "px;font-weight:bold;color:" + __setting_line_colour + ";border-top:1px solid " + __setting_line_colour + ";background:white;border-right:1px solid " + __setting_line_colour + ";\" id=\"resource_bar_hide_show_button\" onclick=\"handleResourceBarClick();\">");
+    	bar.append("<div style=\"overflow:hidden;cursor:pointer;position:absolute;width:" + size + "px;height:" + size + "px;margin-top:-" + size + "px;font-size:" + (size - 2) + "px;font-weight:bold;color:var(--line_colour);border-top:1px solid var(--line_colour);background:var(--main_content_background_colour);border-right:1px solid var(--line_colour);\" id=\"resource_bar_hide_show_button\" onclick=\"handleResourceBarClick();\">");
         bar.append("&nbsp;");
         bar.append("</div>");
     }
@@ -42310,7 +42686,7 @@ bar.append("<div style=\"background:white;width:100%;text-align:left;z-index:2;p
         string [string] outer_containiner_map = mapMake("class", "", "style", style, "id", "resource_bar_outer_container");
         bar.HTMLAppendTagPrefix("div", outer_containiner_map);
         
-        string [string] inner_containiner_map = mapMake("id", "resource_bar_inner_container", "class", "r_bottom_inner_container", "style", "height:auto;text-align:right;background-color:white;"); //text-align right so consumption is always bottom-right //text-align:right;
+        string [string] inner_containiner_map = mapMake("id", "resource_bar_inner_container", "class", "r_bottom_inner_container", "style", "height:auto;text-align:right;background-color:var(--main_content_background_colour);"); //text-align right so consumption is always bottom-right //text-align:right;
         if (onmouseenter_code != "")
             inner_containiner_map["onmouseenter"] = onmouseenter_code;
         if (onmouseleave_code != "")
@@ -42357,7 +42733,7 @@ bar.append("<div style=\"background:white;width:100%;text-align:left;z-index:2;p
     
     boolean [string] categories_to_not_flex = {"consumption junction, what's your function?":true};
     string [string] category_hardcoded_colours = {
-    "consumption junction, what's your function?":"#FFFFFF",
+    "consumption junction, what's your function?":"var(--main_content_background_colour)",
     };
     
     string [string] shortened_category_names = 
@@ -42540,6 +42916,8 @@ bar.append("<div style=\"background:white;width:100%;text-align:left;z-index:2;p
         bar.append("</style>");
     }
     PageAddCSSClass("div", "resource_entry", "flex-basis:30px;"); //base
+    PageAddCSSClass("", "r_resource_bar_image", "display:inline-block;");
+    
     
     boolean no_break_category_lines = false; //wastes quite a bit of space; do not enable
     int next_assigned_id = 1;
@@ -42564,9 +42942,10 @@ bar.append("<div style=\"background:white;width:100%;text-align:left;z-index:2;p
         	else if (hue != -1)
             {
 		        background_colour = "hsl(" + hue + ",100%, 90%)"; //70%, 85%
+                
                 background_colour_intense = "hsl(" + hue + ",100%, 70%)";
                 background_colour_faded_out_alpha = "hsla(" + hue + ",100%, 90%, 0.0)"; 
-                background_color_slightly_transparent = "hsla(" + hue + ",100%, 90%, 90%)"; 
+                background_color_slightly_transparent = "hsla(" + hue + ",100%, 90%, 90%)";
             }
             else
             {
@@ -42577,7 +42956,7 @@ bar.append("<div style=\"background:white;width:100%;text-align:left;z-index:2;p
         }
         //else
             //category_background_style = "background-color:#DDDDDD;";
-        if (false)
+        /*if (false)
         {
         	//Black and white mode:
             //Disabled because it turns into a sea of grey.
@@ -42591,7 +42970,7 @@ bar.append("<div style=\"background:white;width:100%;text-align:left;z-index:2;p
                 background_colour_intense = "black";
                 background_colour_faded_out_alpha = "rgba(221, 221, 221, 0.0)"; 
             }
-        }
+        }*/
         string category_background_style = "";
         if (background_colour != "")
             category_background_style = "background-color:" + background_colour + ";";
@@ -42615,7 +42994,7 @@ bar.append("<div style=\"background:white;width:100%;text-align:left;z-index:2;p
             string shortened = shortened_category_names[category];
             if (shortened == "") shortened = category;
             bar.append("<div style=\"display:inline-block;width:30px;font-size:0.8em;text-align:center;" + category_background_style + "\">"); //height:calc(30px + 1.4em);
-            //bar.append("<div style=\"width:15px;background-color:white;z-index:20;display:inline-block;transform:rotate(90deg);transform-origin:0 0;\">"); //width:" + (shortened.length() * 0.5) + "em;
+            //bar.append("<div style=\"width:15px;background-color:var(--main_content_background_colour);z-index:20;display:inline-block;transform:rotate(90deg);transform-origin:0 0;\">"); //width:" + (shortened.length() * 0.5) + "em;
             //bar.append(shortened);
             //bar.append("</div>");
             bar.append("</div>");
@@ -42712,7 +43091,7 @@ bar.append("<div style=\"background:white;width:100%;text-align:left;z-index:2;p
             	string shortened = shortened_category_names[category];
                 if (shortened == "") shortened = category;
                 bar.append("<div style=\"position:relative;display:inline;font-size:1.0em;font-weight:bold;visibility:hidden;\" id=\"category_" + key0 + "\">");
-                bar.append("<div style=\"position:absolute;left:0px;top:calc(15px - 0.5em - 1px);background-color:white;z-index:20;padding:2px 2px 2px 2px;\">"); //width:" + (shortened.length() * 0.5) + "em;
+                bar.append("<div style=\"position:absolute;left:0px;top:calc(15px - 0.5em - 1px);background-color:var(--main_content_background_colour);z-index:20;padding:2px 2px 2px 2px;\">"); //width:" + (shortened.length() * 0.5) + "em;
                 bar.append(shortened);
                 bar.append("</div>");
                 bar.append("</div>");
@@ -42728,12 +43107,12 @@ bar.append("<div style=\"background:white;width:100%;text-align:left;z-index:2;p
                 	//"tagging" - doesn't look good. we intentionally gave it a background but that looks worse
                     bar.append("<div style=\"position:relative;display:inline-block;\">");
                     bar.append("<div style=\"z-index:2;display:inline-block;position:absolute;left:15px;top:15px;" + category_background_style + "\">");
-                    bar.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, Vec2iMake(15, 15), "", "mix-blend-mode:multiply;"));
+                    bar.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, Vec2iMake(15, 15), "r_resource_bar_image", ""));
                     bar.append("</div>");
                     image_cancel_html.append("</div>"); //position:relative
                 }
             }
-        	string image_html = KOLImageGenerateImageHTML(image_name, true, Vec2iMake(30, 30), "", "display:inline-block;mix-blend-mode:multiply;"); //float:left;
+        	string image_html = KOLImageGenerateImageHTML(image_name, true, Vec2iMake(30, 30), "r_resource_bar_image", ""); //float:left;
             bar.append(image_html);
             bar.append(image_cancel_html);
             
@@ -42794,7 +43173,7 @@ bar.append("<div style=\"background:white;width:100%;text-align:left;z-index:2;p
                     }
                 }
             	bar.append("<div style=\"" + main_style + "\">");
-                //bar.append("<center style=\"font-size:0.8em;color:black;\">"); //margin-top:-3px;
+                //bar.append("<center style=\"font-size:0.8em;color:var(--main_content_text_colour);\">"); //margin-top:-3px;
                 //bar.append("<span style=\"margin-top:-13px;display:inline;\">");
                 
                 boolean relative_enabled = false;
@@ -42855,15 +43234,15 @@ void setUpCSSStyles()
     if (!__setting_use_kol_css)
     {
         //Base page look:
-        body_style += "font-family:Arial,Helvetica,sans-serif;background-color:white;color:black;";
-        PageAddCSSClass("a:link", "", "color:black;", -10);
-        PageAddCSSClass("a:visited", "", "color:black;", -10);
-        PageAddCSSClass("a:active", "", "color:black;", -10);
+        body_style += "font-family:Arial,Helvetica,sans-serif;background-color:var(--main_content_background_colour);color:var(--main_content_text_colour);";
+        PageAddCSSClass("a:link", "", "color:var(--main_content_text_colour);", -10);
+        PageAddCSSClass("a:visited", "", "color:var(--main_content_text_colour);", -10);
+        PageAddCSSClass("a:active", "", "color:var(--main_content_text_colour);", -10);
     }
     if (__setting_side_negative_space_is_dark)
-        body_style += "background-color:" + __setting_dark_colour + ";";
+        body_style += "background-color:var(--dark_colour);";
     else
-        body_style += "background-color:#FFFFFF;";
+        body_style += "background-color:var(--main_content_background_colour);";
     body_style += "margin:0px;padding:0px;font-size:14px;";
     
     if (__setting_ios_appearance)
@@ -42882,12 +43261,12 @@ void setUpCSSStyles()
     
     
 	PageAddCSSClass("", "r_clickable", "cursor:pointer;cursor:hand;user-select:none;-webkit-user-select:none;");
-    PageAddCSSClass("", "r_clickable:hover", "background-color:" + "#CCCCCC" + ";");
-	PageAddCSSClass("", "r_future_option", "color:" + __setting_unavailable_colour + ";");
+    PageAddCSSClass("", "r_clickable:hover", "background-color:var(--hover_alternate_colour);");
+	PageAddCSSClass("", "r_future_option", "color:var(--unavailable_colour);");
 	
     PageAddCSSClass("a", "r_cl_internal_anchor", "position:absolute;z-index:2;padding-top:" + __setting_navbar_height + ";display:inline-block;");
 	
-    PageAddCSSClass("", "r_button", "display:none;cursor:pointer;color:#7F7F7F;font-size:1.5em;");//z-index:3;position:absolute;"); //background:" + __setting_page_background_colour + ";
+    PageAddCSSClass("", "r_button", "display:none;cursor:pointer;color:#7F7F7F;font-size:1.5em;");
 	
     PageAddCSSClass("div", "r_word_wrap_group", "display:inline-block;");
 	
@@ -42896,7 +43275,7 @@ void setUpCSSStyles()
 		string hr_definition;
 		hr_definition = "height: 1px; margin-top: 1px; margin-bottom: 1px; border: 0px; width: 100%;";
 	
-		hr_definition += "background: " + __setting_line_colour + ";";
+		hr_definition += "background: var(--line_colour);";
 		PageAddCSSClass("hr", "", hr_definition);
 	}
 	
@@ -42906,7 +43285,7 @@ void setUpCSSStyles()
     
     if (__setting_show_navbar)
     {
-        PageAddCSSClass("div", "r_navbar_line_separator", "position:absolute;float:left;min-width:1px;min-height:" + __setting_navbar_height + ";background:" + __setting_line_colour + ";");
+        PageAddCSSClass("div", "r_navbar_line_separator", "position:absolute;float:left;min-width:1px;min-height:" + __setting_navbar_height + ";background:var(--line_colour);");
         PageAddCSSClass("div", "r_navbar_text", "text-align:center;font-weight:bold;font-size:.9em;");
         PageAddCSSClass("div", "r_navbar_button_container", "overflow:hidden;vertical-align:top;display:inline-block;min-height:" + __setting_navbar_height + ";");
         
@@ -42934,7 +43313,7 @@ void setUpCSSStyles()
         style += "min-height:" + __setting_navbar_height + ";";
         if (!__setting_side_negative_space_is_dark && !__setting_fill_vertical)
             style += "border-left:1px solid;border-right:1px solid;";
-        style += "border-top:1px solid;border-color:" + __setting_line_colour + ";";
+        style += "border-top:1px solid;border-color:var(--line_colour);";
         PageAddCSSClass("div", "r_bottom_inner_container", style);
     }
     //PageAddCSSClass("", "r_location_bar_table_entry", "vertical-align:middle;padding-left:0.5em;display:table-cell;");
@@ -42973,17 +43352,96 @@ void setUpCSSStyles()
     PageAddCSSClass("", "r_location_bar_background_blur", "background:rgba(255, 255, 255, 0.95);box-shadow:0px 0px 1px 2px rgba(255, 255, 255, 0.95);");
     PageAddCSSClass("", "r_location_bar_background_blur_small", "background:rgba(255, 255, 255, 0.95);box-shadow:0px 0px 0.5px 1px rgba(255, 255, 255, 0.95);");
     
-    PageAddCSSClass("", "r_tooltip_outer_class", "border-bottom:1px dotted;border-color:" + __setting_line_colour + ";position:relative;");
-    PageAddCSSClass("", "r_tooltip_inner_class", "background:white;border-style:solid;border-color:" + __setting_line_colour + ";border-width:1px;padding-left:1em;padding-right:1em;padding-bottom:0.25em;padding-top:0.25em;position:absolute;opacity:0;transition:visibility 0s linear 0.25s, opacity 0.25s linear;visibility:hidden;margin-top:1.5em;z-index:1000;width:60vw;white-space:normal;box-shadow:0px 0px 0px 10000px rgba(0,0,0,0.5);"); //white-space:nowrap;
+    PageAddCSSClass("", "r_tooltip_outer_class", "border-bottom:1px dotted;border-color:var(--line_colour);position:relative;");
+    PageAddCSSClass("", "r_tooltip_inner_class", "background:var(--main_content_background_colour);border-style:solid;border-color:var(--line_colour);border-width:1px;padding-left:1em;padding-right:1em;padding-bottom:0.25em;padding-top:0.25em;position:absolute;opacity:0;transition:visibility 0s linear 0.25s, opacity 0.25s linear;visibility:hidden;margin-top:1.5em;z-index:1000;width:60vw;white-space:normal;box-shadow:0px 0px 0px 10000px rgba(0,0,0,0.5);"); //white-space:nowrap;
     PageAddCSSClass("", "r_tooltip_inner_class_margin", "margin-top:-200px;");
     PageAddCSSClass("", "r_tooltip_outer_class:hover .r_tooltip_inner_class", "opacity:1;visibility:visible;transition-delay:0s;");
-    //PageAddCSSClass("", "r_tooltip_inner_class_weve_had_one_yes_but_what_about_second_inner_class", "background:white;border-style:solid;border-color:black;border-width:1px;padding:1em;top:1.5em;");
+    //PageAddCSSClass("", "r_tooltip_inner_class_weve_had_one_yes_but_what_about_second_inner_class", "background:var(--main_content_background_colour);border-style:solid;border-color:black;border-width:1px;padding:1em;top:1.5em;");
     
     PageAddCSSClass("", "r_no_css_transition", "-webkit-transition:none !important;-moz-transition:none !important;-o-transition:none !important;-ms-transition:none !important;transition:none !important;");
     
     
     
     PageAddCSSClass("img", "", "border:0px;mix-blend-mode:multiply;");
+    
+
+
+    PageAddCSSClass(":root", "",
+    "--unavailable_colour:" + __setting_unavailable_colour + ";" +
+    "--line_colour:" + __setting_line_colour + ";" +
+    "--dark_colour:" + __setting_dark_colour + ";" +
+    "--modifier_colour:" + __setting_modifier_colour + ";" +
+    "--navbar_background_colour:" + __setting_navbar_background_colour + ";" +
+    "--page_background_colour:" + __setting_page_background_colour + ";" +
+    "--main_content_background_colour:" + __setting_main_content_background_colour + ";" +
+    "--main_content_text_colour:" + __setting_main_content_text_colour + ";" +
+    "--hover_alternate_colour:" + __setting_hover_alternate_colour + ";"
+    );
+    if (true)
+    {
+        string style = "";
+        style += "padding-top:5px;padding-bottom:0.25em;"; //max-width:" + max_width_setting + "px;
+        if (true)//!__setting_fill_vertical) //FIXME investigate
+            style += "background-color:var(--page_background_colour);";
+        if (!__setting_side_negative_space_is_dark && !__setting_fill_vertical)
+        {
+            style += "border:1px solid;border-top:0px;border-bottom:1px solid;";
+            style += "border-color:var(--line_colour);";
+        }
+    	PageAddCSSClass("", "r_main_holding_container", style);
+    }
+    if (false)
+    {
+    	//Dark mode override:
+        //doesn't work in gecko
+        
+        PageAddCSSClass(":root", "",
+        "--unavailable_colour:" + __setting_unavailable_colour_dark + ";" +
+        "--line_colour:" + __setting_line_colour_dark + ";" +
+        "--dark_colour:" + __setting_dark_colour_dark + ";" +
+        "--modifier_colour:" + __setting_modifier_colour_dark + ";" +
+        "--navbar_background_colour:" + __setting_navbar_background_colour_dark + ";" +
+        "--page_background_colour:" + __setting_page_background_colour_dark + ";" +
+        "--main_content_background_colour:" + __setting_main_content_background_colour_dark + ";" +
+    	"--main_content_text_colour:" + __setting_main_content_text_colour_dark + ";" +
+    	"--hover_alternate_colour:" + __setting_hover_alternate_colour_dark + ";"
+        ,1, "@media (prefers-color-scheme: dark)");
+        
+     	//PageAddCSSClass("body", "", "color:white;", 1, "@media (prefers-color-scheme: dark)");
+        PageAddCSSClass("", "r_clickable:hover", "background-color:" + "#444444" + ";", 1, "@media (prefers-color-scheme: dark)");
+     
+     	//FIXME are these correct?
+    	PageAddCSSClass("", "r_location_bar_background_blur", "background:rgba(13, 13, 13, 1.0);box-shadow:0px 0px 1px 2px rgba(13, 13, 13, 1.0);", 1, "@media (prefers-color-scheme: dark)");
+    	PageAddCSSClass("", "r_location_bar_background_blur_small", "background:rgba(13, 13, 13, 1.0);box-shadow:0px 0px 0.5px 1px rgba(13, 13, 13, 1.0);", 1, "@media (prefers-color-scheme: dark)");
+        
+        
+        //Highlight gradient:
+        string highlight_colour = __setting_dark_colour_dark; //"#0F0F0F";
+        string dark_container_gradient = "background: #000000;background: -moz-linear-gradient(left, #000000 50%, " + highlight_colour + " 75%, " + highlight_colour + " 100%);background: -webkit-gradient(linear, left top, right top, color-stop(50%,#000000), color-stop(75%," + highlight_colour + "), color-stop(100%," + highlight_colour + "));background: -webkit-linear-gradient(left, #000000 50%," + highlight_colour + " 75%," + highlight_colour + " 100%);background: -o-linear-gradient(left, #000000 50%," + highlight_colour + " 75%," + highlight_colour + " 100%);background: -ms-linear-gradient(left, #000000 50%," + highlight_colour + " 75%," + highlight_colour + " 100%);background: linear-gradient(to right, #000000 50%," + highlight_colour + " 75%," + highlight_colour + " 100%);filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#000000', endColorstr='" + highlight_colour + "',GradientType=1 );"; //help
+        PageAddCSSClass("div", "r_cl_l_container_highlighted", dark_container_gradient);
+    	/*
+    	PageAddCSSClass("", "r_main_holding_container", "background-color:" + __setting_page_background_colour_dark + ";", 1, "@media (prefers-color-scheme: dark)");
+    	PageAddCSSClass("", "r_cl_header_clicked", "background-color:" + __setting_line_colour_dark + ";", 1, "@media (prefers-color-scheme: dark)"); //line
+    	PageAddCSSClass("div", "r_cl_l_left_showhide_clicked", "background-color:" + __setting_line_colour_dark + ";", 1, "@media (prefers-color-scheme: dark)");
+     
+     
+     
+    	
+     	*/
+        if (false)
+        {
+        	//Approach 1: Give a vertical white section
+        	PageAddCSSClass("", "r_cl_l_left", "background-color:white;", 1, "@media (prefers-color-scheme: dark)");
+        }
+        else if (true)
+        {
+        	//Approach two: invert all images.
+        	PageAddCSSClass("img", "", "filter:invert(1);mix-blend-mode:lighten;");
+         	//PageAddCSSClass("", "r_resource_bar_image", "mix-blend-mode:lighten !important;", 1, "@media (prefers-color-scheme: dark)");
+             PageAddCSSClass("div", "r_cl_l_container_minimised:hover", "background-color:var(--hover_alternate_colour);mix-blend-mode:lighten;");
+        }
+     
+    }
 }
 
 RegisterResourceGenerationFunction("IOTMBarrelGodGenerateResource");
@@ -50828,7 +51286,7 @@ void IOTMEmotionChipGenerate(ChecklistCollection checklists)
 	};
 	
 	
-	monster nostalgic_monster = get_property_monster("feelNostalgicMonster");
+	monster nostalgic_monster = get_property_monster("lastCopyableMonster");
 	string [skill] skill_descriptions
 	{
 	lookupSkill("Feel Lonely"):"-5% combat. (20 turns)",
@@ -51402,6 +51860,198 @@ void IOTMSpinmasterLatheGenerate(ChecklistCollection checklists)
 	}
 }
 
+//I dislike using boolean [int] here, since order isn't really supposed to be guaranteed, but ASH won't let you use {} list syntax outside of variable declarations. I think?
+int CargoSelectUnusedPocket(boolean [int] pocket_ids, boolean [int] pockets_emptied)
+{
+    foreach id in pocket_ids
+    {
+        if (!pockets_emptied[id])
+        {
+            return id;
+        }
+    }
+    return -1;
+}
+
+
+void CargoHandleStats(boolean [int] pockets_emptied, string [string][int] pocket_options)
+{
+    if (!__misc_state["need to level"])
+    {
+    	return;
+    }
+    //stats:
+    stat mainstat = my_primestat();
+    
+    int mainstat_pocket = -1;
+    if (mainstat == $stat[muscle] || true)
+    {
+        int pocket_id = CargoSelectUnusedPocket($ints[161,52,545,40,468,291,515,358,454,225,69], pockets_emptied);
+        //what outfits need muscle...?
+        if (mainstat == $stat[muscle])
+        {
+            mainstat_pocket = pocket_id;
+        }
+        else
+        {
+            pocket_options["Statgain"][pocket_id] = "muscle";
+        }
+    }
+    if (mainstat == $stat[mysticality] || true)//my_basestat($stat[mysticality] < 70)
+    {
+        int pocket_id = CargoSelectUnusedPocket($ints[37,183,176,210,133,283,103,358,194,585,459], pockets_emptied);
+        if (mainstat == $stat[mysticality])
+        {
+            mainstat_pocket = pocket_id;
+        }
+        else
+        {
+            pocket_options["Statgain"][pocket_id] = "mysticality";
+        }
+    }
+    if (mainstat == $stat[moxie] || true)//my_basestat($stat[moxie] < 70)
+    {
+        int pocket_id = CargoSelectUnusedPocket($ints[277,606,182,89,378,421,205,454,194,500,12], pockets_emptied);
+        if (mainstat == $stat[moxie])
+        {
+            mainstat_pocket = pocket_id;
+        }
+        else
+        {
+            pocket_options["Statgain"][pocket_id] = "moxie";
+        }
+    }
+    if (mainstat_pocket != -1)
+        pocket_options["Statgain"][mainstat_pocket] = "mainstat";
+    pocket_options["Statgain"][1] = "Every stat";
+}
+
+void CargoHandleFreeFights(boolean [int] pockets_emptied, string [string][int] pocket_options)
+{
+	//Fight table:
+/*
+pocket id	name	useful?	usefulness rating	notes	YR?
+√317	Camel's Toe	very	1	stars + lines, 30% drop
+√565	mountain man	yes	1	ore	yes
+√383	Skinflute	very	1	stars + lines, 30% drop
+√666	smut orc pervert	very	1	smut orc keepsake box
+√589	Green Ops Soldier	kinda, smoke + (war progress?)	2		yes
+√220	lobsterfrogman	yes	2
+√235	modern zmobie	kinda	2
+√452	pygmy shaman	yes	2	silly shaman things - ONLY during quest
+√443	War Hippy (space) cadet	very	2	hippy war outfit	yes
+√568	War Pledge	very	2	frat war outfit	yes
+√136	Knob Goblin Elite Guardsman	yes	3	must YR for outfit	yes
+490	Booze Giant	ya kinda, booze	4		yes
+402	Fruit Golem	vaguely, fruit	4	cherry + lime + orange, 15% drop	yes
+363	pufferfish	probably	4	pufferfish spines for silly things
+250	Blooper	not really	5
+191	batrat	I mean… could YR?	6		yes
+612	bugbear-in-the-box	vaguely	7	drops a box	yes
+47	dairy goat	vaguely	8	you can olfact this
+143	dirty old lihc	vaguely	8	you can olfact this
+279	Hellion	only in a vague sense	8	hellion cube for hell ramen
+299	Knob Goblin Harem Girl	kinda	8	you can meet this	yes (20%)
+646	1335 HaXx0r	don’t think so
+306	big creepy spider	nope
+30	bookbat	nope
+448	completely different spider	nope
+267	creepy clown	don’t think so
+425	eXtreme Orcish snowboarder	I don’t think so
+428	Mob Penguin Thug	don’t think so
+ */
+	if (__misc_state["in run"])
+	{
+        //these tests really need to be unified
+		if ($item[richard's star key].available_amount() + $item[richard's star key].creatable_amount() == 0 && !__quest_state["Level 13"].state_boolean["Richard's star key used"] && !($item[star].available_amount() >= 8 && $item[line].available_amount() >= 7))
+        {
+        	if (!pockets_emptied[317])
+            {
+            	pocket_options["Free Fights"][317] = "Camel's Toe for stars and lines";
+            }
+            else
+            {
+            	pocket_options["Free Fights"][383] = "Skinflute for stars and lines";
+            }
+        }
+        int missing_ore = MAX(0, 3 - __quest_state["Level 8"].state_string["ore needed"].to_item().available_amount());
+        if (!__quest_state["Level 8"].state_boolean["Past mine"] && missing_ore > 0)
+        {
+            pocket_options["Free Fights"][565] = "Mountain man for ore (YR)";
+        }
+        if (!__quest_state["Level 9"].state_boolean["bridge complete"] && (__quest_state["Level 9"].state_int["bridge fasteners needed"] > 1 || __quest_state["Level 9"].state_int["bridge lumber needed"] > 1))
+        {
+            pocket_options["Free Fights"][666] = "Smut orc pervert for bridge parts";
+        }
+        if (!__quest_state["Level 12"].finished) //FIXME improve to be more precise
+        {
+            pocket_options["Free Fights"][589] = "Green Ops Soldier for smoke bombs + war progress (YR)";
+        }
+        if (!(__quest_state["Level 12"].finished || __quest_state["Level 12"].state_boolean["Lighthouse Finished"] || $item[barrel of gunpowder].available_amount() == 5))
+        {
+            pocket_options["Free Fights"][220] = "lobsterfrogman for barrels" + ($item[barrel of gunpowder].available_amount() < 4 ? " (copy)" : "");
+        }
+        if (__quest_state["Level 7"].state_boolean["alcove needs speed tricks"])
+        {
+        	int evilness = get_property_int("cyrptAlcoveEvilness");
+            pocket_options["Free Fights"][235] = "modern zmobie for faster alcove" + (evilness >= 31 ? " (copy)" : "");
+        }
+        if (!__quest_state["Level 11 Hidden City"].state_boolean["Apartment finished"] && $effect[thrice-cursed].have_effect() == 0)
+        {
+        	string description = "pygmy shaman for hidden apartment ";
+            boolean should_copy = false;
+            if ($effect[twice-cursed].have_effect() > 0)
+            {
+            	description += "thrice-cursed";
+            }
+            else if ($effect[once-cursed].have_effect() > 0)
+            {
+            	description += "twice-cursed";
+                should_copy = true;
+            }
+            else
+            {
+            	description += "once-cursed";
+             	should_copy = true;
+            }
+            description += " effect";
+            if (should_copy)
+            	description += " (copy)";
+            pocket_options["Free Fights"][452] = description;
+        }
+        if (!(__quest_state["Level 12"].finished || have_outfit_components("War Hippy Fatigues")))
+        {
+            pocket_options["Free Fights"][443] = "War Hippy (space) cadet for hippy war outfit (YR)";
+        }
+        if (!(__quest_state["Level 12"].finished || have_outfit_components("Frat Warrior Fatigues")))
+        {
+            pocket_options["Free Fights"][568] = "War Pledge for frat war outfit (YR)";
+        }
+        if (!have_outfit_components("Knob Goblin Elite Guard Uniform") && !have_outfit_components("Knob Goblin Harem Girl Disguise") && !__quest_state["Level 5"].finished)
+        {
+            pocket_options["Free Fights"][136] = "Knob Goblin Elite Guardsman for Knob Goblin Elite Guard Uniform outfit";
+        }
+        /*if (some_test)
+        {
+            pocket_options["Free Fights"][490] = "Booze Giant for booze (YR)";
+        }
+        if (some_test)
+        {
+            pocket_options["Free Fights"][402] = "Fruit Golem for fruit (YR)";
+        }*/
+	}
+}
+
+void CargoHandleEffects(boolean [int] pockets_emptied, string [string][int] pocket_options)
+{
+	//pocket_options["Effects"][777] = "To be added";
+}
+
+void CargoHandleItems(boolean [int] pockets_emptied, string [string][int] pocket_options)
+{
+	//pocket_options["Items"][777] = "To be added";
+}
+
 RegisterGenerationFunction("IOTMCargoCultistShortsGenerate");
 void IOTMCargoCultistShortsGenerate(ChecklistCollection checklists)
 {
@@ -51411,6 +52061,48 @@ void IOTMCargoCultistShortsGenerate(ChecklistCollection checklists)
 	if (!get_property_boolean("_cargoPocketEmptied"))
 	{
 		string [int] description;
+        
+        boolean [int] pockets_emptied = get_property("cargoPocketsEmptied").stringToIntIntList(",").listInvert();
+        
+        
+        string [string][int] pocket_options; //pocket_options["Category Name"][pocket_id] = "description";
+        
+        CargoHandleStats(pockets_emptied, pocket_options);
+        CargoHandleFreeFights(pockets_emptied, pocket_options);
+        CargoHandleEffects(pockets_emptied, pocket_options);
+        CargoHandleItems(pockets_emptied, pocket_options);
+        
+
+        foreach category_name in pocket_options
+        {
+        	buffer category_description;
+            category_description.append(category_name);
+            category_description.append(": |*");
+            boolean should_add = false;
+        	foreach pocket_id in pocket_options[category_name]
+            {
+            	if (pocket_id == -1)
+                {
+                	continue;
+                }
+            	if (pockets_emptied[pocket_id])
+                {
+                	continue;
+                }
+                should_add = true;
+                string description = pocket_options[category_name][pocket_id];
+                category_description.append("<span style=\"min-width:33%;display:inline-block;\">");
+                category_description.append("<strong>");
+                category_description.append(pocket_id);
+                category_description.append("</strong>: ");
+                category_description.append(description);
+                category_description.append("</span>");
+            }
+            if (should_add)
+            {
+            	description.listAppend(category_description.to_string());
+            }
+        }
         
         
         checklists.add(C_RESOURCES, ChecklistEntryMake(546, "__item Cargo Cultist Shorts", "inventory.php?action=pocket", ChecklistSubentryMake("Cargo Cultist Shorts pocket", "", description), 1));
@@ -51504,7 +52196,7 @@ void IOTMBackupCameraGenerate(ChecklistCollection checklists)
         
         monster lm = last_monster();
         string last_monster_description = lm;
-        if (lm == $monster[none])
+        if (lm == $monster[none] || !lm.monsterCanBeCopied())
         	last_monster_description = "a monster";
         
         
@@ -54579,9 +55271,9 @@ void PathLicenseToAdventureGenerateTasks(ChecklistEntry [int] task_entries, Chec
         {
             description.listAppend("Jet-Powered Skis: +30% init");
         }
-        if (!get_property_boolean("bondSpleen") && social_capital_available >= 5 && $item[astral energy drink].available_amount() >= 2 && bond_points >= 9)
+        if (!get_property_boolean("bondSpleen") && bond_points >= 9)
         {
-            description.listAppend("Robo-Speen: Consume two AEDs in a day.");
+            description.listAppend("Robo-Speen: Spleen space.");
         }
             
             
@@ -54625,8 +55317,8 @@ void PathExplosionsGenerateResource(ChecklistEntry [int] resource_entries)
         }
         if (isotope_amount >= 10 && !$item[antique accordion].have() && my_class() != $class[accordion thief])
             description.listAppend("<strong>antique accordion</strong> - casting AT buffs.");
-        if (isotope_amount >= 20 && availableSpleen() > $item[lucky pill].available_amount())
-            description.listAppend("<strong>lucky pill</strong> - extra clovers, super useful.");
+        /*if (isotope_amount >= 20 && availableSpleen() > $item[lucky-ish pill].available_amount())
+            description.listAppend("<strong>lucky-ish pill</strong> - extra clovers, super useful.");*/
         if (isotope_amount >= 25 && !$item[signal jammer].have())
             description.listAppend("<strong>signal jammer</strong> - deals with those troublesome wandering skeletons. Equipped this in non-delay-burning areas.");
         if (isotope_amount >= 25 && !$item[space shield].have() && ($item[digital key].have() || $item[white pixel].available_amount() >= 30))
@@ -54789,6 +55481,28 @@ void PathLowKeyGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         
         task_entries.listAppend(ChecklistEntryMake(205, "__item Asdon Martin keyfob", l.getClickableURLForLocation(), subentry, 8).ChecklistEntryTag("low key summer path"));
     }      
+}
+
+RegisterGenerationFunction("PathQuantumOfFamiliarGenerate");
+void PathQuantumOfFamiliarGenerate(ChecklistCollection checklists)
+{
+	if (my_path_id() != PATH_QUANTUM) return;
+	int current_turn = total_turns_played();
+	int next_quantum_alignment = get_property_int("_nextQuantumAlignment");
+	//nextQuantumFamiliarTurn?
+	
+	if (current_turn >= next_quantum_alignment)
+	{
+		int turns_until_next_familiar_switch = clampi(get_property_int("nextQuantumFamiliarTurn") - current_turn, -1, 11);
+		string [int] description;
+        string turns_usable_in = pluralise(turns_until_next_familiar_switch, "turn", "turns");
+        if (turns_until_next_familiar_switch == -1)
+        	turns_usable_in = "unknown turns";
+        description.listAppend("Will be usable in " + turns_usable_in + ".");
+        if (get_property_int("_banderRunaways") < 11)
+	        description.listAppend("Maybe a pair of stomping boots?");
+        checklists.add(C_OPTIONAL_TASKS, ChecklistEntryMake(0, "__familiar pair of stomping boots", "qterrarium.php", ChecklistSubentryMake("Can align your next familiar", "", description), 0));
+	}
 }
 
 
@@ -55013,16 +55727,7 @@ void runMain()
     if (true)
     {
         //Holding container:
-        string style = "";
-        style += "padding-top:5px;padding-bottom:0.25em;"; //max-width:" + max_width_setting + "px;
-        if (!__setting_fill_vertical)
-            style += "background-color:" + __setting_page_background_colour + ";";
-        if (!__setting_side_negative_space_is_dark && !__setting_fill_vertical)
-        {
-            style += "border:1px solid;border-top:0px;border-bottom:1px solid;";
-            style += "border-color:" + __setting_line_colour + ";";
-        }
-        PageWrite(HTMLGenerateTagPrefix("div", mapMake("style", style)));
+        PageWrite(HTMLGenerateTagPrefix("div", mapMake("class", "r_main_holding_container")));
     }
     
     if (true)
@@ -55119,8 +55824,8 @@ void runMain()
     }
     if (__setting_fill_vertical)
     {
-        PageWrite(HTMLGenerateTagWrap("div", "", mapMake("class", "r_vertical_fill", "style", "z-index:-1;background-color:" + __setting_page_background_colour + ";"))); //Color fill //max-width:" + __setting_horizontal_width + "px;"
-        PageWrite(HTMLGenerateTagWrap("div", "", mapMake("class", "r_vertical_fill", "style", "z-index:-11;border-left:1px solid;border-right:1px solid;border-color:" + __setting_line_colour + ";width:" + (__setting_horizontal_width) + "px;"))); //Vertical border lines, empty background
+        PageWrite(HTMLGenerateTagWrap("div", "", mapMake("class", "r_vertical_fill", "style", "z-index:-1;background-color:var(--page_background_colour);"))); //Color fill //max-width:" + __setting_horizontal_width + "px;"
+        PageWrite(HTMLGenerateTagWrap("div", "", mapMake("class", "r_vertical_fill", "style", "z-index:-11;border-left:1px solid;border-right:1px solid;border-color:var(--line_colour);width:" + (__setting_horizontal_width) + "px;"))); //Vertical border lines, empty background
     }
     PageWriteHead("<script type=\"text/javascript\" src=\"GuideBrowserSide.js\"></script>");
     PageWriteHead("<script type=\"text/javascript\">function GuideParachuteInit() { if (typeof GuideInit !== 'function') { document.getElementById('extra_words_at_top').innerHTML = '<H1>Reinstall Guide</H1><H3>Installation is corrupted, missing javascript file GuideBrowserSide.js</H3>Functionality is limited.'}}</script>"); //mafia bug; we renamed a javascript file in a past release, and mafia will not always install a new file, silently breaking an installation

@@ -280,6 +280,7 @@ function mainWindow()
 {
 	var overall_window = window;
     var breakout = 100; //prevent loops, if somehow that happened
+    //Specifically parent, not parentNode or parentElement:
 	while (overall_window.parent != undefined && overall_window.parent != overall_window && breakout > 0)
     {
 		overall_window = overall_window.parent;
@@ -1206,7 +1207,7 @@ function displayResourceBarPopupFor(holding_div)
 	
 	
 	if (colour === "")
-		colour = "#FFFFFF";
+		colour = "var(--main_content_background_colour)";
     if (false)
     {
         var border_style = "";
@@ -1734,7 +1735,7 @@ function showhideChecklistSetState(event, header_button_element, new_hidden_stat
 
 function checklistHeaderButtonClicked(event)
 {
-	var header_button_element = event.target;
+	var header_button_element = event.currentTarget;
 	
 	
 	var new_hidden_state = false;
