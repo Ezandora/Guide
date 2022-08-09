@@ -362,13 +362,15 @@ string ChecklistGenerateModifierSpan(string modifier)
 void ChecklistInit()
 {
 	PageAddCSSClass("a", "r_cl_internal_anchor", "");
-	//PageAddCSSClass("", "r_cl_modifier_inline", "font-size:0.80em; color:" + __setting_modifier_colour + ";");
-	//PageAddCSSClass("", "r_cl_modifier", "font-size:0.80em; color:" + __setting_modifier_colour + "; display:block;");
-    PageAddCSSClass("", "r_cl_modifier_inline", "font-size:0.85em; color:" + __setting_modifier_colour + ";");
-    PageAddCSSClass("", "r_cl_modifier", "font-size:0.85em; color:" + __setting_modifier_colour + "; display:block;");
+	//PageAddCSSClass("", "r_cl_modifier_inline", "font-size:0.80em; color:var(--modifier_colour);");
+	//PageAddCSSClass("", "r_cl_modifier", "font-size:0.80em; color:var(--modifier_colour); display:block;");
+    PageAddCSSClass("", "r_cl_modifier_inline", "font-size:0.85em; color:var(--modifier_colour);");
+    PageAddCSSClass("", "r_cl_modifier", "font-size:0.85em; color:var(--modifier_colour); display:block;");
 	
-	PageAddCSSClass("", "r_cl_header", "text-align:center; font-size:1.15em; font-weight:bold;width:100%;padding-bottom:5px;border-bottom:1px solid " + __setting_line_colour + ";padding-top:5px;");
-	PageAddCSSClass("", "r_cl_header_clicked", "background-color:" + __setting_line_colour + ";"); //__setting_line_colour is too light
+	//PageAddCSSClass("", "r_cl_header", "text-align:center; font-size:1.15em; font-weight:bold;width:100%;padding-bottom:5px;border-bottom:1px solid var(--line_colour);padding-top:5px;");
+	PageAddCSSClass("", "r_cl_header", "text-align:center;width:100%;padding-bottom:5px;border-bottom:1px solid var(--line_colour);padding-top:5px;");
+	PageAddCSSClass("", "r_cl_header_text", "font-size:1.15em; font-weight:bold;");
+	PageAddCSSClass("", "r_cl_header_clicked", "background-color:var(--line_colour);"); //__setting_line_colour is too light
 	//Thought about making subheaders for abridged mode bigger - 1.5em fits fine within the vertical space - but it looks weird, like shouting.
 	PageAddCSSClass("", "r_cl_subheader", "font-size:1.07em; font-weight:bold;");
 	PageAddCSSClass("", "r_cl_subheader_abridged", "font-size:1.07em; font-weight:bold;");
@@ -403,11 +405,11 @@ void ChecklistInit()
 	{
 		string div_style = "";
 		div_style = "margin:0px;";
-        /*div_style += "border-style: solid; border-color:" + __setting_line_colour + ";";
+        /*div_style += "border-style: solid; border-color:var(--line_colour);";
         div_style += "border:1px;";
         div_style += "border-left:0px; border-right:0px;border-bottom:0px;";*/
-        div_style += "border-top:1px solid " + __setting_line_colour + ";";
-        div_style += "background-color:#FFFFFF; width:100%;";// padding-top:5px;";
+        div_style += "border-top:1px solid var(--line_colour);";
+        div_style += "background-color:var(--main_content_background_colour); width:100%;";// padding-top:5px;";
         if (__use_flexbox_on_checklists)
         	div_style += "display:flex;flex-wrap:wrap;align-items:stretch;";
 		PageAddCSSClass("div", "r_cl_checklist_container", div_style);
@@ -485,7 +487,7 @@ void ChecklistInit()
     if (__use_flexbox_on_checklists)
     {
     	//padding-top:5px;padding-bottom:5px;
-        PageAddCSSClass("div", "r_cl_l_container", "display:flex;flex-direction:row;flex-wrap:nowrap;justify-content:flex-start;align-items:stretch;border-bottom:1px solid " + __setting_line_colour + ";flex-grow:1;width:100%;width:100%;"); //width:600px;
+        PageAddCSSClass("div", "r_cl_l_container", "display:flex;flex-direction:row;flex-wrap:nowrap;justify-content:flex-start;align-items:stretch;border-bottom:1px solid var(--line_colour);flex-grow:1;width:100%;width:100%;"); //width:600px;
         PageAddCSSClass("div", "r_cl_l_container_highlighted", container_gradient);
         PageAddCSSClass("div", "r_cl_l_container_minimised", "width:200px;");
         PageAddCSSClass("div", "r_cl_l_container_always_minimised", "width:200px;");
@@ -505,22 +507,22 @@ void ChecklistInit()
         if (false)
         {
         	//solid background:
-            //PageAddCSSClass("div", "r_cl_l_left_showhide", "cursor:pointer;background:" + __setting_line_colour + ";width:20px;flex-shrink:0;");
+            //PageAddCSSClass("div", "r_cl_l_left_showhide", "cursor:pointer;background:var(--line_colour);width:20px;flex-shrink:0;");
         }
         else
         {
-            //PageAddCSSClass("div", "r_cl_l_left_showhide:hover", "background:" + __setting_line_colour + ";");
+            //PageAddCSSClass("div", "r_cl_l_left_showhide:hover", "background:var(--line_colour);");
         }
         //PageAddCSSClass("div", "r_cl_l_left_showhide_blank", "width:21px;max-width:21px;min-width:21px;flex-shrink:0;");
         
         //art design student
         
-        PageAddCSSClass("div", "r_cl_l_left_showhide_clicked", "background-color:" + __setting_page_background_colour + ";"); //this looks nicer, but line matches header clicked
-        //PageAddCSSClass("div", "r_cl_l_left_showhide_clicked", "background-color:" + __setting_line_colour + ";");
+        PageAddCSSClass("div", "r_cl_l_left_showhide_clicked", "background-color:var(--page_background_colour);"); //this looks nicer, but line matches header clicked
+        //PageAddCSSClass("div", "r_cl_l_left_showhide_clicked", "background-color:var(--line_colour);");
         
-        PageAddCSSClass("div", "r_cl_l_left_showhide", "border-right:1px solid " + __setting_line_colour + ";border-left:1px solid " + __setting_line_colour + ";width:15px;max-width:15px;min-width:15px;flex-shrink:0;flex-grow:0;flex-basis:0;margin-left:-1px;"); //-1 px to hide the left border
-        PageAddCSSClass("div", "r_cl_l_container_minimised:hover", "background-color:" + "#CCCCCC" + ";mix-blend-mode:multiply;");
-        //PageAddCSSClass("div", "r_cl_l_left_showhide:hover", "background-color:" + "#CCCCCC" + ";");
+        PageAddCSSClass("div", "r_cl_l_left_showhide", "border-right:1px solid var(--line_colour);border-left:1px solid var(--line_colour);width:15px;max-width:15px;min-width:15px;flex-shrink:0;flex-grow:0;flex-basis:0;margin-left:-1px;"); //-1 px to hide the left border
+        PageAddCSSClass("div", "r_cl_l_container_minimised:hover", "background-color:var(--hover_alternate_colour);mix-blend-mode:multiply;");
+        //PageAddCSSClass("div", "r_cl_l_left_showhide:hover", "background-color:var(--hover_alternate_colour);");
         PageAddCSSClass("div", "r_cl_l_left_showhide", "width:20px;max-width:20px;min-width:15px;", 0, __setting_media_query_medium_size);
         PageAddCSSClass("div", "r_cl_l_left_showhide", "width:15px;max-width:15px;min-width:15px;", 0, __setting_media_query_small_size);
         PageAddCSSClass("div", "r_cl_l_left_showhide", "width:10px;max-width:10px;min-width:10px;", 0, __setting_media_query_tiny_size);
@@ -528,7 +530,7 @@ void ChecklistInit()
         PageAddCSSClass("div", "r_cl_l_left_showhide_blank", "border-right:1px solid transparent;border-left:1px solid transparent;");
         PageAddCSSClass("div", "r_cl_l_left_showhide_blank:hover", "cursor:auto;background:transparent;");
         
-        PageAddCSSClass("div", "showhide_mouseover_popup_class", "position:absolute;background:white;width:100%;z-index:5;border-bottom:1px solid " + __setting_line_colour + ";border-right:1px solid " + __setting_line_colour + ";pointer-events:none;box-shadow:0px 0px 30px 0px black;display:none;");
+        PageAddCSSClass("div", "showhide_mouseover_popup_class", "position:absolute;background:var(--main_content_background_colour);width:100%;z-index:5;border-bottom:1px solid var(--line_colour);border-right:1px solid var(--line_colour);pointer-events:none;box-shadow:0px 0px 30px 0px black;display:none;");
          //transition:opacity 0.25s; box-shadow:0px 0px 0px 10000px rgba(0,0,0,0.5); opacity:0;
         
     }
@@ -909,10 +911,23 @@ buffer ChecklistGenerate(Checklist cl, boolean output_borders)
     result.HTMLAppendTagPrefix("div", main_container_map);
 	
 	
-	result.HTMLAppendTagWrap("div", cl.title, mapMake("class", "r_cl_header r_clickable", "onmousedown", "checklistHeaderButtonClicked(window.event)"));
-	
+	/*string main_header_style_overrides;
 	if (special_subheader != "")
-		result.append(ChecklistGenerateModifierSpan(special_subheader));
+		main_header_style_overrides = "border:0px;";*/
+  
+  	string main_header_text = HTMLGenerateDivOfClass(cl.title, "r_cl_header_text");
+    if (special_subheader != "")
+    {
+    	main_header_text += HTMLGenerateDivOfClassAndStyle(special_subheader, "r_centre r_cl_modifier", "");
+    }
+      
+	result.HTMLAppendTagWrap("div", main_header_text, mapMake("class", "r_cl_header r_clickable", "onmousedown", "checklistHeaderButtonClicked(window.event)"));
+	
+	/*if (special_subheader != "" && false)
+	{
+		result.HTMLAppendTagWrap("div", HTMLGenerateSpanOfClass(special_subheader, "r_centre"), mapMake("class", "r_cl_l_container r_cl_modifier", "style", "padding-bottom:3px;"));
+		//result.append(ChecklistGenerateModifierSpan(special_subheader));
+    }*/
 	
 	int starting_intra_i = 0;
 	if (skip_first_entry)

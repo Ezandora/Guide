@@ -1049,6 +1049,14 @@ boolean weapon_is_club(item it)
     return false;
 }
 
+boolean weapon_is_sword(item it)
+{
+    if (it.to_slot() != $slot[weapon]) return false;
+    if (it.item_type() == "sword" && $effect[Iron Palms].have_effect() == 0)
+        return true;
+    return false;
+}
+
 buffer prepend(buffer in_buffer, buffer value)
 {
     buffer result;
@@ -1238,9 +1246,15 @@ item [int] generateEquipmentForExtraExperienceOnStat(stat desired_stat, boolean 
     	slot s = it.to_slot();
         if (s == $slot[shirt] && !(lookupSkill("Torso Awareness").have_skill() || $skill[Best Dressed].have_skill()))
         	continue;
+        if (s == $slot[weapon] && it.weapon_hands() > 1 && item_slots[$slot[off-hand]] != $item[none]) //can't equip an off-hand and a two-handed weapon
+        	continue;
         if (it.available_amount() > 0 && (!require_can_equip_currently || it.can_equip()) && item_slots[it.to_slot()].numeric_modifier(numeric_modifier_string) < it.numeric_modifier(numeric_modifier_string))
         {
             item_slots[it.to_slot()] = it;
+            if (s == $slot[weapon] && it.weapon_hands() > 1)
+            {
+                item_slots[$slot[off-hand]] = it;
+            }
         }
     }
     
@@ -1431,7 +1445,11 @@ boolean monster_has_zero_turn_cost(monster m)
         return true;
     if ($monsters[terrible mutant,slime blob,government bureaucrat,angry ghost,annoyed snake] contains m && get_property_int("_voteFreeFights") < 3)
     	return true;
+    if ($monsters[void guy,void slab,void spider] contains m && get_property_int("_voidFreeFights") < 5)
+    	return true;
     if ($monsters[biker,burnout,jock,party girl,"plain" girl] contains m && get_property_int("_neverendingPartyFreeTurns") < 10)
+    	return true;
+    if (m == $monster[piranha plant]) //may or may not be location-specific?
     	return true;
     return false;
 }
@@ -1759,3 +1777,23 @@ string getBasicItemDescription(item it)
 	return out.to_string();
 }
 
+boolean monsterCanBeCopied(monster m)
+{
+	if (!m.copyable) return false;
+	if (m.boss) return false;
+	if ($monsters[writing desk,dirty thieving brigand] contains m) return false; //manual override list
+	return true;
+}
+
+boolean locationIsGoneFromTheGame(location l)
+{
+	if (l.parent == "Removed") return true;
+	
+	return false;
+}
+boolean locationIsEventSpecific(location l)
+{
+	if (l.zone == "Twitch" || l.zone == "Events") return true;
+	
+	return false;
+}

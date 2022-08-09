@@ -557,7 +557,7 @@ buffer generateLocationBar(boolean displaying_navbar)
         string [string] outer_containiner_map = mapMake("id", "location_bar_outer_container", "class", "r_bottom_outer_container", "style", style);
         bar.HTMLAppendTagPrefix("div", outer_containiner_map);
         
-        string [string] inner_containiner_map = mapMake("id", "location_bar_inner_container", "class", "r_bottom_inner_container", "style", "background:white;");
+        string [string] inner_containiner_map = mapMake("id", "location_bar_inner_container", "class", "r_bottom_inner_container", "style", "background:var(--main_content_background_colour);");
         if (onmouseenter_code != "")
             inner_containiner_map["onmouseenter"] = onmouseenter_code;
         if (onmouseleave_code != "")

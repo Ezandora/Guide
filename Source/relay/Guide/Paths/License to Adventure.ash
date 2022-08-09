@@ -103,9 +103,9 @@ void PathLicenseToAdventureGenerateTasks(ChecklistEntry [int] task_entries, Chec
         {
             description.listAppend("Jet-Powered Skis: +30% init");
         }
-        if (!get_property_boolean("bondSpleen") && social_capital_available >= 5 && $item[astral energy drink].available_amount() >= 2 && bond_points >= 9)
+        if (!get_property_boolean("bondSpleen") && bond_points >= 9)
         {
-            description.listAppend("Robo-Speen: Consume two AEDs in a day.");
+            description.listAppend("Robo-Speen: Spleen space.");
         }
             
             

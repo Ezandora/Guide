@@ -7,32 +7,34 @@ record CSSEntry
     string class_name;
     string definition;
     int importance;
+    string block_identifier;
 };
 
-CSSEntry CSSEntryMake(string tag, string class_name, string definition, int importance)
+CSSEntry CSSEntryMake(string tag, string class_name, string definition, int importance, string block_identifier)
 {
     CSSEntry entry;
     entry.tag = tag;
     entry.class_name = class_name;
     entry.definition = definition;
     entry.importance = importance;
+    entry.block_identifier = block_identifier;
     return entry;
 }
 
-record CSSBlock
+record CSSBlock //no longer used; kept for backwards compatibility
 {
     CSSEntry [int] defined_css_classes;
     string identifier;
 };
 
-CSSBlock CSSBlockMake(string identifier)
+CSSBlock CSSBlockMake(string identifier) //no longer used; kept for backwards compatibility
 {
     CSSBlock result;
     result.identifier = identifier;
     return result;
 }
 
-buffer CSSBlockGenerate(CSSBlock block)
+buffer CSSBlockGenerate(CSSBlock block) //no longer used; kept for backwards compatibility
 {
     buffer result;
     
@@ -81,7 +83,8 @@ record Page
 	buffer body_contents;
 	string [string] body_attributes; //[attribute_name] -> attribute_value
 	
-    CSSBlock [string] defined_css_blocks; //There is always an implicit "" block.
+    CSSBlock [string] defined_css_blocks; //There is always an implicit "" block. Deprecated.
+    CSSEntry [int] defined_css_classes; //new approach
 };
 
 
@@ -115,7 +118,7 @@ buffer PageGenerateStyle(Page page_in)
 {
     buffer result;
     
-    if (page_in.defined_css_blocks.count() > 0)
+    if (page_in.defined_css_blocks.count() > 0) //no longer used; kept for backwards compatibility
     {
         if (true)
         {
@@ -136,6 +139,62 @@ buffer PageGenerateStyle(Page page_in)
             result.append("\t\t</style>\n");
         }
     }
+    
+    if (page_in.defined_css_classes.count() > 0)
+    {
+    	sort page_in.defined_css_classes by value.block_identifier;
+    	sort page_in.defined_css_classes by value.importance;
+        
+        if (true)
+        {
+            result.append("\t\t");
+            result.HTMLAppendTagPrefix("style", "type", "text/css");
+            result.append("\n");
+        }
+        
+        
+        string active_block_identifier = "";
+        foreach key, entry in page_in.defined_css_classes
+        {
+            boolean has_identifier = (entry.block_identifier != "");
+            
+            if (entry.block_identifier != active_block_identifier)
+            {
+                if (active_block_identifier.length() > 0)
+                    result.append("\n\t\t\t}\n");
+                if (has_identifier)
+                {
+                    result.append("\t\t\t");
+                    result.append(entry.block_identifier);
+                    result.append(" {\n");
+                }
+                active_block_identifier = entry.block_identifier;
+            }
+            
+            result.append("\t\t\t");
+            if (active_block_identifier.length() > 0)
+                result.append("\t");
+        
+            if (entry.class_name == "")
+                result.append(entry.tag + " { " + entry.definition + " }");
+            else
+                result.append(entry.tag + "." + entry.class_name + " { " + entry.definition + " }");
+            result.append("\n");
+                
+        }
+        if (active_block_identifier.length() > 0)
+        {
+        	active_block_identifier = "";
+            result.append("\n\t\t\t}\n");
+        }
+        
+        if (true)
+        {
+            result.append("\t\t</style>\n");
+        }
+    }
+    
+    
     return result;
 }
 
@@ -210,9 +269,14 @@ void PageSetTitle(Page page_in, string title)
 void PageAddCSSClass(Page page_in, string tag, string class_name, string definition, int importance, string block_identifier)
 {
     //print_html("Adding block_identifier \"" + block_identifier + "\"");
-    if (!(page_in.defined_css_blocks contains block_identifier))
-        page_in.defined_css_blocks[block_identifier] = CSSBlockMake(block_identifier);
-    page_in.defined_css_blocks[block_identifier].defined_css_classes.listAppend(CSSEntryMake(tag, class_name, definition, importance));
+    if (false) //deprecated
+    {
+        if (!(page_in.defined_css_blocks contains block_identifier))
+            page_in.defined_css_blocks[block_identifier] = CSSBlockMake(block_identifier);
+        page_in.defined_css_blocks[block_identifier].defined_css_classes.listAppend(CSSEntryMake(tag, class_name, definition, importance, block_identifier));
+	}
+    
+    page_in.defined_css_classes.listAppend(CSSEntryMake(tag, class_name, definition, importance, block_identifier));
 }
 
 void PageAddCSSClass(Page page_in, string tag, string class_name, string definition, int importance)
@@ -339,7 +403,7 @@ void PageInit()
 	//Simple table lines:
 	PageAddCSSClass("div", "r_stl_container", "display:table;");
 	PageAddCSSClass("div", "r_stl_row", "display:table-row;");
-    PageAddCSSClass("div", "r_stl_entry", "padding:0px;margin:0px;display:table-cell;padding-top:1px;padding-right:1em;border-bottom:1px solid " + __setting_line_colour + ";padding-bottom:1px;");
+    PageAddCSSClass("div", "r_stl_entry", "padding:0px;margin:0px;display:table-cell;padding-top:1px;padding-right:1em;border-bottom:1px solid var(--line_colour);padding-bottom:1px;");
     PageAddCSSClass("div", "r_stl_entry_last_column", "padding-right:0em;");
     PageAddCSSClass("div", "r_stl_entry_last_row", "border-bottom:initial;padding-bottom:0px;");
     

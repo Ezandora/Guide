@@ -20,7 +20,7 @@ buffer generateResourceBar(Checklist [int] ordered_output_checklists)
     
     bar.HTMLAppendTagWrap("div", "", mapMake("id", "r_location_popup_blackout_info_container", "class", "r_popup_blackout_class", "style", "z-index:1;"));
     
-bar.append("<div style=\"background:white;width:100%;text-align:left;z-index:2;position:relative;display:flex;\" id=\"resource_bar_info_container\"></div>"); //display:none; //position:relative may break things?
+bar.append("<div style=\"background:var(--main_content_background_colour);width:100%;text-align:left;z-index:2;position:relative;display:flex;\" id=\"resource_bar_info_container\"></div>"); //display:none; //position:relative may break things?
     bar.append("</div>");
     bar.append("</div>");
     
@@ -28,7 +28,7 @@ bar.append("<div style=\"background:white;width:100%;text-align:left;z-index:2;p
     if (true)
     {
     	int size = 20; //30
-    	bar.append("<div style=\"overflow:hidden;cursor:pointer;position:absolute;width:" + size + "px;height:" + size + "px;margin-top:-" + size + "px;font-size:" + (size - 2) + "px;font-weight:bold;color:" + __setting_line_colour + ";border-top:1px solid " + __setting_line_colour + ";background:white;border-right:1px solid " + __setting_line_colour + ";\" id=\"resource_bar_hide_show_button\" onclick=\"handleResourceBarClick();\">");
+    	bar.append("<div style=\"overflow:hidden;cursor:pointer;position:absolute;width:" + size + "px;height:" + size + "px;margin-top:-" + size + "px;font-size:" + (size - 2) + "px;font-weight:bold;color:var(--line_colour);border-top:1px solid var(--line_colour);background:var(--main_content_background_colour);border-right:1px solid var(--line_colour);\" id=\"resource_bar_hide_show_button\" onclick=\"handleResourceBarClick();\">");
         bar.append("&nbsp;");
         bar.append("</div>");
     }
@@ -55,7 +55,7 @@ bar.append("<div style=\"background:white;width:100%;text-align:left;z-index:2;p
         string [string] outer_containiner_map = mapMake("class", "", "style", style, "id", "resource_bar_outer_container");
         bar.HTMLAppendTagPrefix("div", outer_containiner_map);
         
-        string [string] inner_containiner_map = mapMake("id", "resource_bar_inner_container", "class", "r_bottom_inner_container", "style", "height:auto;text-align:right;background-color:white;"); //text-align right so consumption is always bottom-right //text-align:right;
+        string [string] inner_containiner_map = mapMake("id", "resource_bar_inner_container", "class", "r_bottom_inner_container", "style", "height:auto;text-align:right;background-color:var(--main_content_background_colour);"); //text-align right so consumption is always bottom-right //text-align:right;
         if (onmouseenter_code != "")
             inner_containiner_map["onmouseenter"] = onmouseenter_code;
         if (onmouseleave_code != "")
@@ -102,7 +102,7 @@ bar.append("<div style=\"background:white;width:100%;text-align:left;z-index:2;p
     
     boolean [string] categories_to_not_flex = {"consumption junction, what's your function?":true};
     string [string] category_hardcoded_colours = {
-    "consumption junction, what's your function?":"#FFFFFF",
+    "consumption junction, what's your function?":"var(--main_content_background_colour)",
     };
     
     string [string] shortened_category_names = 
@@ -285,6 +285,8 @@ bar.append("<div style=\"background:white;width:100%;text-align:left;z-index:2;p
         bar.append("</style>");
     }
     PageAddCSSClass("div", "resource_entry", "flex-basis:30px;"); //base
+    PageAddCSSClass("", "r_resource_bar_image", "display:inline-block;");
+    
     
     boolean no_break_category_lines = false; //wastes quite a bit of space; do not enable
     int next_assigned_id = 1;
@@ -309,9 +311,10 @@ bar.append("<div style=\"background:white;width:100%;text-align:left;z-index:2;p
         	else if (hue != -1)
             {
 		        background_colour = "hsl(" + hue + ",100%, 90%)"; //70%, 85%
+                
                 background_colour_intense = "hsl(" + hue + ",100%, 70%)";
                 background_colour_faded_out_alpha = "hsla(" + hue + ",100%, 90%, 0.0)"; 
-                background_color_slightly_transparent = "hsla(" + hue + ",100%, 90%, 90%)"; 
+                background_color_slightly_transparent = "hsla(" + hue + ",100%, 90%, 90%)";
             }
             else
             {
@@ -322,7 +325,7 @@ bar.append("<div style=\"background:white;width:100%;text-align:left;z-index:2;p
         }
         //else
             //category_background_style = "background-color:#DDDDDD;";
-        if (false)
+        /*if (false)
         {
         	//Black and white mode:
             //Disabled because it turns into a sea of grey.
@@ -336,7 +339,7 @@ bar.append("<div style=\"background:white;width:100%;text-align:left;z-index:2;p
                 background_colour_intense = "black";
                 background_colour_faded_out_alpha = "rgba(221, 221, 221, 0.0)"; 
             }
-        }
+        }*/
         string category_background_style = "";
         if (background_colour != "")
             category_background_style = "background-color:" + background_colour + ";";
@@ -360,7 +363,7 @@ bar.append("<div style=\"background:white;width:100%;text-align:left;z-index:2;p
             string shortened = shortened_category_names[category];
             if (shortened == "") shortened = category;
             bar.append("<div style=\"display:inline-block;width:30px;font-size:0.8em;text-align:center;" + category_background_style + "\">"); //height:calc(30px + 1.4em);
-            //bar.append("<div style=\"width:15px;background-color:white;z-index:20;display:inline-block;transform:rotate(90deg);transform-origin:0 0;\">"); //width:" + (shortened.length() * 0.5) + "em;
+            //bar.append("<div style=\"width:15px;background-color:var(--main_content_background_colour);z-index:20;display:inline-block;transform:rotate(90deg);transform-origin:0 0;\">"); //width:" + (shortened.length() * 0.5) + "em;
             //bar.append(shortened);
             //bar.append("</div>");
             bar.append("</div>");
@@ -457,7 +460,7 @@ bar.append("<div style=\"background:white;width:100%;text-align:left;z-index:2;p
             	string shortened = shortened_category_names[category];
                 if (shortened == "") shortened = category;
                 bar.append("<div style=\"position:relative;display:inline;font-size:1.0em;font-weight:bold;visibility:hidden;\" id=\"category_" + key0 + "\">");
-                bar.append("<div style=\"position:absolute;left:0px;top:calc(15px - 0.5em - 1px);background-color:white;z-index:20;padding:2px 2px 2px 2px;\">"); //width:" + (shortened.length() * 0.5) + "em;
+                bar.append("<div style=\"position:absolute;left:0px;top:calc(15px - 0.5em - 1px);background-color:var(--main_content_background_colour);z-index:20;padding:2px 2px 2px 2px;\">"); //width:" + (shortened.length() * 0.5) + "em;
                 bar.append(shortened);
                 bar.append("</div>");
                 bar.append("</div>");
@@ -473,12 +476,12 @@ bar.append("<div style=\"background:white;width:100%;text-align:left;z-index:2;p
                 	//"tagging" - doesn't look good. we intentionally gave it a background but that looks worse
                     bar.append("<div style=\"position:relative;display:inline-block;\">");
                     bar.append("<div style=\"z-index:2;display:inline-block;position:absolute;left:15px;top:15px;" + category_background_style + "\">");
-                    bar.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, Vec2iMake(15, 15), "", "mix-blend-mode:multiply;"));
+                    bar.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, Vec2iMake(15, 15), "r_resource_bar_image", ""));
                     bar.append("</div>");
                     image_cancel_html.append("</div>"); //position:relative
                 }
             }
-        	string image_html = KOLImageGenerateImageHTML(image_name, true, Vec2iMake(30, 30), "", "display:inline-block;mix-blend-mode:multiply;"); //float:left;
+        	string image_html = KOLImageGenerateImageHTML(image_name, true, Vec2iMake(30, 30), "r_resource_bar_image", ""); //float:left;
             bar.append(image_html);
             bar.append(image_cancel_html);
             
@@ -539,7 +542,7 @@ bar.append("<div style=\"background:white;width:100%;text-align:left;z-index:2;p
                     }
                 }
             	bar.append("<div style=\"" + main_style + "\">");
-                //bar.append("<center style=\"font-size:0.8em;color:black;\">"); //margin-top:-3px;
+                //bar.append("<center style=\"font-size:0.8em;color:var(--main_content_text_colour);\">"); //margin-top:-3px;
                 //bar.append("<span style=\"margin-top:-13px;display:inline;\">");
                 
                 boolean relative_enabled = false;

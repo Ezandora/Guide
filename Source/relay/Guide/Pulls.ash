@@ -481,7 +481,7 @@ void generatePullList(Checklist [int] checklists)
     }
 	
 	if (my_path_id() != PATH_COMMUNITY_SERVICE)
-		pullable_item_list.listAppend(GPItemMake($item[ten-leaf clover], "Various turn saving.|Generic pull.", 20));
+		pullable_item_list.listAppend(GPItemMake(lookupItem("11-leaf clover"), "Various turn saving.|Generic pull.", 20));
     
     if (!get_property_ascension("lastTempleUnlock") && $item[spooky-gro fertilizer].item_amount() == 0 && my_path_id() != PATH_G_LOVER && !__quest_state["Level 11"].finished)
         pullable_item_list.listAppend(GPItemMake($item[spooky-gro fertilizer], "Saves 2.5 turns while unlocking temple."));
@@ -589,6 +589,7 @@ void generatePullList(Checklist [int] checklists)
         foreach it in $items[mafia thumb ring,License to Chill,etched hourglass]
             pullable_item_list.listAppend(GPItemMake(it, "lazy turngen", 1));
     }
+    boolean [item] already_pulled_today = get_property("_roninStoragePulls").split_string(",").listConvertToItem().listInvert();
     
 	
 	boolean currently_trendy = (my_path_id() == PATH_TRENDY);
@@ -647,6 +648,7 @@ void generatePullList(Checklist [int] checklists)
 		foreach key in items
 		{
 			item it = items[key];
+            if (already_pulled_today[it]) continue;
 			if (currently_trendy && !is_trendy(it))
 				continue;
             if (!is_unrestricted(it))
@@ -667,10 +669,10 @@ void generatePullList(Checklist [int] checklists)
                         url = "storage.php?which=2";
                 }
               
-                if (it.storage_amount() == 0 && (__pulls_reasonable_to_buy_in_run contains it) && it != $item[ten-leaf clover] && it != $item[none])
+                if (it.storage_amount() == 0 && (__pulls_reasonable_to_buy_in_run contains it) && it != lookupItem("11-leaf clover") && it != $item[none])
                     url = "mall.php";
               
-				if (max_wanted == 1)
+				if (max_wanted == 1 || true)
 					pulls_entries.listAppend(ChecklistEntryMake(99, it, url, ChecklistSubentryMake(it, "", reason_list)));
 				else
 					pulls_entries.listAppend(ChecklistEntryMake(100, it, url, ChecklistSubentryMake(pluralise(actual_amount, it), "", reason_list)));

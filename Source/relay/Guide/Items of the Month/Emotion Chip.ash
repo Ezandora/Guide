@@ -70,7 +70,7 @@ void IOTMEmotionChipGenerate(ChecklistCollection checklists)
 	};
 	
 	
-	monster nostalgic_monster = get_property_monster("feelNostalgicMonster");
+	monster nostalgic_monster = get_property_monster("lastCopyableMonster");
 	string [skill] skill_descriptions
 	{
 	lookupSkill("Feel Lonely"):"-5% combat. (20 turns)",

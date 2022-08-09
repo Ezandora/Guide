@@ -16,3 +16,5 @@ import "relay/Guide/Paths/License to Adventure.ash";
 import "relay/Guide/Paths/G-Lover.ash";
 import "relay/Guide/Paths/Explosions.ash";
 import "relay/Guide/Paths/Low Key.ash";
+import "relay/Guide/Paths/Quantum of Familiar.ash";
+

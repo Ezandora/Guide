@@ -1357,7 +1357,7 @@ void QHotAirportLavaCoLampGenerateTasks(ChecklistEntry [int] task_entries)
             }
             else
             {
-                description.listAppend("Acquire glowing New Age crystal. (mall, or healing crystal golem in the mine))");
+                description.listAppend("Acquire glowing New Age crystal. (mall, or healing crystal golem in the mine)");
             }
         }
         if ($item[heat-resistant sheet metal].item_amount() == 0)

@@ -8,7 +8,7 @@ buffer generateNavbar(Checklist [int] ordered_output_checklists)
     else
     	outer_style += "position:relative;z-index:6;";
     navbar.HTMLAppendTagPrefix("div", mapMake("id", "navigation_bar_outer_container", "class", "r_bottom_outer_container", "style", outer_style));
-    navbar.HTMLAppendTagPrefix("div", "class", "r_bottom_inner_container", "style", "background:" + __setting_navbar_background_colour + ";");
+    navbar.HTMLAppendTagPrefix("div", "class", "r_bottom_inner_container", "style", "background:var(--navbar_background_colour);");
     
     string [int] titles;
     foreach key in ordered_output_checklists

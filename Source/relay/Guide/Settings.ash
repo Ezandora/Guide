@@ -1,5 +1,5 @@
 //These settings are for development. Don't worry about editing them.
-string __version = "2.0.2";
+string __version = "2.0.3";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -34,12 +34,27 @@ float __setting_location_bar_max_width_per_entry = 0.35;
 boolean __setting_small_size_uses_full_width = false; //implemented, but disabled - doesn't look amazing. reduced indention width instead to compensate
 boolean __setting_enable_outputting_all_numberology_options = true;
 
-string __setting_unavailable_colour = "#7F7F7F";
-string __setting_line_colour = "#B2B2B2";
-string __setting_dark_colour = "#C0C0C0";
-string __setting_modifier_colour = "#404040";
-string __setting_navbar_background_colour = "#FFFFFF";
-string __setting_page_background_colour = "#F7F7F7";
+//Do not use directly; use var() calls
+string __setting_unavailable_colour = "#7F7F7F"; //var(--unavailable_colour)
+string __setting_line_colour = "#B2B2B2"; //var(--line_colour)
+string __setting_dark_colour = "#C0C0C0"; //var(--dark_colour)
+string __setting_modifier_colour = "#404040"; //var(--modifier_colour)
+string __setting_navbar_background_colour = "#FFFFFF"; //var(--navbar_background_colour)
+string __setting_page_background_colour = "#F7F7F7"; //var(--page_background_colour)
+string __setting_main_content_background_colour = "#FFFFFF"; //var(--main_content_background_colour)
+string __setting_main_content_text_colour = "#000000"; //var(--main_content_text_colour)
+string __setting_hover_alternate_colour = "#CCCCCC"; //var(--hover_alternate_colour)
+
+//Inverted, dark mode versions of above:
+string __setting_unavailable_colour_dark = "#7F7F7F"; //var(--unavailable_colour)
+string __setting_line_colour_dark = "#4D4D4D"; //var(--line_colour)
+string __setting_dark_colour_dark = "#3F3F3F"; //var(--dark_colour)
+string __setting_modifier_colour_dark = "#BFBFBF"; //var(--modifier_colour)
+string __setting_navbar_background_colour_dark = "#000000"; //var(--navbar_background_colour)
+string __setting_page_background_colour_dark = "#3F3F3F"; //var(--page_background_colour)
+string __setting_main_content_background_colour_dark = "#000000"; //var(--main_content_background_colour)
+string __setting_main_content_text_colour_dark = "#FFFFFF"; //var(--main_content_text_colour)
+string __setting_hover_alternate_colour_dark = "#333333"; //var(--hover_alternate_colour)
 
 string __setting_media_query_large_size = "@media (min-width: 500px)";
 string __setting_media_query_medium_size = "@media (min-width: 350px) and (max-width: 500px)";

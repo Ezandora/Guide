@@ -385,9 +385,11 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
         case $location[the beanbat chamber]:
             return questPropertyPastInternalStepNumber("questL04Bat", 3);
         case $location[The Unquiet Garves]:
-            return true;
+            return get_property("questL07Cyrptic") != "unstarted"; //not quite accurate, visit council first?
         case $location[The VERY Unquiet Garves]:
             return get_property("questL07Cyrptic") == "finished";
+        case $location[Tower Ruins]:
+            return questPropertyPastInternalStepNumber("questG03Ego", 3); //is 3 correct?
         case $location[The Wreck of the Edgar Fitzsimmons]:
             return questPropertyPastInternalStepNumber("questS02Monkees", 2);
         case $location[the boss bat's lair]:
@@ -929,17 +931,17 @@ static
         lookup_map["The Defiled Niche"] = "crypt.php";
         lookup_map["Haert of the Cyrpt"] = "crypt.php";
         lookup_map["Frat House"] = "island.php";
-        lookup_map["Frat House In Disguise"] = "island.php";
+        lookup_map["Frat House (Frat Disguise)"] = "island.php";
         lookup_map["The Frat House (Bombed Back to the Stone Age)"] = "island.php";
         lookup_map["Hippy Camp"] = "island.php";
-        lookup_map["Hippy Camp In Disguise"] = "island.php";
+        lookup_map["Hippy Camp (Hippy Disguise)"] = "island.php";
         lookup_map["The Hippy Camp (Bombed Back to the Stone Age)"] = "island.php";
         lookup_map["The Obligatory Pirate's Cove"] = "island.php";
         lookup_map["Barrrney's Barrr"] = "place.php?whichplace=cove";
         lookup_map["The F'c'le"] = "place.php?whichplace=cove";
         lookup_map["The Poop Deck"] = "place.php?whichplace=cove";
         lookup_map["Belowdecks"] = "place.php?whichplace=cove";
-        lookup_map["Post-War Junkyard"] = "island.php";
+        lookup_map["The Junkyard"] = "island.php";
         lookup_map["McMillicancuddy's Farm"] = "island.php";
         lookup_map["The Battlefield (Frat Uniform)"] = "bigisland.php";
         lookup_map["The Battlefield (Hippy Uniform)"] = "bigisland.php";

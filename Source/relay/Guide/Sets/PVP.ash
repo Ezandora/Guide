@@ -132,7 +132,7 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
                 description.listAppend("Possibly use mayozapine if you have that IOTM.");
             }
         }
-        else if (mini == "Hibernation Preparation")
+        else if (mini == "Hibernation Preparation" || mini == "Freshman Fifteen")
         {
         	modifiers.listAppend("+familiar experience");
         	description.listAppend("Gain as much familiar experience as possible.|Ideally, run +familiar experience against free fights.");
@@ -577,7 +577,11 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
         else if (mini == "Creative Holiday Feasting")
         {
             description.listAppend("Eat as many unique foods as possible, ideally 1-fullness.");
-        }   
+        }
+        else if (mini == "Horizon Broadening")
+        {
+            description.listAppend("Drink as many unique drinks as possible, ideally 1-inebriety.");
+        }
     	else if (mini == "Getting in the Holiday Spirits")
         {
             description.listAppend("Drink as many one-inebriety drinks as possible.");

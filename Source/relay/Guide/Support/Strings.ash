@@ -75,10 +75,17 @@ string slot_to_plural_string(slot s)
     return s.slot_to_string();
 }
 
-
 string format_today_to_string(string desired_format)
 {
     return format_date_time("yyyyMMdd", today_to_string(), desired_format);
+    //We tried this, and instead at 7:51AM local time, it claimed the day was yesterday. I don't get it either.
+    //return format_date_time("yyyyMMdd hh:mm:ss z", today_to_string() + " " + time_to_string(), desired_format);
+}
+//this messes with your timezone, because why wouldn't it?
+string format_intraday_time_to_string(string desired_format)
+{
+    //return format_date_time("hh:mm:ss z", time_to_string(), desired_format);
+    return format_date_time("hh:mm:ss", time_to_string(), desired_format); //omit time zone, because give it a time zone and suddenly it decides to be Difficult.
 }
 
 

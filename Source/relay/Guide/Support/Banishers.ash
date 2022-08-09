@@ -1,6 +1,7 @@
 
 import "relay/Guide/Support/Library.ash"
 
+//maybe rename this to ActiveBanish?
 Record Banish
 {
     monster banished_monster;
@@ -233,4 +234,175 @@ boolean BanishIsActive(string name)
             return true;
     }
     return false;
+}
+
+
+
+
+
+//Banish sources, used for writing active banish code:
+
+int BANISH_SOURCE_TYPE_UNKNOWN = 0;
+int BANISH_SOURCE_TYPE_COMBAT_ITEM = 1;
+int BANISH_SOURCE_TYPE_SKILL = 2;
+
+Record BanishSource
+{
+	//private:
+	item required_equipment_equipped;
+	item combat_item_source;
+	skill combat_skill;
+	string name;
+	
+	//reflex hammer does not support .dailylimit, so we will not use that approach:
+	string daily_limit_property_name;
+	int daily_limit_property_limit;
+};
+
+BanishSource [int] __banish_sources;
+
+
+void add(BanishSource [int] list, BanishSource entry)
+{
+	int position = list.count();
+	while (list contains position)
+		position += 1;
+	list[position] = entry;
+}
+
+
+void initialiseBanishSources()
+{
+	if (true)
+	{
+		BanishSource source;
+        source.combat_skill = $skill[Feel Hatred];
+        source.daily_limit_property_name = "_feelHatredUsed";
+        source.daily_limit_property_limit = 3;
+        __banish_sources.add(source);
+	}
+	if (true)
+	{
+		BanishSource source;
+        source.combat_skill = $skill[reflex hammer];
+        source.required_equipment_equipped = $item[Lil' Doctor&trade; bag];
+        source.daily_limit_property_name = "_reflexHammerUsed";
+        source.daily_limit_property_limit = 3;
+        __banish_sources.add(source);
+	}
+	//Throw Latte on Opponent
+	//KGB tranquilizer dart
+	//snokebomb
+	//use the force, but no?
+}
+
+initialiseBanishSources();
+
+
+
+int BanishSourceReplenishableBanishesLeft(BanishSource source)
+{
+	int amount = 0;
+	if (source.daily_limit_property_name != "")
+	{
+		int value = get_property_int(source.daily_limit_property_name);
+        amount += clampi(source.daily_limit_property_limit - value, 0, source.daily_limit_property_limit);
+	}
+	return amount;
+}
+
+int BanishSourceLimitedBanishesLeft(BanishSource source)
+{
+	if (source.combat_item_source != $item[none])
+		return source.combat_item_source.item_amount();
+	return 0;
+}
+
+int BanishSourceAllBanishesLeft(BanishSource source)
+{
+	return source.BanishSourceReplenishableBanishesLeft() + source.BanishSourceLimitedBanishesLeft();
+}
+
+boolean BanishSourceIsLimited(BanishSource source)
+{
+	//more?
+	if (source.combat_item_source != $item[none]) return true;
+	return false;
+}
+
+boolean BanishSourceCanBanishRightNow(BanishSource source)
+{
+	if (source.required_equipment_equipped != $item[none] && !source.required_equipment_equipped.equipped())
+		return false;
+    if (source.combat_item_source != $item[none] && source.combat_item_source.item_amount() == 0)
+    	return false;
+    //if (my_mp() < combat_skill
+    if (source.combat_skill != $skill[none])
+    {
+    	if (!source.combat_skill.skill_is_usable()) return false;
+        if (my_mp() < source.combat_skill.mp_cost()) return false; //FIXME I can't remember if combat_mana_cost_modifier() needs manually tinkering here
+    }
+    
+    if (source.BanishSourceAllBanishesLeft() == 0) return false;
+    
+	return true;
+}
+
+boolean BanishSourceCouldBanish(BanishSource source)
+{
+	if (source.required_equipment_equipped != $item[none] && !source.required_equipment_equipped.have()) return false;
+	if (source.combat_item_source != $item[none] && source.combat_item_source.item_amount() == 0) return false;
+	if (source.combat_skill != $skill[none] && !source.combat_skill.skill_is_usable())
+	{
+		return false;
+    }
+	
+	if (source.BanishSourceAllBanishesLeft() == 0) return false;
+	return true;
+}
+
+int BanishSourceGetType(BanishSource source)
+{
+	if (source.combat_skill != $skill[none]) return BANISH_SOURCE_TYPE_SKILL;
+	if (source.combat_item_source != $item[none]) return BANISH_SOURCE_TYPE_COMBAT_ITEM;
+	
+	return BANISH_SOURCE_TYPE_UNKNOWN;
+}
+
+skill BanishSourceGetSkill(BanishSource source)
+{
+	return source.combat_skill;
+}
+
+item BanishSourceGetCombatItem(BanishSource source)
+{
+	return source.combat_item_source;
+}
+
+item BanishSourceGetEquipmentRequiredEquipped(BanishSource source)
+{
+	return source.required_equipment_equipped;
+}
+
+string BanishSourceGetName(BanishSource source)
+{
+	if (source.name != "")
+		return source.name;
+    else if (source.combat_skill != $skill[none])
+    	return source.combat_skill;
+    else if (source.combat_item_source != $item[none])
+    	return source.combat_item_source;
+    return "";
+}
+
+
+BanishSource GetBanishSourceByName(string name)
+{
+	foreach key, source in __banish_sources
+	{
+		if (source.BanishSourceGetName() ≈ name)
+        	return source;
+	}
+	BanishSource blank;
+	return blank;
 }

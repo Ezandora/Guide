@@ -52,12 +52,14 @@ static
     int PATH_OF_THE_PLUMBER = 38;
     int PATH_PLUMBER = 38;
     int PATH_LUIGI = 38;
-    int PATH_MAMA_LUIGI = 38;
     int PATH_MARIO = 38;
     int PATH_LOW_KEY_SUMMER = 39;
     int PATH_LOKI = 39;
     int PATH_GREY_GOO = 40;
     int PATH_ROBOT = 41;
+    int PATH_QUANTUM_TERRARIUM = 42;
+    int PATH_QUANTUM = 42;
+    int PATH_WILDFIRE = 43;
 }
 
 float numeric_modifier_replacement(item it, string modifier)
@@ -91,6 +93,18 @@ float numeric_modifier_replacement(item it, string modifier)
     {
     	if (it.equipped_amount() == 0)
      	   additional += 5;
+    }
+    if (it == $item[backup camera])
+    {
+    	string camera_mode = get_property("backupCameraMode");
+        if (modifier_lowercase == "monster level" && camera_mode == "ml")
+        {
+        	return clampi(my_level() * 3, 3, 50);
+        }
+        else if (modifier_lowercase == "meat drop" && camera_mode == "meat")
+        	return 50;
+        else if (modifier_lowercase == "initiative" && camera_mode == "init")
+        	return 100;
     }
     return numeric_modifier(it, modifier) + additional;
 }
@@ -144,6 +158,7 @@ static
     boolean [string][item] __equipment_by_numeric_modifier;
     void initialiseItems()
     {
+    	int maximum_item_id = 0;
         foreach it in $items[]
         {
             //Crafting:
@@ -156,8 +171,24 @@ static
                     __items_that_craft_food[ingredient] = true;
                 }
             }*/
-            
+            maximum_item_id = MAX(maximum_item_id, it.to_int());
             //Equipment:
+            if ($slots[hat,weapon,off-hand,back,shirt,pants,acc1,acc2,acc3,familiar] contains it.to_slot())
+            {
+                __equipment[it] = true;
+                if (it.numeric_modifier("combat rate") < 0)
+                    __minus_combat_equipment[it] = true;
+            }
+        }
+        //mafia does not add new items to $items, so, support some new items:
+        for i from maximum_item_id + 1 to maximum_item_id + 100
+        {
+        	item it = i.to_item();
+            if (it == $item[none])
+            {
+            	continue;
+            }
+            
             if ($slots[hat,weapon,off-hand,back,shirt,pants,acc1,acc2,acc3,familiar] contains it.to_slot())
             {
                 __equipment[it] = true;
@@ -177,8 +208,11 @@ static
 boolean [item] equipmentWithNumericModifier(string modifier)
 {
 	modifier = modifier.to_lower_case();
+	//dynamic items here
     boolean [item] dynamic_items;
-    dynamic_items[to_item("kremlin's greatest briefcase")] = true;
+    dynamic_items[to_item("backup camera")] = true;
+    dynamic_items[to_item("unwrapped knock-off retro superhero cape")] = true;
+    dynamic_items[$item[kremlin's greatest briefcase]] = true;
     dynamic_items[$item[your cowboy boots]] = true;
     dynamic_items[$item[a light that never goes out]] = true; //FIXME all smithsness items
     if (!(__equipment_by_numeric_modifier contains modifier))

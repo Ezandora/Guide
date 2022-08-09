@@ -19,6 +19,7 @@ void SBugsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] 
 	bugs.listAppend("make turn-costing banishes be vaguely near the free ones");
 	//bugs.listAppend("ZS changes?");
 	bugs.listAppend("robot path");
+	bugs.listAppend("in the defiled nook, run -combat until you meet the map adventure. also, anywhere else this is true?");
 	bugs.listAppend("grey goo? (do absolutely nothing)");
 	//bugs.listAppend("implement showhide");
 	//bugs.listAppend("emotion chip - if we don't have the skill but we can acquire it via the item, do that");
@@ -48,6 +49,9 @@ void SBugsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] 
 	//bugs.listAppend("resource bar does not interact with hidden entries");
 	//bugs.listAppend("if all entries are on the last line, and the scroll bar is all the way at the bottom, the popup causes problems in chromium, because chromium is constantly jumping down and up. don't know how to fix this - appear above instead of below if we're near the end...?"); //fixed via constant position testing
 	bugs.listAppend("requested movable entries. major project");
+	bugs.listAppend("mention superhero cape as YR");
+	bugs.listAppend("muffin collection reminder");
+	bugs.listAppend("whatever that one suggestion was with -combat?");
 	//bugs.listAppend("superhero cape in L7 code");
 	
 	

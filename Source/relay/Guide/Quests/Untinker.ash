@@ -55,5 +55,5 @@ void QUntinkerGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [i
 		}
 	}
 	
-	optional_task_entries.listAppend(ChecklistEntryMake(29, base_quest_state.image_name, url, subentry, $locations[the degrassi knoll garage]));
+	optional_task_entries.listAppend(ChecklistEntryMake(29, base_quest_state.image_name, url, subentry, 8, $locations[the degrassi knoll garage]));
 }

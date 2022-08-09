@@ -626,7 +626,7 @@ buffer generateLocationBarTable(string [int] table_entries, string [int] table_e
         if (table_entry_classes contains key)
             bar.append(s);
         else
-            bar.HTMLAppendTagWrap("div", s, mapMake("class", "r_cl_modifier_inline", "style", "color:black;")); //r_cl_modifier_inline needs its own div due to CSS class order precedence
+            bar.HTMLAppendTagWrap("div", s, mapMake("class", "r_cl_modifier_inline", "style", "color:var(--main_content_text_colour);")); //r_cl_modifier_inline needs its own div due to CSS class order precedence
         if (entry_url.length() != 0)
         {
             bar.append("</a>");
@@ -664,7 +664,7 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
     PageAddCSSClass("", "r_popup_blackout_class", "position:fixed;top:0px;width:100%;height:100%;background:rgba(0,0,0,0.5);opacity:0;pointer-events:none;visibility:hidden;");
     
     buf.HTMLAppendTagPrefix("div", mapMake("id", "r_location_popup_box", "style", "height:auto;transition:bottom " + transition_time + ";z-index:5;opacity:0;pointer-events:none;bottom:-10000px;position:fixed;", "class", "r_bottom_outer_container"));
-    buf.HTMLAppendTagPrefix("div", "class", "r_bottom_inner_container", "style", "background:white;height:auto;padding-right:20px;");
+    buf.HTMLAppendTagPrefix("div", "class", "r_bottom_inner_container", "style", "background:var(--main_content_background_colour);height:auto;padding-right:20px;");
     
     float [monster] appearance_rates_adjusted = l.appearance_rates_adjusted();
     float [monster] appearance_rates_next_turn = l.appearance_rates(true);

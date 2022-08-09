@@ -249,16 +249,7 @@ void runMain()
     if (true)
     {
         //Holding container:
-        string style = "";
-        style += "padding-top:5px;padding-bottom:0.25em;"; //max-width:" + max_width_setting + "px;
-        if (!__setting_fill_vertical)
-            style += "background-color:" + __setting_page_background_colour + ";";
-        if (!__setting_side_negative_space_is_dark && !__setting_fill_vertical)
-        {
-            style += "border:1px solid;border-top:0px;border-bottom:1px solid;";
-            style += "border-color:" + __setting_line_colour + ";";
-        }
-        PageWrite(HTMLGenerateTagPrefix("div", mapMake("style", style)));
+        PageWrite(HTMLGenerateTagPrefix("div", mapMake("class", "r_main_holding_container")));
     }
     
     if (true)
@@ -355,8 +346,8 @@ void runMain()
     }
     if (__setting_fill_vertical)
     {
-        PageWrite(HTMLGenerateTagWrap("div", "", mapMake("class", "r_vertical_fill", "style", "z-index:-1;background-color:" + __setting_page_background_colour + ";"))); //Color fill //max-width:" + __setting_horizontal_width + "px;"
-        PageWrite(HTMLGenerateTagWrap("div", "", mapMake("class", "r_vertical_fill", "style", "z-index:-11;border-left:1px solid;border-right:1px solid;border-color:" + __setting_line_colour + ";width:" + (__setting_horizontal_width) + "px;"))); //Vertical border lines, empty background
+        PageWrite(HTMLGenerateTagWrap("div", "", mapMake("class", "r_vertical_fill", "style", "z-index:-1;background-color:var(--page_background_colour);"))); //Color fill //max-width:" + __setting_horizontal_width + "px;"
+        PageWrite(HTMLGenerateTagWrap("div", "", mapMake("class", "r_vertical_fill", "style", "z-index:-11;border-left:1px solid;border-right:1px solid;border-color:var(--line_colour);width:" + (__setting_horizontal_width) + "px;"))); //Vertical border lines, empty background
     }
     PageWriteHead("<script type=\"text/javascript\" src=\"GuideBrowserSide.js\"></script>");
     PageWriteHead("<script type=\"text/javascript\">function GuideParachuteInit() { if (typeof GuideInit !== 'function') { document.getElementById('extra_words_at_top').innerHTML = '<H1>Reinstall Guide</H1><H3>Installation is corrupted, missing javascript file GuideBrowserSide.js</H3>Functionality is limited.'}}</script>"); //mafia bug; we renamed a javascript file in a past release, and mafia will not always install a new file, silently breaking an installation

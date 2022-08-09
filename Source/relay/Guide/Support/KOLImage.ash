@@ -651,7 +651,7 @@ buffer KOLImageGenerateImageHTML(string lookup_name, boolean should_centre, Vec2
 			if (__setting_show_alignment_guides)
 				style.append("background:pink;");
 			else
-				style.append("background:#FFFFFF;");
+				style.append("background:var(--main_content_background_colour);");
 			
             style.append("z-index:2;position:absolute;top:");
             style.append(top);

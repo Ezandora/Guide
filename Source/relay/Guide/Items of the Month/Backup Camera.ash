@@ -18,7 +18,7 @@ void IOTMBackupCameraGenerate(ChecklistCollection checklists)
         
         monster lm = last_monster();
         string last_monster_description = lm;
-        if (lm == $monster[none])
+        if (lm == $monster[none] || !lm.monsterCanBeCopied())
         	last_monster_description = "a monster";
         
         

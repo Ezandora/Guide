@@ -20,8 +20,8 @@ void QWhiteCitadelInit()
 
 void QWhiteCitadelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-    if (!__misc_state["in aftercore"] && !in_bad_moon() && my_location() != $location[the road to the white citadel] && __last_adventure_location != $location[the road to the white citadel]) //not yet
-        return;
+    //if (!__misc_state["in aftercore"] && !in_bad_moon() && my_location() != $location[the road to the white citadel] && __last_adventure_location != $location[the road to the white citadel]) //not yet
+        //return;
     if (!__misc_state["guild open"]) //bugged
         return;
 	QuestState base_quest_state = __quest_state["White Citadel"];
@@ -30,8 +30,8 @@ void QWhiteCitadelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
     
     boolean using_black_cat_equivalent = ($familiars[O.A.F.,black cat] contains my_familiar());
     
-    if (__misc_state["in run"] && $location[The Road to the White Citadel].turnsAttemptedInLocation() == 0 && !in_bad_moon()) //not until they're sure
-        return;
+    //if (__misc_state["in run"] && $location[The Road to the White Citadel].turnsAttemptedInLocation() == 0 && !in_bad_moon()) //not until they're sure
+        //return;
     
     boolean add_as_future_task = false;
     

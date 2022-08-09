@@ -220,7 +220,7 @@ void SBountyHunterHunterGenerateTasks(ChecklistEntry [int] task_entries, Checkli
     
     //Load bounty.txt, not sure how else to acquire this data:
     BountyFileEntry [string] bounty_file;
-    file_to_map("bounty.txt", bounty_file);
+    file_to_map("data/bounty.txt", bounty_file);
     
     location [int] relevant_locations;
     foreach bounty_name in bounty_properties

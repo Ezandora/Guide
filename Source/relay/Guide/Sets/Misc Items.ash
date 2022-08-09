@@ -475,12 +475,12 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
 		
 		resource_entries.listAppend(ChecklistEntryMake(316, "clover", "", subentry, 7).ChecklistEntryTag("clovers"));
 	}
-	if (in_run && $item[lucky pill].have() && availableSpleen() > 0)
+	/*if (in_run && $item[lucky-ish pill].have() && availableSpleen() > 0)
 	{
 		string [int] description;
         description.listAppend("Chew for clovers.");
-        resource_entries.listAppend(ChecklistEntryMake(317, "__item lucky pill", "inventory.php?which=3&ftext=lucky+pill", ChecklistSubentryMake(pluralise($item[lucky pill]), "", description), importance_level_unimportant_item).ChecklistEntryTag("clovers"));
-	}
+        resource_entries.listAppend(ChecklistEntryMake(317, "__item lucky-ish pill", "inventory.php?which=3&ftext=lucky+pill", ChecklistSubentryMake(pluralise($item[lucky-ish pill]), "", description), importance_level_unimportant_item).ChecklistEntryTag("clovers"));
+	}*/
 	if (in_run)
 	{
 		if ($item[gameinformpowerdailypro magazine].available_amount() > 0)
@@ -683,7 +683,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
     }
     if (__misc_state["in run"] && $item[tryptophan dart].available_amount() > 0 && in_ronin() && $item[tryptophan dart].item_is_usable())
     {
-        resource_entries.listAppend(ChecklistEntryMake(339, "__item tryptophan dart", "", ChecklistSubentryMake(pluralise($item[tryptophan dart]), "", "Free run/banish."), 6).ChecklistEntryTag("banish"));
+        resource_entries.listAppend(ChecklistEntryMake(339, "__item tryptophan dart", "", ChecklistSubentryMake(pluralise($item[tryptophan dart]), "", "Banish. Costs a turn."), 6).ChecklistEntryTag("banish"));
     }
     
     if ($item[drum machine].available_amount() > 0 && in_run && (my_adventures() <= 1 || (availableDrunkenness() < 0 && availableDrunkenness() > -4 && my_adventures() >= 1)) && __quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && $item[drum machine].item_is_usable())
@@ -703,31 +703,31 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
     
     if (in_run)
     {
-		if ($item[tattered scrap of paper].available_amount() > 0 && __misc_state["free runs usable"] && $item[tattered scrap of paper].item_is_usable())
+		if ($item[tattered scrap of paper].have() && __misc_state["free runs usable"] && $item[tattered scrap of paper].item_is_usable())
 		{
 			string [int] description;
 			description.listAppend(($item[tattered scrap of paper].available_amount() / 2.0).roundForOutput(1) + " free runs.");
             if (in_bad_moon())
                 description.listAppend("Or save for demon summoning.");
-			resource_entries.listAppend(ChecklistEntryMake(342, "__item tattered scrap of paper", "", ChecklistSubentryMake(pluralise($item[tattered scrap of paper]), "", description), importance_level_unimportant_item));
+			resource_entries.listAppend(ChecklistEntryMake(342, "__item tattered scrap of paper", "", ChecklistSubentryMake(pluralise($item[tattered scrap of paper]), "", description), importance_level_unimportant_item).ChecklistEntryTag("free runaway"));
 		}
-		if (2371.to_item().available_amount() > 0 && __misc_state["free runs usable"])
+		if (2371.to_item().have() && __misc_state["free runs usable"])
 		{
             item it = 2371.to_item();
 			string [int] description;
 			description.listAppend((it.available_amount() * 0.9).roundForOutput(1) + " free runs.");
 			resource_entries.listAppend(ChecklistEntryMake(343, "__item " + it, "", ChecklistSubentryMake(pluralise(it), "", description), importance_level_unimportant_item));
 		}
-		if ($item[dungeoneering kit].available_amount() > 0)
+		if ($item[dungeoneering kit].have())
 		{
 			string line = "Open it.";
 			if ($item[dungeoneering kit].available_amount() > 1)
 				line = "Open them.";
 			resource_entries.listAppend(ChecklistEntryMake(344, "__item dungeoneering kit", "inventory.php?which=3&ftext=dungeoneering+kit", ChecklistSubentryMake(pluralise($item[dungeoneering kit]), "", line), importance_level_unimportant_item));
 		}
-        if ($item[Box of familiar jacks].available_amount() > 0)
+        if ($item[Box of familiar jacks].have())
             resource_entries.listAppend(ChecklistEntryMake(345, "__item box of familiar jacks", "", ChecklistSubentryMake(pluralise($item[Box of familiar jacks]), "", "Gives current familiar equipment."), importance_level_unimportant_item));
-        if ($item[csa fire-starting kit].available_amount() > 0 && !get_property_boolean("_fireStartingKitUsed"))
+        if ($item[csa fire-starting kit].have() && !get_property_boolean("_fireStartingKitUsed"))
         {
             string [int] description;
             description.listAppend("All-day 4 HP/MP regeneration.");
@@ -736,7 +736,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
             resource_entries.listAppend(ChecklistEntryMake(346, "__item csa fire-starting kit", "inventory.php?which=3&ftext=csa+fire-starting+kit", ChecklistSubentryMake($item[csa fire-starting kit], "", description), importance_level_unimportant_item));
         }
         
-        if ($item[transporter transponder].available_amount() > 0)
+        if ($item[transporter transponder].have())
         {
             string [int] options;
             if (__misc_state["need to level"])
@@ -751,7 +751,20 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         }
     }
     
-    foreach it in $items[carton of astral energy drinks,astral hot dog dinner,astral six-pack]
+    if ($item[fish-oil smoke bomb].have())
+    {
+        string [int] description;
+        description.listAppend("Free runs.");
+        resource_entries.listAppend(ChecklistEntryMake(0, "__item fish-oil smoke bomb", "", ChecklistSubentryMake(pluralise($item[fish-oil smoke bomb]), "", description), importance_level_unimportant_item).ChecklistEntryTag("free runaway"));
+    }
+    if ($item[fisherman's sack].have())
+    {
+        string [int] description;
+        description.listAppend("Three free runs.");
+        resource_entries.listAppend(ChecklistEntryMake(0, "__item fisherman's sack", "", ChecklistSubentryMake(pluralise($item[fisherman's sack]), "", description), importance_level_unimportant_item).ChecklistEntryTag("free runaway"));
+    }
+    
+    foreach it in $items[[10882]carton of astral energy drinks,astral hot dog dinner,astral six-pack]
     {
         if (it.available_amount() == 0)
             continue;

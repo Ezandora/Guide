@@ -9,14 +9,14 @@ void QPirateInit()
 	state.image_name = "pirate quest";
 	
 	state.state_boolean["valid"] = true;
-	if (__misc_state["mysterious island available"] && !(my_path_id() == PATH_COMMUNITY_SERVICE || __misc_state["in aftercore"]))
+	/*if (__misc_state["mysterious island available"] && !(my_path_id() == PATH_COMMUNITY_SERVICE || __misc_state["in aftercore"]))
 	{
 		state.startable = true;
 		if (!state.in_progress && !state.finished)
 		{
 			QuestStateParseMafiaQuestPropertyValue(state, "started");
 		}
-	}
+	}*/
     
     
 	boolean hot_wings_relevant = knoll_available() || $item[frilly skirt].available_amount() > 0 || !in_hardcore();
@@ -57,8 +57,8 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 {
 	if (!__quest_state["Pirate Quest"].in_progress)
 		return;
-    if (!__quest_state["Pirate Quest"].state_boolean["valid"] && !(get_property_boolean("kingLiberated") && $locations[Barrrney's Barrr,The F'c'le,The Poop Deck,Belowdecks] contains __last_adventure_location))
-        return;
+    /*if (!__quest_state["Pirate Quest"].state_boolean["valid"] && !(get_property_boolean("kingLiberated") && $locations[Barrrney's Barrr,The F'c'le,The Poop Deck,Belowdecks] contains __last_adventure_location))
+        return;*/
         
 	QuestState base_quest_state = __quest_state["Pirate Quest"];
 	ChecklistSubentry subentry;
@@ -353,5 +353,5 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
     if (delay_for_future)
         future_task_entries.listAppend(ChecklistEntryMake(89, base_quest_state.image_name, url, subentry, $locations[the obligatory pirate's cove, barrrney's barrr, the f'c'le]));
     else
-        task_entries.listAppend(ChecklistEntryMake(90, base_quest_state.image_name, url, subentry, $locations[the obligatory pirate's cove, barrrney's barrr, the f'c'le]));
+        optional_task_entries.listAppend(ChecklistEntryMake(90, base_quest_state.image_name, url, subentry, $locations[the obligatory pirate's cove, barrrney's barrr, the f'c'le]));
 }

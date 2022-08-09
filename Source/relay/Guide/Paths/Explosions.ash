@@ -16,8 +16,8 @@ void PathExplosionsGenerateResource(ChecklistEntry [int] resource_entries)
         }
         if (isotope_amount >= 10 && !$item[antique accordion].have() && my_class() != $class[accordion thief])
             description.listAppend("<strong>antique accordion</strong> - casting AT buffs.");
-        if (isotope_amount >= 20 && availableSpleen() > $item[lucky pill].available_amount())
-            description.listAppend("<strong>lucky pill</strong> - extra clovers, super useful.");
+        /*if (isotope_amount >= 20 && availableSpleen() > $item[lucky-ish pill].available_amount())
+            description.listAppend("<strong>lucky-ish pill</strong> - extra clovers, super useful.");*/
         if (isotope_amount >= 25 && !$item[signal jammer].have())
             description.listAppend("<strong>signal jammer</strong> - deals with those troublesome wandering skeletons. Equipped this in non-delay-burning areas.");
         if (isotope_amount >= 25 && !$item[space shield].have() && ($item[digital key].have() || $item[white pixel].available_amount() >= 30))

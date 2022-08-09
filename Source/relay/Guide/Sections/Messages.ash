@@ -341,7 +341,7 @@ string generateRandomMessage()
         equipment_messages[$item[sneaky pete's breath spray]] = "every class a moxie class";
     foreach it in $items[twisted-up wet towel,sommelier's towel,time bandit time towel]
         equipment_messages[it] = "don't panic";
-    equipment_messages[$item[pirate fledges]] = "<img src=\"images/otherimages/12x12skull.gif\" style=\"mix-blend-mode:multiply;\"><strong> oh, better far to live and die, under the brave black flag I fly! </strong><img src=\"images/otherimages/12x12skull.gif\" style=\"mix-blend-mode:multiply;\">";
+    equipment_messages[$item[pirate fledges]] = "<img src=\"images/otherimages/12x12skull.gif\"><strong> oh, better far to live and die, under the brave black flag I fly! </strong><img src=\"images/otherimages/12x12skull.gif\">";
     equipment_messages[lookupItem("unwrapped knock-off retro superhero cape")] = "you needed worthy opponents";
     
     foreach it in equipment_messages
@@ -494,6 +494,10 @@ string generateRandomMessage()
             random_messages.listAppend("avatar of pet rock"); break;
         case PATH_ROBOT:
             random_messages.listAppend("weren't you already a robot? is this double robot?"); break;
+        case PATH_QUANTUM:
+            random_messages.listAppend("doldrums in the quantums"); break;
+        case PATH_WILDFIRE:
+            random_messages.listAppend("I challenge you to an agni kai!"); break;
         /*case PATH_CLASS_ACT_3:
             random_messages.listAppend("buttons for the people"); break;*/
     }
