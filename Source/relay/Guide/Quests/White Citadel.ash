@@ -123,7 +123,7 @@ void QWhiteCitadelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
             poppy_two_drop_rate *= 0.75;
         }
         
-        if (my_path_id() == PATH_HEAVY_RAINS)
+        if (my_path_id_legacy() == PATH_HEAVY_RAINS)
         {
             float washaway_rate = $location[The Road to the White Citadel].washaway_rate_of_location();
             

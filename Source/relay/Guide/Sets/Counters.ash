@@ -221,7 +221,7 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
             //someone reported they saw this window after going past the relevant quest step; safety ignore
             continue;
         }
-        if (window_name == "WoL Monster" && my_path_id() != PATH_AVATAR_OF_WEST_OF_LOATHING)
+        if (window_name == "WoL Monster" && my_path_id_legacy() != PATH_AVATAR_OF_WEST_OF_LOATHING)
         	continue;
         subentry.header = window_display_name;
         
@@ -278,7 +278,7 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
             if (get_property_int("_sourceTerminalDigitizeMonsterCount") >= 2 && digitisations < digitisation_limit)
                 subentry.entries.listAppend("Could re-digitise to reset the window.");
         }
-        if (window_name == "Rain Monster" && my_path_id() == PATH_HEAVY_RAINS)
+        if (window_name == "Rain Monster" && my_path_id_legacy() == PATH_HEAVY_RAINS)
         {
             subentry.entries = SCountersGenerateDescriptionForRainMonster();
         }
@@ -291,7 +291,7 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
         
         if (turn_range.x <= 0) // && counter_is_range || (!counter_is_range && next_exact_turn <= 0))
         {
-            if (my_path_id() != PATH_COMMUNITY_SERVICE && __misc_state["in run"])
+            if (my_path_id_legacy() != PATH_COMMUNITY_SERVICE && __misc_state["in run"])
             {
                 if (window_name == "portscan.edu" && $skill[macrometeorite].skill_is_usable() && get_property_int("_macrometeoriteUses") < 10 && !__quest_state["Level 12"].finished && !__quest_state["Level 12"].state_boolean["Lighthouse Finished"] && $item[barrel of gunpowder].available_amount() < 5)
                 {

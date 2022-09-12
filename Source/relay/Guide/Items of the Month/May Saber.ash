@@ -50,7 +50,7 @@ void IOTMMaySaberGenerateResource(ChecklistEntry [int] resource_entries)
         description.listAppend("Banish a monster for thirty turns.");
         description.listAppend("Make the monster appear 3x times in the zone.");
         description.listAppend("Or collect all* their items.");
-        if (my_path_id() == PATH_COMMUNITY_SERVICE && $skill[Meteor Lore].have_skill())
+        if (my_path_id_legacy() == PATH_COMMUNITY_SERVICE && $skill[Meteor Lore].have_skill())
         {
         	description.listAppend("Bonus! Use Meteor Shower + lightsaber skill to save a bunch of turns on weapon damage/spell damage/familiar weight tests.");
         }

@@ -9,7 +9,7 @@ void IOTMAsdonMartinGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
         return;
     //BanishIsActive
     //FIXME test get_fuel() in point release
-    if (!BanishIsActive("Spring-Loaded Front Bumper") && __misc_state["in run"] && (my_path_id() != PATH_POCKET_FAMILIARS || (__iotms_usable[$item[source terminal]] && __iotms_usable[$item[FantasyRealm membership packet]])))
+    if (!BanishIsActive("Spring-Loaded Front Bumper") && __misc_state["in run"] && (my_path_id_legacy() != PATH_POCKET_FAMILIARS || (__iotms_usable[$item[source terminal]] && __iotms_usable[$item[FantasyRealm membership packet]])))
     {
     	string description = "Banish" + (__misc_state["free runs usable"] ? "/free run" : "") + ", ";
      
@@ -21,7 +21,7 @@ void IOTMAsdonMartinGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
         }
         else
             description += fuel;
-		if (my_path_id() == PATH_POCKET_FAMILIARS)
+		if (my_path_id_legacy() == PATH_POCKET_FAMILIARS)
 			description += "|In FantasyRealm, where you can extract for consumables.";
         task_entries.listAppend(ChecklistEntryMake(515, "__item Asdon Martin keyfob", "campground.php?action=fuelconvertor", ChecklistSubentryMake("Cast Spring-Loaded Front Bumper", "", description), -11));
     }
@@ -78,7 +78,7 @@ void IOTMAsdonMartinGenerateResource(ChecklistEntry [int] resource_entries)
                 boolean cannot_consume_anyways = false;
                 if (!__misc_state["can eat just about anything"] && fuelable.fullness > 0)
                     cannot_consume_anyways = true;
-                if (!__misc_state["can drink just about anything"] && fuelable.inebriety > 0 && !(my_path_id() == PATH_LICENSE_TO_ADVENTURE && fuelable.image == "martini.gif"))
+                if (!__misc_state["can drink just about anything"] && fuelable.inebriety > 0 && !(my_path_id_legacy() == PATH_LICENSE_TO_ADVENTURE && fuelable.image == "martini.gif"))
                     cannot_consume_anyways = true;
                 if (!fuelable.is_unrestricted())
                     cannot_consume_anyways = true;
@@ -113,7 +113,7 @@ void IOTMAsdonMartinGenerateResource(ChecklistEntry [int] resource_entries)
                 entry.image_lookup_name = "__item Asdon Martin keyfob";
         }
     }
-    if (!get_property_boolean("_missileLauncherUsed") && my_path_id() != PATH_POCKET_FAMILIARS && my_path_id() != PATH_G_LOVER)
+    if (!get_property_boolean("_missileLauncherUsed") && my_path_id_legacy() != PATH_POCKET_FAMILIARS && my_path_id_legacy() != PATH_G_LOVER)
     {
         if (entry.image_lookup_name == "")
             entry.image_lookup_name = "__skill asdon martin: missile launcher";

@@ -2,7 +2,7 @@
 RegisterTaskGenerationFunction("PathBugbearInvasionGenerateTasks");
 void PathBugbearInvasionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (my_path_id() != PATH_BUGBEAR_INVASION)
+	if (my_path_id_legacy() != PATH_BUGBEAR_INVASION)
 		return;
     if (!__misc_state["in run"])
         return;
@@ -484,7 +484,7 @@ void PathBugbearInvasionGenerateTasks(ChecklistEntry [int] task_entries, Checkli
 RegisterResourceGenerationFunction("PathBugbearInvasionGenerateResource");
 void PathBugbearInvasionGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (my_path_id() != PATH_BUGBEAR_INVASION)
+	if (my_path_id_legacy() != PATH_BUGBEAR_INVASION)
 		return;
     if (!__misc_state["in run"])
         return;

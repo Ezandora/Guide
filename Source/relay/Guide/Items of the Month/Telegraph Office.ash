@@ -201,7 +201,7 @@ void IOTMTelegraphOfficeGenerateResource(ChecklistEntry [int] resource_entries)
             options.listAppend(LocationChoiceMake($location[the spooky forest], "unlocking the hidden temple"));
         }
         
-        if (my_path_id() == PATH_COMMUNITY_SERVICE)
+        if (my_path_id_legacy() == PATH_COMMUNITY_SERVICE)
         {
             foreach key in options
                 remove options[key];

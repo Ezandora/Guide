@@ -32,7 +32,7 @@ void IOTMPottedPowerPlantGenerate(ChecklistCollection checklists)
         	lookupItem("battery (lantern)"):"1 freekill charge, +100% item, +50% spell damage, +50% init, +3 stats/fight, regen ~7MP/adv (30 turns), 70 MP",
         	lookupItem("battery (car)"):"1 freekill charge, +100% item, +100% meat, +50% spell damage, +50% init, +3 stats/fight, regen ~7MP/adv (30 turns), 80 MP",
         };
-        if (my_path_id() == PATH_ROBOT)
+        if (my_path_id_legacy() == PATH_ROBOT)
         {
         	battery_descriptions[lookupItem("battery (AAA)")] += ", 15 energy";
         	battery_descriptions[lookupItem("battery (AA)")] += ", 20 energy";

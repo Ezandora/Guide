@@ -5,13 +5,13 @@ void QLevel2Init()
 	QuestState state;
 	
 	QuestStateParseMafiaQuestProperty(state, "questL02Larva");
-	if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished"); 
+	if (my_path_id_legacy() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished"); 
 	
 	state.quest_name = "Spooky Forest Quest";
 	state.image_name = "Spooky Forest";
 	state.council_quest = true;
 	
-	if (my_level() >= 2 || my_path_id() == PATH_EXPLOSIONS)
+	if (my_level() >= 2 || my_path_id_legacy() == PATH_EXPLOSIONS)
 		state.startable = true;
 	
 	if (state.in_progress)
@@ -37,7 +37,7 @@ void QLevel2GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	if (!base_quest_state.in_progress)
 		return;
     
-    if (my_path_id() == PATH_COMMUNITY_SERVICE || __misc_state["in aftercore"])
+    if (my_path_id_legacy() == PATH_COMMUNITY_SERVICE || __misc_state["in aftercore"])
         return;
 		
 	ChecklistSubentry subentry;

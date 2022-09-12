@@ -2,7 +2,7 @@
 RegisterGenerationFunction("PathQuantumOfFamiliarGenerate");
 void PathQuantumOfFamiliarGenerate(ChecklistCollection checklists)
 {
-	if (my_path_id() != PATH_QUANTUM) return;
+	if (my_path_id_legacy() != PATH_QUANTUM) return;
 	int current_turn = total_turns_played();
 	int next_quantum_alignment = get_property_int("_nextQuantumAlignment");
 	//nextQuantumFamiliarTurn?

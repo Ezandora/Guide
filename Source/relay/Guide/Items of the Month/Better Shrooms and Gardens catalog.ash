@@ -6,7 +6,7 @@ void IOTMBetterShroomsAndGardensGenerateTasks(ChecklistEntry [int] task_entries,
 	
 	int fights = get_property_int("_mushroomGardenFights");
 	int fight_limit = 1;
-	if (my_path_id() == PATH_LUIGI)
+	if (my_path_id_legacy() == PATH_LUIGI)
 		fight_limit = 5;
     int fights_left = clampi(0, fight_limit - fights, fight_limit);
     
@@ -32,7 +32,7 @@ void IOTMBetterShroomsAndGardensGenerate(ChecklistCollection checklists)
 	if (get_campground()[$item[packet of mushroom spores]] == 0) return;
 	
 	int max_fights = 1;
-	if (my_path_id() == PATH_LUIGI)
+	if (my_path_id_legacy() == PATH_LUIGI)
 		max_fights = 5;
     int fights_left = clampi(max_fights - get_property_int("_mushroomGardenFights"), 0, max_fights);
     if (fights_left > 0)

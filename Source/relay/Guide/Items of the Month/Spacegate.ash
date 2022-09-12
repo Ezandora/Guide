@@ -4,7 +4,7 @@ void IOTMSpacegateGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (!__iotms_usable[$item[Spacegate access badge]])
         return;
-    if (!get_property_boolean("_spacegateVaccine") && my_path_id() != PATH_G_LOVER)
+    if (!get_property_boolean("_spacegateVaccine") && my_path_id_legacy() != PATH_G_LOVER)
     {
         boolean rainbow_unlocked = get_property_boolean("spacegateVaccine1"); //+3 all res
         boolean broad_spectrum_unlocked = get_property_boolean("spacegateVaccine2"); //+50% all stats

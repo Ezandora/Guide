@@ -3,7 +3,7 @@
 RegisterResourceGenerationFunction("PathSneakyPeteGenerateResource");
 void PathSneakyPeteGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (my_path_id() != PATH_AVATAR_OF_SNEAKY_PETE)
+	if (my_path_id_legacy() != PATH_AVATAR_OF_SNEAKY_PETE)
 		return;
     
     
@@ -102,7 +102,7 @@ void PathSneakyPeteGenerateResource(ChecklistEntry [int] resource_entries)
 RegisterTaskGenerationFunction("PathSneakyPeteGenerateTasks");
 void PathSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (my_path_id() != PATH_AVATAR_OF_SNEAKY_PETE)
+	if (my_path_id_legacy() != PATH_AVATAR_OF_SNEAKY_PETE)
 		return;
     
     

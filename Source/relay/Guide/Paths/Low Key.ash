@@ -1,7 +1,7 @@
 RegisterTaskGenerationFunction("PathLowKeyGenerateTasks");
 void PathLowKeyGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (my_path_id() != PATH_LOKI) //I've never met this man in my life
+	if (my_path_id_legacy() != PATH_LOKI) //I've never met this man in my life
 		return;
     location [item] key_locations = {
     $item[Anchovy can key]:$location[The Haunted Pantry],

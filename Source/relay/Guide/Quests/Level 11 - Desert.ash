@@ -2,7 +2,7 @@ void QLevel11DesertInit()
 {
     QuestState state;
     QuestStateParseMafiaQuestProperty(state, "questL11Desert");
-    if (my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path_id_legacy() == PATH_COMMUNITY_SERVICE || my_path_id_legacy() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
     state.quest_name = "Desert Quest";
     state.image_name = "Pyramid"; //"__item instant karma";
     
@@ -15,7 +15,7 @@ void QLevel11DesertInit()
     state.state_boolean["Wormridden"] = (gnasir_progress & 16) > 0;
     
     state.state_int["Desert Exploration"] = get_property_int("desertExploration");
-    if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
+    if (my_path_id_legacy() == PATH_ACTUALLY_ED_THE_UNDYING)
         state.state_int["Desert Exploration"] = 100;
     state.state_boolean["Desert Explored"] = (state.state_int["Desert Exploration"] == 100);
     if (state.finished) //in case mafia doesn't detect it properly
@@ -63,17 +63,17 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
     //if (my_familiar() == lookupFamiliar("Melodramedary") && my_familiar() != $familiar[none])
     if (lookupFamiliar("Melodramedary").familiar_is_usable() && !__misc_state["familiars temporarily blocked"]) //fixme should this be always...?
     	exploration_per_turn += 1.0;
-    if (my_path_id() == PATH_LICENSE_TO_ADVENTURE && get_property_boolean("bondDesert"))
+    if (my_path_id_legacy() == PATH_LICENSE_TO_ADVENTURE && get_property_boolean("bondDesert"))
         exploration_per_turn += 2.0;
     
-    boolean have_blacklight_bulb = (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE && get_property("peteMotorbikeHeadlight") == "Blacklight Bulb");
+    boolean have_blacklight_bulb = (my_path_id_legacy() == PATH_AVATAR_OF_SNEAKY_PETE && get_property("peteMotorbikeHeadlight") == "Blacklight Bulb");
     if (have_blacklight_bulb)
         exploration_per_turn += 2.0;
     //FIXME deal with ultra-hydrated
     int combats_remaining = exploration_remaining;
     combats_remaining = ceil(to_float(exploration_remaining) / exploration_per_turn);
     subentry.entries.listAppend(exploration_remaining + "% exploration remaining. (" + pluralise(combats_remaining, "combat", "combats") + ")");
-    if ($effect[ultrahydrated].have_effect() == 0 && my_path_id() != PATH_G_LOVER)
+    if ($effect[ultrahydrated].have_effect() == 0 && my_path_id_legacy() != PATH_G_LOVER)
     {
         if (__last_adventure_location == $location[the arid, extra-dry desert])
         {
@@ -132,7 +132,7 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
                 subentry.entries.listAppend(line);
             }
         }
-        if (my_path_id() == PATH_G_LOVER)
+        if (my_path_id_legacy() == PATH_G_LOVER)
         {
         }
         else if (!base_quest_state.state_boolean["Manual Pages Given"])
@@ -156,7 +156,7 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
                 subentry.entries.listAppend("Use drum machine.");
             }
         }
-        if (!base_quest_state.state_boolean["Wormridden"] && $item[drum machine].available_amount() == 0 && my_path_id() != PATH_G_LOVER)
+        if (!base_quest_state.state_boolean["Wormridden"] && $item[drum machine].available_amount() == 0 && my_path_id_legacy() != PATH_G_LOVER)
         {
             if (base_quest_state.state_boolean["Manual Pages Given"])
                 subentry.entries.listAppend("Potentially acquire drum machine from blur. (+234% item), use drum machine.");
@@ -183,7 +183,7 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
             subentry.entries.listAppend(line);
         }
     }
-    if ($effect[ultrahydrated].have_effect() == 0 && my_path_id() != PATH_G_LOVER)
+    if ($effect[ultrahydrated].have_effect() == 0 && my_path_id_legacy() != PATH_G_LOVER)
     {
         if (exploration > 0)
             subentry.entries.listAppend("Acquire ultrahydrated effect from oasis. (potential clover for 20 adventures)");
@@ -211,7 +211,7 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         }
         else
         {
-            if ($item[uv-resistant compass].available_amount() == 0 && !(my_path_id() == PATH_LICENSE_TO_ADVENTURE && get_property_boolean("bondDesert")) && my_path_id() != PATH_EXPLOSIONS)
+            if ($item[uv-resistant compass].available_amount() == 0 && !(my_path_id_legacy() == PATH_LICENSE_TO_ADVENTURE && get_property_boolean("bondDesert")) && my_path_id_legacy() != PATH_EXPLOSIONS)
             {
                 line = "Acquire";
                 if (have_blacklight_bulb)

@@ -24,7 +24,7 @@ void SDispensaryGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
 		dispensary_advantages.listAppend("MP Restorative");
 	dispensary_advantages.listAppend("+30% meat");
 	dispensary_advantages.listAppend("+15% items");
-	if (my_path_id() != PATH_BEES_HATE_YOU && !__misc_state["familiars temporarily blocked"])
+	if (my_path_id_legacy() != PATH_BEES_HATE_YOU && !__misc_state["familiars temporarily blocked"])
 		dispensary_advantages.listAppend("+5 familiar weight");
 	dispensary_advantages.listAppend("+1 mainstat/fight");
 	

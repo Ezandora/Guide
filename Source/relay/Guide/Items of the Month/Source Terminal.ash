@@ -13,9 +13,9 @@ void IOTMSourceTerminalGenerateDigitiseTargets(string [int] description)
         string [int] witchess_list;
         if (__misc_state["can eat just about anything"])
             witchess_list.listAppend("knight");
-        if (__misc_state["can drink just about anything"] && my_path_id() != PATH_G_LOVER)
+        if (__misc_state["can drink just about anything"] && my_path_id_legacy() != PATH_G_LOVER)
             witchess_list.listAppend("bishop");
-        if (my_path_id() != PATH_G_LOVER)
+        if (my_path_id_legacy() != PATH_G_LOVER)
 	        witchess_list.listAppend("rook");
         potential_targets.listAppend("witchess " + witchess_list.listJoinComponents("/"));
     }
@@ -28,11 +28,11 @@ void IOTMSourceTerminalGenerateDigitiseTargets(string [int] description)
 RegisterTaskGenerationFunction("IOTMSourceTerminalGenerateTasks");
 void IOTMSourceTerminalGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-    if (in_bad_moon() || get_campground()[$item[Source Terminal]] == 0 || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_ZOMBIE_SLAYER)
+    if (in_bad_moon() || get_campground()[$item[Source Terminal]] == 0 || my_path_id_legacy() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id_legacy() == PATH_ZOMBIE_SLAYER)
         return;
         
     string url = "campground.php?action=terminal";
-    if (my_path_id() == PATH_NUCLEAR_AUTUMN)
+    if (my_path_id_legacy() == PATH_NUCLEAR_AUTUMN)
         url = "place.php?whichplace=falloutshelter&action=vault_term";
     string image_name = "__item source essence";
         
@@ -45,7 +45,7 @@ void IOTMSourceTerminalGenerateTasks(ChecklistEntry [int] task_entries, Checklis
     if (chips["DRAM"])
         skill_limit = 2;
     int skills_need = skill_limit - skills_have.count();
-    if (skills_need > 0 && my_path_id() != PATH_POCKET_FAMILIARS)
+    if (skills_need > 0 && my_path_id_legacy() != PATH_POCKET_FAMILIARS)
     {
         //FIXME this could be rewritten to suggest turbo + compress, when we have enough extractions.
         string [int] possible_skills;
@@ -61,7 +61,7 @@ void IOTMSourceTerminalGenerateTasks(ChecklistEntry [int] task_entries, Checklis
     }
     
     //Set an enquiry:
-    if (get_property("sourceTerminalEnquiry") == "" && my_path_id() != PATH_G_LOVER)
+    if (get_property("sourceTerminalEnquiry") == "" && my_path_id_legacy() != PATH_G_LOVER)
     {
         //familiar - +5 familiar weight
         //monsters - +25 ML (in-run)
@@ -88,7 +88,7 @@ void IOTMSourceTerminalGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         subentries.listAppend(ChecklistSubentryMake("Set an enquiry", "", description));
     }
     //"Digitise something" like arrow something?
-    if (get_property_int("_sourceTerminalDigitizeUses") == 0 && __misc_state["in run"] && my_path_id() != PATH_ZOMBIE_SLAYER && my_path_id() != PATH_LIVE_ASCEND_REPEAT && my_path_id() != PATH_POCKET_FAMILIARS)
+    if (get_property_int("_sourceTerminalDigitizeUses") == 0 && __misc_state["in run"] && my_path_id_legacy() != PATH_ZOMBIE_SLAYER && my_path_id_legacy() != PATH_LIVE_ASCEND_REPEAT && my_path_id_legacy() != PATH_POCKET_FAMILIARS)
     {
         string [int] description;
         IOTMSourceTerminalGenerateDigitiseTargets(description);
@@ -110,12 +110,12 @@ void IOTMSourceTerminalGenerateTasks(ChecklistEntry [int] task_entries, Checklis
 RegisterGenerationFunction("IOTMSourceTerminalGenerate");
 void IOTMSourceTerminalGenerate(ChecklistCollection checklists)
 {
-    if (in_bad_moon() || get_campground()[$item[Source Terminal]] == 0 || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_ZOMBIE_SLAYER)
+    if (in_bad_moon() || get_campground()[$item[Source Terminal]] == 0 || my_path_id_legacy() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id_legacy() == PATH_ZOMBIE_SLAYER)
         return;
         
     
     string url = "campground.php?action=terminal";
-    if (my_path_id() == PATH_NUCLEAR_AUTUMN)
+    if (my_path_id_legacy() == PATH_NUCLEAR_AUTUMN)
         url = "place.php?whichplace=falloutshelter&action=vault_term";
     string image_name = "__item source terminal";
     int importance = 5;
@@ -139,13 +139,13 @@ void IOTMSourceTerminalGenerate(ChecklistCollection checklists)
         turn_duration = clampi(turn_duration, 25, 100);
         string turns_description = " (" + turn_duration + " turns)";
         string [int] description;
-        if (my_path_id() != PATH_G_LOVER)
+        if (my_path_id_legacy() != PATH_G_LOVER)
 	        description.listAppend("items.enh: +30% item." + turns_description);
-        if (my_path_id() != PATH_G_LOVER)
+        if (my_path_id_legacy() != PATH_G_LOVER)
 	        description.listAppend("meat.enh: +60% meat." + turns_description);
-        if (__misc_state["in run"] && my_path_id() != PATH_G_LOVER)
+        if (__misc_state["in run"] && my_path_id_legacy() != PATH_G_LOVER)
             description.listAppend("init.enh: +50% init." + turns_description);
-        if (my_path_id() == PATH_G_LOVER)
+        if (my_path_id_legacy() == PATH_G_LOVER)
             description.listAppend("damage.enh: +5 prismatic damage, only usable buff in this path." + turns_description);
         //the others are moderately boring
         //+critical hit? niche
@@ -155,19 +155,19 @@ void IOTMSourceTerminalGenerate(ChecklistCollection checklists)
     }
     
 	int total_duplicate_uses_available = 1;
-	if (my_path_id() == PATH_THE_SOURCE)
+	if (my_path_id_legacy() == PATH_THE_SOURCE)
 		total_duplicate_uses_available = 5;
 	int duplicate_uses_remaining = clampi(total_duplicate_uses_available - get_property_int("_sourceTerminalDuplicateUses"), 0, total_duplicate_uses_available);
-    if (my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_POCKET_FAMILIARS)
+    if (my_path_id_legacy() == PATH_ZOMBIE_SLAYER || my_path_id_legacy() == PATH_POCKET_FAMILIARS)
         duplicate_uses_remaining = 0;
-    if (duplicate_uses_remaining > 0 && __misc_state["in run"] && my_path_id() != PATH_G_LOVER)
+    if (duplicate_uses_remaining > 0 && __misc_state["in run"] && my_path_id_legacy() != PATH_G_LOVER)
     {
         //Duplication of a monster:
         string [int] description;
         boolean [skill] skills_have = getActiveSourceTerminalSkills();
         
         string line = "Doubles";
-        if (my_path_id() == PATH_THE_SOURCE)
+        if (my_path_id_legacy() == PATH_THE_SOURCE)
             line = "Triples";
         string times = "once/day";
         if (total_duplicate_uses_available > 1)
@@ -185,7 +185,7 @@ void IOTMSourceTerminalGenerate(ChecklistCollection checklists)
             potential_targets.listAppend(HTMLGenerateFutureTextByLocationAvailability("dairy goat", $location[the goatlet]));
         if (!__quest_state["Level 11"].finished && !__quest_state["Level 11 Palindome"].finished && $item[talisman o' namsilat].available_amount() == 0 && $items[gaudy key,snakehead charrrm].available_amount() < 2)
             potential_targets.listAppend(HTMLGenerateFutureTextByLocationAvailability("gaudy pirate", $location[belowdecks]));
-        if (my_path_id() == PATH_THE_SOURCE)
+        if (my_path_id_legacy() == PATH_THE_SOURCE)
         {
             //5x copies
             //LFM, filthworms, evil eyes, tomb rats?, star monsters, Green Ops Soldier?
@@ -216,7 +216,7 @@ void IOTMSourceTerminalGenerate(ChecklistCollection checklists)
     }
     //Portscans: (the source)
     int portscans_remaining = clampi(3 - get_property_int("_sourceTerminalPortscanUses"), 0, 3);
-    if (portscans_remaining > 0 && my_path_id() == PATH_THE_SOURCE)
+    if (portscans_remaining > 0 && my_path_id_legacy() == PATH_THE_SOURCE)
     {
         //Should we suggest portscan outside of the source?
         //It's three scaling monsters a day, that can make one government potion/run, if optimally used in delay-burning areas. Otherwise, they're +turncount for no reason.
@@ -224,9 +224,9 @@ void IOTMSourceTerminalGenerate(ChecklistCollection checklists)
         
         string [int] description;
         description.listAppend("Cast to summon an agent next turn. Make sure to use it to burn delay.");
-        if (my_path_id() == PATH_THE_SOURCE)
+        if (my_path_id_legacy() == PATH_THE_SOURCE)
             description.listAppend("To use optimally, cast once. Then set your autoattack to portscan, and adventure in a delay-burning area.|This will chain the agents, causing them to cost a single turn.");
-        if (get_property_int("sourceInterval") != 0 && my_path_id() == PATH_THE_SOURCE)
+        if (get_property_int("sourceInterval") != 0 && my_path_id_legacy() == PATH_THE_SOURCE)
             description.listAppend("Wait a bit, this is better after an agent had just appeared.");
         
         checklists.add(C_RESOURCES, ChecklistEntryMake(466, image_name, url, ChecklistSubentryMake(pluralise(portscans_remaining, "portscan", "portscans") + " remaining", "", description), importance).ChecklistEntryTag("source terminal").ChecklistEntrySetSpecificImage("__effect Jacked In").ChecklistEntrySetCategory("skill"));
@@ -235,18 +235,18 @@ void IOTMSourceTerminalGenerate(ChecklistCollection checklists)
     //Extrudes:
     int extrudes_remaining = clampi(3 - get_property_int("_sourceTerminalExtrudes"), 0, 3);
     
-    if (extrudes_remaining > 0 && my_path_id() != PATH_ZOMBIE_SLAYER && my_path_id() != PATH_POCKET_FAMILIARS && my_path_id() != PATH_G_LOVER)
+    if (extrudes_remaining > 0 && my_path_id_legacy() != PATH_ZOMBIE_SLAYER && my_path_id_legacy() != PATH_POCKET_FAMILIARS && my_path_id_legacy() != PATH_G_LOVER)
     {
         int essence = $item[source essence].available_amount();
         string [int] description;
-        if (__misc_state["can eat just about anything"] && my_path_id() != PATH_NUCLEAR_AUTUMN)
+        if (__misc_state["can eat just about anything"] && my_path_id_legacy() != PATH_NUCLEAR_AUTUMN)
         {
             string line = "Food: 4 fullness epic.";
             if (essence < 10)
                 line = HTMLGenerateSpanFont(line, "grey");
             description.listAppend(line);
         }
-        if ((my_path_id() == PATH_LICENSE_TO_ADVENTURE || __misc_state["can drink just about anything"]) && my_path_id() != PATH_NUCLEAR_AUTUMN)
+        if ((my_path_id_legacy() == PATH_LICENSE_TO_ADVENTURE || __misc_state["can drink just about anything"]) && my_path_id_legacy() != PATH_NUCLEAR_AUTUMN)
         {
             string line = "Drink: 4 inebriety epic.";
             if (__misc_state["in run"])
@@ -295,7 +295,7 @@ void IOTMSourceTerminalGenerate(ChecklistCollection checklists)
         digitisation_limit += 1;
     if (chips["TRIGRAM"])
         digitisation_limit += 1;
-    if (my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_LIVE_ASCEND_REPEAT || my_path_id() == PATH_POCKET_FAMILIARS)
+    if (my_path_id_legacy() == PATH_ZOMBIE_SLAYER || my_path_id_legacy() == PATH_LIVE_ASCEND_REPEAT || my_path_id_legacy() == PATH_POCKET_FAMILIARS)
         digitisation_limit = 0;
     int digitisations_left = clampi(digitisation_limit - digitisations, 0, 3);
     if (digitisations_left > 0)

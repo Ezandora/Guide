@@ -8,7 +8,7 @@ void IOTMBackupCameraGenerate(ChecklistCollection checklists)
     
     int times_backed_up = get_property_int("_backUpUses");
     int backup_limit = 11;
-    if (my_path_id() == PATH_ROBOT) //from reports
+    if (my_path_id_legacy() == PATH_ROBOT) //from reports
     	backup_limit = 16;
     int backups_left = MAX(0, backup_limit - times_backed_up);
     if (backups_left > 0)

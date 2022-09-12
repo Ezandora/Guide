@@ -17,7 +17,7 @@ void QLevel11HiddenCityInit()
 {
     QuestState state;
     QuestStateParseMafiaQuestProperty(state, "questL11Worship");
-    if (my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path_id_legacy() == PATH_COMMUNITY_SERVICE || my_path_id_legacy() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
     state.quest_name = "Hidden City Quest";
     state.image_name = "Hidden City";
     
@@ -76,7 +76,7 @@ void generateHiddenAreaUnlockForShrine(string [int] description, location shrine
     {
         string line = liana_remaining.int_to_wordy().capitaliseFirstLetter() + " dense liana remain.";
         
-        if (__misc_state["can equip just about any weapon"] && my_path_id() != PATH_POCKET_FAMILIARS)
+        if (__misc_state["can equip just about any weapon"] && my_path_id_legacy() != PATH_POCKET_FAMILIARS)
         {
             if (machete_available == $item[none])
                 line += " Acquire a machete first.";
@@ -118,13 +118,13 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         subentry.entries.listAppend("Unlock the hidden city via the hidden temple.");
         if ($item[the Nostril of the Serpent].available_amount() == 0)
             subentry.entries.listAppend("Need nostril of the serpent.");
-        if ($item[stone wool].available_amount() > 0 && my_path_id() != PATH_G_LOVER)
+        if ($item[stone wool].available_amount() > 0 && my_path_id_legacy() != PATH_G_LOVER)
         {
             if ($effect[Stone-Faced].have_effect() == 0)
                 entry.url = "inventory.php?which=3";
             subentry.entries.listAppend(pluralise($item[stone wool]) + " available.");
         }
-        if (my_path_id() == PATH_G_LOVER)
+        if (my_path_id_legacy() == PATH_G_LOVER)
         {
         	subentry.modifiers.listAppend("-combat");
             if (__iotms_usable[$item[genie bottle]])
@@ -181,7 +181,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 }
                 else
                 {
-                    if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
+                    if (my_path_id_legacy() == PATH_ACTUALLY_ED_THE_UNDYING)
                     {
                         subentry.entries.listAppend("Talk to the protector spectre.");
                     }
@@ -197,13 +197,13 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         }
         if (!at_last_spirit)
         {
-            if ((!janitors_relocated_to_park && !$monster[pygmy janitor].is_banished()) || (!have_machete  && my_path_id() != PATH_POCKET_FAMILIARS))
+            if ((!janitors_relocated_to_park && !$monster[pygmy janitor].is_banished()) || (!have_machete  && my_path_id_legacy() != PATH_POCKET_FAMILIARS))
             {
                 ChecklistSubentry subentry;
                 subentry.header = "Hidden Park";
             
                 subentry.modifiers.listAppend("-combat");
-                if (!have_machete && my_path_id() != PATH_POCKET_FAMILIARS)
+                if (!have_machete && my_path_id_legacy() != PATH_POCKET_FAMILIARS)
                 {
                     int turns_remaining = MAX(0, 7 - $location[the hidden park].turnsAttemptedInLocation());
                     string line;
@@ -304,7 +304,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 {
                     subentry.entries.listAppend("Need three more curses." + curse_details);
                 }
-                if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE && $skill[Shake it off].skill_is_usable())
+                if (my_path_id_legacy() == PATH_AVATAR_OF_SNEAKY_PETE && $skill[Shake it off].skill_is_usable())
                     subentry.entries.listAppend(HTMLGenerateSpanFont("Avoid using Shake It Off to heal", "red") + ", it'll remove the curse.");
         
                 if (__misc_state["have hipster"])
@@ -522,7 +522,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 generateHiddenAreaUnlockForShrine(subentry.entries,$location[a massive ziggurat]);
                 entry.subentries.listAppend(subentry);
             }
-            if (!hidden_tavern_unlocked && my_path_id() != PATH_G_LOVER && my_path_id() != PATH_BEES_HATE_YOU)
+            if (!hidden_tavern_unlocked && my_path_id_legacy() != PATH_G_LOVER && my_path_id_legacy() != PATH_BEES_HATE_YOU)
             {
                 ChecklistSubentry subentry;
                 subentry.header = "Hidden Tavern";
@@ -548,7 +548,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                         if ($skill[the ode to booze].skill_is_usable())
                             adventures_given += 6;
                         
-                        if (my_path_id() != PATH_SLOW_AND_STEADY)
+                        if (my_path_id_legacy() != PATH_SLOW_AND_STEADY)
                             tavern_provides.listAppend("Nightcap drink. (Fog Murderer for " + adventures_given + " adventures)");
                     }
                     if (tavern_provides.count() > 0)

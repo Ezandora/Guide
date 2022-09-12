@@ -4,7 +4,7 @@
 string [int] generateUsefulPlacesToRerollMonsters()
 {
 	string [int] useful_places;
-    if (spleen_limit() > 0 && $familiar[space jellyfish].familiar_is_usable() && get_property_int("_spaceJellyfishDrops") < 4 && my_path_id() != PATH_LIVE_ASCEND_REPEAT)
+    if (spleen_limit() > 0 && $familiar[space jellyfish].familiar_is_usable() && get_property_int("_spaceJellyfishDrops") < 4 && my_path_id_legacy() != PATH_LIVE_ASCEND_REPEAT)
     {
         string line = "stench monster area";
         if ($location[Pirates of the Garbage Barges].locationAvailable())
@@ -29,7 +29,7 @@ void IOTMMeteorLoreGenerateResource(ChecklistEntry [int] resource_entries)
     if (!$skill[Meteor Lore].have_skill())
         return;
     if (!__misc_state["in run"]) return;
-    if (my_path_id() == PATH_G_LOVER) return;
+    if (my_path_id_legacy() == PATH_G_LOVER) return;
     
     ChecklistEntry entry = ChecklistEntryMake(518);
     entry.image_lookup_name = "__skill Meteor Lore";
@@ -42,7 +42,7 @@ void IOTMMeteorLoreGenerateResource(ChecklistEntry [int] resource_entries)
         
         string [int] useful_places = generateUsefulPlacesToRerollMonsters();
         
-        if (useful_places.count() > 0 && my_path_id() != PATH_COMMUNITY_SERVICE)
+        if (useful_places.count() > 0 && my_path_id_legacy() != PATH_COMMUNITY_SERVICE)
             description.listAppend("Reroll:|*-" + useful_places.listJoinComponents("|*-"));
         
         entry.subentries.listAppend(ChecklistSubentryMake(pluralise(macrometeorite_uses_remaining, "macrometeorite", "macrometeorites"), "", description));

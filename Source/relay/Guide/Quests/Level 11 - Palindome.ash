@@ -2,14 +2,14 @@ void QLevel11PalindomeInit()
 {
     QuestState state;
     QuestStateParseMafiaQuestProperty(state, "questL11Palindome");
-    if (my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path_id_legacy() == PATH_COMMUNITY_SERVICE || my_path_id_legacy() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
     state.quest_name = "Palindome Quest";
     state.image_name = "Palindome";
     
     state.state_boolean["Need instant camera"] = false;
     if ($item[photograph of a dog].available_amount() + $item[disposable instant camera].available_amount() == 0 && state.mafia_internal_step < 3)
         state.state_boolean["Need instant camera"] = true;
-    if (7270.to_item().available_amount() > 0 || my_path_id() == PATH_POCKET_FAMILIARS || my_path_id() == PATH_G_LOVER)
+    if (7270.to_item().available_amount() > 0 || my_path_id_legacy() == PATH_POCKET_FAMILIARS || my_path_id_legacy() == PATH_G_LOVER)
         state.state_boolean["Need instant camera"] = false;
     
     state.state_boolean["dr. awkward's office unlocked"] = false;
@@ -32,7 +32,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
         return;
     if (__quest_state["Level 11"].mafia_internal_step <3 )
         return;
-    if (($item[Staff of Ed\, almost].available_amount() > 0 || $item[2325].available_amount() > 0 || $item[2268].available_amount() > 0) && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING)
+    if (($item[Staff of Ed\, almost].available_amount() > 0 || $item[2325].available_amount() > 0 || $item[2268].available_amount() > 0) && my_path_id_legacy() != PATH_ACTUALLY_ED_THE_UNDYING)
         return;
     
     QuestState base_quest_state = __quest_state["Level 11 Palindome"];
@@ -293,7 +293,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
             
             if ($item[photograph of a dog].available_amount() == 0)
             {
-            	if (my_path_id() == PATH_POCKET_FAMILIARS || my_path_id() == PATH_G_LOVER)
+            	if (my_path_id_legacy() == PATH_POCKET_FAMILIARS || my_path_id_legacy() == PATH_G_LOVER)
                 {
                     need_to_adventure_in_palindome = true;
                     subentry.entries.listAppend("Defeat Bob Racecar or Racecar Bobs until you acquire the photograph of a dog.");
@@ -324,7 +324,7 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
                 }
             }
             
-            if ($item[stunt nuts].available_amount() + $item[wet stunt nut stew].available_amount() == 0 && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING)
+            if ($item[stunt nuts].available_amount() + $item[wet stunt nut stew].available_amount() == 0 && my_path_id_legacy() != PATH_ACTUALLY_ED_THE_UNDYING)
             {
                 subentry.modifiers.listAppend("+234% item");
                 subentry.entries.listAppend("Possibly acquire stunt nuts from Bob Racecar or Racecar Bob. (30% drop)");

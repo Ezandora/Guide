@@ -51,7 +51,7 @@ void QSeaInit()
 
 void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name)
 {
-    string path = get_property("merkinQuestPath");
+    string merkin_path = get_property("merkinQuestPath");
     
     boolean can_fight_dad_sea_monkee = $items[Goggles of Loathing,Stick-Knife of Loathing,Scepter of Loathing,Jeans of Loathing,Treads of Loathing,Belt of Loathing,Pocket Square of Loathing].items_missing().count() <= 1;
     
@@ -77,12 +77,12 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
     boolean at_boss = false;
     boolean at_gladiator_boss = false;
     boolean at_scholar_boss = false;
-    if (path == "gladiator")
+    if (merkin_path == "gladiator")
     {
         image_name.s = "Shub-Jigguwatt";
         at_gladiator_boss = true;
     }
-    else if (path == "scholar")
+    else if (merkin_path == "scholar")
     {
         image_name.s = "Yog-Urt";
         at_scholar_boss = true;

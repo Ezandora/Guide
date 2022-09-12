@@ -10,8 +10,8 @@ void QLevel11HiddenTempleInit()
     }
     else
         QuestStateParseMafiaQuestPropertyValue(state, "unstarted");
-    if (my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
-    if (my_path_id() == PATH_EXPLOSIONS) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path_id_legacy() == PATH_COMMUNITY_SERVICE || my_path_id_legacy() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path_id_legacy() == PATH_EXPLOSIONS) QuestStateParseMafiaQuestPropertyValue(state, "finished");
     state.quest_name = "Hidden Temple Unlock";
     state.image_name = "spooky forest";
 
@@ -22,7 +22,7 @@ void QLevel11HiddenTempleGenerateTasks(ChecklistEntry [int] task_entries, Checkl
 {
 	if (!__quest_state["Hidden Temple Unlock"].in_progress)
         return;
-    if (my_path_id() == PATH_G_LOVER) return;
+    if (my_path_id_legacy() == PATH_G_LOVER) return;
         
     QuestState base_quest_state = __quest_state["Hidden Temple Unlock"];
     ChecklistSubentry subentry;

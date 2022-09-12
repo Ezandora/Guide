@@ -309,13 +309,13 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
 	
 	if (zone == "KOL High School")
 	{
-		if (my_path_id() == PATH_KOLHS)
+		if (my_path_id_legacy() == PATH_KOLHS)
 			return true;
 		return false;
 	}
 	if (zone == "Mothership")
 	{
-		if (my_path_id() == PATH_BUGBEAR_INVASION)
+		if (my_path_id_legacy() == PATH_BUGBEAR_INVASION)
 			return true;
 		return false;
 	}
@@ -668,7 +668,7 @@ void locationAvailablePrivateInit()
 	//locations_unlocked_by_item[$location[The Haunted Gallery]] = $item[spookyraven gallery key];
 	locations_unlocked_by_item[$location[The Castle in the Clouds in the Sky (Basement)]] = $item[S.O.C.K.];
 	locations_unlocked_by_item[$location[the hole in the sky]] = $item[steam-powered model rocketship];
-    if (my_path_id() == PATH_EXPLOSION)
+    if (my_path_id_legacy() == PATH_EXPLOSION)
     {
         locations_unlocked_by_item[$location[The Castle in the Clouds in the Sky (Basement)]] = $item[none];
         locations_unlocked_by_item[$location[the hole in the sky]] = $item[none];

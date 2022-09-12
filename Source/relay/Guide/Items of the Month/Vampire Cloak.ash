@@ -7,7 +7,7 @@ void IOTMVampireCloakGenerateResource(ChecklistEntry [int] resource_entries)
     if (!(__misc_state["in run"] && in_ronin())) return;
     
     int uses_left = clampi(10 - get_property_int("_vampyreCloakeFormUses"), 0, 10);
-    if (uses_left > 0 && my_path_id() != PATH_POCKET_FAMILIARS)
+    if (uses_left > 0 && my_path_id_legacy() != PATH_POCKET_FAMILIARS)
 	{
 		string [int] skills;
         skills.listAppend("Wolf: +50% muscle, +50% meat");

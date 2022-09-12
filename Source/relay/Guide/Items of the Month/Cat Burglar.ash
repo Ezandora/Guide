@@ -19,7 +19,7 @@ void IOTMCatBurglarGenerateResource(ChecklistEntry [int] resource_entries)
         //There are also certainly even more options.
         description.listAppend("Obtains one item from a recent fight.");
         string [int] options;
-        if (__misc_state["in run"] && my_path_id() != PATH_COMMUNITY_SERVICE)
+        if (__misc_state["in run"] && my_path_id_legacy() != PATH_COMMUNITY_SERVICE)
         {
         	if ($item[bowling ball].available_amount() < 5 && get_property_int("hiddenBowlingAlleyProgress") < 7)
             {

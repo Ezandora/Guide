@@ -13,14 +13,14 @@ int IOTMEmotionChipCastsLeft(string [skill] skill_property_names, skill s)
 RegisterGenerationFunction("IOTMEmotionChipGenerate");
 void IOTMEmotionChipGenerate(ChecklistCollection checklists)
 {
-	if (my_path_id() == PATH_AVATAR_OF_BORIS) return; //probably a lot of these
+	if (my_path_id_legacy() == PATH_AVATAR_OF_BORIS) return; //probably a lot of these
 	if (!lookupSkill("Emotionally Chipped").have_skill())
 	{
 		if (lookupItem("spinal-fluid-covered emotion chip").have())
         {
         	string [int] description;
             description.listAppend("Use spinal-fluid-covered emotion chip.");
-            if (my_path_id() != PATH_NONE)
+            if (my_path_id_legacy() != PATH_NONE)
 	            description.listAppend("Unless that's impossible this path. (needs spading?)");
         	checklists.add(C_OPTIONAL_TASKS, ChecklistEntryMake(452, "__item spinal-fluid-covered emotion chip", "inventory.php?which=3", ChecklistSubentryMake("Acquire Emotionally Chipped skill", "", description), 9));
         }

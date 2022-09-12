@@ -6,7 +6,7 @@ void QLevel11CopperheadInit()
 	{
 		QuestState state;
 		QuestStateParseMafiaQuestProperty(state, "questL11Ron");
-    	if (my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    	if (my_path_id_legacy() == PATH_COMMUNITY_SERVICE || my_path_id_legacy() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
 		state.quest_name = "Zeppelin Quest"; //"Merry-Go-Ron";
 		state.image_name = "__item copperhead charm (rampant)"; //__item bitchin ford anglia
         
@@ -24,7 +24,7 @@ void QLevel11CopperheadInit()
 	{
 		QuestState state;
 		QuestStateParseMafiaQuestProperty(state, "questL11Shen");
-    	if (my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    	if (my_path_id_legacy() == PATH_COMMUNITY_SERVICE || my_path_id_legacy() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
 		state.quest_name = "Copperhead Club Quest"; //"Of Mice and Shen";
 		state.image_name = "__item copperhead charm"; //"__effect Ancient Annoying Serpent Poison";
 		__quest_state["Level 11 Shen"] = state;
@@ -115,12 +115,12 @@ void QLevel11RonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         if (__misc_state["Torso aware"])
             relevant_lynyrdskin_items[$item[lynyrdskin tunic]] = true;
         
-        if ($item[lynyrd musk].available_amount() > 0 && $effect[Musky].have_effect() == 0 && my_path_id() != PATH_G_LOVER)
+        if ($item[lynyrd musk].available_amount() > 0 && $effect[Musky].have_effect() == 0 && my_path_id_legacy() != PATH_G_LOVER)
         {
             subentry.entries.listAppend(HTMLGenerateSpanFont("Use lynyrd musk.", "red"));
             url = "inventory.php?which=3";
         }
-        if ($item[cigarette lighter].available_amount() > 0 && base_quest_state.state_boolean["need protestor speed tricks"] && my_path_id() != PATH_POCKET_FAMILIARS)
+        if ($item[cigarette lighter].available_amount() > 0 && base_quest_state.state_boolean["need protestor speed tricks"] && my_path_id_legacy() != PATH_POCKET_FAMILIARS)
         {
             subentry.entries.listAppend(HTMLGenerateSpanFont("Use cigarette lighter in-combat.", "red"));
         }
@@ -213,7 +213,7 @@ void QLevel11RonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         subentry.entries.listAppend("Search for Ron in the zeppelin.");
         //possibly 50% chance of no progress without a ticket (unconfirmed chat rumour)
         
-        if (my_path_id() != PATH_POCKET_FAMILIARS)
+        if (my_path_id_legacy() != PATH_POCKET_FAMILIARS)
         {
             subentry.modifiers.listAppend("+234% item");
             foreach m in $monsters[Red Herring,Red Snapper]
@@ -238,7 +238,7 @@ void QLevel11RonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
                 subentry.entries.listAppend("No ticket.");
         }
             
-        if (get_property_int("_glarkCableUses") < 5 && my_path_id() != PATH_POCKET_FAMILIARS)
+        if (get_property_int("_glarkCableUses") < 5 && my_path_id_legacy() != PATH_POCKET_FAMILIARS)
         {
             if ($skill[Transcendent Olfaction].skill_is_usable() && !($effect[on the trail].have_effect() > 0 && get_property_monster("olfactedMonster") == $monster[red butler]))
                 subentry.entries.listAppend("Olfact red butlers for glark cables.");
@@ -324,7 +324,7 @@ void QLevel11ShenGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     {
         subentry.entries.listAppend("Adventure in the Copperhead Club and meet Shen.");
         subentry.entries.listAppend("This will give you unremovable -5 stat poison.");
-        if (my_daycount() == 1 && my_path_id() != PATH_EXPLOSIONS)
+        if (my_daycount() == 1 && my_path_id_legacy() != PATH_EXPLOSIONS)
         	subentry.entries.listAppend("Perhaps wait until tomorrow before starting this; day 2's shen bosses are more favourable.");
     }
     else if (base_quest_state.mafia_internal_step == 2)

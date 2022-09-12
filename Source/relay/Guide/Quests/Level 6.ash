@@ -4,12 +4,12 @@ void QLevel6Init()
 	//questL06Friar
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL06Friar");
-    if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path_id_legacy() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
 	state.quest_name = "Deep Fat Friars' Quest";
 	state.image_name = "forest friars";
 	state.council_quest = true;
 	
-	if (my_level() >= 6 || my_path_id() == PATH_EXPLOSIONS)
+	if (my_level() >= 6 || my_path_id_legacy() == PATH_EXPLOSIONS)
 		state.startable = true;
 	
 	__quest_state["Level 6"] = state;
@@ -66,7 +66,7 @@ void QLevel6GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	boolean want_hell_ramen = false;
 	if ($skill[pastamastery].skill_is_usable() && $skill[Advanced Saucecrafting].skill_is_usable())
 		want_hell_ramen = true;
-    if (my_path_id() == PATH_SLOW_AND_STEADY)
+    if (my_path_id_legacy() == PATH_SLOW_AND_STEADY)
         want_hell_ramen = false;
     want_hell_ramen = false; //this needs rethinking
     

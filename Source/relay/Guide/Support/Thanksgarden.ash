@@ -8,7 +8,7 @@ int [string] lookupCornucopiaReward(int lookup_number)
     return __thanksgarden_cornucopia_rewards[lookup_number];
 }
 
-//Path number is the same as my_path_id().
+//Path number is the same as my_path_id_legacy().
 int [string] lookupCornucopiaReward(int path_id, class player_class, int daycount, int previous_cornucopias_used)
 {
     int class_number = player_class.to_int();
@@ -18,7 +18,7 @@ int [string] lookupCornucopiaReward(int path_id, class player_class, int daycoun
 
 int [string] lookupCornucopiaReward(int previous_cornucopias_used)
 {
-    return lookupCornucopiaReward(my_path_id(), my_class(), my_daycount(), previous_cornucopias_used);
+    return lookupCornucopiaReward(my_path_id_legacy(), my_class(), my_daycount(), previous_cornucopias_used);
 }
 
 int [string] lookupNextCornucopiaReward()

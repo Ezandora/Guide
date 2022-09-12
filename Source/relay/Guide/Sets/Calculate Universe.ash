@@ -12,6 +12,10 @@ void SCalculateUniverseGenerateResource(ChecklistEntry [int] resource_entries)
         int limit = 1;
         int skill_number = get_property_int("skillLevel144");
         limit = max(skill_number, limit);
+        if (in_ronin())
+        {
+            limit = min(limit, 3);
+        }
         if (universe_calculated >= limit)
             return;
         uses_remaining = limit - universe_calculated;
@@ -29,7 +33,7 @@ void SCalculateUniverseGenerateResource(ChecklistEntry [int] resource_entries)
         }
     }
     //Set up useful digits:
-    if (my_path_id() != PATH_SLOW_AND_STEADY)
+    if (my_path_id_legacy() != PATH_SLOW_AND_STEADY)
         useful_digits_and_their_reasons[69] = "+3 adventures";
     if (hippy_stone_broken())
         useful_digits_and_their_reasons[37] = "+3 fights";

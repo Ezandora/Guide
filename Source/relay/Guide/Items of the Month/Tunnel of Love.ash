@@ -13,29 +13,29 @@ void IOTMTunnelOfLoveGenerateTasks(ChecklistEntry [int] task_entries, ChecklistE
     //item: boomerang (arrow), toy dart gun (???), chocolate (adventures), flowers (???), elephant (???), TOAST! (toasty!)
     
     description.listAppend("Three free fights. Attack, spell, and pickpocket respectively for elixirs.");
-    if (my_path_id() == PATH_GELATINOUS_NOOB)
+    if (my_path_id_legacy() == PATH_GELATINOUS_NOOB)
         description.listAppend("Equipment choice unimportant.");
     else
     {
     	string [int] equipment_choices;
         equipment_choices.listAppend(HTMLBoldIfTrue("Eardigan", my_primestat() == $stat[muscle] && __misc_state["in run"] && my_level() < 13) + " (+25% muscle exp, +25 ML)");
-        if (my_path_id() != PATH_G_LOVER)
+        if (my_path_id_legacy() != PATH_G_LOVER)
 	        equipment_choices.listAppend(HTMLBoldIfTrue("Epaulettes", my_primestat() == $stat[mysticality] && __misc_state["in run"] && my_level() < 13) + " (+25% myst exp)");
         equipment_choices.listAppend(HTMLBoldIfTrue("Earrings", (my_primestat() == $stat[moxie] && __misc_state["in run"] && my_level() < 13) || __misc_state["in aftercore"] || my_level() >= 13) + " (+25% moxie exp, +50% meat, +3 all res)");
         description.listAppend("Equipment choice:|*" + equipment_choices.listJoinComponents(", ", "or"));
     }
     string [int] buff_choices;
-    if (my_path_id() != PATH_G_LOVER)
+    if (my_path_id_legacy() != PATH_G_LOVER)
     	buff_choices.listAppend("+10 stats/fight");
     buff_choices.listAppend("+10 familiar weight");
     buff_choices.listAppend("+50% item");
     description.listAppend("Buff choice: (50 turns)|*" + buff_choices.listJoinComponents(", ", "or"));
     
     string [int] usable_items;
-    if (my_path_id() != PATH_LIVE_ASCEND_REPEAT)
+    if (my_path_id_legacy() != PATH_LIVE_ASCEND_REPEAT)
         usable_items.listAppend("single-use wandering copier");
     usable_items.listAppend("chat hearts");
-    if (my_path_id() != PATH_SLOW_AND_STEADY && my_path_id() != PATH_G_LOVER)
+    if (my_path_id_legacy() != PATH_SLOW_AND_STEADY && my_path_id_legacy() != PATH_G_LOVER)
         usable_items.listAppend("chocolate (adventures)");
     if ($familiar[space jellyfish].familiar_is_usable())
         usable_items.listAppend("toast");
@@ -59,7 +59,7 @@ void IOTMTunnelOfLoveGenerateResource(ChecklistEntry [int] resource_entries)
             
         }*/
         item chocolate = $item[LOV Extraterrestrial Chocolate];
-        if (chocolate.available_amount() > 0 && my_path_id() != PATH_SLOW_AND_STEADY)
+        if (chocolate.available_amount() > 0 && my_path_id_legacy() != PATH_SLOW_AND_STEADY)
         {
             //FIXME list other chocolates?
             resource_entries.listAppend(ChecklistEntryMake(582, "__item LOV Extraterrestrial Chocolate", "", ChecklistSubentryMake(pluralise(chocolate), "", "Adventures!"), 5));

@@ -9,7 +9,7 @@ void QPirateInit()
 	state.image_name = "pirate quest";
 	
 	state.state_boolean["valid"] = true;
-	/*if (__misc_state["mysterious island available"] && !(my_path_id() == PATH_COMMUNITY_SERVICE || __misc_state["in aftercore"]))
+	/*if (__misc_state["mysterious island available"] && !(my_path_id_legacy() == PATH_COMMUNITY_SERVICE || __misc_state["in aftercore"]))
 	{
 		state.startable = true;
 		if (!state.in_progress && !state.finished)
@@ -44,7 +44,7 @@ void QPirateInit()
         QuestStateParseMafiaQuestPropertyValue(state, "finished");
 	__quest_state["Pirate Quest"] = state;
 	
-	if (my_path_id() == PATH_POCKET_FAMILIARS || my_path_id() == PATH_G_LOVER || true)
+	if (my_path_id_legacy() == PATH_POCKET_FAMILIARS || my_path_id_legacy() == PATH_G_LOVER || true)
 	{
 		state.state_boolean["valid"] = false;
         state.state_boolean["hot wings relevant"] = false;
@@ -263,7 +263,7 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 					additional_line = "This location can be a nightmare without +234% item.";
                     
                 subentry.modifiers.listAppend("banish chatty/crusty pirate");
-                if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
+                if (my_path_id_legacy() == PATH_ACTUALLY_ED_THE_UNDYING)
                 {
                     monster [int] monsters_left;
                     if ($item[rigging shampoo].available_amount() == 0)

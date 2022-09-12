@@ -4,7 +4,7 @@ void IOTMTimeSpinnerGenerateResource(ChecklistEntry [int] resource_entries)
     //Warn about eating if they're low on turns - you can't use the time spinner when you're out of adventures.
     if ($item[Time-Spinner].available_amount() == 0)
         return;
-    if (my_path_id() == PATH_G_LOVER)
+    if (my_path_id_legacy() == PATH_G_LOVER)
     	return;
     int minutes_left = clampi(10 - get_property_int("_timeSpinnerMinutesUsed"), 0, 10);
     if (minutes_left <= 0)
@@ -36,7 +36,7 @@ void IOTMTimeSpinnerGenerateResource(ChecklistEntry [int] resource_entries)
                 options.listAppend("drink");
             if (!in_ronin())
                 options.listAppend("something to sell");
-            if (my_path_id() == PATH_GELATINOUS_NOOB && !$skill[Pathological Greed].have_skill() && $item[shot of Kardashian Gin].available_amount() == 0)
+            if (my_path_id_legacy() == PATH_GELATINOUS_NOOB && !$skill[Pathological Greed].have_skill() && $item[shot of Kardashian Gin].available_amount() == 0)
             {
                 options.listAppend("Kardashian Gin for +meat skill");
             }

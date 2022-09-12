@@ -7,7 +7,7 @@ void initialiseIOTMsUsable()
     if (in_bad_moon())
         return;
     
-    if (my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING)
+    if (my_path_id_legacy() != PATH_ACTUALLY_ED_THE_UNDYING)
     {
         int [item] campground = get_campground();
         //Campground items:
@@ -21,7 +21,7 @@ void initialiseIOTMsUsable()
     }
     if (get_property_boolean("hasDetectiveSchool"))
         __iotms_usable[$item[detective school application]] = true;
-    if (get_property_boolean("chateauAvailable") && my_path_id() != PATH_EXPLOSIONS)
+    if (get_property_boolean("chateauAvailable") && my_path_id_legacy() != PATH_EXPLOSIONS)
         __iotms_usable[$item[Chateau Mantegna room key]] = true;
     if (get_property_boolean("barrelShrineUnlocked"))
         __iotms_usable[$item[shrine to the Barrel god]] = true;
@@ -35,7 +35,7 @@ void initialiseIOTMsUsable()
         __iotms_usable[$item[heart-shaped crate]] = true;
     if (get_property_boolean("spacegateAlways") || get_property_boolean("_spacegateToday"))
         __iotms_usable[$item[Spacegate access badge]] = true;
-    if (my_path_id() == PATH_EXPLOSIONS)
+    if (my_path_id_legacy() == PATH_EXPLOSIONS)
     	__iotms_usable[$item[Spacegate access badge]] = false;
     if (get_property_boolean("gingerbreadCityAvailable") || get_property_boolean("_gingerbreadCityToday"))
         __iotms_usable[$item[Build-a-City Gingerbread kit]] = true;

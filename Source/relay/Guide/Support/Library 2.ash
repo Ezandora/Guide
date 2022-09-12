@@ -147,7 +147,7 @@ item [int] asdonMartinGenerateListOfFuelables()
     blocklist[$item[white pixel]] = true; //no!
     blocklist[$item[cashew]] = true;
     
-    if (my_path_id() != PATH_LICENSE_TO_ADVENTURE && inebriety_limit() > 0) //FIXME the test for can drink just about
+    if (my_path_id_legacy() != PATH_LICENSE_TO_ADVENTURE && inebriety_limit() > 0) //FIXME the test for can drink just about
     {
         foreach it in $items[bottle of gin,bottle of rum,bottle of vodka,bottle of whiskey,bottle of tequila] //too useful for crafting?
             blocklist[it] = true;
@@ -168,7 +168,7 @@ item [int] asdonMartinGenerateListOfFuelables()
                 continue;
             }
         }
-        if (my_path_id() == PATH_LICENSE_TO_ADVENTURE && false)
+        if (my_path_id_legacy() == PATH_LICENSE_TO_ADVENTURE && false)
         {
             if (it.inebriety > 0 && it.image == "martini.gif")
                 continue;
@@ -200,7 +200,7 @@ item [int] asdonMartinGenerateListOfFuelables()
             
         float soda_bread_efficiency = to_float($item[wad of dough].npc_price() + $item[soda water].npc_price()) / 6.0;
         if (soda_bread_efficiency < 1.0) soda_bread_efficiency = 100000.0;
-        if (it.autosell_price() > 0 && it.autosell_price().to_float() / average_adventures > soda_bread_efficiency && my_path_id() != PATH_EXPLOSIONS)
+        if (it.autosell_price() > 0 && it.autosell_price().to_float() / average_adventures > soda_bread_efficiency && my_path_id_legacy() != PATH_EXPLOSIONS)
         {
             continue;
         }

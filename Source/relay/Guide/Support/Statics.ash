@@ -62,11 +62,16 @@ static
     int PATH_WILDFIRE = 43;
 }
 
+int my_path_id_legacy()
+{
+    return my_path_id();
+}
+
 float numeric_modifier_replacement(item it, string modifier)
 {
     string modifier_lowercase = modifier.to_lower_case();
     float additional = 0;
-    if (my_path_id() == PATH_G_LOVER && !it.contains_text("g") && !it.contains_text("G"))
+    if (my_path_id_legacy() == PATH_G_LOVER && !it.contains_text("g") && !it.contains_text("G"))
     	return 0.0;
     if (it == $item[your cowboy boots])
     {

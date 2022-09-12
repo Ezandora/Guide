@@ -7,7 +7,7 @@ boolean HITSStillRelevant()
 		return false;
 	if (__quest_state["Level 13"].state_boolean["Richard's star key used"])
 		return false;
-	if (!__quest_state["Level 10"].finished && my_path_id() != PATH_EXPLOSIONS)
+	if (!__quest_state["Level 10"].finished && my_path_id_legacy() != PATH_EXPLOSIONS)
 		return false;
         
 	return true;

@@ -4,7 +4,7 @@ void QLevel10Init()
 	//questL10Garbage
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL10Garbage");
-    if (my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path_id_legacy() == PATH_COMMUNITY_SERVICE || my_path_id_legacy() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
 	state.quest_name = "Castle Quest";
 	state.image_name = "castle";
 	state.council_quest = true;
@@ -21,10 +21,10 @@ void QLevel10Init()
         beanstalk_grown = true;
     
     state.state_boolean["beanstalk grown"] = beanstalk_grown;
-    if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
+    if (my_path_id_legacy() == PATH_ACTUALLY_ED_THE_UNDYING)
         state.state_boolean["beanstalk grown"] = true;
 	
-	if (my_level() >= 10 || my_path_id() == PATH_EXPLOSIONS)
+	if (my_level() >= 10 || my_path_id_legacy() == PATH_EXPLOSIONS)
 		state.startable = true;
     
 	__quest_state["Level 10"] = state;
@@ -43,7 +43,7 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     string url = "place.php?whichplace=beanstalk";
 	
     boolean add_as_future_task = false;
-	if ($item[s.o.c.k.].available_amount() == 0 && my_path_id() != PATH_EXPLOSION)
+	if ($item[s.o.c.k.].available_amount() == 0 && my_path_id_legacy() != PATH_EXPLOSION)
 	{
         //FIXME delay if ballroom song not set
         image_name = "penultimate fantasy airship";
@@ -219,7 +219,7 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             }
             if ($item[mohawk wig].available_amount() == 0 && !in_hardcore())
                 subentry.entries.listAppend("Potentially pull and wear a mohawk wig.");
-            if ($item[model airship].available_amount() == 0 && my_path_id() != PATH_EXPLOSIONS)
+            if ($item[model airship].available_amount() == 0 && my_path_id_legacy() != PATH_EXPLOSIONS)
             {
                 if ($item[mohawk wig].available_amount() == 0) //no wig, no airship
                     subentry.entries.listAppend("Backfarm for a model airship in the fantasy airship. (non-combat option, run -combat)");

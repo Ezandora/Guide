@@ -1,7 +1,7 @@
 RegisterTaskGenerationFunction("PathLicenseToAdventureGenerateTasks");
 void PathLicenseToAdventureGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-    if (my_path_id() != PATH_LICENSE_TO_ADVENTURE)
+    if (my_path_id_legacy() != PATH_LICENSE_TO_ADVENTURE)
         return;
     if ($item[Victor's Spoils].available_amount() > 0 && !get_property_boolean("_victorSpoilsUsed"))
     {

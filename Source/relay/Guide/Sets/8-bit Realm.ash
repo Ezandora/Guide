@@ -21,7 +21,7 @@ void S8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         subentry.header = "Bring along the angry jung man";
     
         subentry.entries.listAppend(pluralise(jung_mans_charge_turns_remaining, "turn", "turns") + " until jar drops. (skip 8-bit realm)");
-        if (my_path_id() == PATH_ONE_CRAZY_RANDOM_SUMMER)
+        if (my_path_id_legacy() == PATH_ONE_CRAZY_RANDOM_SUMMER)
             subentry.entries.listAppend("Or wait for pixellated monsters.");
     
         optional_task_entries.listAppend(ChecklistEntryMake(268, "__familiar angry jung man", url, subentry));
@@ -42,7 +42,7 @@ void S8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             modifiers.listAppend("olfact morbid skull");
             description.listAppend("Run +150% item, olfact morbid skull.");
             description.listAppend(total_white_pixels + "/30 white pixels found.");
-            if (my_path_id() == PATH_ONE_CRAZY_RANDOM_SUMMER)
+            if (my_path_id_legacy() == PATH_ONE_CRAZY_RANDOM_SUMMER)
                 description.listAppend("Or wait for pixellated monsters.");
         }
         else if ($item[jar of psychoses (The Crackpot Mystic)].available_amount() > 0)
@@ -50,7 +50,7 @@ void S8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             active_url = "inventory.php?which=3";
             title = "Open the " + $item[jar of psychoses (The Crackpot Mystic)];
             description.listAppend("Fear Man's level access, for digital key.");
-            if (my_path_id() == PATH_ONE_CRAZY_RANDOM_SUMMER)
+            if (my_path_id_legacy() == PATH_ONE_CRAZY_RANDOM_SUMMER)
                 description.listAppend("Or wait for pixellated monsters.");
         }
         else if ($item[psychoanalytic jar].available_amount() > 0)
@@ -60,13 +60,13 @@ void S8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             active_url = "place.php?whichplace=forestvillage&action=fv_mystic";
             title = "Psychoanalyze the crackpot mystic";
             description.listAppend("Fear Man's level access, for digital key.");
-            if (my_path_id() == PATH_ONE_CRAZY_RANDOM_SUMMER)
+            if (my_path_id_legacy() == PATH_ONE_CRAZY_RANDOM_SUMMER)
                 description.listAppend("Or wait for pixellated monsters.");
         }
         optional_task_entries.listAppend(ChecklistEntryMake(269, "__item digital key", active_url, ChecklistSubentryMake(title, modifiers, description), $locations[fear man's level]));
         need_route_output = false;
     }
-    if (my_path_id() == PATH_EXPLOSIONS) need_route_output = false;
+    if (my_path_id_legacy() == PATH_EXPLOSIONS) need_route_output = false;
     if (need_route_output)
     {
         if (in_hardcore() || !$item[jar of psychoses (The Crackpot Mystic)].is_unrestricted())
@@ -81,7 +81,7 @@ void S8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             description.listAppend(total_white_pixels + "/30 white pixels found.");
             if (__misc_state["VIP available"] && __misc_state["fax equivalent accessible"])
                 description.listAppend("Possibly consider faxing/copying a ghost. (+150% item, drops five white pixels)");
-            if (my_path_id() == PATH_ONE_CRAZY_RANDOM_SUMMER)
+            if (my_path_id_legacy() == PATH_ONE_CRAZY_RANDOM_SUMMER)
                 description.listAppend("Or wait for pixellated monsters.");
             if ($item[continuum transfunctioner].equipped_amount() == 0)
             {
@@ -100,7 +100,7 @@ void S8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             //softcore, suggest pulling a jar of psychoses.
             string [int] description;
             description.listAppend("To make digital key.");
-            if (my_path_id() == PATH_ONE_CRAZY_RANDOM_SUMMER)
+            if (my_path_id_legacy() == PATH_ONE_CRAZY_RANDOM_SUMMER)
                 description.listAppend("Or wait for pixellated monsters.");
             if (!$item[powerful glove].have())
 	            optional_task_entries.listAppend(ChecklistEntryMake(272, "__item psychoanalytic jar", "", ChecklistSubentryMake("Pull a jar of psychoses (The Crackpot Mystic)", "", description)));

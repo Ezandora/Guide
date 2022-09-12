@@ -2,7 +2,7 @@
 RegisterResourceGenerationFunction("PathExplosionsGenerateResource");
 void PathExplosionsGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (my_path_id() != PATH_EXPLOSIONS)
+    if (my_path_id_legacy() != PATH_EXPLOSIONS)
         return;
     item isotopes = $item[rare Meat isotope];
     if (isotopes.have())
