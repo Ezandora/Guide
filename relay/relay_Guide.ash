@@ -2,7 +2,7 @@
 
 since 20.6;
 //These settings are for development. Don't worry about editing them.
-string __version = "2.0.4";
+string __version = "2.0.5";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -5821,6 +5821,7 @@ float [monster] appearance_rates_adjusted(location l)
         }
         //Readjust:
         
+        float [monster] source_altered_temp;
         foreach m, rate in source_altered
         {
             float adjusted_rate = rate;
@@ -5842,8 +5843,9 @@ float [monster] appearance_rates_adjusted(location l)
                 else
                     adjusted_rate = rate / source_percent_survivors * (1.0 - actual_percent_aliens);
             }
-            source_altered[m] = adjusted_rate;
+            source_altered_temp[m] = adjusted_rate;
         }
+        source_altered = source_altered_temp;
         
     }
     if (l == $location[The Nemesis' Lair])
