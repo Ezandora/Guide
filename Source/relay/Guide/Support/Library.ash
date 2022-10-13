@@ -1445,7 +1445,7 @@ boolean monster_has_zero_turn_cost(monster m)
         return true;
     if ($monsters[terrible mutant,slime blob,government bureaucrat,angry ghost,annoyed snake] contains m && get_property_int("_voteFreeFights") < 3)
     	return true;
-    if ($monsters[void guy,void slab,void spider] contains m && get_property_int("_voidFreeFights") < 5)
+    if (lookupMonsters("void guy,void slab,void spider") contains m && get_property_int("_voidFreeFights") < 5)
     	return true;
     if ($monsters[biker,burnout,jock,party girl,"plain" girl] contains m && get_property_int("_neverendingPartyFreeTurns") < 10)
     	return true;

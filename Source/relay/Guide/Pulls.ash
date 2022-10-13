@@ -481,7 +481,7 @@ void generatePullList(Checklist [int] checklists)
     }
 	
 	if (my_path_id_legacy() != PATH_COMMUNITY_SERVICE)
-		pullable_item_list.listAppend(GPItemMake(lookupItem("11-leaf clover"), "Various turn saving.|Generic pull.", 20));
+		pullable_item_list.listAppend(GPItemMake(lookupItem("11-leaf clover"), "Various turn saving.|Generic pull.", 1));
     
     if (!get_property_ascension("lastTempleUnlock") && $item[spooky-gro fertilizer].item_amount() == 0 && my_path_id_legacy() != PATH_G_LOVER && !__quest_state["Level 11"].finished)
         pullable_item_list.listAppend(GPItemMake($item[spooky-gro fertilizer], "Saves 2.5 turns while unlocking temple."));

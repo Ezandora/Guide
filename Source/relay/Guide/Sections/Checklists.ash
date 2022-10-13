@@ -289,9 +289,10 @@ void outputChecklists(Checklist [int] ordered_output_checklists)
 {
     if (__misc_state["in run"] && playerIsLoggedIn())
         PageWrite(HTMLGenerateDivOfClass("Day " + my_daycount() + ". " + pluralise(my_turncount(), "turn", "turns") + " played.", "r_bold"));
-	if (my_path() != "" && my_path() != "None" && playerIsLoggedIn())
+	//if (my_path() != "" && my_path() != "None" && playerIsLoggedIn())
+	if (my_path_id_legacy() != 0)
 	{
-		PageWrite(HTMLGenerateDivOfClass(my_path(), "r_bold"));
+		PageWrite(HTMLGenerateDivOfClass(path_id_to_name(my_path_id_legacy()), "r_bold"));
 	}
     
     

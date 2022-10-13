@@ -273,13 +273,15 @@ float [monster] appearance_rates_adjusted(location l)
     //oil peak goes here?
     if (total > 0.0)
     {
+        float [monster] source_altered_temp;
         foreach m in source_altered
         {
             if (m == $monster[none])
                 continue;
             float v = source_altered[m];
-            source_altered[m] = v / total * combat_rate;
+            source_altered_temp[m] = v / total * combat_rate;
         }
+        source_altered = source_altered_temp;
     }
     
     return source_altered;
@@ -386,8 +388,8 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
             return questPropertyPastInternalStepNumber("questL04Bat", 2);
         case $location[the beanbat chamber]:
             return questPropertyPastInternalStepNumber("questL04Bat", 3);
-        case $location[The Unquiet Garves]:
-            return get_property("questL07Cyrptic") != "unstarted"; //not quite accurate, visit council first?
+        case $location[The Unquiet Garves]: //the exact test is unknown to me, it's not this. possibly L7 + wizard of ego + nemesis quest?
+            return true; //get_property("questL07Cyrptic") != "unstarted"; //thos
         case $location[The VERY Unquiet Garves]:
             return get_property("questL07Cyrptic") == "finished";
         case $location[Tower Ruins]:
@@ -973,7 +975,6 @@ static
         lookup_map["The Dire Warren"] = "tutorial.php";
         lookup_map["The Valley of Rof L'm Fao"] = "place.php?whichplace=mountains";
         lookup_map["Mt. Molehill"] = "place.php?whichplace=mountains";
-        lookup_map["The Barrel Full of Barrels"] = "barrel.php";
         lookup_map["The Smut Orc Logging Camp"] = "place.php?whichplace=orc_chasm";
         lookup_map["The Thinknerd Warehouse"] = "place.php?whichplace=mountains";
         lookup_map["A Mob of Zeppelin Protesters"] = "place.php?whichplace=zeppelin";

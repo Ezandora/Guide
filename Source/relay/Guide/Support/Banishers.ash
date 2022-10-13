@@ -294,6 +294,14 @@ void initialiseBanishSources()
 	//KGB tranquilizer dart
 	//snokebomb
 	//use the force, but no?
+	
+	foreach it in $items[tryptophan dart,human musk,Daily Affirmation: Be a Mind Master,tennis ball,Louder Than Bomb,crystal skull,divine champagne popper,Winifred's whistle,Harold's bell]
+	{
+		BanishSource source;
+  		source.combat_item_source = it;
+        string name = it;
+        __banish_sources.add(source);
+	}
 }
 
 initialiseBanishSources();
@@ -405,4 +413,22 @@ BanishSource GetBanishSourceByName(string name)
 	}
 	BanishSource blank;
 	return blank;
+}
+
+
+static
+{
+	boolean [item] __banish_combat_items;
+}
+
+if (__banish_combat_items.count() == 0)
+{
+    //generate:
+    foreach key, source in __banish_sources
+    {
+        item source_item = source.BanishSourceGetCombatItem();
+        if (source_item == $item[none]) continue;
+        
+        __banish_combat_items[source_item] = true;
+    }
 }
