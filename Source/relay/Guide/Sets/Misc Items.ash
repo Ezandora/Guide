@@ -764,7 +764,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake(0, "__item fisherman's sack", "", ChecklistSubentryMake(pluralise($item[fisherman's sack]), "", description), importance_level_unimportant_item).ChecklistEntryTag("free runaway"));
     }
     
-    foreach it in $items[[10882]carton of astral energy drinks,astral hot dog dinner,astral six-pack]
+    foreach it in lookupItems("[10882]carton of astral energy drinks,astral hot dog dinner,astral six-pack")
     {
         if (it.available_amount() == 0)
             continue;
