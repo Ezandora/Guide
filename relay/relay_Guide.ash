@@ -2,7 +2,7 @@
 
 since 20.6;
 //These settings are for development. Don't worry about editing them.
-string __version = "2.0.5";
+string __version = "2.0.6";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -4130,7 +4130,7 @@ boolean monster_has_zero_turn_cost(monster m)
         return true;
     if ($monsters[terrible mutant,slime blob,government bureaucrat,angry ghost,annoyed snake] contains m && get_property_int("_voteFreeFights") < 3)
     	return true;
-    if ($monsters[void guy,void slab,void spider] contains m && get_property_int("_voidFreeFights") < 5)
+    if (lookupMonsters("void guy,void slab,void spider") contains m && get_property_int("_voidFreeFights") < 5)
     	return true;
     if ($monsters[biker,burnout,jock,party girl,"plain" girl] contains m && get_property_int("_neverendingPartyFreeTurns") < 10)
     	return true;
@@ -5954,13 +5954,15 @@ float [monster] appearance_rates_adjusted(location l)
     //oil peak goes here?
     if (total > 0.0)
     {
+        float [monster] source_altered_temp;
         foreach m in source_altered
         {
             if (m == $monster[none])
                 continue;
             float v = source_altered[m];
-            source_altered[m] = v / total * combat_rate;
+            source_altered_temp[m] = v / total * combat_rate;
         }
+        source_altered = source_altered_temp;
     }
     
     return source_altered;
@@ -6067,8 +6069,8 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
             return questPropertyPastInternalStepNumber("questL04Bat", 2);
         case $location[the beanbat chamber]:
             return questPropertyPastInternalStepNumber("questL04Bat", 3);
-        case $location[The Unquiet Garves]:
-            return get_property("questL07Cyrptic") != "unstarted"; //not quite accurate, visit council first?
+        case $location[The Unquiet Garves]: //the exact test is unknown to me, it's not this. possibly L7 + wizard of ego + nemesis quest?
+            return true; //get_property("questL07Cyrptic") != "unstarted"; //thos
         case $location[The VERY Unquiet Garves]:
             return get_property("questL07Cyrptic") == "finished";
         case $location[Tower Ruins]:
@@ -6654,7 +6656,6 @@ static
         lookup_map["The Dire Warren"] = "tutorial.php";
         lookup_map["The Valley of Rof L'm Fao"] = "place.php?whichplace=mountains";
         lookup_map["Mt. Molehill"] = "place.php?whichplace=mountains";
-        lookup_map["The Barrel Full of Barrels"] = "barrel.php";
         lookup_map["The Smut Orc Logging Camp"] = "place.php?whichplace=orc_chasm";
         lookup_map["The Thinknerd Warehouse"] = "place.php?whichplace=mountains";
         lookup_map["A Mob of Zeppelin Protesters"] = "place.php?whichplace=zeppelin";
@@ -31207,6 +31208,14 @@ void initialiseBanishSources()
 	//KGB tranquilizer dart
 	//snokebomb
 	//use the force, but no?
+	
+	foreach it in $items[tryptophan dart,human musk,Daily Affirmation: Be a Mind Master,tennis ball,Louder Than Bomb,crystal skull,divine champagne popper,Winifred's whistle,Harold's bell]
+	{
+		BanishSource source;
+  		source.combat_item_source = it;
+        string name = it;
+        __banish_sources.add(source);
+	}
 }
 
 initialiseBanishSources();
@@ -31318,6 +31327,24 @@ BanishSource GetBanishSourceByName(string name)
 	}
 	BanishSource blank;
 	return blank;
+}
+
+
+static
+{
+	boolean [item] __banish_combat_items;
+}
+
+if (__banish_combat_items.count() == 0)
+{
+    //generate:
+    foreach key, source in __banish_sources
+    {
+        item source_item = source.BanishSourceGetCombatItem();
+        if (source_item == $item[none]) continue;
+        
+        __banish_combat_items[source_item] = true;
+    }
 }
 
 void SEventsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -34818,7 +34845,7 @@ void generatePullList(Checklist [int] checklists)
     }
 	
 	if (my_path_id_legacy() != PATH_COMMUNITY_SERVICE)
-		pullable_item_list.listAppend(GPItemMake(lookupItem("11-leaf clover"), "Various turn saving.|Generic pull.", 20));
+		pullable_item_list.listAppend(GPItemMake(lookupItem("11-leaf clover"), "Various turn saving.|Generic pull.", 1));
     
     if (!get_property_ascension("lastTempleUnlock") && $item[spooky-gro fertilizer].item_amount() == 0 && my_path_id_legacy() != PATH_G_LOVER && !__quest_state["Level 11"].finished)
         pullable_item_list.listAppend(GPItemMake($item[spooky-gro fertilizer], "Saves 2.5 turns while unlocking temple."));
@@ -39719,9 +39746,10 @@ void outputChecklists(Checklist [int] ordered_output_checklists)
 {
     if (__misc_state["in run"] && playerIsLoggedIn())
         PageWrite(HTMLGenerateDivOfClass("Day " + my_daycount() + ". " + pluralise(my_turncount(), "turn", "turns") + " played.", "r_bold"));
-	if (my_path() != "" && my_path() != "None" && playerIsLoggedIn())
+	//if (my_path() != "" && my_path() != "None" && playerIsLoggedIn())
+	if (my_path_id_legacy() != 0)
 	{
-		PageWrite(HTMLGenerateDivOfClass(my_path(), "r_bold"));
+		PageWrite(HTMLGenerateDivOfClass(path_id_to_name(my_path_id_legacy()), "r_bold"));
 	}
     
     
