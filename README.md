@@ -18,7 +18,7 @@ Select Guide. Guide will install itself into the window, and will automatically 
 To update the script itself, run this command in the graphical CLI:
 
 <pre>
-svn update
+git update
 </pre>
 
 What does it do?
