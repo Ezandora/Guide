@@ -1,21 +1,12 @@
 Guide
 =====
 
-Quick note on updating
-----------------------
-The "svn update" command formerly had a bug which will, on occasion, prevent Guide from updating correctly and not print a warning about it. As such, to update, you may need to run these commands:
-
-<pre>
-svn delete Ezandora-Guide-branches-Release
-svn checkout https://github.com/Ezandora/Guide/branches/Release/
-</pre>
-
 How do I use it?
 ----------------
 First, install it by running this command in KoLmafia's graphical CLI:
 
 <pre>
-svn checkout https://github.com/Ezandora/Guide/branches/Release/
+git checkout https://github.com/Ezandora/Guide.git
 </pre>
 
 Once it's installed, look in the relay browser. In the upper-right, there will be a "-run script-" menu:
